@@ -298,22 +298,33 @@ Cell::bif_greater_eq(Cell * Z, const Cell * A) const
    return IntCell::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
 }
 //----------------------------------------------------------------------------
-ShapeItem *
-Cell::sorted_indices(const Cell * ravel, ShapeItem length, Sort_order order,
-                     ShapeItem comp_len)
+ErrorCode
+Cell::sorted_indices(vector<ShapeItem> & indices, const Value & value,
+                     Sort_order order, ShapeItem comp_len)
 {
-ShapeItem * indices = new ShapeItem[length];
-   if (indices == 0)   return indices;
+   Assert(indices.size() == 0);   // initially empty, filled by this function
+
+const ShapeItem rows = value.get_shape_item(0);
+   indices.reserve(rows);
 
    // initialize indices with 0, 1, ... length-1
-   loop(l, length)   indices[l] = l;
+   //
+   try
+     {
+       loop(r, rows)   indices.push_back(r);
+     }
+   catch (...)
+     {
+       return E_WS_FULL;
+     }
+     
 
-const ravel_comp_len ctx = { ravel, comp_len};
+const ravel_comp_len ctx = { &value.get_cfirst(), comp_len};
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::greater_cp);
+      Heapsort<ShapeItem>::sort(indices.data(), rows, &ctx, &Cell::greater_cp);
    else
-      Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::smaller_cp);
-   return indices;
+      Heapsort<ShapeItem>::sort(indices.data(), rows, &ctx, &Cell::smaller_cp);
+   return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
 const char *

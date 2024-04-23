@@ -68,7 +68,7 @@ protected:
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible)
         ASX_MINOR = 3,   ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 6,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_OTHER = 7,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 };
 //----------------------------------------------------------------------------
@@ -80,13 +80,13 @@ public:
    XML_Saving_Archive(ofstream & of)
    : indent(0),
      out(of),
-     values(0),
+     val_pars(0),
      value_count(0),
      char_mode(false)
    {}
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close();  delete [] values; }
+   ~XML_Saving_Archive()   { out.close();  delete [] val_pars; }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
@@ -211,10 +211,11 @@ protected:
    /// output XML file
    std::ofstream & out;
 
-   /// a value and the Vid of its parent (if value is a sub-value of a 
-   /// nested parent)
+   /// an array of values and the Vid of its parent (if value is a
+   ///sub-value of a nested parent). The top-level of an APL value has
+   /// has no parents (i.e. INVALID_VID).
    /// all values in the workspace
-   _val_par * values;
+   _val_par * val_pars;
 
    /// the number of (non-stale) values
    ShapeItem value_count;
@@ -229,10 +230,12 @@ protected:
    bool is_saved(const Function * fun) const;
 };
 //----------------------------------------------------------------------------
-inline void Hswap(XML_Saving_Archive::_val_par & vp1,
-                  XML_Saving_Archive::_val_par & vp2)
+inline void
+Hswap(XML_Saving_Archive::_val_par & vp1, XML_Saving_Archive::_val_par & vp2)
 {
-const XML_Saving_Archive::_val_par tmp = vp1;   vp1 = vp2;   vp2 = tmp;
+const XML_Saving_Archive::_val_par tmp = vp1;
+   vp1 = vp2;
+   vp2 = tmp;
 }
 //----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace

@@ -222,8 +222,11 @@ enum TokenTag
 
 /// exchange TokenTags \b t1 and \b t2
 inline void
-Hswap(TokenTag & t1, TokenTag & t2)
-{ const TokenTag tmp = t1;   t1 = t2;   t2 = tmp; }
+swap(TokenTag & tag1, TokenTag & tag2)
+{ const TokenTag tmp = tag1;
+   tag1 = tag2;
+   tag2 = tmp;
+}
 
 /// return true for / ⌿ \ and ⍀
 inline bool

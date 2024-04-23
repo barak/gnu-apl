@@ -55,10 +55,10 @@ protected:
         return len_A;                                               // not found
       }
 
-   /// find Cell B in the ravel A (of length len_A). Return the position
-   /// (< len_A) if found, or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
-   static ShapeItem find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
-                                       const ShapeItem * Idx_A,
+   /// find Cell B in value A. Return the position (< len_A) if found,
+   /// or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
+   static ShapeItem find_B_in_sorted_A(const Value & A,
+                                       const vector<ShapeItem> & Idx_A,
                                        const Cell & cell_B, double qct);
 
    /// compare function for Heapsort<ShapeItem>::search<const Cell &>

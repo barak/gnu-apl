@@ -772,13 +772,14 @@ bool show_OK = true;   // assume more verbose output
         }
    }
 
-   // 4. discover duplicate parents. In the old clone() scheme every nested value    //    has (at most) one parent. In the new clone() scheme, however, a nested
-   //    value can be reused and have multiple parents.
+   // 4. discover duplicate parents. In the old clone() scheme every nested
+   //    value has (at most) one parent. In the new clone() scheme, however,
+   //    a nested value can be reused and have multiple parents.
    {
 #ifndef NEW_CLONE   // old clone
      // 4a. create a { parent = 0, value } vector<val_val> of all values
      //
-     std::vector<val_val> values;
+     std::vector<val_val> val_vals;
      ShapeItem duplicate_parents = 0;
      for (const DynamicObject * obj =
                 DynamicObject::get_all_values()->get_next();
@@ -787,21 +788,21 @@ bool show_OK = true;   // assume more verbose output
            const Value * val = static_cast<const Value *>(obj);
 
            val_val vv = { 0, val };   // no parent
-           values.push_back(vv);
+           val_vals.push_back(vv);
          }
 
-     // 4b. sort vector<val_val> values by address so we can bsearch it.
+     // 4b. sort vector<val_val> val_vals by address so we can bsearch it.
      //
-     Heapsort<val_val>::sort(&values[0], values.size(), 0,
+     Heapsort<val_val>::sort(&val_vals.front(), val_vals.size(), 0,
                              &val_val::compare_val_val);
-     loop(v, (values.size() - 1))
-         Assert(&values[v].child < &values[v + 1].child);
+     loop(v, (val_vals.size() - 1))
+         Assert(&val_vals[v].child < &val_vals[v + 1].child);
 
       // 4c. set parents of pointer cells
       //
-      loop(v, values.size())   // for every .child (acting as parent here)
+      loop(v, val_vals.size())   // for every .child (acting as parent here)
           {
-            const Value * val = values[v].child;
+            const Value * val = val_vals[v].child;
             const ShapeItem ec = val->nz_element_count();
             loop(e, ec)   // for every ravel cell of the (parent-) value
                 {
@@ -812,7 +813,7 @@ bool show_OK = true;   // assume more verbose output
                   Assert1(sub);
 
                   val_val * vvp = reinterpret_cast<val_val *>
-                       (bsearch(sub, &values[0], values.size(),
+                       (bsearch(sub, &val_vals.front(), val_vals.size(),
                                 sizeof(val_val), val_val::compare_val_val1));
                   Assert(vvp);
                   if (vvp->parent == 0)   // child has no parent (OK)
@@ -880,7 +881,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
    // process and skip the optional library number
    {
-     const Unicode l = args[0][0];
+     const Unicode l = args.front()[0];
      if (Avec::is_digit(l))
         {
           libref = LibRef(l - '0');
@@ -888,7 +889,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
         }
    }
 
-UCS_string wsname = args[0];
+UCS_string wsname = args.front();
    args.erase(0);
    Workspace::copy_WS(out, libref, wsname, args, protection);
 }
@@ -918,7 +919,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
             {
               const UCS_string & src = copy_once_table[row];
               UCS_string ws(UNI_SPACE);
-              ws += src[0];   // Nwsname
+              ws += src.front();      // wsname
               ws += UNI_SPACE;
               ws.append(UCS_string(src, 2, src.size() - 2));
               ws += UNI_SPACE;
@@ -929,9 +930,11 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
       }
 
    // process and skip the optional library number
+   //
    if (args.size() == 2)
       {
-        const Unicode l = args[0][0];
+        const UCS_string & arg0 = args.front();   // first argument
+        const Unicode l = arg0.front();           // first character
         if (Avec::is_digit(l))
            {
              libref = LibRef(l - '0');
@@ -940,7 +943,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
       }
 
    Assert(args.size() == 1);   // only wsname left
-const UCS_string wsname(args[0]);
+const UCS_string wsname(args.front());
    args.erase(0);
 
    // lib_wsname is the name in the copy_once_table
@@ -977,7 +980,7 @@ void
 Command::cmd_DOXY(ostream & out, const UCS_string_vector & args)
 {
 UTF8_string root("/tmp");
-   if (args.size())   root = UTF8_string(args[0]);
+   if (args.size())   root = UTF8_string(args.front());
 
    try
      {
@@ -1010,7 +1013,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = LibRef(lib_ws[0][0] - '0');
+   if (lib_ws.size() == 2)   libref = LibRef(lib_ws.front()[0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -1052,9 +1055,9 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
       {
-        wsid_lib = LibRef(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name.front() - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -1239,7 +1242,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 UCS_string arg;
    loop(a, _arg.size())   arg += Avec::make_standard(_arg[a]);
 
-   if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
+   if (arg.size() > 0 && Avec::is_first_symbol_char(arg.front()))
       {
         // help for a user defined name
         //
@@ -1344,8 +1347,8 @@ UCS_string arg;
    {
      bool prim = arg.size() == 1;   // standard (1-character) APL primitive
      if (arg.size() == 2)
-        prim = arg[0] == UNI_DOWN_TACK ||
-              (arg[0] == UNI_COMMENT && arg[1] == UNI_COMMENT);
+        prim = arg.front() == UNI_DOWN_TACK ||
+              (arg.front() == UNI_COMMENT && arg[1] == UNI_COMMENT);
 
      if (prim)
         {
@@ -1494,8 +1497,8 @@ Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
    //
    // IN filename [objects...]
 
-UCS_string fname = args[0];
-   args[0] = args.back();
+UCS_string fname = args.front();
+   args.front() = args.back();
    args.pop_back();
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, true,
@@ -1581,8 +1584,8 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
    //
    if (args.size() == 2)   // set individual dir
       {
-        const UCS_string & libref_ucs = args[0];
-        const int libref = libref_ucs[0] - '0';
+        const UCS_string & libref_ucs = args.front();
+        const int libref = libref_ucs.front() - '0';
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
              CERR << "Invalid library reference " << libref_ucs << "'" << endl;
@@ -1598,9 +1601,9 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 
    if (args.size() == 1)   // set root
       {
-        UTF8_string utf(args[0]);
+        UTF8_string utf(args.front());
         LibPaths::set_APL_lib_root(utf.c_str());
-        out << "LIBRARY ROOT SET TO " << args[0] << endl;
+        out << "LIBRARY ROOT SET TO " << args.front() << endl;
         return;
       }
 
@@ -1666,16 +1669,16 @@ Command::open_LIB_dir(UTF8_string & path, ostream & out,
    //
 
 UCS_string arg(UNI_0);
-   if (args.size())   arg = args[0];
+   if (args.size())   arg = args.front();
 
    if (args.size() == 0)                       // case 1.
       {
         path = LibPaths::get_lib_dir(LIB0);
       }
    else if (arg.size() == 1 &&
-            Avec::is_digit(Unicode(arg[0])))   // case 2.
+            Avec::is_digit(Unicode(arg.front())))   // case 2.
       {
-        path = LibPaths::get_lib_dir(LibRef(arg[0] - '0'));
+        path = LibPaths::get_lib_dir(LibRef(arg.front() - '0'));
       }
    else                                        // case 3.
       {
@@ -2102,10 +2105,10 @@ Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
 {
    if (args.size() > 0)   // optional AUTO ?
       {
-        if (!args[0].starts_iwith("AUTO"))   // no
+        if (!args.front().starts_iwith("AUTO"))   // no
            {
              CERR << "BAD COMMAND+" << endl;
-             MORE_ERROR() << "Bad )MORE argument: " << args[0]
+             MORE_ERROR() << "Bad )MORE argument: " << args.front()
                           << ". Use none or AUTO.";
              return;
            }
@@ -2230,7 +2233,7 @@ bool
 Command::have_capability(const UCS_string & capa)
 {
 const int len = capa.size();
-   if (capa[0] == UNI_Quad_Quad)   // ⎕xxx
+   if (capa.front() == UNI_Quad_Quad)   // ⎕xxx
       {
         const UCS_string capa1 = capa.drop(1);
         if (len == 4 && capa1.starts_iwith("FFT"))       return apl_FFT;
@@ -2258,7 +2261,7 @@ Command::cmd_PUSHFILE()
         << endl;
 
    if (InputFile::files_todo.size())
-      InputFile::files_todo[0].set_pushed_pending(true);
+      InputFile::files_todo.front().set_pushed_pending(true);
 
 InputFile fam("stdin", stdin, false, true, true, no_LX);
    fam.set_pushed_IE();
@@ -2268,7 +2271,7 @@ InputFile fam("stdin", stdin, false, true, true, no_LX);
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
-UCS_string fname = args[0];
+UCS_string fname = args.front();
    args.erase(0);
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
@@ -2359,9 +2362,9 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
       {
-        wsid_lib = LibRef(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name.front() - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -2388,18 +2391,18 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
    if (args.size() == 1)   // name without libnum
       {
         lib = LIB0;
-        wsname = args[0];
+        wsname = args.front();
         return false;   // OK
       }
 
-   if (!(args[0].size() == 1 && Avec::is_digit(args[0][0])))
+   if (!(args.front().size() == 1 && Avec::is_digit(args.front()[0])))
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "invalid library reference '" << args[0] << "'";
+        MORE_ERROR() << "invalid library reference '" << args.front() << "'";
         return true;   // error
       }
 
-   lib = LibRef(args[0][0] - '0');
+   lib = LibRef(args.front()[0] - '0');
    wsname = args[1];
    return false;   // OK
 }
@@ -2431,14 +2434,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         return;
       }
 
-  if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
+  if (args.size() == 1 && args.front().starts_iwith("REMOVE-ALL"))
      {
        Workspace::get_user_commands().clear();
        out << "    All user-defined commands removed." << endl;
        return;
      }
 
-  if (args.size() == 2 && args[0].starts_iwith("REMOVE"))
+  if (args.size() == 2 && args.front().starts_iwith("REMOVE"))
      {
        loop(u, Workspace::get_user_commands().size())
            {
@@ -2473,13 +2476,13 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         return;
      }
 
-   UCS_string command_name = args[0];
-   UCS_string apl_fun = args[1];
-   int mode = 0;
+UCS_string command_name = args.front();
+UCS_string apl_fun = args[1];
+int mode = 0;
 
    // check if lambda
    bool is_lambda = false;
-   if (apl_fun[0] == '{')
+   if (apl_fun.front() == '{')
       {
          // looks like the user command is a lambda function.
          UCS_string result;
@@ -2608,7 +2611,7 @@ Command::log_control(const UCS_string & arg)
 {
 UCS_string_vector args = split_arg(arg);
 
-   if (args.size() == 0 || arg[0] == UNI_QUESTION)  // no arg or '?'
+   if (args.size() == 0 || arg.front() == UNI_QUESTION)  // no arg or '?'
       {
         for (LogId l = LID_MIN; l < LID_MAX; l = LogId(l + 1))
             {
@@ -2790,7 +2793,7 @@ int idx = get_nrs(var_name, shape);
    if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
-   if (Avec::is_quad(var_name[0]))   // system variable.
+   if (Avec::is_quad(var_name.front()))   // system variable.
       {
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
@@ -2849,7 +2852,7 @@ int idx = get_nrs(var_name, shape);
    if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
-   if (Avec::is_quad(var_name[0]))   // system variable.
+   if (Avec::is_quad(var_name.front()))   // system variable.
       {
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
@@ -3061,10 +3064,10 @@ Command::is_lib_ref(const UCS_string & lib)
 {
    if (lib.size() == 1)   // single char: lib number
       {
-        if (Avec::is_digit(lib[0]))   return true;
+        if (Avec::is_digit(lib.front()))   return true;
       }
 
-   if (lib[0] == UNI_FULLSTOP)   return true;
+   if (lib.front() == UNI_FULLSTOP)   return true;
 
    loop(l, lib.size())
       {

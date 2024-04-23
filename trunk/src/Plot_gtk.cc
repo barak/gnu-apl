@@ -541,9 +541,21 @@ cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * text,
   cairo_set_font_size(cr, font_size);
 
 cairo_text_extents_t extends;
+   extends.width = 0;
+   extends.height = 0;
+
   cairo_text_extents(cr, text, &extends);
   lx = extends.width;
   ly = extends.height;
+
+  if (Quad_PLOT::get_verbosity() & SHOW_DRAW)
+     {
+        CERR << "    string '" << text << "' : "
+             << int(strlen(text) - UTF8_string::bytes_chars(text))
+             << " Unicode point(s), "
+             << strlen(text) << " UTF-8 byte(s), "
+             <<  lx << " pixels" << endl;
+     }
 }
 //----------------------------------------------------------------------------
 /// return the size len_x:len_y of the multi_line string \b lines when
@@ -649,11 +661,11 @@ longest_legend_string(cairo_t * cr, int line_count,
 {
 double ly = FONT_SIZE;
 double longest_len = 0.0;
-   for (int l = 0; l < line_count; ++l)
+   loop(l, line_count)
        {
          double lx = 0.0;
-         const char * line_name = l_props[l]->get_legend_name().c_str();
-         cairo_string_size(lx, ly, cr, line_name, FONT_NAME, FONT_SIZE);
+         const String & line_name = l_props[l]->get_legend_name();
+         cairo_string_size(lx, ly, cr, line_name.c_str(), FONT_NAME, FONT_SIZE);
          if (longest_len < lx)   longest_len = lx;
        }
    return longest_len;

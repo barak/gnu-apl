@@ -1292,7 +1292,7 @@ void
 Executable::reverse_all_token(Token_string & tos)
 {
    for (Token * t1 = &tos[0], * t2 = &tos[tos.size() - 1]; t1 < t2;)
-       t1++->Hswap(*t2--);
+       t1++->swap_token(*t2--);
 }
 //----------------------------------------------------------------------------
 void

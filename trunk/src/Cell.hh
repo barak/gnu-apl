@@ -543,11 +543,11 @@ public:
    static bool compare_ptr(const Cell * const & A, const Cell * const & B,
                           const void * comp_arg);
 
-   /// return \b length indices i1, i2, ... iN so that
-   /// ravel[i1] < ravel[i2] < ... < ravel[iN]. The indices are 0-based and
-   /// the caller must delete[] the result. Returns 0 on error (= WS FULL).
-   static ShapeItem * sorted_indices(const Cell * ravel, ShapeItem length,
-                                     Sort_order order, ShapeItem comp_len);
+   /// return 0-based indices i1, i2, ... iN so that
+   /// value[i1] < value[i2] < ... < value[iN].
+   static ErrorCode sorted_indices(vector<ShapeItem> & indices,
+                                     const Value & value, Sort_order order,
+                                     ShapeItem comp_len);
 
    /// the name of \b ct
    static const char * get_cell_type_name(CellType ct);

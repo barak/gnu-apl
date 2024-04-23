@@ -491,17 +491,17 @@ public:
 };
 //----------------------------------------------------------------------------
 inline void
-Hswap(const UCS_string * & u1, const UCS_string * & u2)
+Hswap(const UCS_string * & usp1, const UCS_string * & usp2)
 {
-const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
+const UCS_string * tmp = usp1;
+   usp1 = usp2;
+   usp2 = tmp;
 }
 //----------------------------------------------------------------------------
 inline void
 Hswap(UCS_string & u1, UCS_string & u2)
 {
-UCS_string  u = u1;
-           u1 = u2;
-           u2 = u;
+   swap(u1, u2);
 }
 //----------------------------------------------------------------------------
 

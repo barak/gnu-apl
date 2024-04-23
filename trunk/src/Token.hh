@@ -175,10 +175,10 @@ public:
      { release_apl_val("~Token()");  }
 
    /// swap this and \b other
-   inline void Hswap(Token & other)
-      { ::Hswap(tag, other.tag);
-        ::Hswap(value.int_vals[0], other.value.int_vals[0]);
-        ::Hswap(value.int_vals[1], other.value.int_vals[1]);
+   inline void swap_token(Token & other)
+      { swap(tag, other.tag);
+        swap(value.int_vals[0], other.value.int_vals[0]);
+        swap(value.int_vals[1], other.value.int_vals[1]);
       }
 
    /// return the TokenValueType of this token.

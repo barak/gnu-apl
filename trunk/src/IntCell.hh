@@ -165,7 +165,7 @@ public:
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
 
    /// swap \b this Intcell and \b other (for Heapsort<IntCell> )
-   void Hswap(IntCell & other)
+   void swap_ivals(IntCell & other)
       {
          const APL_Integer tmp = value.ival;
          value.ival = other.value.ival;
@@ -278,7 +278,7 @@ protected:
 inline void
 Hswap(IntCell & c1, IntCell & c2)
 {
-   c1.Hswap(c2);
+   c1.swap_ivals(c2);
 }
 //----------------------------------------------------------------------------
 

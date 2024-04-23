@@ -33,10 +33,20 @@ Bif_F12_SORT_ASC  Bif_F12_SORT_ASC::fun;     // ⍋
 Bif_F12_SORT_DES  Bif_F12_SORT_DES::fun;     // ⍒
 
 //----------------------------------------------------------------------------
-CollatingCache::CollatingCache(const Value & A, const Cell * base,
+/** class CollatingCache is a helper that efficiently maps characters in
+    vector B to an integer vector B1 (the significances of B) according to
+    the collating sequence A.
+
+    Sorting with collation has to first search every item B[j] in A where
+    the first match in A defines the significance of B[j]. For that reason
+    subsequent copies A[a+k] of some A[a] will never match and are therefore
+    not stored in the CollatingCache.
+ **/
+CollatingCache::CollatingCache(const Value & A,
+                               const vector<ShapeItem> & signif,
                                ShapeItem clen)
    : rank(A.get_rank()),
-     base_B1(base),
+     significances_B(signif),
      comp_len(clen)
 {
 const ShapeItem ec_A = A.element_count();
@@ -63,7 +73,7 @@ UCS_string UA1 = UA.unique();
    loop(a, ec_A)
       {
         const Unicode uni = A.get_cravel(a).get_char_value();
-        CollatingCacheEntry & entry = at(find_entry(uni));
+        CollatingCacheEntry & entry = at(get_significance(uni));
 
         ShapeItem aq = a;
         loop(r, A.get_rank())
@@ -84,58 +94,51 @@ CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
 }
 //----------------------------------------------------------------------------
 bool
-CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
+CollatingCache::greater_vec(const ShapeItem & Za, const ShapeItem & Zb,
                             const void * comp_arg)
 {
 const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
-const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
-const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
+const ShapeItem * significance_a = &cache.significances_B[cache.comp_len * Za];
+const ShapeItem * significance_b = &cache.significances_B[cache.comp_len * Zb];
 
 const sRank rank = cache.get_rank();
 
-   loop(r, rank)
-      {
-        loop(c, cache.get_comp_len())
-           {
-             const APL_Integer a = ca[c].get_int_value();
-             const APL_Integer b = cb[c].get_int_value();
-             const int diff = cache[a].compare_axis(cache[b], rank - r - 1);
+   rev_loop(r, rank)
+   loop(c, cache.get_comp_len())
+       {
+         const CollatingCacheEntry & a = cache[significance_a[c]];
+         const CollatingCacheEntry & b = cache[significance_b[c]];
+         if (const int diff = a.compare_axis(b, r))   return diff > 0;
+       }
 
-              if (diff)   return diff > 0;
-           }
-      }
-
-   return ca > cb;
+   return significance_a > significance_b;
 }
 //----------------------------------------------------------------------------
 bool
-CollatingCache::smaller_vec(const IntCell & Za, const IntCell & Zb,
+CollatingCache::smaller_vec(const ShapeItem & Za, const ShapeItem & Zb,
                             const void * comp_arg)
 {
 const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
-const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
-const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
+const ShapeItem * significance_a = &cache.significances_B[cache.comp_len * Za];
+const ShapeItem * significance_b = &cache.significances_B[cache.comp_len * Zb];
+
 const sRank rank = cache.get_rank();
 
-   loop(r, rank)
-      {
-        loop(c, cache.get_comp_len())
-           {
-             const APL_Integer a = ca[c].get_int_value();
-             const APL_Integer b = cb[c].get_int_value();
-             const int diff = cache[a].compare_axis(cache[b], rank - r - 1);
+   rev_loop(r, rank)
+   loop(c, cache.get_comp_len())
+       {
+         const CollatingCacheEntry & a = cache[significance_a[c]];
+         const CollatingCacheEntry & b = cache[significance_b[c]];
+         if (const int diff = a.compare_axis(b, r))   return diff < 0;
+       }
 
-              if (diff)   return diff < 0;
-           }
-      }
-
-   return ca > cb;
+   return significance_a > significance_b;
 }
 //----------------------------------------------------------------------------
 ShapeItem
-CollatingCache::find_entry(Unicode uni) const
+CollatingCache::get_significance(Unicode uni) const
 {
 const CollatingCacheEntry * entries = &at(0);
 const CollatingCacheEntry * entry =
@@ -157,15 +160,13 @@ const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
 const ShapeItem comp_len = B->element_count()/len_BZ;
 
-const ShapeItem * indices = Cell::sorted_indices(&B->get_cfirst(),
-                                                 len_BZ, order, comp_len);
-   if (indices == 0)   WS_FULL;
+vector<ShapeItem> ordered_indices_B;
+   Cell::sorted_indices(ordered_indices_B, *B, order, comp_len);
 
 Value_P Z(len_BZ, LOC);
 const int qio = Workspace::get_IO();
 
-   loop(a, len_BZ)   Z->next_ravel_Int(indices[a] + qio);
-   delete[] indices;
+   loop(b, len_BZ)   Z->next_ravel_Int(ordered_indices_B[b] + qio);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -174,49 +175,50 @@ const int qio = Workspace::get_IO();
 Token
 Bif_F12_SORT::sort_collating(Value_P A, Value_P B, Sort_order order)
 {
+const APL_Integer qio = Workspace::get_IO();
    if (A->is_scalar())   RANK_ERROR;
    if (A->NOTCHAR())     DOMAIN_ERROR;
-
-const APL_Integer qio = Workspace::get_IO();
    if (B->NOTCHAR())     DOMAIN_ERROR;
    if (B->is_scalar())   return Token(TOK_APL_VALUE1, IntScalar(qio, LOC));
 
 const ShapeItem len_BZ = B->get_shape_item(0);
-   if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
-
-   // first set Z←⍳len_BZ
-   //
-Value_P Z(len_BZ, LOC);
-   loop(l, len_BZ)   Z->next_ravel_Int(l + qio);
-   Z->check_value(LOC);
-   if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
+   if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));   // return ⍬
+   if (len_BZ == 1)
+      {
+        Value_P Z(1, LOC);
+        Z->next_ravel_Int(qio);
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
 
 const ShapeItem ec_B = B->element_count();
 const ShapeItem comp_len = ec_B/len_BZ;
 
-   // create a vector B1 which has the same shape as B, but instead of
-   // B's characters, it has the index of the corresponding CollatingCache
-   // index for each character in B.
+   // create integer vector B1 which is a 1:1 mapping of the characters
+   // in the ravel of B to their integer significance.
    //
-Value_P B1(B->get_shape(), LOC);
-const Cell * base_B1 = &B1->get_cfirst() - qio*comp_len;
-CollatingCache cache(*A, base_B1, comp_len);
+vector<ShapeItem> B1;
+   B1.reserve(ec_B);
+CollatingCache cache(*A, B1, comp_len);
    loop(b, ec_B)
       {
         const Unicode uni = B->get_cravel(b).get_char_value();
-        const APL_Integer b1 = cache.find_entry(uni);
-        B1->next_ravel_Int(b1);
+        const ShapeItem b1 = cache.get_significance(uni);
+        B1.push_back(b1);
       }
-   B1->check_value(LOC);
 
-   // then sort Z (actually re-arrange Z so that B[Z] is sorted)
-   //
-IntCell * Z0 = reinterpret_cast<IntCell *>(&Z->get_wfirst());
+vector<ShapeItem> vZ;
+   vZ.reserve(len_BZ);
+   loop(z, len_BZ)   vZ.push_back(z);
+
    if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::greater_vec);
+      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
+                                &CollatingCache::greater_vec);
    else
-      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::smaller_vec);
-
+      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
+                                &CollatingCache::smaller_vec);
+Value_P Z(len_BZ, LOC);
+   loop(z, len_BZ)   Z->next_ravel_Int(vZ[z] + qio);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

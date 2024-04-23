@@ -127,7 +127,7 @@ const Cell * cells_A = rcl->ravel;
 //----------------------------------------------------------------------------
 
 Value_P
-Quad_MAP::do_map(const Value & A, const ShapeItem * sorted_indices_A,
+Quad_MAP::do_map(const Value & A, const ShapeItem * ordered_indices_A,
                  const Value * B, bool recursive)
 {
 Value_P Z(B->get_shape(), LOC);         // the result, ⍴Z ←→ ⍴B
@@ -145,7 +145,7 @@ const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
          if (const ShapeItem * map =
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
-                                               sorted_indices_A,
+                                               ordered_indices_A,
                                                map_len,
                                                compare_MAP,
                                                &ctx))
@@ -174,7 +174,7 @@ const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
        {
          const Cell & cell_B = B->get_cravel(b);
          if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
-                   (cell_B, sorted_indices_A, map_len, compare_MAP, &ctx))
+                   (cell_B, ordered_indices_A, map_len, compare_MAP, &ctx))
             {
              Z->next_ravel_Cell(A.get_cravel(*map*2 + 1));
             }
@@ -183,7 +183,7 @@ const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
               if (recursive && cell_B.is_pointer_cell())   // nested: recursive
                  {
                    Value_P sub_B = cell_B.get_pointer_value();
-                   Value_P sub_Z = do_map(A, sorted_indices_A,
+                   Value_P sub_Z = do_map(A, ordered_indices_A,
                                           sub_B.get(), true);
                    Z->next_ravel_Pointer(sub_Z.get());
                  }

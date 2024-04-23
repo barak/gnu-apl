@@ -1605,7 +1605,7 @@ UCS_string
 UCS_string::sort() const
 {
 UCS_string ret(*this);
-   Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(&ret.front(), ret.size(), 0, greater_uni);
    return ret;
 }
 //----------------------------------------------------------------------------

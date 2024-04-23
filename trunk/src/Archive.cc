@@ -133,10 +133,10 @@ const int spaces = indent * INDENT_LEN;
 XML_Saving_Archive::Vid
 XML_Saving_Archive::find_vid(const Value * val)
 {
-const void * item = bsearch(val, values, value_count, sizeof(_val_par),
+const void * item = bsearch(val, val_pars, value_count, sizeof(_val_par),
                       _val_par::compare_val_par1);
    if (item == 0)   return INVALID_VID;
-   return Vid(reinterpret_cast<const _val_par *>(item) - values);
+   return Vid(reinterpret_cast<const _val_par *>(item) - val_pars);
 }
 //----------------------------------------------------------------------------
 void
@@ -182,8 +182,8 @@ int space = do_indent();
 XML_Saving_Archive &
 XML_Saving_Archive::save_shape(Vid vid)
 {
-const Value & v = *values[vid]._val;
-const Vid parent_vid = values[vid]._par;
+const Value & v = *val_pars[vid]._val;
+const Vid parent_vid = val_pars[vid]._par;
 
    do_indent();
    out << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
@@ -205,7 +205,7 @@ XML_Saving_Archive::save_Ravel(Vid vid)
 {
    Log(LOG_archive)   CERR << "save_Ravel(Vid " << vid << ")" << endl;
 
-const Value & v = *values[vid]._val;
+const Value & v = *val_pars[vid]._val;
 const ShapeItem len = v.nz_element_count();
 const Cell * C = &v.get_cfirst();
 
@@ -1010,7 +1010,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 
    try
       {
-        values = new _val_par[value_count];
+        val_pars = new _val_par[value_count];
       }
    catch(...)
       {
@@ -1036,7 +1036,7 @@ ShapeItem idx = 0;
          if (val->is_marked())    continue;   // stale
 
          val->unmark();
-         new (values + idx++) _val_par(val, INVALID_VID);
+         new (val_pars + idx++) _val_par(val, INVALID_VID);
        }
 
    Assert(idx == value_count);
@@ -1044,14 +1044,18 @@ ShapeItem idx = 0;
    // some people use an excessive number of values. We therefore sort them
    // by the address of the value as to speed up finding them later on
    //
-   Heapsort<_val_par>::sort(values, value_count, 0, &_val_par::compare_val_par);
-   loop(v, (value_count - 1))   Assert(&values[v]._val < &values[v + 1]._val);
+   Heapsort<_val_par>::sort(val_pars, value_count, 0,
+                            &_val_par::compare_val_par);
+   loop(v, (value_count - 1))
+       {
+         Assert(&val_pars[v]._val < &val_pars[v + 1]._val);
+       }
 
    // set up parents of values
    //
    loop(p, value_count)   // for every (parent-) value
       {
-        const Value & parent = *values[p]._val;
+        const Value & parent = *val_pars[p]._val;
         const ShapeItem ec = parent.nz_element_count();
         loop(e, ec)   // for every ravel cell of the (parent-) value
             {
@@ -1086,14 +1090,14 @@ ShapeItem idx = 0;
                    // case.
                    //
                    CERR << "*** Sub-Value "
-                        << voidP(sub) << " has two parents." << endl
+                        << voidP(sub) << " has two parents."      << endl
                         << "Child: vid=" << sub_idx << ", _val="
-                        << values[sub_idx]._val << ", _par="
-                        << values[sub_idx]._par << endl
+                        << val_pars[sub_idx]._val << ", _par="
+                        << val_pars[sub_idx]._par                 << endl
                         << "Parent 2: vid=" << p <<  ", _val="
-                        << values[p]._val << "_par="
-                        << values[p]._par << endl
-                        << "Call stack:" << endl;
+                        << val_pars[p]._val << "_par="
+                        << val_pars[p]._par                       << endl
+                        << "Call stack:"                          << endl;
                         BACKTRACE
                    CERR << endl << " Running )CHECK..." << endl;
                    UCS_string no_arg;
@@ -1112,7 +1116,7 @@ VH_entry::print_history(CERR, *values[p]._val, 0);
 " asking for BIG trouble!" << endl;
                  }
 
-              values[sub_idx] = _val_par(values[sub_idx]._val, Vid(p));
+              val_pars[sub_idx] = _val_par(val_pars[sub_idx]._val, Vid(p));
             } //   end of loop(e, ec)   (parent ravel cells_
       }   // end of loop(p, value_count) (parent values)
 

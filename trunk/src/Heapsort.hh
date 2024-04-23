@@ -24,24 +24,25 @@
 #ifndef __HEAPSORT_HH_DEFINED__
 #define __HEAPSORT_HH_DEFINED__
 
-#include <stdint.h>
+#include <cstdint>
+#include <vector>
 
 /// heapsort an array of items of type \b T
 template<typename T>
 class Heapsort
 {
 public:
-   /// a function to compare two items. The function returns true if item_a
-   /// is larger than item_b. comp_arg is some additional argument guiding
-   /// the comparison
+   /// a function to compare two items of array a. The function shall return
+   /// true if \b item_a is larger than \b item_b.
+   /// \b comp_arg is some additional argument guiding the comparison
    typedef bool (*greater_fun)(const T & item_a, const T & item_b,
                  const void * comp_arg);
 
-   /// sort \b a according to \b gf
+   /// sort array \b a according to greater_fun \b gf
    static void sort(T * a, int64_t heapsize, const void * comp_arg,
                     greater_fun gf)
       {
-        /* Turn a[] into a heap. This means that for every odd element
+        /* Turn array a[] into a heap. This means that for every odd element
            a[i+i+1] in a[] the heap property "Hodd" and for every even element
            a[i+i+2] in a[] the heap property "Heven" holds, where:
 
@@ -118,7 +119,8 @@ public:
    static const T * search(const KEY & key,
                            const T * array,
                            int64_t /* array size */ u,
-                           int (*compare)(const KEY & key, const T & item,
+                           int (*compare)(const KEY & key,
+                                          const T & item,
                                           const void * comp_ctx),
                            const void * ctx)
       {
