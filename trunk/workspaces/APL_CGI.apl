@@ -75,7 +75,7 @@ xGNU_PIC←HTML∆__src xHTTP_GNU, "graphics/gnu-head-sm.jpg"
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ some file names used in the BODY
 ⍝
-xAPL_VERSION←'apl-1.8'
+xAPL_VERSION←'apl-1.9'
 xTARFILE←xAPL_VERSION,  '.tar.gz'
 xRPMFILE←xAPL_VERSION,  '-0.i386.rpm'
 xSRPMFILE←xAPL_VERSION, '-0.src.rpm'
@@ -194,7 +194,7 @@ functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries.
 
 A compiled 64-bit version of GNU APL (briefly tested under Windows 10)
 which was built under cygwin, but runs without cygwin being installed,
-is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
+is contained in file <B>apl-1.9-windows.zip</B>. This zip file also contains
 an installer for an APL keyboard layout.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>

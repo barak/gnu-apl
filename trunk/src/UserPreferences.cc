@@ -819,7 +819,7 @@ UserPreferences::parse_argv_2(bool logit)
 
    /* Note. Let the first line of script.apl be:
 
-      #!/home/eedjsa/apl-1.8/src/apl -l 37 --script
+      #!/home/eedjsa/apl-1.9/src/apl -l 37 --script
 
      apl may have been started in one off these ways:
 

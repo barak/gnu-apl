@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 1401"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1423", "2024-04-23 15:27:00 UTC", "Linux 5.15.0-91-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1428", "2024-06-28 14:01:28 UTC", "Linux 5.15.0-91-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -346,7 +346,7 @@
 #define PACKAGE_NAME "GNU APL"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU APL 1.8"
+#define PACKAGE_STRING "GNU APL 1.9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "apl"
@@ -355,7 +355,7 @@
 #define PACKAGE_URL "https://www.gnu.org/software/apl/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.8"
+#define PACKAGE_VERSION "1.9"
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -451,7 +451,7 @@
 
 
 /* Version number of package */
-#define VERSION "1.8"
+#define VERSION "1.9"
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
@@ -493,7 +493,7 @@
 #define apl_DIR__prefix "/usr/local"
 
 /* top-level GNU APL source directory */
-#define apl_DIR__src "/home/eedjsa/apl-1.8/src"
+#define apl_DIR__src "/home/eedjsa/apl-1.9/src"
 
 /* --sysconfdir */
 #define apl_DIR__sysconf "/usr/local/etc"

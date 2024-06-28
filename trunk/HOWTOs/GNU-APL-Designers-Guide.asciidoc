@@ -27,7 +27,7 @@ top-level GNU APL directory.
 
 All commands described below shall executed in the top-level GNU APL directory.
 The top-level GNU APL directory is the directory that contains - after
-unpacking a GNU APL tar file like *apl-1.8.tar.gz* or after fetching the GNU
+unpacking a GNU APL tar file like *apl-1.9.tar.gz* or after fetching the GNU
 APL sourced with SVN or with git - the file named *configure.ac*.
 
 GNU APL uses *automake* and *autoconf* to build the interpreter. The build

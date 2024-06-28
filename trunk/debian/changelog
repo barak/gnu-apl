@@ -1,13 +1,4 @@
-apl (1.8-1) UNRELEASED; urgency=low
+apl (1.9-1) UNRELEASED; urgency=low
 
-  * Portability improved
-    GNU APL 1.1 now runs under GNU/Linux, CYGWIN, FreeBSD, and OS-X
-
-  * New memory management using smart pointers
-    GNU APL 1.2 uses a new memory management for APL values
-
-  * Native Functions
-    GNU APL 1.2 now supports user defined APL functions written in C++ 
-
- -- Jürgen Sauermann <bug-apl@gnu.org>  Tue, 04 Jan 2014 14:14:00 +0200
+ -- Jürgen Sauermann <bug-apl@gnu.org>  Fri, 28 Jun 2024 14:14:00 +0200
 

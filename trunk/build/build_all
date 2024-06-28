@@ -46,7 +46,7 @@ echo "configs requested: $configs"
 #    configurations produced by this script are stored in corresponding
 #    subdirectories, e.g. in builddir_standard for configuration "standard"
 #
-#    Example: /home/username/apl-1.8/build
+#    Example: /home/username/apl-1.9/build
 #
 # TOP_LOG_dir:
 #    the directory where top-level logfiles produced by the builds are stored.
@@ -57,23 +57,23 @@ echo "configs requested: $configs"
 #    directory than contains the ./configure script for GNU APL.
 #    Normally #    TOP_BUILD_dir is $ROOT_dir/build.
 #
-#    Example: /home/username/apl-1.8
+#    Example: /home/username/apl-1.9
 #
 # APL_VERSION:
 #    the current version (including the 'apl-' prefix).
 #
-#    Example: apl-1.8
+#    Example: apl-1.9
 #
 # VSRC_dir:
 #    this is (despite of its name 'src' the destination directory for a single
 #    configuration. For example: the VSRC_dir for configuration "standard" is:
 #    $TOP_BUILD_dir/build/builddir_standard/src
 #
-#    Example: /home/username/apl-1.8/src
+#    Example: /home/username/apl-1.9/src
 #
 START_dir=$(pwd)      # e.g. /etc/cron.daily
 
-cd $(dirname $0)      # e.g. /root/apl-1.8
+cd $(dirname $0)      # e.g. /root/apl-1.9
 TOP_BUILD_dir=$(pwd)
 SVN_VERSION=$(svnversion)
 
