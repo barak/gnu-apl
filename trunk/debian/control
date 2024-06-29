@@ -4,13 +4,13 @@ Priority: optional
 Maintainer: Juergen Sauermann<bug-apl@gnu.org>
 Build-Depends: debhelper (>= 7), autotools-dev, libgl1-mesa-glx, mime-support, locales, libc6, gawk
 Standards-Version: 3.8.3
-Homepage: 
+Homepage:  https://www.gnu.org/software/apl
 
 Package: apl
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Suggests: psf-unifont
+Suggests: psf-unifont, libgtk-3-dev, libpcre3-dev, libfftw3-dev
 Description: GNU APL
- GNU APL is a free APL interpreter. It (almost) fully implemented
+ GNU APL is a free APL interpreter. It (almost) fully implements the
  ISO/IEC Standard 13751, aka. Programming Language APL, Extended
 
