@@ -970,6 +970,8 @@ fi
 AS_ECHO(["
 $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
 
+    prefix:       :              $prefix
+
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
     DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED

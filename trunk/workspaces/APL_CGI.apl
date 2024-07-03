@@ -77,9 +77,7 @@ xGNU_PIC←HTML∆__src xHTTP_GNU, "graphics/gnu-head-sm.jpg"
 ⍝
 xAPL_VERSION←'apl-1.9'
 xTARFILE←xAPL_VERSION,  '.tar.gz'
-xRPMFILE←xAPL_VERSION,  '-0.i386.rpm'
-xSRPMFILE←xAPL_VERSION, '-0.src.rpm'
-xDEBFILE←xAPL_VERSION,  '-1_i386.deb'
+xDEBFILE←xAPL_VERSION,  '-1_amd64.deb'
 xSDEBFILE←xAPL_VERSION, '-1.debian.tar.gz'
 xAPL_TAR←xFTP_GNU, '/', xTARFILE
 xMAIL_GNU←'gnu@gnu.org'
@@ -184,17 +182,22 @@ The <B>simplest</B> (though not necessarily best) way to install GNU APL is this
 
 <?apl HTML∆H4[''] 'GNU APL for WINDOWs' ?>
 
-GNU APL compiles under CYGWIN, (see
+GNU APL supposedly compiles under CYGWIN, (see
 <?apl  ('http://',xCYGWIN) HTML∆A xCYGWIN ?>),
 provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
 that should run under CYGWIN lives in the download area. Use at your own risk
 and see <B>README-5-WINDOWS</B> for further information. Building GNU APL under
 cygwin is the method of choice if you need some of the special purpose system
-functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries.
+functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries. Due to
+the proliferation of Windows Versions has the support for apl.exe been
+discontinued. The apl.exe on the gnu mirrors was therefore creataed with an
+(as of today) outdated GNU APL version and will not be updated. However,
+building an up-to-date apl.exe should still be possible under CYGWIN.
 
-A compiled 64-bit version of GNU APL (briefly tested under Windows 10)
+
+A compiled 64-bit version of GNU APL 1.8 (briefly tested under Windows 10)
 which was built under cygwin, but runs without cygwin being installed,
-is contained in file <B>apl-1.9-windows.zip</B>. This zip file also contains
+is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
 an installer for an APL keyboard layout.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
@@ -217,19 +220,11 @@ checkout is:
 and here is <?apl HTML∆x2y xGIT_APL HTML∆A "<EM>more information</EM>" ?>
 about using Git with GNU APL.
 
-<?apl HTML∆H4[''] 'RPMs for GNU APL' ?>
-
-For RPM based GNU/Linux distributions we have created source and binary RPMs.
-Look for files <B><?apl xRPMFILE ?></B> (binary RPM for i386) or 
-<B><?apl xSRPMFILE ?></B> (source RPM). If you encounter a problem with these
-RPMs, then please report it, but with a solution, since the maintainer of
-GNU APL may use a GNU/Linux distribution with a different package manager.
-
 <?apl HTML∆H4[''] 'Debian packages for GNU APL' ?>
 
 For Debian based GNU/Linux distributions we have created source and binary 
 packages for Debian. Look for files <B><?apl xDEBFILE ?></B> (binary Debian
-package for i386) or <B><?apl xSDEBFILE ?></B> (Debian source package).
+package) or <B><?apl xSDEBFILE ?></B> (Debian source package).
 If you encounter a problem with these packages, then please report it,
 but with a solution, since the maintainer of GNU APL may use a GNU/Linux
 distribution with a different package manager.

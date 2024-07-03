@@ -6383,9 +6383,9 @@ Re-creating the ./configure script requires:
 @end itemize
 
 @node Section 5.7
-@section The subdirectories rpm, debian, and debian_tmp
+@section The subdirectories debian and debian_tmp
 
-These subdirectories are templates for building (binary) RPM or Debian
+These subdirectories are templates for building Debian
 packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.

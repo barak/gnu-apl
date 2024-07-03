@@ -263,12 +263,13 @@ Prefix::collect_symbols(basic_string<Symbol *> & symbols)
    //
    // return the TOK_LSYMB2 symbols left of \b PC.
    //
-   for (Function_PC pc = PC; pc < Function_PC(body.size()); ++pc)
+   while (PC < Function_PC(body.size()))
        {
-         if (body[pc].get_ValueType() != TV_SYM)   break;
+         const Token & tok = body[PC];
+         if (tok.get_ValueType() != TV_SYM)   break;
 
-         const Token & tok_var = lookahead().get_token();
-         Symbol * sym_var = tok_var.get_sym_ptr();
+         ++PC;
+         Symbol * sym_var = tok.get_sym_ptr();
          Assert(sym_var);
          if (!sym_var->can_be_assigned())   break;   // not a variable
          symbols.push_back(sym_var);
@@ -588,35 +589,39 @@ again:
    //
    if (size() && at0().get_Class() == TC_END)   push_END_error();
 
-Token_loc tloc = lookahead();   // tloc is possibly changed by Symbol::resolve()
-const TokenClass tcl = tloc.get_Class();
+const Function_PC old_PC = PC++;
+const Token & tok = body[old_PC];
+const TokenClass tcl = tok.get_Class();
    Log(LOG_prefix_parser)
       {
         CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
              << "] Read token[" << size()
-             << "] (←" << get_assign_state() << "←) " << tloc.get_token() << " "
+             << "] (←" << get_assign_state() << "←) " << tok << " "
              << Token::class_name(tcl) << endl;
       }
 
-   saved_MISC.set_PC(tloc.get_PC());   // expand the PC range of the stack
+   saved_MISC.set_PC(old_PC);   // expand the PC range of the stack
 
-   if (tloc.get_tag() == TOK_GOTO_PC)   // →N
+   if (tok.get_tag() == TOK_GOTO_PC)   // →N
       {
-        PC = Function_PC(tloc.get_token().get_int_val());
+        PC = Function_PC(tok.get_int_val());
         Assert1(size() == 0);
         goto again;
       }
 
    if (tcl == TC_SYMBOL)          // resolve symbol if necessary
       {
+        Token_loc tloc(tok, old_PC);
         return push_Symbol(tloc);   // true iff )SI pushed
       }
-   else if (tcl == TC_ASSIGN)     // update assign_state (from right to left)
+
+   if (tcl == TC_ASSIGN)     // update assign_state (from right to left)
       {
         if (get_assign_state() != ASS_none)   syntax_error(LOC);
         set_assign_state(ASS_arrow_seen);
       }
 
+const Token_loc tloc(tok, old_PC);
    push(tloc);
    return false;   // )SI not pushed
 }
@@ -2348,7 +2353,8 @@ Value_P B = at3().get_apl_val();
    //
 const Token result(TOK_APL_VALUE2, at3().get_apl_val());
    pop_args_push_result(result);
-   if (lookahead().get_Class() != TC_L_PARENT)   syntax_error(LOC);
+   if (PC >= body.size() ||
+       body[PC++].get_Class() != TC_L_PARENT)   syntax_error(LOC);
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }

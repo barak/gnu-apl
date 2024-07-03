@@ -180,14 +180,6 @@ public:
    void set_lookahead_PC(Function_PC pc)
       { saved_MISC.set_PC(pc); }
 
-   /// read one more token (don't store yet)
-   Token_loc lookahead()
-      {
-        if (PC >= body.size())   return Token_loc(Token(), PC);  // end of fun
-        const Function_PC old_PC = PC++;
-        return Token_loc(body[old_PC], old_PC);
-      }
-
    /// store one more token. push(A) in e.g. F B would produce A F B.
    /// IOW, push() works right-to-left of XXX in reduce_XXX().
    void push(const Token_loc & tl)

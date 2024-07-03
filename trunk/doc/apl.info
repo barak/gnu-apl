@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 28, 2024 This manual briefly documents GNU APL, an interpreter for
+June 29, 2024 This manual briefly documents GNU APL, an interpreter for
 APL as described in ISO standard 13751, aka.  "Programming Language APL,
 Extended".
 
@@ -6202,13 +6202,13 @@ script on the platform.
 
 File: apl.info,  Node: Section 5.7,  Next: Section 5.8,  Prev: Section 5.6,  Up: Chapter 5
 
-5.7 The subdirectories rpm, debian, and debian_tmp
-==================================================
+5.7 The subdirectories debian and debian_tmp
+============================================
 
-These subdirectories are templates for building (binary) RPM or Debian
-packages that contain GNU APL. Subdirectory debian_tmp is initially
-empty and acts as a scratch directory inside which the interpreter is
-being compiled when a Debian package is built.
+These subdirectories are templates for building Debian packages that
+contain GNU APL. Subdirectory debian_tmp is initially empty and acts as
+a scratch directory inside which the interpreter is being compiled when
+a Debian package is built.
 
 
 File: apl.info,  Node: Section 5.8,  Prev: Section 5.7,  Up: Chapter 5
@@ -7527,13 +7527,13 @@ Node: Section 5.4245216
 Node: Section 5.5245878
 Node: Section 5.6246356
 Node: Section 5.7247129
-Node: Section 5.8247583
-Node: Chapter 6247985
-Node: Section 6.1248404
-Node: Section 6.2249091
-Node: Chapter 7249922
-Node: Section 7.1250425
-Node: Section 7.2275739
+Node: Section 5.8247555
+Node: Chapter 6247957
+Node: Section 6.1248376
+Node: Section 6.2249063
+Node: Chapter 7249894
+Node: Section 7.1250397
+Node: Section 7.2275711
 
 End Tag Table
 
