@@ -826,11 +826,9 @@ const void * Bv = (reinterpret_cast<const _val_par *>(B))->_val;
    return charP(key) - charP(Bv);
 }
 //----------------------------------------------------------------------------
-XML_Saving_Archive &
-XML_Saving_Archive::save()
+void
+XML_Saving_Archive::write_XML_header()
 {
-   Log(LOG_archive)   CERR << "save()" << endl;
-
 tm * t;
    {
      timeval now;   gettimeofday(&now, 0);
@@ -979,6 +977,14 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
      << "\" syntax=\"" << ASX_MAJOR << "."
                        << ASX_MINOR << "."
                        << ASX_OTHER << "\">\n" << endl;
+}
+//----------------------------------------------------------------------------
+XML_Saving_Archive &
+XML_Saving_Archive::save()
+{
+   Log(LOG_archive)   CERR << "save()" << endl;
+
+   write_XML_header();
 
    ++indent;
 
@@ -1106,8 +1112,8 @@ ShapeItem idx = 0;
 
 #if cfg_VALUE_HISTORY_WANTED
 VH_entry::print_history(CERR, *sub, 0);
-VH_entry::print_history(CERR, *values[sub_idx]._val, 0);
-VH_entry::print_history(CERR, *values[p]._val, 0);
+VH_entry::print_history(CERR, *val_pars[sub_idx]._val, 0);
+VH_entry::print_history(CERR, *val_pars[p]._val, 0);
 #endif
 
    CERR << endl <<

@@ -1140,7 +1140,7 @@ Parser::mark_lsymb(Token_string & tos)
         if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 
         // found ← in VAR VAR)← move backwards.
-        // Before that we handle the special case of vector specification,
+        // Before that we handle the special case of a vector specification,
         // i.e. (SYM SYM ... SYM) ← value
         //
         if (ass >= 3 && tos[ass - 1].get_Class() == TC_R_PARENT &&

@@ -481,7 +481,6 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
       }
    else
       {
-
         symbol->resolve_right(tl.get_token(), PC);
       }
 
@@ -881,7 +880,7 @@ TokenClass next = TC_INVALID;   // assume no bext
               // entire indexed value A[ ... ] is computed
               prefix_len = 1;
               reduce_RBRA___();
-              return true;
+              return true;   // do bind
             }
        }
 
@@ -898,10 +897,10 @@ TokenClass next = TC_INVALID;   // assume no bext
              << " matches, but prio " << best_phrase->prio
              << " is too small to call " << best_phrase->reduce_name
              << "()" << endl;
-        return true;
+        return true;   // do bind
       }
 
-   return false;
+   return false;    // don't bind
 }
 //----------------------------------------------------------------------------
 bool
@@ -1674,14 +1673,22 @@ const Token result(TOK_FUN2, derived);
 void
 Prefix::reduce_D_V__()
 {
-   /* end of an A.B.C...V chain. at0() is the final member V and at1() is
-      the '.' (aka. D) before V. Collect the members (and discard the '.'
-      preceeding them) until no more '.' token are found.
+   /* This is the end of an A.B.C...V chain.
+
+      at0() is the final member V, and
+      at1() is the '.' (aka. D) before V.
+
+      Collect the members (and discard the '.' preceeding them)
+      until no more '.' token are found.
 
       Prefix::reduce_D_V__() is called from two places:
 
-      1. from reduce_statements() with prefix_len == 2, or else
-      2. from reduce_D_V_ASS_B()  with prefix_len == 4.
+      case 1. from reduce_statements() with prefix D V and (therefore
+               prefix_len == 2), or else
+
+      case 2. from reduce_D_V_ASS_B() and therefore prefix_len == 4.
+
+      case 1 is called via best_phrase->reduce_fun)() with best_phrase D V.
 
       The processing of member variables is somewhat lengthy and almost the
       same for member reference and for member assignment. We therefore
@@ -1690,14 +1697,15 @@ Prefix::reduce_D_V__()
     */
 
 const bool member_assign = prefix_len == 4;   // assume member reference
-   if (prefix_len == 2)        // case 1: member reference
+   if (prefix_len == 2)      // case 1: member reference
       {
+        Assert(get_assign_state() != ASS_var_seen);
       }
-   else if (member_assign)     // case 2: member assignment
+   else if (member_assign)   // case 2: member assignment
       {
         Assert(get_assign_state() == ASS_var_seen);   // by reduce_D_V_ASS_B
       }
-   else                        // something unexected
+   else                      // something unexected
       {
         Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
         return;
@@ -1786,10 +1794,12 @@ Value_P top_val = top_sym->get_var_value();
       {
         if (member_assign)
            {
-             // VAR.member ← value. The user assigns a value to the member of
-             // a structured variable that does not yet exist. We do the same
-             // as for VAR←value for not existing APL variables, i.e. we
-             // create it automatically.
+             // VAR.member ← value.
+             //
+             // The user assigns a value to the member of a structured
+             // variable that does not yet exist. We do the same as for
+             // VAR←value for not existing APL variables, i.e. we create
+             // t automatically.
              //
              top_val = EmptyStruct(LOC);
              top_sym->assign(top_val, false, LOC);
@@ -1806,16 +1816,19 @@ Value_P top_val = top_sym->get_var_value();
                     << top_sym->get_name() << " for member ";
              more.append_members(members, 0);
              more << " not found";
-             VALUE_ERROR;
+             VALUE_ERROR;   // bail out
            }
       }
+
+   // at this point the structured variable exist, either beforehand or
+   // creased above
 
 Value * member_owner = 0;
 Cell * member_cell = top_val->get_member(members, member_owner,
                                          member_assign, true);
    Assert(member_owner);
 
-   if (member_assign)   // (direct) member assignment
+   if (member_assign)   // (direct) member assignment e.g. A.B.C←V
       {
         if (member_cell->is_member_anchor())
            {
@@ -1855,6 +1868,7 @@ Cell * member_cell = top_val->get_member(members, member_owner,
             {
               if (get_assign_state() == ASS_arrow_seen)   // selective spec.
                  {
+                   set_assign_state(ASS_none);
                    Value_P cell_refs = member_cell->get_pointer_value()
                                                  ->get_cellrefs(LOC);
                    pop_args_push_result(Token(TOK_APL_VALUE2, cell_refs));
@@ -2328,7 +2342,7 @@ basic_string<Symbol *> symbols;
    //
    if (symbols.size() < 2)   // single variable V
       {
-        // definitively case 1. (selective specification).
+        // definitively case 3. (selective specification).
         // Replace variable V by its (left-) value and repeat matching
         //
         Symbol * V = at0().get_sym_ptr();
@@ -2337,13 +2351,15 @@ basic_string<Symbol *> symbols;
         set_assign_state(ASS_var_seen);
         at0().move(result, LOC);
 
-        // at thid point variable name V was resolved to the (left-) value
+        // at this point variable name V was resolved to the (left-) value
         // of V. Repeat matching with the updated phrase.
         //
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
+   // cases 1. or 2. (vector assugnment)
+   //
 Value_P B = at3().get_apl_val();
    Symbol::vector_assignment(symbols, B);
 

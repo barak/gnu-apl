@@ -68,7 +68,7 @@ protected:
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible)
         ASX_MINOR = 3,   ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 7,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_OTHER = 8,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 };
 //----------------------------------------------------------------------------
@@ -198,6 +198,8 @@ protected:
    int leave_char_mode()
       { if (!char_mode)   return 0;   // not in char mode
         out << UNI_PAD_U0;   char_mode = false;   return 1; }
+
+   void write_XML_header();
 
    /// decrement \b space by length of \b str and return \b str
    static const char * decr(int & space, const char * str);

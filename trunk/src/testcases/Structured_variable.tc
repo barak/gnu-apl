@@ -141,6 +141,20 @@ R
 
       )ERASE A
 
+      ⍝ Regression 2024-08-25, Hans Peter Sorge)
+      ⍝
+      CTX.column_names ← 1 2 3
+      ((⎕IO+0)⊃CTX.column_names)←'NAME'
+      CTX
+.column_names: ┌→─────────┐
+               │┌→───┐ 2 3│
+               ││NAME│    │
+               │└────┘    │
+               └ϵ─────────┘
+
+
+      )ERASE CTX
+
       )CHECK
 OK      - no stale functions
 OK      - no stale values
