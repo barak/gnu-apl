@@ -4209,16 +4209,16 @@ therefore should be more than sufficient for most purposes.
 
 Monadic ⎕PNG, i.e. ⎕PNG B is used for 3 purposes:
 
-@itemize
+@enumerate
 @item Conversion of PNG files into the GNU APL color model,
 @item Display of an APL array (in the GNU APL color model) in a window on
 the screen (interactive use of PNG), and
 @item Controlling of ⎕PNG itself.
-@end itemize
+@end enumerate
 
 The desired purpose is dictated by the properties of @strong{B}:
 
-@itemize
+@enumerate
 @item Any APL text vector (i.e. a string) @strong{B} is taken as the name of
   a file that supposedly contains an image in the PNG format. ⎕PNG will
   read the file and return the pixels in it as a numeric APL array of rank 3.
@@ -4247,7 +4247,7 @@ behaviour:
 @item ⎕PNG ¯5 turns on a debug printout related to ⎕PNG (function calls).
 @item ⎕PNG ¯6 returns a vector of all all open ⎕PNG window handles.
 @end itemize
-@end itemize
+@end enumerate
 
 @subsection Dyadic ⎕PNG
 

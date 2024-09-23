@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 29, 2024 This manual briefly documents GNU APL, an interpreter for
-APL as described in ISO standard 13751, aka.  "Programming Language APL,
-Extended".
+September 23, 2024 This manual briefly documents GNU APL, an interpreter
+for APL as described in ISO standard 13751, aka.  "Programming Language
+APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 6::.
@@ -4118,19 +4118,19 @@ for most purposes.
 
 Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
 
-   • Conversion of PNG files into the GNU APL color model,
-   • Display of an APL array (in the GNU APL color model) in a window on
+  1. Conversion of PNG files into the GNU APL color model,
+  2. Display of an APL array (in the GNU APL color model) in a window on
      the screen (interactive use of PNG), and
-   • Controlling of ⎕PNG itself.
+  3. Controlling of ⎕PNG itself.
 
    The desired purpose is dictated by the properties of *B*:
 
-   • Any APL text vector (i.e.  a string) *B* is taken as the name of a
+  1. Any APL text vector (i.e.  a string) *B* is taken as the name of a
      file that supposedly contains an image in the PNG format.  ⎕PNG
      will read the file and return the pixels in it as a numeric APL
      array of rank 3.  The array contains the color components of the
      image in the file as described above.
-   • Any array *B* with rank 3 must be numeric (with values from 0.0 to
+  2. Any array *B* with rank 3 must be numeric (with values from 0.0 to
      1.0) and is then assumed to be an array in the GNU APL color model
      (such as the result of the case above).  This image is displayed in
      a new window on the screen; the window survives even after ⎕PNG has
@@ -4139,7 +4139,7 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
      (in the case described below) to close the window programmatically
      from APL. Alternatively the window can also be closed interactively
      by the user via its close button.
-   • Finally, if *B* is a numeric scalar it fine-tunes the ⎕PNG
+  3. Finally, if *B* is a numeric scalar it fine-tunes the ⎕PNG
      behaviour:
 
         • ⎕PNG N with N ≥ 1 (as returned in the case above) closes the
@@ -7465,75 +7465,75 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11568
-Node: Chapter 223436
-Node: Section 2.125449
-Node: Subsection 2.1.126671
-Node: Subsection 2.1.227302
-Node: Subsection 2.1.328132
-Node: Subsection 2.1.433915
-Node: Subsection 2.1.537711
-Node: Subsection 2.1.638571
-Node: Subsection 2.1.746666
-Node: Subsection 2.1.848399
-Node: Section 2.251715
-Node: Section 2.352474
-Node: Section 2.453749
-Node: Section 2.558176
-Node: Section 2.658349
-Node: Section 2.758979
-Node: Section 2.862942
-Node: Section 2.965279
-Node: Section 2.1067362
-Node: Section 2.1168909
-Node: Section 2.1270694
-Node: Section 2.1372623
-Node: Section 2.1473564
-Node: Section 2.1573816
-Node: Section 2.1675212
-Node: Section 2.1785677
-Node: Section 2.1888174
-Node: Section 2.1994900
-Node: Section 2.2096345
-Node: Section 2.21105620
-Node: Section 2.22110658
-Node: Section 2.23113916
-Node: Section 2.24114207
-Node: Section 2.25125046
-Node: Section 2.26125318
-Node: Section 2.27131897
-Node: Section 2.28134357
-Node: Section 2.29135026
-Node: Section 2.30136677
-Node: Section 2.31140453
-Node: Output File Format156354
-Node: Section 2.32157529
-Node: Section 2.33166896
-Node: Section 2.34167923
-Node: Section 2.35182618
-Node: Section 2.36192777
-Node: Section 2.37197424
-Node: Section 2.38199520
-Node: Section 2.39203938
-Node: Section 2.40225272
-Node: Section 2.41236165
-Node: Chapter 3238162
-Node: Chapter 4240671
-Node: Chapter 5241797
-Node: Section 5.1243334
-Node: Section 5.2244614
-Node: Section 5.3244974
-Node: Section 5.4245216
-Node: Section 5.5245878
-Node: Section 5.6246356
-Node: Section 5.7247129
-Node: Section 5.8247555
-Node: Chapter 6247957
-Node: Section 6.1248376
-Node: Section 6.2249063
-Node: Chapter 7249894
-Node: Section 7.1250397
-Node: Section 7.2275711
+Node: Chapter 11573
+Node: Chapter 223441
+Node: Section 2.125454
+Node: Subsection 2.1.126676
+Node: Subsection 2.1.227307
+Node: Subsection 2.1.328137
+Node: Subsection 2.1.433920
+Node: Subsection 2.1.537716
+Node: Subsection 2.1.638576
+Node: Subsection 2.1.746671
+Node: Subsection 2.1.848404
+Node: Section 2.251720
+Node: Section 2.352479
+Node: Section 2.453754
+Node: Section 2.558181
+Node: Section 2.658354
+Node: Section 2.758984
+Node: Section 2.862947
+Node: Section 2.965284
+Node: Section 2.1067367
+Node: Section 2.1168914
+Node: Section 2.1270699
+Node: Section 2.1372628
+Node: Section 2.1473569
+Node: Section 2.1573821
+Node: Section 2.1675217
+Node: Section 2.1785682
+Node: Section 2.1888179
+Node: Section 2.1994905
+Node: Section 2.2096350
+Node: Section 2.21105625
+Node: Section 2.22110663
+Node: Section 2.23113921
+Node: Section 2.24114212
+Node: Section 2.25125051
+Node: Section 2.26125323
+Node: Section 2.27131902
+Node: Section 2.28134362
+Node: Section 2.29135031
+Node: Section 2.30136682
+Node: Section 2.31140458
+Node: Output File Format156359
+Node: Section 2.32157534
+Node: Section 2.33166889
+Node: Section 2.34167916
+Node: Section 2.35182611
+Node: Section 2.36192770
+Node: Section 2.37197417
+Node: Section 2.38199513
+Node: Section 2.39203931
+Node: Section 2.40225265
+Node: Section 2.41236158
+Node: Chapter 3238155
+Node: Chapter 4240664
+Node: Chapter 5241790
+Node: Section 5.1243327
+Node: Section 5.2244607
+Node: Section 5.3244967
+Node: Section 5.4245209
+Node: Section 5.5245871
+Node: Section 5.6246349
+Node: Section 5.7247122
+Node: Section 5.8247548
+Node: Chapter 6247950
+Node: Section 6.1248369
+Node: Section 6.2249056
+Node: Chapter 7249887
+Node: Section 7.1250390
+Node: Section 7.2275704
 
 End Tag Table
 

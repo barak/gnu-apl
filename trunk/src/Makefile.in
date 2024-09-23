@@ -100,7 +100,7 @@ host_triplet = @host@
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
 @apl_GTK3_TRUE@am__append_2 = Gtk
-@apl_PCRE_TRUE@am__append_3 = Regexp.cc					Regexp.hh
+@apl_PCRE_TRUE@am__append_3 = Regexp.cc								Regexp.hh
 @apl_SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
 @apl_SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
 @apl_SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
