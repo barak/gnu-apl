@@ -60,9 +60,9 @@ main(int argc, char *argv[])
 bool expect_Disassembly = true;
 bool in_ASM = false;
 
-uint64_t from = 0;
-uint64_t to   = 0;
-int src_line  = -1;
+long long from = 0;
+long long to   = 0;
+int src_line   = -1;
 
    enum { BUFLEN = 1000, BUFLAST = BUFLEN - 1 };
 char buffer[BUFLEN];
@@ -96,9 +96,9 @@ char buffer[BUFLEN];
            //
            if (is_prefix(buffer, "  "))   // assembler
              {
-               uint64_t addr = 0;
+               long long addr = 0;
                char colon = 0;
-               const int count = sscanf(buffer, "  %lX%c", &addr, &colon);
+               const int count = sscanf(buffer, "  %llX%c", &addr, &colon);
                if ((count != 2) || (addr== 0)  || (colon != ':'))
                   {
                      cerr << endl
@@ -121,7 +121,7 @@ char buffer[BUFLEN];
 
             if (in_ASM)   // asm → next line
                {
-                 printf("%lX %d %d\n", from, int(to - from), src_line);
+                 printf("%llX %d %d\n", from, int(to - from), src_line);
                  in_ASM = false;   // next line or file
                   // proceed below
                }

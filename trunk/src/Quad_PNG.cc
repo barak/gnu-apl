@@ -41,18 +41,25 @@ extern Token missing_files(const char * qfun,  const char ** libs,
 
 /// PNG_GTK defines whether ⎕PNG B with ⍴⍴B ←→ 3 (display of a PNG file in a
 /// GTK window  shall be supported, Requires libgtk in addition to libnpng.
-#define PNG_GTK	                \
-    apl_X11                  && \
+#if apl_X11                  && \
     defined( apl_GTK3      ) && \
     defined( HAVE_LIBGTK_3 ) 
 
+# define PNG_GTK	1
+#else
+# define PNG_GTK	0
+#endif
+
 /// PNG_LIBS defines if the PNG related libraries (and their header files)
 /// are present
-#define	PNG_LIBS	                  \
-    defined( HAVE_LIBZ           ) && \
+#if	defined( HAVE_LIBZ           ) && \
     defined( HAVE_ZLIB_H         ) && \
     defined( HAVE_LIBPNG         ) && \
     defined( HAVE_LIBPNG16_PNG_H )
+# define PNG_LIBS 1
+#else
+# define PNG_LIBS 0
+#endif
 
 #if PNG_LIBS
 # include <zlib.h>
