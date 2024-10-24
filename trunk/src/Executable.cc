@@ -1085,9 +1085,21 @@ ShapeItem insertion_point = b;
               case TOK_OMEGA_U: if (!level)   signature |= SIG_RO;  // no break
               case TOK_ALPHA_U: if (!level)   signature |= SIG_LO;        break;
 
-              case TOK_DIAMOND: DEFN_ERROR;
-              case TOK_BRANCH:  DEFN_ERROR;
-              case TOK_ESCAPE:  DEFN_ERROR;
+              case TOK_DIAMOND:
+                   MORE_ERROR() << "◊ is not allowed in λ expressionx ";
+                   DEFN_ERROR;
+
+              case TOK_BRANCH:
+                   MORE_ERROR() << "→ is not allowed in λ expressionx ";
+                   DEFN_ERROR;
+
+              case TOK_ESCAPE:
+              case TOK_IF_THEN:
+              case TOK_IF_ELSE:
+              case TOK_IF_END:
+                   MORE_ERROR() << "conditionals (i.e. ←←, ←→, or →→)"
+                                   " are not allowed in λ expressions";
+                   DEFN_ERROR;
 
               case TOK_L_CURLY: ++level;   break;
               case TOK_R_CURLY: --level;   break;
