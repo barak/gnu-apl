@@ -184,7 +184,7 @@ const int t4_len = t4.size();
         return 0;
       }
 
-void * handle = dlopen(filename, RTLD_NOW);
+void * handle = dlopen(filename, RTLD_LAZY);
    if (handle == 0)
       {
         const char * err = dlerror();
