@@ -30,22 +30,35 @@
 //----------------------------------------------------------------------------
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
 {
+  // val is a simple text matrix with var_count rows and name_len columns.
+  // Each row of val is one or two variable names.
+  //
 const ShapeItem var_count = val.get_rows();
 const ShapeItem name_len = val.get_cols();
 
    loop(v, var_count)
       {
-        ShapeItem nidx = v*name_len;
-        const ShapeItem end = nidx + name_len;
-        UCS_string name;
+        ShapeItem start = v * name_len;   // the v'th variable
+        const ShapeItem end = start + name_len;
+        UCS_string name;   // name of the (left) variable
         loop(n, name_len)
            {
-             const Unicode uni = val.get_cravel(nidx++).get_char_value();
+             const Unicode uni = val.get_cravel(start++).get_char_value();
 
-             if (n == 0 && Avec::is_quad(uni))   // leading ⎕
+             if (n == 0)   // first char of the variable name
                 {
-                  name.append(uni);
-                  continue;
+                  if ( Avec::is_quad(uni))   // leading ⎕
+                     {
+                       name.append(uni);
+                       continue;
+                     }
+                  else if (uni == UNI_ALPHA  || uni == UNI_ALPHA_UNDERBAR ||
+                           uni == UNI_OMEGA  || uni == UNI_OMEGA_UNDERBAR ||
+                           uni == UNI_LAMBDA || uni == UNI_CHI)
+                     {
+                       name.append(uni);
+                       continue;
+                     }
                 }
 
              if (Avec::is_symbol_char(uni)      // valid symbol char
@@ -70,14 +83,14 @@ const ShapeItem name_len = val.get_cols();
              // 1. spaces until 'end' (= one name), or
              // 2. a second name (alias)
 
-             // skip spaces from nidx and subsequent spaces
+             // skip spaces from start and subsequent spaces
              //
-             while (nidx < end &&
-                    val.get_cravel(nidx).get_char_value() == UNI_SPACE)
-                   ++nidx;
+             while (start < end &&
+                    val.get_cravel(start).get_char_value() == UNI_SPACE)
+                   ++start;
 
 
-             if (nidx == end)   break;   // only spaces (no second name)
+             if (start == end)   break;   // only spaces (no second name)
 
              // at this point we maybe have the start of a second name, which
              // is an error (if last is false) or not. In both cases the first
@@ -91,9 +104,9 @@ const ShapeItem name_len = val.get_cols();
              // Return the second (i.e. surrogate name)
              //
              surrogate = false;
-             while (nidx < end)
+             while (start < end)
                 {
-                  const Unicode uni = val.get_cravel(nidx++).get_char_value();
+                  const Unicode uni = val.get_cravel(start++).get_char_value();
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
                        name.append(uni);
