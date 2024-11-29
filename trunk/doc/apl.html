@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>September 23, 2024
+<p>November 28, 2024
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -191,94 +191,110 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-Dyadic-_005b_003f_005dJSON" href="#Dyadic-_005b_003f_005dJSON">2.29.2 Dyadic ⎕JSON</a></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dMAP-_002d-Map-Value" href="#Section-2_002e30">2.30 ⎕MAP  - Map Value</a></li>
-    <li><a id="toc-_005b_003f_005dPLOT-_002d-Plot-Data" href="#Section-2_002e31">2.31 ⎕PLOT - Plot Data</a>
+    <li><a id="toc-_005b_003f_005dMX-_002d-Matrix_002fStatistics" href="#Section-2_002e31">2.31 ⎕MX - Matrix/Statistics</a>
     <ul class="no-bullet">
-      <li><a id="toc-The-Plot-Data-B" href="#The-Plot-Data-B">2.31.1 The Plot Data B</a>
+      <li><a id="toc-Determinant" href="#Determinant">2.31.1 Determinant</a></li>
+      <li><a id="toc-Cross-Product" href="#Cross-Product">2.31.2 Cross Product</a></li>
+      <li><a id="toc-Vector-Angle" href="#Vector-Angle">2.31.3 Vector Angle</a></li>
+      <li><a id="toc-Eigenvector" href="#Eigenvector">2.31.4 Eigenvector</a></li>
+      <li><a id="toc-Eigenvalue" href="#Eigenvalue">2.31.5 Eigenvalue</a></li>
+      <li><a id="toc-Ident" href="#Ident">2.31.6 Ident</a></li>
+      <li><a id="toc-Rotation" href="#Rotation">2.31.7 Rotation</a></li>
+      <li><a id="toc-Homogeneous-transform" href="#Homogeneous-transform">2.31.8 Homogeneous transform</a></li>
+      <li><a id="toc-Norm" href="#Norm">2.31.9 Norm</a></li>
+      <li><a id="toc-Randoms" href="#Randoms">2.31.10 Randoms</a></li>
+      <li><a id="toc-Covariance" href="#Covariance">2.31.11 Covariance</a></li>
+      <li><a id="toc-Histograms" href="#Histograms">2.31.12 Histograms</a></li>
+      <li><a id="toc-Print" href="#Print">2.31.13 Print</a></li>
+    </ul></li>
+    <li><a id="toc-_005b_003f_005dPLOT-_002d-Plot-Data" href="#Section-2_002e32">2.32 ⎕PLOT - Plot Data</a>
+    <ul class="no-bullet">
+      <li><a id="toc-The-Plot-Data-B" href="#The-Plot-Data-B">2.32.1 The Plot Data B</a>
       <ul class="no-bullet">
-        <li><a id="toc-Complex-Plot-Data-B" href="#Complex-Plot-Data-B">2.31.1.1 Complex Plot Data B</a></li>
-        <li><a id="toc-Real-Plot-Data-B" href="#Real-Plot-Data-B">2.31.1.2 Real Plot Data B</a></li>
+        <li><a id="toc-Complex-Plot-Data-B" href="#Complex-Plot-Data-B">2.32.1.1 Complex Plot Data B</a></li>
+        <li><a id="toc-Real-Plot-Data-B" href="#Real-Plot-Data-B">2.32.1.2 Real Plot Data B</a></li>
       </ul></li>
-      <li><a id="toc-The-Plot-Attributes-A" href="#The-Plot-Attributes-A">2.31.2 The Plot Attributes A</a>
+      <li><a id="toc-The-Plot-Attributes-A" href="#The-Plot-Attributes-A">2.32.2 The Plot Attributes A</a>
       <ul class="no-bullet">
-        <li><a id="toc-Tick-formatting-_0028GTK-only_0029" href="#Tick-formatting-_0028GTK-only_0029">2.31.2.1 Tick formatting (GTK only)</a></li>
+        <li><a id="toc-Tick-formatting-_0028GTK-only_0029" href="#Tick-formatting-_0028GTK-only_0029">2.32.2.1 Tick formatting (GTK only)</a></li>
       </ul></li>
-      <li><a id="toc-Plot-Window-Handling" href="#Plot-Window-Handling">2.31.3 Plot Window Handling</a></li>
-      <li><a id="toc-Output-File-Format-1" href="#Output-File-Format">2.31.4 Output File Format</a></li>
+      <li><a id="toc-Plot-Window-Handling" href="#Plot-Window-Handling">2.32.3 Plot Window Handling</a></li>
+      <li><a id="toc-Output-File-Format-1" href="#Output-File-Format">2.32.4 Output File Format</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dPNG-_002d-Portable-Network-Graphics" href="#Section-2_002e32">2.32 ⎕PNG - Portable Network Graphics</a>
+    <li><a id="toc-_005b_003f_005dPNG-_002d-Portable-Network-Graphics" href="#Section-2_002e33">2.33 ⎕PNG - Portable Network Graphics</a>
     <ul class="no-bullet">
-      <li><a id="toc-The-GNU-APL-Color-Model" href="#The-GNU-APL-Color-Model">2.32.1 The GNU APL Color Model</a></li>
-      <li><a id="toc-Monadic-_005b_003f_005dPNG" href="#Monadic-_005b_003f_005dPNG">2.32.2 Monadic ⎕PNG</a></li>
-      <li><a id="toc-Dyadic-_005b_003f_005dPNG" href="#Dyadic-_005b_003f_005dPNG">2.32.3 Dyadic ⎕PNG</a></li>
-      <li><a id="toc-APL-Examples" href="#APL-Examples">2.32.4 APL Examples</a></li>
+      <li><a id="toc-The-GNU-APL-Color-Model" href="#The-GNU-APL-Color-Model">2.33.1 The GNU APL Color Model</a></li>
+      <li><a id="toc-Monadic-_005b_003f_005dPNG" href="#Monadic-_005b_003f_005dPNG">2.33.2 Monadic ⎕PNG</a></li>
+      <li><a id="toc-Dyadic-_005b_003f_005dPNG" href="#Dyadic-_005b_003f_005dPNG">2.33.3 Dyadic ⎕PNG</a></li>
+      <li><a id="toc-APL-Examples" href="#APL-Examples">2.33.4 APL Examples</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-2_002e33">2.33 ⎕PS - Print Style</a></li>
-    <li><a id="toc-_005b_003f_005dRE-_002d-Regular-Expressions" href="#Section-2_002e34">2.34 ⎕RE - Regular Expressions</a>
+    <li><a id="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-2_002e34">2.34 ⎕PS - Print Style</a></li>
+    <li><a id="toc-_005b_003f_005dRE-_002d-Regular-Expressions" href="#Section-2_002e35">2.35 ⎕RE - Regular Expressions</a>
     <ul class="no-bullet">
-      <li><a id="toc-Preconditions" href="#Preconditions">2.34.1 Preconditions</a></li>
-      <li><a id="toc-Syntax" href="#Syntax">2.34.2 Syntax</a></li>
-      <li><a id="toc-The-Regular-Expression-A" href="#The-Regular-Expression-A">2.34.3 The Regular Expression A</a></li>
-      <li><a id="toc-The-String_0028s_0029-B-Being-Matched" href="#The-String_0028s_0029-B-Being-Matched">2.34.4 The String(s) B Being Matched</a></li>
-      <li><a id="toc-The-Flags-X" href="#The-Flags-X">2.34.5 The Flags X</a>
+      <li><a id="toc-Preconditions" href="#Preconditions">2.35.1 Preconditions</a></li>
+      <li><a id="toc-Syntax" href="#Syntax">2.35.2 Syntax</a></li>
+      <li><a id="toc-The-Regular-Expression-A" href="#The-Regular-Expression-A">2.35.3 The Regular Expression A</a></li>
+      <li><a id="toc-The-String_0028s_0029-B-Being-Matched" href="#The-String_0028s_0029-B-Being-Matched">2.35.4 The String(s) B Being Matched</a></li>
+      <li><a id="toc-The-Flags-X" href="#The-Flags-X">2.35.5 The Flags X</a>
       <ul class="no-bullet">
-        <li><a id="toc-The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x" href="#The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">2.34.5.1 The libpcre2 flags: i, m, s, and x</a></li>
-        <li><a id="toc-The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f" href="#The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">2.34.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</a></li>
-        <li><a id="toc-the-_005b_003f_005dRE-global-flag-g" href="#the-_005b_003f_005dRE-global-flag-g">2.34.5.3 the ⎕RE global flag g</a></li>
-        <li><a id="toc-the-_005b_003f_005dRE-error-flag-E" href="#the-_005b_003f_005dRE-error-flag-E">2.34.5.4 the ⎕RE error flag E</a></li>
+        <li><a id="toc-The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x" href="#The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">2.35.5.1 The libpcre2 flags: i, m, s, and x</a></li>
+        <li><a id="toc-The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f" href="#The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">2.35.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</a></li>
+        <li><a id="toc-the-_005b_003f_005dRE-global-flag-g" href="#the-_005b_003f_005dRE-global-flag-g">2.35.5.3 the ⎕RE global flag g</a></li>
+        <li><a id="toc-the-_005b_003f_005dRE-error-flag-E" href="#the-_005b_003f_005dRE-error-flag-E">2.35.5.4 the ⎕RE error flag E</a></li>
       </ul></li>
-      <li><a id="toc-Complex-Matches" href="#Complex-Matches">2.34.6 Complex Matches</a></li>
+      <li><a id="toc-Complex-Matches" href="#Complex-Matches">2.35.6 Complex Matches</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dRVAL-_002d-Random-APL-value" href="#Section-2_002e35">2.35 ⎕RVAL - Random APL value</a>
+    <li><a id="toc-_005b_003f_005dRVAL-_002d-Random-APL-value" href="#Section-2_002e36">2.36 ⎕RVAL - Random APL value</a>
     <ul class="no-bullet">
-      <li><a id="toc-General" href="#General">2.35.1 General</a></li>
-      <li><a id="toc-Dyadic-_005b_003f_005dRVAL" href="#Dyadic-_005b_003f_005dRVAL">2.35.2 Dyadic ⎕RVAL</a>
+      <li><a id="toc-General" href="#General">2.36.1 General</a></li>
+      <li><a id="toc-Dyadic-_005b_003f_005dRVAL" href="#Dyadic-_005b_003f_005dRVAL">2.36.2 Dyadic ⎕RVAL</a>
       <ul class="no-bullet">
-        <li><a id="toc-Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B" href="#Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">2.35.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</a></li>
-        <li><a id="toc-Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B" href="#Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B">2.35.2.2 Control of the ranks: 1 ⎕RVAL B</a></li>
-        <li><a id="toc-Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B" href="#Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B">2.35.2.3 Control of the shapes: 2 ⎕RVAL B</a></li>
-        <li><a id="toc-Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">2.35.2.4 Control of the data types: 3 ⎕RVAL B</a></li>
-        <li><a id="toc-Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">2.35.2.5 Control of a maximum depth: 4 ⎕RVAL B</a></li>
-        <li><a id="toc-monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">2.35.2.6 monadic ⎕RVAL B: Return a new random value</a></li>
+        <li><a id="toc-Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B" href="#Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">2.36.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B" href="#Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B">2.36.2.2 Control of the ranks: 1 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B" href="#Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B">2.36.2.3 Control of the shapes: 2 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">2.36.2.4 Control of the data types: 3 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">2.36.2.5 Control of a maximum depth: 4 ⎕RVAL B</a></li>
+        <li><a id="toc-monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">2.36.2.6 monadic ⎕RVAL B: Return a new random value</a></li>
       </ul></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e36">2.36 ⎕SQL - SQL Database Interface</a>
+    <li><a id="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e37">2.37 ⎕SQL - SQL Database Interface</a>
     <ul class="no-bullet">
-      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions" href="#g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions">2.36.1 ⎕SQL[0] : display subfunctions</a></li>
-      <li><a id="toc-ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database" href="#ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">2.36.2 ref ← A ⎕SQL[1] B : open database</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">2.36.3 ⎕SQL[2] B : close database</a></li>
-      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">2.36.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
-      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">2.36.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">2.36.6 ⎕SQL[5] B : start transaction</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">2.36.7 ⎕SQL[6] B : commit transaction</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.36.8 ⎕SQL[7] B : rollback transaction</a></li>
-      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.36.9 Z←⎕SQL[8] B : table names</a></li>
-      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.36.10 Z←⎕SQL[9] B : column names</a></li>
-      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number" href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">2.36.11 Z ← ⎕SQL[10] B : library version number</a></li>
-      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string" href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">2.36.12 Z ← ⎕SQL[11] B : library version string</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions" href="#g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions">2.37.1 ⎕SQL[0] : display subfunctions</a></li>
+      <li><a id="toc-ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database" href="#ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">2.37.2 ref ← A ⎕SQL[1] B : open database</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">2.37.3 ⎕SQL[2] B : close database</a></li>
+      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">2.37.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
+      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">2.37.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">2.37.6 ⎕SQL[5] B : start transaction</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">2.37.7 ⎕SQL[6] B : commit transaction</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.37.8 ⎕SQL[7] B : rollback transaction</a></li>
+      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.37.9 Z←⎕SQL[8] B : table names</a></li>
+      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.37.10 Z←⎕SQL[9] B : column names</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number" href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">2.37.11 Z ← ⎕SQL[10] B : library version number</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string" href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">2.37.12 Z ← ⎕SQL[11] B : library version string</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e37">2.37 ⎕SI - State Indicator</a></li>
-    <li><a id="toc-_005b_003f_005dSYL-_002d-System-limits" href="#Section-2_002e38">2.38 ⎕SYL - System limits</a>
+    <li><a id="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e38">2.38 ⎕SI - State Indicator</a></li>
+    <li><a id="toc-_005b_003f_005dSYL-_002d-System-limits" href="#Section-2_002e39">2.39 ⎕SYL - System limits</a>
     <ul class="no-bullet">
-      <li><a id="toc-_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d" href="#g_t_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d">2.38.1 ⎕SYL[1 2 3 4 5 6;]</a></li>
-      <li><a id="toc-_005b_003f_005dSYL_005b7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23_003b_005d" href="#g_t_005b_003f_005dSYL_005b7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23_003b_005d">2.38.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]</a></li>
-      <li><a id="toc-_005b_003f_005dSYL_005b24-25-26_003b_005d" href="#g_t_005b_003f_005dSYL_005b24-25-26_003b_005d">2.38.3 ⎕SYL[24 25 26;]</a></li>
-      <li><a id="toc-_005b_003f_005dSYL_005b27_003b_005d" href="#g_t_005b_003f_005dSYL_005b27_003b_005d">2.38.4 ⎕SYL[27;]</a></li>
+      <li><a id="toc-_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d" href="#g_t_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d">2.39.1 ⎕SYL[1 2 3 4 5 6;]</a></li>
+      <li><a id="toc-_005b_003f_005dSYL_005b7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23_003b_005d" href="#g_t_005b_003f_005dSYL_005b7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23_003b_005d">2.39.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]</a></li>
+      <li><a id="toc-_005b_003f_005dSYL_005b24-25-26_003b_005d" href="#g_t_005b_003f_005dSYL_005b24-25-26_003b_005d">2.39.3 ⎕SYL[24 25 26;]</a></li>
+      <li><a id="toc-_005b_003f_005dSYL_005b27_003b_005d" href="#g_t_005b_003f_005dSYL_005b27_003b_005d">2.39.4 ⎕SYL[27;]</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dXML-_002d-XML-Parsing" href="#Section-2_002e39">2.39 ⎕XML  - XML Parsing</a>
+    <li><a id="toc-_005b_003f_005dXML-_002d-XML-Parsing" href="#Section-2_002e40">2.40 ⎕XML  - XML Parsing</a>
     <ul class="no-bullet">
-      <li><a id="toc-Purpose" href="#Purpose">2.39.1 Purpose</a></li>
-      <li><a id="toc-Some-XML-Terminology" href="#Some-XML-Terminology">2.39.2 Some XML Terminology</a></li>
-      <li><a id="toc-How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values" href="#How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values">2.39.3 How ⎕XML maps XML documents to APL Values</a></li>
-      <li><a id="toc-Monadic-_005b_003f_005dXML" href="#Monadic-_005b_003f_005dXML">2.39.4 Monadic ⎕XML</a></li>
-      <li><a id="toc-Dyadic-_005b_003f_005dXML" href="#Dyadic-_005b_003f_005dXML">2.39.5 Dyadic ⎕XML</a></li>
-      <li><a id="toc-XML-Queries" href="#XML-Queries">2.39.6 XML Queries</a></li>
+      <li><a id="toc-Purpose" href="#Purpose">2.40.1 Purpose</a></li>
+      <li><a id="toc-Some-XML-Terminology" href="#Some-XML-Terminology">2.40.2 Some XML Terminology</a></li>
+      <li><a id="toc-How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values" href="#How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values">2.40.3 How ⎕XML maps XML documents to APL Values</a></li>
+      <li><a id="toc-Monadic-_005b_003f_005dXML" href="#Monadic-_005b_003f_005dXML">2.40.4 Monadic ⎕XML</a></li>
+      <li><a id="toc-Dyadic-_005b_003f_005dXML" href="#Dyadic-_005b_003f_005dXML">2.40.5 Dyadic ⎕XML</a></li>
+      <li><a id="toc-XML-Queries" href="#XML-Queries">2.40.6 XML Queries</a></li>
     </ul></li>
-    <li><a id="toc-Conditionals" href="#Section-2_002e40">2.40 Conditionals</a>
+    <li><a id="toc-Conditionals" href="#Section-2_002e41">2.41 Conditionals</a>
     <ul class="no-bullet">
-      <li><a id="toc-Design-considerations_002e" href="#Design-considerations_002e">2.40.1 Design considerations.</a></li>
-      <li><a id="toc-Syntax-1" href="#Syntax-1">2.40.2 Syntax</a></li>
+      <li><a id="toc-Design-considerations_002e" href="#Design-considerations_002e">2.41.1 Design considerations.</a></li>
+      <li><a id="toc-Syntax-1" href="#Syntax-1">2.41.2 Syntax</a></li>
     </ul></li>
-    <li><a id="toc-Matrix-Product" href="#Section-2_002e41">2.41 Matrix Product</a></li>
+    <li><a id="toc-Matrix-Product" href="#Section-2_002e42">2.42 Matrix Product</a></li>
   </ul></li>
   <li><a id="toc-Limitations-and-Missing-Features" href="#Chapter-3">3 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -964,17 +980,18 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e28">⎕GTK - GTK Interface</a></li>
 <li><a href="#Section-2_002e29">⎕JSON - JSON Parsing</a></li>
 <li><a href="#Section-2_002e30">⎕MAP  - Map Value</a></li>
-<li><a href="#Section-2_002e31">⎕PLOT - Plot Data</a></li>
-<li><a href="#Section-2_002e32">⎕PNG - Portable Network Graphics</a></li>
-<li><a href="#Section-2_002e33">⎕PS - Print Style</a></li>
-<li><a href="#Section-2_002e34">⎕RE - Regular Expressions</a></li>
-<li><a href="#Section-2_002e35">⎕RVAL - Random APL value</a></li>
-<li><a href="#Section-2_002e36">⎕SQL - SQL Database Interface</a></li>
-<li><a href="#Section-2_002e37">⎕SI - State Indicator</a></li>
-<li><a href="#Section-2_002e38">⎕SYL - System limits</a></li>
-<li><a href="#Section-2_002e39">⎕XML  - XML Parsing</a></li>
-<li><a href="#Section-2_002e40">Conditionals</a></li>
-<li><a href="#Section-2_002e41">Matrix Product</a></li>
+<li><a href="#Section-2_002e31">⎕MX - Matrix/Statistics</a></li>
+<li><a href="#Section-2_002e32">⎕PLOT - Plot Data</a></li>
+<li><a href="#Section-2_002e33">⎕PNG - Portable Network Graphics</a></li>
+<li><a href="#Section-2_002e34">⎕PS - Print Style</a></li>
+<li><a href="#Section-2_002e35">⎕RE - Regular Expressions</a></li>
+<li><a href="#Section-2_002e36">⎕RVAL - Random APL value</a></li>
+<li><a href="#Section-2_002e37">⎕SQL - SQL Database Interface</a></li>
+<li><a href="#Section-2_002e38">⎕SI - State Indicator</a></li>
+<li><a href="#Section-2_002e39">⎕SYL - System limits</a></li>
+<li><a href="#Section-2_002e40">⎕XML  - XML Parsing</a></li>
+<li><a href="#Section-2_002e41">Conditionals</a></li>
+<li><a href="#Section-2_002e42">Matrix Product</a></li>
 </ul>
 <hr>
 <div class="section" id="Section-2_002e1">
@@ -3960,7 +3977,7 @@ is large.
 <div class="section" id="Section-2_002e30">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e31" accesskey="n" rel="next">⎕PLOT - Plot Data</a>, Previous: <a href="#Section-2_002e29" accesskey="p" rel="prev">⎕JSON - JSON Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e31" accesskey="n" rel="next">⎕MX - Matrix/Statistics</a>, Previous: <a href="#Section-2_002e29" accesskey="p" rel="prev">⎕JSON - JSON Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005b_003f_005dMAP-_002d-Map-Value"></span><h3 class="section">2.30 ⎕MAP  - Map Value</h3>
 
@@ -4061,9 +4078,407 @@ shown in the examples below.
 <div class="section" id="Section-2_002e31">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e32" accesskey="n" rel="next">⎕PNG - Portable Network Graphics</a>, Previous: <a href="#Section-2_002e30" accesskey="p" rel="prev">⎕MAP  - Map Value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e32" accesskey="n" rel="next">⎕PLOT - Plot Data</a>, Previous: <a href="#Section-2_002e30" accesskey="p" rel="prev">⎕MAP  - Map Value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dPLOT-_002d-Plot-Data"></span><h3 class="section">2.31 ⎕PLOT - Plot Data</h3>
+<span id="g_t_005b_003f_005dMX-_002d-Matrix_002fStatistics"></span><h3 class="section">2.31 ⎕MX - Matrix/Statistics</h3>
+
+<p>⎕MX[x] is a function that providess a collection of matrix and
+statistical operations such as covariance, eigensystems, and so on,
+and random number generation in several sorts of distributions, The
+operation is selected through the use of the axis specifier:
+</p>
+<pre class="verbatim">        1       monadic Determinant
+        2       nomadic Cross product
+        3       dyadic  Vector angle
+        4       monadic Eigenvector
+        5       monadic Eigenvalue
+        6       monadic Ident
+        7       monadic Rotation matrix
+        8       dyadic  Homogeneous transform
+        9       monadic Norm
+        10      nomadic Randoms
+        11      nomadic Covariance
+        12      dyadic  Histogram
+        13      dyadic  Print
+</pre>
+<p>(These may by shown by entering ⎕mx &rdquo; or ⎕mx[0] on the APL command
+line.)
+</p>
+<ul class="section-toc">
+<li><a href="#Determinant" accesskey="1">Determinant</a></li>
+<li><a href="#Cross-Product" accesskey="2">Cross Product</a></li>
+<li><a href="#Vector-Angle" accesskey="3">Vector Angle</a></li>
+<li><a href="#Eigenvector" accesskey="4">Eigenvector</a></li>
+<li><a href="#Eigenvalue" accesskey="5">Eigenvalue</a></li>
+<li><a href="#Ident" accesskey="6">Ident</a></li>
+<li><a href="#Rotation" accesskey="7">Rotation</a></li>
+<li><a href="#Homogeneous-transform" accesskey="8">Homogeneous transform</a></li>
+<li><a href="#Norm" accesskey="9">Norm</a></li>
+<li><a href="#Randoms">Randoms</a></li>
+<li><a href="#Covariance">Covariance</a></li>
+<li><a href="#Histograms">Histograms</a></li>
+<li><a href="#Print">Print</a></li>
+</ul>
+<div class="subsection" id="Determinant">
+<h4 class="subsection">2.31.1 Determinant</h4>
+
+<p>The determinant operation, ⎕mx[1], is monadic and is valid only for
+numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑⍴B)
+(i.e., a square matrix).  E.g.:
+</p>
+<pre class="verbatim">      mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
+¯164J76
+
+</pre>
+</div>
+<div class="subsection" id="Cross-Product">
+<h4 class="subsection">2.31.2 Cross Product</h4>
+
+<p>The cross-product operation, ⎕mx[2], is nomadic.  In monadic form, it
+requires a numeric argument (real or complex) where ⍴⍴⊥ = 2 and
+(1↑⍴B)-1 = (¯1↑⍴B), i.e., a matrix of N-1 rows of length-N vectors.
+E.g.:
+</p>
+<pre class="verbatim">      B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
+      B
+1  2  3J6  4
+5  6  7    8
+9 10 11   12
+      ⎕mx[2] B
+0J48 0J¯72 0 0J24
+</pre>
+<p>For reasons I&rsquo;m not enough of a mathematician to understand, cross
+products are only valid in 3-space and 7-space, so the only valid monadic
+arguments are matrices of shapes [2 3] or [6 7]. ⎕mx, however, doesn&rsquo;t check
+this and will happily give you a result in any dimensionality and
+leave it your imagination what it may mean.  I&rsquo;m also not enough of a
+mathematician to know what the significance may be of cross products
+involving complex numbers and thus I can&rsquo;t guarantee I&rsquo;m using an
+appropriate method in computing them.
+</p>
+<p>In dyadic form, cross-product requires left and right arguments to be
+numeric and of ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
+</p>
+<pre class="verbatim">      1 2 3j6 ⎕mx[2] 4 5 6
+¯3J¯30 6J24 ¯3
+</pre>
+</div>
+<div class="subsection" id="Vector-Angle">
+<h4 class="subsection">2.31.3 Vector Angle</h4>
+
+<p>The vector angle operation ⎕mx[3] is dyadic and returns the angle between two
+isomorphic real or complex vectors where, ⍴⍴A = 1, ⍴⍴⊥ = 1, and ⍴A =
+⍴B:
+</p>
+<pre class="verbatim">      (⍳8) ⎕mx[3] 4j4+⍳8
+0.2515670406J0.09930859532
+</pre>
+</div>
+<div class="subsection" id="Eigenvector">
+<h4 class="subsection">2.31.4 Eigenvector</h4>
+
+<p>The eigenvector operation, ⎕mx[4], is monadic and returns the complex
+eigenvectors of real non-symetric square matrices:
+</p>
+<pre class="verbatim">      B
+¯1  1 ¯1 1
+¯8  4 ¯2 1
+27  9  3 1
+64 16  4 1
+      ⎕mx[4] B
+  0.09988            0.1113          ¯0.2925           ¯0.9445
+  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601   0.8396J0.04139
+  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601    0.8396J¯0.04139
+ ¯0.1449             0.3566           0.9194            0.08118
+</pre>
+<p>where each row represents an eigenvector:
+</p>
+<pre class="verbatim">      E←⎕mx[4] B
+      E[⎕io;]                   ⍝ first vector
+0.09988 0.1113 ¯0.2925 ¯0.9445
+      E[⎕io+1;]                 ⍝ second vector
+0.04308J0.009687 ¯0.07091J0.1389 0.5166J¯0.01601 0.8396J0.04139
+      etc
+</pre>
+<p>The eigenvalues are computed concurrently and the eignenvector matrix
+is sorted according to the descending magnitude of the corresponding
+eigenvalue.
+</p>
+</div>
+<div class="subsection" id="Eigenvalue">
+<h4 class="subsection">2.31.5 Eigenvalue</h4>
+
+<p>The eigenvalue operation, ⎕mx[5], also monadic with an argument of the
+same shape as that of the argument of the eigenvector operation,
+returns a complex vector of the eigenvectors of the matrix argument:
+</p>
+<pre class="verbatim">      F←⎕mx[5] B
+      F
+¯6.414 5.546J3.085 5.546J¯3.085 2.323
+</pre>
+<p>The order of eigen vectors, E from above, is related to the order of
+the eigenvalues, F, by the relationship:
+</p>
+<pre class="verbatim">             E[k;] ⬄ F[k]
+</pre>
+<p>(Note that, from the above example:
+</p>
+<pre class="verbatim">      |F
+6.414 6.346285607 6.346285607 2.323
+</pre>
+<p>i.e., that the order of the magnitude of the elements is descending,
+making the initial eigenvector, E[⎕io;], the dominant eigenvector and
+each successive eigenvector successively less significant.)
+</p>
+<p>Accordingly:
+</p>
+<pre class="verbatim">      4 ⎕cr (⊂⍉(1,⍴F)⍴F),(⊂E)
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
+┃↓¯6.414       ┃ ↓  0.09988           0.1113         ¯0.2925          ¯0.9445          ┃┃
+┃┃ 5.546J3.085 ┃ ┃  0.04308J0.00969  ¯0.07091J0.139   0.5166J¯0.01601  0.8396J0.04139  ┃┃
+┃┃ 5.546J¯3.085┃ ┃  0.04308J¯0.00969 ¯0.07091J¯0.139  0.5166J0.01601   0.8396J¯0.04139 ┃┃
+┃┃ 2.323       ┃ ┃ ¯0.1449            0.3566          0.9194           0.08118         ┃┃
+┃┗━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+   Values            Vectors
+</pre>
+</div>
+<div class="subsection" id="Ident">
+<h4 class="subsection">2.31.6 Ident</h4>
+
+<p>The ident operation, ⎕mx[6], takes a scalar real integer argument and returns a square
+identity matrix of that size:
+</p>
+<pre class="verbatim">      ⎕mx[6] 4  
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+</pre>
+</div>
+<div class="subsection" id="Rotation">
+<h4 class="subsection">2.31.7 Rotation</h4>
+
+<p>The rotation operation, ⎕mx[7], takes a real or complex scalar angle and returns a 2-space
+rotation matrix:
+</p>
+<pre class="verbatim">      ⎕mx[7] ○30÷180
+0.866 ¯0.5
+0.5    0.866
+</pre>
+</div>
+<div class="subsection" id="Homogeneous-transform">
+<h4 class="subsection">2.31.8 Homogeneous transform</h4>
+
+<p>The homogeneous operation ⎕mx[8] takes as its left arguement a 3-space displacement vector
+and, as its right arguement, a 3-space elemental rotation (i.e., independent rotations
+around the X, Y, and Z axes respectively) and returns the corresponding homogeneous matrix:
+</p>
+<pre class="verbatim">      1 2 3 ⎕mx[8] ○(30 45 60)÷180
+ 0.6124 0.2803  0.7392 0
+ 0.3536 0.7392 ¯0.5732 0
+¯0.7071 0.6124  0.3536 0
+ 1      2       3      1
+</pre>
+</div>
+<div class="subsection" id="Norm">
+<h4 class="subsection">2.31.9 Norm</h4>
+
+<p>The norm operation, ⎕mx[9], takes a real or complex non-scalar numeric
+argument and returns a result of the same shape such that the sum of
+the squares of the elements equals 1:
+</p>
+<pre class="verbatim">      ⎕mx[9] 1 2 3 4
+0.1825741858 0.3651483717 0.5477225575 0.7302967433
+      (⎕mx[9] 1 2 3 4)*2
+0.03333333333 0.1333333333 0.3 0.5333333333
+      +/(⎕mx[9] 1 2 3 4)*2
+1
+     
+      B←(3 3⍴⍳9)-⎕io
+      B
+0 1 2
+3 4 5
+6 7 8
+      ⎕mx[9] B
+0            0.0700140042 0.1400280084
+0.2100420126 0.2800560168 0.350070021
+0.4200840252 0.4900980294 0.5601120336
+      +/,(⎕mx[9] B)*2
+1
+</pre>
+<p>If the magnitude of the arguement is zero, the operation returns an all-zero
+result of of the same shape as the arguement.
+</p>
+
+</div>
+<div class="subsection" id="Randoms">
+<h4 class="subsection">2.31.10 Randoms</h4>
+
+<p>The randoms operation, ⎕mx[10] or ⎕mx[10 x] where x is an integer
+specifying the distribution of the randoms generated.  At present, the
+distibutions supported are:
+</p>
+<ol start="0">
+<li> Normal
+
+</li><li> Lognormal
+
+</li><li> Chi Squared
+
+</li><li> Student T
+</li></ol>
+
+<p>The default if x is not specified is normal distribution.  The right
+arguement is a single real or complex value that specifies the required
+standard deviation&ndash;if the value is complex, the value returned is
+also complex with random real and imaginary components.  If a left
+arguement is specified, it must be a scalar integer and the operation
+returns a ramdom vector of that length.  If a mean is applicable to a
+given distribution, it is set to 0.0.
+</p>
+<pre class="verbatim">      ⎕mx[10] 2
+¯1.0504575511
+      ⎕mx[10] 2
+¯2.9337180373
+      5 ⎕mx[10] 2
+0.05154476627 3.80631021 2.455474045 3.165260688 0.6792784063
+      3 ⎕mx[10] 1j1
+¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
+</pre>
+<img src="MX_distributions.jpg" alt="MX_distributions">
+
+<p>(This image is a plot of three 200-bucket histograms of 200000 samples
+each of a normal distribution, a chi-square distribution, and a
+Student T distribution.  See Histograms below.)
+</p>
+</div>
+<div class="subsection" id="Covariance">
+<h4 class="subsection">2.31.11 Covariance</h4>
+
+<p>The covariance operation, ⎕mx[11], is nomadic.  In monadic form, it
+interprets each row of a matrix argument as samples of a given
+variable, computes the covariance of each sample set with respect to
+every other sample set, and presents the covariances as a matrix.  For
+example:
+</p>
+<pre class="verbatim">      B←3 4⍴?12⍴10
+      B
+5 8  1 9
+7 6  2 9
+6 5 10 4
+      ⎕mx[11] B
+12.91666667   9.333333333 ¯9.25
+ 9.333333333  8.666666667 ¯7.333333333
+¯9.25        ¯7.333333333  6.916666667
+</pre>
+<p>In dyadic form, it computes the covariance of the argument vectors:
+</p>
+<pre class="verbatim">      1 2j6 3 4 ⎕mx[11] 4 3 2j5 1
+¯1.666666667J¯2.5
+</pre>
+<p>In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
+</p>
+<p>Sample variance can be gotten by supplying the same arguement to the
+left and right:
+</p>
+<pre class="verbatim">      A← 6 7 10 13 14 14 18 19 22 24
+      A ⎕mx[11] A
+36.67777778 
+</pre>
+</div>
+<div class="subsection" id="Histograms">
+<h4 class="subsection">2.31.12 Histograms</h4>
+
+<p>The historgram operation, ⎕mx[12], is dyadic and requires a single
+integer left arguement and a real or complex vector as a right
+argument, then creates an equal-width-partition histogram of the
+samples contained in the right-argument vector.  The width of each
+bucket is equal to the range of the samples, max - min, divided by the
+number of buckets.  If the samples are complex, the imaginary
+components are ignored.  As examples:
+</p>
+<pre class="verbatim">      4 ⎕mx[12] (⍳101)-⎕io
+25 25 25 26
+</pre>
+<p>The distribution curves above were the result of things like:
+</p>
+<pre class="verbatim">      200 ⎕mx[12] 200000 ⎕mx[10 0] 1
+</pre>
+<p>I.e., a 200-bucket histotgram of a 200 thousand-member vector of 
+normally distributed samples with a standard deviation of 1.0.
+</p>
+</div>
+<div class="subsection" id="Print">
+<h4 class="subsection">2.31.13 Print</h4>
+
+<p>The print operation, ⎕mx[13], is dyadic and provides an easy way to
+dump large quantities of data to files.  It&rsquo;s right arguement is a
+string containing the file name to be created or, if the name starts
+with a &ldquo;&gt;&rdquo;, appended to.  The left argument can be a scalar, a
+vector, a matrix, or a string.  For example:
+</p>
+<pre class="verbatim">      34 ⎕mx[13] &quot;samples.txt&quot;
+
+      3 4 ⎕mx[13] &quot;&gt;samples.txt&quot;
+
+      (3 4⍴⍳12) ⎕mx[13] &quot;&gt;samples.txt&quot;
+
+      &quot;example line&quot; ⎕mx[13] &quot;&gt;samples.txt&quot;
+
+      &quot;example\nline&quot; ⎕mx[13] &quot;&gt;samples.txt&quot;
+</pre>
+<p>will create a file &ldquo;samples.txt&rdquo; containing:
+</p>
+<pre class="verbatim">34
+3 4
+ 1  2  3  4
+ 5  6  7  8 
+ 9 10 11 12 
+example line
+example
+line
+</pre>
+<p>Referring again to the distribution example, the plot data for that
+was created by:
+</p>
+<pre class="verbatim">    ∇
+[0]   distro;v
+[1]   v←⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 0] 1
+[2]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 2] 8
+[3]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 3] 8
+[4]   v ⎕mx[13] 'MX_distribution.data'
+    ∇
+</pre>
+<p>which created a 200-by-4 matrix, v, and printed it to the file
+MX_distribution.data, that being the format required for use by
+gnuplot:
+</p>
+<pre class="verbatim">   1   48    0
+   0  119    0 
+   0  187    0 
+   1  331    0
+   0  500    0
+   1  728    0
+   0  977    0
+   2 1161    0
+   1 1475    0
+      .
+      .
+      .
+  for 200 lines
+</pre>
+
+<hr>
+</div>
+</div>
+<div class="section" id="Section-2_002e32">
+<div class="header">
+<p>
+Next: <a href="#Section-2_002e33" accesskey="n" rel="next">⎕PNG - Portable Network Graphics</a>, Previous: <a href="#Section-2_002e31" accesskey="p" rel="prev">⎕MX - Matrix/Statistics</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="g_t_005b_003f_005dPLOT-_002d-Plot-Data"></span><h3 class="section">2.32 ⎕PLOT - Plot Data</h3>
 
 <p>⎕PLOT is a function for visualizing numerical APL values. The values to be
 plotted are provided as the right argument of ⎕PLOT while the optional
@@ -4089,7 +4504,7 @@ colors for plot lines, points, and grids, etc.
 <li><a href="#Output-File-Format" accesskey="4">Output File Format</a></li>
 </ul>
 <div class="subsection" id="The-Plot-Data-B">
-<h4 class="subsection">2.31.1 The Plot Data B</h4>
+<h4 class="subsection">2.32.1 The Plot Data B</h4>
 
 <p>The plot data <b>B</b> can be a vector (for a single plot line to be drawn)
 or a matrix (in that case one plot line per matrix row is being
@@ -4105,7 +4520,7 @@ be fine-tuned by overriding the default values (see dyadic A ⎕PLOT B below).
 <li><a href="#Real-Plot-Data-B" accesskey="2">Real Plot Data B</a></li>
 </ul>
 <div class="subsubsection" id="Complex-Plot-Data-B">
-<h4 class="subsubsection">2.31.1.1 Complex Plot Data B</h4>
+<h4 class="subsubsection">2.32.1.1 Complex Plot Data B</h4>
 
 <p>If a data item B[N] or B[row;N] is <b>complex</b>, say B[N] = x + iy. then it is
 placed (after some scaling) at position (x, y) of the plot. The X-range
@@ -4129,7 +4544,7 @@ in text mode see file <b>doc/PLOT_circle.png</b>):
 
 </div>
 <div class="subsubsection" id="Real-Plot-Data-B">
-<h4 class="subsubsection">2.31.1.2 Real Plot Data B</h4>
+<h4 class="subsubsection">2.32.1.2 Real Plot Data B</h4>
 
 <p>On the other hand, if a data item B[N] or B[row;N] is <b>real</b>, then it is
 placed at position (N, x) of the plot. The X-range is then
@@ -4157,7 +4572,7 @@ all real items in B are taken as complex with imaginary part 0.
 </div>
 </div>
 <div class="subsection" id="The-Plot-Attributes-A">
-<h4 class="subsection">2.31.2 The Plot Attributes A</h4>
+<h4 class="subsection">2.32.2 The Plot Attributes A</h4>
 
 <p>There are a number of attributes like colors, point sizes, line widths,
 etc. that control how the resulting plot will look.
@@ -4328,7 +4743,7 @@ Attributes.line_width_2 ← 4   ⍝ except plot line 2: 4 pixels thick
 <li><a href="#Tick-formatting-_0028GTK-only_0029" accesskey="1">Tick formatting (GTK only)</a></li>
 </ul>
 <div class="subsubsection" id="Tick-formatting-_0028GTK-only_0029">
-<h4 class="subsubsection">2.31.2.1 Tick formatting (GTK only)</h4>
+<h4 class="subsubsection">2.32.2.1 Tick formatting (GTK only)</h4>
 
 <p>By default, the ticks on the X, Y, and Z axes show the naked value
 of their corresponding coordinates. Sometimes you may want them to look a
@@ -4392,7 +4807,7 @@ reason there is no <b>gridY_variable</b> or <b>gridZ_variable</b>.
 </div>
 </div>
 <div class="subsection" id="Plot-Window-Handling">
-<h4 class="subsection">2.31.3 Plot Window Handling</h4>
+<h4 class="subsection">2.32.3 Plot Window Handling</h4>
 
 <p>Each call of ⎕PLOT with some plot data <b>B</b> opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
@@ -4422,9 +4837,9 @@ corresponds to the typical method(s) for closing windows on most systems.
 <div class="subsection" id="Output-File-Format">
 <div class="header">
 <p>
-Up: <a href="#Section-2_002e31" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Up: <a href="#Section-2_002e32" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Output-File-Format-1"></span><h4 class="subsection">2.31.4 Output File Format</h4>
+<span id="Output-File-Format-1"></span><h4 class="subsection">2.32.4 Output File Format</h4>
 
 <p>Early versions of ⎕PLOT were using <b>libxcb</b> to display the results of
 ⎕PLOT while recent versions use <b>libgtk-3</b>. The primary driver for this
@@ -4450,12 +4865,12 @@ the <b>libgtk-3</b> option.
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e32">
+<div class="section" id="Section-2_002e33">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e33" accesskey="n" rel="next">⎕PS - Print Style</a>, Previous: <a href="#Section-2_002e31" accesskey="p" rel="prev">⎕PLOT - Plot Data</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e34" accesskey="n" rel="next">⎕PS - Print Style</a>, Previous: <a href="#Section-2_002e32" accesskey="p" rel="prev">⎕PLOT - Plot Data</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dPNG-_002d-Portable-Network-Graphics"></span><h3 class="section">2.32 ⎕PNG - Portable Network Graphics</h3>
+<span id="g_t_005b_003f_005dPNG-_002d-Portable-Network-Graphics"></span><h3 class="section">2.33 ⎕PNG - Portable Network Graphics</h3>
 
 <p>Portable Network Graphics is a file format for images, defined in
 <strong>RFC 2083</strong>. To quote the RFC:
@@ -4470,7 +4885,7 @@ well-compressed, well-specified standard for lossless bitmapped image files.</ci
 <li><a href="#APL-Examples" accesskey="4">APL Examples</a></li>
 </ul>
 <div class="subsection" id="The-GNU-APL-Color-Model">
-<h4 class="subsection">2.32.1 The GNU APL Color Model</h4>
+<h4 class="subsection">2.33.1 The GNU APL Color Model</h4>
 
 <p>An image is a rectangular matrix of <strong>Pixels</strong> which makes APL the
 perfect language for manipulating images. In GNU APL (and also in the PNG
@@ -4579,7 +4994,7 @@ therefore should be more than sufficient for most purposes.
 </p>
 </div>
 <div class="subsection" id="Monadic-_005b_003f_005dPNG">
-<h4 class="subsection">2.32.2 Monadic ⎕PNG</h4>
+<h4 class="subsection">2.33.2 Monadic ⎕PNG</h4>
 
 <p>Monadic ⎕PNG, i.e. ⎕PNG B is used for 3 purposes:
 </p>
@@ -4625,7 +5040,7 @@ behaviour:
 
 </div>
 <div class="subsection" id="Dyadic-_005b_003f_005dPNG">
-<h4 class="subsection">2.32.3 Dyadic ⎕PNG</h4>
+<h4 class="subsection">2.33.3 Dyadic ⎕PNG</h4>
 
 <p>Dyadic <strong>A ⎕PNG B</strong> has only one purpose: to store an APL array in
 the GNU APL color model into a PNG file.
@@ -4644,7 +5059,7 @@ the GNU APL color model into a PNG file.
 
 </div>
 <div class="subsection" id="APL-Examples">
-<h4 class="subsection">2.32.4 APL Examples</h4>
+<h4 class="subsection">2.33.4 APL Examples</h4>
 
 <pre class="verbatim">      ⍝ load PNG file image.png
       Image ← ⎕PNG 'image.png'
@@ -4676,12 +5091,12 @@ the GNU APL color model into a PNG file.
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e33">
+<div class="section" id="Section-2_002e34">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e34" accesskey="n" rel="next">⎕RE - Regular Expressions</a>, Previous: <a href="#Section-2_002e32" accesskey="p" rel="prev">⎕PNG - Portable Network Graphics</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e35" accesskey="n" rel="next">⎕RE - Regular Expressions</a>, Previous: <a href="#Section-2_002e33" accesskey="p" rel="prev">⎕PNG - Portable Network Graphics</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dPS-_002d-Print-Style"></span><h3 class="section">2.33 ⎕PS - Print Style</h3>
+<span id="g_t_005b_003f_005dPS-_002d-Print-Style"></span><h3 class="section">2.34 ⎕PS - Print Style</h3>
 
 <p>⎕PS is an integer vector that currently (read: as of SVN 982) contains
 two integers which control some details of how APL values are being printed.
@@ -4707,12 +5122,12 @@ the same values.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-2_002e34">
+<div class="section" id="Section-2_002e35">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e35" accesskey="n" rel="next">⎕RVAL - Random APL value</a>, Previous: <a href="#Section-2_002e33" accesskey="p" rel="prev">⎕PS - Print Style</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e36" accesskey="n" rel="next">⎕RVAL - Random APL value</a>, Previous: <a href="#Section-2_002e34" accesskey="p" rel="prev">⎕PS - Print Style</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dRE-_002d-Regular-Expressions"></span><h3 class="section">2.34 ⎕RE - Regular Expressions</h3>
+<span id="g_t_005b_003f_005dRE-_002d-Regular-Expressions"></span><h3 class="section">2.35 ⎕RE - Regular Expressions</h3>
 
 <p>⎕RE is a function that provides access to a subset of libpcre2, which is a
 powerful regular expression matching library. &quot;pcre&quot; is an acronym for &quot;Perl
@@ -4728,7 +5143,7 @@ University of Cambridge, England.
 <li><a href="#Complex-Matches" accesskey="6">Complex Matches</a></li>
 </ul>
 <div class="subsection" id="Preconditions">
-<h4 class="subsection">2.34.1 Preconditions</h4>
+<h4 class="subsection">2.35.1 Preconditions</h4>
 
 <p>libpcre2 is NOT shipped with GNU APL but must be installed before the GNU APL
 ./configure script is executed. The ./configure script tries to locate libpcre2
@@ -4739,7 +5154,7 @@ and enables ⎕RE if the library (and its header files) are found.
 </p>
 </div>
 <div class="subsection" id="Syntax">
-<h4 class="subsection">2.34.2 Syntax</h4>
+<h4 class="subsection">2.35.2 Syntax</h4>
 
 <p>⎕RE has two forms. The short form (without an axis argument) is intended to
 cover the most likely use cases of ⎕RE, while the long form gives more control
@@ -4757,7 +5172,7 @@ arguments A, B, and X.
 </p>
 </div>
 <div class="subsection" id="The-Regular-Expression-A">
-<h4 class="subsection">2.34.3 The Regular Expression A</h4>
+<h4 class="subsection">2.35.3 The Regular Expression A</h4>
 
 <p>A is a simple character vector which is expected to be a regular expression
 as defined for the libpcre2 library. ⎕RE passes its left argument A unmodified
@@ -4770,7 +5185,7 @@ comes with libpcre2.
 </p>
 </div>
 <div class="subsection" id="The-String_0028s_0029-B-Being-Matched">
-<h4 class="subsection">2.34.4 The String(s) B Being Matched</h4>
+<h4 class="subsection">2.35.4 The String(s) B Being Matched</h4>
 
 <p>B is either:
 </p>
@@ -4803,7 +5218,7 @@ libpcre2 documentation.
 </p>
 </div>
 <div class="subsection" id="The-Flags-X">
-<h4 class="subsection">2.34.5 The Flags X</h4>
+<h4 class="subsection">2.35.5 The Flags X</h4>
 
 <p>By default, i.e. without an axis argument X or - equivalently - with an empty
 string X←<b>&quot;&quot;</b> as axis argument, ⎕RE returns the first match of the regular
@@ -4824,7 +5239,7 @@ libpcre2 or else understood by ⎕RE itself (and then not passed to libpcre2).
 <li><a href="#the-_005b_003f_005dRE-error-flag-E" accesskey="4">the ⎕RE error flag E</a></li>
 </ul>
 <div class="subsubsection" id="The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">
-<h4 class="subsubsection">2.34.5.1 The libpcre2 flags: i, m, s, and x</h4>
+<h4 class="subsubsection">2.35.5.1 The libpcre2 flags: i, m, s, and x</h4>
 
 <p>The libpcre2 flags accepted by ⎕RE are: i, m, s, and x. They correspond to the
 following libpcre2 flags:
@@ -4841,7 +5256,7 @@ of these flags.
 </p>
 </div>
 <div class="subsubsection" id="The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">
-<h4 class="subsubsection">2.34.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</h4>
+<h4 class="subsubsection">2.35.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</h4>
 
 <p>⎕RE provides different output formats, some of which are tailored to different
 APL functions, so that these other APL functions can use the result of ⎕RE
@@ -4893,7 +5308,7 @@ compress (dyadic /).
 </p>
 </div>
 <div class="subsubsection" id="the-_005b_003f_005dRE-global-flag-g">
-<h4 class="subsubsection">2.34.5.3 the ⎕RE global flag g</h4>
+<h4 class="subsubsection">2.35.5.3 the ⎕RE global flag g</h4>
 
 <p>The default behavior of ⎕RE is to return only the first match of A in B.
 The &rsquo;g&rsquo; flag causes ⎕RE to return all matches instead. For example:
@@ -4961,7 +5376,7 @@ formats &rsquo;string&rsquo; and &rsquo;position/length&rsquo;, but not of the r
 
 </div>
 <div class="subsubsection" id="the-_005b_003f_005dRE-error-flag-E">
-<h4 class="subsubsection">2.34.5.4 the ⎕RE error flag E</h4>
+<h4 class="subsubsection">2.35.5.4 the ⎕RE error flag E</h4>
 
 <p>The default behavior of ⎕RE is to return an empty result if no match of
 the regular expression A is found in B. It is sometimes more convenient to
@@ -4990,7 +5405,7 @@ it is natural to check the length of the result:
 </div>
 </div>
 <div class="subsection" id="Complex-Matches">
-<h4 class="subsection">2.34.6 Complex Matches</h4>
+<h4 class="subsection">2.35.6 Complex Matches</h4>
 
 <p>The regular expressions considered so far were simple, which means that they
 did not have (regular) sub-expressions. In other words, the regular expression
@@ -5057,12 +5472,12 @@ The result is therefore the top-level match plus two 1-character sub-matches:
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e35">
+<div class="section" id="Section-2_002e36">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e36" accesskey="n" rel="next">⎕SQL - SQL Database Interface</a>, Previous: <a href="#Section-2_002e34" accesskey="p" rel="prev">⎕RE - Regular Expressions</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e37" accesskey="n" rel="next">⎕SQL - SQL Database Interface</a>, Previous: <a href="#Section-2_002e35" accesskey="p" rel="prev">⎕RE - Regular Expressions</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dRVAL-_002d-Random-APL-value"></span><h3 class="section">2.35 ⎕RVAL - Random APL value</h3>
+<span id="g_t_005b_003f_005dRVAL-_002d-Random-APL-value"></span><h3 class="section">2.36 ⎕RVAL - Random APL value</h3>
 
 <p>The standard way to produce random numbers is the primitive function ?
 aka. <b>Roll</b>. Roll returns a simple random array whose ravel elements are
@@ -5086,7 +5501,7 @@ useful for other purposes as well.
 <li><a href="#Dyadic-_005b_003f_005dRVAL" accesskey="2">Dyadic ⎕RVAL</a></li>
 </ul>
 <div class="subsection" id="General">
-<h4 class="subsection">2.35.1 General</h4>
+<h4 class="subsection">2.36.1 General</h4>
 
 <p>In general, monadic ⎕RVAL B, returns a single random APL value Z,
 while dyadic A RVAL B is used to control the properties of
@@ -5109,7 +5524,7 @@ integer scalar.
 </p>
 </div>
 <div class="subsection" id="Dyadic-_005b_003f_005dRVAL">
-<h4 class="subsection">2.35.2 Dyadic ⎕RVAL</h4>
+<h4 class="subsection">2.36.2 Dyadic ⎕RVAL</h4>
 
 <p>The left argument A of A ⎕RVAL B determines which aspect of the
 subsequent random APL values shall be controlled. A is an integer scalar:
@@ -5137,7 +5552,7 @@ and
 <li><a href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" accesskey="6">monadic ⎕RVAL B: Return a new random value</a></li>
 </ul>
 <div class="subsubsection" id="Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">
-<h4 class="subsubsection">2.35.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</h4>
+<h4 class="subsubsection">2.36.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</h4>
 
 <p>⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
 only available on platforms which use glibc, for example all GNU/Linux
@@ -5168,7 +5583,7 @@ change the state of the other.
 </p>
 </div>
 <div class="subsubsection" id="Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B">
-<h4 class="subsubsection">2.35.2.2 Control of the ranks: 1 ⎕RVAL B</h4>
+<h4 class="subsubsection">2.36.2.2 Control of the ranks: 1 ⎕RVAL B</h4>
 
 <p>The rank of subsequently generated random values can be controlled with
 1 ⎕RVAL B as follows:
@@ -5209,7 +5624,7 @@ need not add up to 100, but will be scaled accordingly.
 
 </div>
 <div class="subsubsection" id="Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B">
-<h4 class="subsubsection">2.35.2.3 Control of the shapes: 2 ⎕RVAL B</h4>
+<h4 class="subsubsection">2.36.2.3 Control of the shapes: 2 ⎕RVAL B</h4>
 
 <p>The shapes of subsequently generated random values can be controlled with
 2 ⎕RVAL B as follows.
@@ -5240,7 +5655,7 @@ with 3 rows and between 0 and 10 columns.
 </p>
 </div>
 <div class="subsubsection" id="Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">
-<h4 class="subsubsection">2.35.2.4 Control of the data types: 3 ⎕RVAL B</h4>
+<h4 class="subsubsection">2.36.2.4 Control of the data types: 3 ⎕RVAL B</h4>
 
 <p>The types (i.e. CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of subsequently
 generated random values can be controlled with 3 ⎕RVAL B as follows.
@@ -5283,7 +5698,7 @@ query the current setting for 3 ⎕RVAL.
 </pre>
 </div>
 <div class="subsubsection" id="Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">
-<h4 class="subsubsection">2.35.2.5 Control of a maximum depth: 4 ⎕RVAL B</h4>
+<h4 class="subsubsection">2.36.2.5 Control of a maximum depth: 4 ⎕RVAL B</h4>
 
 <p>If the probability of generating a nested value is &gt; 0 then the depth of
 random values can become arbitrarily large and could therefore exceed the
@@ -5298,7 +5713,7 @@ query the current setting for 4 ⎕RVAL.
 </p>
 </div>
 <div class="subsubsection" id="monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">
-<h4 class="subsubsection">2.35.2.6 monadic ⎕RVAL B: Return a new random value</h4>
+<h4 class="subsubsection">2.36.2.6 monadic ⎕RVAL B: Return a new random value</h4>
 
 <p>Calling ⎕RVAL monadically produces one new random APL value.
 </p>
@@ -5353,12 +5768,12 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
 </div>
 </div>
 </div>
-<div class="section" id="Section-2_002e36">
+<div class="section" id="Section-2_002e37">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e37" accesskey="n" rel="next">⎕SI - State Indicator</a>, Previous: <a href="#Section-2_002e35" accesskey="p" rel="prev">⎕RVAL - Random APL value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e38" accesskey="n" rel="next">⎕SI - State Indicator</a>, Previous: <a href="#Section-2_002e36" accesskey="p" rel="prev">⎕RVAL - Random APL value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></span><h3 class="section">2.36 ⎕SQL - SQL Database Interface</h3>
+<span id="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></span><h3 class="section">2.37 ⎕SQL - SQL Database Interface</h3>
 
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below. ⎕SQL has an axis argument that
@@ -5379,7 +5794,7 @@ selects a sub-function of ⎕SQL.
 <li><a href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">Z ← ⎕SQL[11] B : library version string</a></li>
 </ul>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions">
-<h4 class="subsection">2.36.1 ⎕SQL[0] : display subfunctions</h4>
+<h4 class="subsection">2.37.1 ⎕SQL[0] : display subfunctions</h4>
 
 <pre class="verbatim">      ⎕SQL[0]''
 Available function numbers:
@@ -5397,7 +5812,7 @@ ref   ⎕SQL[9] table     - list columns for table
 </pre>
 </div>
 <div class="subsection" id="ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">
-<h4 class="subsection">2.36.2 ref ← A ⎕SQL[1] B : open database</h4>
+<h4 class="subsection">2.37.2 ref ← A ⎕SQL[1] B : open database</h4>
 
 <pre class="verbatim">      type  ⎕SQL[1] file
 </pre>
@@ -5423,7 +5838,7 @@ value.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">
-<h4 class="subsection">2.36.3 ⎕SQL[2] B : close database</h4>
+<h4 class="subsection">2.37.3 ⎕SQL[2] B : close database</h4>
 
 <pre class="verbatim">      ⎕SQL[2] ref
 </pre>
@@ -5436,7 +5851,7 @@ disconnected handles.
 </p>
 </div>
 <div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">
-<h4 class="subsection">2.36.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</h4>
+<h4 class="subsection">2.37.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</h4>
 
 <pre class="verbatim">      query ⎕SQL[3, ref] params
 </pre>
@@ -5457,7 +5872,7 @@ are returned as &rdquo;.
 </p>
 </div>
 <div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">
-<h4 class="subsection">2.36.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</h4>
+<h4 class="subsection">2.37.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</h4>
 
 <pre class="verbatim">      query ⎕SQL[4, ref] params
 </pre>
@@ -5468,7 +5883,7 @@ is used on statements which do not return a result table.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">
-<h4 class="subsection">2.36.6 ⎕SQL[5] B : start transaction</h4>
+<h4 class="subsection">2.37.6 ⎕SQL[5] B : start transaction</h4>
 
 <pre class="verbatim">      ⎕SQL[5] ref
 </pre>
@@ -5476,7 +5891,7 @@ is used on statements which do not return a result table.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">
-<h4 class="subsection">2.36.7 ⎕SQL[6] B : commit transaction</h4>
+<h4 class="subsection">2.37.7 ⎕SQL[6] B : commit transaction</h4>
 
 <pre class="verbatim">      ⎕SQL[6] ref
 </pre>
@@ -5484,7 +5899,7 @@ is used on statements which do not return a result table.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">
-<h4 class="subsection">2.36.8 ⎕SQL[7] B : rollback transaction</h4>
+<h4 class="subsection">2.37.8 ⎕SQL[7] B : rollback transaction</h4>
 
 <pre class="verbatim">      ⎕SQL[7] ref
 </pre>
@@ -5492,7 +5907,7 @@ is used on statements which do not return a result table.
 </p>
 </div>
 <div class="subsection" id="Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">
-<h4 class="subsection">2.36.9 Z←⎕SQL[8] B : table names</h4>
+<h4 class="subsection">2.37.9 Z←⎕SQL[8] B : table names</h4>
 
 <pre class="verbatim">      ⎕SQL[8] ref
 </pre>
@@ -5500,7 +5915,7 @@ is used on statements which do not return a result table.
 </p>
 </div>
 <div class="subsection" id="Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">
-<h4 class="subsection">2.36.10 Z←⎕SQL[9] B : column names</h4>
+<h4 class="subsection">2.37.10 Z←⎕SQL[9] B : column names</h4>
 
 <pre class="verbatim">      ref  ⎕SQL[9] table
 </pre>
@@ -5516,14 +5931,14 @@ release.
 
 </div>
 <div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">
-<h4 class="subsection">2.36.11 Z ← ⎕SQL[10] B : library version number</h4>
+<h4 class="subsection">2.37.11 Z ← ⎕SQL[10] B : library version number</h4>
 
 <p>Return the version number (integer scalar) of the library that was used
 to implement the database type <b>B</b>.
 </p>
 </div>
 <div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">
-<h4 class="subsection">2.36.12 Z ← ⎕SQL[11] B : library version string</h4>
+<h4 class="subsection">2.37.12 Z ← ⎕SQL[11] B : library version string</h4>
 
 <p>Return the version string of the library that was used to implement the
 database type <b>B</b>.
@@ -5532,12 +5947,12 @@ database type <b>B</b>.
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e37">
+<div class="section" id="Section-2_002e38">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e38" accesskey="n" rel="next">⎕SYL - System limits</a>, Previous: <a href="#Section-2_002e36" accesskey="p" rel="prev">⎕SQL - SQL Database Interface</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e39" accesskey="n" rel="next">⎕SYL - System limits</a>, Previous: <a href="#Section-2_002e37" accesskey="p" rel="prev">⎕SQL - SQL Database Interface</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dSI-_002d-State-Indicator"></span><h3 class="section">2.37 ⎕SI - State Indicator</h3>
+<span id="g_t_005b_003f_005dSI-_002d-State-Indicator"></span><h3 class="section">2.38 ⎕SI - State Indicator</h3>
 
 <p>⎕SI returns aspects of the current State Indicator, similar to the standard
 command )SI. This can be used, for example, to create debug functions similar
@@ -5608,12 +6023,12 @@ the caller, and so on.
 
 <hr>
 </div>
-<div class="section" id="Section-2_002e38">
+<div class="section" id="Section-2_002e39">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e39" accesskey="n" rel="next">⎕XML  - XML Parsing</a>, Previous: <a href="#Section-2_002e37" accesskey="p" rel="prev">⎕SI - State Indicator</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e40" accesskey="n" rel="next">⎕XML  - XML Parsing</a>, Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SI - State Indicator</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dSYL-_002d-System-limits"></span><h3 class="section">2.38 ⎕SYL - System limits</h3>
+<span id="g_t_005b_003f_005dSYL-_002d-System-limits"></span><h3 class="section">2.39 ⎕SYL - System limits</h3>
 
 <p>System variable ⎕SYL shows a number of system limits when referenced:
 </p>
@@ -5657,7 +6072,7 @@ be changed at compile-time via ./configure
 <li><a href="#g_t_005b_003f_005dSYL_005b27_003b_005d" accesskey="4">⎕SYL[27;]</a></li>
 </ul>
 <div class="subsection" id="g_t_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d">
-<h4 class="subsection">2.38.1 ⎕SYL[1 2 3 4 5 6;]</h4>
+<h4 class="subsection">2.39.1 ⎕SYL[1 2 3 4 5 6;]</h4>
 
 <p>The first three limits are writable; their purpose is to stop execution
 if:
@@ -5691,7 +6106,7 @@ current value, is rejected with a DOMAIN ERROR.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSYL_005b7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23_003b_005d">
-<h4 class="subsection">2.38.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]</h4>
+<h4 class="subsection">2.39.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]</h4>
 
 <p>These system limits are read-only. Some of them can be changed at
 compile time via ./configure. Most others can be changed in the source code
@@ -5699,14 +6114,14 @@ of GNU APL, but doing so is not recommended.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSYL_005b24-25-26_003b_005d">
-<h4 class="subsection">2.38.3 ⎕SYL[24 25 26;]</h4>
+<h4 class="subsection">2.39.3 ⎕SYL[24 25 26;]</h4>
 
 <p>These system limits have been added in preparation for multi-core GNU APL.
 They are currently not used.
 </p>
 </div>
 <div class="subsection" id="g_t_005b_003f_005dSYL_005b27_003b_005d">
-<h4 class="subsection">2.38.4 ⎕SYL[27;]</h4>
+<h4 class="subsection">2.39.4 ⎕SYL[27;]</h4>
 
 <p>This is not a limit that raises a limit error. Instead it limits the
 size of APL values when printed as statement results. It is fairly easy
@@ -5723,12 +6138,12 @@ is printed instead of VALUE. The shape SH is computed like this:
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e39">
+<div class="section" id="Section-2_002e40">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e40" accesskey="n" rel="next">Conditionals</a>, Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SYL - System limits</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e41" accesskey="n" rel="next">Conditionals</a>, Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕SYL - System limits</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dXML-_002d-XML-Parsing"></span><h3 class="section">2.39 ⎕XML  - XML Parsing</h3>
+<span id="g_t_005b_003f_005dXML-_002d-XML-Parsing"></span><h3 class="section">2.40 ⎕XML  - XML Parsing</h3>
 
 <ul class="section-toc">
 <li><a href="#Purpose" accesskey="1">Purpose</a></li>
@@ -5739,7 +6154,7 @@ Next: <a href="#Section-2_002e40" accesskey="n" rel="next">Conditionals</a>, Pre
 <li><a href="#XML-Queries" accesskey="6">XML Queries</a></li>
 </ul>
 <div class="subsection" id="Purpose">
-<h4 class="subsection">2.39.1 Purpose</h4>
+<h4 class="subsection">2.40.1 Purpose</h4>
 
 <p>GNU APL provides ⎕XML as a means of performing <b>elementary</b>
 manipulations of APL character strings that are formatted according
@@ -5772,7 +6187,7 @@ Hello
 
 </div>
 <div class="subsection" id="Some-XML-Terminology">
-<h4 class="subsection">2.39.2 Some XML Terminology</h4>
+<h4 class="subsection">2.40.2 Some XML Terminology</h4>
 
 <p>An XML document is a character string with a standardized format.
 The characters must be valid XML characters as defined in the XML
@@ -5858,7 +6273,7 @@ entities (i.e. &amp;, &lt;, &gt;, &rsquo;, and &quot;) are recognized (and trans
 </p>
 </div>
 <div class="subsection" id="How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values">
-<h4 class="subsection">2.39.3 How ⎕XML maps XML documents to APL Values</h4>
+<h4 class="subsection">2.40.3 How ⎕XML maps XML documents to APL Values</h4>
 
 <p>The principal mapping between XML strings and APL values is:
 </p>
@@ -5988,7 +6403,7 @@ be contained in a single associative array.
 </pre>
 </div>
 <div class="subsection" id="Monadic-_005b_003f_005dXML">
-<h4 class="subsection">2.39.4 Monadic ⎕XML</h4>
+<h4 class="subsection">2.40.4 Monadic ⎕XML</h4>
 
 <p><b>Z ← ⎕XML B</b> converts APL string B that contains a valid XML document
 to an associative APL array Z and vice versa.
@@ -6007,7 +6422,7 @@ This effect can be suppressed in 2 ways:
 
 </div>
 <div class="subsection" id="Dyadic-_005b_003f_005dXML">
-<h4 class="subsection">2.39.5 Dyadic ⎕XML</h4>
+<h4 class="subsection">2.40.5 Dyadic ⎕XML</h4>
 
 <p><b>Z ← A ⎕XML B</b> provides a number of convenience functions. Its left
 argument A is an integer function number, possibly followed by arguments
@@ -6222,7 +6637,7 @@ _3C
 
 </div>
 <div class="subsection" id="XML-Queries">
-<h4 class="subsection">2.39.6 XML Queries</h4>
+<h4 class="subsection">2.40.6 XML Queries</h4>
 
 <p>The different functions in dyadic ⎕XML are intended to construct XML queries.
 An XML query extracts information from, or modifies information in, an XML
@@ -6241,12 +6656,12 @@ follow these top-level steps:
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e40">
+<div class="section" id="Section-2_002e41">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e41" accesskey="n" rel="next">Matrix Product</a>, Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕XML  - XML Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e42" accesskey="n" rel="next">Matrix Product</a>, Previous: <a href="#Section-2_002e40" accesskey="p" rel="prev">⎕XML  - XML Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Conditionals"></span><h3 class="section">2.40 Conditionals</h3>
+<span id="Conditionals"></span><h3 class="section">2.41 Conditionals</h3>
 
 <p><b>WARNING</b>: GNU APL conditionals are experimental. Use them with care and
 avoid them, wherever possible, in favour of portability. Neither the ISO
@@ -6257,7 +6672,7 @@ APL standard, nor IBM APL2 provide conditionals.
 <li><a href="#Syntax-1" accesskey="2">Syntax</a></li>
 </ul>
 <div class="subsection" id="Design-considerations_002e">
-<h4 class="subsection">2.40.1 Design considerations.</h4>
+<h4 class="subsection">2.41.1 Design considerations.</h4>
 
 <p>The author of GNU APL has, for a long time, hesitated to implement
 conditionals in GNU APL. Primarily for the following reasons:
@@ -6422,7 +6837,7 @@ of 1. (e.g. insertion of debug printouts into a clause).
 </p>
 </div>
 <div class="subsection" id="Syntax-1">
-<h4 class="subsection">2.40.2 Syntax</h4>
+<h4 class="subsection">2.41.2 Syntax</h4>
 
 <p>With the above considerations in mind, GNU APL decided for the following
 syntax:
@@ -6533,12 +6948,12 @@ Fatal error in defined function line [2]. You may now:
 <hr>
 </div>
 </div>
-<div class="section" id="Section-2_002e41">
+<div class="section" id="Section-2_002e42">
 <div class="header">
 <p>
-Previous: <a href="#Section-2_002e40" accesskey="p" rel="prev">Conditionals</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-2_002e41" accesskey="p" rel="prev">Conditionals</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Matrix-Product"></span><h3 class="section">2.41 Matrix Product</h3>
+<span id="Matrix-Product"></span><h3 class="section">2.42 Matrix Product</h3>
 
 <p>In standard APL, the inner product Z of two matrices A and B as known from
 linear algebra, is:

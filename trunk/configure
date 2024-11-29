@@ -702,6 +702,10 @@ apl_GTK3_TRUE
 GTK_CFLAGS
 GTK_LDFLAGS
 PKG_CONFIG
+apl_GSL_FALSE
+apl_GSL_TRUE
+GSL_CFLAGS
+GSL_LIBS
 apl_PCRE_FALSE
 apl_PCRE_TRUE
 PCRE_CFLAGS
@@ -866,6 +870,7 @@ with_x
 with_sqlite3
 with_postgresql
 with_pcre
+with_gsl
 with_gtk3
 with_ctrld_del
 with_android
@@ -1570,6 +1575,7 @@ Optional Packages:
                           use PostgreSQL library [default=yes], optionally
                           specify the PATH to pg_config
   --with-pcre[=prefix]    enable ⎕RE (needs libpcre2)
+  --with-gsl[=prefix]     enable ⎕MX (needs libgsl)
   --with-gtk3             enable ⎕GTK (interface to GTK+ version 3; needs
                           libgtk-3 and more)
   --with-ctrld_del        enable to use ^D as del-char, ^Z as EOT
@@ -21766,6 +21772,237 @@ dash_test_PCRE   # set apl_PCRE to yes or no.
    test "x$apl_PCRE" != "xyes" && printf "%s\n" "   └──── will affect: ⎕RE"
 
 
+# check if libgsl is installed and usable
+
+# wrap multiple tests into a single dash function from which we may
+# return prematurely (which m4 can't) if a sub-test fails...
+#
+dash_test_GSL()
+{ {
+apl_GSL=no
+
+# ===========================================================================
+#     https://www.gnu.org/software/autoconf-archive/ax_path_lib_gsl.html
+#     !!! modified for GNU APL needs: better use the original !!!
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_PATH_LIB_GSL []
+#
+# DESCRIPTION
+#
+#   check for gsl lib and set GSL_LIBS and GSL_CFLAGS accordingly.
+#
+#   also provide --with-gsl option that may point to the $prefix of the
+#   gsl installation - the macro will check $gsl/include and $gsl/lib to
+#   contain the necessary files.
+#
+#   the usual two ACTION-IF-FOUND / ACTION-IF-NOT-FOUND are NOT supported and
+#   they can NOT take advantage of the LIBS/CFLAGS additions.
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
+#
+#   This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation; either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+
+   # define AX_PATH_LIB_GSL()
+
+# Check whether --with-gsl was given.
+if test ${with_gsl+y}
+then :
+  withval=$with_gsl;
+else $as_nop
+  with_gsl="yes"
+fi
+
+
+case $with_gsl in
+   "no")
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: disabled by: --with-gsl=no" >&5
+printf "%s\n" "disabled by: --with-gsl=no" >&6; }
+         ;;
+  "" | "yes")
+
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
+printf %s "checking for cos in -lm... " >&6; }
+if test ${ac_cv_lib_m_cos+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+namespace conftest {
+  extern "C" int cos ();
+}
+int
+main (void)
+{
+return conftest::cos ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  ac_cv_lib_m_cos=yes
+else $as_nop
+  ac_cv_lib_m_cos=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_cos" >&5
+printf "%s\n" "$ac_cv_lib_m_cos" >&6; }
+if test "x$ac_cv_lib_m_cos" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBM 1" >>confdefs.h
+
+  LIBS="-lm $LIBS"
+
+fi
+
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for cblas_dgemm in -lgslcblas" >&5
+printf %s "checking for cblas_dgemm in -lgslcblas... " >&6; }
+if test ${ac_cv_lib_gslcblas_cblas_dgemm+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgslcblas  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+namespace conftest {
+  extern "C" int cblas_dgemm ();
+}
+int
+main (void)
+{
+return conftest::cblas_dgemm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  ac_cv_lib_gslcblas_cblas_dgemm=yes
+else $as_nop
+  ac_cv_lib_gslcblas_cblas_dgemm=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gslcblas_cblas_dgemm" >&5
+printf "%s\n" "$ac_cv_lib_gslcblas_cblas_dgemm" >&6; }
+if test "x$ac_cv_lib_gslcblas_cblas_dgemm" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBGSLCBLAS 1" >>confdefs.h
+
+  LIBS="-lgslcblas $LIBS"
+
+fi
+
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gsl_blas_dgemm in -lgsl" >&5
+printf %s "checking for gsl_blas_dgemm in -lgsl... " >&6; }
+if test ${ac_cv_lib_gsl_gsl_blas_dgemm+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgsl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+namespace conftest {
+  extern "C" int gsl_blas_dgemm ();
+}
+int
+main (void)
+{
+return conftest::gsl_blas_dgemm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  ac_cv_lib_gsl_gsl_blas_dgemm=yes
+else $as_nop
+  ac_cv_lib_gsl_gsl_blas_dgemm=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gsl_gsl_blas_dgemm" >&5
+printf "%s\n" "$ac_cv_lib_gsl_gsl_blas_dgemm" >&6; }
+if test "x$ac_cv_lib_gsl_gsl_blas_dgemm" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBGSL 1" >>confdefs.h
+
+  LIBS="-lgsl $LIBS"
+
+fi
+
+       if test "$ac_cv_lib_gsl_gsl_blas_dgemm" = "yes" ; then
+          GSL_LIBS="-lgsl -lgslcblas"
+       fi
+       ;;
+   *)
+esac
+
+
+
+                   # set ac_cv_lib_gsl_32_gsl_compile_32
+apl_GSL=$ac_cv_lib_gsl_gsl_blas_dgemm
+
+# export apl_GSL to Makefile.am
+ if test "x$apl_GSL" = "xyes"; then
+  apl_GSL_TRUE=
+  apl_GSL_FALSE='#'
+else
+  apl_GSL_TRUE='#'
+  apl_GSL_FALSE=
+fi
+
+} }
+dash_test_GSL   # set apl_GSL to yes or no.
+
+   test "x$apl_GSL" != "xyes" && printf "%s\n" "   └──── will affect: ⎕MX"
+
+
 # check if libgtk-3 and related libraries are installed and usable
 
 # wrap multiple tests into a single dash function from which we may
@@ -23025,6 +23262,15 @@ else
 
 fi
 
+if (test "x$apl_GSL" = "xyes"); then
+
+printf "%s\n" "#define apl_GSL 1" >>confdefs.h
+
+else
+   printf "%s\n" "#define apl_GSL 0" >>confdefs.h
+
+fi
+
 if (test "x$apl_PCRE" = "xyes"); then
 
 printf "%s\n" "#define apl_PCRE 1" >>confdefs.h
@@ -23205,6 +23451,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_PCRE_TRUE}" && test -z "${apl_PCRE_FALSE}"; then
   as_fn_error $? "conditional \"apl_PCRE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${apl_GSL_TRUE}" && test -z "${apl_GSL_FALSE}"; then
+  as_fn_error $? "conditional \"apl_GSL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_GTK3_TRUE}" && test -z "${apl_GTK3_FALSE}"; then
@@ -25733,6 +25983,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions
     apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
+    apl_GSL:                     $apl_GSL	(affects: ⎕MX)
     apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
     apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)

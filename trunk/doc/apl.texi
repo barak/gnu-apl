@@ -761,17 +761,18 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.28::  ⎕GTK  - GTK Interface
 * Section 2.29::  ⎕JSON - JSON Parsing
 * Section 2.30::  ⎕MAP  - Map Value
-* Section 2.31::  ⎕PLOT - Plot Data
-* Section 2.32::  ⎕PNG  - Portable Network Graphics
-* Section 2.33::  ⎕PS   - Print Style
-* Section 2.34::  ⎕RE   - Regular Expressions
-* Section 2.35::  ⎕RVAL - Random APL value
-* Section 2.36::  ⎕SQL  - SQL Database Interface
-* Section 2.37::  ⎕SI   - State Indicator
-* Section 2.38::  ⎕SYL  - System limits
-* Section 2.39::  ⎕XML - XML Parsing
-* Section 2.40::  Conditionals
-* Section 2.41::  Matrix Product
+* Section 2.31::  ⎕MX   - Matrix/Statistics
+* Section 2.32::  ⎕PLOT - Plot Data
+* Section 2.33::  ⎕PNG  - Portable Network Graphics
+* Section 2.34::  ⎕PS   - Print Style
+* Section 2.35::  ⎕RE   - Regular Expressions
+* Section 2.36::  ⎕RVAL - Random APL value
+* Section 2.37::  ⎕SQL  - SQL Database Interface
+* Section 2.38::  ⎕SI   - State Indicator
+* Section 2.39::  ⎕SYL  - System limits
+* Section 2.40::  ⎕XML - XML Parsing
+* Section 2.41::  Conditionals
+* Section 2.42::  Matrix Product
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -3711,6 +3712,411 @@ shown in the examples below.
 @end verbatim
 
 @node    Section 2.31
+@section ⎕MX - Matrix/Statistics
+
+⎕MX[x] is a function that providess a collection of matrix and
+statistical operations such as covariance, eigensystems, and so on,
+and random number generation in several sorts of distributions, The
+operation is selected through the use of the axis specifier:
+
+@verbatim
+        1       monadic Determinant
+        2       nomadic Cross product
+        3       dyadic  Vector angle
+        4       monadic Eigenvector
+        5       monadic Eigenvalue
+        6       monadic Ident
+        7       monadic Rotation matrix
+        8       dyadic  Homogeneous transform
+        9       monadic Norm
+        10      nomadic Randoms
+        11      nomadic Covariance
+        12      dyadic  Histogram
+        13      dyadic  Print
+@end verbatim
+
+(These may by shown by entering ⎕mx '' or ⎕mx[0] on the APL command
+line.)
+
+@subsection Determinant
+
+The determinant operation, ⎕mx[1], is monadic and is valid only for
+numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑⍴B)
+(i.e., a square matrix).  E.g.:
+
+@verbatim
+      mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
+¯164J76
+
+@end verbatim
+
+@subsection Cross Product
+
+The cross-product operation, ⎕mx[2], is nomadic.  In monadic form, it
+requires a numeric argument (real or complex) where ⍴⍴⊥ = 2 and
+(1↑⍴B)-1 = (¯1↑⍴B), i.e., a matrix of N-1 rows of length-N vectors.
+E.g.:
+
+@verbatim
+      B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
+      B
+1  2  3J6  4
+5  6  7    8
+9 10 11   12
+      ⎕mx[2] B
+0J48 0J¯72 0 0J24
+@end verbatim
+
+For reasons I'm not enough of a mathematician to understand, cross
+products are only valid in 3-space and 7-space, so the only valid monadic
+arguments are matrices of shapes [2 3] or [6 7]. ⎕mx, however, doesn't check
+this and will happily give you a result in any dimensionality and
+leave it your imagination what it may mean.  I'm also not enough of a
+mathematician to know what the significance may be of cross products
+involving complex numbers and thus I can't guarantee I'm using an
+appropriate method in computing them.
+
+In dyadic form, cross-product requires left and right arguments to be
+numeric and of ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
+
+@verbatim
+      1 2 3j6 ⎕mx[2] 4 5 6
+¯3J¯30 6J24 ¯3
+@end verbatim
+
+@subsection Vector Angle
+
+The vector angle operation ⎕mx[3] is dyadic and returns the angle between two
+isomorphic real or complex vectors where, ⍴⍴A = 1, ⍴⍴⊥ = 1, and ⍴A =
+⍴B:
+
+@verbatim
+      (⍳8) ⎕mx[3] 4j4+⍳8
+0.2515670406J0.09930859532
+@end verbatim
+
+@subsection Eigenvector
+
+The eigenvector operation, ⎕mx[4], is monadic and returns the complex
+eigenvectors of real non-symetric square matrices:
+
+@verbatim
+      B
+¯1  1 ¯1 1
+¯8  4 ¯2 1
+27  9  3 1
+64 16  4 1
+      ⎕mx[4] B
+  0.09988            0.1113          ¯0.2925           ¯0.9445
+  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601   0.8396J0.04139
+  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601    0.8396J¯0.04139
+ ¯0.1449             0.3566           0.9194            0.08118
+@end verbatim
+
+where each row represents an eigenvector:
+
+@verbatim
+      E←⎕mx[4] B
+      E[⎕io;]                   ⍝ first vector
+0.09988 0.1113 ¯0.2925 ¯0.9445
+      E[⎕io+1;]                 ⍝ second vector
+0.04308J0.009687 ¯0.07091J0.1389 0.5166J¯0.01601 0.8396J0.04139
+      etc
+@end verbatim
+
+The eigenvalues are computed concurrently and the eignenvector matrix
+is sorted according to the descending magnitude of the corresponding
+eigenvalue.
+
+@subsection Eigenvalue
+
+The eigenvalue operation, ⎕mx[5], also monadic with an argument of the
+same shape as that of the argument of the eigenvector operation,
+returns a complex vector of the eigenvectors of the matrix argument:
+
+@verbatim
+      F←⎕mx[5] B
+      F
+¯6.414 5.546J3.085 5.546J¯3.085 2.323
+@end verbatim
+
+The order of eigen vectors, E from above, is related to the order of
+the eigenvalues, F, by the relationship:
+
+@verbatim
+             E[k;] ⬄ F[k]
+@end verbatim
+
+(Note that, from the above example:
+
+@verbatim
+      |F
+6.414 6.346285607 6.346285607 2.323
+@end verbatim
+
+i.e., that the order of the magnitude of the elements is descending,
+making the initial eigenvector, E[⎕io;], the dominant eigenvector and
+each successive eigenvector successively less significant.)
+
+Accordingly:
+
+@verbatim
+      4 ⎕cr (⊂⍉(1,⍴F)⍴F),(⊂E)
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
+┃↓¯6.414       ┃ ↓  0.09988           0.1113         ¯0.2925          ¯0.9445          ┃┃
+┃┃ 5.546J3.085 ┃ ┃  0.04308J0.00969  ¯0.07091J0.139   0.5166J¯0.01601  0.8396J0.04139  ┃┃
+┃┃ 5.546J¯3.085┃ ┃  0.04308J¯0.00969 ¯0.07091J¯0.139  0.5166J0.01601   0.8396J¯0.04139 ┃┃
+┃┃ 2.323       ┃ ┃ ¯0.1449            0.3566          0.9194           0.08118         ┃┃
+┃┗━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+   Values            Vectors
+@end verbatim
+
+@subsection Ident
+
+The ident operation, ⎕mx[6], takes a scalar real integer argument and returns a square
+identity matrix of that size:
+
+@verbatim
+      ⎕mx[6] 4  
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+@end verbatim
+
+@subsection Rotation
+
+The rotation operation, ⎕mx[7], takes a real or complex scalar angle and returns a 2-space
+rotation matrix:
+
+@verbatim
+      ⎕mx[7] ○30÷180
+0.866 ¯0.5
+0.5    0.866
+@end verbatim
+
+@subsection Homogeneous transform
+
+The homogeneous operation ⎕mx[8] takes as its left arguement a 3-space displacement vector
+and, as its right arguement, a 3-space elemental rotation (i.e., independent rotations
+around the X, Y, and Z axes respectively) and returns the corresponding homogeneous matrix:
+
+@verbatim
+      1 2 3 ⎕mx[8] ○(30 45 60)÷180
+ 0.6124 0.2803  0.7392 0
+ 0.3536 0.7392 ¯0.5732 0
+¯0.7071 0.6124  0.3536 0
+ 1      2       3      1
+@end verbatim
+
+@subsection Norm
+
+The norm operation, ⎕mx[9], takes a real or complex non-scalar numeric
+argument and returns a result of the same shape such that the sum of
+the squares of the elements equals 1:
+
+@verbatim
+      ⎕mx[9] 1 2 3 4
+0.1825741858 0.3651483717 0.5477225575 0.7302967433
+      (⎕mx[9] 1 2 3 4)*2
+0.03333333333 0.1333333333 0.3 0.5333333333
+      +/(⎕mx[9] 1 2 3 4)*2
+1
+     
+      B←(3 3⍴⍳9)-⎕io
+      B
+0 1 2
+3 4 5
+6 7 8
+      ⎕mx[9] B
+0            0.0700140042 0.1400280084
+0.2100420126 0.2800560168 0.350070021
+0.4200840252 0.4900980294 0.5601120336
+      +/,(⎕mx[9] B)*2
+1
+@end verbatim
+
+If the magnitude of the arguement is zero, the operation returns an all-zero
+result of of the same shape as the arguement.
+
+
+@subsection Randoms
+
+The randoms operation, ⎕mx[10] or ⎕mx[10 x] where x is an integer
+specifying the distribution of the randoms generated.  At present, the
+distibutions supported are:
+
+@enumerate 0
+@item
+Normal
+
+@item
+Lognormal
+
+@item
+Chi Squared
+
+@item
+Student T
+@end enumerate
+
+The default if x is not specified is normal distribution.  The right
+arguement is a single real or complex value that specifies the required
+standard deviation--if the value is complex, the value returned is
+also complex with random real and imaginary components.  If a left
+arguement is specified, it must be a scalar integer and the operation
+returns a ramdom vector of that length.  If a mean is applicable to a
+given distribution, it is set to 0.0.
+
+@verbatim
+      ⎕mx[10] 2
+¯1.0504575511
+      ⎕mx[10] 2
+¯2.9337180373
+      5 ⎕mx[10] 2
+0.05154476627 3.80631021 2.455474045 3.165260688 0.6792784063
+      3 ⎕mx[10] 1j1
+¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
+@end verbatim
+
+@image{MX_distributions}
+
+(This image is a plot of three 200-bucket histograms of 200000 samples
+each of a normal distribution, a chi-square distribution, and a
+Student T distribution.  See Histograms below.)
+
+@subsection Covariance
+
+The covariance operation, ⎕mx[11], is nomadic.  In monadic form, it
+interprets each row of a matrix argument as samples of a given
+variable, computes the covariance of each sample set with respect to
+every other sample set, and presents the covariances as a matrix.  For
+example:
+
+@verbatim
+      B←3 4⍴?12⍴10
+      B
+5 8  1 9
+7 6  2 9
+6 5 10 4
+      ⎕mx[11] B
+12.91666667   9.333333333 ¯9.25
+ 9.333333333  8.666666667 ¯7.333333333
+¯9.25        ¯7.333333333  6.916666667
+@end verbatim
+
+In dyadic form, it computes the covariance of the argument vectors:
+
+@verbatim
+      1 2j6 3 4 ⎕mx[11] 4 3 2j5 1
+¯1.666666667J¯2.5
+@end verbatim
+
+In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
+
+Sample variance can be gotten by supplying the same arguement to the
+left and right:
+
+@verbatim
+      A← 6 7 10 13 14 14 18 19 22 24
+      A ⎕mx[11] A
+36.67777778 
+@end verbatim
+
+@subsection Histograms
+
+The historgram operation, ⎕mx[12], is dyadic and requires a single
+integer left arguement and a real or complex vector as a right
+argument, then creates an equal-width-partition histogram of the
+samples contained in the right-argument vector.  The width of each
+bucket is equal to the range of the samples, max - min, divided by the
+number of buckets.  If the samples are complex, the imaginary
+components are ignored.  As examples:
+
+@verbatim
+      4 ⎕mx[12] (⍳101)-⎕io
+25 25 25 26
+@end verbatim
+
+The distribution curves above were the result of things like:
+
+@verbatim
+      200 ⎕mx[12] 200000 ⎕mx[10 0] 1
+@end verbatim
+
+I.e., a 200-bucket histotgram of a 200 thousand-member vector of 
+normally distributed samples with a standard deviation of 1.0.
+
+@subsection Print
+
+The print operation, ⎕mx[13], is dyadic and provides an easy way to
+dump large quantities of data to files.  It's right arguement is a
+string containing the file name to be created or, if the name starts
+with a ``>'', appended to.  The left argument can be a scalar, a
+vector, a matrix, or a string.  For example:
+
+@verbatim
+      34 ⎕mx[13] "samples.txt"
+
+      3 4 ⎕mx[13] ">samples.txt"
+
+      (3 4⍴⍳12) ⎕mx[13] ">samples.txt"
+
+      "example line" ⎕mx[13] ">samples.txt"
+
+      "example\nline" ⎕mx[13] ">samples.txt"
+@end verbatim
+
+will create a file ``samples.txt'' containing:
+
+@verbatim
+34
+3 4
+ 1  2  3  4
+ 5  6  7  8 
+ 9 10 11 12 
+example line
+example
+line
+@end verbatim
+
+Referring again to the distribution example, the plot data for that
+was created by:
+
+@verbatim
+    ∇
+[0]   distro;v
+[1]   v←⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 0] 1
+[2]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 2] 8
+[3]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 3] 8
+[4]   v ⎕mx[13] 'MX_distribution.data'
+    ∇
+@end verbatim
+
+which created a 200-by-4 matrix, v, and printed it to the file
+MX_distribution.data, that being the format required for use by
+gnuplot:
+
+@verbatim
+   1   48    0
+   0  119    0 
+   0  187    0 
+   1  331    0
+   0  500    0
+   1  728    0
+   0  977    0
+   2 1161    0
+   1 1475    0
+      .
+      .
+      .
+  for 200 lines
+@end verbatim
+
+
+@node    Section 2.32
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -4089,7 +4495,7 @@ For backward compatibility, the @b{libxcb} option for ⎕PLOT will continue
 to exist for some time, but bug fixes and new features will only be made for
 the @b{libgtk-3} option.
 
-@node    Section 2.32
+@node    Section 2.33
 @section ⎕PNG - Portable Network Graphics
 
 Portable Network Graphics is a file format for images, defined in
@@ -4297,7 +4703,7 @@ the GNU APL color model into a PNG file.
 
 @end verbatim
 
-@node    Section 2.33
+@node    Section 2.34
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -4322,7 +4728,7 @@ the same values.
 Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
-@node    Section 2.34
+@node    Section 2.35
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -4654,7 +5060,7 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-@node    Section 2.35
+@node    Section 2.36
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -4948,7 +5354,7 @@ Examples:
 @end verbatim
 
 
-@node    Section 2.36
+@node    Section 2.37
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -5103,7 +5509,7 @@ Return the version string of the library that was used to implement the
 database type @b{B}.
 
 
-@node    Section 2.37
+@node    Section 2.38
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -5182,7 +5588,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 2.38
+@node    Section 2.39
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -5284,7 +5690,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end verbatim
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.39
+@node    Section 2.40
 @section ⎕XML  - XML Parsing
 
 @subsection Purpose
@@ -5807,7 +6213,7 @@ follow these top-level steps:
 @end enumerate
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.40
+@node    Section 2.41
 @section Conditionals
 
 @b{WARNING}: GNU APL conditionals are experimental. Use them with care and
@@ -6103,7 +6509,7 @@ The recommended usage of corresponding →→, ←→, and ←← token is to:
 Like shown in the examples above.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.41
+@node    Section 2.42
 @section Matrix Product
 
 In standard APL, the inner product Z of two matrices A and B as known from

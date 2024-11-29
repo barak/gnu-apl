@@ -41,8 +41,8 @@ missing_files(const char * qfun,   // the function, e.g. "⎕RE"
 UCS_string & more = MORE_ERROR() <<
 "Bad luck. The system function " << qfun <<
 " has raised a SYNTAX ERROR even though the\n"
-"syntax used was correct. The real reason for the SYNTAX ERROR was that a\n"
-"library or header file on which " << qfun << " depends:\n"
+"syntax used was correct. The real reason for the SYNTAX ERROR was that\n"
+"one or more library and/or header file on which " << qfun << " depends:\n"
 "\n"
 " ⋆ could not be found by ./configure, and/or\n"
 " ⋆ was explitly disabled by a ./configure argument\n"
@@ -67,7 +67,7 @@ UCS_string & more = MORE_ERROR() <<
         const char * numerus = hdrs[1] ? "s were" : " was";
         more << "\nThe possibly missing header file" << numerus << ":";
         for (int j = 0; hdrs[j]; ++j)   more << " " << hdrs[j];
-        more << "\nTo locate it, run e.g.:\n\n";
+        more << "\nTo locate it/them, run e.g.:\n\n";
         for (int j = 0; hdrs[j]; ++j)
             more << "      )HOST find /usr -name '" << hdrs[j]
                  << "' 2>/dev/null\n";

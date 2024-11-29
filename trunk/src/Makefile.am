@@ -125,6 +125,7 @@ common_SOURCES += Quad_FX.cc							Quad_FX.hh
 common_SOURCES += Quad_GTK.cc							Quad_GTK.hh
 common_SOURCES += Quad_JSON.cc							Quad_JSON.hh
 common_SOURCES += Quad_MAP.cc							Quad_MAP.hh
+common_SOURCES += Quad_MX.cc		Quad_MX.def				Quad_MX.hh
 common_SOURCES += Quad_PLOT.cc		Quad_PLOT.def		Quad_PLOT.hh
 common_SOURCES += Quad_PNG.cc							Quad_PNG.hh
 common_SOURCES += Quad_RE.cc							Quad_RE.hh

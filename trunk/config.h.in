@@ -81,6 +81,12 @@
 /* Define to 1 if you have the `gdk-3' library (-lgdk-3). */
 #undef HAVE_LIBGDK_3
 
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#undef HAVE_LIBGSL
+
+/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
+#undef HAVE_LIBGSLCBLAS
+
 /* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
 #undef HAVE_LIBGTK_3
 
@@ -499,6 +505,9 @@
 
 /* FFT available ? */
 #undef apl_FFT
+
+/* GSL available ? */
+#undef apl_GSL
 
 /* GTK+ version 3 installed ? */
 #undef apl_GTK3

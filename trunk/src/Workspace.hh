@@ -31,6 +31,7 @@
 #include "Quad_CR.hh"
 #include "Quad_DLX.hh"
 #include "Quad_FIO.hh"
+#include "Quad_MX.hh"
 #include "Quad_RE.hh"
 #include "Quad_RL.hh"
 #include "Quad_SVx.hh"

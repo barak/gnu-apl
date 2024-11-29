@@ -40,6 +40,7 @@
 #include "Quad_GTK.hh"
 #include "Quad_JSON.hh"
 #include "Quad_MAP.hh"
+#include "Quad_MX.hh"
 #include "Quad_PLOT.hh"
 #include "Quad_PNG.hh"
 #include "Quad_RE.hh"

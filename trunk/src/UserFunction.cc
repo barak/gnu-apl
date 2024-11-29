@@ -40,6 +40,7 @@
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
+// constructor for a normal (non-lambda) define function
 UserFunction::UserFunction(const UCS_string txt, const char * loc,
                            const UTF8_string & _creator, bool tolerant,
                            bool macro)
@@ -100,6 +101,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
    error_info = 0;
 }
 //----------------------------------------------------------------------------
+// conatructor for a lambda
 UserFunction::UserFunction(Fun_signature sig, int lambda_num,
                            const UCS_string & text, Token_string & lambda_body,
                            const basic_string<Symbol *> & lvars)

@@ -40,6 +40,7 @@
 #include "Workspace.hh"
 
 //=========================================================================
+//// constructor for a normal (non-lambda) defined function header
 UserFunction_header::UserFunction_header(const UCS_string & text0, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
     error_info("Bad header"),
@@ -89,6 +90,7 @@ UCS_string lvar_text;
    error = E_NO_ERROR;
 }
 //-------------------------------------------------------------------------
+//s/ constructor for lambda header
 UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
   : error(E_DEFN_ERROR),
     error_info("Bad header"),

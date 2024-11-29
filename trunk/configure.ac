@@ -293,6 +293,9 @@ apl_YES($apl_POSTGRES) && apl_POSTGRES=yes
 m4_include([m4/check_PCRE.m4])
    apl_NYES($apl_PCRE) && AS_ECHO(["   └──── will affect: ⎕RE"])
 
+m4_include([m4/check_GSL.m4])
+   apl_NYES($apl_GSL) && AS_ECHO(["   └──── will affect: ⎕MX"])
+
 m4_include([m4/check_GTK.m4])
    apl_NYES($apl_GTK3) && AS_ECHO(["   └──── may affect: ⎕PLOT, will affect ⎕PNG"])
 
@@ -925,6 +928,12 @@ else
    AC_DEFINE_UNQUOTED(apl_GUI, 0)
 fi
 
+if (apl_YES($apl_GSL)); then
+   AC_DEFINE_UNQUOTED(apl_GSL, 1, [GSL available ?])
+else
+   AC_DEFINE_UNQUOTED(apl_GSL, 0)
+fi
+
 if (apl_YES($apl_PCRE)); then
    AC_DEFINE_UNQUOTED(apl_PCRE, 1, [PCRE available ?])
 else
@@ -983,6 +992,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions
     apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
+    apl_GSL:                     $apl_GSL	(affects: ⎕MX)
     apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
     apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)

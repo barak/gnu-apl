@@ -37,17 +37,17 @@ by different persons (C/Cpp designer/maintainer vs. user):
 === Step 1: Generate ./configure and a Makefile.in for every Makefile.am
 
 Every directory of the GNU APL source tree contains a file named *Makefile.am*.
-The command *autoreconf*, performed in to top-level directory of the GNU APL
+The command *autoreconf*, performed in top-level directory of the GNU APL
 source tree:
 
 ----
 $ autoreconf
 ----
 
-Command *autoreconf* generates a file named *Makefile.in* for every
-*Makefile.am*. In addition it creates a script named *configure*. This
-is normally done by the maintainer and the *Makefile.in* files produced
-are shipped with GNU APL (tar file or svn/git repository).
+generates a file named *Makefile.in* for every *Makefile.am*. In addition it
+creates a script named *configure*. This is normally done by the maintainer
+and the *Makefile.in* files produced are shipped with GNU APL (tar file or
+svn/git repository).
 
 The absolutely cool thing about *autoconf* (as opposed to e.g. *Cmake* or GUI
 based IDEs) is that *autoconf* and *automake* themselves need not be installed
@@ -70,7 +70,7 @@ to add the final *Makefile* in the top-level file *configure.ac* (in m4 macro
 
 The most important take-away here is that the user or maintainer should never
 edit **Makefile**s or **Makefile.in**s because doing so is cumbersome,
-error-prone, and useless since *autoreconf* will overwrite the changes made.
+error-prone, and useless since *autoreconf* will overwrite any changes made.
 
 === Step 2: Generate a Makefile for every Makefile.in
 
@@ -324,12 +324,12 @@ point for those that want to get a quick overview of the GNU APL source code.
 
 == Source Code File Types
 
-The *Makefile** files belong to the build system and were explained above.
+The *Makefile* files belong to the build system and were explained above.
 What remains are:
 
 * C source files (file extension *.c*) are almost never used,
 * C header files (file extension *.h*) are almost never used, a noteworthy
-  exception is *config.h* which is produced by the *./configure* script.
+  exception is *config.h* which is produced by the *./configure* script,
 * Cpp source files for inline functions (file extension *.icc*),
 * Cpp source files (file extension *.cc*),
 * Cpp header files (file extension *.hh*), and
@@ -339,9 +339,9 @@ By and large, the rules for C and Cpp source and header files are:
 
 * Small and many rather than large and few (aka. modularity). Early versions
   of GNU APL did not follow this rule and some left-overs still do not (but
-  those will be further modularized in the future.
-* One class per file; the file name reflects the class name. Exceptions are
-* classes that are closely related (e.g. classes *Token* and *Token_string*)
+  those will be further modularized in the future).
+* One class per file; the file name reflects the class name. Exceptions are:
+* classes that are closely related (e.g. classes *Token* and *Token_string*).
 * The .cc and .hh file names are the same, except for the file name extension
   and classes with a small (say, < 100 lines) source footprint (e.g. those in 
   PrimitiveFunction.hh and PrimitiveFunction.cc).
@@ -354,7 +354,7 @@ By and large, the rules for C and Cpp source and header files are:
 C/Cpp source files primarily contain C/Cpp code and occasionally declarations.
 C/Cpp header files primarily contain C/Cpp declarations and often (inline)
 C/Cpp code. In contrast, .def files contain neither C/Cpp code nor
-C/Cpp declarations, They only contain macro calls whereby the definition of
+C/Cpp declarations. They only contain macro calls whereby the definition of
 the macro is defined outside the .def file. Currently there are about 20 .def
 files in the GNU APL source code so that they deserve an explanation.
 
@@ -368,7 +368,7 @@ Suppose we have a number of integer error codes:
         NO_ERROR     = 0,
         SYNTAX_ERROR = 1,
         RANK_ERROR   = 2,
-        LENGTH_ERROR = 4,
+        LENGTH_ERROR = 4
       };
 ----
 
@@ -388,7 +388,7 @@ struct _error_map
   { NO_ERROR,      "OK"           },
   { SYNTAX_ERROR,  "Syntax Error" },
   { RANK_ERROR,    "Rank Error"   },
-  { LENGTH_ERROR,  "Length Error" },
+  { LENGTH_ERROR,  "Length Error" }
 } error_map;
 
 const char *
@@ -429,15 +429,14 @@ such mappings are needed in a larger program.
 In GNU APL this problem is solved in the following way:
 
 * #define a macro that expresses the relationship (between integer error codes
-  and C/Cpp literals for the corresponding error text in our example),
-  and
+  and C/Cpp literals for the corresponding error text in our example), and
 * call that macro, typically in several different files with the macro
   defined differently. Calling the macro is performed by #including
   the .def file. In our example:
 
 In e.g. *errors.def*:
+
 ----
-   error_def(
    error_def(NO_ERROR     , 0, OK           )
    error_def(SYNTAX_ERROR , 1, Syntax Error )
    error_def(RANK_ERROR:    2, Rank Error   )
@@ -482,7 +481,7 @@ Note the following:
   underscore (_). For this reason the argument lists of the #defines above
   differ slightly.
 * *error_string* is not quoted in *errors.def* even though *get_error_string()*
-  returns a const char *. The quoting is performed by pass:v[# in #error_string]
+  returns a const char *. The quoting is performed by pass:[# in #error_string]
   (a preprocessor feature).
 * the example above uses a simple 1:1 relation between two types. Some *.def*
   files use more than two sides, e.g. numeric IDs, string names, and help
@@ -689,8 +688,8 @@ Class names should be in *CamelCase*. That is:
 
 === Some Coding Conventions
 
-* Use *(const) char \** for ASCII characters (i.e. 0x00...0x7F)
-  and *(const) UTF \** for UTF8 encoded strings. Keep in mind that
+* Use *(const) char ** for ASCII characters (i.e. 0x00...0x7F)
+  and *(const) UTF ** for UTF8 encoded strings. Keep in mind that
   Cpp literals with APL characters (e.g. "A∆B") are automatically
   UTF8 encoded by the compiler even though their type is *const char **.
 * Use *basic_string<typename>* for simple C types (char, int, char \*, ...) and
@@ -728,11 +727,13 @@ Indentation:
 * indent inline function bodies by 3 more spaces
 * do this recursively (nested classes)
 
-And finally: have a look at the existing *.cc* and *.hh* files. Even though
-this will cause some extra work on your part, it simplifies the reading of
-your code for many others. A project with different styles in different files
-looks rather unprofessional, so please respect the style rules above even if
-you do not like them.
+And finally:
+
+have a look at the existing *.cc* and *.hh* files. Even though this will
+cause some extra work on your part, it simplifies the reading of your code
+for many others. A project with different styles in different files looks
+rather unprofessional, so please respect the style rules above even if you
+do not like them.
 
 == Debugging
 
@@ -757,9 +758,9 @@ an assumption turns out to be false then a stack dump is produced which
 tells which assumption (and where) was wrong.
 
 Even though every single assertion has a negligible performance impact, the
-accumulation of all assertions might become noticeable. It is therefore possible
-to enable or disable some or all of them. This is done via the ./configure
-argument ASSERT_LEVEL (see also *README-2-configure*):
+accumulation of all assertions might become noticeable. It is therefore
+possible to enable or disable some or all of them. This is done via the
+./configure argument ASSERT_LEVEL (see also *README-2-configure*):
 
 ----
 .configure ASSERT_LEVEL_WANTED=0    (the default, best performance)
@@ -1240,7 +1241,7 @@ In the example above, the token string
       ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌─────┐
       │ A │ │ ← │ │ 1 │ │ 2 │ │ 3 │ │ ◊ │ │ B │ │ ← │ │ abc │ │ EOL │
       └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └─────┘ └─────┘
----- 
+----
 
 is first split into 2 statements:
 
@@ -1251,7 +1252,7 @@ is first split into 2 statements:
       ┌───┐ ┌───┐ ┌─────┐
       │ B │ │ ← │ │ abc │
       └───┘ └───┘ └─────┘
----- 
+----
 
 The scalars 1, 2, and 3 are then combined into a single APL value (the APL
 value 'abc' is already a single value after tokenization):
@@ -1263,7 +1264,7 @@ value 'abc' is already a single value after tokenization):
       ┌───┐ ┌───┐ ┌─────┐
       │ B │ │ ← │ │ abc │
       └───┘ └───┘ └─────┘
----- 
+----
 
 Next, the individual statements are reversed:
 
@@ -1274,7 +1275,7 @@ Next, the individual statements are reversed:
       ┌─────┐ ┌───┐ ┌───┐
       │ abc │ │ ← │ │ B │
       └─────┘ └───┘ └───┘
----- 
+----
 
 and finally combined again:
 
@@ -1282,12 +1283,13 @@ and finally combined again:
       ┌───────┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌───┐ ┌───┐ ┌────┐
       │ 1 2 3 │ │ ← │ │ A │ │ ◊ │ │ abc │ │ ← │ │ B │ │ EOL│
       └───────┘ └───┘ └───┘ └───┘ └─────┘ └───┘ └───┘ └────┘
----- 
+----
 
 The reason for reversing the tokens of every statement is somewhat subtle: APL
 statements are executed from left to right, but the tokens inside a statement
 are processed from right to left. Without the reversal the tokens would need to
 be processed like this:
+
 ----
     → → → → → → → → → →        → → → → → → → → → → → → → → 
                       ↓       ↑                          ↓
@@ -1297,7 +1299,7 @@ be processed like this:
         ↓                                        ↑
          → → → → → → → → → → → → → → → → → → → → 
 
----- 
+----
 
 By reversing every statement the same processing order now becomes:
 
@@ -1423,8 +1425,8 @@ starts with the same character, and that obsolete IDs are kept (or at least
 their IDs are never reused). The first character (upper 8 bits of the ID are
 chosen in a way that simplifies debugging at little or no cost.
 
-All user defined symbols have the ID 0x0000 and their token contains a unique
-*Symbol ** pointer. The symbol table (class *SymbolTable* in file
+All user defined symbols have the ID 0x0000 and their token contains a
+unique *Symbol ** pointer. The symbol table (class *SymbolTable* in file
 *SymbolTable.hh*) is only used by the pre-parser (to ensure that all symbols
 have the same *Symbol **) and by some APL commands like *)FNS*, *)VARS*,
 *)OPS*, etc.
@@ -1534,7 +1536,7 @@ The value types are defined in *TokenEnums.hh*:
 TokenEnums.hh:
 
 /// The value type of a token
- 
+
 enum TokenValueType
 {
    // token value types. The token value type defines the type of the
@@ -1743,7 +1745,7 @@ In parser terms, one could just as well formulate this as:
 Since GNU APL stores the token in reverse order as explained earlier, from
 right to left actually means left to right for the token string that is being
 interpreted. The rules above amount to what is commonly called a LALR(1)
-parser (short for **L**eft-**R**ight-**L**ook**A**head-Parser with 1 lookahead
+parser (short for **L**ook**A**head-**L**eft**R**ight-Parser with 1 lookahead
 token). In GNU APL terminology it is the *Prefix parser* in file *Prefix.cc*.
 The somewhat simplified algorithm of the GNU APL prefix parser is:
 
@@ -1764,8 +1766,8 @@ The somewhat simplified algorithm of the GNU APL prefix parser is:
 .. *TC_OPER1* - a defined monadic operator (i.e. 1 function argument), or
 .. *TC_OPER2* - a defined dyadic operator (i.e. 2 function argument).
   This name resolution step happens in function
-  *Symbol::resolve_right()* for symbols right of *←* or in
-  *Symbol::resolve_left() for symbols left of *←*. The case *TC_VOID* happens
+** *Symbol::resolve_right()* for symbols right of *←* or in
+** *Symbol::resolve_left()* for symbols left of *←*. The case *TC_VOID* happens
   when a name was tokenized, but no value or function was assigned to it.
 .. If the new token together with the sequence matches a phrase (as discussed
   above) then the phrase is reduced (called REDUCE in parser terminology).
@@ -1786,7 +1788,7 @@ The somewhat simplified algorithm of the GNU APL prefix parser is:
 . an end of statement token (class TC_END) does not stop the parser. The
   necessary actions, e,g, printing of the value for non-committed APL values
   is performed in the reduce function (which calls
-  *StateIndicator::statement_result()), and the parser simply continues after
+  *StateIndicator::statement_result()*), and the parser simply continues after
   the reduce function returns. Only the end of the *body* stops the parser,
   and the last token in the *body* performs the transfer of the value computed
   by a defined APL function to its caller.
@@ -1871,7 +1873,7 @@ The degenerated case is the one where all symbols can be resolved statically
 sequence. In real-life APL programs this degenerated case is fairly rare. It
 could be optimized in a simple manner, but its rarity seems not be worth the
 effort. A more frequent exception is non-conditional branches like *→LABEL*
-which are being optimized in GNU APL.
+which are optimized in GNU APL.
 
 Now, back to the *TC_SYMBOL*. If the prefix parser reads a symbol, then
 it consults the symbol table for the current meaning of the symbol.
@@ -1884,13 +1886,13 @@ There are quite a few different cases:
    is raised, otherwise
 ** The symbol is (the name of) a variable that is being assigned (either
    completely, or indexed, or selectively).
-* The symbol is a defined function, in that case the *TC_SYMBOL*. token is,
-  depending on the signature of the defined functioni, replaced with a token
- of class *TC_FUN0*, *TC_FUN12*, *TC_OPER1*, or *TC_OPER2*. The token value
- then points to a *UserFunction*. Note that APL primitives and APL system
- functions are not user-defined, and therefore no symbol table lookup is
- required. The pre-parser can therefore produce the corresponding tokens
- directly.
+* The symbol is a defined function, in that case the *TC_SYMBOL* token is,
+  depending on the signature of the defined function, replaced with a token
+  of class *TC_FUN0*, *TC_FUN12*, *TC_OPER1*, or *TC_OPER2*. The token value
+  then points to a *UserFunction*. Note that APL primitives and APL system
+  functions are not user-defined, and therefore no symbol table lookup is
+  required. The pre-parser can therefore produce the corresponding tokens
+  directly.
 * The symbol is a variable.
 ** A variable right of ← is referenced and the *TC_SYMBOL* token is replaced
    by a *TC_VALUE* token pointing to the current value of the variable.
@@ -1935,7 +1937,7 @@ are:
 * *grow:* do a SHIFT (if no phrase has matched),
 * *again:* repeat phrase matching (after a reduce function was called), and
 * *done:* the parser returns.
-`
+
 The point of *again:* is that the reduction of some phrases, for example an
 expression in parentheses, may produce a stack that could not be reduced
 before but now can without reading another token.
@@ -1956,7 +1958,7 @@ The tokenizer translates the string "A←1 2 3" into a 4-item *Token_string*:
 To be precise, the *RETURN* token is actually appended by function
 *StatementList::fix()* and not by the Tokenizer itself. Then:
 
-. The prefix parser reads (the single) token *1 2 3* and shifts
+. The prefix parser reads (the single) token *1 2 3* and shifts.
   Pattern is now: *value(1 2 3)*.
 . The prefix parser reads *←* and shifts. Pattern is now: *← value(1 2 3)*.
 . The prefix parser reads *A*. The pattern matches and the parser
@@ -1965,7 +1967,7 @@ To be precise, the *RETURN* token is actually appended by function
   *committed_value(1 2 3)*
 . The prefix parser reads *RETURN*. The pattern matches and the parser
   reduces with *Prefix::reduce_END_B__()*, which calls
-   *StateIndicator::statement_result() and clears the pattern to empty.
+  *StateIndicator::statement_result()* and clears the pattern to empty.
 . The parser has no more token to read and returns.
 
 === Another Example
@@ -1986,7 +1988,7 @@ The tokenizer produces:
 
 * In GNU APL there is a total of 67 phrases and consequently 67 reduce
   functions.
-* reduce functions are typically short. Nevertheless they cannot be inlined
+* reduce functions are typically short. Nevertheless they cannot be in-lined
   since they are being called via the function pointer
   *Prefix::Phrase::reduce_fun* in the phrase table (or tree).
 * reduce functions have return type *void* and no arguments. They access the
@@ -1998,12 +2000,12 @@ The tokenizer produces:
   to *at0()*, *ASS* to *at1()*, and *B* to *at2()*.
 * the lookahead token of the LALR(1) parser is always a token in the body of a
   defined function. It therefore needs not (yet) to be copied at the time of
-  the lookahead. It is instead accessed with *Prefix::lookahead(), which
+  the lookahead. It is instead accessed with *Prefix::lookahead()*, which
   returns *TOK_VOID* if no lookahead token exists.
 
 The principal structure of a reduce function is always:
 
-. obtain the arguments (at0(), at1(), ...)
+. obtain the arguments (*at0()*, *at1()*, ...)
 . compute the desired side effect (assign a variable, evaluate a function,
   perform a branch, etc.)
 . remove (pop) the arguments from the stack and push the result on the stack,
@@ -2015,12 +2017,12 @@ The principal structure of a reduce function is always:
 .. *RA_PUSH_NEXT*: push the next token onto the stack (aka. SHIFT)
 .. *RA_RETURN*: return from the current (sub-) parser and push its result onto
    the stack of the calling parser, or
-.. *RA_SI_PUSHED*: like RA_RETURN but without a result (called a *future* in
-   esoteric computer languages). It indicates that a new parser with a new
+.. *RA_SI_PUSHED*: like *RA_RETURN* but without a result (called a *future*
+   in esoteric computer languages). It indicates that a new parser with a new
    defined function was started and will or will not return a result. This
    case is slightly different from simply calling a sub-parser, because a
-   sub-parser (e.g. for parentheses) remains in the same function body, while a
-   new defined function has its own body.
+   sub-parser (e.g. for parentheses) remains in the same function body, while
+   a new defined function has its own body.
 
 ===  Construction of the phrase table (or tree)
 
@@ -2061,7 +2063,7 @@ build system. The full picture is this:
               write
                 │
        ┌────────┴────────┐                            ┌───────────────┐
-       │  src/Prefix.def ├───────── #include ────→────┤ src/Prefix.hh │
+       │  src/Prefix.def ├───────── #include ─── → ───┤ src/Prefix.hh │
        └────────┬────────┘                            └───────┬───────┘
                 │                                             │
                 ↓                                             ↓
@@ -2109,9 +2111,9 @@ Unicodes and *UTF8_string* for UTF8-encoded strings. In general:
   variable-length encoding, which makes indexing or iterating over them
   cumbersome and error-prone. For this reason all strings used internally
   in GNU APL are UCS_strings.
-* UTF8_strings are commonly used between GNU APL and its environment. They are
-  shorter when transported over the internet, therefore most web pages are
-  UTF8-encoded. Also, filenames in operating systems are UTF8 encoded.
+* UTF8_strings are commonly used between GNU APL and its environment. They
+  are shorter when transported over the Internet, therefore most web pages
+  are UTF8-encoded. Also, filenames in operating systems are UTF8 encoded.
   Finally, most terminal emulators, in particular those that support APL in
   some way, send and expect all characters to be UTF8-encoded.
 
@@ -2138,7 +2140,7 @@ where:
 * The *char_def()* macro defines all Unicodes that are contained in the 256
   character *⎕AV* of GNU APL. In old APL1 the ⎕AV and its derivates (⎕FC, ⎕A,
   ⎕D, ...). These days, the ⎕AV is only maintained for backward compatibility
-  with APL1. In APL2 it has been entirely obsoleted by ⎕UCS. Keep in mind,
+  with APL1. In APL2 it has been entirely obsoleted by *⎕UCS*. Keep in mind,
   however, that:
 ** The encoding of files produced with )OUT or read with )IN are still based
    on ⎕AV. To be precise: based on some IBM ⎕AV defined in the IBM APL2
@@ -2147,10 +2149,10 @@ where:
    PC operating systems used special APL code pages which corresponded to the
    ⎕AV.
 ** GNU APL has two helpers for such conversions, see below.
-** class *Avec contains numerous static functions for handling and classifying
-   of Unicodes contained in the ⎕AV.
+** *class *Avec* contains numerous static functions for handling and
+   classifying of Unicodes contained in the *⎕AV*.
 * In contrast, the *char_uni()* macro defines Unicodes that are used in
-  the GNU APL source code but are not contained in the ⎕AV of GNU APL.
+  the GNU APL source code but are not contained in the *⎕AV* of GNU APL.
 * In short:
 ** any Unicode with APL significance (primitives etc.) are (and
    must be) contained in the ⎕AV of the interpreter. These Unicodes are 
@@ -2222,15 +2224,15 @@ example:
     char(-56) = char(200) < char(100) = unsigned char(100) < unsigned char(200).
 ----
 
-to make things worse, UTF8 encoding works on (unsigned) bytes while C/Cpp
+To make things worse, UTF8 encoding works on (unsigned) bytes while C/Cpp
 literals in compilers are, without specific qualifiers, signed. As a
 consequence, the APL character *'←'* has Unicode 8592 aka. 0x2190, and a UTF8
 encoding of (hex) *E2 86 90* which makes the string literal "→" a
 (0-terminated) sequence of 3 signed (!) and unfortunately negative (!)
-characters. Early versions of GNU APL were using *std::string* instead of
+characters. Early versions of GNU APL used *std::string* instead of
 *UTF8_strings*, and the problems caused by that were numerous. These days
 GNU APL itself is clean when it comes to signed vs. unsigned chars, but some
-older contributions may still suffer. Comparisons for equality works well for
+older contributions may still suffer. Comparisons for equality work well for
 mixed signed/unsigned operands, but < and > do not, and, as a consequence,
 *strcmp()* and friends frequently return the wrong order when used for sorting
 UTF-encoded strings.
@@ -2257,7 +2259,7 @@ The take-aways for designers and contributors are:
 
 * prefer UCS_string over UTF8_string where possible (efficiency),
 * never use std::string, but
-* instead use UTF8_string
+* instead use UTF8_string and
 * do not write your own conversion functions but use the constructors instead.
 
 
@@ -2268,10 +2270,10 @@ An APL value is simply a *Shape* and a *Ravel*, although simplicity ends here.
 
 In that, *Shape* is a class of its own, defined in *Shape.hh*. It has a bunch
 of constructors for various purposes and also numerous inline convenience
-functions that makes the code that deals with shapes more readable.
+functions that make the code that deals with shapes more readable.
 
-Many of the Shape methods have trivial wrappers in class Value, because almost
-every shape is accessed in the context of a value. For example:
+Many of the Shape methods have trivial wrappers in *class Value*, because
+almost every shape is accessed in the context of a value. For example:
 
 ----
    Shape.hh:
@@ -2311,12 +2313,12 @@ outside (which then requires an additional new/delete for the ravel). Put
 differently, a short value has *ravel == &short_value*, while *ravel* in
 long values point to a separately allocated memory area. The border between
 short and long values can be changed with *./configure*; larger values of
-*SHORT_VALUE_LENGTH_WANTED* have a (marginally) better performance, but the
+*SHORT_VALUE_LENGTH_WANTED* have (marginally) better performance, but the
 price is a (less marginal) increase in memory consumption.
 
-Similar to *class Shape*, numerous constructors and (mostly trivial) access
-functions for various purposes. For example, a Value can be constructed from
-a UCS_string (and conversely a UCS_string can be constructed from a Value
+Similar to *class Shape*, there are numerous constructors and (mostly trivial)
+access functions for various purposes. For example, a Value can be constructed
+from a UCS_string (and conversely a UCS_string can be constructed from a Value
 (provided that its rank and Cell types are correct). Most values are
 constructed sequentially and to simplify that, every value has a built-in
 iterator *Value::next_ravel()* which returns a pointer to the next
@@ -2335,8 +2337,8 @@ prototype). For this reason, a *Value* has a *Value::element_count()*, which
 is the ravel length in APL, and a *Value::nz_element_count()* which is the
 ravel length in Cpp. The *Value::next_ravel()* iterator uses the former, which
 causes a segfault when used with an empty value. In short this means that APL
-values may be empty, but their Cpp implementation are never empty _and need to
-be properly initialized_. 
+values may be empty, but their Cpp implementations are never empty _and need
+to be properly initialized_. 
 
 CAUTION: This implies that a proper source code *loop()* over a ravel MUST
 either use *Value::nz_element_count()* (so that the prototype is initialized
@@ -2377,23 +2379,23 @@ the role of *get_wravel(0)* as the prototype of Z explicit.
 
 APL values are rarely copied but pointers to APL values are passed back and
 forth a lot in the interpreter (in more than 1200 source code locations),
-It is therefore easy to loose a Value, which then causes a memory leak. These
-memory leaks were a real plague in early GNU APL versions, but are now fixed
+It is therefore easy to loose a Value, which then causes a memory leak. Early
+GNU APL versions were plagued by these memory leaks, but are now fixed
 using several counter-measures:
 
 * Cpp overloading of operators ::new() and ::delete(). Every newly allocated
   Value, no matter if long or short, is tracked in a link list called
   *DynamicObject::all_values*, see *DynamicObject.hh*
 * The APL command )CHECK compares the values that are are reachable from APL,
-  e.g. via token of class TC_Value, with the values in
+  e.g. via a token of *class TC_Value*, with the values in
   *DynamicObject::all_values* and reports any mismatches as *stale values*.
 * Every value tracks itself with a *ValueHistory* which is, for performance
   reasons, disabled by default but can be enabled with *./configure*,
   or with *make develop*.
-* A reference counter named *Value::owner_count* in combination with class
-  Value_P. A value is automatically deleted when its last owner (typically a
-  *Token* is deleted.
-* Member *Value::check_ptr* to detect double deletion or incorrect
+* A reference counter named *Value::owner_count* in combination with *class
+  Value_P*. A value is automatically deleted when its last owner (typically
+  a *Token* is deleted.
+* Member *Value::check_ptr* to detect incorrect
 * overwriting or double deletion of a value. Every *Value* constructor sets
   *check_ptr* to *(this * * 7)* which points into the middle of a *uint64*
   (of member Value::shape). The destructor later checks that *check_ptr*
@@ -2409,12 +2411,12 @@ pointer typically consists of 2 pointers:
 * one to the reference counter that keeps track of the object's ownership
   (aka. the reference counter)
 
-In contrast, the Value_P is a single pointer (to a Value), and the reference
+In contrast, the *Value_P* is a single pointer (to a Value), and the reference
 counter is allocated inside the value rather than somewhere else. The small
 advantage of a "normal" smart pointer is that they are not intrusive, which
 means that they can be used without any modifications of the object that they
 point to. But since we are in control of the Value class, this benefit does
-not really count and the smaller size of a Value_P outweighs the benefit of
+not really count and the smaller size of a *Value_P* outweighs the benefit of
 standard smart pointers. The Value_Ps are also decoupled from each other;
 one can always construct a Value_P from a Value * (and vice versa). The
 most important member functions of Value_P are:
@@ -2436,7 +2438,7 @@ most important member functions of Value_P are:
 * *bool operator +()* : *true* iff the pointer is valie (non-zero)
 * *bool operator !()* : *true* iff the pointer is invalie (zero)
 * *Value * operator->()* : return the Value * (to the Value)
-* *Value & operator\*()* : return the Value & reference (of the Value)
+* *Value & operator *()* : return the Value & reference (of the Value)
 * *void increment_owner_count()* : dito.
 * *void decrement_owner_count()* : dito.
 * *void isolate(const char * loc)* : if the value has more than one owner then
@@ -2448,9 +2450,9 @@ most important member functions of Value_P are:
   the object.
 
 All functions are inline and some can throw exceptions (primarily *WS FULL*).
-Note that some Value_P constructors above (e.g.
-*Value_P(const UCS_string & ucs, ...) initialize the entire Value (shape
-and ravel) while others (e.g. Value_P(const Shape & sh) only initialize the
+Note that some *Value_P* constructors above (e.g.
+*Value_P(const UCS_string & ucs, ...)* initialize the entire Value (shape
+and ravel) while others (e.g. *Value_P(const Shape & sh)*) only initialize the
 shape and leave the initialization of the ravel to the caller. In fact, the
 construction of a Value is always a two-step process (initializations of the
 shape followed by the initializations of the ravel) and the constructors that
@@ -2464,12 +2466,13 @@ Value_P Z(...);   // construct Z (with un-initialized ravel)
    return Z;
 ----
 
-The constructors for *Value*s are protected (with friend *Value_P*) to enforce
-that values are always constructed via *Value_P::Value_P(...)* rather than the
-corresponding *Value::Value(...)**. On the other hand, many functions use
-*const Value *" (note the const!) instead of *Value_P*, primarily for passing
-function arguments. This is safe and slightly more efficient if the called
-function does not modify the Value (and hence its ownership) passed as argument.
+The constructors for **Value**s are protected (with friend *Value_P*) to
+enforce that values are always constructed via *Value_P::Value_P(...)* rather
+than the corresponding *Value::Value(...) **. On the other hand, many
+functions use *const Value **" (note the const!) instead of *Value_P*,
+primarily for passing function arguments. This is safe and slightly more
+efficient if the called function does not modify the Value (and hence its
+ownership) passed as an argument.
 
 ==== Cloning of Values
 
@@ -2535,15 +2538,15 @@ The rules are:
 * If a Cpp function knows from its context that cloning is not needed (like in
   the second example above) then it may CLONE() and CLONE_P(). Determining if
   the cloning is actually performed, then depends on whether *NEW_CLONE*
-  is *#defined* or not. This could be a mistake and then not *#define*'ing
+  is *#defined* or not. This could be a mistake and then _not_ **#define**ing
   *NEW_CLONE* is a quick way to fall back to the old scheme.
-* Otherwise, _in particular if *#define NEW_CLONE* makes a difference_, the
-  function shall use Value->clone()* which clones unconditionally.
+* Otherwise, _in particular if_ *#define NEW_CLONE* _makes a difference_, the
+  function shall use *Value->clone() ** which clones unconditionally.
 
 ==== Ravel Cells
 
 The ravel of every *Value* is a simple C array and not a Cpp
-*std::vector<Cell>*. The alternative std::vector<Cell>* has some performance
+*std::vector<Cell>*. The alternative *std::vector<Cell>* has some performance
 penalties when used for the ravel of a *Value*:
 
 * destructor calls for every Cell when the vector<> is destructed, and
@@ -2601,7 +2604,7 @@ The base class *Cell* is inherited by the following derived classes:
    Many Cell functions are almost identical for these base classes and these
    functions are implemented in *NumericCell* rather than implementing a
    copy in each base class. The simple trick that replaces hundreds of
-   C/Cpp *switch* statements and *case*s is this:
+   C/Cpp *switch* statements and **case**s is this:
 ** base class *Cell* implements virtual functions that either throws a 
    *DOMAIN ERROR* (e.g. for a character to integer conversion) or else
    return the desired type:
@@ -2618,10 +2621,10 @@ The base class *Cell* is inherited by the following derived classes:
     and *get_imag_value()* but not *get_char_value()*,
 *** etc.
 
-* *PointerCell*, their relevant content is a (nested) APL sub value.
+* *PointerCell*, their relevant content is a (nested) APL sub-value.
 * *LvalCell*, their relevant content is a *Cell* pointer. These **Cell**s are
   used to implement "selective specification". A selective specification like
-  *(2⍴1↓A)←B* starts with (all **Cell**s of) its the rightmost variable *A*,
+  *(2⍴1↓A)←B* starts with (all **Cell**s of *A*) the rightmost variable *A*,
   which is then more and more reduced (by *1↓* and *2⍴*) before the new
   value *B* can be assigned to the Cells that survive.
 
@@ -2659,14 +2662,14 @@ as an example, all other scalar APL functions follow suit:
   time, a pointer *_fun* is created.
 . The single instance of the class is needed because the base class
   *Function* of class *ScalarFunction* has virtual functions (which is
-  impossible for fully static classes). See <<_functions, Functions>> below
-  for details.
+  impossible for fully static classes). See <<_apl_functions, APL Functions>>
+  below for details.
 . The *eval_XXX()* functions like *Bif_F12_PLUS::eval_AB()* are implemented
   in inline function calls to *ScalarFunction::eval_scalar_AB()* which takes
   the  Cell function *Cell::bif_add* that distinguishes the behaviors of the
   (in total many) single instances of the classes derived from
   *ScalarFunction*.
-. The naming convention is that the virtual *Cell* functions is
+. The naming convention is that virtual *Cell* functions are
   *Cell::bif_YYY*.
 . In short: base class *ScalarFunction* is essentially an iterator over the
   ravels the value arguments provided, and the difference between the derived
@@ -2704,12 +2707,12 @@ class Bif_F12_PLUS : public ScalarFunction
 Class *IndexExpr* is a collection of 0 or more **Value_P**s or elided
 indices, where the *Value_P* 0 denotes an _elided index_ (= all
 indices along an axis). *IndexExpr* objects are created and deleted by
-the prfix parser *Prefix..cc*. More precisely, a TOK_R_BRACK (for *]*),
+the prefix parser *Prefix..cc*. More precisely, a TOK_R_BRACK (for *]*),
 starts a new IndexExpr, a *TOK_SEMICOL* (for *;* append new values (axes) to
 an IndexExpr, and TOK_L_BRACK finalizes the creation of the *IndexExpr* .
 The next token (i.e. the token left of the *IndexExpr*) then calls
 the appropriate function (such as *Value::index()* or
-*Symbol::assign_indexed()* and delets the *IndexExpr* again.
+*Symbol::assign_indexed()* and deletes the *IndexExpr* again.
 
 
 === Classes Bif_XXX and Quad_XXX
@@ -2729,13 +2732,13 @@ is implemented in its own class and according to the following rules:
 ** *Quad_* for system functions. These are derived from class *QuadFunction*,
    primarily for grouping purposes. Note that the *Quad_* is also used for
    system variables. Similar to primitives, system functions with a large
-   footprint have their own *.hh* and *.cc* files, while the reamining ones
+   footprint have their own *.hh* and *.cc* files, while the remaining ones
    are collected in *QuadFunction.hh/QuadFunction.cc*.
 * classes with a large code footprint have their own implementation files
   (followed by *.hh* or *.cc*), where the filename is the class name,
 * the remaining classes (with a small code footprint) are declared/implemented
-  implemented in files *Primitivefunction.hh/Primitivefunction.cc*
-* Every class is, directly or indirectly, derived from base class *Function).
+  in files *Primitivefunction.hh/Primitivefunction.cc*
+* Every class is, directly or indirectly, derived from base class *Function*.
   Class *FunctionC* defines all *virtual eval_XXX()* so that they thow a
   *VALENCE_ERROR*.
 * Every class then overrides (only) those *virtual eval_XXX()* whose
@@ -2747,7 +2750,7 @@ is implemented in its own class and according to the following rules:
   signatures of a function (for example: the parser calls the stricly dyadic
   function ≠ monadically) are resolved without any runtime overhead.
 * Due to the *virtual eval_XXX()* functions, every class needs a single
-  (class static) instance which is called *_fun* and every such instance
+  (class static) instance which is called *fun* and every such instance of
   *fun* has a (static) pointer named *_fun* pointing to it.
 
 Except for the APL name (i.e. a single APL character for APL primitives and
@@ -2763,13 +2766,13 @@ standardized in the ISO standard for APL2.
 A symbol identifies an APL object created by the user, i.e. a defined
 function or a user defined variable. In GNU APL, system functions (⎕-functions,
 e.g. ⎕FX) are _NOT_ symbols but *APL primitives*. The commonality between
-⎕-functions and APL primitives is larger than the similarity
+⎕-functions and APL primitives is greater than the similarity
 between ⎕-variables and ⎕-functions. The only noteworthy difference between
 APL primitives and ⎕-functions is their name and the fact that the
 APL primitives are defined in the APL standard, while most ⎕-functions
-and ⎕-variables are not. They are used by APL interpreter vendors to extend
+and ⎕-variables are not. They are used by APL interpreter providers to extend
 their functionality (and to lock-in their customers). The Cpp class hierarchy
-in GNU APL (excerpts, the full picture is shown in the .png files) are:
+in GNU APL (excerpted, the full picture is shown in the .png files) are:
 
 ----
     html/classSystemVariable__inherit__graph.png:
@@ -2820,9 +2823,9 @@ and:
 Some explanations might be helpful:
 
 * the common base class *NamedObject*:
-** provides *virtual UCS_string get_name()* to obtain the name of the object.
+** provides *virtual UCS_string get_name()* to obtain the name of the object,
 ** *virtual const Function * NamedObject::get_function()* returns a
-   valid *Function ** for functions, otherwise 0.
+   valid *Function ** for functions, otherwise 0,
 ** *virtual Symbol * NamedObject::get_symbol()* returns a valid *Symbol ** for
    symbols, otherwise 0.
 * **SystemVariable**s are variables like *⎕IO*, *⎕FC*, ...
@@ -2895,16 +2898,15 @@ variable and *⎕UCS* is always a function.
 
 Every Symbol is contained in one of two symbol tables:
 
-* User-defined symbols are stored in a static instance of class SymbolTable,
+* User-defined symbols are stored in a static instance of class *SymbolTable*,
   while
 * system defined symbols (for system functions and system variables) are 
-   stored in a static instance of class SystemSymTab.
-
+   stored in a static instance of class *SystemSymTab*.
 
 Both symbol tables are contained in the base class *Workspace_0* of the
 static instance *Workspace::the_workspace*. The classes *SymbolTable* and
 *SystemSymTab* have a lot in common, but also differences. The common
-functionality is implemented in their template base class SymbolTableBase:
+functionality is implemented in their template base class *SymbolTableBase*:
 
 ----
 SymbolTable.hh:
@@ -2919,10 +2921,10 @@ class SymbolTableBase
 
 The differences are:
 
-* the table size (256 entries for SystemSymTab and 65536 entries for user
+* the table size (256 entries for *SystemSymTab* and 65536 entries for user
   defined names (constant *SYMBOL_HASH_TABLE_SIZE* in file *SystemLimits.def*
-* On success the lookup of a user defined name returns a *Symbol* \*,
-  while a lookup of a system name returns a *SystemName* \*. Symbols are
+* On success the lookup of a user defined name returns a *Symbol **,
+  while a lookup of a system name returns a *SystemName **. Symbols are
   somewhat more complicated than SystemName because their role (like function
   or variable) can change over time while every SystemName has a fixed role
   (either function or variable) cannot. Also, every SystemName has a unique
@@ -2946,11 +2948,11 @@ The differences are:
   list of colliding names starts.
 * Erased names are not removed from a symbol table, but rather marked erased
   in the Symbol itself, while the symbol name remains in the table. This is to
-  avoid searching of a user defined symbol in all existing tokens. Also, a
+  avoid searching for a user defined symbol in all existing tokens. Also, a
   symbol name could be )ERASEd at the top level but still exist as the name of
   a local in some defined function.
 
-The lookup (and possibly insertion of a new) Symbol uses the following
+The lookup of (and possibly the insertion of a new) Symbol uses the following
 algorithm (*SymbolTable::lookup_symbol(const UCS_string & sym_name)*):
 
 . compute a hash value from *sym_name*
@@ -2958,7 +2960,7 @@ algorithm (*SymbolTable::lookup_symbol(const UCS_string & sym_name)*):
   hash (unsuccessful lookup case 1.)
 .. Create a *new Symbol* with the name *sym_name*,
 .. Store the new symbol in *symbol_table[hash]*, and
-.. return. the new symbol.
+.. return the new symbol.
 . Otherwise one or more symbols with the same hash already exists and the
   name may or may not already exist in the symbol table.
 .. Chase the linked list from *symbol_table[hash]* to its end (via pointer
@@ -2972,7 +2974,7 @@ algorithm (*SymbolTable::lookup_symbol(const UCS_string & sym_name)*):
 ... then re-initialize that symbol with a new name *sym_name* and return the
     symbol (unsuccessful lookup case 2). The condition 4.a.i. or ii. is
     returned by *Symbol::is_erased()*.
-* Otherwise (unsuccessful lookup case 3), the linked list contains no erased
+. Otherwise (unsuccessful lookup case 3), the linked list contains no erased
   symbols that could be re-used. Append a new Symbol at the end of a list,
   like in (unsuccessful lookup case 1.) above.
 
@@ -3075,7 +3077,7 @@ The main differences between the 3 classes are:
 The execution of **ExecuteList**s and **StatementList**s is rather simple:
 the tokens of their body are intepreted from the start of the body to its end,
 no arguments can be passed to the body, no change of the execution with
-branches (→N), etc..
+branches (→N), etc.
 
 ==== Class UserFunction
 
@@ -3086,7 +3088,7 @@ above, class UserFunction inherits from the two classes *Function* and
 The inheritance from *Function* overrides its various virtual *eval_XXX()*
 functions, so that a defined function can be called like an APL primitive,
 The arity of a defined function (monadic, dyadic, operator, etc.) is
-determined by the function header and since class UserFunction cannot know
+determined by the function header and since class UserFunction cannot "know"
 it before the header is parsed, it must overload all possible virtual
 *eval_XXX()* declared in base class *Function*.
 
@@ -3100,13 +3102,14 @@ either of its base classes:
 * Local variables, and
 * Branches (→N)
 
-These aspects are implemented by means of two member variables
-* *vector<Function_PC> UserFunction::line_starts* is a jump table that
-  tells, for every function line N, which token is the start of line N in
-  the (linear) body of the executable. For APL jump statement, say *→N*,
+These aspects are implemented by means of two member variables:
+
+* the variable *vector<Function_PC> UserFunction::line_starts* is a jump table
+  that tells, for every function line N, which token is the start of line N
+  in the (linear) body of the executable. For an APL jump statement, say *→N*,
   *line_starts[N]* is the first token in line N and its execution simply
-  continues at token *body[line_starts[N]*.
-* when a defined function is called then its arguments (if any) are assigned
+  continues at token *body[line_starts[N]]*.
+* when a defined function is called, its arguments (if any) are assigned
   to the formal arguments declared in the function header and the local
   variables in the header are pushed. This happens in member
   *UserFunction::UserFunction_header header*, which is a functional grouping
@@ -3122,7 +3125,7 @@ Let:
 
 The typical life-cycle of Userfunction SUM is then:
 
-. The *Userfunction* named *SUM*,  is created with the ∇-editor or with *⎕FX*
+. The *Userfunction* named *SUM*, is created with the ∇-editor or with *⎕FX*
   (which calls *Userfunction::fix()*).
 . The APL pattern matching (*Prefix.cc*) detects a call of *SUM*,
   say pattern *3 SUM 42*.
@@ -3130,16 +3133,17 @@ The typical life-cycle of Userfunction SUM is then:
 .. Symbols *Z*, *A*, *B*, *C*, and *D* are pushed (and become, at this
    point in time, temporarily undefined).
 .. The actual arguments *2* and *42* of *SUM* are assigned to the formal
-   arguments *A* and *B* of *SUM*. that is, *A←3 ◊ B←42*; *C* and *D* remain
-   unassigned.
-.. The *Executable::body* is executed. This computes *Z←45*.
+   arguments *A* and *B* of *SUM*. that is, *A←3 ◊ B←42*; *C*, *D* and *Z*
+   remain undefined.
+.. The *Executable::body* is executed. This computes *Z←45*; *Z* is now
+   defined.
 . At some point in time *SUM* returns (either when the end of the body is
   reached, or the when execution is stopped explitly (e.g. *→0*).
 .. The current value of *Z* (if any) is set aside (and will later be
    returned to the caller).
 .. The Symbols *Z*, *A*, *B*, *C*, and *D* are popped again (restored).
-.. The pattern matched above (*3 FOO 42*) is replaced by former value
-   of *Z* (i.e. *45*).
+.. The pattern matched above (*3 SUM 42*) is replaced by formerly defined
+   value of *Z* (i.e. *45*).
 
 
 === Class StateIndicator
@@ -3166,7 +3170,7 @@ following principle steps:
   execution, and finally
 . Destruction of the StateIndicator.
 
-In step 2. above, the execution of (the same or a different) executable is
+In step 2. above, the execution of an executable (the same or a different) is
 started, i.e. before the current execution has completed. To accomplish this,
 the different contexts of different executions, regardless of whether the
 execution concerns the same Executable (direct recursion) or different ones
@@ -3230,10 +3234,10 @@ The full picture is something like this:
 
 By and large the only active StateIndicator is the topmost one. The
 StateIndicators below it are relatively passive and only come back
-to life when the topmost StateIndicator, sometimes refered to as *TOS*
-(for **T**op **O**f **S**tack has finalized step 4. above. An error in the
-execution of TOS normally does not end it, but pushed another StateIndicator
-(with mode immediate execution) onto the stack. The only cases that
+to life when the topmost StateIndicator, sometimes referred to as *TOS*
+(for **T**op **O**f **S**tack) has finalized step 4. above. An error in the
+execution of TOS normally does not end it, but another StateIndicator is
+pushed (with mode immediate execution) onto the stack. The only cases that
 remove (pop) one or more items from the SI stack are:
 
 * the executable in TOS reaches the end of the body of its Executable.
@@ -3249,7 +3253,7 @@ remove (pop) one or more items from the SI stack are:
   ⎕EA, ⎕EB, or ⎕EC. This pops the topmost item(s) until TOS has the
   ⎕EA, ⎕EB, or ⎕EC that catches the error (as opposed to the normal
   error handling which would have pushed another StateIndicator onto
-  the stack rather than popping items of it).
+  the stack rather than popping items off it).
 
 The TOS is needed in many different situations, therefore class *Workspace*
 provides, for convenience, a number of static wrapper functions that access
@@ -3379,7 +3383,7 @@ Apart from *Prefix::content*, Prefix has the following members of interest
 ** at2() ←→ *B*.
 
 * Put differently, *Prefix::content*, has a "hot end" that is manipulated
-with Prefix::push_next_token() and the various reduce_XXX() functions and
+with *Prefix::push_next_token()* and the various *reduce_XXX()* functions and
 a "cold end" containing tokens that are put on ice for a while.
 
 * *Prefix::PC* is the **P**rogram **C**ounter. The APL interpreter can be
@@ -3393,35 +3397,35 @@ a "cold end" containing tokens that are put on ice for a while.
 ** The execution is complete when *PC == body.size()* (or after *→0* in defined
    functions).
 
-* **saved_MISC**: many APL functions are __nomadic__, which means that they
+* **saved_MISC**: many APL functions are _nomadic_, which means that they
   can be called monadically or dyadically. This includes _most_ APL primitives
   and _all_ non-niladic defined functions.
 ** There is a fixed set of 'MISC' tokens (more precisely: **TokenClass**es)
    that cause a nomadic function to be evaluated monadically: ← → [ ◊ F C M
    and (.
-** All phrases that start with a MISC token (and differ only by that token)
+** All phrases that start with a *MISC* token (and differ only by that token)
    use the same *Phrase::reduce_fun*. For example, the two APL statements
    *X←⌊1.5* and *-⌊1.5* will both first match phrase MISC_F_B. This is because
-   - (aka. F) and ← are MISC tokens. Therefore both phrases will first compute
-   *⌊1.5* in *Prefix::reduce_MISC_F_B_()* and result *1*.
-** In contrast, in APL statement *2⌊1.5* the leftmost value *2* is NOT a MISC
+   - (aka. F) and ← are *MISC* tokens. Therefore both phrases will first
+   compute *⌊1.5* in *Prefix::reduce_MISC_F_B_()* and result *1*.
+** In contrast, in APL statement *2⌊1.5* the leftmost value *2* is NOT a *MISC*
    token and therefore *Prefix::reduce_A_F_B_()* will be called.
 ** Unfortunately the decision about whether *Prefix::reduce_MISC_F_B_()* or
    *Prefix::reduce_A_F_B_()* matches can only be made _after_ either *MISC*
    or *A* was fetched. IOW: this decision requires a lookahead of 1 token (and
    Prefix is therefore essentially a so-called LALR(1) parser). If the
    decision is in favor of *Prefix::reduce_A_F_B_()*, then everything is fine.
-   However, for *Prefix::reduce_MISC_F_B_()* the MISC token is not used and
-   must be considered somehow. The solution is to store the MISC token in
+   However, for *Prefix::reduce_MISC_F_B_()* the *MISC* token is not used and
+   must be considered somehow. The solution is to store the *MISC* token in
    Cpp variable *Prefix::saved_MISC*. Note that one cannot simply decrement
-   the PC in order to _undo_ the fetching of the MISC token. Decrementing the
-   PC looks much simpler at first glance, but would only work if the MISC
+   the PC in order to _undo_ the fetching of the *MISC* token. Decrementing
+   the PC looks much simpler at first glance, but would only work if the *MISC*
    token came directly from the body of the *Executable*.
    Sometimes, though, (defined function *F*, defined operator *M*,
-   or complete index *C*) the MISC token is the result of a Symbol
+   or complete index *C*) the *MISC* token is the result of a Symbol
    resolution (cases *F* and *M*) or even of a prior computation with
    side effects (case complete index *C*).
-   
+
 The following picture is a slightly more detailed version of the previous one:
 
 ----
@@ -3461,17 +3465,17 @@ The following picture is a slightly more detailed version of the previous one:
 
 === APL Functions
 
-APL knows two types of functions:
+APL implements two types of functions:
 
 * APL primitives (functions and operators) and system functions. They are
   defined by the interpreter itself and are implemented in Cpp, and
-* defined functions, They are defined by the APL programmer.
+* defined functions, coded in APL by the programmer.
 
 Every function has a *signature* that defines the combination of arguments
 that the function can be called with. The total number of possible signatures
 is somewhat large, but a single function only implements a rather small subset
 of them and returns a *VALENCE ERROR* when the *Prefix* parser calls a
-function with a signature that the called function does hot support. In GNU
+function with a signature that the called function does not support. In GNU
 APL the signature is a bitmap of *signature atoms* where every atom
 corresponds to a possible position of an argument in a *Prefix* pattern.
 However, not all possible bitmaps are valid signatures (e.g. a function with
@@ -3571,7 +3575,6 @@ int sig = SIG_FUN;
 
    return Fun_signature(sig);
 }
-
 ----
 
 System functions do not use signatures because their classes know the
@@ -3582,7 +3585,7 @@ the function header and the signatures differ. The only class that cares
 about the signature (of its left function argument) is *Bif_OPER1_EACH*.
 
 For every signature *XXX* that a function class supports it must overload
-the corresponding *eval_XXX()* function. In our example, primitive '*+*'
+the corresponding *eval_XXX()* function. In our example, primitive *+*
 supports monadic *+B* and dyadic *A+B*. It therefore overloads *eval_B()*
 and *eval_AB()*. Likewise the axis variant A[X] is overloaded with
 *eval_AB()* and then delegated to their companions in class *ScalarFunction*.
@@ -3619,9 +3622,9 @@ To summarize the execution of APL functions:
 . The reduce function for the pattern A F B is *reduce_A_F_B()*.
 . The *Function ** in token *F* is e.g. *Bif_F12_PLUS::fun*.
 . The pattern also implies that the eval_AB() function of *F*, i.e.
-  Bif_F12_PLUS::fun->eval_AB(A, B) shall be called in order to prduce the
+  *Bif_F12_PLUS::fun->eval_AB(A, B)* shall be called in order to produce the
   reduction result.
-. *Bif_F12_PLUS::fun->eval_AB()* is inlined and calls
+. *Bif_F12_PLUS::fun->eval_AB()* is in-lined and calls
   *ScalarFunction::eval_AB()* with argument *Cell::bif_add*. It returns
   some result Z.
 . The Prefix parser replaces *A F B* with *Z* which finalizes the execution of
@@ -3658,7 +3661,7 @@ implementation is straightforward.
 
 IBM APL2 defines the ∇-editor to be recursive (so one can start the editing
 of some other defined function while editing another defined function),
-this feature was not implemented in the GNU APL editor.
+this feature was 'not' implemented in the GNU APL ∇-editor.
 
 
 === Class Workspace
@@ -3681,8 +3684,8 @@ The APL interpreter has (only) one static *Workspace* instance named
 
 The *)SAVE* command serializes the binary *Workspace::the_workspace* into a
 human readable .xml file. The *)LOAD* or *)COPY* commands may later
-de-serialized a .xml back into the *Workspace::the_workspace* of another APL
-session. Many of the APL commands modify the state of
+de-serialized a .xml workspace file back into the *Workspace::the_workspace*
+of another APL session. Many of the APL commands modify the state of
 *Workspace::the_workspace*. According to *Workspace.hh* the data relevant
 members of class *Workspace* are:
 
@@ -3724,20 +3727,20 @@ protected:
 };
 ----
 
-The idea between this distribution between base class *Workspace_0* and
+The idea between this distinction between base class *Workspace_0* and
 derived class *Workspace* is twofold:
 
 . It ensures that the two symbol tables *symbol_table* (for user-defined
   names) and *distinguished_names* for system functions and system variables
   are properly initialized (to empty tables) so that the constructor of the
   derived class *Workspace* can simply add system functions and variables
-  without taking care of draining the tables first.
+  without needing to drain (clear) the tables first.
 . It separates the interpreter state produced by the user (and which is
   **)SAVE**d into a .xml file) from the interpreter state produced by the
   intialization of the interpreter itself. Since _system functions_ are
   constant in nature, they have no state related to them. Therefore the
-  initial state of the interpreter is primarily the state of all system
-  variables, for example after a *)CLEAR* command.
+  initial state of the interpreter is primarily the initial state of all
+  system variables, for example after a *)CLEAR* command.
 
 
 === Class XML_Archive
@@ -3751,8 +3754,8 @@ classes. There are actually 3 classes:
   *enum ArchiveSyntax* for verifying that the archive software versions of
   a **)LOAD**ed .xml file is compatible with the software version that
   **)SAVE**d the archive (and warns the user if not).
-* Derived class *XML_Saving_Archive* contains the functions for serializing a
-  *Workspace* object into a file. Serializing means that the internal
+* Derived class *XML_Saving_Archive* contains the functions for serializing
+  a *Workspace* object into a file. Serializing means that the internal
   (binary) representation of a workspace is written into a (human readable)
   format from which it can later be de-serialized. IOW: class derived
   *XML_Saving_Archive* implements the *)SAVE* command.
@@ -3764,7 +3767,7 @@ classes. There are actually 3 classes:
 ==== Serialization (APL to XML)
 
 The serialization is split into a small number of categories or _loops_.
-Each such loop interates over the same kind of data structures in the
+Each such loop iterates over the same kind of data structures in the
 workspace. To simplify the later de-serialization of a .xml file, the order
 of the different loops matters, while the order of items inside a loop is
 arbitrary. The loops are:
@@ -3817,8 +3820,8 @@ Some remarks:
   <TAG ... /> in XML) as opposed to start and end tags (i.e. <TAG ...> ...
   </TAG> in XML. The exceptions are Cpp classes of variable size (arrays,
   vectors, linked lists, etc.), whose items are serialized between the
-  corresponding start and end tags.
-* empty vectors etc. may be omitted
+  corresponding start and end tags,
+* empty vectors, etc., may be omitted.
 
 Most Cpp types are mapped to XML in a straightforward fashion. The exceptions
 are described in more detail in the following.
@@ -3829,7 +3832,7 @@ The serialization of APL Values is implemented with two different loops: one
 for the (typically large) ravel of the value, and one for the rest (i.e.
 shape, flags, etc.
 
-In Cpp, objects refer to each other by their addresses in the memory (aka.
+In Cpp, objects refer to each other by their addresses in memory (aka.
 _pointers_ in C, and/or _references_ in Cpp). Even though one could, in
 theory, emulate pointers with file offsets, this would lead to a rather
 complicated implementation. Instead, GNU APL uses IDs that define relations
@@ -3838,7 +3841,7 @@ and/or references in Cpp.
 
 The IDs are different *enum* types (so that the Cpp compiler can detect
 the use of incompatible pointers). The *enum Vid { ... }* is the ID that
-relates XML <Value .../> tags to the correspinding XML <Ravel .../> tag.
+relates XML <Value .../> tags to the corresponding XML <Ravel .../> tag.
 
 For example, Let:
 
@@ -3867,11 +3870,11 @@ TEST.xml:
   </SymbolTable>
 ----
 
-The serialization of the <Ravel> deserves some more explananion. As already
+The serialization of the <Ravel> deserves some more explanation. As already
 explained, the *vid="15"* attribute of the <Ravel> tag links the ravel to
-the <Value with the (same) *vid="15"*. This information alone suffices to
-de-serialize the right side *1 2 3* of the assignment *Z←1 2 3*. However, the
-assignment to APL variable (aka. Symbol) *Z* has created a second tag
+the <Value with (the same) *vid="15"*. This information alone suffices to
+de-serialize the right side *1 2 3* of the assignment *Z←1 2 3*. However,
+the assignment to APL variable (aka. Symbol) *Z* has created a second tag
 *<Variable vid="15"/>* which links the (current) APL value *1 2 3* to symbol
 *Z*. In the above example *Z* is a global variable, therefore there is only
 one *<Variable ...>* tag between the *<Symbol>* ... *</Symbol>* tags.
@@ -3888,7 +3891,7 @@ Now, a "proper" XML would have serialized the ravel *1 2 3* as follows:
 
 Since ravels tend to be rather long (so that Cells are frequent), the "proper"
 <Cell /> tags were optimized into a far more compact format which may
-be called *micro tags* (or *μ-tags* ). A micro tag is a single Unicode
+be called *micro tags* (or *μ-Tags* ). A micro tag is a single Unicode
 character that defines the following properties and purposes that are
 related to (and later needed to de-serialize) a Cell:
 
@@ -3922,7 +3925,7 @@ from the first character after the μ-Tag to the character before the next
 μ-Tag. Since the number of ASCII characters in the Cell value is somewhat
 larger, the overhead for the μ-Tag is relatively small.
 
-In contrast, CharCells contain one character and the μ-tags tags for a string
+In contrast, CharCells contain one character and the μ-Tag tags for a string
 like "Hello" would require 5 bytes for the ASCII "Hello", plus 10 to 15 bytes
 for the 5 μ-Tags (since the Unicodes of the μ-Tags are UTF8-encoded, and most
 have 2 or 3 bytes per Unicode).
@@ -4012,13 +4015,13 @@ Parallel execution of APL has a longer history.
 In the early 1980s the author learned APL (after ALGOL, Assembler, and BASIC,
 and before C. Cpp was in its early days and not (yet) commercially available.
 The platform was an IBM 5110 desktop, a precursor to the IBM PC which came
-later. C compilers and APL interpreters were expensive and the IBM 5110 was
+later. C compilers and APL interpreters were expensive and on the IBM 5110 was
 slow, particularly in comparison with Assembler or compiled languages like C
 on comparable platforms.
 
-Shortly after the owner of the IBM 5110 replaced it with a faster 16-bit
-machine (a Motorola 68000 CPU with an APL 68000 interpreter (today named APL-X)
-and multi-user capabilities). APL performance was still an issue.
+Shortly afterwards, the owner of the IBM 5110 replaced it with a faster 16-bit
+machine (a Motorola 68000 CPU with an APL 68000 interpreter [today named APL-X]
+with multi-user capabilities). APL performance was still an issue.
 
 To address the performance issue, the author undertook the construction of a
 parallel APL computer. The first draft architecture was based on
@@ -4064,7 +4067,7 @@ of the author. The developers were (in DATIS-P order):
 **I**na Gläs <<Glä>>.
 The DATIS-P was prepared for 256 CPUs, but for budgetary reasons our
 prototype had only 32 CPUs. The power consumption was about 50 Amperes
-at 5 Volts (which blew the fuses in our lab when we turned it on for
+at 5 Volts per CPU (which blew the fuses in our lab when we turned it on for
 the first time). The size was three 19-inch cabinets (roughly the size of
 a mainframe at that time).
 
@@ -4074,15 +4077,15 @@ no suitable technology existed at that time we developed an ASIC (a 1-bit wide
 8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprized of
 8-bit × 3 stages × 4 width = 96 such ASICs. The 3 stages were pipelined,
 a reconfiguration of the network to an arbitrary permutation of the inputs
-was done in parallel by all CPUs and took only 3 CPU instriuctions. The
+was done in parallel by all CPUs and took only 3 CPU instructions. The
 communication bandwith was 2 CPU instructions per byte (one MOVE.B instruction
 to write into the network and one MOVE.B to read the byte (written by some
 other CPU) back. The total bandwidth of the network of our 32-CPU machine was
-therefore (a 16 MHz clock) ÷ (3 clocks per MOVE.B) ÷ (2 MOVE.B per transfer) =
-2.6 MByte/s or 21 MBit/s per CPU = 670 MBit/s for the entire network (a lot
-at that time). The bandwidth of the DATIS-P scales linearly with the number
-of CPUs, therefore a 256 CPU machine would have had a total communication
-bandwidth of 5.3 Gigabit/s.
+therefore (with a 16 MHz clock) ÷ (3 clocks per MOVE.B) ÷ (2 MOVE.B per
+transfer) = 2.6 MBytes/s or 21 MBits/s per CPU = 670 MBits/s for the entire
+network (a lot at that time). The bandwidth of the DATIS-P scales linearly
+with the number of CPUs, therefore a 256 CPU machine would have had a total
+communication bandwidth of 5.3 Gigabits/s.
 
 The architecture of the DATIS-P is:
 
@@ -4123,7 +4126,7 @@ Every CPU of the DATIS-P:
 * A dual-port 1 MByte static memory; one port connected to the local CPU the
   other to the Master CPU.
 
-The development of the hardware (PCB designs, ASIC design) and the sortware
+The development of the hardware (PCB designs, ASIC design) and the software
 took from 1985 to 1989; the author was managing the hardware development
 and finished a Ph.D thesis about the parallel algorithms for the DATIS-P in
 1990 <<Sau>>.
@@ -4235,8 +4238,8 @@ public:
         system_wisdom_loaded(false)
    {}
 
-   static Quad_FOO * fun;          ///< Built-in function.
-   static Quad_FOO  _fun;          ///< Built-in function.
+   static Quad_FOO fun;          ///< Built-in function.
+   static Quad_FOO * _fun;       ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B()
@@ -4259,8 +4262,8 @@ point in time.
 ----
 #include "Quad_FOO.hh"
 
-Quad_FOO  Quad_FOO::_fun;
-Quad_FOO * Quad_FOO::fun = &Quad_FOO::_fun;
+Quad_FOO  Quad_FOO::fun;
+Quad_FOO * Quad_FOO::_fun = &Quad_FOO::fun;
 
 //-----------------------------------------------------------------------------
 Token
@@ -4308,7 +4311,7 @@ The files concerned are:
    Quad_FOO.cc Quad_FOO.hh
 ----
 +
-keep *src/Makefile.am* sorted alphabetically and indented in the same way as
+Keep *src/Makefile.am* sorted alphabetically and indented in the same way as
 the other files.
 +
 .. (re-)run *autoreconf* (in the GNU APL top-level directory)
@@ -4341,7 +4344,7 @@ This defines a new Token with token class *TC_FUN1*, value type *TV_FUN* i.e.
    are used to make explicit that ⎕FOO is monadic. If you should add a dyadic
    signature later on then change the token class to *TC_FUN12*.
 +
-.. Since *src/Token.def* is a *.def* file, it will be *#inluded* by several
+.. Since *src/Token.def* is a *.def* file, it will be *#included* by several
   *.cc* files and magically insert the new token in several source files.
 
 . Add a *sf_def()* macro to *src/SystemVariable.def*:
@@ -4379,8 +4382,8 @@ $ src/apl
 ----
 #include "Quad_FOO.hh"
 
-Quad_FOO  Quad_FOO::_fun;
-Quad_FOO * Quad_FOO::fun = &Quad_FOO::_fun;
+Quad_FOO  Quad_FOO::fun;
+Quad_FOO * Quad_FOO::_fun = &Quad_FOO::fun;
 
 //-----------------------------------------------------------------------------
 Token
@@ -4404,6 +4407,7 @@ Value_P Z(z);                         // constructor: APL value from string
 }
 //-----------------------------------------------------------------------------
 ----
+
 
 == Exercise 2
 

@@ -79,6 +79,7 @@
   sf_def(Quad_FX,    "FX",    "FiX"                          )
   sf_def(Quad_GTK,   "GTK",   "Gtk GUI"                      )
   sf_def(Quad_MAP,   "MAP",   "MAP (replace) ravel elements" )
+  sf_def(Quad_MX,    "MX",    "Matrix/Statistics"           )
   sf_def(Quad_INP,   "INP",   "INPut from script"            )
   sf_def(Quad_NA,    "NA",    "Name Association"             )
   sf_def(Quad_NC,    "NC",    "Name Class"                   )
