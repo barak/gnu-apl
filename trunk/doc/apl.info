@@ -16,12 +16,12 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 28, 2024 This manual briefly documents GNU APL, an interpreter
+November 30, 2024 This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
-Free Documentation License, *Note Chapter 6::.
+Free Documentation License, *Note Chapter 7.
 
    This manual does NOT describe APL itself; there exist a number of
 good books and texts about APL. We would like to refer the reader to the
@@ -62,7 +62,7 @@ APL is built and installed like this:
      <http://www.gnu.org/prep/ftp.html>), and un-tar the file.
 
    • read (and follow) the instructions given in file README in the
-     unpacked directory
+     unpacked directory.
 
    For the experienced, but impatient reader: it is the usual sequence
 
@@ -83,8 +83,8 @@ APL.
 
 Last things first: before explaining how to start APL, it is important
 to remember how to stop (i.e.  exit) it.  Neither ^C nor ^D will stop
-APL - they serve other purposes.  Instead, you leave APL with the
-command )OFF (on a separate line) like this:
+APL - these serve other purposes.  Instead, you leave APL with the
+command )OFF or )off (on a separate line) like this:
 
    )OFF
 
@@ -94,8 +94,10 @@ to return to APL’s command mode so that the )OFF command can be entered.
 In some circumstances it may be necessary to press ^C twice within a
 short time interval (this is called INTERRUPT in APL).
 
-   Having that said, APL is started like every other program - by
-entering its name and optional command line parameters, for example:
+   Using the )OFF command will not automatically save your work,
+however, a history of your GNU APL commands will have been preserved.
+Having that said, APL is started like every other program - by entering
+its name and optional command line parameters, for example:
 
    $ apl
 
@@ -141,8 +143,8 @@ GNU APL understands the following command line options:
      executed).
 
      The -C option is intended to be a security feature for GNU APL
-     interpreters that are facing a hostile environment like the public
-     internet.
+     interpreters that are facing hostile environments such as the
+     public Internet.
 
      NOTES:
 
@@ -181,6 +183,10 @@ GNU APL understands the following command line options:
 
      start with ]COLOR ON [OFF].
 
+   • --CPU_limit_secs sec
+
+     set CPU time limit to sec seconds.
+
    • -d
 
      run the APL interpreter (or APL script) in the background (i.e.  as
@@ -197,19 +203,20 @@ GNU APL understands the following command line options:
 
    • --eval line
 
-     evaluate one APL line and exit.  This option can be given several
-     times; in that case several lines are being executed before GNU apl
-     exits.  Keep in mind that command line options are normally
-     processed by your shell before being passed to apl.  Therefore
-     sometimes quoting the argument of –eval may be needed and common
-     wisdom has it to always quote the argument of –eval.
+     evaluate one APL line and exit (-s without -f is implied).  This
+     option can be given several times; in that case several lines will
+     be executed in command line order before GNU apl exits.  Keep in
+     mind that command line options are normally processed by the shell
+     before being passed to apl.  Therefore quoting the argument of
+     –eval may often be necessary and it is common wisdom to always
+     quote the –eval argument.
 
    • -f file
 
      read input from file rather than from the keyboard.  When the end
      of the file is reached, input is switched back to the keyboard.  If
      you want to terminate the APL interpreter after executing the file,
-     then use )OFF as last line in the file.
+     then use )OFF as last line in the file or include the –OFF option.
 
    • --gpl
 
@@ -280,8 +287,8 @@ GNU APL understands the following command line options:
 
      WARNING: The memory-limit is checked against parameter ’MemFree’ in
      /proc/meminfo when GNU APL starts, but this does not protect
-     against other processes consuming the free memory at a later point
-     in time.
+     against other processes consuming the available free memory
+     sometime later.
 
      If that happens (and according to the rules above the user has the
      responsibility to prevent it), then ⎕WA becomes unreliable and the
@@ -316,7 +323,7 @@ GNU APL understands the following command line options:
      the TCP connection.
 
      WARNING: This option is dangerous if PORT is directly exposed to
-     the internet!
+     the Internet!
 
    • --noCONT
 
@@ -371,9 +378,8 @@ GNU APL understands the following command line options:
 
    • --show_bin_dir
 
-     display the binary directory (where, according to ./configure, the
-     programs apl, APserver, AP100, and AP210 are supposed to be
-     installed.  Then exit.
+     display the binary directory where, according to ./configure, the
+     programs apl, APserver, AP100, and AP210 are installed.  Then exit.
 
    • --show_doc_dir
 
@@ -415,7 +421,7 @@ GNU APL understands the following command line options:
 
      test mode.  This option specifies how the interpreter shall behave
      when running a number of testcases (as specified with the -T
-     option)
+     option).
 
      --TM 0 (default) run all testcases and exit after the last
      testcase.
@@ -556,7 +562,8 @@ file INSTALL).
      APL scripts should have a file extension of .apl but other
      extensions are also accepted by GNU APL. APL scripts are, for
      example, the files expected for the -f command line option.  A
-     workspace can be written in this format with the )DUMP command.
+     workspace can be written in this format with the )DUMP command and
+     can become an active workspace using the )LOAD command.
 
   4. APL testcase files are similar to APL scripts, but in addition to
      the APL commands and expressions they also contain the expected
@@ -567,7 +574,7 @@ file INSTALL).
 
    The following APL commands are related to file names:
 
-   )LOAD [lib] name[.xml]
+   )LOAD [lib] name[.xml|.apl]
 
    )SAVE [lib] [name[.xml]]
 
@@ -682,7 +689,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.6::   Debug Commands
 * Section 2.7::   Direct Functions (Lambdas)
 * Section 2.8::   ]DOXY Command
-* Section 2.9::   )DUMP and DUMP-HTML Commands
+* Section 2.9::   )DUMP and )DUMP-HTML Commands
 * Section 2.10::  ]NEXTFILE and ]PUSHFILE Commands
 * Section 2.11::  History and TAB completion
 * Section 2.12::  Logging Facilities
@@ -713,7 +720,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.37::  ⎕SQL  - SQL Database Interface
 * Section 2.38::  ⎕SI   - State Indicator
 * Section 2.39::  ⎕SYL  - System limits
-* Section 2.40::  ⎕XML - XML Parsing
+* Section 2.40::  ⎕XML  - XML Parsing
 * Section 2.41::  Conditionals
 * Section 2.42::  Matrix Product
 
@@ -761,9 +768,10 @@ shell:
 
     apl < SCRIPT.apl
 
-   Alternatively, the command line option -f of apl can be used:
+   Alternatively, the command line option -f or -s can be used:
 
     apl -f SCRIPT.apl
+    apl -s SCRIPT.apl
 
    Both ways of redirecting the file are almost identical; in the first
 case redirection was performed by the shell running apl, while in the
@@ -775,15 +783,15 @@ File: apl.info,  Node: Subsection 2.1.2,  Next: Subsection 2.1.3,  Prev: Subsect
 2.1.2 Make the script file executable
 -------------------------------------
 
-Alternatively the script can be made executable, mentioning apl as the
-interpreter for the script (see also ‘'man 2 execve'’).  For this to
-work, the first line of the script must have a special format
+Alternatively the script can be made executable, specifying apl as its
+interpreter (see also ‘'man 2 execve'’).  For this to work, the first
+line of the script must have a special format:
 
     #! /usr/local/bin/apl --script
 
    --script prevents: printing of a welcome banner, echoing of stdin to
 stdout, automatic loading of a )CONTINUE workspace, and prevents
-starting of a thread for shared variable communication.
+starting a thread for shared variable communication.
 
    If the path to the interpreter is relative (which might be useful if
 you do not know in advance where the APL interpreter will be installed)
@@ -1474,7 +1482,7 @@ colored output while ]XTERM OFF disables it (for example to avoid
 annoying ANSI Escape sequences when forwarding stdout or stderr to a
 file).
 
-   By default colored output assumes a terminal (-emulation) that
+   Default colored output assumes a terminal (-emulation) that
 understands ANSI (or VT100) Escape sequences.  The xterm that comes with
 most recent GNU/Linux distributions is a perfect choice supporting both
 colors and UTF-8 (Unicode) encoded character I/O.
@@ -1592,7 +1600,7 @@ might expect the opposite.
 
    This pitfall can be avoided by enforcing the same length for all
 strings being compared or sorted.  A simple way to achieve that is the
-use of ⊂[2]⊃ like this (assuming IO←1):
+use of ⊂[2]⊃ like this (assuming ⎕IO←1):
 
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
  Adam Zoo  
@@ -1743,7 +1751,7 @@ File: apl.info,  Node: Section 2.8,  Next: Section 2.9,  Prev: Section 2.7,  Up:
 2.8 ]DOXY Command
 =================
 
-A particularly useful debug command is ]Doxy.  It dumps the current
+A particularly useful debug command is ]DOXY. It dumps the current
 workspace in brows-able HTML format with listings of defined functions
 and hyperlinks between them.
 
@@ -1766,7 +1774,7 @@ the ]DOXY command was executed.
 
    One can (and should make it a habit to) insert special comments into
 defined functions which are copied into proper places inside the
-documentation that is generated by the ]DOXY command.  These "Doxy"
+documentation that is generated by the ]DOXY command.  These "doxy"
 comments begin with ⍝⍝ (as opposed to "normal" APL comments that start
 with a single ⍝.  Doxy comments are typically one-liners that briefly
 explain what a function is supposed to do.
@@ -1793,7 +1801,7 @@ code.  However, such lines will be ignored by the ]DOXY command.
 
    The parser generates no extra code from the doxygen comments, and
 therefore the use of many doxygen comments causes no performance problem
-(and nor do regular APL comments).
+(and neither do regular APL comments).
 
 
 File: apl.info,  Node: Section 2.9,  Next: Section 2.10,  Prev: Section 2.8,  Up: Chapter 2
@@ -1819,14 +1827,15 @@ made executable (see scripting).
 2.9.2 )DUMP-HTML Command
 ------------------------
 
-The )DUMP-HTML command is similar to the )DUMP command.  The output
-format is similar to the )DUMP command, the difference is that those
-characters that need HTML-escaping (e.g.  ’<’ becomes &lt;, ’>’ becomes
-’&gt;) are being HTML-escaped.  The output of the )DUMP-HTML command can
-therefore be directly used by a web server to display workspace listings
-(to share the code).
+The )DUMP-HTML command is similar to the )DUMP command and the output
+format is similar as well.  The difference is that those characters that
+need HTML-escaping (e.g.  ’<’ becomes &lt; and ’>’ becomes ’&gt; etc.)
+are HTML-escaped.  The output of the )DUMP-HTML command can therefore be
+directly used by a web browser to display workspace listings (to share
+the code).
 
-   The files written with command )DUMP-HTML have the extension .html.
+   The files written with the )DUMP-HTML command have the extension
+.html.
 
    In addition to the APL code, the .html files produced have a short
 HTML <head> section template.  The user should replace the fields marked
@@ -1867,7 +1876,7 @@ how it is used, etc.)  without the need to prepend every line with ⍝ or
 
    For example:
 
-#/usr/local/bin/apl
+#!/usr/local/bin/apl
 
 ⍝ see documentation at the end of this file
 
@@ -1918,8 +1927,8 @@ function editing mode or ⍞ input.
 
    1d.  In the ∇-editor, the other function lines of the function being
 edited can be recalled.  This is far more handy than the ∇-editor
-commands for recalling function lines (and which are not fully supported
-in GNU APL).
+commands for recalling function lines (which are not fully supported in
+GNU APL).
 
    2.  Instead of always TAB-completing file names, the tab character
 now understands different TAB-completion contexts:
@@ -1927,7 +1936,7 @@ now understands different TAB-completion contexts:
    2a.  Input starting with .  or / is completed as a filename like
 readline did.
 
-   2b.  Input starting with ) or ] is completed as command name name or,
+   2b.  Input starting with ) or ] is completed as command-name name or,
 to some extent, as command arguments.
 
    2c.  Input starting with ⎕ is completed as a system function name or
@@ -2027,7 +2036,6 @@ uppercase or lowercase:
 
       $2A
 42
-
 
 
 File: apl.info,  Node: Section 2.15,  Next: Section 2.16,  Prev: Section 2.14,  Up: Chapter 2
@@ -2317,8 +2325,8 @@ normal circumstances, but becomes as slow as sequential allocation when
 the number of members in the variable reaches its current capacity.  For
 this reason, if a structured variable is used as an associative array,
 e.g.  as a database, then it is better to not rely on the (automatic)
-reorganization of the variable, but to create the variable with a large
-enough (with 38 ⎕CR) from the beginning.
+reorganization of the variable, but to create a large enough variable
+(with 38 ⎕CR) from the beginning.
 
    If that is not possible (because the (performance-) problem has
 occurred after the variable was created, then one can manually increase
@@ -2352,8 +2360,7 @@ a value that was assigned to a variable, including ⎕ and ⍞) and a
 non-committed value.  The point where it does make a difference is when
 the value is the final result of a statement (as opposed to an
 intermediate result inside a statement).  In that situation (and only
-there) a non-committed value is being printed while a committed value is
-not.
+there) a non-committed value is printed but a committed value is not.
 
    You can use ⊢ in a similar fashion as ⎕← at the left end of a
 statement, to print a value even though it was previously assigned to a
@@ -2400,7 +2407,6 @@ a*c
   '*' ⊢[X] B
 * 2 *
 4 * 6
-
 
 
 File: apl.info,  Node: Section 2.18,  Next: Section 2.19,  Prev: Section 2.17,  Up: Chapter 2
@@ -2577,23 +2583,23 @@ File: apl.info,  Node: Section 2.19,  Next: Section 2.20,  Prev: Section 2.18,  
 ----------------------------
 
 The standard function Interval (Z←⍳B) requires its argument B to be a
-scalar or a length 1 vector.  The result Z←⍳B then contains all possible
-indices of values which have shape B.
+positive integer scalar or a length 1 integer vector.  The result Z←⍳B
+then contains all possible consecutive integer values having shape B.
 
    Generalized monadic ⍳ extends this concept to integer vectors B with
 more than 1 element.  The result Z←⍳B again contains all possible
 indices of a value which has shape B, but the rank of B can now be more
-than 1.  The items of Z are nested integer vectors as opposed to integer
-scalars in the standard case.
+than 1.  The items of Z are nested integer vectors consecutive along
+each axis of B as opposed to integer scalars in the standard case.
 
 2.19.2 Generalized dyadic ⍳
 ---------------------------
 
 The standard function Index Of (Z←A⍳B) requires its left argument A to
 be a scalar or a vector of rank 1.  The items of the result Z are the
-(first) positions (= indices) of the corresponding items of B in A (for
-the items found in A) or else ⎕IO+⍴A (which is an invalid index of A)
-for the items of B that are not found in A.
+(first) positions (= indices) of the matching items of B in A (for the
+items found in A) or else ⎕IO+⍴A (which is an invalid index of A) for
+the items of B that are not found in A.
 
    Generalized dyadic ⍳ extends this concept to find the (first) indices
 of the corresponding items of B in A (in ravel order) where the rank of
@@ -2634,47 +2640,43 @@ not needed.
 
    Example 1 (real B)
 
-      ⎕←B←3 3⍴ 1 1 3 2 4 2 4 8 7
+      ⊢B←3 3⍴ 1 1 3 2 4 2 4 8 7
 1 1 3
 2 4 2
 4 8 7
 
       (QT R Ri)←⌹[⎕CT]B
-      Q←⍉QT   ⍝ recover the non-transposed Q
+      Q←⍉QT           ⍝ recover the non-transposed Q
 
-      4 ⎕CR 0 4⍕ Q
+      4⎕CR0 4⍕Q
 ┏→━━━━━━━━━━━━━━━━━━━┓
-↓ .2182  .9759 ¯.0000┃
-┃ .4364 ¯.0976 ¯.8944┃
-┃ .8729 ¯.1952  .4472┃
+↓ .2182  .4364  .8729┃
+┃ .9759 ¯.0976 ¯.1952┃
+┃ .0000 ¯.8944  .4472┃
 ┗━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that Q is orthogonal
-      4 ⎕CR 0 4⍕ Q +.×⍉Q
+      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━┓
-↓ 1.0000 ¯.0000  .0000┃
-┃ ¯.0000 1.0000  .0000┃
+↓ 1.0000  .0000  .0000┃
+┃  .0000 1.0000  .0000┃
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that R is upper triangle
-      4 ⎕CR 0 4⍕ R
+      4⎕CR0 4⍕R       ⍝ verify that R is upper triangle
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 4.5826 8.9469 7.6376┃
 ┃  .0000 ¯.9759 1.3663┃
-┃ ¯.0000 ¯.0000 1.3416┃
+┃  .0000  .0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
-       Q +.× R
+       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
 1 1 3
 2 4 2
 4 8 7
 
-      ⍝ verify that Ri is the inverse of R
-      4 ⎕CR 0 4⍕ Ri +.×R
+      4⎕CR0 4⍕Ri+.×R  ⍝ verify that Ri is the inverse of R
 ┏→━━━━━━━━━━━━━━━━━━━━┓
-↓ 1.0000 ¯.0000  .0000┃
+↓ 1.0000  .0000  .0000┃
 ┃  .0000 1.0000  .0000┃
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
@@ -2683,42 +2685,37 @@ not needed.
    Example 2 (complex over-determined B)
 
 
-⎕←B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
+      B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
-      (QT R)←⌹[⎕CT]B
-      Q←⍉QT   ⍝ recover the non-transposed Q
-
-      4 ⎕CR 0 4⍕ Q
-┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓ .4107J¯.0310  .0621J¯.1742  .9124J¯.1121  .3710J.3755  ¯.2148J.0626 ┃
-┃ .7219J¯.1180 ¯.5950J.0697  ¯.2629J.4735  ¯.7179J¯.4253 ¯.1979J.2738 ┃
-┃ .1338J¯.1213  .0880J.2603   .3667J¯.0282 ¯.1833J.3784  1.0188J.0717 ┃
-┃ .2271J.0623   .9071J.0968   .0575J.2496  ¯.5003J.2494  ¯.1208J¯.0703┃
-┃ .5538J.1806   .1779J¯.3283 ¯.6232J¯.3575  .8260J¯.3033  .0605J¯.2291┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-      ⍝ verify that Q is orthogonal
-      4 ⎕CR 0 4⍕ Q +.×⍉Q
+      (QT R Ri)←⌹[⎕CT]B
+      4⎕CR0 4⍕Q←⍉QT   ⍝ recover the non-transposed Q
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓ 1.0000J.0000   .0000J¯.0000 ¯.0000J¯.0000 ¯.0000J¯.0000  .0000J.0000 ┃
-┃  .0000J¯.0000 1.0000J.0000   .0000J.0000   .0000J.0000   .0000J¯.0000┃
-┃ ¯.0000J¯.0000  .0000J.0000  1.0000J¯.0000  .0000J¯.0000 ¯.0000J.0000 ┃
-┃ ¯.0000J¯.0000  .0000J.0000   .0000J¯.0000 1.0000J.0000  ¯.0000J.0000 ┃
-┃  .0000J.0000   .0000J¯.0000 ¯.0000J.0000  ¯.0000J.0000  1.0000J.0000 ┃
+↓  .4107J¯.0310  .7219J¯.1180  .1338J¯.1213  .2271J.0623   .5538J.1806 ┃
+┃  .0621J¯.1742 ¯.5950J.0697   .0880J.2603   .9071J.0968   .1779J¯.3283┃
+┃  .9124J¯.1121 ¯.2629J.4735   .3667J¯.0282  .0575J.2496  ¯.6232J¯.3575┃
+┃  .3710J.3755  ¯.7179J¯.4253 ¯.1833J.3784  ¯.5003J.2494   .8260J¯.3033┃
+┃ ¯.2148J.0626  ¯.1979J.2738  1.0188J.0717  ¯.1208J¯.0703  .0605J¯.2291┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that R is upper triangle...
-      4 ⎕CR 0 4⍕ R
+      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+↓ 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
+┃  .0000J.0000 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
+┃  .0000J.0000  .0000J.0000 1.0000J.0000  .0000J.0000  .0000J.0000┃
+┃  .0000J.0000  .0000J.0000  .0000J.0000 1.0000J.0000  .0000J.0000┃
+┃  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000 1.0000J.0000┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4⎕CR0 4⍕R       ⍝ verify that R is upper triangle
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓ 8.5870J15.2557 10.1036J10.9309 13.5055J18.7452 10.0961J15.2530┃
+↓ 8.5870J15.2557 10.1035J10.9309 13.5055J18.7452 10.0961J15.2530┃
 ┃  .0000J.0000    8.7353J5.5589   9.2429J.4120    2.5086J.7539  ┃
-┃ ¯.0000J.0000     .0000J.0000   ¯2.4869J4.4115  ¯5.9788J¯6.0801┃
-┃ ¯.0000J.0000    ¯.0000J.0000    ¯.0000J.0000    7.4038J¯3.9492┃
-┃  .0000J.0000     .0000J.0000     .0000J.0000    ¯.0000J.0000  ┃
+┃  .0000J.0000     .0000J.0000   ¯2.4869J4.4115  ¯5.9788J¯6.0801┃
+┃  .0000J.0000     .0000J.0000     .0000J.0000    7.4038J¯3.9492┃
+┃  .0000J.0000     .0000J.0000     .0000J.0000     .0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
-       Q +.× R
+       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
 3J1  2J3 4J5   1J3
@@ -2748,12 +2745,12 @@ independent) it may not have linearly dependent columns.
 
    Now, for every real or complex number ⍺ does ⎕CT define a range of
 nearby numbers that are considered equal to ⍺ even though they are,
-strictly speaking, different.
+computationally speaking, different?
 
    In the same fashion, let B be a matrix with linearly dependent
 columns.  For every such B does ⎕CT define a range of nearby matrices
 that are also considered linearly dependent even though they are,
-strictly speaking, linearly independent.  As a matter of fact, the
+strictly speaking, linearly independent?  As a matter of fact, the
 probability that the columns of B are strictly linearly independent
 decreases as the size of the matrix grows.  If a matrix has linearly
 dependent columns, then every new row added to the matrix can make it
@@ -2837,7 +2834,7 @@ hex digits respectively.  Every byte in B becomes 2 characters in Z.
    A=11: convert value B to byte vector Z in CDR ("Common Data
 Representation", an IBM standard) format (similar to 3 ⎕TF).
 
-   A=12: convert byte vector Z in CDR format to value Z.
+   A=12: convert byte vector B in CDR format to value Z.
 
    A=13: convert hex string B to byte vector Z.
 
@@ -2923,9 +2920,9 @@ vector throw:
   2. DOMAIN ERROR if one of the B[j] is not a proper byte value
 
    A proper byte value is either an integer in the range -128...255
-including, or a (Unicode) character with a code point between U+FF80 and
-U+FFFF (including, corresponding to a negative signed char in C/C++) or
-between U+0000...U+00FF (including, corresponding to an unsigned char or
+inclusive, or a (Unicode) character with a code point between U+FF80 and
+U+FFFF (inclusive, corresponding to a negative signed char in C/C++) or
+between U+0000...U+00FF (inclusive, corresponding to an unsigned char or
 to a signed positive char in C/C++).  Real, Complex, or rational numbers
 are never proper byte values even if their value is close to an integer.
 Nor are nested APL values or values being assigned.
@@ -3129,7 +3126,7 @@ Q + + + + + + +
 
    Obviously Z contains solutions for the 8 Queens problem; the total
 number of solutions is well known to be 92 and we showed only the first
-two and the last solution above.
+three and the last solution above.
 
    The constraint matrix Q8 is the key to success.  The matrix has 64
 rows - one row for every field of the chess board.  And it has 8 + 8 +
@@ -3456,7 +3453,7 @@ The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
 Transform in the West."  GNU APL checks the presence of libfftw3 when it
 is ./configure’d.  If libfftw3 is present then ⎕FFT will hopefully
 return the expected result; if not then a DOMAIN ERROR will be raised
-when ⎕FFT is being used.
+when ⎕FFT is used.
 
    ⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to
 speed up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom
@@ -3619,41 +3616,43 @@ HAlloWEEn
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
 
-
 
 File: apl.info,  Node: Section 2.31,  Next: Section 2.32,  Prev: Section 2.30,  Up: Chapter 2
 
 2.31 ⎕MX - Matrix/Statistics
 ============================
 
-⎕MX[x] is a function that providess a collection of matrix and
-statistical operations such as covariance, eigensystems, and so on, and
-random number generation in several sorts of distributions, The
-operation is selected through the use of the axis specifier:
+⎕MX[x] is a system function that provides a collection of matrix and
+statistical operations such as covariance, eigensystems, and so on,
+along with random number generation in several statistical
+distributions.  Particular operations are selected through the use of
+the axis specifier x:
 
-        1       monadic Determinant
-        2       nomadic Cross product
-        3       dyadic  Vector angle
-        4       monadic Eigenvector
-        5       monadic Eigenvalue
-        6       monadic Ident
-        7       monadic Rotation matrix
-        8       dyadic  Homogeneous transform
-        9       monadic Norm
-        10      nomadic Randoms
-        11      nomadic Covariance
-        12      dyadic  Histogram
-        13      dyadic  Print
+            ⎕MX[1] B       (monadic) Determinant
+        (A) ⎕MX[2] B       (nomadic) Cross product
+          A ⎕MX[3] B       (dyadic)  Vector angle
+            ⎕MX[4] B       (monadic) Eigenvector
+            ⎕MX[5] B       (monadic) Eigenvalue
+            ⎕MX[6] B       (monadic) Ident
+            ⎕MX[7] B       (monadic) Rotation matrix
+          A ⎕MX[8] B       (dyadic)  Homogeneous transform
+            ⎕MX[9] B       (monadic) Norm
+        (A) ⎕MX[10] B      (nomadic) Randoms
+        (A) ⎕MX[11] B      (nomadic) Covariance
+          A ⎕MX[12] B      (dyadic)  Histogram
+          A ⎕MX[13] B      (dyadic)  Print
 
-   (These may by shown by entering ⎕mx ” or ⎕mx[0] on the APL command
-line.)
+   (These may by shown by entering ⎕MX ” or ⎕MX[0] on the APL command
+line).  In the function list above, A indicates a mandatory left
+argument, while A indicates an optional left argument.  The right
+argument B of ⎕MX[X] is always mandatory.
 
 2.31.1 Determinant
 ------------------
 
-The determinant operation, ⎕mx[1], is monadic and is valid only for
+The determinant operation, ⎕MX[1], is monadic and is valid only for
 numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑⍴B)
-(i.e., a square matrix).  E.g.:
+(i.e.  a square matrix).  For Example:
 
       mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
 ¯164J76
@@ -3662,47 +3661,47 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
 2.31.2 Cross Product
 --------------------
 
-The cross-product operation, ⎕mx[2], is nomadic.  In monadic form, it
-requires a numeric argument (real or complex) where ⍴⍴⊥ = 2 and (1↑⍴B)-1
-= (¯1↑⍴B), i.e., a matrix of N-1 rows of length-N vectors.  E.g.:
+The cross product operation, ⎕MX[2], is nomadic.  In monadic form, it
+requires a numeric argument (real or complex) where ⍴⍴B = 2 and (1↑⍴B)-1
+= (¯1↑⍴B), (i.e.  a matrix of N-1 rows of length-N vectors).  For
+Example:
 
-      B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
-      B
+      ⊢B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
 1  2  3J6  4
 5  6  7    8
 9 10 11   12
-      ⎕mx[2] B
+      ⎕MX[2] B
 0J48 0J¯72 0 0J24
 
    For reasons I’m not enough of a mathematician to understand, cross
 products are only valid in 3-space and 7-space, so the only valid
-monadic arguments are matrices of shapes [2 3] or [6 7].  ⎕mx, however,
+monadic arguments are matrices of shapes [2 3] or [6 7].  ⎕MX, however,
 doesn’t check this and will happily give you a result in any
-dimensionality and leave it your imagination what it may mean.  I’m also
-not enough of a mathematician to know what the significance may be of
-cross products involving complex numbers and thus I can’t guarantee I’m
-using an appropriate method in computing them.
+dimensionality and leave it to your imagination what it may mean.  I’m
+also not enough of a mathematician to know what the significance may be
+of cross products involving complex numbers and thus I can’t guarantee
+I’m using an appropriate method to compute them.
 
-   In dyadic form, cross-product requires left and right arguments to be
-numeric and of ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
+   In dyadic form A ⎕MX[2] B, cross-product requires left and right
+arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 
-      1 2 3j6 ⎕mx[2] 4 5 6
+      1 2 3j6 ⎕MX[2] 4 5 6
 ¯3J¯30 6J24 ¯3
 
 2.31.3 Vector Angle
 -------------------
 
-The vector angle operation ⎕mx[3] is dyadic and returns the angle
-between two isomorphic real or complex vectors where, ⍴⍴A = 1, ⍴⍴⊥ = 1,
+The vector angle operation ⎕MX[3] is dyadic and returns the angle
+between two isomorphic real or complex vectors where, ⍴⍴A = 1, ⍴⍴B = 1
 and ⍴A = ⍴B:
 
-      (⍳8) ⎕mx[3] 4j4+⍳8
+      (⍳8) ⎕MX[3] 4j4+⍳8
 0.2515670406J0.09930859532
 
 2.31.4 Eigenvector
 ------------------
 
-The eigenvector operation, ⎕mx[4], is monadic and returns the complex
+The eigenvector operation, ⎕MX[4], is monadic and returns the complex
 eigenvectors of real non-symetric square matrices:
 
       B
@@ -3710,7 +3709,7 @@ eigenvectors of real non-symetric square matrices:
 ¯8  4 ¯2 1
 27  9  3 1
 64 16  4 1
-      ⎕mx[4] B
+      ⎕MX[4] B
   0.09988            0.1113          ¯0.2925           ¯0.9445
   0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601   0.8396J0.04139
   0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601    0.8396J¯0.04139
@@ -3718,26 +3717,25 @@ eigenvectors of real non-symetric square matrices:
 
    where each row represents an eigenvector:
 
-      E←⎕mx[4] B
-      E[⎕io;]                   ⍝ first vector
+      E←⎕MX[4] B
+      E[⎕IO;]                   ⍝ first vector
 0.09988 0.1113 ¯0.2925 ¯0.9445
-      E[⎕io+1;]                 ⍝ second vector
+      E[⎕IO+1;]                 ⍝ second vector
 0.04308J0.009687 ¯0.07091J0.1389 0.5166J¯0.01601 0.8396J0.04139
-      etc
+      etc.
 
    The eigenvalues are computed concurrently and the eignenvector matrix
 is sorted according to the descending magnitude of the corresponding
-eigenvalue.
+eigenvalues.
 
 2.31.5 Eigenvalue
 -----------------
 
-The eigenvalue operation, ⎕mx[5], also monadic with an argument of the
-same shape as that of the argument of the eigenvector operation, returns
-a complex vector of the eigenvectors of the matrix argument:
+The eigenvalue operation, ⎕MX[5], is also monadic with an argument of
+the same shape as that of the argument of the eigenvector operation.  It
+returns a sorted complex vector of eigenvalues of the matrix argument:
 
-      F←⎕mx[5] B
-      F
+      ⊢F←⎕MX[5] B
 ¯6.414 5.546J3.085 5.546J¯3.085 2.323
 
    The order of eigen vectors, E from above, is related to the order of
@@ -3750,13 +3748,13 @@ the eigenvalues, F, by the relationship:
       |F
 6.414 6.346285607 6.346285607 2.323
 
-   i.e., that the order of the magnitude of the elements is descending,
-making the initial eigenvector, E[⎕io;], the dominant eigenvector and
-each successive eigenvector successively less significant.)
+   the order of the magnitude of the elements is descending, making the
+initial eigenvector, E[⎕IO;], the dominant eigenvector and each
+successive eigenvector successively less significant.)
 
    Accordingly:
 
-      4 ⎕cr (⊂⍉(1,⍴F)⍴F),(⊂E)
+      4 ⎕CR (⊂⍉(1,⍴F)⍴F),(⊂E)
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
 ┃↓¯6.414       ┃ ↓  0.09988           0.1113         ¯0.2925          ¯0.9445          ┃┃
@@ -3770,10 +3768,10 @@ each successive eigenvector successively less significant.)
 2.31.6 Ident
 ------------
 
-The ident operation, ⎕mx[6], takes a scalar real integer argument and
-returns a square identity matrix of that size:
+The monadic ident operation, ⎕MX[6], takes a scalar real integer
+argument and returns a square identity matrix of that size:
 
-      ⎕mx[6] 4  
+      ⎕MX[6] 4  
 1 0 0 0
 0 1 0 0
 0 0 1 0
@@ -3782,22 +3780,23 @@ returns a square identity matrix of that size:
 2.31.7 Rotation
 ---------------
 
-The rotation operation, ⎕mx[7], takes a real or complex scalar angle and
-returns a 2-space rotation matrix:
+The rotation operation, ⎕MX[7], is monadic and takes a real or complex
+scalar angle and returns a 2-space rotation matrix:
 
-      ⎕mx[7] ○30÷180
+      ⎕MX[7] ○30÷180
 0.866 ¯0.5
 0.5    0.866
 
 2.31.8 Homogeneous transform
 ----------------------------
 
-The homogeneous operation ⎕mx[8] takes as its left arguement a 3-space
-displacement vector and, as its right arguement, a 3-space elemental
-rotation (i.e., independent rotations around the X, Y, and Z axes
-respectively) and returns the corresponding homogeneous matrix:
+The homogeneous operation ⎕MX[8] is dyadic and takes as its left
+argument a 3-space displacement vector and, as its right argument, a
+3-space elemental rotation (i.e., independent rotations around the X, Y,
+and Z axes respectively) and returns the corresponding homogeneous
+matrix:
 
-      1 2 3 ⎕mx[8] ○(30 45 60)÷180
+      1 2 3 ⎕MX[8] ○(30 45 60)÷180
  0.6124 0.2803  0.7392 0
  0.3536 0.7392 ¯0.5732 0
 ¯0.7071 0.6124  0.3536 0
@@ -3806,38 +3805,37 @@ respectively) and returns the corresponding homogeneous matrix:
 2.31.9 Norm
 -----------
 
-The norm operation, ⎕mx[9], takes a real or complex non-scalar numeric
-argument and returns a result of the same shape such that the sum of the
-squares of the elements equals 1:
+The monadic norm operation, ⎕MX[9], takes a real or complex non-scalar
+numeric argument and returns a result of the same shape such that the
+sum of the squares of the elements equals 1:
 
-      ⎕mx[9] 1 2 3 4
+      ⎕MX[9] 1 2 3 4
 0.1825741858 0.3651483717 0.5477225575 0.7302967433
-      (⎕mx[9] 1 2 3 4)*2
+      (⎕MX[9] 1 2 3 4)*2
 0.03333333333 0.1333333333 0.3 0.5333333333
-      +/(⎕mx[9] 1 2 3 4)*2
+      +/(⎕MX[9] 1 2 3 4)*2
 1
      
-      B←(3 3⍴⍳9)-⎕io
-      B
+      ⊢B←(3 3⍴⍳9)-⎕IO
 0 1 2
 3 4 5
 6 7 8
-      ⎕mx[9] B
+      ⎕MX[9] B
 0            0.0700140042 0.1400280084
 0.2100420126 0.2800560168 0.350070021
 0.4200840252 0.4900980294 0.5601120336
-      +/,(⎕mx[9] B)*2
+      +/,(⎕MX[9] B)*2
 1
 
-   If the magnitude of the arguement is zero, the operation returns an
-all-zero result of of the same shape as the arguement.
+   If the magnitude of the argument is zero, the operation returns an
+all-zero result with the same shape as the argument.
 
 2.31.10 Randoms
 ---------------
 
-The randoms operation, ⎕mx[10] or ⎕mx[10 x] where x is an integer
-specifying the distribution of the randoms generated.  At present, the
-distibutions supported are:
+The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an
+integer specifying the distribution of the randoms generated.  At
+present, the distibutions supported are:
 
   0. Normal
 
@@ -3847,24 +3845,25 @@ distibutions supported are:
 
   3. Student T
 
-   The default if x is not specified is normal distribution.  The right
-arguement is a single real or complex value that specifies the required
-standard deviation–if the value is complex, the value returned is also
-complex with random real and imaginary components.  If a left arguement
-is specified, it must be a scalar integer and the operation returns a
-ramdom vector of that length.  If a mean is applicable to a given
-distribution, it is set to 0.0.
+   The default if x is not specified is the normal distribution.  The
+right argument is a single real or complex value that specifies the
+required standard deviation.  If this value is complex, the value
+returned is also complex with random real and imaginary components.  If
+a left argument is specified, it must be a scalar integer and the
+operation returns a random vector of that length.  If a mean is
+applicable to a given distribution, it is set to 0.
 
-      ⎕mx[10] 2
+      ⎕MX[10] 2
 ¯1.0504575511
-      ⎕mx[10] 2
+      ⎕MX[10] 2
 ¯2.9337180373
-      5 ⎕mx[10] 2
+      5 ⎕MX[10] 2
 0.05154476627 3.80631021 2.455474045 3.165260688 0.6792784063
-      3 ⎕mx[10] 1j1
+      3 ⎕MX[10] 1j1
 ¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
 
-[MX_distributions]
+ [image src="MX_distributions.png" ]
+
 
    (This image is a plot of three 200-bucket histograms of 200000
 samples each of a normal distribution, a chi-square distribution, and a
@@ -3873,74 +3872,73 @@ Student T distribution.  See Histograms below.)
 2.31.11 Covariance
 ------------------
 
-The covariance operation, ⎕mx[11], is nomadic.  In monadic form, it
+The covariance operation, ⎕MX[11], is nomadic.  In monadic form, it
 interprets each row of a matrix argument as samples of a given variable,
 computes the covariance of each sample set with respect to every other
 sample set, and presents the covariances as a matrix.  For example:
 
-      B←3 4⍴?12⍴10
-      B
+      ⊢B←3 4⍴?12⍴10
 5 8  1 9
 7 6  2 9
 6 5 10 4
-      ⎕mx[11] B
+      ⎕MX[11] B
 12.91666667   9.333333333 ¯9.25
  9.333333333  8.666666667 ¯7.333333333
 ¯9.25        ¯7.333333333  6.916666667
 
    In dyadic form, it computes the covariance of the argument vectors:
 
-      1 2j6 3 4 ⎕mx[11] 4 3 2j5 1
+      1 2j6 3 4 ⎕MX[11] 4 3 2j5 1
 ¯1.666666667J¯2.5
 
    In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
 
-   Sample variance can be gotten by supplying the same arguement to the
+   Sample variance can be computed by supplying the same argument on the
 left and right:
 
       A← 6 7 10 13 14 14 18 19 22 24
-      A ⎕mx[11] A
+      A ⎕MX[11] A ⍝ or ⎕MX[11]⍨ A
 36.67777778 
 
 2.31.12 Histograms
 ------------------
 
-The historgram operation, ⎕mx[12], is dyadic and requires a single
-integer left arguement and a real or complex vector as a right argument,
-then creates an equal-width-partition histogram of the samples contained
-in the right-argument vector.  The width of each bucket is equal to the
-range of the samples, max - min, divided by the number of buckets.  If
-the samples are complex, the imaginary components are ignored.  As
-examples:
+The histogram operation, ⎕MX[12], is dyadic and requires a single
+integer left argument (the number of buckets) and a real or complex
+vector as a right argument (the samples).  It then creates an
+equal-width-partition histogram of the samples contained in the
+right-argument vector.  The width of each bucket is equal to the range
+of the samples, max - min, divided by the number of buckets.  If the
+samples are complex, the imaginary components are ignored.  As examples:
 
-      4 ⎕mx[12] (⍳101)-⎕io
+      4 ⎕MX[12] (⍳101)-⎕IO
 25 25 25 26
 
-   The distribution curves above were the result of things like:
+   The distribution curves above were the result of expressions like:
 
-      200 ⎕mx[12] 200000 ⎕mx[10 0] 1
+      200 ⎕MX[12] 200000 ⎕MX[10 0] 1
 
-   I.e., a 200-bucket histotgram of a 200 thousand-member vector of
-normally distributed samples with a standard deviation of 1.0.
+   I.e.  a 200-bucket histogram of a 200 thousand-member vector of
+normally distributed samples with a standard deviation of 1.
 
 2.31.13 Print
 -------------
 
-The print operation, ⎕mx[13], is dyadic and provides an easy way to dump
-large quantities of data to files.  It’s right arguement is a string
+The print operation, ⎕MX[13], is dyadic and provides an easy way to dump
+large quantities of data to files.  It’s right argument is a string
 containing the file name to be created or, if the name starts with a
 “>”, appended to.  The left argument can be a scalar, a vector, a
 matrix, or a string.  For example:
 
-      34 ⎕mx[13] "samples.txt"
+      34 ⎕MX[13] "samples.txt"
 
-      3 4 ⎕mx[13] ">samples.txt"
+      3 4 ⎕MX[13] ">samples.txt"
 
-      (3 4⍴⍳12) ⎕mx[13] ">samples.txt"
+      (3 4⍴⍳12) ⎕MX[13] ">samples.txt"
 
-      "example line" ⎕mx[13] ">samples.txt"
+      "example line" ⎕MX[13] ">samples.txt"
 
-      "example\nline" ⎕mx[13] ">samples.txt"
+      "example\nline" ⎕MX[13] ">samples.txt"
 
    will create a file “samples.txt” containing:
 
@@ -3958,13 +3956,13 @@ was created by:
 
     ∇
 [0]   distro;v
-[1]   v←⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 0] 1
-[2]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 2] 8
-[3]   v←v,⍉1 200⍴200 ⎕mx[12] 200000 ⎕mx[10 3] 8
-[4]   v ⎕mx[13] 'MX_distribution.data'
+[1]   v←⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 0] 1
+[2]   v←v,⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 2] 8
+[3]   v←v,⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 3] 8
+[4]   v ⎕MX[13] 'MX_distribution.data'
     ∇
 
-   which created a 200-by-4 matrix, v, and printed it to the file
+   which created a 200-by-3 matrix, v, and printed it to the file
 MX_distribution.data, that being the format required for use by gnuplot:
 
    1   48    0
@@ -3996,7 +3994,7 @@ window size, colors for plot lines, points, and grids, etc.
 
    ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
-   H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
+   H←A ⎕PLOT B   ⍝ plot B with specified default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
    ⎕PLOT  0      ⍝ verbosity: OFF (no debug output)
    ⎕PLOT ¯1      ⍝ verbosity: ON (print attribute values before plotting)
@@ -4012,14 +4010,14 @@ window size, colors for plot lines, points, and grids, etc.
 ----------------------
 
 The plot data B can be a vector (for a single plot line to be drawn) or
-a matrix (in that case one plot line per matrix row is being drawn, by
-default in different colors).  Each data item has to be numeric and
-represents one point in the plot.  The points that are adjacent in a row
-of the matrix are connected by lines.  By default plotted points are
-black and the lines connecting them are green (for the first plot line).
-However, all colors used, all diameters of points, and all thicknesses
-of the lines can be fine-tuned by overriding the default values (see
-dyadic A ⎕PLOT B below).
+a matrix (in that case one plot line per matrix row is drawn, by default
+in different colors).  Each data item has to be numeric and represents
+one point in the plot.  The points that are adjacent in a row of the
+matrix are connected by lines.  By default plotted points are black and
+the lines connecting them are green (for the first plot line).  However,
+all colors used, all diameters of points, and all thicknesses of the
+lines can be fine-tuned by overriding the default values (see dyadic A
+⎕PLOT B below).
 
 2.32.1.1 Complex Plot Data B
 ............................
@@ -4087,8 +4085,9 @@ description.  For example:
 
    ⎕PLOT Usage:
 
-   ⎕PLOT B     plot B with default attribute values
-   A ⎕PLOT B   plot B with attributes specified by A
+   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values
+   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions
+   A ⎕PLOT B   plot B with attribute overrides specified by A
 
    A is a nested vector of strings.
    Each string A[i] has the form "Attribute: Value"
@@ -4201,7 +4200,7 @@ legend_name-2: Random Row 2
 
    While specifying the plot attributes A in one place is most
 convenient for a single plot window or when the attributes are read from
-some external test file, its is sometimes simpler to specify the plot
+some external test file, it is sometimes simpler to specify the plot
 attributes individually.  This can be done by using a structured APL
 variable as left argument A:
 
@@ -4215,8 +4214,8 @@ structured APL value and - (minus) if A is specified as a string of
 lines.
 
    If the global attribute output_filename is given, then the plot is
-not only being displayed in a window on the screen, but also written to
-a file with the name of the file provided as attribute value.  *Note
+not only displayed in a window on the screen, but also written to a file
+with the name of the file provided as the value of the attribute.  *Note
 Output File Format:: below.
 
    For example:
@@ -4240,6 +4239,9 @@ or _N suffix.
 
 Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
 Attributes.line_width_2 ← 4   ⍝ except plot line 2: 4 pixels thick
+
+   As of GNU APL 1.9, ⎕PLOT legends may be dragged to other locations
+within a plot window using the usual click and drag GUI technique.
 
 2.32.2.1 Tick formatting (GTK only)
 ...................................
@@ -4516,7 +4518,7 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
           drawing).
         • ⎕PNG ¯5 turns on a debug printout related to ⎕PNG (function
           calls).
-        • ⎕PNG ¯6 returns a vector of all all open ⎕PNG window handles.
+        • ⎕PNG ¯6 returns a vector of all open ⎕PNG window handles.
 
 2.33.3 Dyadic ⎕PNG
 ------------------
@@ -4562,7 +4564,6 @@ APL color model into a PNG file.
       ⍝ paint all pixels of a monochrome image blue
       RGB_Blue ← 0 0 1 ⍀ Mono
 
-
 
 File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
 
@@ -4570,14 +4571,14 @@ File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  
 ======================
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
-two integers which control some details of how APL values are being
-printed.  The default value of ⎕PS is 0 0.  ⎕PS is a session variable
-which survives the *)LOAD*ing of workspaces.
+two integers which control some details of how APL values are printed.
+The default value of ⎕PS is 0 0.  ⎕PS is a session variable which
+survives the *)LOAD*ing of workspaces.
 
    ⎕PS[1] = 0: print rational quotients as normal floating point numbers
 (digits, fractional point, possibly an exponent).
 
-   ⎕PS[1] = 1: print rational quotients as Numerator÷Denominator÷
+   ⎕PS[1] = 1: print rational quotients as Numerator÷Denominator.
 
    Note: ⎕PS[1] has no effect if rational numbers were not
 ./configure’d.
@@ -4659,8 +4660,8 @@ as if the EACH operator had been applied to ⎕RE:
     A ⎕RE B   ←→   A ⎕RE ¨ B
 
    The libpcre2 first compiles A into an internal representation that
-improves the matching (of B) speed.  As a consequence, if several
-strings shall be matched with the same regular expression A, then it is
+improves the speed of matching B. As a consequence, if several strings
+shall be matched with the same regular expression A, then it is
 (sometimes considerably) faster to A ⎕RE B once with several items of a
 nested B, than to A ⎕RE B multiple times with the same A but different
 Bs.  This is especially true when longer text files with many lines will
@@ -4682,10 +4683,9 @@ By default, i.e.  without an axis argument X or - equivalently - with an
 empty string X←"" as axis argument, ⎕RE returns the first match of the
 regular expression A in the string B as an APL string.
 
-   By means of the optional axis argument X ≢ "" (in the following
-called flags) one may override the default behavior to adapt various
-aspects of the matching to satisfy the requirements that the user of ⎕RE
-may have.
+   By means of the optional axis argument X ≢ "" (called flags below)
+one may override the default behavior to adapt various aspects of the
+matching to satisfy the requirements that the user of ⎕RE may have.
 
    The X argument of A⎕RE[X] B is a character vector where each
 character is a flag.  Each flag is either understood by (and then passed
@@ -4994,7 +4994,7 @@ While the primitive ?  keeps its state in ⎕RL, i.e.  in the workspace,
 ⎕RVAL has no associated system variable like ⎕RL which keeps its state.
 Instead, the user needs to store the state of ⎕RVAL in a workspace
 variable if the workspace shall be stored and continued at a later
-point.  This rarely happens, therefore no effort was spent for
+point.  This rarely happens, therefore no effort was spent on
 implementing another system variable.  For the same reason, the state of
 ⎕RVAL survives )CLEAR.
 
@@ -5611,7 +5611,7 @@ needs to be preserved.
 
    Processing instructions and declarations are typically located at the
 beginning of the XML document and at the same level as the root of the
-tree.  defined by the document.  Document type declarations are being
+tree.  defined by the document.  Document type declarations are
 preserved (so that they can be processed in APL), but are currently
 ignored by ⎕XML. As a consequence, entity declarations have no effect
 and only the predefined XML entities (i.e.  &, <, >, ’, and ") are
@@ -5687,9 +5687,9 @@ is understood by the APL parser):
           tag, or
 
         • the character ∆ characterizes a name that was synthesized by
-          ⎕XML itself in order to tag a text (sub-) segment that has no
-          tag of its own.  The corresponding XML entity was not a tag
-          (and therefore had no tag name), or
+          ⎕XML itself to tag a text (sub-) segment that has no tag of
+          its own.  The corresponding XML entity was not a tag (and
+          therefore had no tag name), or
 
         • the character _ characterizes the name of an XML entity, i.e.
           a CML name that occurred between the start tag and the
@@ -5701,10 +5701,9 @@ is understood by the APL parser):
      starts at ⎕IO and restarts at every XML start or leaf tag.
 
    • the attribute name or tag name.  For those parts of an XML entity
-     that do not have a tag name, the member name is being synthesized
-     by ⎕XML and the member value will be the text in the XML document
-     with predefined XML entities replaced by their single characters,
-     i.e.:
+     that do not have a tag name, the member name is synthesized by ⎕XML
+     and the member value will be the text in the XML document with
+     predefined XML entities replaced by their single characters, i.e.:
         • & for &amp,
         • < for &lt,
         • > for &gt,
@@ -5724,7 +5723,7 @@ synthesized names are produced by ⎕XML:
      XML.
 
    Every XML name (of a tag or attribute) is also a valid APL name, but
-valid APL names may also contain the characters ¯, ∆, and ⍙ which are
+valid APL names may also contain the characters _, ∆, and ⍙ which are
 not valid in XML and used in the naming convention above to clearly
 separate the member names used in APL from the names used in the XML
 document.
@@ -5753,8 +5752,8 @@ an associative APL array Z and vice versa.
    Note: If you convert an associative APL array back to a an XML
 document, the result is a possibly very long string containing several
 linefeed characters.  That is OK if the string is written to a file, but
-causes problems when the string is being displayed and longer than ⎕PW.
-The standard APL folding of output near ⎕PW make the string then look
+causes problems when the string is displayed and longer than ⎕PW. The
+standard APL folding of output near ⎕PW make the string then look
 somewhat garbled.  This effect can be suppressed in 2 ways:
 
   1. set ⎕PW large enough, or
@@ -5794,7 +5793,7 @@ APL←⎕XML XML
    • Z←2 ⎕XML B splits an APL member path (a sequence of member names)
      into a vector P of (nested) member names.  This vector P is
      understood by the APL primitive PICK (i.e.  Z←P⊃APL or
-     (P⊃APL←value) and can be used to address the data in an XML node.
+     (P⊃APL)←value and can be used to address the data in an XML node.
 
    • Z←3 ⎕XML B splits an APL member name (as produced by e.g.  monadic
      ⎕XML into a 3-item vector Z. Z[1] is a single character indicating
@@ -5971,7 +5970,6 @@ APL←⎕XML XML
      _3C
            (14 "_3C") ⎕XML APL._1ROOT   ⍝ last member: will be empty
      
-     4786
 
 2.40.6 XML Queries
 ------------------
@@ -5982,12 +5980,14 @@ information in, an XML document.  XML queries may differ considerably in
 their details, but usually follow these top-level steps:
 
   1. Read an XML document into, say, APL (APL←0 ⎕XML B or APL←1 ⎕XML B)
-  2. Optionally, display the structure of the document (3, 4, or 5 ⎕XML)
+  2. Optionally, display the structure of the document (3, 4, or 5 ⎕XML
+     APL)
   3. Select a subset of XML nodes (= GNU APL member names, 6 ⎕XML APL)
   4. retrieve or modify the data in the selected XML nodes (with
      something like MEMBERS←(⊂APL) FUN¨6⎕XML APL←⎕XML followed by
      MEMBER⊃ )
   5. Optionally, convert the modified XML document back to XML (0 ⎕XML
+     APL)
 
 
 File: apl.info,  Node: Section 2.41,  Next: Section 2.42,  Prev: Section 2.40,  Up: Chapter 2
@@ -6011,10 +6011,11 @@ conditionals in GNU APL. Primarily for the following reasons:
    • the large number of keywords for flow control used in some other
      APL interpreters.  See below.
 
-   The C language has 6 keywords for flow control: if, else, for, do,
-Two of them (do and while) are redundant and rarely used, leaving only 4
-base cases.  A quick grep -c over the 90000 top-level C++ source code
-lines of GNU APL reveals the following statistics:
+   The C language has six keywords for flow control: if else, for,
+while, do, switch and goto.  Two of them (do and while) are redundant
+and rarely used, leaving only 4 base cases.  A quick grep -c over the
+100,000 top-level C++ source code lines of GNU APL reveals the following
+statistics:
 
    • 7000 if statements, 1600 of them two-sided if-then-else-endif, the
      others one-sided if-then-endif,
@@ -6025,8 +6026,7 @@ lines of GNU APL reveals the following statistics:
    • 70 do while statements
 
    In contrast, a popular non-free APL interpreter came up with a zoo of
-30 or so keywords for the purpose of flow control in one way or the
-other:
+30 or so keywords for the purpose of flow control in one way or another:
 
    :If :While :Repeat :For :In :InEach :Select :With :Trap :Hold
 :Disposable :Else :ElseIf :AndIf :OrIf :Until :Case :CaseList :EndIf
@@ -6036,13 +6036,13 @@ other:
    This approach, its implementation, and its constraints raise a number
 of serious problems.  To name a few:
 
-   • A rather common APL design practice has it to first debug
-     non-trivial APL statements in immediate execution mode and only
-     transfer them into the body of defined functions when they work
-     properly.  However, the keywords above seem to work only in the
-     bodies of defined functions but not in immediate execution mode.
-     The reason seems to be that their implementation depends on labels
-     which are not available in immediate execution.
+   • A rather common APL design practice is to first debug non-trivial
+     APL statements in immediate execution mode and only transfer them
+     into the body of defined functions when they work properly.
+     However, the keywords above seem to work only in the bodies of
+     defined functions but not in immediate execution mode.  The reason
+     seems to be that their implementation depends on labels which are
+     not available in immediate execution.
 
    • Another rather common design practice is to limit the length of
      lines to less than 80 characters (e.g.  in the GNU coding
@@ -6128,7 +6128,7 @@ example,
      L_else: ELSE
      L_endif:
 
-   A closer look at these case reveals that there is not much room for
+   A closer look at these cases reveals that there is not much room for
 syntax improvements in cases 1.  (switch) and 2.  (loop).  The
 introduction of a new syntax like :Select / :Case for switches or :For /
 :Endfor for loops would therefore only make matters different and
@@ -6272,10 +6272,10 @@ from linear algebra, is:
 
    However, the inner product in APL is more generic than the inner
 product in linear algebra.  In the general case A f.g B may the
-functions f and b also be non-scalar APL primitives or even defined
+functions f and g also be non-scalar APL primitives or even defined
 functions.  This generality is occasionally helpful, but comes with a
 performance penalty since many argument checks are duplicated.  At the
-same time A +.× B is by far the most frequent case of operator ’.’.
+same time A +.× B is by far the most frequent use of operator ’.’.
 
    For this reason GNU APL also provides a more efficient dyadic
 function ∘ (Matrix Product) for the special case +.× of the dyadic
@@ -6329,7 +6329,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 
 GNU APL is an almost full implementation of the ISO standard 13751.
 However, a few limitations exist.  See file README-4-compliance for an
-up-to-date descriptions of limitations.
+up-to-date description of limitations.
 
 3.1 System Limits
 =================
@@ -7124,7 +7124,7 @@ notices just after the title page:
        under the terms of the GNU Free Documentation License, Version 1.3
        or any later version published by the Free Software Foundation;
        with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
-       Texts.  A copy of the license is included in the section entitled ``GNU
+       Texts. A copy of the license is included in the section entitled ``GNU
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
@@ -7827,76 +7827,76 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11572
-Node: Chapter 223440
-Node: Section 2.125499
-Node: Subsection 2.1.126721
-Node: Subsection 2.1.227352
-Node: Subsection 2.1.328182
-Node: Subsection 2.1.433965
-Node: Subsection 2.1.537761
-Node: Subsection 2.1.638621
-Node: Subsection 2.1.746716
-Node: Subsection 2.1.848449
-Node: Section 2.251765
-Node: Section 2.352524
-Node: Section 2.453799
-Node: Section 2.558226
-Node: Section 2.658399
-Node: Section 2.759029
-Node: Section 2.862992
-Node: Section 2.965329
-Node: Section 2.1067412
-Node: Section 2.1168959
-Node: Section 2.1270744
-Node: Section 2.1372673
-Node: Section 2.1473614
-Node: Section 2.1573866
-Node: Section 2.1675262
-Node: Section 2.1785727
-Node: Section 2.1888224
-Node: Section 2.1994950
-Node: Section 2.2096395
-Node: Section 2.21105670
-Node: Section 2.22110708
-Node: Section 2.23113966
-Node: Section 2.24114257
-Node: Section 2.25125096
-Node: Section 2.26125368
-Node: Section 2.27131947
-Node: Section 2.28134407
-Node: Section 2.29135076
-Node: Section 2.30136727
-Node: Section 2.31140503
-Node: Section 2.32152136
-Node: Output File Format168037
-Node: Section 2.33169212
-Node: Section 2.34178567
-Node: Section 2.35179594
-Node: Section 2.36194289
-Node: Section 2.37204448
-Node: Section 2.38209095
-Node: Section 2.39211191
-Node: Section 2.40215609
-Node: Section 2.41236943
-Node: Section 2.42247836
-Node: Chapter 3249833
-Node: Chapter 4252342
-Node: Chapter 5253468
-Node: Section 5.1255005
-Node: Section 5.2256285
-Node: Section 5.3256645
-Node: Section 5.4256887
-Node: Section 5.5257549
-Node: Section 5.6258027
-Node: Section 5.7258800
-Node: Section 5.8259226
-Node: Chapter 6259628
-Node: Section 6.1260047
-Node: Section 6.2260734
-Node: Chapter 7261565
-Node: Section 7.1262068
-Node: Section 7.2287382
+Node: Chapter 11570
+Node: Chapter 223776
+Node: Section 2.125837
+Node: Subsection 2.1.127059
+Node: Subsection 2.1.227711
+Node: Subsection 2.1.328524
+Node: Subsection 2.1.434307
+Node: Subsection 2.1.538103
+Node: Subsection 2.1.638963
+Node: Subsection 2.1.747058
+Node: Subsection 2.1.848791
+Node: Section 2.252107
+Node: Section 2.352866
+Node: Section 2.454138
+Node: Section 2.558568
+Node: Section 2.658741
+Node: Section 2.759371
+Node: Section 2.863334
+Node: Section 2.965674
+Node: Section 2.1067754
+Node: Section 2.1169302
+Node: Section 2.1271083
+Node: Section 2.1373012
+Node: Section 2.1473953
+Node: Section 2.1574204
+Node: Section 2.1675600
+Node: Section 2.1786056
+Node: Section 2.1888544
+Node: Section 2.1995270
+Node: Section 2.2096773
+Node: Section 2.21105928
+Node: Section 2.22110966
+Node: Section 2.23114224
+Node: Section 2.24114515
+Node: Section 2.25125356
+Node: Section 2.26125628
+Node: Section 2.27132207
+Node: Section 2.28134661
+Node: Section 2.29135330
+Node: Section 2.30136981
+Node: Section 2.31140756
+Node: Section 2.32152916
+Node: Output File Format169047
+Node: Section 2.33170222
+Node: Section 2.34179572
+Node: Section 2.35180591
+Node: Section 2.36195272
+Node: Section 2.37205430
+Node: Section 2.38210077
+Node: Section 2.39212173
+Node: Section 2.40216591
+Node: Section 2.41237901
+Node: Section 2.42248817
+Node: Chapter 3250813
+Node: Chapter 4253321
+Node: Chapter 5254447
+Node: Section 5.1255984
+Node: Section 5.2257264
+Node: Section 5.3257624
+Node: Section 5.4257866
+Node: Section 5.5258528
+Node: Section 5.6259006
+Node: Section 5.7259779
+Node: Section 5.8260205
+Node: Chapter 6260607
+Node: Section 6.1261026
+Node: Section 6.2261713
+Node: Chapter 7262544
+Node: Section 7.1263047
+Node: Section 7.2288360
 
 End Tag Table
 
