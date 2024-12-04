@@ -33,5 +33,6 @@ op_entry( OP_RANDOMS,            "Randoms",            "nomadic")
 op_entry( OP_COVARIANCE,         "Covariance",         "nomadic")
 op_entry( OP_HISTOGRAM,          "Histogram",          "dyadic")
 op_entry( OP_PRINT,              "Print",              "dyadic")
+op_entry( OP_SET_RNG_SEED,       "Set RNG seed",       "monadic")
 op_entry( OP_MAX,                "",                   "")
  

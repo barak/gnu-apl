@@ -30,6 +30,12 @@ check ident for real scalar
 other sorts of rotation
 https://en.wikipedia.org/wiki/Rotation_matrix
 
+modded files:
+Quad_MX.cc
+Quad_MX.hh
+Quad_MX.def
+doc/apl.texi
+
  ***/
 
 #include "PointerCell.hh"
@@ -240,6 +246,30 @@ Quad_MX::genMtx(Value_P B, bool padded)
 
 /*************** end utility fcns **************/
 
+//----------------------------------------------------------------------------
+
+static bool rng_seed_set = false;
+static unsigned int rng_seed;
+
+Value_P
+Quad_MX::set_rng_seed(Value_P B)
+{
+Value_P rc = Str0(LOC);
+  const CellType B_celltype = B->deep_cell_types();
+
+  if (B_celltype & CT_INT &&
+      B->get_rank() == 0)
+    {
+      rng_seed_set = true;
+      rng_seed = (unsigned int)(B->get_sole_integer());
+    }
+  else
+    {
+      MORE_ERROR () << "Requires numeric arguement.";
+      DOMAIN_ERROR;
+    }
+  return rc;
+}
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::printit(Value_P A, Value_P B)
@@ -992,6 +1022,26 @@ Quad_MX::randoms(const Value_P *A, const Value_P B, int modifier)
 Value_P rc = Str0(LOC);
 int rcnt = 0;
 
+static mt19937_64 rgen;
+static mt19937_64 igen;
+static bool rng_initialised = false;
+  
+   if (!rng_initialised)
+     {
+       std::seed_seq rseq{1, 2, 3, 4, 5};
+       std::seed_seq iseq{6, 7, 8, 9, 10};
+       rgen.seed (rseq);
+       igen.seed (iseq);
+       rng_initialised = true;
+     }
+
+   if (rng_seed_set)
+     {
+       rgen.seed (rng_seed);
+       igen.seed (rng_seed);
+       rng_seed_set = false;
+     }
+
 const uRank B_rank = B->get_rank();
   if (A)
     {
@@ -1007,10 +1057,6 @@ const uRank B_rank = B->get_rank();
 
   if (rcnt > 0)
     {
-      random_device rrd;
-      random_device ird;
-      mt19937_64 rgen{rrd()};
-      mt19937_64 igen{rrd()};
       const Cell & Bv = B->get_cravel (0);
       APL_Float Bvr = Bv.get_real_value ();
       APL_Float Bvi = 0.0;
@@ -1448,6 +1494,9 @@ Quad_MX::eval_XB(Value_P X, Value_P B) const
       break;
     case OP_ROTATION_MATRIX:
       rc = monadicRotation (B);
+      break;
+    case OP_SET_RNG_SEED:
+      rc = set_rng_seed (B);
       break;
     case OP_VECTOR_ANGLE:
     case OP_HOMOGENEOUS_MATRIX:

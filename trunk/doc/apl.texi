@@ -49,7 +49,7 @@ Copyright @copyright{} 2013 Free Software Foundation, Inc.
 @node Top
 @top GNU APL
 
-@today{}
+@today{}.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. "Programming Language APL, Extended".
 
@@ -3752,11 +3752,12 @@ operations are selected through the use of the axis specifier @b{x}:
         (A) ⎕MX[11] B      (nomadic) Covariance
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
+            ⎕MX[14] B      (monadic) set RNG seed
 @end verbatim
 
 (These may by shown by entering ⎕MX '' or ⎕MX[0] on the APL command
 line). In the function list above, @b{A} indicates a mandatory left
-argument, while @b{A} indicates an optional left argument. The right
+argument, while @b{(A)} indicates an optional left argument. The right
 argument @b{B} of @b{⎕MX[X]} is always mandatory.
 
 @subsection Determinant
@@ -4004,6 +4005,24 @@ given distribution, it is set to 0.
 (This image is a plot of three 200-bucket histograms of 200000 samples
 each of a normal distribution, a chi-square distribution, and a
 Student T distribution. See Histograms below.)
+
+An initial seed may be specified with
+
+@verbatim
+        ⎕MX[14] <seed>
+@end verbatim
+
+where <seed> is a single integer.  This allows repeatable random
+sequences:
+
+@verbatim
+      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
+      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
+@end verbatim
 
 @subsection Covariance
 

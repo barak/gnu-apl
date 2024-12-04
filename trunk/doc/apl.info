@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 30, 2024 This manual briefly documents GNU APL, an interpreter
+December 4, 2024.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -3641,10 +3641,11 @@ the axis specifier x:
         (A) ⎕MX[11] B      (nomadic) Covariance
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
+            ⎕MX[14] B      (monadic) set RNG seed
 
    (These may by shown by entering ⎕MX ” or ⎕MX[0] on the APL command
 line).  In the function list above, A indicates a mandatory left
-argument, while A indicates an optional left argument.  The right
+argument, while (A) indicates an optional left argument.  The right
 argument B of ⎕MX[X] is always mandatory.
 
 2.31.1 Determinant
@@ -3868,6 +3869,20 @@ applicable to a given distribution, it is set to 0.
    (This image is a plot of three 200-bucket histograms of 200000
 samples each of a normal distribution, a chi-square distribution, and a
 Student T distribution.  See Histograms below.)
+
+   An initial seed may be specified with
+
+        ⎕MX[14] <seed>
+
+   where <seed> is a single integer.  This allows repeatable random
+sequences:
+
+      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
+      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
 
 2.31.11 Covariance
 ------------------
@@ -7827,76 +7842,76 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11570
-Node: Chapter 223776
-Node: Section 2.125837
-Node: Subsection 2.1.127059
-Node: Subsection 2.1.227711
-Node: Subsection 2.1.328524
-Node: Subsection 2.1.434307
-Node: Subsection 2.1.538103
-Node: Subsection 2.1.638963
-Node: Subsection 2.1.747058
-Node: Subsection 2.1.848791
-Node: Section 2.252107
-Node: Section 2.352866
-Node: Section 2.454138
-Node: Section 2.558568
-Node: Section 2.658741
-Node: Section 2.759371
-Node: Section 2.863334
-Node: Section 2.965674
-Node: Section 2.1067754
-Node: Section 2.1169302
-Node: Section 2.1271083
-Node: Section 2.1373012
-Node: Section 2.1473953
-Node: Section 2.1574204
-Node: Section 2.1675600
-Node: Section 2.1786056
-Node: Section 2.1888544
-Node: Section 2.1995270
-Node: Section 2.2096773
-Node: Section 2.21105928
-Node: Section 2.22110966
-Node: Section 2.23114224
-Node: Section 2.24114515
-Node: Section 2.25125356
-Node: Section 2.26125628
-Node: Section 2.27132207
-Node: Section 2.28134661
-Node: Section 2.29135330
-Node: Section 2.30136981
-Node: Section 2.31140756
-Node: Section 2.32152916
-Node: Output File Format169047
-Node: Section 2.33170222
-Node: Section 2.34179572
-Node: Section 2.35180591
-Node: Section 2.36195272
-Node: Section 2.37205430
-Node: Section 2.38210077
-Node: Section 2.39212173
-Node: Section 2.40216591
-Node: Section 2.41237901
-Node: Section 2.42248817
-Node: Chapter 3250813
-Node: Chapter 4253321
-Node: Chapter 5254447
-Node: Section 5.1255984
-Node: Section 5.2257264
-Node: Section 5.3257624
-Node: Section 5.4257866
-Node: Section 5.5258528
-Node: Section 5.6259006
-Node: Section 5.7259779
-Node: Section 5.8260205
-Node: Chapter 6260607
-Node: Section 6.1261026
-Node: Section 6.2261713
-Node: Chapter 7262544
-Node: Section 7.1263047
-Node: Section 7.2288360
+Node: Chapter 11571
+Node: Chapter 223777
+Node: Section 2.125838
+Node: Subsection 2.1.127060
+Node: Subsection 2.1.227712
+Node: Subsection 2.1.328525
+Node: Subsection 2.1.434308
+Node: Subsection 2.1.538104
+Node: Subsection 2.1.638964
+Node: Subsection 2.1.747059
+Node: Subsection 2.1.848792
+Node: Section 2.252108
+Node: Section 2.352867
+Node: Section 2.454139
+Node: Section 2.558569
+Node: Section 2.658742
+Node: Section 2.759372
+Node: Section 2.863335
+Node: Section 2.965675
+Node: Section 2.1067755
+Node: Section 2.1169303
+Node: Section 2.1271084
+Node: Section 2.1373013
+Node: Section 2.1473954
+Node: Section 2.1574205
+Node: Section 2.1675601
+Node: Section 2.1786057
+Node: Section 2.1888545
+Node: Section 2.1995271
+Node: Section 2.2096774
+Node: Section 2.21105929
+Node: Section 2.22110967
+Node: Section 2.23114225
+Node: Section 2.24114516
+Node: Section 2.25125357
+Node: Section 2.26125629
+Node: Section 2.27132208
+Node: Section 2.28134662
+Node: Section 2.29135331
+Node: Section 2.30136982
+Node: Section 2.31140757
+Node: Section 2.32153314
+Node: Output File Format169445
+Node: Section 2.33170620
+Node: Section 2.34179970
+Node: Section 2.35180989
+Node: Section 2.36195670
+Node: Section 2.37205828
+Node: Section 2.38210475
+Node: Section 2.39212571
+Node: Section 2.40216989
+Node: Section 2.41238299
+Node: Section 2.42249215
+Node: Chapter 3251211
+Node: Chapter 4253719
+Node: Chapter 5254845
+Node: Section 5.1256382
+Node: Section 5.2257662
+Node: Section 5.3258022
+Node: Section 5.4258264
+Node: Section 5.5258926
+Node: Section 5.6259404
+Node: Section 5.7260177
+Node: Section 5.8260603
+Node: Chapter 6261005
+Node: Section 6.1261424
+Node: Section 6.2262111
+Node: Chapter 7262942
+Node: Section 7.1263445
+Node: Section 7.2288758
 
 End Tag Table
 

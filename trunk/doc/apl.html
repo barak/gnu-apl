@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>November 30, 2024
+<p>December 4, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -4118,10 +4118,11 @@ operations are selected through the use of the axis specifier <b>x</b>:
         (A) ⎕MX[11] B      (nomadic) Covariance
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
+            ⎕MX[14] B      (monadic) set RNG seed
 </pre>
 <p>(These may by shown by entering ⎕MX &rdquo; or ⎕MX[0] on the APL command
 line). In the function list above, <b>A</b> indicates a mandatory left
-argument, while <b>A</b> indicates an optional left argument. The right
+argument, while <b>(A)</b> indicates an optional left argument. The right
 argument <b>B</b> of <b>⎕MX[X]</b> is always mandatory.
 </p>
 <ul class="section-toc">
@@ -4370,6 +4371,20 @@ given distribution, it is set to 0.
 each of a normal distribution, a chi-square distribution, and a
 Student T distribution. See Histograms below.)
 </p>
+<p>An initial seed may be specified with
+</p>
+<pre class="verbatim">        ⎕MX[14] &lt;seed&gt;
+</pre>
+<p>where &lt;seed&gt; is a single integer.  This allows repeatable random
+sequences:
+</p>
+<pre class="verbatim">      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
+      ⊣⎕MX[14] 3
+      4 ⎕MX[10] 1
+¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
+</pre>
 </div>
 <div class="subsection" id="Covariance">
 <h4 class="subsection">2.31.11 Covariance</h4>

@@ -49,7 +49,7 @@ protected:
             {
               krows = r;
               kcols = c;
-              vals = new vector<complex<double>>(r * c);
+              vals = new vector<complex<double> >(r * c);
             }
        
          ~Matrix ()
@@ -96,7 +96,7 @@ protected:
        private:
          int krows;
          int kcols;
-         vector<complex<double>> *vals;
+         vector<complex<double> > *vals;
      };
 
    /// overloaded Function::eval_AXB().
@@ -111,13 +111,13 @@ protected:
    /// overloaded Function::eval_B().
   virtual Token eval_B(Value_P B) const;
 
-  static vector<complex<double>> getCross(Matrix * mtx);
+  static vector<complex<double> > getCross(Matrix * mtx);
 
   static Matrix * genCofactor(Matrix *mtx, int r, int c);
 
   static complex<double> getDet(Matrix * mtx);
 
-  static complex<double> magnitude(vector<complex<double>> &v);
+  static complex<double> magnitude(vector<complex<double> > &v);
 
   static void normalise(vector<double> &v);
 
@@ -128,6 +128,8 @@ protected:
   static Value_P printit(Value_P A, Value_P B);
 
   static Value_P eigenvalues(Value_P B);
+
+  static Value_P set_rng_seed(Value_P B);
 
   static Value_P determinant(Value_P B);
 
