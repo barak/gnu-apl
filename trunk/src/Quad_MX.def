@@ -36,3 +36,5 @@ op_entry( OP_PRINT,              "Print",              "dyadic")
 op_entry( OP_SET_RNG_SEED,       "Set RNG seed",       "monadic")
 op_entry( OP_MAX,                "",                   "")
  
+#undef op_entry
+
