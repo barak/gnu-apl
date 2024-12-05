@@ -645,11 +645,11 @@ The following APL commands are related to file names:
 
 )SAVE [lib] [name[.xml]]
 
-)COPY [lib] [name[.xml]]
+)COPY [lib] [name[.xml|.apl]]
 
-)PCOPY [lib] [name[.xml]]
+)PCOPY [lib] [name[.xml|.apl]]
 
-)DROP [lib] [name[.xml]]
+)DROP [lib] [name[.xml|.apl]]
 
 )IN   [lib] name[.atf]
 
@@ -1774,20 +1774,29 @@ For example:
       )FNS
 
       SUM ← { ⍺ + ⍵ }
-
       )FNS
 SUM
-
       ∇SUM[⎕]∇
-[0] λ←⍺ SUM ⍵
-[1] λ← ⍺ + ⍵ 
+DEFN ERROR+
+      ∇SUM[⎕]∇
+             ^
+      )more
+function is a lambda
+@end verbatim
 
+Even though named lambdas are included in function lists along with other
+user defined functions, they must be listed using ⎕CR 'name':
+
+@verbatim
+      ⎕CR 'SUM'
+λ←⍺ λ1 ⍵
+λ← ⍺ + ⍵ 
 @end verbatim
 
 The lambda_header is automatically deduced from the presence or absence
 of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹) in the
 body_expression and from whether the body_expression is empty (no λ←) or
-not (with λ←).
+not (i.e. with λ←).
 
 It is possible to specify local variables that work exactly like their
 companions in normal defined functions. Please note that this is different
@@ -3733,6 +3742,8 @@ shown in the examples below.
 @node    Section 2.31
 @section ⎕MX - Matrix/Statistics
 
+⎕MX was kindly contributed by Henrik Moller
+
 ⎕MX[x] is a system function that provides a collection of matrix and
 statistical operations such as covariance, eigensystems, and so on, along
 with random number generation in several statistical distributions. Particular
@@ -3752,13 +3763,13 @@ operations are selected through the use of the axis specifier @b{x}:
         (A) ⎕MX[11] B      (nomadic) Covariance
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
-            ⎕MX[14] B      (monadic) set RNG seed
+            ⎕MX[14] B      (monadic) Set RNG seed
 @end verbatim
 
-(These may by shown by entering ⎕MX '' or ⎕MX[0] on the APL command
-line). In the function list above, @b{A} indicates a mandatory left
-argument, while @b{(A)} indicates an optional left argument. The right
-argument @b{B} of @b{⎕MX[X]} is always mandatory.
+(These may by shown by entering ⎕MX '' or ⎕MX[0]0 on the APL command line.)
+In the function list above, @b{A} indicates a mandatory left argument,
+while (@b{A}) indicates an optional left argument. The right argument @b{B}
+of @b{⎕MX[X]} is always mandatory.
 
 @subsection Determinant
 
@@ -3776,7 +3787,7 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
 
 The cross product operation, ⎕MX[2], is nomadic. In monadic form, it
 requires a numeric argument (real or complex) where ⍴⍴B = 2 and
-(1↑⍴B)-1 = (¯1↑⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
+(↑⍴B)+1 = (1↓⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
 For Example:
 
 @verbatim
@@ -3790,9 +3801,9 @@ For Example:
 
 For reasons I'm not enough of a mathematician to understand, cross
 products are only valid in 3-space and 7-space, so the only valid monadic
-arguments are matrices of shapes [2 3] or [6 7]. ⎕MX, however, doesn't
-check this and will happily give you a result in any dimensionality and
-leave it to your imagination what it may mean. I'm also not enough of a
+arguments are matrices of shapes [2 3] or [6 7]. However, ⎕MX, doesn't
+check this and will happily give you a result in any dimensionality thus
+leaving it to your imagination what it may mean. I'm also not enough of a
 mathematician to know what the significance may be of cross products
 involving complex numbers and thus I can't guarantee I'm using an
 appropriate method to compute them.
@@ -3826,11 +3837,12 @@ eigenvectors of real non-symetric square matrices:
 ¯8  4 ¯2 1
 27  9  3 1
 64 16  4 1
+      ⎕PP←4
       ⎕MX[4] B
-  0.09988            0.1113          ¯0.2925           ¯0.9445
-  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601   0.8396J0.04139
-  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601    0.8396J¯0.04139
- ¯0.1449             0.3566           0.9194            0.08118
+  0.09988            0.1113          ¯0.2925          ¯0.9445
+  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601  0.8396J0.04139
+  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601   0.8396J¯0.04139
+ ¯0.1449             0.3566           0.9194           0.08118
 @end verbatim
 
 where each row represents an eigenvector:
@@ -3870,7 +3882,7 @@ the eigenvalues, @b{F}, by the relationship:
 
 @verbatim
       |F
-6.414 6.346285607 6.346285607 2.323
+6.41391 6.346285607 6.346285607 2.3228
 @end verbatim
 
 the order of the magnitude of the elements is descending, making the
@@ -3938,6 +3950,7 @@ numeric argument and returns a result of the same shape such that the sum
 of the squares of the elements equals 1:
 
 @verbatim
+      ⎕PP←10
       ⎕MX[9] 1 2 3 4
 0.1825741858 0.3651483717 0.5477225575 0.7302967433
       (⎕MX[9] 1 2 3 4)*2
@@ -3996,6 +4009,7 @@ given distribution, it is set to 0.
 ¯2.9337180373
       5 ⎕MX[10] 2
 0.05154476627 3.80631021 2.455474045 3.165260688 0.6792784063
+      ⎕PP←4
       3 ⎕MX[10] 1j1
 ¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
 @end verbatim
@@ -4012,8 +4026,7 @@ An initial seed may be specified with
         ⎕MX[14] <seed>
 @end verbatim
 
-where <seed> is a single integer.  This allows repeatable random
-sequences:
+where <seed> is a single integer. This allows repeatable random sequences:
 
 @verbatim
       ⊣⎕MX[14] 3
@@ -4037,6 +4050,7 @@ example:
 5 8  1 9
 7 6  2 9
 6 5 10 4
+      ⎕PP←10
       ⎕MX[11] B
 12.91666667   9.333333333 ¯9.25
  9.333333333  8.666666667 ¯7.333333333
@@ -5399,6 +5413,8 @@ Examples:
 
 @node    Section 2.37
 @section ⎕SQL - SQL Database Interface
+
+⎕SQL was kindly contributed by Elias Mårtenson.
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below. ⎕SQL has an axis argument that

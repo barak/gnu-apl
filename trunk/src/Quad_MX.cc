@@ -584,37 +584,29 @@ ShapeItem cols = B->get_shape_item(1);
 Value_P
 Quad_MX::determinant(Value_P B)
 {
-Value_P rc = Str0(LOC);
-  
 const uRank B_rank = B->get_rank();
 
-  if (B_rank == 2)
+  if (B_rank != 2)
     {
-      ShapeItem rows = B->get_shape_item(0);
-      ShapeItem cols = B->get_shape_item(1);
-      if (rows == cols)
-    {
-      Matrix *mtx = genMtx (B, false);
-      complex<double>det = getDet (mtx);
-      delete mtx;
-      rc = (det.imag () == 0.0) ?
-        FloatScalar(det.real (), LOC) :
-        ComplexScalar(det.real (), det.imag (), LOC);
-      rc->check_value(LOC);
-    }
-      else
-    {
-      MORE_ERROR () << "Non-square matrix";
-      RANK_ERROR;
-    }
-    }
-  else
-    {
-      MORE_ERROR () << "Invalid rank..";
+      MORE_ERROR () << "Invalid rank (matrix expected)"
+                       " in Quad_MX::determinant().";
       RANK_ERROR;
     }
 
-  return rc;
+  if (B->get_shape_item(0) != B->get_shape_item(1))
+     {
+       MORE_ERROR () << "Non-square matrix in Quad_MX::determinant()";
+       RANK_ERROR;
+     }
+
+Matrix * mtx = genMtx(B, false);
+const complex<double>det = getDet(mtx);
+  delete mtx;
+
+Value_P Z(det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
+                             : ComplexScalar(det.real(), det.imag(), LOC));
+  Z->check_value(LOC);
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -665,7 +657,7 @@ const uRank B_rank = B->get_rank();
     }
   else
     {
-      MORE_ERROR () << "Invalid rank..";
+      MORE_ERROR () << "Invalid rank in Quad_MX::monadicCrossProduct().";
       RANK_ERROR;
     }
   
@@ -676,59 +668,49 @@ const uRank B_rank = B->get_rank();
 Value_P
 Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
 {
-Value_P rc = Str0(LOC);
-  
 const ShapeItem A_count = A->element_count();
 const uRank     A_rank  = A->get_rank();
 const ShapeItem B_count = B->element_count();
 const uRank     B_rank  = B->get_rank();
 
-  if (A_rank == 1 && B_rank == 1 && A_count == B_count && A_count == 3)
+  if (A_rank != 1 || B_rank != 1 || A_count != B_count || A_count != 3)
     {
-      Matrix *mtx = new Matrix (3, 3);
-      loop (c, 3)
-    {
-      const Cell & Av = A->get_cravel(c);
-      const Cell & Bv = B->get_cravel(c);
-      APL_Float Avr = Av.get_real_value();
-      APL_Float Avi = Av.get_imag_value();
-      APL_Float Bvr = Bv.get_real_value ();
-      APL_Float Bvi = Bv.get_imag_value();
-      mtx->val (0, c, complex (1.0, 0.0));
-      mtx->val (1, c, complex (Avr, Avi));
-      mtx->val (2, c, complex (Bvr, Bvi));
-    }
-      {
-        vector<complex<double> > cp = getCross (mtx);
-        Shape shape_Z;
-        shape_Z.add_shape_item(mtx->cols ());
-        rc = Value_P (shape_Z, LOC);
-        bool is_cpx = false;
-        for (int i = 0; i < mtx->cols (); i++)
-      {
-        if (cp[i].imag () != 0.0) {
-          is_cpx = true;
-          break;
-        }
-      }
-        for (int i = 0; i < mtx->cols (); i++)
-      {
-        if (is_cpx)
-          (*rc).set_ravel_Complex (i, cp[i].real (), cp[i].imag ());
-        else
-          (*rc).set_ravel_Float (i, cp[i].real ());
-      }
-        rc->check_value(LOC);
-      }
-      delete mtx;
-    }
-  else
-    {
-      MORE_ERROR () << "Invalid rank..";
+      MORE_ERROR () << "Invalid rank in Quad_MX::dyadicCrossProduct().";
       RANK_ERROR;
     }
 
-  return rc;
+Matrix *mtx = new Matrix (3, 3);
+  loop (c, 3)
+       {
+         const Cell & Av = A->get_cravel(c);
+         const Cell & Bv = B->get_cravel(c);
+         APL_Float Avr = Av.get_real_value();
+         APL_Float Avi = Av.get_imag_value();
+         APL_Float Bvr = Bv.get_real_value ();
+         APL_Float Bvi = Bv.get_imag_value();
+         mtx->val (0, c, complex (1.0, 0.0));
+         mtx->val (1, c, complex (Avr, Avi));
+         mtx->val (2, c, complex (Bvr, Bvi));
+       }
+
+vector<complex<double> > cp = getCross (mtx);
+bool is_cpx = false;
+  loop(i, mtx->cols())
+      {
+        if (cp[i].imag () != 0.0)   { is_cpx = true; break; }
+      }
+
+const Shape shape_Z(mtx->cols());
+Value_P Z(shape_Z, LOC);
+  loop(i, mtx->cols())
+      {
+        if (is_cpx)   Z->next_ravel_Complex(cp[i].real(), cp[i].imag());
+        else          Z->next_ravel_Float(cp[i].real());
+      }
+  Z->check_value(LOC);
+  delete mtx;
+
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P

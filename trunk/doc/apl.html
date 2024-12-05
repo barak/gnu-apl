@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 4, 2024.
+<p>December 5, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -854,11 +854,11 @@ where &rsquo;apl&rsquo; is installed can be changed via ./configure options
 </p>
 <p>)SAVE [lib] [name[.xml]]
 </p>
-<p>)COPY [lib] [name[.xml]]
+<p>)COPY [lib] [name[.xml|.apl]]
 </p>
-<p>)PCOPY [lib] [name[.xml]]
+<p>)PCOPY [lib] [name[.xml|.apl]]
 </p>
-<p>)DROP [lib] [name[.xml]]
+<p>)DROP [lib] [name[.xml|.apl]]
 </p>
 <p>)IN   [lib] name[.atf]
 </p>
@@ -2014,19 +2014,26 @@ name for an axis argument.
 <pre class="verbatim">      )FNS
 
       SUM ← { ⍺ + ⍵ }
-
       )FNS
 SUM
-
       ∇SUM[⎕]∇
-[0] λ←⍺ SUM ⍵
-[1] λ← ⍺ + ⍵ 
-
+DEFN ERROR+
+      ∇SUM[⎕]∇
+             ^
+      )more
+function is a lambda
+</pre>
+<p>Even though named lambdas are included in function lists along with other
+user defined functions, they must be listed using ⎕CR &rsquo;name&rsquo;:
+</p>
+<pre class="verbatim">      ⎕CR 'SUM'
+λ←⍺ λ1 ⍵
+λ← ⍺ + ⍵ 
 </pre>
 <p>The lambda_header is automatically deduced from the presence or absence
 of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹) in the
 body_expression and from whether the body_expression is empty (no λ←) or
-not (with λ←).
+not (i.e. with λ←).
 </p>
 <p>It is possible to specify local variables that work exactly like their
 companions in normal defined functions. Please note that this is different
@@ -4100,6 +4107,8 @@ Next: <a href="#Section-2_002e32" accesskey="n" rel="next">⎕PLOT - Plot Data</
 </div>
 <span id="g_t_005b_003f_005dMX-_002d-Matrix_002fStatistics"></span><h3 class="section">2.31 ⎕MX - Matrix/Statistics</h3>
 
+<p>⎕MX was kindly contributed by Henrik Moller
+</p>
 <p>⎕MX[x] is a system function that provides a collection of matrix and
 statistical operations such as covariance, eigensystems, and so on, along
 with random number generation in several statistical distributions. Particular
@@ -4118,12 +4127,12 @@ operations are selected through the use of the axis specifier <b>x</b>:
         (A) ⎕MX[11] B      (nomadic) Covariance
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
-            ⎕MX[14] B      (monadic) set RNG seed
+            ⎕MX[14] B      (monadic) Set RNG seed
 </pre>
-<p>(These may by shown by entering ⎕MX &rdquo; or ⎕MX[0] on the APL command
-line). In the function list above, <b>A</b> indicates a mandatory left
-argument, while <b>(A)</b> indicates an optional left argument. The right
-argument <b>B</b> of <b>⎕MX[X]</b> is always mandatory.
+<p>(These may by shown by entering ⎕MX &rdquo; or ⎕MX[0]0 on the APL command line.)
+In the function list above, <b>A</b> indicates a mandatory left argument,
+while (<b>A</b>) indicates an optional left argument. The right argument <b>B</b>
+of <b>⎕MX[X]</b> is always mandatory.
 </p>
 <ul class="section-toc">
 <li><a href="#Determinant" accesskey="1">Determinant</a></li>
@@ -4157,7 +4166,7 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
 
 <p>The cross product operation, ⎕MX[2], is nomadic. In monadic form, it
 requires a numeric argument (real or complex) where ⍴⍴B = 2 and
-(1↑⍴B)-1 = (¯1↑⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
+(↑⍴B)+1 = (1↓⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
 For Example:
 </p>
 <pre class="verbatim">      ⊢B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
@@ -4169,9 +4178,9 @@ For Example:
 </pre>
 <p>For reasons I&rsquo;m not enough of a mathematician to understand, cross
 products are only valid in 3-space and 7-space, so the only valid monadic
-arguments are matrices of shapes [2 3] or [6 7]. ⎕MX, however, doesn&rsquo;t
-check this and will happily give you a result in any dimensionality and
-leave it to your imagination what it may mean. I&rsquo;m also not enough of a
+arguments are matrices of shapes [2 3] or [6 7]. However, ⎕MX, doesn&rsquo;t
+check this and will happily give you a result in any dimensionality thus
+leaving it to your imagination what it may mean. I&rsquo;m also not enough of a
 mathematician to know what the significance may be of cross products
 involving complex numbers and thus I can&rsquo;t guarantee I&rsquo;m using an
 appropriate method to compute them.
@@ -4204,11 +4213,12 @@ eigenvectors of real non-symetric square matrices:
 ¯8  4 ¯2 1
 27  9  3 1
 64 16  4 1
+      ⎕PP←4
       ⎕MX[4] B
-  0.09988            0.1113          ¯0.2925           ¯0.9445
-  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601   0.8396J0.04139
-  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601    0.8396J¯0.04139
- ¯0.1449             0.3566           0.9194            0.08118
+  0.09988            0.1113          ¯0.2925          ¯0.9445
+  0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601  0.8396J0.04139
+  0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601   0.8396J¯0.04139
+ ¯0.1449             0.3566           0.9194           0.08118
 </pre>
 <p>where each row represents an eigenvector:
 </p>
@@ -4242,7 +4252,7 @@ the eigenvalues, <b>F</b>, by the relationship:
 <p>(Note that, from the above example:
 </p>
 <pre class="verbatim">      |F
-6.414 6.346285607 6.346285607 2.323
+6.41391 6.346285607 6.346285607 2.3228
 </pre>
 <p>the order of the magnitude of the elements is descending, making the
 initial eigenvector, <b>E[⎕IO;]</b>, the dominant eigenvector and each
@@ -4308,7 +4318,8 @@ respectively) and returns the corresponding homogeneous matrix:
 numeric argument and returns a result of the same shape such that the sum
 of the squares of the elements equals 1:
 </p>
-<pre class="verbatim">      ⎕MX[9] 1 2 3 4
+<pre class="verbatim">      ⎕PP←10
+      ⎕MX[9] 1 2 3 4
 0.1825741858 0.3651483717 0.5477225575 0.7302967433
       (⎕MX[9] 1 2 3 4)*2
 0.03333333333 0.1333333333 0.3 0.5333333333
@@ -4362,6 +4373,7 @@ given distribution, it is set to 0.
 ¯2.9337180373
       5 ⎕MX[10] 2
 0.05154476627 3.80631021 2.455474045 3.165260688 0.6792784063
+      ⎕PP←4
       3 ⎕MX[10] 1j1
 ¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
 </pre>
@@ -4375,8 +4387,7 @@ Student T distribution. See Histograms below.)
 </p>
 <pre class="verbatim">        ⎕MX[14] &lt;seed&gt;
 </pre>
-<p>where &lt;seed&gt; is a single integer.  This allows repeatable random
-sequences:
+<p>where &lt;seed&gt; is a single integer. This allows repeatable random sequences:
 </p>
 <pre class="verbatim">      ⊣⎕MX[14] 3
       4 ⎕MX[10] 1
@@ -4399,6 +4410,7 @@ example:
 5 8  1 9
 7 6  2 9
 6 5 10 4
+      ⎕PP←10
       ⎕MX[11] B
 12.91666667   9.333333333 ¯9.25
  9.333333333  8.666666667 ¯7.333333333
@@ -5813,6 +5825,8 @@ Next: <a href="#Section-2_002e38" accesskey="n" rel="next">⎕SI - State Indicat
 </div>
 <span id="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></span><h3 class="section">2.37 ⎕SQL - SQL Database Interface</h3>
 
+<p>⎕SQL was kindly contributed by Elias Mårtenson.
+</p>
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below. ⎕SQL has an axis argument that
 selects a sub-function of ⎕SQL.
