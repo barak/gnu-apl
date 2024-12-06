@@ -46,9 +46,9 @@ protected:
      {
        public:
          Matrix (int r, int c)
+         : krows(r),
+           kcols(c)
             {
-              krows = r;
-              kcols = c;
               vals = new vector<complex<double> >(r * c);
             }
        
@@ -69,15 +69,9 @@ protected:
               (*vals)[c + r * kcols] = v;
             }
     
-         int  rows ()
-            {
-              return krows;
-            }
+         int  rows()   { return krows; }
     
-         int  cols ()
-            {
-              return kcols;
-            }
+         int  cols()   { return kcols; }
     
          void show()
             {
@@ -92,7 +86,17 @@ protected:
                     fprintf (stderr, "\n");
                   }
             }
-    
+
+         /// return true iff vector (!) has complex items
+         static bool is_complex(const vector<complex<double> > & vector)
+            {
+              loop(i, vector.size())
+                  {
+                    if (vector[i].imag () != 0.0)   return true;
+                  }
+              return false;
+            }
+
        private:
          int krows;
          int kcols;

@@ -60,91 +60,29 @@ Quad_MX Quad_MX::fun;
 /************** start Matrix class **************/
 /****** gsl matrices don't support complex ******/
 
-class Matrix
-{
-public:
-  Matrix(int r, int c)
-  {
-    krows = r;
-    kcols = c;
-    vals = new vector<complex<double> >(r * c);
-  }
-    
-  ~Matrix()
-  {
-    delete vals;
-  }
-
-  complex<double> val(int r, int c)
-  {
-    complex<double>rc(0.0, 0.0);
-    rc = (*vals)[c + r * kcols];
-    return rc;
-  }
-
-  void val(int r, int c, complex<double> v)
-  {
-    (*vals)[c + r * kcols] = v;
-  }
-
-  int  rows()
-  {
-    return krows;
-  }
-
-  int  cols()
-  {
-    return kcols;
-  }
-
-  void show()
-  {
-    for (int r = 0; r < krows; r++)
-      {
-    for (int c = 0; c < kcols; c++)
-      {
-        fprintf(stderr, "%gj%g ",
-             this->val(r, c).real(),
-             this->val(r, c).imag());
-      }
-    fprintf(stderr, "\n");
-      }
-}
-
-  
-private:
-  int krows;
-  int kcols;
-  vector<complex<double> > *vals;
-};
-
-/************** end Matrix class **************/
-
 /*************** start utility fcns **************/
 
 Quad_MX::Matrix *
 Quad_MX::genCofactor(Matrix *mtx, int r, int c)
 {
-Matrix * cf = new Matrix(mtx->rows()-1, mtx->cols()-1);
+Matrix * cf = new Matrix(mtx->rows() - 1, mtx->cols() - 1);
 
-  int rx = 0;
-  for (int rr = 0; rr < mtx->rows(); rr++)
-    {
-      if (rr != r)
-    {
-      int cx = 0;
-      for (int cc = 0; cc < mtx->cols (); cc++)
-        {
-          if (cc != c)
-        cf->val(rx, cx++, mtx->val(rr, cc));
-        }
-      rx++;
-    }
-    }
+int rx = 0;
+  loop(rr, mtx->rows())
+      {
+        if (rr != r)
+           {
+             int cx = 0;
+             loop(cc, mtx->cols())
+               {
+                 if (cc != c)   cf->val(rx, cx++, mtx->val(rr, cc));
+               }
+             rx++;
+           }
+      }
 
   return cf;
 }
-
 //----------------------------------------------------------------------------
 complex<double>
 Quad_MX::getDet(Matrix * mtx)
@@ -173,22 +111,23 @@ complex<double> det(0.0, 0.0);
 vector<complex<double> >
 Quad_MX::getCross(Matrix *mtx)
 {
-  complex<double> det(0.0, 0.0);
-  vector<complex<double> > rc(mtx->cols());
-  if (mtx->rows() == 2) {
-    det = (mtx->val(0, 0) * mtx->val(1,1)) -
-      (mtx->val(0, 1) * mtx->val(1,0));
-  }
+complex<double> det(0.0, 0.0);
+vector<complex<double> > rc(mtx->cols());
+  if (mtx->rows() == 2)
+     {
+       det = (mtx->val(0, 0) * mtx->val(1,1)) 
+           - (mtx->val(0, 1) * mtx->val(1,0));
+     }
   else
     {
-      for (int k = 0; k < mtx->rows(); k++)
-    {
-      double sign = pow(-1.0, (double)(k));
-      Matrix *cf = genCofactor(mtx, 0, k);
-      complex<double> id = getDet(cf);
-      delete cf;
-      rc[k] = sign * id;
-    }
+      loop(k, mtx->rows())
+          {
+            const double sign = pow(-1.0, (double)(k));
+            Matrix * cf = genCofactor(mtx, 0, k);
+            const complex<double> id = getDet(cf);
+            delete cf;
+            rc[k] = sign * id;
+          }
     }
 
   return rc;
@@ -197,17 +136,16 @@ Quad_MX::getCross(Matrix *mtx)
 complex<double>
 Quad_MX::magnitude(vector<complex<double> > &v)
 {
-  complex<double> rc(0.0, 0.0);
+complex<double> rc(0.0, 0.0);
   loop(i, v.size()) rc += v[i] * v[i];
-  rc = sqrt(rc);
-  return rc;
+  return sqrt(rc);
 }
 //----------------------------------------------------------------------------
 void
 Quad_MX::normalise(vector<double> &v)
 {
-  double mean = gsl_stats_mean(v.data(), 1, v.size());
-  double sdev = gsl_stats_sd_m(v.data(), 2, v.size(), mean);
+const double mean = gsl_stats_mean(v.data(), 1, v.size());
+const double sdev = gsl_stats_sd_m(v.data(), 2, v.size(), mean);
   loop(c, v.size())
     v[c] = (v[c] - mean) / sdev;
 }
@@ -215,29 +153,28 @@ Quad_MX::normalise(vector<double> &v)
 Quad_MX::Matrix *
 Quad_MX::genMtx(Value_P B, bool padded)
 {
-  ShapeItem rows = B->get_shape_item(0);
-  ShapeItem cols = B->get_shape_item(1);
+const ShapeItem cols = B->get_shape_item(1);
+ShapeItem rows = B->get_shape_item(0);
 
   if (padded) rows++;
 
   Matrix *mtx = new Matrix(rows, cols);
   int p = 0;
   loop(r, rows)
-    {
-      loop(c, cols)
-    {
-      if (padded && r == 0)
-        {
-           mtx->val(0, c, complex(1.0, 0.0));
-        }
-      else {
-        const Cell & Bv = B->get_cravel(p++);
-        APL_Float xvr = Bv.get_real_value();
-        APL_Float xvi = Bv.get_imag_value();
-        mtx->val(r, c, complex(xvr, xvi));
+  loop(c, cols)
+      {
+        if (padded && r == 0)
+           {
+             mtx->val(0, c, complex(1.0, 0.0));
+           }
+        else
+           {
+             const Cell & Bv = B->get_cravel(p++);
+             const APL_Float xvr = Bv.get_real_value();
+             const APL_Float xvi = Bv.get_imag_value();
+             mtx->val(r, c, complex(xvr, xvi));
+           }
       }
-    }
-    }
 
   return mtx;
 }
@@ -253,7 +190,6 @@ static unsigned int rng_seed;
 Value_P
 Quad_MX::set_rng_seed(Value_P B)
 {
-Value_P rc = Str0(LOC);
   const CellType B_celltype = B->deep_cell_types();
 
   if (B_celltype & CT_INT &&
@@ -267,14 +203,13 @@ Value_P rc = Str0(LOC);
       MORE_ERROR () << "Requires numeric arguement.";
       DOMAIN_ERROR;
     }
-  return rc;
+  return Str0(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::printit(Value_P A, Value_P B)
 {
-  Value_P rc = Str0(LOC);
-  const CellType A_celltype = A->deep_cell_types();
+const CellType A_celltype = A->deep_cell_types();
 
 
   if (A->is_char_string() && B->is_char_string())
@@ -300,8 +235,9 @@ char *vs = (char *)(val.c_str());
       fprintf(ofile, "%s\n", vs);
       fclose(ofile);
 
-      return rc;
+      return Str0(LOC);
     }
+
   if ((A_celltype & CT_NUMERIC) &&
       B->is_char_string())
     {
@@ -408,7 +344,7 @@ char *vs = (char *)(val.c_str());
     }
 
       fclose(ofile);
-      return rc;
+      return Str0(LOC);
     }
   else
     {
@@ -416,169 +352,138 @@ char *vs = (char *)(val.c_str());
       DOMAIN_ERROR;
     }
 
-  return rc;
+  return Str0(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::eigenvectors(Value_P B)
 {
-Value_P rc = Str0(LOC);
-  
-const uRank B_rank = B->get_rank();
-  if (B_rank == 2) {
-    Matrix *mtx = genMtx(B, false);
+  if (B->get_rank() != 2)
+     {
+       MORE_ERROR () << "Invalid rank.";
+       RANK_ERROR;
+     }
+
+const ShapeItem rows = B->get_shape_item(0);
+const ShapeItem cols = B->get_shape_item(1);
     
-ShapeItem rows = B->get_shape_item(0);
-ShapeItem cols = B->get_shape_item(1);
-    
-    if (rows == cols)
+    if (rows != cols)
+       {
+         MORE_ERROR () << "Non-square matrix.";
+         RANK_ERROR;
+       }
+
+Matrix * mtx = genMtx(B, false);
+double *data = (double *)alloca(mtx->rows() * mtx->cols() * sizeof(double));
+int i = 0;
+  loop(j, mtx->rows())
+  for (int k = 0; k < mtx->cols(); k++, i++)
       {
-    double *data =
-      (double *)alloca(mtx->rows() * mtx->cols() * sizeof(double));
-    int i = 0;
-    for (int j = 0; j < mtx->rows(); j++)
-      {
-        for (int k = 0; k < mtx->cols(); k++, i++)
-          {
         data[i] = mtx->val(j, k).real();
-          }
       }
 
-    gsl_matrix_view m =
-      gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
+gsl_matrix_view m = gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
 
-    gsl_vector_complex *eval = gsl_vector_complex_alloc(mtx->rows());
-    gsl_matrix_complex *evec =
-          gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
+gsl_vector_complex * eval = gsl_vector_complex_alloc(mtx->rows());
+gsl_matrix_complex * evec = gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
 
-    gsl_eigen_nonsymmv_workspace *w =
-      gsl_eigen_nonsymmv_alloc(mtx->rows());
-    int erc = GSL_FAILURE;
-    erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
+gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(mtx->rows());
+int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
     if (erc == GSL_SUCCESS)
-      {
-        gsl_eigen_nonsymmv_free(w);
-        erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
-      }
+       {
+         gsl_eigen_nonsymmv_free(w);
+         erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
+       }
 
-    if (erc == GSL_SUCCESS)
+    if (erc != GSL_SUCCESS)
       {
-        Shape shape_Z;
-        shape_Z.add_shape_item(rows);
-        shape_Z.add_shape_item(cols);
-        rc = Value_P(shape_Z, LOC);
-
-        int k = 0;
-        for (int c = 0; c < mtx->cols(); c++)
-          {
-        gsl_vector_complex_view evec_c =
-          gsl_matrix_complex_column(evec, c);
-        for (int r = 0; r < mtx->rows(); r++)
-          {
-            gsl_complex z = gsl_vector_complex_get(&evec_c.vector, r);
-            (*rc).set_ravel_Complex(k++, GSL_REAL(z), GSL_IMAG (z));
-          }
-          }
-      }
-    else
-      {
+        delete mtx;
         MORE_ERROR () << "Eigensystem computation error.";
         INTERNAL_ERROR;
       }
-      }
-    else
-      {
-    MORE_ERROR () << "Non-square matrix.";
-    RANK_ERROR;
-      }
-    delete mtx;
-  }
-  else
-    {
-      MORE_ERROR () << "Invalid rank.";
-      RANK_ERROR;
-    }
 
-  return rc;
+const Shape shape_Z(rows, cols);
+Value_P Z(shape_Z, LOC);
+
+int k = 0;
+  loop (c, mtx->cols())
+       {
+         gsl_vector_complex_view evec_c = gsl_matrix_complex_column(evec, c);
+         loop(r, mtx->rows())
+             {
+                gsl_complex z = gsl_vector_complex_get(&evec_c.vector, r);
+                Z->set_ravel_Complex(k++, GSL_REAL(z), GSL_IMAG (z));
+             }
+       }
+  delete mtx;
+
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::eigenvalues(Value_P B)
 {
-Value_P rc = Str0(LOC);
-  
 const uRank      B_rank    = B->get_rank();
-  if (B_rank == 2) {
-    Matrix *mtx = genMtx (B, false);
+  if (B_rank != 2) 
+     {
+       MORE_ERROR () << "Matrix expected.";
+       RANK_ERROR;
+     }
     
-ShapeItem rows = B->get_shape_item(0);
-ShapeItem cols = B->get_shape_item(1);
+const ShapeItem rows = B->get_shape_item(0);
+const ShapeItem cols = B->get_shape_item(1);
     
-    if (rows == cols)
-      {
-    double *data =
-      (double *)alloca (mtx->rows () * mtx->cols () * sizeof(double));
-    int i = 0;
-    for (int j = 0; j < mtx->rows (); j++)
+    if (rows != cols)
+       {
+        MORE_ERROR () << "Non-square matrix.";
+        LENGTH_ERROR;
+       }
+
+Matrix * mtx = genMtx (B, false);
+double * data = (double *)alloca (mtx->rows () * mtx->cols () * sizeof(double));
+int i = 0;
+  loop(j, mtx->rows())
       {
         for (int k = 0; k < mtx->cols (); k++, i++)
           {
-        data[i] = mtx->val (j, k).real ();
+            data[i] = mtx->val (j, k).real ();
           }
       }
 
-    gsl_matrix_view m =
-      gsl_matrix_view_array (data, mtx->rows (), mtx->cols ());
+gsl_matrix_view m = gsl_matrix_view_array (data, mtx->rows(), mtx->cols());
 
-    gsl_vector_complex *eval = gsl_vector_complex_alloc (mtx->rows ());
-    gsl_matrix_complex *evec =
-          gsl_matrix_complex_alloc (mtx->rows (), mtx->cols ());
+gsl_vector_complex * eval = gsl_vector_complex_alloc (mtx->rows());
+gsl_matrix_complex * evec = gsl_matrix_complex_alloc (mtx->rows(), mtx->cols());
 
-    gsl_eigen_nonsymmv_workspace *w =
-      gsl_eigen_nonsymmv_alloc (mtx->rows ());
-    int erc = GSL_FAILURE;
-    erc = gsl_eigen_nonsymmv (&m.matrix, eval, evec, w);
-    if (erc == GSL_SUCCESS)
-      {
-        gsl_eigen_nonsymmv_free (w);
-        erc = gsl_eigen_nonsymmv_sort (eval, evec, GSL_EIGEN_SORT_ABS_DESC);
-      }
+gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc (mtx->rows());
+int erc = gsl_eigen_nonsymmv (&m.matrix, eval, evec, w);
+  if (erc == GSL_SUCCESS)
+     {
+       gsl_eigen_nonsymmv_free (w);
+       erc = gsl_eigen_nonsymmv_sort (eval, evec, GSL_EIGEN_SORT_ABS_DESC);
+     }
 
-    if (erc == GSL_SUCCESS)
-      {
-        Shape shape_Z;
-        shape_Z.add_shape_item(cols);
-        rc = Value_P (shape_Z, LOC);
+  if (erc != GSL_SUCCESS)
+     {
+       delete mtx;
+       MORE_ERROR () << "Eigensystem computation error.";
+       INTERNAL_ERROR;
+     }
+
+const Shape shape_Z(cols);
+Value_P Z(shape_Z, LOC);
     
-        for (int i = 0; i < mtx->cols (); i++)
-          {
-        gsl_complex eval_i = gsl_vector_complex_get (eval, i);
-
-        complex<double> v (GSL_REAL(eval_i), GSL_IMAG(eval_i));
-        (*rc).set_ravel_Complex (i, v.real (), v.imag ());
-          }
-        rc->check_value(LOC);
-      }
-    else
+  loop(i, mtx->cols())
       {
-        MORE_ERROR () << "Eigensystem computation error.";
-        INTERNAL_ERROR;
-      }
-    delete mtx;
-      }
-    else
-      {
-    MORE_ERROR () << "Non-square matrix.";
-    RANK_ERROR;
-      }
-  }
-  else
-    {
-      MORE_ERROR () << "Invalid rank.";
-      RANK_ERROR;
-    }
+        gsl_complex eval_i = gsl_vector_complex_get(eval, i);
 
-  return rc;
+        complex<double> v(GSL_REAL(eval_i), GSL_IMAG(eval_i));
+        Z->next_ravel_Complex (v.real (), v.imag ());
+      }
+  Z->check_value(LOC);
+  delete mtx;
+
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -612,71 +517,57 @@ Value_P Z(det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
 Value_P
 Quad_MX::monadicCrossProduct(Value_P B)
 {
-Value_P rc = Str0(LOC);
-  
   //  const ShapeItem B_count   = B->element_count();
 const uRank B_rank = B->get_rank();
 
-  if (B_rank == 2)
+  if (B_rank != 2)
     {
-      ShapeItem rows = B->get_shape_item(0);
-      ShapeItem cols = B->get_shape_item(1);
-    if (rows+1 == cols)
-      {
-    Matrix *mtx = genMtx (B, true);
-    vector<complex<double> > cp = getCross (mtx);
-    Shape shape_Z;
-    shape_Z.add_shape_item(mtx->cols ());
-    rc = Value_P (shape_Z, LOC);
-    bool is_cpx = false;
-    for (int i = 0; i < mtx->cols (); i++)
-      {
-        if (cp[i].imag () != 0.0)
-          {
-                is_cpx = true;
-                break;
-              }
-      }
-    for (int i = 0; i < mtx->cols (); i++)
-      {
-        if (is_cpx)
-          (*rc).set_ravel_Complex (i, cp[i].real (), cp[i].imag ());
-        else
-          (*rc).set_ravel_Float (i, cp[i].real ());
-      }
-    delete mtx;
-    rc->check_value(LOC);
-
-      }
-    else
-      {
-    MORE_ERROR () <<
-      "For cross product, the shape of the argument must be [n-1 n";
-    RANK_ERROR;
-      }
-    }
-  else
-    {
-      MORE_ERROR () << "Invalid rank in Quad_MX::monadicCrossProduct().";
+      MORE_ERROR () << "matrix expected in Quad_MX::monadicCrossProduct().";
       RANK_ERROR;
     }
-  
 
-  return rc;
+const ShapeItem rows = B->get_shape_item(0);
+const ShapeItem cols = B->get_shape_item(1);
+  if (rows >= cols)
+     {
+       MORE_ERROR () << "too many vectors in cross product. "
+                        "Max. is n-1 vectors in ℝⁿ resp. ℂⁿ ";
+       LENGTH_ERROR;
+     }
+     
+Matrix * mtx = genMtx(B, true);
+vector<complex<double> > cp = getCross(mtx);
+const Shape shape_Z(mtx->cols());
+Value_P Z(shape_Z, LOC);
+const bool cp_is_complex = Matrix::is_complex(cp);
+  loop(i, mtx->cols())
+      {
+        if (cp_is_complex)   Z->next_ravel_Complex(cp[i].real(), cp[i].imag());
+        else                 Z->next_ravel_Float(cp[i].real());
+      }
+  delete mtx;
+  Z->check_value(LOC);
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
 {
-const ShapeItem A_count = A->element_count();
-const uRank     A_rank  = A->get_rank();
-const ShapeItem B_count = B->element_count();
-const uRank     B_rank  = B->get_rank();
-
-  if (A_rank != 1 || B_rank != 1 || A_count != B_count || A_count != 3)
+  // A and B shall be vectors
+  //
+  if (!(A->is_vector() && B->is_vector()))
     {
-      MORE_ERROR () << "Invalid rank in Quad_MX::dyadicCrossProduct().";
+      MORE_ERROR () << "vectors expected in Quad_MX::dyadicCrossProduct().";
       RANK_ERROR;
+    }
+
+const ShapeItem A_count = A->element_count();
+const ShapeItem B_count = B->element_count();
+
+  if (A_count != B_count || A_count != 3)
+    {
+      MORE_ERROR () << "Invalid length in Quad_MX::dyadicCrossProduct().";
+      LENGTH_ERROR;
     }
 
 Matrix *mtx = new Matrix (3, 3);
@@ -688,24 +579,20 @@ Matrix *mtx = new Matrix (3, 3);
          APL_Float Avi = Av.get_imag_value();
          APL_Float Bvr = Bv.get_real_value ();
          APL_Float Bvi = Bv.get_imag_value();
-         mtx->val (0, c, complex (1.0, 0.0));
-         mtx->val (1, c, complex (Avr, Avi));
-         mtx->val (2, c, complex (Bvr, Bvi));
+         mtx->val(0, c, complex (1.0, 0.0));
+         mtx->val(1, c, complex (Avr, Avi));
+         mtx->val(2, c, complex (Bvr, Bvi));
        }
 
-vector<complex<double> > cp = getCross (mtx);
-bool is_cpx = false;
-  loop(i, mtx->cols())
-      {
-        if (cp[i].imag () != 0.0)   { is_cpx = true; break; }
-      }
+vector<complex<double> > cp = getCross(mtx);
+const bool cp_is_complex = Matrix::is_complex(cp);
 
 const Shape shape_Z(mtx->cols());
 Value_P Z(shape_Z, LOC);
   loop(i, mtx->cols())
       {
-        if (is_cpx)   Z->next_ravel_Complex(cp[i].real(), cp[i].imag());
-        else          Z->next_ravel_Float(cp[i].real());
+        if (cp_is_complex)   Z->next_ravel_Complex(cp[i].real(), cp[i].imag());
+        else                 Z->next_ravel_Float(cp[i].real());
       }
   Z->check_value(LOC);
   delete mtx;
@@ -716,154 +603,126 @@ Value_P Z(shape_Z, LOC);
 Value_P
 Quad_MX::vectorAngle(const Value_P A, const Value_P B)
 {
-Value_P rc = Str0(LOC);
+const ShapeItem A_count = A->element_count();
 
-  const ShapeItem A_count = A->element_count();
-  const uRank     A_rank  = A->get_rank();  
-  const ShapeItem B_count = B->element_count();
-  const uRank     B_rank  = B->get_rank();
+  if (A->get_rank() != 1 || B->get_rank() != 1)
+     {
+       MORE_ERROR () << "Vector angle: expecting vectors.";
+       DOMAIN_ERROR;
+     }
 
-  if (A_rank == 1 && B_rank == 1 && A_count == B_count)
-    {
-      vector<complex<double> > Av (A_count);
-      vector<complex<double> > Bv (B_count);
-      loop (c, A_count)
-    {
-      const Cell & Ac = A->get_cravel (c);
-      const Cell & Bc = B->get_cravel (c);
-      APL_Float Avr = Ac.get_real_value();
-      APL_Float Avi = Ac.get_imag_value();
-      APL_Float Bvr = Bc.get_real_value();
-      APL_Float Bvi = Bc.get_imag_value();
-      Av[c] = complex<double> (Avr, Avi);
-      Bv[c] = complex<double> (Bvr, Bvi);
-    }
-      complex<double> Amag = magnitude (Av);
-      complex<double> Bmag = magnitude (Bv);
-      complex<double> mag = Amag * Bmag;
-      if (mag != complex<double>(0.0, 0.0))
-    {
-      complex<double> dp (0.0, 0.0);
-      loop (i, Av.size ()) dp += Av[i] * Bv[i];
-      complex<double> an = acos (dp/mag);
-      rc = ComplexScalar((APL_Float)an.real (), an.imag (), LOC);
-    }
-      else
-    {
-      MORE_ERROR () << "Invalid vector(s).";
-      DOMAIN_ERROR;
-    }
-    }
-  else {
-    MORE_ERROR () << "Vector angle arguments must be conformable vectors.";
-    DOMAIN_ERROR;
-  }
+  if (A_count != B->element_count())
+     {
+       MORE_ERROR () << "Vector angle: expecting vectors of same length.";
+       LENGTH_ERROR;
+     }
 
-  rc->check_value(LOC);
-  return rc;
+vector<complex<double> > Av(A_count);
+vector<complex<double> > Bv(A_count);
+  loop(c, A_count)
+      {
+        const Cell & Ac = A->get_cravel (c);
+        const Cell & Bc = B->get_cravel (c);
+        APL_Float Avr = Ac.get_real_value();
+        APL_Float Avi = Ac.get_imag_value();
+        APL_Float Bvr = Bc.get_real_value();
+        APL_Float Bvi = Bc.get_imag_value();
+        Av[c] = complex<double> (Avr, Avi);
+        Bv[c] = complex<double> (Bvr, Bvi);
+      }
+
+complex<double> Amag = magnitude(Av);
+complex<double> Bmag = magnitude(Bv);
+complex<double> mag = Amag * Bmag;
+  if (mag != complex<double>(0.0, 0.0))
+     {
+       complex<double> dp (0.0, 0.0);
+       loop (i, Av.size ()) dp += Av[i] * Bv[i];
+       complex<double> an = acos(dp/mag);
+       return ComplexScalar((APL_Float)an.real(), an.imag(), LOC);
+     }
+
+  MORE_ERROR () << "Invalid vector(s).";
+  DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::ident(const Value_P B)
 {
-  Value_P rc = Str0(LOC);
-  
-const uRank B_rank = B->get_rank();
+  if (!B->is_scalar())
+     {
+       MORE_ERROR() << "skalar expected.";
+       RANK_ERROR;
+     }
 
-  if (B_rank == 0)
-    {
-      int dim = B->get_sole_integer();
-      Shape shape_W;
-      shape_W.add_shape_item (dim);
-      shape_W.add_shape_item (dim);
-      rc = Value_P (shape_W, LOC);
-      int p = 0;
-      for (int i = 0; i < dim; i++)
-    {
-      for (int j = 0; j < dim; j++, p++)
-        {
-          (*rc).set_ravel_Complex (p,
-                       ((i == j) ? 1.0 : 0.0),
-                       0.0);
-            }
-    }
-    }
+const ShapeItem dim = B->get_sole_integer();
+  if (dim == 0)   return Str0(LOC);
 
-  rc->check_value(LOC);
-  return rc;
+Shape shape_W(dim, dim);
+Value_P Z(shape_W, LOC);
+  loop(i, dim)
+      {
+        loop(j, dim)   Z->next_ravel_Complex( (i == j ? 1.0 : 0.0), 0.0);
+      }
+
+  Z->check_value(LOC);
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::monadicCovariance(const Value_P B)
 {
-Value_P rc = Str0(LOC);
+  if (B->get_rank() != 2)
+     {
+       MORE_ERROR () << "Matrix argument expected.";
+       RANK_ERROR;
+     }
 
-const uRank B_rank = B->get_rank();
+ShapeItem rows = B->get_shape_item(0);
+ShapeItem cols = B->get_shape_item(1);
 
-  if (B_rank == 2)
-    {
-      ShapeItem rows = B->get_shape_item(0);
-      ShapeItem cols = B->get_shape_item(1);
+  if (rows == 0)   return Str0(LOC);   // empty result
 
-      if (1 || rows == cols)
-    {
-      vector<vector<double> > Breals (rows);
-      vector<vector<double> > Bimags (rows);
-      loop (r, rows)
-        {
-              Breals[r].reserve (cols);
-              Bimags[r].reserve (cols);
-              int offset = r * cols;
-              loop (c, cols) {
-                const Cell & Bv = B->get_cravel (offset + c);
-                Breals[r][c] = Bv.get_real_value();
-                Bimags[r][c] = Bv.get_imag_value();
-              }
-              normalise (Breals[r]);
-              normalise (Bimags[r]);
+vector<vector<double> > Breals (rows);
+vector<vector<double> > Bimags (rows);
+  loop(r, rows)
+      {
+        Breals[r].reserve (cols);
+        Bimags[r].reserve (cols);
+        const int offset = r * cols;
+        loop(c, cols)
+            {
+              const Cell & Bv = B->get_cravel (offset + c);
+               Breals[r][c] = Bv.get_real_value();
+               Bimags[r][c] = Bv.get_imag_value();
             }
-            Shape shape_Z;
-            shape_Z.add_shape_item (rows * rows);
-            rc = Value_P (shape_Z, LOC);
-            for (int r = 0; r < rows; r++)
-          {
-        for (int c = r; c < rows; c++)
-          {
-            double realcov =
-              gsl_stats_covariance (Breals[r].data (), 1,
-                        Breals[c].data (), 1,
-                        cols);
-            double imagcov =
-              gsl_stats_covariance (Bimags[r].data (), 1,
-                        Bimags[c].data (), 1,
-                        cols);
-            int ix = (r * rows) + c;
-            (*rc).set_ravel_Complex (ix,   realcov, imagcov);
-            if (r != c)
-              {
-            int ix = (c * rows) + r;
-            (*rc).set_ravel_Complex (ix,   realcov, imagcov);
-              }
-          }
-          }
-            rc->check_value(LOC);
-            Shape shape_W;
-            shape_W.add_shape_item(rows);
-            shape_W.add_shape_item(rows);
-            (*rc).set_shape (shape_W);
-    }
-      else {
-    MORE_ERROR () << "Not a square matrix.";
-    RANK_ERROR;
+        normalise (Breals[r]);
+        normalise (Bimags[r]);
       }
-    }
-  else {
-    MORE_ERROR () << "Not a matrix.";
-    RANK_ERROR;
-  }
 
-  rc->check_value(LOC);
-  return rc;
+Shape shape_Z(rows*rows);
+Value_P Z(shape_Z, LOC);
+  loop(r, rows)
+  for (int c = r; c < rows; c++)
+      {
+       const double realcov = gsl_stats_covariance (Breals[r].data (), 1,
+                                                    Breals[c].data (), 1, cols);
+       const double imagcov = gsl_stats_covariance (Bimags[r].data (), 1,
+                                                    Bimags[c].data (), 1, cols);
+       const int ix = (r * rows) + c;
+       Z->set_ravel_Complex (ix, realcov, imagcov);
+       if (r != c)
+          {
+            const int ix = (c * rows) + r;
+            Z->set_ravel_Complex(ix, realcov, imagcov);
+          }
+      }
+
+  Z->check_value(LOC);
+const Shape shape_W(rows, rows);
+  Z->set_shape(shape_W);
+  Z->check_value(LOC);
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -875,86 +734,75 @@ Quad_MX::histogram(const Value_P A, const Value_P B)
        0      .25     .50     .75    1.0
        
    ****/
-Value_P rc = Str0(LOC);
 
-const uRank     A_rank  = A->get_rank();
 const ShapeItem B_count = B->element_count();
 const uRank     B_rank  = B->get_rank();
 
-  int nr_buckets = 0;
+  if (!A->is_scalar())
+     {
+       MORE_ERROR () << "Non-scalar argument.";
+       RANK_ERROR;
+     }
 
-  if (A_rank == 0)
-    {
-      nr_buckets = A->get_sole_integer ();
+const int nr_buckets = A->get_sole_integer ();
+    
+  if (nr_buckets < 2)
+     {
+       MORE_ERROR () << "Too few buckets.";
+       DOMAIN_ERROR;
+     }
 
-      if (nr_buckets >= 2)
-    {
-      if (B_rank == 1)
-        {
-          double maxv = -MAXFLOAT;
-          double minv =  MAXFLOAT;
-          loop (c, B_count)
-        {   
-          const Cell & Bv = B->get_cravel (c);
-          double val = Bv.get_real_value ();
-          if (maxv < val) maxv = val;
-          if (minv > val) minv = val;
-        }
-          double incr = (maxv - minv) / (double)nr_buckets;
-          vector<int> buckets (nr_buckets);
-          int nr_bumps = 0;
-          loop (c, B_count)
-        {   
-          const Cell & Bv = B->get_cravel (c);
-          double val = Bv.get_real_value ();
-          double mark = minv + incr;
-          for (int b = 0; b < nr_buckets - 1; b++, mark += incr)
+  if (B_rank != 1)
+     {
+       MORE_ERROR () << "Non-vector right argument.";
+       RANK_ERROR;
+     }
+
+double maxv = -MAXFLOAT;
+double minv =  MAXFLOAT;
+  loop (c, B_count)
+       {   
+         const Cell & Bv = B->get_cravel (c);
+         double val = Bv.get_real_value ();
+         if (maxv < val) maxv = val;
+         if (minv > val) minv = val;
+       }
+
+double incr = (maxv - minv) / (double)nr_buckets;
+vector<int> buckets (nr_buckets);
+int nr_bumps = 0;
+  loop(c, B_count)
+      {   
+        const Cell & Bv = B->get_cravel (c);
+        double val = Bv.get_real_value ();
+        double mark = minv + incr;
+        for (int b = 0; b < nr_buckets - 1; b++, mark += incr)
             {
               if (val < mark)
-            {
-              buckets[b]++;
-              nr_bumps++;
-              break;
-            }
-            }
-          buckets[nr_buckets - 1] = B_count - nr_bumps;
-        }
-          Shape shape_W;
-          shape_W.add_shape_item (nr_buckets);
-          rc = Value_P (shape_W, LOC);
-          loop (b, nr_buckets)
-        {
-          (*rc).set_ravel_Int (b,  buckets[b]);
-        }
-          rc->check_value(LOC);
-        }
-      else
-        {
-          MORE_ERROR () << "Non-vector argument.";
-          RANK_ERROR;
-        }
-    }
-      else
-    {
-      MORE_ERROR () << "Too few buckets.";
-      DOMAIN_ERROR;
-    }
-    }
-  else
-    {
-      MORE_ERROR () << "Non-scalar argument.";
-      RANK_ERROR;
-    }
+                 {
+                   buckets[b]++;
+                   nr_bumps++;
+                   break;
+                 }
+          }
+        buckets[nr_buckets - 1] = B_count - nr_bumps;
+      }
 
-  rc->check_value(LOC);
-  return rc;
+const Shape shape_Z(nr_buckets);
+Value_P Z(shape_Z, LOC);
+  loop(b, nr_buckets)
+      {
+        Z->next_ravel_Int(buckets[b]);
+      }
+  Z->check_value(LOC);
+
+  Z->check_value(LOC);
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::dyadicCovariance(const Value_P A, const Value_P B)
 {
-Value_P Z = Str0(LOC);
-
 const ShapeItem A_count = A->element_count();
 const ShapeItem B_count = B->element_count();
   
@@ -1037,8 +885,7 @@ APL_Float Bvr = Bv.get_real_value ();
 APL_Float Bvi = Bv.get_imag_value();
    if (rcnt > 1)
       {
-        Shape shape_Z;
-        shape_Z.add_shape_item (rcnt);
+        const Shape shape_Z(rcnt);
         Z = Value_P(shape_Z, LOC);
       }
 
@@ -1158,9 +1005,7 @@ const uRank     B_rank    = B->get_rank();
   if (A_count == 3 && B_count == 3 && A_rank == 1 && B_rank == 1)
     {
       int sdim = (tp == 9) ? 3 : 4;
-      Shape shape_W;
-      shape_W.add_shape_item (sdim);
-      shape_W.add_shape_item (sdim);
+      const Shape shape_W(sdim, sdim);
       Z = Value_P (shape_W, LOC);
       vector<complex<double> > angs (3);
       loop(i, 3)
@@ -1387,23 +1232,23 @@ Value_P Z = Str0(LOC);
 
   switch(op)
     {
-      case OP_UNKNOWN:            showHelp ();                          break;
-      case OP_CROSS_PRODUCT:      Z = monadicCrossProduct (B);          break;
+      case OP_UNKNOWN:            showHelp();                          break;
+      case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
            //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
-      case OP_RANDOMS:            Z = randoms (nullptr, B, modifier);   break;
-      case OP_DETERMINANT:        Z = determinant (B);                  break;
-      case OP_COVARIANCE:         Z = monadicCovariance (B);            break;
-      case OP_NORM:               Z = norm (B);                         break;
-      case OP_EIGENVECTORS:       Z = eigenvectors (B);                 break;
-      case OP_EIGENVALUES:        Z = eigenvalues (B);                  break;
-      case OP_IDENT:              Z = ident (B);                        break;
-      case OP_ROTATION_MATRIX:    Z = monadicRotation (B);              break;
-      case OP_SET_RNG_SEED:       Z = set_rng_seed (B);                 break;
+      case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
+      case OP_DETERMINANT:        Z = determinant(B);                  break;
+      case OP_COVARIANCE:         Z = monadicCovariance(B);            break;
+      case OP_NORM:               Z = norm(B);                         break;
+      case OP_EIGENVECTORS:       Z = eigenvectors(B);                 break;
+      case OP_EIGENVALUES:        Z = eigenvalues(B);                  break;
+      case OP_IDENT:              Z = ident(B);                        break;
+      case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
+      case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
       case OP_VECTOR_ANGLE:
-      case OP_HOMOGENEOUS_MATRIX: MORE_ERROR () << "Not a monadic function.";
+      case OP_HOMOGENEOUS_MATRIX: MORE_ERROR() << "Not a monadic function.";
                                   SYNTAX_ERROR;                          break;
       default:
-        MORE_ERROR () << "Function not yet implemented.";
+        MORE_ERROR() << "Function not yet implemented.";
         SYNTAX_ERROR;
     }
 
