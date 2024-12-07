@@ -33,11 +33,20 @@
 /// The class implementing ⎕MX
 class Quad_MX : public QuadFunction
 {
+  typedef std::complex<double> Dcomplex;
+
 public:
    /// Constructor.
   Quad_MX() : QuadFunction(TOK_Quad_MX)
   {
   }
+
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
 
    static Quad_MX  fun;          ///< Built-in function.
 
@@ -49,7 +58,7 @@ protected:
          : krows(r),
            kcols(c)
             {
-              vals = new vector<complex<double> >(r * c);
+              vals = new vector<Dcomplex>(r * c);
             }
        
          ~Matrix ()
@@ -57,14 +66,12 @@ protected:
               delete vals;
             }
     
-         complex<double> val (int r, int c)
+         Dcomplex val(int r, int c)
             {
-              complex<double>rc (0.0, 0.0);
-              rc = (*vals)[c + r * kcols];
-              return rc;
+              return (*vals)[c + r * kcols];
             }
     
-         void val (int r, int c, complex<double> v)
+         void val(int r, int c, Dcomplex v)
             {
               (*vals)[c + r * kcols] = v;
             }
@@ -88,7 +95,7 @@ protected:
             }
 
          /// return true iff vector (!) has complex items
-         static bool is_complex(const vector<complex<double> > & vector)
+         static bool is_complex(const vector<Dcomplex> & vector)
             {
               loop(i, vector.size())
                   {
@@ -100,7 +107,7 @@ protected:
        private:
          int krows;
          int kcols;
-         vector<complex<double> > *vals;
+         vector<Dcomplex> *vals;
      };
 
    /// overloaded Function::eval_AXB().
@@ -115,13 +122,13 @@ protected:
    /// overloaded Function::eval_B().
   virtual Token eval_B(Value_P B) const;
 
-  static vector<complex<double> > getCross(Matrix * mtx);
+  static vector<Dcomplex> getCross(Matrix * mtx);
 
   static Matrix * genCofactor(Matrix *mtx, int r, int c);
 
-  static complex<double> getDet(Matrix * mtx);
+  static Dcomplex getDet(Matrix * mtx);
 
-  static complex<double> magnitude(vector<complex<double> > &v);
+  static Dcomplex magnitude(vector<Dcomplex> &v);
 
   static void normalise(vector<double> &v);
 
@@ -159,8 +166,7 @@ protected:
 
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
 
-  static void showHelp();
-
+  static void list_functions(bool);
 };
 
 #endif  // __Quad_MX_DEFINED__

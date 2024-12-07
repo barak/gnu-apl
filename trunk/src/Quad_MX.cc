@@ -84,10 +84,10 @@ int rx = 0;
   return cf;
 }
 //----------------------------------------------------------------------------
-complex<double>
+Quad_MX::Quad_MX::Dcomplex
 Quad_MX::getDet(Matrix * mtx)
 {
-complex<double> det(0.0, 0.0);
+Dcomplex det(0.0, 0.0);
   if (mtx->rows() == 2)
      {
        det = (mtx->val(0, 0) * mtx->val(1,1)) -
@@ -98,7 +98,7 @@ complex<double> det(0.0, 0.0);
        for (int k = 0; k < mtx->rows(); k++) {
          double sign = pow(-1.0, (double)(k));
          Matrix *cf = genCofactor(mtx, 0, k);
-         complex<double> id = getDet(cf);
+         Dcomplex id = getDet(cf);
          delete cf;
          det += sign * mtx->val(0, k) * id;
      }
@@ -108,11 +108,11 @@ complex<double> det(0.0, 0.0);
 }
 //----------------------------------------------------------------------------
 
-vector<complex<double> >
+vector<Quad_MX::Dcomplex>
 Quad_MX::getCross(Matrix *mtx)
 {
-complex<double> det(0.0, 0.0);
-vector<complex<double> > rc(mtx->cols());
+Dcomplex det(0.0, 0.0);
+vector<Dcomplex> rc(mtx->cols());
   if (mtx->rows() == 2)
      {
        det = (mtx->val(0, 0) * mtx->val(1,1)) 
@@ -124,7 +124,7 @@ vector<complex<double> > rc(mtx->cols());
           {
             const double sign = pow(-1.0, (double)(k));
             Matrix * cf = genCofactor(mtx, 0, k);
-            const complex<double> id = getDet(cf);
+            const Dcomplex id = getDet(cf);
             delete cf;
             rc[k] = sign * id;
           }
@@ -133,10 +133,10 @@ vector<complex<double> > rc(mtx->cols());
   return rc;
 }
 //----------------------------------------------------------------------------
-complex<double>
-Quad_MX::magnitude(vector<complex<double> > &v)
+Quad_MX::Dcomplex
+Quad_MX::magnitude(vector<Dcomplex> &v)
 {
-complex<double> rc(0.0, 0.0);
+Dcomplex rc(0.0, 0.0);
   loop(i, v.size()) rc += v[i] * v[i];
   return sqrt(rc);
 }
@@ -200,7 +200,7 @@ Quad_MX::set_rng_seed(Value_P B)
     }
   else
     {
-      MORE_ERROR () << "Requires numeric arguement.";
+      MORE_ERROR() << "Requires numeric arguement.";
       DOMAIN_ERROR;
     }
   return Str0(LOC);
@@ -360,7 +360,7 @@ Quad_MX::eigenvectors(Value_P B)
 {
   if (B->get_rank() != 2)
      {
-       MORE_ERROR () << "Invalid rank.";
+       MORE_ERROR() << "Invalid rank.";
        RANK_ERROR;
      }
 
@@ -369,7 +369,7 @@ const ShapeItem cols = B->get_shape_item(1);
     
     if (rows != cols)
        {
-         MORE_ERROR () << "Non-square matrix.";
+         MORE_ERROR() << "Non-square matrix.";
          RANK_ERROR;
        }
 
@@ -398,7 +398,7 @@ int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
     if (erc != GSL_SUCCESS)
       {
         delete mtx;
-        MORE_ERROR () << "Eigensystem computation error.";
+        MORE_ERROR() << "Eigensystem computation error.";
         INTERNAL_ERROR;
       }
 
@@ -426,7 +426,7 @@ Quad_MX::eigenvalues(Value_P B)
 const uRank      B_rank    = B->get_rank();
   if (B_rank != 2) 
      {
-       MORE_ERROR () << "Matrix expected.";
+       MORE_ERROR() << "Matrix expected.";
        RANK_ERROR;
      }
     
@@ -435,7 +435,7 @@ const ShapeItem cols = B->get_shape_item(1);
     
     if (rows != cols)
        {
-        MORE_ERROR () << "Non-square matrix.";
+        MORE_ERROR() << "Non-square matrix.";
         LENGTH_ERROR;
        }
 
@@ -466,7 +466,7 @@ int erc = gsl_eigen_nonsymmv (&m.matrix, eval, evec, w);
   if (erc != GSL_SUCCESS)
      {
        delete mtx;
-       MORE_ERROR () << "Eigensystem computation error.";
+       MORE_ERROR() << "Eigensystem computation error.";
        INTERNAL_ERROR;
      }
 
@@ -477,7 +477,7 @@ Value_P Z(shape_Z, LOC);
       {
         gsl_complex eval_i = gsl_vector_complex_get(eval, i);
 
-        complex<double> v(GSL_REAL(eval_i), GSL_IMAG(eval_i));
+        Dcomplex v(GSL_REAL(eval_i), GSL_IMAG(eval_i));
         Z->next_ravel_Complex (v.real (), v.imag ());
       }
   Z->check_value(LOC);
@@ -493,19 +493,19 @@ const uRank B_rank = B->get_rank();
 
   if (B_rank != 2)
     {
-      MORE_ERROR () << "Invalid rank (matrix expected)"
-                       " in Quad_MX::determinant().";
+      MORE_ERROR() << "Invalid rank (matrix expected)"
+                      " in Quad_MX::determinant().";
       RANK_ERROR;
     }
 
   if (B->get_shape_item(0) != B->get_shape_item(1))
      {
-       MORE_ERROR () << "Non-square matrix in Quad_MX::determinant()";
+       MORE_ERROR() << "Non-square matrix in Quad_MX::determinant()";
        RANK_ERROR;
      }
 
 Matrix * mtx = genMtx(B, false);
-const complex<double>det = getDet(mtx);
+const Dcomplex det = getDet(mtx);
   delete mtx;
 
 Value_P Z(det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
@@ -517,12 +517,9 @@ Value_P Z(det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
 Value_P
 Quad_MX::monadicCrossProduct(Value_P B)
 {
-  //  const ShapeItem B_count   = B->element_count();
-const uRank B_rank = B->get_rank();
-
-  if (B_rank != 2)
+  if (B->get_rank() != 2)
     {
-      MORE_ERROR () << "matrix expected in Quad_MX::monadicCrossProduct().";
+      MORE_ERROR() << "matrix expected in Quad_MX::monadicCrossProduct().";
       RANK_ERROR;
     }
 
@@ -530,13 +527,13 @@ const ShapeItem rows = B->get_shape_item(0);
 const ShapeItem cols = B->get_shape_item(1);
   if (rows >= cols)
      {
-       MORE_ERROR () << "too many vectors in cross product. "
+       MORE_ERROR() << "too many vectors in cross product. "
                         "Max. is n-1 vectors in ℝⁿ resp. ℂⁿ ";
        LENGTH_ERROR;
      }
      
 Matrix * mtx = genMtx(B, true);
-vector<complex<double> > cp = getCross(mtx);
+vector<Dcomplex> cp = getCross(mtx);
 const Shape shape_Z(mtx->cols());
 Value_P Z(shape_Z, LOC);
 const bool cp_is_complex = Matrix::is_complex(cp);
@@ -557,20 +554,40 @@ Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
   //
   if (!(A->is_vector() && B->is_vector()))
     {
-      MORE_ERROR () << "vectors expected in Quad_MX::dyadicCrossProduct().";
+      MORE_ERROR() << "vectors expected in Quad_MX::dyadicCrossProduct().";
       RANK_ERROR;
     }
 
 const ShapeItem A_count = A->element_count();
-const ShapeItem B_count = B->element_count();
 
-  if (A_count != B_count || A_count != 3)
+  if (A_count != B->element_count())
     {
-      MORE_ERROR () << "Invalid length in Quad_MX::dyadicCrossProduct().";
+      MORE_ERROR() << "length mismatch in Quad_MX::dyadicCrossProduct().";
       LENGTH_ERROR;
     }
 
-Matrix *mtx = new Matrix (3, 3);
+  // handle len > 3 cases in monadicCrossProduct()
+  //
+  if (A_count != 3)
+     {
+       const Shape shape_BB(2, A_count);
+       Value_P BB(shape_BB, LOC);
+       Cell * cell_BB = &BB->get_wfirst();
+       {
+         const Cell * cell_A = &A->get_cfirst();
+         loop(a, A_count)   cell_A++->init_other(cell_BB++, *BB, LOC);
+       }
+
+       {
+         const Cell * cell_B = &B->get_cfirst();
+         loop(b, A_count)   cell_B++->init_other(cell_BB++, *BB, LOC);
+       }
+
+       BB->check_value(LOC);
+       return monadicCrossProduct(BB);
+     }
+
+Matrix * mtx = new Matrix (3, 3);
   loop (c, 3)
        {
          const Cell & Av = A->get_cravel(c);
@@ -584,7 +601,7 @@ Matrix *mtx = new Matrix (3, 3);
          mtx->val(2, c, complex (Bvr, Bvi));
        }
 
-vector<complex<double> > cp = getCross(mtx);
+vector<Dcomplex> cp = getCross(mtx);
 const bool cp_is_complex = Matrix::is_complex(cp);
 
 const Shape shape_Z(mtx->cols());
@@ -607,18 +624,18 @@ const ShapeItem A_count = A->element_count();
 
   if (A->get_rank() != 1 || B->get_rank() != 1)
      {
-       MORE_ERROR () << "Vector angle: expecting vectors.";
+       MORE_ERROR() << "Vector angle: expecting vectors.";
        DOMAIN_ERROR;
      }
 
   if (A_count != B->element_count())
      {
-       MORE_ERROR () << "Vector angle: expecting vectors of same length.";
+       MORE_ERROR() << "Vector angle: expecting vectors of same length.";
        LENGTH_ERROR;
      }
 
-vector<complex<double> > Av(A_count);
-vector<complex<double> > Bv(A_count);
+vector<Dcomplex> Av(A_count);
+vector<Dcomplex> Bv(A_count);
   loop(c, A_count)
       {
         const Cell & Ac = A->get_cravel (c);
@@ -627,22 +644,22 @@ vector<complex<double> > Bv(A_count);
         APL_Float Avi = Ac.get_imag_value();
         APL_Float Bvr = Bc.get_real_value();
         APL_Float Bvi = Bc.get_imag_value();
-        Av[c] = complex<double> (Avr, Avi);
-        Bv[c] = complex<double> (Bvr, Bvi);
+        Av[c] = Dcomplex (Avr, Avi);
+        Bv[c] = Dcomplex (Bvr, Bvi);
       }
 
-complex<double> Amag = magnitude(Av);
-complex<double> Bmag = magnitude(Bv);
-complex<double> mag = Amag * Bmag;
-  if (mag != complex<double>(0.0, 0.0))
+Dcomplex Amag = magnitude(Av);
+Dcomplex Bmag = magnitude(Bv);
+Dcomplex mag = Amag * Bmag;
+  if (mag != Dcomplex(0.0, 0.0))
      {
-       complex<double> dp (0.0, 0.0);
+       Dcomplex dp (0.0, 0.0);
        loop (i, Av.size ()) dp += Av[i] * Bv[i];
-       complex<double> an = acos(dp/mag);
+       Dcomplex an = acos(dp/mag);
        return ComplexScalar((APL_Float)an.real(), an.imag(), LOC);
      }
 
-  MORE_ERROR () << "Invalid vector(s).";
+  MORE_ERROR() << "Invalid vector(s).";
   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -674,7 +691,7 @@ Quad_MX::monadicCovariance(const Value_P B)
 {
   if (B->get_rank() != 2)
      {
-       MORE_ERROR () << "Matrix argument expected.";
+       MORE_ERROR() << "Matrix argument expected.";
        RANK_ERROR;
      }
 
@@ -740,7 +757,7 @@ const uRank     B_rank  = B->get_rank();
 
   if (!A->is_scalar())
      {
-       MORE_ERROR () << "Non-scalar argument.";
+       MORE_ERROR() << "Non-scalar argument.";
        RANK_ERROR;
      }
 
@@ -748,13 +765,13 @@ const int nr_buckets = A->get_sole_integer ();
     
   if (nr_buckets < 2)
      {
-       MORE_ERROR () << "Too few buckets.";
+       MORE_ERROR() << "Too few buckets.";
        DOMAIN_ERROR;
      }
 
   if (B_rank != 1)
      {
-       MORE_ERROR () << "Non-vector right argument.";
+       MORE_ERROR() << "Non-vector right argument.";
        RANK_ERROR;
      }
 
@@ -808,13 +825,13 @@ const ShapeItem B_count = B->element_count();
   
   if (!(A->is_vector() && B->is_vector()))
     {
-      MORE_ERROR () << "Both arguments must be vectors.";
+      MORE_ERROR() << "Both arguments must be vectors.";
       RANK_ERROR;
     }
 
   if (A_count != B_count)
     {
-      MORE_ERROR () << "Arguments must be of the same length.";
+      MORE_ERROR() << "Arguments must be of the same length.";
       LENGTH_ERROR;
     }
 
@@ -891,7 +908,7 @@ APL_Float Bvi = Bv.get_imag_value();
 
    loop(xx, rcnt)
        {
-         complex<double> yy;
+         Dcomplex yy;
          switch(modifier)
             {
               // https://en.cppreference.com/w/cpp/numeric/random
@@ -939,17 +956,17 @@ Quad_MX::norm(const Value_P B)
 {
   if (B->is_scalar())
     {
-      MORE_ERROR () << "invalid scalar argument.";
+      MORE_ERROR() << "invalid scalar argument.";
       RANK_ERROR;
     }
 
 Value_P Z(B->get_shape(), LOC);
 const ShapeItem B_count = B->element_count();
-complex<double> sum(0.0, 0.0);
+Dcomplex sum(0.0, 0.0);
   loop (c, B_count)
     {
       const Cell & Bv = B->get_cravel (c);
-      complex<double> val(Bv.get_real_value(), Bv.get_imag_value());
+      Dcomplex val(Bv.get_real_value(), Bv.get_imag_value());
       sum += val * val;
     }
       
@@ -958,7 +975,7 @@ complex<double> sum(0.0, 0.0);
   loop (b, B_count)
     {
       const Cell & Bv = B->get_cravel(b);
-      complex<double> val(Bv.get_real_value(), Bv.get_imag_value());
+      Dcomplex val(Bv.get_real_value(), Bv.get_imag_value());
       val /= sum;
 
       Z->next_ravel_Complex(val.real(), val.imag());
@@ -972,7 +989,7 @@ Quad_MX::monadicRotation(Value_P B)
 {
   if (!B->is_scalar())
      {
-       MORE_ERROR () << "scalar argument expected.";
+       MORE_ERROR() << "scalar argument expected.";
        RANK_ERROR;
      }
 
@@ -981,9 +998,9 @@ Value_P Z(shape_W, LOC);
 const Cell & Bv = B->get_cravel (0);
 APL_Float xvr = Bv.get_real_value();
 APL_Float xvi = Bv.get_imag_value();
-complex<double>theta (xvr, xvi);
-complex<double>cosx = cos (theta);
-complex<double>sinx = sin (theta);
+Dcomplex theta (xvr, xvi);
+Dcomplex cosx = cos (theta);
+Dcomplex sinx = sin (theta);
   Z->next_ravel_Complex( cosx.real(),  cosx.imag());
   Z->next_ravel_Complex(-sinx.real(), -sinx.imag());
   Z->next_ravel_Complex( sinx.real(),  sinx.imag());
@@ -1006,32 +1023,32 @@ const uRank     B_rank    = B->get_rank();
     {
       int sdim = (tp == 9) ? 3 : 4;
       const Shape shape_W(sdim, sdim);
-      Z = Value_P (shape_W, LOC);
-      vector<complex<double> > angs (3);
+      Z = Value_P(shape_W, LOC);
+      vector<Dcomplex> angs (3);
       loop(i, 3)
           {
             const Cell & Bv = B->get_cravel (i);
             angs[i] =
-              complex<double>(Bv.get_real_value(), Bv.get_imag_value());
+              Dcomplex(Bv.get_real_value(), Bv.get_imag_value());
           }
-      complex<double>cosa = cos(angs[0]);
-      complex<double>sina = sin(angs[0]);
-      complex<double>cosb = cos(angs[1]);
-      complex<double>sinb = sin(angs[1]);
-      complex<double>cosg = cos(angs[2]);
-      complex<double>sing = sin(angs[2]);
+      const Dcomplex cosa = cos(angs[0]);
+      const Dcomplex sina = sin(angs[0]);
+      const Dcomplex cosb = cos(angs[1]);
+      const Dcomplex sinb = sin(angs[1]);
+      const Dcomplex cosg = cos(angs[2]);
+      const Dcomplex sing = sin(angs[2]);
 
-      complex<double>t00 = cosa * cosb;
-      complex<double>t01 = cosa * sinb * sing - sina * cosg;;
-      complex<double>t02 = cosa * sinb * cosg + sina * sing;;
+      const Dcomplex t00 = cosa * cosb;
+      const Dcomplex t01 = cosa * sinb * sing - sina * cosg;;
+      const Dcomplex t02 = cosa * sinb * cosg + sina * sing;;
 
-      complex<double>t10 = sina * cosb;
-      complex<double>t11 = sina * sinb * sing + cosa * cosg;;
-      complex<double>t12 = sina * sinb * cosg - cosa * sing;;
+      const Dcomplex t10 = sina * cosb;
+      const Dcomplex t11 = sina * sinb * sing + cosa * cosg;;
+      const Dcomplex t12 = sina * sinb * cosg - cosa * sing;;
 
-      complex<double>t20 = -sinb;
-      complex<double>t21 =  cosb * sing;
-      complex<double>t22 =  cosb * cosg;
+      const Dcomplex t20 = -sinb;
+      const Dcomplex t21 =  cosb * sing;
+      const Dcomplex t22 =  cosb * cosg;
 
       if (tp == 9)
          {
@@ -1047,12 +1064,12 @@ const uRank     B_rank    = B->get_rank();
          }
       else
          {
-           vector<complex<double> > trans(3);
+           vector<Dcomplex> trans(3);
            loop(i, 3)
                {
                  const Cell & Av = A->get_cravel(i);
-                 trans[i] = complex<double>(Av.get_real_value(),
-                                            Av.get_imag_value());
+                 trans[i] = Dcomplex(Av.get_real_value(),
+                                     Av.get_imag_value());
                }
            Z->set_ravel_Complex(0,   t00.real (),  t00.imag ());
            Z->set_ravel_Complex(1,   t01.real (),  t01.imag ());
@@ -1079,7 +1096,7 @@ const uRank     B_rank    = B->get_rank();
     }
   else
     {
-      MORE_ERROR () << "Both arguments must be vectors of ⍴ = 3.";
+      MORE_ERROR() << "Both arguments must be vectors of ⍴ = 3.";
       RANK_ERROR;
     }
 
@@ -1089,49 +1106,101 @@ const uRank     B_rank    = B->get_rank();
   
 /**************** end operational functions ***************/
 
-enum mx_ops_e
+enum MX_ops
 {
-#define op_entry(e,d,v) e,
+#define op_entry(num, _desc, _v, _sub) OP_ ## num,
 #include "Quad_MX.def"
 };
 
-struct op_desc_s
+const struct
 {
-  int code;
-  const char *valence;
-  const char *desc;
+  MX_ops       code;   // OP_xxx
+  int          valence;
+  const char * desc;
 } op_desc[] = {
-#define op_entry(e,d,v) {e, v, d},
+#define op_entry(e, desc, v, sub) { OP_ ## e, v, desc},
 #include "Quad_MX.def"
               };
 
 //----------------------------------------------------------------------------
 void
-Quad_MX::showHelp()
+Quad_MX::list_functions(bool mapping)
 {
-  COUT << "\nValid ⎕MX[*] indices\n\n";
-  
-  for (int i = OP_DETERMINANT; i < OP_MAX; i++)
-      COUT << "\t" << op_desc[i].code
-           << "\t" << op_desc[i].valence
-           << "\t" << op_desc[i].desc
-           << endl;
+ostream & out = CERR;
+  if (mapping)
+     {
+       // ⎕MX "": print the number to name mappings like:
+       //
+       // ⎕MX[1]  ←→  ⎕MX['determinant']        ←→  ⎕MX.determinant
+       //
+       out <<
+"      With a small performance penalty, ⎕MX also accepts the following "
+"strings\n      instead of function numbers as axis argument:\n\n";
+
+#define op_entry(num, _d, _v, sub)                \
+if (OP_ ## num > 0 && OP_ ## num < OP_MAX) {      \
+  char NN[10];   SPRINTF(NN, "%2d", OP_ ## num);  \
+  out << "      ⎕MX[" << NN                       \
+      << "]  ←→  ⎕MX['" << sub << "']"            \
+      << UCS_string(20 - strlen(sub), UNI_SPACE)  \
+      << "←→  ⎕MX." << sub << endl;               \
+              }
+#include "Quad_MX.def"
+
+         out << "\n      For a more detailed description of all functions:\n\n"
+                "      ⎕MX ⍬" << endl;
+     }
+  else
+     {
+       out << "\nValid ⎕MX[*] indices are:\n\n";
+       
+       for (int i = OP_DETERMINANT; i < OP_MAX; i++)
+           {
+             char descr[40];
+             snprintf(descr, sizeof(descr), "⎕MX[%2u] B", op_desc[i].code);
+      
+             out << "    ";
+             switch(op_desc[i].valence)
+                {
+                  case 1:  out << "    ";   break;
+                  case 2:  out << "  A ";   break;
+                  case 3:  out << "{A} ";   break;
+                  default: FIXME;
+                }
+             out << descr << "    ";
+             switch(op_desc[i].valence)
+                {
+                  case 1:  out << "(monadic) ";   break;
+                  case 2:  out << "(dyadic)  ";   break;
+                  case 3:  out << "(nomadic) ";   break;
+                  default: FIXME;
+                }
+      
+             out << op_desc[i].desc << endl;
+           }
+       out << "\n    where {A} shall mean that A is optional" << endl;
+     }
 }
 //----------------------------------------------------------------------------
 Token
 Quad_MX::eval_AB(Value_P A, Value_P B) const
 {
-Value_P Z = Str0(LOC);
-  showHelp();
-  return Token(TOK_APL_VALUE1, Z);
+  return eval_B(B);
 }
 //----------------------------------------------------------------------------
 Token
 Quad_MX::eval_B(Value_P B) const
 {
-Value_P Z = Str0(LOC);
-  showHelp();
-  return Token(TOK_APL_VALUE1, Z);
+  // the only non-axis function is to show help (for now)
+  //
+  if (B->get_rank() != 1)        RANK_ERROR;
+  if (B->element_count() != 0)   LENGTH_ERROR;
+
+  if (B->get_cfirst().is_character_cell())      list_functions(true);
+  else if (B->get_cfirst().is_integer_cell())   list_functions(false);
+  else                                          DOMAIN_ERROR;
+
+  return Token(TOK_APL_VALUE1, Idx0_0(LOC));
 }
 //----------------------------------------------------------------------------
 Token
@@ -1139,19 +1208,19 @@ Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 Value_P Z = Str0(LOC);
   
-  mx_ops_e op = OP_UNKNOWN;
+MX_ops op = OP_UNKNOWN;
 
-  int modifier = 0;
+int modifier = 0;
 
   if (X->is_numeric_scalar())
     {
-      op = (mx_ops_e)(X->get_sole_integer ());
+      op = (MX_ops)(X->get_sole_integer ());
     }
   else if (X->is_vector ())
     {
       const ShapeItem X_count   = X->element_count();
       const Cell & Xv = X->get_cravel (0);
-      op = (mx_ops_e)(Xv.get_int_value ());
+      op = (MX_ops)(Xv.get_int_value ());
       if (X_count > 1)
     {
       const Cell & Xv = X->get_cravel (1);
@@ -1160,35 +1229,36 @@ Value_P Z = Str0(LOC);
     }
   else
     {
-      MORE_ERROR () << "mtx[*] requires a numeric function specifier.";
+      MORE_ERROR() << "mtx[*] requires a numeric function specifier.";
       SYNTAX_ERROR;
     }
  
   if (op < OP_UNKNOWN || op >= OP_MAX)
     {
-      MORE_ERROR () << "Function specifier out of range.";
+      MORE_ERROR() << "Function specifier out of range.";
       SYNTAX_ERROR;
     }
 
   switch(op)
     {
-    case OP_UNKNOWN:            showHelp(); break;
-    case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct (A, B);   break;
-    case OP_VECTOR_ANGLE:       Z = vectorAngle (A, B);          break;
-    case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation (16, A, B);   break;
-    case OP_COVARIANCE:         Z = dyadicCovariance (A, B);     break;
-    case OP_HISTOGRAM:          Z = histogram (A, B);            break;
-    case OP_RANDOMS:            Z = randoms (&A, B, modifier);   break;
-    case OP_PRINT:              Z = printit (A, B);              break;
-    case OP_DETERMINANT:        // fall through
-    case OP_EIGENVECTORS:       // fall through
-    case OP_EIGENVALUES:        // fall through
-    case OP_IDENT:              // fall through
-    case OP_ROTATION_MATRIX:    // fall through
-    case OP_NORM:               MORE_ERROR() << "Not a dyadic function.";
-                                SYNTAX_ERROR;                    break;
-    default:                    MORE_ERROR() << "Function not yet implemented.";
-                                SYNTAX_ERROR;
+      case OP_UNKNOWN:            list_functions(false);           break;
+      case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct (A, B);   break;
+      case OP_VECTOR_ANGLE:       Z = vectorAngle (A, B);          break;
+      case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation (16, A, B);   break;
+      case OP_COVARIANCE:         Z = dyadicCovariance (A, B);     break;
+      case OP_HISTOGRAM:          Z = histogram (A, B);            break;
+      case OP_RANDOMS:            Z = randoms (&A, B, modifier);   break;
+      case OP_PRINT:              Z = printit (A, B);              break;
+      case OP_DETERMINANT:        // fall through
+      case OP_EIGENVECTORS:       // fall through
+      case OP_EIGENVALUES:        // fall through
+      case OP_IDENT:              // fall through
+      case OP_ROTATION_MATRIX:    // fall through
+      case OP_NORM:               MORE_ERROR() << "Not a dyadic function.";
+                                  SYNTAX_ERROR;                    break;
+      default:                    MORE_ERROR() <<
+                                  "Function not yet implemented.";
+                                  SYNTAX_ERROR;
     }
 
   Z->check_value(LOC);
@@ -1198,20 +1268,20 @@ Value_P Z = Str0(LOC);
 Token
 Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
-Value_P Z = Str0(LOC);
-  mx_ops_e op = OP_UNKNOWN;
+Value_P Z = Idx0_0(LOC);
+MX_ops op = OP_UNKNOWN;
 
-  int modifier = 0;
+int modifier = 0;
 
   if (X->is_numeric_scalar())
     {
-      op = (mx_ops_e)(X->get_sole_integer ());
+      op = static_cast<MX_ops>(X->get_sole_integer ());
     }
   else if (X->is_vector ())
     {
       const ShapeItem X_count   = X->element_count();
       const Cell & Xv = X->get_cravel (0);
-      op = (mx_ops_e)(Xv.get_int_value ());
+      op = static_cast<MX_ops>(Xv.get_int_value ());
       if (X_count > 1)
     {
       const Cell & Xv = X->get_cravel (1);
@@ -1220,19 +1290,19 @@ Value_P Z = Str0(LOC);
     }
   else
     {
-      MORE_ERROR () << "mtx[*] requires a numeric function specifier.";
+      MORE_ERROR() << "mtx[*] requires a numeric function specifier.";
       SYNTAX_ERROR;
     }
 
   if (op < OP_UNKNOWN || op >= OP_MAX)
     {
-      MORE_ERROR () << "Function specifier out of range.";
+      MORE_ERROR() << "Function specifier out of range.";
       SYNTAX_ERROR;
     }
 
   switch(op)
     {
-      case OP_UNKNOWN:            showHelp();                          break;
+      case OP_UNKNOWN:            list_functions(false);               break;
       case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
            //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
       case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
@@ -1246,7 +1316,7 @@ Value_P Z = Str0(LOC);
       case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
       case OP_VECTOR_ANGLE:
       case OP_HOMOGENEOUS_MATRIX: MORE_ERROR() << "Not a monadic function.";
-                                  SYNTAX_ERROR;                          break;
+                                  SYNTAX_ERROR;                        break;
       default:
         MORE_ERROR() << "Function not yet implemented.";
         SYNTAX_ERROR;
@@ -1289,7 +1359,20 @@ Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
   return eval_B(B);
 }
-//----------------------------------------------------------------------------
 
 #endif
 
+//----------------------------------------------------------------------------
+sAxis
+Quad_MX::subfun_to_axis(const UCS_string & name) const
+{
+UTF8_string name_utf8(name);
+const char * name_str = name_utf8.c_str();
+
+#define op_entry(num, _d, _v, sub) \
+   if (!strcmp(sub, name_str))  return OP_ ## num;
+#include "Quad_MX.def"
+
+  return -1;
+}
+//----------------------------------------------------------------------------

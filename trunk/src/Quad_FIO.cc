@@ -1020,6 +1020,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
          // ⎕FIO "": print the number to name mappings like:
          //
          // ⎕FIO[20]  ←→  ⎕FIO['mkdir']        ←→  ⎕FIO.mkdir
+         //
          out <<
 "      With a small performance penalty, ⎕FIO also accepts the following "
 "strings\n      instead of function numbers as axis argument:\n\n";
@@ -1167,7 +1168,6 @@ Quad_FIO::eval_B(Value_P B) const
    CHECK_SECURITY(disable_Quad_FIO);
 
    if (B->get_rank() > 1)   RANK_ERROR;
-   if (B->get_rank() > 1)   RANK_ERROR;
 
    if (B->element_count() == 0)   // '' or ⍬
       {
@@ -1175,6 +1175,7 @@ Quad_FIO::eval_B(Value_P B) const
            return list_functions(CERR, true);
         if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
+        DOMAIN_ERROR;
       }
 
 const APL_Integer function_number = B->get_cfirst().get_int_value();

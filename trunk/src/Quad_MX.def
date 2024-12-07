@@ -18,23 +18,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-op_entry( OP_UNKNOWN,            "", "")
-op_entry( OP_DETERMINANT,        "Determinant",        "monadic")
-op_entry( OP_CROSS_PRODUCT,      "Cross product",      "nomadic")
-op_entry( OP_VECTOR_ANGLE,       "Vector angle",       "dyadic")
-op_entry( OP_EIGENVECTORS,       "Eigenvector",        "monadic")
-op_entry( OP_EIGENVALUES,        "Eigenvalue",         "monadic")
-op_entry( OP_IDENT,              "Ident",              "monadic")
-op_entry( OP_ROTATION_MATRIX,    "Rotation matrix",    "monadic")
-op_entry( OP_HOMOGENEOUS_MATRIX, "Homogeneous matrix", "dyadic")
-op_entry( OP_NORM,               "Norm",               "monadic")
-op_entry( OP_RANDOMS,            "Randoms",            "nomadic")
-op_entry( OP_COVARIANCE,         "Covariance",         "nomadic")
-op_entry( OP_HISTOGRAM,          "Histogram",          "dyadic")
-op_entry( OP_PRINT,              "Print",              "dyadic")
-op_entry( OP_SET_RNG_SEED,       "Set RNG seed",       "monadic")
-op_entry( OP_MAX,                "",                   "")
+op_entry( UNKNOWN,            "",                   0, "")                     /*  0 */
+op_entry( DETERMINANT,        "Determinant",        1, "determinant")          /*  1 */
+op_entry( CROSS_PRODUCT,      "Cross product",      3, "cross_product")        /*  2 */
+op_entry( VECTOR_ANGLE,       "Vector angle",       2, "vector_angle")         /*  3 */
+op_entry( EIGENVECTORS,       "Eigenvector",        1, "eigenvector")          /*  4 */
+op_entry( EIGENVALUES,        "Eigenvalue",         1, "eigenvalue")           /*  5 */
+op_entry( IDENT,              "Ident",              1, "ident")                /*  6 */
+op_entry( ROTATION_MATRIX,    "Rotation matrix",    1, "rotation_matrix")      /*  7 */
+op_entry( HOMOGENEOUS_MATRIX, "Homogeneous matrix", 2, "homogeneous_matrix")   /*  8 */
+op_entry( NORM,               "Norm",               1, "norm")                 /*  9 */
+op_entry( RANDOMS,            "Randoms",            3, "randoms")              /* 10 */
+op_entry( COVARIANCE,         "Covariance",         3, "covariance")           /* 11 */
+op_entry( HISTOGRAM,          "Histogram",          2, "histogram")            /* 12 */
+op_entry( PRINT,              "Print",              2, "print")                /* 13 */
+op_entry( SET_RNG_SEED,       "Set RNG seed",       1, "set_rng_seed")         /* 14 */
+op_entry( MAX,                "",                   0, "")                     /* 15 */
  
 #undef op_entry
 
