@@ -37,9 +37,13 @@ class Quad_MX : public QuadFunction
 
 public:
    /// Constructor.
-  Quad_MX() : QuadFunction(TOK_Quad_MX)
-  {
-  }
+  Quad_MX() : QuadFunction(TOK_Quad_MX)   { }
+
+  enum MX_ops
+     {
+#define op_entry(num, _desc, _v, _sub) OP_ ## num,
+#include "Quad_MX.def"
+     };
 
    /// overloaded Function::has_subfuns()
    virtual bool has_subfuns() const
@@ -167,6 +171,11 @@ protected:
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
 
   static void list_functions(bool);
+
+  static bool rng_seed_set;
+
+  static unsigned int rng_seed;
+
 };
 
 #endif  // __Quad_MX_DEFINED__

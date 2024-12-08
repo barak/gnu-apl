@@ -53,14 +53,15 @@ Quad_MX Quad_MX::fun;
 #include<vector>
 
 #if apl_GSL
+
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 
 /************** start Matrix class **************/
-/****** gsl matrices don't support complex ******/
+/****** NOTE: gsl matrices don't support complex ******/
 
-/*************** start utility fcns **************/
+// ============= start utility fcns ===============
 
 Quad_MX::Matrix *
 Quad_MX::genCofactor(Matrix *mtx, int r, int c)
@@ -84,30 +85,29 @@ int rx = 0;
   return cf;
 }
 //----------------------------------------------------------------------------
-Quad_MX::Quad_MX::Dcomplex
+Quad_MX::Dcomplex
 Quad_MX::getDet(Matrix * mtx)
 {
-Dcomplex det(0.0, 0.0);
   if (mtx->rows() == 2)
      {
-       det = (mtx->val(0, 0) * mtx->val(1,1)) -
-             (mtx->val(0, 1) * mtx->val(1,0));
+       return (mtx->val(0, 0) * mtx->val(1, 1)) -   // diagonal
+              (mtx->val(0, 1) * mtx->val(1, 0));    // off-diagonal
      }
-  else
-     {
-       for (int k = 0; k < mtx->rows(); k++) {
-         double sign = pow(-1.0, (double)(k));
-         Matrix *cf = genCofactor(mtx, 0, k);
-         Dcomplex id = getDet(cf);
-         delete cf;
-         det += sign * mtx->val(0, k) * id;
-     }
-  }
+
+Dcomplex det(0.0, 0.0);
+  for (int k = 0; k < mtx->rows(); k++)
+      {
+        const int sign = k & 1 ? -1 : 1;
+        Matrix * cf = genCofactor(mtx, 0, k);
+        const Dcomplex id = getDet(cf);
+        delete cf;
+        if (sign > 0)   det += mtx->val(0, k) * id;
+        else            det -= mtx->val(0, k) * id;
+      }
 
   return det;
 }
 //----------------------------------------------------------------------------
-
 vector<Quad_MX::Dcomplex>
 Quad_MX::getCross(Matrix *mtx)
 {
@@ -122,11 +122,11 @@ vector<Dcomplex> rc(mtx->cols());
     {
       loop(k, mtx->rows())
           {
-            const double sign = pow(-1.0, (double)(k));
+            const int sign = k & 1 ? -1 : 1;
             Matrix * cf = genCofactor(mtx, 0, k);
             const Dcomplex id = getDet(cf);
             delete cf;
-            rc[k] = sign * id;
+            rc[k] = sign > 0 ? id : -id;
           }
     }
 
@@ -137,7 +137,7 @@ Quad_MX::Dcomplex
 Quad_MX::magnitude(vector<Dcomplex> &v)
 {
 Dcomplex rc(0.0, 0.0);
-  loop(i, v.size()) rc += v[i] * v[i];
+  loop(i, v.size())   rc += v[i] * v[i];
   return sqrt(rc);
 }
 //----------------------------------------------------------------------------
@@ -156,10 +156,10 @@ Quad_MX::genMtx(Value_P B, bool padded)
 const ShapeItem cols = B->get_shape_item(1);
 ShapeItem rows = B->get_shape_item(0);
 
-  if (padded) rows++;
+  if (padded)   ++rows;
 
-  Matrix *mtx = new Matrix(rows, cols);
-  int p = 0;
+Matrix * mtx = new Matrix(rows, cols);
+int p = 0;
   loop(r, rows)
   loop(c, cols)
       {
@@ -169,41 +169,35 @@ ShapeItem rows = B->get_shape_item(0);
            }
         else
            {
-             const Cell & Bv = B->get_cravel(p++);
-             const APL_Float xvr = Bv.get_real_value();
-             const APL_Float xvi = Bv.get_imag_value();
+             const Cell & Bp = B->get_cravel(p++);
+             const APL_Float xvr = Bp.get_real_value();
+             const APL_Float xvi = Bp.get_imag_value();
              mtx->val(r, c, complex(xvr, xvi));
            }
       }
 
   return mtx;
 }
-
-
-/*************** end utility fcns **************/
+// ============= end of utility fcns ===============
 
 //----------------------------------------------------------------------------
 
-static bool rng_seed_set = false;
-static unsigned int rng_seed;
+bool Quad_MX::rng_seed_set = false;
+unsigned int Quad_MX::rng_seed = 0;
 
 Value_P
 Quad_MX::set_rng_seed(Value_P B)
 {
-  const CellType B_celltype = B->deep_cell_types();
+  if (!B->is_int_scalar())
+     {
+       MORE_ERROR() << "numeric scalar argument expected.";
+       DOMAIN_ERROR;
+     }
 
-  if (B_celltype & CT_INT &&
-      B->get_rank() == 0)
-    {
-      rng_seed_set = true;
-      rng_seed = (unsigned int)(B->get_sole_integer());
-    }
-  else
-    {
-      MORE_ERROR() << "Requires numeric arguement.";
-      DOMAIN_ERROR;
-    }
-  return Str0(LOC);
+  rng_seed = B->get_sole_integer();
+  rng_seed_set = true;
+
+  return Idx0_0(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -212,147 +206,148 @@ Quad_MX::printit(Value_P A, Value_P B)
 const CellType A_celltype = A->deep_cell_types();
 
 
+  // B is either function_name or >function_name,
+  // where > indicates append (as opposed to overwrite) and shall be skipped
+  //
   if (A->is_char_string() && B->is_char_string())
-    {
-      const UCS_string ustr = B->get_UCS_ravel();
-      UTF8_string fn(ustr);
-      char *fns = (char *)(fn.c_str());
-      bool append = false;
-      if (strlen(fns) > 1)
-    {
-          if (*fns == '>')
-            {
-              fns++;
-              append = true;
-            }
-    }
-FILE * ofile = fopen(fns, append ? "a" : "w");
-
-const UCS_string vstr = A->get_UCS_ravel();
-UTF8_string val(vstr);
-char *vs = (char *)(val.c_str());
-
-      fprintf(ofile, "%s\n", vs);
-      fclose(ofile);
-
-      return Str0(LOC);
-    }
-
-  if ((A_celltype & CT_NUMERIC) &&
-      B->is_char_string())
-    {
-      const ShapeItem A_count   = A->element_count();
-      const uRank     A_rank    = A->get_rank();
-      const UCS_string  ustr = B->get_UCS_ravel();
-      UTF8_string fn(ustr);
-      char *fns = (char *)(fn.c_str());
-      bool append = false;
-      if (strlen(fns) > 1)
-    {
-      if (*fns == '>') {
-        fns++;
-        append = true;
-      }
-    }
-      FILE *ofile = append ?
-        fopen(fns, "a") :
-        fopen(fns, "w");
-
-      if (!ofile) {
-        MORE_ERROR() << "Open failure on " << ustr;
-        DOMAIN_ERROR;
-      }
-      if (A_rank <= 1)
-    {
-        for (int i = 0; i < A_count; i++)
-      {
-        const Cell & Av = A->get_cravel(i);
-        const APL_Float Avr = Av.get_real_value();
-        if (Av.is_complex_cell())
+     {
+       const UCS_string ustr = B->get_UCS_ravel();
+       UTF8_string fun(ustr);
+       const char * fun_ccp = fun.c_str();
+       const char * mode = "w";
+       if (strlen(fun_ccp) > 1 && *fun_ccp == '>')
           {
-            const APL_Float Avi = Av.get_imag_value();
-            fprintf(ofile, "%gj%g ", Avr, Avi);
+            fun_ccp++;
+            mode = "a";   // append
           }
-        else
-          fprintf(ofile, "%g ", Avr);
-      }
-        fprintf(ofile, "\n");
-    }
-      else
+
+       FILE * ofile = fopen(fun_ccp, mode);
+       const UCS_string A_ucs = A->get_UCS_ravel();
+       const UTF8_string val(A_ucs);
+       const char * vs = val.c_str();
+
+       fprintf(ofile, "%s\n", vs);
+       fclose(ofile);
+
+       return Idx0_0(LOC);
+     }
+
+  if (!((A_celltype & CT_NUMERIC) && B->is_char_string()))
+     {
+       MORE_ERROR() << "Incompatible arguments.";
+       DOMAIN_ERROR;
+     }
+
+const ShapeItem A_count = A->element_count();
+const uRank     A_rank  = A->get_rank();
+const UCS_string ustr   = B->get_UCS_ravel();
+UTF8_string fn(ustr);
+const char * fun_ccp = fn.c_str();
+const char * mode = "w";   // write (as opposed to append)
+  if (strlen(fun_ccp) > 1 && * fun_ccp == '>')
+     {
+       fun_ccp++;
+       mode = "a";   // append
+     }
+FILE * ofile = fopen(fun_ccp, mode);
+
+  if (!ofile)
+     {
+       MORE_ERROR() << "Open failure on " << ustr;
+       DOMAIN_ERROR;
+     }
+  if (A_rank <= 1)
+     {
+       for (int i = 0; i < A_count; i++)
+           {
+             const Cell & Ai = A->get_cravel(i);
+             const APL_Float Air = Ai.get_real_value();
+             if (Ai.is_complex_cell())
+               {
+                 const APL_Float Aii = Ai.get_imag_value();
+                 fprintf(ofile, "%gj%g ", Air, Aii);
+               }
+             else
+               {
+                 fprintf(ofile, "%g ", Air);
+               }
+           }
+       fprintf(ofile, "\n");
+     }
+  else
     {
-      int end_line = (int)(A->get_shape_item(A_rank-1));
-      int end_grid = end_line * (int)(A->get_shape_item(A_rank-2));
+      const int end_line = A->get_shape_item(A_rank - 1);
+      const int end_grid = end_line * A->get_shape_item(A_rank - 2);
 #define STR_LEN 256
       char str[STR_LEN];
       bool is_cpx = false;
       int max_len = -1;
-      for (int i = 0; i < A_count; i++)
+      loop(a, A_count)
         {
           int len;
-          const Cell & Av = A->get_cravel(i);
-          const APL_Float Avr = Av.get_real_value();
-          if (Av.is_complex_cell())
+          const Cell & cell_A = A->get_cravel(a);
+          const APL_Float Aa_real = cell_A.get_real_value();
+          if (cell_A.is_complex_cell())
              {
-               const APL_Float Avi = Av.get_imag_value();
-               len = snprintf(str, STR_LEN, "%gj%g", Avr, Avi);
-               if (Avi != 0.0) is_cpx = true;
+               const APL_Float Aa_imag = cell_A.get_imag_value();
+               len = snprintf(str, STR_LEN, "%gj%g", Aa_real, Aa_imag);
+               if (Aa_imag != 0.0) is_cpx = true;
              }
           else
-             len = snprintf(str, STR_LEN, "%g", Avr);
+             len = snprintf(str, STR_LEN, "%g", Aa_real);
           if (max_len < len) max_len = len;
         }
-      int *rho = (int *)alloca(A_rank * sizeof(int));
-      bzero(rho, A_rank * sizeof(int));
-      bzero(rho, A_rank * sizeof(int));
+
+      int * rho = reinterpret_cast<int *>(alloca(A_rank * sizeof(int)));
+      memset(rho, 0, A_rank * sizeof(int));
+      memset(rho, 0, A_rank * sizeof(int));
 
       for (int i = 0; i < A_count; i++)
-        {
-          if (A_rank > 2)
-        {
-          if (0 == i%end_grid) {
-            fprintf(ofile, "\n[");
-            for (uRank j = 0; j < A_rank - 2; j++)
-              fprintf(ofile, "%d ", rho[j]);
-            fprintf(ofile, "* *]:\n");
-            bool carry = 1;
-            for (int j = A_rank - 3; j >= 0; j--)
-              {
-            rho[j] += carry;
-            if (rho[j] >= A->get_shape_item(j))
-              {
-                rho[j] = 0;
-                carry = 1;
-              }
+          {
+            if (A_rank > 2)
+               {
+                 if (0 == i%end_grid)
+                    {
+                     fprintf(ofile, "\n[");
+                     for (uRank j = 0; j < A_rank - 2; j++)
+                         fprintf(ofile, "%d ", rho[j]);
+                     fprintf(ofile, "* *]:\n");
+                     bool carry = 1;
+                     for (int j = A_rank - 3; j >= 0; j--)
+                         {
+                           rho[j] += carry;
+                           if (rho[j] >= A->get_shape_item(j))
+                              {
+                                rho[j] = 0;
+                                carry = 1;
+                              }
+                           else
+                              {
+                                carry = 0;
+                              }
+                         }
+                    }
+               }
+
+            const Cell & Av = A->get_cravel(i);
+            const APL_Float Avr = Av.get_real_value();
+            char str[STR_LEN];
+            if (is_cpx && Av.is_complex_cell())
+               {
+                 const APL_Float Avi = Av.get_imag_value();
+                 snprintf(str, STR_LEN, "%gj%g", Avr, Avi);
+               }
             else
-              carry = 0;
-              }
+               {
+                 snprintf(str, STR_LEN, "%g", Avr);
+               }
+            fprintf(ofile, "%*s ", max_len, str);
+            if (0 == (i+1)%end_line) fprintf(ofile, "\n");
           }
-        }
-          const Cell & Av = A->get_cravel(i);
-          const APL_Float Avr = Av.get_real_value();
-          char str[STR_LEN];
-          if (is_cpx && Av.is_complex_cell())
-             {
-               const APL_Float Avi = Av.get_imag_value();
-               snprintf(str, STR_LEN, "%gj%g", Avr, Avi);
-             }
-          else
-             snprintf(str, STR_LEN, "%g", Avr);
-          fprintf(ofile, "%*s ", max_len, str);
-          if (0 == (i+1)%end_line) fprintf(ofile, "\n");
-        }
     }
 
-      fclose(ofile);
-      return Str0(LOC);
-    }
-  else
-    {
-      MORE_ERROR() << "Incompatible arguments.";
-      DOMAIN_ERROR;
-    }
-
-  return Str0(LOC);
+  fclose(ofile);
+  return Idx0_0(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -360,7 +355,7 @@ Quad_MX::eigenvectors(Value_P B)
 {
   if (B->get_rank() != 2)
      {
-       MORE_ERROR() << "Invalid rank.";
+       MORE_ERROR() << "Matrix expected.";
        RANK_ERROR;
      }
 
@@ -374,7 +369,8 @@ const ShapeItem cols = B->get_shape_item(1);
        }
 
 Matrix * mtx = genMtx(B, false);
-double *data = (double *)alloca(mtx->rows() * mtx->cols() * sizeof(double));
+const size_t mtx_bytes = mtx->rows() * mtx->cols() * sizeof(double);
+double * data = reinterpret_cast<double *>(alloca(mtx_bytes));
 int i = 0;
   loop(j, mtx->rows())
   for (int k = 0; k < mtx->cols(); k++, i++)
@@ -423,8 +419,7 @@ int k = 0;
 Value_P
 Quad_MX::eigenvalues(Value_P B)
 {
-const uRank      B_rank    = B->get_rank();
-  if (B_rank != 2) 
+  if (B->get_rank() != 2) 
      {
        MORE_ERROR() << "Matrix expected.";
        RANK_ERROR;
@@ -435,19 +430,18 @@ const ShapeItem cols = B->get_shape_item(1);
     
     if (rows != cols)
        {
-        MORE_ERROR() << "Non-square matrix.";
+        MORE_ERROR() << "square matrix expected.";
         LENGTH_ERROR;
        }
 
 Matrix * mtx = genMtx (B, false);
-double * data = (double *)alloca (mtx->rows () * mtx->cols () * sizeof(double));
+const size_t mtx_bytes = mtx->rows() * mtx->cols() * sizeof(double);
+double * data = reinterpret_cast<double *> (alloca(mtx_bytes));
 int i = 0;
   loop(j, mtx->rows())
+  for (int k = 0; k < mtx->cols (); k++, i++)
       {
-        for (int k = 0; k < mtx->cols (); k++, i++)
-          {
-            data[i] = mtx->val (j, k).real ();
-          }
+        data[i] = mtx->val (j, k).real ();
       }
 
 gsl_matrix_view m = gsl_matrix_view_array (data, mtx->rows(), mtx->cols());
@@ -478,10 +472,11 @@ Value_P Z(shape_Z, LOC);
         gsl_complex eval_i = gsl_vector_complex_get(eval, i);
 
         Dcomplex v(GSL_REAL(eval_i), GSL_IMAG(eval_i));
-        Z->next_ravel_Complex (v.real (), v.imag ());
+        Z->next_ravel_Complex(v.real(), v.imag());
       }
-  Z->check_value(LOC);
+
   delete mtx;
+  Z->check_value(LOC);
 
   return Z;
 }
@@ -493,14 +488,13 @@ const uRank B_rank = B->get_rank();
 
   if (B_rank != 2)
     {
-      MORE_ERROR() << "Invalid rank (matrix expected)"
-                      " in Quad_MX::determinant().";
+      MORE_ERROR() << "Matrix expected in ⎕MX.determinant.";
       RANK_ERROR;
     }
 
   if (B->get_shape_item(0) != B->get_shape_item(1))
      {
-       MORE_ERROR() << "Non-square matrix in Quad_MX::determinant()";
+       MORE_ERROR() << "Square matrix expected in ⎕MX.determinant.";
        RANK_ERROR;
      }
 
@@ -508,10 +502,8 @@ Matrix * mtx = genMtx(B, false);
 const Dcomplex det = getDet(mtx);
   delete mtx;
 
-Value_P Z(det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
-                             : ComplexScalar(det.real(), det.imag(), LOC));
-  Z->check_value(LOC);
-  return Z;
+  return det.imag () == 0.0 ? FloatScalar(det.real(), LOC)
+                            : ComplexScalar(det.real(), det.imag(), LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -554,19 +546,18 @@ Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
   //
   if (!(A->is_vector() && B->is_vector()))
     {
-      MORE_ERROR() << "vectors expected in Quad_MX::dyadicCrossProduct().";
+      MORE_ERROR() << "Vectors expected in dyadic ⎕MX.cross_product().";
       RANK_ERROR;
     }
 
 const ShapeItem A_count = A->element_count();
-
   if (A_count != B->element_count())
     {
-      MORE_ERROR() << "length mismatch in Quad_MX::dyadicCrossProduct().";
+      MORE_ERROR() << "Length mismatch in dyadic ⎕MX.cross_product().";
       LENGTH_ERROR;
     }
 
-  // handle len > 3 cases in monadicCrossProduct()
+  // JSA: handle len > 3 cases in monadicCrossProduct()
   //
   if (A_count != 3)
      {
@@ -590,15 +581,15 @@ const ShapeItem A_count = A->element_count();
 Matrix * mtx = new Matrix (3, 3);
   loop (c, 3)
        {
-         const Cell & Av = A->get_cravel(c);
-         const Cell & Bv = B->get_cravel(c);
-         APL_Float Avr = Av.get_real_value();
-         APL_Float Avi = Av.get_imag_value();
-         APL_Float Bvr = Bv.get_real_value ();
-         APL_Float Bvi = Bv.get_imag_value();
+         const Cell & Ac = A->get_cravel(c);
+         const Cell & Bc = B->get_cravel(c);
+         APL_Float Acr = Ac.get_real_value();
+         APL_Float Aci = Ac.get_imag_value();
+         APL_Float Bcr = Bc.get_real_value ();
+         APL_Float Bci = Bc.get_imag_value();
          mtx->val(0, c, complex (1.0, 0.0));
-         mtx->val(1, c, complex (Avr, Avi));
-         mtx->val(2, c, complex (Bvr, Bvi));
+         mtx->val(1, c, complex (Acr, Aci));
+         mtx->val(2, c, complex (Bcr, Bci));
        }
 
 vector<Dcomplex> cp = getCross(mtx);
@@ -622,30 +613,30 @@ Quad_MX::vectorAngle(const Value_P A, const Value_P B)
 {
 const ShapeItem A_count = A->element_count();
 
-  if (A->get_rank() != 1 || B->get_rank() != 1)
+  if (!(A->is_vector() && B->is_vector()))
      {
-       MORE_ERROR() << "Vector angle: expecting vectors.";
+       MORE_ERROR() << "Vectors expected in ⎕MX.vector_angle.";
        DOMAIN_ERROR;
      }
 
   if (A_count != B->element_count())
      {
-       MORE_ERROR() << "Vector angle: expecting vectors of same length.";
+       MORE_ERROR() << "Length mismatch in ⎕MX.vector_angle.";
        LENGTH_ERROR;
      }
 
 vector<Dcomplex> Av(A_count);
 vector<Dcomplex> Bv(A_count);
-  loop(c, A_count)
+  loop(a, A_count)
       {
-        const Cell & Ac = A->get_cravel (c);
-        const Cell & Bc = B->get_cravel (c);
-        APL_Float Avr = Ac.get_real_value();
-        APL_Float Avi = Ac.get_imag_value();
-        APL_Float Bvr = Bc.get_real_value();
-        APL_Float Bvi = Bc.get_imag_value();
-        Av[c] = Dcomplex (Avr, Avi);
-        Bv[c] = Dcomplex (Bvr, Bvi);
+        const Cell & Aa = A->get_cravel (a);
+        const Cell & Ba = B->get_cravel (a);
+        APL_Float Aar = Aa.get_real_value();
+        APL_Float Aai = Aa.get_imag_value();
+        APL_Float Bar = Ba.get_real_value();
+        APL_Float Bai = Ba.get_imag_value();
+        Av[a] = Dcomplex (Aar, Aai);
+        Bv[a] = Dcomplex (Bar, Bai);
       }
 
 Dcomplex Amag = magnitude(Av);
@@ -675,12 +666,10 @@ Quad_MX::ident(const Value_P B)
 const ShapeItem dim = B->get_sole_integer();
   if (dim == 0)   return Str0(LOC);
 
-Shape shape_W(dim, dim);
+const Shape shape_W(dim, dim);
 Value_P Z(shape_W, LOC);
   loop(i, dim)
-      {
-        loop(j, dim)   Z->next_ravel_Complex( (i == j ? 1.0 : 0.0), 0.0);
-      }
+  loop(j, dim)   Z->next_ravel_Complex( (i == j ? 1.0 : 0.0), 0.0);
 
   Z->check_value(LOC);
   return Z;
@@ -695,13 +684,13 @@ Quad_MX::monadicCovariance(const Value_P B)
        RANK_ERROR;
      }
 
-ShapeItem rows = B->get_shape_item(0);
-ShapeItem cols = B->get_shape_item(1);
+const ShapeItem rows = B->get_shape_item(0);
+const ShapeItem cols = B->get_shape_item(1);
 
   if (rows == 0)   return Str0(LOC);   // empty result
 
-vector<vector<double> > Breals (rows);
-vector<vector<double> > Bimags (rows);
+vector<vector<double> > Breals(rows);
+vector<vector<double> > Bimags(rows);
   loop(r, rows)
       {
         Breals[r].reserve (cols);
@@ -717,8 +706,12 @@ vector<vector<double> > Bimags (rows);
         normalise (Bimags[r]);
       }
 
-Shape shape_Z(rows*rows);
+const Shape shape_Z(rows*rows);
 Value_P Z(shape_Z, LOC);
+
+  // Z is symmetric, therefore only the upper half is computed
+  // and copied to the lower half in the process
+  //
   loop(r, rows)
   for (int c = r; c < rows; c++)
       {
@@ -728,7 +721,7 @@ Value_P Z(shape_Z, LOC);
                                                     Bimags[c].data (), 1, cols);
        const int ix = (r * rows) + c;
        Z->set_ravel_Complex (ix, realcov, imagcov);
-       if (r != c)
+       if (r != c)   // off-diagonal
           {
             const int ix = (c * rows) + r;
             Z->set_ravel_Complex(ix, realcov, imagcov);
@@ -753,23 +746,21 @@ Quad_MX::histogram(const Value_P A, const Value_P B)
    ****/
 
 const ShapeItem B_count = B->element_count();
-const uRank     B_rank  = B->get_rank();
 
   if (!A->is_scalar())
      {
-       MORE_ERROR() << "Non-scalar argument.";
+       MORE_ERROR() << "Scalar left argument expected in ⎕MX.histogram.";
        RANK_ERROR;
      }
 
-const int nr_buckets = A->get_sole_integer ();
-    
+const int nr_buckets = A->get_sole_integer();
   if (nr_buckets < 2)
      {
-       MORE_ERROR() << "Too few buckets.";
+       MORE_ERROR() << "Too few buckets in ⎕MX.histogram.";
        DOMAIN_ERROR;
      }
 
-  if (B_rank != 1)
+  if (B->get_rank() != 1)
      {
        MORE_ERROR() << "Non-vector right argument.";
        RANK_ERROR;
@@ -777,30 +768,31 @@ const int nr_buckets = A->get_sole_integer ();
 
 double maxv = -MAXFLOAT;
 double minv =  MAXFLOAT;
-  loop (c, B_count)
+  loop (b, B_count)
        {   
-         const Cell & Bv = B->get_cravel (c);
-         double val = Bv.get_real_value ();
+         const Cell & Bb = B->get_cravel(b);
+         const double val = Bb.get_real_value();
          if (maxv < val) maxv = val;
          if (minv > val) minv = val;
        }
 
-double incr = (maxv - minv) / (double)nr_buckets;
-vector<int> buckets (nr_buckets);
+const double incr = (maxv - minv) / (double)nr_buckets;
+vector<int> buckets(nr_buckets);
 int nr_bumps = 0;
-  loop(c, B_count)
+  loop(b, B_count)
       {   
-        const Cell & Bv = B->get_cravel (c);
-        double val = Bv.get_real_value ();
+        const Cell & Bb = B->get_cravel(b);
+        double val = Bb.get_real_value();
         double mark = minv + incr;
-        for (int b = 0; b < nr_buckets - 1; b++, mark += incr)
+        loop(bucket, nr_buckets - 1)
             {
               if (val < mark)
                  {
-                   buckets[b]++;
+                   buckets[bucket]++;
                    nr_bumps++;
                    break;
                  }
+            mark += incr;
           }
         buckets[nr_buckets - 1] = B_count - nr_bumps;
       }
@@ -812,34 +804,30 @@ Value_P Z(shape_Z, LOC);
         Z->next_ravel_Int(buckets[b]);
       }
   Z->check_value(LOC);
-
-  Z->check_value(LOC);
   return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_MX::dyadicCovariance(const Value_P A, const Value_P B)
 {
-const ShapeItem A_count = A->element_count();
-const ShapeItem B_count = B->element_count();
-  
   if (!(A->is_vector() && B->is_vector()))
     {
       MORE_ERROR() << "Both arguments must be vectors.";
       RANK_ERROR;
     }
 
-  if (A_count != B_count)
+const ShapeItem AB_count = A->element_count();
+  if (AB_count != B->element_count())
     {
       MORE_ERROR() << "Arguments must be of the same length.";
       LENGTH_ERROR;
     }
 
-vector<double> Areals(A_count);
-vector<double> Aimags(A_count);
-vector<double> Breals(B_count);
-vector<double> Bimags(B_count);
-  loop (ab, A_count)
+vector<double> Areals(AB_count);
+vector<double> Aimags(AB_count);
+vector<double> Breals(AB_count);
+vector<double> Bimags(AB_count);
+  loop (ab, AB_count)
     {
       const Cell & Av = A->get_cravel(ab);
       const Cell & Bv = B->get_cravel(ab);
@@ -850,15 +838,15 @@ vector<double> Bimags(B_count);
     }
 
 const double realcov =
-    gsl_stats_covariance(Areals.data(), 1, Breals.data(), 1, A_count);
+    gsl_stats_covariance(Areals.data(), 1, Breals.data(), 1, AB_count);
 const double imagcov =
-    gsl_stats_covariance(Aimags.data(), 1, Bimags.data(), 1, A_count);
+    gsl_stats_covariance(Aimags.data(), 1, Bimags.data(), 1, AB_count);
   return imagcov == 0.0 ? FloatScalar(realcov, LOC) :
                           ComplexScalar(realcov, imagcov, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_MX::randoms(const Value_P *A, const Value_P B, int modifier)
+Quad_MX::randoms(const Value_P * opt_A, const Value_P B, int modifier)
 {
 Value_P Z = Str0(LOC);
 int rcnt = 0;
@@ -871,8 +859,8 @@ static bool rng_initialised = false;
      {
        std::seed_seq rseq{1, 2, 3, 4, 5};
        std::seed_seq iseq{6, 7, 8, 9, 10};
-       rgen.seed (rseq);
-       igen.seed (iseq);
+       rgen.seed(rseq);
+       igen.seed(iseq);
        rng_initialised = true;
      }
 
@@ -883,22 +871,20 @@ static bool rng_initialised = false;
        rng_seed_set = false;
      }
 
-const uRank B_rank = B->get_rank();
-  if (A)
-    {
-      const uRank A_rank = (*A)->get_rank();
-      if (A_rank == 0 && B_rank == 0)
-    rcnt = (*A)->get_sole_integer ();
-    }
+  if (opt_A)
+     {
+       if ((*opt_A)->is_scalar() && B->is_scalar())
+          rcnt = (*opt_A)->get_sole_integer();
+     }
   else
-    {
-      if (B_rank == 0)   rcnt = 1;
-    }
+     {
+       if (B->is_scalar() == 0)   rcnt = 1;
+     }
 
   if (rcnt == 0)   RANK_ERROR;
 
-const Cell & Bv = B->get_cravel (0);
-APL_Float Bvr = Bv.get_real_value ();
+const Cell & Bv = B->get_cravel(0);
+APL_Float Bvr = Bv.get_real_value();
 APL_Float Bvi = Bv.get_imag_value();
    if (rcnt > 1)
       {
@@ -906,46 +892,43 @@ APL_Float Bvi = Bv.get_imag_value();
         Z = Value_P(shape_Z, LOC);
       }
 
-   loop(xx, rcnt)
+   loop(r, rcnt)
        {
          Dcomplex yy;
          switch(modifier)
             {
               // https://en.cppreference.com/w/cpp/numeric/random
-              case 1:
-                {
-                  lognormal_distribution rd{0.0, Bvr};
-                  lognormal_distribution id{0.0, Bvi};
-                  yy = complex (rd(rgen), id(igen));
-                }
-                break;
-              case 2:
-                {
-                  chi_squared_distribution rd{Bvr};
-                  chi_squared_distribution id{Bvi};
-                  yy = complex (rd(rgen), id(igen));
-                }
-                break;
-              case 3:
-                {
-                  student_t_distribution rd{Bvr};
-                  student_t_distribution id{Bvi};
-                  yy = complex (rd(rgen), id(igen));
-                }
-                break;
-              default:
-                {
-                  normal_distribution rd{0.0, Bvr};
-                  normal_distribution id{0.0, Bvi};
-                  yy = complex(rd(rgen), id(igen));
-                }
-                break;
+              case 1:   {
+                          lognormal_distribution rd{0.0, Bvr};
+                          lognormal_distribution id{0.0, Bvi};
+                          yy = complex (rd(rgen), id(igen));
+                        }
+                        break;
+                       
+              case 2:   {
+                          chi_squared_distribution rd{Bvr};
+                          chi_squared_distribution id{Bvi};
+                          yy = complex (rd(rgen), id(igen));
+                        }
+                        break;
+                       
+              case 3:   {
+                          student_t_distribution rd{Bvr};
+                          student_t_distribution id{Bvi};
+                          yy = complex (rd(rgen), id(igen));
+                        }
+                        break;
+
+              default: {
+                         normal_distribution rd{0.0, Bvr};
+                         normal_distribution id{0.0, Bvi};
+                         yy = complex(rd(rgen), id(igen));
+                       }
             }
          
-         if (rcnt > 1)
-           Z->next_ravel_Complex(yy.real(), yy.imag());
-         else
-           Z = ComplexScalar(yy.real(), yy.imag(), LOC);
+         if (rcnt == 1)   return ComplexScalar(yy.real(), yy.imag(), LOC);
+
+         Z->next_ravel_Complex(yy.real(), yy.imag());
        }
 
   return Z;
@@ -956,7 +939,7 @@ Quad_MX::norm(const Value_P B)
 {
   if (B->is_scalar())
     {
-      MORE_ERROR() << "invalid scalar argument.";
+      MORE_ERROR() << "Unexpected scalar argument in ⎕MX.norm.";
       RANK_ERROR;
     }
 
@@ -974,8 +957,8 @@ Dcomplex sum(0.0, 0.0);
 
   loop (b, B_count)
     {
-      const Cell & Bv = B->get_cravel(b);
-      Dcomplex val(Bv.get_real_value(), Bv.get_imag_value());
+      const Cell & Bb = B->get_cravel(b);
+      Dcomplex val(Bb.get_real_value(), Bb.get_imag_value());
       val /= sum;
 
       Z->next_ravel_Complex(val.real(), val.imag());
@@ -989,18 +972,19 @@ Quad_MX::monadicRotation(Value_P B)
 {
   if (!B->is_scalar())
      {
-       MORE_ERROR() << "scalar argument expected.";
+       MORE_ERROR() << "scalar argument expected in ⎕MX.rotation_matrix.";
        RANK_ERROR;
      }
 
+const Cell & B0 = B->get_cravel(0);
+const APL_Float xr = B0.get_real_value();
+const APL_Float xi = B0.get_imag_value();
+const Dcomplex theta(xr, xi);
+const Dcomplex cosx = cos(theta);
+const Dcomplex sinx = sin(theta);
+
 const Shape shape_W(2, 2);
 Value_P Z(shape_W, LOC);
-const Cell & Bv = B->get_cravel (0);
-APL_Float xvr = Bv.get_real_value();
-APL_Float xvi = Bv.get_imag_value();
-Dcomplex theta (xvr, xvi);
-Dcomplex cosx = cos (theta);
-Dcomplex sinx = sin (theta);
   Z->next_ravel_Complex( cosx.real(),  cosx.imag());
   Z->next_ravel_Complex(-sinx.real(), -sinx.imag());
   Z->next_ravel_Complex( sinx.real(),  sinx.imag());
@@ -1012,25 +996,34 @@ Dcomplex sinx = sin (theta);
 Value_P
 Quad_MX::dyadicRotation(int tp, Value_P A, Value_P B)
 {
-Value_P Z;
-
 const ShapeItem A_count   = A->element_count();
 const uRank     A_rank    = A->get_rank();
 const ShapeItem B_count   = B->element_count();
 const uRank     B_rank    = B->get_rank();
     
-  if (A_count == 3 && B_count == 3 && A_rank == 1 && B_rank == 1)
+  if (A_rank != 1 || B_rank != 1)
     {
-      int sdim = (tp == 9) ? 3 : 4;
-      const Shape shape_W(sdim, sdim);
-      Z = Value_P(shape_W, LOC);
-      vector<Dcomplex> angs (3);
-      loop(i, 3)
-          {
-            const Cell & Bv = B->get_cravel (i);
-            angs[i] =
-              Dcomplex(Bv.get_real_value(), Bv.get_imag_value());
-          }
+      MORE_ERROR() << "Both arguments must be vectors in ⎕MX.rotation_matrix.";
+      RANK_ERROR;
+    }
+
+  if (A_count != 3 || B_count != 3)
+    {
+      MORE_ERROR() << "Both arguments must be vectors "
+                      "of ⍴ = 3 in ⎕MX.rotation_matrix.";
+      LENGTH_ERROR;
+    }
+
+const int sdim = (tp == 9) ? 3 : 4;
+const Shape shape_W(sdim, sdim);
+Value_P Z(shape_W, LOC);
+vector<Dcomplex> angs (3);
+  loop(i, 3)
+      {
+        const Cell & Bv = B->get_cravel(i);
+        angs[i] = Dcomplex(Bv.get_real_value(), Bv.get_imag_value());
+      }
+
       const Dcomplex cosa = cos(angs[0]);
       const Dcomplex sina = sin(angs[0]);
       const Dcomplex cosb = cos(angs[1]);
@@ -1039,12 +1032,12 @@ const uRank     B_rank    = B->get_rank();
       const Dcomplex sing = sin(angs[2]);
 
       const Dcomplex t00 = cosa * cosb;
-      const Dcomplex t01 = cosa * sinb * sing - sina * cosg;;
-      const Dcomplex t02 = cosa * sinb * cosg + sina * sing;;
+      const Dcomplex t01 = cosa * sinb * sing - sina * cosg;
+      const Dcomplex t02 = cosa * sinb * cosg + sina * sing;
 
       const Dcomplex t10 = sina * cosb;
-      const Dcomplex t11 = sina * sinb * sing + cosa * cosg;;
-      const Dcomplex t12 = sina * sinb * cosg - cosa * sing;;
+      const Dcomplex t11 = sina * sinb * sing + cosa * cosg;
+      const Dcomplex t12 = sina * sinb * cosg - cosa * sing;
 
       const Dcomplex t20 = -sinb;
       const Dcomplex t21 =  cosb * sing;
@@ -1052,73 +1045,50 @@ const uRank     B_rank    = B->get_rank();
 
       if (tp == 9)
          {
-           Z->set_ravel_Complex(0,  t00.real (),  t00.imag ());
-           Z->set_ravel_Complex(1,  t01.real (),  t01.imag ());
-           Z->set_ravel_Complex(2,  t02.real (),  t02.imag ());
-           Z->set_ravel_Complex(3,  t10.real (),  t10.imag ());
-           Z->set_ravel_Complex(4,  t11.real (),  t11.imag ());
-           Z->set_ravel_Complex(5,  t12.real (),  t12.imag ());
-           Z->set_ravel_Complex(6,  t20.real (),  t20.imag ());
-           Z->set_ravel_Complex(7,  t21.real (),  t21.imag ());
-           Z->set_ravel_Complex(8,  t22.real (),  t22.imag ());
+           Z->next_ravel_Complex(t00.real (),  t00.imag ());
+           Z->next_ravel_Complex(t01.real (),  t01.imag ());
+           Z->next_ravel_Complex(t02.real (),  t02.imag ());
+           Z->next_ravel_Complex(t10.real (),  t10.imag ());
+           Z->next_ravel_Complex(t11.real (),  t11.imag ());
+           Z->next_ravel_Complex(t12.real (),  t12.imag ());
+           Z->next_ravel_Complex(t20.real (),  t20.imag ());
+           Z->next_ravel_Complex(t21.real (),  t21.imag ());
+           Z->next_ravel_Complex(t22.real (),  t22.imag ());
          }
       else
          {
-           vector<Dcomplex> trans(3);
-           loop(i, 3)
-               {
-                 const Cell & Av = A->get_cravel(i);
-                 trans[i] = Dcomplex(Av.get_real_value(),
-                                     Av.get_imag_value());
-               }
-           Z->set_ravel_Complex(0,   t00.real (),  t00.imag ());
-           Z->set_ravel_Complex(1,   t01.real (),  t01.imag ());
-           Z->set_ravel_Complex(2,   t02.real (),  t02.imag ());
-           Z->set_ravel_Complex(3,   0.0, 0.0);
-        
-           Z->set_ravel_Complex(4,   t10.real (),  t10.imag ());
-           Z->set_ravel_Complex(5,   t11.real (),  t11.imag ());
-           Z->set_ravel_Complex(6,   t12.real (),  t12.imag ());
-           Z->set_ravel_Complex(7,   0.0, 0.0);
-        
-           Z->set_ravel_Complex(8,   t20.real (),  t20.imag ());
-           Z->set_ravel_Complex(9,   t21.real (),  t21.imag ());
-           Z->set_ravel_Complex(10,  t22.real (),  t22.imag ());
-           Z->set_ravel_Complex(11,  0.0, 0.0);
-        
-           Z->set_ravel_Complex(12,  trans[0].real (), trans[0].imag ());
-           Z->set_ravel_Complex(13,  trans[1].real (), trans[1].imag ());
-           Z->set_ravel_Complex(14,  trans[2].real (), trans[2].imag ());
-           Z->set_ravel_Complex(15,  1.0, 0.0);
-         }
+           Z->next_ravel_Complex(t00.real(), t00.imag());
+           Z->next_ravel_Complex(t01.real(), t01.imag());
+           Z->next_ravel_Complex(t02.real(), t02.imag());
+           Z->next_ravel_Complex(0.0,        0.0);
 
-      
-    }
-  else
-    {
-      MORE_ERROR() << "Both arguments must be vectors of ⍴ = 3.";
-      RANK_ERROR;
-    }
+           Z->next_ravel_Complex(t10.real(), t10.imag());
+           Z->next_ravel_Complex(t11.real(), t11.imag());
+           Z->next_ravel_Complex(t12.real(), t12.imag());
+           Z->next_ravel_Complex(0.0,        0.0);
+
+           Z->next_ravel_Complex(t20.real(), t20.imag());
+           Z->next_ravel_Complex(t21.real(), t21.imag());
+           Z->next_ravel_Complex(t22.real(), t22.imag());
+           Z->next_ravel_Complex(0.0,        0.0);
+
+           Z->next_ravel_Cell(A->get_cravel(0));
+           Z->next_ravel_Cell(A->get_cravel(1));
+           Z->next_ravel_Cell(A->get_cravel(2));
+           Z->next_ravel_Complex(1.0, 0.0);
+         }
 
   Z->check_value(LOC);
   return Z;
 }
-  
-/**************** end operational functions ***************/
-
-enum MX_ops
-{
-#define op_entry(num, _desc, _v, _sub) OP_ ## num,
-#include "Quad_MX.def"
-};
-
+//----------------------------------------------------------------------------
 const struct
 {
-  MX_ops       code;   // OP_xxx
-  int          valence;
-  const char * desc;
+  Quad_MX::MX_ops code;   // OP_xxx
+  int             valence;
+  const char *    desc;
 } op_desc[] = {
-#define op_entry(e, desc, v, sub) { OP_ ## e, v, desc},
+#define op_entry(e, desc, v, sub) { Quad_MX::OP_ ## e, v, desc},
 #include "Quad_MX.def"
               };
 
@@ -1185,7 +1155,7 @@ if (OP_ ## num > 0 && OP_ ## num < OP_MAX) {      \
 Token
 Quad_MX::eval_AB(Value_P A, Value_P B) const
 {
-  return eval_B(B);
+  return eval_B(B);   // show help
 }
 //----------------------------------------------------------------------------
 Token
@@ -1206,42 +1176,41 @@ Quad_MX::eval_B(Value_P B) const
 Token
 Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-Value_P Z = Str0(LOC);
-  
 MX_ops op = OP_UNKNOWN;
-
 int modifier = 0;
 
   if (X->is_numeric_scalar())
-    {
-      op = (MX_ops)(X->get_sole_integer ());
-    }
-  else if (X->is_vector ())
-    {
-      const ShapeItem X_count   = X->element_count();
-      const Cell & Xv = X->get_cravel (0);
-      op = (MX_ops)(Xv.get_int_value ());
-      if (X_count > 1)
-    {
-      const Cell & Xv = X->get_cravel (1);
-      modifier = Xv.get_int_value ();
-    }
-    }
+     {
+       op = static_cast<MX_ops>(X->get_sole_integer());
+     }
+  else if (X->is_vector())
+     {
+       const ShapeItem X_count = X->element_count();
+       const Cell & X0 = X->get_cravel(0);
+       op = static_cast<MX_ops>(X0.get_int_value());
+       if (X_count > 1)
+          {
+            const Cell & X1 = X->get_cravel(1);
+            modifier = X1.get_int_value();
+          }
+     }
   else
     {
-      MORE_ERROR() << "mtx[*] requires a numeric function specifier.";
+      MORE_ERROR() << "Axis X of ⎕MX[X] requires a numeric function specifier.";
       SYNTAX_ERROR;
     }
  
   if (op < OP_UNKNOWN || op >= OP_MAX)
     {
       MORE_ERROR() << "Function specifier out of range.";
-      SYNTAX_ERROR;
+      AXIS_ERROR;
     }
 
+Value_P Z;
   switch(op)
     {
-      case OP_UNKNOWN:            list_functions(false);           break;
+      case OP_UNKNOWN:            Z = Idx0_0(LOC);
+                                  list_functions(false);           break;
       case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct (A, B);   break;
       case OP_VECTOR_ANGLE:       Z = vectorAngle (A, B);          break;
       case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation (16, A, B);   break;
@@ -1290,7 +1259,7 @@ int modifier = 0;
     }
   else
     {
-      MORE_ERROR() << "mtx[*] requires a numeric function specifier.";
+      MORE_ERROR() << "Axis X of ⎕MX[X] requires a numeric function specifier.";
       SYNTAX_ERROR;
     }
 
@@ -1325,8 +1294,9 @@ int modifier = 0;
   Z->check_value(LOC);
   return Token(TOK_APL_VALUE1, Z);
 }
+//----------------------------------------------------------------------------
 
-#else // not if apl_GSL ======================================================
+#else //====================not apl_GSL =====================================
  
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
@@ -1360,7 +1330,7 @@ Quad_MX::eval_XB(Value_P X, Value_P B) const
   return eval_B(B);
 }
 
-#endif
+#endif   // (not) apl_GSL
 
 //----------------------------------------------------------------------------
 sAxis
@@ -1375,4 +1345,3 @@ const char * name_str = name_utf8.c_str();
 
   return -1;
 }
-//----------------------------------------------------------------------------
