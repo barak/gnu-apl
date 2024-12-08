@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 5, 2024.  This manual briefly documents GNU APL, an interpreter
+December 8, 2024.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -3953,20 +3953,16 @@ normally distributed samples with a standard deviation of 1.
 -------------
 
 The print operation, ⎕MX[13], is dyadic and provides an easy way to dump
-large quantities of data to files.  It’s right argument is a string
+large quantities of data to files.  It’s left argument is a string
 containing the file name to be created or, if the name starts with a
-“>”, appended to.  The left argument can be a scalar, a vector, a
+“>”, appended to.  The right argument may be a scalar, a vector, a
 matrix, or a string.  For example:
 
-      34 ⎕MX[13] "samples.txt"
-
-      3 4 ⎕MX[13] ">samples.txt"
-
-      (3 4⍴⍳12) ⎕MX[13] ">samples.txt"
-
-      "example line" ⎕MX[13] ">samples.txt"
-
-      "example\nline" ⎕MX[13] ">samples.txt"
+      "samples.txt" ⎕MX[13] 34
+      ">samples.txt" ⎕MX[13] 3 4
+      ">samples.txt" ⎕MX[13] 3 4⍴⍳12
+      ">samples.txt" ⎕MX[13] "example line"
+      ">samples.txt" ⎕MX[13] "example\nline"
 
    will create a file “samples.txt” containing:
 
@@ -7898,35 +7894,35 @@ Node: Section 2.28134918
 Node: Section 2.29135587
 Node: Section 2.30137238
 Node: Section 2.31141013
-Node: Section 2.32153685
-Node: Output File Format169816
-Node: Section 2.33170991
-Node: Section 2.34180341
-Node: Section 2.35181360
-Node: Section 2.36196041
-Node: Section 2.37206199
-Node: Section 2.38210901
-Node: Section 2.39212997
-Node: Section 2.40217415
-Node: Section 2.41238725
-Node: Section 2.42249641
-Node: Chapter 3251637
-Node: Chapter 4254145
-Node: Chapter 5255271
-Node: Section 5.1256808
-Node: Section 5.2258088
-Node: Section 5.3258448
-Node: Section 5.4258690
-Node: Section 5.5259352
-Node: Section 5.6259830
-Node: Section 5.7260603
-Node: Section 5.8261029
-Node: Chapter 6261431
-Node: Section 6.1261850
-Node: Section 6.2262537
-Node: Chapter 7263368
-Node: Section 7.1263871
-Node: Section 7.2289184
+Node: Section 2.32153679
+Node: Output File Format169810
+Node: Section 2.33170985
+Node: Section 2.34180335
+Node: Section 2.35181354
+Node: Section 2.36196035
+Node: Section 2.37206193
+Node: Section 2.38210895
+Node: Section 2.39212991
+Node: Section 2.40217409
+Node: Section 2.41238719
+Node: Section 2.42249635
+Node: Chapter 3251631
+Node: Chapter 4254139
+Node: Chapter 5255265
+Node: Section 5.1256802
+Node: Section 5.2258082
+Node: Section 5.3258442
+Node: Section 5.4258684
+Node: Section 5.5259346
+Node: Section 5.6259824
+Node: Section 5.7260597
+Node: Section 5.8261023
+Node: Chapter 6261425
+Node: Section 6.1261844
+Node: Section 6.2262531
+Node: Chapter 7263362
+Node: Section 7.1263865
+Node: Section 7.2289178
 
 End Tag Table
 

@@ -201,17 +201,17 @@ Quad_MX::set_rng_seed(Value_P B)
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_MX::printit(Value_P A, Value_P B)
+Quad_MX::printit(Value_P filename, Value_P B)
 {
-const CellType A_celltype = A->deep_cell_types();
+const CellType B_celltype = B->deep_cell_types();
 
 
-  // B is either function_name or >function_name,
+  // A is either function_name or >function_name,
   // where > indicates append (as opposed to overwrite) and shall be skipped
   //
-  if (A->is_char_string() && B->is_char_string())
+  if (filename->is_char_string() && B->is_char_string())
      {
-       const UCS_string ustr = B->get_UCS_ravel();
+       const UCS_string ustr = filename->get_UCS_ravel();
        UTF8_string fun(ustr);
        const char * fun_ccp = fun.c_str();
        const char * mode = "w";
@@ -222,8 +222,8 @@ const CellType A_celltype = A->deep_cell_types();
           }
 
        FILE * ofile = fopen(fun_ccp, mode);
-       const UCS_string A_ucs = A->get_UCS_ravel();
-       const UTF8_string val(A_ucs);
+       const UCS_string B_ucs = B->get_UCS_ravel();
+       const UTF8_string val(B_ucs);
        const char * vs = val.c_str();
 
        fprintf(ofile, "%s\n", vs);
@@ -232,15 +232,15 @@ const CellType A_celltype = A->deep_cell_types();
        return Idx0_0(LOC);
      }
 
-  if (!((A_celltype & CT_NUMERIC) && B->is_char_string()))
+  if (!(filename->is_char_string() && (B_celltype & CT_NUMERIC)))
      {
-       MORE_ERROR() << "Incompatible arguments.";
+       MORE_ERROR() << "Incompatible arguments in ⎕MX.print.";
        DOMAIN_ERROR;
      }
 
-const ShapeItem A_count = A->element_count();
-const uRank     A_rank  = A->get_rank();
-const UCS_string ustr   = B->get_UCS_ravel();
+const ShapeItem B_count = B->element_count();
+const uRank     B_rank  = B->get_rank();
+const UCS_string ustr   = filename->get_UCS_ravel();
 UTF8_string fn(ustr);
 const char * fun_ccp = fn.c_str();
 const char * mode = "w";   // write (as opposed to append)
@@ -256,36 +256,36 @@ FILE * ofile = fopen(fun_ccp, mode);
        MORE_ERROR() << "Open failure on " << ustr;
        DOMAIN_ERROR;
      }
-  if (A_rank <= 1)
+  if (B_rank <= 1)
      {
-       for (int i = 0; i < A_count; i++)
+       loop(b, B_count)
            {
-             const Cell & Ai = A->get_cravel(i);
-             const APL_Float Air = Ai.get_real_value();
-             if (Ai.is_complex_cell())
+             const Cell & Bb = B->get_cravel(b);
+             const APL_Float Bbr = Bb.get_real_value();
+             if (Bb.is_complex_cell())
                {
-                 const APL_Float Aii = Ai.get_imag_value();
-                 fprintf(ofile, "%gj%g ", Air, Aii);
+                 const APL_Float Bbi = Bb.get_imag_value();
+                 fprintf(ofile, "%gj%g ", Bbr, Bbi);
                }
              else
                {
-                 fprintf(ofile, "%g ", Air);
+                 fprintf(ofile, "%g ", Bbr);
                }
            }
        fprintf(ofile, "\n");
      }
   else
     {
-      const int end_line = A->get_shape_item(A_rank - 1);
-      const int end_grid = end_line * A->get_shape_item(A_rank - 2);
+      const int end_line = B->get_shape_item(B_rank - 1);
+      const int end_grid = end_line * B->get_shape_item(B_rank - 2);
 #define STR_LEN 256
       char str[STR_LEN];
       bool is_cpx = false;
       int max_len = -1;
-      loop(a, A_count)
+      loop(a, B_count)
         {
           int len;
-          const Cell & cell_A = A->get_cravel(a);
+          const Cell & cell_A = B->get_cravel(a);
           const APL_Float Aa_real = cell_A.get_real_value();
           if (cell_A.is_complex_cell())
              {
@@ -298,25 +298,23 @@ FILE * ofile = fopen(fun_ccp, mode);
           if (max_len < len) max_len = len;
         }
 
-      int * rho = reinterpret_cast<int *>(alloca(A_rank * sizeof(int)));
-      memset(rho, 0, A_rank * sizeof(int));
-      memset(rho, 0, A_rank * sizeof(int));
+      int * rho = reinterpret_cast<int *>(alloca(B_rank * sizeof(int)));
+      memset(rho, 0, B_rank * sizeof(int));
 
-      for (int i = 0; i < A_count; i++)
+      loop(b, B_count)
           {
-            if (A_rank > 2)
+            if (B_rank > 2)
                {
-                 if (0 == i%end_grid)
+                 if (0 == b % end_grid)
                     {
                      fprintf(ofile, "\n[");
-                     for (uRank j = 0; j < A_rank - 2; j++)
-                         fprintf(ofile, "%d ", rho[j]);
+                     loop(j, B_rank - 2)   fprintf(ofile, "%d ", rho[j]);
                      fprintf(ofile, "* *]:\n");
                      bool carry = 1;
-                     for (int j = A_rank - 3; j >= 0; j--)
+                     for (int j = B_rank - 3; j >= 0; j--)
                          {
                            rho[j] += carry;
-                           if (rho[j] >= A->get_shape_item(j))
+                           if (rho[j] >= B->get_shape_item(j))
                               {
                                 rho[j] = 0;
                                 carry = 1;
@@ -329,7 +327,7 @@ FILE * ofile = fopen(fun_ccp, mode);
                     }
                }
 
-            const Cell & Av = A->get_cravel(i);
+            const Cell & Av = B->get_cravel(b);
             const APL_Float Avr = Av.get_real_value();
             char str[STR_LEN];
             if (is_cpx && Av.is_complex_cell())
@@ -342,7 +340,7 @@ FILE * ofile = fopen(fun_ccp, mode);
                  snprintf(str, STR_LEN, "%g", Avr);
                }
             fprintf(ofile, "%*s ", max_len, str);
-            if (0 == (i+1)%end_line) fprintf(ofile, "\n");
+            if (0 == (b + 1) % end_line)   fprintf(ofile, "\n");
           }
     }
 
@@ -664,7 +662,7 @@ Quad_MX::ident(const Value_P B)
      }
 
 const ShapeItem dim = B->get_sole_integer();
-  if (dim == 0)   return Str0(LOC);
+  if (dim == 0)   return Idx0_0(LOC);
 
 const Shape shape_W(dim, dim);
 Value_P Z(shape_W, LOC);
@@ -687,7 +685,7 @@ Quad_MX::monadicCovariance(const Value_P B)
 const ShapeItem rows = B->get_shape_item(0);
 const ShapeItem cols = B->get_shape_item(1);
 
-  if (rows == 0)   return Str0(LOC);   // empty result
+  if (rows == 0)   return Idx0_0(LOC);   // empty result
 
 vector<vector<double> > Breals(rows);
 vector<vector<double> > Bimags(rows);
@@ -848,7 +846,7 @@ const double imagcov =
 Value_P
 Quad_MX::randoms(const Value_P * opt_A, const Value_P B, int modifier)
 {
-Value_P Z = Str0(LOC);
+Value_P Z = Idx0(LOC);
 int rcnt = 0;
 
 static mt19937_64 rgen;
@@ -997,11 +995,9 @@ Value_P
 Quad_MX::dyadicRotation(int tp, Value_P A, Value_P B)
 {
 const ShapeItem A_count   = A->element_count();
-const uRank     A_rank    = A->get_rank();
 const ShapeItem B_count   = B->element_count();
-const uRank     B_rank    = B->get_rank();
     
-  if (A_rank != 1 || B_rank != 1)
+  if (!(A->is_vector() && B->is_vector()))
     {
       MORE_ERROR() << "Both arguments must be vectors in ⎕MX.rotation_matrix.";
       RANK_ERROR;

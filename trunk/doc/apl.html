@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 5, 2024.
+<p>December 8, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -4457,20 +4457,16 @@ normally distributed samples with a standard deviation of 1.
 <h4 class="subsection">2.31.13 Print</h4>
 
 <p>The print operation, ⎕MX[13], is dyadic and provides an easy way to
-dump large quantities of data to files. It&rsquo;s right argument is a
+dump large quantities of data to files. It&rsquo;s left argument is a
 string containing the file name to be created or, if the name starts
-with a &ldquo;&gt;&rdquo;, appended to. The left argument can be a scalar, a
+with a &ldquo;&gt;&rdquo;, appended to. The right argument may be a scalar, a
 vector, a matrix, or a string. For example:
 </p>
-<pre class="verbatim">      34 ⎕MX[13] &quot;samples.txt&quot;
-
-      3 4 ⎕MX[13] &quot;&gt;samples.txt&quot;
-
-      (3 4⍴⍳12) ⎕MX[13] &quot;&gt;samples.txt&quot;
-
-      &quot;example line&quot; ⎕MX[13] &quot;&gt;samples.txt&quot;
-
-      &quot;example\nline&quot; ⎕MX[13] &quot;&gt;samples.txt&quot;
+<pre class="verbatim">      &quot;samples.txt&quot; ⎕MX[13] 34
+      &quot;&gt;samples.txt&quot; ⎕MX[13] 3 4
+      &quot;&gt;samples.txt&quot; ⎕MX[13] 3 4⍴⍳12
+      &quot;&gt;samples.txt&quot; ⎕MX[13] &quot;example line&quot;
+      &quot;&gt;samples.txt&quot; ⎕MX[13] &quot;example\nline&quot;
 </pre>
 <p>will create a file &ldquo;samples.txt&rdquo; containing:
 </p>

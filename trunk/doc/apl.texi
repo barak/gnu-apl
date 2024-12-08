@@ -4102,21 +4102,17 @@ normally distributed samples with a standard deviation of 1.
 @subsection Print
 
 The print operation, ⎕MX[13], is dyadic and provides an easy way to
-dump large quantities of data to files. It's right argument is a
+dump large quantities of data to files. It's left argument is a
 string containing the file name to be created or, if the name starts
-with a ``>'', appended to. The left argument can be a scalar, a
+with a ``>'', appended to. The right argument may be a scalar, a
 vector, a matrix, or a string. For example:
 
 @verbatim
-      34 ⎕MX[13] "samples.txt"
-
-      3 4 ⎕MX[13] ">samples.txt"
-
-      (3 4⍴⍳12) ⎕MX[13] ">samples.txt"
-
-      "example line" ⎕MX[13] ">samples.txt"
-
-      "example\nline" ⎕MX[13] ">samples.txt"
+      "samples.txt" ⎕MX[13] 34
+      ">samples.txt" ⎕MX[13] 3 4
+      ">samples.txt" ⎕MX[13] 3 4⍴⍳12
+      ">samples.txt" ⎕MX[13] "example line"
+      ">samples.txt" ⎕MX[13] "example\nline"
 @end verbatim
 
 will create a file ``samples.txt'' containing:
