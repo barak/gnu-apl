@@ -105,7 +105,21 @@ inline Value_P::Value_P(ShapeItem len, const char * loc)
 const char * args = "ShapeItem len, const char * loc";
    value_p = 0;
 
-   try                           { value_p = new Value(len, loc); }
+   try                           { value_p = new Value(len, loc);             }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   value_p->increment_owner_count(loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//----------------------------------------------------------------------------
+inline Value_P::Value_P(ShapeItem rows, ShapeItem cols, const char * loc)
+{
+const char * args = "ShapeItem rows, Shapeitem cols, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(rows, cols, loc);      }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
    catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }

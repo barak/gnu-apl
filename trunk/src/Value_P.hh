@@ -107,7 +107,7 @@ class Value_P : public Value_P_Base
 public:
    /// Constructor: 0 pointer
    Value_P()
-   { value_p = 0; }
+      { value_p = 0; }
 
    /// a new scalar value with un-initialized ravel
    inline Value_P(const char * loc);
@@ -117,6 +117,9 @@ public:
 
    /// a new true vector (rank 1 value) of length len and un-initialized ravel
    inline Value_P(ShapeItem len, const char * loc);
+
+   /// a new matrix (rank 2 value) with an un-initialized ravel
+   inline Value_P(ShapeItem rows, ShapeItem cols, const char * loc);
 
    /// a new value with shape sh and un-initialized ravel
    inline Value_P(const Shape & sh, const char * loc);

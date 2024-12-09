@@ -37,7 +37,7 @@ class Quad_MX : public QuadFunction
 
 public:
    /// Constructor.
-  Quad_MX() : QuadFunction(TOK_Quad_MX)   { }
+  Quad_MX();
 
   enum MX_ops
      {
@@ -55,45 +55,44 @@ public:
    static Quad_MX  fun;          ///< Built-in function.
 
 protected:
+  /// a matrix suitable for libgsl
   class Matrix
      {
        public:
-         Matrix (int r, int c)
+         /// constructor: un-initialzed r×c matrix
+         Matrix(int r, int c)
          : krows(r),
-           kcols(c)
+           kcols(c),
+           vals(r * c)
+         {}
+
+         /// return the value at \b row and \b col
+         Dcomplex val(int row, int col) const
             {
-              vals = new vector<Dcomplex>(r * c);
-            }
-       
-         ~Matrix ()
-            {
-              delete vals;
-            }
-    
-         Dcomplex val(int r, int c)
-            {
-              return (*vals)[c + r * kcols];
+              return vals[col + row * kcols];
             }
     
-         void val(int r, int c, Dcomplex v)
+         /// set the value at \b row and \b col to \b value
+         void set_val(int row, int col, Dcomplex value)
             {
-              (*vals)[c + r * kcols] = v;
+              vals[col + row * kcols] = value;
             }
     
-         int  rows()   { return krows; }
+         /// return the number of rows
+         int rows() const   { return krows; }
     
-         int  cols()   { return kcols; }
+         /// return the number of columns
+         int cols() const   { return kcols; }
     
-         void show()
+         /// print \b this matrix to stderr
+         void show() const
             {
-              for (int r = 0; r < krows; r++)
+              loop(r, krows)
                   {
-                    for (int c = 0; c < kcols; c++)
-                      {
-                        fprintf (stderr, "%gj%g ",
-                             this->val (r, c).real (),
-                             this->val (r, c).imag ());
-                      }
+                    loop(c, kcols)
+                        {
+                          fprintf (stderr, "%gj%g ", val (r, c).real (), val (r, c).imag ());
+                        }
                     fprintf (stderr, "\n");
                   }
             }
@@ -109,9 +108,13 @@ protected:
             }
 
        private:
+         /// the number of rows
          int krows;
+         /// the number of columns
          int kcols;
-         vector<Dcomplex> *vals;
+
+         /// the matrix items
+         vector<Dcomplex> vals;
      };
 
    /// overloaded Function::eval_AXB().
@@ -126,43 +129,70 @@ protected:
    /// overloaded Function::eval_B().
   virtual Token eval_B(Value_P B) const;
 
+  /// properties of subfunctions
+  static struct fun_info
+     {
+       MX_ops       code;       ///< OP_xxx aka. the axis (for the ⎕MX[code] syntax)
+       int          valence;    ///< the function valence(s)
+       const char * desc;       ///< description
+       const char * sub_name;   ///< subfunction name (for ⎕MX.sub_name syntax)
+     } op_desc[];   ///< all subfunctions
+
+  /// return the cros product of all rows in \b mtx
   static vector<Dcomplex> getCross(Matrix * mtx);
 
-  static Matrix * genCofactor(Matrix *mtx, int r, int c);
+  /// return mtx with \b row and \b col removed
+  static Matrix * genCofactor(Matrix * mtx, int row, int col);
 
+  /// return the determinant of \b mtx
   static Dcomplex getDet(Matrix * mtx);
 
-  static Dcomplex magnitude(vector<Dcomplex> &v);
+  /// return the magnitude of \b v
+  static Dcomplex magnitude(vector<Dcomplex> & v);
 
-  static void normalise(vector<double> &v);
+  /// normalize \b v to length 1
+  static void normalise(vector<double> & v);
 
+  /// generate a matrix suitable for libgsl
   static Matrix * genMtx(Value_P B, bool padded);
 
+  /// return the eigenvectors of \b B
   static Value_P eigenvectors(Value_P B);
 
+  /// print \B to file \A
   static Value_P printit(Value_P A, Value_P B);
 
+  //// return the eigencalues of \b B
   static Value_P eigenvalues(Value_P B);
 
+  /// set the random number generators seed
   static Value_P set_rng_seed(Value_P B);
 
+  //// return the determinant of \b B
   static Value_P determinant(Value_P B);
 
+  //// return the cross product of all vectors in \b B
   static Value_P monadicCrossProduct(Value_P B);
 
+  //// return the cross product of \b A and \b B
   static Value_P dyadicCrossProduct(Value_P A, Value_P B);
 
+  //// return the angle between \b A and \b B
   static Value_P vectorAngle(const Value_P A, const Value_P B);
 
+  //// return the (complex) identity matrix
   static Value_P ident(const Value_P B);
 
+  //// return the monadic Covariance
   static Value_P monadicCovariance(const Value_P B);
 
   static Value_P histogram(const Value_P A, const Value_P B);
 
+  //// return the dyadic Covariance
   static Value_P dyadicCovariance(const Value_P A, const Value_P B);
 
-  static Value_P randoms(const Value_P *A, const Value_P B, int modifier);
+  /// return random numbers
+  static Value_P randoms(const Value_P * opt_A, const Value_P B, int modifier);
 
   static Value_P norm(const Value_P B);
 
@@ -170,12 +200,26 @@ protected:
 
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
 
+  /// list functions and their syntaces
   static void list_functions(bool);
 
+  /// helper for bsearch() in subfun_to_axis
+  static int axis_compare(const void * key, const void * info);
+
+  /// true if the random number generators were initialized
+  static bool rng_initialised;
+
+  /// true if the random number generator seed was initialized
   static bool rng_seed_set;
 
+  /// random number generator seed
   static unsigned int rng_seed;
 
+  /// random number generator for real parts
+  static mt19937_64 rgen;   // aka. mersenne_twister_engine<...>
+
+  /// random number generator fore imaginary parts
+  static mt19937_64 igen;
 };
 
 #endif  // __Quad_MX_DEFINED__

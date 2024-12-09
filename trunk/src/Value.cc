@@ -281,9 +281,19 @@ Value::Value(const Cell & cell, const char * loc)
    check_value(LOC);
 }
 //----------------------------------------------------------------------------
-Value::Value(ShapeItem sh, const char * loc)
+Value::Value(ShapeItem len, const char * loc)
    : DynamicObject(loc, &all_values),
-     shape(sh),
+     shape(len),
+     flags(VF_NONE),
+     valid_ravel_items(0)
+{
+   ADD_EVENT(this, VHE_Create, 0, loc);
+   init_ravel();
+}
+//----------------------------------------------------------------------------
+Value::Value(ShapeItem rows, ShapeItem cols, const char * loc)
+   : DynamicObject(loc, &all_values),
+     shape(rows, cols),
      flags(VF_NONE),
      valid_ravel_items(0)
 {

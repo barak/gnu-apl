@@ -76,8 +76,11 @@ protected:
    /// constructor: a scalar value (i.e. a value with rank 0) from a cell
    Value(const Cell & cell, const char * loc);
 
-   /// constructor: a true vector (i.e. a value with rank 1) with shape \b sh
-   Value(ShapeItem sh, const char * loc);
+   /// constructor: a true vector (i.e. a value with rank 1) with len items
+   Value(ShapeItem len, const char * loc);
+
+   /// constructor: a matrix (i.e. a value with rank 2)
+   Value(ShapeItem rows, ShapeItem cols, const char * loc);
 
    /// constructor: a general array with shape \b sh
    Value(const Shape & sh, const char * loc);
