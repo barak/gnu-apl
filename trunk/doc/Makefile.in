@@ -437,14 +437,15 @@ SUBDIRS = DALY
 info_TEXINFOS = 
 man1_MANS = apl.1
 dist_doc_DATA = \
-	apl.1			\
-	apl.texi		\
-	apl.info		\
-	apl.html		\
-	libapl.texi		\
-	libapl.info		\
-	PLOT_circle.png		\
-	PLOT_zigzag.png		\
+	apl.1					\
+	apl.texi				\
+	apl.info				\
+	apl.html				\
+	libapl.texi				\
+	libapl.info				\
+	PLOT_circle.png			\
+	PLOT_zigzag.png			\
+    MX_distributions.png	\
 	libapl.html
 
 all: all-recursive

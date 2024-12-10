@@ -52,20 +52,10 @@ Quad_MX Quad_MX::fun;
 #include<complex>
 #include<vector>
 
-#if apl_GSL
-
-#include <gsl/gsl_statistics.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_eigen.h>
-
 struct Quad_MX::fun_info Quad_MX::op_desc[] = {
 #define op_entry(e, desc, v, sub) { Quad_MX::OP_ ## e, v, desc, sub},
 #include "Quad_MX.def"
                                               };
-/************** start Matrix class **************/
-/****** NOTE: gsl matrices don't support complex ******/
-
-//----------------------------------------------------------------------------
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
   // sort op_desc alphabetically. It is small, so a simple O(n²) algo suffices
@@ -83,6 +73,17 @@ const int count = sizeof(op_desc) / sizeof(*op_desc);
            }
       }
 }
+
+#if apl_GSL
+
+#include <gsl/gsl_statistics.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_eigen.h>
+
+/************** start Matrix class **************/
+/****** NOTE: gsl matrices don't support complex ******/
+
+//----------------------------------------------------------------------------
 // ============= start utility fcns ===============
 
 //----------------------------------------------------------------------------

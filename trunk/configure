@@ -25983,7 +25983,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions
     apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
-    apl_GSL:                     $apl_GSL	(affects: ⎕MX)
+    apl_GSL:                     $apl_GSL	(affects: ⎕MX, ⌹)
     apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
     apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)

@@ -29,6 +29,10 @@
 
 #include "LApack.hh"
 
+#if apl_GSL
+# include "QR_factorization_GSL.hh"
+#endif
+
 # include "LAdebug.icc"   // print_matrix() etc.
 
 Bif_F12_DOMINO Bif_F12_DOMINO   ::fun;    // ⌹
@@ -119,7 +123,7 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
    //
    if (!X->is_scalar())   RANK_ERROR;
 
-enum { ALGO_BAD, ALGO_HELZER, ALGO_LAPACK } algo = ALGO_BAD;
+enum { ALGO_BAD, ALGO_HELZER, ALGO_LAPACK, ALGO_GSL } algo = ALGO_BAD;
 const Cell & X0 = X->get_cscalar();
 double EPS = Workspace::get_CT();
 
@@ -132,6 +136,9 @@ double EPS = Workspace::get_CT();
       {
         if      (X0.get_int_value() <= 1)   algo = ALGO_HELZER;
         else if (X0.get_int_value() == 2)   algo = ALGO_LAPACK;
+#if apl_GSL
+        else if (X0.get_int_value() == 3)   algo = ALGO_GSL;
+#endif
       }
 
    if (algo == ALGO_BAD)
@@ -154,10 +161,10 @@ Value_P Z(3, LOC);
 
    if (algo == ALGO_HELZER)
       {
-        LA_DEBUG && CERR << "QR factorization with G. Helzer's algorithm...\n";
+        LA_DEBUG && CERR << "QR factorization with Gary Helzer's algorithm...\n";
         QR_Helzer(Z, need_complex, M, N, &B->get_cfirst(), EPS);
       }
-   else
+   else if (algo == ALGO_LAPACK)
       {
         LA_DEBUG && CERR << "QR factorization with LA_pack::laqp2()...\n";
         if (need_complex)
@@ -165,6 +172,16 @@ Value_P Z(3, LOC);
         else
            LA_pack::factorize_DD_matrix(*Z, M, N, &B->get_cfirst(), EPS);
       }
+#if apl_GSL
+   else if (algo == ALGO_GSL)
+      {
+        LA_DEBUG && CERR << "QR factorization with libgsl algorithm...\n";
+        if (need_complex)
+           GSL::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+        else
+           GSL::factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+      }
+#endif
 
    Z->set_proto_Int();   // never since M*cols__B ≠ 0. Just for clarity
    Z->check_value(LOC);

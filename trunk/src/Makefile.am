@@ -115,6 +115,7 @@ common_SOURCES += 										PrimitiveOperator.hh
 common_SOURCES += PrintBuffer.cc						PrintBuffer.hh
 common_SOURCES += 										PrintContext.hh
 common_SOURCES += 										PrintOperator.hh
+common_SOURCES += QR_factorization_GSL.cc               QR_factorization_GSL.hh
 common_SOURCES += QuadFunction.cc						QuadFunction.hh
 common_SOURCES += ProcessorID.cc						ProcessorID.hh
 common_SOURCES += Quad_CR.cc		Quad_CR.def			Quad_CR.hh

@@ -47,14 +47,15 @@ libapl.info: libapl.texi
 	$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 
-dist_doc_DATA =			\
-	apl.1			\
-	apl.texi		\
-	apl.info		\
-	apl.html		\
-	libapl.texi		\
-	libapl.info		\
-	PLOT_circle.png		\
-	PLOT_zigzag.png		\
+dist_doc_DATA =				\
+	apl.1					\
+	apl.texi				\
+	apl.info				\
+	apl.html				\
+	libapl.texi				\
+	libapl.info				\
+	PLOT_circle.png			\
+	PLOT_zigzag.png			\
+    MX_distributions.png	\
 	libapl.html
 

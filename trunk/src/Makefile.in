@@ -217,6 +217,7 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
 	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
@@ -306,23 +307,24 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Plot_data.lo \
 	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
-	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-QuadFunction.lo \
-	lib_gnu_apl_la-ProcessorID.lo lib_gnu_apl_la-Quad_CR.lo \
-	lib_gnu_apl_la-Quad_DLX.lo lib_gnu_apl_la-Quad_FFT.lo \
-	lib_gnu_apl_la-Quad_FIO.lo lib_gnu_apl_la-Quad_FX.lo \
-	lib_gnu_apl_la-Quad_GTK.lo lib_gnu_apl_la-Quad_JSON.lo \
-	lib_gnu_apl_la-Quad_MAP.lo lib_gnu_apl_la-Quad_MX.lo \
-	lib_gnu_apl_la-Quad_PLOT.lo lib_gnu_apl_la-Quad_PNG.lo \
-	lib_gnu_apl_la-Quad_RE.lo lib_gnu_apl_la-Quad_RL.lo \
-	lib_gnu_apl_la-Quad_RVAL.lo lib_gnu_apl_la-Quad_SQL.lo \
-	lib_gnu_apl_la-Quad_SVx.lo lib_gnu_apl_la-Quad_TF.lo \
-	lib_gnu_apl_la-Quad_WA.lo lib_gnu_apl_la-Quad_XML.lo \
-	lib_gnu_apl_la-RealCell.lo lib_gnu_apl_la-sbrk.lo \
-	lib_gnu_apl_la-Shape.lo lib_gnu_apl_la-ScalarFunction.lo \
-	lib_gnu_apl_la-Security.lo lib_gnu_apl_la-StateIndicator.lo \
-	lib_gnu_apl_la-Svar_DB.lo lib_gnu_apl_la-Svar_record.lo \
-	lib_gnu_apl_la-Symbol.lo lib_gnu_apl_la-SymbolTable.lo \
-	lib_gnu_apl_la-SystemVariable.lo \
+	lib_gnu_apl_la-PrintBuffer.lo \
+	lib_gnu_apl_la-QR_factorization_GSL.lo \
+	lib_gnu_apl_la-QuadFunction.lo lib_gnu_apl_la-ProcessorID.lo \
+	lib_gnu_apl_la-Quad_CR.lo lib_gnu_apl_la-Quad_DLX.lo \
+	lib_gnu_apl_la-Quad_FFT.lo lib_gnu_apl_la-Quad_FIO.lo \
+	lib_gnu_apl_la-Quad_FX.lo lib_gnu_apl_la-Quad_GTK.lo \
+	lib_gnu_apl_la-Quad_JSON.lo lib_gnu_apl_la-Quad_MAP.lo \
+	lib_gnu_apl_la-Quad_MX.lo lib_gnu_apl_la-Quad_PLOT.lo \
+	lib_gnu_apl_la-Quad_PNG.lo lib_gnu_apl_la-Quad_RE.lo \
+	lib_gnu_apl_la-Quad_RL.lo lib_gnu_apl_la-Quad_RVAL.lo \
+	lib_gnu_apl_la-Quad_SQL.lo lib_gnu_apl_la-Quad_SVx.lo \
+	lib_gnu_apl_la-Quad_TF.lo lib_gnu_apl_la-Quad_WA.lo \
+	lib_gnu_apl_la-Quad_XML.lo lib_gnu_apl_la-RealCell.lo \
+	lib_gnu_apl_la-sbrk.lo lib_gnu_apl_la-Shape.lo \
+	lib_gnu_apl_la-ScalarFunction.lo lib_gnu_apl_la-Security.lo \
+	lib_gnu_apl_la-StateIndicator.lo lib_gnu_apl_la-Svar_DB.lo \
+	lib_gnu_apl_la-Svar_record.lo lib_gnu_apl_la-Symbol.lo \
+	lib_gnu_apl_la-SymbolTable.lo lib_gnu_apl_la-SystemVariable.lo \
 	lib_gnu_apl_la-TabExpansion.lo \
 	lib_gnu_apl_la-Thread_context.lo lib_gnu_apl_la-Token.lo \
 	lib_gnu_apl_la-Tokenizer.lo lib_gnu_apl_la-UCS_string.lo \
@@ -388,6 +390,7 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
 	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
@@ -468,30 +471,31 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Prefix.lo libapl_la-Plot_line_properties.lo \
 	libapl_la-Plot_data.lo libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrintBuffer.lo \
-	libapl_la-QuadFunction.lo libapl_la-ProcessorID.lo \
-	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
-	libapl_la-Quad_FFT.lo libapl_la-Quad_FIO.lo \
-	libapl_la-Quad_FX.lo libapl_la-Quad_GTK.lo \
-	libapl_la-Quad_JSON.lo libapl_la-Quad_MAP.lo \
-	libapl_la-Quad_MX.lo libapl_la-Quad_PLOT.lo \
-	libapl_la-Quad_PNG.lo libapl_la-Quad_RE.lo \
-	libapl_la-Quad_RL.lo libapl_la-Quad_RVAL.lo \
-	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
-	libapl_la-Quad_TF.lo libapl_la-Quad_WA.lo \
-	libapl_la-Quad_XML.lo libapl_la-RealCell.lo libapl_la-sbrk.lo \
-	libapl_la-Shape.lo libapl_la-ScalarFunction.lo \
-	libapl_la-Security.lo libapl_la-StateIndicator.lo \
-	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
-	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
-	libapl_la-SystemVariable.lo libapl_la-TabExpansion.lo \
-	libapl_la-Thread_context.lo libapl_la-Token.lo \
-	libapl_la-Tokenizer.lo libapl_la-UCS_string.lo \
-	libapl_la-UCS_string_vector.lo libapl_la-UserFunction.lo \
-	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
-	libapl_la-UTF8_string.lo libapl_la-Value.lo \
-	libapl_la-ValueHistory.lo libapl_la-Workspace.lo \
-	libapl_la-static_Objects.lo $(am__objects_8) $(am__objects_9) \
-	$(am__objects_10) $(am__objects_11)
+	libapl_la-QR_factorization_GSL.lo libapl_la-QuadFunction.lo \
+	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
+	libapl_la-Quad_DLX.lo libapl_la-Quad_FFT.lo \
+	libapl_la-Quad_FIO.lo libapl_la-Quad_FX.lo \
+	libapl_la-Quad_GTK.lo libapl_la-Quad_JSON.lo \
+	libapl_la-Quad_MAP.lo libapl_la-Quad_MX.lo \
+	libapl_la-Quad_PLOT.lo libapl_la-Quad_PNG.lo \
+	libapl_la-Quad_RE.lo libapl_la-Quad_RL.lo \
+	libapl_la-Quad_RVAL.lo libapl_la-Quad_SQL.lo \
+	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
+	libapl_la-Quad_WA.lo libapl_la-Quad_XML.lo \
+	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
+	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
+	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
+	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
+	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
+	libapl_la-TabExpansion.lo libapl_la-Thread_context.lo \
+	libapl_la-Token.lo libapl_la-Tokenizer.lo \
+	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
+	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
+	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
+	libapl_la-Value.lo libapl_la-ValueHistory.lo \
+	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
+	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
+	$(am__objects_11)
 @apl_TARGET_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
 @apl_TARGET_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -538,6 +542,7 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
 	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
@@ -619,18 +624,18 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
 	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
-	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
-	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
-	apl-Quad_FFT.$(OBJEXT) apl-Quad_FIO.$(OBJEXT) \
-	apl-Quad_FX.$(OBJEXT) apl-Quad_GTK.$(OBJEXT) \
-	apl-Quad_JSON.$(OBJEXT) apl-Quad_MAP.$(OBJEXT) \
-	apl-Quad_MX.$(OBJEXT) apl-Quad_PLOT.$(OBJEXT) \
-	apl-Quad_PNG.$(OBJEXT) apl-Quad_RE.$(OBJEXT) \
-	apl-Quad_RL.$(OBJEXT) apl-Quad_RVAL.$(OBJEXT) \
-	apl-Quad_SQL.$(OBJEXT) apl-Quad_SVx.$(OBJEXT) \
-	apl-Quad_TF.$(OBJEXT) apl-Quad_WA.$(OBJEXT) \
-	apl-Quad_XML.$(OBJEXT) apl-RealCell.$(OBJEXT) \
-	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-QR_factorization_GSL.$(OBJEXT) apl-QuadFunction.$(OBJEXT) \
+	apl-ProcessorID.$(OBJEXT) apl-Quad_CR.$(OBJEXT) \
+	apl-Quad_DLX.$(OBJEXT) apl-Quad_FFT.$(OBJEXT) \
+	apl-Quad_FIO.$(OBJEXT) apl-Quad_FX.$(OBJEXT) \
+	apl-Quad_GTK.$(OBJEXT) apl-Quad_JSON.$(OBJEXT) \
+	apl-Quad_MAP.$(OBJEXT) apl-Quad_MX.$(OBJEXT) \
+	apl-Quad_PLOT.$(OBJEXT) apl-Quad_PNG.$(OBJEXT) \
+	apl-Quad_RE.$(OBJEXT) apl-Quad_RL.$(OBJEXT) \
+	apl-Quad_RVAL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
+	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
+	apl-Quad_WA.$(OBJEXT) apl-Quad_XML.$(OBJEXT) \
+	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
@@ -712,6 +717,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-Plot_xcb.Po ./$(DEPDIR)/apl-PointerCell.Po \
 	./$(DEPDIR)/apl-Prefix.Po ./$(DEPDIR)/apl-PrimitiveFunction.Po \
 	./$(DEPDIR)/apl-PrintBuffer.Po ./$(DEPDIR)/apl-ProcessorID.Po \
+	./$(DEPDIR)/apl-QR_factorization_GSL.Po \
 	./$(DEPDIR)/apl-QuadFunction.Po ./$(DEPDIR)/apl-Quad_CR.Po \
 	./$(DEPDIR)/apl-Quad_DLX.Po ./$(DEPDIR)/apl-Quad_FFT.Po \
 	./$(DEPDIR)/apl-Quad_FIO.Po ./$(DEPDIR)/apl-Quad_FX.Po \
@@ -804,6 +810,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo \
@@ -916,6 +923,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/libapl_la-PrintBuffer.Plo \
 	./$(DEPDIR)/libapl_la-ProcessorID.Plo \
+	./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo \
 	./$(DEPDIR)/libapl_la-QuadFunction.Plo \
 	./$(DEPDIR)/libapl_la-Quad_CR.Plo \
 	./$(DEPDIR)/libapl_la-Quad_DLX.Plo \
@@ -1312,6 +1320,7 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
 	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
@@ -1629,6 +1638,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrintBuffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ProcessorID.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-QR_factorization_GSL.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-QuadFunction.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_CR.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_DLX.Po@am__quote@ # am--include-marker
@@ -1742,6 +1752,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo@am__quote@ # am--include-marker
@@ -1855,6 +1866,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ProcessorID.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-QuadFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_CR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_DLX.Plo@am__quote@ # am--include-marker
@@ -2411,6 +2423,13 @@ lib_gnu_apl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrintBuffer.cc' object='lib_gnu_apl_la-PrintBuffer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+
+lib_gnu_apl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Tpo -c -o lib_gnu_apl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Tpo $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='lib_gnu_apl_la-QR_factorization_GSL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
 
 lib_gnu_apl_la-QuadFunction.lo: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QuadFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Tpo -c -o lib_gnu_apl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
@@ -3258,6 +3277,13 @@ libapl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrintBuffer.cc' object='libapl_la-PrintBuffer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+
+libapl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/libapl_la-QR_factorization_GSL.Tpo -c -o libapl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-QR_factorization_GSL.Tpo $(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='libapl_la-QR_factorization_GSL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
 
 libapl_la-QuadFunction.lo: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-QuadFunction.lo -MD -MP -MF $(DEPDIR)/libapl_la-QuadFunction.Tpo -c -o libapl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
@@ -4575,6 +4601,20 @@ apl-PrintBuffer.obj: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PrintBuffer.obj `if test -f 'PrintBuffer.cc'; then $(CYGPATH_W) 'PrintBuffer.cc'; else $(CYGPATH_W) '$(srcdir)/PrintBuffer.cc'; fi`
 
+apl-QR_factorization_GSL.o: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QR_factorization_GSL.o -MD -MP -MF $(DEPDIR)/apl-QR_factorization_GSL.Tpo -c -o apl-QR_factorization_GSL.o `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QR_factorization_GSL.Tpo $(DEPDIR)/apl-QR_factorization_GSL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='apl-QR_factorization_GSL.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-QR_factorization_GSL.o `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+
+apl-QR_factorization_GSL.obj: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QR_factorization_GSL.obj -MD -MP -MF $(DEPDIR)/apl-QR_factorization_GSL.Tpo -c -o apl-QR_factorization_GSL.obj `if test -f 'QR_factorization_GSL.cc'; then $(CYGPATH_W) 'QR_factorization_GSL.cc'; else $(CYGPATH_W) '$(srcdir)/QR_factorization_GSL.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QR_factorization_GSL.Tpo $(DEPDIR)/apl-QR_factorization_GSL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='apl-QR_factorization_GSL.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-QR_factorization_GSL.obj `if test -f 'QR_factorization_GSL.cc'; then $(CYGPATH_W) 'QR_factorization_GSL.cc'; else $(CYGPATH_W) '$(srcdir)/QR_factorization_GSL.cc'; fi`
+
 apl-QuadFunction.o: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QuadFunction.o -MD -MP -MF $(DEPDIR)/apl-QuadFunction.Tpo -c -o apl-QuadFunction.o `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QuadFunction.Tpo $(DEPDIR)/apl-QuadFunction.Po
@@ -5641,6 +5681,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
 	-rm -f ./$(DEPDIR)/apl-ProcessorID.Po
+	-rm -f ./$(DEPDIR)/apl-QR_factorization_GSL.Po
 	-rm -f ./$(DEPDIR)/apl-QuadFunction.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_CR.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_DLX.Po
@@ -5754,6 +5795,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo
@@ -5867,6 +5909,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-QuadFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_DLX.Plo
@@ -6049,6 +6092,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
 	-rm -f ./$(DEPDIR)/apl-ProcessorID.Po
+	-rm -f ./$(DEPDIR)/apl-QR_factorization_GSL.Po
 	-rm -f ./$(DEPDIR)/apl-QuadFunction.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_CR.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_DLX.Po
@@ -6162,6 +6206,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo
@@ -6275,6 +6320,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-QuadFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_DLX.Plo
