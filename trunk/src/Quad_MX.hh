@@ -43,6 +43,7 @@ public:
      {
 #define op_entry(num, _desc, _v, _sub) OP_ ## num,
 #include "Quad_MX.def"
+       OP_MAX
      };
 
    /// overloaded Function::has_subfuns()
@@ -136,7 +137,7 @@ protected:
        int          valence;    ///< the function valence(s)
        const char * desc;       ///< description
        const char * sub_name;   ///< subfunction name (for ⎕MX.sub_name syntax)
-     } op_desc[];   ///< all subfunctions
+     } op_desc[OP_MAX];         ///< all subfunctions
 
   /// return the cros product of all rows in \b mtx
   static vector<Dcomplex> getCross(Matrix * mtx);

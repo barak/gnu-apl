@@ -1302,8 +1302,11 @@ Quad_MX::subfun_to_axis(const UCS_string & name) const
 const UTF8_string function_name_utf8(name);
 const char * function_name_str = function_name_utf8.c_str();
 
+  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(op_desc)
+  //       since Apple complains with a bogus error.
   enum { FUN_INFO_SIZE  = sizeof(fun_info),
-         FUN_INFO_COUNT = sizeof(op_desc) / FUN_INFO_SIZE };
+         FUN_INFO_COUNT = OP_MAX
+       };
 
   if (const void * vp = bsearch(function_name_str, op_desc,
                                 FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))

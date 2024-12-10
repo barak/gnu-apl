@@ -33,7 +33,6 @@ op_entry( COVARIANCE,         "Covariance",         3, "covariance")           /
 op_entry( HISTOGRAM,          "Histogram",          2, "histogram")            /* 12 */
 op_entry( PRINT,              "Print",              2, "print")                /* 13 */
 op_entry( SET_RNG_SEED,       "Set RNG seed",       1, "set_rng_seed")         /* 14 */
-op_entry( MAX,                "",                   0, "")                     /* 15 */
  
 #undef op_entry
 
