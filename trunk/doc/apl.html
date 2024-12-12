@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 8, 2024.
+<p>December 12, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -3040,26 +3040,28 @@ Next: <a href="#Section-2_002e21" accesskey="n" rel="next">Dyadic ⎕CR</a>, Pre
 <span id="g_t_005b_003f_005d_005bX_005d-_002d-QR-Factorization"></span><h3 class="section">2.20 ⌹[X] - QR Factorization</h3>
 
 <p>Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The
-axis argument X is used to clear near-0 matrix items to exactly 0.0 during
-the computation. Set X←⎕CT if unsure.
+axis argument X is used to either clear near-0 matrix items to exactly 0.0
+during the computation (in Garry Helzer&rsquo;s algorithm), or else to select
+a different algorithm for computing the factorization. Set X←⎕CT if unsure.
 </p>
-<p>The result Z is a triple (QT R Ri)←Z with the following properties.
+<p>The result Z is a triple (Q R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
 </p>
-<p>* QT is an orthogonal M×M matrix, i.e QT<sup>-1</sup> = QT<sup>T</sup>, and QT +.× ⍉QT
+<p>* <b>Q</b> is an orthogonal M×M matrix, i.e Q<sup>-1</sup> = Q<sup>T</sup>, and Q +.× ⍉Q
  is the M×M identity matrix I<sub>M</sub> (with I<sub>M</sub>←∘.=⍨⍳M).
 </p>
-<p>* R is an upper triangular M×N matrix, i.e. R[m;n] = 0 for n &lt; m, and
+<p>* <b>R</b> is an upper triangular N×N matrix, i.e. R[m;n] = 0 for n &lt; m. Note
+  that if M&gt;N then, following a convention in other libraries (read: libgsl),
+  the triangular matrices R and Ri have shape (N N) and not (M N).
+   This is because the rows below row N are always 0 in R and in Ri,
+  and therefore not of interest. As a consequence, in order to restore
+  B from Q and R one has to use <b>Q+.×M N↑R</b> (or shorter <b>Q∘M N↑R)</b> and
+  not simply <b>Q+.×B</b> (or <b>Q∘R</b>).
 </p>
-<p>* Ri is the inverse of R, i.e. Ri +.× R is the identity matrix I<sub>N</sub>.
+<p>* <b>Ri</b> is the inverse of <b>R</b>, i.e. <b>Ri +.× R</b> is the N×N identity
+  matrix I<sub>N</sub>.
 </p>
-<p>* (⍉QT) +.× R = B.
-</p>
-<p>Note that, unlike in standard QR factorizations, the matrix QT returned by
-⌹[X] is already inverted (i.e. transposed since QT is orthogonal). The
-reason is that the algorithm used can transpose Q with no extra cost and
-usually the first step after a QR factorization is to transpose the
-returned Q matrix. This first transpose step is therefore not needed.
+<p>* <b>B = Q +.× M N↑R</b>.
 </p>
 <p>Example 1 (real B)
 </p><pre class="verbatim">
@@ -3068,17 +3070,16 @@ returned Q matrix. This first transpose step is therefore not needed.
 2 4 2
 4 8 7
 
-      (QT R Ri)←⌹[⎕CT]B
-      Q←⍉QT           ⍝ recover the non-transposed Q
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q
+      4⎕CR 4⍕Q
 ┏→━━━━━━━━━━━━━━━━━━━┓
-↓ .2182  .4364  .8729┃
-┃ .9759 ¯.0976 ¯.1952┃
-┃ .0000 ¯.8944  .4472┃
+↓ .2182  .9759  .0000┃
+┃ .4364 ¯.0976 ¯.8944┃
+┃ .8729 ¯.1952  .4472┃
 ┗━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q+.×⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000  .0000  .0000┃
 ┃  .0000 1.0000  .0000┃
@@ -3092,7 +3093,7 @@ returned Q matrix. This first transpose step is therefore not needed.
 ┃  .0000  .0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q+.×R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 1 1 3
 2 4 2
 4 8 7
@@ -3110,17 +3111,9 @@ returned Q matrix. This first transpose step is therefore not needed.
 <pre class="verbatim">
       B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
-      (QT R Ri)←⌹[⎕CT]B
-      4⎕CR0 4⍕Q←⍉QT   ⍝ recover the non-transposed Q
-┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓  .4107J¯.0310  .7219J¯.1180  .1338J¯.1213  .2271J.0623   .5538J.1806 ┃
-┃  .0621J¯.1742 ¯.5950J.0697   .0880J.2603   .9071J.0968   .1779J¯.3283┃
-┃  .9124J¯.1121 ¯.2629J.4735   .3667J¯.0282  .0575J.2496  ¯.6232J¯.3575┃
-┃  .3710J.3755  ¯.7179J¯.4253 ¯.1833J.3784  ¯.5003J.2494   .8260J¯.3033┃
-┃ ¯.2148J.0626  ¯.1979J.2738  1.0188J.0717  ¯.1208J¯.0703  .0605J¯.2291┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q∘⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
 ┃  .0000J.0000 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
@@ -3129,16 +3122,15 @@ returned Q matrix. This first transpose step is therefore not needed.
 ┃  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000 1.0000J.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕R       ⍝ verify that R is upper triangle
+      4⎕CR 4⍕R       ⍝ verify that R is upper triangle
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 8.5870J15.2557 10.1035J10.9309 13.5055J18.7452 10.0961J15.2530┃
 ┃  .0000J.0000    8.7353J5.5589   9.2429J.4120    2.5086J.7539  ┃
 ┃  .0000J.0000     .0000J.0000   ¯2.4869J4.4115  ¯5.9788J¯6.0801┃
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    7.4038J¯3.9492┃
-┃  .0000J.0000     .0000J.0000     .0000J.0000     .0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q∘5 4↑R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
 3J1  2J3 4J5   1J3
@@ -3214,9 +3206,11 @@ that compute a QR factorization of a matrix <b>B</b>:
 <ul>
 <li> <b>⌹[1]B</b> uses the algorithm published by Garry Helzer in APL Quote
       Quad in 1990.
-</li><li> <b>⌹[2]B</b> uses a LApack algorithm (xGELSY). This algorithm uses
-      <b>⎕CT</b> in the same way as described above for <b>⌹B</b> and <b>A⌹B</b>.
-</li><li> for backward compatibility with older versions of GNU APL, a real 
+</li><li> <b>⌹[2]B</b> uses a libgsl based algorithm (and is therefore only available
+      if libgsl was installed when GNU APL was compiled).
+
+<p><b>⎕CT</b> in the same way as described above for <b>⌹B</b> and <b>A⌹B</b>.
+</p></li><li> for backward compatibility with older versions of GNU APL, a real 
       scalar <b>X</b> in <b>⌹[X]B</b> uses <b>⌹[1]B</b> if <b>X &lt; 0.1</b> and
       <b>⌹[2]B</b> otherwise. The scalar <b>X</b> is used instead of <b>⎕CT</b>.
       Do not use this case in new code.
@@ -3224,7 +3218,7 @@ that compute a QR factorization of a matrix <b>B</b>:
 
 <p>The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
 a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
-all matrix items close to 0.0 are set to exactly 0.0.
+all matrix items that are close to 0.0 are set to exactly 0.0.
 </p>
 <p>GNU APL uses <b>⎕CT</b> in the same way as the Helzer alogrithm, i.e. to decide
 if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
@@ -3232,11 +3226,9 @@ if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
 implement <b>A TOL X</b> and <b>A CPR B</b>). GNU APL uses the example
 implementation given in the Helzer paper. The <b>TOL</b> and <b>CPR</b>
 functions seem to be related to what is elsewhere known as the
-<i>condition number</i> of the matrix that is being factorized. In the LApack
-case, the parameter <b>RCOND</b> of FORTRAN function <b>xcDGELSY</b> is set
-to <b>⎕CT</b>.
+<i>condition number</i> of the matrix that is being factorized. In the libgsl
+case, <b>⎕CT</b> is not used.
 </p>
-
 <hr>
 </div>
 </div>

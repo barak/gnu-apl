@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 8, 2024.  This manual briefly documents GNU APL, an interpreter
-for APL as described in ISO standard 13751, aka.  "Programming Language
-APL, Extended".
+December 12, 2024.  This manual briefly documents GNU APL, an
+interpreter for APL as described in ISO standard 13751, aka.
+"Programming Language APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -2621,29 +2621,29 @@ File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  
 ============================
 
 Z←⌹[X] B computes a QR factorization of the real or complex matrix B.
-The axis argument X is used to clear near-0 matrix items to exactly 0.0
-during the computation.  Set X←⎕CT if unsure.
+The axis argument X is used to either clear near-0 matrix items to
+exactly 0.0 during the computation (in Garry Helzer’s algorithm), or
+else to select a different algorithm for computing the factorization.
+Set X←⎕CT if unsure.
 
-   The result Z is a triple (QT R Ri)←Z with the following properties.
+   The result Z is a triple (Q R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
 
-   * QT is an orthogonal M×M matrix, i.e QT^{-1} = QT^{T}, and QT +.×
-⍉QT is the M×M identity matrix I_{M} (with I_{M}←∘.=⍨⍳M).
+   * Q is an orthogonal M×M matrix, i.e Q^{-1} = Q^{T}, and Q +.× ⍉Q is
+the M×M identity matrix I_{M} (with I_{M}←∘.=⍨⍳M).
 
-   * R is an upper triangular M×N matrix, i.e.  R[m;n] = 0 for n < m,
-and
+   * R is an upper triangular N×N matrix, i.e.  R[m;n] = 0 for n < m.
+Note that if M>N then, following a convention in other libraries (read:
+libgsl), the triangular matrices R and Ri have shape (N N) and not (M
+N). This is because the rows below row N are always 0 in R and in Ri,
+and therefore not of interest.  As a consequence, in order to restore B
+from Q and R one has to use Q+.×M N↑R (or shorter Q∘M N↑R) and not
+simply Q+.×B (or Q∘R).
 
-   * Ri is the inverse of R, i.e.  Ri +.× R is the identity matrix
+   * Ri is the inverse of R, i.e.  Ri +.× R is the N×N identity matrix
 I_{N}.
 
-   * (⍉QT) +.× R = B.
-
-   Note that, unlike in standard QR factorizations, the matrix QT
-returned by ⌹[X] is already inverted (i.e.  transposed since QT is
-orthogonal).  The reason is that the algorithm used can transpose Q with
-no extra cost and usually the first step after a QR factorization is to
-transpose the returned Q matrix.  This first transpose step is therefore
-not needed.
+   * B = Q +.× M N↑R.
 
    Example 1 (real B)
 
@@ -2652,17 +2652,16 @@ not needed.
 2 4 2
 4 8 7
 
-      (QT R Ri)←⌹[⎕CT]B
-      Q←⍉QT           ⍝ recover the non-transposed Q
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q
+      4⎕CR 4⍕Q
 ┏→━━━━━━━━━━━━━━━━━━━┓
-↓ .2182  .4364  .8729┃
-┃ .9759 ¯.0976 ¯.1952┃
-┃ .0000 ¯.8944  .4472┃
+↓ .2182  .9759  .0000┃
+┃ .4364 ¯.0976 ¯.8944┃
+┃ .8729 ¯.1952  .4472┃
 ┗━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q+.×⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000  .0000  .0000┃
 ┃  .0000 1.0000  .0000┃
@@ -2676,7 +2675,7 @@ not needed.
 ┃  .0000  .0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q+.×R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 1 1 3
 2 4 2
 4 8 7
@@ -2694,17 +2693,9 @@ not needed.
 
       B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
-      (QT R Ri)←⌹[⎕CT]B
-      4⎕CR0 4⍕Q←⍉QT   ⍝ recover the non-transposed Q
-┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓  .4107J¯.0310  .7219J¯.1180  .1338J¯.1213  .2271J.0623   .5538J.1806 ┃
-┃  .0621J¯.1742 ¯.5950J.0697   .0880J.2603   .9071J.0968   .1779J¯.3283┃
-┃  .9124J¯.1121 ¯.2629J.4735   .3667J¯.0282  .0575J.2496  ¯.6232J¯.3575┃
-┃  .3710J.3755  ¯.7179J¯.4253 ¯.1833J.3784  ¯.5003J.2494   .8260J¯.3033┃
-┃ ¯.2148J.0626  ¯.1979J.2738  1.0188J.0717  ¯.1208J¯.0703  .0605J¯.2291┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q∘⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
 ┃  .0000J.0000 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
@@ -2713,16 +2704,15 @@ not needed.
 ┃  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000 1.0000J.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕R       ⍝ verify that R is upper triangle
+      4⎕CR 4⍕R       ⍝ verify that R is upper triangle
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 8.5870J15.2557 10.1035J10.9309 13.5055J18.7452 10.0961J15.2530┃
 ┃  .0000J.0000    8.7353J5.5589   9.2429J.4120    2.5086J.7539  ┃
 ┃  .0000J.0000     .0000J.0000   ¯2.4869J4.4115  ¯5.9788J¯6.0801┃
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    7.4038J¯3.9492┃
-┃  .0000J.0000     .0000J.0000     .0000J.0000     .0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q∘5 4↑R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
 3J1  2J3 4J5   1J3
@@ -2786,15 +2776,18 @@ that compute a QR factorization of a matrix B:
 
    • ⌹[1]B uses the algorithm published by Garry Helzer in APL Quote
      Quad in 1990.
-   • ⌹[2]B uses a LApack algorithm (xGELSY). This algorithm uses ⎕CT in
-     the same way as described above for ⌹B and A⌹B.
+   • ⌹[2]B uses a libgsl based algorithm (and is therefore only
+     available if libgsl was installed when GNU APL was compiled).
+
+     ⎕CT in the same way as described above for ⌹B and A⌹B.
    • for backward compatibility with older versions of GNU APL, a real
      scalar X in ⌹[X]B uses ⌹[1]B if X < 0.1 and ⌹[2]B otherwise.  The
      scalar X is used instead of ⎕CT. Do not use this case in new code.
 
    The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1)
 matrix, a (N-2)×(N-2) matrix, and so forth.  After every step of that
-recursion, all matrix items close to 0.0 are set to exactly 0.0.
+recursion, all matrix items that are close to 0.0 are set to exactly
+0.0.
 
    GNU APL uses ⎕CT in the same way as the Helzer alogrithm, i.e.  to
 decide if a matrix item close to 0.0 shall be set to 0.0 or not (APL
@@ -2802,8 +2795,7 @@ functions A TOL X and A CPR B, where Helzer leaves it open how to
 implement A TOL X and A CPR B). GNU APL uses the example implementation
 given in the Helzer paper.  The TOL and CPR functions seem to be related
 to what is elsewhere known as the condition number of the matrix that is
-being factorized.  In the LApack case, the parameter RCOND of FORTRAN
-function xcDGELSY is set to ⎕CT.
+being factorized.  In the libgsl case, ⎕CT is not used.
 
 
 File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
@@ -7883,46 +7875,46 @@ Node: Section 2.1786313
 Node: Section 2.1888801
 Node: Section 2.1995527
 Node: Section 2.2097030
-Node: Section 2.21106185
-Node: Section 2.22111223
-Node: Section 2.23114481
-Node: Section 2.24114772
-Node: Section 2.25125613
-Node: Section 2.26125885
-Node: Section 2.27132464
-Node: Section 2.28134918
-Node: Section 2.29135587
-Node: Section 2.30137238
-Node: Section 2.31141013
-Node: Section 2.32153679
-Node: Output File Format169810
-Node: Section 2.33170985
-Node: Section 2.34180335
-Node: Section 2.35181354
-Node: Section 2.36196035
-Node: Section 2.37206193
-Node: Section 2.38210895
-Node: Section 2.39212991
-Node: Section 2.40217409
-Node: Section 2.41238719
-Node: Section 2.42249635
-Node: Chapter 3251631
-Node: Chapter 4254139
-Node: Chapter 5255265
-Node: Section 5.1256802
-Node: Section 5.2258082
-Node: Section 5.3258442
-Node: Section 5.4258684
-Node: Section 5.5259346
-Node: Section 5.6259824
-Node: Section 5.7260597
-Node: Section 5.8261023
-Node: Chapter 6261425
-Node: Section 6.1261844
-Node: Section 6.2262531
-Node: Chapter 7263362
-Node: Section 7.1263865
-Node: Section 7.2289178
+Node: Section 2.21105304
+Node: Section 2.22110342
+Node: Section 2.23113600
+Node: Section 2.24113891
+Node: Section 2.25124732
+Node: Section 2.26125004
+Node: Section 2.27131583
+Node: Section 2.28134037
+Node: Section 2.29134706
+Node: Section 2.30136357
+Node: Section 2.31140132
+Node: Section 2.32152798
+Node: Output File Format168929
+Node: Section 2.33170104
+Node: Section 2.34179454
+Node: Section 2.35180473
+Node: Section 2.36195154
+Node: Section 2.37205312
+Node: Section 2.38210014
+Node: Section 2.39212110
+Node: Section 2.40216528
+Node: Section 2.41237838
+Node: Section 2.42248754
+Node: Chapter 3250750
+Node: Chapter 4253258
+Node: Chapter 5254384
+Node: Section 5.1255921
+Node: Section 5.2257201
+Node: Section 5.3257561
+Node: Section 5.4257803
+Node: Section 5.5258465
+Node: Section 5.6258943
+Node: Section 5.7259716
+Node: Section 5.8260142
+Node: Chapter 6260544
+Node: Section 6.1260963
+Node: Section 6.2261650
+Node: Chapter 7262481
+Node: Section 7.1262984
+Node: Section 7.2288297
 
 End Tag Table
 

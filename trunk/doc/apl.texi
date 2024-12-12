@@ -2727,26 +2727,28 @@ if the item was not found).
 @section ⌹[X] - QR Factorization
 
 Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The
-axis argument X is used to clear near-0 matrix items to exactly 0.0 during
-the computation. Set X←⎕CT if unsure.
+axis argument X is used to either clear near-0 matrix items to exactly 0.0
+during the computation (in Garry Helzer's algorithm), or else to select
+a different algorithm for computing the factorization. Set X←⎕CT if unsure.
 
-The result Z is a triple (QT R Ri)←Z with the following properties.
+The result Z is a triple (Q R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
 
-* QT is an orthogonal M×M matrix, i.e QT@sup{-1} = QT@sup{T}, and QT +.× ⍉QT
+* @b{Q} is an orthogonal M×M matrix, i.e Q@sup{-1} = Q@sup{T}, and Q +.× ⍉Q
  is the M×M identity matrix I@sub{M} (with I@sub{M}←∘.=⍨⍳M).
 
-* R is an upper triangular M×N matrix, i.e. R[m;n] = 0 for n < m, and
+* @b{R} is an upper triangular N×N matrix, i.e. R[m;n] = 0 for n < m. Note
+  that if M>N then, following a convention in other libraries (read: libgsl),
+  the triangular matrices R and Ri have shape (N N) and not (M N).
+   This is because the rows below row N are always 0 in R and in Ri,
+  and therefore not of interest. As a consequence, in order to restore
+  B from Q and R one has to use @b{Q+.×M N↑R} (or shorter @b{Q∘M N↑R)} and
+  not simply @b{Q+.×B} (or @b{Q∘R}).
 
-* Ri is the inverse of R, i.e. Ri +.× R is the identity matrix I@sub{N}.
+* @b{Ri} is the inverse of @b{R}, i.e. @b{Ri +.× R} is the N×N identity
+  matrix I@sub{N}.
 
-* (⍉QT) +.× R = B.
-
-Note that, unlike in standard QR factorizations, the matrix QT returned by
-⌹[X] is already inverted (i.e. transposed since QT is orthogonal). The
-reason is that the algorithm used can transpose Q with no extra cost and
-usually the first step after a QR factorization is to transpose the
-returned Q matrix. This first transpose step is therefore not needed.
+* @b{B = Q +.× M N↑R}.
 
 Example 1 (real B)
 @verbatim
@@ -2756,17 +2758,16 @@ Example 1 (real B)
 2 4 2
 4 8 7
 
-      (QT R Ri)←⌹[⎕CT]B
-      Q←⍉QT           ⍝ recover the non-transposed Q
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q
+      4⎕CR 4⍕Q
 ┏→━━━━━━━━━━━━━━━━━━━┓
-↓ .2182  .4364  .8729┃
-┃ .9759 ¯.0976 ¯.1952┃
-┃ .0000 ¯.8944  .4472┃
+↓ .2182  .9759  .0000┃
+┃ .4364 ¯.0976 ¯.8944┃
+┃ .8729 ¯.1952  .4472┃
 ┗━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q+.×⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000  .0000  .0000┃
 ┃  .0000 1.0000  .0000┃
@@ -2780,7 +2781,7 @@ Example 1 (real B)
 ┃  .0000  .0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q+.×R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 1 1 3
 2 4 2
 4 8 7
@@ -2800,17 +2801,9 @@ Example 2 (complex over-determined B)
 
       B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
-      (QT R Ri)←⌹[⎕CT]B
-      4⎕CR0 4⍕Q←⍉QT   ⍝ recover the non-transposed Q
-┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-↓  .4107J¯.0310  .7219J¯.1180  .1338J¯.1213  .2271J.0623   .5538J.1806 ┃
-┃  .0621J¯.1742 ¯.5950J.0697   .0880J.2603   .9071J.0968   .1779J¯.3283┃
-┃  .9124J¯.1121 ¯.2629J.4735   .3667J¯.0282  .0575J.2496  ¯.6232J¯.3575┃
-┃  .3710J.3755  ¯.7179J¯.4253 ¯.1833J.3784  ¯.5003J.2494   .8260J¯.3033┃
-┃ ¯.2148J.0626  ¯.1979J.2738  1.0188J.0717  ¯.1208J¯.0703  .0605J¯.2291┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      (Q R Ri)←⌹[⎕CT]B
 
-      4⎕CR0 4⍕Q+.×QT  ⍝ verify that Q is orthogonal
+      4⎕CR 4⍕Q∘⍉Q  ⍝ verify that Q is orthogonal
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
 ┃  .0000J.0000 1.0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000┃
@@ -2819,16 +2812,15 @@ Example 2 (complex over-determined B)
 ┃  .0000J.0000  .0000J.0000  .0000J.0000  .0000J.0000 1.0000J.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      4⎕CR0 4⍕R       ⍝ verify that R is upper triangle
+      4⎕CR 4⍕R       ⍝ verify that R is upper triangle
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ↓ 8.5870J15.2557 10.1035J10.9309 13.5055J18.7452 10.0961J15.2530┃
 ┃  .0000J.0000    8.7353J5.5589   9.2429J.4120    2.5086J.7539  ┃
 ┃  .0000J.0000     .0000J.0000   ¯2.4869J4.4115  ¯5.9788J¯6.0801┃
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    7.4038J¯3.9492┃
-┃  .0000J.0000     .0000J.0000     .0000J.0000     .0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       QT+.×R         ⍝ verify that B is QT+.×R (i.e. B is (⍉Q)+.×R)
+       Q∘5 4↑R         ⍝ verify that B is Q+.×R (i.e. B is (⍉Q)+.×R)
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
 3J1  2J3 4J5   1J3
@@ -2894,7 +2886,9 @@ that compute a QR factorization of a matrix @b{B}:
 @itemize
 @item @b{⌹[1]B} uses the algorithm published by Garry Helzer in APL Quote
       Quad in 1990.
-@item @b{⌹[2]B} uses a LApack algorithm (xGELSY). This algorithm uses
+@item @b{⌹[2]B} uses a libgsl based algorithm (and is therefore only available
+      if libgsl was installed when GNU APL was compiled).
+
       @b{⎕CT} in the same way as described above for @b{⌹B} and @b{A⌹B}.
 @item for backward compatibility with older versions of GNU APL, a real 
       scalar @b{X} in @b{⌹[X]B} uses @b{⌹[1]B} if @b{X < 0.1} and
@@ -2904,7 +2898,7 @@ that compute a QR factorization of a matrix @b{B}:
 
 The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
 a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
-all matrix items close to 0.0 are set to exactly 0.0.
+all matrix items that are close to 0.0 are set to exactly 0.0.
 
 GNU APL uses @b{⎕CT} in the same way as the Helzer alogrithm, i.e. to decide
 if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
@@ -2912,10 +2906,8 @@ if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
 implement @b{A TOL X} and @b{A CPR B}). GNU APL uses the example
 implementation given in the Helzer paper. The @b{TOL} and @b{CPR}
 functions seem to be related to what is elsewhere known as the
-@i{condition number} of the matrix that is being factorized. In the LApack
-case, the parameter @b{RCOND} of FORTRAN function @b{xcDGELSY} is set
-to @b{⎕CT}.
-
+@i{condition number} of the matrix that is being factorized. In the libgsl
+case, @b{⎕CT} is not used.
 
 @node    Section 2.21
 @section Dyadic ⎕CR

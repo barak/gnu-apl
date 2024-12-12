@@ -123,21 +123,21 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
    //
    if (!X->is_scalar())   RANK_ERROR;
 
-enum { ALGO_BAD, ALGO_HELZER, ALGO_LAPACK, ALGO_GSL } algo = ALGO_BAD;
+enum { ALGO_BAD, ALGO_QR_HELZER, ALGO_QR_LAPACK, ALGO_QR_GSL } algo = ALGO_BAD;
 const Cell & X0 = X->get_cscalar();
 double EPS = Workspace::get_CT();
 
    if (X0.is_float_cell())   // a.
       {
         EPS = X0.get_real_value();
-        if (EPS < 0.1)   algo = ALGO_HELZER;
+        if (EPS < 0.1)   algo = ALGO_QR_HELZER;
       }
    else if (X0.is_integer_cell())   // b. or c.
       {
-        if      (X0.get_int_value() <= 1)   algo = ALGO_HELZER;
-        else if (X0.get_int_value() == 2)   algo = ALGO_LAPACK;
+        APL_Integer x0 = X0.get_int_value();
+        if      (x0 <= 1)   algo = ALGO_QR_HELZER;
 #if apl_GSL
-        else if (X0.get_int_value() == 3)   algo = ALGO_GSL;
+        else if (x0 == 2)   algo = ALGO_QR_GSL;
 #endif
       }
 
@@ -159,27 +159,39 @@ const ShapeItem N = B->get_cols();
 const bool need_complex = B->is_complex(true);
 Value_P Z(3, LOC);
 
-   if (algo == ALGO_HELZER)
+   if (algo == ALGO_QR_HELZER)
       {
-        LA_DEBUG && CERR << "QR factorization with Gary Helzer's algorithm...\n";
+        LA_DEBUG && CERR <<
+                    "QR factorization with Gary Helzer's algorithm...\n";
         QR_Helzer(Z, need_complex, M, N, &B->get_cfirst(), EPS);
       }
-   else if (algo == ALGO_LAPACK)
-      {
-        LA_DEBUG && CERR << "QR factorization with LA_pack::laqp2()...\n";
-        if (need_complex)
-           LA_pack::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst(), EPS);
-        else
-           LA_pack::factorize_DD_matrix(*Z, M, N, &B->get_cfirst(), EPS);
-      }
 #if apl_GSL
-   else if (algo == ALGO_GSL)
+   else if (algo == ALGO_QR_GSL)
       {
         LA_DEBUG && CERR << "QR factorization with libgsl algorithm...\n";
+
+        // FIXME: for so far unnown reasons, the first call to 
+        // GSL::factorize_DD_matrix or GSL::factorize_ZZ_matrix fails by
+        // returning an incorrect 1↓R[;1]. We fix this by calling them twice
+        // when M or N changes.
+        //
         if (need_complex)
-           GSL::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
-        else
-           GSL::factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+           {
+             static ShapeItem last_M_imag = -1;
+             static ShapeItem last_N_imag = -1;
+             if (M != last_M_imag || N != last_N_imag)   // new M or N
+                {
+                  Value_P ZZ(3, LOC);
+                  GSL::factorize_ZZ_matrix(*ZZ, M, N, &B->get_cfirst());
+                  last_M_imag = M;
+                  last_N_imag = N;
+                }
+             GSL::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+           }
+        else   // real
+           {
+             GSL::factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+           }
       }
 #endif
 
@@ -465,11 +477,11 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
 
    // Z[2] aka. R
    {
-     const Shape shape_Z2(M, N);
+     const Shape shape_Z2(N, N);
      Value_P Z2(shape_Z2, LOC);
      if (need_complex)
         {
-          ALL_ROWS(M)   // APL order
+          ALL_ROWS(N)   // APL order
           ALL_COLS(N)   // APL order
              {
                const ShapeItem offset = col + row*N;   // APL order
@@ -486,13 +498,13 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
         }
      else
         {
-          ALL_ROWS(M)   // APL order
+          ALL_ROWS(N)   // APL order
           ALL_COLS(N)   // APL order
              {
                const ShapeItem offset = col + row*N;   // APL order
                if (row > col)   // below diagonal: force 0.0
                   {
-                     data[base_R + offset]     = 0;
+                     data[base_R + offset] = 0;
                   }
                const double real = data[base_R + offset];
                if (!isfinite(real))   DOMAIN_ERROR;
