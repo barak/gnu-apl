@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 12, 2024.
+<p>December 13, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -3050,13 +3050,13 @@ Let ⍴B=(M, N).
 <p>* <b>Q</b> is an orthogonal M×M matrix, i.e Q<sup>-1</sup> = Q<sup>T</sup>, and Q +.× ⍉Q
  is the M×M identity matrix I<sub>M</sub> (with I<sub>M</sub>←∘.=⍨⍳M).
 </p>
-<p>* <b>R</b> is an upper triangular N×N matrix, i.e. R[m;n] = 0 for n &lt; m. Note
-  that if M&gt;N then, following a convention in other libraries (read: libgsl),
-  the triangular matrices R and Ri have shape (N N) and not (M N).
-   This is because the rows below row N are always 0 in R and in Ri,
-  and therefore not of interest. As a consequence, in order to restore
-  B from Q and R one has to use <b>Q+.×M N↑R</b> (or shorter <b>Q∘M N↑R)</b> and
-  not simply <b>Q+.×B</b> (or <b>Q∘R</b>).
+<p>* <b>R</b> is an upper triangular N×N matrix, i.e. R[m;n] = 0 for all n &lt; m.
+  Note that if M&gt;N then, following a convention in other libraries (read:
+  libgsl), the triangular matrices R and Ri have shape (N N) and not (M N).
+  This is because the rows below row N are always 0 in R and in Ri, and
+  are therefore not of interest. As a consequence, in order to restore
+  B from Q and R one has to either use <b>Q+.×M N↑R</b> or else Q∘R (the latter
+  accepts arguments R with fewer rows than columns of Q.
 </p>
 <p>* <b>Ri</b> is the inverse of <b>R</b>, i.e. <b>Ri +.× R</b> is the N×N identity
   matrix I<sub>N</sub>.
@@ -7000,27 +7000,29 @@ linear algebra, is:
 </p>
 <pre class="verbatim">      Z←A +.× B      ⍝ the most frequent special case of A f.g B
 </pre>
-<p>However, the inner product in APL is more generic than the inner product in
+<p>However, the inner product in APL is more general than the inner product in
 linear algebra. In the general case <b>A f.g B</b> may the functions <b>f</b>
 and <b>g</b> also be non-scalar APL primitives or even defined functions.
-This generality is occasionally helpful, but comes with a performance
+This generality may occasionally be helpful, but it comes with a performance
 penalty since many argument checks are duplicated. At the same time
-<b>A +.× B</b> is by far the most frequent use of operator &rsquo;.&rsquo;.
+<b>A +.× B</b> is by far the most frequent use of the inner product operator &rsquo;.&rsquo;.
 </p>
 <p>For this reason GNU APL also provides a more efficient dyadic function
 <b>∘</b> (Matrix Product) for the special case <b>+.×</b> of the dyadic
 operator &rsquo;.&rsquo;. This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 </p>
-<p>For two-dimensional matrices A and B function ∘ is the same as +.×:
+<p>For two-dimensional matrices A and B function ∘ is conceptually the
+same as +.×:
 </p>
 <p>A∘B ←→ A +.× B
 </p>
-<p>Otherwise there are some subtle differences between ∘ and +.×:
+<p>Hwoever, there are some subtle differences between ∘ and +.×:
 </p>
 <ul>
 <li> <b>A +.× B</b> allows A and B to be of any rank, while <b>A∘B</b> raises a
  RANK ERROR if the rank of A or B is more than 2.
+
 </li><li> With operator +.× the product of e.g. a vector and a matrix (or
  vice versa) is a vector, usually understood as row-vector.
  In contrast (and more similar to linear algebra) A∘B is always a matrix,
@@ -7050,7 +7052,14 @@ and computes the matrix product as known from linear algebra.
 1 2
       ⍴M∘V       ⍝ column vector
 2 1
-</pre></li></ul>
+</pre>
+</li><li> <b>A +.× B</b> requires that the number of columns in <b>A</b> is equal to
+the number of rows in <b>B</b>. In contrast, <b>A∘B</b> has no such requirement
+and will add 0-columns to <b>A</b> resp. 0-rows to <b>B</b> to match the shapes
+of <b>A</b> and <b>B</b>. Naturally, the multiplications of these 0-columns or
+0-rows is not in fact performed, but optimized away.
+
+</li></ul>
 
 <hr>
 </div>

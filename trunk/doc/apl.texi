@@ -2737,13 +2737,13 @@ Let ⍴B=(M, N).
 * @b{Q} is an orthogonal M×M matrix, i.e Q@sup{-1} = Q@sup{T}, and Q +.× ⍉Q
  is the M×M identity matrix I@sub{M} (with I@sub{M}←∘.=⍨⍳M).
 
-* @b{R} is an upper triangular N×N matrix, i.e. R[m;n] = 0 for n < m. Note
-  that if M>N then, following a convention in other libraries (read: libgsl),
-  the triangular matrices R and Ri have shape (N N) and not (M N).
-   This is because the rows below row N are always 0 in R and in Ri,
-  and therefore not of interest. As a consequence, in order to restore
-  B from Q and R one has to use @b{Q+.×M N↑R} (or shorter @b{Q∘M N↑R)} and
-  not simply @b{Q+.×B} (or @b{Q∘R}).
+* @b{R} is an upper triangular N×N matrix, i.e. R[m;n] = 0 for all n < m.
+  Note that if M>N then, following a convention in other libraries (read:
+  libgsl), the triangular matrices R and Ri have shape (N N) and not (M N).
+  This is because the rows below row N are always 0 in R and in Ri, and
+  are therefore not of interest. As a consequence, in order to restore
+  B from Q and R one has to either use @b{Q+.×M N↑R} or else Q∘R (the latter
+  accepts arguments R with fewer rows than columns of Q.
 
 * @b{Ri} is the inverse of @b{R}, i.e. @b{Ri +.× R} is the N×N identity
   matrix I@sub{N}.
@@ -6566,27 +6566,29 @@ linear algebra, is:
       Z←A +.× B      ⍝ the most frequent special case of A f.g B
 @end verbatim
 
-However, the inner product in APL is more generic than the inner product in
+However, the inner product in APL is more general than the inner product in
 linear algebra. In the general case @b{A f.g B} may the functions @b{f}
 and @b{g} also be non-scalar APL primitives or even defined functions.
-This generality is occasionally helpful, but comes with a performance
+This generality may occasionally be helpful, but it comes with a performance
 penalty since many argument checks are duplicated. At the same time
-@b{A +.× B} is by far the most frequent use of operator '.'.
+@b{A +.× B} is by far the most frequent use of the inner product operator '.'.
 
 For this reason GNU APL also provides a more efficient dyadic function
 @b{∘} (Matrix Product) for the special case @b{+.×} of the dyadic
 operator '.'. This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 
-For two-dimensional matrices A and B function ∘ is the same as +.×:
+For two-dimensional matrices A and B function ∘ is conceptually the
+same as +.×:
 
 A∘B ←→ A +.× B
 
-Otherwise there are some subtle differences between ∘ and +.×:
+Hwoever, there are some subtle differences between ∘ and +.×:
 
 @itemize
 @item @b{A +.× B} allows A and B to be of any rank, while @b{A∘B} raises a
  RANK ERROR if the rank of A or B is more than 2.
+
 @item With operator +.× the product of e.g. a vector and a matrix (or
  vice versa) is a vector, usually understood as row-vector.
  In contrast (and more similar to linear algebra) A∘B is always a matrix,
@@ -6618,6 +6620,13 @@ Otherwise there are some subtle differences between ∘ and +.×:
       ⍴M∘V       ⍝ column vector
 2 1
 @end verbatim
+
+@item @b{A +.× B} requires that the number of columns in @b{A} is equal to
+the number of rows in @b{B}. In contrast, @b{A∘B} has no such requirement
+and will add 0-columns to @b{A} resp. 0-rows to @b{B} to match the shapes
+of @b{A} and @b{B}. Naturally, the multiplications of these 0-columns or
+0-rows is not in fact performed, but optimized away.
+
 @end itemize
 
 @c ----------------------------------------------------------------------------

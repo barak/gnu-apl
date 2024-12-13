@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 12, 2024.  This manual briefly documents GNU APL, an
+December 13, 2024.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -2632,13 +2632,13 @@ Let ⍴B=(M, N).
    * Q is an orthogonal M×M matrix, i.e Q^{-1} = Q^{T}, and Q +.× ⍉Q is
 the M×M identity matrix I_{M} (with I_{M}←∘.=⍨⍳M).
 
-   * R is an upper triangular N×N matrix, i.e.  R[m;n] = 0 for n < m.
-Note that if M>N then, following a convention in other libraries (read:
-libgsl), the triangular matrices R and Ri have shape (N N) and not (M
-N). This is because the rows below row N are always 0 in R and in Ri,
-and therefore not of interest.  As a consequence, in order to restore B
-from Q and R one has to use Q+.×M N↑R (or shorter Q∘M N↑R) and not
-simply Q+.×B (or Q∘R).
+   * R is an upper triangular N×N matrix, i.e.  R[m;n] = 0 for all n <
+m.  Note that if M>N then, following a convention in other libraries
+(read: libgsl), the triangular matrices R and Ri have shape (N N) and
+not (M N). This is because the rows below row N are always 0 in R and in
+Ri, and are therefore not of interest.  As a consequence, in order to
+restore B from Q and R one has to either use Q+.×M N↑R or else Q∘R (the
+latter accepts arguments R with fewer rows than columns of Q.
 
    * Ri is the inverse of R, i.e.  Ri +.× R is the N×N identity matrix
 I_{N}.
@@ -6288,26 +6288,29 @@ from linear algebra, is:
 
       Z←A +.× B      ⍝ the most frequent special case of A f.g B
 
-   However, the inner product in APL is more generic than the inner
+   However, the inner product in APL is more general than the inner
 product in linear algebra.  In the general case A f.g B may the
 functions f and g also be non-scalar APL primitives or even defined
-functions.  This generality is occasionally helpful, but comes with a
-performance penalty since many argument checks are duplicated.  At the
-same time A +.× B is by far the most frequent use of operator ’.’.
+functions.  This generality may occasionally be helpful, but it comes
+with a performance penalty since many argument checks are duplicated.
+At the same time A +.× B is by far the most frequent use of the inner
+product operator ’.’.
 
    For this reason GNU APL also provides a more efficient dyadic
 function ∘ (Matrix Product) for the special case +.× of the dyadic
 operator ’.’.  This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 
-   For two-dimensional matrices A and B function ∘ is the same as +.×:
+   For two-dimensional matrices A and B function ∘ is conceptually the
+same as +.×:
 
    A∘B ←→ A +.× B
 
-   Otherwise there are some subtle differences between ∘ and +.×:
+   Hwoever, there are some subtle differences between ∘ and +.×:
 
    • A +.× B allows A and B to be of any rank, while A∘B raises a RANK
      ERROR if the rank of A or B is more than 2.
+
    • With operator +.× the product of e.g.  a vector and a matrix (or
      vice versa) is a vector, usually understood as row-vector.  In
      contrast (and more similar to linear algebra) A∘B is always a
@@ -6338,6 +6341,12 @@ and computes the matrix product as known from linear algebra.
      1 2
            ⍴M∘V       ⍝ column vector
      2 1
+
+   • A +.× B requires that the number of columns in A is equal to the
+     number of rows in B. In contrast, A∘B has no such requirement and
+     will add 0-columns to A resp.  0-rows to B to match the shapes of A
+     and B. Naturally, the multiplications of these 0-columns or 0-rows
+     is not in fact performed, but optimized away.
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -7875,46 +7884,46 @@ Node: Section 2.1786313
 Node: Section 2.1888801
 Node: Section 2.1995527
 Node: Section 2.2097030
-Node: Section 2.21105304
-Node: Section 2.22110342
-Node: Section 2.23113600
-Node: Section 2.24113891
-Node: Section 2.25124732
-Node: Section 2.26125004
-Node: Section 2.27131583
-Node: Section 2.28134037
-Node: Section 2.29134706
-Node: Section 2.30136357
-Node: Section 2.31140132
-Node: Section 2.32152798
-Node: Output File Format168929
-Node: Section 2.33170104
-Node: Section 2.34179454
-Node: Section 2.35180473
-Node: Section 2.36195154
-Node: Section 2.37205312
-Node: Section 2.38210014
-Node: Section 2.39212110
-Node: Section 2.40216528
-Node: Section 2.41237838
-Node: Section 2.42248754
-Node: Chapter 3250750
-Node: Chapter 4253258
-Node: Chapter 5254384
-Node: Section 5.1255921
-Node: Section 5.2257201
-Node: Section 5.3257561
-Node: Section 5.4257803
-Node: Section 5.5258465
-Node: Section 5.6258943
-Node: Section 5.7259716
-Node: Section 5.8260142
-Node: Chapter 6260544
-Node: Section 6.1260963
-Node: Section 6.2261650
-Node: Chapter 7262481
-Node: Section 7.1262984
-Node: Section 7.2288297
+Node: Section 2.21105342
+Node: Section 2.22110380
+Node: Section 2.23113638
+Node: Section 2.24113929
+Node: Section 2.25124770
+Node: Section 2.26125042
+Node: Section 2.27131621
+Node: Section 2.28134075
+Node: Section 2.29134744
+Node: Section 2.30136395
+Node: Section 2.31140170
+Node: Section 2.32152836
+Node: Output File Format168967
+Node: Section 2.33170142
+Node: Section 2.34179492
+Node: Section 2.35180511
+Node: Section 2.36195192
+Node: Section 2.37205350
+Node: Section 2.38210052
+Node: Section 2.39212148
+Node: Section 2.40216566
+Node: Section 2.41237876
+Node: Section 2.42248792
+Node: Chapter 3251168
+Node: Chapter 4253676
+Node: Chapter 5254802
+Node: Section 5.1256339
+Node: Section 5.2257619
+Node: Section 5.3257979
+Node: Section 5.4258221
+Node: Section 5.5258883
+Node: Section 5.6259361
+Node: Section 5.7260134
+Node: Section 5.8260560
+Node: Chapter 6260962
+Node: Section 6.1261381
+Node: Section 6.2262068
+Node: Chapter 7262899
+Node: Section 7.1263402
+Node: Section 7.2288715
 
 End Tag Table
 
