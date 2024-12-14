@@ -123,7 +123,13 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
    //
    if (!X->is_scalar())   RANK_ERROR;
 
-enum { ALGO_BAD, ALGO_QR_HELZER, ALGO_QR_LAPACK, ALGO_QR_GSL } algo = ALGO_BAD;
+enum { ALGO_BAD,
+       ALGO_QR_HELZER,
+       ALGO_QR_LAPACK,
+       ALGO_QR_GSL,
+       ALGO_LQ_GSL,
+       ALGO_LQ } algo = ALGO_BAD;
+
 const Cell & X0 = X->get_cscalar();
 double EPS = Workspace::get_CT();
 
@@ -138,6 +144,7 @@ double EPS = Workspace::get_CT();
         if      (x0 <= 1)   algo = ALGO_QR_HELZER;
 #if apl_GSL
         else if (x0 == 2)   algo = ALGO_QR_GSL;
+        else if (x0 == 3)   algo = ALGO_LQ_GSL;
 #endif
       }
 
@@ -170,27 +177,26 @@ Value_P Z(3, LOC);
       {
         LA_DEBUG && CERR << "QR factorization with libgsl algorithm...\n";
 
-        // FIXME: for so far unnown reasons, the first call to 
-        // GSL::factorize_DD_matrix or GSL::factorize_ZZ_matrix fails by
-        // returning an incorrect 1↓R[;1]. We fix this by calling them twice
-        // when M or N changes.
-        //
         if (need_complex)
            {
-             static ShapeItem last_M_imag = -1;
-             static ShapeItem last_N_imag = -1;
-             if (M != last_M_imag || N != last_N_imag)   // new M or N
-                {
-                  Value_P ZZ(3, LOC);
-                  GSL::factorize_ZZ_matrix(*ZZ, M, N, &B->get_cfirst());
-                  last_M_imag = M;
-                  last_N_imag = N;
-                }
-             GSL::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QR_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
            }
         else   // real
            {
-             GSL::factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QR_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+           }
+      }
+   else if (algo == ALGO_LQ_GSL)
+      {
+        LA_DEBUG && CERR << "LQ factorization with libgsl algorithm...\n";
+
+        if (need_complex)
+           {
+             GSL::LQ_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+           }
+        else   // real
+           {
+             GSL::LQ_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
            }
       }
 #endif

@@ -2724,12 +2724,20 @@ if the item was not found).
 
 
 @node    Section 2.20
-@section ⌹[X] - QR Factorization
+@section ⌹[X] - QR and LQ Factorizations
 
-Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The
-axis argument X is used to either clear near-0 matrix items to exactly 0.0
-during the computation (in Garry Helzer's algorithm), or else to select
-a different algorithm for computing the factorization. Set X←⎕CT if unsure.
+@subsection ⌹[1] and ⌹[2] - QR Factorizations
+
+@b{Z←⌹[1] B} and @b{Z←⌹[2] B} compute a QR factorization of the real or
+complex matrix B. The results of @b{Z←⌹[1] B} and @b{Z←⌹[2] B} are
+conceptually identical, while the algorithms used to compute the results.
+differ. Also, @b{Z←⌹[1] B} always exist, while @b{Z←⌹[2] B} requires
+@b{libgsl} to be installed when GNU APL is compiled.
+
+The axis argument @b{X} is used to either clear near-0 matrix items to
+exactly 0.0 during the computation (in Garry Helzer's algorithm), or else
+to select a different algorithm for computing the factorization. Set
+@b{X←⎕CT} if unsure.
 
 The result Z is a triple (Q R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
@@ -2909,6 +2917,39 @@ functions seem to be related to what is elsewhere known as the
 @i{condition number} of the matrix that is being factorized. In the libgsl
 case, @b{⎕CT} is not used.
 
+@subsubsection Matrix Inverse
+
+The matrix @b{Ri} returned by @b{⌹[1]} or @b{⌹[2]} provides an alternative
+to @b{⌹B} for computing the inverse of a matrix @b{B}, in particular if the
+QR-factorization of @b{B} was already computed.
+
+Since @b{B = Q∘R}, it follows that @b{B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q}.
+
+Indeed:
+
+@verbatim
+      B←?5 5⍴100   ⍝ a random matrix B
+      (Q R Ri)←⌹[2]B
+      (⌹B)=Ri∘⍉Q
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+
+@end verbatim
+
+@subsection ⌹[3]- LQ Factorizations
+
+@b{⌹[3] B} computes an LQ factorization fof @b{B}. The result @b{(Q L Li)←⌹[3]}
+is similar to the result of the QR factorization above, except that @b{L} and
+@b{Li} are lower triangular rather than upper triangular. @b{⌹[3]} requires
+@b{libgsl}.
+
+There is no LQ-factorizations based on the Helzer algorithm, but if so desired
+one can use the Helzer QR-factorization with its argument @b{B} as well as its
+results @b{Q}, @b{R}, and @b{Ri} transposed.
+
 @node    Section 2.21
 @section Dyadic ⎕CR
 
@@ -3011,12 +3052,36 @@ Example:
 55 Value
 @end verbatim
 
-The TLVs constructed by 33 ⎕CR can be sent back-to-back over a TCP connection
-or similar in such a way that the receiver knows exactly after which byte
-a TLV ends, which is perfect for connections over which data is sent
-sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for encoding and
-decoding TLV byte buffers exchanged between GNU APL and processes that were
-forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
+receiver can be sent back-to-back over a TCP connection or similar in such
+a way that the receiver knows exactly after which byte a TLV ends (and possibly
+the next TLV, if any, starts). This is perfect for connections over which
+data is sent sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for
+encoding and decoding TLV byte buffers exchanged between GNU APL and
+processes that were forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+
+A=35: convert a string of lines (containing LF characters as line delimiters)
+to a nested vector of lines.
+
+A=36: the inverse of ⎕CR[35]. Convert a nested vector of lines to a string
+with lines terminated with LF characxters.
+
+A=37 Same as @b{⎕CR B} but without removing any indentation.
+
+A=38: Return an empty structured variable with (integer) capacity @b{Bi},
+or convert an N×2 matrix @b{B} to a structured variable.
+
+A=39: convert a strucured variable @b{B} to an N×2 variable.
+
+A=40: pack a boolean variable Bi (experimental).
+
+A=41: unpack a boolean variable Bi (experimental).
+
+A=42: tokenize the APL statement Bs.
+
+A=43: parse the APL statement Bs.
+
+A=44: decode the (integer) token tag B or the (nested) token B.
 
 Most dyadic ⎕CR variants whose argument B is expected to be a byte vector throw:
 

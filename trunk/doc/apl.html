@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 13, 2024.
+<p>December 14, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -169,13 +169,16 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <li><a id="toc-Generalized-monadic-_005b_003f_005d" href="#Generalized-monadic-_005b_003f_005d">2.19.1 Generalized monadic ⍳</a></li>
       <li><a id="toc-Generalized-dyadic-_005b_003f_005d" href="#Generalized-dyadic-_005b_003f_005d">2.19.2 Generalized dyadic ⍳</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-QR-Factorization" href="#Section-2_002e20">2.20 ⌹[X] - QR Factorization</a>
+    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-QR-and-LQ-Factorizations" href="#Section-2_002e20">2.20 ⌹[X] - QR and LQ Factorizations</a>
     <ul class="no-bullet">
-      <li><a id="toc-The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d">2.20.1 The Impact of ⎕CT for ⌹</a>
+      <li><a id="toc-_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations" href="#g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations">2.20.1 ⌹[1] and ⌹[2] - QR Factorizations</a></li>
+      <li><a id="toc-The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d">2.20.2 The Impact of ⎕CT for ⌹</a>
       <ul class="no-bullet">
-        <li><a id="toc-A_005b_003f_005dB-and-_005b_003f_005dB" href="#A_005b_003f_005dB-and-_005b_003f_005dB">2.20.1.1 A⌹B and ⌹B</a></li>
-        <li><a id="toc-_005b_003f_005d_005bX_005d-B" href="#g_t_005b_003f_005d_005bX_005d-B">2.20.1.2 ⌹[X] B</a></li>
+        <li><a id="toc-A_005b_003f_005dB-and-_005b_003f_005dB" href="#A_005b_003f_005dB-and-_005b_003f_005dB">2.20.2.1 A⌹B and ⌹B</a></li>
+        <li><a id="toc-_005b_003f_005d_005bX_005d-B" href="#g_t_005b_003f_005d_005bX_005d-B">2.20.2.2 ⌹[X] B</a></li>
+        <li><a id="toc-Matrix-Inverse" href="#Matrix-Inverse">2.20.2.3 Matrix Inverse</a></li>
       </ul></li>
+      <li><a id="toc-_005b_003f_005d_005b3_005d_002d-LQ-Factorizations" href="#g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations">2.20.3 ⌹[3]- LQ Factorizations</a></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e21">2.21 Dyadic ⎕CR</a></li>
     <li><a id="toc-Dyadic-_005b_003f_005dFX-_0028Native-Functions_0029" href="#Section-2_002e22">2.22 Dyadic ⎕FX (Native Functions)</a></li>
@@ -978,7 +981,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e17">Monadic ⊢ and ⊣, dyadic ⊢ with Axis</a></li>
 <li><a href="#Section-2_002e18">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a></li>
 <li><a href="#Section-2_002e19">Generalized ⍳</a></li>
-<li><a href="#Section-2_002e20">⌹[X] - QR Factorization</a></li>
+<li><a href="#Section-2_002e20">⌹[X] - QR and LQ Factorizations</a></li>
 <li><a href="#Section-2_002e21">Dyadic ⎕CR</a></li>
 <li><a href="#Section-2_002e22">Dyadic ⎕FX (Native Functions)</a></li>
 <li><a href="#Section-2_002e23">⎕ARG - Interpreter command line arguments</a></li>
@@ -2991,7 +2994,7 @@ BE
 <div class="section" id="Section-2_002e19">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e20" accesskey="n" rel="next">⌹[X] - QR Factorization</a>, Previous: <a href="#Section-2_002e18" accesskey="p" rel="prev">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e20" accesskey="n" rel="next">⌹[X] - QR and LQ Factorizations</a>, Previous: <a href="#Section-2_002e18" accesskey="p" rel="prev">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Generalized-_005b_003f_005d"></span><h3 class="section">2.19 Generalized ⍳</h3>
 
@@ -3037,12 +3040,26 @@ if the item was not found).
 <p>
 Next: <a href="#Section-2_002e21" accesskey="n" rel="next">Dyadic ⎕CR</a>, Previous: <a href="#Section-2_002e19" accesskey="p" rel="prev">Generalized ⍳</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005d_005bX_005d-_002d-QR-Factorization"></span><h3 class="section">2.20 ⌹[X] - QR Factorization</h3>
+<span id="g_t_005b_003f_005d_005bX_005d-_002d-QR-and-LQ-Factorizations"></span><h3 class="section">2.20 ⌹[X] - QR and LQ Factorizations</h3>
 
-<p>Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The
-axis argument X is used to either clear near-0 matrix items to exactly 0.0
-during the computation (in Garry Helzer&rsquo;s algorithm), or else to select
-a different algorithm for computing the factorization. Set X←⎕CT if unsure.
+<ul class="section-toc">
+<li><a href="#g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations" accesskey="1">⌹[1] and ⌹[2] - QR Factorizations</a></li>
+<li><a href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" accesskey="2">The Impact of ⎕CT for ⌹</a></li>
+<li><a href="#g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations" accesskey="3">⌹[3]- LQ Factorizations</a></li>
+</ul>
+<div class="subsection" id="g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations">
+<h4 class="subsection">2.20.1 ⌹[1] and ⌹[2] - QR Factorizations</h4>
+
+<p><b>Z←⌹[1] B</b> and <b>Z←⌹[2] B</b> compute a QR factorization of the real or
+complex matrix B. The results of <b>Z←⌹[1] B</b> and <b>Z←⌹[2] B</b> are
+conceptually identical, while the algorithms used to compute the results.
+differ. Also, <b>Z←⌹[1] B</b> always exist, while <b>Z←⌹[2] B</b> requires
+<b>libgsl</b> to be installed when GNU APL is compiled.
+</p>
+<p>The axis argument <b>X</b> is used to either clear near-0 matrix items to
+exactly 0.0 during the computation (in Garry Helzer&rsquo;s algorithm), or else
+to select a different algorithm for computing the factorization. Set
+<b>X←⎕CT</b> if unsure.
 </p>
 <p>The result Z is a triple (Q R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
@@ -3141,11 +3158,9 @@ Let ⍴B=(M, N).
 <p>Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 </p>
-<ul class="section-toc">
-<li><a href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" accesskey="1">The Impact of ⎕CT for ⌹</a></li>
-</ul>
+</div>
 <div class="subsection" id="The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d">
-<h4 class="subsection">2.20.1 The Impact of ⎕CT for ⌹</h4>
+<h4 class="subsection">2.20.2 The Impact of ⎕CT for ⌹</h4>
 
 <p>Due to the lack of a better place we describe here how <b>⎕CT</b> is used
 in the various <b>⌹</b> functions.
@@ -3153,9 +3168,10 @@ in the various <b>⌹</b> functions.
 <ul class="section-toc">
 <li><a href="#A_005b_003f_005dB-and-_005b_003f_005dB" accesskey="1">A⌹B and ⌹B</a></li>
 <li><a href="#g_t_005b_003f_005d_005bX_005d-B" accesskey="2">⌹[X] B</a></li>
+<li><a href="#Matrix-Inverse" accesskey="3">Matrix Inverse</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
-<h4 class="subsubsection">2.20.1.1 A⌹B and ⌹B</h4>
+<h4 class="subsubsection">2.20.2.1 A⌹B and ⌹B</h4>
 
 <p>The first step in the computation of <b>A⌹B</b> or <b>⌹B</b> is the estimation
 of the number of linearly independent columns of <b>B</b>. If that number is
@@ -3198,7 +3214,7 @@ matrix <b>B</b> then there are two possibilities:
 
 </div>
 <div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B">
-<h4 class="subsubsection">2.20.1.2 ⌹[X] B</h4>
+<h4 class="subsubsection">2.20.2.2 ⌹[X] B</h4>
 
 <p>The integer scalar <b>X</b> chooses one of currently two different algorithms
 that compute a QR factorization of a matrix <b>B</b>:
@@ -3229,14 +3245,49 @@ functions seem to be related to what is elsewhere known as the
 <i>condition number</i> of the matrix that is being factorized. In the libgsl
 case, <b>⎕CT</b> is not used.
 </p>
-<hr>
 </div>
+<div class="subsubsection" id="Matrix-Inverse">
+<h4 class="subsubsection">2.20.2.3 Matrix Inverse</h4>
+
+<p>The matrix <b>Ri</b> returned by <b>⌹[1]</b> or <b>⌹[2]</b> provides an alternative
+to <b>⌹B</b> for computing the inverse of a matrix <b>B</b>, in particular if the
+QR-factorization of <b>B</b> was already computed.
+</p>
+<p>Since <b>B = Q∘R</b>, it follows that <b>B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q</b>.
+</p>
+<p>Indeed:
+</p>
+<pre class="verbatim">      B←?5 5⍴100   ⍝ a random matrix B
+      (Q R Ri)←⌹[2]B
+      (⌹B)=Ri∘⍉Q
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+
+</pre>
+</div>
+</div>
+<div class="subsection" id="g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations">
+<h4 class="subsection">2.20.3 ⌹[3]- LQ Factorizations</h4>
+
+<p><b>⌹[3] B</b> computes an LQ factorization fof <b>B</b>. The result <b>(Q L Li)←⌹[3]</b>
+is similar to the result of the QR factorization above, except that <b>L</b> and
+<b>Li</b> are lower triangular rather than upper triangular. <b>⌹[3]</b> requires
+<b>libgsl</b>.
+</p>
+<p>There is no LQ-factorizations based on the Helzer algorithm, but if so desired
+one can use the Helzer QR-factorization with its argument <b>B</b> as well as its
+results <b>Q</b>, <b>R</b>, and <b>Ri</b> transposed.
+</p>
+<hr>
 </div>
 </div>
 <div class="section" id="Section-2_002e21">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e22" accesskey="n" rel="next">Dyadic ⎕FX (Native Functions)</a>, Previous: <a href="#Section-2_002e20" accesskey="p" rel="prev">⌹[X] - QR Factorization</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e22" accesskey="n" rel="next">Dyadic ⎕FX (Native Functions)</a>, Previous: <a href="#Section-2_002e20" accesskey="p" rel="prev">⌹[X] - QR and LQ Factorizations</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Dyadic-_005b_003f_005dCR"></span><h3 class="section">2.21 Dyadic ⎕CR</h3>
 
@@ -3333,12 +3384,36 @@ is the transmission of a tagged byte vector over e.g a TCP socket:
 </p><pre class="verbatim">      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
 55 Value
 </pre>
-<p>The TLVs constructed by 33 ⎕CR can be sent back-to-back over a TCP connection
-or similar in such a way that the receiver knows exactly after which byte
-a TLV ends, which is perfect for connections over which data is sent
-sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for encoding and
-decoding TLV byte buffers exchanged between GNU APL and processes that were
-forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+<p>The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
+receiver can be sent back-to-back over a TCP connection or similar in such
+a way that the receiver knows exactly after which byte a TLV ends (and possibly
+the next TLV, if any, starts). This is perfect for connections over which
+data is sent sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for
+encoding and decoding TLV byte buffers exchanged between GNU APL and
+processes that were forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+</p>
+<p>A=35: convert a string of lines (containing LF characters as line delimiters)
+to a nested vector of lines.
+</p>
+<p>A=36: the inverse of ⎕CR[35]. Convert a nested vector of lines to a string
+with lines terminated with LF characxters.
+</p>
+<p>A=37 Same as <b>⎕CR B</b> but without removing any indentation.
+</p>
+<p>A=38: Return an empty structured variable with (integer) capacity <b>Bi</b>,
+or convert an N×2 matrix <b>B</b> to a structured variable.
+</p>
+<p>A=39: convert a strucured variable <b>B</b> to an N×2 variable.
+</p>
+<p>A=40: pack a boolean variable Bi (experimental).
+</p>
+<p>A=41: unpack a boolean variable Bi (experimental).
+</p>
+<p>A=42: tokenize the APL statement Bs.
+</p>
+<p>A=43: parse the APL statement Bs.
+</p>
+<p>A=44: decode the (integer) token tag B or the (nested) token B.
 </p>
 <p>Most dyadic ⎕CR variants whose argument B is expected to be a byte vector throw:
 </p>

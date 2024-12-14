@@ -1713,9 +1713,9 @@ Value_P Z(shape_Z, LOC);
 Value_P
 Quad_CR::do_CR39(const Value * B)
 {
-   // structured value to array
+   // structured value B to array Z.
    //
-   if (B->get_rank()  != 2)   RANK_ERROR;
+   if (B->get_rank() != 2)   RANK_ERROR;
    if (B->get_cols() != 2)   LENGTH_ERROR;
 
 const ShapeItem rows_B = B->get_rows();

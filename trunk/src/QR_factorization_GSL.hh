@@ -32,8 +32,10 @@ class Cell;
 class GSL
 {
 public:
-   static void factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
-   static void factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void LQ_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void LQ_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void QR_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void QR_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
 
 protected:
   /// invert the M×M matrix Q in place

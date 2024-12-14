@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 13, 2024.  This manual briefly documents GNU APL, an
+December 14, 2024.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -2617,11 +2617,19 @@ vector (if the item was found) or - different from the standard case (!)
 
 File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  Up: Chapter 2
 
-2.20 ⌹[X] - QR Factorization
-============================
+2.20 ⌹[X] - QR and LQ Factorizations
+====================================
 
-Z←⌹[X] B computes a QR factorization of the real or complex matrix B.
-The axis argument X is used to either clear near-0 matrix items to
+2.20.1 ⌹[1] and ⌹[2] - QR Factorizations
+----------------------------------------
+
+Z←⌹[1] B and Z←⌹[2] B compute a QR factorization of the real or complex
+matrix B. The results of Z←⌹[1] B and Z←⌹[2] B are conceptually
+identical, while the algorithms used to compute the results.  differ.
+Also, Z←⌹[1] B always exist, while Z←⌹[2] B requires libgsl to be
+installed when GNU APL is compiled.
+
+   The axis argument X is used to either clear near-0 matrix items to
 exactly 0.0 during the computation (in Garry Helzer’s algorithm), or
 else to select a different algorithm for computing the factorization.
 Set X←⎕CT if unsure.
@@ -2723,13 +2731,13 @@ I_{N}.
    Please note as well that QR factorization is currently experimental.
 So please double-check its results before using it in production code.
 
-2.20.1 The Impact of ⎕CT for ⌹
+2.20.2 The Impact of ⎕CT for ⌹
 ------------------------------
 
 Due to the lack of a better place we describe here how ⎕CT is used in
 the various ⌹ functions.
 
-2.20.1.1 A⌹B and ⌹B
+2.20.2.1 A⌹B and ⌹B
 ...................
 
 The first step in the computation of A⌹B or ⌹B is the estimation of the
@@ -2768,7 +2776,7 @@ columns of some matrix B then there are two possibilities:
      matrices that are nearly linearly dependent tend to produce
      significant rounding errors in the result.
 
-2.20.1.2 ⌹[X] B
+2.20.2.2 ⌹[X] B
 ...............
 
 The integer scalar X chooses one of currently two different algorithms
@@ -2796,6 +2804,39 @@ implement A TOL X and A CPR B). GNU APL uses the example implementation
 given in the Helzer paper.  The TOL and CPR functions seem to be related
 to what is elsewhere known as the condition number of the matrix that is
 being factorized.  In the libgsl case, ⎕CT is not used.
+
+2.20.2.3 Matrix Inverse
+.......................
+
+The matrix Ri returned by ⌹[1] or ⌹[2] provides an alternative to ⌹B for
+computing the inverse of a matrix B, in particular if the
+QR-factorization of B was already computed.
+
+   Since B = Q∘R, it follows that B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q.
+
+   Indeed:
+
+      B←?5 5⍴100   ⍝ a random matrix B
+      (Q R Ri)←⌹[2]B
+      (⌹B)=Ri∘⍉Q
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+
+
+2.20.3 ⌹[3]- LQ Factorizations
+------------------------------
+
+⌹[3] B computes an LQ factorization fof B. The result (Q L Li)←⌹[3] is
+similar to the result of the QR factorization above, except that L and
+Li are lower triangular rather than upper triangular.  ⌹[3] requires
+libgsl.
+
+   There is no LQ-factorizations based on the Helzer algorithm, but if
+so desired one can use the Helzer QR-factorization with its argument B
+as well as its results Q, R, and Ri transposed.
 
 
 File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
@@ -2904,13 +2945,37 @@ socket:
       34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
 55 Value
 
-   The TLVs constructed by 33 ⎕CR can be sent back-to-back over a TCP
-connection or similar in such a way that the receiver knows exactly
-after which byte a TLV ends, which is perfect for connections over which
-data is sent sporadically.  33 ⎕CR and 34 ⎕CR are particularly useful
-for encoding and decoding TLV byte buffers exchanged between GNU APL and
-processes that were forked by GNU APL with ⎕FIO[57] (aka.  fork() and
-execve()).
+   The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR
+by the receiver can be sent back-to-back over a TCP connection or
+similar in such a way that the receiver knows exactly after which byte a
+TLV ends (and possibly the next TLV, if any, starts).  This is perfect
+for connections over which data is sent sporadically.  33 ⎕CR and 34 ⎕CR
+are particularly useful for encoding and decoding TLV byte buffers
+exchanged between GNU APL and processes that were forked by GNU APL with
+⎕FIO[57] (aka.  fork() and execve()).
+
+   A=35: convert a string of lines (containing LF characters as line
+delimiters) to a nested vector of lines.
+
+   A=36: the inverse of ⎕CR[35].  Convert a nested vector of lines to a
+string with lines terminated with LF characxters.
+
+   A=37 Same as ⎕CR B but without removing any indentation.
+
+   A=38: Return an empty structured variable with (integer) capacity Bi,
+or convert an N×2 matrix B to a structured variable.
+
+   A=39: convert a strucured variable B to an N×2 variable.
+
+   A=40: pack a boolean variable Bi (experimental).
+
+   A=41: unpack a boolean variable Bi (experimental).
+
+   A=42: tokenize the APL statement Bs.
+
+   A=43: parse the APL statement Bs.
+
+   A=44: decode the (integer) token tag B or the (nested) token B.
 
    Most dyadic ⎕CR variants whose argument B is expected to be a byte
 vector throw:
@@ -7884,46 +7949,46 @@ Node: Section 2.1786313
 Node: Section 2.1888801
 Node: Section 2.1995527
 Node: Section 2.2097030
-Node: Section 2.21105342
-Node: Section 2.22110380
-Node: Section 2.23113638
-Node: Section 2.24113929
-Node: Section 2.25124770
-Node: Section 2.26125042
-Node: Section 2.27131621
-Node: Section 2.28134075
-Node: Section 2.29134744
-Node: Section 2.30136395
-Node: Section 2.31140170
-Node: Section 2.32152836
-Node: Output File Format168967
-Node: Section 2.33170142
-Node: Section 2.34179492
-Node: Section 2.35180511
-Node: Section 2.36195192
-Node: Section 2.37205350
-Node: Section 2.38210052
-Node: Section 2.39212148
-Node: Section 2.40216566
-Node: Section 2.41237876
-Node: Section 2.42248792
-Node: Chapter 3251168
-Node: Chapter 4253676
-Node: Chapter 5254802
-Node: Section 5.1256339
-Node: Section 5.2257619
-Node: Section 5.3257979
-Node: Section 5.4258221
-Node: Section 5.5258883
-Node: Section 5.6259361
-Node: Section 5.7260134
-Node: Section 5.8260560
-Node: Chapter 6260962
-Node: Section 6.1261381
-Node: Section 6.2262068
-Node: Chapter 7262899
-Node: Section 7.1263402
-Node: Section 7.2288715
+Node: Section 2.21106654
+Node: Section 2.22112536
+Node: Section 2.23115794
+Node: Section 2.24116085
+Node: Section 2.25126926
+Node: Section 2.26127198
+Node: Section 2.27133777
+Node: Section 2.28136231
+Node: Section 2.29136900
+Node: Section 2.30138551
+Node: Section 2.31142326
+Node: Section 2.32154992
+Node: Output File Format171123
+Node: Section 2.33172298
+Node: Section 2.34181648
+Node: Section 2.35182667
+Node: Section 2.36197348
+Node: Section 2.37207506
+Node: Section 2.38212208
+Node: Section 2.39214304
+Node: Section 2.40218722
+Node: Section 2.41240032
+Node: Section 2.42250948
+Node: Chapter 3253324
+Node: Chapter 4255832
+Node: Chapter 5256958
+Node: Section 5.1258495
+Node: Section 5.2259775
+Node: Section 5.3260135
+Node: Section 5.4260377
+Node: Section 5.5261039
+Node: Section 5.6261517
+Node: Section 5.7262290
+Node: Section 5.8262716
+Node: Chapter 6263118
+Node: Section 6.1263537
+Node: Section 6.2264224
+Node: Chapter 7265055
+Node: Section 7.1265558
+Node: Section 7.2290871
 
 End Tag Table
 
