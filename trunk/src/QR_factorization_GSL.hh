@@ -32,12 +32,23 @@ class Cell;
 class GSL
 {
 public:
-   static void LQ_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
-   static void LQ_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void RQ_factorize(Value & Z, int M, int N, Value_P B);
+   static void LQ_factorize(Value & Z, int M, int N, Value_P B,
+                            bool need_complex);
+
    static void QR_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
    static void QR_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
 
+   static void QL_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+
+   static void LU_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+   static void LU_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
+
 protected:
+  static void set_GSL_error_handler();
+  static void GSL_error_handler(const char * reason, const char * file,
+                                int line, int gsl_errno);
+
   /// invert the M×M matrix Q in place
   static int invert_matrix(gsl_matrix * Q, size_t M);
 };

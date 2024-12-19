@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 14, 2024.  This manual briefly documents GNU APL, an
+December 19, 2024.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -2776,67 +2776,84 @@ columns of some matrix B then there are two possibilities:
      matrices that are nearly linearly dependent tend to produce
      significant rounding errors in the result.
 
-2.20.2.2 ⌹[X] B
-...............
+2.20.2.2 ⌹[X] B: Factorizations of B
+....................................
 
-The integer scalar X chooses one of currently two different algorithms
-that compute a QR factorization of a matrix B:
+The numeric scalar X chooses one of several algorithms that computes a
+factorization (aka.  decomposition) of a matrix B:
 
-   • ⌹[1]B uses the algorithm published by Garry Helzer in APL Quote
-     Quad in 1990.
-   • ⌹[2]B uses a libgsl based algorithm (and is therefore only
-     available if libgsl was installed when GNU APL was compiled).
+   • ⌹[1]B computes a QR-factorization of B. It uses the algorithm
+     published by Garry Helzer in APL Quote Quad in 1990.  This
+     algorithm is always available.
 
-     ⎕CT in the same way as described above for ⌹B and A⌹B.
-   • for backward compatibility with older versions of GNU APL, a real
-     scalar X in ⌹[X]B uses ⌹[1]B if X < 0.1 and ⌹[2]B otherwise.  The
-     scalar X is used instead of ⎕CT. Do not use this case in new code.
+   • ⌹[2]B also computes a QR-factorization of B. However, it uses a
+     libgsl based algorithm and is therefore only available if libgsl
+     was installed when GNU APL was ./configure’d..
+
+   • ⌹[3]B computes a RQ-factoriztion of B. It also requires libgsl.
+
+   • ⌹[4]B computes a LQ-factoriztion of B. It also requires libgsl.
+
+   • ⌹[5]B computes a QL-factoriztion of B. It also requires libgsl.
+
+   • ⌹[6]B computes a LU-factoriztion of B. It also requires libgsl.
+
+   • ⌹[TOL]B with a small real TOL. This variant is obsolete and only
+     provided for backward compatibility with older versions of GNU APL
+     (and is subject to being removed at some point in time).  It uses
+     the Helzer algorithm with TOL instead of ⎕CT. New code should not
+     use ⌹[TOL] but rather ⌹[1] or ⌹[2] after setting ⎕CT←TOL.
 
    The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1)
 matrix, a (N-2)×(N-2) matrix, and so forth.  After every step of that
 recursion, all matrix items that are close to 0.0 are set to exactly
-0.0.
+0.0.  The meaning of close is defined by ⎕CT in ⌹[1]B (resp.  TOL in the
+obsolete case above).
 
-   GNU APL uses ⎕CT in the same way as the Helzer alogrithm, i.e.  to
-decide if a matrix item close to 0.0 shall be set to 0.0 or not (APL
-functions A TOL X and A CPR B, where Helzer leaves it open how to
-implement A TOL X and A CPR B). GNU APL uses the example implementation
-given in the Helzer paper.  The TOL and CPR functions seem to be related
-to what is elsewhere known as the condition number of the matrix that is
-being factorized.  In the libgsl case, ⎕CT is not used.
+   In the Helzer algorithm, GNU APL uses ⎕CT as the tolerance TOL which
+decides if a matrix item close to 0.0 shall be set to 0.0 or not (APL
+functions A TOL X and A CPR B in the Helzer paper).  The Helzer paper
+leaves it open how to implement A TOL X and A CPR B). GNU APL uses the
+example implementation given in the Helzer paper.  The TOL and CPR
+functions seem to be related to what is elsewhere known as the condition
+number of the matrix that is being factorized.  In the libgsl based
+algotithms is ⎕CT not used.
+
+   The factorizations ⌹[1], ⌹[2], ⌹[3], ⌹[4], and ⌹[5] return a (nested)
+vector (Q T Ti) where Q is orthogonal, T is (upper or lower) triangular,
+and Ti is T^{-1}.
+
+   Let ⍴B = (M N) and let min_MN = min(M, N). Then the factorization
+⌹[6] returns a nested vector (P U L) where:
+   • vector P is a permutation of ⍳M,
+   • matrix L is lower triangular with shape (M min_MN) and all of its
+     diagonal items equal to 1.0.,
+   • matrix U is upper triangular with shape (min_MN N), and, most
+     importantly,
+   • B[P;] = L∘U.
 
 2.20.2.3 Matrix Inverse
 .......................
 
-The matrix Ri returned by ⌹[1] or ⌹[2] provides an alternative to ⌹B for
+The matrix Ti returned by ⌹[1] or ⌹[2] provides an alternative to ⌹B for
 computing the inverse of a matrix B, in particular if the
 QR-factorization of B was already computed.
 
-   Since B = Q∘R, it follows that B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q.
+   Since B = Q∘T, it follows that B⁻¹ = T⁻¹∘Q⁻¹ = Ti∘⍉Q.
 
    Indeed:
 
       B←?5 5⍴100   ⍝ a random matrix B
-      (Q R Ri)←⌹[2]B
-      (⌹B)=Ri∘⍉Q
+      (Q T Ti)←⌹[2]B
+      (⌹B) = Ti∘⍉Q
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 
-
-2.20.3 ⌹[3]- LQ Factorizations
-------------------------------
-
-⌹[3] B computes an LQ factorization fof B. The result (Q L Li)←⌹[3] is
-similar to the result of the QR factorization above, except that L and
-Li are lower triangular rather than upper triangular.  ⌹[3] requires
-libgsl.
-
-   There is no LQ-factorizations based on the Helzer algorithm, but if
-so desired one can use the Helzer QR-factorization with its argument B
-as well as its results Q, R, and Ri transposed.
+   The computation of ⍉Q and Ti∘⍉Q is considerably faster than the
+computation of ⌹B if B is large.
 
 
 File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
@@ -7949,46 +7966,46 @@ Node: Section 2.1786313
 Node: Section 2.1888801
 Node: Section 2.1995527
 Node: Section 2.2097030
-Node: Section 2.21106654
-Node: Section 2.22112536
-Node: Section 2.23115794
-Node: Section 2.24116085
-Node: Section 2.25126926
-Node: Section 2.26127198
-Node: Section 2.27133777
-Node: Section 2.28136231
-Node: Section 2.29136900
-Node: Section 2.30138551
-Node: Section 2.31142326
-Node: Section 2.32154992
-Node: Output File Format171123
-Node: Section 2.33172298
-Node: Section 2.34181648
-Node: Section 2.35182667
-Node: Section 2.36197348
-Node: Section 2.37207506
-Node: Section 2.38212208
-Node: Section 2.39214304
-Node: Section 2.40218722
-Node: Section 2.41240032
-Node: Section 2.42250948
-Node: Chapter 3253324
-Node: Chapter 4255832
-Node: Chapter 5256958
-Node: Section 5.1258495
-Node: Section 5.2259775
-Node: Section 5.3260135
-Node: Section 5.4260377
-Node: Section 5.5261039
-Node: Section 5.6261517
-Node: Section 5.7262290
-Node: Section 5.8262716
-Node: Chapter 6263118
-Node: Section 6.1263537
-Node: Section 6.2264224
-Node: Chapter 7265055
-Node: Section 7.1265558
-Node: Section 7.2290871
+Node: Section 2.21107523
+Node: Section 2.22113405
+Node: Section 2.23116663
+Node: Section 2.24116954
+Node: Section 2.25127795
+Node: Section 2.26128067
+Node: Section 2.27134646
+Node: Section 2.28137100
+Node: Section 2.29137769
+Node: Section 2.30139420
+Node: Section 2.31143195
+Node: Section 2.32155861
+Node: Output File Format171992
+Node: Section 2.33173167
+Node: Section 2.34182517
+Node: Section 2.35183536
+Node: Section 2.36198217
+Node: Section 2.37208375
+Node: Section 2.38213077
+Node: Section 2.39215173
+Node: Section 2.40219591
+Node: Section 2.41240901
+Node: Section 2.42251817
+Node: Chapter 3254193
+Node: Chapter 4256701
+Node: Chapter 5257827
+Node: Section 5.1259364
+Node: Section 5.2260644
+Node: Section 5.3261004
+Node: Section 5.4261246
+Node: Section 5.5261908
+Node: Section 5.6262386
+Node: Section 5.7263159
+Node: Section 5.8263585
+Node: Chapter 6263987
+Node: Section 6.1264406
+Node: Section 6.2265093
+Node: Chapter 7265924
+Node: Section 7.1266427
+Node: Section 7.2291740
 
 End Tag Table
 

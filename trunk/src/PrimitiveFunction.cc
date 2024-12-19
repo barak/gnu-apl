@@ -378,10 +378,9 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 Token
 Bif_F12_TRANSPOSE::do_eval_B(const Value * B)
 {
-Shape shape_A;
-
    // monadic transpose is A⍉B with A = ... 4 3 2 1 0
    //
+Shape shape_A;
    loop(r, B->get_rank())   shape_A.add_shape_item(B->get_rank() - r - 1);
 
 Value_P Z = transpose(shape_A, B);

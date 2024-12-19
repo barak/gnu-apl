@@ -123,12 +123,15 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
    //
    if (!X->is_scalar())   RANK_ERROR;
 
-enum { ALGO_BAD,
-       ALGO_QR_HELZER,
-       ALGO_QR_LAPACK,
-       ALGO_QR_GSL,
-       ALGO_LQ_GSL,
-       ALGO_LQ } algo = ALGO_BAD;
+enum { ALGO_BAD,         ///< bad algorithm number
+       ALGO_QR_HELZER,   ///< QR factorization with Gary Helzer's algorithm
+       ALGO_QR_LAPACK,   ///< QR " with a LApack based algorithm (obsolete)
+       ALGO_QR_GSL,      ///< QR factorization with a libgsl based algorithm
+       ALGO_RQ_GSL,      ///< RQ factorization (libgsl based, ⍉(QR ⍉B)
+       ALGO_LQ_GSL,      ///< LQ factorization (libgsl based, ⍉(QL ⍉B)
+       ALGO_QL_GSL,      ///< QL factorization (libgsl based)
+       ALGO_LU_GSL,      ///< LU factorization (libgsl based)
+     } algo = ALGO_BAD;
 
 const Cell & X0 = X->get_cscalar();
 double EPS = Workspace::get_CT();
@@ -144,11 +147,14 @@ double EPS = Workspace::get_CT();
         if      (x0 <= 1)   algo = ALGO_QR_HELZER;
 #if apl_GSL
         else if (x0 == 2)   algo = ALGO_QR_GSL;
-        else if (x0 == 3)   algo = ALGO_LQ_GSL;
+        else if (x0 == 3)   algo = ALGO_RQ_GSL;
+        else if (x0 == 4)   algo = ALGO_LQ_GSL;
+        else if (x0 == 5)   algo = ALGO_QL_GSL;
+        else if (x0 == 6)   algo = ALGO_LU_GSL;
 #endif
       }
 
-   if (algo == ALGO_BAD)
+   if (algo == ALGO_BAD)   // none of the above
       {
         MORE_ERROR() << "Bad algorithm in X of ⌹[X]B";
         DOMAIN_ERROR;
@@ -176,7 +182,6 @@ Value_P Z(3, LOC);
    else if (algo == ALGO_QR_GSL)
       {
         LA_DEBUG && CERR << "QR factorization with libgsl algorithm...\n";
-
         if (need_complex)
            {
              GSL::QR_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
@@ -186,17 +191,47 @@ Value_P Z(3, LOC);
              GSL::QR_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
            }
       }
+   else if (algo == ALGO_RQ_GSL)
+      {
+        if (need_complex)
+           {
+             MORE_ERROR() << "RQ factorization is only available "
+                             "for real matrices.";
+             DOMAIN_ERROR;
+           }
+
+        LA_DEBUG && CERR << "RQ factorization with libgsl algorithm...\n";
+        GSL::RQ_factorize(*Z, M, N, B);
+      }
    else if (algo == ALGO_LQ_GSL)
       {
         LA_DEBUG && CERR << "LQ factorization with libgsl algorithm...\n";
-
+        GSL::LQ_factorize(*Z, M, N, B, need_complex);
+      }
+   else if (algo == ALGO_QL_GSL)
+      {
+        LA_DEBUG && CERR << "QL factorization with libgsl algorithm...\n";
         if (need_complex)
            {
-             GSL::LQ_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+             MORE_ERROR() << "LQ factorization is only available "
+                             "for real matrices.";
+             DOMAIN_ERROR;
            }
         else   // real
            {
-             GSL::LQ_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QL_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+           }
+      }
+   else if (algo == ALGO_LU_GSL)
+      {
+        LA_DEBUG && CERR << "LU factorization with libgsl algorithm...\n";
+        if (need_complex)
+           {
+             GSL::LU_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+           }
+        else
+           {
+             GSL::LU_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
            }
       }
 #endif

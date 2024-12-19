@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 14, 2024.
+<p>December 19, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -175,10 +175,9 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <li><a id="toc-The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d">2.20.2 The Impact of ⎕CT for ⌹</a>
       <ul class="no-bullet">
         <li><a id="toc-A_005b_003f_005dB-and-_005b_003f_005dB" href="#A_005b_003f_005dB-and-_005b_003f_005dB">2.20.2.1 A⌹B and ⌹B</a></li>
-        <li><a id="toc-_005b_003f_005d_005bX_005d-B" href="#g_t_005b_003f_005d_005bX_005d-B">2.20.2.2 ⌹[X] B</a></li>
+        <li><a id="toc-_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B" href="#g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B">2.20.2.2 ⌹[X] B: Factorizations of B</a></li>
         <li><a id="toc-Matrix-Inverse" href="#Matrix-Inverse">2.20.2.3 Matrix Inverse</a></li>
       </ul></li>
-      <li><a id="toc-_005b_003f_005d_005b3_005d_002d-LQ-Factorizations" href="#g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations">2.20.3 ⌹[3]- LQ Factorizations</a></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e21">2.21 Dyadic ⎕CR</a></li>
     <li><a id="toc-Dyadic-_005b_003f_005dFX-_0028Native-Functions_0029" href="#Section-2_002e22">2.22 Dyadic ⎕FX (Native Functions)</a></li>
@@ -3045,7 +3044,6 @@ Next: <a href="#Section-2_002e21" accesskey="n" rel="next">Dyadic ⎕CR</a>, Pre
 <ul class="section-toc">
 <li><a href="#g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations" accesskey="1">⌹[1] and ⌹[2] - QR Factorizations</a></li>
 <li><a href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" accesskey="2">The Impact of ⎕CT for ⌹</a></li>
-<li><a href="#g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations" accesskey="3">⌹[3]- LQ Factorizations</a></li>
 </ul>
 <div class="subsection" id="g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations">
 <h4 class="subsection">2.20.1 ⌹[1] and ⌹[2] - QR Factorizations</h4>
@@ -3167,7 +3165,7 @@ in the various <b>⌹</b> functions.
 </p>
 <ul class="section-toc">
 <li><a href="#A_005b_003f_005dB-and-_005b_003f_005dB" accesskey="1">A⌹B and ⌹B</a></li>
-<li><a href="#g_t_005b_003f_005d_005bX_005d-B" accesskey="2">⌹[X] B</a></li>
+<li><a href="#g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B" accesskey="2">⌹[X] B: Factorizations of B</a></li>
 <li><a href="#Matrix-Inverse" accesskey="3">Matrix Inverse</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
@@ -3213,75 +3211,96 @@ matrix <b>B</b> then there are two possibilities:
 </li></ol>
 
 </div>
-<div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B">
-<h4 class="subsubsection">2.20.2.2 ⌹[X] B</h4>
+<div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B">
+<h4 class="subsubsection">2.20.2.2 ⌹[X] B: Factorizations of B</h4>
 
-<p>The integer scalar <b>X</b> chooses one of currently two different algorithms
-that compute a QR factorization of a matrix <b>B</b>:
+<p>The numeric scalar <b>X</b> chooses one of several algorithms that computes a 
+factorization (aka. decomposition) of a matrix <b>B</b>:
 </p>
 <ul>
-<li> <b>⌹[1]B</b> uses the algorithm published by Garry Helzer in APL Quote
-      Quad in 1990.
-</li><li> <b>⌹[2]B</b> uses a libgsl based algorithm (and is therefore only available
-      if libgsl was installed when GNU APL was compiled).
+<li> <b>⌹[1]B</b> computes a QR-factorization of <b>B</b>. It uses the algorithm
+      published by Garry Helzer in APL Quote Quad in 1990. This algorithm is
+      always available.
 
-<p><b>⎕CT</b> in the same way as described above for <b>⌹B</b> and <b>A⌹B</b>.
-</p></li><li> for backward compatibility with older versions of GNU APL, a real 
-      scalar <b>X</b> in <b>⌹[X]B</b> uses <b>⌹[1]B</b> if <b>X &lt; 0.1</b> and
-      <b>⌹[2]B</b> otherwise. The scalar <b>X</b> is used instead of <b>⎕CT</b>.
-      Do not use this case in new code.
+</li><li> <b>⌹[2]B</b> also computes a QR-factorization of <b>B</b>. However, it uses a
+      <b>libgsl</b> based algorithm and is therefore only available
+      if <b>libgsl</b> was installed when GNU APL was ./configure&rsquo;d..
+
+</li><li> <b>⌹[3]B</b> computes a RQ-factoriztion of <b>B</b>.
+  It also requires <b>libgsl</b>.
+
+</li><li> <b>⌹[4]B</b> computes a LQ-factoriztion of <b>B</b>.
+  It also requires <b>libgsl</b>.
+
+</li><li> <b>⌹[5]B</b> computes a QL-factoriztion of <b>B</b>.
+  It also requires <b>libgsl</b>.
+
+</li><li> <b>⌹[6]B</b> computes a LU-factoriztion of <b>B</b>.
+  It also requires <b>libgsl</b>.
+
+</li><li> <b>⌹[TOL]B</b> with a small real <b>TOL</b>. This variant is obsolete and
+only provided for backward compatibility with older versions of GNU APL
+(and is subject to being removed at some point in time). It uses the Helzer
+algorithm with <b>TOL</b> instead of <b>⎕CT</b>. New code should not use <b>⌹[TOL]</b>
+ but rather <b>⌹[1]</b> or <b>⌹[2]</b> after setting <b>⎕CT←TOL</b>.
 </li></ul>
 
 <p>The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
 a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
-all matrix items that are close to 0.0 are set to exactly 0.0.
+all matrix items that are <i>close</i> to <b>0.0</b> are set to exactly <b>0.0</b>.
+The meaning of <i>close</i> is defined by <b>⎕CT</b> in <b>⌹[1]B</b> (resp. <b>TOL</b> in
+the obsolete case above).
 </p>
-<p>GNU APL uses <b>⎕CT</b> in the same way as the Helzer alogrithm, i.e. to decide
-if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
-<b>A TOL X</b> and <b>A CPR B</b>, where Helzer leaves it open how to
-implement <b>A TOL X</b> and <b>A CPR B</b>). GNU APL uses the example
-implementation given in the Helzer paper. The <b>TOL</b> and <b>CPR</b>
-functions seem to be related to what is elsewhere known as the
-<i>condition number</i> of the matrix that is being factorized. In the libgsl
-case, <b>⎕CT</b> is not used.
+<p>In the Helzer algorithm, GNU APL uses <b>⎕CT</b> as the tolerance <b>TOL</b>
+which decides if a matrix item close to <b>0.0</b> shall be set to <b>0.0</b>
+or not (APL functions <b>A TOL X</b> and <b>A CPR B</b> in the Helzer paper).
+The Helzer paper leaves it open how to implement <b>A TOL X</b> and <b>A CPR B</b>).
+GNU APL uses the example implementation given in the Helzer paper.
+The <b>TOL</b> and <b>CPR</b> functions seem to be related to what is elsewhere
+known as the <i>condition number</i> of the matrix that is being factorized.
+In the libgsl based algotithms is <b>⎕CT</b> not used.
 </p>
+<p>The factorizations <b>⌹[1]</b>, <b>⌹[2]</b>, <b>⌹[3]</b>, <b>⌹[4]</b>, and <b>⌹[5]</b>
+return a (nested) vector <b>(Q T Ti)</b> where <b>Q</b> is orthogonal,
+<b>T</b> is (upper or lower) triangular, and <b>Ti</b> is <b>T<sup>-1</sup></b>.
+</p>
+<p>Let <b>⍴B = (M N)</b> and let <b>min_MN = min(M, N)</b>. Then the
+factorization <b>⌹[6]</b> returns a nested vector <b>(P U L)</b> where:
+</p><ul>
+<li> vector <b>P</b> is a permutation of <b>⍳M</b>,
+  </li><li> matrix <b>L</b> is lower triangular with shape <b>(M min_MN)</b> and all 
+    of its diagonal items equal to <b>1.0</b>.,
+  </li><li> matrix <b>U</b> is upper triangular with shape <b>(min_MN N)</b>, and,
+    most importantly,
+  </li><li> <b>B[P;] = L∘U</b>.
+</li></ul>
+
 </div>
 <div class="subsubsection" id="Matrix-Inverse">
 <h4 class="subsubsection">2.20.2.3 Matrix Inverse</h4>
 
-<p>The matrix <b>Ri</b> returned by <b>⌹[1]</b> or <b>⌹[2]</b> provides an alternative
+<p>The matrix <b>Ti</b> returned by <b>⌹[1]</b> or <b>⌹[2]</b> provides an alternative
 to <b>⌹B</b> for computing the inverse of a matrix <b>B</b>, in particular if the
 QR-factorization of <b>B</b> was already computed.
 </p>
-<p>Since <b>B = Q∘R</b>, it follows that <b>B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q</b>.
+<p>Since <b>B = Q∘T</b>, it follows that <b>B⁻¹ = T⁻¹∘Q⁻¹ = Ti∘⍉Q</b>.
 </p>
 <p>Indeed:
 </p>
 <pre class="verbatim">      B←?5 5⍴100   ⍝ a random matrix B
-      (Q R Ri)←⌹[2]B
-      (⌹B)=Ri∘⍉Q
+      (Q T Ti)←⌹[2]B
+      (⌹B) = Ti∘⍉Q
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
-
 </pre>
-</div>
-</div>
-<div class="subsection" id="g_t_005b_003f_005d_005b3_005d_002d-LQ-Factorizations">
-<h4 class="subsection">2.20.3 ⌹[3]- LQ Factorizations</h4>
-
-<p><b>⌹[3] B</b> computes an LQ factorization fof <b>B</b>. The result <b>(Q L Li)←⌹[3]</b>
-is similar to the result of the QR factorization above, except that <b>L</b> and
-<b>Li</b> are lower triangular rather than upper triangular. <b>⌹[3]</b> requires
-<b>libgsl</b>.
-</p>
-<p>There is no LQ-factorizations based on the Helzer algorithm, but if so desired
-one can use the Helzer QR-factorization with its argument <b>B</b> as well as its
-results <b>Q</b>, <b>R</b>, and <b>Ri</b> transposed.
+<p>The computation of <b>⍉Q</b> and <b>Ti∘⍉Q</b> is considerably faster than the
+computation of <b>⌹B</b> if <b>B</b> is large.
 </p>
 <hr>
+</div>
 </div>
 </div>
 <div class="section" id="Section-2_002e21">

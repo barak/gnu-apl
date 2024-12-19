@@ -2886,69 +2886,92 @@ matrix @b{B} then there are two possibilities:
       significant rounding errors in the result.
 @end enumerate
 
-@subsubsection ⌹[X] B
+@subsubsection ⌹[X] B: Factorizations of B
 
-The integer scalar @b{X} chooses one of currently two different algorithms
-that compute a QR factorization of a matrix @b{B}:
+The numeric scalar @b{X} chooses one of several algorithms that computes a 
+factorization (aka. decomposition) of a matrix @b{B}:
 
 @itemize
-@item @b{⌹[1]B} uses the algorithm published by Garry Helzer in APL Quote
-      Quad in 1990.
-@item @b{⌹[2]B} uses a libgsl based algorithm (and is therefore only available
-      if libgsl was installed when GNU APL was compiled).
+@item @b{⌹[1]B} computes a QR-factorization of @b{B}. It uses the algorithm
+      published by Garry Helzer in APL Quote Quad in 1990. This algorithm is
+      always available.
 
-      @b{⎕CT} in the same way as described above for @b{⌹B} and @b{A⌹B}.
-@item for backward compatibility with older versions of GNU APL, a real 
-      scalar @b{X} in @b{⌹[X]B} uses @b{⌹[1]B} if @b{X < 0.1} and
-      @b{⌹[2]B} otherwise. The scalar @b{X} is used instead of @b{⎕CT}.
-      Do not use this case in new code.
+@item @b{⌹[2]B} also computes a QR-factorization of @b{B}. However, it uses a
+      @b{libgsl} based algorithm and is therefore only available
+      if @b{libgsl} was installed when GNU APL was ./configure'd..
+
+@item @b{⌹[3]B} computes a RQ-factoriztion of @b{B}.
+  It also requires @b{libgsl}.
+
+@item @b{⌹[4]B} computes a LQ-factoriztion of @b{B}.
+  It also requires @b{libgsl}.
+
+@item @b{⌹[5]B} computes a QL-factoriztion of @b{B}.
+  It also requires @b{libgsl}.
+
+@item @b{⌹[6]B} computes a LU-factoriztion of @b{B}.
+  It also requires @b{libgsl}.
+
+@item @b{⌹[TOL]B} with a small real @b{TOL}. This variant is obsolete and
+only provided for backward compatibility with older versions of GNU APL
+(and is subject to being removed at some point in time). It uses the Helzer
+algorithm with @b{TOL} instead of @b{⎕CT}. New code should not use @b{⌹[TOL]}
+ but rather @b{⌹[1]} or @b{⌹[2]} after setting @b{⎕CT←TOL}.
 @end itemize
 
 The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
 a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
-all matrix items that are close to 0.0 are set to exactly 0.0.
+all matrix items that are @i{close} to @b{0.0} are set to exactly @b{0.0}.
+The meaning of @i{close} is defined by @b{⎕CT} in @b{⌹[1]B} (resp. @b{TOL} in
+the obsolete case above).
 
-GNU APL uses @b{⎕CT} in the same way as the Helzer alogrithm, i.e. to decide
-if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
-@b{A TOL X} and @b{A CPR B}, where Helzer leaves it open how to
-implement @b{A TOL X} and @b{A CPR B}). GNU APL uses the example
-implementation given in the Helzer paper. The @b{TOL} and @b{CPR}
-functions seem to be related to what is elsewhere known as the
-@i{condition number} of the matrix that is being factorized. In the libgsl
-case, @b{⎕CT} is not used.
+In the Helzer algorithm, GNU APL uses @b{⎕CT} as the tolerance @b{TOL}
+which decides if a matrix item close to @b{0.0} shall be set to @b{0.0}
+or not (APL functions @b{A TOL X} and @b{A CPR B} in the Helzer paper).
+The Helzer paper leaves it open how to implement @b{A TOL X} and @b{A CPR B}).
+GNU APL uses the example implementation given in the Helzer paper.
+The @b{TOL} and @b{CPR} functions seem to be related to what is elsewhere
+known as the @i{condition number} of the matrix that is being factorized.
+In the libgsl based algotithms is @b{⎕CT} not used.
+
+The factorizations @b{⌹[1]}, @b{⌹[2]}, @b{⌹[3]}, @b{⌹[4]}, and @b{⌹[5]}
+return a (nested) vector @b{(Q T Ti)} where @b{Q} is orthogonal,
+@b{T} is (upper or lower) triangular, and @b{Ti} is @b{T@sup{-1}}.
+
+Let @b{⍴B = (M N)} and let @b{min_MN = min(M, N)}. Then the
+factorization @b{⌹[6]} returns a nested vector @b{(P U L)} where:
+@itemize
+  @item vector @b{P} is a permutation of @b{⍳M},
+  @item matrix @b{L} is lower triangular with shape @b{(M min_MN)} and all 
+    of its diagonal items equal to @b{1.0}.,
+  @item matrix @b{U} is upper triangular with shape @b{(min_MN N)}, and,
+    most importantly,
+  @item @b{B[P;] = L∘U}.
+@end itemize
 
 @subsubsection Matrix Inverse
 
-The matrix @b{Ri} returned by @b{⌹[1]} or @b{⌹[2]} provides an alternative
+The matrix @b{Ti} returned by @b{⌹[1]} or @b{⌹[2]} provides an alternative
 to @b{⌹B} for computing the inverse of a matrix @b{B}, in particular if the
 QR-factorization of @b{B} was already computed.
 
-Since @b{B = Q∘R}, it follows that @b{B⁻¹ = R⁻¹∘Q⁻¹ = Ri∘⍉Q}.
+Since @b{B = Q∘T}, it follows that @b{B⁻¹ = T⁻¹∘Q⁻¹ = Ti∘⍉Q}.
 
 Indeed:
 
 @verbatim
       B←?5 5⍴100   ⍝ a random matrix B
-      (Q R Ri)←⌹[2]B
-      (⌹B)=Ri∘⍉Q
+      (Q T Ti)←⌹[2]B
+      (⌹B) = Ti∘⍉Q
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
-
 @end verbatim
 
-@subsection ⌹[3]- LQ Factorizations
-
-@b{⌹[3] B} computes an LQ factorization fof @b{B}. The result @b{(Q L Li)←⌹[3]}
-is similar to the result of the QR factorization above, except that @b{L} and
-@b{Li} are lower triangular rather than upper triangular. @b{⌹[3]} requires
-@b{libgsl}.
-
-There is no LQ-factorizations based on the Helzer algorithm, but if so desired
-one can use the Helzer QR-factorization with its argument @b{B} as well as its
-results @b{Q}, @b{R}, and @b{Ri} transposed.
+The computation of @b{⍉Q} and @b{Ti∘⍉Q} is considerably faster than the
+computation of @b{⌹B} if @b{B} is large.
 
 @node    Section 2.21
 @section Dyadic ⎕CR
