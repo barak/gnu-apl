@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 19, 2024.  This manual briefly documents GNU APL, an
+December 24, 2024.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -6378,26 +6378,39 @@ with a performance penalty since many argument checks are duplicated.
 At the same time A +.× B is by far the most frequent use of the inner
 product operator ’.’.
 
-   For this reason GNU APL also provides a more efficient dyadic
-function ∘ (Matrix Product) for the special case +.× of the dyadic
-operator ’.’.  This function ∘ has been optimized for numeric arguments
-and computes the matrix product as known from linear algebra.
+   For this reason GNU APL also provides a slightly more efficient
+dyadic function ∘ (Matrix Product) for the special case +.× of the
+dyadic operator ’.’.  This function ∘ has been optimized for numeric
+arguments and computes the matrix product as known from linear algebra.
 
-   For two-dimensional matrices A and B function ∘ is conceptually the
+   For two-dimensional matrices A and B is function ∘ conceptually the
 same as +.×:
 
    A∘B ←→ A +.× B
 
-   Hwoever, there are some subtle differences between ∘ and +.×:
+   However, there are some subtle differences between the function ∘ and
+the operator +.×:
 
    • A +.× B allows A and B to be of any rank, while A∘B raises a RANK
      ERROR if the rank of A or B is more than 2.
 
-   • With operator +.× the product of e.g.  a vector and a matrix (or
-     vice versa) is a vector, usually understood as row-vector.  In
-     contrast (and more similar to linear algebra) A∘B is always a
-     matrix, to preserve the distinction between row vectors and column
-     vectors:
+   • The product A +.× B can be a vector (e.g.  if A is a vector and B
+     is a matrix), usually understood as row-vector.  In contrast (and
+     more similar to linear algebra) A∘B is always a matrix.
+   • In order to preserve the distinction between row vectors and column
+     vectors the arguments A and B of ∘ are possibly reshaped according
+     to the following rules:
+
+        • if A and/or B is a scalar then the normal (element-wise)
+          product of A and B is computed.  That is, A∘B ←→ A×B.
+        • if A is a APL vector of length N then it is reshaped to a
+          row-vector before A∘B is computed.  In this context, the term
+          row-vector shall refer to a matrix of shape (1 N).
+        • if B is a APL vector of length N then it is reshaped to a
+          column-vector before A∘B is computed.  In this context, the
+          term column-vector shall refer to a matrix of shape (N 1).
+
+     Examples:
 
            M←2 2⍴1 2 3 4   ⍝ a matrix
            V←10 11         ⍝ a vector
@@ -6415,13 +6428,13 @@ same as +.×:
            V∘M
      43 64
      
-           ⍴M +.× V   ⍝ vector
+           ⍴M +.× V   ⍝ the result is an (APL-) vector of length 2
      2
-           ⍴V +.× M   ⍝ vector
+           ⍴V +.× M   ⍝ the result is an (APL-) vector of length 2
      2
-           ⍴V∘M       ⍝ row vector
+           ⍴V∘M       ⍝ the result is row vector
      1 2
-           ⍴M∘V       ⍝ column vector
+           ⍴M∘V       ⍝ the result is column vector
      2 1
 
    • A +.× B requires that the number of columns in A is equal to the
@@ -7989,23 +8002,23 @@ Node: Section 2.39215173
 Node: Section 2.40219591
 Node: Section 2.41240901
 Node: Section 2.42251817
-Node: Chapter 3254193
-Node: Chapter 4256701
-Node: Chapter 5257827
-Node: Section 5.1259364
-Node: Section 5.2260644
-Node: Section 5.3261004
-Node: Section 5.4261246
-Node: Section 5.5261908
-Node: Section 5.6262386
-Node: Section 5.7263159
-Node: Section 5.8263585
-Node: Chapter 6263987
-Node: Section 6.1264406
-Node: Section 6.2265093
-Node: Chapter 7265924
-Node: Section 7.1266427
-Node: Section 7.2291740
+Node: Chapter 3254991
+Node: Chapter 4257499
+Node: Chapter 5258625
+Node: Section 5.1260162
+Node: Section 5.2261442
+Node: Section 5.3261802
+Node: Section 5.4262044
+Node: Section 5.5262706
+Node: Section 5.6263184
+Node: Section 5.7263957
+Node: Section 5.8264383
+Node: Chapter 6264785
+Node: Section 6.1265204
+Node: Section 6.2265891
+Node: Chapter 7266722
+Node: Section 7.1267225
+Node: Section 7.2292538
 
 End Tag Table
 

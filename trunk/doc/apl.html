@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 19, 2024.
+<p>December 24, 2024.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -7099,29 +7099,46 @@ linear algebra. In the general case <b>A f.g B</b> may the functions <b>f</b>
 and <b>g</b> also be non-scalar APL primitives or even defined functions.
 This generality may occasionally be helpful, but it comes with a performance
 penalty since many argument checks are duplicated. At the same time
-<b>A +.× B</b> is by far the most frequent use of the inner product operator &rsquo;.&rsquo;.
+<b>A +.× B</b> is by far the most frequent use of the inner product operator
+<b>&rsquo;.&rsquo;</b>.
 </p>
-<p>For this reason GNU APL also provides a more efficient dyadic function
-<b>∘</b> (Matrix Product) for the special case <b>+.×</b> of the dyadic
+<p>For this reason GNU APL also provides a slightly more efficient dyadic
+function <b>∘</b> (Matrix Product) for the special case <b>+.×</b> of the dyadic
 operator &rsquo;.&rsquo;. This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 </p>
-<p>For two-dimensional matrices A and B function ∘ is conceptually the
-same as +.×:
+<p>For two-dimensional matrices <b>A</b> and <b>B</b> is function <b>∘</b> conceptually
+the same as <b>+.×</b>:
 </p>
-<p>A∘B ←→ A +.× B
+<p><b>A∘B ←→ A +.× B</b>
 </p>
-<p>Hwoever, there are some subtle differences between ∘ and +.×:
+<p>However, there are some subtle differences between the function <b>∘</b> and
+the operator <b>+.×</b>:
 </p>
 <ul>
-<li> <b>A +.× B</b> allows A and B to be of any rank, while <b>A∘B</b> raises a
- RANK ERROR if the rank of A or B is more than 2.
+<li> <b>A +.× B</b> allows <b>A</b> and <b>B</b> to be of any rank, while <b>A∘B</b>
+raises a RANK ERROR if the rank of <b>A</b> or <b>B</b> is more than 2.
 
-</li><li> With operator +.× the product of e.g. a vector and a matrix (or
- vice versa) is a vector, usually understood as row-vector.
- In contrast (and more similar to linear algebra) A∘B is always a matrix,
- to preserve the distinction between row vectors and column vectors:
+</li><li> The product <b>A +.× B</b> can be a vector (e.g. if <b>A</b> is a vector
+and <b>B</b> is a matrix), usually understood as row-vector.
+ In contrast (and more similar to linear algebra) <b>A∘B</b> is always a matrix.
+</li><li> In order to preserve the distinction between row vectors and column
+  vectors the arguments <b>A</b> and <b>B</b> of <b>∘</b> are possibly reshaped
+  according to the following rules:
 
+<ul>
+<li> if <b>A</b> and/or <b>B</b> is a scalar then the normal (element-wise)
+  product of <b>A</b> and <b>B</b> is computed. That is, <b>A∘B ←→ A×B</b>.
+</li><li> if <b>A</b> is a APL vector of length <b>N</b> then it is reshaped to a
+row-vector before <b>A∘B</b> is computed. In this context,
+the term  <i>row-vector</i> shall refer to a matrix of shape <b>(1 N)</b>.
+</li><li> if <b>B</b> is a APL vector of length <b>N</b> then it is reshaped to a
+column-vector before <b>A∘B</b> is computed. In this context, the term
+<i>column-vector</i> shall refer to a matrix of shape <b>(N 1)</b>.
+</li></ul>
+
+<p>Examples:
+</p>
 <pre class="verbatim">      M←2 2⍴1 2 3 4   ⍝ a matrix
       V←10 11         ⍝ a vector
 
@@ -7138,13 +7155,13 @@ same as +.×:
       V∘M
 43 64
 
-      ⍴M +.× V   ⍝ vector
+      ⍴M +.× V   ⍝ the result is an (APL-) vector of length 2
 2
-      ⍴V +.× M   ⍝ vector
+      ⍴V +.× M   ⍝ the result is an (APL-) vector of length 2
 2
-      ⍴V∘M       ⍝ row vector
+      ⍴V∘M       ⍝ the result is row vector
 1 2
-      ⍴M∘V       ⍝ column vector
+      ⍴M∘V       ⍝ the result is column vector
 2 1
 </pre>
 </li><li> <b>A +.× B</b> requires that the number of columns in <b>A</b> is equal to

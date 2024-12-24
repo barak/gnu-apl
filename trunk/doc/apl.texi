@@ -6659,28 +6659,45 @@ linear algebra. In the general case @b{A f.g B} may the functions @b{f}
 and @b{g} also be non-scalar APL primitives or even defined functions.
 This generality may occasionally be helpful, but it comes with a performance
 penalty since many argument checks are duplicated. At the same time
-@b{A +.× B} is by far the most frequent use of the inner product operator '.'.
+@b{A +.× B} is by far the most frequent use of the inner product operator
+@b{'.'}.
 
-For this reason GNU APL also provides a more efficient dyadic function
-@b{∘} (Matrix Product) for the special case @b{+.×} of the dyadic
+For this reason GNU APL also provides a slightly more efficient dyadic
+function @b{∘} (Matrix Product) for the special case @b{+.×} of the dyadic
 operator '.'. This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 
-For two-dimensional matrices A and B function ∘ is conceptually the
-same as +.×:
+For two-dimensional matrices @b{A} and @b{B} is function @b{∘} conceptually
+the same as @b{+.×}:
 
-A∘B ←→ A +.× B
+@b{A∘B ←→ A +.× B}
 
-Hwoever, there are some subtle differences between ∘ and +.×:
+However, there are some subtle differences between the function @b{∘} and
+the operator @b{+.×}:
 
 @itemize
-@item @b{A +.× B} allows A and B to be of any rank, while @b{A∘B} raises a
- RANK ERROR if the rank of A or B is more than 2.
+@item @b{A +.× B} allows @b{A} and @b{B} to be of any rank, while @b{A∘B}
+raises a RANK ERROR if the rank of @b{A} or @b{B} is more than 2.
 
-@item With operator +.× the product of e.g. a vector and a matrix (or
- vice versa) is a vector, usually understood as row-vector.
- In contrast (and more similar to linear algebra) A∘B is always a matrix,
- to preserve the distinction between row vectors and column vectors:
+@item The product @b{A +.× B} can be a vector (e.g. if @b{A} is a vector
+and @b{B} is a matrix), usually understood as row-vector.
+ In contrast (and more similar to linear algebra) @b{A∘B} is always a matrix.
+@item In order to preserve the distinction between row vectors and column
+  vectors the arguments @b{A} and @b{B} of @b{∘} are possibly reshaped
+  according to the following rules:
+
+@itemize
+@item if @b{A} and/or @b{B} is a scalar then the normal (element-wise)
+  product of @b{A} and @b{B} is computed. That is, @b{A∘B ←→ A×B}.
+@item if @b{A} is a APL vector of length @b{N} then it is reshaped to a
+row-vector before @b{A∘B} is computed. In this context,
+the term  @i{row-vector} shall refer to a matrix of shape @b{(1 N)}.
+@item if @b{B} is a APL vector of length @b{N} then it is reshaped to a
+column-vector before @b{A∘B} is computed. In this context, the term
+@i{column-vector} shall refer to a matrix of shape @b{(N 1)}.
+@end itemize
+
+Examples:
 
 @verbatim
       M←2 2⍴1 2 3 4   ⍝ a matrix
@@ -6699,13 +6716,13 @@ Hwoever, there are some subtle differences between ∘ and +.×:
       V∘M
 43 64
 
-      ⍴M +.× V   ⍝ vector
+      ⍴M +.× V   ⍝ the result is an (APL-) vector of length 2
 2
-      ⍴V +.× M   ⍝ vector
+      ⍴V +.× M   ⍝ the result is an (APL-) vector of length 2
 2
-      ⍴V∘M       ⍝ row vector
+      ⍴V∘M       ⍝ the result is row vector
 1 2
-      ⍴M∘V       ⍝ column vector
+      ⍴M∘V       ⍝ the result is column vector
 2 1
 @end verbatim
 

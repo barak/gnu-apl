@@ -27,18 +27,23 @@
 #include "Macro.hh"
 #include "Workspace.hh"
 
-Bif_JOT          Bif_JOT        ::fun;
-Bif_OPER2_OUTER  Bif_OPER2_OUTER::fun;
+Bif_JOT          Bif_JOT        ::fun;   // ∘
+Bif_OPER2_OUTER  Bif_OPER2_OUTER::fun;   // A ∘.f B
 
 Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
 //----------------------------------------------------------------------------
-Token Bif_JOT::eval_AB(Value_P A, Value_P B) const
+Token
+Bif_JOT::eval_AB(Value_P A, Value_P B) const
 {
    // compute A∘B ←→ A +.× B
+   // the rank of A and B is 0..2
    //
    if (A->get_rank() > 2)   RANK_ERROR;
    if (B->get_rank() > 2)   RANK_ERROR;
+
+   if (A->is_scalar() || B->is_scalar())
+      return Bif_F12_TIMES::fun.eval_AB(A, B);
 
    // ranks are valid. check that A and B are numeric (so that we can depend
    // on it below instead of testing it multiple times.
