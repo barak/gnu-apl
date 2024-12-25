@@ -4,6 +4,7 @@
 # put them into apl-x.x.tar.gz, but don't install them.
 #
 dist_noinst_DATA =                              \
+		0000_OBSOLETE_TESTCASES                 \
         AAA0_Global_Settings.tc                 \
         AAA1.tc                                 \
         AAA2.tc                                 \

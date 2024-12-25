@@ -129,9 +129,12 @@ signal_WINCH_handler(int)
 
 struct winsize wsize;
    // TIOCGWINSZ is 0x5413 on GNU/Linux. We use 0x5413 instead of TIOCGWINSZ
-   // because TIOCGWINSZ may not exist on all platforms
+   // if TIOCGWINSZ is not #defined on some platform.
    //
-   if (0 != ioctl(STDIN_FILENO, 0x5413, &wsize))   return;
+#ifndef TIOCGWINSZ
+# define TIOCGWINSZ 0x5413
+#endif
+   if (0 != ioctl(STDIN_FILENO, TIOCGWINSZ, &wsize))   return;
    if (wsize.ws_col < MIN_Quad_PW)   return;
    if (wsize.ws_col > MAX_Quad_PW)   return;
 
@@ -449,10 +452,10 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
         signal_WINCH_handler(0);   // pretend window size change
       }
-   else
-      {
-        Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
-      }
+
+    // honor the user's initial PW preference.
+    //
+    Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
 
 #if PARALLEL_ENABLED
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));
