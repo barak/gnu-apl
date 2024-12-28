@@ -364,6 +364,41 @@ AC_MSG_RESULT([$HAVE_SEM_INIT])
 
 
 ######################## pthread_getaffinity_np() check #######################
+# see if TIOCGWINSZ is available
+#
+AC_MSG_CHECKING([whether ioctl(fd, TIOCGWINSZ, ...) is available])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([ [#include <asm/termbits.h> /* for TIOCGWINSZ */]
+                       [#include <sys/ioctl.h>]
+                     ],
+                     [ [winsize win;]
+                       [ioctl(/*fd */ 0, TIOCGWINSZ, &win);]
+                     ])],
+    [HAVE_IOCTL_TIOCGWINSZ=yes
+     AC_DEFINE(HAVE_IOCTL_TIOCGWINSZ, 1,
+               [Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available])
+    ],
+    [HAVE_IOCTL_TIOCGWINSZ=no])
+AC_MSG_RESULT([$HAVE_TIOCGWINSZ])
+
+######################## pthread_setname_np() check #######################
+# see if pthread_setname_np is available
+#
+AC_MSG_CHECKING([whether pthread_setname_np is available])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([ [#include <pthread.h>]
+                     ],
+                     [ [pthread_t thread = 0;]
+                       [pthread_setname_np(thread, "thread_name");]
+                     ])],
+    [HAVE_PTHREAD_SETNAME_NP=yes
+     AC_DEFINE(HAVE_PTHREAD_SETNAME_NP, 1,
+               [Define to 1 iff pthread_setname_np() is available])
+    ],
+    [HAVE_PTHREAD_SETNAME_NP=no])
+AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
+
+######################## pthread_getaffinity_np() check #######################
 # see if pthread_getaffinity_np() and pthread_setaffinity_np are available
 #
 AC_MSG_CHECKING([whether pthread_setaffinity_np is available])
@@ -914,7 +949,7 @@ else   # normal build
                       [top-level GNU APL source directory])
 fi
 
-# we want 0/1 instead of yes/no in config.h...
+# we want yes/no in the ./configure output, but 0/1 in config.h...
 #
 if (apl_YES($apl_FFT)); then
    AC_DEFINE_UNQUOTED(apl_FFT, 1, [FFT available ?])

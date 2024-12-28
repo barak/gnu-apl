@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 1439"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1593", "2024-12-25 12:21:32 UTC", "Linux 5.15.0-126-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1596", "2024-12-28 17:00:08 UTC", "Linux 5.15.0-126-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -60,6 +60,9 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
+
+/* Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available */
+#define HAVE_IOCTL_TIOCGWINSZ 1
 
 /* Define to 1 if you have the `atomicity' library (-latomicity). */
 /* #undef HAVE_LIBATOMICITY */

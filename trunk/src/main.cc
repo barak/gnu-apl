@@ -41,6 +41,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#if HAVE_IOCTL_TIOCGWINSZ   // plat form has ioctl(fd, TIOCGWINSZ. ...)
+# include <asm/termbits.h>  /* Definition of TIOC*WINSZ constants */
+# include <sys/ioctl.h>
+#endif
+
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
 #include "Common.hh"
@@ -453,9 +458,37 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
         signal_WINCH_handler(0);   // pretend window size change
       }
 
-    // honor the user's initial PW preference.
+#if HAVE_IOCTL_TIOCGWINSZ
+   // The platform supports reading back of the window size. If the user
+   // wants ⎕PW to be controlled by the window size, then she most likely
+   // also wants ⎕PW to be controlled by the window size at start-up.
+   //
+   if (UserPreferences::uprefs.WINCH_sets_pw)
+      {
+        winsize win_size;
+        win_size.ws_col = MAX_Quad_PW;   // invalidate the column count
+        if (0 == ioctl(STDIN_FILENO, TIOCGWINSZ, &win_size))
+           {
+             // MAX_Quad_PW is 10,000 or so, which is certainly larger than
+             // the number of screen columns. We trust TIOCGWINSZ only if 
+             // it is resonably small. We allow it to be too small (and then
+             // increase it). but ignore it if it is too large.
+             //
+             if (win_size.ws_col < MIN_Quad_PW)   // increase too small ws_col
+                win_size.ws_col = MIN_Quad_PW;
+
+             if (win_size.ws_col < MAX_Quad_PW)   // ognmore large ws_col
+                Workspace::set_PW(win_size.ws_col, LOC);
+           }
+      }
+#endif
+
+    // the final word should be the user preferences (if any).
     //
-    Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
+    if (UserPreferences::uprefs.initial_PW_by_user)
+       {
+         Workspace::set_PW(UserPreferences::uprefs.initial_PW, LOC);
+       }
 
 #if PARALLEL_ENABLED
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));

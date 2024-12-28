@@ -55,7 +55,8 @@ struct UserPreferences
      echo_CIN(false),
      emacs_arg(0),
      emacs_mode(false),
-     initial_pw(DEFAULT_Quad_PW),
+     initial_PW(DEFAULT_Quad_PW),
+     initial_PW_by_user(false),
      line_history_len(500),
      line_history_path(".apl.history"),
      mem_arg(0),
@@ -172,7 +173,10 @@ struct UserPreferences
    std::basic_string<const char *> eval_exprs;
 
    /// initial value of ⎕PW
-   int initial_pw;
+   int initial_PW;
+
+   /// user has set the initial value of ⎕PW (preferences or command line)
+   bool initial_PW_by_user;
 
    /// a workspace to be loaded at startup
    UTF8_string initial_workspace;

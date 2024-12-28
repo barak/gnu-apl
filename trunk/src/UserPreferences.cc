@@ -612,14 +612,17 @@ UserPreferences::parse_argv_2(bool logit)
                   exit(a);
                 }
 
-              initial_pw = atoi(val);
-              if (initial_pw < MIN_Quad_PW || initial_pw > MAX_Quad_PW)
+              initial_PW = atoi(val);
+              if (initial_PW < MIN_Quad_PW || initial_PW > MAX_Quad_PW)
                 {
                   CERR << "bad --PW value (ignored)" << endl; 
+                  initial_PW_by_user = false;   // since ignored
+                  initial_PW = 80;
                 }
               else
                 {
-                  Workspace::set_PW(initial_pw, LOC);
+                  Workspace::set_PW(initial_PW, LOC);
+                  initial_PW_by_user = true;
                 }
               continue;
             }
@@ -1488,11 +1491,19 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "INITIAL-⎕PW"))
             {
-              if (initial_pw >= MIN_Quad_PW && initial_pw <= MAX_Quad_PW)
-                 initial_pw = atoi(arg);
+              initial_PW = atoi(arg);
+              if (initial_PW < MIN_Quad_PW || initial_PW > MAX_Quad_PW)
+                 {
+                   CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
+                        << endl;
+                   initial_PW_by_user = false;
+                   initial_PW = 80;
+                 }
               else
-                 CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
-                      << endl;
+                 {
+                   initial_PW_by_user = true;
+                   Workspace::set_PW(initial_PW, LOC);
+                 }
             }
          else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
             {
