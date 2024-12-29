@@ -368,12 +368,9 @@ AC_MSG_RESULT([$HAVE_SEM_INIT])
 #
 AC_MSG_CHECKING([whether ioctl(fd, TIOCGWINSZ, ...) is available])
 AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([ [#include <asm/termbits.h> /* for TIOCGWINSZ */]
-                       [#include <sys/ioctl.h>]
-                     ],
-                     [ [winsize win;]
-                       [ioctl(/*fd */ 0, TIOCGWINSZ, &win);]
-                     ])],
+    [AC_LANG_PROGRAM([ [#include <sys/ioctl.h>] ],
+                     [ [winsize win;] [ioctl(/*fd */ 0, TIOCGWINSZ, &win);] ])
+    ],
     [HAVE_IOCTL_TIOCGWINSZ=yes
      AC_DEFINE(HAVE_IOCTL_TIOCGWINSZ, 1,
                [Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available])

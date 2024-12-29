@@ -22419,18 +22419,15 @@ printf "%s\n" "$HAVE_SEM_INIT" >&6; }
 printf %s "checking whether ioctl(fd, TIOCGWINSZ, ...) is available... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
- #include <asm/termbits.h> /* for TIOCGWINSZ */
-                       #include <sys/ioctl.h>
-
+ #include <sys/ioctl.h>
 int
 main (void)
 {
- winsize win;
-                       ioctl(/*fd */ 0, TIOCGWINSZ, &win);
-
+ winsize win; ioctl(/*fd */ 0, TIOCGWINSZ, &win);
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"
 then :

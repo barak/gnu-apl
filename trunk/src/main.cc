@@ -42,7 +42,6 @@
 #include <sys/types.h>
 
 #if HAVE_IOCTL_TIOCGWINSZ   // plat form has ioctl(fd, TIOCGWINSZ. ...)
-# include <asm/termbits.h>  /* Definition of TIOC*WINSZ constants */
 # include <sys/ioctl.h>
 #endif
 
