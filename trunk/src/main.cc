@@ -41,13 +41,9 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#if HAVE_IOCTL_TIOCGWINSZ   // plat form has ioctl(fd, TIOCGWINSZ. ...)
-# include <sys/ioctl.h>
-#endif
-
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
-#include "Common.hh"
+#include "Common.hh"      // #includes config.h
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "LineInput.hh"
@@ -56,6 +52,10 @@
 #include "Output.hh"
 #include "Workspace.hh"
 #include "UserPreferences.hh"
+
+#if HAVE_IOCTL_TIOCGWINSZ   // platform has ioctl(fd, TIOCGWINSZ. ...)
+# include <sys/ioctl.h>
+#endif
 
 #if HAVE_LIBELFIN_ELF_ELF___HH
 # include <libelfin/elf/elf++.hh>
@@ -127,22 +127,36 @@ static void
 signal_WINCH_handler(int)
 {
    // fgets() returns EOF when the WINCH signal is received. We remember
-   // this fact and repeat fgets() once after a WINCH signal
+   // this fact and repeat fgets() once after a WINCH signal. got_WINCH
+   // is used in LineInput::safe_fgetc()
    //
    got_WINCH = true;
 
-struct winsize wsize;
-   // TIOCGWINSZ is 0x5413 on GNU/Linux. We use 0x5413 instead of TIOCGWINSZ
-   // if TIOCGWINSZ is not #defined on some platform.
-   //
-#ifndef TIOCGWINSZ
-# define TIOCGWINSZ 0x5413
-#endif
-   if (0 != ioctl(STDIN_FILENO, TIOCGWINSZ, &wsize))   return;
-   if (wsize.ws_col < MIN_Quad_PW)   return;
-   if (wsize.ws_col > MAX_Quad_PW)   return;
 
-   Workspace::set_PW(wsize.ws_col, LOC);
+#if HAVE_IOCTL_TIOCGWINSZ
+
+
+   // query the window size and set ⎕PW if we have ioctl TIOCGWINSZ
+   //
+    
+   // MAX_Quad_PW is 10,000 or so, which is certainly larger than
+   // the number of screen columns. We trust TIOCGWINSZ only if
+   // it is resonably small. We allow it to be too small (and then
+   // increase it). but ignore it if it is too large.
+   //
+struct winsize wsize;
+   wsize.ws_col = MAX_Quad_PW;   // invalidate the column count
+   if (0 == ioctl(STDIN_FILENO, TIOCGWINSZ, &wsize))
+      {
+        if (wsize.ws_col < MIN_Quad_PW)   // increase too small ws_col
+           wsize.ws_col = MIN_Quad_PW;
+        if (wsize.ws_col > MAX_Quad_PW)   // limit ws_col
+           wsize.ws_col = MAX_Quad_PW;
+        Workspace::set_PW(wsize.ws_col, LOC);
+      }
+#endif
+   // just return if we don't have ioctl TIOCGWINSZ
+   return;
 }
 //----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
@@ -451,34 +465,26 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
-   if (UserPreferences::uprefs.WINCH_sets_pw)
-      {
-        sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
-        signal_WINCH_handler(0);   // pretend window size change
-      }
 
 #if HAVE_IOCTL_TIOCGWINSZ
-   // The platform supports reading back of the window size. If the user
-   // wants ⎕PW to be controlled by the window size, then she most likely
-   // also wants ⎕PW to be controlled by the window size at start-up.
+   // Enable the ability to change ⎕PW on window resize only if the
+   // platform supports ioctl TIOCGWINSZ
    //
+    
    if (UserPreferences::uprefs.WINCH_sets_pw)
       {
-        winsize win_size;
-        win_size.ws_col = MAX_Quad_PW;   // invalidate the column count
-        if (0 == ioctl(STDIN_FILENO, TIOCGWINSZ, &win_size))
-           {
-             // MAX_Quad_PW is 10,000 or so, which is certainly larger than
-             // the number of screen columns. We trust TIOCGWINSZ only if 
-             // it is resonably small. We allow it to be too small (and then
-             // increase it). but ignore it if it is too large.
-             //
-             if (win_size.ws_col < MIN_Quad_PW)   // increase too small ws_col
-                win_size.ws_col = MIN_Quad_PW;
-
-             if (win_size.ws_col < MAX_Quad_PW)   // ognmore large ws_col
-                Workspace::set_PW(win_size.ws_col, LOC);
-           }
+        // IF WINCH_sets_pw preference is enabled, set up a handler for the
+        // SIGWINCH signal.
+        sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
+         
+        // The platform supports reading back of the window size. If the user
+        // wants ⎕PW to be controlled by the window size, then she most likely
+        // also wants ⎕PW to be controlled by the window size at start-up.
+        // We do this by by using the WINCH signal handler to pretend that
+        // there's a window size change
+        
+        signal_WINCH_handler(0);   // pretend window size change
+        got_WINCH = false;
       }
 #endif
 
