@@ -97,9 +97,15 @@ extern int64_t get_main();
 /// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
 extern bool gtk_init_done;
 
-/// initialize
-extern void init_1(const char * argv0, bool log_startup);
-extern void init_2(bool log_startup);
+/// initialize those modules (⎕WA, rlimits, Avec, LibPaths, Value, and VH_entry)
+/// that depend on the command line arguments. Note that different
+/// build targets (main.cc, libapl.cc, and python_apl.cc) provide their own
+/// \b init_modules() function.
+extern void init_modules(const char * argv0, bool log_startup);
+
+/// initialize those modules (Output, Svar_DB, LineInput, and Parallel)
+/// that are independent of the command line arguments.
+extern void init_modules2(bool log_startup);
 
 /// clean up
 extern void cleanup(bool soft);

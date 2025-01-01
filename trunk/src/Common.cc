@@ -86,7 +86,7 @@ bool interrupt_is_raised()
 }
 //----------------------------------------------------------------------------
 void
-init_1(const char * argv0, bool log_startup)
+init_modules(const char * argv0, bool log_startup)
 {
    // init the workspace memory limits
    //
@@ -150,7 +150,7 @@ rlimit rl;
 //----------------------------------------------------------------------------
 /// initialize subsystems that depend on argv[]
 void
-init_2(bool log_startup)
+init_modules2(bool log_startup)
 {
 const int retry_max = UserPreferences::uprefs.emacs_mode ? 15 : 5;
 

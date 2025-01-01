@@ -98,7 +98,7 @@ std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
 /// the difference between function main() in the result of backtrace_symbol()
 /// and the address of main() in the loaded program. Only valid after the
-/// line <main>: was processes in read_apl_lines_file().
+/// line main>: was processes in read_apl_lines_file().
 //
 static int64_t main_offset_0 = 0;
 

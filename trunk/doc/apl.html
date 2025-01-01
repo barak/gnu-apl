@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 24, 2024.
+<p>January 1, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -4594,7 +4594,24 @@ gnuplot:
       .
   for 200 lines
 </pre>
+<p>Instead of a filename, <b>⎕MX[13]</b> also accepts an integer scalar which should
+be a file handle as returned by <b>⎕FIO[3]</b> aka. <b>⎕FIO.fopen</b>. This allows
+e.g. for texts before and/or after the value(s) printed by <b>⎕MX[13]</b>.
+For example:
+</p>
+<pre class="verbatim">      Heading←⎕CR.string_to_UTF8 &quot;Print: 10+⍳10\n\n&quot;   ⍝ a heading
+      Value←10 + ⍳10                                   ⍝ a value
+      Handle←&quot;w&quot; ⎕FIO.fopen &quot;/tmp/test&quot;                ⍝ open file for writing
+      Heading ⎕FIO.fwrite Handle                       ⍝ write the heading
+      Handle ⎕MX.print Value                           ⍝ write the value
+      ⎕FIO.fclose Handle                               ⍝ close the file
+</pre>
+<p>which produces file <b>/tmp/test</b> with the following 3-line content:
+</p>
+<pre class="verbatim">Print: 10+⍳10
 
+11 12 13 14 15 16 17 18 19 20 
+</pre>
 <hr>
 </div>
 </div>

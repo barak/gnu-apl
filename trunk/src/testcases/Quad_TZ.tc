@@ -30,13 +30,17 @@
       ⎕TZ
 6.2
 
-      ⍝ regression
+      ⍝ regression. This usually fails on 12/31 because ⎕TZ←12 already points
+      ⍝ to new tears day of the next year while TZ←¯12 is still `2/`3 of the
+      ⍝ previous year.
       ⍝
       ⎕TZ←12  ◊ T1←⎕TS
       ⎕TZ←¯12 ◊ T2←⎕TS
+      ⍝ handle month-wrap caused by timezones on different days.
+      ⍝ The year-wrap is not handled because it is too rare,
+      ⍝
       +/ (⊂(T1 - T2)[2 3])≡¨ (0 1) (1 ¯27) (1 ¯28) (1 ¯29) (1 ¯30)
 1
-
 
 ⍝ ==================================
 

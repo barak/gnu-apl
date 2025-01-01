@@ -49,6 +49,115 @@ UserPreferences UserPreferences::uprefs;
 #endif
 
 //----------------------------------------------------------------------------
+UserPreferences::UserPreferences()
+   :
+     append_summary(false),
+     auto_OFF(false),
+     backup_before_save(false),
+     control_Ds_to_exit(0),
+     CPU_limit_secs(0),
+     daemon(false),
+     discard_indentation(false),
+#define sec_def(X) X(false),
+#include "Security.def"   // all start with disable_
+     do_CONT(true),
+     do_Color(true),
+     do_not_echo(false),
+     echo_CIN(false),
+     emacs_arg(0),
+     emacs_mode(false),
+     initial_PW(DEFAULT_Quad_PW),
+     initial_PW_by_user(false),
+     line_history_len(500),
+     line_history_path(".apl.history"),
+     mem_arg(0),
+     multi_line_strings(true),
+     multi_line_strings_3(true),
+     nabla_to_history(1),   // if function was modified
+     output_to_cout(false),
+     randomize_testfiles(false),
+     raw_cin(false),
+     requested_cc(CCNT_UNKNOWN),
+     requested_id(0),
+     requested_par(0),
+     safe_mode(false),
+     script_argc(0),
+     silent(false),
+     system_do_svars(true),
+     tcp_port(0),
+     tcp_websocket(false),
+     user_do_svars(true),
+     user_profile(0),
+     wait_ms(0),
+     WINCH_sets_pw(false)
+{
+   gettimeofday(&session_start, 0);
+}
+//----------------------------------------------------------------------------
+bool
+UserPreferences::collect_preferences(int argc, const char ** argv)
+{
+const bool log_startup0 = parse_argv_0(argc, argv);
+   if (LOG_argc_argv || log_startup0)
+      {
+         CERR << "argc/argv before expansion:\n";
+         show_argv(argc, argv);
+      }
+
+   expand_argv(argc, argv);
+
+const bool log_startup = parse_argv_1() || log_startup0;
+   if (LOG_argc_argv || log_startup)
+      {
+         CERR << "argc/argv after expansion:\n";
+         show_argv(expanded_argv.size(), &expanded_argv[0]);
+      }
+
+#ifdef cfg_DYNAMIC_LOG_WANTED
+   if (log_startup)   Log_control(LID_startup, true);
+#endif // cfg_DYNAMIC_LOG_WANTED
+
+   init_modules(argv[0], log_startup);
+
+   // read /etc/gnu-apl.d/preferences
+   read_config_file(true,  log_startup);
+
+   // read $HOME/.config/gnu_apl/preferences
+   read_config_file(false, log_startup);
+
+  // read /etc/gnu-apl.d/parallel_thresholds
+   read_threshold_file(true, log_startup);
+
+  // read $HOME/.config/gnu_apl/parallel_thresholds
+   read_threshold_file(false, log_startup);
+
+  parse_argv_2(log_startup);
+
+  return log_startup0;
+}
+//----------------------------------------------------------------------------
+/// print argc and argv[]
+void
+UserPreferences::show_argv(int argc, const char ** argv)
+{
+   CERR << "argc: " << argc << endl;
+   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
+
+   // tell if stdin is open or closed
+   //
+   if (fcntl(STDIN_FILENO, F_GETFD))
+      CERR << "stdin is: CLOSED" << endl;
+   else
+      CERR << "stdin is: OPEN" << endl;
+
+   // tell if fd 3 is open or closed
+   //
+   if (fcntl(3, F_GETFD))
+      CERR << "fd 3 is:  CLOSED" << endl;
+   else
+      CERR << "fd 3 is:  OPEN" << endl;
+}
+//----------------------------------------------------------------------------
 void
 UserPreferences::usage(const char * prog)
 {

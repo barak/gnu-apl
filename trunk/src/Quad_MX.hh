@@ -109,13 +109,9 @@ protected:
             }
 
        private:
-         /// the number of rows
-         int krows;
-         /// the number of columns
-         int kcols;
-
-         /// the matrix items
-         vector<Dcomplex> vals;
+         int krows;               ///< the number of rows
+         int kcols;               ///< the number of columns
+         vector<Dcomplex> vals;   ///< the matrix items
      };
 
    /// overloaded Function::eval_AXB().
@@ -160,8 +156,11 @@ protected:
   /// return the eigenvectors of \b B
   static Value_P eigenvectors(Value_P B);
 
-  /// print \B to file \A
-  static Value_P printit(Value_P A, Value_P B);
+  /// print value \b B to file \b A
+  static Value_P printit(Value_P filename_A, Value_P B);
+
+  /// open file indicated by filename.
+  static FILE * open_file(const Value & filename, bool & close_file);
 
   //// return the eigencalues of \b B
   static Value_P eigenvalues(Value_P B);

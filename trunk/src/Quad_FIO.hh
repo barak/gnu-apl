@@ -77,6 +77,10 @@ public:
    /// cycle counter at start of a benchmark (⎕FIO[-1])
    static uint64_t benchmark_cycles_from;
 
+   /// return the open FILE * for (APL integer value) \b handle
+   static FILE * get_FILE(const Value & handle)
+      { return get_FILE(handle.get_cscalar().get_near_int()); }
+
 protected:
    /// overloaded Function::is_operator()
    virtual bool is_operator() const   { return true; }
@@ -157,10 +161,6 @@ protected:
    /// return the open file for (APL integer) \b handle
    static file_entry & get_file_entry(const Value & handle)
       { return get_file_entry(handle.get_cscalar().get_near_int()); }
-
-   /// return the open FILE * (APL integer) \b handle
-   static FILE * get_FILE(const Value & handle)
-      { return get_FILE(handle.get_cscalar().get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
    static int get_fd(const Value & value)

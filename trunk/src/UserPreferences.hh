@@ -36,92 +36,12 @@ class Function;
     (command line arguments, config files, environment variables ...)
  */
 /// Various preferences of the user (sorted alphabetically)
-struct UserPreferences
+class UserPreferences
 {
-   UserPreferences()
-   :
-     append_summary(false),
-     auto_OFF(false),
-     backup_before_save(false),
-     control_Ds_to_exit(0),
-     CPU_limit_secs(0),
-     daemon(false),
-     discard_indentation(false),
-#define sec_def(X) X(false),
-#include "Security.def"   // all start with disable_
-     do_CONT(true),
-     do_Color(true),
-     do_not_echo(false),
-     echo_CIN(false),
-     emacs_arg(0),
-     emacs_mode(false),
-     initial_PW(DEFAULT_Quad_PW),
-     initial_PW_by_user(false),
-     line_history_len(500),
-     line_history_path(".apl.history"),
-     mem_arg(0),
-     multi_line_strings(true),
-     multi_line_strings_3(true),
-     nabla_to_history(1),   // if function was modified
-     output_to_cout(false),
-     randomize_testfiles(false),
-     raw_cin(false),
-     requested_cc(CCNT_UNKNOWN),
-     requested_id(0),
-     requested_par(0),
-     safe_mode(false),
-     script_argc(0),
-     silent(false),
-     system_do_svars(true),
-     tcp_port(0),
-     tcp_websocket(false),
-     user_do_svars(true),
-     user_profile(0),
-     wait_ms(0),
-     WINCH_sets_pw(false)
-   { gettimeofday(&session_start, 0); }
-
-   /// read a \b preference file and update parameters set there
-   void read_config_file(bool sys, bool log_startup);
-
-   /// read a \b parallel_thresholds file and update parameters set there
-   void read_threshold_file(bool sys, bool log_startup);
-
-   /// print possible command line options and exit
-   static void usage(const char * prog);
-
-   /// return " (default)" if yes is true
-   static const char * is_default(bool yes)
-      { return yes ? " (default)" : ""; }
-
-   /// print how the interpreter was configured (via ./configure) and exit
-   static void show_configure_options();
-
-   /// print the GPL
-   static void show_GPL(ostream & out);
-
-   /// show version information
-   static void show_version(ostream & out);
-
-   /// parse the original command line parameters to figure start-up Logging
-   /// (BEFORe any expansions). Parses (only) the -l option. Return true
-   /// iff startup-logging is requested.
-   bool parse_argv_0(int argc, const char * argv[]);
-
-   /// parse command line parameters (BEFORE reading preference files).
-   /// Parses the -l, -p, -C, and -u options. Return true iff startup-logging
-   /// is requested.
-   bool parse_argv_1();
-
-   /// parse command line parameters (AFTER reading preference files)
-   /// Parses all valid options.
-   void parse_argv_2(bool logit);
-
-   /// argv/argc at startup before expand_argv()
-   std::basic_string<const char *> original_argv;
-
-   /// argv/argc after expand_argv()
-   std::basic_string<const char *> expanded_argv;
+public:
+  /// collect all user preferences (from command line arguments and from
+  /// preferences file). Return \b true iff start-up logging was requested.
+  bool collect_preferences(int argc, const char ** argv);
 
    /// append test results to summary.log rather than overriding it
    bool append_summary;
@@ -138,7 +58,7 @@ struct UserPreferences
    /// limit (seconds) on the CPU time
    int CPU_limit_secs;
 
-   /// run as deamon
+   /// run GNU APL as deamon
    bool daemon;
 
    /// true if leading spaces in the ∇-editor shall be dropped
@@ -263,10 +183,50 @@ struct UserPreferences
    /// \b preferences files) for the APL interpreter instance
    static UserPreferences uprefs;
 
+   /// argv/argc after expand_argv(). The strings in \b expanded_argv are
+   /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
+   std::basic_string<const char *> expanded_argv;
+
 protected:
+   /// constructor. Called before main() and initializes the default
+   /// values for all user preferences.
+   UserPreferences();
+
+   /// read a \b preference file and update parameters set there
+   void read_config_file(bool sys, bool log_startup);
+
+   /// read a \b parallel_thresholds file and update parameters set there
+   void read_threshold_file(bool sys, bool log_startup);
+
+   /// print possible command line options and exit
+   static void usage(const char * prog);
+
+   /// print how the interpreter was configured (via ./configure) and exit
+   static void show_configure_options();
+
+   /// print the GPL
+   static void show_GPL(ostream & out);
+
+   /// show version information
+   static void show_version(ostream & out);
+
+   /// parse the original command line arguments to figure if start-up logging
+   /// is desired (BEFORE any expansions). Parses (only) the -l option.
+   /// Return true iff startup-logging (aka. -l 37) was requested.
+   bool parse_argv_0(int argc, const char * argv[]);
+
+   /// parse \b expanded_argv (BEFORE reading preference
+   /// files). Parses the -l, -p, -C, and -u options. Return true iff
+   /// startup-logging was requested.
+   bool parse_argv_1();
+
+   /// parse \b expanded_argv (AFTER reading preference files)
+   /// Parses all valid options.
+   void parse_argv_2(bool logit);
+
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
-   /// itself), or 2 2-character hex value
+   /// itself), or a 2-character hex value
    /// 
    static int decode_ASCII(const char * strg);
 
@@ -281,6 +241,16 @@ protected:
    /// set the parallel threshold of function \b fun to \b threshold
    static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
+
+  /// print \b argv (of length \b argc).
+  static void show_argv(int argc, const char ** argv);
+
+   /// return " (default)" if yes is true
+   static const char * is_default(bool yes)
+      { return yes ? " (default)" : ""; }
+
+   /// argv/argc at startup before expand_argv()
+   std::basic_string<const char *> original_argv;
 };
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 24, 2024.  This manual briefly documents GNU APL, an
-interpreter for APL as described in ISO standard 13751, aka.
-"Programming Language APL, Extended".
+January 1, 2025.  This manual briefly documents GNU APL, an interpreter
+for APL as described in ISO standard 13751, aka.  "Programming Language
+APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -4077,6 +4077,24 @@ MX_distribution.data, that being the format required for use by gnuplot:
       .
   for 200 lines
 
+   Instead of a filename, ⎕MX[13] also accepts an integer scalar which
+should be a file handle as returned by ⎕FIO[3] aka.  ⎕FIO.fopen.  This
+allows e.g.  for texts before and/or after the value(s) printed by
+⎕MX[13].  For example:
+
+      Heading←⎕CR.string_to_UTF8 "Print: 10+⍳10\n\n"   ⍝ a heading
+      Value←10 + ⍳10                                   ⍝ a value
+      Handle←"w" ⎕FIO.fopen "/tmp/test"                ⍝ open file for writing
+      Heading ⎕FIO.fwrite Handle                       ⍝ write the heading
+      Handle ⎕MX.print Value                           ⍝ write the value
+      ⎕FIO.fclose Handle                               ⍝ close the file
+
+   which produces file /tmp/test with the following 3-line content:
+
+Print: 10+⍳10
+
+11 12 13 14 15 16 17 18 19 20 
+
 
 File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
 
@@ -7949,76 +7967,76 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11571
-Node: Chapter 223792
-Node: Section 2.125853
-Node: Subsection 2.1.127075
-Node: Subsection 2.1.227727
-Node: Subsection 2.1.328540
-Node: Subsection 2.1.434323
-Node: Subsection 2.1.538119
-Node: Subsection 2.1.638979
-Node: Subsection 2.1.747074
-Node: Subsection 2.1.848807
-Node: Section 2.252123
-Node: Section 2.352882
-Node: Section 2.454154
-Node: Section 2.558584
-Node: Section 2.658757
-Node: Section 2.759387
-Node: Section 2.863591
-Node: Section 2.965931
-Node: Section 2.1068011
-Node: Section 2.1169559
-Node: Section 2.1271340
-Node: Section 2.1373269
-Node: Section 2.1474210
-Node: Section 2.1574461
-Node: Section 2.1675857
-Node: Section 2.1786313
-Node: Section 2.1888801
-Node: Section 2.1995527
-Node: Section 2.2097030
-Node: Section 2.21107523
-Node: Section 2.22113405
-Node: Section 2.23116663
-Node: Section 2.24116954
-Node: Section 2.25127795
-Node: Section 2.26128067
-Node: Section 2.27134646
-Node: Section 2.28137100
-Node: Section 2.29137769
-Node: Section 2.30139420
-Node: Section 2.31143195
-Node: Section 2.32155861
-Node: Output File Format171992
-Node: Section 2.33173167
-Node: Section 2.34182517
-Node: Section 2.35183536
-Node: Section 2.36198217
-Node: Section 2.37208375
-Node: Section 2.38213077
-Node: Section 2.39215173
-Node: Section 2.40219591
-Node: Section 2.41240901
-Node: Section 2.42251817
-Node: Chapter 3254991
-Node: Chapter 4257499
-Node: Chapter 5258625
-Node: Section 5.1260162
-Node: Section 5.2261442
-Node: Section 5.3261802
-Node: Section 5.4262044
-Node: Section 5.5262706
-Node: Section 5.6263184
-Node: Section 5.7263957
-Node: Section 5.8264383
-Node: Chapter 6264785
-Node: Section 6.1265204
-Node: Section 6.2265891
-Node: Chapter 7266722
-Node: Section 7.1267225
-Node: Section 7.2292538
+Node: Chapter 11570
+Node: Chapter 223791
+Node: Section 2.125852
+Node: Subsection 2.1.127074
+Node: Subsection 2.1.227726
+Node: Subsection 2.1.328539
+Node: Subsection 2.1.434322
+Node: Subsection 2.1.538118
+Node: Subsection 2.1.638978
+Node: Subsection 2.1.747073
+Node: Subsection 2.1.848806
+Node: Section 2.252122
+Node: Section 2.352881
+Node: Section 2.454153
+Node: Section 2.558583
+Node: Section 2.658756
+Node: Section 2.759386
+Node: Section 2.863590
+Node: Section 2.965930
+Node: Section 2.1068010
+Node: Section 2.1169558
+Node: Section 2.1271339
+Node: Section 2.1373268
+Node: Section 2.1474209
+Node: Section 2.1574460
+Node: Section 2.1675856
+Node: Section 2.1786312
+Node: Section 2.1888800
+Node: Section 2.1995526
+Node: Section 2.2097029
+Node: Section 2.21107522
+Node: Section 2.22113404
+Node: Section 2.23116662
+Node: Section 2.24116953
+Node: Section 2.25127794
+Node: Section 2.26128066
+Node: Section 2.27134645
+Node: Section 2.28137099
+Node: Section 2.29137768
+Node: Section 2.30139419
+Node: Section 2.31143194
+Node: Section 2.32156683
+Node: Output File Format172814
+Node: Section 2.33173989
+Node: Section 2.34183339
+Node: Section 2.35184358
+Node: Section 2.36199039
+Node: Section 2.37209197
+Node: Section 2.38213899
+Node: Section 2.39215995
+Node: Section 2.40220413
+Node: Section 2.41241723
+Node: Section 2.42252639
+Node: Chapter 3255813
+Node: Chapter 4258321
+Node: Chapter 5259447
+Node: Section 5.1260984
+Node: Section 5.2262264
+Node: Section 5.3262624
+Node: Section 5.4262866
+Node: Section 5.5263528
+Node: Section 5.6264006
+Node: Section 5.7264779
+Node: Section 5.8265205
+Node: Chapter 6265607
+Node: Section 6.1266026
+Node: Section 6.2266713
+Node: Chapter 7267544
+Node: Section 7.1268047
+Node: Section 7.2293360
 
 End Tag Table
 

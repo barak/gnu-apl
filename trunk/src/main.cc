@@ -218,28 +218,6 @@ signal_HUP_handler(int)
    raise(SIGHUP);
 }
 //----------------------------------------------------------------------------
-/// print argc and argv[]
-static void
-show_argv(int argc, const char ** argv)
-{
-   CERR << "argc: " << argc << endl;
-   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
-
-   // tell if stdin is open or closed
-   //
-   if (fcntl(STDIN_FILENO, F_GETFD))
-      CERR << "stdin is: CLOSED" << endl;
-   else
-      CERR << "stdin is: OPEN" << endl;
-
-   // tell if fd 3 is open or closed
-   //
-   if (fcntl(3, F_GETFD))
-      CERR << "fd 3 is:  CLOSED" << endl;
-   else
-      CERR << "fd 3 is:  OPEN" << endl;
-}
-//----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0)
@@ -326,7 +304,7 @@ sockaddr_in local;
           perror("setsockopt(SO_REUSEADDR) failed");
         }
 
-      // continue, since a failed setsockopt() is sort of OK here.
+      // continue, since a failed setsockopt(SO_REUSEADDR) is sort of OK here.
    }
 
    if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
@@ -403,40 +381,10 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
-const bool log_startup0 = UserPreferences::uprefs.parse_argv_0(argc, argv);
-   if (LOG_argc_argv || log_startup0)
-      {
-         CERR << "argc/argv before expansion:\n";
-         show_argv(argc, argv);
-      }
-
-   UserPreferences::uprefs.expand_argv(argc, argv);
-
-const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
-   if (LOG_argc_argv || log_startup)
-      {
-         CERR << "argc/argv after expansion:\n";
-         show_argv(UserPreferences::uprefs.expanded_argv.size(),
-                  &UserPreferences::uprefs.expanded_argv[0]);
-      }
-
-#ifdef cfg_DYNAMIC_LOG_WANTED
-   if (log_startup)   Log_control(LID_startup, true);
-#endif // cfg_DYNAMIC_LOG_WANTED
-
-   init_1(argv[0], log_startup);
-
-   // read /etc/gnu-apl.d/preferences
-   UserPreferences::uprefs.read_config_file(true,  log_startup);
-
-   // read $HOME/.config/gnu_apl/preferences
-   UserPreferences::uprefs.read_config_file(false, log_startup);
-
-  // read /etc/gnu-apl.d/parallel_thresholds
-   UserPreferences::uprefs.read_threshold_file(true, log_startup);
-
-  // read $HOME/.config/gnu_apl/parallel_thresholds
-   UserPreferences::uprefs.read_threshold_file(false, log_startup);
+  // collect all user preferences.
+  //
+const bool log_startup =
+      UserPreferences::uprefs.collect_preferences(argc, argv);
 
    // NOTE: struct sigaction differs between GNU/Linux and other systems,
    // which causes compile errors for direct curly bracket assignment on
@@ -470,8 +418,8 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    // Enable the ability to change ⎕PW on window resize only if the
    // platform supports ioctl TIOCGWINSZ
    //
-    
-   if (UserPreferences::uprefs.WINCH_sets_pw)
+const UserPreferences & uprefs = UserPreferences::uprefs;    
+   if (uprefs.WINCH_sets_pw)
       {
         // IF WINCH_sets_pw preference is enabled, set up a handler for the
         // SIGWINCH signal.
@@ -490,9 +438,9 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
 
     // the final word should be the user preferences (if any).
     //
-    if (UserPreferences::uprefs.initial_PW_by_user)
+    if (uprefs.initial_PW_by_user)
        {
-         Workspace::set_PW(UserPreferences::uprefs.initial_PW, LOC);
+         Workspace::set_PW(uprefs.initial_PW, LOC);
        }
 
 #if PARALLEL_ENABLED
@@ -501,14 +449,12 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
 #endif
 
-   UserPreferences::uprefs.parse_argv_2(log_startup);
-
    // maybe use TCP connection instead of stdin/stderr. This function blocks
    // until a TCP connections was received.
    //
    remap_stdio();
 
-   if (UserPreferences::uprefs.CPU_limit_secs)
+   if (uprefs.CPU_limit_secs)
       {
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
@@ -519,7 +465,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    if (UserPreferences::uprefs.emacs_mode)
       {
         UCS_string info;
-        if (const char * emacs_arg = UserPreferences::uprefs.emacs_arg)
+        if (const char * emacs_arg = uprefs.emacs_arg)
            {
              info = NativeFunction::load_emacs_library(emacs_arg);
            }
@@ -563,7 +509,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
            }
       }
 
-   if (UserPreferences::uprefs.daemon)
+   if (uprefs.daemon)
       {
         const pid_t pid = fork();
         if (pid)   // parent
@@ -579,14 +525,13 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
            CERR << "child forked (pid" << getpid() << ")" << endl;
       }
 
-   if (const int wait = UserPreferences::uprefs.wait_ms)   usleep(1000*wait);
+   if (const int wait = uprefs.wait_ms)   usleep(1000*wait);
 
-   init_2(log_startup);
+   init_modules2(log_startup);
 
-   if (!UserPreferences::uprefs.silent)   show_welcome(cout, argv[0]);
+   if (!uprefs.silent)   show_welcome(cout, argv[0]);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
-   Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);
 
    if (ProcessorID::init(log_startup))
       {
@@ -594,18 +539,14 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
         return 8;
       }
 
-   if (UserPreferences::uprefs.do_Color)
-      Output::toggle_color(UTF8_string("ON"));
+   if (uprefs.do_Color)   Output::toggle_color(UTF8_string("ON"));
 
-   if (UserPreferences::uprefs.latent_expression.size())
+   if (uprefs.latent_expression.size())
       {
         // there was a --LX expression on the command line
         //
-        UCS_string lx(UserPreferences::uprefs.latent_expression);
-
-        if (log_startup)
-           CERR << "executing --LX '" << lx << "'" << endl;
-
+        UCS_string lx(uprefs.latent_expression);
+        if (log_startup)   CERR << "executing --LX '" << lx << "'" << endl;
         Command::process_line(lx, 0);
       }
 
@@ -616,8 +557,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    // (2) --script (which implies --noCONT), or
    // (3)  -L wsname
    //
-   if (UserPreferences::uprefs.do_CONT &&
-       !UserPreferences::uprefs.initial_workspace.size())
+   if (uprefs.do_CONT && !uprefs.initial_workspace.size())
       {
          UCS_string cont(UTF8_string("CONTINUE"));
          UTF8_string filename =
@@ -648,13 +588,12 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
             }
       }
 
-   if (UserPreferences::uprefs.initial_workspace.size())
+   if (uprefs.initial_workspace.size())
       {
          // the user has provided a workspace name via -L
          //
-         UCS_string init_ws(UserPreferences::uprefs.initial_workspace);
-         const char * cmd = UserPreferences::uprefs.silent
-                          ? ")QLOAD " : ")LOAD ";
+         UCS_string init_ws(uprefs.initial_workspace);
+         const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
          const UTF8_string utf(cmd);
          UCS_string load_cmd(utf);
          load_cmd.append(init_ws);

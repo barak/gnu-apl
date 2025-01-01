@@ -39,6 +39,7 @@ doc/apl.texi
  ***/
 
 #include "PointerCell.hh"
+#include "Quad_FIO.hh"
 #include "Quad_MX.hh"
 #include "Workspace.hh"
 #include "APL_types.hh"
@@ -225,62 +226,34 @@ Quad_MX::set_rng_seed(Value_P B)
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_MX::printit(Value_P filename, Value_P B)
+Quad_MX::printit(Value_P filename_A, Value_P B)
 {
 const CellType B_celltype = B->deep_cell_types();
 
-
-  // A is either function_name or >function_name,
-  // where > indicates append (as opposed to overwrite) and shall be skipped
-  //
-  if (filename->is_char_string() && B->is_char_string())
+bool close_A = false;
+  if (B->is_char_string())
      {
-       const UCS_string ustr = filename->get_UCS_ravel();
-       UTF8_string fun(ustr);
-       const char * fun_ccp = fun.c_str();
-       const char * mode = "w";
-       if (strlen(fun_ccp) > 1 && *fun_ccp == '>')
-          {
-            fun_ccp++;
-            mode = "a";   // append
-          }
-
-       FILE * ofile = fopen(fun_ccp, mode);
+       FILE * ofile = open_file(*filename_A, close_A);
        const UCS_string B_ucs = B->get_UCS_ravel();
-       const UTF8_string val(B_ucs);
-       const char * vs = val.c_str();
+       const UTF8_string B_utf(B_ucs);
+       const char * B_ccp = B_utf.c_str();
 
-       fprintf(ofile, "%s\n", vs);
-       fclose(ofile);
-
+       fprintf(ofile, "%s\n", B_ccp);
+       if (close_A)   fclose(ofile);
        return Idx0_0(LOC);
      }
 
-  if (!(filename->is_char_string() && (B_celltype & CT_NUMERIC)))
+  if (!(B_celltype & CT_NUMERIC))
      {
-       MORE_ERROR() << "Incompatible arguments in ⎕MX.print.";
+       MORE_ERROR() << "Non-numeric argument B in A ⎕MX.print B.";
        DOMAIN_ERROR;
      }
 
 const ShapeItem B_count = B->element_count();
 const uRank     B_rank  = B->get_rank();
-const UCS_string ustr   = filename->get_UCS_ravel();
-UTF8_string fn(ustr);
-const char * fun_ccp = fn.c_str();
-const char * mode = "w";   // write (as opposed to append)
-  if (strlen(fun_ccp) > 1 && * fun_ccp == '>')
-     {
-       fun_ccp++;
-       mode = "a";   // append
-     }
-FILE * ofile = fopen(fun_ccp, mode);
+FILE * ofile = open_file(*filename_A, close_A);
 
-  if (!ofile)
-     {
-       MORE_ERROR() << "Open failure on " << ustr;
-       DOMAIN_ERROR;
-     }
-  if (B_rank <= 1)
+  if (B_rank <= 1)   // scalar or vector
      {
        loop(b, B_count)
            {
@@ -298,7 +271,7 @@ FILE * ofile = fopen(fun_ccp, mode);
            }
        fprintf(ofile, "\n");
      }
-  else
+  else               // matrix or higher rank
      {
        const int end_line = B->get_shape_item(B_rank - 1);
        const int end_grid = end_line * B->get_shape_item(B_rank - 2);
@@ -365,8 +338,48 @@ FILE * ofile = fopen(fun_ccp, mode);
           }
      }
 
-  fclose(ofile);
+  if (close_A)   fclose(ofile);
   return Idx0_0(LOC);
+}
+//----------------------------------------------------------------------------
+FILE *
+Quad_MX::open_file(const Value & filename, bool & close_file)
+{
+  if (filename.is_int_scalar())
+     {
+       close_file = false;   // leave it open
+       return Quad_FIO::get_FILE(filename);
+     }
+
+  close_file= true;
+
+  // filename is either "file_name" or ">file_name:", where the leading
+  // '>' indicates append (as opposed to overwrite) and shall be skipped.
+  //
+  if (!filename.is_char_string())
+     {
+       MORE_ERROR() << "A ⎕MX.print B: bad filename argument A"
+                       " (string expected)";
+       DOMAIN_ERROR;
+     }
+
+const UCS_string filename_ucs = filename.get_UCS_ravel();
+const UTF8_string filename_utf(filename_ucs);
+const char * filename_ccp = filename_utf.c_str();
+const char * mode = "w";
+  if (strlen(filename_ccp) > 1 && *filename_ccp == '>')
+     {
+       ++filename_ccp;
+       mode = "a";   // append
+     }
+
+FILE * ofile = fopen(filename_ccp, mode);
+  if (!ofile)
+     {
+       MORE_ERROR() << "Open failure on " << filename_ucs;
+       DOMAIN_ERROR;
+     }
+  return ofile;
 }
 //----------------------------------------------------------------------------
 Value_P

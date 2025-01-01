@@ -735,8 +735,8 @@ UTF8_string utf8(ucs);
    if (length)   *length = utf8.size();
 }
 //----------------------------------------------------------------------------
-extern void init_1(const char * argv0, bool log_startup);
-extern void init_2(bool log_startup);
+extern void init_modules(const char * argv0, bool log_startup);
+extern void init_modules2(bool log_startup);
 
 void
 init_libapl(const char * progname, int log_startup)
@@ -746,7 +746,7 @@ init_libapl(const char * progname, int log_startup)
    UserPreferences::uprefs.system_do_svars = false;
    UserPreferences::uprefs.requested_id    = 2000;
 
-   init_1(progname, log_startup);
+   init_modules(progname, log_startup);
 
    // in /etc/gnu-apl.d/ or in /usr/local/etc/gnu-apl.d/
    UserPreferences::uprefs.read_config_file(true,  log_startup);
@@ -754,7 +754,7 @@ init_libapl(const char * progname, int log_startup)
    // in $HOME/.config/gnu_apl/
    UserPreferences::uprefs.read_config_file(false, log_startup);
 
-   init_2(log_startup);
+   init_modules2(log_startup);
 }
 //----------------------------------------------------------------------------
 extern DiffOut DOUT_filebuf;

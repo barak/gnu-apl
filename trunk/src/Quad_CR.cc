@@ -1212,7 +1212,12 @@ Quad_CR::do_CR18(const Value * B)
 {
 UCS_string ucs(*B);
 UTF8_string utf(ucs);
-Value_P Z(utf, LOC);
+const ShapeItem length = utf.size();
+Value_P Z(length, LOC);
+
+   loop(l, length)   Z->next_ravel_Int(utf[l] & 0xFF);
+   Z->set_proto_Int();
+   Z->check_value(LOC);
    return Z;
 }
 //----------------------------------------------------------------------------

@@ -4241,6 +4241,27 @@ gnuplot:
   for 200 lines
 @end verbatim
 
+Instead of a filename, @b{⎕MX[13]} also accepts an integer scalar which should
+be a file handle as returned by @b{⎕FIO[3]} aka. @b{⎕FIO.fopen}. This allows
+e.g. for texts before and/or after the value(s) printed by @b{⎕MX[13]}.
+For example:
+
+@verbatim
+      Heading←⎕CR.string_to_UTF8 "Print: 10+⍳10\n\n"   ⍝ a heading
+      Value←10 + ⍳10                                   ⍝ a value
+      Handle←"w" ⎕FIO.fopen "/tmp/test"                ⍝ open file for writing
+      Heading ⎕FIO.fwrite Handle                       ⍝ write the heading
+      Handle ⎕MX.print Value                           ⍝ write the value
+      ⎕FIO.fclose Handle                               ⍝ close the file
+@end verbatim
+
+which produces file @b{/tmp/test} with the following 3-line content:
+
+@verbatim
+Print: 10+⍳10
+
+11 12 13 14 15 16 17 18 19 20 
+@end verbatim
 
 @node    Section 2.32
 @section ⎕PLOT - Plot Data

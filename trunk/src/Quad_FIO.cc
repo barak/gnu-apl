@@ -1082,7 +1082,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF
                                           << ", Bh) 1 byte per Zb\n"
 "   Zb ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
-"   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ai, Bh) 1 byte per Ai\n"
+"   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ab, Bh) 1 byte per Ab\n"
 "   Zb ←    ⎕FIO[ 8] Bh    fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
 "   Zb ← Ai ⎕FIO[ 8] Bh    fgets(Zb, Ai, Bh) 1 byte per Zb\n"
 "   Zb ←    ⎕FIO[ 9] Bh    fgetc(Zb, Bh) 1 byte\n"
