@@ -203,6 +203,10 @@ protected:
   /// list functions and their syntaces
   static void list_functions(bool);
 
+  /// list one item
+  static void list_item(ostream & out, int idx, int valence,
+                        const char * description);
+
   /// helper for bsearch() in subfun_to_axis
   static int axis_compare(const void * key, const void * info);
 

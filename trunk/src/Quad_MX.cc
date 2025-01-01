@@ -53,6 +53,7 @@ Quad_MX Quad_MX::fun;
 #include<complex>
 #include<vector>
 
+//----------------------------------------------------------------------------
 struct Quad_MX::fun_info Quad_MX::op_desc[] = {
 #define op_entry(e, desc, v, sub) { Quad_MX::OP_ ## e, v, desc, sub},
 #include "Quad_MX.def"
@@ -83,9 +84,6 @@ const int count = sizeof(op_desc) / sizeof(*op_desc);
 
 /************** start Matrix class **************/
 /****** NOTE: gsl matrices don't support complex ******/
-
-//----------------------------------------------------------------------------
-// ============= start utility fcns ===============
 
 //----------------------------------------------------------------------------
 Quad_MX::Matrix *
@@ -1106,36 +1104,42 @@ ostream & out = CERR;
   else
      {
        out << "\nValid ⎕MX[*] indices are:\n\n";
-       
-       loop(c, sizeof(op_desc) / sizeof(*op_desc))
-           {
-             const fun_info & info = op_desc[c];
-             if (*info.desc == 0)   continue;
 
-             char descr[40];
-             snprintf(descr, sizeof(descr), "⎕MX[%2u] B", info.code);
-      
-             out << "    ";
-             switch(info.valence)
-                {
-                  case 1:  out << "    ";   break;
-                  case 2:  out << "  A ";   break;
-                  case 3:  out << "{A} ";   break;
-                  default: FIXME;
-                }
-             out << descr << "    ";
-             switch(info.valence)
-                {
-                  case 1:  out << "(monadic) ";   break;
-                  case 2:  out << "(dyadic)  ";   break;
-                  case 3:  out << "(nomadic) ";   break;
-                  default: FIXME;
-                }
-      
-             out << info.desc << endl;
-           }
+#define op_entry(en, desc, valence, sub) \
+  list_item(out, OP_ ## en, valence, desc);
+#include "Quad_MX.def"
+
        out << "\n    where {A} shall mean that A is optional" << endl;
      }
+}
+//----------------------------------------------------------------------------
+void
+Quad_MX::list_item(ostream & out, int idx, int valence,
+                   const char * description)
+{
+  if (*description == 0)   return;
+
+char descr[40];
+  snprintf(descr, sizeof(descr), "⎕MX[%2u] B", idx);
+      
+  out << "    ";
+  switch(valence)
+     {
+       case 1:  out << "    ";   break;
+       case 2:  out << "  A ";   break;
+       case 3:  out << "{A} ";   break;
+       default: FIXME;
+     }
+  out << descr << "    ";
+  switch(valence)
+     {
+       case 1:  out << "(monadic) ";   break;
+       case 2:  out << "(dyadic)  ";   break;
+       case 3:  out << "(nomadic) ";   break;
+       default: FIXME;
+     }
+      
+  out << description << endl;
 }
 //----------------------------------------------------------------------------
 Token
