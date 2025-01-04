@@ -213,6 +213,27 @@ APL_time_us when = now();
    interrupt_when = when;
 }
 //----------------------------------------------------------------------------
+int
+axis_compare(const void * key, const void * info)
+{
+   return strcasecmp(reinterpret_cast<const char *>(key),
+                     reinterpret_cast<const sub_function_info *>
+                                     (info)->sub_name);
+}
+//----------------------------------------------------------------------------
+void
+list_mapping(ostream & out, const char * top_fun, size_t idx,
+             const char * subfun, size_t max_subfun_len)
+{
+  if (idx == 0)   return;
+
+char NN[10];   SPRINTF(NN, "%2d", int(idx));
+  out << "      " << top_fun << "[" << NN
+      << "]  ←→  " << top_fun << "['" << subfun << "']"
+      << UCS_string(max_subfun_len - strlen(subfun), UNI_SPACE)
+      << "←→  " << top_fun << "." << subfun << endl;
+}
+//----------------------------------------------------------------------------
 
 // Probes...
 

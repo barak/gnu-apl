@@ -372,7 +372,7 @@ sockaddr_in local;
 //----------------------------------------------------------------------------
 /// initialize the interpreter
 int
-init_apl(int argc, const char * argv[])
+init_apl(const std::basic_string<const char *> & args)
 {
    {
      // make curses happy
@@ -384,7 +384,7 @@ init_apl(int argc, const char * argv[])
   // collect all user preferences.
   //
 const bool log_startup =
-      UserPreferences::uprefs.collect_preferences(argc, argv);
+      UserPreferences::uprefs.collect_preferences(args);
 
    // NOTE: struct sigaction differs between GNU/Linux and other systems,
    // which causes compile errors for direct curly bracket assignment on
@@ -529,7 +529,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    init_modules2(log_startup);
 
-   if (!uprefs.silent)   show_welcome(cout, argv[0]);
+   if (!uprefs.silent)   show_welcome(cout, args[0]);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
 
@@ -614,7 +614,8 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 int
 main(int argc, const char *argv[])
 {
-   if (const int ret = init_apl(argc, argv))   return ret;
+const std::basic_string<const char *> args(argv, argc);
+   if (const int ret = init_apl(args))   return ret;
 
    if (UserPreferences::uprefs.eval_exprs.size())
       {

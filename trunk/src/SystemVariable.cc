@@ -196,12 +196,12 @@ Quad_ARG::Quad_ARG()
 Value_P
 Quad_ARG::get_apl_value() const
 {
-const int argc = UserPreferences::uprefs.expanded_argv.size();
+const ShapeItem argc = UserPreferences::uprefs.expanded_args.size();
 
 Value_P Z(argc, LOC);
    loop(a, argc)
       {
-        const char * arg = UserPreferences::uprefs.expanded_argv[a];
+        const char * arg = UserPreferences::uprefs.expanded_args[a];
         UTF8_string utf(arg);
         UCS_string ucs(utf);
         Value_P sub(ucs, LOC);

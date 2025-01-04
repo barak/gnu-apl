@@ -60,6 +60,16 @@ public:
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
 protected:
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
+  /// list functions and their syntaces
+  static void list_functions(bool mapping);
+
    /// compute the Q matrix of B = QR
    static void QR_Helzer(Value_P Z, bool need_complex, ShapeItem rows,
                          ShapeItem cols, const Cell * cB, double EPS);

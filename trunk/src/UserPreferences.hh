@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class UserPreferences
 public:
   /// collect all user preferences (from command line arguments and from
   /// preferences file). Return \b true iff start-up logging was requested.
-  bool collect_preferences(int argc, const char ** argv);
+  bool collect_preferences(const std::basic_string<const char *> & args);
 
    /// append test results to summary.log rather than overriding it
    bool append_summary;
@@ -87,7 +87,7 @@ public:
    bool emacs_mode;
 
    /// expand lumped arguments
-   void expand_argv(int argc, const char ** argv);
+   void expand_args(const std::basic_string<const char *> & args);
 
    /// --eval expressions
    std::basic_string<const char *> eval_exprs;
@@ -148,7 +148,7 @@ public:
    bool safe_mode;
 
    /// the argument number of the APL script name (if run from a script)
-   /// in expanded_argv, or 0 if apl is started directly.
+   /// in expanded_args, or 0 if apl is started directly.
    size_t script_argc;
 
    /// when apl was started
@@ -183,9 +183,9 @@ public:
    /// \b preferences files) for the APL interpreter instance
    static UserPreferences uprefs;
 
-   /// argv/argc after expand_argv(). The strings in \b expanded_argv are
+   /// args after expand_args(). The strings in \b expanded_args are
    /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
-   std::basic_string<const char *> expanded_argv;
+   std::basic_string<const char *> expanded_args;
 
 protected:
    /// constructor. Called before main() and initializes the default
@@ -213,16 +213,16 @@ protected:
    /// parse the original command line arguments to figure if start-up logging
    /// is desired (BEFORE any expansions). Parses (only) the -l option.
    /// Return true iff startup-logging (aka. -l 37) was requested.
-   bool parse_argv_0(int argc, const char * argv[]);
+   bool parse_args_0(const std::basic_string<const char *> & args);
 
-   /// parse \b expanded_argv (BEFORE reading preference
+   /// parse \b expanded_args (BEFORE reading preference
    /// files). Parses the -l, -p, -C, and -u options. Return true iff
    /// startup-logging was requested.
-   bool parse_argv_1();
+   bool parse_args_1();
 
-   /// parse \b expanded_argv (AFTER reading preference files)
+   /// parse \b expanded_args (AFTER reading preference files)
    /// Parses all valid options.
-   void parse_argv_2(bool logit);
+   void parse_args_2(bool logit);
 
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
@@ -242,15 +242,12 @@ protected:
    static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
 
-  /// print \b argv (of length \b argc).
-  static void show_argv(int argc, const char ** argv);
+  /// print \b args
+  static void show_args(const std::basic_string<const char *> & args);
 
    /// return " (default)" if yes is true
    static const char * is_default(bool yes)
       { return yes ? " (default)" : ""; }
-
-   /// argv/argc at startup before expand_argv()
-   std::basic_string<const char *> original_argv;
 };
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

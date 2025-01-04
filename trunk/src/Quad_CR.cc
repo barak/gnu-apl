@@ -31,9 +31,9 @@
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
-Quad_CR::_sub_fun Quad_CR::sub_functions[] =
+sub_function_info Quad_CR::sub_functions[] =
 {
-#define crdef(N, name)   { N, #name },
+#define crdef(N, name)   { N, #name, -1, 0 },
 #include "Quad_CR.def"
 };
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ int
 Quad_CR::fun_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const _sub_fun *>(sf)->key);
+                     reinterpret_cast<const sub_function_info *>(sf)->sub_name);
 }
 //----------------------------------------------------------------------------
 Token
@@ -53,11 +53,11 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "      With a small performance penalty, ⎕CR also accepts the following "
 "strings\n      instead of function numbers as left argument:\n\n";
 
-         loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
+         loop(f, sizeof(sub_functions)/sizeof(sub_function_info))
              {
-               const int N = sub_functions[f].val;
-               char NN[10];   SPRINTF(NN, "%2d", N);
-               const char * name = sub_functions[f].key;
+               const size_t N = sub_functions[f].axis;
+               char NN[10];   SPRINTF(NN, "%2d", int(N));
+               const char * name = sub_functions[f].sub_name;
                out << "      " << NN << " ⎕CR  ←→"
                    << UCS_string(24 - strlen(name), UNI_SPACE)
                    << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
@@ -230,15 +230,14 @@ Quad_CR::subfun_to_axis(const UCS_string & name) const
 UTF8_string name_utf(name);
 const char * function_name = name_utf.c_str();
 
-  enum { SF_SIZE = sizeof(_sub_fun),
+  enum { SF_SIZE = sizeof(sub_function_info),
          SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
 
  if (const void * vp = bsearch(function_name, sub_functions,
                                 SF_COUNT, SF_SIZE, fun_compare))
-      return reinterpret_cast<const _sub_fun *>(vp)->val;
+      return reinterpret_cast<const sub_function_info *>(vp)->axis;
 
   return -1;    // not found
-
 }
 //----------------------------------------------------------------------------
 Token

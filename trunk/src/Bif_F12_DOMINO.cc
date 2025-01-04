@@ -50,8 +50,16 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (B->get_rank() == 1)   // inversion at the unit sphere
+   if (B->get_rank() == 1)   // help or inversion at the unit sphere
       {
+        if (B->element_count() == 0)   // '' or ⍬: help
+           {
+             if (B->get_cfirst().is_character_cell())      list_functions(true);
+             else if (B->get_cfirst().is_integer_cell())   list_functions(false);
+             else                                          DOMAIN_ERROR;
+             return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+           }
+
         const double qct = Workspace::get_CT();
         const ShapeItem len = B->get_shape_item(0);
         APL_Complex r2(0.0);
@@ -391,6 +399,77 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    CERR << name;
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
+}
+//----------------------------------------------------------------------------
+const sub_function_info function_infos[] = {
+ { 4, "lq_fact",        -1, 0 },
+ { 6, "lu_fact",        -1, 0 },
+ { 5, "ql_fact",        -1, 0 },
+ { 2, "qr_fact_gsl",    -1, 0 },
+ { 1, "qr_fact_helzer", -1, 0 },
+ { 3, "rq_fact",        -1, 0 },
+                                    };
+sAxis
+Bif_F12_DOMINO::subfun_to_axis(const UCS_string & name) const
+{
+const UTF8_string function_name_utf8(name);
+const char * function_name = function_name_utf8.c_str();
+
+  enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
+         FUN_INFO_COUNT = sizeof(function_infos) / sizeof(sub_function_info)
+       };
+
+  if (const void * vp = bsearch(function_name, function_infos,
+                                FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
+     {
+       // found: vp is a fun_info *
+       const sub_function_info * info =
+             reinterpret_cast<const sub_function_info *>(vp);
+       if (info->valence)   return info->axis;
+     }
+
+  return -1;    // not found
+}
+//----------------------------------------------------------------------------
+void
+Bif_F12_DOMINO::list_functions(bool mapping)
+{
+ostream & out = CERR;
+  if (mapping)
+     {
+       // ⌹ "": print the number to name mappings like:
+       //
+       // ⌹[1]  ←→  ⌹['determinant']        ←→  ⌹.determinant
+       //
+       out << "      With a small performance penalty, ⌹[ ] also accepts the "
+                     "following strings\n"
+              "      instead of function numbers as axis argument:\n\n";
+
+       loop(idx, sizeof(function_infos) / sizeof(sub_function_info))
+           {
+             list_mapping(out, "⌹", function_infos[idx].axis,
+                          function_infos[idx].sub_name, 20);
+           }
+       out << "\n      For a more detailed description of all functions:\n\n"
+              "      ⎕MX ⍬" << endl;
+     }
+  else
+     {
+       out <<
+"\n"
+"Valid ⌹[*] indices are:\n"
+"\n"
+"    (Q R Ri) ← ⌹[1] B    QR factorization of B (Helzer algorithm)\n"
+"    (Q R Ri) ← ⌹[2] B    QR factorization of B (libgsl algorithm)\n"
+"    (Q R Ri) ← ⌹[3] B    RQ factorization of B (libgsl algorithm)\n"
+"    (Q R Ri) ← ⌹[4] B    LQ factorization of B (libgsl algorithm)\n"
+"    (Q R Ri) ← ⌹[5] B    QL factorization of B (libgsl algorithm)\n"
+"    (P U Li) ← ⌹[6] B    LU factorization of B (libgsl algorithm)\n"
+"\n"
+"      For a more detailed description of all functions:\n"
+"\n"
+"      ⌹ ⍬\n";
+     }
 }
 //----------------------------------------------------------------------------
 void

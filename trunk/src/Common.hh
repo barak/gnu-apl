@@ -137,6 +137,11 @@ extern APL_time_us interrupt_when;
 /// signal handler for ^C
 extern void control_C(int);
 
+/// list one sub-funxtion mapping, such as
+/// 
+extern void list_mapping(ostream & out, const char * top_fun, size_t idx,
+                         const char * subfun, size_t max_subfun_len);
+ 
 /// normal APL output (to stdout)
 extern ostream COUT;
 
@@ -374,6 +379,18 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
 };
+//----------------------------------------------------------------------------
+/// the properties of one subfunction
+struct sub_function_info
+{
+  size_t       axis;          ///< integer axis for the fun[N] syntax
+  const char * sub_name;      ///< name in the fun['name'] or fun.name syntaces
+  int          valence;       ///< the valence(s) (optional)
+  const char * description;   ///< description (optional)
+};
+//----------------------------------------------------------------------------
+/// helper for bsearch() in subfun_to_axis
+extern int axis_compare(const void * key, const void * info);
 //----------------------------------------------------------------------------
 /// whether ⎕LX shall be executed at the end of the file
 enum LX_mode

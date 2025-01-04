@@ -111,14 +111,7 @@ protected:
    static FILE * get_FILE(int handle);
 
    /// a mapping between function names and function numbers
-   struct _sub_fun
-      {
-        unsigned int val;   ///< the function number
-        const char * key;   ///< the name for it
-      };
-
-   /// a mapping between function names and function numbers
-   static _sub_fun sub_functions[];
+   static sub_function_info sub_functions[];
 
    /// one file (openend with open(), fopen(), or fdopen()).
    /// : handle == fd, and FILE * may or may not exist for fd

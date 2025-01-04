@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 1, 2025.  This manual briefly documents GNU APL, an interpreter
+January 4, 2025.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -700,7 +700,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.17::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 * Section 2.18::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
 * Section 2.19::  Generalized ⍳
-* Section 2.20::  ⌹[X] - QR Factorization
+* Section 2.20::  ⌹[X] - Matrix Factorizations
 * Section 2.21::  Dyadic ⎕CR
 * Section 2.22::  Dyadic ⎕FX (Native Functions)
 * Section 2.23::  ⎕ARG  - Interpreter command line arguments
@@ -2625,7 +2625,7 @@ File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  
 
 Z←⌹[1] B and Z←⌹[2] B compute a QR factorization of the real or complex
 matrix B. The results of Z←⌹[1] B and Z←⌹[2] B are conceptually
-identical, while the algorithms used to compute the results.  differ.
+identical, while the algorithms used to compute the results differ.
 Also, Z←⌹[1] B always exist, while Z←⌹[2] B requires libgsl to be
 installed when GNU APL is compiled.
 
@@ -3776,7 +3776,7 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 -------------------
 
 The vector angle operation ⎕MX[3] is dyadic and returns the angle
-between two isomorphic real or complex vectors where, ⍴⍴A = 1, ⍴⍴B = 1
+between two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1,
 and ⍴A = ⍴B:
 
       (⍳8) ⎕MX[3] 4j4+⍳8
@@ -7969,74 +7969,74 @@ Tag Table:
 Node: Top383
 Node: Chapter 11570
 Node: Chapter 223791
-Node: Section 2.125852
-Node: Subsection 2.1.127074
-Node: Subsection 2.1.227726
-Node: Subsection 2.1.328539
-Node: Subsection 2.1.434322
-Node: Subsection 2.1.538118
-Node: Subsection 2.1.638978
-Node: Subsection 2.1.747073
-Node: Subsection 2.1.848806
-Node: Section 2.252122
-Node: Section 2.352881
-Node: Section 2.454153
-Node: Section 2.558583
-Node: Section 2.658756
-Node: Section 2.759386
-Node: Section 2.863590
-Node: Section 2.965930
-Node: Section 2.1068010
-Node: Section 2.1169558
-Node: Section 2.1271339
-Node: Section 2.1373268
-Node: Section 2.1474209
-Node: Section 2.1574460
-Node: Section 2.1675856
-Node: Section 2.1786312
-Node: Section 2.1888800
-Node: Section 2.1995526
-Node: Section 2.2097029
-Node: Section 2.21107522
-Node: Section 2.22113404
-Node: Section 2.23116662
-Node: Section 2.24116953
-Node: Section 2.25127794
-Node: Section 2.26128066
-Node: Section 2.27134645
-Node: Section 2.28137099
-Node: Section 2.29137768
-Node: Section 2.30139419
-Node: Section 2.31143194
-Node: Section 2.32156683
-Node: Output File Format172814
-Node: Section 2.33173989
-Node: Section 2.34183339
-Node: Section 2.35184358
-Node: Section 2.36199039
-Node: Section 2.37209197
-Node: Section 2.38213899
-Node: Section 2.39215995
-Node: Section 2.40220413
-Node: Section 2.41241723
-Node: Section 2.42252639
-Node: Chapter 3255813
-Node: Chapter 4258321
-Node: Chapter 5259447
-Node: Section 5.1260984
-Node: Section 5.2262264
-Node: Section 5.3262624
-Node: Section 5.4262866
-Node: Section 5.5263528
-Node: Section 5.6264006
-Node: Section 5.7264779
-Node: Section 5.8265205
-Node: Chapter 6265607
-Node: Section 6.1266026
-Node: Section 6.2266713
-Node: Chapter 7267544
-Node: Section 7.1268047
-Node: Section 7.2293360
+Node: Section 2.125857
+Node: Subsection 2.1.127079
+Node: Subsection 2.1.227731
+Node: Subsection 2.1.328544
+Node: Subsection 2.1.434327
+Node: Subsection 2.1.538123
+Node: Subsection 2.1.638983
+Node: Subsection 2.1.747078
+Node: Subsection 2.1.848811
+Node: Section 2.252127
+Node: Section 2.352886
+Node: Section 2.454158
+Node: Section 2.558588
+Node: Section 2.658761
+Node: Section 2.759391
+Node: Section 2.863595
+Node: Section 2.965935
+Node: Section 2.1068015
+Node: Section 2.1169563
+Node: Section 2.1271344
+Node: Section 2.1373273
+Node: Section 2.1474214
+Node: Section 2.1574465
+Node: Section 2.1675861
+Node: Section 2.1786317
+Node: Section 2.1888805
+Node: Section 2.1995531
+Node: Section 2.2097034
+Node: Section 2.21107525
+Node: Section 2.22113407
+Node: Section 2.23116665
+Node: Section 2.24116956
+Node: Section 2.25127797
+Node: Section 2.26128069
+Node: Section 2.27134648
+Node: Section 2.28137102
+Node: Section 2.29137771
+Node: Section 2.30139422
+Node: Section 2.31143197
+Node: Section 2.32156686
+Node: Output File Format172817
+Node: Section 2.33173992
+Node: Section 2.34183342
+Node: Section 2.35184361
+Node: Section 2.36199042
+Node: Section 2.37209200
+Node: Section 2.38213902
+Node: Section 2.39215998
+Node: Section 2.40220416
+Node: Section 2.41241726
+Node: Section 2.42252642
+Node: Chapter 3255816
+Node: Chapter 4258324
+Node: Chapter 5259450
+Node: Section 5.1260987
+Node: Section 5.2262267
+Node: Section 5.3262627
+Node: Section 5.4262869
+Node: Section 5.5263531
+Node: Section 5.6264009
+Node: Section 5.7264782
+Node: Section 5.8265208
+Node: Chapter 6265610
+Node: Section 6.1266029
+Node: Section 6.2266716
+Node: Chapter 7267547
+Node: Section 7.1268050
+Node: Section 7.2293363
 
 End Tag Table
 

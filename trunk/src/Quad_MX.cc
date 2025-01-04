@@ -53,15 +53,28 @@ Quad_MX Quad_MX::fun;
 #include<complex>
 #include<vector>
 
-//----------------------------------------------------------------------------
-struct Quad_MX::fun_info Quad_MX::op_desc[] = {
-#define op_entry(e, desc, v, sub) { Quad_MX::OP_ ## e, v, desc, sub},
+#if apl_GSL
+
+#include <gsl/gsl_statistics.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_eigen.h>
+
+sub_function_info Quad_MX::op_desc[] = {
+#define op_entry(enum, _axis, sub, val, desc) \
+   { Quad_MX::OP_ ## enum, sub, val, desc },
 #include "Quad_MX.def"
-                                              };
+                                       };
+enum { OP_MAX = sizeof(Quad_MX::op_desc) / sizeof(sub_function_info) };
+
+//----------------------------------------------------------------------------
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
-  // sort op_desc alphabetically. It is small, so a simple O(n²) algo suffices
-  //
+  /* sort op_desc alphabetically. It is small, so a simple O(n²) algo suffices.
+     sorting is needed for:
+
+     (1) bsearch() in subfun_to_axis() , and
+     (2) list_functions() with mapping == true.
+   */
 const int count = sizeof(op_desc) / sizeof(*op_desc);
 
   loop(i, count)
@@ -69,22 +82,12 @@ const int count = sizeof(op_desc) / sizeof(*op_desc);
       {
         if (strcmp(op_desc[i].sub_name, op_desc[j].sub_name) > 0)
            {;
-             const fun_info tmp = op_desc[i];
+             const sub_function_info tmp = op_desc[i];
              op_desc[i] = op_desc[j];
              op_desc[j] = tmp;
            }
       }
 }
-
-#if apl_GSL
-
-#include <gsl/gsl_statistics.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_eigen.h>
-
-/************** start Matrix class **************/
-/****** NOTE: gsl matrices don't support complex ******/
-
 //----------------------------------------------------------------------------
 Quad_MX::Matrix *
 Quad_MX::genCofactor(Matrix *mtx, int r, int c)
@@ -1083,20 +1086,14 @@ ostream & out = CERR;
        //
        // ⎕MX[1]  ←→  ⎕MX['determinant']        ←→  ⎕MX.determinant
        //
-       out << "      With a small performance penalty, ⎕MX also accepts the "
+       out << "      With a small performance penalty, ⎕MX[ ] also accepts the "
                      "following strings\n"
               "      instead of function numbers as axis argument:\n\n";
 
-       loop(c, sizeof(op_desc) / sizeof(*op_desc))
+       loop(idx, OP_MAX)
            {
-             const fun_info & info = op_desc[c];
-             if (*info.desc == 0)   continue;
-
-             char NN[10];   SPRINTF(NN, "%2d", info.code);
-             out << "      ⎕MX[" << NN
-                 << "]  ←→  ⎕MX['" << info.sub_name << "']"
-                 << UCS_string(20 - strlen(info.sub_name), UNI_SPACE)
-                 << "←→  ⎕MX." << info.sub_name << endl;
+             list_mapping(out, "⎕MX", op_desc[idx].axis,
+                                      op_desc[idx].sub_name, 20);
            }
        out << "\n      For a more detailed description of all functions:\n\n"
               "      ⎕MX ⍬" << endl;
@@ -1105,8 +1102,8 @@ ostream & out = CERR;
      {
        out << "\nValid ⎕MX[*] indices are:\n\n";
 
-#define op_entry(en, desc, valence, sub) \
-  list_item(out, OP_ ## en, valence, desc);
+#define op_entry(enum, _axis, desc, valence, sub) \
+  list_item(out, OP_ ## enum, valence, desc);
 #include "Quad_MX.def"
 
        out << "\n    where {A} shall mean that A is optional" << endl;
@@ -1117,8 +1114,6 @@ void
 Quad_MX::list_item(ostream & out, int idx, int valence,
                    const char * description)
 {
-  if (*description == 0)   return;
-
 char descr[40];
   snprintf(descr, sizeof(descr), "⎕MX[%2u] B", idx);
       
@@ -1156,6 +1151,8 @@ Quad_MX::eval_B(Value_P B) const
   if (B->get_rank() != 1)        RANK_ERROR;
   if (B->element_count() != 0)   LENGTH_ERROR;
 
+  // at this point, B is an empty vector (character or numerical).
+  //
   if (B->get_cfirst().is_character_cell())      list_functions(true);
   else if (B->get_cfirst().is_integer_cell())   list_functions(false);
   else                                          DOMAIN_ERROR;
@@ -1166,7 +1163,7 @@ Quad_MX::eval_B(Value_P B) const
 Token
 Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-MX_ops op = OP_UNKNOWN;
+MX_ops op = OP_MIN;
 int modifier = 0;
 
   if (X->is_numeric_scalar())
@@ -1185,7 +1182,7 @@ int modifier = 0;
       SYNTAX_ERROR;
     }
  
-  if (op < OP_UNKNOWN || op >= OP_MAX)
+  if (op < OP_MIN || int(op) >= OP_MAX)
      {
        MORE_ERROR() << "Function specifier " << op << " is out of range.";
        AXIS_ERROR;
@@ -1194,7 +1191,7 @@ int modifier = 0;
 Value_P Z;
   switch(op)
     {
-      case OP_UNKNOWN:            Z = Idx0_0(LOC);
+      case OP_MIN:            Z = Idx0_0(LOC);
                                   list_functions(false);          break;
       case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A, B);   break;
       case OP_VECTOR_ANGLE:       Z = vectorAngle(A, B);          break;
@@ -1221,7 +1218,7 @@ Value_P Z;
 Token
 Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
-MX_ops op = OP_UNKNOWN;
+MX_ops op = OP_MIN;
 int modifier = 0;
 
   if (X->is_numeric_scalar())   // op only
@@ -1240,7 +1237,7 @@ int modifier = 0;
       SYNTAX_ERROR;
     }
 
-  if (op < OP_UNKNOWN || op >= OP_MAX)
+  if (op < OP_MIN || int(op) >= OP_MAX)
      {
        MORE_ERROR() << "Function specifier " << op << " is out of range.";
        AXIS_ERROR;
@@ -1249,7 +1246,7 @@ int modifier = 0;
 Value_P Z = Idx0_0(LOC);
   switch(op)
     {
-      case OP_UNKNOWN:            list_functions(false);               break;
+      case OP_MIN:                list_functions(false);               break;
       case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
            //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
       case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
@@ -1307,31 +1304,25 @@ Quad_MX::eval_XB(Value_P X, Value_P B) const
 #endif   // (not) apl_GSL
 
 //----------------------------------------------------------------------------
-int
-Quad_MX::axis_compare(const void * key, const void * info)
-{
-   return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const fun_info *>(info)->sub_name);
-}
-//----------------------------------------------------------------------------
 sAxis
 Quad_MX::subfun_to_axis(const UCS_string & name) const
 {
 const UTF8_string function_name_utf8(name);
-const char * function_name_str = function_name_utf8.c_str();
+const char * function_name = function_name_utf8.c_str();
 
   // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(op_desc)
   //       since Apple complains with a bogus error.
-  enum { FUN_INFO_SIZE  = sizeof(fun_info),
+  enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
          FUN_INFO_COUNT = OP_MAX
        };
 
-  if (const void * vp = bsearch(function_name_str, op_desc,
+  if (const void * vp = bsearch(function_name, op_desc,
                                 FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
      {
        // found: vp is a fun_info *
-       const fun_info * info = reinterpret_cast<const fun_info *>(vp);
-       if (info->valence)   return info->code;
+       const sub_function_info * info =
+             reinterpret_cast<const sub_function_info *>(vp);
+       if (info->valence)   return info->axis;
      }
 
   return -1;    // not found

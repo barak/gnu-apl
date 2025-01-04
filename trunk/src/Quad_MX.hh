@@ -36,14 +36,14 @@ class Quad_MX : public QuadFunction
   typedef std::complex<double> Dcomplex;
 
 public:
-   /// Constructor.
+   /// Constructor. Sorts \b op_desc by name (as needed by bsearch()).
   Quad_MX();
 
   enum MX_ops
      {
-#define op_entry(num, _desc, _v, _sub) OP_ ## num,
+       OP_MIN = 0,
+#define op_entry(enum, axis, _sub_name, _valence, _desc) OP_ ## enum = axis,
 #include "Quad_MX.def"
-       OP_MAX
      };
 
    /// overloaded Function::has_subfuns()
@@ -54,6 +54,9 @@ public:
    virtual sAxis subfun_to_axis(const UCS_string & name) const;
 
    static Quad_MX  fun;          ///< Built-in function.
+
+  /// properties of subfunctions
+  static sub_function_info op_desc[];   ///< all subfunctions
 
 protected:
   /// a matrix suitable for libgsl
@@ -126,15 +129,6 @@ protected:
    /// overloaded Function::eval_B().
   virtual Token eval_B(Value_P B) const;
 
-  /// properties of subfunctions
-  static struct fun_info
-     {
-       MX_ops       code;       ///< OP_xxx aka. the axis (for the ⎕MX[code] syntax)
-       int          valence;    ///< the function valence(s)
-       const char * desc;       ///< description
-       const char * sub_name;   ///< subfunction name (for ⎕MX.sub_name syntax)
-     } op_desc[OP_MAX];         ///< all subfunctions
-
   /// return the cros product of all rows in \b mtx
   static vector<Dcomplex> getCross(Matrix * mtx);
 
@@ -201,14 +195,11 @@ protected:
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
 
   /// list functions and their syntaces
-  static void list_functions(bool);
+  static void list_functions(bool mapping);
 
   /// list one item
   static void list_item(ostream & out, int idx, int valence,
                         const char * description);
-
-  /// helper for bsearch() in subfun_to_axis
-  static int axis_compare(const void * key, const void * info);
 
   /// true if the random number generators were initialized
   static bool rng_initialised;

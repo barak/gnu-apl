@@ -18,21 +18,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-op_entry( UNKNOWN,            "",                   0, "")                     /*  0 */
-op_entry( DETERMINANT,        "Determinant",        1, "determinant")          /*  1 */
-op_entry( CROSS_PRODUCT,      "Cross product",      3, "cross_product")        /*  2 */
-op_entry( VECTOR_ANGLE,       "Vector angle",       2, "vector_angle")         /*  3 */
-op_entry( EIGENVECTORS,       "Eigenvector",        1, "eigenvector")          /*  4 */
-op_entry( EIGENVALUES,        "Eigenvalue",         1, "eigenvalue")           /*  5 */
-op_entry( IDENT,              "Ident",              1, "ident")                /*  6 */
-op_entry( ROTATION_MATRIX,    "Rotation matrix",    1, "rotation_matrix")      /*  7 */
-op_entry( HOMOGENEOUS_MATRIX, "Homogeneous matrix", 2, "homogeneous_matrix")   /*  8 */
-op_entry( NORM,               "Norm",               1, "norm")                 /*  9 */
-op_entry( RANDOMS,            "Randoms",            3, "randoms")              /* 10 */
-op_entry( COVARIANCE,         "Covariance",         3, "covariance")           /* 11 */
-op_entry( HISTOGRAM,          "Histogram",          2, "histogram")            /* 12 */
-op_entry( PRINT,              "Print",              2, "print")                /* 13 */
-op_entry( SET_RNG_SEED,       "Set RNG seed",       1, "set_rng_seed")         /* 14 */
+#ifdef op_entry
+    //  ( enum,             axis, sub_function    valence, description,                    )
+op_entry( HELP,                0, "",                   1, "(help for ⎕MX)"                )
+op_entry( DETERMINANT,         1, "determinant",        1, "Determinant of B"              )
+op_entry( CROSS_PRODUCT,       2, "cross_product",      3, "Cross product"                 )
+op_entry( VECTOR_ANGLE,        3, "vector_angle",       2, "Angle between vectors A and B" )
+op_entry( EIGENVECTORS,        4, "eigenvector",        1, "Eigenvector"                   )
+op_entry( EIGENVALUES,         5, "eigenvalue",         1, "Eigenvalue"                    )
+op_entry( IDENT,               6, "ident",              1, "Identity matrix"               )
+op_entry( ROTATION_MATRIX,     7, "rotation_matrix",    1, "Rotation matrix"               )
+op_entry( HOMOGENEOUS_MATRIX,  8, "homogeneous_matrix", 2, "Homogeneous matrix"            )
+op_entry( NORM,                9, "norm",               1, "Norm of B"                     )
+op_entry( RANDOMS,            10, "randoms",            3, "Randoms"                       )
+op_entry( COVARIANCE,         11, "covariance",         3, "Covariance"                    )
+op_entry( HISTOGRAM,          12, "histogram",          2, "Histogram"                     )
+op_entry( PRINT,              13, "print",              2, "Print B to file A"             )
+op_entry( SET_RNG_SEED,       14, "set_rng_seed",       1, "Set RNG seed"                  )
  
 #undef op_entry
+#endif // op_entry
 

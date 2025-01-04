@@ -77,9 +77,9 @@ union SockAddr
    // If the axis is missing, then a list of functions implemented by
    // ⎕FIO is displayed
 
-Quad_FIO::_sub_fun Quad_FIO::sub_functions[] =
+sub_function_info Quad_FIO::sub_functions[] =
 {
-#define fiodef(N, name)   { N, #name },
+#define fiodef(N, name)   { N, #name, -1, 0 },
 #include "Quad_FIO.def"
 };
 //----------------------------------------------------------------------------
@@ -87,13 +87,13 @@ int
 Quad_FIO::axis_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const _sub_fun *>(sf)->key);
+             reinterpret_cast<const sub_function_info *>(sf)->sub_name);
 }
 //----------------------------------------------------------------------------
 int
 Quad_FIO::function_name_to_int(const char * function_name)
 {
-  enum { SF_SIZE = sizeof(_sub_fun),
+  enum { SF_SIZE = sizeof(sub_function_info),
          SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
 
 #if 0
@@ -110,7 +110,7 @@ Quad_FIO::function_name_to_int(const char * function_name)
 
   if (const void * vp = bsearch(function_name, sub_functions,
                                 SF_COUNT, SF_SIZE, axis_compare))
-      return reinterpret_cast<const _sub_fun *>(vp)->val;
+      return reinterpret_cast<const sub_function_info *>(vp)->axis;
 
   return -1;    // not found
 }
@@ -1025,11 +1025,11 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "      With a small performance penalty, ⎕FIO also accepts the following "
 "strings\n      instead of function numbers as axis argument:\n\n";
 
-         loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
+         loop(f, sizeof(sub_functions)/sizeof(sub_function_info))
              {
-               const int N = sub_functions[f].val;
+               const int N = sub_functions[f].axis;
                char NN[10];   SPRINTF(NN, "%2d", N);
-               const char * name = sub_functions[f].key;
+               const char * name = sub_functions[f].sub_name;
                out << "      ⎕FIO[" << NN
                    << "]  ←→  ⎕FIO['" << name << "']"
                    << UCS_string(13 - strlen(name), UNI_SPACE)

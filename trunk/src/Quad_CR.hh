@@ -79,14 +79,7 @@ public:
 
 protected:
    /// a mapping between function names and function numbers
-   struct _sub_fun
-      {
-        unsigned int val;   ///< the function number
-        const char * key;   ///< the name for it
-      };
-
-   /// a mapping between function names and function numbers
-   static _sub_fun sub_functions[];
+   static sub_function_info sub_functions[];
 
    /// compare two axis strings (function names)
    static int fun_compare(const void * key, const void * sf);

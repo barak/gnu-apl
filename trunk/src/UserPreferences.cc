@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,29 +95,30 @@ UserPreferences::UserPreferences()
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::collect_preferences(int argc, const char ** argv)
+UserPreferences::collect_preferences(const std::basic_string<const char *>
+                                     & args)
 {
-const bool log_startup0 = parse_argv_0(argc, argv);
+const bool log_startup0 = parse_args_0(args);
    if (LOG_argc_argv || log_startup0)
       {
          CERR << "argc/argv before expansion:\n";
-         show_argv(argc, argv);
+         show_args(args);
       }
 
-   expand_argv(argc, argv);
+   expand_args(args);
 
-const bool log_startup = parse_argv_1() || log_startup0;
+const bool log_startup = parse_args_1() || log_startup0;
    if (LOG_argc_argv || log_startup)
       {
          CERR << "argc/argv after expansion:\n";
-         show_argv(expanded_argv.size(), &expanded_argv[0]);
+         show_args(expanded_args);
       }
 
 #ifdef cfg_DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
 #endif // cfg_DYNAMIC_LOG_WANTED
 
-   init_modules(argv[0], log_startup);
+   init_modules(args[0], log_startup);
 
    // read /etc/gnu-apl.d/preferences
    read_config_file(true,  log_startup);
@@ -131,17 +132,18 @@ const bool log_startup = parse_argv_1() || log_startup0;
   // read $HOME/.config/gnu_apl/parallel_thresholds
    read_threshold_file(false, log_startup);
 
-  parse_argv_2(log_startup);
+  parse_args_2(log_startup);
 
   return log_startup0;
 }
 //----------------------------------------------------------------------------
-/// print argc and argv[]
+/// print args
 void
-UserPreferences::show_argv(int argc, const char ** argv)
+UserPreferences::show_args(const std::basic_string<const char *> & args)
 {
-   CERR << "argc: " << argc << endl;
-   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
+   CERR << "argc: " << args.size() << endl;
+   loop(a, args.size())   CERR << "  args[" << a << "]: '"
+                               << args[a] << "'" << endl;
 
    // tell if stdin is open or closed
    //
@@ -317,11 +319,11 @@ const size_t len = read(fd, buf, sizeof(buf));
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::parse_argv_0(int argc, const char * argv[])
+UserPreferences::parse_args_0(const std::basic_string<const char *> & args)
 {
-   for (int a = 1; a < (argc - 1); ++a)
+   for (size_t a = 1; a < (args.size() - 1); ++a)
        {
-         if (!strcmp(argv[a], "-l") && atoi(argv[a+1]) == LID_startup)
+         if (!strcmp(args[a], "-l") && atoi(args[a+1]) == LID_startup)
             return true;
        }
 
@@ -329,13 +331,13 @@ UserPreferences::parse_argv_0(int argc, const char * argv[])
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::parse_argv_1()
+UserPreferences::parse_args_1()
 {
 bool log_startup = false;
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_args.size(); )
        {
-         const char * opt = expanded_argv[a++];
-         const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
+         const char * opt = expanded_args[a++];
+         const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
          if (!strcmp(opt, "-l"))
             {
@@ -415,7 +417,7 @@ bool log_startup = false;
 }
 //----------------------------------------------------------------------------
 void
-UserPreferences::parse_argv_2(bool logit)
+UserPreferences::parse_args_2(bool logit)
 {
    // execve() puts the script name (and optional script arguments at the
    // end of argv.
@@ -430,7 +432,7 @@ UserPreferences::parse_argv_2(bool logit)
    // if GNU APL is started as aplscript, then --script is implied
    //
    {
-      const char * prog = expanded_argv[0];
+      const char * prog = expanded_args[0];
       if (strlen(prog) >= 6 && !strcmp("script", (prog + strlen(prog) - 6)))
          {
             do_CONT = false;               // --noCONT
@@ -440,12 +442,12 @@ UserPreferences::parse_argv_2(bool logit)
          }
    }
 
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_args.size(); )
        {
          if (a == script_argc)   { ++a;   continue; }   // skip scriptname
 
-         const char * opt = expanded_argv[a++];
-         const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
+         const char * opt = expanded_args[a++];
+         const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
@@ -469,7 +471,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-C"))
             {
               ++a;
-              continue;   // -C already handled in parse_argv_1()
+              continue;   // -C already handled in parse_args_1()
             }
 
 #if cfg_CORE_COUNT_WANTED == -2
@@ -581,7 +583,7 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "-h") || !strcmp(opt, "--help"))
             {
-              usage(expanded_argv[0]);
+              usage(expanded_args[0]);
               exit(0);
             }
 
@@ -697,7 +699,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-p"))
             {
               ++a;
-              continue;   // -p already handled in parse_argv_1()
+              continue;   // -p already handled in parse_args_1()
             }
 
          if (!strcmp(opt, "--par"))
@@ -818,15 +820,15 @@ UserPreferences::parse_argv_2(bool logit)
               // IO_Files::open_next_file() will exit if it sees "-"
               //
               IO_Files::need_total = true;
-              for (; a < expanded_argv.size(); ++a)   // inner for
+              for (; a < expanded_args.size(); ++a)   // inner for
                   {
-                    if (!strcmp(expanded_argv[a], "--"))  // end of -T args
+                    if (!strcmp(expanded_args[a], "--"))  // end of -T args
                        {
                          ++a;   // skip --
                          break;           // inner for
 
                        }
-                    const UTF8_string & filename = expanded_argv[a];
+                    const UTF8_string & filename = expanded_args[a];
                     InputFile fam(filename, 0, true, true, false, no_LX);
                     InputFile::files_todo.push_back(fam);
                     InputFile::files_orig.push_back(fam);
@@ -900,7 +902,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-u"))
             {
               ++a;
-              continue;   // -u already handled in parse_argv_1()
+              continue;   // -u already handled in parse_args_1()
             }
 
          if (!strcmp(opt, "-w"))
@@ -916,7 +918,7 @@ UserPreferences::parse_argv_2(bool logit)
             }
 
          CERR << "unknown option '" << opt << "'" << endl;
-         usage(expanded_argv[0]);
+         usage(expanded_args[0]);
          exit(a);
        }
 
@@ -936,22 +938,22 @@ UserPreferences::parse_argv_2(bool logit)
      apl may have been started in one off these ways:
 
       A.  ./apl -f script1.apl   # with script1.apl NOT executable. Then:
-               expanded_argv[script_argc] is:  ./apl
+               expanded_args[script_argc] is:  ./apl
               InputFile::files_todo.size():    1   (from -f)
                script_argc is:                 0
 
       B.  ./apl -f script2.apl   # with script2.apl executable. Then:
-              expanded_argv[script_argc] is:   script2.apl
+              expanded_args[script_argc] is:   script2.apl
               InputFile::files_todo.size():    1    (from -f)
                script_argc is:                 2
 
       C.   ./apl
-               expanded_argv[script_argc] is:  ./apl
+               expanded_args[script_argc] is:  ./apl
               InputFile::files_todo.size():    0    (since no -f)
                script_argc is:                 0
 
       D.  ./script.apl   # with script2.apl executable. Then:
-              expanded_argv[script_argc] is:   script2.apl
+              expanded_args[script_argc] is:   script2.apl
               InputFile::files_todo.size():    0    (since no -f)
               script_argc is:                  1    #!./apl
               script_argc is:                  2    #!./apl --script
@@ -964,7 +966,7 @@ UserPreferences::parse_argv_2(bool logit)
    if (InputFile::files_todo.size() == 0)   // no -f (cases C. and D.)
    if (script_argc > 0)                     // (case D.)
       {
-        const UTF8_string & filename = expanded_argv[script_argc];
+        const UTF8_string & filename = expanded_args[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
         InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
       }
@@ -998,53 +1000,49 @@ UserPreferences::parse_argv_2(bool logit)
     /usr/bin/apl -s --             at least on GNU/linux
     /usr/bin/apl --script --       at least on GNU/linux
 
-    expand_argv() does the following:
+    expand_args() does the following:
 
     1. expand argv[1] into multiple arguments
     2. maybe set script_argc
 
  **/
 void
-UserPreferences::expand_argv(int argc, const char ** argv)
+UserPreferences::expand_args(const std::basic_string<const char *> & args)
 {
-   // 1. copy the command line arguments into original_argv and expanded_argv.
+   // 1. copy the command line arguments into expanded_args.
    //
-   loop(a, argc)
-       {
-         original_argv.push_back(argv[a]);
-         expanded_argv.push_back(argv[a]);
-       }
+   loop(a, args.size())   expanded_args.push_back(args[a]);
 
-   if (argc <= 1)   // program name argv[0] only, hence no arguments to expand
+   if (args.size() <= 1)   // program name argv[0] only (arguments to expand)
       {
         return;
       }
 
-   if (is_APL_script(argv[1]))   // case 2: script without argument
+   if (is_APL_script(args[1]))   // case 2: script without argument
       {
         script_argc = 1;
         return;
       }
 
-   if (!is_APL_script(argv[2]))   return;   // not run from a script
+   if (!is_APL_script(args[2]))   return;   // not run from a script
 
    /* at this point:
 
-      argv[1] is the optional argument of the interpreter on the shebang line,
-      argv[2] is the name of the script, and
-      argv[3] ... are the command line arguments given by the user
+      args[1] is the optional argument of the interpreter on the shebang line,
+      args[2] is the name of the script, and
+      args[3] ... are the command line arguments given by the user
                   when starting the script.
       expand argv[1], stopping at --
     */
-const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
+const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
    script_argc = 2;
    if (!strchr(apl_args, ' '))   // single option
       {
         return;
       }
 
-   // remove expanded_argv[1] and insert the expanded expanded_argv[1] instead
-   expanded_argv.erase(expanded_argv.begin() + 1);
+   // remove expanded_args[1] and insert the expanded expanded_args[1] instead
+   expanded_args.erase(expanded_args.begin() + 1);
    --script_argc;
    for (int index = 1;;)
        {
@@ -1056,7 +1054,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
 
          if (!strcmp(apl_args, "--"))        // "--" at end of apl_args
             {
-              expanded_argv.insert(expanded_argv.begin() + index++, "--");
+              expanded_args.insert(expanded_args.begin() + index++, "--");
               ++script_argc;
               break;   // done
             }
@@ -1064,7 +1062,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
          if (!strncmp(apl_args, "-- ", 2) &&
                apl_args[2] <= ' ')   // "--" somewhere in apl_args
             {
-              expanded_argv.insert(expanded_argv.begin() + index++, "--");
+              expanded_args.insert(expanded_args.begin() + index++, "--");
               ++script_argc;
               apl_args += 2;   // skip "--"
               continue;
@@ -1075,14 +1073,14 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
             {
               const int arg_len = arg_end - apl_args;
               const char * arg = strndup(apl_args, arg_len);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               apl_args += arg_len;
             }
          else           // last argument
             {
               const char * arg = strdup(apl_args);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               break;
             }
