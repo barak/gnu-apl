@@ -72,7 +72,7 @@ Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
   /* sort op_desc alphabetically. It is small, so a simple O(n²) algo suffices.
      sorting is needed for:
 
-     (1) bsearch() in subfun_to_axis() , and
+     (1) bsearch() in subfun_to_axis(), and
      (2) list_functions() with mapping == true.
    */
 const int count = sizeof(op_desc) / sizeof(*op_desc);
@@ -1266,6 +1266,30 @@ Value_P Z = Idx0_0(LOC);
   return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
+sAxis
+Quad_MX::subfun_to_axis(const UCS_string & name) const
+{
+const UTF8_string function_name_utf8(name);
+const char * function_name = function_name_utf8.c_str();
+
+  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(op_desc)
+  //       since Apple complains with a bogus error.
+  enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
+         FUN_INFO_COUNT = OP_MAX
+       };
+
+  if (const void * vp = bsearch(function_name, op_desc,
+                                FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
+     {
+       // found: vp is a fun_info *
+       const sub_function_info * info =
+             reinterpret_cast<const sub_function_info *>(vp);
+       if (info->valence)   return info->axis;
+     }
+
+  return -1;    // not found
+}
+//----------------------------------------------------------------------------
 
 #else //====================not apl_GSL =====================================
  
@@ -1300,31 +1324,13 @@ Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
   return eval_B(B);
 }
-
-#endif   // (not) apl_GSL
-
 //----------------------------------------------------------------------------
 sAxis
 Quad_MX::subfun_to_axis(const UCS_string & name) const
 {
-const UTF8_string function_name_utf8(name);
-const char * function_name = function_name_utf8.c_str();
-
-  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(op_desc)
-  //       since Apple complains with a bogus error.
-  enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
-         FUN_INFO_COUNT = OP_MAX
-       };
-
-  if (const void * vp = bsearch(function_name, op_desc,
-                                FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
-     {
-       // found: vp is a fun_info *
-       const sub_function_info * info =
-             reinterpret_cast<const sub_function_info *>(vp);
-       if (info->valence)   return info->axis;
-     }
-
-  return -1;    // not found
+  return -1;
 }
 //----------------------------------------------------------------------------
+
+#endif   // (not) apl_GSL
+
