@@ -1293,6 +1293,8 @@ const char * function_name = function_name_utf8.c_str();
 
 #else //====================not apl_GSL =====================================
  
+Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX) {}
+
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
 
