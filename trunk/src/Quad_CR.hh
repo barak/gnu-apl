@@ -81,9 +81,6 @@ protected:
    /// a mapping between function names and function numbers
    static sub_function_info sub_functions[];
 
-   /// compare two axis strings (function names)
-   static int fun_compare(const void * key, const void * sf);
-
    /// list all ⎕CR functions
    static Token list_functions(ostream & out, bool mapping);
 

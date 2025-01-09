@@ -5497,7 +5497,7 @@ Let 4=⍴B. Then
    B[4]←4 ⎕RVAL B[4]
 @end verbatim
 
-If 4>⍴B then the missing properties are not changed.
+If 4 > ⍴B then the missing properties are not changed.
 
 Examples:
 
@@ -5507,6 +5507,18 @@ Examples:
 
 @end verbatim
 
+@subsubsection Syntax Alternatives
+
+For an improved readability, ⎕RVAL also accepts string arguments for its left
+argument A and also the subfunction notation:
+
+@verbatim
+      0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
+      1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
+      2 ⎕RVAL B  ←→  'shape' ⎕RVAL B  ←→  ⎕RVAL.shape B
+      3 ⎕RVAL B  ←→   'type' ⎕RVAL B  ←→  ⎕RVAL.type  B
+      4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
+@end verbatim
 
 @node    Section 2.37
 @section ⎕SQL - SQL Database Interface

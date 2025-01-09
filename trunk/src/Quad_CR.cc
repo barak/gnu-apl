@@ -37,13 +37,6 @@ sub_function_info Quad_CR::sub_functions[] =
 #include "Quad_CR.def"
 };
 //----------------------------------------------------------------------------
-int
-Quad_CR::fun_compare(const void * key, const void * sf)
-{
-   return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const sub_function_info *>(sf)->sub_name);
-}
-//----------------------------------------------------------------------------
 Token
 Quad_CR::list_functions(ostream & out, bool mapping)
 {
@@ -178,7 +171,6 @@ const Function * function = 0;
                    break;
                  }
             }
-
       }
    else   // maybe user defined function
       {
@@ -234,7 +226,7 @@ const char * function_name = name_utf.c_str();
          SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
 
  if (const void * vp = bsearch(function_name, sub_functions,
-                                SF_COUNT, SF_SIZE, fun_compare))
+                               SF_COUNT, SF_SIZE, axis_compare))
       return reinterpret_cast<const sub_function_info *>(vp)->axis;
 
   return -1;    // not found

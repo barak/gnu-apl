@@ -197,20 +197,39 @@ const ShapeItem ec = Z->element_count();
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
-   // A shall be a scalar int (function number)
+int function_number = -1;
 
-   if (!A->is_scalar())
+   // A shall be a scalar int (function number) or a string (function name)
+   //
+   if (A->is_char_array())   // function name, e.g. "APL_expression"
       {
-        MORE_ERROR() << "non-scalar A in A ⎕RVAL B";
-        RANK_ERROR;
+        UCS_string ucs_A(*A);
+        UTF8_string utf_A(ucs_A);
+        function_number = subfun_to_axis(UTF8_string(utf_A.c_str()));
+        if (function_number == -1)
+           {
+             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
+                          << ucs_A << "')";
+             DOMAIN_ERROR;
+           }
       }
-   if (!A->is_int_scalar())
+   else
       {
-        MORE_ERROR() << "non-integer A in A ⎕RVAL B";
-        DOMAIN_ERROR;
+        if (!A->is_scalar())
+           {
+             MORE_ERROR() << "non-scalar A in A ⎕RVAL B";
+             RANK_ERROR;
+           }
+
+        if (!A->is_int_scalar())
+           {
+             MORE_ERROR() << "non-integer A in A ⎕RVAL B";
+             DOMAIN_ERROR;
+           }
+        function_number = A->get_cfirst().get_int_value();
       }
 
-Value_P Z = do_eval_AB(A->get_cfirst().get_int_value(), *B);
+Value_P Z = do_eval_AB(function_number, *B);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
@@ -275,6 +294,31 @@ Value_P Z(N, LOC);
       }
 
    return Z;
+}
+//----------------------------------------------------------------------------
+/// sub function names. Keep them sorted by nae.
+const sub_function_info sub_functions[] = {
+  { 4, "depth",  2, "desired max. depth(s)"         },
+  { 1, "rank",   2, "desired rank"                  },
+  { 2, "shape",  2, "desired shape"                 },
+  { 0, "state",  2, "random number generator state" },
+  { 3, "type",   2, "desired type(s)"               },
+                                          };
+
+sAxis
+Quad_RVAL::subfun_to_axis(const UCS_string & name) const
+{
+UTF8_string name_utf(name);
+const char * function_name = name_utf.c_str();
+
+  enum { SF_SIZE = sizeof(sub_function_info),
+         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
+
+ if (const void * vp = bsearch(function_name, sub_functions,
+                               SF_COUNT, SF_SIZE, axis_compare))
+      return reinterpret_cast<const sub_function_info *>(vp)->axis;
+
+  return -1;    // not found
 }
 //----------------------------------------------------------------------------
 Value_P

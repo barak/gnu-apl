@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>January 4, 2025.
+<p>January 9, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -257,6 +257,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">2.36.2.4 Control of the data types: 3 ⎕RVAL B</a></li>
         <li><a id="toc-Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">2.36.2.5 Control of a maximum depth: 4 ⎕RVAL B</a></li>
         <li><a id="toc-monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">2.36.2.6 monadic ⎕RVAL B: Return a new random value</a></li>
+        <li><a id="toc-Syntax-Alternatives" href="#Syntax-Alternatives">2.36.2.7 Syntax Alternatives</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e37">2.37 ⎕SQL - SQL Database Interface</a>
@@ -5699,6 +5700,7 @@ and
 <li><a href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" accesskey="4">Control of the data types: 3 ⎕RVAL B</a></li>
 <li><a href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" accesskey="5">Control of a maximum depth: 4 ⎕RVAL B</a></li>
 <li><a href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" accesskey="6">monadic ⎕RVAL B: Return a new random value</a></li>
+<li><a href="#Syntax-Alternatives" accesskey="7">Syntax Alternatives</a></li>
 </ul>
 <div class="subsubsection" id="Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">
 <h4 class="subsubsection">2.36.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</h4>
@@ -5904,7 +5906,7 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
    B[3]←3 ⎕RVAL B[3]
    B[4]←4 ⎕RVAL B[4]
 </pre>
-<p>If 4&gt;⍴B then the missing properties are not changed.
+<p>If 4 &gt; ⍴B then the missing properties are not changed.
 </p>
 <p>Examples:
 </p>
@@ -5912,7 +5914,19 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
 ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
 
 </pre>
+</div>
+<div class="subsubsection" id="Syntax-Alternatives">
+<h4 class="subsubsection">2.36.2.7 Syntax Alternatives</h4>
 
+<p>For an improved readability, ⎕RVAL also accepts string arguments for its left
+argument A and also the subfunction notation:
+</p>
+<pre class="verbatim">      0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
+      1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
+      2 ⎕RVAL B  ←→  'shape' ⎕RVAL B  ←→  ⎕RVAL.shape B
+      3 ⎕RVAL B  ←→   'type' ⎕RVAL B  ←→  ⎕RVAL.type  B
+      4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
+</pre>
 <hr>
 </div>
 </div>

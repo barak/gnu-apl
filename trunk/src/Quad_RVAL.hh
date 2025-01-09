@@ -48,6 +48,18 @@ protected:
    /// do eval_AB(A, B);
    static Value_P do_eval_AB(int A, const Value & B);
 
+   /// overloaded Function::eval_XB().
+   /// ⎕CR[X] B  ←→  X ⎕CR B
+   virtual Token eval_XB(Value_P X, Value_P B) const
+      { return eval_AB(X, B); }
+
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis()
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
    /// do eval_B(B);
    static Value_P do_eval_B(const Value & B, int depth);
 

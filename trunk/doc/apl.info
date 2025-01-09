@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 4, 2025.  This manual briefly documents GNU APL, an interpreter
+January 9, 2025.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -5297,13 +5297,25 @@ non-empty B.
    B[3]←3 ⎕RVAL B[3]
    B[4]←4 ⎕RVAL B[4]
 
-   If 4>⍴B then the missing properties are not changed.
+   If 4 > ⍴B then the missing properties are not changed.
 
    Examples:
 
 ⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
 ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
 
+
+2.36.2.7 Syntax Alternatives
+............................
+
+For an improved readability, ⎕RVAL also accepts string arguments for its
+left argument A and also the subfunction notation:
+
+      0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
+      1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
+      2 ⎕RVAL B  ←→  'shape' ⎕RVAL B  ←→  ⎕RVAL.shape B
+      3 ⎕RVAL B  ←→   'type' ⎕RVAL B  ←→  ⎕RVAL.type  B
+      4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
 
 
 File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
@@ -8014,29 +8026,29 @@ Node: Section 2.33173992
 Node: Section 2.34183342
 Node: Section 2.35184361
 Node: Section 2.36199042
-Node: Section 2.37209200
-Node: Section 2.38213902
-Node: Section 2.39215998
-Node: Section 2.40220416
-Node: Section 2.41241726
-Node: Section 2.42252642
-Node: Chapter 3255816
-Node: Chapter 4258324
-Node: Chapter 5259450
-Node: Section 5.1260987
-Node: Section 5.2262267
-Node: Section 5.3262627
-Node: Section 5.4262869
-Node: Section 5.5263531
-Node: Section 5.6264009
-Node: Section 5.7264782
-Node: Section 5.8265208
-Node: Chapter 6265610
-Node: Section 6.1266029
-Node: Section 6.2266716
-Node: Chapter 7267547
-Node: Section 7.1268050
-Node: Section 7.2293363
+Node: Section 2.37209739
+Node: Section 2.38214441
+Node: Section 2.39216537
+Node: Section 2.40220955
+Node: Section 2.41242265
+Node: Section 2.42253181
+Node: Chapter 3256355
+Node: Chapter 4258863
+Node: Chapter 5259989
+Node: Section 5.1261526
+Node: Section 5.2262806
+Node: Section 5.3263166
+Node: Section 5.4263408
+Node: Section 5.5264070
+Node: Section 5.6264548
+Node: Section 5.7265321
+Node: Section 5.8265747
+Node: Chapter 6266149
+Node: Section 6.1266568
+Node: Section 6.2267255
+Node: Chapter 7268086
+Node: Section 7.1268589
+Node: Section 7.2293902
 
 End Tag Table
 
