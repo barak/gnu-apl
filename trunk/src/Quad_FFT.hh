@@ -53,6 +53,21 @@ protected:
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
+   /// overloaded Function::eval_XB().
+   /// FFTCR[X] B  ←→  X ⎕FFT B
+   virtual Token eval_XB(Value_P X, Value_P B) const
+      { return eval_AB(X, B); }
+
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis()
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
+  /// list functions and their syntaces
+  static void list_functions(bool mapping);
+
    /// window function for sample n of N with parameters a = a0, a1, ...
    typedef double (*window_function)(ShapeItem n, ShapeItem N);
 

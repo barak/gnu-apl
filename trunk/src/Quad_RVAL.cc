@@ -70,13 +70,20 @@ Quad_RVAL::Quad_RVAL()
 Value_P
 Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
-   if (B.get_rank() != 1)
+   if (B.get_rank() > 1)
       {
-        MORE_ERROR() << "1≠⍴⍴B in in ⎕RVAL B";
+        MORE_ERROR() << "1<⍴⍴B in in ⎕RVAL B";
         RANK_ERROR;
       }
 
-const ShapeItem ec_B = B.element_count();
+ShapeItem ec_B = B.element_count();
+   if (B.is_vector() && ec_B == 0)   // empty vector 
+      {
+        if (B.get_cfirst().is_character_cell())      list_functions(true);
+        else if (B.get_cfirst().is_integer_cell())   list_functions(false);
+        else                                         DOMAIN_ERROR;
+        return Idx0_0(LOC);
+      }
    if (ec_B > 4)
       {
         MORE_ERROR() << "monadic ⎕RVAL B expects at most 4 properties B←"
@@ -84,7 +91,9 @@ const ShapeItem ec_B = B.element_count();
         LENGTH_ERROR;
       }
 
-   // save properties values so that we can restore them
+   if (B.is_scalar())   ec_B = 1;   // pretend that B is a vector
+
+   // save properties so that we can restore them
    //
 basic_string<int> old_desired_ranks = desired_ranks;
 Shape old_desired_shape = desired_shape;
@@ -151,7 +160,6 @@ bool need_restore = false;
 
 const sRank rank = choose_integer(desired_ranks);
 Shape shape;
-
 
    for (sRank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
@@ -296,14 +304,14 @@ Value_P Z(N, LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
-/// sub function names. Keep them sorted by nae.
-const sub_function_info sub_functions[] = {
-  { 4, "depth",  2, "desired max. depth(s)"         },
-  { 1, "rank",   2, "desired rank"                  },
-  { 2, "shape",  2, "desired shape"                 },
-  { 0, "state",  2, "random number generator state" },
-  { 3, "type",   2, "desired type(s)"               },
-                                          };
+/// sub function names. Keep them sorted by subfunction name.
+const sub_function_info sub_function_infos[] = {
+  { 4, "depth",  -1, 0 },
+  { 1, "rank",   -1, 0 },
+  { 2, "shape",  -1, 0 },
+  { 0, "state",  -1, 0 },
+  { 3, "type",   -1, 0 },
+                                               };
 
 sAxis
 Quad_RVAL::subfun_to_axis(const UCS_string & name) const
@@ -312,13 +320,41 @@ UTF8_string name_utf(name);
 const char * function_name = name_utf.c_str();
 
   enum { SF_SIZE = sizeof(sub_function_info),
-         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
+         SF_COUNT = sizeof(sub_function_infos) / SF_SIZE };
 
- if (const void * vp = bsearch(function_name, sub_functions,
+ if (const void * vp = bsearch(function_name, sub_function_infos,
                                SF_COUNT, SF_SIZE, axis_compare))
       return reinterpret_cast<const sub_function_info *>(vp)->axis;
 
   return -1;    // not found
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::list_functions(bool mapping)
+{
+ostream & out = CERR;
+  if (mapping)
+     {
+       // ⎕RVAL "": print the number to name mappings like:
+       //
+       // ⎕RVAL[1]  ←→  ⎕RVAL['rank']        ←→  ⎕RVAL.determinant
+       //
+       enum { COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info) };
+       list_all_mappings(out, "⎕RVAL", sub_function_infos, COUNT);
+     }
+  else
+     {
+       out <<
+"\n"
+"Valid ⎕RVAL[*] indices are:\n"
+"\n"
+"    ⎕RVAL[0] B    state:  get (B=⍬) or set the random number generator state\n"
+"    ⎕RVAL[1] B    rank:   set the desired rank\n"
+"    ⎕RVAL[2] B    shape:  set he desired shape\n"
+"    ⎕RVAL[3] B    type:   set the desired data type(s)\n"
+"    ⎕RVAL[4] B    type:   set the desired depth\n"
+           << endl;
+     }
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -601,6 +637,12 @@ Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
    N = 8;
+}
+//----------------------------------------------------------------------------
+sAxis
+Quad_RVAL::subfun_to_axis(const UCS_string & name) const
+{
+   return -1;
 }
 //----------------------------------------------------------------------------
 Value_P

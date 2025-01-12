@@ -40,6 +40,14 @@ bool Quad_FFT::system_wisdom_loaded = false;
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
+   if (B->is_vector() && B->element_count() == 0)   // empty vector
+      {
+        if (B->get_cfirst().is_character_cell())      list_functions(true);
+        else if (B->get_cfirst().is_integer_cell())   list_functions(false);
+        else                                          DOMAIN_ERROR;
+        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+      }
+
    return do_fft(FFTW_FORWARD, B, 0);
 }
 //----------------------------------------------------------------------------
@@ -304,8 +312,84 @@ ShapeItem rlen = 1;
          rlen *= axis_len;
        }
 }
+//------------------------------------------------------------------------------
+/// sub function names. Keep them sorted by subfunction name.
+const sub_function_info sub_function_infos[] = {
+  { -13, "blackman_harris_window", -1, 0 },
+  { -14, "blackman_nuttal_window", -1, 0 },
+  { -12, "blackman_window",        -1, 0 },
+  {   0, "fft",                    -1, 0 },
+  {  12, "fft_blackman",           -1, 0 },
+  {  13, "fft_blackman_harris",    -1, 0 },
+  {  14, "fft_blackman_nuttal",    -1, 0 },
+  {  15, "fft_flat_top",           -1, 0 },
+  {  11, "fft_hamming",            -1, 0 },
+  {  10, "fft_hann",               -1, 0 },
+  { -15, "flat_top_window",        -1, 0 },
+  { -11, "hamming",                -1, 0 },
+  { -10, "hann",                   -1, 0 },
+  {  -1, "inverse_fft",            -1, 0 },
+                                               };
+
+sAxis
+Quad_FFT::subfun_to_axis(const UCS_string & name) const
+{
+UTF8_string name_utf(name);
+const char * function_name = name_utf.c_str();
+
+  enum { SF_SIZE = sizeof(sub_function_info),
+         SF_COUNT = sizeof(sub_function_infos)  / SF_SIZE };
+
+ if (const void * vp = bsearch(function_name, sub_function_infos,
+                               SF_COUNT, SF_SIZE, axis_compare))
+      return reinterpret_cast<const sub_function_info *>(vp)->axis;
+
+  return -1;    // not found
+}
+//------------------------------------------------------------------------------
+void
+Quad_FFT::list_functions(bool mapping)
+{
+ostream & out = CERR;
+  if (mapping)
+     {
+       // ⎕FFT "": print the number to name mappings like:
+       //
+       // ⎕FFT[0]  ←→  ⎕FFT['fft']        ←→  ⎕FFT.fft
+       //
+       enum { SUB_COUNT =
+              sizeof(sub_function_infos) / sizeof(sub_function_info) };
+       list_all_mappings(out, "⎕FFT", sub_function_infos, SUB_COUNT);
+     }
+  else
+     {
+       out <<
+       "    ⎕FFT[¯15] B : B × flat-top window\n"
+       "    ⎕FFT[¯14] B : B × Blackman-Nuttal window\n"
+       "    ⎕FFT[¯13] B : B × Blackman-Harris window\n"
+       "    ⎕FFT[¯12] B : B × Blackman window\n"
+       "    ⎕FFT[¯11] B : B × Hamming window\n"
+       "    ⎕FFT[¯10] B : B × Hann window\n"
+       "    ⎕FFT[ ¯1] B : inverse FFT\n"
+       "    ⎕FFT[  0] B : forward FFT (same as ⎕FFT B)\n"
+       "    ⎕FFT[ 10] B : FFT with Hann window\n"
+       "    ⎕FFT[ 11] B : FFT with Hamming window\n"
+       "    ⎕FFT[ 12] B : FFT with Blackman window\n"
+       "    ⎕FFT[ 13] B : FFT with Blackman-Harris window\n"
+       "    ⎕FFT[ 14] B : FFT with Blackman-Nuttal window\n"
+       "    ⎕FFT[ 15] B : FFT with flat-top window\n"
+           << endl;
+     }
+}
+//------------------------------------------------------------------------------
 
 #else
+
+sAxis
+Quad_FFT::subfun_to_axis(const UCS_string & name) const
+{
+  return -1;
+}
 
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);

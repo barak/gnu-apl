@@ -49,7 +49,7 @@ protected:
    static Value_P do_eval_AB(int A, const Value & B);
 
    /// overloaded Function::eval_XB().
-   /// ⎕CR[X] B  ←→  X ⎕CR B
+   /// ⎕RVAL[X] B  ←→  X ⎕RVAL B
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
 
@@ -59,6 +59,9 @@ protected:
 
    /// overloaded Function::subfun_to_axis()
    virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
+  /// list functions and their syntaces
+  static void list_functions(bool mapping);
 
    /// do eval_B(B);
    static Value_P do_eval_B(const Value & B, int depth);

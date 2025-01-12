@@ -59,32 +59,35 @@ Quad_MX Quad_MX::fun;
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 
-sub_function_info Quad_MX::op_desc[] = {
+sub_function_info Quad_MX::sub_function_infos[] = {
 #define op_entry(enum, _axis, sub, val, desc) \
    { Quad_MX::OP_ ## enum, sub, val, desc },
 #include "Quad_MX.def"
-                                       };
-enum { OP_MAX = sizeof(Quad_MX::op_desc) / sizeof(sub_function_info) };
+                                                  };
+enum { OP_MAX = sizeof(Quad_MX::sub_function_infos)
+              / sizeof(sub_function_info) };
 
 //----------------------------------------------------------------------------
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
-  /* sort op_desc alphabetically. It is small, so a simple O(n²) algo suffices.
+  /* sort sub_function_infos alphabetically.
+     It is small, so a simple O(n²) algo suffices.
      sorting is needed for:
 
      (1) bsearch() in subfun_to_axis(), and
      (2) list_functions() with mapping == true.
    */
-const int count = sizeof(op_desc) / sizeof(*op_desc);
+const int count = sizeof(sub_function_infos) / sizeof(sub_function_info);
 
   loop(i, count)
   for (ShapeItem j = i + 1; j < count; ++j)
       {
-        if (strcmp(op_desc[i].sub_name, op_desc[j].sub_name) > 0)
+        if (strcmp(sub_function_infos[i].sub_name,
+                   sub_function_infos[j].sub_name) > 0)
            {;
-             const sub_function_info tmp = op_desc[i];
-             op_desc[i] = op_desc[j];
-             op_desc[j] = tmp;
+             const sub_function_info tmp = sub_function_infos[i];
+             sub_function_infos[i] = sub_function_infos[j];
+             sub_function_infos[j] = tmp;
            }
       }
 }
@@ -1086,17 +1089,8 @@ ostream & out = CERR;
        //
        // ⎕MX[1]  ←→  ⎕MX['determinant']        ←→  ⎕MX.determinant
        //
-       out << "      With a small performance penalty, ⎕MX[ ] also accepts the "
-                     "following strings\n"
-              "      instead of function numbers as axis argument:\n\n";
-
-       loop(idx, OP_MAX)
-           {
-             list_mapping(out, "⎕MX", op_desc[idx].axis,
-                                      op_desc[idx].sub_name, 20);
-           }
-       out << "\n      For a more detailed description of all functions:\n\n"
-              "      ⎕MX ⍬" << endl;
+       enum { SUB_COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info) };
+       list_all_mappings(out, "⎕MX", sub_function_infos, SUB_COUNT);
      }
   else
      {
@@ -1148,10 +1142,10 @@ Quad_MX::eval_B(Value_P B) const
 {
   // the only non-axis function is to show help (for now)
   //
-  if (B->get_rank() != 1)        RANK_ERROR;
-  if (B->element_count() != 0)   LENGTH_ERROR;
+  if (!B->is_vector())      RANK_ERROR;
+  if (B->element_count())   LENGTH_ERROR;   // not empty
 
-  // at this point, B is an empty vector (character or numerical).
+  // at this point, B is an empty vector (supposedly character or numerical).
   //
   if (B->get_cfirst().is_character_cell())      list_functions(true);
   else if (B->get_cfirst().is_integer_cell())   list_functions(false);
@@ -1272,13 +1266,13 @@ Quad_MX::subfun_to_axis(const UCS_string & name) const
 const UTF8_string function_name_utf8(name);
 const char * function_name = function_name_utf8.c_str();
 
-  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(op_desc)
+  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(sub_function_infos)
   //       since Apple complains with a bogus error.
   enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
          FUN_INFO_COUNT = OP_MAX
        };
 
-  if (const void * vp = bsearch(function_name, op_desc,
+  if (const void * vp = bsearch(function_name, sub_function_infos,
                                 FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
      {
        // found: vp is a fun_info *

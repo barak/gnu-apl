@@ -33,7 +33,7 @@ host_os = @host_os@
 common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
-common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
+common_LDFLAGS  = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS)
 
 common_SOURCES  = $(plot_SOURCES) 
 common_SOURCES +=										../config.h

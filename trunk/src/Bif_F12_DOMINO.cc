@@ -401,14 +401,14 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
 #endif // DOMINO_DEBUG
 }
 //----------------------------------------------------------------------------
-const sub_function_info function_infos[] = {
+const sub_function_info sub_function_infos[] = {
  { 4, "lq_fact",        -1, 0 },
  { 6, "lu_fact",        -1, 0 },
  { 5, "ql_fact",        -1, 0 },
  { 2, "qr_fact_gsl",    -1, 0 },
  { 1, "qr_fact_helzer", -1, 0 },
  { 3, "rq_fact",        -1, 0 },
-                                    };
+                                               };
 sAxis
 Bif_F12_DOMINO::subfun_to_axis(const UCS_string & name) const
 {
@@ -416,10 +416,10 @@ const UTF8_string function_name_utf8(name);
 const char * function_name = function_name_utf8.c_str();
 
   enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
-         FUN_INFO_COUNT = sizeof(function_infos) / sizeof(sub_function_info)
+         FUN_INFO_COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info)
        };
 
-  if (const void * vp = bsearch(function_name, function_infos,
+  if (const void * vp = bsearch(function_name, sub_function_infos,
                                 FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
      {
        // found: vp is a fun_info *
@@ -441,17 +441,8 @@ ostream & out = CERR;
        //
        // ⌹[1]  ←→  ⌹['determinant']        ←→  ⌹.determinant
        //
-       out << "      With a small performance penalty, ⌹[ ] also accepts the "
-                     "following strings\n"
-              "      instead of function numbers as axis argument:\n\n";
-
-       loop(idx, sizeof(function_infos) / sizeof(sub_function_info))
-           {
-             list_mapping(out, "⌹", function_infos[idx].axis,
-                          function_infos[idx].sub_name, 20);
-           }
-       out << "\n      For a more detailed description of all functions:\n\n"
-              "      ⎕MX ⍬" << endl;
+       enum { SUB_COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info) };
+       list_all_mappings(out, "⌹", sub_function_infos, SUB_COUNT);
      }
   else
      {
@@ -465,10 +456,7 @@ ostream & out = CERR;
 "    (Q R Ri) ← ⌹[4] B    LQ factorization of B (libgsl algorithm)\n"
 "    (Q R Ri) ← ⌹[5] B    QL factorization of B (libgsl algorithm)\n"
 "    (P U Li) ← ⌹[6] B    LU factorization of B (libgsl algorithm)\n"
-"\n"
-"      For a more detailed description of all functions:\n"
-"\n"
-"      ⌹ ⍬\n";
+"\n";
      }
 }
 //----------------------------------------------------------------------------

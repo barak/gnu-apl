@@ -36,7 +36,7 @@ class Quad_MX : public QuadFunction
   typedef std::complex<double> Dcomplex;
 
 public:
-   /// Constructor. Sorts \b op_desc by name (as needed by bsearch()).
+   /// Constructor. Sorts \b sub_function_infos by name (as needed by bsearch()).
   Quad_MX();
 
   enum MX_ops
@@ -53,10 +53,10 @@ public:
    /// overloaded Function::subfun_to_axis
    virtual sAxis subfun_to_axis(const UCS_string & name) const;
 
-   static Quad_MX  fun;          ///< Built-in function.
+   static Quad_MX fun;          ///< Built-in function.
 
   /// properties of subfunctions
-  static sub_function_info op_desc[];   ///< all subfunctions
+  static sub_function_info sub_function_infos[];   ///< all subfunctions
 
 protected:
   /// a matrix suitable for libgsl
@@ -95,7 +95,8 @@ protected:
                   {
                     loop(c, kcols)
                         {
-                          fprintf (stderr, "%gj%g ", val (r, c).real (), val (r, c).imag ());
+                          fprintf(stderr, "%gj%g ", val(r, c).real(),
+                                                    val(r, c).imag());
                         }
                     fprintf (stderr, "\n");
                   }
