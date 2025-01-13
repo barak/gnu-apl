@@ -1306,7 +1306,7 @@ const char * libs[] = { "libgsl.so", "libgslcblas.so", 0 };
 const char * hdrs[] = { "gsl_statistics.h", "gsl_math.h", "gsl_eigen.h", 0 };
 const char * pkgs[] = { "libgsl-dev", 0 };
 
-   return missing_files("⎕ME", libs, hdrs, pkgs);
+   return missing_files("⎕MX", libs, hdrs, pkgs);
 }
 //----------------------------------------------------------------------------
 Token

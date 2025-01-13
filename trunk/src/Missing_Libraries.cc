@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,10 +42,11 @@ UCS_string & more = MORE_ERROR() <<
 "Bad luck. The system function " << qfun <<
 " has raised a SYNTAX ERROR even though the\n"
 "syntax used was correct. The real reason for the SYNTAX ERROR was that\n"
-"one or more library and/or header file on which " << qfun << " depends:\n"
+"one or more library and/or header files on which " << qfun << " depends:\n"
 "\n"
 " ⋆ could not be found by ./configure, and/or\n"
-" ⋆ was explitly disabled by a ./configure argument\n"
+" ⋆ was explicitly disabled by a ./configure argument, and/or\n"
+" ⋆ had the wrong (typically too old) version.\n"
 "\n"
 "just before GNU APL was compiled.\n";
 
@@ -55,7 +56,11 @@ UCS_string & more = MORE_ERROR() <<
         const char * numerus2 = libs[1] ? " were:" : " was:";
         more << "\nThe possibly missing (or disabled) librar" << numerus1
              << "needed by " << qfun << numerus2;
-        for (int j = 0; libs[j]; ++j)   more << " " << libs[j];
+        for (int j = 0; libs[j]; ++j)
+            {
+              if (j)   more << ",";
+              more << " " << libs[j];
+            }
         more << "\nTo locate installed versions of it, run e.g.:\n\n";
         for (int j = 0; libs[j]; ++j)
             more << "      )HOST find /usr -name '" << libs[j]
@@ -83,7 +88,7 @@ UCS_string & more = MORE_ERROR() <<
       {
         more <<
 "If the problem was caused by missing libraries or header files, then (on a\n"
-" standard GNU/Linux/Debian system) they can usually be installed with the\n"
+"standard GNU/Linux/Debian system) they can usually be installed with the\n"
 "following command:\n"
 "\n"
 "      apt install";
@@ -112,8 +117,8 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "in the top-level directory of the GNU APL package. On GNU/Linux distros\n"
 "other than Debian, the package manager may not be apt, and the name of the\n"
-"may also differ slightly. Always use the -dev variant of the package (which\n"
-"also contains the required header files).\n";
+"library may also differ slightly. Always use the -dev variant of the package\n"
+"(which also contains the required header files).\n";
       }
 
    SYNTAX_ERROR;
