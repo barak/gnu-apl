@@ -87,9 +87,6 @@
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
-/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
-#undef HAVE_LIBGSLCBLAS
-
 /* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
 #undef HAVE_LIBGTK_3
 

@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 1439"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1649", "2025-01-13 15:06:44 UTC", "Linux 5.15.0-126-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1650", "2025-01-14 16:17:56 UTC", "Linux 5.15.0-126-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -87,9 +87,6 @@
 
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #define HAVE_LIBGSL 1
-
-/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
-#define HAVE_LIBGSLCBLAS 1
 
 /* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
 #define HAVE_LIBGTK_3 1
