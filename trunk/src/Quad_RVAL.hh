@@ -99,8 +99,7 @@ protected:
    /// initialize \b cell with a random nested value
    static void random_nested(Value & Z, const Value & B, int depth);
 
-   /// return a 17-bit random number
-   // of random_r()
+   /// return a 17-bit random number from random()
    static uint64_t rand17();
 
    /// the number of bytes in the state of the random number generator
@@ -120,11 +119,6 @@ protected:
 
    /// the state buffer of the random number generator
    static char state[256];
-
-#if HAVE_LIBC
-   /// the state of the random number generator
-   static struct random_data rdata;
-#endif
 };
 
 #endif // __Quad_RVAL_DEFINED__

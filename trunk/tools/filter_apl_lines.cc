@@ -151,7 +151,7 @@ char buffer[BUFLEN];
    return 0;   // OK
 
 bad_buffer:
-   cerr << "bad buffer: '" << buffer << "'" << endl; buffer;
+   cerr << "bad buffer: '" << buffer << "'" << endl;
    return 1;
 }
 //═══════════════════════════════════════════════════════════════════════════

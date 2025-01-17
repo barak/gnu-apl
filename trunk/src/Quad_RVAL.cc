@@ -36,10 +36,6 @@ int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
 size_t      Quad_RVAL::N;
 
-#if HAVE_LIBC
-random_data Quad_RVAL::rdata;
-#endif
-
 Quad_RVAL  Quad_RVAL::fun;
 
 // ⎕RVAL depends on glibc, so we use it only in development mode
@@ -53,7 +49,7 @@ Quad_RVAL::Quad_RVAL()
    N = 8;
    desired_maxdepth = 4;
    memset(state, 0, sizeof(state));
-   initstate_r(1, state, N, &rdata);
+   initstate(1, state, N);
 
    while (desired_shape.get_rank() < MAX_RANK)
          desired_shape.add_shape_item(1);
@@ -298,7 +294,7 @@ Value_P Z(N, LOC);
             {
                state[b] = B.get_cravel(b).get_int_value();
             }
-         setstate_r(state, &rdata);
+         setstate(state);
       }
 
    return Z;
@@ -621,8 +617,7 @@ Value_P Zsub;
 uint64_t
 Quad_RVAL::rand17()
 {
-int32_t rnd;
-   if (random_r(&rdata, &rnd))   FIXME;
+const int32_t rnd = random();
 
    // the lower bits are less random, so we xor the upper 16 bits into
    // the lower 16 bits and return them.

@@ -73,7 +73,7 @@ using namespace std;
 class IO_Files
 {
    friend int main(int argc, const char *argv[]);
-   friend struct UserPreferences;
+   friend class UserPreferences;
 
 public:
    /// count an error
