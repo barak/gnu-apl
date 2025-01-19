@@ -34,7 +34,7 @@ Shape       Quad_RVAL::desired_shape;
 basic_string<int> Quad_RVAL::desired_types;
 int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
-size_t      Quad_RVAL::N;
+size_t      Quad_RVAL::N = 256;
 
 Quad_RVAL  Quad_RVAL::fun;
 
@@ -259,14 +259,15 @@ Value_P
 Quad_RVAL::generator_state(const Value & B)
 {
    // expect an empty, 8, 16, 32, 64, 128, or 256 byte integer vector
+   //
    if (B.get_rank() != 1)   RANK_ERROR;
 
 const ShapeItem new_N = B.element_count();
    if (new_N !=   0 && new_N !=   8 && new_N !=  32 &&
        new_N !=  64 && new_N != 128 && new_N != 256)
       {
-        MORE_ERROR() << "bad new_N in generator_state()";
-        DOMAIN_ERROR;
+        MORE_ERROR() << "bad new_N (aka. ⍴B) in generator_state()";
+        LENGTH_ERROR;
       }
 
    // always return the previous state
