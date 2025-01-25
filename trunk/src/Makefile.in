@@ -230,23 +230,23 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
@@ -403,23 +403,23 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -555,23 +555,23 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -1331,20 +1331,20 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	$(am__append_3) $(am__append_6) $(am__append_7) \
-	$(am__append_10)
+	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh $(am__append_3) $(am__append_6) \
+	$(am__append_7) $(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc

@@ -58,7 +58,7 @@ utf8P(ASCII * cp)
 }
 //----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
-class UTF8_string : public std::basic_string<UTF8>
+class UTF8_string : public std::string
 {
 public:
    /// constructor: empty UTF8_string
@@ -90,15 +90,10 @@ public:
         return true;
       }
 
-   /// return \b this string as a 0-terminated C string
-   const char * c_str() const
-      { return reinterpret_cast<const char *>
-                               (std::basic_string<UTF8>::c_str()); }
-
    /// prevent basic_string::erase() with its dangerous default value for
    /// the number of erased character.
    void erase(size_t pos)
-      { basic_string<UTF8>::erase(pos, 1); }
+      { std::string::erase(pos, 1); }
 
    /// return the last byte in this string
    UTF8 back() const

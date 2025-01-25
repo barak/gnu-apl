@@ -126,7 +126,8 @@ start_of_sequence:
                                           << " at " << LOC << endl;
                         if (utf.size() >= 40)
                            {
-                             const UTF8_string end(&utf[utf.size() - 10], 10);
+                             const UTF8_string end(utf8P(&utf[utf.size() - 10]),
+                                                                           10);
                              end.dump_hex(CERR << endl << "(ending with : ", 20)
                                                << ")" << endl;
                            }
@@ -147,7 +148,8 @@ start_of_sequence:
                                           << " at " << LOC <<  endl;
                         if (utf.size() >= 40)
                            {
-                             const UTF8_string end(&utf[utf.size() - 10], 10);
+                             const UTF8_string end(utf8P(&utf[utf.size() - 10]),
+                                                                           10);
                              end.dump_hex(CERR << endl << "(ending with : ", 20)
                                                << ")" << endl;
                            }
