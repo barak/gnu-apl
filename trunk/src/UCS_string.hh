@@ -382,6 +382,10 @@ public:
         void skip_white()
            { while (pos < s.size() && Avec::is_white(s[pos]))   ++pos; }
 
+        /// the rest (starting at \b pos
+        UCS_string rest() const
+           { return UCS_string(s, pos, s.size() - pos); }
+       
         protected:
            /// the string
            const UCS_string & s;

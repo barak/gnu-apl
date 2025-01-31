@@ -199,17 +199,17 @@ protected:
    /// editor commands
    enum Ecmd
       {
-        ECMD_NOP,      ///< do nothing
-        ECMD_SHOW,     ///< show function line(s) idx_from ... idx_to
-        ECMD_EDIT,     ///< edit function line edit_from
-        ECMD_DELETE,   ///< delete function line(s) edit_from ... idx_to
-        ECMD_ESCAPE,   ///< abort editing (discard changes made so far)
+        ECMD_NOP    = 0,   ///< do nothing
+        ECMD_SHOW   = 1,   ///< show function line(s) idx_from ... idx_to
+        ECMD_EDIT   = 2,   ///< edit function line edit_from
+        ECMD_DELETE = 3,   ///< delete function line(s) edit_from ... idx_to
+        ECMD_ESCAPE = 4,   ///< abort editing (discard changes made so far)
       } ecmd;          ///< the current editor command
 
-   /// optional start of a range for an editor command
+   /// optional start (line) of a range for an editor command
    LineLabel edit_from;
 
-   /// optional end of a range for an editor command
+   /// optional end (line) of a range for an editor command
    LineLabel edit_to;
 
    /// true if user has entered a range, i.e. [edit_from - edit_to],
@@ -237,7 +237,7 @@ protected:
    LineLabel current_line;
 
    /// the command used to open the function
-   const UCS_string first_command;
+   UCS_string first_command;
 
    /// the text for line \b current_line
    UCS_string current_text;

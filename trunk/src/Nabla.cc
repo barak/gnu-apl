@@ -78,10 +78,13 @@ Nabla::edit()
 {
    if (const char * error = start())
       {
-        Log(LOG_verbose_error)   if (Workspace::more_error().size() == 0)
+        Log(LOG_verbose_error)
            {
-             UERR << "Bad ∇-open '" << first_command
-                  << "' : '" << error << "'" << endl;
+             if (Workspace::more_error().size() == 0)
+                {
+                  UERR << "Bad ∇-open '" << first_command
+                       << "' : '" << error << "'" << endl;
+                }
            }
         throw_edit_error(error);
       }
@@ -249,20 +252,31 @@ std::basic_string<Function_Line> trace_vec;
 const char *
 Nabla::start()
 {
-   // cmd should be something like:
+   /* cmd should be something like:
+     
+      ∇FUN
+      ∇FUN[⎕]
+      ∇FUN[⎕]∇
+      etc.
+    */
+
+   // skip trailing ∇ (if any)
    //
-   // ∇FUN
-   // ∇FUN[⎕]
-   // ∇FUN[⎕]∇
-   // etc.
-   //
+bool trailing_nabla = false;
+   first_command.remove_trailing_whitespaces();
+   if (first_command.back() == UNI_NABLA)
+      {
+        first_command.pop_back();
+        trailing_nabla = true;
+      }
+
 UCS_string::iterator c(first_command);
 
    // skip leading spaces
    //
    c.skip_white();
 
-   // skip leading nabla.
+   // skip the leading nabla. This should always succeed.
    //
    if (c.has_more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
 
@@ -270,7 +284,7 @@ UCS_string::iterator c(first_command);
    //
    c.skip_white();
 
-   // function header.
+   // function header... Copy the function name
    //
    while (c.has_more() && c.lookup() != UNI_L_BRACK)
          fun_header.append(c.next());
@@ -286,9 +300,13 @@ UCS_string::iterator c(first_command);
     */
    if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
       {
-        c.next();   // the [
+        c.next();   // skip the [
         c.skip_white();
-        if (c.has_more() && Avec::is_first_symbol_char(c.lookup()))   // axis
+        if (c.has_more() && c.lookup() == UNI_DELTA)   // command
+           {
+             c.un_next();
+           }
+        else if (c.has_more() && Avec::is_first_symbol_char(c.lookup()))
            {
              fun_header.append(UNI_L_BRACK);   //  copy the [
              while (c.has_more() && c.lookup() != UNI_L_BRACK)
@@ -379,13 +397,27 @@ UserFunction_header hdr(fun_header, false);
    // immediate close (only show command is allowed here),
    // e.g. ∇fun[⎕]∇
    //
-   if (c.has_more() && c.lookup() == UNI_NABLA)
+   if (ecmd == ECMD_EDIT && c.has_more())
+      {
+        /* For example:  ∇FOO[1]123∇
+
+           We have parsed ∇FOO[1] and c.rest() is the line to be replaced,
+           optionally followed by a closing ∇. We copy c.rest() into
+           current_text and then 
+         */
+         while (c.has_more())   current_text += c.next();
+         execute_oper();
+         do_close = trailing_nabla;
+         return 0;   // OK
+      }
+
+   do_close = trailing_nabla;
+   if (c.has_more())
       {
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
            UERR << "execute_oper() failed at " << loc << endl;
-        do_close = true;
-        return 0;
+        return 0;   // OK
       }
 
    if (const char * loc = execute_oper())
@@ -487,10 +519,9 @@ command_loop:
                  return "Bad ∇-command";
       }
 
-   // don't allow delete or escape in the first command
+   // don't allow escape in the first command
    if (initial)
       {
-        if (ecmd == ECMD_DELETE)   return "Bad initial ∇-command ∆";
         if (ecmd == ECMD_ESCAPE)   return "Bad initial ∇-command →";
       }
 
