@@ -60,15 +60,15 @@ Nabla::Nabla(const UCS_string & cmd)
 void
 Nabla::throw_edit_error(const char * why)
 {
+UCS_string command = first_command;
+   if (trailing_nabla)   command += UNI_NABLA;
+
    COUT << "DEFN ERROR+" << endl
-        << "      " << first_command << endl
-        << "      " << UCS_string(first_command.size() - 1, UNI_SPACE)
+        << "      " << command << endl
+        << "      " << UCS_string(command.size() - 1, UNI_SPACE)
         << "^" << endl;
 
-   if (Workspace::more_error().size() == 0)
-      {
-        MORE_ERROR() << why;
-      }
+   if (Workspace::more_error().size() == 0)   MORE_ERROR() << why;
 
    Error::throw_define_error(fun_header, first_command, why);
 }
@@ -252,23 +252,41 @@ std::basic_string<Function_Line> trace_vec;
 const char *
 Nabla::start()
 {
-   /* cmd should be something like:
-     
-      ∇FUN
-      ∇FUN[⎕]
-      ∇FUN[⎕]∇
-      etc.
+   /* This function parses member 'first_command', which is the line with
+      which the ∇-editor was started. There are 3 valid cases:
+
+      1.   ∇FUN...          where FUN EXISTS,
+      2a.  ∇FUN...          where FUN is new,
+      2b.  ∇A FUN...        where FUN is new,
+      2c.  ∇A (LO FUN ...   where FUN is new,
     */
 
-   // skip trailing ∇ (if any)
+   // skip (and remember) trailing ∇ (if any)
    //
-bool trailing_nabla = false;
+   trailing_nabla = false;
    first_command.remove_trailing_whitespaces();
    if (first_command.back() == UNI_NABLA)
       {
         first_command.pop_back();
         trailing_nabla = true;
       }
+
+   // distinguish cases 1. vs. 2a.-2c. and set 'function_existed' accordingly
+   //
+   {
+     function_existed = false;   // assume function exists (case 1. above)
+     if (const Symbol * fun = Workspace::lookup_existing_symbol(first_command))
+        {
+          // a symbol with that name exists...
+          //
+          if (fun->get_NC() & NC_FUN_OPER)   // and is a function or an operator
+             {
+               // the first symbol is an (existing) function or operator.
+               //
+               function_existed = true;
+             }
+        }
+   }
 
 UCS_string::iterator c(first_command);
 
@@ -284,7 +302,9 @@ UCS_string::iterator c(first_command);
    //
    c.skip_white();
 
-   // function header... Copy the function name
+   // function header... Copy the leftmost name. The name may be the name of
+   // the function to be edited, or maybe the left variable of a dyadic
+   // function or operator header.
    //
    while (c.has_more() && c.lookup() != UNI_L_BRACK)
          fun_header.append(c.next());
@@ -300,25 +320,16 @@ UCS_string::iterator c(first_command);
     */
    if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
       {
-        c.next();   // skip the [
-        c.skip_white();
-        if (c.has_more() && c.lookup() == UNI_DELTA)   // command
+        if (is_axis(c.rest()))   // new function header
            {
-             c.un_next();
-           }
-        else if (c.has_more() && Avec::is_first_symbol_char(c.lookup()))
-           {
-             fun_header.append(UNI_L_BRACK);   //  copy the [
-             while (c.has_more() && c.lookup() != UNI_L_BRACK)
-                   fun_header.append(c.next());
-           }
-        else                                                      // ∇-command
-           {
-             c.un_next();
+             while (c.has_more())   fun_header.append(c.next());
            }
       }
 
-UserFunction_header hdr(fun_header, false);
+   // at this point is fun_header either the entire header of a new function,
+   // oer else the function name of a supposedly  existing function.
+   //
+const UserFunction_header hdr(fun_header, /* macro= */ false);
    if (hdr.get_error())
       {
          static char cc[200];
@@ -414,6 +425,7 @@ UserFunction_header hdr(fun_header, false);
    do_close = trailing_nabla;
    if (c.has_more())
       {
+        if (ecmd == ECMD_NOP)    return 0;
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
            UERR << "execute_oper() failed at " << loc << endl;
@@ -424,6 +436,22 @@ UserFunction_header hdr(fun_header, false);
       UERR << "execute_oper() failed at " << loc << endl;
 
    return 0;   // no error
+}
+//----------------------------------------------------------------------------
+bool
+Nabla::is_axis(const UCS_string & ucs)
+{
+   // ucs was checked to start with with '['.
+   //
+UCS_string::iterator c(ucs);
+   Assert(c.has_more() && c.lookup() == UNI_L_BRACK);   // [
+   c.next();   // skip '['
+   c.skip_white();
+   if (!c.has_more())                           return false;    // not an axis
+   if (!Avec::is_first_symbol_char(c.next()))   return false;    // not an axis
+   while (c.has_more() && Avec::is_symbol_char(c.lookup()))   c.next();
+   c.skip_white();
+   return c.has_more() && c.lookup() == UNI_R_BRACK;
 }
 //----------------------------------------------------------------------------
 const char *

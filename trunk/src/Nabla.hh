@@ -170,6 +170,9 @@ protected:
    /// create a new function.
    const char * open_new_function();
 
+   /// return true if \b ucs starts with an axis
+   static bool is_axis(const UCS_string & ucs);
+
    /// open an existing function, or create a new one.
    const char * open_existing_function();
 
@@ -187,7 +190,12 @@ protected:
    /// started the ∇-editor
    const int defn_line_no;
 
-   /// the header of the function being edited
+   /** the header of the function being edited. This variable contains the
+       opening line up to (excluding) the [ ] (if any). For an existing
+       function this is only the function name, while for a new function this
+       is the function header, possibly truncated at '[' (i.e. if the header
+       contains an axis specification).
+     */
    UCS_string fun_header;
 
    /// the symbol for the function being edited
@@ -221,6 +229,10 @@ protected:
 
    /// true if the function was modified
    bool modified;
+
+   /// true if the function to be editied shall be closed immediately
+   /// after processing the first editor line.
+   bool trailing_nabla;
 
    /// true iff this function shall be closed
    bool do_close;

@@ -370,9 +370,13 @@ public:
            Unicode next()
               { Assert(pos < s.size());   return s[pos++]; }
 
-           /// undo a prior next();
-           void un_next()
-              { Assert(pos);   --pos; }
+           /// return the position of the next character
+           size_t get_pos() const
+              { return pos; }
+
+           /// set (restore) the position of the next character
+           void set_pos(int new_pos)
+              { Assert(new_pos < s.size());   pos = new_pos; }
 
            /// return true iff there are more chars available
            bool has_more() const

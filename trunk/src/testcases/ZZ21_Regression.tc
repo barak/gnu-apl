@@ -8,8 +8,8 @@ CLEAR WS
       ⍝
       ∇foo[⎕]∇
 DEFN ERROR+
-      ∇foo[⎕]
-            ^
+      ∇foo[⎕]∇
+             ^
 
       )FNS
 
