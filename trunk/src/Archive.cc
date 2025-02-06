@@ -462,7 +462,7 @@ const UserFunction * ufun = fun.get_func_ufun();
       }
    else        // primitive or quad function
       {
-        out << " fun-id=\"" << HEX(fun.get_Id());
+        out << " fun-id=\"" << HEX(fun.get_Id()) << "\"";
         return 1;   // one attribute
       }
 }
@@ -766,7 +766,6 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
                          Assert1(fun);
                          save_Function_name(*fun);
                        }
-                       out << "\"";
                        break;
 
         default:       FIXME;
