@@ -187,13 +187,13 @@ public:
    /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
    std::basic_string<const char *> expanded_args;
 
+   /// read a \b preference file and update parameters set there
+   void read_config_file(bool sys, bool log_startup);
+
 protected:
    /// constructor. Called before main() and initializes the default
    /// values for all user preferences.
    UserPreferences();
-
-   /// read a \b preference file and update parameters set there
-   void read_config_file(bool sys, bool log_startup);
 
    /// read a \b parallel_thresholds file and update parameters set there
    void read_threshold_file(bool sys, bool log_startup);

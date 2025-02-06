@@ -534,7 +534,7 @@ UTF8_string text;
    text.reserve(len);
    for (const char ** f = function_lines_utf8; *f; ++f)
       {
-        text.append(reinterpret_cast<const UTF8 *>(*f));
+        text.append_ASCII(*f);
         text += UNI_LF;
       }
 

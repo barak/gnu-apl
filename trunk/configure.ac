@@ -1033,4 +1033,10 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
+
+    Special Build targets:
+        Android:                 $apl_TARGET_ANDROID
+        Erlang:                  $apl_TARGET_ERLANG
+        libapl:                  $apl_TARGET_LIBAPL
+        Python:                  $apl_TARGET_PYTHON
 "])
