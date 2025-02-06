@@ -320,15 +320,22 @@ UCS_string::iterator c(first_command);
     */
    if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
       {
-        if (is_axis(c.rest()))   // new function header
+        if (is_axis(c.rest()))   // new function header, i.e. not a ∇-command
            {
+             // copy the rest to fun_header. After that, fun_header is
+             // ther entire first_command, but with its leading and
+             // trailing ∇s (and whitespaces) removed.
+             //
              while (c.has_more())   fun_header.append(c.next());
            }
       }
 
-   // at this point is fun_header either the entire header of a new function,
-   // oer else the function name of a supposedly  existing function.
-   //
+   /* at this point is fun_header either:
+
+      (a) the entire header of a new function, or else
+      (b) (only) the function name of a supposedly existing function. In
+          this case c.rest() shall empty or an ∇-command.
+    */
 const UserFunction_header hdr(fun_header, /* macro= */ false);
    if (hdr.get_error())
       {
@@ -384,6 +391,9 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
 
              // interactive
              {
+               const char * open_loc = open_existing_function();
+               if (open_loc)   return open_loc;
+
                if (hdr.has_vars())
                   {
                        // an existing function was opened with a header that
@@ -393,8 +403,6 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
                               "new function header";
                   }
 
-               const char * open_loc = open_existing_function();
-               if (open_loc)   return open_loc;
              }
              break;
 

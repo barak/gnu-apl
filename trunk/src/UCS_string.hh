@@ -364,19 +364,11 @@ public:
 
            /// return the next char (without pos increment)
            Unicode lookup() const
-              { Assert(pos < s.size());    return s[pos]; }
+              { Assert(has_more());    return s[pos]; }
 
            /// return the next char
            Unicode next()
-              { Assert(pos < s.size());   return s[pos++]; }
-
-           /// return the position of the next character
-           size_t get_pos() const
-              { return pos; }
-
-           /// set (restore) the position of the next character
-           void set_pos(int new_pos)
-              { Assert(new_pos < s.size());   pos = new_pos; }
+              { Assert(has_more());   return s[pos++]; }
 
            /// return true iff there are more chars available
            bool has_more() const
@@ -384,7 +376,7 @@ public:
 
         /// skip whitespace
         void skip_white()
-           { while (pos < s.size() && Avec::is_white(s[pos]))   ++pos; }
+           { while (has_more() && Avec::is_white(s[pos]))   ++pos; }
 
         /// the rest (starting at \b pos
         UCS_string rest() const

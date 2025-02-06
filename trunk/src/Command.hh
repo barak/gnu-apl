@@ -91,9 +91,14 @@ public:
    /// one user defined command
    struct user_command
       {
-        UCS_string prefix;         ///< the first characters of the command
-        UCS_string apl_function;   ///< APL function implementing the command
-        int        mode;           ///< how left arg of apl_function is computed
+        /// the first characters of the command
+        UCS_string prefix;
+
+        /// the APL function that implements the command
+        UCS_string apl_function;
+
+        /// how the left arg of \b apl_function is computed.
+        int mode;
       };
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)

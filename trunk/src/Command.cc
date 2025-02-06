@@ -179,7 +179,7 @@ Command::do_APL_command(ostream & out, UCS_string & line)
 {
    if (line.contains(UNI_COMMENT))   // unlikely, but valid
       {
-        loop(l, line.size())   // find ⍝
+        loop(l, line.size())   // find the leading ⍝
             {
               if (line[l] == UNI_COMMENT)   // found ⍝
                  {
@@ -650,14 +650,16 @@ const char * term = getenv("TERM");
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
+   // split arg into tokens separated by whitespace
+
 UCS_string_vector result;
    for (size_t idx = 0; ; )
       {
-        UCS_string token;
-        idx = arg.copy_black(token, idx);
-        if (token.size() == 0)   return result;
+        UCS_string token_ucs;
+        idx = arg.copy_black(token_ucs, idx);
+        if (token_ucs.size() == 0)   return result;
 
-        result.push_back(token);
+        result.push_back(token_ucs);
       }
 }
 //----------------------------------------------------------------------------
@@ -2411,14 +2413,14 @@ void
 Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                      UCS_string_vector & args)
 {
-   // ]USERCMD
-   // ]USERCMD REMOVE-ALL
-   // ]USERCMD REMOVE        ]existing-command
-   // ]USERCMD ]new-command  APL-fun
-   // ]USERCMD ]new-command  APL-fun  mode
-   // ]USERCMD ]new-command  { ... }
+   // case 1:    ]USERCMD
+   // case 2a:   ]USERCMD REMOVE-ALL
+   // case 2b:   ]USERCMD REMOVE        ]existing-command
+   // case 3a:   ]USERCMD ]new-command  APL-fun
+   // case 3b:   ]USERCMD ]new-command  APL-fun  mode
+   // case 3c:   ]USERCMD ]new-command  { ... }
    //
-   if (args.size() == 0)
+   if (args.size() == 0)   // case 1: list all commands
       {
         if (Workspace::get_user_commands().size())
            {
@@ -2434,14 +2436,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         return;
       }
 
-  if (args.size() == 1 && args.front().starts_iwith("REMOVE-ALL"))
+  if (args.size() == 1 && args.front().starts_iwith("REMOVE-ALL"))   // case 2a.
      {
        Workspace::get_user_commands().clear();
        out << "    All user-defined commands removed." << endl;
        return;
      }
 
-  if (args.size() == 2 && args.front().starts_iwith("REMOVE"))
+  if (args.size() == 2 && args.front().starts_iwith("REMOVE"))   // case 2b.
      {
        loop(u, Workspace::get_user_commands().size())
            {
@@ -2467,7 +2469,10 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
        return;
      }
 
-  // check if the user command is not followed by the string
+  // cases 3a, 2b, and 3c...
+  //
+
+  // check that the user command is not followed by the string
   if (args.size() == 1)
      {
         out << "BAD COMMAND+" << endl;
@@ -2489,7 +2494,7 @@ int mode = 0;
          // lambdas could contain spaces, collect all arguments in one string
          for (ShapeItem i = 1; i < args.size(); ++i)
             {
-               result << args[i];
+               result.append(args[i]);
             }
          // check if lamda-function closed properly
          if (result.back() == '}')
@@ -2589,8 +2594,17 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
                     UCS_string_vector & args, int uidx)
 {
+   /*
+      apl_cmd   is '' (due to line.clear() in Command::do_APL_command().
+      line      is the user input from (including) the command
+                                  to the end of the line.
+      cmd       is the command (first token in line)
+      args is the tokenized line
+    */
+
   if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
      {
+        // construct the left argument of the (dyadic) 'apl_function'
         apl_cmd.append_quoted(cmd);
         apl_cmd.append(UNI_SPACE);
         loop(a, args.size())

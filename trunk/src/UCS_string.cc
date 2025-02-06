@@ -594,8 +594,22 @@ UCS_string::split_ws(UCS_string & rest)
 size_t
 UCS_string::copy_black(UCS_string & dest, int idx) const
 {
+   // skip leading whitespace
+   //
    while (idx < size() && at(idx) <= ' ')   ++idx;
-   while (idx < size() && at(idx) >  ' ')   dest.append(at(idx++));
+
+bool single_quoted = false;
+bool double_quoted = false;
+   while (idx < size() && (at(idx) >  ' ' || single_quoted || double_quoted))
+         {
+           const Unicode uni = at(idx++);
+           dest.append(uni);
+           if (uni == UNI_SINGLE_QUOTE)   single_quoted = !single_quoted;
+           if (uni == UNI_DOUBLE_QUOTE)   double_quoted = !double_quoted;
+         }
+
+   // skip trailing whitespace
+   //
    while (idx < size() && at(idx) <= ' ')   ++idx;
    return idx;
 }
