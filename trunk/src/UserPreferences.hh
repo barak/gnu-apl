@@ -118,10 +118,10 @@ public:
 
    /// true if old-style multi-line strings are allowed (in ∇-defined
    /// functions)
-   bool multi_line_strings;
+   bool old_multi_line_strings;
 
    /// true if new-style multi-line strings are allowed
-   bool multi_line_strings_3;
+   bool new_multi_line_strings;
 
    /// when function body shall go into the history
    int nabla_to_history;

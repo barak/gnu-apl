@@ -634,7 +634,10 @@ bool got_end = false;
          else if (uni == UNI_LF)          // end of line before "
             {
               rest_2 = src.rest_len();
-              Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+              if (UserPreferences::uprefs.old_multi_line_strings)
+                 break;   // while (src.has_more())
+              else
+                 Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else if (uni == UNI_BACKSLASH)   // backslash
             {
@@ -662,11 +665,13 @@ bool got_end = false;
             }
        }
 
-   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
-
-   else
+   if (got_end || UserPreferences::uprefs.old_multi_line_strings)
       {
         tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
+      }
+   else
+      {
+        Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
       }
 }
 //----------------------------------------------------------------------------

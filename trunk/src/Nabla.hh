@@ -170,11 +170,11 @@ protected:
    /// create a new function.
    const char * open_new_function();
 
+   /// open an existing function, or create a new one.
+   const char * open_existing_function(const UCS_string & name);
+
    /// return true if \b ucs starts with an axis
    static bool is_axis(const UCS_string & ucs);
-
-   /// open an existing function, or create a new one.
-   const char * open_existing_function();
 
    /// parse [nn.mm] into a LineLabel;
    LineLabel parse_lineno(UCS_string::iterator & c);

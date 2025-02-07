@@ -71,8 +71,8 @@ UserPreferences::UserPreferences()
      line_history_len(500),
      line_history_path(".apl.history"),
      mem_arg(0),
-     multi_line_strings(true),
-     multi_line_strings_3(true),
+     old_multi_line_strings(true),
+     new_multi_line_strings(true),
      nabla_to_history(1),   // if function was modified
      output_to_cout(false),
      randomize_testfiles(false),
@@ -1614,16 +1614,16 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
             {
-              multi_line_strings = yes;
-              multi_line_strings_3 = yes;
+              old_multi_line_strings = yes;
+              new_multi_line_strings = yes;
             }
          else if (!strcasecmp(opt, "NEW-MULTI-LINE-STRINGS"))
             {
-              multi_line_strings_3 = yes;
+              new_multi_line_strings = yes;
             }
          else if (!strcasecmp(opt, "OLD-MULTI-LINE-STRINGS"))
             {
-              multi_line_strings = yes;
+              old_multi_line_strings = yes;
             }
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {

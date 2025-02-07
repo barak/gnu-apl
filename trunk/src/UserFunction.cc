@@ -841,7 +841,7 @@ UCS_string_vector original_text;
    //
    clear_body();
 
-   if (UserPreferences::uprefs.multi_line_strings_3)   // new-style multi-line
+   if (UserPreferences::uprefs.new_multi_line_strings)
       {
         for (int li = 1; li < get_text_size(); ++li)
             {
@@ -861,7 +861,7 @@ UCS_string_vector original_text;
             }
       }
 
-   if (UserPreferences::uprefs.multi_line_strings)     // old-style multi-line
+   if (UserPreferences::uprefs.old_multi_line_strings)
       {
         for (int li = 1; li < get_text_size(); ++li)
             {

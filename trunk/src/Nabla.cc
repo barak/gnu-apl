@@ -253,44 +253,34 @@ const char *
 Nabla::start()
 {
    /* This function parses member 'first_command', which is the line with
-      which the ∇-editor was started. There are 3 valid cases:
+      which the ∇-editor was started. There are 4 valid cases:
 
-      1.   ∇FUN...          where FUN EXISTS,
-      2a.  ∇FUN...          where FUN is new,
-      2b.  ∇A FUN...        where FUN is new,
-      2c.  ∇A (LO FUN ...   where FUN is new,
+      1a. ... FUN[X]   where X is an axis (and therefore FUN is new)
+      1b. ... FUN ...  where FUN is new
+      1c. ... FUN ...  where FUN exists, but in script
+      2.  ... FUN ...  where FUN exists
+
+      Cases 1a. and 1b. create a new function.
+      Case  1c. overwrites an existing function.
+      Case  2.  starts editing of an existing function.
+
+      start() returns 0 on success or a short error description on failure.
     */
 
    // skip (and remember) trailing ∇ (if any)
    //
-   trailing_nabla = false;
    first_command.remove_trailing_whitespaces();
+   trailing_nabla = false;
    if (first_command.back() == UNI_NABLA)
       {
         first_command.pop_back();
         trailing_nabla = true;
+        do_close = true;
       }
-
-   // distinguish cases 1. vs. 2a.-2c. and set 'function_existed' accordingly
-   //
-   {
-     function_existed = false;   // assume function exists (case 1. above)
-     if (const Symbol * fun = Workspace::lookup_existing_symbol(first_command))
-        {
-          // a symbol with that name exists...
-          //
-          if (fun->get_NC() & NC_FUN_OPER)   // and is a function or an operator
-             {
-               // the first symbol is an (existing) function or operator.
-               //
-               function_existed = true;
-             }
-        }
-   }
 
 UCS_string::iterator c(first_command);
 
-   // skip leading spaces
+   // skip any leading spaces
    //
    c.skip_white();
 
@@ -302,54 +292,68 @@ UCS_string::iterator c(first_command);
    //
    c.skip_white();
 
-   // function header... Copy the leftmost name. The name may be the name of
-   // the function to be edited, or maybe the left variable of a dyadic
-   // function or operator header.
+   // function header... Copy anything, but stop at '[' (if present).
    //
-   while (c.has_more() && c.lookup() != UNI_L_BRACK)
-         fun_header.append(c.next());
+   while (c.has_more() && c.lookup() != UNI_L_BRACK)   fun_header += c.next();
+   c.skip_white();
 
-   /* at this point there could be an axis specification [X] that
-      could be confused with an operation like [⎕]. We take the first char
-      after the [ to decide if there is an axis or a ∇-operation like [⎕].
+   /* at this point there could be an axis specification [X] or
+      a ∇-operation like [⎕] or [N]...
 
       For example:
 
-          ∇FOO[X] B : [ starts axis
-          ∇FOO[⎕]   : [ starts ∇operation [⎕] (display)
+          ∇FOO[X] B   : the '[' starts an axis specification
+          ∇FOO[⎕]     : the '[' starts a ∇-operation [⎕] (display)
+          ∇FOO[2] ⍴B  : the '[' starts a ∇-operation [2] (change line 2)
+
+      We first handle (and rule out) the axis case
     */
-   if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
+   if (c.has_more()              &&
+       c.lookup() == UNI_L_BRACK &&
+       is_axis(c.rest()))
       {
-        if (is_axis(c.rest()))   // new function header, i.e. not a ∇-command
+        /* new function header, i.e. not a ∇-command. Copy the rest to
+           fun_header. After that, fun_header is
+           ther entire first_command, but with its leading and
+           trailing ∇s (and whitespaces) removed.
+         */
+        while (c.has_more())   fun_header.append(c.next());
+        if (InputFile::running_script() || !function_existed)   // case 1a.
            {
-             // copy the rest to fun_header. After that, fun_header is
-             // ther entire first_command, but with its leading and
-             // trailing ∇s (and whitespaces) removed.
-             //
-             while (c.has_more())   fun_header.append(c.next());
+             if (const char * loc = open_new_function())   return loc;
+             return 0;
            }
       }
 
-   /* at this point is fun_header either:
+   /* at this point fun_header is either:
 
       (a) the entire header of a new function, or else
       (b) (only) the function name of a supposedly existing function. In
-          this case c.rest() shall empty or an ∇-command.
-    */
-const UserFunction_header hdr(fun_header, /* macro= */ false);
-   if (hdr.get_error())
-      {
-         static char cc[200];
-         SPRINTF(cc, "Bad function header: %s", hdr.get_error_info());
-         return cc;
-      }
+          this case c.rest() shall be empty or an ∇-command.
 
-   fun_symbol = Workspace::lookup_symbol(hdr.get_name());
-   Assert(fun_symbol);
+      The name of the function to be edited could be anywhere in 'fun_header'.
+      We therefore parse 'fun_header' into 'hdr' and then fetch the name from
+      'hdr'.
+    */
+bool hdr_has_vars;
+   {
+     const UserFunction_header hdr(fun_header, /* macro= */ false);
+     if (hdr.get_error())
+        {
+           static char cc[200];
+           SPRINTF(cc, "Bad function header: %s", hdr.get_error_info());
+           return cc;
+        }
+
+     hdr_has_vars = hdr.has_vars();
+     fun_symbol = Workspace::lookup_symbol(hdr.get_name());
+     Assert(fun_symbol);
+   }
 
    if (fun_header.size() == 0)   return "no function name";
 
-   // optional operation
+   // optional ∇-operation. The case where '[' starts a header was already
+   // handled above.
    //
    if (c.has_more() && c.lookup() == UNI_L_BRACK)
       {
@@ -367,6 +371,9 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
    switch(fun_symbol->get_NC())
       {
         case NC_UNUSED_USER_NAME:   // open a new function
+             // this is the case where a new function or operator shall be
+             // defined, and the new function or operator has no axis.
+             //
              function_existed = false;
              modified = true;
              {
@@ -374,44 +381,45 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
                //
                if (ecmd != ECMD_NOP)   return "∇-command in new function";
 
-               const char * open_loc = open_new_function();
-               if (open_loc)   return open_loc;
+               // case 1b.
+               if (const char * loc = open_new_function())   return loc;
              }
              break;
 
         case NC_FUNCTION:
-        case NC_OPERATOR:   // open an existing function
+        case NC_OPERATOR:           // open an existing function
              function_existed = true;
              if (InputFile::running_script())   // script
                 {
-                  const char * open_loc = open_new_function();
-                  if (open_loc)   return open_loc;
+                  // case 1c.
+                  if (const char * loc = open_new_function())   return loc;
                   break;   // continue below
                 }
 
-             // interactive
-             {
-               const char * open_loc = open_existing_function();
-               if (open_loc)   return open_loc;
+             // interactive.
+             //
+             // case 2.
+             if (const char * loc =
+                              open_existing_function(fun_symbol->get_name()))
+                return loc;
 
-               if (hdr.has_vars())
-                  {
-                       // an existing function was opened with a header that
-                       // contains more than the function name.
-                       //
-                       return "attempt to ∇-open existing function with "
-                              "new function header";
-                  }
+             if (hdr_has_vars)
+                {
+                  // an existing function was opened with a header that
+                  // contains more than the function name.
+                  //
+                  return "attempt to ∇-open existing function with "
+                              "a new function header";
+                }
 
-             }
              break;
 
         default:
-             return "attempt to ∇-open a variable at " LOC;
+             return "attempt to ∇-open a non-function at " LOC;
       }
 
    // at this point the (new or existing) function was successfully opened.
-   // That means that at least the header is present (lines.size() > 0)
+   // That means that at least the header was present (lines.size() > 0)
 
    // immediate close (only show command is allowed here),
    // e.g. ∇fun[⎕]∇
@@ -426,11 +434,9 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
          */
          while (c.has_more())   current_text += c.next();
          execute_oper();
-         do_close = trailing_nabla;
          return 0;   // OK
       }
 
-   do_close = trailing_nabla;
    if (c.has_more())
       {
         if (ecmd == ECMD_NOP)    return 0;
@@ -449,7 +455,8 @@ const UserFunction_header hdr(fun_header, /* macro= */ false);
 bool
 Nabla::is_axis(const UCS_string & ucs)
 {
-   // ucs was checked to start with with '['.
+   // ucs was checked to start with with '['. Return true iff the '['
+   // is the start of an axis specification such as [ Name ]
    //
 UCS_string::iterator c(ucs);
    Assert(c.has_more() && c.lookup() == UNI_L_BRACK);   // [
@@ -687,19 +694,18 @@ const char *
 Nabla::open_new_function()
 {
    Log(LOG_nabla)
-      UERR << "creating new function '" << fun_symbol->get_name() 
-           << "' with header '" << fun_header << "'" << endl;
+      UERR << "creating new function with header '"
+           << fun_header << "'" << endl;
 
    lines.push_back(FunLine(0, fun_header));
    return 0;
 }
 //----------------------------------------------------------------------------
 const char *
-Nabla::open_existing_function()
+Nabla::open_existing_function(const UCS_string & name)
 {
    Log(LOG_nabla)
-      UERR << "opening existing function '" << fun_symbol->get_name()
-           << "'" << endl;
+      UERR << "opening existing function '" << name << "'" << endl;
 
    if (const char * why = fun_symbol->cant_be_defined())   return why;
 
@@ -889,7 +895,7 @@ Nabla::execute_edit()
    //
    if (current_text.size() == 0)   // empty line (we MAY need it)
       {
-        if (!UserPreferences::uprefs.multi_line_strings_3)
+        if (!UserPreferences::uprefs.new_multi_line_strings)
            return 0;   // we do not
         if (out_of_order)
            return 0;   // we do not;
@@ -949,7 +955,7 @@ const char *
 Nabla::edit_body_line()
 {
 UCS_string parse_text = current_text;   // a copy that can be modified.
-   if (UserPreferences::uprefs.multi_line_strings_3)
+   if (UserPreferences::uprefs.new_multi_line_strings)
       {
         // figure the multi-line status from all lines before current_line
         bool multi = false;
@@ -985,7 +991,8 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
         Token_string in;
 
         ErrorCode ec = parser.parse(parse_text, in, true);
-        if (ec == E_NO_STRING_END && UserPreferences::uprefs.multi_line_strings)
+        if ((ec == E_NO_STRING_END) &&
+            UserPreferences::uprefs.old_multi_line_strings)
            {
              ec = E_NO_ERROR;
              Workspace::more_error().clear();
