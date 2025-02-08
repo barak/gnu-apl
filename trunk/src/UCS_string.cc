@@ -46,31 +46,31 @@ UCS_string::UCS_string()
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : basic_string<Unicode>(1, uni)
+   : basic_string<Unicode, Unicode_traits>(1, uni)
 {
   create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : basic_string<Unicode>(data, len)
+   : basic_string<Unicode, Unicode_traits>(data, len)
 {
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : basic_string<Unicode>(len, uni)
+   : basic_string<Unicode, Unicode_traits>(len, uni)
 {
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : basic_string<Unicode>(ucs)
+   : basic_string<Unicode, Unicode_traits>(ucs)
 {
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : basic_string<Unicode>(ucs, pos, len)
+   : basic_string<Unicode, Unicode_traits>(ucs, pos, len)
 {
    create(LOC);
 }
@@ -570,7 +570,7 @@ int count = 0;
 
    if (count == 0)        return;      // no leading whitspaces
    if (count == size())   clear();     // only whitespaces
-   else                   basic_string::erase(0, count);
+   else                   basic_string<Unicode, Unicode_traits>::erase(0, count);
 }
 //----------------------------------------------------------------------------
 void
@@ -1027,7 +1027,7 @@ UCS_string::append_shape(const Shape & shape)
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::append_members(const basic_string<const UCS_string *> & members,
+UCS_string::append_members(const vector<const UCS_string *> & members,
                            int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)

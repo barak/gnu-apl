@@ -372,7 +372,7 @@ sockaddr_in local;
 //----------------------------------------------------------------------------
 /// initialize the interpreter
 int
-init_apl(const std::basic_string<const char *> & args)
+init_apl(const std::vector<const char *> & args)
 {
    {
      // make curses happy
@@ -614,7 +614,8 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 int
 main(int argc, const char *argv[])
 {
-const std::basic_string<const char *> args(argv, argc);
+std::vector<const char *> args(argc);
+   loop(a, argc)   args[a] = argv[a];
    if (const int ret = init_apl(args))   return ret;
 
    if (UserPreferences::uprefs.eval_exprs.size())

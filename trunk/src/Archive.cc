@@ -519,7 +519,7 @@ XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
    Log(LOG_archive)   CERR << "save_symtab()" << endl;
 
-std::basic_string<const Symbol *> symbols = symtab.get_all_symbols();
+std::vector<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //

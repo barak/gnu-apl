@@ -57,7 +57,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
         }
     }
 
-    std::basic_string<const Symbol *> symbols = Workspace::get_all_symbols();
+    std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
     loop(i, symbols.size())
         {
           const Symbol * symbol = symbols[i];

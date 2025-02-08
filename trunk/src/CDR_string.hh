@@ -72,7 +72,7 @@ public:
    CDR_string(const uint8_t * data, int len)
       { loop(l, len)   push_back(*data++); }
 
-  /// overload basic_string::size() so that it returns a signed length
+  /// overload vector::size() so that it returns a signed length
    ShapeItem size() const
       { return  UTF8_string::size(); }
 

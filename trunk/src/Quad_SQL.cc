@@ -34,8 +34,8 @@
 #include "Security.hh"
 
 // !!! declare providers before Quad_SQL::_fun !!!
-static std::basic_string<Provider *> providers;
-static std::basic_string<Connection *> connections;
+static std::vector<Provider *> providers;
+static std::vector<Connection *> connections;
 
 Quad_SQL  Quad_SQL::fun;
 

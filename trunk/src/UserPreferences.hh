@@ -41,7 +41,7 @@ class UserPreferences
 public:
   /// collect all user preferences (from command line arguments and from
   /// preferences file). Return \b true iff start-up logging was requested.
-  bool collect_preferences(const std::basic_string<const char *> & args);
+  bool collect_preferences(const std::vector<const char *> & args);
 
    /// append test results to summary.log rather than overriding it
    bool append_summary;
@@ -87,10 +87,10 @@ public:
    bool emacs_mode;
 
    /// expand lumped arguments
-   void expand_args(const std::basic_string<const char *> & args);
+   void expand_args(const std::vector<const char *> & args);
 
    /// --eval expressions
-   std::basic_string<const char *> eval_exprs;
+   std::vector<const char *> eval_exprs;
 
    /// initial value of ⎕PW
    int initial_PW;
@@ -185,7 +185,7 @@ public:
 
    /// args after expand_args(). The strings in \b expanded_args are
    /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
-   std::basic_string<const char *> expanded_args;
+   std::vector<const char *> expanded_args;
 
    /// read a \b preference file and update parameters set there
    void read_config_file(bool sys, bool log_startup);
@@ -213,7 +213,7 @@ protected:
    /// parse the original command line arguments to figure if start-up logging
    /// is desired (BEFORE any expansions). Parses (only) the -l option.
    /// Return true iff startup-logging (aka. -l 37) was requested.
-   bool parse_args_0(const std::basic_string<const char *> & args);
+   bool parse_args_0(const std::vector<const char *> & args);
 
    /// parse \b expanded_args (BEFORE reading preference
    /// files). Parses the -l, -p, -C, and -u options. Return true iff
@@ -243,7 +243,7 @@ protected:
                              ShapeItem threshold);
 
   /// print \b args
-  static void show_args(const std::basic_string<const char *> & args);
+  static void show_args(const std::vector<const char *> & args);
 
    /// return " (default)" if yes is true
    static const char * is_default(bool yes)

@@ -29,9 +29,9 @@
 #include "Value.hh"
 
 size_t N;
-basic_string<int> Quad_RVAL::desired_ranks;
+vector<int> Quad_RVAL::desired_ranks;
 Shape       Quad_RVAL::desired_shape;
-basic_string<int> Quad_RVAL::desired_types;
+vector<int> Quad_RVAL::desired_types;
 int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
 size_t      Quad_RVAL::N = 256;
@@ -91,9 +91,9 @@ ShapeItem ec_B = B.element_count();
 
    // save properties so that we can restore them
    //
-basic_string<int> old_desired_ranks = desired_ranks;
+vector<int> old_desired_ranks = desired_ranks;
 Shape old_desired_shape = desired_shape;
-basic_string<int> old_desired_types = desired_types;
+vector<int> old_desired_types = desired_types;
 int old_desired_maxdepth = desired_maxdepth;
 bool need_restore = false;
 
@@ -159,7 +159,7 @@ Shape shape;
 
    for (sRank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
-         basic_string<int> vsh_r;
+         vector<int> vsh_r;
          vsh_r.push_back(desired_shape.get_shape_item(r));
          const int sh_r = choose_integer(vsh_r);
          shape.add_shape_item(sh_r);
@@ -383,7 +383,7 @@ Value_P Z(desired_ranks.size(), LOC);
       }
    else if (B.element_count())   // distribution of ranks
       {
-        basic_string<int>new_ranks;
+        vector<int>new_ranks;
         loop(b, B.element_count())
             {
               const int rank_b = B.get_cravel(b).get_int_value();
@@ -472,7 +472,7 @@ Value_P Z(desired_types.size(), LOC);
 
    if (B.element_count())   // distribution of depths
       {
-        basic_string<int>new_types;
+        vector<int>new_types;
         bool B_has_simple = false;
         loop(b, B.element_count())
             {
@@ -527,7 +527,7 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
 }
 //----------------------------------------------------------------------------
 int
-Quad_RVAL::choose_integer(const basic_string<int> & dist)
+Quad_RVAL::choose_integer(const vector<int> & dist)
 {
 const int n = dist.size();
    Assert(n > 0);

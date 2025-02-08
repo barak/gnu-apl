@@ -974,7 +974,7 @@ const int grid_style = w_props.get_gridX_style();
                Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
    }
 
-basic_string<double> xvals;
+vector<double> xvals;
 const Plot_data & data = w_props.get_plot_data();
    loop(r, data.get_row_count())
       {

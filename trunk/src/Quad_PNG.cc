@@ -141,7 +141,7 @@ struct PNG_context
 int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
-static basic_string<PNG_context *> all_PNG_contexts;
+static vector<PNG_context *> all_PNG_contexts;
 //-----------------------------------------------------------------------------
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)

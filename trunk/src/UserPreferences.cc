@@ -95,8 +95,7 @@ UserPreferences::UserPreferences()
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::collect_preferences(const std::basic_string<const char *>
-                                     & args)
+UserPreferences::collect_preferences(const std::vector<const char *> & args)
 {
 const bool log_startup0 = parse_args_0(args);
    if (LOG_argc_argv || log_startup0)
@@ -139,7 +138,7 @@ const bool log_startup = parse_args_1() || log_startup0;
 //----------------------------------------------------------------------------
 /// print args
 void
-UserPreferences::show_args(const std::basic_string<const char *> & args)
+UserPreferences::show_args(const std::vector<const char *> & args)
 {
    CERR << "argc: " << args.size() << endl;
    loop(a, args.size())   CERR << "  args[" << a << "]: '"
@@ -319,7 +318,7 @@ const size_t len = read(fd, buf, sizeof(buf));
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::parse_args_0(const std::basic_string<const char *> & args)
+UserPreferences::parse_args_0(const std::vector<const char *> & args)
 {
    for (size_t a = 1; a < (args.size() - 1); ++a)
        {
@@ -1007,7 +1006,7 @@ UserPreferences::parse_args_2(bool logit)
 
  **/
 void
-UserPreferences::expand_args(const std::basic_string<const char *> & args)
+UserPreferences::expand_args(const std::vector<const char *> & args)
 {
    // 1. copy the command line arguments into expanded_args.
    //
