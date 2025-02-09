@@ -1393,16 +1393,14 @@ bool left_col = true;
 
   if (Workspace::get_user_commands().size())
      {
-       out << endl << "User defined commands:" << endl;
-       loop(u, Workspace::get_user_commands().size())
+       out << endl << endl << "User defined commands:" << endl;
+       for (size_t u = Workspace::get_user_commands().size(); u; )
            {
-             out << "      " << Workspace::get_user_commands()[u].prefix
-                 << " [args]  calls:  ";
-             if (Workspace::get_user_commands()[u].mode)
-                out << "tokenized-args ";
+             const user_command & ucmd = Workspace::get_user_commands()[--u];
+             out << "      " << ucmd.prefix << " [args]  calls:  ";
+             if (ucmd.mode)   out << "tokenized-args ";
  
-             out << Workspace::get_user_commands()[u].apl_function
-                 << " quoted-args" << endl;
+             out << ucmd.apl_function << " (quoted-args)" << endl;
            }
      }
 
@@ -2424,13 +2422,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
       {
         if (Workspace::get_user_commands().size())
            {
-             loop(u, Workspace::get_user_commands().size())
+             for (size_t u = Workspace::get_user_commands().size(); u;)
                 {
-                  out << Workspace::get_user_commands()[u].prefix << " → ";
-                  if (Workspace::get_user_commands()[u].mode)   out << "A ";
-                  out << Workspace::get_user_commands()[u].apl_function << " B"
-                      << " (mode " << Workspace::get_user_commands()[u].mode
-                      << ")" << endl;
+                  const user_command & ucmd =
+                                       Workspace::get_user_commands()[--u];
+                  out << setw(12) << ucmd.prefix << " → ";
+                  if (ucmd.mode)   out << "A ";   // if dyadic
+                  out << ucmd.apl_function << " B"
+                      << " (mode " << ucmd.mode << ")" << endl;
                 }
            }
         return;
@@ -2476,8 +2475,9 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
   if (args.size() == 1)
      {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "user command syntax in ]USERCMD:"
-                        " ]new-command  APL-fun  [mode]";
+        MORE_ERROR() << "The user command syntax is: ]USERCMD "
+                        " ]new-command  APL-function [mode]";
+
         return;
      }
 
@@ -2522,6 +2522,7 @@ int mode = 0;
       }
 
    // check mode
+   //
    if (!is_lambda && args.size() == 3)   mode = args[2].atoi();
    if (mode < 0 || mode > 1)
       {
@@ -2582,8 +2583,24 @@ int mode = 0;
             }
       }
 
-user_command new_user_command = { command_name, apl_fun, mode };
-   Workspace::get_user_commands().push_back(new_user_command);
+const user_command new_user_command = { command_name, apl_fun, mode };
+
+   // keep user commands sorted by command_name
+   //
+vector<user_command> & user_commands = Workspace::get_user_commands();
+bool inserted = false;
+   loop(u, user_commands.size())
+       {
+         const Comp_result comp = user_commands[u].prefix.compare(command_name);
+         if (comp == COMP_LT)
+            {
+              user_commands.insert(user_commands.begin() + u, new_user_command);
+              inserted = true;
+              break;
+            }
+      }
+
+   if (!inserted)   user_commands.push_back(new_user_command);
 
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
