@@ -312,13 +312,29 @@ UCS_string::iterator c(first_command);
        c.lookup() == UNI_L_BRACK &&
        is_axis(c.rest()))
       {
-        /* new function header, i.e. not a ∇-command. Copy the rest to
-           fun_header. After that, fun_header is
-           ther entire first_command, but with its leading and
+        /* new function header, i.e. not a ∇-command. Restore the symbol name
+           name left of [ ]. The possible cases are
+
+                 FOO [...]
+               A FOO [...]
+             (LO)FOO [...]
+           A (LO)FOO [...]
+
+           move backwards, skipping the whitespace between FOO and [...]
+         */
+        size_t end = c.get_pos();
+        while (end && first_command[end - 1] == UNI_SPACE)   --end;
+        size_t pos = end;
+        while (pos && Avec::is_symbol_char(first_command[pos-1]))   --pos;
+        const UCS_string function_name(first_command, pos, end - pos);
+        fun_symbol = Workspace::lookup_symbol(function_name);
+
+        /* Copy the rest to fun_header. After that, fun_header is
+           the entire first_command, but with its leading and
            trailing ∇s (and whitespaces) removed.
          */
         while (c.has_more())   fun_header.append(c.next());
-        if (InputFile::running_script() || !function_existed)   // case 1a.
+        if (InputFile::running_script())   // case 1a.
            {
              if (const char * loc = open_new_function())   return loc;
              return 0;
@@ -374,7 +390,6 @@ bool hdr_has_vars;
              // this is the case where a new function or operator shall be
              // defined, and the new function or operator has no axis.
              //
-             function_existed = false;
              modified = true;
              {
                // a new function must not have a command
@@ -388,7 +403,6 @@ bool hdr_has_vars;
 
         case NC_FUNCTION:
         case NC_OPERATOR:           // open an existing function
-             function_existed = true;
              if (InputFile::running_script())   // script
                 {
                   // case 1c.
@@ -697,6 +711,7 @@ Nabla::open_new_function()
       UERR << "creating new function with header '"
            << fun_header << "'" << endl;
 
+   function_existed = false;
    lines.push_back(FunLine(0, fun_header));
    return 0;
 }
@@ -707,6 +722,7 @@ Nabla::open_existing_function(const UCS_string & name)
    Log(LOG_nabla)
       UERR << "opening existing function '" << name << "'" << endl;
 
+   function_existed = true;
    if (const char * why = fun_symbol->cant_be_defined())   return why;
 
    // this function must only be called when editing functions interactively
@@ -1052,7 +1068,7 @@ Nabla::execute_escape()
    // the user has entered [→].
    //
    // Note that fun_symbol and fun_symbol->get_function() may both be valid
-   // even though the function is "fresh". We use function_existed imstead.
+   // even though the function is "fresh". We use function_existed instead.
    //
    lines.clear();
 

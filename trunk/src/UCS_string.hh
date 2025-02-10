@@ -433,6 +433,10 @@ public:
            Unicode next()
               { Assert(has_more());   return s[pos++]; }
 
+           /// return the iterator position in the underlying string
+           int get_pos() const
+              { return pos; }
+
            /// return true iff there are more chars available
            bool has_more() const
               { return pos < s.size(); }
