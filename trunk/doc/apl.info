@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 12, 2025.  This manual briefly documents GNU APL, an interpreter
-for APL as described in ISO standard 13751, aka.  "Programming Language
-APL, Extended".
+February 11, 2025.  This manual briefly documents GNU APL, an
+interpreter for APL as described in ISO standard 13751, aka.
+"Programming Language APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -1118,9 +1118,9 @@ mode because they could easily be entered by mistake (by simply
 forgetting the terminating " or ’ of a standard string) and that would
 have obscured the familiar behavior of immediate execution mode.  In
 function definition mode, the total number of function lines is known
-and it can therefore check if a multi-line string inside the function is
-properly terminated.  Immediate execution mode, however, is open-ended
-and therefore a forgotten closing " can lead to a fatal
+and it can therefore be checked if a multi-line string inside the
+function is properly terminated.  Immediate execution mode, however, is
+open-ended and therefore a forgotten closing " can lead to a fatal
 misinterpretation of (intended) string content as (unintended) APL code,
 with lots of nonsense error messages.
 
@@ -8129,68 +8129,68 @@ Node: Subsection 2.1.328579
 Node: Subsection 2.1.434362
 Node: Subsection 2.1.538158
 Node: Subsection 2.1.639018
-Node: Subsection 2.1.747113
-Node: Subsection 2.1.848846
-Node: Section 2.252162
-Node: Section 2.352921
-Node: Section 2.458545
-Node: Section 2.559817
-Node: Section 2.664247
-Node: Section 2.764420
-Node: Section 2.865050
-Node: Section 2.969254
-Node: Section 2.1071595
-Node: Section 2.1173684
-Node: Section 2.1275233
-Node: Section 2.1377014
-Node: Section 2.1478943
-Node: Section 2.1579884
-Node: Section 2.1680135
-Node: Section 2.1781531
-Node: Section 2.1891987
-Node: Section 2.1994475
-Node: Section 2.20101201
-Node: Section 2.21102704
-Node: Section 2.22113195
-Node: Section 2.23119077
-Node: Section 2.24122335
-Node: Section 2.25122626
-Node: Section 2.26133467
-Node: Section 2.27133739
-Node: Section 2.28140318
-Node: Section 2.29142772
-Node: Section 2.30143441
-Node: Section 2.31145092
-Node: Section 2.32148867
-Node: Section 2.33162356
-Node: Output File Format178487
-Node: Section 2.34179662
-Node: Section 2.35189012
-Node: Section 2.36190031
-Node: Section 2.37204712
-Node: Section 2.38215708
-Node: Section 2.39220410
-Node: Section 2.40222506
-Node: Section 2.41226924
-Node: Section 2.42248234
-Node: Section 2.43259150
-Node: Chapter 3262324
-Node: Chapter 4264832
-Node: Chapter 5265958
-Node: Section 5.1267495
-Node: Section 5.2268775
-Node: Section 5.3269135
-Node: Section 5.4269377
-Node: Section 5.5270039
-Node: Section 5.6270517
-Node: Section 5.7271290
-Node: Section 5.8271716
-Node: Chapter 6272118
-Node: Section 6.1272537
-Node: Section 6.2273224
-Node: Chapter 7274055
-Node: Section 7.1274558
-Node: Section 7.2299871
+Node: Subsection 2.1.747118
+Node: Subsection 2.1.848851
+Node: Section 2.252167
+Node: Section 2.352926
+Node: Section 2.458550
+Node: Section 2.559822
+Node: Section 2.664252
+Node: Section 2.764425
+Node: Section 2.865055
+Node: Section 2.969259
+Node: Section 2.1071600
+Node: Section 2.1173689
+Node: Section 2.1275238
+Node: Section 2.1377019
+Node: Section 2.1478948
+Node: Section 2.1579889
+Node: Section 2.1680140
+Node: Section 2.1781536
+Node: Section 2.1891992
+Node: Section 2.1994480
+Node: Section 2.20101206
+Node: Section 2.21102709
+Node: Section 2.22113200
+Node: Section 2.23119082
+Node: Section 2.24122340
+Node: Section 2.25122631
+Node: Section 2.26133472
+Node: Section 2.27133744
+Node: Section 2.28140323
+Node: Section 2.29142777
+Node: Section 2.30143446
+Node: Section 2.31145097
+Node: Section 2.32148872
+Node: Section 2.33162361
+Node: Output File Format178492
+Node: Section 2.34179667
+Node: Section 2.35189017
+Node: Section 2.36190036
+Node: Section 2.37204717
+Node: Section 2.38215713
+Node: Section 2.39220415
+Node: Section 2.40222511
+Node: Section 2.41226929
+Node: Section 2.42248239
+Node: Section 2.43259155
+Node: Chapter 3262329
+Node: Chapter 4264837
+Node: Chapter 5265963
+Node: Section 5.1267500
+Node: Section 5.2268780
+Node: Section 5.3269140
+Node: Section 5.4269382
+Node: Section 5.5270044
+Node: Section 5.6270522
+Node: Section 5.7271295
+Node: Section 5.8271721
+Node: Chapter 6272123
+Node: Section 6.1272542
+Node: Section 6.2273229
+Node: Chapter 7274060
+Node: Section 7.1274563
+Node: Section 7.2299876
 
 End Tag Table
 

@@ -619,10 +619,11 @@ UserFunction::transform_old_multi_lines()
 
     into:
 
-    [k+1] PREFIX "L1\nL2\n ... LN" SUFFIX
-//  [k+1] PREFIX "L1" "L2" ... "LN" SUFFIX
+    [k+1] PREFIX "L1" "L2" ... "LN" SUFFIX
     [...] (empty)
     [k+N] (empty)
+
+    The result is nested.
    */
 
 enum Line_status
@@ -668,38 +669,24 @@ Line_status current = APL_text;
          return E_DEFN_ERROR;
       }
 
-   // 2. modify lines according to their state...
+   // 2. modify lines...
    //
-   for (int lnum = 1; lnum < get_text_size();)
+   for (int line_number = 1; line_number < get_text_size();)
        {
-         if (status[lnum] == APL_text)   // "normal" APL line (even # of quotes)
-            {
-              ++lnum;
-              continue;
-            }
-
-         const int start_line_number = lnum;
-
-         // copy the first line as is.
-         // The last " in the first line will open the string.
-         //
-         Assert1(status[lnum] == Start_of_string);
-         UCS_string accu(get_text(lnum++));
-
-         // copy the subsequent lines with " escaped...
-         //
-         while (status[lnum] == Inside_string)   // then: " → \"
+         if (status[line_number] == APL_text)   { ++line_number;   continue; }
+         const int start_line_number = line_number;
+         Assert1(status[line_number] == Start_of_string);
+         UCS_string accu = get_text(line_number++);
+         accu << "\" ";
+         while (status[line_number] == Inside_string)
                {
-                 accu << "\\n" << get_text(lnum).do_escape(true);
-                 clear_text(lnum++);
+                 accu << " \"" << get_text(line_number).do_escape(true) << "\"";
+                 clear_text(line_number++);
                }
-         // copy the last line as is.
-         // The first " in the last line will close the string.
-         //
-         Assert(status[lnum] == End_of_string);
-         accu << "\\n" << get_text(lnum);
+         Assert(status[line_number] == End_of_string);
+         accu << "\"" << get_text(line_number);
          set_text(start_line_number, accu);
-         clear_text(lnum++);
+         clear_text(line_number++);
        }
 
    // remove trailing empty lines...
@@ -707,7 +694,7 @@ Line_status current = APL_text;
    while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
          text.pop_back();
 
-// CERR << "SHOW:" << endl;
+// CERR << endl;
 // loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
 
    return E_NO_ERROR;
