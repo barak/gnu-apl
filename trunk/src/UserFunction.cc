@@ -985,6 +985,30 @@ UserFunction * fun = 0;
 bool
 UserFunction::resolve_labels()
 {
+   /*
+      This optimization is disabled since it fails for (as of now) unknown
+      reasons. To reproduce the problem (thanks to Hans-Peter Sorge):
+      re-enable the optimization below and run the following in immediate
+      execution mode:
+
+⎕FX """
+WWW
+ws←3↓1⊃⍎')WSID'
+→ x
+x: 
+marker ← ⊂'⍝','∆∆∆'
+"""
+
+WWW
+
+      where the final WWW incorrectly produces:
+
+SYNTAX ERROR
+WWW[4]  marker←⊂'⍝','∆∆∆'
+        ^          ^
+    */
+   return false;   // disable this optimization
+
    if (DONT_FT_LABEL_LITERAL)   return false;
 
 const int labels_declared = header.get_label_count();
