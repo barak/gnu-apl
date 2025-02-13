@@ -61,7 +61,7 @@ void
 Nabla::throw_edit_error(const char * why)
 {
 UCS_string command = first_command;
-   if (trailing_nabla)   command += UNI_NABLA;
+   if (trailing_nabla)   command.push_back(UNI_NABLA);
 
    COUT << "DEFN ERROR+" << endl
         << "      " << command << endl
@@ -294,7 +294,8 @@ UCS_string::iterator c(first_command);
 
    // function header... Copy anything, but stop at '[' (if present).
    //
-   while (c.has_more() && c.lookup() != UNI_L_BRACK)   fun_header += c.next();
+   while (c.has_more() && c.lookup() != UNI_L_BRACK)
+         fun_header.push_back(c.next());
    c.skip_white();
 
    /* at this point there could be an axis specification [X] or
@@ -446,7 +447,7 @@ bool hdr_has_vars;
            optionally followed by a closing ∇. We copy c.rest() into
            current_text and then 
          */
-         while (c.has_more())   current_text += c.next();
+         while (c.has_more())   current_text.push_back(c.next());
          execute_oper();
          return 0;   // OK
       }

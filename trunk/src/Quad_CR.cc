@@ -702,7 +702,7 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result,
 
          const UCS_string member_ucs(*member_name);
          UCS_string path = var_name;
-         path += UNI_FULLSTOP;
+         path.push_back(UNI_FULLSTOP);
          path.append(member_ucs);
 
          const Cell & data_cell = value->get_cravel(2*r + 1);
@@ -1982,7 +1982,7 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
                                  }
                               break;
 
-               case TV_CHAR:  result += cVal.get_char_value();
+               case TV_CHAR:  result.push_back(cVal.get_char_value());
                               break;
 
                case TV_INT:   result.append_number(cVal.get_int_value());
@@ -1992,7 +1992,7 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
                               break;
 
                case TV_CPX:   result.append_double(cVal.get_real_value());
-                              result += UNI_J;
+                              result.push_back(UNI_J);
                               result.append_double(cVal.get_imag_value());
                               break;
 
@@ -2043,7 +2043,7 @@ const ShapeItem ec = value.element_count();
         loop(r, rank)
            {
              result.append_number(value.get_shape_item(r));
-             result += UNI_SPACE;
+             result.push_back(UNI_SPACE);
              
            }
          result.back() = UNI_RHO;
@@ -2060,9 +2060,9 @@ const ShapeItem ec = value.element_count();
           const  Cell & cell = value.get_cravel(e);
           if (cell.is_character_cell())   // string or char
              {
-               result += UNI_SINGLE_QUOTE;
-               result += cell.get_char_value();
-               result += UNI_SINGLE_QUOTE;
+               result.push_back(UNI_SINGLE_QUOTE);
+               result.push_back(cell.get_char_value());
+               result.push_back(UNI_SINGLE_QUOTE);
              }
           else if (cell.is_integer_cell())
              {
@@ -2075,7 +2075,7 @@ const ShapeItem ec = value.element_count();
           else if (cell.is_complex_cell())
              {
                result.append_double(cell.get_real_value());
-               result += UNI_J;
+               result.push_back(UNI_J);
                result.append_double(cell.get_imag_value());
              }
           else if (cell.is_pointer_cell())
@@ -2091,7 +2091,7 @@ const ShapeItem ec = value.element_count();
                FIXME;
              }
 
-         result += UNI_SPACE;
+         result.push_back(UNI_SPACE);
        }
 
    result.pop_back();   // trailing blanf

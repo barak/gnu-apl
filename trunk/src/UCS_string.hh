@@ -48,71 +48,9 @@ class UCS_string_vector;
 /// track construction and destruction of UCS_strings
 #define UCS_tracking 0
 
-struct Unicode_traits : public char_traits<Unicode>
-{
-  typedef int int_type;
-
-  static bool eq(const Unicode & c, const Unicode & d)
-     { return c == d; }
-
-  static bool lt(const Unicode & c, const Unicode & d)
-     { return c < d; }
-
-  static size_t length(const char_type* s)
-     { for (size_t len = 0; ; ++len)   if (*s++ == Unicode_0)   return len; }
-
-  static void assign(Unicode & r, const Unicode & c)
-     { r = c; }
-
-  static Unicode * assign(Unicode * p, size_t n, Unicode  c)
-     { loop(j, n)   { p[j] = c; }   return p; }
-
-  static int compare(const Unicode * p, const Unicode * q, size_t n)
-     {
-       loop(j, n)
-          {
-            if (!eq(p[j], q[j]))   return lt(p[j], q[j]) ?-1 : 1;
-          }
-       return 0;
-     }
-
-  static const Unicode * find(const Unicode * p, size_t n, const Unicode & c)
-     { loop(j, n)   { if (eq(c, p[j]))   return p + j;
-          }
-       return static_cast<const Unicode *>(0);
-     }
-
-  static Unicode * move(Unicode * dest, const Unicode * src, size_t n)
-     { if (dest <= src)   loop(j, n)   dest[j] = src[j];
-       else               loop(j, n)   dest[n - j - 1] = src[n - j - 1];
-       return dest;
-     }
-
-  static Unicode * copy(Unicode * dest, const Unicode * src, size_t n)
-     { loop(j, n)   dest[j] = src[j];   return dest; }
-
-  static Unicode eof()
-     { return UNI_EOF; }
-
-  static int_type not_eof(const int_type & c)
-     { return Unicode(c) == eof() ? UNI_SPACE : c ; }
-
-  static Unicode to_char_type(const int_type & c)
-     {
-       return Unicode(c);
-     }
-
-  static int_type to_int_type(const Unicode & c)
-      {
-        return c;
-      }
-
-  static bool eq_int_type(const int_type & x, const int_type & y)
-     { return x == y; }
-};
 //============================================================================
 /// A string of Unicode characters (32-bit)
-class UCS_string : public std::basic_string<Unicode, Unicode_traits>
+class UCS_string : public std::vector<Unicode>
 {
 public:
    /// default constructor: empty string
@@ -326,18 +264,17 @@ public:
 
    /// remove the last character in \b this string
    void pop_back()
-   { Assert(size() > 0);
-     std::basic_string<Unicode, Unicode_traits>::pop_back(); }
+      { Assert(size() > 0); std::vector<Unicode>::pop_back(); }
 
    /// append UCS_string suffix to \b this string
    void append(const UCS_string & suffix)
-      {  basic_string<Unicode, Unicode_traits>::append(suffix); }
+      {  loop(s, suffix.size())   push_back(suffix[s]); }
 
    /// append 0-terminated ASCII string \b str to this string.
    /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of
    /// append_ASCII() if such interpretation is desired)
    void append_ASCII(const char * ascii)
-      { while (const char cc = *ascii++)   *this += Unicode(cc); }
+      { while (const char cc = *ascii++)   push_back(Unicode(cc)); }
 
    /// append 0-terminated UTF8 string str to \b this UCS_string.
    // This is different from append_ASCII((const char * str):
@@ -355,7 +292,7 @@ public:
 
    /// more intuitive insert() function
    void insert(ShapeItem pos, Unicode uni)
-      {  basic_string<Unicode, Unicode_traits>::insert(pos, 1, uni); }
+      {  vector<Unicode>::insert(begin() + pos, uni); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)
@@ -363,7 +300,7 @@ public:
 
    /// return \b this string and \b other concatenated
    UCS_string operator +(const UCS_string & other) const
-      { UCS_string ret(*this);   ret += other;   return ret; }
+      { UCS_string ret(*this);   ret.append(other);   return ret; }
 
    /// append C-string \b str
    UCS_string & operator <<(const char * str)
@@ -375,11 +312,11 @@ public:
 
    /// append character \b uni
    UCS_string & operator <<(Unicode uni)
-      { *this += uni;   return *this; }
+      { push_back(uni);   return *this; }
 
    /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & other)
-      {  basic_string<Unicode, Unicode_traits>::append(other);   return *this; }
+      {  append(other);   return *this; }
 
    /// compare \b this with UCS_string \b other
    Comp_result compare(const UCS_string & other) const
@@ -411,9 +348,9 @@ public:
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);
 
-   /// overload basic_string::size() so that it returns a signed length
+   /// overload vector::size() so that it returns a signed length
    ShapeItem size() const
-      { return  ShapeItem(basic_string<Unicode, Unicode_traits>::size()); }
+      { return  ShapeItem(vector<Unicode>::size()); }
 
    /// an iterator for UCS_strings
    class iterator
@@ -466,7 +403,7 @@ public:
 
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)
-      {  basic_string<Unicode, Unicode_traits>::erase(pos, 1); }
+      { vector<Unicode>::erase(begin() + pos); }
 
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2,
@@ -530,7 +467,7 @@ private:
 private:
    /// prevent accidental usage of the rather dangerous default len parameter
    /// in basic_strng::erase(pos, len = npos)
-    basic_string<Unicode, Unicode_traits> & erase(size_type pos, size_type len);
+    vector<Unicode> & erase(size_type pos, size_type len);
 
    /// constructor: UCS_string from 0-terminated C string.
    /// Made private because it was far too often used incorrectly.

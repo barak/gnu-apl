@@ -322,7 +322,7 @@ bool tag_open = false;
 
                    start_tag_name = UCS_string(member_data);
                    start_tag.clear();
-                   start_tag += UNI_LESS;   // <
+                   start_tag.push_back(UNI_LESS);   // <
                    start_tag.append(start_tag_name);
                    start_tag_open = true;
                    tag_open = true;
@@ -334,9 +334,9 @@ bool tag_open = false;
                         DOMAIN_ERROR;
                       }
 
-                   start_tag += UNI_SPACE;
+                   start_tag.push_back(UNI_SPACE);
                    start_tag.append(UCS_string(name));
-                   start_tag += UNI_EQUAL;
+                   start_tag.push_back(UNI_EQUAL);
                    start_tag.append(XML_node::denormalize_attribute_value(
                                               UCS_string(member_data), true));
                  }
@@ -378,7 +378,7 @@ bool tag_open = false;
              start_tag.clear();
              start_tag.append_UTF8("</");
              start_tag.append(start_tag_name);
-             start_tag += UNI_GREATER;
+             start_tag.push_back(UNI_GREATER);
            }
         entities.push_back(new UCS_string(start_tag));
       }
@@ -1002,7 +1002,7 @@ UCS_string ret;
            {
              if (a == 0 || a == (attval.size() - 1))
                 {
-                  ret += uni;
+                  ret.push_back(uni);
                   continue;
                 }
            }
@@ -1022,7 +1022,7 @@ UCS_string ret;
               case UNI_AMPERSAND:    ret.append_UTF8("&amp;");    continue;
               case UNI_SINGLE_QUOTE: ret.append_UTF8("&apos;");   continue;
               case UNI_DOUBLE_QUOTE: ret.append_UTF8("&quot;");   continue;
-              default: ret += uni;
+              default: ret.push_back(uni);
             }
       }
 
@@ -1154,7 +1154,7 @@ ShapeItem pos = 1;
 UCS_string ret;
 
    while (ucs[pos] >= UNI_0 && ucs[pos] <= UNI_9)   ++pos;   // skip digits
-   while (pos < ucs.size())   ret += ucs[pos++];
+   while (pos < ucs.size())   ret.push_back(ucs[pos++]);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1411,12 +1411,12 @@ const APL_Integer position = b1.get_int_value();
       }
 
 UCS_string UCS_Z;
-   UCS_Z += b0.get_char_value();    // namespace (normally ∆, ⍙, or _)
+   UCS_Z.push_back(b0.get_char_value());    // namespace (normally ∆, ⍙, or _)
    UCS_Z.append_number(position);   // position
 
    if (b2.is_character_cell())   // single char name: OK
       {
-        UCS_Z += b2.get_char_value();
+        UCS_Z.push_back(b2.get_char_value());
       }
    else                     // multi char name (the normal case)
       {
@@ -1429,7 +1429,7 @@ UCS_string UCS_Z;
            }
 
          const ShapeItem len_B2 = B2->element_count();
-         loop(bb, len_B2)   UCS_Z += B2->get_cravel(bb).get_char_value();
+         loop(bb, len_B2)   UCS_Z.push_back(B2->get_cravel(bb).get_char_value());
       }
 
 Value_P Z(UCS_Z, LOC);
@@ -1500,7 +1500,7 @@ ShapeItem pos = 0;
    //
    if (category)   *category = val0;
    if (position)   *position = pos;
-   if (name)   { while (src < end)   *name += src++->get_char_value(); }
+   if (name)   { while (src < end)   (*name).push_back(src++->get_char_value()); }
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1545,20 +1545,20 @@ std::vector<const Cell *>member_values;
      // the continuation lines (if any) below the indentation above
      loop (p, prefix.size())
          {
-           loop(l, LEG_IND)              z += UNI_SPACE;
-           if (prefix[p] == UNI_SPACE)   z += UNI_SPACE;
-           else                          z += UNI_LINE_VERT;
-           loop(l, LEG_TOT - LEG_IND)    z += UNI_SPACE;
+           loop(l, LEG_IND)              z.push_back(UNI_SPACE);
+           if (prefix[p] == UNI_SPACE)   z.push_back(UNI_SPACE);
+           else                          z.push_back(UNI_LINE_VERT);
+           loop(l, LEG_TOT - LEG_IND)    z.push_back(UNI_SPACE);
          }
-     loop(l, LEG_IND)                    z += UNI_SPACE;
-     z += UNI_LINE_VERT;
-     z += UNI_LF;
+     loop(l, LEG_IND)                    z.push_back(UNI_SPACE);
+     z.push_back(UNI_LINE_VERT);
+     z.push_back(UNI_LF);
    }
 
-   prefix += UNI_LINE_VERT_RIGHT;   // add ├
+   prefix.push_back(UNI_LINE_VERT_RIGHT);   // add ├
    loop(m, member_names.size())
       {
-        loop(l, LEG_IND)              z += UNI_SPACE;
+        loop(l, LEG_IND)              z.push_back(UNI_SPACE);
         Unicode last_char = prefix.back();
         const bool last_member = m == (member_names.size() - 1);
         if (last_member)
@@ -1569,28 +1569,28 @@ std::vector<const Cell *>member_values;
 
         loop(p, (prefix.size() - 1))
             {
-              if (prefix[p] == UNI_SPACE)   z += UNI_SPACE;
-              else                          z += UNI_LINE_VERT;
-              loop(l, LEG_TOT)   z += UNI_SPACE;
+              if (prefix[p] == UNI_SPACE)   z.push_back(UNI_SPACE);
+              else                          z.push_back(UNI_LINE_VERT);
+              loop(l, LEG_TOT)   z.push_back(UNI_SPACE);
             }
-        z += last_char;
-        loop(l, LEG_LEN)   z += UNI_LINE_HORI;
-        z += UNI_SPACE;
+        z.push_back(last_char);
+        loop(l, LEG_LEN)   z.push_back(UNI_LINE_HORI);
+        z.push_back(UNI_SPACE);
         if (flags & tf_fullpath)
            {
-             z += name_prefix;
-             z += UNI_FULLSTOP;
+             z.append(name_prefix);
+             z.push_back(UNI_FULLSTOP);
            }
 
-        z += member_names[m];
-        z += UNI_LF;
+        z.append(member_names[m]);
+        z.push_back(UNI_LF);
         if (!member_values[m]->is_pointer_cell())   continue;
 
         Value_P sub = member_values[m]->get_pointer_value();
         if (!sub->is_structured())   continue;
         UCS_string subname(name_prefix);
-        subname += UNI_FULLSTOP;
-        subname += member_names[m];
+        subname.push_back(UNI_FULLSTOP);
+        subname.append(member_names[m]);
         tree(*sub, z, prefix, subname, flags);
         if (last_member && prefix.size() > 1)
            {
@@ -1656,7 +1656,7 @@ std::vector<const Cell *>member_values;
    loop(m, member_names.size())
       {
         UCS_string path(name_prefix);
-        path += UNI_FULLSTOP;
+        path.push_back(UNI_FULLSTOP);
         path.append(member_names[m]);
 
         // see if the path is desired in the result. In most cases the

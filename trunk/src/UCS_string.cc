@@ -46,32 +46,36 @@ UCS_string::UCS_string()
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : basic_string<Unicode, Unicode_traits>(1, uni)
 {
+  push_back(uni);
   create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : basic_string<Unicode, Unicode_traits>(data, len)
 {
+   reserve(2*len);
+   loop(l, len)   push_back(data[l]);
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : basic_string<Unicode, Unicode_traits>(len, uni)
 {
+   reserve(2*len);
+   loop(l, len)   push_back(uni);
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : basic_string<Unicode, Unicode_traits>(ucs)
+   : vector<Unicode>(ucs)
 {
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : basic_string<Unicode, Unicode_traits>(ucs, pos, len)
 {
+   if (len > ucs.size() - pos)   len = ucs.size() - pos;
+   reserve(2*len);
+   loop(l, len)   push_back(ucs[pos + l]);
    create(LOC);
 }
 //----------------------------------------------------------------------------
@@ -367,7 +371,7 @@ const int total_width = pb.get_column_count();
    // All subsequent rows are aligned to the first row, therefore the first
    // row can be taken as a prototype for all rows.
 size_t chunk_len = 0;
-std::basic_string<int> chunk_lengths;
+vector<int> chunk_lengths;
    chunk_lengths.reserve(2*total_width/quad_PW);
    for (int col = 0; col < total_width; col += chunk_len)
        {
@@ -561,16 +565,16 @@ UCS_string::remove_trailing_whitespaces()
 void
 UCS_string::remove_leading_whitespaces()
 {
-int count = 0;
+ShapeItem count = 0;
    loop(s, size())
       {
         if (at(s) <= UNI_SPACE)   ++count;
-        else                            break;
+        else                      break;
       }
 
    if (count == 0)        return;      // no leading whitspaces
    if (count == size())   clear();     // only whitespaces
-   else                   basic_string<Unicode, Unicode_traits>::erase(0, count);
+   else                   vector<Unicode>::erase(begin(), begin() + count);
 }
 //----------------------------------------------------------------------------
 void
@@ -1032,7 +1036,7 @@ UCS_string::append_members(const vector<const UCS_string *> & members,
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {
-         if (mm < int(members.size() - 1))   *this += Unicode('.');
+         if (mm < int(members.size() - 1))   push_back(UNI_FULLSTOP);
          append(*members[mm]);
        }
 }
@@ -1513,8 +1517,8 @@ UCS_string mantissa = from_double_to_fixed(v, fract_digits);
              mantissa.resize(1);
              if (fract_digits)
                 {
-                  mantissa += UNI_FULLSTOP;
-                  loop(z, fract_digits)   mantissa += UNI_0;
+                  mantissa.push_back(UNI_FULLSTOP);
+                  loop(z, fract_digits)   mantissa.push_back(UNI_0);
                 }
              ++expo;
            }

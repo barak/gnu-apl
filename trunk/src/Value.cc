@@ -2372,7 +2372,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
          const UCS_string member_name = cell_sub->get_UCS_ravel();
          const size_t pad = longest_name - member_name.size();
          UCS_string member = member_prefix;   // ancestor.ancestor ...
-         member += UNI_FULLSTOP;
+         member.push_back(UNI_FULLSTOP);
          member.append(member_name);
          out << member << ": ";
          out << UCS_string(pad, UNI_SPACE);

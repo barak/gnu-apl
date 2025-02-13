@@ -1343,7 +1343,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, new_value.get());
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-std::string data(charP(cdr.get_items()), cdr.size());
+const std::string data(charP(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //

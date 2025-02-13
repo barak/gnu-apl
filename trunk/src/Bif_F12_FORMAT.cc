@@ -1079,7 +1079,7 @@ bool has_complex = false;
                imag.remove_leading_whitespaces();
                if (imag.size())
                   {
-                    real_imag += UNI_J;
+                    real_imag.push_back(UNI_J);
                     real_imag.append(imag);
                   }
                pb_real_imag.append_ucs(real_imag);

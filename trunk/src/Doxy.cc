@@ -556,8 +556,8 @@ const NativeFunction * nat = reinterpret_cast<const NativeFunction *>(fun);
 UCS_string Z(UTF8_string("    <TR><TD class=center>"));
    if (nat->has_result())
       {
-        Z += UNI_Z;
-        Z += UNI_LEFT_ARROW;
+        Z.push_back(UNI_Z);
+        Z.push_back(UNI_LEFT_ARROW);
       }
 
 UTF8_string fun_filename(root_dir);

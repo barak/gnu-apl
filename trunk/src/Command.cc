@@ -921,10 +921,10 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
             {
               const UCS_string & src = copy_once_table[row];
               UCS_string ws(UNI_SPACE);
-              ws += src.front();      // wsname
-              ws += UNI_SPACE;
+              ws.push_back(src.front());      // wsname
+              ws.push_back(UNI_SPACE);
               ws.append(UCS_string(src, 2, src.size() - 2));
-              ws += UNI_SPACE;
+              ws.push_back(UNI_SPACE);
               usv.push_back(ws);
             }
         usv.print_table(out, 1);
@@ -951,7 +951,7 @@ const UCS_string wsname(args.front());
    // lib_wsname is the name in the copy_once_table
    //
 UCS_string lib_wsname(Unicode(libref + UNI_0));
-   lib_wsname += UNI_UNDERSCORE;
+   lib_wsname.push_back(UNI_UNDERSCORE);
    lib_wsname.append(wsname);
 
    // silently return if wsname is already contained in the copy_once_table
@@ -1242,7 +1242,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & _arg)
    // map alternate APL characters to standard ones
    //
 UCS_string arg;
-   loop(a, _arg.size())   arg += Avec::make_standard(_arg[a]);
+   loop(a, _arg.size())   arg.push_back(Avec::make_standard(_arg[a]));
 
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg.front()))
       {

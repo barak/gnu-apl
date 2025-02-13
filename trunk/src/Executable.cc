@@ -826,7 +826,7 @@ UCS_string failed_statement;
            if (failed_line[f] == UNI_DIAMOND)   { ++l;   continue; }
            if (l > statement)   break;      // subsequent line
            if (l < statement)   continue;   // previous line
-           failed_statement += failed_line[f];
+           failed_statement.push_back(failed_line[f]);
          }
    }
 
@@ -1265,10 +1265,10 @@ out:
             {
               if (j == insertion_point)
                  {
-                   ret += UNI_LAMBDA;       // insert λ
-                   ret += UNI_LEFT_ARROW;   // insert ←
+                   ret.push_back(UNI_LAMBDA);       // insert λ
+                   ret.push_back(UNI_LEFT_ARROW);   // insert ←
                  }
-              ret += lambda_text[j];
+              ret.push_back(lambda_text[j]);
             }
         return ret;
       }

@@ -221,7 +221,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
    if (B.is_char_vector())
       {
         const UCS_string ucs_string(B);
-        result += UNI_DOUBLE_QUOTE;
+        result.push_back(UNI_DOUBLE_QUOTE);
         loop(u, ucs_string.size())
             {
               switch(const Unicode uni = ucs_string[u])
@@ -241,11 +241,11 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                                }
                             else
                                {
-                                 result += uni;
+                                 result.push_back(uni);
                                }
                  }
             }
-        result += UNI_DOUBLE_QUOTE;
+        result.push_back(UNI_DOUBLE_QUOTE);
         return;
       }
 
@@ -295,12 +295,12 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
              if (result.size() == 0)   return;   // error converting member_data
              if (size_t(m) < (member_indices.size() - 1))
                 {
-                  result += UNI_COMMA;
-                  result += UNI_LF;
+                  result.push_back(UNI_COMMA);
+                  result.push_back(UNI_LF);
                 }
              else
                 {
-                  result += UNI_SPACE;
+                  result.push_back(UNI_SPACE);
                 }
            }
 
@@ -411,8 +411,8 @@ const ShapeItem len_B = B.element_count();
 
 UCS_string ucs_B;
    ucs_B.reserve(len_B + 1);
-   loop(b, len_B)   ucs_B += B.get_cravel(b).get_char_value();
-   ucs_B += Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
+   loop(b, len_B)   ucs_B.push_back(B.get_cravel(b).get_char_value());
+   ucs_B.push_back(Unicode_0);   // 0-terminate ucs_B to avoid too many length checks
 
    // tokenize ucs_B
    //
@@ -926,11 +926,11 @@ bool expect_colon = true;
          switch(uni)
                {
                  case UNI_L_BRACK:            // [
-                      stack += UNI_R_BRACK;   // push ]
+                      stack.push_back(UNI_R_BRACK);   // push ]
                       continue;
 
                  case UNI_L_CURLY:            //      {
-                      stack += UNI_R_CURLY;   // push }
+                      stack.push_back(UNI_R_CURLY);   // push }
                       continue;
 
                  case UNI_COMMA:

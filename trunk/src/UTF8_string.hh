@@ -90,10 +90,9 @@ public:
         return true;
       }
 
-   /// prevent basic_string::erase() with its dangerous default value for
-   /// the number of erased character.
+   /// erase one item at \b pos
    void erase(size_t pos)
-      { std::string::erase(pos, 1); }
+      { std::string::erase(begin() + pos); }
 
    /// return the last byte in this string
    UTF8 back() const

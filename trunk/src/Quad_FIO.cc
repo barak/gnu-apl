@@ -921,7 +921,7 @@ Unicode lookahead = input.get_next();
              // if the next char is ] then it shall belong to the range,
              // otherwise it terminates the range than ending it.
              if (f == format.size())   LENGTH_ERROR;
-             if (format[f] == UNI_R_BRACK)   range += format[f++];
+             if (format[f] == UNI_R_BRACK)   range.push_back(format[f++]);
 
             // the characters of the range, terminated by ]
             //
@@ -963,11 +963,12 @@ Unicode lookahead = input.get_next();
                        // at this point the A-B construct is valid. Insert
                        // the characters into range...
                        //
-                       for (int u = from + 1; u <= to;)   range += Unicode(u++);
+                       for (int u = from + 1; u <= to;)
+                           range.push_back(Unicode(u++));
                      }
                   if (funi == UNI_R_BRACK)   break;   // end of range
                   ++f;
-                  range += funi;
+                  range.push_back(funi);
                 }
 
              // 2. create the APL result
