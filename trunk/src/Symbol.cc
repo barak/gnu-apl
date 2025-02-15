@@ -73,7 +73,7 @@ ostream &
 Symbol::print_verbose(ostream & out) const
 {
    out << "Symbol ";
-   print(out) << " " << voidP(this) << endl;
+   print(out) << " at " << voidP(this) << endl;
 
    loop(v, value_stack.size())
        {

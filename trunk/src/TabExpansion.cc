@@ -114,19 +114,24 @@ UCS_string arg;                // argument
 UCS_string_vector matches;
    if (have_trailing_blank || arg.size())   // cmd is a complete command
       {
-#define cmd_def(cmd_str, code, arg, hint)                           \
-   { UCS_string ustr(UTF8_string(cmd_str));                         \
-     if (cmd.size() == strlen(cmd_str) && ustr.starts_iwith(cmd))   \
-        { matches.push_back(ustr); ehint = hint; shint = arg; } }
+#define cmd_def(cmd_str, code, arg, hint)     \
+   { UCS_string ustr(UTF8_string(cmd_str));   \
+     if (cmd.size() == strlen(cmd_str) &&     \
+         ustr.starts_iwith(cmd))              \
+        { matches.push_back(ustr);            \
+          ehint = EH_ ## hint;                \
+          shint = arg; } }
 #include "Command.def"
 
       }
    else                       // command prefix
       {
-#define cmd_def(cmd_str, code, arg, hint)                           \
-   { UCS_string ustr(UTF8_string(cmd_str));                         \
-     if (ustr.starts_iwith(cmd))                                    \
-        { matches.push_back(ustr); ehint = hint; shint = arg; } }
+#define cmd_def(cmd_str, code, arg, hint)     \
+   { UCS_string ustr(UTF8_string(cmd_str));   \
+     if (ustr.starts_iwith(cmd))              \
+        { matches.push_back(ustr);            \
+          ehint = EH_ ## hint;                \
+          shint = arg; } }
 #include "Command.def"
       }
 

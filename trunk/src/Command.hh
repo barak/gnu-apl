@@ -68,18 +68,6 @@ public:
    /// or a path containing . or / chars
    static bool is_lib_ref(const UCS_string & lib);
 
-   /// continue with (jump to) next input file.
-   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
-
-   /// clean-up and exit from APL interpreter
-   static void cmd_OFF(int exit_val);
-
-   /// show or clear optimizarion counters
-   static void cmd_OPTIM(ostream & out, const UCS_string & lib);
-
-   /// clean-up and exit from APL interpreter
-   static void cmd_PUSHFILE();
-
    /// return the current boxing format
    static int get_boxing_format()
       { return boxing_format; }
@@ -100,9 +88,6 @@ public:
         /// how the left arg of \b apl_function is computed.
         int mode;
       };
-
-   /// check workspace integrity (stale Value and IndexExpr objects, etc)
-   static void cmd_CHECK(ostream & out, const UCS_string & arg);
 
    /// a helper for finding sub-values with two parents
    struct val_val
@@ -126,6 +111,12 @@ public:
 
    /// clear the copy_once_table.
    static void clear_copy_once_table();
+
+   /// )CHECK: check workspace integrity (stale Value and IndexExpr objects, etc)
+   static void cmd_CHECK(ostream & out, const UCS_string & arg);
+
+   /// )OFF: clean-up and exit from APL interpreter
+   static void cmd_OFF(int exit_val);
 
    /// format for ]BOXING
    static int boxing_format;
@@ -157,10 +148,13 @@ protected:
         OOT on_off_toggle;   ///< turn lid On, Off, or Toggle it
       };
 
-   /// )BOXING command
+   /// )BOXING: select output format for APL values
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 
-   /// )SAVE active WS as CONTINUE and )OFF
+   /// )CLEAR: clear the current Workspace
+   static void cmd_CLEAR(ostream & out);
+
+   /// )SAVE the current  WS as CONTINUE and then )OFF
    static void cmd_CONTINUE(ostream & out);
 
    /// )COPY: copy a workspace file
@@ -183,13 +177,14 @@ protected:
    /// )ERASE: erase symbols
    static void cmd_ERASE(ostream & out, UCS_string_vector & args);
 
+   /// ]EXPECT: set the number of expected errors (in testcase files)
+   static void cmd_EXPECT(ostream & out, const UCS_string & arg);
+
+   /// )FNS: show list of functions
+   static void cmd_FNS(ostream & out, const UCS_string & arg);
+
    /// show list of commands
    static void cmd_HELP(ostream & out, const UCS_string & arg);
-
-   /// show help for APL primitives
-   static void primitive_help(ostream & out, const char * arg, int arity,
-                              const char * prim, const char * name,
-                              const char * title, const char * descr);
 
    /// show or clear input history
    static void cmd_HISTORY(ostream & out, const UCS_string & arg);
@@ -203,12 +198,93 @@ protected:
    /// show US keyboard layout
    static void cmd_KEYB(ostream & out);
 
+   /// list content of workspace and wslib directories: ]LIB [N]
+   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
+
+   /// list paths of workspace and wslib directories
+   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
+
    /// )LOAD: load a workspace file
    static void cmd_LOAD(ostream & out, UCS_string_vector & args, 
                         UCS_string & quad_lx, bool silent);
 
+   /// control logging facilities
+   static void cmd_LOG(ostream & out, const UCS_string & arg);
+
+   /// print more error info
+   static void cmd_MORE(ostream & out, const UCS_string_vector & args);
+
+   /// continue with (jump to) next input file.
+   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
+
+   /// )NMS: show list of (Symbol-) names
+   static void cmd_NMS(ostream & out, const UCS_string & arg);
+
+   /// do nothing helper for ]USERCMD
+#define cmd__NO_OP_
+
+   /// )FNS: show list of operators
+   static void cmd_OPS(ostream & out, const UCS_string & arg);
+
+   /// show or clear optimizarion counters
+   static void cmd_OPTIM(ostream & out, const UCS_string & lib);
+
+   /// )OUT: export a workspace file in .atf format
+   static void cmd_OUT(ostream & out, UCS_string_vector & args);
+
+   /// )OWNERS: show list of all APL value owners
+   static void cmd_OWNERS(ostream & out);
+
    /// show performance counters
    static void cmd_PSTAT(ostream & out, const UCS_string & arg);
+
+   /// PUSHFILE: push one (testcase-) file
+   static void cmd_PUSHFILE();
+
+   /// )SAVE: save a workspace file (.xml)
+   static void cmd_SAVE(ostream & out, const UCS_string_vector & args);
+
+   /// )SI: display the )SI stack
+   static void cmd_SI(ostream & out, bool dbg);
+
+   /// )SIC: clear the )SI stack
+   static void cmd_SIC(ostream & out);
+
+   /// )SINL: display the )SI stack with name list
+   static void cmd_SINL(ostream & out);
+
+   /// )SIS: display the )SI stack with statements
+   static void cmd_SIS(ostream & out, bool dbg);
+
+   /// ]SVARS: display all shared variables
+   static void cmd_SVARS(ostream & out);
+
+   /// ]SYMBOL: display the details of one symbol
+   static void cmd_SYMBOL(ostream & out, const UCS_string & arg);
+
+   /// ]SYMBOLS: set or display the number of symbols
+   static void cmd_SYMBOLS(ostream & out, const UCS_string & arg);
+
+   /// ]USERCMD: create a user defined command
+   static void cmd_USERCMD(ostream & out, const UCS_string & arg,
+                           UCS_string_vector & args);
+
+   /// )VALUES: show list of all APL values
+   static void cmd_VALUES(ostream & out);
+
+   /// )VARS: show list of variables
+   static void cmd_VARS(ostream & out, const UCS_string & arg);
+
+   /// display the workspace name
+   static void cmd_WSID(ostream & out, const UCS_string & arg);
+
+   /// enable and disable colors
+   static void cmd_XTERM(ostream & out, const UCS_string & args);
+
+   /// show help for APL primitives
+   static void primitive_help(ostream & out, const char * arg, int arity,
+                              const char * prim, const char * name,
+                              const char * title, const char * descr);
 
    /// open directory arg and follow symlinks
    static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
@@ -234,31 +310,6 @@ protected:
                                
    /// list content of workspace and wslib directories: )LIB [N]
    static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
-
-   /// list content of workspace and wslib directories: ]LIB [N]
-   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
-
-   /// control logging facilities
-   static void cmd_LOG(ostream & out, const UCS_string & arg);
-
-   /// list paths of workspace and wslib directories
-   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
-
-   /// print more error info
-   static void cmd_MORE(ostream & out, const UCS_string_vector & args);
-
-   /// )OUT: export a workspace file
-   static void cmd_OUT(ostream & out, UCS_string_vector & args);
-
-   /// )SAVE: save a workspace file (.xml)
-   static void cmd_SAVE(ostream & out, const UCS_string_vector & args);
-
-   /// create a user defined command
-   static void cmd_USERCMD(ostream & out, const UCS_string & arg,
-                           UCS_string_vector & args);
-
-   /// enable and disable colors
-   static void cmd_XTERM(ostream & out, const UCS_string & args);
 
    /// split whitespace separated arguments into individual arguments
    static UCS_string_vector split_arg(const UCS_string & arg);

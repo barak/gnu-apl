@@ -831,6 +831,7 @@ Line_status current = APL_text;
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
+   header.clear_labels();
    line_starts.clear();
    line_starts.push_back(Function_PC_0);   // will be set later.
 
@@ -983,7 +984,7 @@ UserFunction * fun = 0;
 }
 //----------------------------------------------------------------------------
 bool
-UserFunction::resolve_labels()
+UserFunction::optimize_labels()
 {
    /*
       This optimization is disabled since it fails for (as of now) unknown
@@ -993,11 +994,13 @@ UserFunction::resolve_labels()
 
 ⎕FX """
 WWW
-ws←3↓1⊃⍎')WSID'
+ONE←1
 → x
 x: 
-marker ← ⊂'⍝','∆∆∆'
+FOUR←4
 """
+
+]SYMBOL WWW
 
 WWW
 
@@ -1364,7 +1367,7 @@ cFunction_P old_function = symbol->get_function();
         CERR <<  "------------------- UserFunction::fix() OK --" << endl;
       }
 
-   ufun->resolve_labels();
+   ufun->optimize_labels();
    ufun->optimize_unconditional_branches();
    if (ufun->compute_if_else_targets())
       {
@@ -1567,9 +1570,36 @@ UserFunction::print_properties(ostream & out, int indent) const
 {
    header.print_properties(out, indent);
 UCS_string ind(indent, UNI_SPACE);
-   out << ind << "Body Lines:      " << line_starts.size() << endl
-       << ind << "Creator:         " << get_creator()      << endl
-       << ind << "Body: " << body << endl;
+   out << ind << "Body Lines:     " << (line_starts.size() - 1) << "+[0]" << endl
+       << ind << "Creator:        " << get_creator()      << endl
+       << ind << "Body[" << body.size() << "⏩]: ";
+
+   loop(b, body.size())
+       {
+         // maybe print line prefix
+         //
+         Function_Line line_number = Function_Invalid;
+         loop(ls, line_starts.size())
+            {
+              if (b == line_starts[ls])   // b is the start of a line
+                 {
+                   line_number = Function_Line(ls);
+                   out << endl << ind << "    [" << line_number << "]";
+
+                   loop(lab, header.get_label_count())
+                       {
+                         const labVal & lv = header.get_label(lab);
+                         if (lv.line == line_number)
+                            {
+                              out << " " << lv.sym->get_name() << ":";
+                            }
+                       }
+                 }
+            }
+
+         out << " ⏩" << body[b];
+       }
+   out << endl;
 }
 //----------------------------------------------------------------------------
 UCS_string

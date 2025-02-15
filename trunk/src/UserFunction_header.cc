@@ -490,14 +490,14 @@ void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
-   if (is_operator())   out << "Operator " << function_name << endl;
-   else                 out << "Function " << function_name << endl;
+   out << (is_operator() ? "Operator " : "Function ")
+       << function_name << endl;
 
-   if (sym_Z)    out << ind << "Result:         " << *sym_Z  << endl;
-   if (sym_A)    out << ind << "Left Argument:  " << *sym_A  << endl;
-   if (sym_LO)   out << ind << "Left Op Arg:    " << *sym_LO << endl;
-   if (sym_RO)   out << ind << "Right Op Arg:   " << *sym_RO << endl;
-   if (sym_B)    out << ind << "Right Argument: " << *sym_B  << endl;
+   if (sym_Z)    out << ind << "Result:        " << *sym_Z  << endl;
+   if (sym_A)    out << ind << "Left Val Arg:  " << *sym_A  << endl;
+   if (sym_LO)   out << ind << "Left Fun Arg:  " << *sym_LO << endl;
+   if (sym_RO)   out << ind << "Right Fun Arg: " << *sym_RO << endl;
+   if (sym_B)    out << ind << "Right Val Arg: " << *sym_B  << endl;
 
    if (local_vars.size())
       {

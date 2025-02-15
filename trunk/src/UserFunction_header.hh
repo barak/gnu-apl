@@ -123,6 +123,10 @@ public:
    /// reverse the order of the local vars (if parsed back-to-front)
    void reverse_local_vars();
 
+   /// clear all labels
+   void clear_labels()
+      { label_values.clear(); }
+
    /// add a label
    void add_label(Symbol * sym, Function_Line line)
       {
@@ -147,7 +151,7 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return local_vars[idx]; }
 
-   /// return the number fof labels (in the function body).
+   /// return the number of labels (in the function body).
    const size_t get_label_count() const
       { return label_values.size(); }
 

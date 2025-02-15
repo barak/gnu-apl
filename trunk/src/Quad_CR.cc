@@ -144,10 +144,7 @@ Token
 Quad_CR::do_eval_B(const Value * B, bool remove_extra_spaces)
 {
 UCS_string symbol_name(*B);
-
-   // remove trailing whitespaces in B
-   //
-   while (symbol_name.back() <= ' ')   symbol_name.pop_back();
+   symbol_name.remove_trailing_whitespaces();
 
    /*  return an empty character matrix,     if:
     *  1) symbol_name is not known,          or

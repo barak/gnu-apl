@@ -298,7 +298,7 @@ protected:
 
    /// resolve labels in the function body. Return \b true if any
    /// labels were resolved.
-   bool resolve_labels();
+   bool optimize_labels();
 
    /// optimize unconditional (→N) branches.
    bool optimize_unconditional_branches();

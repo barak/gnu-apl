@@ -210,10 +210,10 @@ UCS_string_vector args = split_arg(arg);
         Workspace::more_error().clear();
       }
 
-#define cmd_def(cmd_str, code, garg, _hint)                          \
-   if (cmd.starts_iwith(cmd_str))                                    \
+#define cmd_def(cmd_str, cmd_XXX, garg, _hint)                            \
+   if (cmd.starts_iwith(cmd_str))                                         \
       { if (check_params(out, cmd_str, args.size(), garg))   return true; \
-        code; return false; }
+        cmd_ ## cmd_XXX; return false; }
 #include "Command.def"
 
    // check for user defined commands...
@@ -622,31 +622,6 @@ check_EOC:
    Workspace::pop_SI(LOC);
 }
 //----------------------------------------------------------------------------
-void
-Command::cmd_XTERM(ostream & out, const UCS_string & arg)
-{
-const char * term = getenv("TERM");
-   if (!strncmp(term, "dumb", 4) && arg.starts_iwith("ON"))
-      {
-        out << "impossible on dumb terminal" << endl;
-      }
-   else if (arg.starts_iwith("OFF") || arg.starts_iwith("ON"))
-      {
-        Output::toggle_color(arg);
-      }
-   else if (arg.size() == 0)
-      {
-        out << "]COLOR/XTERM ";
-        if (Output::color_enabled()) out << "ON"; else out << "OFF";
-        out << endl;
-      }
-   else
-      {
-        out << "BAD COMMAND" << endl;
-        return;
-      }
-}
-//----------------------------------------------------------------------------
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
@@ -858,6 +833,12 @@ bool show_OK = true;   // assume more verbose output
    // 5. discover strange Cells and counters.
    //
    Value::check_all_Cells(out);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_CLEAR(ostream & out)
+{
+   Workspace::clear_WS(out, false);
 }
 //----------------------------------------------------------------------------
 void
@@ -1235,7 +1216,19 @@ int ret = 0;
    while (const char cc = *txt++)   if ((cc & 0xC0) == 0x80)   ++ret;
    return ret;
 }
-
+//---------------------------------------------------------------------------
+void
+Command::cmd_EXPECT(ostream & out, const UCS_string & arg)
+{
+   IO_Files::expect_apl_errors(arg);
+}
+//---------------------------------------------------------------------------
+void
+Command::cmd_FNS(ostream & out, const UCS_string & arg)
+{
+   Workspace::list(out, LIST_FUNS, arg);
+}
+//---------------------------------------------------------------------------
 void
 Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 {
@@ -2147,6 +2140,37 @@ Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
 }
 //----------------------------------------------------------------------------
 void
+Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
+{
+   loop(a, args.size())
+       {
+         const UCS_string & arg = args[a];
+
+         // figure HAVE- or NO- prefix and capability
+         //
+         if (arg.starts_iwith("HAVE-"))
+            {
+              if (! have_capability(arg.drop(5)))   return;
+            }
+         else if (arg.starts_iwith("NO-"))
+            {
+              if (have_capability(arg.drop(3)))   return;
+            }
+         else
+            {
+              CERR << "]NEXTFILE: unknown capability '" << arg
+                   << "' (ignored).\n"
+                      "Capabilities start with HAVE- or with NO- "
+                      "(try TAB expansion)."
+                   << endl;
+              continue;   // next arg
+            }
+       }
+
+   IO_Files::next_file();
+}
+//----------------------------------------------------------------------------
+void
 Command::cmd_OFF(int exit_val)
 {
    COUT << endl;
@@ -2178,6 +2202,18 @@ rlimit rl;
 
    exit(exit_val);
 }
+//---------------------------------------------------------------------------
+void
+Command::cmd_NMS(ostream & out, const UCS_string & arg)
+{
+   Workspace::list(out, LIST_NAMES, arg);
+}
+//---------------------------------------------------------------------------
+void
+Command::cmd_OPS(ostream & out, const UCS_string & arg)
+{
+   Workspace::list(out, LIST_OPERS, arg);
+}
 //----------------------------------------------------------------------------
 void
 Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
@@ -2196,37 +2232,6 @@ int ulen;
    else     out << "disabled";                                              \
    out << endl;
 #include "Performance.def"
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
-{
-   loop(a, args.size())
-       {
-         const UCS_string & arg = args[a];
-
-         // figure HAVE- or NO- prefix and capability
-         //
-         if (arg.starts_iwith("HAVE-"))
-            {
-              if (! have_capability(arg.drop(5)))   return;
-            }
-         else if (arg.starts_iwith("NO-"))
-            {
-              if (have_capability(arg.drop(3)))   return;
-            }
-         else
-            {
-              CERR << "]NEXTFILE: unknown capability '" << arg
-                   << "' (ignored).\n"
-                      "Capabilities start with HAVE- or with NO- "
-                      "(try TAB expansion)."
-                   << endl;
-              continue;   // next arg
-            }
-       }
-
-   IO_Files::next_file();
 }
 //----------------------------------------------------------------------------
 bool
@@ -2254,21 +2259,6 @@ const int len = capa.size();
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_PUSHFILE()
-{
-   CERR <<
-"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
-        << endl;
-
-   if (InputFile::files_todo.size())
-      InputFile::files_todo.front().set_pushed_pending(true);
-
-InputFile fam("stdin", stdin, false, true, true, no_LX);
-   fam.set_pushed_IE();
-   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
-}
-//----------------------------------------------------------------------------
-void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
 UCS_string fname = args.front();
@@ -2291,6 +2281,12 @@ uint64_t seq = 1;   // sequence number for records written
    Workspace::write_OUT(atf, seq, args);
 
    fclose(atf);
+}
+//---------------------------------------------------------------------------
+void
+Command::cmd_OWNERS(ostream & out)
+{
+   Value::list_all(out, true);
 }
 //----------------------------------------------------------------------------
 bool
@@ -2338,6 +2334,21 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
      }
 
    return false;
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_PUSHFILE()
+{
+   CERR <<
+"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
+        << endl;
+
+   if (InputFile::files_todo.size())
+      InputFile::files_todo.front().set_pushed_pending(true);
+
+InputFile fam("stdin", stdin, false, true, true, no_LX);
+   fam.set_pushed_IE();
+   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
 //----------------------------------------------------------------------------
 void
@@ -2405,6 +2416,50 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
    lib = LibRef(args.front()[0] - '0');
    wsname = args[1];
    return false;   // OK
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SI(ostream & out, bool dbg)
+{
+   if (dbg)   Workspace::list_SI(out, SIM_SI_dbg);
+   else       Workspace::list_SI(out, SIM_SI);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SIC(ostream & out)
+{
+   Workspace::clear_SI(out);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SINL(ostream & out)
+{
+   Workspace::list_SI(out, SIM_SINL);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SIS(ostream & out, bool dbg)
+{
+   if (dbg)   Workspace::list_SI(out, SIM_SIS_dbg);
+   else       Workspace::list_SI(out, SIM_SIS);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SVARS(ostream & out)
+{
+   Svar_DB::print(out);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SYMBOL(ostream & out, const UCS_string & arg)
+{
+   Workspace::get_symbol_table().list_symbol(out, arg);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_SYMBOLS(ostream & out, const UCS_string & arg)
+{
+   Workspace::list(out, LIST_NONE, arg);
 }
 //----------------------------------------------------------------------------
 void
@@ -2604,6 +2659,49 @@ bool inserted = false;
 
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
+}
+//---------------------------------------------------------------------------
+void
+Command::cmd_VALUES(ostream & out)
+{
+   Value::list_all(out, false);
+}
+//---------------------------------------------------------------------------
+void
+Command::cmd_VARS(ostream & out, const UCS_string & arg)
+{
+   Workspace::list(out, LIST_VARS, arg);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_WSID(ostream & out, const UCS_string & arg)
+{
+   Workspace::wsid(out, arg, LIB_WSNAME, false);
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_XTERM(ostream & out, const UCS_string & arg)
+{
+const char * term = getenv("TERM");
+   if (!strncmp(term, "dumb", 4) && arg.starts_iwith("ON"))
+      {
+        out << "impossible on dumb terminal" << endl;
+      }
+   else if (arg.starts_iwith("OFF") || arg.starts_iwith("ON"))
+      {
+        Output::toggle_color(arg);
+      }
+   else if (arg.size() == 0)
+      {
+        out << "]COLOR/XTERM ";
+        if (Output::color_enabled()) out << "ON"; else out << "OFF";
+        out << endl;
+      }
+   else
+      {
+        out << "BAD COMMAND" << endl;
+        return;
+      }
 }
 //----------------------------------------------------------------------------
 void
