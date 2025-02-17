@@ -986,32 +986,6 @@ UserFunction * fun = 0;
 bool
 UserFunction::optimize_labels()
 {
-   /*
-      This optimization is disabled since it fails for (as of now) unknown
-      reasons. To reproduce the problem (thanks to Hans-Peter Sorge):
-      re-enable the optimization below and run the following in immediate
-      execution mode:
-
-⎕FX """
-WWW
-ONE←1
-→ x
-x: 
-FOUR←4
-"""
-
-]SYMBOL WWW
-
-WWW
-
-      where the final WWW incorrectly produces:
-
-SYNTAX ERROR
-WWW[4]  marker←⊂'⍝','∆∆∆'
-        ^          ^
-    */
-   return false;   // disable this optimization
-
    if (DONT_FT_LABEL_LITERAL)   return false;
 
 const int labels_declared = header.get_label_count();
@@ -1199,6 +1173,29 @@ bool VOID_inserted = false;
    if (VOID_inserted)   remove_TOK_VOID();
 
    return VOID_inserted;
+}
+//----------------------------------------------------------------------------
+void
+UserFunction::recompute_line_starts()
+{
+   line_starts.clear();
+
+   // line [0] is the last token (RETURN_VOID or TOK_RETURN_SYMBOL) of the body
+   //
+   line_starts.push_back(Function_PC(body.size() - 1));
+
+   // line [1] is the first token of the body.
+   //
+   line_starts.push_back(Function_PC_0);
+
+   // the remaining lines start one token after the TOK_ENDL of the line before.
+   loop(pc, body.size())
+      {
+        if (body[pc].get_tag() == TOK_ENDL)
+           {
+             line_starts.push_back(Function_PC(pc + 1));
+           }
+      }
 }
 //----------------------------------------------------------------------------
 void
@@ -1708,21 +1705,44 @@ Function_PC dst_PC = Function_PC_0;
 
    loop(src_PC, body.size())
       {
+        // take care of empty lines. Empty lines have the same PC as the
+        // current line (src_line)
+        //
         while (src_PC == line_starts[src_line + 1])
            {
-             // src_PC is the first token of the next line
+             // src_PC has reached the first token of the next line.
+             // Increment the current line and adjust line_starts.
              ++src_line;
              line_starts[src_line] = Function_PC(dst_PC);
            }
 
-        if (body[src_PC].get_tag() == TOK_VOID)   continue;   // ignore (skip)
-        if (src_PC != dst_PC)   body[dst_PC].move(body[src_PC], LOC);
-         ++dst_PC;
+        if (body[src_PC].get_tag() != TOK_VOID)
+           {
+             if (src_PC != dst_PC)   body[dst_PC].move(body[src_PC], LOC);
+             ++dst_PC;
+           }
+        else   // TOK_VOID
+           {
+             // Do not copy but ignore (skip) body[src_PC]. After the removal
+             // of the TOK_VOID have all GOTO_PC targets above src_PC become
+             // are too high (by 1). Adjust these token.
+             //
+             loop(bb, body.size())
+                 {
+                   Token & tok = body[bb];
+                   if (tok.get_tag() == TOK_GOTO_PC)
+                      {
+                        const int64_t tok_pc = tok.get_int_val();
+                        if (tok_pc >= src_PC)   tok.set_int_val(tok_pc - 1);
+                      }
+                
+                 }
+           }
       }
 
 const VoidCount ret = VoidCount(body.size() - dst_PC);
    body.resize(dst_PC);
-   line_starts[0] = dst_PC;   // convention: line_starts[0] is the end of body
+   line_starts[0] = dst_PC - 1;   // convention: line_starts[0] is the end of body
 
    return ret;
 }

@@ -177,23 +177,23 @@ am__uninstall_files_from_dir = { \
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_gnu_apl_la_LIBADD =
 am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
+	APL_Float_as_class.hh APL_types.hh APL_enums.hh Archive.cc \
+	Archive.hh ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
+	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc \
+	Bif_F12_COMMA.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
+	Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -350,23 +350,23 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
+	APL_Float_as_class.hh APL_types.hh APL_enums.hh Archive.cc \
+	Archive.hh ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
+	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc \
+	Bif_F12_COMMA.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
+	Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -502,23 +502,23 @@ libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
 @apl_TARGET_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
 am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
+	APL_Float_as_class.hh APL_types.hh APL_enums.hh Archive.cc \
+	Archive.hh ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
+	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc \
+	Bif_F12_COMMA.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
+	Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -1279,22 +1279,23 @@ common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) \
 common_LDFLAGS = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS) \
 	$(am__append_5) $(am__append_9)
 common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
-	APL_types.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
-	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
-	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
-	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
-	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
-	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
-	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
-	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
-	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
-	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
-	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
-	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
+	APL_types.hh APL_enums.hh Archive.cc Archive.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
+	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
+	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
+	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \

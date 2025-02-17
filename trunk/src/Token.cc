@@ -177,6 +177,11 @@ operator << (ostream & out, const Token & token)
         return out << token.get_Id() << token.get_int_val();
       }
 
+   if (token.get_tag() == TOK_GOTO_PC)
+      {
+        return out << "→PC=" << token.get_int_val();
+      }
+
    if (token.get_tag() == TOK_NOBRANCH)
       {
         return out << token.get_Id() << token.get_int_val();

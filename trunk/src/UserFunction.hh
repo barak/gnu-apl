@@ -133,7 +133,7 @@ public:
    virtual UCS_string get_name() const
       { return header.get_name(); }
 
-   /// return e.g. 'FOO[10]' 
+   /// return e.g. 'FOO[10]' for the given \b pc
    UCS_string get_name_and_line(Function_PC pc) const;
 
    /// Overloaded Function::print_properties()
@@ -293,8 +293,8 @@ protected:
    /// helper function to print token with Function or Value content
    static ostream & print_val_or_fun(ostream & out, Token & tok);
 
-   /// "[nn] " prefix
-   UCS_string line_prefix(Function_Line l) const;
+   /// return the "[nn] " prefix
+   UCS_string line_prefix(Function_Line nn) const;
 
    /// resolve labels in the function body. Return \b true if any
    /// labels were resolved.
@@ -302,6 +302,9 @@ protected:
 
    /// optimize unconditional (→N) branches.
    bool optimize_unconditional_branches();
+
+   /// rewcompute member \b line_starts (after VOID tokens have been removed).
+   void recompute_line_starts();
 
    // debug function: print the body tokens line by line.
    void print_body_by_line(const char * where) const;
@@ -323,11 +326,11 @@ protected:
 
       will, for example, have a N+1 element jump vector:
 
-      [0] goto end of function        --------------+
-      [1] L1: xxx                                   |
-      ...                                           |
-      [N-1]   yyy                                   |
-      [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
+      [0] goto end of function        ──────────────┐
+      [1] L1: xxx                                   │
+      ...                                           │
+      [N-1]   yyy                                   │
+      [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <──┘
 
    **/
    std::vector<Function_PC> line_starts;

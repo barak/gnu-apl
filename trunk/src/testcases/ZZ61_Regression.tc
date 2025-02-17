@@ -1,0 +1,23 @@
+⍝ ZZ61_Regression.tc
+⍝ ══════════════════
+
+      ⍝ bug-apl@gnu.org, 2/11/2025 (Hans-Peter Sorge) ...
+
+      )CLEAR
+CLEAR WS
+
+
+⎕FX ⎕INP '⍝∆∆∆'
+WWW
+ws←3↓1⊃⍎')WSID'
+→ x                                                                                            
+x:                                                                                             
+marker ← ⊂'⍝','∆∆∆'                                                                                   
+⍝∆∆∆
+WWW
+
+      WWW
+
+      )CLEAR
+CLEAR WS
+

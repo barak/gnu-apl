@@ -60,8 +60,6 @@
 # define cfg_MAX_RANK_WANTED 8
 #endif
 
-enum { MAX_RANK = cfg_MAX_RANK_WANTED };
-
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
 #ifdef erase
@@ -390,13 +388,6 @@ extern void list_all_mappings(ostream & out, const char * top_fun,
 //----------------------------------------------------------------------------
 /// helper for bsearch() in subfun_to_axis
 extern int axis_compare(const void * key, const void * info);
-//----------------------------------------------------------------------------
-/// whether ⎕LX shall be executed at the end of the file
-enum LX_mode
-{
-   no_LX = 0,     ///< no
-   do_LX = 1      ///< yes
-};
 //----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE

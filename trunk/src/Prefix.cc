@@ -2416,8 +2416,8 @@ Token B = pop().get_token();   // pop B
 
    if (END.get_tag() == TOK_IF_THEN)   // end of condition B
       {
-        // B is supposed to be the Boolean condition of an if/else conditional
-        // END is the token after the condition (PC of the ELSE clause).
+        // B is the Boolean condition of an if/else conditional.
+        // END is the token after the condition (PC of the IF clause).
         //
         // If COND is 1 then continue, wlse jump to the else clause
         Value_P COND(B.get_apl_val());
