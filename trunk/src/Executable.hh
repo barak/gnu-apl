@@ -169,6 +169,10 @@ public:
    /// decrement the reference counter
    void decrement_refcount(const char * loc);
 
+   /// compute the targets for if/else aka →→ ←→ and ←←.
+   /// Maybe set MORE() info and return true on error.
+   bool compute_if_else_targets();
+
 protected:
    /// the body positions of the ←← and ←→ tokens of a congitional
    struct conditional
@@ -225,10 +229,6 @@ protected:
    /// parse the body line number \b line of \b this function
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              bool trace, bool tolerant, const char * loc);
-
-   /// compute the targets for if/else aka →→ ←→ and ←←.
-   /// Maybe set MORE() info and return true on error.
-   bool compute_if_else_targets();
 
    /// the mode \b this Executable
    const ParseMode pmode;

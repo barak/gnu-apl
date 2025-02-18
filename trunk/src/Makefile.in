@@ -6470,6 +6470,7 @@ testAP: all
 # run all testcases, except slow ones
 test3: all
 	./apl --id 1010 -T testcases_3/*tc
+	stty sane
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt

@@ -440,14 +440,6 @@ extern std::ostream & get_CERR();
 #endif
 
 //============================================================================
-/// Function_Line ++ (post increment)
-inline Function_Line operator ++(Function_Line & fl, int)
-{
-const Function_Line before_increment = fl;
-   fl = Function_Line(fl + 1);
-   return before_increment;
-}
-//============================================================================
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;

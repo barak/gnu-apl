@@ -268,6 +268,15 @@ public:
    // debug function: print the PC for every linr
    void print_line_PCs(const char * loc) const;
 
+   /// resolve labels in the function body. Return \b true if any
+   /// labels were resolved.
+   bool optimize_labels();
+
+   bool optimize_labels2();
+
+   /// optimize unconditional (→N) branches.
+   bool optimize_unconditional_branches();
+
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
    UserFunction(const UCS_string txt, const char * loc,
@@ -295,16 +304,6 @@ protected:
 
    /// return the "[nn] " prefix
    UCS_string line_prefix(Function_Line nn) const;
-
-   /// resolve labels in the function body. Return \b true if any
-   /// labels were resolved.
-   bool optimize_labels();
-
-   /// optimize unconditional (→N) branches.
-   bool optimize_unconditional_branches();
-
-   /// rewcompute member \b line_starts (after VOID tokens have been removed).
-   void recompute_line_starts();
 
    // debug function: print the body tokens line by line.
    void print_body_by_line(const char * where) const;

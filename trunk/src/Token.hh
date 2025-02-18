@@ -396,7 +396,7 @@ Token::copy_N(const Token & src)
         case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
         case TV_INDEX: value.index_val     = src.value.index_val;       break;
         case TV_FUN:   value.function      = src.value.function;        break;
-        default:       FIXME;
+        default:       Q1(src.get_ValueType());   FIXME;
       }
 }
 //----------------------------------------------------------------------------

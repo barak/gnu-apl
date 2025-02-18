@@ -189,8 +189,10 @@ char creator[APL_PATH_MAX+20];
    SPRINTF(creator, "%s:%d", InputFile::current_filename(), defn_line_no)
 const UTF8_string creator_utf8(creator);
 
-UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
-                                        LOC, creator_utf8, true);
+UserFunction * ufun = UserFunction::fix(fun_text, error_line,
+                                        /* keep_existing */ false,
+                                        LOC, creator_utf8,
+                                        /* tolerant */  true);
 
    if (ufun == 0)   // UserFunction::fix() failed
       {
@@ -247,6 +249,12 @@ std::vector<Function_Line> trace_vec;
 
    ufun->set_trace_stop(stop_vec,  true);
    ufun->set_trace_stop(trace_vec, false);
+
+   // set_trace_stop() calls parse_body(), so we have to redo optimizations
+   //
+   ufun->optimize_labels();
+   ufun->optimize_unconditional_branches();
+   ufun->compute_if_else_targets();
 }
 //----------------------------------------------------------------------------
 const char *

@@ -223,7 +223,7 @@ operator << (ostream & out, const Token & token)
         case TC_SYMBOL:
              if (token.get_tag() == TOK_LSYMB)
                 {
-                  token.get_sym_ptr()->print(out << "'");
+                  token.get_sym_ptr()->print(out);
                   out << UNI_LEFT_ARROW;
                 }
              else if (token.get_tag() == TOK_LSYMB2)
@@ -233,7 +233,7 @@ operator << (ostream & out, const Token & token)
                 }
              else
                 {
-                  token.get_sym_ptr()->print(out << "'");
+                  token.get_sym_ptr()->print(out);
                 }
              return out;
 

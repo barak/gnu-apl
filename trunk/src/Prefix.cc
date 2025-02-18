@@ -2667,14 +2667,14 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
     */
     if (at1().get_tag() == TOK_GOTO_PC)   // optimized →N
        {
-              reset(LOC);
+         reset(LOC);
          const Function_PC new_PC = Function_PC(at1().get_int_val());
          if (new_PC == Function_PC_done)   // →0 etc.
             {
-              PC = Function_PC(body.size() - 1);
+              PC = Function_PC(body.size() - 1);   // RETURN_XXX
               const Token result(TOK_VOID);
               pop_args_push_result(result);
-              set_action(RA_RETURN);      // return from defined function
+              set_action(RA_CONTINUE);      // return from defined function
             }
          else                             // normal →N
             {

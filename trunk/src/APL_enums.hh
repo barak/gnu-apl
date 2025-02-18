@@ -187,6 +187,22 @@ enum Function_Line
    Function_Line_1  =  1,
    Function_Line_10 = 10,
 };
+
+/// Function_Line ++ (pre increment)
+inline Function_Line operator ++(Function_Line & fl)
+{
+   fl = Function_Line(fl + 1);
+   return fl;
+}
+
+/// Function_Line ++ (post increment)
+inline Function_Line operator ++(Function_Line & fl, int)
+{
+const Function_Line before_increment = fl;
+   fl = Function_Line(fl + 1);
+   return before_increment;
+}
+
 //----------------------------------------------------------------------------
 ///  What is being parsed (defined function, immediate execution statements,
 /// or ⍎expr)
