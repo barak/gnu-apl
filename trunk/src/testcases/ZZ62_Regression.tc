@@ -1,0 +1,14 @@
+⍝ ZZ62_Regression.tc
+⍝ ══════════════════
+
+      ⍝ bug-apl@gnu.org, 2/18/2025 (Hans-Peter Sorge) ...
+
+      )CLEAR
+CLEAR WS
+
+      x←, ⊂1 1 0 0 1 1
+      y←,⊂'asdfgh'
+      x[1]/¨y[1]
+ asgh 
+
+

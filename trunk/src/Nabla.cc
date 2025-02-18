@@ -253,7 +253,7 @@ std::vector<Function_Line> trace_vec;
    // set_trace_stop() calls parse_body(), so we have to redo optimizations
    //
    ufun->optimize_labels();
-   ufun->optimize_unconditional_branches();
+   ufun->optimize_label_vectors();
    ufun->compute_if_else_targets();
 }
 //----------------------------------------------------------------------------

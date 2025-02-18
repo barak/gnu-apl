@@ -991,7 +991,7 @@ UserFunction::optimize_labels()
 const size_t labels_declared = header.get_label_count();
    if (labels_declared == 0)   return false;   // function has no labels
 
-   for (int pc = Function_PC(-1); pc < body.size() - 3; ++pc)
+   for (int pc = Function_PC(-1); pc < body.size() - 4; ++pc)
        {
          if (body[pc + 2].get_tag() == TOK_R_ARROW &&   // least likely first
              body[pc + 3].get_tag() == TOK_ENDL    &&
@@ -1038,149 +1038,19 @@ const size_t labels_declared = header.get_label_count();
 }
 //----------------------------------------------------------------------------
 bool
-UserFunction::optimize_labels2()
+UserFunction::optimize_label_vectors()
 {
-   if (DONT_FT_LABEL_LITERAL)   return false;
-const int labels_declared = header.get_label_count();
-   if (labels_declared == 0)   return false;   // no labels defined
+   /* Frequent design patterns are:
 
-int labels_seen = 0;
+      → EXPR / L1, L2 ... Ln
+      → EXPR / L1 L2 ... Ln
+      → EXPR ⍴ L
+              ├── const B ──┤
 
-   // pass 1: replace all labels in the body with integers. At this point
-   //         the parser has removed all TOK_INTEGER, so we can temporarily
-   //         use them as markers.
-   //
-   loop(pc, body.size())
-       {
-         const Token & tok = body[pc];
-         if (tok.get_tag() != TOK_SYMBOL)   continue;
-         const Symbol * symbol = tok.get_sym_ptr();
-         loop(idx, labels_declared)
-             {
-               const labVal & label = header.get_label(idx);
-               if (symbol == label.sym)
-                  {
-                    // do not (yet) create a Value since we may need to
-                    // collect several labels below.
-                    //
-                    body[pc] = Token(TOK_INTEGER, int64_t(label.line));
-                    OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
-
-                    ++labels_seen;
-                  }
-             }
-       }
-
-   if (labels_seen == 0)   return false;   // no labels referenced in body
-
-   /* pass 2: optimize frequent branch cases.
-     
-              The typical branch cases are:
-     
-      case 1:   → N                 branch to single label
-      case 2:   → SEL/N1 N2 N3...   switch with strand notation
-      case 3:   → SEL/N1,N2,N3...   switch with comma separated labels
-      case 4:   a mix of cases 2 and 3
-
-      case 1 will become →PC while the others only replace N1.N2,N3...
-      with a single APL value that will be later reduced with SEL/
+      In these cases, the right argument of / or ⍴ is a constant, so we can
+      resolve the label values of L or L1, ... Ln into a single APL value B.
+      That avoids the resolution (symbol lookup, line extraction) at runtime.
     */
-bool VOID_inserted = false;
-Function_Line line = Function_Line_1;   // for LOG_optimization
-   loop(pc, body.size())
-       {
-         if (body[pc].get_tag() == TOK_ENDL)   { ++line; continue; }
-         if (body[pc].get_tag() != TOK_INTEGER)          continue;
-
-         // collect multiple labels (if any), starting at pc. Kepp in mind that
-         // the labels run backwards (i.e. start with the rightmost label).
-
-         // at this point, pc is the first label (of one or more).
-         // Collect all of them and invalidate their token.
-
-         vector<int> labels_in_statement;
-         labels_in_statement.push_back(body[pc].get_int_val());
-         body[pc] = Token();
-         for (int pc_1 = pc + 1; (pc_1 < body.size()); ++pc_1)
-             {
-               const int pc_2 = pc_1 + 1;
-
-               const Token & tok_1 = body[pc_1];
-               if (tok_1.get_Class() == TC_END)   break;   // end of statement
-
-               const TokenTag tag_1 = tok_1.get_tag();
-               const TokenTag tag_2 = pc_2 < body.size()
-                                    ? body[pc_2].get_tag() : TOK_INVALID;
-
-
-               if ((tag_1 == TOK_INTEGER))   // former label (set above)
-                  {
-                    // case 2. : INT INT
-                    labels_in_statement.push_back(body[pc_1].get_int_val());
-                    body[pc_1] = Token();
-                    VOID_inserted = true;
-                    continue;   // next pc_1
-                  }
-               else if ((tag_1 == TOK_F12_COMMA) && (tag_2 == TOK_INTEGER))
-                  {
-                    // case 3. : INT , INT
-                    labels_in_statement.push_back(body[pc_2].get_int_val());
-                    body[pc_1] = Token();
-                    body[pc_2] = Token();
-                    VOID_inserted = true;
-                    continue;   // next pc_1
-                  }
-               else   // end of label vector
-                  {
-                    break;
-                  }
-             }
-
-         const int label_count = labels_in_statement.size();
-         Assert(label_count);   // since body[tok_1] is one
-
-         if (label_count == 1)   // single label (case 1 above)
-            {
-              Value_P single = IntScalar(labels_in_statement[0], LOC);
-              Token tok(TOK_APL_VALUE1, single);
-              body[pc].move(tok, LOC);
-              Log(LOG_optimization)
-                 {
-                   CERR << "optimizing →" << labels_in_statement[0]
-                        << " on line [" << line << "]" << endl;
-                 }
-            }
-         else                    // multiple labels (cases 2 and 3 above)
-            {
-              Value_P value(label_count, LOC);
-              loop(l, label_count)
-                  value->next_ravel_Int(labels_in_statement[l]);
-              value->check_value(LOC);
-              Token tok(TOK_APL_VALUE1, value);
-              body[pc].move(tok, LOC);
-              Log(LOG_optimization)
-                 {
-                   CERR << "optimizing label vector["
-                        << label_count << "] =";
-                   loop(l, label_count)
-                       CERR << " ["
-                            << labels_in_statement[label_count - l - 1]
-                            << "]" << " on line [" << line << "]" << endl;
-                 }
-            }
-       }
-
-   if (VOID_inserted)   remove_TOK_VOID();
-
-   return VOID_inserted;
-}
-//----------------------------------------------------------------------------
-bool
-UserFunction::optimize_unconditional_branches()
-{
-// disabled since broken. The ⊢N case is now handled in optimize_labels()
-return false;
-
    if (DONT_FT_DIRECT_BRANCHES)   return false;
 
    /* check for: VALUE → ENDL      e.g. → 4
@@ -1194,41 +1064,97 @@ return false;
 
     */
 bool VOID_inserted = false;
-   for (Function_PC pc = Function_PC_0; pc < body.size() - 3; ++pc)
+   for (Function_PC pc = Function_PC(1); pc < body.size() - 3; ++pc)
       {
-        /*
-           1.  look for (and noting that body is in inverse order)
-  
-                PC  +3  +2 +1 +0
-                    ↓   ↓  ↓  ↓
-                   END  →  N END
-         */
-        if (body[pc    ].get_Class() != TC_END)       continue;
-        if (body[pc + 1].get_Class() != TC_VALUE)     continue;
-        if (body[pc + 2].get_tag()   != TOK_R_ARROW)   continue;
-        if (body[pc + 3].get_Class() != TC_END)       continue;
+        vector<Function_PC> items_B;
+        const TokenTag tag_pc = body[pc].get_tag();
+        const Token & tok_pc_1 = body[pc - 1];   // token left of / or ⍴
+        const TokenClass class_pc_1 = tok_pc_1.get_Class();
+        if ((is_SLASH_or_BACKSLASH(tag_pc) || tag_pc == TOK_F12_RHO) &&
+            ((class_pc_1 == TC_SYMBOL && is_label(tok_pc_1.get_sym_ptr())) ||
+              class_pc_1 == TC_VALUE))
+           {
+             // collect items in right argument
+             //
+             items_B.push_back(Function_PC(pc - 1));
+             for (Function_PC pos = pc - 2; pos >= 0; --pos)
+                 {
+                   const TokenTag tag_pos = body[pos].get_tag();
+                   const TokenClass class_pos = body[pos].get_Class();
+                   if (class_pos == TC_SYMBOL &&
+                       is_label(body[pos].get_sym_ptr()))
+                      {
+                        items_B.push_back(Function_PC(pos));
+                      }
+                   else if (class_pos == TC_VALUE &&
+                            body[pos].get_apl_val()->is_int_scalar())
+                      {
+                        items_B.push_back(Function_PC(pos));
+                      }
+                   else if (tag_pos == TOK_F12_COMMA || tag_pos == TOK_F12_COMMA)
+                      {
+                        // skip , or ⍪
+                      }
+                   else if (pos == 0 || class_pos == TC_END)
+                      {
+                        break;   // for (int pos...)
+                      }
+                   else   // something else: do nothing
+                      {
+                        items_B.clear();
+                        break;
+                      }
+                 }
 
-        // at this point we have →VALUE.
-        // figure the function line (which may be impossibe)
-        //
-        const Value & v_line = *body[pc + 1].get_apl_val();
-        if (!v_line.is_int_scalar())                  continue;
+           }
+        if (items_B.size() == 0)   continue;   // for (Function_PC pc...
+        if (items_B.size() == 1)
+           {
+             // single item. If iot is a value then leave it as is.
+             // Otherwise resolve the label symbol.
+             //
+             const Function_PC pc0 = items_B[0];
+             Token & tok0 = body[pc0];
+             if (tok0.get_Class() == TC_SYMBOL)
+                {
+                  const Symbol * symbol = tok0.get_sym_ptr();
+                  const int64_t line = get_label_line(symbol);
+                  Value_P value = IntScalar(line, LOC);
+                  value->increment_owner_count(LOC);
+                  tok0 = Token(TOK_APL_VALUE1, value);
+                }
+           }
+        else   // vector B
+           {
+             Value_P B(items_B.size(), LOC);
+             loop(b, items_B.size())
+                 {
+                   const Function_PC pc_b = items_B[b];
+                   Token & tok_b = body[pc_b];
+                   if (tok_b.get_Class() == TC_SYMBOL)
+                      {
+                        const Symbol * symbol = tok_b.get_sym_ptr();
+                        const int64_t line = get_label_line(symbol);
+                        B->next_ravel_Int(line);
+                      }
+                   else if (tok_b.get_Class() == TC_VALUE)
+                      {
+                        const int64_t line = tok_b.get_apl_val()->get_cfirst()
+                                                  .get_int_value();
+                        B->next_ravel_Int(line);
+                      }
+                 }
+             B->check_value(LOC);
 
-        const APL_Integer line_number = v_line.get_cscalar().get_int_value();
-        if (line_number < Function_Line_1)            continue;   // e.g. →0
-        if (line_number >= int(line_starts.size()))   continue;
-
-        const int64_t target_PC = line_starts[line_number];
-
-        // maybe do it. This optimization does not work well with
-        // conditonals,so we don't if we see one.
-        //
-        body[pc + 1].clear(LOC);   // release N
-        body[pc + 1] = Token(TOK_GOTO_PC, target_PC);   // B with →PC
-        body[pc + 2].copy_N(body[pc + 3]);              // → with ENDL
-        body[pc + 3] = Token();
-        VOID_inserted = true;
-        OptmizationStatistics::count(OPTI_FT_DIRECT_BRANCHES);
+             // items_B is decreasing, so back() < front()
+             for (Function_PC pc = items_B.back(); pc <= items_B.front(); ++pc)
+                 {
+                  body[pc].clear(LOC);
+                 }
+             body[items_B.back()] = Token(TOK_APL_VALUE1, B);
+             B->increment_owner_count(LOC);   // keep it
+             VOID_inserted = true;
+           }
       }
 
    if (VOID_inserted)   remove_TOK_VOID();
@@ -1403,7 +1329,7 @@ cFunction_P old_function = symbol->get_function();
       }
 
    ufun->optimize_labels();
-   ufun->optimize_unconditional_branches();
+   ufun->optimize_label_vectors();
    if (ufun->compute_if_else_targets())
       {
         // must NOT: delete ufun;

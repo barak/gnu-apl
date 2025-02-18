@@ -54,6 +54,10 @@ public:
    virtual bool is_defined() const
       { return true; }
 
+   /// Overloaded \b Function::is_operator.
+   virtual bool is_operator() const
+      { return header.is_operator(); }
+
    /// return the macro number (if this function is one) or -1
    virtual int get_macnum() const
       { return -1; }
@@ -106,10 +110,6 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
 
-   /// Overloaded \b Function::is_operator.
-   virtual bool is_operator() const
-      { return header.is_operator(); }
-
    /// add a label
    void add_label(Symbol * sym, Function_Line line)
       { header.add_label(sym, line); }
@@ -129,9 +129,32 @@ public:
    /// overloaded Executable::print()
    virtual ostream & print(ostream & out) const;
 
-   /// return the name of this function
+   /// return the name of \b this function
    virtual UCS_string get_name() const
       { return header.get_name(); }
+
+   /// return \b true if \b symbol is a label of \b this function
+   bool is_label(const Symbol * symbol) const
+      {
+        loop(l, header.get_label_count())
+            {
+              if (symbol == header.get_label(l).sym)   return true;
+            }
+
+        return false;
+      }
+
+   /// return the line number for label \b symbol \b this function
+   Function_Line get_label_line(const Symbol * symbol)
+      {
+        loop(l, header.get_label_count())
+            {
+              const labVal & label = header.get_label(l);
+              if (symbol == label.sym)   return label.line;
+            }
+
+        return Function_Invalid;
+      }
 
    /// return e.g. 'FOO[10]' for the given \b pc
    UCS_string get_name_and_line(Function_PC pc) const;
@@ -274,8 +297,8 @@ public:
 
    bool optimize_labels2();
 
-   /// optimize unconditional (→N) branches.
-   bool optimize_unconditional_branches();
+   /// optimize vectors of labels
+   bool optimize_label_vectors();
 
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function

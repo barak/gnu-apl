@@ -643,6 +643,13 @@ UCS_string ucs;
                   return ret;
                 }
 
+        case TC_VOID:
+             {
+               UCS_string ret;
+               ret << "-VOID-";
+               return ret;
+             }
+
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
                   << " at " << LOC << endl;

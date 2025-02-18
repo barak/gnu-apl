@@ -1494,14 +1494,14 @@ Prefix::MM_is_FM(Function_PC pc)
                                     //               │ │ │
               case TC_FUN12:        //               + / ¨ (1 2)(3 4)(5 6)
               case TC_OPER1:        // M1 is M       / / ¨ (1 2)(3 4)(5 6)
-                   return false;
+                   return false;    // MM is operator
 
               case TC_SYMBOL:
                    return NEXT.get_sym_ptr()->M_is_F();
 
-              // TC_INDEX should not happen here since body[PC]... have
-              // not yet been parsed
-              case TC_INDEX: FIXME
+              // most likely an indexed value
+              case TC_INDEX:
+                   return true;   // MM is function
 
               case TC_R_BRACK:   // skip over [ ... ]
                    pc = Function_PC(int(pc) + body[pc].get_int_val2());
@@ -2656,7 +2656,7 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
            returned by si.jump(line) in reduce_END_GOTO_B_(), where
            si.jump() also modifies the PC.
 
-       In UserFunction::optimize_unconditional_branches() we optimize
+       In UserFunction::optimize_labels() we optimize
        the statements →N (with literal integer N) and →LABEL into a single
        token TOK_GOTO_PC whose integer value is the new PC, and:
 
