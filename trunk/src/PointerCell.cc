@@ -210,6 +210,19 @@ Value_P val = get_pointer_value();
                 }
              ucs.append(UNI_SINGLE_QUOTE);
            }
+        else if (ec == 0)   // empty
+           {
+             if (val->get_rank() > 1)   TODO;
+             if (val->get_cfirst().is_character_cell())
+                {
+                  ucs.append_ASCII("''");
+                }
+             else if (val->get_cfirst().is_integer_cell())
+                {
+                  ucs.append(UNI_ZILDE);
+                }
+             else TODO;
+           }
         else
            {
              ucs.append(UNI_L_PARENT);

@@ -63,16 +63,28 @@ public:
    static bool figure_default(const Value * value, Unicode & default_char,
                               APL_Integer & default_int);
 
-   /// compute the prolog (e,g, ((⎕IO+2)⊃X)←)  for the pick of \b left
-   static UCS_string compute_prolog(int pick_level, const UCS_string & left,
-                                    const Value * value);
-
    static Quad_CR  fun;          ///< Built-in function.
 
    /// portable variable encoding of value \b name (varname or varname ⊂)
    static void do_CR10_variable(UCS_string_vector & result,
                                 const UCS_string & var_name,
                                 const Value * value);
+
+   /// compute 10 ⎕CR recursively (structured variable)
+   static const char * do_CR10_structured(UCS_string_vector & result,
+                                          const UCS_string & varname,
+                                          const Value * value);
+
+   /// emit one level of \b value
+   static void do_CR10_level(UCS_string_vector & result,
+                             const UCS_string & var_name, size_t level,
+                             const Value & value);
+
+   /// emit a simple Cell
+   static UCS_string do_CR10_simple_cell(const Cell & cell);
+
+   /// emit a shaoe
+   static UCS_string do_CR10_shape(const Shape &_shape);
 
    /// compute \b 35 ⎕CR \b B
    static Value_P do_CR35(const Value * B);
@@ -169,67 +181,6 @@ protected:
    /// append \b value to result
    static void value_CR44(UCS_string & result, const Value & value);
 
-   /// the left argument of Pick (⊃) which selects a sub-item of a variable
-   /// being constructed
-   class Picker
-      {
-        public:
-           /// constructor: Picket at top (= variable) level
-           Picker(const UCS_string & vname)
-           : var_name(vname)
-           {}
-
-          /// push \b sh on \b shapes stack and \b pidx on \b indices stack
-          void push(const Shape & sh, ShapeItem pidx)
-             {
-               shapes.push_back(sh);
-               indices.push_back(pidx);
-             }
-
-          /// pop \b shapes and \b indices
-          void pop()
-             {
-               shapes.pop_back();
-               indices.pop_back();
-             }
-
-           /// varname or pick of varname
-           void get(UCS_string & result);
-
-           /// indexed varname or pick of varname
-           void get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len);
-
-           /// the pick depth (⍴A for A⊃B)
-           int get_level() const
-              { return shapes.size(); }
-
-        protected:
-           /// the name of the variable from which we pick
-           const UCS_string & var_name;
-
-           /// the shapes along the pick
-           std::vector<Shape> shapes;
-
-           /// the indices along the pick
-           std::vector<ShapeItem> indices;
-      };
-
-   /// compute 10 ⎕CR recursively
-   static void do_CR10_value(UCS_string_vector & result, const Value * value,
-                             Picker & picker, ShapeItem pidx);
-
-   /// compute 10 ⎕CR recursively (structured variable)
-   static const char * do_CR10_structured(UCS_string_vector & result,
-                                          const UCS_string & varname,
-                                          const Value * value);
-
-   /// try to emit \b value in short format. Retrun true if that is not
-   /// possible.
-   static bool short_ravel(UCS_string_vector & result, bool & nested,
-                           const Value * value, const Picker & picker,
-                           const UCS_string & left,
-                           const UCS_string & shape_rho);
-
    /// the state of the current output line
    enum V_mode
       {
@@ -242,10 +193,6 @@ protected:
    /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
    static void do_CR10(UCS_string_vector & result, const Value * symbol_name);
 
-   /// one ravel item in 10 ⎕CR symbol_name
-   static V_mode do_CR10_item(UCS_string & item, const Cell & cell,
-                              V_mode mode, bool may_quote);
-
    /// decide if 'xxx' or ⎕UCS(xxx) shall be used
    static bool use_quote(V_mode mode, const Value * value, ShapeItem pos);
 
@@ -255,6 +202,9 @@ protected:
    /// print item separator
    static void item_separator(UCS_string & line,
                               V_mode from_mode, V_mode to_mode);
+
+   /// return an (almost) unique variable name
+   static UCS_string temp_varname();
 };
 //----------------------------------------------------------------------------
 

@@ -84,19 +84,19 @@ protected:
    /// choose an integer value at random according to distribution \b dist
    static int choose_integer(const vector<int> & dist);
 
-   /// initialize \b cell with a random character
+   /// initialize the next ravel cell of \b Z with a random character
    static void random_character(Value & Z);
 
-   /// initialize \b cell with a random integer
+   /// initialize the next ravel cell of \b Z with a random integer
    static void random_integer(Value & Z);
 
-   /// initialize \b cell with a random float
+   /// initialize the next ravel cell of \b Z with a random float
    static void random_float(Value & Z);
 
-   /// initialize \b cell with a random complex number
+   /// initialize the next ravel cell of \b Z with a random complex number
    static void random_complex(Value & Z);
 
-   /// initialize \b cell with a random nested value
+   /// initialize the next ravel cell of \b Z with a random nested value
    static void random_nested(Value & Z, const Value & B, int depth);
 
    /// return a 17-bit random number from random()

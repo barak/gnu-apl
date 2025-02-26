@@ -144,6 +144,10 @@ public:
         return false;
       }
 
+   /// return \b true if \b token is for a label of \b this function
+   bool is_label(const Token & tok)
+      { return tok.get_Class() == TC_SYMBOL && is_label(tok.get_sym_ptr()); }
+
    /// return the line number for label \b symbol \b this function
    Function_Line get_label_line(const Symbol * symbol)
       {

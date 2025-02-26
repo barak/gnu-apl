@@ -229,7 +229,7 @@ public:
    virtual bool is_example_field() const
       { return false; }
 
-   /// Return true iff this is a PointerCell which pouints to a member value
+   /// Return true iff this is a PointerCell which points to a member value.
    virtual bool is_member_anchor() const
       { return false; }
 

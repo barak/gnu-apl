@@ -708,7 +708,7 @@ Value::get_member(const vector<const UCS_string *> & members,
                                 << "member access: member " << member_ucs
                                 << " exists in ";
                    more.append_members(members, m);
-                   more << "but its (internal) value is not nested";
+                   more << " but its (internal) value is not nested";
                    DOMAIN_ERROR;
                  }
 

@@ -987,10 +987,11 @@ void
 UCS_string::append_double(double num)
 {
 char cc[40];
-   SPRINTF(cc, "%g", num);
+   if (Cell::is_near_int(num))   { SPRINTF(cc, "%.2g", num); }
+   else                          { SPRINTF(cc, "%g", num);   }
    loop(c, sizeof(cc))
       {
-        if (char digit = cc[c])   append(Unicode(digit));
+        if (char digit = cc[c])   push_back(Unicode(digit));
         else                      break;
       }
 }
@@ -1045,10 +1046,11 @@ void
 UCS_string::append_float(APL_Float num)
 {
 char cc[60];
-   SPRINTF(cc, "%lf", double(num));
+   if (Cell::is_near_int(num))   { SPRINTF(cc, "%.2lf", double(num)); }
+   else                          { SPRINTF(cc, "%lf", double(num));   }
    loop(c, sizeof(cc))
       {
-        if (cc[c])   append(Unicode(cc[c]));
+        if (cc[c])   push_back(Unicode(cc[c]));
         else         break;
       }
 }

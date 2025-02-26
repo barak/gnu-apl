@@ -332,8 +332,12 @@ public:
    /// append number (in ASCII encoding like %d) to this string
    void append_number(ShapeItem num);
 
-   /// append floating a point number (in ASCII encoding like %f) to this string
+   /// append a floating point number (in ASCII encoding like %f) to this string
    void append_double(double num);
+
+   /// append a complex number to this string
+   void append_complex(double real, double imag)
+      { append_double(real);   push_back(UNI_J);   append_double(imag); }
 
    /// append number (in ASCII encoding like %X or %x) to this string
    void append_hex(ShapeItem num, bool uppercase);

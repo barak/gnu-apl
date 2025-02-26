@@ -21,6 +21,8 @@
 /** @file
 */
 
+#include <sys/time.h>
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "CDR.hh"
 #include "Macro.hh"
@@ -412,8 +414,10 @@ const Cell * cB = &B->get_cfirst();
 Value_P
 Quad_CR::do_CR10(const Value * B)
 {
-   // cannot use PrintBuffer because the lines in ucs_vec
+   // cannot use PrintBuffer here because the lines in ucs_vec
    // have different lengths
+
+   // collect the APL code that produces B in ucs_vec
    //
 UCS_string_vector ucs_vec;
    do_CR10(ucs_vec, B);
@@ -433,9 +437,16 @@ Value_P Z(ucs_vec.size(), LOC);
 void
 Quad_CR::do_CR10(UCS_string_vector & result, const Value * B)
 {
+   // B is the name of a variable or function.
+   // result shall be the APL code that produces it.
+   //
 const UCS_string symbol_name(*B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
-   if (symbol == 0)   DOMAIN_ERROR;
+   if (symbol == 0)
+      {
+        MORE_ERROR() << "10⎕CR: bad Symbol in do_CR10()";
+        DOMAIN_ERROR;
+      }
 
    switch(symbol->get_NC())
       {
@@ -501,7 +512,8 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                return;
              }
 
-        default: DOMAIN_ERROR;
+        default: MORE_ERROR() << "⎕RVAL: bad symbol->get_NC() in do_CR10()";
+                 DOMAIN_ERROR;
       }
 }
 //----------------------------------------------------------------------------
@@ -510,9 +522,11 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
                           const UCS_string & var_name,
                           const Value * value)
 {
+   // avoid any disturbances by ⎕FC (Format Control).
+   //
    Workspace::push_FC();
 
-   if (value->is_member())   // normal variable
+   if (value->is_member())   // structured variable
       {
         if (const char * error = do_CR10_structured(result, var_name, value))
            {
@@ -522,164 +536,200 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
              goto not_structured;
            }
 
-        Workspace::pop_FC();
+        Workspace::pop_FC();   // restore ⎕FC
         return;   // OK
       }
 
 not_structured:
 
-Picker picker(var_name);
-   do_CR10_value(result, value, picker, -99);
-   Workspace::pop_FC();
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::do_CR10_value(UCS_string_vector & result, const Value * value, 
-                     Picker & picker, ShapeItem pidx)
-{
-   /*
-      recursively encode var_name with value.
+#define PUSH_TEXT result.push_back(text);   text.clear();
 
-      we emit one of 2 formats:
+UCS_string text;
+const APL_types::Depth depth = value->compute_depth();
 
-      short format: dest ← (⍴ value) ⍴ value
-
-      long format:  dest ← (⍴ value) ⍴ 0                 " prolog "
-                    dest[] ← partial value ...
-
-      short format (the default) requires a reasonably short value
-
-      If value is nested then the short or long format is followed
-      by recursive do_CR10_value() calls for the sub-values.
-   */
-
-   picker.push(value->get_shape(), pidx);
-
-UCS_string left;
-   picker.get(left);
-
-   // compute shape_rho which is "" for scalars and true vectors
-   // of length > 1, "," for true vectors of length 1, and
-   // "n1 n2 ... ⍴" otherwise
+   // frequent special case: simple scalar or short simple vector
    //
-UCS_string shape_rho;
-   {
-     if (value->get_rank() == 1)   // true vector
-        {
-          if      (value->element_count() == 0)   shape_rho.append_UTF8("0⍴");
-          else if (value->element_count() == 1)   shape_rho.append_UTF8(",");
-        }
-     else if (value->get_rank() > 1)   // matrix or higher
-        {
-           shape_rho.append_shape(value->get_shape());
-           shape_rho.append_UTF8("⍴");
-         }
-   }
-
-   if (value->element_count() == 0)   // empty value
+   if (depth <= 1             &&
+       value->get_rank() <= 1 &&
+       value->element_count() < 20)   // short simple vector
       {
-        UCS_string reshape(2*(picker.get_level() - 1), UNI_SPACE);
-        Value_P proto = value->prototype(LOC);
-
-        // emit one line for the prototype
-        UCS_string proto_name;
-        picker.get(proto_name);
-        picker.pop();
-        do_CR10_value(result, proto.get(), picker, pidx);
-        result.back().append_UTF8(" ⍝ proto 1");
-
-        // and then another line to reshape the prototype
-        //
-        reshape.append(proto_name);
-        reshape.append_UTF8("←");
-        reshape.append(shape_rho);
-        reshape.append(proto_name);
-        result.push_back(reshape);
-        result.back().append_UTF8(" ⍝ proto 2");
+        text << var_name << "←";
+        if (value->element_count())   // non-empty value
+           {
+             loop(e, value->element_count())
+                 {
+                   if (e)   text << " ";
+                   const Cell & cell = value->get_cravel(e);
+                   text << do_CR10_simple_cell(cell);
+                 }
+           }
+        else                         // empty vector
+           {
+             if (value->get_cfirst().is_character_cell())   text << "''";
+             else                                           text << "⍬";
+           }
+        PUSH_TEXT
+        Workspace::pop_FC();   // restore ⎕FC
         return;
       }
 
-bool nested = false;
-
-   // step 1: top-level ravel. Try short (one-line) ravel and use long
-   // (multi-line ravel) if that fails.
+   // VAR ← (depth+1)⍴0. The first depth items are used as temporary values
+   // for the different depths, while the last item is for saving ⎕IO.
    //
-   if (short_ravel(result, nested, value, picker, left, shape_rho))
+   text << var_name << "←" << (depth + 1) << "⍴0   ⍝ ⍴"
+        << var_name << " ←→ 1+≡" << var_name
+        << ". One item per depth and one for ⎕IO.";                  PUSH_TEXT
+   text << var_name << "[⎕IO+" << depth << "]←⎕IO ◊ ⎕IO←0";          PUSH_TEXT
+
+   do_CR10_level(result, var_name, 0, *value);
+   text << "⎕IO←" << var_name << "[" << depth << "]";                PUSH_TEXT
+   text << var_name << "←↑" << var_name;                             PUSH_TEXT
+
+   Workspace::pop_FC();   // restore ⎕FC
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR10_level(UCS_string_vector & result, const UCS_string & var_name,
+                       size_t level, const Value & value)
+{
+UCS_string text;
+UCS_string indent(2*(level + 1), UNI_SPACE);
+UCS_string var_level = var_name;     var_level << "[" << level << "]";
+UCS_string ind_var_level = indent;   ind_var_level << var_level; 
+   text << ind_var_level << "←⊂" << value.nz_element_count()
+        << "⍴0   ⍝ L" << level << " zeros";                      PUSH_TEXT
+
+bool has_nested = false;
+bool has_simple = false;
+   loop(v, value.nz_element_count())
+       {
+         const Cell & cell = value.get_cravel(v);
+         if (cell.is_pointer_cell())
+            {
+              has_nested = true;
+              continue;
+            }
+         if (cell.is_near_zero())   continue;   // already done
+         has_simple = true;
+       }
+
+   if (has_simple)
       {
-        result.push_back(compute_prolog(picker.get_level(), left, value));
+        text << indent << "⍝ L" << level << " simple items...";   PUSH_TEXT
+        UCS_string accu;
+        loop(e, value.nz_element_count())
+            {
+              const Cell & cell = value.get_cravel(e);
+              if (cell.is_pointer_cell())   continue;
 
-        ShapeItem pos = 0;
-        V_mode mode = Vm_NONE;
-        UCS_string rhs;
-        ShapeItem count = 0;                // the number of items on this line
-        ShapeItem todo = value->nz_element_count();  // number of items to do
+              UCS_string item_text;
+              item_text << "((⊃" << var_level << ")[" << e << "])←"
+                        << do_CR10_simple_cell(cell);
 
-        loop(p, todo)
+             if ((indent.size() + accu.size() + item_text.size()) < 72)
+                {
+                  // item_text fits into the accu. Append it to the accu
+                  //
+                  if (accu.size())   accu.append_UTF8(" ◊ ");
+                  accu.append(item_text);
+                }
+             else
+                {
+                  // item_text does not fit into the accu. Flush the accu and
+                  // start a new one.
+                  text = indent;   text.append(accu);                PUSH_TEXT
+                  accu = item_text;
+                }
+            }
+        if (accu.size())
            {
-             // recompute line (which changes because count changes)
-             //
-             UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
-             picker.get_indexed(line, pos, count);
-             line.append_UTF8("←");
-
-             // compute next item
-             //
-             UCS_string item;
-             const Cell & cell = value->get_cravel(p);
-             if (cell.is_pointer_cell())   nested = true;
-             const bool may_quote = use_quote(mode, value, p);
-             const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
-
-              if (count && (rhs.size() + item.size() + line.size()) > 76)
-                 {
-                   // next item does not fit in this line. Close the line,
-                   // append it to result, and start a new line.
-                   //
-                   close_mode(rhs, mode);
-
-                   line.append(rhs);
-                   pos += count;
-                   count = 0;
-
-                   result.push_back(line);
-                   rhs.clear();
-                   mode = Vm_NONE;
-                 }
-
-             item_separator(rhs, mode, next_mode);
-
-             mode = next_mode;
-             rhs.append(item);
-             ++count;
-           }
-
-     // all items done: close mode
-     //
-     close_mode(rhs, mode);
-
-UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
-     picker.get_indexed(line, pos, count);
-     line.append_UTF8("←");
-     line.append(rhs);
-
-     result.push_back(line);
-   }
-
-   // step 2: nested items
-   //
-   if (nested)
-      {
-        loop(p, value->element_count())
-           {
-             const Cell & cell = value->get_cravel(p);
-             if (!cell.is_pointer_cell())   continue;
-
-             const Value * sub_value = cell.get_pointer_value().get();
-             do_CR10_value(result, sub_value, picker, p);
+             text = indent;
+             text.append(accu);
+             PUSH_TEXT
+             text = indent;
            }
       }
 
-   picker.pop();
+   if (has_nested)
+      {
+        text << indent << "⍝ L" << level << " nested items...";      PUSH_TEXT
+        loop(v, value.nz_element_count())
+            {
+              const Cell & cell = value.get_cravel(v);
+              if (!cell.is_pointer_cell())   continue;
+              const Value & sub_val = *cell.get_pointer_value();
+              do_CR10_level(result, var_name, level + 1, sub_val);
+
+              text << indent << "((⊃" << var_level << ")[" << v << "])←"
+                   << var_name << "[" << (level + 1) << "]";         PUSH_TEXT
+            }
+      }
+
+   // final reshape
+   //
+const Shape & shape = value.get_shape();
+   if (shape.get_rank() != 1)
+      {
+        text << ind_var_level << "←⊂" <<  do_CR10_shape(shape)
+             << "⍴⊃" << var_name << "[" << level << "]"
+             << "   ⍝ L" << level << " final reshape";               PUSH_TEXT
+      }
+   else
+      {
+        text << indent << "⍝ no need for final reshape";             PUSH_TEXT
+      }
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::do_CR10_simple_cell(const Cell & cell)
+{
+UCS_string text;
+   if (cell.is_character_cell())
+      {
+        // be careful with non-printable characters and quotes
+        //
+        const Unicode uni = cell.get_char_value();
+        if (uni < ' ' ||
+            uni == UNI_SINGLE_QUOTE ||
+            uni == UNI_DOUBLE_QUOTE ||
+            uni == 127)
+           {
+             text << "(⎕UCS " << int(uni) << ")";
+           }
+        else
+           {
+             text << "'" << uni << "'";
+           }
+        return text;
+      }
+   if (cell.is_integer_cell())
+      {
+        return text << cell.get_int_value();
+      }
+   if (cell.is_real_cell())
+      {
+        return text << cell.get_real_value();
+      }
+   if (cell.is_complex_cell())
+      {
+        text.append_complex(cell.get_real_value(), cell.get_imag_value());
+        return text;
+      }
+   FIXME;
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::do_CR10_shape(const Shape & shape)
+{
+   if (shape.get_rank() == 0)   return UCS_string(UNI_ZILDE);   // scalar
+
+UCS_string result;
+   loop(r, shape.get_rank())
+       {
+         if (r)   result.push_back(UNI_SPACE);
+         result.append_number(shape.get_shape_item(r));
+       }
+   return result;
 }
 //----------------------------------------------------------------------------
 const char *
@@ -687,127 +737,40 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result,
                             const UCS_string & var_name,
                             const Value * value)
 {
-   if (value->get_rank() != 2)   return "bad rank";
-   if (value->get_cols() != 2)   return "bad shape";
+   if (value->get_rank() != 2)   return "bad rank (structured variable)";
+   if (value->get_cols() != 2)   return "bad shape (structured variable)";
 
    loop(r, value->get_rows())
        {
          const Cell & member_cell = value->get_cravel(2*r);
          if (!member_cell.is_pointer_cell())   continue;
          const Value * member_name = member_cell.get_pointer_value().get();
+
+         // unused member entries are integer 0.
+         //
          if (!member_name->is_char_string())   continue;
 
          const UCS_string member_ucs(*member_name);
-         UCS_string path = var_name;
-         path.push_back(UNI_FULLSTOP);
-         path.append(member_ucs);
+         UCS_string member_path = var_name;
+         member_path.push_back(UNI_FULLSTOP);
+         member_path.append(member_ucs);
 
          const Cell & data_cell = value->get_cravel(2*r + 1);
-         if (data_cell.is_member_anchor())   // non-leaf
+         if (data_cell.is_simple_cell())
             {
-              const Value * sub_value = data_cell.get_pointer_value().get();
-              do_CR10_structured(result, path, sub_value);
+              member_path.push_back(UNI_LEFT_ARROW);
+              const UCS_string data_value = do_CR10_simple_cell(data_cell);
+              member_path.append(data_value);
+              result.push_back(member_path);
             }
-         else                                // leaf
+         else
             {
-              Picker picker(path);
-              if (data_cell.is_pointer_cell())   // nested data_cell
-                 {
-                   const Value * sub_value =
-                                 data_cell.get_pointer_value().get();
-                   do_CR10_value(result, sub_value, picker, -99);
-                 }
-              else                               // simple data_cell
-                 {
-                   Value_P sub_value(LOC);
-                   sub_value->next_ravel_Cell(data_cell);
-                   do_CR10_value(result, sub_value.get(), picker, -99);
-                 }
+              do_CR10_variable(result, member_path,
+                               data_cell.get_pointer_value().get());
             }
        }
 
    return 0;
-}
-//----------------------------------------------------------------------------
-bool
-Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
-                     const Value * value, const Picker & picker,
-                     const UCS_string & left, const UCS_string & shape_rho)
-{
-   // some quick checks beforehand to avoid wasting time attempting to
-   // create short ravel
-   //
-   enum { MAX_SHORT_RAVEL_LEN = 70 };
-
-const ShapeItem value_len = value->nz_element_count();
-   if (value_len >= MAX_SHORT_RAVEL_LEN)   return true;  // too long
-int len = 0;
-   loop(v, value_len)
-      {
-        const Cell & cell = value->get_cravel(v);
-        if (cell.is_integer_cell())   len += 2;   // min. integer (+ separator)
-        else if (cell.is_character_cell())   len += 1;
-        else if (cell.is_pointer_cell())     len += 1;
-        else if (cell.is_complex_cell())     len += 3;
-        else                                 len += 2;
-
-        if (len >= MAX_SHORT_RAVEL_LEN)   return true;
-      }
-
-   // at this point, a short ravel MAY be possible. Try it
-   //
-UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);  // indent
-
-   line.append(left);
-   line.append_UTF8("←");
-   line.append(shape_rho);
-
-V_mode mode = Vm_NONE;
-   loop(v, value_len)
-       {
-         // compute next item
-         //
-          UCS_string item;
-          const Cell & cell = value->get_cravel(v);
-          if (cell.is_pointer_cell())   nested = true;
-          const bool may_quote = use_quote(mode, value, v);
-          const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
-
-          item_separator(line, mode, next_mode);
-
-          mode = next_mode;
-          line.append(item);
-          if ((line.size() + item.size()) >= MAX_SHORT_RAVEL_LEN)   return true;
-       }
-
-   // all items done: close mode
-   //
-   close_mode(line, mode);
-
-   result.push_back(line);
-   return false;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Quad_CR::compute_prolog(int pick_level, const UCS_string & left,
-                        const Value * value)
-{
-   // compute the prolog
-   //
-UCS_string prolog(2 * (pick_level - 1), UNI_SPACE);
-Unicode default_char = UNI_SPACE;
-APL_Integer default_int  = 0;
-const bool default_is_int = figure_default(value, default_char, default_int);
-
-   prolog.append(left);
-   prolog.append_UTF8("←");
-   if (pick_level > 1)   prolog.append_UTF8("⊂");
-   prolog.append_shape(value->get_shape());
-   if (default_is_int)   prolog.append_UTF8("⍴0 ⍝ prolog ≡");
-   else                  prolog.append_UTF8("⍴' ' ⍝ prolog ≡");
-   prolog.append_number(pick_level);
-
-   return prolog;
 }
 //----------------------------------------------------------------------------
 bool
@@ -830,135 +793,6 @@ ShapeItem blanks = 0;
       }
 
    return zeroes >= blanks;
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::Picker::get(UCS_string & result)
-{
-const int level = shapes.size();
-
-   if (level == 1)
-      {
-        result.append(var_name);
-        return;
-      }
-
-   result.append_UTF8("((⎕IO+");
-   if (level == 2 && shapes[0].get_rank() > 1)   // need ⊂ for left ⊃ arg
-      {
-         Shape sh = shapes[0].offset_to_index(indices[1], 0);
-         result.append_UTF8("(⊂");
-         result.append_shape(sh);
-         result.append_UTF8(")");
-      }
-   else
-      {
-        loop(s, shapes.size() - 1)
-           {
-             if (s)   result.append_UTF8(" ");
-             Shape sh = shapes[s].offset_to_index(indices[s + 1], 0);
-             if (sh.get_rank() > 1)   result.append_UTF8("(");
-             result.append_shape(sh);
-             if (sh.get_rank() > 1)   result.append_UTF8(")");
-           }
-      }
-
-   result.append_UTF8(")⊃");
-   result.append(var_name);
-   result.append_UTF8(")");
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::Picker::get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len)
-{
-   // ⊃ is not needed at top level
-   //
-const bool need_disclose = get_level() > 1;
-
-   // , is only needed if the picked item is not a true vector
-   //
-const bool need_comma = shapes.back().get_rank() != 1;
-
-   result.append_UTF8("(");
-   if (need_comma)      result.append_UTF8(",");
-   if (need_disclose)   result.append_UTF8("⊃");
-   get(result);
-   result.append_UTF8(")");
-   result.append_UTF8("[");
-   if (pos)
-      {
-        result.append_number(pos);
-        result.append_UTF8("+");
-      }
-   result.append_UTF8("⍳");
-   result.append_number(len);
-   result.append_UTF8("]");
-}
-//----------------------------------------------------------------------------
-Quad_CR::V_mode
-Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
-                      bool may_quote)
-{
-   if (cell.is_character_cell())
-      {
-        if (may_quote)   // use ''
-           {
-             const Unicode uni = cell.get_char_value();
-             item.append(uni);
-             if (uni == UNI_SINGLE_QUOTE)   item.append(uni);
-             return Vm_QUOT;
-           }
-        else             // use UCS()
-           {
-             item.append_number(cell.get_char_value());
-             return Vm_UCS;
-           }
-      }
-
-   if (cell.is_integer_cell())
-      {
-        APL_Integer aint = cell.get_int_value();
-        if (aint < 0)
-           {
-             item.append(UNI_OVERBAR);
-             aint = -aint;
-           }
-        item.append_number(aint);
-        return Vm_NUM;
-      }
-
-   if (cell.is_float_cell())
-      {
-        bool scaled = false;
-        PrintContext pctx(PR_APL_MIN, MAX_Quad_PP, MAX_Quad_PW);
-        item = UCS_string(cell.get_real_value(), scaled, pctx);
-        return Vm_NUM;
-      }
-
-   if (cell.is_complex_cell())
-      {
-        bool scaled = false;
-        PrintContext pctx(PR_APL_MIN, MAX_Quad_PP, MAX_Quad_PW);
-        item = UCS_string(cell.get_real_value(), scaled, pctx);
-        item.append_UTF8("J");
-        scaled = false;
-        item.append(UCS_string(cell.get_imag_value(), scaled, pctx));
-        return Vm_NUM;
-      }
-
-   if (cell.is_pointer_cell())
-      {
-        // cell is a pointer cell which will be replaced later.
-        // For now we add an item in the current mode as placeholder
-        //
-        if (mode == Vm_QUOT)   { item.append_UTF8("∘");     return Vm_QUOT; }
-        if (mode == Vm_UCS)    { item.append_UTF8("33");    return Vm_UCS;  }
-        item.append_UTF8("00");
-        return Vm_NUM;
-      }
-
-   DOMAIN_ERROR;
-   return mode;   // not reached
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -2093,6 +1927,19 @@ const ShapeItem ec = value.element_count();
 
    result.pop_back();   // trailing blanf
 
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::temp_varname()
+{
+char cc[40];
+timeval tv;
+   gettimeofday(&tv, 0);
+   SPRINTF(cc, "⍙¯%X¯%X", uint32_t(tv.tv_sec), uint32_t(tv.tv_usec));
+   usleep(1000);   // to make the timestamp unique;
+
+const UTF8_string varname_utf(cc);
+   return UCS_string(varname_utf);
 }
 //----------------------------------------------------------------------------
 

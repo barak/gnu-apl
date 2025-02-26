@@ -1071,18 +1071,16 @@ bool VOID_inserted = false;
         const Token & tok_pc_1 = body[pc - 1];   // token left of / or ⍴
         const TokenClass class_pc_1 = tok_pc_1.get_Class();
         if ((is_SLASH_or_BACKSLASH(tag_pc) || tag_pc == TOK_F12_RHO) &&
-            ((class_pc_1 == TC_SYMBOL && is_label(tok_pc_1.get_sym_ptr())) ||
-              class_pc_1 == TC_VALUE))
+            ( is_label(tok_pc_1) || class_pc_1 == TC_VALUE))
            {
-             // collect items in right argument
+             // collect items in right argument of / or ⍴
              //
              items_B.push_back(Function_PC(pc - 1));
              for (Function_PC pos = pc - 2; pos >= 0; --pos)
                  {
                    const TokenTag tag_pos = body[pos].get_tag();
                    const TokenClass class_pos = body[pos].get_Class();
-                   if (class_pos == TC_SYMBOL &&
-                       is_label(body[pos].get_sym_ptr()))
+                   if (is_label(body[pos]))
                       {
                         items_B.push_back(Function_PC(pos));
                       }
@@ -1105,9 +1103,10 @@ bool VOID_inserted = false;
                         break;
                       }
                  }
-
            }
+
         if (items_B.size() == 0)   continue;   // for (Function_PC pc...
+
         if (items_B.size() == 1)
            {
              // single item. If iot is a value then leave it as is.
