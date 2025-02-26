@@ -179,7 +179,8 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                       {
                         Value_P B1 = cell_B.get_pointer_value();
                         Value_P Z1(B1->get_shape(), LOC);
-                        new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
+                        new (&cell_Z) PointerCell(Z1.get(),
+                                                  *job_B->value_Z, 0x6B616769);
 
                         const PJob_scalar_B j1(Z1, B1);
                         Thread_context::get_master().joblist_B.add_job(j1);
