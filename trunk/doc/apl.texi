@@ -7036,6 +7036,21 @@ of @b{A} and @b{B}. Naturally, the multiplications of these 0-columns or
 
 @end itemize
 
+@c ----------------------------------------------------------------------------
+@node    Section 2.44
+@section Monadic ≠ (Nub Sieve)
+
+The nub sieve @b{Z←≠B} of a value @b{B} is a Boolean vector @b{Z} with the
+same shape as @b{B} and:
+
+@b{Z[i]} is 1 if @b{B[i]} is the first occurrence of @b{B[i]} in @b{B} and
+0 otherwise. For vectors @b{B} this can also be expressed as:
+
+@verbatim
+≠ B ←→ (B⍳B)=(⍳⍴B)
+@end verbatim
+
+
 @c ============================================================================
 @node Chapter 3
 

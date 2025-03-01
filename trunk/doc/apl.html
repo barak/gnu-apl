@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>February 11, 2025.
+<p>March 1, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -305,6 +305,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <li><a id="toc-Syntax-1" href="#Syntax-1">2.42.2 Syntax</a></li>
     </ul></li>
     <li><a id="toc-Matrix-Product" href="#Section-2_002e43">2.43 Matrix Product</a></li>
+    <li><a id="toc-Monadic-_005b_003f_005d-_0028Nub-Sieve_0029" href="#Section-2_002e44">2.44 Monadic ≠ (Nub Sieve)</a></li>
   </ul></li>
   <li><a id="toc-Limitations-and-Missing-Features" href="#Chapter-3">3 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -1012,6 +1013,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e41">⎕XML  - XML Parsing</a></li>
 <li><a href="#Section-2_002e42">Conditionals</a></li>
 <li><a href="#Section-2_002e43">Matrix Product</a></li>
+<li><a href="#Section-2_002e44">Monadic ≠ (Nub Sieve)</a></li>
 </ul>
 <hr>
 <div class="section" id="Section-2_002e1">
@@ -7282,7 +7284,7 @@ Fatal error in defined function line [2]. You may now:
 <div class="section" id="Section-2_002e43">
 <div class="header">
 <p>
-Previous: <a href="#Section-2_002e42" accesskey="p" rel="prev">Conditionals</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e44" accesskey="n" rel="next">Monadic ≠ (Nub Sieve)</a>, Previous: <a href="#Section-2_002e42" accesskey="p" rel="prev">Conditionals</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Matrix-Product"></span><h3 class="section">2.43 Matrix Product</h3>
 
@@ -7368,6 +7370,24 @@ of <b>A</b> and <b>B</b>. Naturally, the multiplications of these 0-columns or
 0-rows is not in fact performed, but optimized away.
 
 </li></ul>
+
+<hr>
+</div>
+<div class="section" id="Section-2_002e44">
+<div class="header">
+<p>
+Previous: <a href="#Section-2_002e43" accesskey="p" rel="prev">Matrix Product</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Monadic-_005b_003f_005d-_0028Nub-Sieve_0029"></span><h3 class="section">2.44 Monadic ≠ (Nub Sieve)</h3>
+
+<p>The nub sieve <b>Z←≠B</b> of a value <b>B</b> is a Boolean vector <b>Z</b> with the
+same shape as <b>B</b> and:
+</p>
+<p><b>Z[i]</b> is 1 if <b>B[i]</b> is the first occurrence of <b>B[i]</b> in <b>B</b> and
+0 otherwise. For vectors <b>B</b> this can also be expressed as:
+</p>
+<pre class="verbatim">≠ B ←→ (B⍳B)=(⍳⍴B)
+</pre>
 
 <hr>
 </div>

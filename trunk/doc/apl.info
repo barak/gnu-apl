@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 11, 2025.  This manual briefly documents GNU APL, an
-interpreter for APL as described in ISO standard 13751, aka.
-"Programming Language APL, Extended".
+March 1, 2025.  This manual briefly documents GNU APL, an interpreter
+for APL as described in ISO standard 13751, aka.  "Programming Language
+APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -6531,7 +6531,7 @@ Fatal error in defined function line [2]. You may now:
    Like shown in the examples above.
 
 
-File: apl.info,  Node: Section 2.43,  Prev: Section 2.42,  Up: Chapter 2
+File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
 
 2.43 Matrix Product
 ===================
@@ -6613,6 +6613,20 @@ the operator +.×:
      will add 0-columns to A resp.  0-rows to B to match the shapes of A
      and B. Naturally, the multiplications of these 0-columns or 0-rows
      is not in fact performed, but optimized away.
+
+
+File: apl.info,  Node: Section 2.44,  Prev: Section 2.43,  Up: Chapter 2
+
+2.44 Monadic ≠ (Nub Sieve)
+==========================
+
+The nub sieve Z←≠B of a value B is a Boolean vector Z with the same
+shape as B and:
+
+   Z[i] is 1 if B[i] is the first occurrence of B[i] in B and 0
+otherwise.  For vectors B this can also be expressed as:
+
+≠ B ←→ (B⍳B)=(⍳⍴B)
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -8120,77 +8134,78 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11571
-Node: Chapter 223792
-Node: Section 2.125892
-Node: Subsection 2.1.127114
-Node: Subsection 2.1.227766
-Node: Subsection 2.1.328579
-Node: Subsection 2.1.434362
-Node: Subsection 2.1.538158
-Node: Subsection 2.1.639018
-Node: Subsection 2.1.747118
-Node: Subsection 2.1.848851
-Node: Section 2.252167
-Node: Section 2.352926
-Node: Section 2.458550
-Node: Section 2.559822
-Node: Section 2.664252
-Node: Section 2.764425
-Node: Section 2.865055
-Node: Section 2.969259
-Node: Section 2.1071600
-Node: Section 2.1173689
-Node: Section 2.1275238
-Node: Section 2.1377019
-Node: Section 2.1478948
-Node: Section 2.1579889
-Node: Section 2.1680140
-Node: Section 2.1781536
-Node: Section 2.1891992
-Node: Section 2.1994480
-Node: Section 2.20101206
-Node: Section 2.21102709
-Node: Section 2.22113200
-Node: Section 2.23119082
-Node: Section 2.24122340
-Node: Section 2.25122631
-Node: Section 2.26133472
-Node: Section 2.27133744
-Node: Section 2.28140323
-Node: Section 2.29142777
-Node: Section 2.30143446
-Node: Section 2.31145097
-Node: Section 2.32148872
-Node: Section 2.33162361
-Node: Output File Format178492
-Node: Section 2.34179667
-Node: Section 2.35189017
-Node: Section 2.36190036
-Node: Section 2.37204717
-Node: Section 2.38215713
-Node: Section 2.39220415
-Node: Section 2.40222511
-Node: Section 2.41226929
-Node: Section 2.42248239
-Node: Section 2.43259155
-Node: Chapter 3262329
-Node: Chapter 4264837
-Node: Chapter 5265963
-Node: Section 5.1267500
-Node: Section 5.2268780
-Node: Section 5.3269140
-Node: Section 5.4269382
-Node: Section 5.5270044
-Node: Section 5.6270522
-Node: Section 5.7271295
-Node: Section 5.8271721
-Node: Chapter 6272123
-Node: Section 6.1272542
-Node: Section 6.2273229
-Node: Chapter 7274060
-Node: Section 7.1274563
-Node: Section 7.2299876
+Node: Chapter 11568
+Node: Chapter 223789
+Node: Section 2.125889
+Node: Subsection 2.1.127111
+Node: Subsection 2.1.227763
+Node: Subsection 2.1.328576
+Node: Subsection 2.1.434359
+Node: Subsection 2.1.538155
+Node: Subsection 2.1.639015
+Node: Subsection 2.1.747115
+Node: Subsection 2.1.848848
+Node: Section 2.252164
+Node: Section 2.352923
+Node: Section 2.458547
+Node: Section 2.559819
+Node: Section 2.664249
+Node: Section 2.764422
+Node: Section 2.865052
+Node: Section 2.969256
+Node: Section 2.1071597
+Node: Section 2.1173686
+Node: Section 2.1275235
+Node: Section 2.1377016
+Node: Section 2.1478945
+Node: Section 2.1579886
+Node: Section 2.1680137
+Node: Section 2.1781533
+Node: Section 2.1891989
+Node: Section 2.1994477
+Node: Section 2.20101203
+Node: Section 2.21102706
+Node: Section 2.22113197
+Node: Section 2.23119079
+Node: Section 2.24122337
+Node: Section 2.25122628
+Node: Section 2.26133469
+Node: Section 2.27133741
+Node: Section 2.28140320
+Node: Section 2.29142774
+Node: Section 2.30143443
+Node: Section 2.31145094
+Node: Section 2.32148869
+Node: Section 2.33162358
+Node: Output File Format178489
+Node: Section 2.34179664
+Node: Section 2.35189014
+Node: Section 2.36190033
+Node: Section 2.37204714
+Node: Section 2.38215710
+Node: Section 2.39220412
+Node: Section 2.40222508
+Node: Section 2.41226926
+Node: Section 2.42248236
+Node: Section 2.43259152
+Node: Section 2.44262347
+Node: Chapter 3262723
+Node: Chapter 4265231
+Node: Chapter 5266357
+Node: Section 5.1267894
+Node: Section 5.2269174
+Node: Section 5.3269534
+Node: Section 5.4269776
+Node: Section 5.5270438
+Node: Section 5.6270916
+Node: Section 5.7271689
+Node: Section 5.8272115
+Node: Chapter 6272517
+Node: Section 6.1272936
+Node: Section 6.2273623
+Node: Chapter 7274454
+Node: Section 7.1274957
+Node: Section 7.2300270
 
 End Tag Table
 
