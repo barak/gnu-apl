@@ -287,8 +287,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A, B,
-                              &Cell::bif_not_equal_bitwise); }
+      { return eval_scalar_AB(A, B, &Cell::bif_not_equal_bitwise); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -557,6 +556,9 @@ public:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_not_equal); }
+
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const

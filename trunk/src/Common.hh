@@ -399,14 +399,8 @@ using namespace std;
 
 //----------------------------------------------------------------------------
 
-/// return true iff \b uni is a padding character (used internally).
-inline bool is_iPAD_char(Unicode uni)
-{
-   return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
-       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
-}
-//----------------------------------------------------------------------------
-
+/// a function to be used if CERR might not (yet) be initialized. Returns cerr
+/// in that case.
 extern std::ostream & get_CERR();
 
 /// The current location in the source file.

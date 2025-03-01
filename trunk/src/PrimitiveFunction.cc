@@ -1287,26 +1287,21 @@ Value_P Z = IntScalar(depth, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-Token
-Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
+bool
+Bif_F12_EQUIV::do_eval_AB(Value_P A, Value_P B)
 {
    // match
    //
-
 const double qct = Workspace::get_CT();
 
-   if (!A->same_shape(*B))   //shape mismatch
-      return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+   if (!A->same_shape(*B))   return false;   // shape mismatch
 
    for (ConstRavel_P a(A, true), b(B, true); +a; ++a, ++b)
        {
-         if (!a->equal(*b, qct))
-            {
-              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
-            }
+         if (!a->equal(*b, qct))   return false;   // no match
        }
 
-   return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // match
+   return true;   // match
 }
 //============================================================================
 Token

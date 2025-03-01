@@ -1067,6 +1067,66 @@ const Cell * C = &B.get_cfirst();
 }
 //============================================================================
 Token
+Bif_F2_UNEQU::eval_B(Value_P B) const
+{
+   // ≠ B : nub sievce. Return a boolean vector Z, corresponding to B, where 
+   // Z[i] is 1 iff B[i] is the first occurrence in B. Aka.(B⍳B)=(⍳⍴B).
+   //
+const double qct = Workspace::get_CT();
+vector<const Cell *> firsts;
+Value_P Z(B->get_shape(), LOC);
+   loop(b, B->element_count())
+       {
+         const Cell & cell_B = B->get_cravel(b);
+
+         // sequentially search cell_B in firsts...
+         //
+         bool existing_item = false;
+         loop(f, firsts.size())
+             {
+               const Cell & cell_F = *firsts[f];
+               if (cell_B.is_pointer_cell())   // nested B
+                  {
+                    if (cell_F.is_pointer_cell())
+                       {
+                         Value_P vB = cell_B.get_pointer_value();
+                         Value_P vF = cell_F.get_pointer_value();
+                         const Token equiv = Bif_F12_EQUIV::fun.eval_AB(vB, vF);
+                         if (equiv.get_apl_val()->get_cfirst()
+                                  .get_int_value() == 0)   continue;
+                       }
+                    else
+                       {
+                         continue;
+                       }
+                  }
+               else   // simple B
+                  {
+                    if (cell_F.is_pointer_cell())     continue;
+                    if (!cell_B.equal(cell_F, qct))   continue;
+                  }
+
+               existing_item = true;
+               break;   // loop(f, ...
+             }
+
+         if (existing_item)
+            {
+              Z->next_ravel_0();
+            }
+         else
+            {
+              Z->next_ravel_1();
+              firsts.push_back(&cell_B);   // and remember it
+            }
+       }
+
+   Z->set_default(*B.get(), LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;

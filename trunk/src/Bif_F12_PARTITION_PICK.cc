@@ -259,7 +259,7 @@ const ShapeItem ec_A = A->element_count();
 
 const APL_Integer qio = Workspace::get_IO();
 
-Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B, qio);
+Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B.get(), qio);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -531,7 +531,7 @@ ShapeItem ret[MAX_RANK];
 //----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_PICK::pick_offset(const Cell * const A0, ShapeItem idx_A,
-                          ShapeItem len_A, Value_P B, APL_Integer qio)
+                          ShapeItem len_A, const Value * B, APL_Integer qio)
 {
 const Cell & cA = A0[idx_A];
 
@@ -561,8 +561,7 @@ const Cell & cA = A0[idx_A];
              vector<const UCS_string *> members;
              members.push_back(&member);
              members.push_back(&top_level);   // dummy, must be last
-             Value * val_B = B.get();
-             Cell * Bsub = B->get_member(members, val_B, false, true);
+             const Cell * Bsub = B->get_existing_member(members);  // may throw
              return Bsub - &B->get_cfirst();
            }
         else                  // case ii. (normal B)
@@ -615,7 +614,7 @@ const Cell & cA = A0[idx_A];
 //----------------------------------------------------------------------------
 Value_P
 Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
-                   Value_P B, APL_Integer qio)
+                   const Value * B, APL_Integer qio)
 {
    // A0 points to ↑A and we are at depth idx_A, which means that A0[idx_A] is
    // the current index of B.
@@ -627,7 +626,8 @@ const Cell * cB = &B->get_cravel(offset);
       {
         if (cB->is_pointer_cell())
            {
-             return pick(A0, idx_A+1, len_A-1, cB->get_pointer_value(), qio);
+             return pick(A0, idx_A+1, len_A-1,
+                         cB->get_pointer_value().get(), qio);
            }
 
         if (cB->is_lval_cell())
@@ -645,7 +645,7 @@ const Cell * cB = &B->get_cravel(offset);
              //
              Value_P subval = target.get_pointer_value();   // right-value
              Value_P subrefs = subval->get_cellrefs(LOC);   // left-value
-             return pick(A0, idx_A + 1, len_A - 1, subrefs, qio);
+             return pick(A0, idx_A + 1, len_A - 1, subrefs.get(), qio);
            }
 
         // simple cell. This means that the depth of B does not suffice to
@@ -655,8 +655,8 @@ const Cell * cB = &B->get_cravel(offset);
                       // ERROR would be more intuitive since A is too long.
       }
 
-   // len_A == 1, i.e. the end of the itesation over A has been reached,
-   // and cB is the cell in B that was pick'ed by A⊃B.
+   // len_A == 1, means that the end of the iteration over A has been reached,
+   // and that cB is the cell in B that was pick'ed by A⊃B.
    //
    if (cB->is_pointer_cell())
       {
@@ -671,13 +671,13 @@ const Cell * cB = &B->get_cravel(offset);
 
 #if 1
 
-// if the target is nested, then GNU APL used used to assign to the items in
-// the target (possibly scalar-extending or filling the value B as to match the
-// the shape of B. However, neither IBM APL2 nor Dyalog do do that and hence,
-// being overruled by the majority, we follow suit.
+/* if the target is nested, then GNU APL used to assign B to the items in
+   the target (possibly scalar-extending or filling the value B as to match
+   the shape of B. However, neither IBM APL2 nor Dyalog do that and hence,
+   being overruled by the majority, we follow suit.
 
-// See bug-apl@gnu.org, 3/4/2023 (Mr. Sunday).
-
+   See bug-apl@gnu.org, 3/4/2023 (Mr. Sunday).
+ */
         if (target->is_pointer_cell())
            {
              // cB was created by get_cellrefs() which is flat (non-recursive).

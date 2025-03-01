@@ -652,7 +652,7 @@ const ShapeItem ec = nz_element_count();
 //----------------------------------------------------------------------------
 Cell *
 Value::get_member(const vector<const UCS_string *> & members,
-                  Value * & owner, bool create_if_needed, bool throw_error)
+                  Value * & owner, bool throw_error)
 {
    owner = this;
 
@@ -718,17 +718,6 @@ Value::get_member(const vector<const UCS_string *> & members,
             }
          else   // member does not exist
             {
-              if (!create_if_needed)   // give up
-                 {
-                   if (!throw_error)   return 0;   // silent
-
-                   UCS_string & more = MORE_ERROR()
-                                       << "member access: structure ";
-                   more.append_members(members, m + 1);
-                   more << " has no member '" << member_ucs << "'.";
-                   VALUE_ERROR;
-                 }
-
               // create new member row...
 
               // find an unused slot in owner. get_new_member() is guaranteed
@@ -742,6 +731,80 @@ Value::get_member(const vector<const UCS_string *> & members,
               Value_P member_sub = EmptyStruct(LOC);
               new (member_data)   PointerCell(member_sub.get(), *owner);
               owner = member_sub.get();
+            }   // if (member_cell == 0)
+       }
+
+   FIXME;   // not reached
+}
+//----------------------------------------------------------------------------
+const Cell *
+Value::get_existing_member(const vector<const UCS_string *> & members) const
+{
+const Value * parent = this;
+
+   // members[members.size() - 1] == this
+   //
+   for (int m = members.size() - 2; m >= 0; --m)
+       {
+         if (!parent->is_member())
+            {
+              UCS_string & more = MORE_ERROR()
+                  << "member access: non-structured variable "
+                  << *members.back() << " has no member ";
+              more.append_members(members, 0);
+              DOMAIN_ERROR;
+            }
+
+         const UCS_string & member_ucs = *members[m];
+         if (parent->get_rank() != 2)
+            {
+              UCS_string & more = MORE_ERROR() << "member access: the rank of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              RANK_ERROR;
+            }
+
+         if (parent->get_cols() != 2)
+            {
+              UCS_string & more = MORE_ERROR()
+                 << "member access: the number of columns of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              LENGTH_ERROR;
+            }
+
+         const Cell * member_cell = parent->get_member_data(member_ucs);
+         if (member_cell)   // existing member
+            {
+              if (m == 0)   return member_cell; // final member
+
+              // more members coming. Then member_cell should point to a
+              // structured sub-member
+              //
+              if (!member_cell->is_pointer_cell() ||
+                  !member_cell->get_pointer_value()->is_member())
+                 {
+                   UCS_string & more = MORE_ERROR()
+                                << "member access: member " << member_ucs
+                                << " exists in ";
+                   more.append_members(members, m);
+                   more << " but its (internal) value is not nested";
+                   DOMAIN_ERROR;
+                 }
+
+              // next member
+              //
+              parent = member_cell->get_pointer_value().get();
+            }
+         else   // member does not exist
+            {
+              UCS_string & more = MORE_ERROR()
+                                       << "member access: structure ";
+              more.append_members(members, m + 1);
+              more << " has no member '" << member_ucs << "'.";
+              VALUE_ERROR;
             }   // if (member_cell == 0)
        }
 
@@ -1177,7 +1240,7 @@ vector<const UCS_string *> members;
    members.push_back(&member_name);   // ignored
 
 Value * member_owner = 0;
-Cell * data = get_member(members, member_owner, true, false);
+Cell * data = get_member(members, member_owner, false);
    Assert(member_owner);
    Assert(member_owner == this);
    new (data) PointerCell(member_value, *this);
@@ -2631,51 +2694,67 @@ const Cell & first = get_cfirst();
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-/// lrp p.138: S←⍴⍴A + NOTCHAR (per column)
+/* lrp p.138: S←⍴⍴A + NOTCHAR (per column)
+
+   lrm defines NOTCHAR as (comments by jsa)
+
+   ∇ Z←NOTCHAR R
+   [1] Z←1              ⍝ assume NOTCHAR
+   [2] →(1<≡R)/0        ⍝ NOTCHAR if R is nested
+   [3] Z←' '∨.≠,↑0⍴⊂R   ⍝ all characters ?
+   ∇
+
+  IOW: NOTCHAR returns 1 if R is not a simple character
+       array and 0 otherwise.
+ */
 int32_t
-Value::get_col_spacing(bool & not_char, ShapeItem col, bool framed) const
+Value::get_col_spacing(bool & NOTCHAR, ShapeItem col, bool framed) const
 {
 int32_t max_spacing = 0;
-   not_char = false;
+   NOTCHAR = false;
 
 const ShapeItem ec = element_count();
 const ShapeItem cols = get_last_shape_item();
 const ShapeItem rows = ec/cols;
-   loop(row, rows)
-      {
-        // compute spacing, which is the spacing required by this item.
-        //
-        int32_t spacing = 1;   // assume simple numeric
-        const Cell & cell = get_cravel(col + row*cols);
 
-        if (cell.is_pointer_cell())   // nested 
+   loop(row, rows)   // for all items of column col
+      {
+        /* compute the S, which is the spacing demanded by this item.
+           The spacing is defined by the rank of the item (lrm p.138):
+         
+           S←((ρρA)+NOTCHAR A)⌈(ρρB)+NOTCHAR B
+
+           Instead of computing S for every pair A, B of adjacent columns
+           (which would compute it twice for every column) we only compute it
+           once for every column and reuse the result when B becomes A.
+         */ 
+        const Cell & cell = get_cravel(col + row*cols);
+        int32_t S = 1;   // assume simple numeric
+
+        if (cell.is_pointer_cell())   // nested: NOTCHAR[2]
            {
+             NOTCHAR = true;
              if (framed)
                 {
-                  not_char = true;
-                  spacing = 1;
+                  S = 1;
                 }
              else
                 {
-                  Value_P v =  cell.get_pointer_value();
-                  spacing = v->get_rank();
-                  if (v->NOTCHAR())
-                     {
-                       not_char = true;
-                       ++spacing;
-                     }
+                  const Value & sub = *cell.get_pointer_value();
+                  S = sub.get_rank();
+                  if (sub.NOTCHAR())   ++S;
                 }
            }
         else if (cell.is_character_cell())   // simple char
            {
-             spacing = 0;
+             S = 0;
            }
         else                                 // simple numeric
            {
-             not_char = true;
+             NOTCHAR = true;
            }
 
-        if (max_spacing < spacing)   max_spacing = spacing;
+        if (max_spacing < S)   max_spacing = S;
       }
 
    return max_spacing;

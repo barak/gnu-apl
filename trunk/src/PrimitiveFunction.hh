@@ -222,11 +222,15 @@ public:
    : NonscalarFunction(TOK_F12_EQUIV)
    {}
 
-   /// overloaded Function::eval_B()
+   /// overloaded Function::eval_B() : B 
    virtual Token eval_B(Value_P B) const;
 
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// overloaded Function::eval_AB() : A ≡ B
+   virtual Token eval_AB(Value_P A, Value_P B) const
+      { return Token(TOK_APL_VALUE1,
+                     IntScalar((do_eval_AB(A, B) ? 1 : 0), LOC)); }
+
+   static bool do_eval_AB(Value_P A, Value_P B);
 
    static Bif_F12_EQUIV  fun;   ///< Built-in function
 

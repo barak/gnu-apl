@@ -292,8 +292,8 @@ Value_P Z;
       {
         if (LO->get_fun_valence() == 0)
            {
-             // we allow niladic functions N so that one can loop over them with
-             // N ¨ 1 2 3 4
+             // we allow niladic functions N so that one can simply loop
+             // over them with N ¨ 1 2 3 4
              //
              Token result = LO->eval_();
 
@@ -317,10 +317,10 @@ Value_P Z;
         else
            {
              const Cell * cB = &B->get_cravel(z);
-             const bool left_val = cB->is_lval_cell();
+             const bool is_left_val = cB->is_lval_cell();
              Value_P LO_B = cB->to_value(LOC);      // right argument of LO
 
-             if (left_val)
+             if (is_left_val)
                 {
                   Cell * dest = cB->get_lval_value();
                   if (dest->is_pointer_cell())
@@ -335,7 +335,8 @@ Value_P Z;
                 {
                   Value * vZ = result.get_apl_val().get();
 
-                  if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
+                  if (vZ->is_simple_scalar() ||
+                      (is_left_val && vZ->is_scalar()))
                      Z->next_ravel_Cell(vZ->get_cfirst());
                   else
                      Z->next_ravel_Pointer(vZ);

@@ -293,12 +293,20 @@ public:
    /// is checked.
    void check_lval_consistency() const;
 
-   /// return member of this value, defined by \b members. The first name in
-   /// members is the deepest, while the last name is the name of the
-   /// variable containing the members (and is only used in error printouts).
+   /** return member of this value, defined by \b members. The first name in
+       members is the deepest, while the last name is the name of the
+       variable containing the members (and is only used in error printouts).
+   **/
    Cell * get_member(const vector<const UCS_string *> & members,
-                     Value * & owner, bool create_if_needed,
-                     bool throw_error);
+                     Value * & owner, bool throw_error);
+
+   /** return the existing member of this value, defined by \b members. Thei
+       first name in members is the deepest, while the last name is the name
+       of the variable containing the members (and is only used in error
+       printouts). Return 0 if member was not found.
+    **/
+   const Cell * get_existing_member(const vector<const UCS_string *>
+                                    & members)const;
 
    /// return the Cell (if any) containing the data of structured value member
    /// \b member, or 0 if member not found.
@@ -756,10 +764,10 @@ public:
 
 #endif
 
-   /// get the min spacing for this column and set/clear if there
+   /// get the min spacing for this column and set/clear NOTCHAR if there
    /// is/isn't a numeric item in the column.
    /// are/ain't numeric items in col.
-   int32_t get_col_spacing(bool & numeric, ShapeItem col, bool framed) const;
+   int32_t get_col_spacing(bool & NOTCHAR, ShapeItem col, bool framed) const;
 
    /// list a value
    ostream & list_one(ostream & out, bool show_owners) const;

@@ -96,11 +96,10 @@ public:
    /// contructor: a PrintBuffer from an APL value
    PrintBuffer(const Value & value, const PrintContext & pctx, ostream * out);
 
-   /// helper for non-trivial PrintBuffer(const Value & ...) constructor
-   void do_PrintBuffer(const Value & value,const PrintContext & pctx,
+   /// helper for non-trivial PrintBuffer(const Value & ...) constructor.
+   /// return \b true iff the user has hit ^C twice
+   bool do_PrintBuffer(const Value & value,const PrintContext & pctx,
                          ostream * out, PrintStyle outer_style,
-                         std::vector<bool> & scaling,
-                         std::vector<PrintBuffer> & pcols,
                          PrintBuffer * item_matrix);
 
    /// PrintBuffer from an APL value in function-style

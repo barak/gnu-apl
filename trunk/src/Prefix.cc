@@ -1821,15 +1821,14 @@ Value_P top_val = top_sym->get_var_value();
       }
 
    // at this point the structured variable exist, either beforehand or
-   // creased above
-
-Value * member_owner = 0;
-Cell * member_cell = top_val->get_member(members, member_owner,
-                                         member_assign, true);
-   Assert(member_owner);
+   // created above
 
    if (member_assign)   // (direct) member assignment e.g. A.B.C←V
       {
+        Value * member_owner = 0;
+        Cell * member_cell = top_val->get_member(members, member_owner, true);
+        Assert(member_owner);
+
         if (member_cell->is_member_anchor())
            {
              UCS_string & more = MORE_ERROR() <<
@@ -1854,6 +1853,9 @@ Cell * member_cell = top_val->get_member(members, member_owner,
       }
    else                 // member reference (or selective specification)
       {
+        const Cell * member_cell = top_val->get_existing_member(members);
+        Assert(member_cell);
+
         if (member_cell->is_member_anchor() &&
             get_assign_state() == ASS_arrow_seen)
            {

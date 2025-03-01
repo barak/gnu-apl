@@ -51,13 +51,12 @@ enum Unicode
    UNI_CursorHome  = -7,
    UNI_InsertMode  = -8,
 
-   /// internal pad characters - will be removed before printout
+   /// internal pad characters - will be removed or replaced before printout
 #ifdef cfg_VISIBLE_MARKERS_WANTED
-   UNI_iPAD_U2    = UNI_PAD_U2,   // blank on the right after notchar column
-   UNI_iPAD_U3    = UNI_PAD_U3,   // blank on the left before notchar column
-   UNI_iPAD_U1    = UNI_PAD_U1,   // not (yet) a pad char
-
    UNI_iPAD_U0    = UNI_PAD_U0,   // not (yet) a pad char
+   UNI_iPAD_U1    = UNI_PAD_U1,   // blank on the right after NOTCHAR column
+   UNI_iPAD_U2    = UNI_PAD_U2,   // not (yet) a pad char. Used in ⎕AV!
+   UNI_iPAD_U3    = UNI_PAD_U3,   // blank on the left before NOTCHAR column
    UNI_iPAD_U4    = UNI_PAD_U4,   // blank on the left to separate values
    UNI_iPAD_U5    = UNI_PAD_U5,   // blank on the right to separate values
    UNI_iPAD_U6    = UNI_PAD_U6,   // empty line below to reach max_row_height
@@ -101,9 +100,18 @@ extern int nibble(Unicode uni);
 /// value 0-63 of base64 digit, or -1 if uni not base64 (RFC 4648)
 extern int sixbit(Unicode uni);
 
+//----------------------------------------------------------------------------
 /// swap Unicodes u1 and u2 (used by UCS_string::sort())
 inline void
 Hswap(Unicode & u1, Unicode & u2)
 { const Unicode tmp = u1;   u1 = u2;   u2 = tmp; }
+//----------------------------------------------------------------------------
+/// return true iff \b uni is a padding character (used internally).
+inline bool is_iPAD_char(Unicode uni)
+{
+   return ((uni > UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ³ ¹
+       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
+}
+//----------------------------------------------------------------------------
 
 #endif // __UNICODE_HH_DEFINED__

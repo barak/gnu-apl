@@ -36,6 +36,9 @@
 #include "UTF8_string.hh"
 #include "Value.hh"
 
+/// uncomment to NOT replace iPAD chars with blanks
+// #define KEEP_iPAD_characters
+
 ShapeItem UCS_string::total_count = 0;
 ShapeItem UCS_string::total_id = 0;
 
@@ -399,10 +402,12 @@ vector<int> chunk_lengths;
 
    // replace pad chars with blanks.
    //
+#ifndef KEEP_iPAD_characters
    loop(u, size())
        {
          if (is_iPAD_char(at(u)))   at(u) = UNI_SPACE;
        }
+#endif // KEEP_iPAD_characters
 }
 //----------------------------------------------------------------------------
 /// constructor
@@ -478,7 +483,7 @@ int pos = col + chunk_len;
    while (--pos > col)
       {
          const Unicode uni = at(pos);
-         if (uni == UNI_SPACE || uni == UNI_iPAD_U2 || uni == UNI_iPAD_U3)
+         if (uni == UNI_SPACE || uni == UNI_iPAD_U1 || uni == UNI_iPAD_U3)
             {
                return pos - col + 1;
             }
@@ -520,14 +525,14 @@ again:
 
         if (first && at(size() - 2) == UNI_iPAD_L0)
            {
-        // last column is a nested dimension separator row
-        //
-        ShapeItem len = size() - 2;
-        while (len && (at(len - 1) == UNI_iPAD_L0 ||
-                       at(len - 1) == UNI_iPAD_U0 ||
-                       at(len - 1) == UNI_iPAD_U2 ||
-                       at(len - 1) == UNI_iPAD_U6 ||
-                       at(len - 1) == UNI_iPAD_U7))   --len;
+             // last column is a nested dimension separator row
+             //
+             ShapeItem len = size() - 2;
+             while (len && (at(len - 1) == UNI_iPAD_L0 ||
+                            at(len - 1) == UNI_iPAD_U0 ||
+                            at(len - 1) == UNI_iPAD_U1 ||
+                            at(len - 1) == UNI_iPAD_U6 ||
+                            at(len - 1) == UNI_iPAD_U7))   --len;
              if (len && at(len - 1) == first)
                 {
                   resize(len - 1);
@@ -536,8 +541,7 @@ again:
            }
       }
 
-   // If the line contains UNI_iPAD_L0 (higher dimension separator)
-   // then discard all chars (unless the line is framed)..
+   // discard all trailing pad chars (unless the line is framed)..
    //
    while (size())
       {
@@ -547,8 +551,8 @@ again:
             last == UNI_iPAD_L2 ||   // ₂: pad PrintBuffer width to line
             last == UNI_iPAD_L3 ||   // ₃: pad integer part to the left
             last == UNI_iPAD_L4 ||   // ₄: pad fractional part to the right
-            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
-            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
+            last == UNI_iPAD_U1 ||   // ¹: column separator (after NOTCHAR col)
+            last == UNI_iPAD_U3 ||   // ³: column separator (before NOTCHAR col)
             last == UNI_iPAD_U7)     // ⁷  pad final to the right
             pop_back();
         else

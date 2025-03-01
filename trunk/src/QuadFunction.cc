@@ -726,9 +726,9 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
    {
      Value_P toplevel_val = symbol->get_var_value();
      if (!toplevel_val)   goto cleanup;
-     Value * owner = 0;   // not used
-     if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
+     if (const Cell * ccell = toplevel_val->get_existing_member(members))
         {
+          Cell * cell = const_cast<Cell *>(ccell);
           cell->release(LOC);   IntCell::z0(cell--);   // member value
           cell->release(LOC);   IntCell::z0(cell);     // member name
           ret = 1;   // ⎕EX success
