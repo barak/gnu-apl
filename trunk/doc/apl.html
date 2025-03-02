@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>March 1, 2025.
+<p>March 2, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -7386,8 +7386,17 @@ same shape as <b>B</b> and:
 <p><b>Z[i]</b> is 1 if <b>B[i]</b> is the first occurrence of <b>B[i]</b> in <b>B</b> and
 0 otherwise. For vectors <b>B</b> this can also be expressed as:
 </p>
-<pre class="verbatim">≠ B ←→ (B⍳B)=(⍳⍴B)
+<pre class="verbatim">      ≠ B ←→ (B⍳B)=(⍳⍴B)
 </pre>
+<p>Examples:
+</p>
+<pre class="verbatim">      ≠'Hello, World.'
+1 1 1 0 1 1 1 1 0 1 0 1 1
+      ≠ 1 (2 3) 4 (2 3) 5 6
+1 1 1 0 1 1
+</pre>
+
+
 
 <hr>
 </div>

@@ -296,11 +296,10 @@ const ShapeItem item_len = item_shape.get_volume();
         const Cell & B0 = B->get_cproto();
         if (B0.is_pointer_cell())
            {
-             Value_P vB = B0.get_pointer_value();    // some nested value
-             Value_P B_proto = vB->prototype(LOC);   // its prototype
-             Z->get_wproto().init(B_proto->get_cproto(), *Z, LOC);
+             Value_P vB = B0.get_pointer_value();
+             return vB;
            }
-        else
+        else   // simple B0
            {
              Z->set_default(B0, LOC);
            }

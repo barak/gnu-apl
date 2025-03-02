@@ -7047,8 +7047,19 @@ same shape as @b{B} and:
 0 otherwise. For vectors @b{B} this can also be expressed as:
 
 @verbatim
-≠ B ←→ (B⍳B)=(⍳⍴B)
+      ≠ B ←→ (B⍳B)=(⍳⍴B)
 @end verbatim
+
+Examples:
+
+@verbatim
+      ≠'Hello, World.'
+1 1 1 0 1 1 1 1 0 1 0 1 1
+      ≠ 1 (2 3) 4 (2 3) 5 6
+1 1 1 0 1 1
+@end verbatim
+
+
 
 
 @c ============================================================================

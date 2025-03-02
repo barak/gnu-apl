@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 1, 2025.  This manual briefly documents GNU APL, an interpreter
+March 2, 2025.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -6626,7 +6626,14 @@ shape as B and:
    Z[i] is 1 if B[i] is the first occurrence of B[i] in B and 0
 otherwise.  For vectors B this can also be expressed as:
 
-≠ B ←→ (B⍳B)=(⍳⍴B)
+      ≠ B ←→ (B⍳B)=(⍳⍴B)
+
+   Examples:
+
+      ≠'Hello, World.'
+1 1 1 0 1 1 1 1 0 1 0 1 1
+      ≠ 1 (2 3) 4 (2 3) 5 6
+1 1 1 0 1 1
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -8189,23 +8196,23 @@ Node: Section 2.41226926
 Node: Section 2.42248236
 Node: Section 2.43259152
 Node: Section 2.44262347
-Node: Chapter 3262723
-Node: Chapter 4265231
-Node: Chapter 5266357
-Node: Section 5.1267894
-Node: Section 5.2269174
-Node: Section 5.3269534
-Node: Section 5.4269776
-Node: Section 5.5270438
-Node: Section 5.6270916
-Node: Section 5.7271689
-Node: Section 5.8272115
-Node: Chapter 6272517
-Node: Section 6.1272936
-Node: Section 6.2273623
-Node: Chapter 7274454
-Node: Section 7.1274957
-Node: Section 7.2300270
+Node: Chapter 3262837
+Node: Chapter 4265345
+Node: Chapter 5266471
+Node: Section 5.1268008
+Node: Section 5.2269288
+Node: Section 5.3269648
+Node: Section 5.4269890
+Node: Section 5.5270552
+Node: Section 5.6271030
+Node: Section 5.7271803
+Node: Section 5.8272229
+Node: Chapter 6272631
+Node: Section 6.1273050
+Node: Section 6.2273737
+Node: Chapter 7274568
+Node: Section 7.1275071
+Node: Section 7.2300384
 
 End Tag Table
 
