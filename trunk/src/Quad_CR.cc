@@ -560,7 +560,8 @@ const APL_types::Depth depth = value->compute_depth();
                  {
                    if (e)   text << " ";
                    const Cell & cell = value->get_cravel(e);
-                   text << do_CR10_simple_cell(cell);
+                   const UCS_string item_e = do_CR10_simple_cell(cell);
+                   text << item_e;
                  }
            }
         else                         // empty vector
@@ -615,39 +616,81 @@ bool has_simple = false;
 
    if (has_simple)
       {
+        // if all items of value are numeric, then we can safely use ' '.
+        // as item separator. Otherwise we need commas (which is less
+        // efficient)
+        //
         text << indent << "⍝ L" << level << " simple items...";   PUSH_TEXT
-        UCS_string accu;
-        loop(e, value.nz_element_count())
+        const ShapeItem ec = value.nz_element_count();
+        for (ShapeItem e = 0; e < ec;)
             {
               const Cell & cell = value.get_cravel(e);
-              if (cell.is_pointer_cell())   continue;
+              if (cell.is_pointer_cell())
+                 {
+                   ++e;
+                   continue;
+                 }
+
+              UCS_string U1;   // ((⊃V    (fixed size)
+              UCS_string U2;   // indices (variable size)
+              UCS_string U3;   // ])←     (fixed size)
+              UCS_string U4;   // items   (variable size)
+
+              // code for one item
+              //
+              U1 << "((⊃" << var_level << ")[";
+              U2 << e;
+              U3 << "])←";
+              U4 << do_CR10_simple_cell(cell);
+              ++e;
 
               UCS_string item_text;
-              item_text << "((⊃" << var_level << ")[" << e << "])←"
-                        << do_CR10_simple_cell(cell);
+              item_text << U1 << U2 << U3 << U4;
 
-             if ((indent.size() + accu.size() + item_text.size()) < 72)
-                {
-                  // item_text fits into the accu. Append it to the accu
-                  //
-                  if (accu.size())   accu.append_UTF8(" ◊ ");
-                  accu.append(item_text);
-                }
-             else
-                {
-                  // item_text does not fit into the accu. Flush the accu and
-                  // start a new one.
-                  text = indent;   text.append(accu);                PUSH_TEXT
-                  accu = item_text;
-                }
+             const int line_limit = 72 - indent.size() - U1.size() - U3.size();
+
+             // fill U2 and U4 with more items until line_limit is reached...
+             //
+             bool has_string = false;
+             int count = 1;        // from first item above
+             int e_from = e - 1;   // dito.
+             while (e < ec && (U2.size() + U4.size()) < line_limit)
+                   {
+                     const Cell & cell = value.get_cravel(e++);
+                     if (cell.is_pointer_cell())   continue;
+
+                     U2 << " " << e - 1;   // - 1 since e++ above
+                     ++count;
+                     const UCS_string text_e = do_CR10_simple_cell(cell);
+                     if (U4.back() == UNI_SINGLE_QUOTE &&
+                         text_e.front() == UNI_SINGLE_QUOTE)
+                        {
+                          U4.pop_back();   // trailing '
+                          U4 << UCS_string(text_e, 1, text_e.size() - 1);
+                          has_string = true;
+                        }
+                     else
+                        {
+                          U4 << Invalid_Unicode << text_e;   // for now
+                        }
+                   }
+
+              // now we know if we need commas instead of spaces
+              //
+              loop(u, U4.size())
+                  {
+                    if (U4[u] == Invalid_Unicode)
+                       U4[u] = has_string ? UNI_COMMA : UNI_SPACE;
+                  }
+
+              if (count > 3 && count == (e - e_from))   // consecutive indices
+                 {
+                   U2.clear();
+                   U2 << e_from << " + ⍳" << count;
+                 }
+
+              text << indent << U1 << U2 << U3 << U4;                PUSH_TEXT
             }
-        if (accu.size())
-           {
-             text = indent;
-             text.append(accu);
-             PUSH_TEXT
-             text = indent;
-           }
       }
 
    if (has_nested)
@@ -676,7 +719,8 @@ const Shape & shape = value.get_shape();
       }
    else
       {
-        text << indent << "⍝ no need for final reshape";             PUSH_TEXT
+        text << indent << "⍝ no (need for) L" << level
+             << " final reshape";                                    PUSH_TEXT
       }
 }
 //----------------------------------------------------------------------------
@@ -689,12 +733,13 @@ UCS_string text;
         // be careful with non-printable characters and quotes
         //
         const Unicode uni = cell.get_char_value();
-        if (uni < ' ' ||
-            uni == UNI_SINGLE_QUOTE ||
-            uni == UNI_DOUBLE_QUOTE ||
-            uni == 127)
+        if (uni < ' ' || uni == 127)
            {
              text << "(⎕UCS " << int(uni) << ")";
+           }
+        else if (uni == UNI_SINGLE_QUOTE)
+           {
+             text << "''''";
            }
         else
            {
@@ -702,6 +747,7 @@ UCS_string text;
            }
         return text;
       }
+
    if (cell.is_integer_cell())
       {
         return text << cell.get_int_value();
