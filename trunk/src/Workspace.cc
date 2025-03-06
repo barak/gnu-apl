@@ -1077,9 +1077,8 @@ Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
    // )COPY WS_name objects...                   WS_name /absolute or relative
    // )COPY libnum WS_name objects...            WS_name relative
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
+const UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
                                                   ".xml", ".apl");
-
    // open filename. There are three cases:
    //
    // 1. filename.apl (i.e. file was )DUMPed). dump_fd: ≠ -1, in: closed

@@ -865,7 +865,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
    // process and skip the optional library number
    {
      const Unicode l = args.front()[0];
-     if (Avec::is_digit(l))
+     if (Avec::is_digit(l) && args.front().size() == 1)   // single digit
         {
           libref = LibRef(l - '0');
           args.erase(0);
@@ -918,7 +918,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
       {
         const UCS_string & arg0 = args.front();   // first argument
         const Unicode l = arg0.front();           // first character
-        if (Avec::is_digit(l))
+        if (Avec::is_digit(l) && args.front().size() == 1)   // single digit
            {
              libref = LibRef(l - '0');
              args.erase(0);

@@ -253,7 +253,7 @@ UTF8_string filename_ext2 = name;
 }
 //----------------------------------------------------------------------------
 UTF8_string
-LibPaths::get_lib_filename(LibRef lib, const UTF8_string & name, 
+LibPaths::get_lib_filename(const LibRef lib, const UTF8_string & name, 
                            bool existing, const char * ext1, const char * ext2)
 {
    // check if name has one of the extensions ext1 or ext2 already.

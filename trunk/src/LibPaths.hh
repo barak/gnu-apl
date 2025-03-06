@@ -106,7 +106,8 @@ public:
       { return lib_dirs[lib].cfg_src; }
 
    /// return full path for file \b name, possibly adding .ext1 or .ext2
-   static UTF8_string get_lib_filename(LibRef lib, const UTF8_string & name,
+   static UTF8_string get_lib_filename(const LibRef lib,
+                                       const UTF8_string & name,
                                       bool existing, const char * ext1,
                                                      const char * ext2);
 protected:
