@@ -2738,6 +2738,9 @@ Prefix::reduce_RETC_VOID__()
 
    Assert1(prefix_len == 2);
 
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
+
 const Token result(TOK_VOID);   // function result is VOID
    pop_args_push_result(result);
    set_action(RA_RETURN);            // return from context;
@@ -2749,6 +2752,9 @@ Prefix::reduce_RETC___()
    Assert1(prefix_len == 1);
 
    if (size() != 1)   syntax_error(LOC);
+
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
 
    // end of context reached. There are 4 cases:
    //
@@ -2829,13 +2835,15 @@ Prefix::reduce_RETC_A__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)
+   if (size() != 2)   // there extra tokens
       {
         syntax_error(LOC);
       }
 
-   Log(LOG_prefix_parser)
-      CERR << "- end of ⍎ context.";
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
+
+   Log(LOG_prefix_parser)   CERR << "- end of ⍎ context.";
 
 Token B = at1();
    pop_args_push_result(B);
