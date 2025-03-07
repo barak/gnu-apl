@@ -67,7 +67,7 @@ protected:
    enum ArchiveSyntax
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible change)
-        ASX_MINOR = 8,   ///< ++ if XML file format change (backward compatible)
+        ASX_MINOR = 9,   ///< ++ if XML file format change (backward compatible)
         ASX_OTHER = 1,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 };
@@ -137,26 +137,31 @@ public:
    /// write entire workspace
    XML_Saving_Archive & save();
 
-   /// a value and its parent (if the parent is nested)
+   /// a value and its parent (if the parent is nested, -1 if not)
    struct _val_par
       {
          /// default constructor
          _val_par()
          : _val(0),
-           _par(INVALID_VID)
+           _par(INVALID_VID),
+           _depth(-1)
          {}
 
          /// constructor
          _val_par(const Value * v, Vid par)
          : _val(v),
-           _par(par)
+           _par(par),
+           _depth(v->compute_depth())
          {}
 
          /// the value
          const Value * _val;
 
-         /// the optional parent
+         /// the optional parent, -1 for top-level values
          Vid _par;
+
+         /// the depth of the value
+         const APL_types::Depth _depth;
 
          /// assign \b other
          void operator=(const _val_par & other)

@@ -206,6 +206,7 @@ XML_Saving_Archive::save_Ravel(Vid vid)
    Log(LOG_archive)   CERR << "save_Ravel(Vid " << vid << ")" << endl;
 
 const Value & v = *val_pars[vid]._val;
+const APL_types::Depth depth = val_pars[vid]._depth;
 const ShapeItem len = v.nz_element_count();
 const Cell * C = &v.get_cfirst();
 
@@ -235,12 +236,12 @@ int space = do_indent();
         out << nohex << "\"/>" << endl;
         --indent;
       }
-   else
+   else   // normal ravel
       {
         // print the start of the XML element
         {
           char cc[80];   // output line buffer
-          SPRINTF(cc, "<Ravel vid=\"%d\" cells=\"", vid);
+          SPRINTF(cc, "<Ravel vid=\"%d\" depth=\"%d\" cells=\"", vid, depth);
           out << decr(space, cc);
         }
 
@@ -1132,12 +1133,21 @@ VH_entry::print_history(CERR, *val_pars[p]._val, 0);
    out << "<!-- APL values... -->" << endl;
    loop(vid, value_count)   save_shape(Vid(vid));
 
-   // save ravels of all values
+   // save ravels of all values. Ordered by increasing level
    //
    out << endl;
    do_indent();
    out << "<!-- Ravels of APL values... -->" << endl;
-   loop(vid, value_count)   save_Ravel(Vid(vid));
+ShapeItem done_count = 0;
+   for (ShapeItem depth = 0; done_count != value_count; ++depth)
+       {
+          loop(vid, value_count)
+              {
+                if (val_pars[vid]._depth != depth)   continue;
+                save_Ravel(Vid(vid));
+                ++done_count;
+              }
+       }
 
    // save user defined symbols
    //
