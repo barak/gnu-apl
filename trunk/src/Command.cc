@@ -864,10 +864,10 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
    // process and skip the optional library number
    {
-     const Unicode l = args.front()[0];
-     if (Avec::is_digit(l) && args.front().size() == 1)   // single digit
+     const Unicode lib = args.front()[0];
+     if (args.size() > 1 && Avec::is_digit(lib) && args.front().size() == 1)
         {
-          libref = LibRef(l - '0');
+          libref = LibRef(lib - '0');
           args.erase(0);
         }
    }
@@ -917,10 +917,10 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
    if (args.size() == 2)
       {
         const UCS_string & arg0 = args.front();   // first argument
-        const Unicode l = arg0.front();           // first character
-        if (Avec::is_digit(l) && args.front().size() == 1)   // single digit
+        const Unicode lib = arg0.front();         // first character
+        if (args.size() > 1 && Avec::is_digit(lib) && args.front().size() == 1)
            {
-             libref = LibRef(l - '0');
+             libref = LibRef(lib - '0');
              args.erase(0);
            }
       }
