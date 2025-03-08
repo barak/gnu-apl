@@ -2,10 +2,10 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* the SVN version of Archive.cc */
-#define ARCHIVE_SVN " 1811"
+#define ARCHIVE_SVN " 1813"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1812", "2025-03-07 15:45:27 UTC", "Linux 5.15.0-131-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1818", "2025-03-08 15:13:36 UTC", "Linux 5.15.0-131-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1

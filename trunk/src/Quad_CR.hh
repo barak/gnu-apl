@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,8 +76,7 @@ public:
                                           const Value * value);
 
    /// emit one level of \b value
-   static void do_CR10_level(UCS_string_vector & result,
-                             const UCS_string & var_name, size_t level,
+   static void do_CR10_level(UCS_string_vector & result, size_t level,
                              const Value & value);
 
    /// emit a simple Cell

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -543,6 +543,9 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
 not_structured:
 
 #define PUSH_TEXT result.push_back(text);   text.clear();
+#define TMP_VAR_PREFIX "⍙¯_"
+#define TMP_VAR_SUFFIX "_∆¯"
+#define TMP_VAR(d)   TMP_VAR_PREFIX << int(d) << TMP_VAR_SUFFIX
 
 UCS_string text;
 const APL_types::Depth depth = value->compute_depth();
@@ -577,50 +580,58 @@ const APL_types::Depth depth = value->compute_depth();
    // VAR ← (depth+1)⍴0. The first depth items are used as temporary values
    // for the different depths, while the last item is for saving ⎕IO.
    //
-   text << var_name << "←" << (depth + 1) << "⍴0   ⍝ ⍴"
-        << var_name << " ←→ 1+≡" << var_name
-        << ". One item per depth and one for ⎕IO.";                  PUSH_TEXT
-   text << var_name << "[⎕IO+" << depth << "]←⎕IO ◊ ⎕IO←0";          PUSH_TEXT
+   text << TMP_VAR(depth) "←⎕IO ◊ ⎕IO←0";                            PUSH_TEXT
 
-   do_CR10_level(result, var_name, 0, *value);
-   text << "⎕IO←" << var_name << "[" << depth << "]";                PUSH_TEXT
-   text << var_name << "←↑" << var_name;                             PUSH_TEXT
-
+   do_CR10_level(result, 0, *value);
+   text << "⎕IO←" TMP_VAR(depth) << " ◊ "
+        << var_name << "←⍙¯_0_∆¯";                                   PUSH_TEXT
+   text << "⊣⎕EX ⊃";
+   loop(d, depth + 1)   text << " '" << TMP_VAR(d) << "'";
+                                                                     PUSH_TEXT
    Workspace::pop_FC();   // restore ⎕FC
 }
 //----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_level(UCS_string_vector & result, const UCS_string & var_name,
-                       size_t level, const Value & value)
+Quad_CR::do_CR10_level(UCS_string_vector & result, size_t level,
+                       const Value & value)
 {
 UCS_string text;
 UCS_string indent(2*(level + 1), UNI_SPACE);
-UCS_string var_level = var_name;     var_level << "[" << level << "]";
-UCS_string ind_var_level = indent;   ind_var_level << var_level; 
-   text << ind_var_level << "←⊂" << value.nz_element_count()
-        << "⍴0   ⍝ L" << level << " zeros";                      PUSH_TEXT
+UCS_string var_level;   var_level << TMP_VAR(level); 
+UCS_string ind_var_level = indent;   ind_var_level << var_level;
+   text << ind_var_level << "←" << value.nz_element_count()
+        << "⍴0   ⍝ L" << level << " zeros";                          PUSH_TEXT
 
-bool has_nested = false;
-bool has_simple = false;
+size_t nested_count = 0;
+size_t simple_count = 0;
+size_t zero_count  = 0;
    loop(v, value.nz_element_count())
        {
          const Cell & cell = value.get_cravel(v);
          if (cell.is_pointer_cell())
             {
-              has_nested = true;
+              ++nested_count;
               continue;
             }
-         if (cell.is_near_zero())   continue;   // already done
-         has_simple = true;
+         if (cell.is_near_zero())
+            {
+              ++zero_count;
+            }
+         else
+            {
+              ++simple_count;
+            }
        }
 
-   if (has_simple)
+   if (simple_count)
       {
         // if all items of value are numeric, then we can safely use ' '.
         // as item separator. Otherwise we need commas (which is less
         // efficient)
         //
-        text << indent << "⍝ L" << level << " simple items...";   PUSH_TEXT
+        text << indent << "⍝ L" << level << ": ";
+        if (zero_count)   text << zero_count << "+";
+        text << simple_count << " simple item(s)...";                PUSH_TEXT
         const ShapeItem ec = value.nz_element_count();
         for (ShapeItem e = 0; e < ec;)
             {
@@ -638,9 +649,9 @@ bool has_simple = false;
 
               // code for one item
               //
-              U1 << "((⊃" << var_level << ")[";
+              U1 << var_level << "[";
               U2 << e;
-              U3 << "])←";
+              U3 << "]←";
               U4 << do_CR10_simple_cell(cell);
               ++e;
 
@@ -686,35 +697,36 @@ bool has_simple = false;
               if (count > 3 && count == (e - e_from))   // consecutive indices
                  {
                    U2.clear();
-                   U2 << e_from << " + ⍳" << count;
+                   U2 << e_from << "+⍳" << count;
                  }
 
               text << indent << U1 << U2 << U3 << U4;                PUSH_TEXT
             }
       }
 
-   if (has_nested)
+   if (nested_count)
       {
-        text << indent << "⍝ L" << level << " nested items...";      PUSH_TEXT
+        text << indent << "⍝ L" << level << ": " << nested_count
+             << " nested item(s)...";                                PUSH_TEXT
         loop(v, value.nz_element_count())
             {
               const Cell & cell = value.get_cravel(v);
               if (!cell.is_pointer_cell())   continue;
               const Value & sub_val = *cell.get_pointer_value();
-              do_CR10_level(result, var_name, level + 1, sub_val);
+              do_CR10_level(result, level + 1, sub_val);
 
-              text << indent << "((⊃" << var_level << ")[" << v << "])←"
-                   << var_name << "[" << (level + 1) << "]";         PUSH_TEXT
+              text << indent << var_level << "[" << v << "]←⊂"
+                   << TMP_VAR(level + 1);                            PUSH_TEXT
             }
       }
 
    // final reshape
    //
 const Shape & shape = value.get_shape();
-   if (shape.get_rank() != 1)
+   if (shape.get_rank() != 1 || shape.get_volume() == 0)
       {
-        text << ind_var_level << "←⊂" <<  do_CR10_shape(shape)
-             << "⍴⊃" << var_name << "[" << level << "]"
+        text << ind_var_level << "←" <<  do_CR10_shape(shape)
+             << "⍴" << var_level
              << "   ⍝ L" << level << " final reshape";               PUSH_TEXT
       }
    else
@@ -754,7 +766,9 @@ UCS_string text;
       }
    if (cell.is_real_cell())
       {
-        return text << cell.get_real_value();
+        PrintContext pctx(PR_APL);
+        PrintBuffer pbuf = cell.character_representation(pctx) ;
+        return text << pbuf.l1();
       }
    if (cell.is_complex_cell())
       {
