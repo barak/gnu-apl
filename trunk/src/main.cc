@@ -307,7 +307,8 @@ sockaddr_in local;
       // continue, since a failed setsockopt(SO_REUSEADDR) is sort of OK here.
    }
 
-   if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+   if (::bind(listen_socket, reinterpret_cast<const sockaddr *>(&local),
+              sizeof(local)))
       {
         perror("bind() failed");
         exit(1);

@@ -137,7 +137,7 @@ static void throw_illegal_db_id( void )
 
 static Connection *db_id_to_connection( int db_id )
 {
-   if( db_id < 0 || db_id >= (int)connections.size() ) {
+   if( db_id < 0 || db_id >= int(connections.size())) {
         throw_illegal_db_id();
     }
     Connection *conn = connections[db_id];
@@ -166,7 +166,7 @@ static Token close_database( Value_P B )
     }
 
     int db_id = B->get_cravel( 0 ).get_int_value();
-    if( db_id < 0 || db_id >= (int)connections.size() ) {
+    if (db_id < 0 || db_id >= int(connections.size())) {
         throw_illegal_db_id();
     }
     Connection *conn = connections[db_id];
@@ -453,12 +453,19 @@ Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 void *
 get_function_mux( const char *function_name )
 {
-   if (strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "eval_B"))         return (void *)&eval_B;
-   if (!strcmp(function_name, "eval_AB"))        return (void *)&eval_AB;
-   if (!strcmp(function_name, "eval_XB"))        return (void *)&eval_XB;
-   if (!strcmp(function_name, "eval_AXB"))       return (void *)&eval_AXB;
-   if (!strcmp( function_name, "close_fun"))     return (void *)&close_fun;
+    if (strcmp(function_name, "get_signature") == 0)
+       return reinterpret_cast<void *>(&get_signature);
+    if (strcmp(function_name, "eval_B") == 0)
+       return reinterpret_cast<void *>(&eval_B);
+    if (strcmp(function_name, "eval_AB") == 0)
+       return reinterpret_cast<void *>(&eval_AB);
+    if (strcmp(function_name, "eval_XB") == 0)
+       return reinterpret_cast<void *>(&eval_XB);
+    if (strcmp(function_name, "eval_AXB") == 0)
+       return reinterpret_cast<void *>(&eval_AXB);
+    if (strcmp(function_name, "close_fun") == 0)
+       return reinterpret_cast<void *>(&close_fun);
+
    return 0;
 }
 

@@ -662,7 +662,8 @@ const Dcomplex mag = Amag * Bmag;
        Dcomplex dp(0.0, 0.0);
        loop(i, Av.size())   dp += Av[i] * Bv[i];
        const Dcomplex an = acos(dp/mag);
-       return ComplexScalar((APL_Float)an.real(), an.imag(), LOC);
+       return ComplexScalar(static_cast<APL_Float>(an.real()),
+                            an.imag(), LOC);
      }
 
   MORE_ERROR() << "Invalid vector(s) in ⎕MX.vector_angle.";
@@ -788,7 +789,7 @@ double minv =  MAXFLOAT;
         if (minv > val) minv = val;
       }
 
-const double incr = (maxv - minv) / (double)nr_buckets;
+const double incr = (maxv - minv) / static_cast<double>(nr_buckets);
 vector<int> buckets(nr_buckets);
 int nr_bumps = 0;
   loop(b, B_count)

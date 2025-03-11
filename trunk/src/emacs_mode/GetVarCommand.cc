@@ -68,7 +68,7 @@ void scalar_value_to_el( ostream &out, Value_P value )
                                           << cell.get_real_value() << " "
                                           << cell.get_imag_value() << ")";
     else if(cell.is_character_cell()) out << "(:unicode "
-                                          << (int)cell.get_char_value() << ")";
+                                          << static_cast<int>(cell.get_char_value()) << ")";
     else out << "(:unknown)";
 }
 

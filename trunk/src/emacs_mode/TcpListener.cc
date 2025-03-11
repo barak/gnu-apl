@@ -73,9 +73,10 @@ std::string TcpListener::start( void )
     }
 
     int v = 1;
-    if( setsockopt( server_socket, SOL_SOCKET, SO_REUSEADDR, (void *)&v, sizeof( v ) ) == -1 ) {
+    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR,
+                  &v, sizeof(v)) == -1) {
         stringstream errmsg;
-        errmsg << "Error setting SO_REUSEADDR parameter: " << strerror( errno );
+        errmsg << "Error setting SO_REUSEADDR parameter: " << strerror(errno);
         close( server_socket );
         MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;        
@@ -99,10 +100,13 @@ std::string TcpListener::start( void )
 
     struct sockaddr_in listen_address;
     socklen_t listen_address_len = sizeof( listen_address );
-    if( getsockname( server_socket, (struct sockaddr *)&listen_address, &listen_address_len ) == -1 ) {
+    if(getsockname(server_socket,
+                   reinterpret_cast<sockaddr *>(&listen_address),
+                   &listen_address_len) == -1) {
         stringstream errmsg;
-        errmsg << "Error getting port number of socket: " << strerror( errno ) << endl;
-        close( server_socket );
+        errmsg << "Error getting port number of socket: "
+               << strerror(errno) << endl;
+        close(server_socket);
         MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }

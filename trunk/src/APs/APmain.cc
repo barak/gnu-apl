@@ -118,7 +118,7 @@ print_vars(ostream & out)
          const uint32_t * varname = Svar_DB::get_svar_name(cv.key);
          if (varname)
             {
-              while (*varname)   get_CERR() << (Unicode)(*varname++);
+              while (*varname)   get_CERR() << static_cast<Unicode>(*varname++);
             }
          else
             {
@@ -287,8 +287,8 @@ string progname(prog_name());
          char * del = 0;
          const char * err_loc = 0;
          const Signal_base * signal =
-               Signal_base::recv_TCP(tcp2, (char *)buff, sizeof(buff),
-                                     del, 0, &err_loc);
+               Signal_base::recv_TCP(tcp2, reinterpret_cast<char *>(buff),
+                                     sizeof(buff), del, 0, &err_loc);
 
          if (signal == 0)   // no signal for 10 seconds
             {
@@ -321,7 +321,8 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
                    if (! is_valid_varname(varname))
                       {
                        get_CERR() << "Bad varname ";
-                        while (*varname)   get_CERR() << (Unicode)(*varname++);
+                        while (*varname)
+                              get_CERR() << static_cast<Unicode>(*varname++);
                         get_CERR() << " at " << LOC << endl;
                        break;
                       }
@@ -456,32 +457,37 @@ ostream & operator << (ostream & out, const AP_num3 & ap3)
 ostream &
 operator << (ostream & os, Unicode uni)
 {
-   if (uni < 0x80)      return os << (char)uni;
+   if (uni < 0x80)
+      return os << static_cast<char>(uni);
 
-   if (uni < 0x800)     return os << (char)(0xC0 | (uni >> 6))
-                                  << (char)(0x80 | (uni & 0x3F));
+   if (uni < 0x800)
+      return os << static_cast<char>(0xC0 | (uni >> 6))
+                                  << static_cast<char>(0x80 | (uni & 0x3F));
 
-   if (uni < 0x10000)    return os << (char)(0xE0 | (uni >> 12))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x10000)
+      return os << static_cast<char>(0xE0 | (uni >> 12))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x200000)   return os << (char)(0xF0 | (uni >> 18))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x200000)
+      return os << static_cast<char>(0xF0 | (uni >> 18))
+                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x4000000)  return os << (char)(0xF8 | (uni >> 24))
-                                   << (char)(0x80 | (uni >> 18 & 0x3F))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x4000000)
+      return os << static_cast<char>(0xF8 | (uni >> 24))
+                << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
+                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   return os << (char)(0xFC | (uni >> 30))
-             << (char)(0x80 | (uni >> 24 & 0x3F))
-             << (char)(0x80 | (uni >> 18 & 0x3F))
-             << (char)(0x80 | (uni >> 12 & 0x3F))
-             << (char)(0x80 | (uni >>  6 & 0x3F))
-             << (char)(0x80 | (uni       & 0x3F));
+   return os << static_cast<char>(0xFC | (uni >> 30))
+             << static_cast<char>(0x80 | (uni >> 24 & 0x3F))
+             << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
+             << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+             << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+             << static_cast<char>(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
 

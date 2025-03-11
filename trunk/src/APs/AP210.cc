@@ -312,7 +312,8 @@ const int nelm = cdr.header().get_nelm();
       }
    else if (cdr.get_type() == CDR_INT32)
       {
-        const uint32_t * ravel = (const uint32_t *)cdr.ravel();
+        const uint32_t * ravel =
+                         reinterpret_cast<const uint32_t *>(cdr.ravel());
         op                        = ravel[0];
         if (nelm >= 2)   ctx.rec_num  = ravel[1];
         if (nelm >= 3)   ctx.rec_size = ravel[2];
@@ -651,7 +652,7 @@ assign_value(Coupled_var & var, const string & data)
    if (data.size() < sizeof(CDR_header))   // too short
       { error_loc = LOC;   return E_LENGTH_ERROR; }
 
-const CDR_header * header = (const CDR_header *)data.c_str();
+const CDR_header * header = reinterpret_cast<const CDR_header *>(data.c_str());
 
 const int rank = header->rank;
 
@@ -661,7 +662,8 @@ const uint32_t * varname = Svar_DB::get_svar_name(var.key);
    if (*varname == 'D')   // e.g. DAT←value
       {
         delete var.data;
-        var.data = new CDR_string((const uint8_t *)data.c_str(), data.size());
+        var.data = new CDR_string(reinterpret_cast<const uint8_t *>
+                                  (data.c_str()), data.size());
         return E_NO_ERROR;
       }
 
@@ -697,7 +699,8 @@ Coupled_var * var_D = 0;
 
 
    delete var.data;
-   var.data = new CDR_string((const uint8_t *)data.c_str(), data.size());
+   var.data = new CDR_string(reinterpret_cast<const uint8_t *>(data.c_str()),
+                             data.size());
 
 SVAR_context * ctx = var.context;
    if (ctx)
@@ -719,10 +722,13 @@ SVAR_context * ctx = var.context;
       }
    else
       {
-        const char * cmd = (const char *)(header + 1) + 4*rank;
+        const char * cmd = reinterpret_cast<const char *>(header + 1) + 4*rank;
         handle_cmd(cmd, data.size(), var, *var_D);
-        if (!Svar_DB::get_svar_name(key_D)) { error_loc = LOC;
-                                            return E_VALUE_ERROR; }
+        if (!Svar_DB::get_svar_name(key_D))
+           {
+             error_loc = LOC;
+             return E_VALUE_ERROR;
+           }
    Svar_DB::set_state(var.key, false, LOC);
    Svar_DB::set_state(key_D, false, LOC);
       }
@@ -735,7 +741,8 @@ get_value(Coupled_var & var, string & data)
 {
    if (var.data == 0)   return E_VALUE_ERROR;
 
-   data = string((const char *)(var.data->get_items()), var.data->size());
+   data = string(reinterpret_cast<const char *>(var.data->get_items()),
+                 var.data->size());
    error_loc = "no_error";   return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------

@@ -298,7 +298,7 @@ FILE * fp = popen(popen_arg, "r");
         return;
       }
 
-   for (int cc; (cc = getc(fp)) != EOF;)   cerr << (char)cc;
+   for (int cc; (cc = getc(fp)) != EOF;)   cerr << static_cast<char>(cc);
    cerr << endl;
 
    pclose(fp);
@@ -460,14 +460,16 @@ AP3_fd * ap_fd = 0;
 
                if (svar)
                   {
-                    string data((const char *)svar, sizeof(Svar_record));
+                    string data(reinterpret_cast<const char *>(svar),
+                                sizeof(Svar_record));
                     { SVAR_RECORD_IS_c(fd, data); }
                   }
                else
                   {
                     char dummy[sizeof(Svar_record)];
                     memset(&dummy, 0, sizeof(Svar_record));
-                    string data((const char *)&dummy, sizeof(Svar_record));
+                    string data(reinterpret_cast<const char *>(&dummy),
+                                sizeof(Svar_record));
                     { SVAR_RECORD_IS_c(fd, data); }
                   }
              }
@@ -489,7 +491,9 @@ AP3_fd * ap_fd = 0;
                const int parent = request->get__REGISTER_PROCESSOR__parent();
                const int grand  = request->get__REGISTER_PROCESSOR__grand();
                const bool evconn =  request->get__REGISTER_PROCESSOR__evconn();
-               const AP_num3 ap3((AP_num)proc, (AP_num)parent, (AP_num)grand);
+               const AP_num3 ap3(static_cast<AP_num>(proc),
+                                 static_cast<AP_num>(parent),
+                                 static_cast<AP_num>(grand));
 
                if (evconn)
                   {
@@ -525,13 +529,13 @@ AP3_fd * ap_fd = 0;
                const int fr_parent = request->get__MATCH_OR_MAKE__from_parent();
                const int fr_grand  = request->get__MATCH_OR_MAKE__from_grand();
 
-               const AP_num3 to((AP_num)to_proc,
-                                (AP_num)to_parent,
-                                (AP_num)to_grand);
+               const AP_num3 to(static_cast<AP_num>(to_proc),
+                                static_cast<AP_num>(to_parent),
+                                static_cast<AP_num>(to_grand));
 
-               const AP_num3 fr((AP_num)fr_proc,
-                                (AP_num)fr_parent,
-                                (AP_num)fr_grand);
+               const AP_num3 fr(static_cast<AP_num>(fr_proc),
+                                static_cast<AP_num>(fr_parent),
+                                static_cast<AP_num>(fr_grand));
 
                maybe_start_AP(to);
 
@@ -548,7 +552,9 @@ AP3_fd * ap_fd = 0;
                const int proc   = request->get__GET_EVENTS__proc();
                const int parent = request->get__GET_EVENTS__parent();
                const int grand  = request->get__GET_EVENTS__grand();
-               const AP_num3 ap3((AP_num)proc, (AP_num)parent, (AP_num)grand);
+               const AP_num3 ap3(static_cast<AP_num>(proc),
+                                 static_cast<AP_num>(parent),
+                                 static_cast<AP_num>(grand));
                const SV_key key = db.get_events(events, ap3);
                EVENTS_ARE_c(fd, key, events);
              }
@@ -559,7 +565,9 @@ AP3_fd * ap_fd = 0;
                const int proc   = request->get__CLEAR_ALL_EVENTS__proc();
                const int parent = request->get__CLEAR_ALL_EVENTS__parent();
                const int grand  = request->get__CLEAR_ALL_EVENTS__grand();
-               const AP_num3 ap3((AP_num)proc, (AP_num)parent, (AP_num)grand);
+               const AP_num3 ap3(static_cast<AP_num>(proc),
+                                 static_cast<AP_num>(parent),
+                                 static_cast<AP_num>(grand));
                const Svar_event events = db.clear_all_events(ap3);
                EVENTS_ARE_c(fd, 0, events);
              }
@@ -572,8 +580,10 @@ AP3_fd * ap_fd = 0;
                const int parent = request->get__ADD_EVENT__parent();
                const int grand  = request->get__ADD_EVENT__grand();
                const int event  = request->get__ADD_EVENT__event();
-               const AP_num3 ap3((AP_num)proc, (AP_num)parent, (AP_num)grand);
-              db.add_event(key, ap3, (Svar_event)event);
+               const AP_num3 ap3(static_cast<AP_num>(proc),
+                                 static_cast<AP_num>(parent),
+                                 static_cast<AP_num>(grand));
+              db.add_event(key, ap3, static_cast<Svar_event>(event));
              }
              return;
 
@@ -582,7 +592,9 @@ AP3_fd * ap_fd = 0;
                const int proc   = request->get__IS_REGISTERED_ID__proc();
                const int parent = request->get__IS_REGISTERED_ID__parent();
                const int grand  = request->get__IS_REGISTERED_ID__grand();
-               const AP_num3 ap3((AP_num)proc, (AP_num)parent, (AP_num)grand);
+               const AP_num3 ap3(static_cast<AP_num>(proc),
+                                 static_cast<AP_num>(parent),
+                                 static_cast<AP_num>(grand));
                int is_registered = 0;
                for (size_t p = 0; p < connected_procs.size(); ++p)
                    {
@@ -609,11 +621,11 @@ AP3_fd * ap_fd = 0;
 
         case sid_GET_OFFERING_PROCS:
              {
-               const AP_num to_proc = (AP_num)
-                            request->get__GET_OFFERING_PROCS__offered_to_proc();
+               const AP_num to_proc = static_cast<AP_num>
+                     (request->get__GET_OFFERING_PROCS__offered_to_proc());
                vector<AP_num> processors;
                db.get_offering_processors(to_proc, processors);
-               string sprocs((const char *)&processors[0],
+               string sprocs(reinterpret_cast<const char *>(&processors[0]),
                              processors.size()*sizeof(AP_num));
                OFFERING_PROCS_ARE_c(fd, sprocs);
              }
@@ -621,13 +633,13 @@ AP3_fd * ap_fd = 0;
 
         case sid_GET_OFFERED_VARS:
              {
-               const AP_num to_proc = (AP_num)
-                            request->get__GET_OFFERED_VARS__offered_to_proc();
-               const AP_num from_proc = (AP_num)
-                            request->get__GET_OFFERED_VARS__accepted_by_proc();
+               const AP_num to_proc = static_cast<AP_num>
+                     (request->get__GET_OFFERED_VARS__offered_to_proc());
+               const AP_num from_proc = static_cast<AP_num>
+                     (request->get__GET_OFFERED_VARS__accepted_by_proc());
                vector<uint32_t> varnames;
                db.get_offered_variables(to_proc, from_proc, varnames);
-               string svars((const char *)&varnames[0],
+               string svars(reinterpret_cast<const char *>(&varnames[0]),
                             varnames.size()*sizeof(uint32_t));
                OFFERED_VARS_ARE_c(fd, svars);
              }
@@ -841,8 +853,8 @@ AP3_fd * ap_fd = 0;
                const SV_key key = request->get__SET_CONTROL__key();
                Svar_record * svar = db.find_var(key, LOC);
 
-               if (svar) svar->set_control((Svar_Control)request->
-                                            get__SET_CONTROL__new_control());
+               if (svar) svar->set_control(static_cast<Svar_Control>(request->
+                                            get__SET_CONTROL__new_control()));
                else cerr << "*** key not in db at " << LOC << endl;
              }
              return;
@@ -898,7 +910,8 @@ struct sockaddr_un local;
 
    strcpy(local.sun_path + ABSTRACT_OFFSET, listen_name);
 
-   if (::bind(listen_sock, (const sockaddr *)&local, sizeof(sockaddr_un)))
+   if (::bind(listen_sock, reinterpret_cast<const sockaddr *>(&local),
+              sizeof(sockaddr_un)))
       {
         cerr << prog << ": ::bind("
              << listen_name << ") failed:" << strerror(errno) << endl;
@@ -941,7 +954,8 @@ sockaddr_in local;
    local.sin_port = htons(listen_port);
    local.sin_addr.s_addr = htonl(0x7F000001);
 
-   if (::bind(listen_sock, (const sockaddr *)&local, sizeof(sockaddr_in)))
+   if (::bind(listen_sock, reinterpret_cast<const sockaddr *>(&local),
+              sizeof(sockaddr_in)))
       {
         cerr << prog << ": ::bind(127.0.0.1 port"
              << listen_port << ") failed:" << strerror(errno) << endl;
@@ -1261,7 +1275,8 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
            {
              struct sockaddr_in from;
              socklen_t from_len = sizeof(sockaddr_in);
-             const int new_fd = ::accept(listen_sock, (sockaddr *)&from,
+             const int new_fd = ::accept(listen_sock,
+                                         reinterpret_cast<sockaddr *>(&from),
                                          &from_len);
 
              // disable nagle
@@ -1278,7 +1293,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
                   continue;
                 }
 
-             new_connection((TCP_socket)new_fd);
+             new_connection(static_cast<TCP_socket>(new_fd));
              continue;
            }
 
@@ -1345,7 +1360,8 @@ print_db(ostream & out)
 
 }
 //-----------------------------------------------------------------------------
-ostream & operator << (ostream & out, const AP_num3 & ap3)
+ostream &
+operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
@@ -1353,32 +1369,37 @@ ostream & operator << (ostream & out, const AP_num3 & ap3)
 ostream &
 operator << (ostream & os, Unicode uni)
 {
-   if (uni < 0x80)      return os << (char)uni;
+   if (uni < 0x80)
+      return os << static_cast<char>(uni);
 
-   if (uni < 0x800)     return os << (char)(0xC0 | (uni >> 6))
-                                  << (char)(0x80 | (uni & 0x3F));
+   if (uni < 0x800)
+      return os << static_cast<char>(0xC0 | (uni >> 6))
+                << static_cast<char>(0x80 | (uni & 0x3F));
 
-   if (uni < 0x10000)    return os << (char)(0xE0 | (uni >> 12))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x10000)
+      return os << static_cast<char>(0xE0 | (uni >> 12))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x200000)   return os << (char)(0xF0 | (uni >> 18))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x200000)
+      return os << static_cast<char>(0xF0 | (uni >> 18))
+                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x4000000)  return os << (char)(0xF8 | (uni >> 24))
-                                   << (char)(0x80 | (uni >> 18 & 0x3F))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x4000000)
+      return os << static_cast<char>(0xF8 | (uni >> 24))
+                << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
+                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+                << static_cast<char>(0x80 | (uni       & 0x3F));
 
-   return os << (char)(0xFC | (uni >> 30))
-             << (char)(0x80 | (uni >> 24 & 0x3F))
-             << (char)(0x80 | (uni >> 18 & 0x3F))
-             << (char)(0x80 | (uni >> 12 & 0x3F))
-             << (char)(0x80 | (uni >>  6 & 0x3F))
-             << (char)(0x80 | (uni       & 0x3F));
+   return os << static_cast<char>(0xFC | (uni >> 30))
+             << static_cast<char>(0x80 | (uni >> 24 & 0x3F))
+             << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
+             << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
+             << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
+             << static_cast<char>(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
 

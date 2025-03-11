@@ -102,7 +102,7 @@ std::string NetworkConnection::read_line_from_fd()
         }
 
         if( !end ) {
-            int res = read( socket_fd, (void *)buffer, sizeof( buffer ) );
+            int res = read(socket_fd, buffer, sizeof(buffer));
             if( res == -1 ) {
                 throw ConnectionError( "network error" );
             }
