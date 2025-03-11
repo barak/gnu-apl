@@ -89,8 +89,29 @@ using namespace std;
 /// if there is less than x chars left on the current line then leave
 /// char mode and start a new line indented.
 #define NEED(x)   if (space < int(x)) \
-   { leave_char_mode();   out << "\n";   space = do_indent(); } out
+   { leave_char_mode();   outf << "\n";   space = do_indent(); } outf
 
+//----------------------------------------------------------------------------
+XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
+                                       const char * filename)
+  : XML_Archive(of, ef),
+     indent(0),
+     val_pars(0),
+     value_count(0),
+     char_mode(false)
+{
+   outf.open(filename, ofstream::out);
+   if (!outf.is_open())   // open() failed
+      {
+        err << "Unable to )SAVE workspace '" << filename
+            << "'. " << strerror(errno) << endl;
+        return;
+      }
+
+   Log(LOG_archive)   err << "saving XML_Saving_Archive..." << endl;
+   save();
+   Log(LOG_archive)   err << "done XML_Saving_Archive." << endl;
+}
 //----------------------------------------------------------------------------
 bool
 XML_Saving_Archive::xml_allowed(Unicode uni)
@@ -125,7 +146,7 @@ int
 XML_Saving_Archive::do_indent()
 {
 const int spaces = indent * INDENT_LEN;
-   loop(s, spaces)   out << " ";
+   loop(s, spaces)   outf << " ";
 
    return 72 - spaces;
 }
@@ -145,7 +166,7 @@ XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
    if (uni == UNI_LF)
       {
         leave_char_mode();
-        out << UNI_PAD_U1 << "A" << "\n";
+        outf << UNI_PAD_U1 << "A" << "\n";
         space = do_indent();
       }
    else if (!xml_allowed(uni))
@@ -160,7 +181,7 @@ XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
       {
         NEED(1) << "";
         space -= enter_char_mode();
-        out << uni;
+        outf << uni;
         space--;   // uni
       }
 }
@@ -169,12 +190,12 @@ void
 XML_Saving_Archive::save_UCS(const UCS_string & ucs)
 {
 int space = do_indent();
-   out << decr(space, "<UCS uni=\"");
+   outf << decr(space, "<UCS uni=\"");
    Assert(char_mode == false);
    indent += 5;
    loop(u, ucs.size())   emit_unicode(ucs[u], space);
    leave_char_mode();
-   out << "\"/>" << endl;
+   outf << "\"/>" << endl;
    space -= 2;
    indent -= 5;
 }
@@ -186,24 +207,24 @@ const Value & v = *val_pars[vid]._val;
 const Vid parent_vid = val_pars[vid]._par;
 
    do_indent();
-   out << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
+   outf << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
                  "vid=\"" << vid                << "\" "
                  "parent=\"" << parent_vid      << "\" "
                  "rk=\"" << v.get_rank()        << "\"";
 
    loop (r, v.get_rank())
       {
-        out << " sh-" << r << "=\"" << v.get_shape_item(r) << "\"";
+        outf << " sh-" << r << "=\"" << v.get_shape_item(r) << "\"";
       }
 
-   out << "/>" << endl;
+   outf << "/>" << endl;
    return *this;
 }
 //----------------------------------------------------------------------------
 XML_Saving_Archive &
 XML_Saving_Archive::save_Ravel(Vid vid)
 {
-   Log(LOG_archive)   CERR << "save_Ravel(Vid " << vid << ")" << endl;
+   Log(LOG_archive)   err << "save_Ravel(Vid " << vid << ")" << endl;
 
 const Value & v = *val_pars[vid]._val;
 const APL_types::Depth depth = val_pars[vid]._depth;
@@ -220,20 +241,20 @@ int space = do_indent();
         {
           char cc[80];   // output line buffer
           SPRINTF(cc, "<Ravel vid=\"%d\" bytes=\"", vid);
-          out << cc;
+          outf << cc;
         }
 
         // print the data of the bytes attribute
         ++indent;
-        out << uhex << UNI_PAD_U9;   // emit the following bytes in hex
-        if (space < byte_count)   out << endl;
+        outf << uhex << UNI_PAD_U9;   // emit the following bytes in hex
+        if (space < byte_count)   outf << endl;
 
         loop(b, byte_count)   // print with max. 64 bytes per line
             {
-              if (b && (b & 0x3F) == 0)   out << "\n    " << UNI_PAD_U9;
-              out << (bytes[b] & 0xFF);
+              if (b && (b & 0x3F) == 0)   outf << "\n    " << UNI_PAD_U9;
+              outf << (bytes[b] & 0xFF);
             }
-        out << nohex << "\"/>" << endl;
+        outf << nohex << "\"/>" << endl;
         --indent;
       }
    else   // normal ravel
@@ -242,7 +263,7 @@ int space = do_indent();
         {
           char cc[80];   // output line buffer
           SPRINTF(cc, "<Ravel vid=\"%d\" depth=\"%d\" cells=\"", vid, depth);
-          out << decr(space, cc);
+          outf << decr(space, cc);
         }
 
         // print the data of the 'cells' attribute
@@ -252,7 +273,7 @@ int space = do_indent();
         space -= leave_char_mode();
         space -= 2;
 
-        out << "\"/>" << endl;
+        outf << "\"/>" << endl;
         --indent;
       }
 
@@ -342,34 +363,34 @@ XML_Saving_Archive::save_functions()
    // save build-in functions
    //
    do_indent();
-   out << "<!-- system functions and primitives... -->" << endl;
+   outf << "<!-- system functions and primitives... -->" << endl;
 #define sf_def(x, _str, _txt)   save_Function(x::fun);
 #define pf_def(x, _str, _txt)   save_Function(x::fun);
 #include "SystemVariable.def"
 
-   out << endl;
+   outf << endl;
 }
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_Function(const Function & fun)
 {
    do_indent();
-   out << "<Function fid=\"" << HEX(&fun) << "\"";
+   outf << "<Function fid=\"" << HEX(&fun) << "\"";
 
    if (is_saved(&fun))
       {
-         out << " ref=\"true\"/>"    << endl;
+         outf << " ref=\"true\"/>"    << endl;
       }
    else if (fun.is_macro())
       {
         const UserFunction * ufun = fun.get_func_ufun();
         Assert(ufun);
 
-        out << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
+        outf << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
       }
    else if (fun.is_derived())
       {
-        CERR << endl <<
+        err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
 "         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
@@ -380,46 +401,46 @@ XML_Saving_Archive::save_Function(const Function & fun)
              << endl;
 
         const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
-        out << " LO-fid=\"" << HEX(dfn.get_LO())     << "\""
+        outf << " LO-fid=\"" << HEX(dfn.get_LO())     << "\""
                " OPER-fid=\"" << HEX(dfn.get_OPER()) << "\"";
 
         const Function * ro = dfn.get_RO();
         const Value * axis = dfn.get_AXIS();
         if (ro || axis)
            {
-             out << endl;
+             outf << endl;
              do_indent();
-             out << "        ";
+             outf << "        ";
            }
-        if (ro)     out << " RO-fid=\""   << HEX(ro) << "\"";
-        if (axis)   out << " AXIS-vid=\"" << HEX(find_vid(axis)) << "\"";
+        if (ro)     outf << " RO-fid=\""   << HEX(ro) << "\"";
+        if (axis)   outf << " AXIS-vid=\"" << HEX(find_vid(axis)) << "\"";
 
-        out << "/>" << endl;
+        outf << "/>" << endl;
       }
    else if (fun.is_defined())   // defined APL function
       {
         const int * eprops = fun.get_exec_properties();
         const APL_time_us creation_time = fun.get_creation_time();
 
-        out << " creation-time=\"" << creation_time << "\"" << endl
+        outf << " creation-time=\"" << creation_time << "\"" << endl
             << "                exec-properties=\""
             << eprops[0] << "," << eprops[1] << ","
             << eprops[2] << "," << eprops[3] << "\"";
 
-        if (fun.is_native())   out << " native=\"1\"";
-        out << ">" << endl;
+        if (fun.is_native())   outf << " native=\"1\"";
+        outf << ">" << endl;
         ++indent;
 
         save_UCS(fun.canonical(false));
 
         --indent;
         do_indent();
-        out << "</Function>" << endl;
+        outf << "</Function>" << endl;
         saved_Functions.push_back(&fun);
       }
    else // primitive APL function
       {
-        out << " tag=\"" << fun.get_tag()  << "\""
+        outf << " tag=\"" << fun.get_tag()  << "\""
                "/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
             << " -->" << endl;
       }
@@ -439,7 +460,7 @@ XML_Saving_Archive::save_Function_name(const Function & fun)
 {
    if (fun.is_derived())
       {
-        CERR << endl <<
+        err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
 "         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
@@ -457,17 +478,16 @@ const UserFunction * ufun = fun.get_func_ufun();
         Symbol * sym = Workspace::lookup_symbol(fname);
         Assert(sym);
         const int sym_depth = sym->get_exec_ufun_depth(ufun);
-        out << " ufun-name=\""  << fname     << "\""
+        outf << " ufun-name=\""  << fname     << "\""
             << " symbol-level=\"" << sym_depth << "\"";
         return 2;   // two attributes
       }
    else        // primitive or quad function
       {
-        out << " fun-id=\"" << HEX(fun.get_Id()) << "\"";
+        outf << " fun-id=\"" << HEX(fun.get_Id()) << "\"";
         return 1;   // one attribute
       }
 }
-
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_Parser(const StateIndicator & si)
@@ -475,7 +495,7 @@ XML_Saving_Archive::save_Parser(const StateIndicator & si)
 const Prefix & prefix = si.current_stack;
 
    do_indent();
-    out << "<Parser size=\""      << prefix.size()
+    outf << "<Parser size=\""      << prefix.size()
         << "\" assign-pending=\"" << prefix.get_assign_state()
         << "\" action=\""         << prefix.action
         << "\" lookahead-high=\"" << prefix.get_lookahead_PC()
@@ -502,7 +522,7 @@ const Prefix & prefix = si.current_stack;
    --indent;
 
    do_indent();
-   out << "</Parser>" << endl;
+   outf << "</Parser>" << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -518,7 +538,7 @@ XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
-   Log(LOG_archive)   CERR << "save_symtab()" << endl;
+   Log(LOG_archive)   err << "save_symtab()" << endl;
 
 std::vector<const Symbol *> symbols = symtab.get_all_symbols();
 
@@ -537,11 +557,11 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
         ++s;
       }
 
-   out << endl;
+   outf << endl;
    do_indent();
-   out << "<!-- Symbol Table -->" << endl;
+   outf << "<!-- Symbol Table -->" << endl;
    do_indent();
-   out << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
+   outf << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
 
    ++indent;
 
@@ -565,18 +585,18 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
    --indent;
 
    do_indent();
-   out << "</SymbolTable>" << endl << endl;
+   outf << "</SymbolTable>" << endl << endl;
 }
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_SI_entry(const StateIndicator & si)
 {
-   Log(LOG_archive)   CERR << "save_SI_entry()" << endl;
+   Log(LOG_archive)   err << "save_SI_entry()" << endl;
 
 const Executable & exec = *si.get_executable();
 
    do_indent();
-   out << "<SI-entry level=\"" << si.get_level()
+   outf << "<SI-entry level=\"" << si.get_level()
        << "\" pc=\"" << si.get_PC()
        << "\" line=\"" << exec.get_line(si.get_PC()) << "\""
        <<">" << endl << flush;
@@ -594,40 +614,40 @@ const Executable & exec = *si.get_executable();
                const int sym_depth = sym->get_exec_ufun_depth(ufun);
 
                if (ufun->is_macro())
-                  out << "<UserFunction macro-num=\"" << ufun->get_macnum()
+                  outf << "<UserFunction macro-num=\"" << ufun->get_macnum()
                       << "\"/>" << endl;
                else if (ufun->is_lambda())
                   {
-                    out << "<UserFunction lambda-name=\"" << ufun->get_name()
+                    outf << "<UserFunction lambda-name=\"" << ufun->get_name()
                         << "\">" << endl;
                     ++indent;
                     save_UCS(ufun->canonical(false));
                     --indent;
                     do_indent();
-                    out << "</UserFunction>" << endl;
+                    outf << "</UserFunction>" << endl;
                   }
                else
-                  out << "<UserFunction ufun-name=\"" << sym->get_name()
+                  outf << "<UserFunction ufun-name=\"" << sym->get_name()
                       << "\" symbol-level=\"" << sym_depth << "\"/>" << endl;
              }
              break;
 
         case PM_STATEMENT_LIST:
-             out << "<Statements>" << endl;
+             outf << "<Statements>" << endl;
              ++indent;
              save_UCS(exec.get_text(0));
              --indent;
              do_indent();
-             out << "</Statements>" << endl;
+             outf << "</Statements>" << endl;
                break;
 
         case PM_EXECUTE:
-             out << "<Execute>" << endl;
+             outf << "<Execute>" << endl;
              ++indent;
              save_UCS(exec.get_text(0));
              --indent;
              do_indent();
-             out << "</Execute>" << endl;
+             outf << "</Execute>" << endl;
              break;
 
           default: FIXME;
@@ -640,17 +660,17 @@ const Executable & exec = *si.get_executable();
    --indent;
 
    do_indent();
-   out << "</SI-entry>" << endl << endl;
+   outf << "</SI-entry>" << endl << endl;
 }
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_Symbol(const Symbol & sym)
 {
-   Log(LOG_archive)   CERR << "save_Symbol(Vid "
+   Log(LOG_archive)   err << "save_Symbol(Vid "
                            << sym.get_name() << ")" << endl;
 
    do_indent();
-   out << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
+   outf << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
        << sym.value_stack_size() << "\">" << endl;
 
    ++indent;
@@ -658,43 +678,43 @@ XML_Saving_Archive::save_Symbol(const Symbol & sym)
    --indent;
 
    do_indent();
-   out << "</Symbol>" << endl << endl;
+   outf << "</Symbol>" << endl << endl;
 }
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_user_commands(
                const std::vector<Command::user_command> & cmds)
 {
-   Log(LOG_archive)   CERR << "save_user_commands()" << endl;
+   Log(LOG_archive)   err << "save_user_commands()" << endl;
    if (cmds.size() == 0)   return;
 
    do_indent();
-   out << "<Commands size=\"" << cmds.size() << "\">" << endl;
+   outf << "<Commands size=\"" << cmds.size() << "\">" << endl;
 
    ++indent;
    loop(u, cmds.size())
       {
         const Command::user_command & ucmd = cmds[u];
         do_indent();
-        out << "<Command name=\"" << ucmd.prefix
+        outf << "<Command name=\"" << ucmd.prefix
             << "\" mode=\"" << ucmd.mode
             << "\" fun=\"" <<  ucmd.apl_function << "\"/>" << endl;
       }
 
    --indent;
    do_indent();
-   out << "</Commands>" << endl << endl;
+   outf << "</Commands>" << endl << endl;
 }
 //----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 {
    do_indent();
-   out << "<Token pc=\"" << tloc.get_PC()
+   outf << "<Token pc=\"" << tloc.get_PC()
        << "\" tag=\"" << HEX(tloc.get_token().get_tag()) << "\"";
    emit_token_val(tloc.get_token());
 
-   out << "/>" << endl;
+   outf << "/>" << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -704,64 +724,64 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
       {
         case TV_NONE:  break;
 
-        case TV_CHAR:  Log(LOG_archive)   CERR << "Saving TV_SYM Token" << endl;
-                       out << " char=\"" << int(tok.get_char_val()) << "\"";
+        case TV_CHAR:  Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
+                       outf << " char=\"" << int(tok.get_char_val()) << "\"";
                        break;
 
-        case TV_INT:   Log(LOG_archive)   CERR << "Saving TV_INT Token" << endl;
-                       out << " int=\"" << tok.get_int_val() << "\"";
+        case TV_INT:   Log(LOG_archive)   err << "Saving TV_INT Token" << endl;
+                       outf << " int=\"" << tok.get_int_val() << "\"";
                        break;
 
-        case TV_FLT:   Log(LOG_archive)   CERR << "Saving TV_FLT Token" << endl;
-                       out << " float=\"" << tok.get_flt_val() << "\"";
+        case TV_FLT:   Log(LOG_archive)   err << "Saving TV_FLT Token" << endl;
+                       outf << " float=\"" << tok.get_flt_val() << "\"";
                        break;
 
-        case TV_CPX:   Log(LOG_archive)   CERR << "Saving TV_CPX Token" << endl;
-                       out << " real=\"" << tok.get_cpx_real()
+        case TV_CPX:   Log(LOG_archive)   err << "Saving TV_CPX Token" << endl;
+                       outf << " real=\"" << tok.get_cpx_real()
                            << "\" imag=\"" << tok.get_cpx_imag() << "\"";
                        break;
 
-        case TV_SYM:   Log(LOG_archive)   CERR << "Saving TV_SYM Token" << endl;
+        case TV_SYM:   Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
                        {
                          Symbol * sym = tok.get_sym_ptr();
                          const UCS_string name = sym->get_name();
-                         out << " sym=\"" << name << "\"";
+                         outf << " sym=\"" << name << "\"";
                        }
                        break;
 
-        case TV_LIN:   Log(LOG_archive)   CERR << "Saving TV_LIN Token" << endl;
-                       out << " line=\"" << tok.get_fun_line() << "\"";
+        case TV_LIN:   Log(LOG_archive)   err << "Saving TV_LIN Token" << endl;
+                       outf << " line=\"" << tok.get_fun_line() << "\"";
                        break;
 
         case TV_VAL:   {
                          Log(LOG_archive)
-                            CERR << "Saving TV_VAL Token" << endl;
+                            err << "Saving TV_VAL Token" << endl;
 
                          const Vid vid = find_vid(tok.get_apl_val().get());
-                         out << " vid=\"" << vid << "\"";
+                         outf << " vid=\"" << vid << "\"";
                        }
                        break;
 
         case TV_INDEX: {
                          Log(LOG_archive)
-                            CERR << "Saving TV_INDEX Token" << endl;
+                            err << "Saving TV_INDEX Token" << endl;
                          const IndexExpr & idx = tok.get_index_val();
                          const int rank = idx.get_rank();
-                         out << " index=\"";
+                         outf << " index=\"";
                          loop(i, rank)
                              {
-                               if (i)   out << ",";
+                               if (i)   outf << ",";
                                const Value * val = idx.values[i].get();
-                               if (val)   out << "vid_" << find_vid(val);
-                               else       out << "-";
-                                out << "\"";
+                               if (val)   outf << "vid_" << find_vid(val);
+                               else       outf << "-";
+                                outf << "\"";
                              }
                        }
                        break;
 
         case TV_FUN:   {
                          Log(LOG_archive)
-                            CERR << "Saving TV_FUN Token" << endl;
+                            err << "Saving TV_FUN Token" << endl;
 
                          cFunction_P fun = tok.get_function();
                          Assert1(fun);
@@ -777,23 +797,23 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
 void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
-   Log(LOG_archive)   CERR << "    save_vstack_item(name_class "
+   Log(LOG_archive)   err << "    save_vstack_item(name_class "
                            << vsi.get_NC() << ")" << endl;
    switch(vsi.get_NC())
       {
         case NC_UNUSED_USER_NAME:
              do_indent();
-             out << "<unused-name/>" << endl;
+             outf << "<unused-name/>" << endl;
              break;
 
         case NC_LABEL:
              do_indent();
-             out << "<Label value=\"" << vsi.get_label() << "\"/>" << endl;
+             outf << "<Label value=\"" << vsi.get_label() << "\"/>" << endl;
              break;
 
         case NC_VARIABLE:
              do_indent();
-             out << "<Variable vid=\"" << find_vid(vsi.get_val_cptr())
+             outf << "<Variable vid=\"" << find_vid(vsi.get_val_cptr())
                  << "\"/>" << endl;
              break;
 
@@ -804,7 +824,7 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 
         case NC_SYSTEM_VAR:
              do_indent();
-             out << "<Shared-Variable key=\"" << vsi.get_key()
+             outf << "<Shared-Variable key=\"" << vsi.get_key()
                  << "\"/>" << endl;
              break;
 
@@ -840,13 +860,13 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 
    // check with: xmllint --valid workspace.xml >/dev/null
    //
-   out <<
+   outf <<
 "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n"
 "\n"
 "<!DOCTYPE Workspace\n"
 "[\n"
-"    <!ELEMENT Workspace (Function*,Value*,Ravel*,SymbolTable,\n"
-"                         Symbol*,Commands?,StateIndicator)>\n"
+"    <!ELEMENT Workspace (Function*, Value*, Ravel*, SymbolTable,\n"
+"                         Symbol*, Commands?, StateIndicator)>\n"
 "    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  year       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  month      CDATA #REQUIRED>\n"
@@ -876,12 +896,13 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "        <!ATTLIST Ravel vid    CDATA #REQUIRED>\n"
 "        <!ATTLIST Ravel bytes  CDATA #IMPLIED>\n"
 "        <!ATTLIST Ravel cells  CDATA #IMPLIED>\n"
+"        <!ATTLIST Ravel depth  CDATA #IMPLIED>\n"
 "\n"
 "        <!ELEMENT SymbolTable (Symbol*)>\n"
 "        <!ATTLIST SymbolTable size CDATA #REQUIRED>\n"
 "\n"
-"            <!ELEMENT Symbol (unused-name|Variable|Function|\n"
-"                              Label|Shared-Variable)*>\n"
+"            <!ELEMENT Symbol (unused-name | Variable | Function|\n"
+"                              Label       | Shared-Variable)*>\n"
 "            <!ATTLIST Symbol name       CDATA #REQUIRED>\n"
 "            <!ATTLIST Symbol stack-size CDATA #REQUIRED>\n"
 "\n"
@@ -916,12 +937,13 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "            <!ELEMENT Command (#PCDATA)>\n"
 "            <!ATTLIST Command name       CDATA #REQUIRED>\n"
 "            <!ATTLIST Command mode       CDATA #REQUIRED>\n"
-"            <!ATTLIST Command fun       CDATA #REQUIRED>\n"
+"            <!ATTLIST Command fun        CDATA #REQUIRED>\n"
 "\n"
 "        <!ELEMENT StateIndicator (SI-entry*)>\n"
 "        <!ATTLIST StateIndicator levels CDATA #REQUIRED>\n"
 "\n"
-"            <!ELEMENT SI-entry ((Execute|Statements|UserFunction),Parser+)>\n"
+"            <!ELEMENT SI-entry ((Execute | Statements | UserFunction),\n"
+"                                Parser+)>\n"
 "            <!ATTLIST SI-entry level     CDATA #REQUIRED>\n"
 "            <!ATTLIST SI-entry pc        CDATA #REQUIRED>\n"
 "            <!ATTLIST SI-entry line      CDATA #REQUIRED>\n"
@@ -936,7 +958,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>\n"
 "                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>\n"
 "\n"
-"                <!ELEMENT Parser (Token*,Function*)>\n"
+"                <!ELEMENT Parser (Token*, Function*)>\n"
 "                <!ATTLIST Parser size           CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
@@ -962,7 +984,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "]>\n"
 "\n"
 "    <!-- hour/minute/second is )SAVE time in UTC (aka. GMT).\n"
-"         timezone is offset to UTC in seconds.\n"
+"         timezone is +/- offset to UTC in seconds.\n"
 "         local time is UTC + offset -->\n"
 "\n"
 "<Workspace wsid=\""       << Workspace::get_WS_name()
@@ -982,22 +1004,22 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 XML_Saving_Archive &
 XML_Saving_Archive::save()
 {
-   Log(LOG_archive)   CERR << "save()" << endl;
+   Log(LOG_archive)   err << "save()" << endl;
 
    write_XML_header();
 
    ++indent;
 
-   Log(LOG_archive)   CERR << "save() saves function..." << endl;
+   Log(LOG_archive)   err << "save() saves function..." << endl;
    save_functions();
 
    // collect all values to be saved. We mark the values to avoid
    // saving of stale values and unmark the used values
    //
-   Log(LOG_archive)   CERR << "save() marks values..." << endl;
+   Log(LOG_archive)   err << "save() marks values..." << endl;
    Value::mark_all_dynamic_values();
 
-   Log(LOG_archive)   CERR << "save() unmarks values..." << endl;
+   Log(LOG_archive)   err << "save() unmarks values..." << endl;
    Workspace::unmark_all_values();
 
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();
@@ -1012,7 +1034,7 @@ XML_Saving_Archive::save()
        }
 
    Log(LOG_archive)
-      CERR << "save() allocates values[" << value_count << "]..." << endl;
+      err << "save() allocates values[" << value_count << "]..." << endl;
 
    try
       {
@@ -1029,7 +1051,7 @@ XML_Saving_Archive::save()
            ;
          WS_FULL;
       }
-   Log(LOG_archive)   CERR << "save() done allocating values[]..." << endl;
+   Log(LOG_archive)   err << "save() done allocating values[]..." << endl;
 
 ShapeItem idx = 0;
 
@@ -1069,7 +1091,7 @@ ShapeItem idx = 0;
               if (cP.is_lval_cell())
                  {
                    Log(LOG_archive)
-                      CERR << "LVAL CELL in " << p << " at " LOC << endl;
+                      err << "LVAL CELL in " << p << " at " LOC << endl;
                    continue;
                  }
 
@@ -1092,10 +1114,10 @@ ShapeItem idx = 0;
 #endif
                  {
                    // sub already has a parent, which supposedly cannot
-                   // happen. print out some more information about this
+                   // happen. Print some more information about this
                    // case.
                    //
-                   CERR << "*** Sub-Value "
+                   err << "*** Sub-Value "
                         << voidP(sub) << " has two parents."      << endl
                         << "Child: vid=" << sub_idx << ", _val="
                         << val_pars[sub_idx]._val << ", _par="
@@ -1105,18 +1127,18 @@ ShapeItem idx = 0;
                         << val_pars[p]._par                       << endl
                         << "Call stack:"                          << endl;
                         BACKTRACE
-                   CERR << endl << " Running )CHECK..." << endl;
+                   err << endl << " Running )CHECK..." << endl;
                    UCS_string no_arg;
-                   Command::cmd_CHECK(CERR, no_arg);
-                   CERR << endl;
+                   Command::cmd_CHECK(err, no_arg);
+                   err << endl;
 
 #if cfg_VALUE_HISTORY_WANTED
-VH_entry::print_history(CERR, *sub, 0);
-VH_entry::print_history(CERR, *val_pars[sub_idx]._val, 0);
-VH_entry::print_history(CERR, *val_pars[p]._val, 0);
+   VH_entry::print_history(err, *sub, 0);
+   VH_entry::print_history(err, *val_pars[sub_idx]._val, 0);
+   VH_entry::print_history(err, *val_pars[p]._val, 0);
 #endif
 
-   CERR << endl <<
+   err << endl <<
 "The workspace will be )SAVEd, but using it for anything other than for\n"
 " recovering its content (i.e. defined functions or variables) means\n"
 " asking for BIG trouble!" << endl;
@@ -1130,14 +1152,14 @@ VH_entry::print_history(CERR, *val_pars[p]._val, 0);
    // save all values (without their ravel)
    //
    do_indent();
-   out << "<!-- APL values... -->" << endl;
+   outf << "<!-- APL values... -->" << endl;
    loop(vid, value_count)   save_shape(Vid(vid));
 
    // save ravels of all values. Ordered by increasing level
    //
-   out << endl;
+   outf << endl;
    do_indent();
-   out << "<!-- Ravels of APL values... -->" << endl;
+   outf << "<!-- Ravels of APL values... -->" << endl;
 ShapeItem done_count = 0;
    for (ShapeItem depth = 0; done_count != value_count; ++depth)
        {
@@ -1153,10 +1175,11 @@ ShapeItem done_count = 0;
    //
    save_symtab(Workspace::get_symbol_table());
 
-   // save certain system variables
+   // save all system variables. Just for completeness, not all of
+   // them will be restired on )LOAD.
    //
    do_indent();
-   out << "<!-- APL system variables... -->" << endl;
+   outf << "<!-- APL system variables... -->" << endl;
 
 #define rw_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #define ro_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
@@ -1169,12 +1192,12 @@ ShapeItem done_count = 0;
    // save state indicator
    //
    {
-     out << endl;
+     outf << endl;
      do_indent();
-     out << "<!-- State Indicator -->" << endl;
+     outf << "<!-- State Indicator -->" << endl;
      const int levels = Workspace::SI_entry_count();
      do_indent();
-     out << "<StateIndicator levels=\"" << levels << "\">" << endl;
+     outf << "<StateIndicator levels=\"" << levels << "\">" << endl;
 
      ++indent;
 
@@ -1194,7 +1217,7 @@ ShapeItem done_count = 0;
      --indent;
 
      do_indent();
-     out << "</StateIndicator>" << endl << endl;
+     outf << "</StateIndicator>" << endl << endl;
    }
 
    --indent;
@@ -1204,15 +1227,15 @@ ShapeItem done_count = 0;
    // write closing tag and a few 0's so that string functions
    // can be used on the mmaped file.
    //
-   out << "</Workspace>" << endl
-       << char(0) << char(0) <<char(0) <<char(0) << endl;
+   outf << "</Workspace>" << endl
+       << char(0) << char(0) << char(0) << char(0) << endl;
 
    return *this;
 }
 //============================================================================
-XML_Loading_Archive::XML_Loading_Archive(ostream & _out, const char * _filename,
-                                         int & dump_fd)
-   : out(_out),
+XML_Loading_Archive::XML_Loading_Archive(ostream & of, ostream & ef,
+                                         const char * _filename, int & dump_fd)
+   : XML_Archive(of, ef),
      fd(-1),
      map_start(0),
      map_length(0),
@@ -1229,7 +1252,7 @@ XML_Loading_Archive::XML_Loading_Archive(ostream & _out, const char * _filename,
      filename(_filename),
      file_is_complete(false)
 {
-   Log(LOG_archive)   CERR << "Loading file " << filename << endl;
+   Log(LOG_archive)   err << "Loading file " << filename << endl;
 
    fd = open(filename, O_RDONLY);
    if (fd == -1)   return;
@@ -1237,7 +1260,7 @@ XML_Loading_Archive::XML_Loading_Archive(ostream & _out, const char * _filename,
 struct stat st;
    if (fstat(fd, &st))
       {
-        CERR << "fstat() failed: " << strerror(errno) << endl;
+        err << "fstat() failed: " << strerror(errno) << endl;
         close(fd);
         fd = -1;
         return;
@@ -1247,7 +1270,7 @@ struct stat st;
    map_start = mmap(0, map_length, PROT_READ, MAP_SHARED, fd, 0);
    if (map_start == reinterpret_cast<const void *>(-1))
       {
-        CERR << "mmap() failed: " << strerror(errno) << endl;
+        err << "mmap() failed: " << strerror(errno) << endl;
         close(fd);
         fd = -1;
         return;
@@ -1268,13 +1291,13 @@ struct stat st;
         // Return the open file descriptor (the destructor will unmap())
         //
         dump_fd = fd;
-        fd = -1;   // file will be closed via dump_fd
+        fd = -1;   // caller will closed the file via dump_fd by 
         return;
       }
 
    if (strncmp(file_start, "<?xml", 5))   // not an xml file
       {
-        CERR << "file " << filename << " does not " << endl
+        err << "file " << filename << " does not " << endl
              << "have the format of a GNU APL .xml or .apl file" << endl;
         close(fd);
         fd = -1;
@@ -1320,27 +1343,27 @@ XML_Loading_Archive::read_vids()
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::where(ostream & out)
+XML_Loading_Archive::where()
 {
-   out << "line=" << line_no << "+" << (data - line_start) << " '";
+   err << "line=" << line_no << "+" << (data - line_start) << " '";
 
-   loop(j, 40)   { if (data[j] == 0x0A)   break;   out << data[j]; }
-   out << "'" << endl;
+   loop(j, 40)   { if (data[j] == 0x0A)   break;   err << data[j]; }
+   err << "'" << endl;
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::where_att(ostream & out)
+XML_Loading_Archive::where_att()
 {
-   out << "line=" << line_no << "+" << (attributes - line_start) << " '";
+   err << "line=" << line_no << "+" << (attributes - line_start) << " '";
 
    loop(j, 40)
       {
         if (attributes[j] == 0x0A)        break;
         if (attributes + j >= end_attr)   break;
-         out << attributes[j];
+        err << attributes[j];
       }
 
-   out << "'" << endl;
+   err << "'" << endl;
 }
 //----------------------------------------------------------------------------
 bool
@@ -1366,18 +1389,18 @@ XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
 {
    if (!is_tag(prefix))
       {
-        CERR << "   Got tag ";
-        print_tag(CERR);
-        CERR << " when expecting tag " << prefix
-             << " at " << loc << "  line " << line_no << endl;
+        err << "   Got tag ";
+        print_tag();
+        err << " when expecting tag " << prefix
+            << " at " << loc << "  line " << line_no << endl;
         DOMAIN_ERROR;
       }
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::print_tag(ostream & out) const
+XML_Loading_Archive::print_tag() const
 {
-   loop(t, attributes - tag_name)   out << tag_name[t];
+   loop(t, attributes - tag_name)   err << tag_name[t];
 }
 //----------------------------------------------------------------------------
 const UTF8 *
@@ -1491,9 +1514,9 @@ again:
    end_attr = data;
 
 /*
-   CERR << "See tag ";
-   for (const UTF8 * t = tag_name; t < attributes; ++t)   CERR << char(*t);
-   CERR << " at " << loc << " line " << line_no << endl;
+   err << "See tag ";
+   for (const UTF8 * t = tag_name; t < attributes; ++t)   err << char(*t);
+   err << " at " << loc << " line " << line_no << endl;
 */
 
    return false;
@@ -1565,7 +1588,7 @@ bool prev_month = false;
    if      (mon > 12)   { mon =  1; ++year; }
    else if (mon <  1)   { mon = 12; --year; }
 
-   Log(LOG_archive)   CERR << "read_Workspace() " << endl;
+   Log(LOG_archive)   err << "read_Workspace() " << endl;
 
    // quick check that the file is complete
    //
@@ -1580,7 +1603,7 @@ bool prev_month = false;
 
    if (!file_is_complete && !copying)
       {
-        CERR <<
+        err <<
 "*** workspace file " << filename << endl <<
 "    seems to be incomplete (possibly caused by a crash on )SAVE?)\n" 
 "    You may still be able to )COPY from it.\n"
@@ -1669,9 +1692,9 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 
    if (have_allowed_objects && allowed_objects.size())
       {
-        CERR << "NOT COPIED:";
-        loop(a, allowed_objects.size())   CERR << " " << allowed_objects[a];
-        CERR << endl;
+        err << "NOT COPIED:";
+        loop(a, allowed_objects.size())   err << " " << allowed_objects[a];
+        err << endl;
       }
 }
 //----------------------------------------------------------------------------
@@ -1689,7 +1712,7 @@ XML_Loading_Archive::check_compatibility()
         if (major == ASX_MAJOR && minor == ASX_MINOR)   return;
         if (major == ASX_MAJOR)
            {
-              CERR << "NOTE: this workspaces was )SAVEd with syntax version "
+              err << "NOTE: this workspaces was )SAVEd with syntax version "
                    << major << "." << minor << "." << other << endl
                    << "but is now )LOADed with a newer version " << ASX_MAJOR
                    << "." << ASX_MINOR << "." << ASX_OTHER << "." << endl
@@ -1713,13 +1736,13 @@ UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
    if (saving_SVN.size() == 0)   // saved with very old version
       {
         mismatch = true;
-        CERR << "WARNING: this workspace was )SAVEd with a VERY "
+        err << "WARNING: this workspace was )SAVEd with a VERY "
              << "old SVN version of GNU APL." << endl;
       }
    else if (saving_SVN != current_SVN)   // saved with different version
       {
         mismatch = true;
-        CERR << "WARNING: this workspace was )SAVEd with SVN version "
+        err << "WARNING: this workspace was )SAVEd with SVN version "
              << saving_SVN << endl <<
         "          but is now being )LOADed with a SVN version "
              << current_SVN << " or greater" << endl;
@@ -1727,9 +1750,9 @@ UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
 
    if (mismatch)
       {
-        CERR << "Expect problems, in particular when the )SI was not clear.\n";
+        err << "Expect problems, in particular when the )SI was not clear.\n";
         if (!copying)
-           CERR << "In case of problems, please try )COPY instead of )LOAD."
+           err << "In case of problems, please try )COPY instead of )LOAD."
                 << endl;
       }
 }
@@ -1746,7 +1769,7 @@ const int flags  = find_int_attr("flg",    false, 16);
 const Vid parent = find_Vid_attr("parent", false, 10);
 const int rk     = find_int_attr("rk",     false, 10);
 
-   Log(LOG_archive)   CERR << "  read_Value() vid=" << vid << endl;
+   Log(LOG_archive)   err << "  read_Value() vid=" << vid << endl;
 
    if (reading_vids)
       {
@@ -2061,7 +2084,7 @@ const UTF8 * cells_utf = find_optional_attr("cells");
    if (!cells_utf)   cells_utf = find_mandatory_attr("bytes");
 
    Log(LOG_archive)
-      CERR << "    read_Ravel() vid=" << vid
+      err << "    read_Ravel() vid=" << vid
            << ", XML line " << line_no << " - ";
 
    Assert(vid < int(values.size()));
@@ -2069,14 +2092,14 @@ Value_P Z = values[vid];
 
    if (!Z)
       {
-        Log(LOG_archive) CERR << "NO (vids_COPY or static)" << endl;
+        Log(LOG_archive) err << "NO (vids_COPY or static)" << endl;
         return;   // )COPY with vids_COPY or static value
       }
 
    if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
       {
         read_Cells(*Z, cells_utf);
-        Log(LOG_archive) CERR << "YES (packed)" << endl;
+        Log(LOG_archive)   err << "YES (packed)" << endl;
         return;
       }
 
@@ -2085,7 +2108,7 @@ Value_P Z = values[vid];
         Value_P Z0(LOC);   // a scalar to read the prototype
         read_Cells(*Z0, cells_utf);   // prototype
         Z->set_default(*Z0, LOC);
-        Log(LOG_archive) CERR << "YES (empty)" << endl;
+        Log(LOG_archive)   err << "YES (empty)" << endl;
       }
    else
       {
@@ -2094,7 +2117,7 @@ Value_P Z = values[vid];
               cells_utf = read_Cells(*Z, cells_utf);
            // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
             }
-        Log(LOG_archive) CERR << "YES (" << Z->element_count()
+        Log(LOG_archive) err << "YES (" << Z->element_count()
                               << " items)" << endl;
          }
    Z->check_value(LOC);
@@ -2103,7 +2126,7 @@ Value_P Z = values[vid];
 void
 XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
 {
-   Log(LOG_archive)   CERR << "      [" << d << "] unused name" << endl;
+   Log(LOG_archive)   err << "      [" << d << "] unused name" << endl;
 
    if (d == 0)   return;   // Symbol::Symbol has already created the top level
 
@@ -2116,7 +2139,7 @@ XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
 const int vid = find_int_attr("vid", false, 10);
    Assert(vid < int(values.size()));
 
-   Log(LOG_archive)   CERR << "      [" << d << "] read_Variable() vid=" << vid
+   Log(LOG_archive)   err << "      [" << d << "] read_Variable() vid=" << vid
                            << " name=" << symbol.get_name() << endl;
 
    // some system variables are saved for troubleshooting purposes, but
@@ -2130,7 +2153,7 @@ const int vid = find_int_attr("vid", false, 10);
 
    if (vid == -1)   // stale variable
       {
-        Log(LOG_archive)   CERR << "      " << symbol.get_name()
+        Log(LOG_archive)   err << "      " << symbol.get_name()
                                 << " looks like a stale variable" << endl;
         return;
       }
@@ -2146,7 +2169,7 @@ const int vid = find_int_attr("vid", false, 10);
       }
    catch (...)
       {
-        CERR << "*** Could not assign value " << *values[vid]
+        err << "*** Could not assign value " << *values[vid]
              << "    to variable " << symbol.get_name() << " ***" << endl;
       }
 }
@@ -2230,7 +2253,7 @@ int eprops[4] = { 0, 0, 0, 0 };
       }
 
    Log(LOG_archive)
-      CERR << "      [" << d << "] read_Function(" << symbol.get_name()
+      err << "      [" << d << "] read_Function(" << symbol.get_name()
            << ") native=" << native << endl;
 
    next_tag(LOC);
@@ -2254,7 +2277,7 @@ UCS_string text;
            }
         else        // fix failed
            {
-             CERR << "   *** loading of native function " << text
+             err << "   *** loading of native function " << text
                   << " failed" << endl << endl;
              if (d == 0)   symbol.pop();
              symbol.push();
@@ -2262,7 +2285,7 @@ UCS_string text;
       }
    else
       {
-        int err = 0;
+        int error = 0;
         UTF8_string filename_utf(filename);
         UCS_string creator_UCS(filename_utf);
         creator_UCS.append(UNI_COLON);
@@ -2277,7 +2300,7 @@ UCS_string text;
            }
         else
            {
-             ufun = UserFunction::fix(text, err, false, LOC, creator, false);
+             ufun = UserFunction::fix(text, error, false, LOC, creator, false);
            }
 
         if (d == 0)   symbol.pop();
@@ -2290,7 +2313,7 @@ UCS_string text;
            }
         else
            {
-             CERR << "    ⎕FX " << symbol.get_name() << " failed: "
+             err << "    ⎕FX " << symbol.get_name() << " failed: "
                   << Workspace::more_error() << endl;
              symbol.push();
              add_fid_function(fid, 0, LOC);
@@ -2301,7 +2324,7 @@ UCS_string text;
 void
 XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
 {
-   Log(LOG_archive)   CERR << "  read_Derived()" << endl;
+   Log(LOG_archive)   err << "  read_Derived()" << endl;
 
 const Fid fid      = find_Fid_attr("fid", false, 16);   // in the )SAVEing WS
 const Fid LO_fid   = find_Fid_attr("LO-fid",   false, 16);
@@ -2312,7 +2335,7 @@ Function * derived = si.fun_oper_cache.get(LOC);
 
    if (LO_fid == NO_FID)
       {
-        CERR << "got non-derived function when expecting a derived one" << endl;
+        err << "got non-derived function when expecting a derived one" << endl;
         return;
       }
 
@@ -2328,7 +2351,7 @@ XML_Loading_Archive::read_Shared_Variable(int d, Symbol & symbol)
 // const SV_key key = find_int_attr("key", false, 10);
    if (d != 0)   symbol.push();
 
-   CERR << "WARNING: workspace was )SAVEd with a shared variable "
+   err << "WARNING: workspace was )SAVEd with a shared variable "
         << symbol.get_name() << endl
         << " (shared variables are not restored by )LOAD or )COPY)" << endl;
 
@@ -2340,7 +2363,7 @@ XML_Loading_Archive::read_SymbolTable()
 {
 const int size = find_int_attr("size", false, 10);
 
-   Log(LOG_archive)   CERR << "  read_SymbolTable()" << endl;
+   Log(LOG_archive)   err << "  read_SymbolTable()" << endl;
 
    loop(s, size)
       {
@@ -2365,13 +2388,13 @@ UTF8_string name_UTF(name, name_end - name);
 UCS_string  name_UCS(name_UTF);
    if (name_UCS.size() == 0)
       {
-        CERR << "*** Warning: empty Symbol name in XML archive " << filename
+        err << "*** Warning: empty Symbol name in XML archive " << filename
              << " around line " << line_no << endl;
         skip_to_tag("/Symbol");
         return;
       }
 
-   Log(LOG_archive)   CERR << "    read_Symbol() name=" << name_UCS << endl;
+   Log(LOG_archive)   err << "    read_Symbol() name=" << name_UCS << endl;
 
    // ⎕NLT and ⎕PT were removed, but could lurk around in old workspaces.
    // ⎕PW and ⎕TZ are session variables that must not )LOADed (but might be
@@ -2379,7 +2402,7 @@ UCS_string  name_UCS(name_UTF);
    //
    if (name_UTF == UTF8_string("⎕NLT") || name_UTF == UTF8_string("⎕PT"))
       {
-        Log(LOG_archive)   CERR << "        skipped at " << LOC << endl;
+        Log(LOG_archive)   err << "        skipped at " << LOC << endl;
         skip_to_tag("/Symbol");
         return;
       }
@@ -2420,7 +2443,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         //
         if (no_copy || (depth == 0))
            {
-             Log(LOG_archive)   CERR << "        skipped at " << LOC << endl;
+             Log(LOG_archive)   err << "        skipped at " << LOC << endl;
              skip_to_tag("/Symbol");
              return;
            }
@@ -2451,7 +2474,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
          name_UCS == ID::get_name_UCS(ID_Quad_RL)
         ))
       {
-        Log(LOG_archive)   CERR << name_UCS << " not copied at " << LOC << endl;
+        Log(LOG_archive)   err << name_UCS << " not copied at " << LOC << endl;
         no_copy = true;
       }
 
@@ -2521,7 +2544,7 @@ XML_Loading_Archive::read_Commands()
 {
 const int size = find_int_attr("size", false, 10);
 
-   Log(LOG_archive)   CERR << "  read_Commands()" << endl;
+   Log(LOG_archive)   err << "  read_Commands()" << endl;
 
    loop(s, size)
       {
@@ -2565,7 +2588,7 @@ XML_Loading_Archive::read_StateIndicator()
         return;
       }
 
-   Log(LOG_archive)   CERR << "read_StateIndicator()" << endl;
+   Log(LOG_archive)   err << "read_StateIndicator()" << endl;
 
 const int levels = find_int_attr("levels", false, 10);
 
@@ -2580,7 +2603,7 @@ const int levels = find_int_attr("levels", false, 10);
            }
         catch (...)
            {
-             CERR <<
+             err <<
 "\n"
 "*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
 "    workspace. The )SI stack was reconstructed to the extent possible.\n"
@@ -2609,7 +2632,7 @@ XML_Loading_Archive::read_SI_entry(int lev)
 const int level = find_int_attr("level", false, 10);
 const int pc = find_int_attr("pc", false, 10);
 
-   Log(LOG_archive)   CERR << "    read_SI_entry() level=" << level << endl;
+   Log(LOG_archive)   err << "    read_SI_entry() level=" << level << endl;
 
 const Executable * exec = 0;
    next_tag(LOC);
@@ -2732,7 +2755,7 @@ XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
    next_tag(LOC);
    expect_tag("Parser", LOC);
 
-   Log(LOG_archive)   CERR << "        read_Parser() level=" << lev << endl;
+   Log(LOG_archive)   err << "        read_Parser() level=" << lev << endl;
 
 const int stack_size = find_int_attr("size",           false, 10);
 const int ass_state  = find_int_attr("assign-pending", false, 10);
@@ -2775,8 +2798,8 @@ Prefix & parser = si.current_stack;
 
    Log(LOG_archive)
       {
-         CERR << "        ";
-         parser.print_stack(CERR, LOC);
+         err << "        ";
+         parser.print_stack(err, LOC);
       }
 
    expect_tag("/Parser", LOC);
@@ -2972,7 +2995,7 @@ XML_Loading_Archive::add_fid_function(Fid fid, cFunction_P new_fun,
              //
              if (new_fun == map->new_fun)   return;
 
-             CERR << "*** OVERRIDING fid " << HEX(fid)
+             err << "*** OVERRIDING fid " << HEX(fid)
                   << " (from " << map->loc << ") at " << loc << "***" << endl;
            }
         else
@@ -3095,7 +3118,7 @@ const Token_string & body = exec.get_body();
         if (fname == lambda)   return fun;
       }
 
-   CERR << "find_lambda() failed for " << lambda
+   err << "find_lambda() failed for " << lambda
         << " at )SI level=" << si.get_level() << endl;
    return 0;
 }

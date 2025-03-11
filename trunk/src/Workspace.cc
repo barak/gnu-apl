@@ -654,29 +654,31 @@ void
 Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
                    bool name_from_WSID)
 {
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
-                                                  ".xml", 0);
+const UTF8_string filename =
+      LibPaths::get_lib_filename(libref, WS_name, false, ".xml", 0);
 
-   // dont )SAVE if WS_name differs from wsid and the file exists
+   // don't )SAVE if WS_name differs from wsid and the file exists
    //
-const bool file_exists = access(filename.c_str(), W_OK) == 0;
-   if (file_exists)
-      {
-        if (WS_name.compare(the_workspace.WS_name) != 0)   // names differ
-           {
-             const UCS_string & wsid = the_workspace.WS_name;
-             out << "NOT SAVED: THIS WS IS " << wsid << endl;
-
-             MORE_ERROR() <<
-                "the workspace was not saved because"
-                " the workspace name '" << wsid << "' according\n"
-                "   to )WSID does not match the name '" << WS_name
-             << "' in the )SAVE command, AND the\n"
-                "   workspace file " << filename << " already exists.\n"
-                "   Use )WSID " << WS_name << " first."; 
-             return;
-           }
-      }
+   {
+     const bool file_exists = access(filename.c_str(), W_OK) == 0;
+     if (file_exists)
+        {
+          if (WS_name.compare(the_workspace.WS_name) != 0)   // names differ
+             {
+               const UCS_string & wsid = the_workspace.WS_name;
+               out << "NOT SAVED: THIS WS IS " << wsid << endl;
+    
+               MORE_ERROR() <<
+                  "the workspace was not saved because"
+                  " the workspace name '" << wsid << "' according\n"
+                  "   to )WSID does not match the name '" << WS_name
+               << "' in the )SAVE command, AND the\n"
+                  "   workspace file " << filename << " already exists.\n"
+                  "   Use )WSID " << WS_name << " first."; 
+               return;
+             }
+        }
+   }
 
    if (UserPreferences::uprefs.backup_before_save &&
        backup_existing_file(filename.c_str()))
@@ -686,25 +688,15 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
         return;
       }
 
-   // at this point it is OK to rename and save the workspace
+   // at this point it is OK to rename and save the workspace...
    //
-ofstream outf(filename.c_str(), ofstream::out);
-   if (!outf.is_open())   // open failed
-      {
-        CERR << "Unable to )SAVE workspace '" << WS_name
-             << "'. " << strerror(errno) << endl;
-        return;
-      }
-
    the_workspace.WS_name = WS_name;
 
    Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
-XML_Saving_Archive ar(outf);
-   Log(LOG_archive)   CERR << "saving XML_Saving_Archive..." << endl;
-   ar.save();
-   Log(LOG_archive)   CERR << "done XML_Saving_Archive." << endl;
+XML_Saving_Archive ar(out, CERR, filename.c_str());
 
    // print time and date to COUT
+   //
    get_v_Quad_TZ().print_timestamp(out, now());
    if (name_from_WSID)   out << " " << the_workspace.WS_name;
    out << endl;
@@ -992,8 +984,9 @@ vector<Command::user_command> & cmds = get_user_commands();
 //----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
-Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
-                   UCS_string & quad_lx, bool silent)
+Workspace::load_WS(ostream & out, ostream & err, LibRef libref,
+                   const UCS_string & WS_name, UCS_string & quad_lx,
+                   bool silent)
 {
    // )LOAD WS_name                              WS_name /absolute or relative
    // )LOAD libnum WS_name                       WS_name relative
@@ -1010,7 +1003,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
                                                   ".xml", ".apl");
 
 int dump_fd = -1;
-XML_Loading_Archive in(out, filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
 
    if (dump_fd != -1)   // probably not a WS.xml, assume WS_name.apl
       {
@@ -1069,7 +1062,8 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 }
 //----------------------------------------------------------------------------
 void
-Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
+Workspace::copy_WS(ostream & out, ostream & err, LibRef libref,
+                   const UCS_string & WS_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
 {
    // )COPY WS_name                              WS_name /absolute or relative
@@ -1086,7 +1080,7 @@ const UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
    // 3. no such file.                         dump_fd: = -1, in: closed
    //
 int dump_fd = -1;
-XML_Loading_Archive in(out, filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
    if (dump_fd != -1)   // case 1: )DUMPed .apl file
       {
         load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects);

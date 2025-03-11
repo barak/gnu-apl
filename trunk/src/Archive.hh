@@ -51,6 +51,11 @@ using namespace std;
 class XML_Archive
 {
 protected:
+   XML_Archive(ostream & of, ostream & ef)
+   : out(of),
+     err(ef)
+   {}
+
    /** archive syntax version, hopefully stepped up after Archive.hh or
       Archive.cc were changed:
 
@@ -70,6 +75,12 @@ protected:
         ASX_MINOR = 9,   ///< ++ if XML file format change (backward compatible)
         ASX_OTHER = 1,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
+
+   /// where to send information messages (such as "SAVED...")
+   ostream & out;
+
+   /// where to send error messages
+   ostream & err;
 };
 //----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
@@ -77,16 +88,10 @@ class XML_Saving_Archive: public XML_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
-   XML_Saving_Archive(ofstream & of)
-   : indent(0),
-     out(of),
-     val_pars(0),
-     value_count(0),
-     char_mode(false)
-   {}
+   XML_Saving_Archive(ostream & of, ostream & ef, const char * filename);
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close();  delete [] val_pars; }
+   ~XML_Saving_Archive()   { outf.close();  delete [] val_pars; }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
@@ -197,12 +202,12 @@ protected:
    /// enter char mode. maybe print ² and return the number of chars printed
    int enter_char_mode()
       { if (char_mode)   return 0;   // already in char mode
-        out << UNI_PAD_U2;   char_mode = true;   return 1; }
+        outf << UNI_PAD_U2;   char_mode = true;   return 1; }
 
    /// leave char mode. maybe print ⁰ and return the number of chars printed
    int leave_char_mode()
       { if (!char_mode)   return 0;   // not in char mode
-        out << UNI_PAD_U0;   char_mode = false;   return 1; }
+        outf << UNI_PAD_U0;   char_mode = false;   return 1; }
 
    void write_XML_header();
 
@@ -216,7 +221,7 @@ protected:
    int indent;
 
    /// output XML file
-   std::ofstream & out;
+   ofstream outf;
 
    /// an array of values and the Vid of its parent (if value is a
    ///sub-value of a nested parent). The top-level of an APL value has
@@ -250,7 +255,8 @@ class XML_Loading_Archive: public XML_Archive
 {
 public:
    /// constructor: remember file name and workspace
-   XML_Loading_Archive(ostream & _out, const char * _filename, int & dump_fd);
+   XML_Loading_Archive(ostream & of, ostream & ef, const char * _filename,
+                       int & dump_fd);
 
    /// destructor (unmap()s file).
    ~XML_Loading_Archive();
@@ -283,9 +289,6 @@ public:
    bool next_tag(const char * loc);
 
 protected:
-   /// where to send the "SAVED..." message
-   ostream & out;
-
    /// a value ID in a )SAVEd workspace
    enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
 
@@ -378,11 +381,13 @@ protected:
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
 
-   /// show some characters starting at the current position
-   void where(ostream & out);
+   /// show some characters starting at the current position.
+   /// Debug function, currently defined but not used.
+   void where();
 
    /// show attributes of current tag
-   void where_att(ostream & out);
+   /// Debug function, currently defined but not used.
+   void where_att();
 
    /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
    bool get_uni();
@@ -394,7 +399,7 @@ protected:
    void expect_tag(const char * prefix, const char * loc) const;
 
    /// print current tag
-   void print_tag(ostream & out) const;
+   void print_tag() const;
 
    /// find attribute \b att_name and return: a pointer to its value if found,
    /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.

@@ -254,12 +254,14 @@ public:
                          UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(ostream & out, LibRef lib, const UCS_string & wsname,
-                       UCS_string & quad_lx, bool silent);
+   static void load_WS(ostream & out, ostream & err, LibRef lib,
+                       const UCS_string & wsname, UCS_string & quad_lx,
+                       bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, LibRef lib, const UCS_string & wsname,
-                       UCS_string_vector & objects, bool protection);
+   static void copy_WS(ostream & out, ostream & err, LibRef lib,
+                       const UCS_string & wsname, UCS_string_vector & objects,
+                       bool protection);
 
    /// return a token for system function or variable \b ucs
    static Token get_quad(const UCS_string & ucs, int & len);

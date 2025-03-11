@@ -874,7 +874,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
 UCS_string wsname = args.front();
    args.erase(0);
-   Workspace::copy_WS(out, libref, wsname, args, protection);
+   Workspace::copy_WS(out, CERR, libref, wsname, args, protection);
 }
 //----------------------------------------------------------------------------
 void
@@ -946,7 +946,7 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
    out << wsname << endl;
 
    copy_once_table.push_back(lib_wsname);
-   Workspace::copy_WS(out, libref, wsname, args, false);
+   Workspace::copy_WS(out, CERR, libref, wsname, args, false);
 }
 //----------------------------------------------------------------------------
 void
@@ -1563,7 +1563,7 @@ LibRef lib;
 UCS_string wsname;
    if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
 
-   Workspace::load_WS(out, lib, wsname, quad_lx, silent);
+   Workspace::load_WS(out, CERR, lib, wsname, quad_lx, silent);
 }
 //----------------------------------------------------------------------------
 void
