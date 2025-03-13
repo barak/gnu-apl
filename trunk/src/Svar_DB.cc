@@ -330,7 +330,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log, &err_loc);
    if (response)
       {
-        memcpy(static_cast<void *>(&cache),
+        memcpy(reinterpret_cast<void *>(&cache),
                response->get__SVAR_RECORD_IS__record().data(),
                sizeof(Svar_record));
 

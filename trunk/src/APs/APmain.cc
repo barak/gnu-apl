@@ -118,7 +118,7 @@ print_vars(ostream & out)
          const uint32_t * varname = Svar_DB::get_svar_name(cv.key);
          if (varname)
             {
-              while (*varname)   get_CERR() << static_cast<Unicode>(*varname++);
+              while (*varname)   get_CERR() << Unicode(*varname++);
             }
          else
             {
@@ -322,7 +322,7 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
                       {
                        get_CERR() << "Bad varname ";
                         while (*varname)
-                              get_CERR() << static_cast<Unicode>(*varname++);
+                              get_CERR() << Unicode(*varname++);
                         get_CERR() << " at " << LOC << endl;
                        break;
                       }
@@ -449,7 +449,8 @@ int64_t get_main()
    return reinterpret_cast<int64_t>(&main);
 }
 //-----------------------------------------------------------------------------
-ostream & operator << (ostream & out, const AP_num3 & ap3)
+ostream &
+operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
@@ -457,37 +458,32 @@ ostream & operator << (ostream & out, const AP_num3 & ap3)
 ostream &
 operator << (ostream & os, Unicode uni)
 {
-   if (uni < 0x80)
-      return os << static_cast<char>(uni);
+   if (uni < 0x80)      return os << char(uni);
 
-   if (uni < 0x800)
-      return os << static_cast<char>(0xC0 | (uni >> 6))
-                                  << static_cast<char>(0x80 | (uni & 0x3F));
+   if (uni < 0x800)     return os << char(0xC0 | (uni >> 6))
+                                  << char(0x80 | (uni & 0x3F));
 
-   if (uni < 0x10000)
-      return os << static_cast<char>(0xE0 | (uni >> 12))
-                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
-                << static_cast<char>(0x80 | (uni       & 0x3F));
+   if (uni < 0x10000)    return os << char(0xE0 | (uni >> 12))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x200000)
-      return os << static_cast<char>(0xF0 | (uni >> 18))
-                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
-                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
-                << static_cast<char>(0x80 | (uni       & 0x3F));
+   if (uni < 0x200000)   return os << char(0xF0 | (uni >> 18))
+                                   << char(0x80 | (uni >> 12 & 0x3F))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x4000000)
-      return os << static_cast<char>(0xF8 | (uni >> 24))
-                << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
-                << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
-                << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
-                << static_cast<char>(0x80 | (uni       & 0x3F));
+   if (uni < 0x4000000)  return os << char(0xF8 | (uni >> 24))
+                                   << char(0x80 | (uni >> 18 & 0x3F))
+                                   << char(0x80 | (uni >> 12 & 0x3F))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   return os << static_cast<char>(0xFC | (uni >> 30))
-             << static_cast<char>(0x80 | (uni >> 24 & 0x3F))
-             << static_cast<char>(0x80 | (uni >> 18 & 0x3F))
-             << static_cast<char>(0x80 | (uni >> 12 & 0x3F))
-             << static_cast<char>(0x80 | (uni >>  6 & 0x3F))
-             << static_cast<char>(0x80 | (uni       & 0x3F));
+   return os << char(0xFC | (uni >> 30))
+             << char(0x80 | (uni >> 24 & 0x3F))
+             << char(0x80 | (uni >> 18 & 0x3F))
+             << char(0x80 | (uni >> 12 & 0x3F))
+             << char(0x80 | (uni >>  6 & 0x3F))
+             << char(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
 

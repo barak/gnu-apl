@@ -112,7 +112,7 @@ public:
    const T * raw() const
       {
         Assert(sizeof(T) == sizeof(Unicode));
-        return reinterpret_cast<const T *>(&at(0));
+        return reinterpret_cast<const T *>(&front());
       }
 
    /// return this string with the first \b drop_count characters removed

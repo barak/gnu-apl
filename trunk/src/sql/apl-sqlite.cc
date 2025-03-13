@@ -96,10 +96,9 @@ static Token list_functions( ostream &out )
 
 static int find_free_connection( void )
 {
-    for( int i = 0 ; i < static_cast<int>( connections.size() ) ; i++ ) {
-        if( connections[i] == NULL ) {
-            return i;
-        }
+    loop (i, connections.size())
+         {
+           if (connections[i] == NULL )   return i;
     }
 
     connections.push_back( NULL );

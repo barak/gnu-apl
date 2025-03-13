@@ -99,34 +99,33 @@ PostgresArgListBuilder::~PostgresArgListBuilder()
 
 void PostgresArgListBuilder::clear_args( void )
 {
-    for( vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
-        delete *i;
-    }
+    for (vector<PostgresArg *>::iterator i = args.begin();
+         i != args.end() ;i++)   delete *i;
     args.clear();
 }
 
 void PostgresArgListBuilder::append_string( const string &arg, int pos )
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<string>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<string>(arg));
 }
 
 void PostgresArgListBuilder::append_long( long arg, int pos )
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<long>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<long>(arg));
 }
 
-void PostgresArgListBuilder::append_double( double arg, int pos )
+void PostgresArgListBuilder::append_double( double arg, int pos)
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<double>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<double>(arg) );
 }
 
-void PostgresArgListBuilder::append_null( int pos )
+void PostgresArgListBuilder::append_null(int pos)
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresNullArg() );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresNullArg());
 }
 
 static void

@@ -292,7 +292,7 @@ char cc[80];
 
         case CT_INT:   // uses UNI_PAD_U3
              space -= leave_char_mode();
-             SPRINTF(cc, "%lld", static_cast<long long>(cell.get_int_value()));
+             SPRINTF(cc, "%lld", long_long(cell.get_int_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
              break;
 
@@ -307,8 +307,8 @@ char cc[80];
                     // a non-zero denominator indicates a rational quotient)
                     //
                     const APL_Integer numer = flt.get_numerator();
-                    SPRINTF(cc, "%lld÷%lld", static_cast< long long>(numer),
-                                             static_cast<long long>(denom));
+                    SPRINTF(cc, "%lld÷%lld", long_long(numer),
+                                             long_long(denom));
                     NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                     break;
                   }

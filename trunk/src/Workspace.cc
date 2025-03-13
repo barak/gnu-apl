@@ -845,7 +845,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
                                                   extension, 0);
    if (WS_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
-        // don't save CLEAR WS
+        // don't dump CLEAR WS
         //
         COUT << "NOT DUMPED: THIS WS IS " << WS_name << endl;
         MORE_ERROR() <<
@@ -923,7 +923,7 @@ const YMDhmsu time(gmt + 1000000*offset);
 "⍝"                                                                 << endl <<
                                                                        endl;
         }
-     else
+     else   // .apl
         {
           outf << "#!" << LibPaths::get_APL_bin_path()
                << "/" << LibPaths::get_APL_bin_name()

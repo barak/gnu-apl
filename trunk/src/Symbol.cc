@@ -1057,10 +1057,8 @@ UCS_string data;
              buffer[1 + uu] = cc;
            }
 
-        snprintf(buffer + 72,
-                 sizeof(buffer) - 72,
-                 "%8.8lld\r\n",
-                 static_cast<long long>(seq++));
+        snprintf(buffer + 72, sizeof(buffer) - 72,
+                 "%8.8lld\r\n", long_long(seq++));
         NULL_TERMINATE(buffer)
         fwrite(buffer, 1, 82, out);
       }
@@ -1170,6 +1168,8 @@ const Cell * cV = &values->get_cfirst();
 void
 Symbol::dump(ostream & out) const
 {
+   out << "⍝«" << get_name() << "»" << endl;   // start marker
+
 const ValueStackItem & vs = value_stack[0];
    if (vs.get_NC() == NC_VARIABLE)
       {
@@ -1188,8 +1188,6 @@ const ValueStackItem & vs = value_stack[0];
 
         if (value->is_member())
            out << "⍝ end of structured variable " << get_name() << endl;
-
-        out << endl;
       }
    else if (vs.get_NC() & NC_FUN_OPER)
       {
@@ -1260,9 +1258,10 @@ const ValueStackItem & vs = value_stack[0];
 
              if (ufun->get_exec_properties()[0])   out << "⍫";
              else                                  out << "∇";
-             out << endl << endl;
+             out << endl;
            }
       }
+   out << "⍝«/" << get_name() << "»" << endl << endl;   // end marker
 }
 //----------------------------------------------------------------------------
 int

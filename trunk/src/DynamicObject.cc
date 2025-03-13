@@ -77,6 +77,8 @@ DynamicObject::rValue()
    /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
       because DynamicObject is non-virtual. The caller must therefore be
       careful and we allow only class Value to use rValue().
+
+      NOTE: reinterpret_cast<Value *>(this) dubiously segfaults.
     */
    return *static_cast<Value *>(this);
 }

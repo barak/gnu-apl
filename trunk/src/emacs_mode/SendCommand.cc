@@ -48,7 +48,7 @@ write_string_to_fd(const string &line, int fd)
 ssize_t ret = write( fd, line.c_str(), line.size() );
    if (ret == -1)
       throw_with_error( "Error writing block" );
-    else if(ret != static_cast<ssize_t>(line.size()))
+    else if(ret != ssize_t(line.size()))
         throw ConnectionError( "Incomplete write of buffer" );
 }
 

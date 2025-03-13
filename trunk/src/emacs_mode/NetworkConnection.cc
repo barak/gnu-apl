@@ -163,28 +163,34 @@ static char get_char_and_check( const std::string &command, std::string::const_i
 static std::string unescape( const std::string &command )
 {
     stringstream out;
-    for( std::string::const_iterator i = command.begin() ; i != command.end() ; i++ ) {
-        if( *i == '&' ) {
-            char buf[3];
-            buf[0] = get_char_and_check( command, ++i );
-            buf[1] = get_char_and_check( command, ++i );
-            buf[2] = 0;
-            if( get_char_and_check( command, ++i ) != ';' ) {
-                throw ConnectionError( "Illegal escape sequence" );
-            }
-
-            char *endptr;
-            long v = strtol( buf, &endptr, 16 );
-            if( *endptr != 0 ) {
-                throw ConnectionError( "Illegal character code" );
-            }
-
-            out << static_cast<unsigned char>( v );
+    for (std::string::const_iterator i = command.begin();
+         i != command.end(); i++)
+        {
+          if (*i == '&')
+             {
+               char buf[3];
+               buf[0] = get_char_and_check( command, ++i );
+               buf[1] = get_char_and_check( command, ++i );
+               buf[2] = 0;
+               if (get_char_and_check( command, ++i) != ';')
+                  {
+                    throw ConnectionError( "Illegal escape sequence" );
+                  }
+             
+               char *endptr;
+               long v = strtol(buf, &endptr, 16);
+               if (*endptr != 0)
+                  {
+                    throw ConnectionError( "Illegal character code" );
+                  }
+             
+               out << uint8_t(v);
+             }
+          else
+             {
+               out << *i;
+             }
         }
-        else {
-            out << *i;
-        }
-    }
 
     return out.str();
 }

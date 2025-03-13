@@ -113,7 +113,7 @@ void * result =
             sizeof(Id_name), Id_name::compare);
 
    Assert(result);
-Id_name * idn = static_cast<Id_name *>(result);
+const Id_name * idn = reinterpret_cast<Id_name *>(result);
    if (const UTF8 * utf = idn->utf_name)   return utf; 
 
    // the name was not yet constructed. Do it now

@@ -831,12 +831,12 @@ UCS_string ret;
 bool
 UCS_string::is_comment_or_label() const
 {
-   if (size() == 0)                          return false;
-   if (at(0) == UNI_NUMBER_SIGN)       return true;   // comment
-   if (at(0) == UNI_COMMENT)                 return true;   // comment
+   if (size() == 0)                  return false;
+   if (front() == UNI_NUMBER_SIGN)   return true;   // comment
+   if (front() == UNI_COMMENT)       return true;   // comment
    loop(t, size())
        {
-         if (at(t) == UNI_COLON)       return true;   // label
+         if (at(t) == UNI_COLON)             return true;   // label
          if (!Avec::is_symbol_char(at(t)))   return false;
        }
 
@@ -979,7 +979,7 @@ void
 UCS_string::append_number(ShapeItem num)
 {
 char cc[40];
-   SPRINTF(cc, "%lld", static_cast<long long>(num));
+   SPRINTF(cc, "%lld", long_long(num));
    loop(c, sizeof(cc))
       {
         if (char digit = cc[c])   append(Unicode(digit));
@@ -1005,7 +1005,7 @@ UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
 const char * format = uppercase ? "%llX" : "%llx";
 char cc[40];
-   SPRINTF(cc, format, static_cast<long long>(num));
+   SPRINTF(cc, format, long_long(num));
    loop(c, sizeof(cc))
       {
         if (char hex_digit = cc[c])   append(Unicode(hex_digit));
@@ -1616,7 +1616,7 @@ bool carry = true;   // from the rounded up digit
    if (size() && back() == UNI_FULLSTOP)   pop_back();
    if (carry)
       {
-        insert(at(0) == UNI_OVERBAR || at(0) == UNI_MINUS ? 1 : 0, UNI_1);
+        insert(front() == UNI_OVERBAR || front() == UNI_MINUS ? 1 : 0, UNI_1);
       }
 }
 //----------------------------------------------------------------------------

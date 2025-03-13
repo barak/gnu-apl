@@ -487,7 +487,7 @@ std::vector<const Symbol *> symbols;
             }
       }
 
-   // pass 1: functions
+   // pass 1: defined functions and operators
    //
    loop(s, symbols.size())
       {
