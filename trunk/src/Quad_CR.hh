@@ -65,28 +65,13 @@ public:
 
    static Quad_CR  fun;          ///< Built-in function.
 
+   /// compute \b 35 ⎕CR \b B
+   static Value_P do_CR35(const Value * B);
+
    /// portable variable encoding of value \b name (varname or varname ⊂)
    static void do_CR10_variable(UCS_string_vector & result,
                                 const UCS_string & var_name,
                                 const Value * value);
-
-   /// compute 10 ⎕CR recursively (structured variable)
-   static const char * do_CR10_structured(UCS_string_vector & result,
-                                          const UCS_string & varname,
-                                          const Value * value);
-
-   /// emit one level of \b value
-   static void do_CR10_level(UCS_string_vector & result, size_t level,
-                             const Value & value);
-
-   /// emit a simple Cell
-   static UCS_string do_CR10_simple_cell(const Cell & cell);
-
-   /// emit a shaoe
-   static UCS_string do_CR10_shape(const Shape &_shape);
-
-   /// compute \b 35 ⎕CR \b B
-   static Value_P do_CR35(const Value * B);
 
 protected:
    /// a mapping between function names and function numbers
@@ -103,6 +88,24 @@ protected:
 
    /// compute \b 10 ⎕CR \b B
    static Value_P do_CR10(const Value * B);
+
+   /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
+   static void do_CR10(UCS_string_vector & result, const Value * symbol_name);
+
+   /// compute 10 ⎕CR recursively (structured variable)
+   static const char * do_CR10_structured(UCS_string_vector & result,
+                                          const UCS_string & varname,
+                                          const Value * value);
+
+   /// emit one level of \b value
+   static void do_CR10_level(UCS_string_vector & result, size_t level,
+                             const Value & value);
+
+   /// emit a simple Cell
+   static UCS_string do_CR10_simple_cell(const Cell & cell);
+
+   /// emit a shaoe
+   static UCS_string do_CR10_shape(const Shape &_shape);
 
    /// compute \b 11 ⎕CR \b B
    static Value_P do_CR11(const Value * B);
@@ -189,8 +192,9 @@ protected:
         Vm_UCS     ///< in ⎕UCS(),                  e.g. ⎕UCS(97 98 99)
       };
 
-   /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
-   static void do_CR10(UCS_string_vector & result, const Value * symbol_name);
+   /// return true if Value is a plain string that can be double-quoted
+   /// without problems.
+   static bool is_plain_string(const Value * value);
 
    /// decide if 'xxx' or ⎕UCS(xxx) shall be used
    static bool use_quote(V_mode mode, const Value * value, ShapeItem pos);

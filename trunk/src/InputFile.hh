@@ -167,10 +167,10 @@ struct InputFile
    static std::vector<InputFile> files_orig;
 
    /// FILE * from fopen (or 0 if file is closed)
-   FILE       * file;
+   FILE * file;
 
    /// the file name
-   UTF8_string  filename;
+   UTF8_string filename;
 
 protected:
    bool test;            ///< true for -T testfile, false for -f APL file
@@ -182,19 +182,19 @@ protected:
    int  line_no;         ///< line number in file
    int  in_html;         ///< 0: no HTML, 1: in HTML file 2: in HTML header
 
-   /// functions and vars that shoule be )COPIED
+   /// functions and vars that shall be )COPIED
    UCS_string_vector object_filter;
 
-   /// true if current line belongs to a function. Cleared at final ∇
+   /// true if current line belongs to a function. Cleared at the final ∇
    bool in_function;
 
    /// return true if current line belongs to a variable. Cleared by empty line
    bool in_variable;
 
-   /// true if current function or variable was mentioned in object_filter
+   /// true if the current function or variable was mentioned in object_filter
    bool in_matched;
 
-   /// true if this file comes from a )COPY XXX.apl (but not XXX.xml
+   /// true if this file comes from a )COPY XXX.apl (but not XXX.xml)
    bool from_COPY;
 
    /// a unique number for this (instance of) file.

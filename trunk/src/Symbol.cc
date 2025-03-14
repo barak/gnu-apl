@@ -1168,8 +1168,6 @@ const Cell * cV = &values->get_cfirst();
 void
 Symbol::dump(ostream & out) const
 {
-   out << "⍝«" << get_name() << "»" << endl;   // start marker
-
 const ValueStackItem & vs = value_stack[0];
    if (vs.get_NC() == NC_VARIABLE)
       {
@@ -1261,7 +1259,7 @@ const ValueStackItem & vs = value_stack[0];
              out << endl;
            }
       }
-   out << "⍝«/" << get_name() << "»" << endl << endl;   // end marker
+   out << endl;
 }
 //----------------------------------------------------------------------------
 int

@@ -480,7 +480,14 @@ operator --(Function_PC & pc)
 inline const char *
 charP(const void * vp)
 {
-  return reinterpret_cast<const char *>(vp);
+   return reinterpret_cast<const char *>(vp);
+}
+//----------------------------------------------------------------------------
+/// frequently used cast to a const void *
+inline const void *
+voidP(const void * addr)
+{
+   return addr;
 }
 //----------------------------------------------------------------------------
 
@@ -502,9 +509,6 @@ charP(const void * vp)
 #define HEX16s(x)          uhexs << std::right << \
                            setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
-
-/// cast to a const void *
-inline const void * voidP(const void * addr) { return addr; }
 
 /// set the last byte in buffer to 0 (so that string functions won't fail
 /// even if the  buffer was not 0-terminated for some reason.

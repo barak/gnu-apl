@@ -548,13 +548,24 @@ not_structured:
 #define TMP_VAR(d)   TMP_VAR_PREFIX << int(d) << TMP_VAR_SUFFIX
 
 UCS_string text;
-const APL_types::Depth depth = value->compute_depth();
+const ShapeItem ec = value->element_count();
 
+   // frequent special case: string
+   //
+   if (ec < 60 && is_plain_string(value))
+      {
+        text << var_name << "←\"";
+        loop(e, ec)   text << value->get_cravel(e).get_char_value();
+        text << "\"";
+        PUSH_TEXT
+        Workspace::pop_FC();   // restore ⎕FC
+        return;
+      }
+
+const APL_types::Depth depth = value->compute_depth();
    // frequent special case: simple scalar or short simple vector
    //
-   if (depth <= 1             &&
-       value->get_rank() <= 1 &&
-       value->element_count() < 20)   // short simple vector
+   if (depth <= 1 && value->get_rank() <= 1 && ec < 20)   // short simple vector
       {
         text << var_name << "←";
         if (value->element_count())   // non-empty value
@@ -580,7 +591,7 @@ const APL_types::Depth depth = value->compute_depth();
    // VAR ← (depth+1)⍴0. The first depth items are used as temporary values
    // for the different depths, while the last item is for saving ⎕IO.
    //
-   text << TMP_VAR(depth) "←⎕IO ◊ ⎕IO←0";                            PUSH_TEXT
+   text << TMP_VAR(depth) "←⎕IO ◊ ⎕IO←0   ⍝ " << var_name << "←";    PUSH_TEXT
 
    do_CR10_level(result, 0, *value);
    text << "⎕IO←" TMP_VAR(depth) << " ◊ "
@@ -599,7 +610,21 @@ UCS_string text;
 UCS_string indent(2*(level + 1), UNI_SPACE);
 UCS_string var_level;   var_level << TMP_VAR(level); 
 UCS_string ind_var_level = indent;   ind_var_level << var_level;
-   text << ind_var_level << "←" << value.nz_element_count()
+
+   text << ind_var_level << "←";
+
+   // important special case: string
+   //
+   if (value.element_count() < int(60 - 2*level) && is_plain_string(&value))
+      {
+        text << "\"";
+        loop(e, value.element_count())
+            text << value.get_cravel(e).get_char_value();
+        text << "\"";                                                PUSH_TEXT
+        return;
+      }
+
+   text << value.nz_element_count()
         << "⍴0   ⍝ L" << level << " zeros";                          PUSH_TEXT
 
 size_t nested_count = 0;
@@ -1314,6 +1339,24 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 
    Z->check_value(LOC);
    return Z;
+}
+//----------------------------------------------------------------------------
+bool
+Quad_CR::is_plain_string(const Value * value)
+{
+   if (value->get_rank() != 1)   return false;   // not a vector
+   loop(v, value->nz_element_count())
+       {
+         const Cell & cell = value->get_cravel(v);
+         if (!cell.is_character_cell())   return false;
+
+         const Unicode uni = cell.get_char_value();
+         if (uni < UNI_SPACE)           return false;   // control character
+         if (uni == UNI_SINGLE_QUOTE)   return false;
+         if (uni == UNI_DELETE)         return false;
+       }
+
+   return true;
 }
 //----------------------------------------------------------------------------
 bool
