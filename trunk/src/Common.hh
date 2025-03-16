@@ -111,6 +111,9 @@ extern void cleanup(bool soft);
 /// true if Control-C was hit (once)
 extern bool attention_is_raised();
 
+/// The range in the prefix oarser when ^C was hit (once)
+extern Function_PC2 attention_range;
+
 /// set the attention_raised flag
 extern void set_attention_raised(const char * loc);
 
@@ -119,6 +122,9 @@ extern void clear_attention_raised(const char * loc);
 
 /// true if Control-C was hit twice within 500 ms
 extern bool interrupt_is_raised();
+
+/// The range in the prefix oarser when ^C was hit (twice)
+extern Function_PC2 interrupt_range;
 
 /// set the interrupt_raised flag
 extern void set_interrupt_raised(const char * loc);

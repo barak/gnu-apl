@@ -158,6 +158,12 @@ struct AP_num3
 //  function body
 struct Function_PC2
 {
+   /// an invalid  PC range
+   Function_PC2()
+   : low(Function_PC_invalid),
+     high(Function_PC_invalid)
+   {}
+
    /// a PC range
    Function_PC2(Function_PC l, Function_PC h)
    : low(l),

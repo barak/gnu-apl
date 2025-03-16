@@ -47,6 +47,7 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
+#include "Workspace.hh"
 
 bool got_WINCH = false;
 
@@ -69,9 +70,12 @@ bool attention_is_raised()
    return attention_raised;
 }
 //----------------------------------------------------------------------------
-APL_time_us interrupt_when = 0;
+APL_time_us interrupt_when = 0;   // to detect double ^C
 uint64_t interrupt_count = 0;
+Function_PC2 attention_range;
+Function_PC2 interrupt_range;
 static bool interrupt_raised = false;
+
 void set_interrupt_raised(const char * loc)
 {
    interrupt_raised = true;
@@ -202,11 +206,24 @@ APL_time_us when = now();
 
    CIN << "^C";
 
+   if (StateIndicator * si = Workspace::SI_top())
+      {
+        const Prefix & prefix = si->get_prefix();
+        
+        attention_range.low = prefix.get_range_low();
+        attention_range.high = prefix.get_range_high();
+      }
+   else
+      {
+        attention_range.low  = Function_PC_invalid;
+        attention_range.high = Function_PC_invalid;
+      }
    attention_raised = true;
    ++attention_count;
    if ((when - interrupt_when) < 1000000)   // second ^C within 1 second
       {
         interrupt_raised = true;
+        interrupt_range = attention_range;
         ++interrupt_count;
       }
 

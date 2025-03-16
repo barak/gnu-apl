@@ -211,20 +211,20 @@ const APL_time_us end = start + 1000000 * B->get_cfirst().get_real_value();
    if (end < start)                           DOMAIN_ERROR;
    if (end > start + 31*24*60*60*1000000LL)   DOMAIN_ERROR;   // > 1 month
 
-bool need_CR = false;
+bool need_LF = false;
    while (now() < end)
        {
          usleep(20000);
-         if (attention_is_raised())   need_CR = true;
-         if (interrupt_is_raised())
+         if (attention_is_raised())   need_LF = true;   // first ^C
+         if (interrupt_is_raised())                     // second ^C
             {
-              need_CR = true;
+              need_LF = true;
               break;
             }
        }
 
    // interrupt or attention may have displayed ^C, start a new line if so.
-   if (need_CR)   CERR << endl;
+   if (need_LF)   CERR << endl;
 
    // we do not clear_attention_raised(LOC) or clear_interrupt_raised(LOC);
    // so that the user can continue with →''

@@ -592,7 +592,50 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
    // for value errors we point to the failed symbol itself.
    //
    if (error.get_error_code() == E_VALUE_ERROR)
-      body_from_to.low = body_from_to.high;
+      {
+        body_from_to.low = body_from_to.high;
+      }
+   else if (error.get_error_code() == E_ATTENTION)
+      {
+        /* E_ATTENTION is typically raised at the end of the line, i.e. when
+           attention_raised was checked and not when attention_raised was
+           raised. We use attention_range instead.
+         */
+        if (attention_range.low != Function_PC_invalid)
+           {
+             body_from_to = attention_range;
+           }
+        else
+           {
+             const StateIndicator * si = Workspace::SI_top();
+             const Prefix & prefix = si->get_prefix();
+             const Function_PC pc(prefix.get_PC() - 1);
+             body_from_to.low  = pc;
+             body_from_to.high = pc;
+           }
+      }
+   else if (error.get_error_code() == E_INTERRUPT)
+      {
+        /* E_INTERRUPT may be raised when interrupt_raised was checked (and
+           not when interrupt_raised was raised). We use interrupt_range
+           instead.
+
+           Note that E_INTERRUPT may also be raised synchronously, e.g.
+           ewhen a system limit was hit.
+         */
+        if (interrupt_range.low != Function_PC_invalid)
+           {
+             body_from_to = interrupt_range;
+           }
+        else
+           {
+             const StateIndicator * si = Workspace::SI_top();
+             const Prefix & prefix = si->get_prefix();
+             const Function_PC pc(prefix.get_PC() - 1);
+             body_from_to.low  = pc;
+             body_from_to.high = pc;
+           }
+      }
 
    Log(LOG_prefix__location_info)
       {
