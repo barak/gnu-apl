@@ -53,41 +53,8 @@ bool got_WINCH = false;
 
 bool gtk_init_done = false;
 
-//----------------------------------------------------------------------------
-static bool attention_raised = false;
-static uint64_t attention_count = 0;
+InterruptContext InterruptContext::interrupt_context;
 
-extern void set_attention_raised(const char * loc)
-{
-   attention_raised = true;
-}
-extern void clear_attention_raised(const char * loc)
-{
-   attention_raised = false;
-}
-bool attention_is_raised()
-{
-   return attention_raised;
-}
-//----------------------------------------------------------------------------
-APL_time_us interrupt_when = 0;   // to detect double ^C
-uint64_t interrupt_count = 0;
-Function_PC2 attention_range;
-Function_PC2 interrupt_range;
-static bool interrupt_raised = false;
-
-void set_interrupt_raised(const char * loc)
-{
-   interrupt_raised = true;
-}
-void clear_interrupt_raised(const char * loc)
-{
-   interrupt_raised = false;
-}
-bool interrupt_is_raised()
-{
-   return interrupt_raised;
-}
 //----------------------------------------------------------------------------
 void
 init_modules(const char * argv0, bool log_startup)
@@ -200,7 +167,7 @@ cleanup(bool soft)
 }
 //----------------------------------------------------------------------------
 void
-control_C(int)
+InterruptContext::control_C(int)
 {
 APL_time_us when = now();
 
@@ -210,24 +177,24 @@ APL_time_us when = now();
       {
         const Prefix & prefix = si->get_prefix();
         
-        attention_range.low = prefix.get_range_low();
-        attention_range.high = prefix.get_range_high();
+        interrupt_context.attention_range.low  = prefix.get_range_low();
+        interrupt_context.attention_range.high = prefix.get_range_high();
       }
    else
       {
-        attention_range.low  = Function_PC_invalid;
-        attention_range.high = Function_PC_invalid;
+        interrupt_context.attention_range.low  = Function_PC_invalid;
+        interrupt_context.attention_range.high = Function_PC_invalid;
       }
-   attention_raised = true;
-   ++attention_count;
-   if ((when - interrupt_when) < 1000000)   // second ^C within 1 second
+   interrupt_context.attention_raised = true;
+   ++interrupt_context.attention_count;
+   if ((when - interrupt_context.interrupt_when) < 1000000)   // second ^C within 1 second
       {
-        interrupt_raised = true;
-        interrupt_range = attention_range;
-        ++interrupt_count;
+        interrupt_context.interrupt_raised = true;
+        interrupt_context.interrupt_range  = interrupt_context.attention_range;
+        ++interrupt_context.interrupt_count;
       }
 
-   interrupt_when = when;
+   interrupt_context.interrupt_when = when;
 }
 //----------------------------------------------------------------------------
 int

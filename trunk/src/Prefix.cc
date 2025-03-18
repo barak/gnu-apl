@@ -2393,11 +2393,11 @@ const bool trace = end_of_line && (at0().get_int_val() & 1);
 Token Void(TOK_VOID);
    si.statement_result(Void, trace);
    set_action(RA_PUSH_NEXT);   // aka. SHIFT
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }
@@ -2484,11 +2484,11 @@ Token B = pop().get_token();   // pop B
    si.statement_result(B, trace);
 
    set_action(RA_PUSH_NEXT);   // aka. SHIFT
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }
@@ -2637,11 +2637,11 @@ const Token result = si.jump(line);   // may change the PC
 void
 Prefix::check_interrupt_or_attention(bool end_of_line)
 {
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }

@@ -401,7 +401,7 @@ const bool log_startup =
    memset(&new_TERM_action,      0, sizeof(struct sigaction));
    memset(&new_HUP_action,       0, sizeof(struct sigaction));
 
-   new_control_C_action.sa_handler = &control_C;
+   new_control_C_action.sa_handler = &InterruptContext::control_C;
    new_WINCH_action    .sa_handler = &signal_WINCH_handler;
    new_USR1_action     .sa_handler = &signal_USR1_handler;
    new_SEGV_action     .sa_handler = &signal_SEGV_handler;

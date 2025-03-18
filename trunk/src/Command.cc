@@ -456,10 +456,10 @@ check_EOC:
             {
               if (Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST)
                  {
-                   if (attention_is_raised())
+                   if (InterruptContext::attention_is_raised())
                       {
-                        clear_attention_raised(LOC);
-                        clear_interrupt_raised(LOC);
+                        InterruptContext::clear_attention_raised(LOC);
+                        InterruptContext::clear_interrupt_raised(LOC);
                         ATTENTION;
                       }
 
@@ -479,10 +479,10 @@ check_EOC:
 
                 new (&prefix.tos().get_token()) Token(token);
               }
-              if (attention_is_raised())
+              if (InterruptContext::attention_is_raised())
                  {
-                   clear_attention_raised(LOC);
-                   clear_interrupt_raised(LOC);
+                   InterruptContext::clear_attention_raised(LOC);
+                   InterruptContext::clear_interrupt_raised(LOC);
                    ATTENTION;
                  }
 
@@ -549,8 +549,8 @@ check_EOC:
 
               // clear attention and interrupt flags
               //
-              clear_attention_raised(LOC);
-              clear_interrupt_raised(LOC);
+              InterruptContext::clear_attention_raised(LOC);
+              InterruptContext::clear_interrupt_raised(LOC);
 
               // check for safe execution mode. Unroll all SI entries that
               // have the same safe_execution_count, except the last

@@ -1016,7 +1016,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               case UNI_ETX:   // ^C
                    lec.clear();
-                   control_C(SIGINT);
+                   InterruptContext::control_C(SIGINT);
                    break;
 
 

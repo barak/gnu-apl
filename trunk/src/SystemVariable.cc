@@ -839,7 +839,7 @@ UCS_string line;
                       LineHistory::quote_quad_history);
    done(false, LOC);   // in case InputMux::get_line() has not called it
 
-   if (interrupt_is_raised())   INTERRUPT
+   if (InterruptContext::interrupt_is_raised())   INTERRUPT
 
    if (Workspace::get_PR().size() > 0)   // valid prompt replacement char
       {

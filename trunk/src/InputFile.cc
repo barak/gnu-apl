@@ -137,58 +137,52 @@ InputFile::echo_current_file()
 }
 //----------------------------------------------------------------------------
 bool
-InputFile::check_filter(const UTF8_string & line)
+InputFile::COPY_filter::check_filter(const UTF8_string & line)
 {
-bool ret = in_matched;
 UCS_string ucs_line(line);
    ucs_line.remove_leading_and_trailing_whitespaces();
 
-   /* if we are in a function or in a variable (matched or not) then
-      we have to look for the end of the fiunction or variable and
-      return the current state (aka. in_matched)...
+   /* if we are in a function or in a variable (matched or not) then look for
+      the end of the function or variable and return the current state (aka.
+      in_matched)...
     */
-   if (in_function)
+   if (where == WH_in_function)
       {
+        bool ret = in_matched;   // state of the current line
         if (ucs_line.size() && ucs_line[0] == UNI_NABLA)   // end of a function
            {
-             in_function = false;
-             in_variable = false;
+             where = WH_outside;
              in_matched  = false;
            }
         return ret;
       }
 
-   if (in_variable)
+   if (where == WH_in_variable)
       {
+        bool ret = in_matched;   // state of the current line
         if (ucs_line.size() == 0)                          // end of a vriable
            {
-             in_function = false;
-             in_variable = false;
+             where = WH_outside;
              in_matched  = false;
            }
         return ret;
       }
 
-   /* at this point we are outside any function or variable, so we have to
-      look for the start of a new function or variable...
+   /* at this point we are outside any function or variable.
+      Look for the start of a new function or variable...
     */
    if (ucs_line.size() && (ucs_line.front() == UNI_NABLA))   // new function
       {
-        in_function = true;
-        in_variable = false;
+        where = WH_in_function;
         in_matched  = false;
         ucs_line = ucs_line.drop(1);
         UserFunction_header uh(ucs_line, false);
-        const UCS_string fun_name = uh.get_name();
+        const UCS_string & fun_name = uh.get_name();
         loop(n, object_filter.size())
            {
-              if (fun_name == object_filter[n])
-                 {
-                   in_matched = true;
-                   break;
-                 }
+             if (fun_name == object_filter[n])   return in_matched = true;
            }
-        return in_matched;
+        return false;
       }
 
    /* maybe (the start of) a new variable.
@@ -223,22 +217,15 @@ const Unicode u1 = ucs_line.size() ? ucs_line.back()  : Invalid_Unicode;
       }
    else                                                       // something else
       {
-        return ret;   // remain in current state
+        return false;   // since where = WH_outside
       }
 
-   in_function = false;
-   in_variable = true;
+   where = WH_in_variable;   // start of a new variable
    loop(of, object_filter.size())
        {
-         if (ucs_line == object_filter[of])
-            {
-              in_matched = true;
-              return true;
-            }
+         if (ucs_line == object_filter[of])   return in_matched = true;
        }
-   in_matched = false;
-
-   return ret;
+   return in_matched = false;
 }
 //----------------------------------------------------------------------------
 

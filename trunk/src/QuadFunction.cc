@@ -215,8 +215,8 @@ bool need_LF = false;
    while (now() < end)
        {
          usleep(20000);
-         if (attention_is_raised())   need_LF = true;   // first ^C
-         if (interrupt_is_raised())                     // second ^C
+         if (InterruptContext::attention_is_raised())   need_LF = true;   // first ^C
+         if (InterruptContext::interrupt_is_raised())                     // second ^C
             {
               need_LF = true;
               break;

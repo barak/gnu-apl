@@ -145,10 +145,11 @@ InputFile * input = InputFile::current_file();
                   if (file_line.size() == 0)   continue;   // line with tag(s)
                  }
 
-              if (input->has_object_filter())
+              if (input->copy_filter.has_object_filter())
                  {
-                    const bool allowed = input->check_filter(file_line);
-                    if (!allowed)
+                    const bool line_allowed =
+                          input->copy_filter.check_filter(file_line);
+                    if (!line_allowed)
                        {
                          file_line.clear();
                          continue;

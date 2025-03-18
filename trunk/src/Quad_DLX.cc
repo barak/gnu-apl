@@ -527,18 +527,18 @@ new_level:
 
    deep_check();
 
-   if (LOG_Quad_DLX || attention_is_raised())
+   if (LOG_Quad_DLX || InterruptContext::attention_is_raised())
       {
         CERR << "⎕DLX[" << level << "]";
         loop(s, level)
             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
         CERR << endl;
-        clear_attention_raised(LOC);
+        InterruptContext::clear_attention_raised(LOC);
       }
 
-   if (interrupt_is_raised())
+   if (InterruptContext::interrupt_is_raised())
       {
-        clear_interrupt_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         return;
       }
 

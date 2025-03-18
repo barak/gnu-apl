@@ -93,8 +93,8 @@ Value::init_ravel()
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::value_count_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
 const ShapeItem length = shape.get_volume();
@@ -134,8 +134,8 @@ CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::ravel_count_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
    alloc_size = length * sizeof(Cell);

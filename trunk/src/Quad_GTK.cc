@@ -182,7 +182,7 @@ const int function = B->get_cfirst().get_int_value();
              // We can not really block because the user may want to bump
              // out of ⎕GTK with ^C.
              //
-             while (event_queue.size() == 0 && !interrupt_is_raised())
+             while (event_queue.size() == 0 && !InterruptContext::interrupt_is_raised())
                    {
                      usleep(10000);
                      poll_all();
@@ -193,7 +193,7 @@ const int function = B->get_cfirst().get_int_value();
              //
              if (event_queue.size() == 0)   // hence interrupt was raised
                 {
-                   clear_interrupt_raised(LOC);
+                   InterruptContext::clear_interrupt_raised(LOC);
                    return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
                 }
 

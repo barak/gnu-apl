@@ -601,9 +601,9 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
            attention_raised was checked and not when attention_raised was
            raised. We use attention_range instead.
          */
-        if (attention_range.low != Function_PC_invalid)
+        if (InterruptContext::get_attention_range().low != Function_PC_invalid)
            {
-             body_from_to = attention_range;
+             body_from_to = InterruptContext::get_attention_range();
            }
         else
            {
@@ -621,11 +621,11 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
            instead.
 
            Note that E_INTERRUPT may also be raised synchronously, e.g.
-           ewhen a system limit was hit.
+           when a system limit was hit.
          */
-        if (interrupt_range.low != Function_PC_invalid)
+        if (InterruptContext::get_interrupt_range().low != Function_PC_invalid)
            {
-             body_from_to = interrupt_range;
+             body_from_to = InterruptContext::get_interrupt_range();
            }
         else
            {

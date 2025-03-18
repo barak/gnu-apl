@@ -165,8 +165,8 @@ PrintBuffer * item_matrix = 0;
       {
         // the user has interrupted the construction
         //
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (out)   *out << endl << "INTERRUPT" << endl;
       }
 
@@ -182,7 +182,7 @@ PrintBuffer::do_PrintBuffer(const Value & value, const PrintContext & pctx,
 {
 const bool framed = outer_style & (PST_CS_MASK | PST_CS_OUTER);
 const ShapeItem ec = value.element_count();
-const uint64_t ii_count = interrupt_count;
+const uint64_t ii_count = InterruptContext::get_interrupt_count();
 const bool huge = out && ec > 10000;
 const bool nested = !value.is_simple();
 const ShapeItem cols = value.get_last_shape_item();
@@ -203,7 +203,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
    loop(x, cols)
    loop(y, rows)
        {
-         if (huge && (ii_count != interrupt_count))   return true;
+         if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
          if (value.get_cravel(x + y*cols).need_scaling(pctx))
             {
               scaling[x] = true;
@@ -234,7 +234,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
 
         loop(x, cols)
             {
-              if (huge && (ii_count != interrupt_count))   return true;
+              if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
 
               PrintBuffer & item = item_matrix[y*cols + x];
               PrintContext pctx1 = pctx;
@@ -266,7 +266,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
         loop(x, cols)
            {
               PrintBuffer & item = item_matrix[y*cols + x];
-              if (huge && (ii_count != interrupt_count))   return true;
+              if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
 
              item.pad_height(UNI_iPAD_U6, max_row_height);
              Assert1(item.is_rectangular());
@@ -282,7 +282,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
         ColInfo col_info_x;
         loop(y, rows)
             {
-              if (huge && (ii_count != interrupt_count))   return true;
+              if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
               PrintBuffer * item_row = item_matrix + y*cols;
               col_info_x.consider(item_row[x].get_info());
             }
@@ -291,7 +291,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
 
         loop(y, rows)
             {
-              if (huge && (ii_count != interrupt_count))   return true;
+              if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
               PrintBuffer * item_row = item_matrix + y*cols;
               item_row[x].align(col_info_x);
             }
@@ -334,7 +334,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
 
         loop(y, rows)
             {
-              if (huge && (ii_count != interrupt_count))   return true;
+              if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
 
               // insert separator row(s)
               //
@@ -358,7 +358,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
                                   ?  col_spacing : last_col_spacing;
         int NOTCHAR_spaces = 0;   // the number of spaces added for NOTCHAR
 
-        if (huge && (ii_count != interrupt_count))   return true;
+        if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
 
         if (x)   // subsequent column
            {
@@ -389,7 +389,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
                 }
            }
 
-        if (huge && (ii_count != interrupt_count))   return true;
+        if (huge && (ii_count != InterruptContext::get_interrupt_count()))   return true;
 
         last_col_spacing = col_spacing;
         last_NOTCHAR = NOTCHAR;
@@ -503,11 +503,11 @@ vector<ShapeItem> chunk_lengths;
                   }
               col += chunk_len;
 
-              if (interrupt_is_raised())
+              if (InterruptContext::interrupt_is_raised())
                  {
                    out << endl << "INTERRUPT" << endl;
-                   clear_attention_raised(LOC);
-                   clear_interrupt_raised(LOC);
+                   InterruptContext::clear_attention_raised(LOC);
+                   InterruptContext::clear_interrupt_raised(LOC);
                    return;
                  }
             }

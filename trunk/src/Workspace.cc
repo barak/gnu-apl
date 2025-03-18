@@ -113,8 +113,8 @@ Workspace::push_SI(const Executable * fun, const char * loc)
 
 
         Quad_SYL::si_depth_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
    if (Value::check_WS_FULL(__FUNCTION__, 1000, LOC))
@@ -786,7 +786,7 @@ InputFile fam(filename, file, false, false, true, with_LX);
    if (object_filter)   // therefore )COPY, not )LOAD
       {
         loop(o, object_filter->size())
-            fam.add_filter_object((*object_filter)[o]);
+            fam.copy_filter.add_filter_object((*object_filter)[o]);
         fam.set_COPY();
         ++Bif_F1_EXECUTE::copy_pending;
       }

@@ -108,35 +108,88 @@ extern void init_modules2(bool log_startup);
 /// clean up
 extern void cleanup(bool soft);
 
-/// true if Control-C was hit (once)
-extern bool attention_is_raised();
+class InterruptContext
+{
+public:
+  InterruptContext()
+  : attention_raised(false),
+    interrupt_raised(false),
+    interrupt_when(0),
+    attention_count(0),
+    interrupt_count(0)
+  {}
 
-/// The range in the prefix oarser when ^C was hit (once)
-extern Function_PC2 attention_range;
+  // ^C handler
+  static void control_C(int);
 
-/// set the attention_raised flag
-extern void set_attention_raised(const char * loc);
+  /// true if Control-C was hit (once)
+  static bool attention_is_raised()
+     {
+       return interrupt_context.attention_raised;
+     }
 
-/// clear the attention_raised flag
-extern void clear_attention_raised(const char * loc);
+  /// true if Control-C was hit twice within 500 ms
+  static bool interrupt_is_raised()
+     {
+       return interrupt_context.interrupt_raised;
+     }
 
-/// true if Control-C was hit twice within 500 ms
-extern bool interrupt_is_raised();
+  static void set_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = true;
+     }
 
-/// The range in the prefix oarser when ^C was hit (twice)
-extern Function_PC2 interrupt_range;
+  static void clear_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = false;
+     }
 
-/// set the interrupt_raised flag
-extern void set_interrupt_raised(const char * loc);
+   static void set_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = true;
+      }
 
-/// clear the interrupt_raised flag
-extern void clear_interrupt_raised(const char * loc);
+   static void clear_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = false;
+      }
 
-/// the number of Control-C signals received
-extern uint64_t interrupt_count;
+   /// return the number of interrupts
+   static uint64_t get_interrupt_count()
+      { return interrupt_context.interrupt_count; }
 
-/// time when ^C was hit last
-extern APL_time_us interrupt_when;
+  /// return the range in the prefix parser when ^C was hit (once)
+  static const Function_PC2 & get_attention_range()
+     { return interrupt_context.attention_range; };
+
+  /// return the range in the prefix parser when ^C was hit (twice)
+  static const Function_PC2 & get_interrupt_range()
+     { return interrupt_context.interrupt_range; }
+
+  /// the context for Attention and Interrupt.
+  static InterruptContext interrupt_context;
+
+protected:
+  /// true if ^C was hit (once)
+  bool attention_raised;
+
+  /// true if ^C was hit (twice)
+  bool interrupt_raised;
+
+  APL_time_us interrupt_when = 0;   // to detect double ^C
+
+  /// the number of attentions
+  uint64_t attention_count;
+
+  /// the number of interrupts
+  uint64_t interrupt_count;
+
+  /// The range in the prefix parser when ^C was hit (once)
+  Function_PC2 attention_range;
+
+  /// The range in the prefix parser when ^C was hit (twice)
+  Function_PC2 interrupt_range;
+};
 
 /// signal handler for ^C
 extern void control_C(int);
