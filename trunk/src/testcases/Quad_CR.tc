@@ -585,13 +585,13 @@ Z←2 2⍴5 6.6 7J8
       ⍝ trigger a domain error if new left arguments were implemented
       ⍝ without adding a testcase for them above
       ⍝
-      45 ⎕CR A
+      46 ⎕CR A
 DOMAIN ERROR+
-      45 ⎕CR A
+      46 ⎕CR A
       ^      ^
 
       )MORE
-A ⎕CR B with invalid A (=45)
+A ⎕CR B with invalid A (=46)
       →
 
       ⍝ regression

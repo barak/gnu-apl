@@ -310,6 +310,9 @@ public:
    UCS_string & operator <<(ShapeItem num)
       { append_number(num);   return *this; }
 
+   /// append \b shape
+   UCS_string & operator <<(const Shape & shape);
+
    /// append character \b uni
    UCS_string & operator <<(Unicode uni)
       { push_back(uni);   return *this; }

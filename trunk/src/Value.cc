@@ -513,9 +513,9 @@ Value_P left_Z(get_shape(), loc);
 void
 Value::assign_cellrefs(Value_P new_value)
 {
-   // assign new_value to this left value
+   // assign new_value to this (left-) value
 
-const ShapeItem value_count = new_value->nz_element_count();
+const ShapeItem new_value_count = new_value->nz_element_count();
 const ShapeItem dest_count  = element_count();
    if (dest_count == 0)   return;   // nothing to assign
 
@@ -530,7 +530,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         //        though the shapes of 1 0/M and 'abc' differ. We therefore
         //
         MORE_ERROR() << "in (f Z)←B: length(X⊃F Z) is " << dest_count
-                     << ", but length(X⊃V) is " << value_count
+                     << ", but length(X⊃V) is " << new_value_count
                      << " (for some X)";
         LENGTH_ERROR;
       }
@@ -545,7 +545,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
 
     */
 
-   // consistency check: all items are LvalCells
+   // consistency check: all items are LvalCells or PointerCells.
    //
    check_lval_consistency();
 
@@ -556,21 +556,21 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
         if (Cell * target = LVC0->get_lval_value())   // valid right Cell
            {
-             Value * owner = LVC0->get_cell_owner();
+             Value & owner = *LVC0->get_cell_owner();
              target->release(LOC);   // free sub-values etc (if any)
-             new (target)   PointerCell(new_value.get(), *owner);
+             new (target)   PointerCell(new_value.get(), owner);
            }
         return;
       }
 
-const Cell * src = &new_value->get_cfirst();
    loop(d, dest_count)
       {
-        Cell & left_C = get_wravel(d);
-        if (left_C.is_pointer_cell())
+        const Cell & src = new_value->get_cravel(d * src_incr);
+        Cell & dest = get_wravel(d);
+        if (dest.is_pointer_cell())
            {
              /*
-                NOTE: At this point left_C is one of the left cells in a
+                NOTE: At this point dest is one of the left cells in a
                       selective assignment, say:
 
                       (f1 f2 ... fn VAR) ← new_value.
@@ -578,43 +578,71 @@ const Cell * src = &new_value->get_cfirst();
                 The initial cellrefs (i.e. of VAR) contains no PointerCells
                 (though possibly Lval cells pointing to PointerCells).
 
-                Therefore left_C must have been created by one of the fi and
-                then all sub-values of left_C must also be Lval Cells.
+                Therefore dest must have been created by one of the fi and
+                then all sub-values of dest must also be Lval Cells.
               */
-              Value * sub = left_C.get_pointer_value().get();   // right-value
-              loop(s, sub->nz_element_count())
+              Value_P left_sub = dest.get_pointer_value();
+              Value_P right_sub;
+              if (src.is_pointer_cell())   right_sub = src.get_pointer_value();
+              if (+right_sub)
+                 {
+                   if (left_sub->get_rank() != right_sub->get_rank())
+                      {
+                        MORE_ERROR() <<
+                        "In selective specification: left rank is " <<
+                        left_sub->get_rank() << ", but right rank is " <<
+                        right_sub->get_rank();
+                        RANK_ERROR;
+                      }
+                   if (left_sub->get_shape() != right_sub->get_shape())
+                      {
+                        const Shape & left_shape = left_sub->get_shape();
+                        const Shape & right_shape = right_sub->get_shape();
+
+                        MORE_ERROR()                                      <<
+                            "In selective specification: left shape is: " <<
+                            left_shape                                    <<
+                            ", but right shape is: "                      <<
+                            right_shape;
+                        LENGTH_ERROR;
+                      }
+                 }
+              loop(s, left_sub->nz_element_count())
                   {
-                    Cell * Csub = &sub->get_wravel(s);
+                    Cell * Csub = &left_sub->get_wravel(s);
                     if (!Csub->is_lval_cell())   LEFT_SYNTAX_ERROR;
-
+              
                     const LvalCell * LVC =
-                                     reinterpret_cast<const LvalCell *>(Csub);
-                    if (Cell * target = LVC->get_lval_value())   // can be 0!
+                          reinterpret_cast<const LvalCell *>(Csub);
+                    Cell * target = LVC->get_lval_value();
+                    if (target)   // target can be 0!
                        {
-                         target->release(LOC);   // free sub-values etc (if any)
+                         target->release(LOC);   // free sub-values etc.
+                         Value & owner = *LVC->get_cell_owner();
 
-                         // erase the pointee when overriding a pointer-cell.
+                         // if src is simple, then scalar extend it.
+                         // Otherwise use item s of src.
                          //
-                         Value * owner = LVC->get_cell_owner();
-                         target->init(*src, *owner, LOC);
+                         const Cell & right_cell = +right_sub ?
+                                     right_sub->get_cravel(s) : src;
+                         target->init(right_cell, owner, LOC);
                        }
                   }
            }
-        else if (left_C.is_lval_cell())
+        else if (dest.is_lval_cell())
            {
-             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(left_C);
-             if (Cell * target = left_C.get_lval_value())   // target can be 0!
+             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(dest);
+             if (Cell * target = dest.get_lval_value())   // target can be 0!
                 {
                   target->release(LOC);   // free sub-values etc (if any)
 
                   // erase the pointee when overriding a pointer-cell.
                   //
-                  Value * owner = LVC.get_cell_owner();
-                  target->init(*src, *owner, LOC);
+                  Value & owner = *LVC.get_cell_owner();
+                  target->init(src, owner, LOC);
                 }
            }
         else   LEFT_SYNTAX_ERROR;
-        src += src_incr;
       }
 }
 //----------------------------------------------------------------------------
@@ -623,13 +651,14 @@ Value::check_lval_consistency() const
 {
 const ShapeItem ec = nz_element_count();
 
-   // left value rules:
-   //
-   // 1. every item is either an LvalCell, or a PointerCell
-   // 2. for every LvalCells:
-   // 2a. either cell is 0 and owner is 0,
-   // 2c, or cell is ≠0 and owner is ≠0 and cell lies in the ravel of owner
-   //
+   /* check the following left value rules:
+     
+      1. every ravel item is either an LvalCell, or a PointerCell
+
+      2. for every LvalCells:
+      2a. either cell is 0 and owner is 0,
+      2b. or cell is ≠0 and owner is ≠0 and cell lies in the ravel of owner
+    */
    loop(e, ec)
        {
          const Cell * cell = &get_cravel(e);   // rarely

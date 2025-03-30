@@ -288,11 +288,6 @@ public:
    /// assign \b val to the cell references in this value.
    void assign_cellrefs(Value_P val);
 
-   /// check that this left-value is consistent and return its cell owner. If
-   /// \b quick then the first owner is returned, otherwise the entire value
-   /// is checked.
-   void check_lval_consistency() const;
-
    /** return member of this value, defined by \b members. The first name in
        members is the deepest, while the last name is the name of the
        variable containing the members (and is only used in error printouts).
@@ -743,8 +738,11 @@ public:
        the callee are the same as long as they are not modified, and
    2c. A Value is only cloned before it is being modified and only if it
        has more than one owner.
+
+   !!! NOTE that Scheme2 was reported to fail in certain cases of
+            slective specification.
  **/
-#define NEW_CLONE
+// #define NEW_CLONE
 
 #ifdef NEW_CLONE   /* new clone() scheme */
 
@@ -911,6 +909,9 @@ public:
    Value_P clone(const char * loc) const;
 
 protected:
+   /// check that this left-value is consistent.
+   void check_lval_consistency() const;
+
    /// return the next ravel cell to be initialized (excluding prototype)
    Cell * next_ravel()
       { return more() ? ravel + valid_ravel_items++ : 0; }

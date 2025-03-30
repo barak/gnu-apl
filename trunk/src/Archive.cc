@@ -1105,12 +1105,12 @@ ShapeItem idx = 0;
               Assert(sub_idx < value_count);
 
               // check for multiple parents of the same value. This is an
-              // error in the old cloning sheme, but not in the new one.
+              // error in the old cloning scheme, but not in the new one.
               //
 #ifdef NEW_CLONE
               if (false)   // never (new scheme)
 #else
-              if (values[sub_idx]._par != INVALID_VID)
+              if (val_pars[sub_idx]._par != INVALID_VID)
 #endif
                  {
                    // sub already has a parent, which supposedly cannot

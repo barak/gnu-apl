@@ -166,9 +166,6 @@ public:
   static const Function_PC2 & get_interrupt_range()
      { return interrupt_context.interrupt_range; }
 
-  /// the context for Attention and Interrupt.
-  static InterruptContext interrupt_context;
-
 protected:
   /// true if ^C was hit (once)
   bool attention_raised;
@@ -189,6 +186,9 @@ protected:
 
   /// The range in the prefix parser when ^C was hit (twice)
   Function_PC2 interrupt_range;
+
+  /// the context for Attention and Interrupt.
+  static InterruptContext interrupt_context;
 };
 
 /// signal handler for ^C
@@ -470,6 +470,8 @@ extern std::ostream & get_CERR();
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
                         << " '" << x << "' at " LOC << endl;
+#define Qn(n) get_CERR() << std::left << "══════════ " << #n << "=" << int(n) \
+                         << " ══════════" << "' at " LOC << endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
 /// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.

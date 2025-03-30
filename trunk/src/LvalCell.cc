@@ -92,6 +92,5 @@ LvalCell::check_consistency() const
      }
   else Assert(value.pval.owner == 0);   // no owner
 }
-
 //----------------------------------------------------------------------------
 

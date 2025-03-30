@@ -183,6 +183,11 @@ protected:
    /// append \b value to result
    static void value_CR44(UCS_string & result, const Value & value);
 
+   /// print value addresses in B
+   static void do_CR45(const Value * B);
+
+   static void do_CR45_value(const UCS_string prefix, const Value * B);
+
    /// the state of the current output line
    enum V_mode
       {

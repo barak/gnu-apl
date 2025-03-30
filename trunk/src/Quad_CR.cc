@@ -122,6 +122,7 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Zt ← 42 ⎕CR Bs    tokenize APL statement(s) Bs\n"
 "   Zt ← 43 ⎕CR Bs    parse APL statement(s) Bs\n"
 "   Zs ← 44 ⎕CR Bt    decode token(s) or token tag(s) Bt\n"
+"   Z  ← 45 ⎕CR B     print value addresses, return B\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
       }
@@ -255,8 +256,13 @@ int function_number = -1;
         function_number = A->get_cfirst().get_int_value();
       }
 
-PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
+   if (function_number == 45)   // filter (i= return B)
+      {
+        do_CR45(B.get());
+        return Token(TOK_APL_VALUE1, B);
+      }
 
+PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
 Value_P Z = do_CR(function_number, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -355,7 +361,7 @@ bool extra_frame = false;
         case 41: return do_CR41(B);            // packed → boolean
         case 42: return do_CR42_43(B, false);  // tokenize B
         case 43: return do_CR42_43(B, true);   // parse B
-        case 44: return do_CR44(B);            // decode token ir tags
+        case 44: return do_CR44(B);            // decode token tags
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
@@ -2030,6 +2036,30 @@ const ShapeItem ec = value.element_count();
 
    result.pop_back();   // trailing blanf
 
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR45(const Value * B)
+{
+UCS_string prefix;   prefix << "├───";
+   do_CR45_value(prefix, B);
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR45_value(const UCS_string prefix, const Value * B)
+{
+ostream & out = CERR;
+UCS_string sub_prefix = prefix;   sub_prefix << "────";
+
+   out << prefix << " " << voidP(B) << endl;
+   loop(b, B->nz_element_count())
+       {
+         const Cell & cB = B->get_cravel(b);
+         if (cB.is_pointer_cell())
+            {
+              do_CR45_value(sub_prefix, cB.get_pointer_value().get());
+            }
+       }
 }
 //----------------------------------------------------------------------------
 UCS_string

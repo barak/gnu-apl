@@ -1284,7 +1284,7 @@ bool negative = false;
 }
 //----------------------------------------------------------------------------
 ostream &
-operator << (ostream & os, Unicode uni)
+operator <<(ostream & os, Unicode uni)
 {
    if (uni < 0x80)      return os << char(uni);
         
@@ -1315,7 +1315,7 @@ operator << (ostream & os, Unicode uni)
 }
 //----------------------------------------------------------------------------
 ostream &
-operator << (ostream & os, const UCS_string & ucs)
+operator <<(ostream & os, const UCS_string & ucs)
 {
 const int fill_len = os.width() - ucs.size();
 
@@ -1331,6 +1331,18 @@ const int fill_len = os.width() - ucs.size();
       }
 
    return os;
+}
+//----------------------------------------------------------------------------
+UCS_string &
+UCS_string::operator <<(const Shape & shape)
+{
+   loop(r, shape.get_rank())
+       {
+         if (r)   *this << UNI_SPACE;
+         *this << shape.get_shape_item(r);
+       }
+
+   return *this;
 }
 //----------------------------------------------------------------------------
 bool
