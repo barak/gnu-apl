@@ -288,6 +288,7 @@ UCS_string args_ucs(args_utf);
         MORE_ERROR() << "missing parameter(s) in command " << command
                      << ". Usage:\n"
                      << "      " << command << " " << args;
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
       }
 
@@ -299,6 +300,7 @@ UCS_string args_ucs(args_utf);
         MORE_ERROR() << "too many (" << argc << ") parameter(s) in command "
                      << command << ". Usage:\n"
                      << "      " << command << " " << args;
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
       }
 
@@ -859,6 +861,7 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
       }
 
@@ -2103,6 +2106,7 @@ Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
              CERR << "BAD COMMAND+" << endl;
              MORE_ERROR() << "Bad )MORE argument: " << args.front()
                           << ". Use none or AUTO.";
+             if (auto_MORE)   CERR << Workspace::more_error() << endl;
              return;
            }
 
@@ -2117,6 +2121,7 @@ Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
                   CERR << "BAD COMMAND+" << endl;
                   MORE_ERROR() << "Bad )MORE AUTO argument: " << args[1]
                                << ". Use none, ON, or OFF.";
+                  if (auto_MORE)   CERR << Workspace::more_error() << endl;
                   return;
                 }
            }
@@ -2307,6 +2312,7 @@ int len = cnew.size();
 
    out << "BAD COMMAND+" << endl;
    MORE_ERROR() << "conflict with existing command name in command ]USERCMD";
+   if (auto_MORE)   CERR << Workspace::more_error() << endl;
 
    return true;
 }
@@ -2326,9 +2332,10 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
        // user command name matches; so must mode and function
        if (mnew != mold || fnew != fold)
          {
-           out << "BAD COMMAND" << endl;
+           out << "BAD COMMAND+" << endl;
            MORE_ERROR() <<
            "conflict with existing user command definition in command ]USERCMD";
+           if (auto_MORE)   CERR << Workspace::more_error() << endl;
          }
        return true;
      }
@@ -2410,6 +2417,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "invalid library reference '" << args.front() << "'";
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;   // error
       }
 
@@ -2520,6 +2528,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
        out << "BAD COMMAND+" << endl;
        MORE_ERROR() << "user command in command"
                        " ]USERCMD REMOVE does not exist";
+       if (auto_MORE)   CERR << Workspace::more_error() << endl;
        return;
      }
 
@@ -2532,7 +2541,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "The user command syntax is: ]USERCMD "
                         " ]new-command  APL-function [mode]";
-
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
      }
 
@@ -2565,6 +2574,7 @@ int mode = 0;
             {
                out << "BAD COMMAND+" << endl;
                MORE_ERROR() << "closing } in lambda function not found";
+               if (auto_MORE)   CERR << Workspace::more_error() << endl;
                return;
             }
       }
@@ -2573,6 +2583,7 @@ int mode = 0;
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "too many parameters in command ]USERCMD";
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
       }
 
@@ -2584,6 +2595,7 @@ int mode = 0;
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "unsupported mode " << mode
                      << " in command ]USERCMD (0 or 1 expected)";
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
       }
 
@@ -2606,6 +2618,7 @@ int mode = 0;
            {
              out << "BAD COMMAND+" << endl;
              MORE_ERROR() << " bad user command name in command ]USERCMD";
+             if (auto_MORE)   CERR << Workspace::more_error() << endl;
              return;
            }
       }
@@ -2633,6 +2646,7 @@ int mode = 0;
                      out << "BAD COMMAND+" << endl;
                      MORE_ERROR() <<
                           "bad APL function name in command ]USERCMD";
+                     if (auto_MORE)   CERR << Workspace::more_error() << endl;
                      return;
                   }
             }
