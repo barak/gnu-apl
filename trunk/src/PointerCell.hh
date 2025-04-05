@@ -79,6 +79,9 @@ public:
    void isolate(const char * loc)
       { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
 
+   /// isolate this value and all of its sub values
+   void isolate_deep(const char * loc);
+
 protected:
    ///  overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const

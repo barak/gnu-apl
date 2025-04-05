@@ -2302,7 +2302,7 @@ vector<Symbol *> symbols;
         // false around line 820 in Parser.cc). We fix this case here.
         //
         const TokenClass tc = body[PC].get_Class();
-        if (!((1 << tc) & TCG_FUN12_OPER12))
+        if (!((1 << tc) & TCG_FUN12_OPER12))   // tc is neither fun nor oper
            {
              // this case is rather rare, so we can afford a little time
              // to verify that we have at least one function in the supposed
@@ -2335,12 +2335,12 @@ vector<Symbol *> symbols;
       }
 
    // at this point the pattern could still be a selective specification
-   // or a vector assignment. However, the count computed above shall
-   // distinguishes them, e.g.
+   // or a vector assignment. However, the count (i.e. symbol.size())
+   // computed above shall distinguishes them. For example:
    //
-   // (T U V) ← value        count = 2      vector assignment
-   //   (U V) ← value        count = 1      vector assignment
-   // (2 ↑ V) ← value        count = 0      selective specification
+   // case 1: (T U V) ← value        count = 2      vector assignment
+   // case 2:   (U V) ← value        count = 1      vector assignment
+   // case 3: (2 ↑ V) ← value        count = 0      selective specification
    //
    if (symbols.size() < 2)   // single variable V
       {

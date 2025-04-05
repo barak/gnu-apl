@@ -793,7 +793,7 @@ Symbol::resolve_lv(const char * loc)
 
    if (value_stack.back().get_NC() == NC_VARIABLE)
       {
-        value_stack.back().isolate(loc);
+        value_stack.back().isolate_deep(loc);
         Value_P Z = get_var_value();
         return Token(TOK_APL_VALUE1, Z->get_cellrefs(loc));
       }

@@ -287,6 +287,27 @@ Value_P_Base::isolate(const char * loc)
 }
 //----------------------------------------------------------------------------
 inline void
+Value_P_Base::isolate_deep(const char * loc)
+{
+#ifdef NEW_CLONE
+   isolate(LOC);
+
+   if (value_p)
+      {
+        loop(j, value_p->nz_element_count())
+            {
+              Cell & cell = value_p->get_wravel(j);
+              if (cell.is_pointer_cell())
+                 {
+                   PointerCell & ptr = reinterpret_cast<PointerCell &>(cell);
+                   ptr.isolate_deep(LOC);
+                 }
+            }
+      }
+#endif
+}
+//----------------------------------------------------------------------------
+inline void
 Value_P_Base::move(Value_P_Base & other, const char * loc)
 {
    if (value_p)   value_p->decrement_owner_count(loc);

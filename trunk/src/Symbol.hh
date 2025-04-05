@@ -116,6 +116,10 @@ public:
    void isolate(const char * loc)
       { if (+apl_val)   apl_val.isolate(loc); }
 
+   /// isolate \b apl_val and its sub-values
+   void isolate_deep(const char * loc)
+      { if (+apl_val)   apl_val.isolate_deep(loc); }
+
 protected:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem()

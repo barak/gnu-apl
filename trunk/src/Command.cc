@@ -1007,8 +1007,9 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
 const int result = unlink(filename.c_str());
    if (result)
       {
-        out << wname << " NOT DROPPED: " << strerror(errno) << endl;
+        out << wname << " NOT DROPPED: " << strerror(errno) << "+" << endl;
         MORE_ERROR() << "could not unlink file " << filename;
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
       }
    else
       {
@@ -1052,11 +1053,12 @@ UCS_string wsid_name = Workspace::get_WS_name();
       { 
         // don't dump CLEAR WS
         //
-        COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
+        COUT << "NOT DUMPED: THIS WS IS CLEAR WS+" << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
         "workspace name that cannot be dumped. "
         "First create WS name with )WSID <name>."; 
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
       }
 
@@ -2390,11 +2392,12 @@ UCS_string wsid_name = Workspace::get_WS_name();
    if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
         // don't save CLEAR WS
-        COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
+        COUT << "NOT SAVED: THIS WS IS CLEAR WS+" << endl;
         MORE_ERROR() <<
         "the workspace was not saved because 'CLEAR WS' is a special\n"
         "workspace name that cannot be saved. "
         "First create WS name with )WSID <name>."; 
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
         return;
       }
 

@@ -468,7 +468,7 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
-   /* Create a non-nested (!) (left-) value left_Z from this (right-)value.
+   /* Create a non-nested (!) (left-) value left_Z from this (right-) value.
       left_Z has the same shape and consists entirely of LvalCells that point
       to the corresponding cells of this value.
 

@@ -742,7 +742,7 @@ public:
    !!! NOTE that Scheme2 was reported to fail in certain cases of
             slective specification.
  **/
-// #define NEW_CLONE
+#define NEW_CLONE
 
 #ifdef NEW_CLONE   /* new clone() scheme */
 
@@ -1005,7 +1005,7 @@ protected:
 #endif
 
    /// explicit cast from Value & to Value *. Use with care
-   Value * get_pointer ()   { return this; }
+   Value * get_pointer()   { return this; }
 
 private:
    /// prevent new[] of Value

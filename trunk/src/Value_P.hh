@@ -93,6 +93,9 @@ public:
    /// clone value if more than one Value_P points to it
    inline void isolate(const char * loc);
 
+   /// isolate this value and its sub-values
+   inline void isolate_deep(const char * loc);
+
    /// move the Value * from \b other to \b this.
    inline void move(Value_P_Base & other, const char * loc);
 
