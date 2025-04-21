@@ -36,6 +36,7 @@
 #include <InputFile.hh>
 #include <IO_Files.hh>
 #include <LineInput.hh>
+#include <Parallel.hh>
 #include <PointerCell.hh>
 #include <StateIndicator.hh>
 #include <Tokenizer.hh>

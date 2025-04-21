@@ -15,10 +15,27 @@ the option will not occur.
 
 --with-libapl
    This option builds GNU APL as a shared library (libapl.so) rather than an
-   integrated executable. This option is often combined with option
+   executable program. This option is often combined with option
    --with-android, and is automatically set by option --with-erlang. The
-   --with-libapl option not only builds approproate Makefiles, but it also
+   --with-libapl option not only creates approproate Makefiles, but it also
    changes the GNU APL code in some places.
+
+   It is important to note that the libapl.so library needs to be initialized
+   with its function init_libapl() before calling any of its other functions.
+   IOW: the top-level main() function of an executable that uses libapl.so
+   should look like this:
+
+   int
+   main(int argc, char * argv[])
+   {
+     init_libapl(argv[0], /* no start-up-logging */ 0);
+     ...
+     return 0;
+   }
+
+   The first argument of init_libapl() is, by convention, the name of the
+   executable program. The second argument, if non-zero, enables start-up
+   logging of the interpreter (for debugging purposes).
 
 --with-sqlite3=[ARG]
    Build the native function for SQL using sqlite3. ARG may provide the

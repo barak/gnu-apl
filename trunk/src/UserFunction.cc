@@ -1671,7 +1671,8 @@ Function_PC dst_PC = Function_PC_0;
         // take care of empty lines. Empty lines have the same PC as the
         // current line (src_line)
         //
-        while (src_PC == line_starts[src_line + 1])
+        while ((src_line + 1) < line_starts.size() &&
+               src_PC == line_starts[src_line + 1])
            {
              // src_PC has reached the first token of the next line.
              // Increment the current line and adjust line_starts.
