@@ -16,8 +16,8 @@
 @node Top
 @top libAPL
 
-libapl is a C library, kindly contributed to the GNU APL project by
-@b{Dr. Dirk Laurie}, that gives C programs access to GNU APL.
+@b{libapl} is a C library that was kindly contributed to the GNU APL project by
+@b{Dr. Dirk Laurie}. @b{libapl} gives C programs access to GNU APL.
 
 Almost everything that a user can do interactively with GNU APL can also be
 done programmatically with libapl. You can )LOAD and )SAVE workspaces,
@@ -27,8 +27,8 @@ directly with values originating from in your C code.
 The main facilities provided by libapl are listed in the following.
 
 Some functions come in two flavours: one whose argument is a (0-terminated and
-UTF8-encoded) C-strings (that is, a const char *) and one whose argument is a
-const unsigned int * to a 0-terminated array of Unicodes.
+UTF8-encoded) C-string (that is, a @b{const char *}), and one whose argument
+is a @b{const unsigned int *} to a 0-terminated array of Unicodes.
 
 @table @asis
 @item @code{apl_exec(const char * line_utf8)}
@@ -220,6 +220,7 @@ The other parameter values have the following types:
 @end multitable
 
 @menu
+* Library Initialization::
 * Constructor functions::
 * Read access to Values::
 * Write access to cells::
@@ -227,6 +228,36 @@ The other parameter values have the following types:
 * Destructor function::
 * Print support::
 @end menu
+
+@node Library Initialization
+@section Library Initialization
+@anchor{#library-initialization}
+
+For the correct operation of @b{libapl} it is mandatory to first initialize it.
+This is accomplished by calling the libapl function
+@b{init_libapl(const char * prog, int su_log)} once, and before any other
+libapl function.
+
+The first argument @b{prog} is, by convention, the name of the binary program
+that uses libapl. This name is used in some of the printouts produced by libapl.
+
+The second argument @b{su_log} controls whether libapl shall emit startup
+logging messages (su_log ≠ 0) or not (su_log = 0).
+
+For example:
+@verbatim
+#include "apl/libapl.h"
+
+int
+main(int argc, char * argv[])
+{
+   init_libapl(argv[0], /* no startup logging */ 0);
+   return apl_exec("⎕←2 3⍴⍳6");
+}
+@end verbatim
+
+See also section @b{liba[l} in the document
+@b{HOWTOS/APL-Communication-Cookbook.html}
 
 @node Constructor functions
 @section Constructor functions
