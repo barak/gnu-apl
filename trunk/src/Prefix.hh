@@ -131,7 +131,7 @@ public:
    Token reduce_statements();
 
    /// return the number of token currently in the FIFO
-   int size() const
+   int ssize() const
       { return put; }
 
    /// return the leftmost token (in APL order, e.g. A in A←B or in A+B)

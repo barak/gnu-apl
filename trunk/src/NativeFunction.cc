@@ -177,7 +177,7 @@ const int t4_len = t4.size();
 
    if (access(filename, R_OK) != 0)
       {
-        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
+        while (t4.ssize() < t4_len + 44)     t4.append_UTF8(" ");
         t4.append_UTF8(" (");
         t4.append_UTF8(strerror(errno));
         t4.append_UTF8(")\n");
@@ -190,7 +190,7 @@ void * handle = dlopen(filename, RTLD_LAZY);
         const char * err = dlerror();
         if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
 
-        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
+        while (t4.ssize() < t4_len + 44)     t4.append_UTF8(" ");
         t4.append_UTF8(" (");
         t4.append_UTF8(err);
         t4.append_UTF8(" )\n");

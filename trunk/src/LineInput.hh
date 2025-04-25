@@ -215,7 +215,7 @@ public:
    void cursor_LEFT()   { if (uidx > 0)   move_idx(--uidx); }
 
    /// move cursor right
-   void cursor_RIGHT()   { if (uidx < user_line.size())   move_idx(++uidx); }
+   void cursor_RIGHT()   { if (uidx < user_line.ssize())   move_idx(++uidx); }
 
    /// move cursor left and delete char
    void backspc()

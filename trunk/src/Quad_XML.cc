@@ -493,7 +493,7 @@ const char * cdoc = "!DOCTYPE";
 bool inside_dq  = false;   // inside "..."
 bool inside_sq  = false;   // inside '...'
 
-   for (ShapeItem pos = offset + 1; pos < string_B.size();)
+   for (ShapeItem pos = offset + 1; pos < string_B.ssize();)
        {
          const Unicode uni = string_B[pos++];
 
@@ -519,7 +519,7 @@ bool inside_sq  = false;   // inside '...'
          if (is_doctype && !*cdoc)   // rarely: <!DOCTYPE...
             {
               size_t level = 1;
-              for (; pos < string_B.size();)
+              for (; pos < string_B.ssize();)
                   {
                     const Unicode uni = string_B[pos++];
                     if (uni == '<')   ++level;
@@ -918,7 +918,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
 
          // &#xxx
          //
-         if ((src + 2) < attval.size() && attval[src + 1] == '#')
+         if ((src + 2) < attval.ssize() && attval[src + 1] == '#')
             {
               src += 2;   // skip &#
               int number = 0;
@@ -926,7 +926,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
               if (attval[src] == 'x')   // hex value &#xHH
                  {
                    ++src;   // skip 'x'
-                   while (src < attval.size() && !bad_char)
+                   while (src < attval.ssize() && !bad_char)
                       {
                         const Unicode digit = attval[src++];
                         if (digit == ';')   break;   // end of hex digits
@@ -937,7 +937,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
                  }
               else                      // decimal value &#DDD
                  {
-                   while (src < attval.size())
+                   while (src < attval.ssize())
                       {
                         const Unicode digit = attval[src++];
                         if (digit == ';')   break;   // end of decimal digits
@@ -964,7 +964,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
              {
                const _mapping & pred = predefined_entities[p];
                const int len = pred.string_len;
-               if ((src + len) > attval.size())   continue;   // too short
+               if ((src + len) > attval.ssize())   continue;   // too short
 
                bool match = true;
                loop(ll, len)
@@ -1000,7 +1000,7 @@ UCS_string ret;
         const Unicode uni = attval[a];
         if (quoted)
            {
-             if (a == 0 || a == (attval.size() - 1))
+             if (a == 0 || a == (attval.ssize() - 1))
                 {
                   ret.push_back(uni);
                   continue;
@@ -1154,7 +1154,7 @@ ShapeItem pos = 1;
 UCS_string ret;
 
    while (ucs[pos] >= UNI_0 && ucs[pos] <= UNI_9)   ++pos;   // skip digits
-   while (pos < ucs.size())   ret.push_back(ucs[pos++]);
+   while (pos < ucs.ssize())   ret.push_back(ucs[pos++]);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1360,7 +1360,7 @@ ShapeItem from = 0;
             }
        }
 
-   if (from < path.size())
+   if (from < path.ssize())
       {
         const UCS_string member(path, from, len_Z - from);
         Value_P Zp(member, LOC);
@@ -1560,7 +1560,7 @@ std::vector<const Cell *>member_values;
       {
         loop(l, LEG_IND)              z.push_back(UNI_SPACE);
         Unicode last_char = prefix.back();
-        const bool last_member = m == (member_names.size() - 1);
+        const bool last_member = m == (member_names.ssize() - 1);
         if (last_member)
            {
              last_char     = UNI_LINE_UP_RIGHT;   // └ in this line

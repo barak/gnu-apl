@@ -194,7 +194,7 @@ int max_len = 0;
         if (remove_extra_spaces)
            tlines[row].remove_leading_and_trailing_whitespaces();
 
-        if (max_len < tlines[row].size())   max_len = tlines[row].size();
+        if (max_len < tlines[row].ssize())   max_len = tlines[row].ssize();
       }
 
 Shape shape_Z;
@@ -474,14 +474,14 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                     res.append(UNI_LEFT_ARROW);
                     res.append(UNI_L_CURLY);
                     int t = 0;
-                    while (t < text.size())   // skip λ header
+                    while (t < text.ssize())   // skip λ header
                        {
                          const Unicode uni = text[t++];
                          if (uni == UNI_LF)   break;
                        }
 
 
-                    while (t < text.size())   // copy body
+                    while (t < text.ssize())   // copy body
                         {
                           const Unicode uni = text[t++];
                           if (uni == UNI_LF)   break;
@@ -495,7 +495,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                   {
                     UCS_string res(UTF8_string("∇"));
 
-                    loop(u, text.size())
+                    loop(u, text.ssize())
                        {
                          if (text[u] == '\n')
                              {
@@ -503,7 +503,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                                res.clear();
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
-                                   u < (text.size() - 1))
+                                   u < (text.ssize() - 1))
                                   res.append(UNI_SPACE);
                              }
                          else
@@ -696,7 +696,7 @@ size_t zero_count  = 0;
              bool has_string = false;
              int count = 1;        // from first item above
              int e_from = e - 1;   // dito.
-             while (e < ec && (U2.size() + U4.size()) < line_limit)
+             while (e < ec && (U2.ssize() + U4.ssize()) < line_limit)
                    {
                      const Cell & cell = value.get_cravel(e++);
                      if (cell.is_pointer_cell())   continue;

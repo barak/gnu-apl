@@ -1045,7 +1045,7 @@ UCS_string data;
         default: return;
       }
 
-   for (ShapeItem u = 0; u < data.size() ;)
+   for (ShapeItem u = 0; u < data.ssize() ;)
       {
         const ShapeItem rest = data.size() - u;
         if (rest <= 71)   buffer[0] = 'X';   // last record
@@ -1053,7 +1053,7 @@ UCS_string data;
         loop(uu, 71)
            {
              unsigned char cc = ' ';
-             if (u < data.size()) cc = Avec::unicode_to_cp(data[u++]);
+             if (u < data.ssize()) cc = Avec::unicode_to_cp(data[u++]);
              buffer[1 + uu] = cc;
            }
 
@@ -1211,22 +1211,22 @@ const ValueStackItem & vs = value_stack[0];
              out << get_name();
              out << "←{";
              int t = 0;
-             while (t < text.size())   // skip λ header
+             while (t < text.ssize())   // skip λ header
                 {
                   const Unicode uni = text[t++];
                   if (uni == UNI_LF)   break;
                 }
 
              // skip λ← and spaces
-             while (t < text.size() && text[t] <= ' ')   ++t;
-             if    (t < text.size() && text[t] == UNI_LAMBDA)   ++t;
-             while (t < text.size() && text[t] <= ' ')   ++t;
-             if    (t < text.size() && text[t] == UNI_LEFT_ARROW)   ++t;
-             while (t < text.size() && text[t] <= ' ')   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
+             if    (t < text.ssize() && text[t] == UNI_LAMBDA)   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
+             if    (t < text.ssize() && text[t] == UNI_LEFT_ARROW)   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
 
              // copy body
              //
-             while (t < text.size())
+             while (t < text.ssize())
                 {
                    const Unicode uni = text[t++];
                    if (uni == UNI_LF)   break;

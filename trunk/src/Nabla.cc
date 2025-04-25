@@ -1154,7 +1154,7 @@ UCS_string ret(UTF8_string("["));
       }
 
    ret.append_UTF8("] ");
-   while (ret.size() < min_size)   ret.append(UNI_SPACE);
+   while (ret.ssize() < min_size)   ret.append(UNI_SPACE);
    return ret;
 }
 //----------------------------------------------------------------------------

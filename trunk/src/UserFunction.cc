@@ -139,7 +139,7 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
 
    parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
    setup_lambdas();
-   line_starts.push_back(Function_PC(lambda_body.size() - 1));
+   line_starts.push_back(Function_PC(lambda_body.ssize() - 1));
    line_starts.push_back(Function_PC_0);
    error_line = -1;   // no error
    error_info = 0;
@@ -906,7 +906,7 @@ UCS_string_vector original_text;
            }
 
         error_line = l;   // assume error
-        line_starts.push_back(Function_PC(body.size()));
+        line_starts.push_back(Function_PC(body.ssize()));
 
         if (stop_line)
            {
@@ -941,12 +941,12 @@ UCS_string_vector original_text;
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "body.size() is " << body.size() << endl
+        CERR << "body.ssize() is " << body.ssize() << endl
              << "line_starts.size() is " << line_starts.size() <<endl; 
       }
 
    // let [0] be the end of the function.
-   line_starts[0] = Function_PC(body.size());
+   line_starts[0] = Function_PC(body.ssize());
 
    if (header.Z())   body.push_back(Token(TOK_RETURN_SYMBOL, header.Z()));
    else              body.push_back(Token(TOK_RETURN_VOID));
@@ -991,7 +991,7 @@ UserFunction::optimize_labels()
 const size_t labels_declared = header.get_label_count();
    if (labels_declared == 0)   return false;   // function has no labels
 
-   for (int pc = Function_PC(-1); pc < body.size() - 4; ++pc)
+   for (int pc = Function_PC(-1); pc < body.ssize() - 4; ++pc)
        {
          if (body[pc + 2].get_tag() == TOK_R_ARROW &&   // least likely first
              body[pc + 3].get_tag() == TOK_ENDL    &&
@@ -1064,7 +1064,7 @@ UserFunction::optimize_label_vectors()
 
     */
 bool VOID_inserted = false;
-   for (Function_PC pc = Function_PC(1); pc < body.size() - 3; ++pc)
+   for (Function_PC pc = Function_PC(1); pc < body.ssize() - 3; ++pc)
       {
         vector<Function_PC> items_B;
         const TokenTag tag_pc = body[pc].get_tag();
@@ -1221,7 +1221,7 @@ Function_PC
 UserFunction::pc_for_line(Function_Line line) const
 {
    if (line <= Function_Line_0 || line >= Function_Line(line_starts.size()))
-      return Function_PC(body.size() - 1);
+      return Function_PC(body.ssize() - 1);
 
    return line_starts[line];
 }
@@ -1363,7 +1363,7 @@ int signature = SIG_FUN | SIG_Z;
 int t = 0;
 
 ShapeItem semi = -1;
-   while (t < text.size())
+   while (t < text.ssize())
        {
          switch(text[t++])
             {
@@ -1385,10 +1385,10 @@ ShapeItem semi = -1;
 
    // discard leading spaces
    //
-   while (t < text.size() && text[t] == UNI_SPACE)   ++t;
+   while (t < text.ssize() && text[t] == UNI_SPACE)   ++t;
 
 UCS_string body_text;
-   for (; t < text.size(); ++t)   body_text.append(text[t]);
+   for (; t < text.ssize(); ++t)   body_text.append(text[t]);
 
    while (body_text.back() == UNI_LF)  body_text.pop_back();
 
@@ -1417,9 +1417,9 @@ const Parser parser(PM_FUNCTION, LOC, false);
       }
 
 vector<Symbol *> local_vars;
-   while (body.size() >= 2)
+   while (body.ssize() >= 2)
       {
-        const size_t semi = body.size() - 2;
+        const size_t semi = body.ssize() - 2;
         if (body[semi]    .get_tag() != TOK_SEMICOL)   break;
         if (body[semi + 1].get_Class() != TC_SYMBOL)   break;
         local_vars.push_back(body[semi + 1].get_sym_ptr());
@@ -1532,9 +1532,9 @@ UserFunction::print_properties(ostream & out, int indent) const
 UCS_string ind(indent, UNI_SPACE);
    out << ind << "Body Lines:     " << (line_starts.size() - 1) << "+[0]" << endl
        << ind << "Creator:        " << get_creator()      << endl
-       << ind << "Body[" << body.size() << "⏩]: ";
+       << ind << "Body[" << body.ssize() << "⏩]: ";
 
-   loop(b, body.size())
+   loop(b, body.ssize())
        {
          // maybe print line prefix
          //
@@ -1621,7 +1621,7 @@ UserFunction::print_body_by_line(const char * where) const
    loop(line, line_starts.size())
       {
         CERR << "[" << line << "]:";
-        ShapeItem next = body.size();   // assume last line
+        ShapeItem next = body.ssize();   // assume last line
         if ((line + 1) < int(line_starts.size()))
            next = line_starts[line + 1];
         loop(offset, next - line_starts[line])
@@ -1666,7 +1666,7 @@ Function_PC dst_PC = Function_PC_0;
 
    // be careful not to increment src_PC if a line is empty!
 
-   loop(src_PC, body.size())
+   loop(src_PC, body.ssize())
       {
         // take care of empty lines. Empty lines have the same PC as the
         // current line (src_line)
@@ -1691,7 +1691,7 @@ Function_PC dst_PC = Function_PC_0;
              // of the TOK_VOID have all GOTO_PC targets above src_PC become
              // are too high (by 1). Adjust these token.
              //
-             loop(bb, body.size())
+             loop(bb, body.ssize())
                  {
                    Token & tok = body[bb];
                    if (tok.get_tag() == TOK_GOTO_PC)
@@ -1704,7 +1704,7 @@ Function_PC dst_PC = Function_PC_0;
            }
       }
 
-const VoidCount ret = VoidCount(body.size() - dst_PC);
+const VoidCount ret = VoidCount(body.ssize() - dst_PC);
    body.resize(dst_PC);
    line_starts[0] = dst_PC - 1;   // convention: line_starts[0] is the end of body
 

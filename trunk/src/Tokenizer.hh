@@ -47,7 +47,7 @@ public:
      idx(src.idx + from),
      end(src.idx + from + to)
    {
-     if (end > src.str.size())   end = src.str.size();
+     if (end > src.str.ssize())   end = src.str.size();
      if (idx > end)   idx = end;
    }
 

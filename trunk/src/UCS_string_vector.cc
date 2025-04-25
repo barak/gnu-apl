@@ -212,9 +212,9 @@ UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
 ShapeItem ret = 0;
 
-   for (ShapeItem s = col; s < size(); s += column_count)
+   for (ShapeItem s = col; s < ssize(); s += column_count)
        {
-          const ShapeItem len_s = at(s).size();
+          const ShapeItem len_s = at(s).ssize();
           if (ret < len_s)   ret = len_s;
        }
 
@@ -244,13 +244,13 @@ const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
 
    // data rows
    //
-   for (ShapeItem d = 0; d < size();)
+   for (ShapeItem d = 0; d < ssize();)
        {
          out << frame[7];                                  // ║
          loop(col, column_count)
              {
                const ShapeItem width = column_widths[col];
-               if (d < size())   // valid data available
+               if (d < ssize())   // valid data available
                   {
                     const UCS_string & data = (*this)[d++];
                     loop(j, data.size())             out << data[j];

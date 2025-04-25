@@ -119,7 +119,7 @@ public:
    UCS_string drop(int drop_count) const
       {
         if (drop_count <= 0)        return UCS_string(*this, 0, size());
-        if (size() <= drop_count)   return UCS_string();
+        if (ssize() <= drop_count)   return UCS_string();
         return UCS_string(*this, drop_count, size() - drop_count);
       }
 
@@ -356,7 +356,7 @@ public:
    void append_float(APL_Float num);
 
    /// overload vector::size() so that it returns a signed length
-   ShapeItem size() const
+   ShapeItem ssize() const
       { return  ShapeItem(vector<Unicode>::size()); }
 
    /// an iterator for UCS_strings
@@ -383,7 +383,7 @@ public:
 
            /// return true iff there are more chars available
            bool has_more() const
-              { return pos < s.size(); }
+              { return pos < s.ssize(); }
 
         /// skip whitespace
         void skip_white()

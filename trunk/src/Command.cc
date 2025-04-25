@@ -258,7 +258,7 @@ UCS_string args_ucs(args_utf);
               else            --mandatory_args;
               continue;
          case '.':
-              if (a < (args_ucs.size() - 2) &&
+              if (a < (args_ucs.ssize() - 2) &&
                   args_ucs[a + 1] == '.'    &&
                   args_ucs[a + 2] == '.')   many = true;
               continue;
@@ -2301,7 +2301,7 @@ Command::check_name_conflict(ostream & out, const UCS_string & cnew,
                              const UCS_string cold)
 {
 int len = cnew.size();
-        if (len > cold.size())   len = cold.size();
+        if (len > cold.ssize())   len = cold.size();
 
    loop(l, len)
       {
@@ -2559,7 +2559,7 @@ int mode = 0;
          // looks like the user command is a lambda function.
          UCS_string result;
          // lambdas could contain spaces, collect all arguments in one string
-         for (ShapeItem i = 1; i < args.size(); ++i)
+         for (ShapeItem i = 1; i < args.ssize(); ++i)
             {
                result.append(args[i]);
             }
@@ -2898,12 +2898,12 @@ int idx = 1;
 
    // data + 1 is: NAME RK SHAPE RAVEL...
    //
-   while (idx < data.size() && data[idx] != UNI_SPACE)
+   while (idx < data.ssize() && data[idx] != UNI_SPACE)
          name.append(data[idx++]);
    ++idx;   // skip space after the name
 
 int rank = 0;
-   while (idx < data.size() &&
+   while (idx < data.ssize() &&
           data[idx] >= UNI_0 &&
           data[idx] <= UNI_9)
       {
@@ -2915,7 +2915,7 @@ int rank = 0;
    loop (r, rank)
       {
         ShapeItem s = 0;
-        while (idx < data.size() &&
+        while (idx < data.ssize() &&
                data[idx] >= UNI_0 &&
                data[idx] <= UNI_9)
            {
@@ -2966,7 +2966,7 @@ Token_string tos;
      if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
    }
  
-   if (tos.size() != shape.get_volume())   return;
+   if (tos.ssize() != shape.get_volume())   return;
 
 Value_P Z(shape, LOC);
    Z->set_proto_Int();   // prototype
@@ -3026,8 +3026,8 @@ ShapeItem padded = 0;
    loop(e, ec)
       {
         Unicode uni = UNI_SPACE;
-        if (e < (data.size() - idx))   uni = data[e + idx];
-        else                           ++padded;
+        if (e < (data.ssize() - idx))   uni = data[e + idx];
+        else                            ++padded;
         Z->next_ravel_Char(uni);
       }
 
@@ -3081,14 +3081,14 @@ int idx = 1;
 UCS_string fun_name;
 
    /// chars 1...' ' are the function name
-   while ((idx < data.size()) && (data[idx] != UNI_SPACE))
+   while ((idx < data.ssize()) && (data[idx] != UNI_SPACE))
         fun_name.append(data[idx++]);
    ++idx;
 
    if (objects.size() && !objects.contains(fun_name))   return;
 
 UCS_string statement;
-   while (idx < data.size())   statement.append(data[idx++]);
+   while (idx < data.ssize())   statement.append(data[idx++]);
    statement.append(UNI_LF);
 
 UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
@@ -3164,35 +3164,35 @@ bool got_minus = false;
 
    // skip spaces before from
    //
-   while (s < user_arg.size() && user_arg[s] <= ' ') ++s;
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
-   if (s == user_arg.size())   return false;   // case 1.: OK
+   if (s == user_arg.ssize())   return false;   // case 1.: OK
 
    // copy left of - to from
    //
-   while (s < user_arg.size()   &&
+   while (s < user_arg.ssize()   &&
               user_arg[s] > ' ' &&
               user_arg[s] != '-')  from.append(user_arg[s++]);
 
    // skip spaces after from
    //
-   while (s < user_arg.size() && user_arg[s] <= ' ') ++s;
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
-   if (s < user_arg.size() && user_arg[s] == '-') { ++s;   got_minus = true; }
+   if (s < user_arg.ssize() && user_arg[s] == '-') { ++s;   got_minus = true; }
 
    // skip spaces before to
    //
-   while (s < user_arg.size() && user_arg[s] <= ' ') ++s;
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
    // copy right of - to from
    //
-   while (s < user_arg.size() && user_arg[s] > ' ')  to.append(user_arg[s++]);
+   while (s < user_arg.ssize() && user_arg[s] > ' ')  to.append(user_arg[s++]);
 
    // skip spaces after to
    //
-   while (s < user_arg.size() && user_arg[s] <= ' ') ++s;
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
-   if (s < user_arg.size())   return true;   // error: non-blank after to
+   if (s < user_arg.ssize())   return true;   // error: non-blank after to
 
    if (!got_minus)   to = from;   // case 2.
 

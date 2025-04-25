@@ -206,7 +206,7 @@ const int function = B->get_cfirst().get_int_value();
                //
                UCS_string_vector args;
                UCS_string arg;
-               for (ShapeItem j = 1; j < HWF.size(); ++j)
+               for (ShapeItem j = 1; j < HWF.ssize(); ++j)
                    {
                      if (HWF[j] == UNI_COLON)
                         {

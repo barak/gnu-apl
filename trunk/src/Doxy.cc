@@ -63,8 +63,8 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
          // library reference number and the whitespace directly after it
          //
          int pos = 1;   // first blank after the library reference number
-         while (pos < ws_name.size() && Avec::is_white(ws_name[pos]))   ++pos;
-         ws_name = UCS_string(ws_name, pos, ws_name.size() - pos);
+         while (pos < ws_name.ssize() && Avec::is_white(ws_name[pos]))   ++pos;
+         ws_name = UCS_string(ws_name, pos, ws_name.ssize() - pos);
       }
 
    root_dir.append_ASCII("/");
@@ -504,7 +504,7 @@ std::vector<const StateIndicator *> stack;
                         }
 
                     int spe2 = spc2;
-                    while (spe2 < el2.size() &&
+                    while (spe2 < el2.ssize() &&
                            el2[spe2] == UNI_SPACE)   ++spe2;
                     const int spl2 = el2.size() - spe2;
                     const UCS_string & el3 =

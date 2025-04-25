@@ -809,9 +809,9 @@ UCS_string hori(get_column_count(), HORI);
            {
              UCS_string ucs;
              ucs.append_number(shape.get_last_shape_item());
-             if (ucs.size() < (get_column_count() - 2))
+             if (ucs.ssize() < (get_column_count() - 2))
                 {
-                  loop(u, ucs.size())   set_char(u + 1, 0, ucs[u]);
+                  loop(u, ucs.ssize())   set_char(u + 1, 0, ucs[u]);
                 }
            }
       }
@@ -827,7 +827,7 @@ UCS_string hori(get_column_count(), HORI);
                   if (r)   ucs.append(VERT);
                   ucs.append_number(shape.get_shape_item(r));
                 }
-             if (ucs.size() < (get_row_count() - 2))
+             if (ucs.ssize() < get_row_count() - 2)
                 {
                   loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
                 }
@@ -1323,7 +1323,7 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
    // copy exponent part
    //
    for (int ex = col_info.int_len + col_info.fract_len;
-        ex < buffer[0].size(); ++ex)
+        ex < buffer[0].ssize(); ++ex)
        new_buf.append(buffer[0][ex]);
 
    col_info.fract_len = wanted_fract_len;

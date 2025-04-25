@@ -138,7 +138,7 @@ std::vector<Token_string *> statements;
         loop(t, stat->size())
            {
              tos.push_back(Token());
-             tos[tos.size() - 1].move((*stat)[t], LOC);
+             tos[tos.ssize() - 1].move((*stat)[t], LOC);
            }
         delete stat;
       }
@@ -156,7 +156,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
 
    Log(LOG_parse)
       {
-        CERR << "parse 2 [" << tos.size() << "]: ";
+        CERR << "parse 2 [" << tos.ssize() << "]: ";
         tos.print(CERR, true);
       }
 
@@ -172,7 +172,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
 
    Log(LOG_parse)
       {
-        CERR << "parse 3 [" << tos.size() << "]: ";
+        CERR << "parse 3 [" << tos.ssize() << "]: ";
         tos.print(CERR, true);
       }
 
@@ -198,7 +198,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
 
    // special case: single APL value (to speed up ⍎)
    //
-   if (tos.size() == 1)
+   if (tos.ssize() == 1)
       {
         Log(LOG_parse)   CERR << "parse 3a: single value " << tos[0] << endl;;
         return E_NO_ERROR;
@@ -206,7 +206,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
 
    Log(LOG_parse)
       {
-        CERR << "parse 4 [" << tos.size() << "]: ";
+        CERR << "parse 4 [" << tos.ssize() << "]: ";
         tos.print(CERR, true);
       }
 
@@ -215,7 +215,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    mark_lsymb(tos);
    Log(LOG_parse)
       {
-        CERR << "parse 5 [" << tos.size() << "]: ";
+        CERR << "parse 5 [" << tos.ssize() << "]: ";
         tos.print(CERR, true);
       }
 
@@ -226,19 +226,19 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         optimize_static_patterns(tos);
         Log(LOG_parse)
            {
-             CERR << "parse 6 [" << tos.size() << "]: ";
+             CERR << "parse 6 [" << tos.ssize() << "]: ";
              tos.print(CERR, true);
            }
       }
 
    // 7. update the distances between ( and ), [ and ], or { and }. After
-   //    that, tos.size() must not be changed anymore.
+   //    that, tos.ssize() must not be changed anymore.
    //
    {
      const ErrorCode ec = match_par_bra(tos, false);
      if (ec != E_NO_ERROR)
         {
-          loop(t, tos.size())   tos[t].clear(LOC);
+          loop(t, tos.ssize())   tos[t].clear(LOC);
           return ec;
         }
    }
@@ -252,13 +252,13 @@ Parser::collect_constants(Token_string & tos)
 bool progress = false;
    Log(LOG_collect_constants)
       {
-        CERR << "collect_constants [" << tos.size() << " token] in: ";
+        CERR << "collect_constants [" << tos.ssize() << " token] in: ";
         tos.print(CERR, true);
       }
 
    // convert several items in vector notation into a single APL value
    //
-   loop (t, tos.size())
+   loop (t, tos.ssize())
       {
         ShapeItem to;
         switch(tos[t].get_tag())
@@ -277,7 +277,7 @@ bool progress = false;
 
         // at this point, t is the first item. Collect subsequenct items.
         //
-        for (to = t + 1; to < tos.size(); ++to)
+        for (to = t + 1; to < tos.ssize(); ++to)
             {
 #if 1
               // Note: ISO 13751 gives an example with 1 2 3[2] ↔ 2
@@ -291,7 +291,7 @@ bool progress = false;
               // if tos[to + 1] is [ then [ binds stronger than
               // vector notation and we stop collecting.
               //
-              if ((to + 1) < tos.size() &&
+              if ((to + 1) < tos.ssize() &&
                   tos[to + 1].get_tag() == TOK_L_BRACK)   break;
 #endif
               const TokenTag tag = tos[to].get_tag();
@@ -315,7 +315,7 @@ bool progress = false;
 
    Log(LOG_collect_constants)
       {
-        CERR << "collect_constants [" << tos.size() << " token] out: ";
+        CERR << "collect_constants [" << tos.ssize() << " token] out: ";
         tos.print(CERR, true);
       }
 
@@ -327,12 +327,12 @@ Parser::collect_groups(Token_string & tos)
 {
    Log(LOG_collect_constants)
       {
-        CERR << "collect_groups [" << tos.size() << " token] in: ";
+        CERR << "collect_groups [" << tos.ssize() << " token] in: ";
         tos.print(CERR, true);
       }
 
 int opening = -1;
-   loop(t, tos.size())
+   loop(t, tos.ssize())
        {
          switch(tos[t].get_tag())
             {
@@ -367,7 +367,7 @@ int opening = -1;
 
                    Log(LOG_collect_constants)
                       {
-                        CERR << "collect_groups [" << tos.size()
+                        CERR << "collect_groups [" << tos.ssize()
                              << " token] out: ";
                         tos.print(CERR, true);
                       }
@@ -389,7 +389,7 @@ Parser::find_closing_bracket(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.ssize(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -435,7 +435,7 @@ Parser::find_closing_parent(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.ssize(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -483,7 +483,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
    //
    for (bool progress = true; progress; progress = false)
        {
-         loop(t, tos.size() - 2)
+         loop(t, tos.ssize() - 2)
              {
                if (tos[t].get_Class() != TC_L_PARENT)   continue;
 
@@ -545,7 +545,7 @@ Parser::optimize_static_patterns(Token_string & tos)
     */
 
 bool TOK_VOID_inserted = false;
-   loop(t, tos.size() - 1)   // -1 since we need tos[t + 1]
+   loop(t, tos.ssize() - 1)   // -1 since we need tos[t + 1]
        {
          if (tos[t].get_tag() == TOK_OPER2_INNER    &&   // some f.g
              t                                      &&   // f exists
@@ -669,7 +669,7 @@ Parser::get_assign_state(Token_string & tos, ShapeItem pos)
    // complicated cases (i.e. those involving ←) to the prefix parser
    // and return ASS_unknown instead of a more precise result.
    //
-   while (pos < tos.size())
+   while (pos < tos.ssize())
        {
          if (tos[pos++].get_Class() == TC_ASSIGN)   return ASS_unknown;
        }
@@ -690,7 +690,7 @@ Parser::optimize_literal_axes(Token_string & tos)
    // the Prefix parser.
 bool progress = false;
 
-   loop(src, tos.size() - 1)
+   loop(src, tos.ssize() - 1)
        {
          if (tos[src].get_tag() != TOK_L_BRACK)   continue;
 
@@ -719,7 +719,7 @@ bool progress = false;
 
             case 2a. is fairly frequent with f being ⎕FIO or ⎕CR.
           */
-         if ((src + 2) < tos.size()          &&   // tos[src+2] exists
+         if ((src + 2) < tos.ssize()          &&   // tos[src+2] exists
              tos[src + 2].get_tag() == TOK_R_BRACK &&   // and is ]
              T1.get_Class() == TC_VALUE            &&   // value N
              T1.get_apl_val()->is_int_scalar())
@@ -766,7 +766,7 @@ Parser::optimize_short_primitives(Token_string & tos)
    // such as 4⍴0 with their result. The scope of tos is one statement.
    //
 bool progress = false;
-   if (tos.size() < 3)   return false;   // too short to optimize
+   if (tos.ssize() < 3)   return false;   // too short to optimize
 
 // CERR << endl << "tos: ";   tos.print(CERR, false);
 
@@ -778,11 +778,11 @@ bool progress = false;
    // The optimization starts at "6" (end of statement) and restarts at ")".
    //
 vector<ShapeItem> ends;
-   ends.push_back(tos.size());
+   ends.push_back(tos.ssize());
 
    // tos is in forward (aka. APL) order. We move backwards from the end
    //
-   rev_loop(pc, tos.size())
+   rev_loop(pc, tos.ssize())
        {
          if (pc < 3)   break;   // to few tokens remaining in tos
 
@@ -923,14 +923,14 @@ Parser::remove_TOK_VOID(Token_string & tos)
 {
 ShapeItem dst = 0;
 
-   loop(src, tos.size())
+   loop(src, tos.ssize())
        {
          if (tos[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
          if (src != dst)   tos[dst].move(tos[src], LOC);
          ++dst;
        }
 
-const VoidCount ret = VoidCount(tos.size() - dst);
+const VoidCount ret = VoidCount(tos.ssize() - dst);
    tos.resize(dst);
    return ret;
 }
@@ -939,9 +939,9 @@ ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
 std::vector<ShapeItem> stack;
-   loop(s, tos.size())
+   loop(s, tos.ssize())
        {
-         const ShapeItem t = backwards ? (tos.size() - 1) - s : s;
+         const ShapeItem t = backwards ? (tos.ssize() - 1) - s : s;
          ErrorCode ec;   // anticipated error code, not used in most cases
          TokenClass tc_peer;
          switch(tos[t].get_Class())
@@ -1009,7 +1009,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
 {
    Log(LOG_create_value)
       {
-        CERR << "create_value(" << __LINE__ << ") tos[" << tos.size()
+        CERR << "create_value(" << __LINE__ << ") tos[" << tos.ssize()
              <<  "]  pos " << pos << " count " << count << " in:";
         tos.print(CERR, true);
       }
@@ -1019,7 +1019,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
 
    Log(LOG_create_value)
       {
-        CERR << "create_value(" << __LINE__ << ") tos[" << tos.size()
+        CERR << "create_value(" << __LINE__ << ") tos[" << tos.ssize()
              <<  "]  pos " << pos << " count " << count << " out:";
         tos.print(CERR, true);
       }
@@ -1126,7 +1126,7 @@ Token tok(TOK_APL_VALUE3, Z);
 
    Log(LOG_create_value)
       {
-        CERR << "create_value [" << tos.size() << " token] out: ";
+        CERR << "create_value [" << tos.ssize() << " token] out: ";
         tos.print(CERR, true);
       }
 }
@@ -1135,7 +1135,7 @@ Token tok(TOK_APL_VALUE3, Z);
 void
 Parser::mark_lsymb(Token_string & tos)
 {
-   loop(ass, tos.size())
+   loop(ass, tos.ssize())
       {
         if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 

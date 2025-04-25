@@ -38,7 +38,7 @@ public:
    UCS_string_vector(const Value & val, bool surrogate);
 
    /// overload vector<UCS_string>::size() so that it returns a signed length
-   ShapeItem size() const
+   ShapeItem ssize() const
       { return ShapeItem(std::vector<UCS_string>::size()); }
 
    /// return true iff one of the strings is equal to \b ucs

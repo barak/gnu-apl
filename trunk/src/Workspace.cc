@@ -309,7 +309,7 @@ Workspace::lookup_existing_name(const UCS_string & name)
         int len;
         Token tok = get_quad(name, len);
         if (len == 1)                          return 0;
-        if (name.size() != len)                return 0;
+        if (name.ssize() != len)               return 0;
         if (tok.get_Class() == TC_SYMBOL)      return tok.get_sym_ptr();
         if (tok.get_Class() == TC_FUN0)        return tok.get_function();
         if (tok.get_Class() == TC_FUN1)        return tok.get_function();
@@ -342,8 +342,8 @@ Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
       {
         int len;
         Token tok = get_quad(symbol_name, len);
-        if (symbol_name.size() != len)         return 0;
-        if (tok.get_Class() != TC_SYMBOL)      return 0;   // system function
+        if (symbol_name.ssize() != len)     return 0;
+        if (tok.get_Class() != TC_SYMBOL)   return 0;   // system function
 
         return tok.get_sym_ptr();
       }
@@ -365,7 +365,7 @@ UCS_string name(UNI_Quad_Quad);
 
 SystemName * longest = 0;
 
-   for (ShapeItem u = 1; u < ucs.size(); ++u)
+   for (ShapeItem u = 1; u < ucs.ssize(); ++u)
       {
         Unicode uni = ucs[u];
         if (!Avec::is_symbol_char(uni))   break;

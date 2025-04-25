@@ -848,8 +848,8 @@ UCS_string line;
         // leave the characters after the first changed one unchanged.
         loop(i, line.size())
            {
-             if (i >= old_buffer.size())     break;   // end of prompt
-             if (old_buffer[i] != line[i])   break;   // changed prompt[i]
+             if (i >= old_buffer.ssize())     break;   // end of prompt
+             if (old_buffer[i] != line[i])    break;   // changed prompt[i]
              line[i] = qpr;          // unchanged prompt[i]: replace with qpr
            }
       }

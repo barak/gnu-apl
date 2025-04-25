@@ -1242,8 +1242,7 @@ const bool funs = requested_NCs & 1 << 6;
 ShapeItem longest = 0;
    loop(n, names.size())
       {
-        if (longest < names[n].size())
-           longest = names[n].size();
+        if (longest < names[n].ssize())   longest = names[n].size();
       }
 
 const Shape shZ(names.size(), longest);
@@ -1267,7 +1266,7 @@ Value_P Z(shZ, LOC);
         loop(l, longest)
            {
              const UCS_string & ucs = names[smallest];
-             Z->next_ravel_Char(l < ucs.size() ? ucs[l] : UNI_SPACE);
+             Z->next_ravel_Char(l < ucs.ssize() ? ucs[l] : UNI_SPACE);
            }
 
         // remove smalles from table

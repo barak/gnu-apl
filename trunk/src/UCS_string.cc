@@ -242,13 +242,13 @@ UCS_string digits;
            {
              // 10.0 or more is a rounding error from 9,999...
              digits.append(Unicode(10 + '0'));
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
+             while (digits.ssize() < (quad_pp + 2))   digits.append(UNI_0);
              break;
            }
         else if (value < 0.0)
            {
              // less than 0.0 is a rounding error from 0.000...
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
+             while (digits.ssize() < (quad_pp + 2))   digits.append(UNI_0);
              break;
              digits.append(UNI_0);
              value = 0.0;
@@ -343,17 +343,17 @@ const Unicode last = digits.back();
            {
              loop(e, expo + 1)
                 {
-                  if (e < digits.size())   append(digits[e]);
-                  else                     append(UNI_0);
+                  if (e < digits.ssize())   append(digits[e]);
+                  else                      append(UNI_0);
                 }
 
-             if ((expo + 1) < digits.size())   // there are fractional digits
+             if ((expo + 1) < digits.ssize())   // there are fractional digits
                 {
                   append(UNI_FULLSTOP);
-                  for (int e = expo + 1; e < digits.size(); ++e)
+                  for (int e = expo + 1; e < digits.ssize(); ++e)
                      {
-                       if (e < digits.size())   append(digits[e]);
-                       else                     break;
+                       if (e < digits.ssize())   append(digits[e]);
+                       else                      break;
                      }
                 }
            }
@@ -475,7 +475,7 @@ const int chunk_len = col ? quad_PW - 6 : quad_PW;
    //  then return the length of the rest.
    //
 int pos = col + chunk_len;
-   if (pos >= size())   return size() - col;
+   if (pos >= ssize())   return ssize() - col;
 
    // otherwise the rest does not fit into ⎕PW. Find a whitespace
    // at which the line should be broken.
@@ -577,8 +577,8 @@ ShapeItem count = 0;
       }
 
    if (count == 0)        return;      // no leading whitspaces
-   if (count == size())   clear();     // only whitespaces
-   else                   vector<Unicode>::erase(begin(), begin() + count);
+   if (count == ssize())   clear();     // only whitespaces
+   else                    vector<Unicode>::erase(begin(), begin() + count);
 }
 //----------------------------------------------------------------------------
 void
@@ -591,8 +591,8 @@ UCS_string::split_ws(UCS_string & rest)
          if (Avec::is_white(at(clen)))   // first whilespace: end of command
             {
               ShapeItem arg = clen;
-              while (arg < size() && Avec::is_white(at(arg)))   ++arg;
-              while (arg < size())   rest.append(at(arg++));
+              while (arg < ssize() && Avec::is_white(at(arg)))   ++arg;
+              while (arg < ssize())   rest.append(at(arg++));
               resize(clen);
               return;
             }
@@ -604,11 +604,11 @@ UCS_string::copy_black(UCS_string & dest, int idx) const
 {
    // skip leading whitespace
    //
-   while (idx < size() && at(idx) <= ' ')   ++idx;
+   while (idx < ssize() && at(idx) <= ' ')   ++idx;
 
 bool single_quoted = false;
 bool double_quoted = false;
-   while (idx < size() && (at(idx) >  ' ' || single_quoted || double_quoted))
+   while (idx < ssize() && (at(idx) >  ' ' || single_quoted || double_quoted))
          {
            const Unicode uni = at(idx++);
            dest.append(uni);
@@ -618,7 +618,7 @@ bool double_quoted = false;
 
    // skip trailing whitespace
    //
-   while (idx < size() && at(idx) <= ' ')   ++idx;
+   while (idx < ssize() && at(idx) <= ' ')   ++idx;
    return idx;
 }
 //----------------------------------------------------------------------------
@@ -626,18 +626,18 @@ ShapeItem
 UCS_string::LF_count() const
 {
 ShapeItem count = 0;
-   loop(u, size())   if (at(u) == UNI_LF)   ++count;
+   loop(u, ssize())   if (at(u) == UNI_LF)   ++count;
    return count;
 }
 //----------------------------------------------------------------------------
 ShapeItem
 UCS_string::substr_pos(const UCS_string & sub) const
 {
-const ShapeItem start_positions = 1 + size() - sub.size();
+const ShapeItem start_positions = 1 + ssize() - sub.ssize();
    loop(start, start_positions)
       {
         bool mismatch = false;
-        loop(u, sub.size())
+        loop(u, sub.ssize())
            {
              if (at(start + u) != sub[u])
                 {
@@ -655,7 +655,7 @@ const ShapeItem start_positions = 1 + size() - sub.size();
 ShapeItem
 UCS_string::multi_pos(bool expect_end) const
 {
-const ShapeItem end = size() - 2;   // excluding, 3 valid chars
+const ShapeItem end = ssize() - 2;   // excluding, 3 valid chars
    loop(pos, end)   //
        {
          switch(at(pos))
@@ -707,14 +707,14 @@ const ShapeItem end = size() - 2;   // excluding, 3 valid chars
 bool
 UCS_string::has_black() const
 {
-   loop(s, size())   if (!Avec::is_white(at(s)))   return true;
+   loop(s, ssize())   if (!Avec::is_white(at(s)))   return true;
    return false;
 }
 //----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const char * prefix) const
 {
-   loop(s, size())
+   loop(s, ssize())
       {
         const char pc = *prefix++;
         if (pc == 0)   return true;   // prefix matches this string.
@@ -732,17 +732,17 @@ bool
 UCS_string::ends_with(const char * suffix) const
 {
 const ShapeItem s_len = strlen(suffix);
-   if (size() < s_len)   return false;
+   if (ssize() < s_len)   return false;
 
    suffix += s_len;    // goto end of suffix
-   loop(s, s_len)   if (at(size() - s - 1) != *--suffix)   return false;
+   loop(s, s_len)   if (at(ssize() - s - 1) != *--suffix)   return false;
    return true;
 }
 //----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const UCS_string & prefix) const
 {
-   if (prefix.size() > size())   return false;
+   if (prefix.ssize() > ssize())   return false;
 
    loop(p, prefix.size())   if (at(p) != prefix[p])   return false;
 
@@ -1077,7 +1077,7 @@ UCS_string ret;
                   continue;
                 }
 
-             if (s >= (size() - 1))   // \ at end of string
+             if (s >= ssize() - 1)   // \ at end of string
                 {
                   ret.append(UNI_BACKSLASH);
                   break;
@@ -1121,7 +1121,7 @@ UCS_string ret;
                int value = 0;
                loop(m, max_len)
                    {
-                     if (s >= (size() - 1))   break;
+                     if (s >= ssize() - 1)   break;
                      const int dig = at(s+1);
                      const char * pos = strchr(hex, dig);
                      if (pos == 0)   break;   // non-hex character
@@ -1238,7 +1238,7 @@ size_t max_len = 0;
              const size_t len = result.back().size();
              if (max_len < len)   max_len = len;
 
-             if (s < size() - 1)   // more coming
+             if (s < ssize() - 1)   // more coming
                 result.push_back(UCS_string());
            }
         else
@@ -1350,7 +1350,7 @@ UCS_string::lexical_before(const UCS_string other) const
 {
    loop(u, size())
       {
-        if (u >= other.size())   return false;   // other is a prefix of this
+        if (u >= other.ssize())   return false;   // other is a prefix of this
         if (at(u) < other.at(u))   return true;
         if (at(u) > other.at(u))   return false;
       }
@@ -1584,7 +1584,7 @@ UCS_string ret;
    // round to last digit may increase the length
 const int ret_len = ret.size();
    ret.round_last_digit();
-   while (ret.size() > ret_len)   ret.pop_back();
+   while (ret.ssize() > ret_len)   ret.pop_back();
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1657,7 +1657,7 @@ UCS_string ret;
    ret.reserve(sorted.size());
 
    ret.append(sorted[0]);
-   for (ShapeItem j = 1; j < size(); ++j)
+   for (ShapeItem j = 1; j < ssize(); ++j)
        {
          if (sorted[j] != ret.back())   ret.append(sorted[j]);
        }
@@ -1670,7 +1670,7 @@ UCS_string
 UCS_string::to_HTML(int offset, bool preserve_ws) const
 {
 UCS_string ret;
-   for (;offset < size(); ++offset)
+   for (;offset < ssize(); ++offset)
       {
         const Unicode uni = at(offset);
         switch(uni)

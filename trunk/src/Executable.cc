@@ -91,7 +91,7 @@ ShapeItem last_semi = -1;
 
    if (last_semi != -1)
       {
-        for (ShapeItem t = last_semi; t < lambda_text.size(); ++t)
+        for (ShapeItem t = last_semi; t < lambda_text.ssize(); ++t)
             header.append(lambda_text[t]);
         text.push_back(header);
 
@@ -332,7 +332,7 @@ Function_PC2 cause_PC(Function_PC_invalid, Function_PC_invalid);
 
 vector<conditional> conditionals;
 
-   for (Function_PC pc = Function_PC_0; pc < body.size(); ++pc)
+   for (Function_PC pc = Function_PC_0; pc < body.ssize(); ++pc)
        {
          switch(body[pc].get_tag())
             {
@@ -536,7 +536,7 @@ int stats_before = 0;
        }
 
 int tidx = 0;
-   while(tidx < line_txt.size())
+   while(tidx < line_txt.ssize())
       {
         if (stats_before == 0)   break;
         if ( Avec::is_diamond(line_txt[tidx++])   // ◊ xxx
@@ -548,7 +548,7 @@ int tidx = 0;
    while (line_txt[tidx] == ' ')   ++tidx;
 
 UCS_string ret;
-   while (tidx < line_txt.size())
+   while (tidx < line_txt.ssize())
       {
         if (Avec::is_diamond(line_txt[tidx]))    break;
         ret.append(line_txt[tidx++]);
@@ -704,7 +704,7 @@ bool optimized = false;
 vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
 
    for (Function_PC PC_before = Function_PC_0, PC_after  = Function_PC_0;
-        int(ranges_before.size()) < stat_before.size();
+        int(ranges_before.size()) < stat_before.ssize();
           ++PC_before, ++PC_after) 
       {
         if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
@@ -855,7 +855,7 @@ int statement = 0;
    //
    if (get_parse_mode() != PM_FUNCTION)   line = 0;
 
-   Assert(line <= text.size());
+   Assert(line <= text.ssize());
 const UCS_string & failed_line = text[line];
 
    // extract the failed statement text from the failed_line
@@ -1216,14 +1216,14 @@ bool in_double_quotes = false;
    //
    for (;;)
        {
-         if (tidx >= text.size())
+         if (tidx >= text.ssize())
             {
               Q1(copying)   Q1(tidx)   Q1(skip)   FIXME;
             }
 
          const UCS_string & line = text[tidx];
 
-         if (tcol >= line.size())   // end of line: wrap to next line
+         if (tcol >= line.ssize())   // end of line: wrap to next line
             {
               ++tidx;     // next line
               tcol = 0;   // first column
@@ -1322,7 +1322,7 @@ void
 Executable::reverse_each_statement(Token_string & tos)
 {
 const ShapeItem last = tos.size();
-   for (ShapeItem from = 0, to = 1; to < tos.size(); ++to)
+   for (ShapeItem from = 0, to = 1; to < tos.ssize(); ++to)
        {
          if (tos[to].get_Class() == TC_END)
             {

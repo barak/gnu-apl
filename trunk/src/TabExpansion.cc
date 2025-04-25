@@ -240,7 +240,7 @@ UCS_string_vector matches;
         matches.sort();
 
         const int common_len = compute_common_length(prefix.size(), matches);
-        if (common_len > prefix.size())
+        if (common_len > prefix.ssize())
            {
              // all matches can be extended in a unique way
              //
@@ -373,7 +373,7 @@ int qpos = -1;   // the position of ⎕ in user_input
 
    loop(e, max_e)
       {
-        if (e >= user_input.size())   break;
+        if (e >= user_input.ssize())   break;
         if (user_input[user_input.size() - e - 1] == UNI_Quad_Quad)
            {
              qpos = user_input.size() - e;
@@ -403,7 +403,7 @@ int qpos = -1;   // the position of ⎕ in user_input
             matches.sort();
 
             const int common_len = compute_common_length(qxx.size(), matches);
-            if (common_len == qxx.size())
+            if (common_len == qxx.ssize())
                {
                  // qxx is already the common part of all matching ⎕xx
                  // display matching ⎕xx
@@ -758,7 +758,7 @@ TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
        {
          loop(m, matches.size())
             {
-              if (len >= matches[m].size())   return matches[m].size();
+              if (len >= matches[m].ssize())   return matches[m].size();
               if (matches[0][len] != matches[m][len])    return len;
             }
        }

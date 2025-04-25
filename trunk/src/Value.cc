@@ -1631,7 +1631,7 @@ Value::equal_string(const UCS_string & ucs) const
    if (get_rank() == 1)        // most likely: char vector
       {
         const ShapeItem len = element_count();
-        if (ucs.size() != len)   return false;   // wrong length
+        if (ucs.ssize() != len)   return false;   // wrong length
         loop(u, len)
             if (ucs[u] != get_cravel(u).get_char_value())   // mismatch
                return false;

@@ -506,7 +506,7 @@ UCS_string ucs(var_name);
    ucs.append(UNI_LEFT_ARROW);
 
    // copy ucs_value except the outer parrentheses
-   for (ShapeItem v = 1; v < (ucs_value.size() - 1); ++v)
+   for (ShapeItem v = 1; v < (ucs_value.ssize() - 1); ++v)
        ucs.append(ucs_value[v]);
 
    Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
@@ -1435,7 +1435,7 @@ UCS_string ret;
 
    loop(u, ucs.size())
       {
-        if ( u < ucs.size() - 6 &&
+        if ( u < ucs.ssize() - 6 &&
              ucs[u]     == '\'' &&
              ucs[u + 1] == ','  &&
              ucs[u + 2] == '('  &&
@@ -1448,11 +1448,11 @@ UCS_string ret;
 
              for (;;)
                  {
-                  while (u < ucs.size() && ucs[u] == ' ')   ++u;
+                  while (u < ucs.ssize() && ucs[u] == ' ')   ++u;
                   if (ucs[u] == ')')   { u += 2;   break; }
 
                   int num = 0;
-                  while (u < ucs.size() && ucs[u] >= '0' && ucs[u] <= '9')
+                  while (u < ucs.ssize() && ucs[u] >= '0' && ucs[u] <= '9')
                      { num *= 10;   num += ucs[u++] - '0'; }
 
                   ret.append(Unicode(num));

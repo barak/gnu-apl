@@ -348,7 +348,7 @@ UCS_string current_format;
          else if (cc == UNI_6)                  // end of field, case 1b.
             {
               ++f;   // next char is right decorator (and end of field)
-              if (f < all_formats.size())
+              if (f < all_formats.ssize())
                  current_format.append(all_formats[f]);
 
               col_formats.push_back(current_format);
@@ -389,10 +389,10 @@ bool overflow = false;
 
 const UCS_string left = format_left_side(data_int, value < 0.0, overflow);
    if (overflow)   return UCS_string(out_size(), Workspace::get_FC(3));
-   Assert(left.size() == (left_deco.out_len + int_part.out_len));
+   Assert(left.ssize() == (left_deco.out_len + int_part.out_len));
 
 const UCS_string right = format_right_side(data_fract, value < 0.0, data_expo);
-   Assert(right.size() == (fract_part.out_len + expo_deco.out_len +
+   Assert(right.ssize() == (fract_part.out_len + expo_deco.out_len +
                            exponent.out_len + right_deco.out_len));
 
    return left + right;
@@ -406,7 +406,7 @@ const UCS_string data = int_part.insert_int_commas(data_int, overflow);
 
    if (overflow)   return UCS_string();
 
-   Assert(int_part.size() >= size_t(data.size()));
+   Assert(int_part.size() >= data.size());
 const Unicode pad_char = int_part.pad_char(Workspace::get_FC(2));
 const UCS_string pad(int_part.size() - data.size(), pad_char);
 
@@ -442,7 +442,7 @@ UCS_string ucs;
    if (fract_part.out_len)
       {
         const UCS_string data = fract_part.insert_fract_commas(data_fract);
-        Assert(fract_part.size() >= size_t(data.size()));
+        Assert(fract_part.size() >= data.size());
         pad_count += fract_part.size() - data.size();
 
         // print nothing instead of .
@@ -468,7 +468,7 @@ UCS_string ucs;
            }
         else                                 // floating enabled and deco hidden
            {
-             data.append(UCS_string(expo_deco.format.size(), pad_char));
+             data.append(UCS_string(expo_deco.format.ssize(), pad_char));
              data.append(data_expo);
            }
 
@@ -512,7 +512,7 @@ bool exponent_pending = false;
 bool have_decimal_point = false;
 
 // left_decorator:
-   while (f < format.size())
+   while (f < format.ssize())
       {
         if (is_control_char(format[f]))   goto integral_part;
         else                              left_deco.format.append(format[f++]);
@@ -520,7 +520,7 @@ bool have_decimal_point = false;
    goto fields_done;
 
 integral_part:
-   while (f < format.size())
+   while (f < format.ssize())
       {
         const Unicode cc = format[f++];
 
@@ -544,7 +544,7 @@ integral_part:
    goto fields_done;
 
 fractional_part:
-   while (f < format.size())
+   while (f < format.ssize())
       {
         const Unicode cc = format[f++];
         if (cc == UNI_7)          exponent_pending = true;
@@ -565,7 +565,7 @@ fractional_part:
 exponent_decorator:
    if (!exponent_pending)   { --f;   goto right_decorator; }
 
-   while (f < format.size())
+   while (f < format.ssize())
       {
         const Unicode cc = format[f++];
 
@@ -581,7 +581,7 @@ exponent_decorator:
       }
 
 exponent_part:
-   while (f < format.size())
+   while (f < format.ssize())
       {
         const Unicode cc = format[f++];
 
@@ -600,8 +600,8 @@ exponent_part:
 right_decorator:   /// the right decorator
 
    if (have_decimal_point &&
-       exponent.format.size() == 0 &&
-       fract_part.format.size() == 0)   // quirk!
+       exponent.format.ssize() == 0 &&
+       fract_part.format.ssize() == 0)   // quirk!
       {
         // this is ambiguous as to whether the decimal point belongs to
         // the number or to the right decorator. lrm says all non-digits
@@ -612,24 +612,24 @@ right_decorator:   /// the right decorator
         right_deco.format.append(UNI_FULLSTOP);
       }
 
-   while (f < format.size())
+   while (f < format.ssize())
       right_deco.format.append(format[f++]);
 
 fields_done:
-   left_deco.out_len = left_deco .format.size();
+   left_deco.out_len = left_deco .format.ssize();
 
-   int_part  .out_len = int_part  .format.size();
+   int_part  .out_len = int_part  .format.ssize();
 
-   if (fract_part.format.size())
-      fract_part.out_len = fract_part.format.size() + 1;
+   if (fract_part.format.ssize())
+      fract_part.out_len = fract_part.format.ssize() + 1;
 
    if (exponent.size())
       {
         expo_deco.out_len = expo_deco.size();
-        exponent.out_len = exponent.format.size() + 1;
+        exponent.out_len = exponent.format.ssize() + 1;
       }
 
-   right_deco.out_len = right_deco.format.size();
+   right_deco.out_len = right_deco.format.ssize();
 
    // compute floating flags.
    //
@@ -652,7 +652,7 @@ Format_sub::map_field(int type)
 {
 int flt_cnt = 0;
 
-   loop(f, format.size())
+   loop(f, format.ssize())
       {
         switch(format[f])
            {
@@ -672,10 +672,10 @@ int flt_cnt = 0;
 
    if (flt_mask & (BIT_0 | BIT_9))
       {
-        min_len = format.size();
-        loop(f, format.size())
+        min_len = format.ssize();
+        loop(f, format.ssize())
             {
-              const size_t pos = (type == 1) ? format.size() - f - 1 : f;
+              const size_t pos = (type == 1) ? format.ssize() - f - 1 : f;
               const Unicode uni = format[pos];
               if (uni == UNI_0)   break;
               if (uni == UNI_9)   break;
@@ -818,7 +818,7 @@ Unicode fill_char = UNI_SPACE;
    // BIT_9: pad with 0
    if (flt_mask & (BIT_0 | BIT_8 | BIT_9))   // format has a '0', '8', or '9'
       {
-        loop(f, format.size())
+        loop(f, format.ssize())
            {
              const Unicode format_char = format[f];
               if (format_char == UNI_0 || format_char == UNI_9)
@@ -844,12 +844,12 @@ UCS_string ucs;
 size_t d = data.size();
 
    // d  runs downwards from data.size()   to 0
-   // f1 runs upwards  from 0              to  format.size()
-   // f  runs downwards from format.size() to 0
+   // f1 runs upwards  from 0              to  format.ssize()
+   // f  runs downwards from format.ssize() to 0
    //
-   loop(f1, format.size())
+   loop(f1, format.ssize())
       {
-        const size_t f = format.size() - f1 - 1;
+        const size_t f = format.ssize() - f1 - 1;
         const Unicode format_char = format[f];
          if (format_char == UNI_COMMA)
             {
@@ -890,7 +890,7 @@ Format_sub::insert_fract_commas(const UCS_string & data) const
 UCS_string ucs;
 int d = 0;
 
-   loop(f, format.size())
+   loop(f, format.ssize())
       {
         const Unicode format_char = format[f];
          if (format_char == UNI_COMMA)
@@ -899,8 +899,8 @@ int d = 0;
             }
          else if (Avec::is_digit(format_char))
             {
-              if (d < data.size())   ucs.append(data[d++]);
-              else                   break;
+              if (d < data.ssize())   ucs.append(data[d++]);
+              else                    break;
             }
          else
             {
@@ -1106,7 +1106,7 @@ bool has_complex = false;
              Value_P value = cell.get_pointer_value();
              UCS_string data = value->get_UCS_ravel();
 
-             if (width && data.size() > width)   // overflow
+             if (width && data.ssize() > width)   // overflow
                 {
                   if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
 
@@ -1140,7 +1140,7 @@ bool has_complex = false;
             if (value < minval && value > -minval)   value = 0.0;
 
              UCS_string data = format_float_by_spec(value, precision);
-             if (width && data.size() > width)   // overflow
+             if (width && data.ssize() > width)   // overflow
                 {
                   if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
                   data = UCS_string(width, Workspace::get_FC(3));
@@ -1180,7 +1180,7 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
       }
    else if (!has_num)    // only chars: align left
       {
-        const int d = ret.get_column_count() - data.size();
+        const int d = ret.get_column_count() - data.ssize();
         if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
         else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
         ret.append_ucs(data);

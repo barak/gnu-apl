@@ -547,6 +547,6 @@ SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
 
 SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
-   if (max_name_len < name.size())   max_name_len = name.size();
+   if (max_name_len < name.ssize())   max_name_len = name.size();
 }
 //----------------------------------------------------------------------------

@@ -495,7 +495,7 @@ XML_Saving_Archive::save_Parser(const StateIndicator & si)
 const Prefix & prefix = si.current_stack;
 
    do_indent();
-    outf << "<Parser size=\""      << prefix.size()
+    outf << "<Parser size=\""      << prefix.ssize()
         << "\" assign-pending=\"" << prefix.get_assign_state()
         << "\" action=\""         << prefix.action
         << "\" lookahead-high=\"" << prefix.get_lookahead_PC()
@@ -509,9 +509,9 @@ const Prefix & prefix = si.current_stack;
 
    // write the lookahead token, starting at the fifo's get position
    //
-   loop(s, prefix.size())
+   loop(s, prefix.ssize())
       {
-        const Token_loc & tloc = prefix.at(prefix.size() - s - 1);
+        const Token_loc & tloc = prefix.at(prefix.ssize() - s - 1);
         save_token_loc(tloc);
       }
 
@@ -2791,8 +2791,8 @@ Prefix & parser = si.current_stack;
               Token_loc tl;
               read_Token(tl);
 
-              if (parser.size() < stack_size)   parser.push(tl);
-              else                    parser.saved_MISC.copy(tl, LOC);
+              if (parser.ssize() < stack_size)   parser.push(tl);
+              else                             parser.saved_MISC.copy(tl, LOC);
             }
        }
 

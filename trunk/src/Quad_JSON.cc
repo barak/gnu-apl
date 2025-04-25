@@ -321,7 +321,7 @@ const ShapeItem B0 = b++;   // the leading "
    Assert(ucs_B[B0] == UNI_DOUBLE_QUOTE);
 
 ShapeItem content_len = 0;
-   for (; b < ucs_B.size(); ++b)
+   for (; b < ucs_B.ssize(); ++b)
        {
          const Unicode uni = ucs_B[b];
          if (uni == UNI_DOUBLE_QUOTE)   return content_len;

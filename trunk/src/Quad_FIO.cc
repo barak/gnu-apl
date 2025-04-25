@@ -272,7 +272,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
 
 #define COUNT_ARG if   (conversion_count_A++ >= arg_count_B)   goto missing_arg
 
-   for (int fA = 0; fA < A_format.size(); /* no fA++ */ )
+   for (int fA = 0; fA < A_format.ssize(); /* no fA++ */ )
        {
          const Unicode uni = A_format[fA++];
          if (uni != UNI_PERCENT)   // not %
@@ -292,7 +292,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
          bool thousands = false;   // print thousands separator (',')
          for (;;)
              {
-               if (fA >= A_format.size())
+               if (fA >= A_format.ssize())
                   {
                     // After having seen a %, the end of the format string was
                     // reached without seeing the conversion specifier.
@@ -616,7 +616,7 @@ public:
             }
          else        // data comes from a UCS_string
             {
-              if (offset >= string->size())   return UNI_EOF;
+              if (offset >= string->ssize())   return UNI_EOF;
               ++unicodes_read;
               return (*string)[offset++];
             }
@@ -662,7 +662,7 @@ public:
               lookahead = Invalid_Unicode;
             }
 
-         while (cidx < (sizeof(cc) - 1) && offset < string->size())
+         while (cidx < (sizeof(cc) - 1) && offset < string->ssize())
             {
               const Unicode uni = get_next();
               if (Avec::is_digit(uni))       cc[cidx++] = uni;   // 0-9
@@ -708,7 +708,7 @@ public:
               lookahead = Invalid_Unicode;
             }
 
-         while (cidx < (sizeof(cc)) - 1 && offset < string->size())
+         while (cidx < (sizeof(cc)) - 1 && offset < string->ssize())
             {
               const Unicode uni = get_next();
               if (uni == UNI_OVERBAR)                  cc[cidx++] = '-';   // ¯
@@ -743,14 +743,14 @@ Token
 Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
                    int function_number)
 {
-   if (format.size() == 0)   LENGTH_ERROR;
+   if (format.ssize() == 0)   LENGTH_ERROR;
 
    // we take the total number of % as an upper bound for the number of items.
    // the real count may be lower due to %% and assugnment suppression. We fix
    // that after label out: below
    //
 ShapeItem count = 0;
-   loop(f, format.size() - 1)
+   loop(f, format.ssize() - 1)
       {
         if (format[f] == UNI_PERCENT)   ++count;
       }
@@ -760,7 +760,7 @@ Value_P Z(count, LOC);
 Unicode lookahead = input.get_next();
    if (lookahead == UNI_EOF)   goto out;
 
-   loop(f, format.size())
+   loop(f, format.ssize())
       {
         const Unicode fmt_ch = format[f];
         if (fmt_ch == UNI_SPACE)
@@ -793,7 +793,7 @@ Unicode lookahead = input.get_next();
         Unicode conv = Unicode_0;   // no conversion specifier
         int conv_len = 0;
         bool suppress = false;
-        for (;f < format.size(); ++f)
+        for (;f < format.ssize(); ++f)
            {
              const Unicode cc = format[f];
              if (cc == UNI_ASTERISK ||      // *: assignment character
@@ -884,7 +884,7 @@ Unicode lookahead = input.get_next();
              while (lookahead > UNI_SPACE)
                  {
                    ucs.append(lookahead);
-                   if (conv_len && ucs.size() >= conv_len)   break;
+                   if (conv_len && ucs.ssize() >= conv_len)   break;
                    lookahead = input.get_next();
                    if (lookahead == UNI_EOF)   break;
                  }
@@ -910,24 +910,24 @@ Unicode lookahead = input.get_next();
              // shall be excluded rather than included. The range itself is
              // not affected, though.
              //
-             if (f == format.size())   LENGTH_ERROR;
+             if (f == format.ssize())   LENGTH_ERROR;
              const bool excluding = format[f] == UNI_CIRCUMFLEX   // ^
                                  || format[f] == UNI_AND;
             if (excluding)   ++f;   // skip ^ or ∧
 
              UCS_string range;   // the character range to be in- or excluded
-             range.reserve(format.size());
+             range.reserve(format.ssize());
 
              // if the next char is ] then it shall belong to the range,
              // otherwise it terminates the range than ending it.
-             if (f == format.size())   LENGTH_ERROR;
+             if (f == format.ssize())   LENGTH_ERROR;
              if (format[f] == UNI_R_BRACK)   range.push_back(format[f++]);
 
             // the characters of the range, terminated by ]
             //
             for (;;)
                 {
-                 if (f == format.size())   // end of format string
+                 if (f == format.ssize())   // end of format string
                     {
                       MORE_ERROR() << "No ] in character range A of A ⎕FIO["
                                    << function_number << "] B";
@@ -974,11 +974,11 @@ Unicode lookahead = input.get_next();
              // 2. create the APL result
              //
              UCS_string ucs;
-             ucs.reserve(format.size());
+             ucs.reserve(format.ssize());
              for (;;)
                  {
                    if (lookahead == UNI_EOF)                 break;
-                   if (conv_len && ucs.size() >= conv_len)   break;
+                   if (conv_len && ucs.ssize() >= conv_len)   break;
 
                    if (range.contains(lookahead) == excluding)
                       {

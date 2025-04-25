@@ -73,7 +73,7 @@ public:
       { loop(l, len)   push_back(*data++); }
 
   /// overload vector::size() so that it returns a signed length
-   ShapeItem size() const
+   ShapeItem ssize() const
       { return  UTF8_string::size(); }
 
    /// return the bytes of this CDR

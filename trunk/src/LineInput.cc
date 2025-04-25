@@ -204,7 +204,7 @@ ofstream outf(filename);
       }
 
 int count = 0;
-   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)
+   for (ShapeItem p = put + 1; p < hist_lines.ssize(); ++p)
       {
         outf << hist_lines[p] << endl;
         ++count;
@@ -234,7 +234,7 @@ LineHistory::print_history(ostream & out, const UCS_string & filter) const
 {
    // hist_lines is a ring buffer. first print its tail, then its head.
 
-   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)   // tail
+   for (ShapeItem p = put + 1; p < hist_lines.ssize(); ++p)   // tail
       {
         if (filter.size() && !hist_lines[p].starts_iwith(filter))   continue;
         out << "      " << hist_lines[p] << endl;
@@ -255,7 +255,7 @@ LineHistory::add_line(const UCS_string & line)
    // remove leading blanks
    //
 int blanks = 0;
-   while (blanks < line.size() && line[blanks] <= UNI_SPACE)   ++blanks;
+   while (blanks < line.ssize() && line[blanks] <= UNI_SPACE)   ++blanks;
 
    // a repeated cut-and-paste of entire lines increases the indentation every
    // time due to the APL input prompt). We therefore limit this effect
@@ -443,7 +443,7 @@ const int saved_uidx = uidx;
 
    adjust_allocated_height();
    set_cursor();
-   for (; uidx < user_line.size(); ++uidx)
+   for (; uidx < user_line.ssize(); ++uidx)
        {
          refresh_wrapped_cursor();
          CIN << user_line[uidx];
@@ -487,7 +487,7 @@ const int saved_uidx = uidx;
 void
 LineEditContext::delete_char()
 {
-   if (uidx == (user_line.size() - 1))   // cursor on last char
+   if (uidx == (user_line.ssize() - 1))   // cursor on last char
       {
         CIN << ' ' << UNI_BS;
         user_line.pop_back();
@@ -504,7 +504,7 @@ LineEditContext::delete_char()
 void
 LineEditContext::insert_char(Unicode uni)
 {
-   if (uidx >= user_line.size())   // append char
+   if (uidx >= user_line.ssize())   // append char
       {
         user_line.append(uni);
         adjust_allocated_height();
@@ -532,7 +532,7 @@ LineEditContext::insert_char(Unicode uni)
 void
 LineEditContext::cut_to_EOL()
 {
-   if (uidx >= user_line.size())   return;   // nothing to cut
+   if (uidx >= user_line.ssize())   return;   // nothing to cut
 
    cut_buffer = UCS_string(user_line, uidx, user_line.size() - uidx);
    user_line.resize(uidx);
@@ -544,7 +544,7 @@ LineEditContext::paste()
 {
    if (cut_buffer.size() == 0)   return;
 
-   if (uidx >= user_line.size())   // append cut buffer
+   if (uidx >= user_line.ssize())   // append cut buffer
       {
         user_line.append(cut_buffer);
       }

@@ -56,7 +56,7 @@ Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
 void
 Prefix::clean_up()
 {
-   loop(s, size())
+   loop(s, ssize())
       {
         Token & tok = at(s).get_token();
         if (tok.get_Class() == TC_VALUE)
@@ -89,7 +89,7 @@ Prefix::syntax_error(const char * loc)
 
    // clear values in FIFO
    //
-   loop (s, size())
+   loop (s, ssize())
       {
         Token & tok = at(s).get_token();
         if (tok.get_Class() == TC_VALUE)
@@ -110,7 +110,7 @@ Prefix::syntax_error(const char * loc)
    // see if error was caused by a function not returning a value.
    // In that case we throw a value error instead of a syntax error.
    //
-   loop (s, size())
+   loop (s, ssize())
       {
         if (at(s).get_Class() == TC_VOID)
            {
@@ -127,7 +127,7 @@ Prefix::syntax_error(const char * loc)
 bool
 Prefix::uses_function(const UserFunction * ufun) const
 {
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() == TV_FUN &&
@@ -152,7 +152,7 @@ Prefix::has_quad_LRX() const
         B  [X]                       in  5 6 [2]
     */
 
-   switch(size())
+   switch(ssize())
       {
         case 0:  return false;
         case 1:  return false;
@@ -171,7 +171,7 @@ Prefix::is_value_parenthesis(int pc) const
    Assert1(body[pc].get_Class() == TC_R_PARENT);
 
    ++pc;
-   if (pc >= int(body.size()))   return true;   // syntax error
+   if (pc >= int(body.ssize()))   return true;   // syntax error
 
 TokenClass next = body[pc].get_Class();
 
@@ -180,7 +180,7 @@ TokenClass next = body[pc].get_Class();
         const int offset = body[pc].get_int_val2();
         pc += offset;
         Assert1(body[pc].get_Class() == TC_L_BRACK);   // opening [
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
         next = body[pc].get_Class();
       }
 
@@ -204,11 +204,11 @@ TokenClass next = body[pc].get_Class();
         if (!is_value_parenthesis(pc))   return false;   // (fun)) XXX
         const int offset = body[pc].get_int_val2();
         pc += offset;
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
         next = body[pc].get_Class();
         Assert1(next == TC_L_PARENT);   // opening (
         ++pc;
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
 
         //   (val)) XXX
         //  ^
@@ -232,7 +232,7 @@ TokenClass next = body[pc].get_Class();
    // dyadic operator with numeric function argument, for example:  ⍤ 0
    //
    if (next == TC_VALUE                  &&
-       pc < Function_PC(body.size() - 1) &&
+       pc < Function_PC(body.ssize() - 1) &&
        body[pc+1].get_Class() == TC_OPER2)   return false;
 
    return true;
@@ -263,7 +263,7 @@ Prefix::collect_symbols(vector<Symbol *> & symbols)
    //
    // return the TOK_LSYMB2 symbols left of \b PC.
    //
-   while (PC < Function_PC(body.size()))
+   while (PC < Function_PC(body.ssize()))
        {
          const Token & tok = body[PC];
          if (tok.get_ValueType() != TV_SYM)   break;
@@ -281,10 +281,10 @@ Prefix::print_stack(ostream & out, const char * loc) const
 {
 const int si_depth = si.get_level();
 
-   out << "fifo[si=" << si_depth << " len=" << size()
+   out << "fifo[si=" << si_depth << " len=" << ssize()
        << " PC=" << PC << "] is now :";
 
-   loop(s, size())
+   loop(s, ssize())
       {
         const TokenClass tc = at(s).get_Class();
         out << " " << Token::class_name(tc);
@@ -299,7 +299,7 @@ Prefix::show_owners(const char * prefix, ostream & out,
 {
 int count = 0;
 
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() != TV_VAL)      continue;
@@ -342,7 +342,7 @@ Prefix::value_expected() const
 
    // look ahead further until value index vs. function axis can be decided.
    //
-   for (ShapeItem pc = PC; pc < body.size();)
+   for (ShapeItem pc = PC; pc < body.ssize();)
       {
         const Token & tok = body[pc++];
         switch(tok.get_Class())
@@ -382,7 +382,7 @@ Prefix::value_expected() const
 void
 Prefix::unmark_all_values() const
 {
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() != TV_VAL)      continue;
@@ -410,7 +410,7 @@ Prefix::push_Symbol(Token_loc & tl)
       }
 
 Symbol * const symbol = tl.get_token().get_sym_ptr();
-   if (PC < body.size() && body[PC].get_tag() == TOK_OPER2_INNER)
+   if (PC < body.ssize() && body[PC].get_tag() == TOK_OPER2_INNER)
       {
         /* The APL code is .SYM which could be:
  
@@ -459,7 +459,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
         return false;
       }
 
-   if (size()                        &&          // at0() is valid,
+   if (ssize()                       &&          // at0() is valid,
        at0().get_Class() == TC_INDEX &&          // at0() is [...;... ], and
        tl.get_tag() == TOK_SYMBOL)   // user defined variable
       {
@@ -505,7 +505,7 @@ Prefix::push_END_error()
 
    // provide help on some common cases...
    //
-   for (int j = 1; j < (size() - 1); ++j)
+   for (int j = 1; j < ssize() - 1; ++j)
        {
          if ( (at(j)    .get_Class() == TC_ASSIGN) &&
               (at(j + 1).get_Class() == TC_VALUE))
@@ -534,7 +534,7 @@ UCS_string & more = MORE_ERROR();
    enum { MAX_j = 4 };   // limit for the number of tokens displayed
    loop(j, MAX_j)
        {
-         const bool rightmost = (j == size() - 1);   // end of phrase
+         const bool rightmost = (j == ssize() - 1);   // end of phrase
          const Token & tok = at(j).get_token();
          more << " ";
          if (tok.is_function())   // token is a function
@@ -543,7 +543,7 @@ UCS_string & more = MORE_ERROR();
               more << fun->get_name();
               if (rightmost)   // rightmost token is a function
                  {
-                   if (MAX_j < size())   more << "...";
+                   if (MAX_j < ssize())   more << "...";
 
                    // frequent error: missing right argument of a non-niladic
                    // function.
@@ -558,7 +558,7 @@ UCS_string & more = MORE_ERROR();
                  more << UCS_string(name, 4, name.size() - 4);
               else
                  more << name;
-              if (rightmost && MAX_j < size())   more << "...";
+              if (rightmost && MAX_j < ssize())   more << "...";
             }
 
          if (rightmost)   break;
@@ -586,7 +586,7 @@ again:
    // The caller wants one more Token, but we may not have any. In that
    /// case: prepare the )MORE info and throw a SYNTAX_ERROR.
    //
-   if (size() && at0().get_Class() == TC_END)   push_END_error();
+   if (ssize() && at0().get_Class() == TC_END)   push_END_error();
 
 const Function_PC old_PC = PC++;
 const Token & tok = body[old_PC];
@@ -594,7 +594,7 @@ const TokenClass tcl = tok.get_Class();
    Log(LOG_prefix_parser)
       {
         CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
-             << "] Read token[" << size()
+             << "] Read token[" << ssize()
              << "] (←" << get_assign_state() << "←) " << tok << " "
              << Token::class_name(tcl) << endl;
       }
@@ -604,7 +604,7 @@ const TokenClass tcl = tok.get_Class();
    if (tok.get_tag() == TOK_GOTO_PC)   // →N
       {
         PC = Function_PC(tok.get_int_val());
-        Assert1(size() == 0);
+        Assert1(ssize() == 0);
         goto again;
       }
 
@@ -629,7 +629,7 @@ const Token_loc tloc(tok, old_PC);
 inline void
 Prefix::find_best_phrase()
 {
-const int s_max = size() < 4 ? size() : 4;
+const int s_max = ssize() < 4 ? ssize() : 4;
 const int s_max_1 = s_max - 1;
 unsigned int hash[4] = { at0().get_Class() };
    for (int s = 0; s < s_max_1;)
@@ -733,7 +733,7 @@ Prefix::reduce_statements()
              << "]) ============================================" << endl;
       }
 
-   if (size())   goto again;
+   if (ssize())   goto again;
 
    // the main loop of an LALR(1) parser...
    //
@@ -845,7 +845,7 @@ inline bool
 Prefix::check_next_binding()
 {
 TokenClass next = TC_INVALID;   // assume no bext
-    if (PC < Function_PC(body.size()))
+    if (PC < Function_PC(body.ssize()))
        {
          const Token & tok = body[PC];
          next = tok.get_Class();
@@ -960,24 +960,24 @@ Prefix::locate_L(UCS_string & function) const
         2   ÷   0   3            in 2 ÷ 0   (⎕L is 2)
     */
 
-   if (size() && at0().get_ValueType() == TV_FUN)
+   if (ssize() && at0().get_ValueType() == TV_FUN)
       {
-        // e.g. DOMAIN ERROR in × ÷ 0. size() is 2 and at0() is ÷
+        // e.g. DOMAIN ERROR in × ÷ 0. ssize() is 2 and at0() is ÷
         function = at0().get_function()->get_name();
         return 0;
       }
 
-   if (size() > 1 && at1().get_ValueType() == TV_FUN)
+   if (ssize() > 1 && at1().get_ValueType() == TV_FUN)
       {
         function = at1().get_function()->get_name();
       }
-   else if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   else if (ssize() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_ASCII_string("[]");
         return at0().get_apl_valp();
       }
 
-   if (size() < 3)   return 0;
+   if (ssize() < 3)   return 0;
 
    if (at0().get_Class() == TC_VALUE)   return at0().get_apl_valp();
    return 0;
@@ -988,9 +988,9 @@ Prefix::locate_R(UCS_string & function) const
 {
    // ⎕R requires at least f B (so we have at0() and at1()
 
-   if (size() < 2)   return 0;
+   if (ssize() < 2)   return 0;
 
-   if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   if (ssize() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_ASCII_string("[]");   // valid function
         return 0;                      // but no ⎕R.
@@ -1002,7 +1002,7 @@ Prefix::locate_R(UCS_string & function) const
    if (at0().get_ValueType() != TV_FUN &&
        at1().get_ValueType() != TV_FUN)   return 0;
 
-const Token & ret = content[size() - prefix_len].get_token();
+const Token & ret = content[ssize() - prefix_len].get_token();
    if (ret.get_Class() == TC_VALUE)   return ret.get_apl_valp();
    return 0;
 }
@@ -1012,12 +1012,12 @@ Prefix::locate_X(UCS_string & function) const
 {
    // ⎕X requires at least X B (so we have at0() and at1()
 
-   if (size() < 2)   return 0;
+   if (ssize() < 2)   return 0;
 
    // either at0() (for monadic f X B) or at1() (for dyadic A f X B) must
    // be a function or operator
    //
-   rev_loop(x, size())
+   rev_loop(x, ssize())
        {
          if (content[x].get_ValueType() == TV_FUN)
             {
@@ -1043,7 +1043,7 @@ Prefix::print(ostream & out, int indent) const
 {
    loop(i, indent)   out << "    ";
    out << "Token: ";
-   loop(s, size())   out << " " << at(s).get_token();
+   loop(s, ssize())   out << " " << at(s).get_token();
    out << endl;
 }
 //----------------------------------------------------------------------------
@@ -1731,7 +1731,7 @@ const bool member_assign = prefix_len == 4;   // assume member reference
 vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
-   while (PC < (body.size() - 1))   // at least 2 more token
+   while (PC < body.ssize() - 1)   // at least 2 more token
          {
            if (body[PC].get_Class() == TC_SYMBOL)   // the normal case
               {
@@ -1911,7 +1911,7 @@ Prefix::reduce_F_D_C_B()
    // reduce, except if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
    //
-   if (PC < Function_PC(body.size()))
+   if (PC < Function_PC(body.ssize()))
         {
           const Token & tok = body[PC];
           TokenClass next =  tok.get_Class();
@@ -2371,7 +2371,7 @@ Value_P B = at3().get_apl_val();
    //
 const Token result(TOK_APL_VALUE2, at3().get_apl_val());
    pop_args_push_result(result);
-   if (PC >= body.size() ||
+   if (PC >= body.ssize() ||
        body[PC++].get_Class() != TC_L_PARENT)   syntax_error(LOC);
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -2382,7 +2382,7 @@ Prefix::reduce_END_VOID__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
 const bool trace = end_of_line && (at0().get_int_val() & 1);
@@ -2408,7 +2408,7 @@ Prefix::reduce_END_B__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
 const Token END = pop().get_token();   // pop END
 const bool end_of_line = END.get_tag() == TOK_ENDL;
@@ -2546,11 +2546,11 @@ const APL_Integer jump_offset = A0.get_near_int();
         // function (token ENDL). However, that skips the return of the
         // ∇-result. Fix it.
         //
-        if (PC >= body.size())           // PC at or past end of function
+        if (PC >= body.ssize())           // PC at or past end of function
            {
              Assert(body[PC-1].get_tag() == TOK_ENDL);
              Assert(body[PC].get_Class() == TC_RETURN);
-             PC = Function_PC(body.size() -1);
+             PC = Function_PC(body.ssize() -1);
            }
       }
    else         // ⍎ or ◊ context
@@ -2673,7 +2673,7 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
          const Function_PC new_PC = Function_PC(at1().get_int_val());
          if (new_PC == Function_PC_done)   // →0 etc.
             {
-              PC = Function_PC(body.size() - 1);   // RETURN_XXX
+              PC = Function_PC(body.ssize() - 1);   // RETURN_XXX
               const Token result(TOK_VOID);
               pop_args_push_result(result);
               set_action(RA_CONTINUE);      // return from defined function
@@ -2688,7 +2688,7 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
 
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
    si.fun_oper_cache.reset();
 
@@ -2751,7 +2751,7 @@ Prefix::reduce_RETC___()
 {
    Assert1(prefix_len == 1);
 
-   if (size() != 1)   syntax_error(LOC);
+   if (ssize() != 1)   syntax_error(LOC);
 
    // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
    // discarded and no reset() of it is required.
@@ -2835,7 +2835,7 @@ Prefix::reduce_RETC_A__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   // there extra tokens
+   if (ssize() != 2)   // there extra tokens
       {
         syntax_error(LOC);
       }
@@ -2867,7 +2867,7 @@ Prefix::reduce_RETC_GOTO_B_()
    // Note: reduce_RETC_GOTO_B__ can only happen for context ⍎, since
    //       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
 
-   if (size() != 3)   syntax_error(LOC);
+   if (ssize() != 3)   syntax_error(LOC);
 
    // monadic →LABEL.
 
@@ -2940,7 +2940,7 @@ Prefix::reduce_RETC_GOTO__()
    // Note: reduce_RETC_ESC___ can only happen for context ⍎, since
    //       contexts ◊ and ∇ use reduce_END_ESC___ instead
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
    reduce_END_GOTO__();
 }
