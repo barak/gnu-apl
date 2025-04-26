@@ -784,7 +784,7 @@ vector<ShapeItem> ends;
    //
    rev_loop(pc, tos.ssize())
        {
-         if (pc < 3)   break;   // to few tokens remaining in tos
+         if (pc < 4)   break;   // to few tokens remaining in tos
 
          // at this point we have at least:
          //
