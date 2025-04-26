@@ -922,13 +922,12 @@ Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
 {
    //  must be an array index of the form [something; 2]
    //
-   if (IDX.get_rank() != 2)   INDEX_ERROR;
+   if (IDX.get_rank() != 2)   RANK_ERROR;
 
    // The only point of getting X2 is to check that it is not elided
    // but quasi-scalar qio + 1
    //
 const Value * X2 = IDX.get_axis_value(1);
-
 const APL_Integer qio = Workspace::get_IO();
 
    if (!X2)                                          INDEX_ERROR;
@@ -936,9 +935,20 @@ const APL_Integer qio = Workspace::get_IO();
    if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
    if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
 
-const Value * X1 = IDX.get_axis_value(0);
-
-   assign_indexed(X1, B);
+   if (const Value * X1 = IDX.get_axis_value(0))   // normal index
+      {
+        assign_indexed(X1, B);
+      }
+   else                                            // elided index: ⎕SYL[;2]←B
+      {
+        Value_P E1(SYL_MAX, LOC);
+        loop(col, E1->element_count())
+            {
+              E1->next_ravel_Int(col + qio);
+            }
+        E1->check_value(LOC);
+        assign_indexed(E1.get(), B);
+      }
 }
 //----------------------------------------------------------------------------
 void
