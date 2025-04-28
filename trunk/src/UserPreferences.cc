@@ -1012,7 +1012,8 @@ UserPreferences::expand_args(const std::vector<const char *> & args)
    //
    loop(a, args.size())   expanded_args.push_back(args[a]);
 
-   if (args.size() <= 1)   // program name argv[0] only (arguments to expand)
+const size_t argc = args.size();
+   if (argc <= 1)   // program name argv[0] only (arguments to expand)
       {
         return;
       }
@@ -1023,7 +1024,7 @@ UserPreferences::expand_args(const std::vector<const char *> & args)
         return;
       }
 
-   if (!is_APL_script(args[2]))   return;   // not run from a script
+   if (argc > 2 && !is_APL_script(args[2]))   return;   // not run from a script
 
    /* at this point:
 
