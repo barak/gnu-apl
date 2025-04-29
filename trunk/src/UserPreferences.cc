@@ -978,9 +978,10 @@ UserPreferences::parse_args_2(bool logit)
 /**
     GNU APL can be started in a number of ways:
 
-    1. directly - argc/argv have the usual meaning
+    1. directly - argc/argv have the usual meaning. For example:
+       /usr/local/bin/apl [ binargs... ]
 
-    2. as a script without arguments on the first script line, e.g.
+    2. as a script without arguments on the first script line. For example:
        /usr/bin/apl SCRIPT.apl [ scriptargs... ]
 
     3. as a script with arguments on the first script line, e.g.
@@ -999,7 +1000,7 @@ UserPreferences::parse_args_2(bool logit)
     /usr/bin/apl -s --             at least on GNU/linux
     /usr/bin/apl --script --       at least on GNU/linux
 
-    expand_args() does the following:
+    Function expand_args() does the following:
 
     1. expand argv[1] into multiple arguments
     2. maybe set script_argc
@@ -1024,7 +1025,7 @@ const size_t argc = args.size();
         return;
       }
 
-   if (argc > 2 && !is_APL_script(args[2]))   return;   // not run from a script
+   if (argc >= 2 && !is_APL_script(args[2]))   return;   // not run from a script
 
    /* at this point:
 
@@ -1042,6 +1043,7 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
       }
 
    // remove expanded_args[1] and insert the expanded expanded_args[1] instead
+   // 
    expanded_args.erase(expanded_args.begin() + 1);
    --script_argc;
    for (int index = 1;;)

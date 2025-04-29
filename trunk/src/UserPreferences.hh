@@ -216,12 +216,13 @@ protected:
    bool parse_args_0(const std::vector<const char *> & args);
 
    /// parse \b expanded_args (BEFORE reading preference
-   /// files). Parses the -l, -p, -C, and -u options. Return true iff
-   /// startup-logging was requested.
+   /// files). Parses (only) the -l, -p, -C, and -u options.
+   /// Return true iff startup-logging was requested (from parse_args_0).
    bool parse_args_1();
 
    /// parse \b expanded_args (AFTER reading preference files)
-   /// Parses all valid options.
+   /// Parses all valid options (and overwrite any corresponding settings in
+   /// the preference files).
    void parse_args_2(bool logit);
 
    /// decode a byte in a preferences file. The byte can be given as ASCII name
