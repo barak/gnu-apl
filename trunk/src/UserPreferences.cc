@@ -1000,6 +1000,20 @@ UserPreferences::parse_args_2(bool logit)
     /usr/bin/apl -s --             at least on GNU/linux
     /usr/bin/apl --script --       at least on GNU/linux
 
+    If (!) GNU APL is started from an (executable) script, then:
+
+    A.  argv[0] is the program name (= GNU APL interpreter). I.e. the first
+        item on the shebang line
+            of the script, typically /usr/local/apl.
+    B1. if the shebang line contains any arguments, then:
+        argv[1] is the script arguments separated by blanks, and
+        argv[2] is the path to the script
+    B2. Otherwise (no arguments on the shebang line) then:
+        argv[1] is the path to the script
+
+    C.  the argguments from the command line (if any) follow after the path
+        to the script.
+
     Function expand_args() does the following:
 
     1. expand argv[1] into multiple arguments
@@ -1011,41 +1025,45 @@ UserPreferences::expand_args(const std::vector<const char *> & args)
 {
    // 1. copy the command line arguments into expanded_args.
    //
-   loop(a, args.size())   expanded_args.push_back(args[a]);
-
 const size_t argc = args.size();
-   if (argc <= 1)   // program name argv[0] only (arguments to expand)
+   loop(a, argc)   expanded_args.push_back(args[a]);
+
+   if (argc <= 1)   // program name argv[0] only (no arguments to expand)
       {
         return;
       }
 
-   if (is_APL_script(args[1]))   // case 2: script without argument
+   // argc >= 2
+   //
+   if (is_APL_script(args[1]))   // case B2: script without argument
       {
         script_argc = 1;
         return;
       }
 
-   if (argc >= 2 && !is_APL_script(args[2]))   return;   // not run from a script
+   if (argc == 2)                             return;   // not run from a script
+   if (argc > 2 && !is_APL_script(args[2]))   return;   // unless B1
 
-   /* at this point:
+   /* case B1. At this point:
 
-      args[1] is the optional argument of the interpreter on the shebang line,
-      args[2] is the name of the script, and
-      args[3] ... are the command line arguments given by the user
+      args[1] is one or more argument(s) of the interpreter on the shebang
+               line, separated by blanks.
+      args[2] is the path to the script, and
+      args[3]... are the command line arguments given by the user
                   when starting the script.
-      expand argv[1], stopping at --
+      expand argv[1], possibly stopping at --
     */
 const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
-   script_argc = 2;
    if (!strchr(apl_args, ' '))   // single option
       {
+        script_argc = 2;   // script name and one script argument
         return;
       }
 
    // remove expanded_args[1] and insert the expanded expanded_args[1] instead
    // 
    expanded_args.erase(expanded_args.begin() + 1);
-   --script_argc;
+   script_argc = 1;   // script name
    for (int index = 1;;)
        {
          // skip leading whitespace
@@ -1061,7 +1079,7 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
               break;   // done
             }
 
-         if (!strncmp(apl_args, "-- ", 2) &&
+         if (!strncmp(apl_args, "--", 2) &&
                apl_args[2] <= ' ')   // "--" somewhere in apl_args
             {
               expanded_args.insert(expanded_args.begin() + index++, "--");

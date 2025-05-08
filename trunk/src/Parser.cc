@@ -766,7 +766,7 @@ Parser::optimize_short_primitives(Token_string & tos)
    // such as 4⍴0 with their result. The scope of tos is one statement.
    //
 bool progress = false;
-   if (tos.ssize() < 3)   return false;   // too short to optimize
+   if (tos.ssize() < 4)   return false;   // too short to optimize
 
 // CERR << endl << "tos: ";   tos.print(CERR, false);
 
@@ -784,7 +784,7 @@ vector<ShapeItem> ends;
    //
    rev_loop(pc, tos.ssize())
        {
-         if (pc < 4)   break;   // to few tokens remaining in tos
+         if (pc <= 4)   break;   // to few tokens remaining in tos
 
          // at this point we have at least:
          //
@@ -802,7 +802,10 @@ vector<ShapeItem> ends;
          // for the dyadic cases. Below we refer to the dyadic END as Q and
          // to the monadic END as AQ (since its position is A).
          //
-         if ((1 << tos[pc].get_Class()) & TCG_R_PAR_BRA)   ends.push_back(pc);
+         if ((1 << tos[pc].get_Class()) & TCG_R_PAR_BRA)
+            {
+              ends.push_back(pc);
+            }
        }
 
    loop(e, ends.size())
