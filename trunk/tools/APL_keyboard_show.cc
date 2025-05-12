@@ -85,7 +85,7 @@ struct termios new_tios;
 
                 if (len <= 0)   break;
                 buflen += len;
-                if (buflen >= sizeof(buffer))   break;
+                if (buflen >= int(sizeof(buffer)))   break;
              }
 
            printf("key_seq_%d(", buflen);

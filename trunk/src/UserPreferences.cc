@@ -1628,8 +1628,8 @@ int file_profile = 0;   // the current profile in the preferences file
                  }
               else
                  {
-                   initial_PW_by_user = true;
                    Workspace::set_PW(initial_PW, LOC);
+                   initial_PW_by_user = true;
                  }
             }
          else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))

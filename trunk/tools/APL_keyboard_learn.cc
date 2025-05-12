@@ -56,7 +56,7 @@ int buflen = 1;
 
          if (len <= 0)   break;
          buflen += len;
-         if (buflen >= sizeof(buffer))   break;
+         if (buflen >= int(sizeof(buffer)))   break;
        }
 
    return buflen;

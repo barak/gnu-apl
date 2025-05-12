@@ -73,7 +73,7 @@ char buffer[BUFLEN];
           if (s == 0)   break;
           buffer[BUFLAST] = 0;   // just in case buffer is not 0-termonated.
 
-          size_t last = strlen(buffer) - 1;
+          int last = strlen(buffer) - 1;
           if (last >= 0 && buffer[last] == '\n')   buffer[last--] = 0;
           if (last >= 0 && buffer[last] == '\r')   buffer[last--] = 0;
           // cerr << "buffer[" << (last + 1) << "]='" << buffer << "'" << endl;

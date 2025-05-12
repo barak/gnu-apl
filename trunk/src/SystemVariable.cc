@@ -702,8 +702,13 @@ Value_P Z(2, LOC);
 Quad_PW::Quad_PW()
    : SystemVariable(ID_Quad_PW)
 {
-   Symbol::assign(IntScalar(UserPreferences::uprefs.initial_PW, LOC),
-                  false, LOC);
+int pw = UserPreferences::uprefs.initial_PW;
+
+   // in cygwin it seems to be possible that ⎕PW is 0. Fix that here.
+   //
+   if (pw < MIN_Quad_PW || pw > MAX_Quad_PW)   pw = DEFAULT_Quad_PW;
+
+   Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
 //----------------------------------------------------------------------------
 void

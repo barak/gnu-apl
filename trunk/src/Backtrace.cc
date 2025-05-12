@@ -1432,7 +1432,7 @@ std::string tmp;
    tmp.reserve(result_max + 1);
    for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
        tmp += *b;
-   tmp.append(0);
+   tmp += char(0);
 
 char * e = 0;
 int status = 3;

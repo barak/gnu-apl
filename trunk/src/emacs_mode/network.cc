@@ -68,7 +68,7 @@ unique_ptr<Listener> listener( Listener::create_listener( port ) );
 
 string conninfo = listener->start();
     
-   if (int res = pthread_create(&thread_id, 0, listener_loop, listener.get()))
+   if (pthread_create(&thread_id, 0, listener_loop, listener.get()))
       {
         throw InitProtocolError("Unable to start network connection thread");
       }
