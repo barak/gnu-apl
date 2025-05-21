@@ -51,6 +51,9 @@ protected:
      set_monadic_threshold(thresh_B);
    }
 
+   /// overloaded Function::is_scalar_function
+   virtual bool is_scalar_function() const   { return true; }
+
    /// Evaluate a scalar function monadically.
    Token eval_scalar_B(Value_P B, prim_f1 fun) const;
 

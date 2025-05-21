@@ -62,8 +62,8 @@ cFunction_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P proto_A = Bif_F12_TAKE::first(*A);
-        Value_P proto_B = Bif_F12_TAKE::first(*B);
+        Value_P first_A = Bif_F12_TAKE::first(*A);
+        Value_P first_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -72,18 +72,47 @@ cFunction_P LO = _LO.get_function();
         if (B->is_empty())          shape_Z = B->get_shape();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
-        Token tZ1 = LO->eval_fill_AB(proto_A, proto_B);
-        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
+        // evaluate the fill function (lrm p. 245)
+        //
+        Value_P Z1;
+        if (LO->is_defined())
+           {
+             // the fill function of a defined functions is the identity
+             // function, i.e. its right argument
+             //
+             Z1 = first_B;
+           }
+        else if (LO->is_scalar_function())
+           {
+             // NOTE: even though eval_ALB is dyadic, we call the monadic
+             //       fill function because it (and not the dyadic fill
+             //       function handles the empty argument case).
+             //
+             Token tok_Z1 = LO->eval_fill_B(B->is_empty() ? first_B : first_A);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+        else
+           {
+             // the fill function is the function itself
+             //
+             Token tok_Z1 = LO->eval_AB(first_A, first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
 
-        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(shape_Z, LOC);
 
         // Z1 is the prototype of the empty Z
         //
         if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
-           Z->set_ravel_Cell(0, Z1->get_cscalar());
-        else   // need to encose Z1
-           Z->set_ravel_Pointer(0, Z1.get());
+           {
+             Z->set_ravel_Cell(0, Z1->get_cscalar());
+           }
+        else   // need to enclose Z1
+           {
+             Z->set_ravel_Pointer(0, Z1.get());
+           }
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -256,10 +285,10 @@ cFunction_P LO = _LO.get_function();
         if (!LO->has_result())   return Token(TOK_VOID);    // no-op
 
         Value_P proto_B = Bif_F12_TAKE::first(*B);
-        Token tZ1 = LO->eval_fill_B(proto_B);
-        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
+        Token tok_Z1 = LO->eval_fill_B(proto_B);
+        if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
 
-        Value_P Z1 = tZ1.get_apl_val();
+        Value_P Z1 = tok_Z1.get_apl_val();
         Value_P Z(B->get_shape(), LOC);
 
         // Z1 is the prototype of the empty Z

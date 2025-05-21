@@ -75,6 +75,7 @@ public:
 
    /// return \b true iff \b this is a native function
    virtual bool is_native() const   { return false; }
+   virtual bool is_scalar_function() const   { return false; }
 
    /// return \b true iff \b this function is a lambda
    virtual bool is_lambda() const   { return false; }

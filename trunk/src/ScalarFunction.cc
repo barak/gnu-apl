@@ -642,7 +642,7 @@ Token
 ScalarFunction::do_eval_fill_AB(Value_P A, Value_P B) const
 {
    /* eval_fill_AB() is called when A and/or B is empty and the non-empty
-      argument (if any) is non-scalar. The scalar case for the non-empty
+      argument (if any) is non-scalar (!!!). The scalar case for the non-empty
       argument of a dyadic scalar function is handled by do_eval_fill_B().
 
        NOTE however, that even though non-empty arguments of scalar functions
@@ -703,6 +703,7 @@ ScalarFunction::do_eval_fill_B(Value_P B) const
    if (B->get_cfirst().is_numeric() || B->get_cfirst().is_character_cell())
       {
         Value_P Z(B->get_shape(), LOC);
+        Z->set_ravel_Int(0, 0);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -712,6 +713,7 @@ ScalarFunction::do_eval_fill_B(Value_P B) const
       for character Cells.
     */
 Value_P Z = B->clone(LOC);
+   Z->check_value(LOC);
    Z->to_type(/* numeric */ true);
    Z->check_value(LOC);
 

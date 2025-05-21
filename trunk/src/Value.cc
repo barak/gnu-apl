@@ -2622,8 +2622,9 @@ Value::to_type(bool force_numeric)
         Cell & cell = get_wravel(e);
         if (cell.is_pointer_cell())
            {
-             reinterpret_cast<PointerCell &>(cell).isolate(LOC);
-             cell.get_pointer_value()->to_type(false);
+             PointerCell & ptr_cell = reinterpret_cast<PointerCell &>(cell);
+             ptr_cell.isolate(LOC);
+             ptr_cell.get_pointer_value()->to_type(false);
            }
         else if (cell.is_character_cell())
            {

@@ -115,7 +115,7 @@ public:
    /// a new scalar value with un-initialized ravel
    inline Value_P(const char * loc);
 
-   /// a new scalar value with the value of Cell
+   /// a new scalar value with the value of cell
    inline Value_P(const Cell & cell, const char * loc);
 
    /// a new true vector (rank 1 value) of length len and un-initialized ravel
