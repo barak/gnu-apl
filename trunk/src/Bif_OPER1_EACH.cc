@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Macro.hh"
@@ -115,6 +116,7 @@ cFunction_P LO = _LO.get_function();
            }
 
         Z->check_value(LOC);
+        Z->to_type(true);
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -284,21 +286,61 @@ cFunction_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);    // no-op
 
-        Value_P proto_B = Bif_F12_TAKE::first(*B);
-        Token tok_Z1 = LO->eval_fill_B(proto_B);
-        if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+        Value_P first_B = Bif_F12_TAKE::first(*B);
 
-        Value_P Z1 = tok_Z1.get_apl_val();
+        // evaluate the fill function (lrm p. 245)
+        //
+        Value_P Z1;
+        if (LO->is_defined())
+           {
+             // the fill function of a defined functions is the identity
+             // function, i.e. its right argument
+             //
+             Z1 = first_B;
+           }
+        else if (LO->is_scalar_function() || (LO == &Bif_F12_DOMINO::fun))
+           {
+             Token tok_Z1 = LO->eval_fill_B(first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+        else if (LO == &Quad_EC::fun)
+           {
+             // fake Z1←⎕EC ''  ←→  3 (0 0) (0 0⍴0)
+             //
+             if (!B->get_cfirst().is_character_cell())   DOMAIN_ERROR;
+             Z1 = Value_P(3, LOC);
+             Z1->next_ravel_Number(3);
+             {
+               Value_P sub1(2, LOC);
+               sub1->next_ravel_0();
+               sub1->next_ravel_0();
+               sub1->check_value(LOC);
+               Z1->next_ravel_Pointer(sub1.get());
+             }
+             Value_P sub2 = Idx0_0(LOC);
+             Z1->next_ravel_Pointer(sub2.get());
+           }
+        else
+           {
+             // the fill function is the function itself
+             //
+             Token tok_Z1 = LO->eval_B(first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+
         Value_P Z(B->get_shape(), LOC);
 
         // Z1 is the prototype of the empty Z
         //
         if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
            Z->set_ravel_Cell(0, Z1->get_cscalar());
-        else   // need to encose Z1
+        else                            // need to encose Z1
            Z->set_ravel_Pointer(0, Z1.get());
 
         Z->check_value(LOC);
+        Z->to_type(true);
         return Token(TOK_APL_VALUE1, Z);
       }
 
