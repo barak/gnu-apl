@@ -707,7 +707,8 @@ vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
         int(ranges_before.size()) < stat_before.ssize();
           ++PC_before, ++PC_after) 
       {
-        if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
+        if (PC_after < stat_after.ssize() &&
+             stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
            {
              // optimized value. Only set in
              // Parser::optimize_short_primitives() to replace
