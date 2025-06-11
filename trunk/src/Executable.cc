@@ -763,7 +763,8 @@ Executable::set_error_info(Error & error,
 
       IOW: a Value B can never be wrong.
     */
-   if (failed_statement[range.low].get_Class() == TC_VALUE)
+   if (range.low < failed_statement.size() &&
+       failed_statement[range.low].get_Class() == TC_VALUE)
       {
          ++range.low;
       }
