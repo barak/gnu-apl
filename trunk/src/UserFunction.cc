@@ -1237,7 +1237,8 @@ UserFunction::fix(const UCS_string & text, int & err_line,
              <<  "------------------- UserFunction::fix() --" << endl;
       }
 
-UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
+UserFunction * ufun = new UserFunction(text, loc, creator,
+                                       tolerant, /* macro = */ false);
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 

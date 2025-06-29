@@ -163,6 +163,10 @@ public:
    const char * get_loc() const
       { return alloc_loc; }
 
+   /// return the refcount
+   int get_refcount() const
+      { return refcount; }
+
    /// increment the reference counter
    void increment_refcount(const char * loc);
 

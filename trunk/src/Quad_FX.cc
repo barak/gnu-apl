@@ -39,8 +39,10 @@ Quad_FX  Quad_FX::fun;
 Token
 Quad_FX::do_eval_B(const Value * B)
 {
-static const int eprops[] = { 0, 0, 0, 0 };
-   return do_quad_FX(eprops, B, UTF8_string("⎕FX"), false);
+   // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
+   //
+static const int default_eprops[] = { 0, 0, 0, 0 };
+   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"), false);
 }
 //----------------------------------------------------------------------------
 Token
@@ -128,7 +130,7 @@ Quad_FX::do_quad_FX(const int * exec_props, const Value * B,
 
 UCS_string text;
 
-   // ⎕FX accepts two kinds of B argments:
+   // ⎕FX accepts two kinds of arguments B:
    //
    // 1. A vector whose elements are the (nested) lines of the function, or
    // 2. A character matrix whose rows are the lines of the function.
@@ -234,8 +236,8 @@ Quad_FX::do_quad_FX(const int * exec_props, const UCS_string & text,
                     const UTF8_string & creator, bool tolerant)
 {
 int error_line = 0;
-UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator,
-                                       tolerant);
+UserFunction * fun = UserFunction::fix(text, error_line, false, LOC,
+                                       creator, tolerant);
    if (fun == 0)
       {
         Value_P Z(LOC);
@@ -243,6 +245,8 @@ UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator,
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
+
+   if (text[0] == UNI_LAMBDA)   fun->increment_refcount(LOC);
 
    fun->set_exec_properties(exec_props);
 
