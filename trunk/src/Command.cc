@@ -1574,26 +1574,46 @@ UCS_string wsname;
 void
 Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
-   // Command is:
+   // Command is one of:
    //
-   // )LIB N path         (set libdir N to path)
-   // )LIB path           (set libroot to path)
-   // )LIB                (display root and path states)
+   // 1a. )LIBS N path          (set libdir N to path)
+   // 1b. )LIBS N ?             (display the state of libdir N
+   // 2.  )LIBS path            (set libroot to path)
+   // 3. )LIBS                 (display root and path states)
    //
-   if (args.size() == 2)   // set individual dir
+   //
+const bool query = args.size() &&
+           args.back().size()  &&
+           args.back()[0] == UNI_QUESTION;
+
+   if (args.size() == 2)   // cases 1a. or 1b.: set or query single libdir
       {
         const UCS_string & libref_ucs = args.front();
-        const int libref = libref_ucs.front() - '0';
+        const LibRef libref = LibRef(libref_ucs.front() - '0');
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
              CERR << "Invalid library reference " << libref_ucs << "'" << endl;
              return;
            }
 
-        UTF8_string path(args[1]);
-        LibPaths::set_lib_dir(LibRef(libref), path.c_str(),
-                              LibPaths::LibDir::CSRC_CMD);
-        out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
+        if (query)
+           {
+             out << "library reference " << libref << " stands for directory "
+                 << LibPaths::get_lib_dir(libref) << endl
+                 << "    That directory ";
+             if (LibPaths::is_present(libref))
+                out << "exists.\n";
+             else
+                out << "is missing or not accessible.\n"
+                       "    See command )LIBS without arguments for details.\n";
+           }
+        else
+           {
+             UTF8_string path(args[1]);
+             LibPaths::set_lib_dir(LibRef(libref), path.c_str(),
+                                   LibPaths::LibDir::CSRC_CMD);
+             out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
+           }
         return;
       }
 
