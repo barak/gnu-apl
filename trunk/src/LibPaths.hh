@@ -95,8 +95,8 @@ public:
    /// set library path (from config file)
    static void set_lib_dir(LibRef lib, const char * path, LibDir::CfgSrc src);
 
-   /// return true iff directory \b lib) is present
-   static bool is_present(LibRef lib);
+   /// return 0 if directory \b lib) is present, otherwise the reason why not.
+   static const char * is_present(LibRef lib);
 
    /// return library path (from config file or from libroot)
    static UTF8_string get_lib_dir(LibRef lib);

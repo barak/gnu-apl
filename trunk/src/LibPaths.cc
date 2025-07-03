@@ -350,17 +350,23 @@ UTF8_string filename = get_lib_dir(lib);
       }
 }
 //----------------------------------------------------------------------------
-bool
+const char *
 LibPaths::is_present(LibRef lib)
 {
-   // try to open dir and return false if that fails
+   // try to open dir and return the reason if that fails
    //
 UTF8_string path = LibPaths::get_lib_dir(lib);
 DIR * dir = opendir(path.c_str());
-   if (!dir)   return false;
+   if (dir)   // success
+      {
+        closedir(dir);
+        return 0;
+      }
+   else
+      {
+        return strerror(errno);
+      }
 
-   closedir(dir);
-   return true;
 }
 //----------------------------------------------------------------------------
 

@@ -1592,7 +1592,8 @@ const bool query = args.size() &&
         const LibRef libref = LibRef(libref_ucs.front() - '0');
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
-             CERR << "Invalid library reference " << libref_ucs << "'" << endl;
+             CERR << "Invalid library reference '" << libref_ucs << "'"
+                     ". Valid library references are the digits 0..9." << endl;
              return;
            }
 
@@ -1601,16 +1602,16 @@ const bool query = args.size() &&
              out << "library reference " << libref << " stands for directory "
                  << LibPaths::get_lib_dir(libref) << endl
                  << "    That directory ";
-             if (LibPaths::is_present(libref))
-                out << "exists.\n";
-             else
-                out << "is missing or not accessible.\n"
+             if (const char * cause = LibPaths::is_present(libref))
+                out << "is not accessible (" << cause << ").\n"
                        "    See command )LIBS without arguments for details.\n";
+             else
+                out << "exists.\n";
            }
         else
            {
              UTF8_string path(args[1]);
-             LibPaths::set_lib_dir(LibRef(libref), path.c_str(),
+             LibPaths::set_lib_dir(libref, path.c_str(),
                                    LibPaths::LibDir::CSRC_CMD);
              out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
            }
@@ -1628,7 +1629,7 @@ const bool query = args.size() &&
    out << "Library root: " << LibPaths::get_APL_lib_root() << 
 "\n"
 "\n"
-"Library reference number to (absolute) path mapping:\n"
+"Library reference number (Ref) to (absolute) path mapping:\n"
 "\n"
 "╔═══╤═════╤═════════════╤══════════════════════════════════════════════════════╗\n"
 "║Ref│Conf │State (errno)│ Path to the directory containing the workspace files ║\n"
