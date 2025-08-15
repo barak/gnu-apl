@@ -70,7 +70,8 @@ public:
    /// print items of \b this vector in a table with \b column_count columns
    std::ostream & print_table(std::ostream & out, size_t column_count) const;
 
-   /// return the size of the longest UCS_string in \b this vector.
+   /// return the length of the longest UCS_string in \b this vector,
+   /// starting at \b col
    ShapeItem max_width(size_t col, size_t column_count) const;
 
 private:

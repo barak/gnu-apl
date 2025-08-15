@@ -30,6 +30,8 @@
 #include "Error.hh"
 #include "LibPaths.hh"
 #include "PrintOperator.hh"
+#include "UCS_string_vector.hh"
+#include "Workspace.hh"
 
 bool LibPaths::root_from_env = false;
 bool LibPaths::root_from_pwd = false;
@@ -235,11 +237,11 @@ UTF8_string ret(APL_lib_root);
 }
 //----------------------------------------------------------------------------
 void
-LibPaths::maybe_warn_ambiguous(int name_has_extension, const UTF8_string name,
+LibPaths::maybe_warn_ambiguous(int has_extension, const UTF8_string name,
                                const char * ext1, const char * ext2)
 {
-   if (name_has_extension)   return;   // extension was provided
-   if (ext2 == 0)            return;   // no second extension
+   if (has_extension)   return;   // extension was provided
+   if (ext2 == 0)       return;   // no second extension
 
 UTF8_string filename_ext2 = name;
    filename_ext2.append_ASCII(ext2);
@@ -253,60 +255,61 @@ UTF8_string filename_ext2 = name;
 }
 //----------------------------------------------------------------------------
 UTF8_string
-LibPaths::get_lib_filename(const LibRef lib, const UTF8_string & name, 
-                           bool existing, const char * ext1, const char * ext2)
+LibPaths::get_filename(const LibRef_name & lib_name, bool existing,
+                       const char * ext1, const char * ext2)
 {
    // check if name has one of the extensions ext1 or ext2 already.
    //
-int name_has_extension = 0;   // assume name has neither extension ext1 nor ext2
-   if      (name.ends_with(ext1))   name_has_extension = 1;
-   else if (name.ends_with(ext2))   name_has_extension = 2;
+int has_extension = 0;   // assume name has neither extension ext1 nor ext2
+   if      (lib_name.get_name().ends_with(ext1))           has_extension = 1;
+   else if (ext2 && lib_name.get_name().ends_with(ext2))   has_extension = 2;
 
-   if (name.starts_with("/")   || 
-       name.starts_with("./")  || 
-       name.starts_with("../"))
+   if (lib_name.get_name().starts_with("/")   || 
+       lib_name.get_name().starts_with("./")  || 
+       lib_name.get_name().starts_with("../"))
       {
         // paths from / or ./ are fallbacks for the case where the library
         // path setup is wrong. So that the user can survive by using an
         // explicit path
         //
-        if (name_has_extension)   return name;
+        if (has_extension)   return lib_name.get_name();
 
-        UTF8_string filename(name);
+        UTF8_string filename(lib_name.get_name());
         if (access(filename.c_str(), F_OK) == 0)   return filename;
 
         if (ext1)
            {
-             UTF8_string filename_ext1 = name;
+             UTF8_string filename_ext1 = lib_name.get_name();
              filename_ext1.append_ASCII(ext1);
              if (!access(filename_ext1.c_str(), F_OK))
                 {
                    // filename_ext1 exists, but filename_ext2 may exist as well.
                    // warn user unless an explicit extension was given.
                    //
-                   maybe_warn_ambiguous(name_has_extension, name, ext1, ext2);
+                   maybe_warn_ambiguous(has_extension, lib_name.get_name(),
+                                        ext1, ext2);
                    return filename_ext1;
                 }
            }
 
         if (ext2)
            {
-             UTF8_string filename_ext2 = name;
+             UTF8_string filename_ext2 = lib_name.get_name();
              filename_ext2.append_ASCII(ext2);
              if (!access(filename_ext2.c_str(), F_OK))   return filename_ext2;
            }
 
          // neither ext1 nor ext2 worked: return original name
          //
-         filename = name;
+         filename = lib_name.get_name();
          return filename;
       }
 
-UTF8_string filename = get_lib_dir(lib);
+UTF8_string filename = get_lib_dir(lib_name.get_libref());
    filename += '/';
-   filename.append_UTF8(name);
+   filename.append_UTF8(lib_name.get_name());
 
-   if (name_has_extension)   return filename;
+   if (has_extension)   return filename;
 
    if (existing)
       {
@@ -321,7 +324,7 @@ UTF8_string filename = get_lib_dir(lib);
              filename_ext1.append_ASCII(ext1);
              if (!access(filename_ext1.c_str(), F_OK))
                 {
-                  maybe_warn_ambiguous(name_has_extension,
+                  maybe_warn_ambiguous(has_extension,
                                        filename, ext1, ext2);
                    return filename_ext1;
                 }
@@ -342,7 +345,7 @@ UTF8_string filename = get_lib_dir(lib);
         // therefore checking the existence does not work.
         // check that the file ends with ext1 or ext2 if provided
         //
-        if (name_has_extension)   return filename;
+        if (has_extension)   return filename;
 
         if      (ext1) filename.append_ASCII(ext1);
         else if (ext2) filename.append_ASCII(ext2);
@@ -368,5 +371,33 @@ DIR * dir = opendir(path.c_str());
       }
 
 }
-//----------------------------------------------------------------------------
+//============================================================================
+LibRef_name::LibRef_name(ostream & out, const UCS_string_vector & args,
+                         bool allow_LIB_NONE)
+{
+   Assert(args.size() > 0);
+   if (args.size() == 1)   // workspace name without library reference number
+      {
+        lib  = allow_LIB_NONE ? LIB_NONE : LIB0;
+        name = args.front();
+        return;   // OK
+      }
+
+   // name with library reference number (0-9)
+   //
+const UCS_string & libref = args.front();
+   if (libref.size() == 1 && Avec::is_digit(libref[0]))
+      {
+        lib  = LibRef(args.front()[0] - '0');
+        name = args[1];
+        return;   // OK
+      }
+
+   out << "BAD COMMAND+" << endl;
+   MORE_ERROR() << "invalid library reference '" << args.front() << "'";
+   if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+
+   // error (lib_name.name is "").
+}
+//============================================================================
 

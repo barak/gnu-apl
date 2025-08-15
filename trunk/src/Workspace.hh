@@ -25,6 +25,7 @@
 #define __WORKSPACE_HH_DEFINED__
 
 #include "Command.hh"
+#include "LibPaths.hh"
 #include "PrimitiveOperator.hh"
 #include "PrintContext.hh"
 #include "QuadFunction.hh"
@@ -177,12 +178,12 @@ public:
       { return the_workspace.prompt; }
 
    /// return the name of the current workspace.
-   static const UCS_string & get_WS_name()
-      { return the_workspace.WS_name; }
+   static const LibRef_name & get_WS_id()
+      { return the_workspace.WS_id; }
 
    /// set the name of the current workspace.
-   static void set_WS_name(const UCS_string & new_name)
-      { the_workspace.WS_name = new_name; }
+   static void set_WS_id(const LibRef_name & new_id)
+      { the_workspace.WS_id = new_id; }
 
    /// Return all user-defined commands
    static vector<Command::user_command> & get_user_commands()
@@ -232,15 +233,15 @@ public:
       { return the_workspace.symbol_table.find_lambda_name(lambda); }
 
    /// save this workspace
-   static void save_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+   static void save_WS(ostream & out, const LibRef_name & lib_name,
                        bool name_from_WSID);
 
    /// backup an existing file \b filename, return true on error
    static bool backup_existing_file(const char * filename);
 
    /// dump this workspace
-   static void dump_WS(ostream & out, LibRef lib, const UCS_string & wsname,
-                       bool html, bool silent);
+   static void dump_WS(ostream & out, const LibRef_name & lib_name, bool html,
+                       bool silent);
 
    /// dump the commands in this workspace
    static void dump_commands(ostream & out);
@@ -254,14 +255,14 @@ public:
                          UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(ostream & out, ostream & err, LibRef lib,
-                       const UCS_string & wsname, UCS_string & quad_lx,
-                       bool silent);
+   static void load_WS(ostream & out, ostream & err,
+                       const LibRef_name & lib_name,
+                       UCS_string & quad_lx, bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, ostream & err, LibRef lib,
-                       const UCS_string & wsname, UCS_string_vector & objects,
-                       bool protection);
+   static void copy_WS(ostream & out, ostream & err,
+                      const LibRef_name & lib_name,
+                       UCS_string_vector & objects, bool protection);
 
    /// return a token for system function or variable \b ucs
    static Token get_quad(const UCS_string & ucs, int & len);
@@ -309,8 +310,8 @@ public:
       { return the_workspace.pushed_command; }
 
 protected:
-   /// the name of the workspace
-   UCS_string WS_name;
+   /// Optional library reference, mandatory workspace name
+   LibRef_name WS_id;
 
    // system variables.
    //

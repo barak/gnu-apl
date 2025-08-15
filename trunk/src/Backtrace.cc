@@ -1390,18 +1390,20 @@ char ** strings = backtrace_symbols(buffer, size);
         return;
       }
 
-   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
+   for (int item = 1; item < size - 1; ++item)   // loop over stacktrace lines
        {
-         // make a copy si of strings[i] that show_item() can mess up.
-         // variable i is the number passed to show_item() and counts
-         // from oldest to latest, while 'strings' runs from latest to
-         // oldest. We want the lines to be displayed from oldest to latest.
-         //
-         const char * const_si = strings[size - i - 1];
-         char si[strlen(const_si) + 1];
-         strcpy(si, const_si);
-         si[sizeof(si) - 1] = 0;   // 0-terminate (just in case)
-         show_item(i - 1, si);
+         /* make a copy mutable_si of strings[item] which show_item() may mess
+            up.
+            variable item is the number passed to show_item() and counts
+            from oldest to latest, while 'strings' runs from latest to
+            oldest. We want the lines to be displayed from oldest to latest.
+          */
+         const char * const_si = strings[size - item - 1];
+         const size_t si_len =  strlen(const_si) + 1;
+         char * mutable_si = reinterpret_cast<char *>(alloca(si_len));
+         strcpy(mutable_si, const_si);
+         mutable_si[si_len - 1] = 0;   // 0-terminate mutable_si (just in case)
+         show_item(item - 1, mutable_si);
        }
 
    cerr << "========================================" << endl;

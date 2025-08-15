@@ -275,13 +275,13 @@ protected:
    /// )VARS: show list of variables
    static void cmd_VARS(ostream & out, const UCS_string & arg);
 
-   /// display the workspace name
-   static void cmd_WSID(ostream & out, const UCS_string & arg);
+   /// )WSID: display or change the workspace name
+   static void cmd_WSID(ostream & out, const UCS_string_vector & args);
 
-   /// enable and disable colors
+   /// ]XTERM: enable and disable colors
    static void cmd_XTERM(ostream & out, const UCS_string & args);
 
-   /// show help for APL primitives
+   /// )HELP: show help for APL primitives
    static void primitive_help(ostream & out, const char * arg, int arity,
                               const char * prim, const char * name,
                               const char * title, const char * descr);
@@ -330,11 +330,6 @@ protected:
    /// check the number of parameters in a command
    static bool check_params(ostream & out, const char * command, int argc,
                             const char * args);
-
-   /// resolve an optional lib followed by a WS name
-   static bool resolve_lib_wsname(ostream & out,
-                                  const UCS_string_vector & args,
-                                  LibRef &lib, UCS_string & wsname);
 
    /// a helper struct for the )IN command
    struct transfer_context

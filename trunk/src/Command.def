@@ -66,7 +66,7 @@ cmd_def(")SI"       ,SI(out, false)               ,""                        ,NO
 cmd_def(")SYMBOLS"  ,SYMBOLS(out, arg)            ,"[count]"                 ,COUNT      )
 cmd_def(")VALUES"   ,VALUES(out)                  ,""                        ,NO_PARAM   )
 cmd_def(")VARS"     ,VARS(out, arg)               ,"[from-to]"               ,oFROM_oTO  )
-cmd_def(")WSID"     ,WSID(out, arg)               ,"[wsname]"                ,oWSNAME    )
+cmd_def(")WSID"     ,WSID(out, args)              ,"[[lib] wsname]"          ,oLIB_WSNAME)
 
 cmd_def("]BOXING"   ,BOXING(out, arg)             ,"[OFF|2|3|4|7|8|9]"       ,BOXING     )
 cmd_def("]COLOR"    ,XTERM(out, arg)              ,"[ON|OFF]"                ,oON_OFF    )

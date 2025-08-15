@@ -24,7 +24,10 @@
 #ifndef __LIBPATHS_HH_DEFINED__
 #define __LIBPATHS_HH_DEFINED__
 
+#include "UCS_string.hh"
 #include "UTF8_string.hh"
+
+class UCS_string_vector;
 
 //----------------------------------------------------------------------------
 
@@ -32,6 +35,7 @@
 /// No library reference number is the same as LIB0.
 enum LibRef
 {
+   LIB_NONE = -1,    ///< no library reference specified.
    LIB0 = 0,         ///< library 0
    LIB1 = 1,         ///< library 1
    LIB2 = 2,         ///< library 2
@@ -43,8 +47,45 @@ enum LibRef
    LIB8 = 8,         ///< library 8
    LIB9 = 9,         ///< library 9
    LIB_MAX,          ///< valid library references are smaller than this
-   LIB_WSNAME,       ///< WS name may start with a library reference
-   LIB_NONE = LIB0   ///< no library reference specified.
+};
+//----------------------------------------------------------------------------
+/// a library reference number (0..9) and a workspace name
+class LibRef_name
+{
+public:
+  /// constructor (from WS name without libref)
+  LibRef_name(const UCS_string & wsname, bool allow_LIB_NONE)
+  : lib(allow_LIB_NONE ? LIB_NONE : LIB0),
+    name(wsname)
+  {}
+
+  /// constructor (from WS name with libref)
+  LibRef_name(LibRef wslib, const UCS_string & wsname)
+  : lib(wslib),
+
+    name(wsname)
+  {}
+
+   /// constructor from an optional library reference number (0-9),
+   /// followed by the mandatory WS name. Set name == "" on error.
+   LibRef_name(ostream & out, const UCS_string_vector & args,
+               bool allow_LIB_NONE);
+
+   /// return the workspace name
+  const UCS_string & get_name() const
+     { return name; }
+
+   /// return the library reference
+  LibRef get_libref() const
+     { return lib; }
+
+   /// set the library reference
+   void set_libref(LibRef new_lib)
+      { lib = new_lib; }
+
+protected:
+  LibRef lib;
+  UCS_string name;
 };
 //----------------------------------------------------------------------------
 /// a class mapping library reference numbers to directories
@@ -105,11 +146,11 @@ public:
    static LibDir::CfgSrc get_cfg_src(LibRef lib)
       { return lib_dirs[lib].cfg_src; }
 
-   /// return full path for file \b name, possibly adding .ext1 or .ext2
-   static UTF8_string get_lib_filename(const LibRef lib,
-                                       const UTF8_string & name,
-                                      bool existing, const char * ext1,
-                                                     const char * ext2);
+   /// return the full path for lib/file \b lib_name, possibly adding
+   /// the .ext1 or the .ext2 extension (if not provided)
+   static UTF8_string get_filename(const LibRef_name & lib_name, bool existing,
+                                   const char * ext1, const char * ext2);
+
 protected:
    /// maybe warn the user if two files that differ only by extension exist
    static void maybe_warn_ambiguous(int name_has_extension,

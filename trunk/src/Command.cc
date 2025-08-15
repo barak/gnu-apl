@@ -846,16 +846,17 @@ Command::cmd_CLEAR(ostream & out)
 void
 Command::cmd_CONTINUE(ostream & out)
 {
-UCS_string wsname(UTF8_string("CONTINUE"));
-   Workspace::wsid(out, wsname, LIB0, false);     // )WSID CONTINUE
-   Workspace::save_WS(out, LIB0, wsname, true);   // )SAVE
-   cmd_OFF(0);                                    // )OFF
+const UCS_string wsname(UTF8_string("CONTINUE"));
+   Workspace::wsid(out, wsname, LIB_NONE, false);     // )WSID CONTINUE
+const LibRef_name lib_name(wsname, false);
+   Workspace::save_WS(out, lib_name, true);           // )SAVE
+   cmd_OFF(0);                                        // )OFF
 }
 //----------------------------------------------------------------------------
 void
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
-LibRef libref = LIB0;   // library reference number to copy from, default is 0
+LibRef libref = LIB0;   // default library reference num to copy from
 
    if (args.size() == 0)   // at least workspace name is required
       {
@@ -877,7 +878,8 @@ LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
 UCS_string wsname = args.front();
    args.erase(0);
-   Workspace::copy_WS(out, CERR, libref, wsname, args, protection);
+   LibRef_name lib_name(libref, wsname);
+   Workspace::copy_WS(out, CERR, lib_name, args, protection);
 }
 //----------------------------------------------------------------------------
 void
@@ -889,7 +891,7 @@ Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
         return;
       }
 
-LibRef libref = LIB0;   // library reference number to copy from, default is 0
+LibRef libref = LIB_NONE;   // default library reference number to copy from
    if (args.size() == 0)   // no argument means: display current table
       {
         if (copy_once_table.size() == 0)
@@ -949,7 +951,8 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
    out << wsname << endl;
 
    copy_once_table.push_back(lib_wsname);
-   Workspace::copy_WS(out, CERR, libref, wsname, args, false);
+   LibRef_name lib_name(libref, wsname);
+   Workspace::copy_WS(out, CERR, lib_name, args, false);
 }
 //----------------------------------------------------------------------------
 void
@@ -995,19 +998,17 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    // )DROP wsname
    // )DROP libnum wsname
 
-   // lib_ws.size() is 1 or 2. If 2 then the first is the lib number
-   //
-LibRef libref = LIB_NONE;
-UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = LibRef(lib_ws.front()[0] - '0');
+const LibRef_name lib_name(out, lib_ws, false);
+   if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
-                                                  ".xml", ".apl");
+const UTF8_string filename = LibPaths::get_filename(lib_name, true,
+                                                    ".xml", ".apl");
 
 const int result = unlink(filename.c_str());
    if (result)
       {
-        out << wname << " NOT DROPPED: " << strerror(errno) << "+" << endl;
+        out << lib_name.get_name() << " NOT DROPPED: "
+            << strerror(errno) << "+" << endl;
         MORE_ERROR() << "could not unlink file " << filename;
         if (auto_MORE)   CERR << Workspace::more_error() << endl;
       }
@@ -1031,25 +1032,17 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
 
    if (args.size() > 0)   // workspace or lib workspace
       {
-        LibRef lib;
-        UCS_string wsname;
-        if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
-        Workspace::dump_WS(out, lib, wsname, html, silent);
+        const LibRef_name lib_name(out, args, false);
+        if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
+        Workspace::dump_WS(out, lib_name, html, silent);
         return;
       }
 
    // )DUMP: use )WSID unless it is CLEAR WS
    //
-LibRef wsid_lib = LIB0;
-UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
-      {
-        wsid_lib = LibRef(wsid_name.front() - '0');
-        wsid_name.erase(0);
-        wsid_name.remove_leading_whitespaces();
-      }
+LibRef_name wsid  = Workspace::get_WS_id();
 
-   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+   if (wsid.get_name().compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       { 
         // don't dump CLEAR WS
         //
@@ -1062,7 +1055,8 @@ UCS_string wsid_name = Workspace::get_WS_name();
         return;
       }
 
-   Workspace::dump_WS(out, wsid_lib, wsid_name, html, silent);
+   if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
+   Workspace::dump_WS(out, wsid, html, silent);
 }
 //----------------------------------------------------------------------------
 void
@@ -1499,8 +1493,8 @@ UCS_string fname = args.front();
    args.front() = args.back();
    args.pop_back();
 
-UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, true,
-                                                  ".atf", 0);
+const LibRef_name lib_name(LIB0, fname);
+const UTF8_string filename = LibPaths::get_filename(lib_name, true, ".atf", 0);
 
 FILE * in = fopen(filename.c_str(), "r");
    if (in == 0)   // open failed: try filename.atf unless already .atf
@@ -1564,11 +1558,10 @@ Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
    // LOAD wsname
    // LOAD libnum wsname
 
-LibRef lib;
-UCS_string wsname;
-   if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
+const LibRef_name lib_name(out, args, false);
+   if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
 
-   Workspace::load_WS(out, CERR, lib, wsname, quad_lx, silent);
+   Workspace::load_WS(out, CERR, lib_name, quad_lx, silent);
 }
 //----------------------------------------------------------------------------
 void
@@ -1692,7 +1685,7 @@ UCS_string arg(UNI_0);
 
    if (args.size() == 0)                       // case 1.
       {
-        path = LibPaths::get_lib_dir(LIB0);
+        path = LibPaths::get_lib_dir(LIB_NONE);
       }
    else if (arg.size() == 1 &&
             Avec::is_digit(Unicode(arg.front())))   // case 2.
@@ -2266,7 +2259,7 @@ bool
 Command::have_capability(const UCS_string & capa)
 {
 const int len = capa.size();
-   if (capa.front() == UNI_Quad_Quad)   // ⎕xxx
+   if (capa.front() == UNI_Quad_Quad)   // ⎕xx
       {
         const UCS_string capa1 = capa.drop(1);
         if (len == 4 && capa1.starts_iwith("FFT"))       return apl_FFT;
@@ -2289,11 +2282,14 @@ const int len = capa.size();
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
+   // )OUT filename
+   // )OUT filename object...
+   //
 UCS_string fname = args.front();
    args.erase(0);
 
-UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
-                                                  ".atf", 0);
+const LibRef_name lib_name(LIB0, fname);
+const UTF8_string filename = LibPaths::get_filename(lib_name, false, ".atf", 0);
 
 FILE * atf = fopen(filename.c_str(), "w");
    if (atf == 0)
@@ -2390,27 +2386,21 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
    // )SAVE workspace
    // )SAVE lib workspace
 
-   if (args.size() > 0)   // workspace or lib workspace
+   if (args.size() > 0)   // wsname or lib wsname
       {
-        LibRef lib;
-        UCS_string wsname;
-        if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
-        Workspace::save_WS(out, lib, wsname, false);
+        const LibRef_name lib_name(out, args, false);
+        if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
+        Workspace::save_WS(out, lib_name, false);
         return;
       }
 
-   // )SAVE without arguments: use )WSID unless CLEAR WS
-   //
-LibRef wsid_lib = LIB0;
-UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
-      {
-        wsid_lib = LibRef(wsid_name.front() - '0');
-        wsid_name.erase(0);
-        wsid_name.remove_leading_whitespaces();
-      }
+   // )SAVE without arguments: use )WSID unless CLEAR WS...
 
-   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+   // split wsname into lib (if any) and name
+   //
+LibRef_name wsid =  Workspace::get_WS_id();
+
+   if (wsid.get_name().compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
         // don't save CLEAR WS
         COUT << "NOT SAVED: THIS WS IS CLEAR WS+" << endl;
@@ -2422,32 +2412,8 @@ UCS_string wsid_name = Workspace::get_WS_name();
         return;
       }
 
-   Workspace::save_WS(out, wsid_lib, wsid_name, true);
-}
-//----------------------------------------------------------------------------
-bool
-Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
-                            LibRef &lib, UCS_string & wsname)
-{
-   Assert(args.size() > 0);
-   if (args.size() == 1)   // name without libnum
-      {
-        lib = LIB0;
-        wsname = args.front();
-        return false;   // OK
-      }
-
-   if (!(args.front().size() == 1 && Avec::is_digit(args.front()[0])))
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "invalid library reference '" << args.front() << "'";
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return true;   // error
-      }
-
-   lib = LibRef(args.front()[0] - '0');
-   wsname = args[1];
-   return false;   // OK
+   if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
+   Workspace::save_WS(out, wsid, true);
 }
 //----------------------------------------------------------------------------
 void
@@ -2712,9 +2678,28 @@ Command::cmd_VARS(ostream & out, const UCS_string & arg)
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_WSID(ostream & out, const UCS_string & arg)
+Command::cmd_WSID(ostream & out, const UCS_string_vector & args)
 {
-   Workspace::wsid(out, arg, LIB_WSNAME, false);
+   // )WSID
+   // )WSID wsname
+   // )WSID lib wsname
+   //
+LibRef lib = LIB_NONE;
+UCS_string arg;   // ""
+   if (args.size() == 0)        // )WSID
+      {
+        lib = LIB_NONE;
+      }
+   else if (args.size() == 1)   // )WSID wsname
+      {
+        arg = args.front();
+      }
+   else                        // )WSID lib wsname
+      {
+        lib = LibRef(args.front()[0] - '0');
+        arg = args[1];   // ""
+      }
+   Workspace::wsid(out, arg, lib, false);
 }
 //----------------------------------------------------------------------------
 void

@@ -67,20 +67,21 @@ Shape sh_Z(*B, 0);
    // at this point sh is correct and ⍳ cannot fail.
    //
 Value_P Z(sh_Z, LOC);
-const sRank rk_Z = Z->get_rank();
+const sRank rank_Z = Z->get_rank();
    loop(z, Z->element_count())
       {
-        Value_P ZZ(rk_Z, LOC);
+        Value_P ZZ(rank_Z, LOC);
         ShapeItem N = z;
-        ShapeItem zz[rk_Z];
-        loop(r, rk_Z)
+        ShapeItem * zz = reinterpret_cast<ShapeItem *>
+                                         (alloca(rank_Z * sizeof(ShapeItem)));
+        loop(r, rank_Z)
             {
               const ShapeItem q = sh_Z.get_shape_item(ec - r - 1);
               zz[ec - r - 1] = N % q + qio;
               N /= q;
             }
 
-        loop(r, rk_Z)   ZZ->next_ravel_Int(zz[r]);
+        loop(r, rank_Z)   ZZ->next_ravel_Int(zz[r]);
 
         ZZ->check_value(LOC);
         Z->next_ravel_Pointer(ZZ.get());
@@ -88,7 +89,7 @@ const sRank rk_Z = Z->get_rank();
 
    if (Z->element_count() == 0)   // empty result
       {
-        Value_P ZZ(rk_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
+        Value_P ZZ(rank_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
         while (ZZ->more())   ZZ->next_ravel_0();
         ZZ->check_value(LOC);
 

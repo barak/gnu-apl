@@ -635,7 +635,8 @@ enum Line_status
      End_of_string   = 4
    };
 
-char status[get_text_size()];   status[0] = Function_header;
+char * status = reinterpret_cast<char *>(alloca(get_text_size()));
+   status[0] = Function_header;
 Line_status current = APL_text;
 
    // 1. determine the line status of each line...
@@ -728,7 +729,8 @@ enum Line_status
      End_of_string   = 4
    };
 
-char status[get_text_size()];   status[0] = Function_header;
+char * status = reinterpret_cast<char *>(alloca(get_text_size()));
+   status[0] = Function_header;
 Line_status current = APL_text;
 
    // determine line status of each line...
@@ -853,7 +855,7 @@ UCS_string_vector original_text;
               if (multi == -1)   continue;   // line contains no """
 
               original_text = text;   // precaution for errors
-              if (const ErrorCode ec = transform_new_multi_lines())
+              if (/* const ErrorCode ec = */ transform_new_multi_lines())
                  {
                    text = original_text;   // restore function text
                    error_line = li;
@@ -872,7 +874,7 @@ UCS_string_vector original_text;
               if (!(line.double_quote_count(false) & 1))   continue;
 
               original_text = text;   // precaution for errors.
-              if (const ErrorCode ec = transform_old_multi_lines())
+              if (/* const ErrorCode ec = */ transform_old_multi_lines())
                  {
                    text = original_text;   // restore function text
                    error_line = li;
@@ -1411,7 +1413,7 @@ Token_string body;
       }
 
 const Parser parser(PM_FUNCTION, LOC, false);
-   if (const ErrorCode ec = parser.parse(body_text, body, true))
+   if (/* const ErrorCode ec = */ parser.parse(body_text, body, true))
       {
         CERR << "Parsing '" << body_text << "' failed" << endl;
         return 0;

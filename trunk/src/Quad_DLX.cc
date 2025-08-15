@@ -462,8 +462,8 @@ ShapeItem pcnt = 0;
        }
    out << endl;
 
-char rows_used[rows];
-   memset(rows_used, 0, sizeof(rows_used));
+char * rows_used = reinterpret_cast<char *>(alloca(rows));
+   memset(rows_used, 0, rows);
 
    for (const DLX_Node * x = right; x != this; x = x->right)
    for (const DLX_Node * y = x->down; y != x; y = y->down)
@@ -471,12 +471,12 @@ char rows_used[rows];
          rows_used[y->row] = 1;     // mark row used
        }
 
-   for (ShapeItem r = 0; r < rows; ++r)
+   loop (r, rows)
        {
          if (!rows_used[r])   continue;
 
-         int row[cols];
-         memset(row, 0, sizeof(row));
+         int * row = reinterpret_cast<int *>(alloca(cols * sizeof(int)));
+         memset(row, 0, cols*sizeof(int));
          for (const DLX_Node * x = right; x != this; x = x->right)
          for (const DLX_Node * y = x->down; y != x; y = y->down)
              {

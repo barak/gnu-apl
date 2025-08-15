@@ -561,8 +561,9 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
    if (uprefs.do_CONT && !uprefs.initial_workspace.size())
       {
          UCS_string cont(UTF8_string("CONTINUE"));
+         LibRef_name lib_name(LIB0, cont);
          UTF8_string filename =
-            LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
+            LibPaths::get_filename(lib_name, true, ".xml", ".apl");
 
          if (access(filename.c_str(), F_OK) == 0)
             {
@@ -575,9 +576,8 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
          // no CONTINUE workspace but maybe SETUP
          //
-         cont = UCS_ASCII_string("SETUP");
-         filename =
-            LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
+         lib_name = LibRef_name(UCS_ASCII_string("SETUP"), true);
+         filename = LibPaths::get_filename(lib_name, true, ".xml", ".apl");
 
          if (access(filename.c_str(), F_OK) == 0)
             {
