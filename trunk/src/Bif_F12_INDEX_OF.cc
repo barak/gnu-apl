@@ -72,8 +72,7 @@ const sRank rank_Z = Z->get_rank();
       {
         Value_P ZZ(rank_Z, LOC);
         ShapeItem N = z;
-        ShapeItem * zz = reinterpret_cast<ShapeItem *>
-                                         (alloca(rank_Z * sizeof(ShapeItem)));
+        ShapeItem * zz = ALLOCA(ShapeItem, rank_Z);
         loop(r, rank_Z)
             {
               const ShapeItem q = sh_Z.get_shape_item(ec - r - 1);

@@ -1140,7 +1140,7 @@ Quad_CR::do_CR19(const Value * B)
    if (B->get_rank() > 1)   RANK_ERROR;
 const ShapeItem len_B = B->element_count();
 
-UTF8 * bytes_utf = reinterpret_cast<UTF8 *>(alloca(len_B + 10));
+UTF8 * bytes_utf = ALLOCA(UTF8, len_B + 10);
    loop(b, len_B)   bytes_utf[b] = B->get_cravel(b).get_byte_value();
    bytes_utf[len_B] = 0;
 

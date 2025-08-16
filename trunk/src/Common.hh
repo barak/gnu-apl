@@ -478,6 +478,10 @@ extern std::ostream & get_CERR();
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" \
                          << " '" << x << "' at " LOC << endl;
 
+/// replacement for variable length arrays
+#define ALLOCA(typ, count) \
+        reinterpret_cast<typ *>(alloca((count) * sizeof(typ)))
+
 //----------------------------------------------------------------------------
 
 #ifdef cfg_VALUE_HISTORY_WANTED

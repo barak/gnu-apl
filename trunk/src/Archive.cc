@@ -987,7 +987,15 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "         timezone is +/- offset to UTC in seconds.\n"
 "         local time is UTC + offset -->\n"
 "\n"
-"<Workspace wsid=\""       << Workspace::get_WS_id().get_name()
+"<Workspace wsid=\"";
+
+   /// libref if provided
+   {
+     const LibRef lib = Workspace::get_WSID().get_libref();
+     if (lib != LIB_NONE)   outf << lib << " ";
+   }
+   outf <<
+        Workspace::get_WSID().get_name()
      << "\" year=\""       << (t->tm_year + 1900)
      << "\" month=\""      << (t->tm_mon  + 1)
      << "\" day=\""        <<  t->tm_mday << "\"" << endl <<
@@ -1689,7 +1697,7 @@ const char * tz_sign = (offset < 0) ? "" : "+";
         const UTF8_string wsname_utf(wsid, end - wsid);
         const UCS_string wsname_ucs(wsname_utf);
         const LibRef_name lib_name(wsname_ucs, true);
-        Workspace::set_WS_id(lib_name);
+        Workspace::set_WSID(lib_name);
       }
 
    if (have_allowed_objects && allowed_objects.size())

@@ -635,7 +635,7 @@ enum Line_status
      End_of_string   = 4
    };
 
-char * status = reinterpret_cast<char *>(alloca(get_text_size()));
+char * status = ALLOCA(char, get_text_size());
    status[0] = Function_header;
 Line_status current = APL_text;
 
@@ -729,7 +729,7 @@ enum Line_status
      End_of_string   = 4
    };
 
-char * status = reinterpret_cast<char *>(alloca(get_text_size()));
+char * status = ALLOCA(char, get_text_size());
    status[0] = Function_header;
 Line_status current = APL_text;
 

@@ -535,8 +535,7 @@ const Shape weights_B = sh_B.get_weights();
    // sum of weights that map to z.
    //
 Shape shape_Z;
-ShapeItem * weight_Z = reinterpret_cast<ShapeItem *>
-                                       (alloca(rank_Z * sizeof(ShapeItem)));
+ShapeItem * weight_Z = ALLOCA(ShapeItem, rank_Z);
    loop(z, rank_Z)
        {
          weight_Z[z] = 0;

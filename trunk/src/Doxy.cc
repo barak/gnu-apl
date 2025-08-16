@@ -52,7 +52,7 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
      root_dir(dest_dir),
      errors(0)
 {
-   ws_name = Workspace::get_WS_id().get_name();
+   ws_name = Workspace::get_WSID().get_name();
    if (ws_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
         ws_name = UCS_ASCII_string("CLEAR-WS");

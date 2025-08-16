@@ -1040,9 +1040,7 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
 
    // )DUMP: use )WSID unless it is CLEAR WS
    //
-LibRef_name wsid  = Workspace::get_WS_id();
-
-   if (wsid.get_name().compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+   if (Workspace::is_CLEAR_WS())
       { 
         // don't dump CLEAR WS
         //
@@ -1055,6 +1053,7 @@ LibRef_name wsid  = Workspace::get_WS_id();
         return;
       }
 
+LibRef_name wsid  = Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::dump_WS(out, wsid, html, silent);
 }
@@ -2396,11 +2395,7 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 
    // )SAVE without arguments: use )WSID unless CLEAR WS...
 
-   // split wsname into lib (if any) and name
-   //
-LibRef_name wsid =  Workspace::get_WS_id();
-
-   if (wsid.get_name().compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+   if (Workspace::is_CLEAR_WS())
       {
         // don't save CLEAR WS
         COUT << "NOT SAVED: THIS WS IS CLEAR WS+" << endl;
@@ -2412,6 +2407,7 @@ LibRef_name wsid =  Workspace::get_WS_id();
         return;
       }
 
+LibRef_name wsid =  Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::save_WS(out, wsid, true);
 }

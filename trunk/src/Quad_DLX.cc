@@ -462,7 +462,7 @@ ShapeItem pcnt = 0;
        }
    out << endl;
 
-char * rows_used = reinterpret_cast<char *>(alloca(rows));
+char * rows_used = ALLOCA(char, rows);
    memset(rows_used, 0, rows);
 
    for (const DLX_Node * x = right; x != this; x = x->right)
@@ -475,7 +475,7 @@ char * rows_used = reinterpret_cast<char *>(alloca(rows));
        {
          if (!rows_used[r])   continue;
 
-         int * row = reinterpret_cast<int *>(alloca(cols * sizeof(int)));
+         int * row = ALLOCA(int, cols);
          memset(row, 0, cols*sizeof(int));
          for (const DLX_Node * x = right; x != this; x = x->right)
          for (const DLX_Node * y = x->down; y != x; y = y->down)

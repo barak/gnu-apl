@@ -299,7 +299,7 @@ FILE * ofile = open_file(*filename_A, close_A);
             if (max_len < len) max_len = len;
           }
 
-      int * rho = reinterpret_cast<int *>(alloca(B_rank * sizeof(int)));
+      int * rho = ALLOCA(int, B_rank);
       memset(rho, 0, B_rank * sizeof(int));
 
       loop(b, B_count)
@@ -405,8 +405,7 @@ const ShapeItem cols = B->get_cols();
        }
 
 Matrix * mtx = genMtx(B, false);
-const size_t mtx_bytes = mtx->rows() * mtx->cols() * sizeof(double);
-double * data = reinterpret_cast<double *>(alloca(mtx_bytes));
+double * data = ALLOCA(double, mtx->rows() * mtx->cols());
 int i = 0;
   loop(j, mtx->rows())
   for (int k = 0; k < mtx->cols(); k++, i++)
@@ -468,8 +467,7 @@ const ShapeItem cols = B->get_cols();
      }
 
 Matrix * mtx = genMtx(B, false);
-const size_t mtx_bytes = mtx->rows() * mtx->cols() * sizeof(double);
-double * data = reinterpret_cast<double *> (alloca(mtx_bytes));
+double * data = ALLOCA(double, mtx->rows() * mtx->cols());
 int i = 0;
   loop(j, mtx->rows())
   loop(k, mtx->cols())

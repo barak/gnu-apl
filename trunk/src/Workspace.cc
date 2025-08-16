@@ -97,6 +97,13 @@ Workspace::Workspace()
    new (&Quad_ES::fun)   Quad_ES;
 }
 //----------------------------------------------------------------------------
+bool
+Workspace::is_CLEAR_WS()
+{
+   return get_WSID().get_name()
+                    .compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ;
+}
+//----------------------------------------------------------------------------
 void
 Workspace::push_SI(const Executable * fun, const char * loc)
 {
@@ -627,7 +634,7 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
    Quad_SQL::close_all_connections();
 
 const LibRef_name lib_name(UCS_ASCII_string("CLEAR WS"), true);
-   set_WS_id(lib_name);
+   set_WSID(lib_name);
    if (!silent)   out << "CLEAR WS" << endl;
 }
 //----------------------------------------------------------------------------

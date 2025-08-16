@@ -178,16 +178,19 @@ public:
       { return the_workspace.prompt; }
 
    /// return the name of the current workspace.
-   static const LibRef_name & get_WS_id()
+   static const LibRef_name & get_WSID()
       { return the_workspace.WS_id; }
 
    /// set the name of the current workspace.
-   static void set_WS_id(const LibRef_name & new_id)
+   static void set_WSID(const LibRef_name & new_id)
       { the_workspace.WS_id = new_id; }
 
    /// Return all user-defined commands
    static vector<Command::user_command> & get_user_commands()
       {  return the_workspace.user_commands; }
+
+   /// return \b true if \b the_workspace is the CLEAR WS
+   static bool is_CLEAR_WS();
 
    /// Create a new SI-entry on the SI stack.
    static void push_SI(const Executable * fun, const char * loc);
@@ -267,7 +270,7 @@ public:
    /// return a token for system function or variable \b ucs
    static Token get_quad(const UCS_string & ucs, int & len);
 
-   /// return oldest SI entry that is running \b exex, or 0 if none
+   /// return the oldest SI entry that is running \b exex, or 0 if none
    static StateIndicator * oldest_exec(const Executable * exec);
 
    /// return true iff function \b funname is on the current call stack

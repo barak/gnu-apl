@@ -228,8 +228,7 @@ UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
    /// starting at \b col
 
 const ShapeItem column_count1 = column_count - 1;
-ShapeItem * column_widths = reinterpret_cast<ShapeItem *>
-                                      (alloca(column_count*sizeof(ShapeItem)));
+ShapeItem * column_widths = ALLOCA(ShapeItem, column_count);
    loop(col, column_count)   column_widths[col] = max_width(col, column_count);
 
 const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));

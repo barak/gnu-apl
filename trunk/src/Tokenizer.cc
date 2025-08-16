@@ -963,9 +963,9 @@ bool dot_seen = false;      // the decimal . was seen
 
    // construct a C string according to the APL string
    //
-char * buffer = reinterpret_cast<char *>(alloca(int_digits.size() +
-                                                fract_digits.size() +
-                                                expo_digits.size() + 20));
+char * buffer = ALLOCA(char, int_digits.size() +
+                             fract_digits.size() +
+                             expo_digits.size() + 20);
 char * b = buffer;
    if (mant_negative)   *b++ = '-';
    loop(i, int_digits.size())   *b++ = int_digits[i];
