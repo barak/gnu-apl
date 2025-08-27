@@ -1672,32 +1672,32 @@ DIR *
 Command::open_LIB_dir(UTF8_string & path, ostream & out,
                       const UCS_string_vector & args)
 {
-   // args can be one of:
-   //                              example:
-   // 1.                           )LIB
-   // 2.  N                        )LIB 1
-   // 3.  )LIB directory-name      )LIB /usr/lib/...
-   //
+   /* args should be one of:
+                                   example:
+      1.                           )LIB
+      2.  N                        )LIB 1
+      3.  )LIB directory-name      )LIB /usr/lib/...
+    */
 
 UCS_string arg(UNI_0);
    if (args.size())   arg = args.front();
 
-   if (args.size() == 0)                       // case 1.
+   if (args.size() == 0)                            // case 1.
       {
-        path = LibPaths::get_lib_dir(LIB_NONE);
+        path = LibPaths::get_lib_dir(LIB0);
       }
    else if (arg.size() == 1 &&
             Avec::is_digit(Unicode(arg.front())))   // case 2.
       {
         path = LibPaths::get_lib_dir(LibRef(arg.front() - '0'));
       }
-   else                                        // case 3.
+   else                                             // case 3.
       {
         path = UTF8_string(arg);
       }
 
-   // follow symbolic links, but not too often (because symbolic links may
-   // form an endless loop)...
+   // follow symbolic links, but not too often (because symbolic links are
+   // subject to creating an endless loop)...
    //
    loop(depth, 20)
        {
@@ -1717,19 +1717,16 @@ UCS_string arg(UNI_0);
             }
        }
 
-DIR * dir = opendir(path.c_str());
+   if (DIR * dir = opendir(path.c_str()))   return dir;   // OK
 
-   if (dir == 0)
-      {
-        const char * why = strerror(errno);
-        out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << endl;
+   // error opening path
+   //
+const char * why = strerror(errno);
+   out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << endl;
 
-        MORE_ERROR() <<
-        "path '" << path << "' could not be opened as directory: " << why;
-        return 0;   // error
-      }
-
-   return dir;
+   MORE_ERROR() << "Could not open the directory '" << path << ".\n"
+                << "Reason: " << why;
+   return 0;   // error
 }
 //----------------------------------------------------------------------------
 bool

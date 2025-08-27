@@ -79,7 +79,7 @@ union SockAddr
 
 sub_function_info Quad_FIO::sub_functions[] =
 {
-#define fiodef(N, name)   { N, #name, -1, 0 },
+#define fio_def(N, name)   { N, #name, -1, 0 },
 #include "Quad_FIO.def"
 };
 //----------------------------------------------------------------------------
@@ -245,6 +245,8 @@ Value_P Z(ShapeItem(fd_count), LOC);
 Token
 Quad_FIO::do_fprintf(FILE * outf, Value_P A)
 {
+   CHECK_SECURITY(disable_Quad_FIO__write);
+
    // A is expected to be a nested APL value. A[1] is the format string,
    // A[2...] are the values for each % field in A[1]. The result returned
    // is the number of characters (not bytes!) written to the file.
@@ -1609,6 +1611,8 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, "r") filename Bs
               {
+                CHECK_SECURITY(disable_Quad_FIO__open);
+
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
                 errno = 0;
@@ -1624,6 +1628,8 @@ int function_number = -1;
 
          case 4:   // fclose(Bh)
               {
+                CHECK_SECURITY(disable_Quad_FIO__open);
+
                 errno = 0;
                 file_entry & fe = get_file_entry(*B.get());
 
@@ -1773,6 +1779,7 @@ int function_number = -1;
               goto out_errno;
 
          case 24:   // popen(Bs, "r") command Bs
+              CHECK_SECURITY(disable_Quad_FIO__exec);
               {
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
@@ -1926,6 +1933,7 @@ int function_number = -1;
               }
 
          case 32:   // socket(Bi=AF_INET, SOCK_STREAM, 0)
+              CHECK_SECURITY(disable_Quad_FIO__socket);
               UNSAFE("socket", function_number);
               {
                 errno = 0;
@@ -2284,6 +2292,7 @@ int function_number = -1;
 
          case 57:   // fork() + execve() in the child
               {
+                CHECK_SECURITY(disable_Quad_FIO__exec);
                 errno = 0;
                 const int fd = do_FIO_57(*B.get(), 0);
                 if (fd == -1)   goto out_errno;
@@ -2565,6 +2574,7 @@ int function_number = -1;
               }
 
          case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi
+              CHECK_SECURITY(disable_Quad_FIO__write);
               {
                 errno = 0;
                 const size_t bytes = A->element_count();
@@ -2654,6 +2664,7 @@ int function_number = -1;
               }
 
          case 23:   // fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
+              CHECK_SECURITY(disable_Quad_FIO__write);
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
@@ -2664,6 +2675,7 @@ int function_number = -1;
               }
 
          case 24:   // popen(Bs, As) command Bs mode As
+              CHECK_SECURITY(disable_Quad_FIO__exec);
               {
                 const UCS_string mode_ucs(*A.get());
                 const UCS_string path_ucs(*B.get());
@@ -2853,6 +2865,7 @@ int function_number = -1;
               }
 
          case 42:   // write(Bh, Ai, ⍴Ai) 1 byte per Zi
+              CHECK_SECURITY(disable_Quad_FIO__write);
               {
                 const size_t bytes = A->element_count();
                 const int fd = get_fd(*B.get());
@@ -2874,6 +2887,7 @@ int function_number = -1;
               }
 
          case 43:   // write(Bh, Ac, ⍴Ac) Unicode Ac Output UTF-8
+              CHECK_SECURITY(disable_Quad_FIO__write);
               {
                 const int fd = get_fd(*B.get());
                 UCS_string text(*A.get());
@@ -2927,7 +2941,9 @@ int function_number = -1;
               }
 
          case 56:   // write nested lines As to file Bs
+              CHECK_SECURITY(disable_Quad_FIO__write);
               {
+
                 // 1. before opening the output file, check that A is valid.
                 //
                 errno = 0;

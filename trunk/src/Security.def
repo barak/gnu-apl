@@ -24,11 +24,15 @@
 
 
 sec_def( disable_native_functions )   ///< disable dyadic ⎕FX
-sec_def( disable_Quad_FIO )           ///< disable ⎕FIO
-sec_def( disable_Quad_GTK  )          ///< disable ⎕GTK
-sec_def( disable_Quad_PLOT )          ///< disable ⎕PLOT
-sec_def( disable_Quad_SQL )           ///< disable ⎕SQL
-sec_def( disable_SAVE_command  )      ///< disable )SAVE and )DUMP cimmands
+sec_def( disable_Quad_FIO         )   ///< disable ⎕FIO (all functions)
+sec_def( disable_Quad_FIO__exec   )   ///< disable execve(), popen()
+sec_def( disable_Quad_FIO__open   )   ///< disable (f)open(), (f)close()
+sec_def( disable_Quad_FIO__socket )   ///< disable (f)open(), (f)close()
+sec_def( disable_Quad_FIO__write  )   ///< disable (f)write(), fprintf()
+sec_def( disable_Quad_GTK         )   ///< disable ⎕GTK
+sec_def( disable_Quad_PLOT        )   ///< disable ⎕PLOT
+sec_def( disable_Quad_SQL         )   ///< disable ⎕SQL
+sec_def( disable_SAVE_command     )   ///< disable )SAVE and )DUMP commands
 
 #undef sec_def
 

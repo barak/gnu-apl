@@ -172,7 +172,7 @@ protected:
         if (UserPreferences::uprefs.safe_mode)
            {
              MORE_ERROR() << "⎕FIO[" << funnum
-                          << " is not permitted in safe mode (see ⎕ARGi)";
+                          << " is not permitted in safe mode (see ⎕ARG)";
              DOMAIN_ERROR;
            }
       }
