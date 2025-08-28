@@ -128,9 +128,9 @@ protected:
    /// sort order
    enum SORT_ORDER
       {
-        SORT_NONE = 0,
-        SORT_SIZE = 1,
-        SORT_TIME = 2,
+        SORT_NONE = 0,      ///< do not sort
+        SORT_SIZE = 1,      ///< sort by size
+        SORT_TIME = 2,      ///< sort by time
       };
 
    /// On, Off, or Toggle
@@ -295,12 +295,12 @@ protected:
                           bool dbg);
 
    /// print the workspace names in the LIB directory w/o sorting
-   static void LIB_print_0(ostream & out, const UTF8_string lib_path,
+   static void LIB_print_flat(ostream & out, const UTF8_string lib_path,
                            const UCS_string_vector & directories,
                            const UCS_string_vector & files);
 
    /// print the workspace names in the LIB directory with sorting
-   static void LIB_print_12(ostream & out, const UTF8_string lib_path,
+   static void LIB_print_sorted(ostream & out, const UTF8_string lib_path,
                            const UCS_string_vector & directories,
                            const UCS_string_vector & files, SORT_ORDER sort);
 

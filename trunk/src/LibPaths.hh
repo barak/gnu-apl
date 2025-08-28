@@ -114,7 +114,7 @@ public:
              CSRC_CMD       = 5,   ///< lib root from )LIBS command
            };
 
-        /// how dir_path was computed
+        /// how this->dir_path was computed
         CfgSrc cfg_src;
       };
 
@@ -134,7 +134,8 @@ public:
    static void set_APL_lib_root(const char * new_root);
 
    /// set library path (from config file)
-   static void set_lib_dir(LibRef lib, const char * path, LibDir::CfgSrc src);
+   static void set_lib_dir(LibRef lib, const UTF8_string & path,
+                           LibDir::CfgSrc src);
 
    /// return 0 if directory \b lib) is present, otherwise the reason why not.
    static const char * is_present(LibRef lib);
@@ -182,7 +183,7 @@ protected:
    /// true if APL_lib_root was computed from environment variable APL_LIB_ROOT
    static bool root_from_env;
 
-   /// true if APL_lib_root was not found ("." taken)
+   /// true if APL_lib_root was not found (thus "." taken as fallback)
    static bool root_from_pwd;
 };
 //----------------------------------------------------------------------------

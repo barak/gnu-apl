@@ -1603,8 +1603,7 @@ const bool query = args.size() &&
         else
            {
              UTF8_string path(args[1]);
-             LibPaths::set_lib_dir(libref, path.c_str(),
-                                   LibPaths::LibDir::CSRC_CMD);
+             LibPaths::set_lib_dir(libref, path, LibPaths::LibDir::CSRC_CMD);
              out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
            }
         return;
@@ -1666,6 +1665,8 @@ const bool query = args.size() &&
 "       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
 "       └── PWD:   the path is relative to current directory $PWD (last resort)"
        << endl;
+
+   out << right;   // restore the default
 }
 //----------------------------------------------------------------------------
 DIR *
@@ -1857,13 +1858,13 @@ UCS_string_vector directories;
               continue;
             }
 
-         if (filename[dlen - 1] == '~')   continue;  // editor backup
+         if (filename[dlen - 1] == '~')   continue;  // editor backup file
 
-         if (dbg)
+         if (dbg)   // ]LIB ...
             {
               files.push_back(filename);
             }
-         else
+         else       // )LIB ...
             {
               if (filename_utf8.ends_with(".apl"))
                  {
@@ -1884,12 +1885,12 @@ UCS_string_vector directories;
 
    // 5. print the directories, then the files
    //
-   if (sort)   LIB_print_12(out, path, directories, files, sort);
-   else        LIB_print_0(out, path, directories, files);
+   if (sort)   LIB_print_sorted(out, path, directories, files, sort);
+   else        LIB_print_flat(out, path, directories, files);
 }
 //----------------------------------------------------------------------------
 void
-Command::LIB_print_0(ostream & out, const UTF8_string lib_path,
+Command::LIB_print_flat(ostream & out, const UTF8_string lib_path,
                      const UCS_string_vector & directories,
                      const UCS_string_vector & files)
 {
@@ -1947,20 +1948,20 @@ std::vector<int> col_widths;
 }
 //----------------------------------------------------------------------------
 void
-Command::LIB_print_12(ostream & out, const UTF8_string lib_path,
-                      const UCS_string_vector & directories,
-                      const UCS_string_vector & files, SORT_ORDER sort)
+Command::LIB_print_sorted(ostream & out, const UTF8_string lib_path,
+                          const UCS_string_vector & directories,
+                          const UCS_string_vector & files, SORT_ORDER sort)
 {
-const size_t max_dir = directories.max_width(1, 1);
-const size_t max_file = files.max_width(1, 1);
-const size_t max_name = max_dir > max_file ? max_dir : max_file;
+const size_t max_dir_name = directories.max_width(0, 1);
+const size_t max_file_name = files.max_width(0, 1);
+const size_t max_name = max(max_dir_name, max_file_name);
 
    // print directories
    //
    loop(d, directories.size())
        {
-         const size_t fill = max_name - directories[d].size() + 9;
-         out << directories[d] << string(fill, ' ') << "(DIR)" << endl;
+         const size_t blanks = max_name - directories[d].size() + 9;
+         out << directories[d] << string(blanks, ' ') << "(DIR)" << endl;
        }
 
    if (files.size() == 0)   return;
@@ -2004,9 +2005,8 @@ vector<bool> appended;         // appended[f] is true if file[f] was appended
 
    loop(f, sorted_files.size())
        {
-         out << sorted_files[f];
-         for (size_t j = sorted_files[f].size() ; j < max_name; ++j)
-             out << " ";
+         const size_t blanks = max_name - sorted_files[f].size();
+         out << sorted_files[f] << string(blanks, ' ');
 
          if (sort == SORT_SIZE)
             {
@@ -2051,13 +2051,13 @@ Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
    /* Command is:
 
-    )LIB [N] [RANGE] [sort]
+      )LIB [N] [RANGE] [sort]
    
-    where:
+      where:
 
-    N is an optional library number (0-9, default 0)
-    RANGE is a range for the file names (two ASCII characters A-Z)
-    sort is a sorting order: -T (sort by time) or -S (sort by size)
+      N is an optional library number (0-9, default 0)
+      RANGE is a range for the file names (two ASCII characters A-Z)
+      sort is a sorting order: -T (sort by time) or -S (sort by size)
     */
 
    Command::LIB_common(out, args, false);
@@ -2068,16 +2068,16 @@ Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
    /* Command is:
 
-    ]LIB [N] [RANGE] [sort]
+      ]LIB [N] [RANGE] [sort]
    
-    where:
+      where:
 
-    N is an optional library number (0-9, default 0)
-    RANGE is a range for the file names (two ASCII characters A-Z)
-    sort is a sorting order: -sT (sort by time) or -sS (sort by size)
+      N is an optional library number (0-9, default 0)
+      RANGE is a range for the file names (two ASCII characters A-Z)
+      sort is a sorting order: -sT (sort by time) or -sS (sort by size)
     */
 
-   // The difference between cmd_LIB2 and cmd_LIB2 is the output
+   // The difference between cmd_LIB1 and cmd_LIB2 is the output
    // channel, i.e. )LIB vs. ]LIB.
 
    Command::LIB_common(out, args, true);

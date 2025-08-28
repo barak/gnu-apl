@@ -42,6 +42,8 @@ char LibPaths::APL_lib_root[APL_PATH_MAX + 10] = "";
 
 LibPaths::LibDir LibPaths::lib_dirs[LIB_MAX];
 
+// realpath() complains if its result is not used, To avoid that warning
+// we assign the result to variable unused below.
 const void * unused = 0;
 
 //----------------------------------------------------------------------------
@@ -115,7 +117,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
    unused = realpath(argv0, APL_bin_path);
    APL_bin_path[APL_PATH_MAX] = 0;
    {
-     char * slash =   strrchr(APL_bin_path, '/');
+     char * slash = strrchr(APL_bin_path, '/');
      if (slash)   { *slash = 0;   APL_bin_name = slash + 1; }
      else         { APL_bin_name = APL_bin_path;            }
    }
@@ -199,9 +201,10 @@ LibPaths::set_APL_lib_root(const char * new_root)
 }
 //----------------------------------------------------------------------------
 void
-LibPaths::set_lib_dir(LibRef libref, const char * path, LibDir::CfgSrc src)
+LibPaths::set_lib_dir(LibRef libref, const UTF8_string & path,
+                      LibDir::CfgSrc src)
 {
-   lib_dirs[libref].dir_path = UTF8_string(path);
+   lib_dirs[libref].dir_path = path;
    lib_dirs[libref].cfg_src = src;
 }
 //----------------------------------------------------------------------------

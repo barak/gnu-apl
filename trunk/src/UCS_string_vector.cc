@@ -210,12 +210,15 @@ int max_nb = 0;
 ShapeItem
 UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
+   /*  interpret this UCS_string_vector as a 2-dimensional array of names.
+       Assume further that this hypothetical array has column_count columns.
+       Then return the length of the longest name in column col.
+    */
 ShapeItem ret = 0;
 
    for (ShapeItem s = col; s < ssize(); s += column_count)
        {
-          const ShapeItem len_s = at(s).ssize();
-          if (ret < len_s)   ret = len_s;
+          ret = max(ret, at(s).ssize());
        }
 
    return ret;

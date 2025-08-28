@@ -1561,7 +1561,8 @@ int file_profile = 0;   // the current profile in the preferences file
                    continue;
                  }
 
-              LibPaths::set_lib_dir(LibRef(lib_ref), arg,
+              const UTF8_string arg_utf(arg);
+              LibPaths::set_lib_dir(LibRef(lib_ref), arg_utf,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
                                         : LibPaths::LibDir::CSRC_PREF_HOME);
             }
