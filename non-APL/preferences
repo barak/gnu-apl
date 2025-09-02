@@ -1,0 +1,130 @@
+
+# vim: et:ts=4:sw=4
+
+# directory names (mandatory)...
+#
+ROOT="/home/eedjsa/Django/trunk"    # ROOT is where all Django projects live
+VENV="djangotutorial"               # virtual python environment in ROOT
+SITE="mysite"                       # site in $VENV
+APPL="polls"                        # application in $VENV
+
+# Directory name suffixes. Directory name suffixes may be useful to
+# identify the nature of a directory.
+#
+# Setting all suffixes to "", and leaving the directory names above unchanged,
+# causes new_project.bash to produce the same directory names as the
+# Django tutorial.
+#
+VENX="_venv"    # suffix for $VENV
+SITX="_site"    # suffix for $SITE
+APPX="_appl"    # suffix for $APPL
+
+# The browser to be used for displaying web pages of the project
+BROWSER="firefox"
+
+# The Django tutorial contains a number of interactive tests. By interactive
+# tests we mean tests that are performed by the user, typically after one or
+# more files have been changed as the tutorial proceeds.
+#
+# NOTE that these interactive test have nothing to do with the automated
+# tests described in part 5 of the Django tutorial. The purpose of interactive
+# test is to verify that the 'new_project.bash' script is doing what the Django
+# tutorial describes, while the automated verify that the Django application
+# developed in the tutorial is doing what it should. IOW: the interactive tests
+# aim at testing the initial directory structure produced by the
+# 'new_project.bash' script, while the automated tests aim at testing aspects
+# of the # Django applicated AFTER the initial directory structure was
+# produced.
+#
+# A few interactive tests use 'manage.py shell' to issue commands to the
+# Django applcation and the user should then control the response in the shell.
+#
+# The majority of tests, however, use:
+# (1) a web server to run the Django application, and
+# (2) a browser (as configured above) to access the Django # application.
+#
+# For this web server, the 'new_project.bash' script provides 3 alternatives
+# as configured below.
+#
+# 1. Web_server="manage_py_runserver" uses the web server shipped with the
+#    Django tutorial. This web server is started at the beginning of each
+#    test and keeps running until the next interactive test. As the tutorial
+#    says, this web server must be used only during development of Django
+#    applications and, for security reasons, NEVER ON THE PUBLIC INTERNET.
+#    This web server uses a different port than regular web servers and
+#    can therefore run parallel to them.
+#
+# 2. Web_server="mod_wsgi_express" uses a web server written in python that
+#    uses, under the hood, the standard apache 2 web server. This web server
+#    COULD be more secure than alternative 1 above, but only if it is
+#    configured properly (file /tmp/mod_wsgi-localhost*/httpd.conf) after
+#    the web server was started. Like alternative1., this web server uses
+#    a different port than regular web servers and can therefore run parallel
+#    to them. See https://pypi.org/project/mod-wsgi/ for details.
+# 
+# 3. Web_server="extern" uses an existing (and running) web server like
+#    apache or nginx  to serve theDjango application. Unlike alternatives
+#    1. and 2. above (which start the web server at the beginning of an
+#    interactve test), this web server must be configured accordingly (see
+#    https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/modwsgi/
+#    for details), and must be running before an interacive test is executed
+#    from new_project.bash.
+#
+  Web_server="manage_py_runserver"
+# Web_server="mod_wsgi_express"
+# Web_server="extern"
+#
+
+# The tutorial modifies the same files (e.g. views.py, urls.py, models.py)
+# as it proceeds. Moreover, the same file name may occur in different
+# directories. This may make it difficult for newcomers to modify the
+# correct file when executing the tutorial.
+#
+# Setting DO_LISTING='yes' below, causes new_project.bash to create a listing
+# after a file was modified. By diff'ing these listings one can see what was
+# changed  (provided that the listing concerns the same file, of course).
+#
+DO_LISTING='yes'
+
+# construct the name like PollsApplConfig in INSTALLED_APPS in the settings.py
+# file of the site. For example, for application name 'polls_appl' the file
+# name is PollsApplConfig (uppercasing 'polls' and 'appl', removing the '_',
+# and finally concatenating 'Polls', 'Appl', and 'Config').
+#
+A1=$(tr a-z A-Z <<< "${APPL:0:1}")     # e.g. "P" from "polls"
+An="${APPL:1}"                         # e.g. "olls" from "polls"
+X1=$(tr a-z A-Z <<< "${APPX:1:1}")     # e.g. "A" from "_appl"
+Xn="${APPX:2}"                         # e.g. "appl" from "_appl"
+APPL_CONFIG="${A1}${An}${X1}${Xn}Config"  # e.g. "PollsApplConfig"
+unset A1 An X1 Xn
+
+# add the directory name suffixes
+#
+VENV="${VENV}${VENX}"           # e.g. "djangotutorial_venv"
+SITE="${SITE}${SITX}"           # e.g. "mysite_site"
+APPL="${APPL}${APPX}"           # e.g. "polls.appl"
+
+# absolute directory paths
+#
+abs_VENV="${ROOT}/${VENV}"
+abs_SITE="${abs_VENV}/${SITE}"
+abs_APPL="${abs_VENV}/${APPL}"
+abs_TMPL="${abs_APPL}/templates/${APPL}"  # templates for $APPL
+
+# print the directory names
+#
+ROOT_len=${#ROOT}
+echo "
+\$ROOT:   $ROOT
+\$VENV:   $VENV at: \$ROOT${abs_VENV:$ROOT_len}
+\$SITE:   $SITE at: \$ROOT${abs_SITE:$ROOT_len}
+\$APPL:   $APPL at: \$ROOT${abs_APPL:$ROOT_len}
+\$TMPL:   at: \$ROOT${abs_TMPL:$ROOT_len}
+
+config:  class $APPL_CONFIG in: \$ROOT${abs_APPL:$ROOT_len}/apps.py
+         and variable INSTALLED_APPS in: \$ROOT${abs_SITE:$ROOT_len}
+"
+unset ROOT_len
+
+# EOF
+
