@@ -163,10 +163,6 @@ stop_web_server()
 
         "mod_wsgi_express")
             echo "stopping stale web server (if any, method: $Web_server)"
-            ps -ef  | grep -F "mod_wsgi-express"   \
-                    | grep -F $USER                \
-                    | awk '{ printf(" %s", $2); }' \
-                    > /tmp/web_server_pids
             PIDS=$(ps -ef | grep -F "mod_wsgi-express" | grep -v "grep"   \
                           | grep -F $USER              | awk $AWK)
         ;;
@@ -294,9 +290,21 @@ stop_web_server "mod_wsgi_express"
 #
 rm -Rf $abs_VENV
 
-# create an empty directory structure for a new VENV
+# create an empty directory structure (as at the start of the tutorial),
+# or a virtual envireonment (as at the end of the tutorial) for a new VENV
 #
-mkdir $abs_VENV
+if [ "$VENV_TYPE" = "subdir" ]; then
+    mkdir $abs_VENV
+elif [ "$VENV_TYPE" = "full_venv" ]; then
+    python -m venv $VENV        # create virtual environment,
+    $abs_VENV/bin/activate      # and activate it
+else
+    echo
+    echo "*** Configuration error: The bash variable 'VENV_TYPE'"
+    echo "    in file $preferences is $VENV_TYPE, but should"
+    echo "    be either 'subdir' or 'full_venv'."
+    exit 5
+fi
 
 # maybe install django. For unprivileged users it typically lands below the
 # user's ~/.local/lib/python3.10/site-packages/ directory.
@@ -390,11 +398,6 @@ echo "
         ╚══════════════╝
 "
 $MANAGE migrate
-
-# Listing 11, part 2, p. 23
-#
-start_listing 12 23 "$abs_SITE/settings.py"
-make_listing # ══════════════════════════════════════════════════
 
 # create DB model. We combine two sections in the tutorial:
 # Listing 13, Part 2, p. 28,
