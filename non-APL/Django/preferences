@@ -3,7 +3,7 @@
 
 # directory names (mandatory)...
 #
-ROOT="/home/eedjsa/Django/trunk"    # ROOT is where all Django projects live
+ROOT="$(pwd)"                       # ROOT is where all Django projects live
 VENV="djangotutorial"               # virtual python environment in ROOT
 SITE="mysite"                       # site in $VENV
 APPL="polls"                        # application in $VENV
@@ -12,11 +12,12 @@ APPL="polls"                        # application in $VENV
 # beginning of the tutorial) or else as a full virtual environment (as
 # described at the end of the tutorial).
 #
-# Apparently a full virtual environment does not harm, therefore by default
-# we use # it from the start rather than at the end.
+# NOTE that VENV_TYPE="full_venv" below most likely requires some additional
+# configuration of the web servers 'mod_wsgi_express' and 'extern' below (and
+# that configuration is beyond the scope of the new_project script).
 # 
-# VENV_TYPE="subdir"
-VENV_TYPE="full_venv"
+VENV_TYPE="subdir"
+# VENV_TYPE="full_venv"
 
 # Directory name suffixes. Directory name suffixes may be useful to
 # identify the nature of a directory.
