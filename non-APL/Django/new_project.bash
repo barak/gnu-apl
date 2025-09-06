@@ -296,8 +296,8 @@ rm -Rf $abs_VENV
 if [ "$VENV_TYPE" = "subdir" ]; then
     mkdir $abs_VENV
 elif [ "$VENV_TYPE" = "full_venv" ]; then
-    python -m venv $VENV        # create virtual environment,
-    $abs_VENV/bin/activate      # and activate it
+    python -m venv $VENV            # create virtual environment,
+    source $abs_VENV/bin/activate   # and activate it
 else
     echo
     echo "*** Configuration error: The bash variable 'VENV_TYPE'"
