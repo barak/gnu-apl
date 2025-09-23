@@ -145,6 +145,17 @@ Command::process_line(UCS_string & line, ostream * out)
    line.remove_leading_whitespaces();
    if (line.size() == 0)           return;   // empty input line
 
+   /* at this point, line is not empty and starts with a non-blank.
+      The first character line[0] determines the nature of the line:
+
+      ')':       regular APL command
+      ']':       debug command (a GNU APL extension of IBM APL2)
+      '∇':       invocaton of the Nabla function editor
+      '⍝':       full line APL comment
+      '#':       full line APL comment (a GNU APL extension of IBM APL2)
+      otherwise: APL expression in immediate execution mode
+    */
+
    switch(line[0])
       {
          case UNI_R_PARENT:      // regular command, e.g. )SI
@@ -159,11 +170,11 @@ Command::process_line(UCS_string & line, ostream * out)
               if (line.size())   break;
               return;
 
-         case UNI_NABLA:               // e.g. ∇FUN
+         case UNI_NABLA:         // Nabla editor, e.g. ∇FUN
               Nabla::edit_function(line);
               return;
 
-         case UNI_NUMBER_SIGN:   // e.g. # comment
+         case UNI_NUMBER_SIGN:         // e.g. # comment
          case UNI_COMMENT:             // e.g. ⍝ comment
               return;
 
@@ -177,6 +188,8 @@ Command::process_line(UCS_string & line, ostream * out)
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
+   out << left << dec << nouppercase << setfill(' ');
+
    if (line.contains(UNI_COMMENT))   // unlikely, but valid
       {
         loop(l, line.size())   // find the leading ⍝
@@ -310,6 +323,7 @@ UCS_string args_ucs(args_utf);
 void
 Command::do_APL_expression(UCS_string & line)
 {
+   COUT << left << dec << nouppercase << setfill(' ');
    Workspace::more_error().clear();
 
 Executable * statements = 0;

@@ -193,6 +193,14 @@ const xcb_query_text_extents_cookie_t cookie =
       }
 }
 //----------------------------------------------------------------------------
+/// return the length (in pixels) of string
+Pixel_X
+string_width(const XCB_context & pctx, const char * string)
+{
+string_width_height wh(pctx, string);
+   return wh.width;
+}
+//----------------------------------------------------------------------------
 /// test a returned cookie for errors (and print \b errMessage if any).
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
@@ -541,8 +549,8 @@ void
 draw_point(const XCB_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
 {
-const Pixel_X point_size  = l_props.get_point_size();   // outer point diameter
-const Pixel_X point_size2 = l_props.get_point_size2();  // inner point diameter
+const uint16_t point_size  = l_props.get_point_size();   // outer point diameter
+const uint16_t point_size2 = l_props.get_point_size2();  // inner point diameter
 const int16_t half = point_size >> 1;                   // outer point radius
 const int point_style = l_props.get_point_style();
 const Color point_color = l_props.get_point_color();
@@ -585,9 +593,9 @@ const Color point_color = l_props.get_point_color();
              const int16_t center2_y = xy.y - 2*point_size2/3;
              const int16_t hypo2_y = half2*1.732;
              const xcb_point_t points2[3]  = {
-                 { int16_t(xy.x), center2_y   },
-                 { int16_t(half2), hypo2_y },
-                 { int16_t(-2*half2), 0    } };
+                 { int16_t(xy.x),     center2_y },
+                 { half2,             hypo2_y   },
+                 { int16_t(-2*half2), 0         } };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
@@ -600,9 +608,9 @@ const Color point_color = l_props.get_point_color();
         const int16_t center_y = xy.y + 2*point_size/3;
         const int16_t hypo_y = - half*1.732;
         const xcb_point_t points[3]   = {
-              { int16_t(xy.x), center_y  },
-              { int16_t(half), hypo_y },
-              { int16_t(-2*half), 0   } };
+              { int16_t(xy.x),    center_y },
+              { half,             hypo_y   },
+              { int16_t(-2*half), 0        } };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                       XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
@@ -612,9 +620,9 @@ const Color point_color = l_props.get_point_color();
              const int16_t center2_y = xy.y + 2*point_size2/3;
              const int16_t hypo2_y = - half2*1.732;
              const xcb_point_t points2[3]  = {
-                 { int16_t(xy.x), center2_y   },
-                 { int16_t(half2), hypo2_y },
-                 { int16_t(-2*half2), 0    } };
+                 { int16_t(xy.x),     center2_y },
+                 { half2,             hypo2_y   },
+                 { int16_t(-2*half2), 0         } };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
@@ -625,10 +633,10 @@ const Color point_color = l_props.get_point_color();
    else if (point_style == 4)   // caro
       {
         const xcb_point_t points[4] =           {
-              { int16_t(xy.x), int16_t(xy.y - half) },
-              {  half,  half },
-              { int16_t(-half),  half },
-              { int16_t(-half), int16_t(-half) } };
+              { int16_t(xy.x),  int16_t(xy.y - half) },
+              { half,           half                 },
+              { int16_t(-half), half                 },
+              { int16_t(-half), int16_t(-half)       } };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                       XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
@@ -686,14 +694,13 @@ const int line_count = w_props.get_line_count();
 
    // estimate the box size from the length of the longest legend string
    //
-const char * longest_legend = "";
+Pixel_X longest_legend = 20;
    for (int l = 0; l < line_count; ++l)
        {
          const char * lstr = l_props[l]->get_legend_name().c_str();
-         if (strlen(longest_legend) < strlen(lstr))   longest_legend = lstr;
+         const Pixel_X width = string_width(pctx, lstr);
+         if (longest_legend < width)   longest_legend = width;
        }
-
-string_width_height longest_size(pctx, longest_legend);
 
 const Color canvas_color = w_props.get_canvas_color();
 
@@ -714,7 +721,7 @@ const int dy = w_props.get_legend_dY();
      set_GC_foreground(pctx, pctx.fill, canvas_color);
      xcb_rectangle_t rect = { int16_t(x0 - 10),
                               int16_t(y0 -  8),
-                              uint16_t(20 + xt + longest_size.width - x0),
+                              uint16_t(20 + xt + longest_legend - x0),
                               uint16_t(dy*line_count) };
      xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.fill, 1, &rect);
      xcb_flush(pctx.conn);
@@ -1100,8 +1107,9 @@ do_plot(const XCB_context & pctx,
 const Color canvas_color = w_props.get_canvas_color();
    {
      set_GC_attr(pctx, pctx. line, XCB_GC_FOREGROUND, canvas_color);
-     xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
-                                    w_props.get_window_height() };
+     const uint16_t width = w_props.get_window_width();
+     const uint16_t height = w_props.get_window_height();
+     xcb_rectangle_t rect = { 0, 0, width, height };
      xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.line, 1, &rect);
    }
 
