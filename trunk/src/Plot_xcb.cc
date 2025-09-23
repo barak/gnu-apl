@@ -79,7 +79,11 @@ using namespace std;
 
 /// two int16_t
 #define I1616(x, y) int16_t(x), int16_t(y)
-/// the number of items in \b x
+
+/// array with two int16_t
+#define XY16(x, y) { I1616(x, y) }
+
+/// the number of items in aray \b x
 #define ITEMS(x) sizeof(x)/sizeof(*x), x
 
 /// 2 byte little endian
@@ -592,10 +596,10 @@ const Color point_color = l_props.get_point_color();
              const int16_t half2 = point_size2 >> 1;
              const int16_t center2_y = xy.y - 2*point_size2/3;
              const int16_t hypo2_y = half2*1.732;
-             const xcb_point_t points2[3]  =    {
-                 { I1616(xy.x,     center2_y) },
-                 { I1616(half2,    hypo2_y)   },
-                 { I1616(-2*half2, 0)         } };
+             const xcb_point_t points2[3] = {
+                   XY16(xy.x,     center2_y),
+                   XY16(half2,    hypo2_y)  ,
+                   XY16(-2*half2, 0)        };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
@@ -607,10 +611,10 @@ const Color point_color = l_props.get_point_color();
       {
         const int16_t center_y = xy.y + 2*point_size/3;
         const int16_t hypo_y = - half*1.732;
-        const xcb_point_t points[3]   =     {
-              { I1616(xy.x,     center_y) },
-              { I1616(half,     hypo_y)   },
-              { I1616(-2*half, 0)         } };
+        const xcb_point_t points[3] =  {
+              XY16(xy.x,     center_y) ,
+              XY16(half,     hypo_y)   ,
+              XY16(-2*half, 0)         };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                       XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
@@ -619,10 +623,10 @@ const Color point_color = l_props.get_point_color();
              const int16_t half2 = point_size2 >> 1;
              const int16_t center2_y = xy.y + 2*point_size2/3;
              const int16_t hypo2_y = - half2*1.732;
-             const xcb_point_t points2[3]  =     {
-                 { I1616(xy.x,      center2_y) },
-                 { I1616(half2,     hypo2_y)   },
-                 { I1616(-2*half2, 0)          } };
+             const xcb_point_t points2[3] =  {
+                   XY16(xy.x,      center2_y),
+                   XY16(half2,     hypo2_y)  ,
+                   XY16(-2*half2,  0)        };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
@@ -632,22 +636,22 @@ const Color point_color = l_props.get_point_color();
       }
    else if (point_style == 4)   // caro
       {
-        const xcb_point_t points[4] =       {
-              { I1616(xy.x,  xy.y - half) },
-              { I1616(half,  half)        },
-              { I1616(-half, half)        },
-              { I1616(-half, -half)       } };
+        const xcb_point_t points[4] = {
+              XY16(xy.x,  xy.y - half),
+              XY16(half,  half)       ,
+              XY16(-half, half)       ,
+              XY16(-half, -half)      };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                       XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             const xcb_point_t points2[4] =      {
-                   { I1616(xy.x, xy.y - half2) },
-                   { I1616( half2,  half2)     },
-                   { I1616(-half2,  half2)     },
-                   { I1616(-half2, -half2)     } };
+             const xcb_point_t points2[4] = {
+                   XY16(xy.x, xy.y - half2) ,
+                   XY16( half2,  half2)     ,
+                   XY16(-half2,  half2)     ,
+                   XY16(-half2, -half2)     };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
@@ -658,22 +662,22 @@ const Color point_color = l_props.get_point_color();
       }
    else if (point_style == 5)   // square
       {
-        const xcb_point_t points[4] = {
-              { I1616(xy.x - half, xy.y - half) },
-              { I1616(point_size, 0)  },
-              { I1616(0, point_size)  },
-              { I1616(-point_size, 0) } };
+        const xcb_point_t points[4] =       {
+              XY16(xy.x - half, xy.y - half),
+              XY16(point_size,  0)          ,
+              XY16(0,           point_size) ,
+              XY16(-point_size, 0)          };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                       XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             const xcb_point_t points2[4] = {
-                   { I1616(xy.x - half2, xy.y - half2) },
-                   { I1616(point_size2,  0)            },
-                   { I1616(0,            point_size2)  },
-                   { I1616(-point_size2, 0)            } };
+             const xcb_point_t points2[4] =        {
+                   XY16(xy.x - half2, xy.y - half2),
+                   XY16(point_size2,  0)           ,
+                   XY16(0,            point_size2) ,
+                   XY16(-point_size2, 0)           };
              set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
