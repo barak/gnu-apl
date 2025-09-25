@@ -757,17 +757,9 @@ else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
-# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build.
-# reproducible builds should not contain any non-predictable data.
-#
-if test -n "$SOURCE_DATE_EPOCH"
-then
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
-    apl_BUILD_OS=""
-else
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z"`
-    apl_BUILD_OS=`uname -s -r -m`
-fi
+AC_MSG_CHECKING([when and where this interpreter was built])
+m4_include([m4/build_date.m4])
+AC_MSG_RESULT([$apl_BUILD_DATE])
 
 # set 'abs_apl_top' to the "real" top-level directory. The "real" top-level
 # directory contains file configure.ac, while the VPATH copies of it do not.
@@ -1011,7 +1003,9 @@ fi
 AS_ECHO(["
 $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
 
-    prefix:       :              $prefix
+    # A. command line arguments for ./configure
+    #
+    prefix:                      $prefix
 
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
@@ -1020,6 +1014,10 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED
     VALUE_HISTORY_WANTED:        $VALUE_HISTORY_WANTED
 
+    # B. computed variables (most of them in m4/*.m4
+    #
+    apl_BUILD_DATE:              $apl_BUILD_DATE
+    apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions

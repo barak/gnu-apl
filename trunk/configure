@@ -665,6 +665,8 @@ ac_func_cxx_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+apl_BUILD_OS
+apl_BUILD_DATE
 RATIONAL_NUMBERS_WANTED
 VISIBLE_MARKERS_WANTED
 SHORT_VALUE_LENGTH_WANTED
@@ -22987,17 +22989,47 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $RATIONAL_NUMBERS_WANTED" >&5
 printf "%s\n" "$RATIONAL_NUMBERS_WANTED" >&6; }
 
-# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build.
-# reproducible builds should not contain any non-predictable data.
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking when and where this interpreter was built" >&5
+printf %s "checking when and where this interpreter was built... " >&6; }
+
+# compute the GNU APL build date, using $SOURCE_DATE_EPOCH if present.
+# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build
+# (see https://reproducible-builds.org/docs/source-date-epoch ).
+# Reproducible builds should not contain any non-predictable data.i
+# In our case the non-predictable data is apl_BUILD_DATE and apl_BUILD_OS.
 #
+
+# format the date, see https://unix.stackexchange.com/questions/230464/how-to-format-date-output-with-spaces-as-variable-in-script
+#
+dash_format_date()
+{
+  date "+%F %R:%S %Z" "$@"
+}
+
+dash_build_date()
+{ {
+
+DATE_FMT="+%F\ %R:%S\ %Z"
+apl_BUILD_DATE=$(dash_format_date)      # current time (not predictable)
+apl_BUILD_OS=$(uname -s -r -m)          # current OS
+
 if test -n "$SOURCE_DATE_EPOCH"
-then
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
-    apl_BUILD_OS=""
-else
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z"`
-    apl_BUILD_OS=`uname -s -r -m`
+then :
+   apl_BUILD_OS="none"
+         apl_BUILD_DATE=             $(
+                   dash_format_date -u -d "$SOURCE_DATE_EPOCH" 2>/dev/null ||
+                   dash_format_date -u -r $SOURCE_DATE_EPOCH  ||
+                   dash_format_date -u)
+
 fi
+
+
+} }
+
+dash_build_date     # set apl_BUILD_DATE and apl_BUILD_OS
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $apl_BUILD_DATE" >&5
+printf "%s\n" "$apl_BUILD_DATE" >&6; }
 
 # set 'abs_apl_top' to the "real" top-level directory. The "real" top-level
 # directory contains file configure.ac, while the VPATH copies of it do not.
@@ -25926,7 +25958,9 @@ fi
 printf "%s\n" "
 $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
 
-    prefix:       :              $prefix
+    # A. command line arguments for ./configure
+    #
+    prefix:                      $prefix
 
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
@@ -25935,6 +25969,10 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED
     VALUE_HISTORY_WANTED:        $VALUE_HISTORY_WANTED
 
+    # B. computed variables (most of them in m4/*.m4
+    #
+    apl_BUILD_DATE:              $apl_BUILD_DATE
+    apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions
