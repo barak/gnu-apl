@@ -65,13 +65,30 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
              if (!InputFile::current_file()->file)   break;   // no more files
            }
 
-        // At this point current_file and current_file->file are valid
-        // read a line with CR and LF removed.
+        // At this point current_file and current_file->file are valid.
+        // Read a line with CR and LF removed.
         //
         eof = false;
         read_file_line(line, eof);
         if (eof)   // end of file reached: do some global checks
            {
+             if (Command::inside_multiline)
+                {
+                  CERR << "\n*** WARNING: Multiline string not closed "
+                          "at the end of a file.\n";
+                  if (InputFile::current_file())
+                     {
+                       CERR << "*** File: "
+                            << InputFile::current_file()->filename;
+                       if (const int start = Command::multiline_start + 1)
+                          {
+                            CERR << " (the string starts near line "
+                                 << start << ")";
+                          }
+                       CERR << ".\n";
+                     }
+                }
+
              if (InputFile::current_file()->with_LX == do_LX)
                 {
                   InputFile::current_file()->with_LX = no_LX;

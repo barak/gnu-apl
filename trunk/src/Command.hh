@@ -124,6 +124,10 @@ public:
    /// automatically display )MORE info after errors
    static bool auto_MORE;
 
+   /// true if inside a multi-line string
+   static bool inside_multiline;
+   static int multiline_start;
+
 protected:
    /// sort order
    enum SORT_ORDER

@@ -171,11 +171,9 @@ FILE * hist = fopen(filename, "r");
         return;
       }
 
-   for (;;)
+char buffer[4000];
+   while (fgets(buffer, sizeof(buffer) - 1, hist))
        {
-         char buffer[4000];
-         const char * s = fgets(buffer, sizeof(buffer) - 1, hist);
-         if (s == 0)   break;   // end of file
          buffer[sizeof(buffer) - 1] = 0;
 
          int slen = strlen(buffer);
@@ -847,7 +845,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
         char buffer[4000];
         const APL_time_us from = now();
          const char * s = fgets(buffer, sizeof(buffer) - 1, stdin);
-        Workspace::add_wait(now() - from);
+         Workspace::add_wait(now() - from);
 
         if (s == 0)
            {

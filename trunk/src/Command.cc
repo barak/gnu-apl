@@ -62,6 +62,8 @@
 #include "Workspace.icc"
 
 bool Command::auto_MORE = false;
+bool Command::inside_multiline = false;
+int  Command::multiline_start = 0;
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
@@ -75,23 +77,23 @@ Command::process_line()
 UCS_string prefix;   // for new-style multiline strings
 UCS_string accu;     // for new-style multiline strings
 UCS_string prompt = Workspace::get_prompt();
-bool multiline = false;
 int count = 0;
    for (;;)
        {
          UCS_string line;
          bool eof = false;
          InputMux::get_line(LIM_ImmediateExecution, prompt,
-                      line, eof, LineInput::get_history());
+                            line, eof, LineInput::get_history());
 
          if (eof) CERR << "EOF at " << LOC << endl;
 
-         const ShapeItem multi = line.multi_pos(multiline);
+         const ShapeItem multi = line.multi_pos(inside_multiline);
          if (multi != -1)   /// line is START or END of multi-line string
             {
-              multiline = ! multiline;
-              if (multiline)    // START of multi-line string
+              inside_multiline = ! inside_multiline;
+              if (inside_multiline)    // START of multi-line string
                   {
+                    multiline_start = InputFile::current_line_no();
                     count = 0;
                     prefix = line;
                     prefix.resize(multi);   // discard trailing """ ff.
@@ -101,6 +103,7 @@ int count = 0;
                   }
               else              // END of multi-line string
                   {
+                    multiline_start = -1;
                     accu.pop_back();   // trailing " "
                     if (accu.size() == 1)   accu.append_ASCII(" \"\"");
 
@@ -124,7 +127,7 @@ int count = 0;
                     return;
                   }
             }
-         else if (multiline)   // inside multi-line
+         else if (inside_multiline)   // inside multi-line
             {
               ++count;
               accu.append_ASCII("\"");
