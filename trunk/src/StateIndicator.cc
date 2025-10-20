@@ -37,7 +37,7 @@
 //----------------------------------------------------------------------------
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
-     safe_execution_count(_par ? _par->safe_execution_count : 0),
+     safe_execution_depth(_par ? _par->safe_execution_depth : 0),
      level(_par ? 1 + _par->get_level() : 0),
      error(E_NO_ERROR, LOC),
      current_stack(*this, exec->get_body()),
@@ -173,7 +173,7 @@ StateIndicator::print(ostream & out) const
 {
    out << "Depth:      " << level                << endl;
    out << "Exec:       " << executable           << endl;
-   out << "Safe exec:  " << safe_execution_count << endl;
+   out << "Safe exec:  " << safe_execution_depth << endl;
 
    Assert(executable);
 

@@ -307,7 +307,7 @@ ExecuteList * fun = 0;
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
    Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution_count();
+   Workspace::SI_top()->set_safe_execution_depth();
 
    return Token(TOK_SI_PUSHED);
 }
@@ -359,6 +359,8 @@ Quad_EC::eoc(Token & result)
 Value_P Z(3, LOC);
    if (result.get_tag() == TOK_ERROR)
       {
+        /// clear any )MORE info that may have been produced in the ⎕EC context
+        Workspace::more_error().clear();
         StateIndicator * si = Workspace::SI_top();
         si->clear_safe_execution();
 
@@ -514,7 +516,7 @@ Quad_ES::eval_B(Value_P B) const
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
    if (error.get_error_code() == E_NO_ERROR)              return ret;
-   if (Workspace::SI_top()->get_safe_execution_count())   return ret;
+   if (Workspace::SI_top()->get_safe_execution_depth())   return ret;
 
    throw error;
 }

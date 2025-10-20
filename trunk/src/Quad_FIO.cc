@@ -1488,7 +1488,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
              if (result.get_tag() == TOK_SI_PUSHED)
                 {
                   Workspace::SI_top()->                     // pretend ⎕ES
-                             set_safe_execution_count();
+                             set_safe_execution_depth();
                   benchmark_cycles_from = from;
                   return result;
                 }
@@ -1537,7 +1537,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
              cFunction_P fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
-             Workspace::SI_top()->set_safe_execution_count();   // pretend ⎕ES
+             Workspace::SI_top()->set_safe_execution_depth();   // pretend ⎕ES
              Token result = fun->eval_B(B);
              if (result.get_tag() == TOK_SI_PUSHED)
                 {

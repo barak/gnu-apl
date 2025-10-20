@@ -572,22 +572,22 @@ check_EOC:
               InterruptContext::clear_interrupt_raised(LOC);
 
               // check for safe execution mode. Unroll all SI entries that
-              // have the same safe_execution_count, except the last
+              // have the same safe_execution_depth, except the last
               // unroll the SI stack.
               //
-              if (Workspace::SI_top()->get_safe_execution_count())
+              if (Workspace::SI_top()->get_safe_execution_depth())
                  {
                    // SI_top() is in save execution mode. Pop it and all
-                   // callers with the same get_safe_execution_count().
+                   // callers with the same get_safe_execution_depth().
                    //
                    // after pop'ing the SI entries only the original SI
                    // (which has set the save execution mode) shall remain
                    // the SI stack.
                    //
                    StateIndicator * si = Workspace::SI_top();
-                   const int sex_level = si->get_safe_execution_count();
+                   const int sex_level = si->get_safe_execution_depth();
                    while (si->get_parent() && sex_level ==
-                          si->get_parent()->get_safe_execution_count())
+                          si->get_parent()->get_safe_execution_depth())
                       {
                         si = si->get_parent();
                         Workspace::pop_SI(LOC);

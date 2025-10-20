@@ -240,7 +240,7 @@ StateIndicator * si = Workspace::SI_top();   // the current )SI entry
 
    Log(LOG_verbose_error)
       {
-        if (!(si && si->get_safe_execution_count()))   BACKTRACE
+        if (!(si && si->get_safe_execution_depth()))   BACKTRACE
       }
 
    // maybe map error to DOMAIN ERROR.
@@ -289,9 +289,13 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
         CERR << endl;
       }
 
-   if (Workspace::more_error().size() == 0)   // no )MORE info provided
+   if (Workspace::more_error().size() == 0 &&   // no )MORE info provided, and
+       Workspace::SI_top()->get_safe_execution_depth() == 0)   // and not in ⎕ES
       {
-        MORE_ERROR() << "Offending symbol: " << sym_name;
+        char extra[20] = { 0 };
+        if (sym_name.size() == 1 && sym_name[0] >= 0x80)
+           SPRINTF(extra, " (U+%4.4X)", sym_name[0]);
+        MORE_ERROR() << "Offending symbol: " << sym_name << extra;
       }
 
    Log(LOG_verbose_error)     BACKTRACE
@@ -405,7 +409,7 @@ out:
    // )SI entries below a ⎕ES entry must not print anything but simply return
    for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
        {
-         if (si1->get_safe_execution_count()) return;
+         if (si1->get_safe_execution_depth()) return;
        }
 
    print_em(UERR, LOC);
