@@ -621,12 +621,18 @@ std::vector<const char *> args(argc);
 
    if (UserPreferences::uprefs.eval_exprs.size())
       {
-         loop(e, UserPreferences::uprefs.eval_exprs.size())
+        loop(e, UserPreferences::uprefs.eval_exprs.size())
             {
               const char * expr = UserPreferences::uprefs.eval_exprs[e];
               const UTF8_string expr_utf(expr);
               UCS_string expr_ucs(expr_utf);
-              Command::process_line(expr_ucs, 0);
+              try
+                 { Command::process_line(expr_ucs, 0); }
+              catch (...)
+                 {
+                   CERR << "*** --eval '" << expr << "' failed.";
+                   Command::cmd_OFF(6);
+                 }
             }
         Command::cmd_OFF(0);
         return 0;
