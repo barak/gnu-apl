@@ -53,12 +53,22 @@ CREATE TABLE COMPANY(
  3 Teddy 23 
 
       update←'UPDATE COMPANY SET SALARY=? where ID=?'
-      update ⎕SQL[4, DB] 22000 3
+      update ⎕SQL[4, DB] 22000 3        ⍝ increase TTeddy's salary
 
       select←'SELECT ID,NAME,SALARY FROM COMPANY'
       select ⎕SQL[4, DB] ''
  1 Paul  20000 
  2 Allen 15000 
+ 3 Teddy 22000 
+
+      ⍝ using function name syntax
+      ⍝
+      update ⎕SQL.update (DB (17000 2))     ⍝ increase Allan's salary
+
+      select←'SELECT ID,NAME,SALARY FROM COMPANY'
+      select ⎕SQL.query (DB '')
+ 1 Paul  20000 
+ 2 Allen 17000 
  3 Teddy 22000 
 
       ⎕SQL[2] DB   ⍝ close DB

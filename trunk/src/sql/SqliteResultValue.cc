@@ -50,7 +50,9 @@ void StringResultValue::update(Value & Z) const
        }
     else
        {
-         Z.next_ravel_Pointer(make_string_cell(value, LOC).get());
+         const UTF8_string utf(value.c_str());
+         Value_P ZZ(utf, LOC);
+         Z.next_ravel_Pointer(ZZ.get());
        }
 }
 

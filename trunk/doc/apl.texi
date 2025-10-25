@@ -1597,12 +1597,13 @@ purpose. The function groups of GNU APL are:
 @itemize
 @item @b{⌹}: a collection of matrix factorizations (aka. decompositions)
 @item @b{⎕CR}: a collection of data conversions (formerly known as monadic
-  @b{C}harater @b{R}epresentation
+  @b{C}harater @b{R}epresentations
+@item @b{⎕FFT}: a collection of @b{F}ast @b{F}ourier @b{T}ransformations
 @item @b{⎕FIO}: a collection of @b{F}ile @b{I}/O functions
 @item @b{⎕MX}: a collection of @b{M}atri@b{x} functions
-@item @b{⎕FFT}: a collection of @b{F}ast @b{F}ourier @b{T}ransformation
   functions
 @item @b{⎕RVAL}: generation of @b{R}andom APL @b{Val}ues
+@item @b{SQL}:  an nterface to @b{SQL databases}
 @end itemize
 
 The syntax for function groups has evolved in 3 phases as elucidated in the
@@ -5773,23 +5774,73 @@ system function ⎕SQL, described below. ⎕SQL has an axis argument that
 selects a sub-function of ⎕SQL.
 
 @c ............................................................................
-@subsection ⎕SQL[0] : display subfunctions
+@subsection ⎕SQL[0] ⍬ : display subfunction numbers
 
 @verbatim
-      ⎕SQL[0]''
-Available function numbers:
-type  ⎕SQL[1] file      - open a database file, return reference ID for it
-      ⎕SQL[2] ref       - close database
-query ⎕SQL[3,db] params - send SQL query
-query ⎕SQL[4,db] params - send SQL update
-      ⎕SQL[5] ref       - begin a transaction
-      ⎕SQL[6] ref       - commit current transaction
-      ⎕SQL[7] ref       - rollback current transaction
-      ⎕SQL[8] ref       - list tables
-ref   ⎕SQL[9] table     - list columns for table
-      ⎕SQL[10] type     - return the library version number
-      ⎕SQL[11] type     - return the library version string
+   Valid sub-function numbers for ⎕SQL...
+
+   Legend: Fs - database file name (path)
+           Ty - database type ('sqlite' or 'postgres')
+           Db - database handle (small integer)
+           Qs - SQL query string
+           Pv - query parameters (APL values, to be bound to Qs)
+           Ts - name of a table in the database
+
+           ⎕SQL[0] ''       ⍝ list the ⎕SQL function names
+           ⎕SQL[0] ⍬        ⍝ list the ⎕SQL function numbers
+   Db ← Ty ⎕SQL[1] Fs       ⍝ open database Fs & return a handle for it
+           ⎕SQL[2] Db       ⍝ close database handle Db
+        Qs ⎕SQL[3, Db] Pv   ⍝ send SQL query Qs
+        Qs ⎕SQL[4, Db] Pv   ⍝ send SQL update Qs
+           ⎕SQL[5] Db       ⍝ begin a transaction
+           ⎕SQL[6] Db       ⍝ commit the current transaction
+           ⎕SQL[7] Db       ⍝ roll the current transaction back
+           ⎕SQL[8] Db       ⍝ list the tables in database Db
+        Db ⎕SQL[9] Ts       ⍝ list the column names and types of table Tn
+   Vn ← Db ⎕SQL[10] Ty      ⍝ return the provider version number for type Ty
+   Vs ← Db ⎕SQL[11] Ty      ⍝ return the provider version string for type Ty
 @end verbatim
+
+The axis argument [0] is optional; one can also use @b{⎕SQL ⍬}.
+
+@subsection ⎕SQL[0] '' : display subfunction names
+
+As of @b{SVN version 1901}, ⎕SQL has been promoted to be a Function Group.
+Instead of function nunbers one can use function names with the following
+syntax:
+
+@verbatim
+      ⎕SQL[0] ''
+      With a small performance penalty, ⎕SQL also accepts the following
+      sub-function names instead of sub-function numbers as axis argument:
+
+   Legend: Fs - database file name (path)
+           Ty - database type ('sqlite' or 'postgres')
+           Db - database handle (small integer)
+           Qs - SQL query string
+           Pv - query parameters (APL values, to be bound to Qs)
+           Ts - name of a table in the database
+           Vi - DB provider version number (integer)
+           Vs - DB provider version string
+
+       ⎕SQL[0] ''      ←→  ⎕SQL.list ''        ⍝ list ⎕SQL function names
+       ⎕SQL[0] ⍬       ←→  ⎕SQL.list ⍬         ⍝ list ⎕SQL function numbers)
+    Ty ⎕SQL[1] Fs      ←→  ⎕SQL.open Fs        ⍝ open the database file Fs
+       ⎕SQL[2] Db      ←→  ⎕SQL.close Db       ⍝ close a database handle Db
+    Qs ⎕SQL[3, Db]     ←→  ⎕SQL.query (Db B)   ⍝ SQL database query
+    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update         ⍝ SQL database update
+       ⎕SQL[5] Db   Pv ←→  ⎕SQL.begin          ⍝ begin a transaction
+       ⎕SQL[6] Db      ←→  ⎕SQL.commit         ⍝ end a transaction
+       ⎕SQL[7] Db      ←→  ⎕SQL.rollback       ⍝ roll a transaction back
+       ⎕SQL[8] Db      ←→  ⎕SQL.tables         ⍝ show all tables
+    Db ⎕SQL[9] Ts      ←→  ⎕SQL.columns        ⍝ show the columns of a table
+       ⎕SQL[10] Ty     ←→  ⎕SQL.version        ⍝ SQL provider version number
+       ⎕SQL[11] Ty     ←→  ⎕SQL.vstring        ⍝ SQL provider version string
+
+end @verbatim
+
+Like for ⎕SQL[0] ⍬ above is the axis argument [0] is optional; one can also 
+use @b{⎕SQL ''} instead of ⎕SQL[0] ''.
 
 @c ............................................................................
 @subsection ref ← A ⎕SQL[1] B : open database
@@ -5923,14 +5974,17 @@ release.
 @subsection Z ← ⎕SQL[10] B : library version number
 
 Return the version number (integer scalar) of the library that was used
-to implement the database type @b{B}.
+to implement the database type @b{B}. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type.
 
 @c ............................................................................
 @subsection Z ← ⎕SQL[11] B : library version string
 
 Return the version string of the library that was used to implement the
-database type @b{B}.
-
+database type @b{B}. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type.
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.39

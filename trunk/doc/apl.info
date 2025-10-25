@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 2, 2025.  This manual briefly documents GNU APL, an interpreter
+October 25, 2025.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -1500,11 +1500,12 @@ somehow related by their purpose.  The function groups of GNU APL are:
 
    • ⌹: a collection of matrix factorizations (aka.  decompositions)
    • ⎕CR: a collection of data conversions (formerly known as monadic
-     Charater Representation
+     Charater Representations
+   • ⎕FFT: a collection of Fast Fourier Transformations
    • ⎕FIO: a collection of File I/O functions
-   • ⎕MX: a collection of Matrix functions
-   • ⎕FFT: a collection of Fast Fourier Transformation functions
+   • ⎕MX: a collection of Matrix functions functions
    • ⎕RVAL: generation of Random APL Values
+   • SQL: an nterface to SQL databases
 
    The syntax for function groups has evolved in 3 phases as elucidated
 in the following.
@@ -5470,26 +5471,77 @@ File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  
 system function ⎕SQL, described below.  ⎕SQL has an axis argument that
 selects a sub-function of ⎕SQL.
 
-2.38.1 ⎕SQL[0] : display subfunctions
--------------------------------------
+2.38.1 ⎕SQL[0] ⍬ : display subfunction numbers
+----------------------------------------------
 
-      ⎕SQL[0]''
-Available function numbers:
-type  ⎕SQL[1] file      - open a database file, return reference ID for it
-      ⎕SQL[2] ref       - close database
-query ⎕SQL[3,db] params - send SQL query
-query ⎕SQL[4,db] params - send SQL update
-      ⎕SQL[5] ref       - begin a transaction
-      ⎕SQL[6] ref       - commit current transaction
-      ⎕SQL[7] ref       - rollback current transaction
-      ⎕SQL[8] ref       - list tables
-ref   ⎕SQL[9] table     - list columns for table
-      ⎕SQL[10] type     - return the library version number
-      ⎕SQL[11] type     - return the library version string
+   Valid sub-function numbers for ⎕SQL...
 
-2.38.2 ref ← A ⎕SQL[1] B : open database
-----------------------------------------
+   Legend: Fs - database file name (path)
+           Ty - database type ('sqlite' or 'postgres')
+           Db - database handle (small integer)
+           Qs - SQL query string
+           Pv - query parameters (APL values, to be bound to Qs)
+           Ts - name of a table in the database
 
+           ⎕SQL[0] ''       ⍝ list the ⎕SQL function names
+           ⎕SQL[0] ⍬        ⍝ list the ⎕SQL function numbers
+   Db ← Ty ⎕SQL[1] Fs       ⍝ open database Fs & return a handle for it
+           ⎕SQL[2] Db       ⍝ close database handle Db
+        Qs ⎕SQL[3, Db] Pv   ⍝ send SQL query Qs
+        Qs ⎕SQL[4, Db] Pv   ⍝ send SQL update Qs
+           ⎕SQL[5] Db       ⍝ begin a transaction
+           ⎕SQL[6] Db       ⍝ commit the current transaction
+           ⎕SQL[7] Db       ⍝ roll the current transaction back
+           ⎕SQL[8] Db       ⍝ list the tables in database Db
+        Db ⎕SQL[9] Ts       ⍝ list the column names and types of table Tn
+   Vn ← Db ⎕SQL[10] Ty      ⍝ return the provider version number for type Ty
+   Vs ← Db ⎕SQL[11] Ty      ⍝ return the provider version string for type Ty
+
+   The axis argument [0] is optional; one can also use ⎕SQL ⍬.
+
+2.38.2 ⎕SQL[0] ” : display subfunction names
+--------------------------------------------
+
+As of SVN version 1901, ⎕SQL has been promoted to be a Function Group.
+Instead of function nunbers one can use function names with the
+following syntax:
+
+      ⎕SQL[0] ''
+      With a small performance penalty, ⎕SQL also accepts the following
+      sub-function names instead of sub-function numbers as axis argument:
+
+   Legend: Fs - database file name (path)
+           Ty - database type ('sqlite' or 'postgres')
+           Db - database handle (small integer)
+           Qs - SQL query string
+           Pv - query parameters (APL values, to be bound to Qs)
+           Ts - name of a table in the database
+           Vi - DB provider version number (integer)
+           Vs - DB provider version string
+
+       ⎕SQL[0] ''      ←→  ⎕SQL.list ''        ⍝ list ⎕SQL function names
+       ⎕SQL[0] ⍬       ←→  ⎕SQL.list ⍬         ⍝ list ⎕SQL function numbers)
+    Ty ⎕SQL[1] Fs      ←→  ⎕SQL.open Fs        ⍝ open the database file Fs
+       ⎕SQL[2] Db      ←→  ⎕SQL.close Db       ⍝ close a database handle Db
+    Qs ⎕SQL[3, Db]     ←→  ⎕SQL.query (Db B)   ⍝ SQL database query
+    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update         ⍝ SQL database update
+       ⎕SQL[5] Db   Pv ←→  ⎕SQL.begin          ⍝ begin a transaction
+       ⎕SQL[6] Db      ←→  ⎕SQL.commit         ⍝ end a transaction
+       ⎕SQL[7] Db      ←→  ⎕SQL.rollback       ⍝ roll a transaction back
+       ⎕SQL[8] Db      ←→  ⎕SQL.tables         ⍝ show all tables
+    Db ⎕SQL[9] Ts      ←→  ⎕SQL.columns        ⍝ show the columns of a table
+       ⎕SQL[10] Ty     ←→  ⎕SQL.version        ⍝ SQL provider version number
+       ⎕SQL[11] Ty     ←→  ⎕SQL.vstring        ⍝ SQL provider version string
+
+end @verbatim
+
+Like for ⎕SQL[0] ⍬ above is the axis argument [0] is optional; one can also 
+use @b{⎕SQL ''} instead of ⎕SQL[0] ''.
+
+@c ............................................................................
+@subsection ref ← A ⎕SQL[1] B : open database
+
+@verbatim
       type  ⎕SQL[1] file
 
    Connect to database of type A using connection arguments B. The
@@ -5597,13 +5649,16 @@ future release.
 -----------------------------------------------
 
 Return the version number (integer scalar) of the library that was used
-to implement the database type B.
+to implement the database type B. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one kind
+of SQL database type.
 
 2.38.12 Z ← ⎕SQL[11] B : library version string
 -----------------------------------------------
 
 Return the version string of the library that was used to implement the
-database type B.
+database type B. Depending on the SQL libraries detected by ./configure,
+⎕SQL may support no, one, or more than one kind of SQL database type.
 
 
 File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
@@ -8141,78 +8196,78 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11568
-Node: Chapter 223789
-Node: Section 2.125889
-Node: Subsection 2.1.127111
-Node: Subsection 2.1.227763
-Node: Subsection 2.1.328576
-Node: Subsection 2.1.434359
-Node: Subsection 2.1.538155
-Node: Subsection 2.1.639015
-Node: Subsection 2.1.747115
-Node: Subsection 2.1.848848
-Node: Section 2.252164
-Node: Section 2.352923
-Node: Section 2.458547
-Node: Section 2.559819
-Node: Section 2.664249
-Node: Section 2.764422
-Node: Section 2.865052
-Node: Section 2.969256
-Node: Section 2.1071597
-Node: Section 2.1173686
-Node: Section 2.1275235
-Node: Section 2.1377016
-Node: Section 2.1478945
-Node: Section 2.1579886
-Node: Section 2.1680137
-Node: Section 2.1781533
-Node: Section 2.1891989
-Node: Section 2.1994477
-Node: Section 2.20101203
-Node: Section 2.21102706
-Node: Section 2.22113197
-Node: Section 2.23119079
-Node: Section 2.24122337
-Node: Section 2.25122628
-Node: Section 2.26133469
-Node: Section 2.27133741
-Node: Section 2.28140320
-Node: Section 2.29142774
-Node: Section 2.30143443
-Node: Section 2.31145094
-Node: Section 2.32148869
-Node: Section 2.33162358
-Node: Output File Format178489
-Node: Section 2.34179664
-Node: Section 2.35189014
-Node: Section 2.36190033
-Node: Section 2.37204714
-Node: Section 2.38215710
-Node: Section 2.39220412
-Node: Section 2.40222508
-Node: Section 2.41226926
-Node: Section 2.42248236
-Node: Section 2.43259152
-Node: Section 2.44262347
-Node: Chapter 3262837
-Node: Chapter 4265345
-Node: Chapter 5266471
-Node: Section 5.1268008
-Node: Section 5.2269288
-Node: Section 5.3269648
-Node: Section 5.4269890
-Node: Section 5.5270552
-Node: Section 5.6271030
-Node: Section 5.7271803
-Node: Section 5.8272229
-Node: Chapter 6272631
-Node: Section 6.1273050
-Node: Section 6.2273737
-Node: Chapter 7274568
-Node: Section 7.1275071
-Node: Section 7.2300384
+Node: Chapter 11571
+Node: Chapter 223792
+Node: Section 2.125892
+Node: Subsection 2.1.127114
+Node: Subsection 2.1.227766
+Node: Subsection 2.1.328579
+Node: Subsection 2.1.434362
+Node: Subsection 2.1.538158
+Node: Subsection 2.1.639018
+Node: Subsection 2.1.747118
+Node: Subsection 2.1.848851
+Node: Section 2.252167
+Node: Section 2.352926
+Node: Section 2.458593
+Node: Section 2.559865
+Node: Section 2.664295
+Node: Section 2.764468
+Node: Section 2.865098
+Node: Section 2.969302
+Node: Section 2.1071643
+Node: Section 2.1173732
+Node: Section 2.1275281
+Node: Section 2.1377062
+Node: Section 2.1478991
+Node: Section 2.1579932
+Node: Section 2.1680183
+Node: Section 2.1781579
+Node: Section 2.1892035
+Node: Section 2.1994523
+Node: Section 2.20101249
+Node: Section 2.21102752
+Node: Section 2.22113243
+Node: Section 2.23119125
+Node: Section 2.24122383
+Node: Section 2.25122674
+Node: Section 2.26133515
+Node: Section 2.27133787
+Node: Section 2.28140366
+Node: Section 2.29142820
+Node: Section 2.30143489
+Node: Section 2.31145140
+Node: Section 2.32148915
+Node: Section 2.33162404
+Node: Output File Format178535
+Node: Section 2.34179710
+Node: Section 2.35189060
+Node: Section 2.36190079
+Node: Section 2.37204760
+Node: Section 2.38215756
+Node: Section 2.39223468
+Node: Section 2.40225564
+Node: Section 2.41229982
+Node: Section 2.42251292
+Node: Section 2.43262208
+Node: Section 2.44265403
+Node: Chapter 3265893
+Node: Chapter 4268401
+Node: Chapter 5269527
+Node: Section 5.1271064
+Node: Section 5.2272344
+Node: Section 5.3272704
+Node: Section 5.4272946
+Node: Section 5.5273608
+Node: Section 5.6274086
+Node: Section 5.7274859
+Node: Section 5.8275285
+Node: Chapter 6275687
+Node: Section 6.1276106
+Node: Section 6.2276793
+Node: Chapter 7277624
+Node: Section 7.1278127
+Node: Section 7.2303440
 
 End Tag Table
 

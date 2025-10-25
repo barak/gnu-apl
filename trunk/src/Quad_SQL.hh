@@ -61,17 +61,24 @@ protected:
    /// overloaded Function::eval_XB().
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
    /// list ⎕SQL functions
-   static Value_P list_functions(ostream & out);
+   static Value_P list_functions(ostream & out, bool mapping);
 
    /// open a database, return its handle
    static Value_P open_database(Value_P A, Value_P B);
 
    /// run a (read-only) database query
-   static Value_P run_query(Connection * conn, Value_P A, Value_P B);
+   static Value_P run_query(Value_P A, Value_P X, Value_P B);
 
    /// run a (read/write) database update
-   static Value_P run_update(Connection * conn, Value_P A, Value_P B);
+   static Value_P run_update(Value_P A, Value_P X, Value_P B);
 
    /// return the names of the database columns
    static Value_P column_names(Value_P A, Value_P B);
@@ -85,6 +92,15 @@ protected:
 
    /// return the version string of the SQL provider (synthesized as needed).
    static Value_P get_version_string(const UCS_string & ucs_B);
+
+   /// find function number for function name, -1 if not found
+   static int function_name_to_int(const char * function_name);
+
+   /// convert axis argument X to a database connection. X may have length 2
+   /// (for function number and database handle) or length 1 (function number
+   /// only with B nested and ↑B being the database handle).
+   ///
+   static Connection * param_to_db(Value_P X, Value_P B, bool & nested_B);
 };
 //----------------------------------------------------------------------------
 
