@@ -1,4 +1,9 @@
 /*
+        if (count == 0)   // no connections
+           {
+             new (&Z->get_wproto()) IntCell(0);
+           }
+
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
@@ -26,7 +31,6 @@
 
 #include "Common.hh"
 
-#include "sql/apl-sqlite.hh"
 #include "sql/Connection.hh"
 #include "sql/Provider.hh"
 
@@ -34,10 +38,12 @@
 #include "Security.hh"
 
 // !!! declare providers before Quad_SQL::_fun !!!
-static std::vector<Provider *> providers;
-static std::vector<Connection *> connections;
+std::vector<Provider *> Quad_SQL::SQL_providers;
+std::vector<Quad_SQL::conn_file> Quad_SQL::SQL_connections;
 
-Quad_SQL  Quad_SQL::fun;
+Quad_SQL Quad_SQL::fun;
+Quad_SQL_3 Quad_SQL_3::fun;   // ⎕SQL[3, DB]
+Quad_SQL_4 Quad_SQL_4::fun;   // ⎕SQL[4, DB]
 
 #if apl_SQLITE3
 # include "sql/SqliteResultValue.hh"
@@ -85,22 +91,28 @@ const UTF8_string name_utf(name);
 void
 Quad_SQL::close_all_connections()
 {
-   loop(c, connections.size())
+   loop(c, SQL_connections.size())
       {
-        if (connections[c])   delete connections[c];
-        connections.clear();
-        connections.push_back(0);   // for the next connection
+        conn_file slot = SQL_connections[c];
+        if (Connection * conn = slot.connection)
+           {
+             CERR << "*** WARNING: ⎕SQL handle " << c
+                  << " (file " << slot.filename
+                  << ") is still open. Closing it," << endl;
+             delete conn;
+           }
       }
+   SQL_connections.clear();
 }
 //----------------------------------------------------------------------------
-static void
-init_provider_map()
+void
+Quad_SQL::init_provider_map()
 {
 #if apl_SQLITE3
    {
      Provider * sqliteProvider = new SqliteProvider();
      Assert(sqliteProvider);
-     providers.push_back(sqliteProvider);
+     SQL_providers.push_back(sqliteProvider);
    }
 #elif cfg_USER_WANTS_SQLITE3
 # warning "SQLite3 unavailable since ./configure could not detect it"
@@ -110,7 +122,7 @@ init_provider_map()
    {
 Provider * postgresProvider = new PostgresProvider();
    Assert(postgresProvider);
-   providers.push_back(postgresProvider);
+   SQL_providers.push_back(postgresProvider);
    }
 #elif cfg_USER_WANTS_POSTGRES
 #  warning "PostgreSQL unavailable since ./configure could not detect it."
@@ -128,159 +140,191 @@ Quad_SQL::Quad_SQL()
 //----------------------------------------------------------------------------
 Quad_SQL::~Quad_SQL()
 {
-   loop(p, providers.size())   delete providers[p];
+   loop(p, SQL_providers.size())   delete SQL_providers[p];
+   SQL_providers.clear();
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_SQL::list_functions(ostream & out, bool mapping)
 {
 const char * legend =
-"   Legend: Fs - database file name (path)\n"
-"           Ty - database type ('sqlite' or 'postgres')\n"
-"           Db - database handle (small integer)\n"
-"           Qs - SQL query string\n"
-"           Pv - query parameters (APL values, to be bound to Qs)\n"
-"           Ts - name of a table in the database\n"
-"           Vi - DB provider version number (integer)\n"
-"           Vs - DB provider version string\n"
+"    Legend: Fs - database file name (path)\n"
+"            Ty - database type ('sqlite' or 'postgres')\n"
+"            Db - database handle (small integer)\n"
+"            Qs - SQL query string\n"
+"            Pv - query parameters (APL values, to be bound to Qs)\n"
+"            Ts - name of a table in the database (string)\n"
+"            Vi - DB provider (library) version (integer)\n"
+"            Vs - DB provider (library) version (string)\n"
 "\n";
 
    if (mapping)
       {
-         // ⎕SQL "": print the (axis-)number to function name mappings
-         //
-         out <<
-"      With a small performance penalty, ⎕SQL also accepts the following\n"
-"      sub-function names instead of sub-function numbers as axis argument:\n"
-"\n" << legend <<
-"       ⎕SQL[0] ''      ←→  ⎕SQL.list ''        ⍝ list ⎕SQL function names\n"
-"       ⎕SQL[0] ⍬       ←→  ⎕SQL.list ⍬         ⍝ list ⎕SQL function numbers)\n"
-"    Ty ⎕SQL[1] Fs      ←→  ⎕SQL.open Fs        ⍝ open the database file Fs\n"
-"       ⎕SQL[2] Db      ←→  ⎕SQL.close Db       ⍝ close a database handle Db\n"
-"    Qs ⎕SQL[3, Db]     ←→  ⎕SQL.query (Db B)   ⍝ SQL database query\n"
-"    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update         ⍝ SQL database update\n"
-"       ⎕SQL[5] Db   Pv ←→  ⎕SQL.begin          ⍝ begin a transaction\n"
-"       ⎕SQL[6] Db      ←→  ⎕SQL.commit         ⍝ end a transaction\n"
-"       ⎕SQL[7] Db      ←→  ⎕SQL.rollback       ⍝ roll a transaction back\n"
-"       ⎕SQL[8] Db      ←→  ⎕SQL.tables         ⍝ show all tables\n"
-"    Db ⎕SQL[9] Ts      ←→  ⎕SQL.columns        ⍝ show the columns of a table\n"
-"       ⎕SQL[10] Ty     ←→  ⎕SQL.version        ⍝ SQL provider version number\n"
-"       ⎕SQL[11] Ty     ←→  ⎕SQL.vstring        ⍝ SQL provider version string\n"
-;
+        // ⎕SQL "": print the (axis-)number to function name mappings
+        //
+        const char * map[] = {
+    "   ⎕SQL[5]       ", "begin       ", "begin a transaction"         ,
+    "   ⎕SQL[9]       ", "columns     ", "show the columns of a table" ,
+    "   ⎕SQL[6]       ", "commit      ", "end a transaction"           ,
+    "   ⎕SQL[2]       ", "close       ", "close a database handle"     ,
+    "   ⎕SQL[0]       ", "list ''     ", "⎕SQL function names/numbers" ,
+    "   ⎕SQL[1]       ", "open        ", "open database file"          ,
+    "   ⎕SQL[3, Db] Pv", "query Db Pv ", "SQL database query"          ,
+    "   ⎕SQL[7]       ", "rollback    ", "roll a transaction back"     ,
+    "   ⎕SQL[8]       ", "tables      ", "show all tables"             ,
+    "   ⎕SQL[4, Db] Pv", "update Db Pv", "SQL database update"         ,
+    "   ⎕SQL[10]      ", "version     ", "SQL provider version number" ,
+    "   ⎕SQL[11]      ", "vstring     ", "SQL provider version string" ,
+    0                  , 0               , 0 };
+
+        out <<
+"    With a small performance penalty, ⎕SQL also accepts the following\n"
+"    sub-function names instead of sub-function numbers as axis argument:\n\n"
+             << legend;
+
+        for (const char ** m = map; *m;) 
+            {
+              out << "    "        << *m++;           // axis syntax
+              out << "  ←→  ⎕SQL." << *m++;           // name syntax
+              out << "  ⍝ "        << *m++ << endl;   // comment
+             }
       }
    else
       {
-        out <<
-"   Valid sub-function numbers for ⎕SQL...\n"
-"\n" << legend <<
-"           ⎕SQL[0] ''       ⍝ list the ⎕SQL function names\n"
-"           ⎕SQL[0] ⍬        ⍝ list the ⎕SQL function numbers\n"
-"   Db ← Ty ⎕SQL[1] Fs       ⍝ open database Fs & return a handle for it\n"
-"           ⎕SQL[2] Db       ⍝ close database handle Db\n"
-"        Qs ⎕SQL[3, Db] Pv   ⍝ send SQL query Qs\n"
-"        Qs ⎕SQL[4, Db] Pv   ⍝ send SQL update Qs\n"
-"           ⎕SQL[5] Db       ⍝ begin a transaction\n"
-"           ⎕SQL[6] Db       ⍝ commit the current transaction\n"
-"           ⎕SQL[7] Db       ⍝ roll the current transaction back\n"
-"           ⎕SQL[8] Db       ⍝ list the tables in database Db\n"
-"        Db ⎕SQL[9] Ts       ⍝ list the column names and types of table Tn\n"
-"   Vi ←    ⎕SQL[10] Ty      ⍝ the provider version number for type Ty\n"
-"   Vs ←    ⎕SQL[11] Ty      ⍝ the provider version string for type Ty\n"
-;
+         const char * funs[] = {
+   "        ⎕SQL[0] ''    ", "list the ⎕SQL (sub-)function names"         ,
+   "        ⎕SQL[0] ⍬     ", "list the ⎕SQL (sub-)function numbers"       ,
+   "Db ← Ty ⎕SQL[1] Fs    ", "open database Fs & return a handle for it"  ,
+   "        ⎕SQL[2] Db    ", "close database handle Db"                   ,
+   "     Qs ⎕SQL[3, Db] Pv", "perform SQL query Qs"                       ,
+   "     Qs ⎕SQL[4, Db] Pv", "perform SQL update Qs"                      ,
+   "        ⎕SQL[5] Db    ", "begin a transaction"                        ,
+   "        ⎕SQL[6] Db    ", "commit the current transaction"             ,
+   "        ⎕SQL[7] Db    ", "roll the current transaction back"          ,
+   "        ⎕SQL[8] Db    ", "list the tables in database Db"             ,
+   "     Db ⎕SQL[9] Ts    ", "list the column names and types of table Tn",
+   "Vi ←    ⎕SQL[10] Ty   ", "the provider version number for type Ty"    ,
+   "Vs ←    ⎕SQL[11] Ty   ", "the provider version string for type Ty"    ,
+   0                       , 0 };
+
+         out << "    Valid (sub-)function numbers for ⎕SQL:\n\n" << legend;
+
+        for (const char ** f = funs; *f;)
+             {
+               out << "    " << *f++;           // axis syntax
+               out << "    " << *f++ << endl;   // comment
+             }
       }
 
    return Str0(LOC);
 }
 //----------------------------------------------------------------------------
-static int find_free_connection( void )
+int
+Quad_SQL::find_free_connection(const UTF8_string & filename)
 {
-    for ( int i = 0 ; i < connections.size(); ++i)
-        {
-          if (connections[i] == 0)   return i;
-        }
+   loop(h, SQL_connections.size())
+       {
+         conn_file & slot = SQL_connections[h];
+         if (slot.connection == 0)   // free slot
+            {
+              slot.filename = filename;
+              return h;              // re-use handle h
+            }
+       }
 
-    connections.push_back(0);
-    return connections.size() - 1;
+   // no free connection: append a new slot to SQL_connections
+   //
+   conn_file slot = { 0, filename };
+   SQL_connections.push_back(slot);
+   return SQL_connections.size() - 1;
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_SQL::open_database(Value_P A, Value_P B)
+Quad_SQL::open_database(const Value & A, const Value & B)
 {
-    if (!A->is_apl_char_vector() )
+   // open an SQL database of type A in database file B
+   //
+    if (!A.is_apl_char_vector())
        {
-         MORE_ERROR() << "A ⎕SQL[1] B: Illegal database type A";
-         VALUE_ERROR;
+         MORE_ERROR() <<
+              "A ⎕SQL[1] B: Illegal database type A (string expected).";
+         DOMAIN_ERROR;
       }
 
-const UTF8_string type_utf(A->get_UCS_ravel());
-   loop(p, providers.size())
+    if (!B.is_apl_char_vector() )
        {
-         if (!strcasecmp(providers[p]->get_provider_name(), type_utf.c_str()))
+         MORE_ERROR() <<
+              "A ⎕SQL[1] B: Illegal database file name B (string expected).";
+         DOMAIN_ERROR;
+      }
+
+const UTF8_string type_utf(A.get_UCS_ravel());
+const UTF8_string file_utf(B.get_UCS_ravel());
+
+   /// find a provider for type A and let iy open database file B.
+   loop(p, SQL_providers.size())
+       {
+         Provider * provider = SQL_providers[p];
+         if (!strcasecmp(provider->get_provider_name(), type_utf.c_str()))
             {
-              const APL_Integer connection_index = find_free_connection();
-              connections[connection_index] = providers[p]->open_database(B);
-              return IntScalar(connection_index, LOC);
+              const APL_Integer handle = find_free_connection(file_utf);
+              SQL_connections[handle].connection = provider->open_database(B);
+              return IntScalar(handle, LOC);
             }
        }
 
 UCS_string & more = MORE_ERROR();
    more << "⎕SQL: Unknown database provider type: " << type_utf.c_str() << "\n"
            "      Supported providers are:";
-   loop(p, providers.size())
+   loop(p, SQL_providers.size())
        {
-         more << " " << providers[p]->get_provider_name();
+         more << " " << SQL_providers[p]->get_provider_name();
        }
 
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-static void
-throw_illegal_db_handle(int handle)
+void
+Quad_SQL::throw_illegal_db_handle(int handle)
 {
    if (handle == -1)  MORE_ERROR() << "⎕SQL: Illegal database handle type" ;
    else  MORE_ERROR() << "⎕SQL: Illegal database handle " << handle;
     DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-static Connection *
-db_id_to_connection(int db_id)
+Connection *
+Quad_SQL::db_id_to_connection(int db_id)
 {
-   if (db_id < 0 || db_id >= connections.size() )
+   if (db_id < 0 || db_id >= SQL_connections.size())
       {
         throw_illegal_db_handle(db_id);
       }
 
-Connection * conn = connections[db_id];
-    if (conn == 0 )
-       {
-         throw_illegal_db_handle(db_id);
-       }
-
-    return conn;
+   if (Connection * conn = SQL_connections[db_id].connection)   return conn;
+   throw_illegal_db_handle(db_id);
 }
 //----------------------------------------------------------------------------
-static Connection *
-value_to_db_id(Value_P B)
+Connection *
+Quad_SQL::Quad_SQL::value_to_db_id(const Value & B)
 {
-   if (!B->is_scalar())
+   if (!B.is_scalar())
       {
         MORE_ERROR() << "⎕SQL: non-scalar database handle";
         RANK_ERROR;
       }
 
-   if (!B->is_int_scalar())
+   if (!B.is_int_scalar())
       {
         MORE_ERROR() << "⎕SQL: non-integer database handle";
         DOMAIN_ERROR;
       }
 
-
-const APL_Integer db_id = B->get_cfirst().get_int_value();
+const APL_Integer db_id = B.get_cfirst().get_int_value();
     return db_id_to_connection(db_id);
  }
 //----------------------------------------------------------------------------
-static Token
-close_database(Value_P B)
+Token
+Quad_SQL::close_database(Value_P B)
 {
     if (!B->is_int_scalar())
        {
@@ -290,30 +334,29 @@ close_database(Value_P B)
        }
 
 int db_id = B->get_cfirst().get_int_value();
-   if (db_id < 0 || db_id >= connections.size())
+   if (db_id < 0 || db_id >= SQL_connections.size())
        {
          throw_illegal_db_handle(db_id);
         }
 
-Connection *conn = connections[db_id];
-    if (conn == 0)
+   if (Connection * conn = SQL_connections[db_id].connection)
       {
-        throw_illegal_db_handle(db_id);
+        SQL_connections[db_id].connection = 0;  // mark slot as free
+        delete conn;
+
+        return Token(TOK_APL_VALUE1, Str0(LOC));
       }
 
-    connections[db_id] = NULL;
-    delete conn;
-
-    return Token(TOK_APL_VALUE1, Str0(LOC));
+   throw_illegal_db_handle(db_id);
 }
 //----------------------------------------------------------------------------
-static Value_P
-run_generic_one_query(ArgListBuilder * arg_list, Value_P B, int start,
-                      int num_args, bool ignore_result)
+Value_P
+Quad_SQL::run_generic_one_query(ArgListBuilder * arg_list, const Value & B,
+                                int start, int num_args)
 {
     loop (i, num_args)
          {
-           const Cell & cell = B->get_cravel(start + i);
+           const Cell & cell = B.get_cravel(start + i);
            if (cell.is_integer_cell())
               {
                 arg_list->append_long(cell.get_int_value(), i);
@@ -343,50 +386,55 @@ run_generic_one_query(ArgListBuilder * arg_list, Value_P B, int start,
              }
          }
 
-    return arg_list->run_query(ignore_result);
+    return arg_list->run_query();
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_SQL::run_generic(Connection * conn, Value_P A, Value_P B, bool query)
+Quad_SQL::run_generic(Connection * conn, const Value & A, const Value & B,
+                      bool query)
 {
-   if (!A->is_char_string())
+   // A is the SQL query string
+   //
+   if (!A.is_char_string())
       {
-        MORE_ERROR() << "Illegal query argument type";
+        MORE_ERROR() <<
+       "A ⎕SQL B: Illegal query string A (string expected)";
         DOMAIN_ERROR;
       }
 
-    if (B->get_rank() > 2)
+const sRank rank_B = B.get_rank();
+    if (rank_B > 2)
        {
-         MORE_ERROR() << "⎕SQL: Bind params have illegal rank";
+         MORE_ERROR() <<
+         "A ⎕SQL B: Bind parameters B have illegal rank " << rank_B << " > 2";
          RANK_ERROR;
        }
 
 const string statement = conn->replace_bind_args(
-                                   UTF8_string(A->get_UCS_ravel()).c_str());
+                                   UTF8_string(A.get_UCS_ravel()).c_str());
 ArgListBuilder * builder = query ? conn->make_prepared_query(statement)
                                  : conn->make_prepared_update(statement);
 
-    if (B->get_rank() < 2)
+    if (rank_B < 2)
        {
-         const int num_args = B->element_count();
-         Value_P Z = run_generic_one_query(builder, B, 0, num_args, false);
+         const int num_args = B.element_count();
+         Value_P Z = run_generic_one_query(builder, B, 0, num_args);
          delete builder;
          return Z;
        }
 
-    if (B->get_rank() == 2)   // matrix B
+    if (rank_B == 2)   // matrix B
        {
-         if (const int rows = B->get_rows())
+         if (const int rows = B.get_rows())
             {
-              const int cols = B->get_cols();
+              const int cols = B.get_cols();
               Assert_fatal(rows > 0);
               Value_P Z;
               loop (row, rows)
                    {
-                    const bool not_last = row < rows - 1;
-                    Z = run_generic_one_query(builder, B, row * cols,
-                                              cols, not_last);
-                    if (not_last)   builder->clear_args();
+                    const bool more = row < rows - 1;
+                    Z = run_generic_one_query(builder, B, row * cols, cols);
+                    if (more)   builder->clear_args();
                    }
              delete builder;
              return Z;
@@ -399,54 +447,34 @@ ArgListBuilder * builder = query ? conn->make_prepared_query(statement)
        }
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_SQL::run_query(Value_P A, Value_P X, Value_P B)
+Token
+Quad_SQL::run_transaction_begin(Value_P B)
 {
-bool nested_B = false;
-Connection * conn = param_to_db(X, B, nested_B);
-   if (!nested_B)   return run_generic(conn, A, B, true);
-Value_P B1 = B->get_cravel(1).get_pointer_value();
-   return run_generic(conn, A, B1, /* query = */ true);
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_SQL::run_update(Value_P A, Value_P X, Value_P B)
-{
-bool nested_B = false;
-Connection * conn = param_to_db(X, B, nested_B);
-   if (!nested_B)   return run_generic(conn, A, B, /*  query = */false);
-Value_P B1 = B->get_cravel(1).get_pointer_value();
-   return run_generic(conn, A, B1, false);
-}
-//----------------------------------------------------------------------------
-static Token
-run_transaction_begin(Value_P B)
-{
-Connection *conn = value_to_db_id(B);
+Connection * conn = value_to_db_id(*B);
     conn->transaction_begin();
     return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
 //----------------------------------------------------------------------------
-static Token
-run_transaction_commit(Value_P B)
+Token
+Quad_SQL::run_transaction_commit(Value_P B)
 {
-    Connection *conn = value_to_db_id( B );
+Connection * conn = value_to_db_id(*B);
     conn->transaction_commit();
     return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
 //----------------------------------------------------------------------------
-static Token
-run_transaction_rollback(Value_P B)
+Token
+Quad_SQL::run_transaction_rollback(Value_P B)
 {
-Connection * conn = value_to_db_id(B);
+Connection * conn = value_to_db_id(*B);
    conn->transaction_rollback();
    return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
 //----------------------------------------------------------------------------
-static Token
-show_tables(Value_P B)
+Token
+Quad_SQL::show_tables(Value_P B)
 {
-Connection * conn = value_to_db_id(B);
+Connection * conn = value_to_db_id(*B);
 vector<string> tables;
    conn->fill_tables(tables);
 
@@ -468,7 +496,7 @@ Value_P value;
      }
 
    value->check_value( LOC );
-   return Token( TOK_APL_VALUE1, value );
+   return Token(TOK_APL_VALUE1, value);
 }
 //----------------------------------------------------------------------------
 Value_P 
@@ -476,11 +504,11 @@ Quad_SQL::get_version_number(const UCS_string & ucs_B)
 {
 const UTF8_string utf_B(ucs_B);
 const char * provider_name = utf_B.c_str();
-   loop(p, providers.size())
+   loop(p, SQL_providers.size())
        {
          // ucs_B should match either the provider type or the provider name
          //
-         const Provider * provider = providers[p];
+         const Provider * provider = SQL_providers[p];
          if (strcmp(provider_name, provider->get_provider_name()) == 0 ||
              strcmp(provider_name, provider->get_provider_type()) == 0)
             {
@@ -493,9 +521,9 @@ const char * provider_name = utf_B.c_str();
 
 UCS_string & more = MORE_ERROR();
    more << "Invalid SQL provider '" << ucs_B << "'. The known providers are:\n";
-   loop(p, providers.size())
+   loop(p, SQL_providers.size())
        {
-         const Provider * provider = providers[p];
+         const Provider * provider = SQL_providers[p];
          more << "    " << provider->get_provider_name()
               << "  ("   << provider->get_provider_type() << ")\n";
        }
@@ -510,11 +538,11 @@ const char * provider_name = utf_B.c_str();
 
    // provider_name could be the provider name (e.g. SQLite) or the
    // providder type (e.g. sqlite)
-   loop(p, providers.size())
+   loop(p, SQL_providers.size())
        {
          // ucs_B should match either the provider type or the provider name
          //
-         const Provider * provider = providers[p];
+         const Provider * provider = SQL_providers[p];
          if (strcmp(provider_name, provider->get_provider_name()) == 0 ||
              strcmp(provider_name, provider->get_provider_type()) == 0)
             {
@@ -528,9 +556,9 @@ const char * provider_name = utf_B.c_str();
 
 UCS_string & more = MORE_ERROR();
    more << "Invalid SQL provider '" << ucs_B << "'. The known providers are:\n";
-   loop(p, providers.size())
+   loop(p, SQL_providers.size())
        {
-         const Provider * provider = providers[p];
+         const Provider * provider = SQL_providers[p];
          more << "    " << provider->get_provider_name()
               << "  ("   << provider->get_provider_type() << ")\n";
        }
@@ -540,7 +568,7 @@ UCS_string & more = MORE_ERROR();
 Value_P
 Quad_SQL::column_names(Value_P A, Value_P B)
 {
-Connection * conn = value_to_db_id(A);
+Connection * conn = value_to_db_id(*A);
 vector<ColumnDescriptor> cols;
 
    if (!B->is_apl_char_vector())
@@ -587,6 +615,43 @@ Quad_SQL::eval_B(Value_P B) const
    CHECK_SECURITY(disable_Quad_SQL);
 
    if (B->get_rank() > 1)         RANK_ERROR;
+
+   if (B->is_int_scalar() && B->get_cfirst().get_int_value() == 0)
+      {
+        // ⎕SQL 0 : show open handles
+        //
+        ShapeItem count = 0;
+        loop(c, SQL_connections.size())
+            {
+              if (SQL_connections[c].connection)   ++count;
+
+            }
+
+        Value_P Z(count, 3, LOC);   // ⍴Z is count, 2
+        if (count == 0)   // no connections
+           {
+             new (&Z->get_wproto()) IntCell(0);   // prototype
+           }
+
+        loop(c, count)
+            {
+              const conn_file slot = SQL_connections[c];
+              if (const Connection * conn = slot.connection)
+                 {
+                   Z->next_ravel_Int(c);    // handle
+                   const UTF8_string name(conn->get_provider_name());
+                   const UTF8_string file(slot.filename);
+                   Value_P Z2(name, LOC);            // the SQL provider
+                   Z->next_ravel_Pointer(Z2.get());
+                   Value_P Z3(file, LOC);            // the filename
+                   Z->next_ravel_Pointer(Z3.get());
+                 }
+            }
+
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
    if (B->element_count() != 0)   LENGTH_ERROR;
 
    if (B->get_cfirst().is_character_cell())
@@ -616,11 +681,15 @@ const bool map = B->get_cfirst().is_character_cell();
     switch(function_number)
        {
          case  0: return Token(TOK_APL_VALUE1, list_functions(CERR, map));
+         case  1: VALENCE_ERROR;
          case  2: return close_database(B);
+         case  3:
+         case  4:
          case  5: return run_transaction_begin(B);
          case  6: return run_transaction_commit(B);
          case  7: return run_transaction_rollback(B);
          case  8: return show_tables(B);
+         case  9:
          case 10: return Token(TOK_APL_VALUE1,
                                get_version_number(UCS_string(*B)));
          case 11: return Token(TOK_APL_VALUE1,
@@ -633,64 +702,17 @@ const bool map = B->get_cfirst().is_character_cell();
 }
 //----------------------------------------------------------------------------
 Connection *
-Quad_SQL::param_to_db(Value_P X, Value_P B, bool & nested_B)
+Quad_SQL::param_to_db(const Value & X)
 {
-const uRank rank_X = X->get_rank();
-   if (rank_X > 1)
+
+const Shape & shape = X.get_shape();
+   if (shape.get_volume() != 2 )
       {
-        MORE_ERROR() << "⎕SQL[X]: Bad rank " << rank_X << " of axis X.";
+        MORE_ERROR() << "⎕SQL: Database id missing from axis parameter";
         RANK_ERROR;
       }
 
-const ShapeItem ec_X = X->element_count();
-   if (ec_X == 2)   // [sub-function number, DB handle]; parameters in B
-      {
-        // ⎕SQL[function, DB-handle] and plain B
-        //
-        nested_B = false;
-        const int DB_handle = X->get_cravel(1).get_near_int();
-        return db_id_to_connection(DB_handle);
-      }
-
-   if (ec_X == 1)   // [sub-function name]; handle ↑B, parameters 1↓B
-      {
-        // ⎕SQL[function-handle] and nested B = [DB-handle] parameters]
-        //
-        nested_B = true;
-        const uRank rank_B = B->get_rank();
-        const int DB_handle = B->get_cravel(0).get_near_int();
-        if (rank_B != 1)
-           {
-             MORE_ERROR() << "A ⎕SQL[X] B: Bad rank " << rank_B
-                          << " of right argument B (expected: ⍴⍴B = 1).";
-             RANK_ERROR;
-           }
-
-        const ShapeItem ec_B = B->element_count();
-        if (ec_B != 2)
-           {
-             MORE_ERROR() << "A ⎕SQL[X] B: Bad length " << ec_B
-                          << " of right argument B (expected: ⍴B = 2).";
-             LENGTH_ERROR;
-           }
-
-        if (!B->get_cravel(1).is_pointer_cell())
-           {
-             MORE_ERROR() << "A ⎕SQL[X] B: 1↓B not nested "
-                             "(expected: nested query parameters 1↓B).";
-             DOMAIN_ERROR;
-           }
-        return db_id_to_connection(DB_handle);
-      }
-
-   if (ec_X == 0)
-      {
-        MORE_ERROR() << "⎕SQL[X]: Empty axis argument X.";
-        LENGTH_ERROR;
-      }
-
-   MORE_ERROR() << "⎕SQL[X]: Axis argument X too long.";
-   LENGTH_ERROR;
+    return db_id_to_connection(X.get_cravel(1).get_near_int());
 }
 //----------------------------------------------------------------------------
 Token
@@ -702,15 +724,60 @@ const APL_Integer function_number = X->get_cfirst().get_near_int();
 
    switch(function_number)
       {
-        case 0: return Token(TOK_APL_VALUE1, list_functions(CERR, false));
-        case 1: return Token(TOK_APL_VALUE1, open_database(A, B));
-        case 3: return Token(TOK_APL_VALUE1, run_query(A, X, B));
-        case 4: return Token(TOK_APL_VALUE1, run_update(A, X, B));
-        case 9: return Token(TOK_APL_VALUE1, column_names(A, B));
+        case  0: return Token(TOK_APL_VALUE1, list_functions(CERR, false));
+        case  1: return Token(TOK_APL_VALUE1, open_database(*A, *B));
+        case  2: VALENCE_ERROR;
+        case  3: return Token(TOK_APL_VALUE1, run_query(*A, *X, *B));
+        case  4: return Token(TOK_APL_VALUE1, run_update(*A, *X, *B));
+        case  5:
+        case  6:
+        case  7:
+        case  8: VALENCE_ERROR;
+        case  9: return Token(TOK_APL_VALUE1, column_names(A, B));
+        case 10: VALENCE_ERROR;
+        case 11: VALENCE_ERROR;
       }
 
    MORE_ERROR() << "A ⎕SQL[X] B: Illegal function number X="
                 << function_number;
    DOMAIN_ERROR;
+}
+//============================================================================
+Quad_SQL_3::Quad_SQL_3()
+   : QuadFunction(TOK_Quad_SQL_3)
+{
+}
+//----------------------------------------------------------------------------
+Token
+Quad_SQL_3::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   /// convert integer scalar X to (3, X) or (4, X)
+const APL_Integer DB = X->get_cfirst().get_int_value();
+const APL_Integer subfun = 3;
+
+Value_P FUN_DB(2, LOC);
+   FUN_DB->next_ravel_Int(subfun);
+   FUN_DB->next_ravel_Int(DB);
+   FUN_DB->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Quad_SQL::run_query(*A, *FUN_DB, *B));
+}
+//============================================================================
+Quad_SQL_4::Quad_SQL_4()
+   : QuadFunction(TOK_Quad_SQL_4)
+{
+}
+//----------------------------------------------------------------------------
+Token
+Quad_SQL_4::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   /// convert integer scalar X to (3, X) or (4, X)
+const APL_Integer DB = X->get_cfirst().get_int_value();
+const APL_Integer subfun = 4;
+
+Value_P FUN_DB(2, LOC);
+   FUN_DB->next_ravel_Int(subfun);
+   FUN_DB->next_ravel_Int(DB);
+   FUN_DB->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Quad_SQL::run_update(*A, *FUN_DB, *B));
 }
 //----------------------------------------------------------------------------

@@ -2210,7 +2210,6 @@ Command::cmd_OFF(int exit_val)
    COUT << endl;
    if (!UserPreferences::uprefs.silent)
       {
-
         timeval end;
         gettimeofday(&end, 0);
         end.tv_sec -= UserPreferences::uprefs.session_start.tv_sec;

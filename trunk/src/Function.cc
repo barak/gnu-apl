@@ -79,57 +79,81 @@ Function::get_attributes(int mode, Value & Z) const
 Token
 Function::eval_() const
 {
-   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   FIXME;
+   return phrase_error("");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_B(Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("B");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_AB(Value_P A, Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("AB");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_LB(Token & LO, Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("LB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_XB(Value_P X, Value_P B) const
+{
+   return phrase_error("XB");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("ALB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   return phrase_error("AXB");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("LRB");
 }
 //----------------------------------------------------------------------------
 Token
 Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-   VALENCE_ERROR;
+   return phrase_error("ALRB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
+{
+   return phrase_error("ALXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                     Value_P X, Value_P B) const
+{
+   return phrase_error("ALRXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LXB(Token & LO, Value_P X, Value_P B) const
+{
+   return phrase_error("LXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LRXB(Token & LO, Token & RO,
+                     Value_P X, Value_P B) const
+{
+   return phrase_error("LRXB");
 }
 //----------------------------------------------------------------------------
 Fun_signature
@@ -148,17 +172,64 @@ int sig = SIG_FUN;
    return Fun_signature(sig);
 }
 //----------------------------------------------------------------------------
-Token Function::eval_fill_AB(Value_P A, Value_P B) const
+Token
+Function::phrase_error(const char * pattern) const
 {
-  MORE_ERROR() << "The fill function of " << get_name()
-               << " is not defined (or not yet implemented)";
+   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
+        << "() called (overloaded variant not yet implemented?)" << endl;
+
+int signature = 0;   // the signature for pattern
+
+   for (; *pattern; ++pattern)
+       {
+         switch(*pattern)
+            {
+              case 'A': signature |= SIG_A;    break;
+              case 'L': signature |= SIG_LO;   break;
+              case 'R': signature |= SIG_RO;   break;
+              case 'X': signature |= SIG_X;    break;
+              case 'B': signature |= SIG_B;    break;
+              default:  FIXME;
+            }
+       }
+
+UCS_string & more = MORE_ERROR();
+   more << "Invalid phrase '";
+   if (signature & SIG_A)   more << "A";
+   if (signature & SIG_LO)   more << " (L ";
+   more << get_name();
+   if (signature & SIG_X)   more << "[X]";
+   if (signature & SIG_RO)   more << " R)";
+   if (signature & SIG_B)   more << " B";
+
+   more << "'. The phrase may be valid in general, but not for function "
+        << get_name();
+   VALENCE_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_fill_AB(Value_P A, Value_P B) const
+{
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no dyadic fill function";
+
   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-Token Function::eval_identity_fun(Value_P B, sAxis axis) const
+Token
+Function::eval_fill_B(Value_P B) const
 {
-  MORE_ERROR() << "The identity function of " << get_name()
-               << " is not defined (or not yet implemented)";
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no monadic fill function";
+
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_identity_fun(Value_P B, sAxis axis) const
+{
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no identity function";
   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------

@@ -333,10 +333,19 @@ Bif_OPER2_RANK::split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B)
 
    // y123_B shall be a scalar or vector
    //
-   if (y123_B->get_rank() > 1)   RANK_ERROR;
+   if (y123_B->get_rank() > 1)
+      {
+        BACKTRACE
+        MORE_ERROR() << "f⍤j B: ⍴⍴ = " << y123_B->get_rank();
+        RANK_ERROR;
+      }
 
 const ShapeItem length = y123_B->element_count();
-   if (length == 0)   LENGTH_ERROR;
+   if (length == 0)
+      {
+        MORE_ERROR() << "f⍤j B: ⍴j = " << length;
+        LENGTH_ERROR;
+      }
 
    // check for case 1 (the only one with nested first element)
    //

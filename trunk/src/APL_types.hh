@@ -80,6 +80,8 @@ typedef int64_t APL_Integer;
 
 class Function;
 typedef const Function * cFunction_P;
+typedef const Function * cMonOP;
+typedef const Function * cDyaOP;
 
 inline void
 Hswap(APL_Integer & i1, APL_Integer & i2)

@@ -208,52 +208,45 @@ public:
    /// plain function, 0 arguments
    virtual Token eval_() const;
 
+   /// plain function, 1 argument
+   virtual Token eval_B(Value_P B) const;
+
    /// plain function, 2 arguments
    virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// monadic operator, 1 argument
+   virtual Token eval_LB(Token & LO, Value_P B) const;
+
+   /// plain function, 1 argument, with axis
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// monadic operator, 2 arguments
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// plain function, 2 arguments, with axis
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { AXIS_ERROR; }
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// dyadic operator, 1 arguments
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
+
+   /// monadic operator, 1 arguments, with axis
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// dyadic operator, 2 arguments
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// monadic operator, 2 arguments, with axis
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
-      { AXIS_ERROR; }
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+
+   /// dyadic operator, 1 arguments, with axis
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// dyadic operator, 2 arguments, with axis
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                            Value_P X, Value_P B) const
-      { AXIS_ERROR; }
-
-   /// plain function, 1 argument
-   virtual Token eval_B(Value_P B) const;
-
-   /// monadic operator, 1 argument
-   virtual Token eval_LB(Token & LO, Value_P B) const;
-
-   /// plain function, 1 arguments, with axis
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { AXIS_ERROR; }
-
-   /// monadic operator, 1 arguments, with axis
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const
-      { AXIS_ERROR; }
-
-   /// dyadic operator, 1 arguments
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
-
-   /// dyadic operator, 1 arguments, with axis
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
-      { AXIS_ERROR; }
+                            Value_P X, Value_P B) const;
 
    /// Evaluate \b the fill function.
-   virtual Token eval_fill_B(Value_P B) const
-      { DOMAIN_ERROR; }
+   virtual Token eval_fill_B(Value_P B) const;
 
    /// Evaluate \b the fill function.
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
@@ -289,6 +282,9 @@ public:
    /// return the signature of this function (currently only valid
    /// for user-defined functions)
    Fun_signature get_signature() const;
+
+   /// raise an invalid phrase error
+   Token phrase_error(const char * pattern) const;
 
    /// return break-even point for monadic parallel execution
    ShapeItem get_monadic_threshold() const

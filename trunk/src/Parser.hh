@@ -69,6 +69,9 @@ public:
    static ErrorCode match_par_bra(Token_string & tos, bool backwards);
 
 protected:
+   /// print a detailed log message
+   static void parse_log(int N, const Token_string & tos);
+   
    /// Parse token string \b tos (a statement without diamonds).
    static ErrorCode parse_statement(Token_string & tos, bool optimize);
 
@@ -84,17 +87,40 @@ protected:
    /// find closing paranthesis; throw error if not found.
    static int find_closing_parent(const Token_string & tos, int pos);
 
+   /// insert one TOK_VOID token after \b pos in \b tos
+   static void insert_1(Token_string & tos, int pos);
+
+   /// insert two TOK_VOID token after \b pos in \b tos
+   static void insert_2(Token_string & tos, int pos);
+
+   /// return the number of INT or near-INT, starting at
+   /// pos (and at most 4). Replace near-int floats and complex
+   /// literals with ints.
+   static int j_length(Token_string & tos, int pos);
+
    /// Collect consecutive smaller APL values or value token into vectors
    static bool collect_constants(Token_string & tos);
 
    /// mark next symbol left of ← on the same level as LSYMB
    static void mark_lsymb(Token_string & tos);
 
-   /// Collect groups
-   static bool collect_groups(Token_string & tos);
+   /// Replace (V1, V2,...) with a single (nested) /// value.
+   static bool collect_value_groups(Token_string & tos);
 
-   /// Replace (X) by X and ((..) by (..) in \b string. (X is a single token)
-   static void remove_nongrouping_parantheses(Token_string & tos);
+   /// fix the syntax of the RANK (⍤) operator.
+   static bool fix_RANK_syntax(Token_string & tos);
+
+   /// Replace (X) with X and ((..) with (..) in \b tos (where X is a
+   // single token).
+   static bool remove_nongrouping_parantheses(Token_string & tos);
+
+   /// replace subfunction names like ⎕XXX.subfun with a numeric
+   /// axis like XXX[num]
+   static bool map_function_groups(Token_string & tos);
+
+   /// complain abount an invalid sub-function name (of ⎕CR and friends)
+   static void bad_sub_fun_error(cFunction_P quad_fun,
+                                 const UCS_string sub_name);
 
    /** Replace:
 

@@ -3066,25 +3066,26 @@ XML_Loading_Archive::instantiate_derived_functions(bool allocate)
 
              if (todo.AXIS_vid == -1)   // dyadic operator without axis
                 {
-                  new (todo.cache) DerivedFunction(tok_LO, OPER, tok_RO, LOC);
+                  new (todo.cache)
+                      Derived_LO_D_RO(tok_LO, OPER, tok_RO, LOC);
                 }
              else                       // dyadic operator with axis
                 {
                   Value_P val_X = values[todo.AXIS_vid];
-                  new (todo.cache) DerivedFunction(tok_LO, OPER, val_X,
-                                                   tok_RO, LOC);
+                  new (todo.cache) Derived_LO_D_X_RO(tok_LO, OPER, val_X,
+                                                     tok_RO, LOC);
                 }
            }
         else                       // monadic operator
            {
              if (todo.AXIS_vid == -1)   // monadic operator without axis
                 {
-                  new (todo.cache) DerivedFunction(tok_LO, OPER, LOC);
+                  new (todo.cache) Derived_LO_M(tok_LO, OPER, LOC);
                 }
              else                       // monadic operator with axis
                 {
-                  Value_P val_X = values[todo.AXIS_vid];
-                  new (todo.cache) DerivedFunction(tok_LO, OPER, val_X, LOC);
+                  Value_P X = values[todo.AXIS_vid];
+                  new (todo.cache) Derived_LO_M_X(tok_LO, OPER, X, LOC);
                 }
            }
       }

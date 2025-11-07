@@ -632,36 +632,50 @@ const int64_t rnd = rand17()
    Z.next_ravel_Int(rnd);
 }
 //----------------------------------------------------------------------------
+double
+Quad_RVAL::random_ieee()
+{
+union { double f;
+        char bytes[8];
+      } u;
+   do {
+        const int64_t rand64 = rand17()
+                             ^ (rand17() << 16)
+                             ^ (rand17() << 32)
+                             ^ (rand17() << 48);
+        
+        enum { BIAS     = 1023,          // IEEE
+               EXPO     = 0 + BIAS,      // 2^0
+               EXPO_LSB = EXPO & 0x0F,   // 0..15
+               EXPO_MSB = EXPO >> 4      // 0..15
+             };
+
+        u.bytes[7] = EXPO_MSB;                // SIGN + and exponent MSBs
+        u.bytes[6] = EXPO_LSB << 4            // exponent LSBs
+                   | (rand64 >> 56) & 0x0F;   // 52 bit fraction MSBs
+        u.bytes[5] = rand64 >> 40;            // 52 bit fraction
+        u.bytes[4] = rand64 >> 32;            // 52 bit fraction
+        u.bytes[3] = rand64 >> 24;            // 52 bit fraction
+        u.bytes[2] = rand64 >> 16;            // 52 bit fraction
+        u.bytes[1] = rand64 >>  8;            // 52 bit fraction
+        u.bytes[0] = rand64 >>  0;            // 52 bit fraction LSBs
+      } while (!isnormal(u.f));
+
+   // at this point: 1.0 < u.f < 2.0
+   //
+   return u.f - 1.0;
+}
+//----------------------------------------------------------------------------
 void
 Quad_RVAL::random_float(Value & Z)
 {
-union { uint64_t i; double f; } u;
-   do {
-        u.i = rand17() | rand17() << 17 | rand17() << 34;
-        u.i &= 0x000FFFFFFFFFFFFFULL;
-        u.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u.f));
-
-   Z.next_ravel_Float(u.f);
+   Z.next_ravel_Float(random_ieee());
 }
 //----------------------------------------------------------------------------
 void
 Quad_RVAL::random_complex(Value & Z)
 {
-union { int64_t i; double f; } u1, u2;
-   do {
-        u1.i = rand17() | rand17() << 17 | rand17() << 34;
-        u1.i &= 0x000FFFFFFFFFFFFFULL;
-        u1.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u1.f));
-
-   do {
-        u2.i = rand17() | rand17() << 17 | rand17() << 34;
-        u2.i &= 0x000FFFFFFFFFFFFFULL;
-        u2.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u2.f));
-
-   Z.next_ravel_Complex(u1.f - 1.0, u2.f - 1.0);
+   Z.next_ravel_Complex(random_ieee(), random_ieee());
 }
 //----------------------------------------------------------------------------
 void

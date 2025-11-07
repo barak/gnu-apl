@@ -35,6 +35,7 @@
 #include "Parser.hh"
 #include "PointerCell.hh"
 #include "PrintOperator.hh"
+#include "Quad_SQL.hh"
 #include "Symbol.hh"
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
@@ -72,12 +73,7 @@ ErrorCode
 Parser::parse(const Token_string & input, Token_string & tos,
               bool optimize) const
 {
-   Log(LOG_parse)
-      {
-        CERR << "parse 1 [" << input.size() << "]: ";
-        input.print(CERR, true);
-        CERR << endl;
-      }
+   parse_log(1, input);
 
    // split input line into statements (separated by ◊)
    //
@@ -146,18 +142,34 @@ std::vector<Token_string *> statements;
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
+void
+Parser::parse_log(int N, const Token_string & tos)
+{
+   Log(LOG_parse)
+      {
+        CERR << "parse " << N << " [" << tos.ssize() << "]: " << endl;
+        tos.print(CERR, 3);
+      }
+}
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse_statement(Token_string & tos, bool optimize)
 {
+   /// fix the broken syntax of the RANK OPERATOR
+   if (fix_RANK_syntax(tos))   parse_log(2, tos);;
+
    // 1. convert (X) into X and ((X...)) into (X...)
    //
-   remove_nongrouping_parantheses(tos);
-   remove_TOK_VOID(tos);
-
-   Log(LOG_parse)
+   if (remove_nongrouping_parantheses(tos))
       {
-        CERR << "parse 2 [" << tos.ssize() << "]: ";
-        tos.print(CERR, true);
+        remove_TOK_VOID(tos);
+        parse_log(3, tos);
+      }
+
+   if (map_function_groups(tos))
+      {
+        remove_TOK_VOID(tos);
+        parse_log(4, tos);
       }
 
    // 2. convert groups like '(' val val...')' into single APL values
@@ -166,26 +178,31 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    //
    for (int progress = true; progress;)
       {
-        progress = collect_groups(tos);
-        if (progress)   remove_TOK_VOID(tos);
-      }
-
-   Log(LOG_parse)
-      {
-        CERR << "parse 3 [" << tos.ssize() << "]: ";
-        tos.print(CERR, true);
+        progress = collect_value_groups(tos);
+        if (progress)
+           {
+             remove_TOK_VOID(tos);
+             parse_log(5, tos);
+           }
       }
 
    // 3. convert vectors like 1 2 3 or '1' 2 '3' into single APL values
    //
-   if (collect_constants(tos))           remove_TOK_VOID(tos);
+   if (collect_constants(tos))
+      {
+        remove_TOK_VOID(tos);
+        parse_log(6, tos);
+      }
 
-   // parse_statement() is normally called with optimize == true; However,
-   // Executable::reparse() calls it with optimize == false in order to
-   // restore the body before it was optimized.
-   //
-   // To disable optimizations you must set the enable arg(s) in
-   // Performance.def to 0 (as opposed to setting optimize to false.
+   /* parse_statement() is normally called with optimize == true; However,
+      Executable::reparse() calls it with optimize == false in order to
+      restore the body before it was optimized.
+     
+      To disable optimizations you must set the enable arg(s) in
+      Performance.def to 0 (as opposed to setting optimize to false.
+     */
+
+   // 4. maybe optimize literal axes and short primitives
    //
    if (optimize)
       {
@@ -195,55 +212,197 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         while (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
            remove_TOK_VOID(tos);
       }
+   parse_log(7, tos);
 
-   // special case: single APL value (to speed up ⍎)
+   // 5. special case: single APL value (to speed up ⍎)
    //
    if (tos.ssize() == 1)
       {
-        Log(LOG_parse)   CERR << "parse 3a: single value " << tos[0] << endl;;
+        Log(LOG_parse)   CERR << "parse 5: single value " << tos[0] << endl;;
         return E_NO_ERROR;
       }
+   parse_log(8, tos);
 
-   Log(LOG_parse)
-      {
-        CERR << "parse 4 [" << tos.ssize() << "]: ";
-        tos.print(CERR, true);
-      }
-
-   // 5. mark symbol left of ← as LSYMB
+   // 6. mark symbol left of ← as LSYMB
    //
    mark_lsymb(tos);
-   Log(LOG_parse)
-      {
-        CERR << "parse 5 [" << tos.ssize() << "]: ";
-        tos.print(CERR, true);
-      }
+   parse_log(8, tos);
 
-   // 6. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
+   // 7. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
    if (optimize)
       {
         optimize_static_patterns(tos);
-        Log(LOG_parse)
-           {
-             CERR << "parse 6 [" << tos.ssize() << "]: ";
-             tos.print(CERR, true);
-           }
+        parse_log(10, tos);
       }
 
-   // 7. update the distances between ( and ), [ and ], or { and }. After
+   // 8. update the distances between ( and ), [ and ], or { and }. After
    //    that, tos.ssize() must not be changed anymore.
    //
-   {
-     const ErrorCode ec = match_par_bra(tos, false);
-     if (ec != E_NO_ERROR)
-        {
-          loop(t, tos.ssize())   tos[t].clear(LOC);
-          return ec;
-        }
-   }
+   if (const ErrorCode ec = match_par_bra(tos, false))
+       {
+         loop(t, tos.ssize())   tos[t].clear(LOC);
+         return ec;
+       }
 
    return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
+void
+Parser::insert_1(Token_string & tos, int pos)
+{
+   tos.push_back(Token(TOK_VOID));
+   for (int from = tos.size() - 2; from > pos; --from)
+       {
+         tos[from + 1].move(tos[from], LOC);   // shift towards end
+       }
+}
+//----------------------------------------------------------------------------
+void
+Parser::insert_2(Token_string & tos, int pos)
+{
+   tos.push_back(Token(TOK_VOID));
+   tos.push_back(Token(TOK_VOID));
+   for (int from = tos.size() - 3; from > pos; --from)
+       {
+         tos[from + 2].move(tos[from], LOC);   // shift towards end
+       }
+}
+//----------------------------------------------------------------------------
+int
+Parser::j_length(Token_string & tos, int pos)
+{
+int len = 0;
+   for (size_t t = pos; t < tos.size(); ++t)
+       {
+         const Token & T = tos[t];
+         const TokenTag tag = T.get_tag();
+         if (tag == TOK_INTEGER)
+            {
+              ++len;
+            }
+         else if (tag == TOK_REAL)   // stupid ?
+            {
+              const APL_Float val = T.get_flt_val();
+              if (Cell::is_near_int(val))
+                 {
+                   ++len;
+                   if (len <= 3)   // replace float with integer
+                      {
+                        new (&tos[t]) Token(TOK_INTEGER, Cell::near_int(val));
+                      }
+                 }
+         else if (tag == TOK_COMPLEX)   // even more stupid ?
+                 {
+                   const APL_Float imag = T.get_cpx_imag();
+                   if (!(Cell::is_near_zero(imag)))   break;
+                   const APL_Float real = T.get_cpx_real();
+                   if (!(Cell::is_near_int(real)))   break;
+
+                   if (len <= 3)   // replace float with integer
+                      {
+                        new (&tos[t]) Token(TOK_INTEGER, Cell::near_int(real));
+                      }
+                 }
+              else break;   // not literal
+            }
+         else break;
+       }
+   return len;
+}
+//----------------------------------------------------------------------------
+bool
+Parser::fix_RANK_syntax(Token_string & tos)
+{
+bool progress = false;
+   /* Z ← A ⍤ j B  or  Z ← ⍤ j B 
+     
+      where j is a near-int-vector of length 1, 2, or 3
+
+      Collecting the items of such an expression can make the expression
+      ambiguous. We therefore translate the above expression into:
+
+       Z ← A ⍤[j] B  resp.Z ← ⍤[j] B 
+
+      v is a scalar or vector with 3 ≥ ⍴,v and it defines the splitting points
+      of ⍴Z, ⍴A, and ⍴B. (Up to) 3 splitting points V are needed and they are
+      defined by V3 ← ⌽3⍴⌽v (see ISO p. 124).
+
+      NOTE that:
+
+      ⌽3⍴⌽ 1     ←→ 1 1 1   ⍝ same splitting point for Z, A, and B
+      ⌽3⍴⌽ 1 2   ←→ 2 1 2   ⍝ same splitting point for Z and B
+      ⌽3⍴⌽ 1 2 3 ←→ 1 2 3
+    */
+   loop(t, tos.size() - 2)
+       {
+         if (tos[t].get_tag() != TOK_OPER2_RANK)   continue;
+         Token * T1 = &tos[t + 1];
+         Token * T2 = &tos[t + 2];
+         Token * T3 = &tos[t + 3];
+         const TokenTag tag_1 = T1->get_tag();
+         if (tag_1 == TOK_SYMBOL)   // symbol j
+            {
+                                                         // t T1   T2     T3  ...
+                                                         // ⍤ j
+              insert_2(tos, t);                          // ⍤ VOID VOID   j
+              T2->move(*T3, LOC);                        // ⍤ VOID j      VOID
+              new (T1) Token(TOK_L_BRACK, int64_t(0));   // ⍤ [    j      VOID
+              new (T3) Token(TOK_R_BRACK, int64_t(0));   // ⍤ [    j      ]
+              progress = true;
+            }
+
+         if (const int len_j = 0 * j_length(tos, t + 1))   // literal j j
+            {
+              const APL_Integer j1 = tos[t + 1].get_int_val();
+              if (len_j > 3)   // ISO p. 124
+                 {
+                   MORE_ERROR() << "⍤ j B: j too long (⍴j = " << len_j << ")";
+                   LENGTH_ERROR;
+                 }
+
+              // create V3 ← ⌽3⍴⌽v
+              //
+              Value_P V3(3, LOC);
+              if (len_j == 3)        // 1 2 3 → 1 2 3
+                 {
+                   const APL_Integer j2 = tos[t + 2].get_int_val();
+                   const APL_Integer j3 = tos[t + 3].get_int_val();
+                   V3->next_ravel_Int(j1);
+                   V3->next_ravel_Int(j2);
+                   V3->next_ravel_Int(j3);
+                 }
+              else if (len_j == 2)   // 1 2 → 2 1 2
+                 {
+                   const APL_Integer j2 = tos[t + 2].get_int_val();
+                   V3->next_ravel_Int(j2);
+                   V3->next_ravel_Int(j1);
+                   V3->next_ravel_Int(j2);
+                 }
+              else       // 1 → 1 1 1
+                 {
+                   V3->next_ravel_Int(j1);
+                   V3->next_ravel_Int(j1);
+                   V3->next_ravel_Int(j1);
+                 }
+
+              // then replace j with [ V3 ]...
+
+              // first extend tos as needed.
+              if      (len_j == 2)   insert_1(tos, t + 2);
+              else if (len_j == 1)   insert_2(tos, t + 1);
+
+              // then replace. MUST NOT USE T1, T2, T3 here!
+              //
+              new (&tos[t + 1]) Token(TOK_L_BRACK, int64_t(0));
+              new (&tos[t + 2]) Token(TOK_APL_VALUE1, V3);
+              new (&tos[t + 3]) Token(TOK_R_BRACK, int64_t(0));
+              V3->check_value(LOC);
+              progress = true;
+            }
+       }
+
+   return progress;
 }
 //----------------------------------------------------------------------------
 bool
@@ -253,7 +412,7 @@ bool progress = false;
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.ssize() << " token] in: ";
-        tos.print(CERR, true);
+        tos.print(CERR, 3);
       }
 
    // convert several items in vector notation into a single APL value
@@ -316,19 +475,19 @@ bool progress = false;
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.ssize() << " token] out: ";
-        tos.print(CERR, true);
+        tos.print(CERR, 3);
       }
 
    return progress;
 }
 //----------------------------------------------------------------------------
 bool
-Parser::collect_groups(Token_string & tos)
+Parser::collect_value_groups(Token_string & tos)
 {
    Log(LOG_collect_constants)
       {
-        CERR << "collect_groups [" << tos.ssize() << " token] in: ";
-        tos.print(CERR, true);
+        CERR << "collect_value_groups [" << tos.ssize() << " token] in: ";
+        tos.print(CERR, 3);
       }
 
 int opening = -1;
@@ -367,13 +526,13 @@ int opening = -1;
 
                    Log(LOG_collect_constants)
                       {
-                        CERR << "collect_groups [" << tos.ssize()
+                        CERR << "collect_value_groups [" << tos.ssize()
                              << " token] out: ";
-                        tos.print(CERR, true);
+                        tos.print(CERR, 3);
                       }
                    return true;
 
-              default: // nothing group'able
+              default: // nothing that can be grouped
                    opening = -1;
                    continue;
             }
@@ -474,15 +633,17 @@ int others = 0;
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
-void
+bool
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
    //
    // 1. replace ((X...)) by: (X...)
    // 2. replace (X)      by: X for a single token X,
    //
-   for (bool progress = true; progress; progress = false)
-       {
+bool ret = false;        // total progress
+bool progress = false;   // per iteration progress
+   do {
+         progress = false;
          loop(t, tos.ssize() - 2)
              {
                if (tos[t].get_Class() != TC_L_PARENT)   continue;
@@ -503,7 +664,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                          // remove redundant tos[t] and tos[closing] because
                          // ((...)) are not "not separating"
                          //
-                         progress = true;
+                         ret = progress = true;
                          tos[t].clear(LOC);
                          tos[closing].clear(LOC);
                          continue;
@@ -520,7 +681,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                // (X) : "not grouping" if X is a scalar. 
                // If X is non-scalar, enclose it
                //
-               progress = true;
+               ret = progress = true;
                tos[t + 2].move(tos[t + 1], LOC);
 
                // we "remember" the nongrouping parantheses to disambiguate
@@ -533,6 +694,100 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                ++t;   // skip tos[t + 1]
              }
        }
+   while(progress);
+   return ret;
+}
+//----------------------------------------------------------------------------
+bool
+Parser::map_function_groups(Token_string & tos)
+{
+bool progress = false;
+   for (size_t t = 0; (t + 2) < tos.size(); ++t)
+       {
+         const TokenTag & tag1 = tos[t + 1].get_tag();
+         if (tag1 == TOK_OPER2_INNER)   // possibly ⎕xxx.subfun
+            {
+              const TokenTag & tag0 = tos[t].get_tag();
+              const TokenTag & tag2 = tos[t + 2].get_tag();
+              if (tag2 == TOK_SYMBOL &&
+                  ( tag0 == TOK_F12_DOMINO ||
+                    tag0 == TOK_Quad_CR    ||
+                    tag0 == TOK_Quad_FFT   ||
+                    tag0 == TOK_Quad_FIO   ||
+                    tag0 == TOK_Quad_MX    ||
+                    tag0 == TOK_Quad_RVAL))   // functions with a plain axis
+                 {
+                   const Symbol * subfun_symbol = tos[t + 2].get_sym_ptr();
+                   const UCS_string sub_name = subfun_symbol->get_name();
+                   const Function * topfun = tos[t].get_function();
+                   const sAxis axis = topfun->subfun_to_axis(sub_name);
+                   if (axis < 0)   bad_sub_fun_error(topfun, sub_name);
+
+                   // valid axis. replace: topfun . subfun with topfun [subfun]
+                   //
+                   Value_P axis_val = IntScalar(axis, LOC);
+                   new (&tos[t + 1]) Token(TOK_AXIS, axis_val);
+                   tos[t + 2].clear(LOC);
+                   t += 2;
+                   progress = true;
+                 }
+             else if (tag0 == TOK_Quad_SQL)   // ⎕SQL may have a complex axis
+                 {
+                   const Symbol * subfun_symbol = tos[t + 2].get_sym_ptr();
+                   const UCS_string sub_name = subfun_symbol->get_name();
+                   const Function * topfun = tos[t].get_function();
+                   const sAxis axis = topfun->subfun_to_axis(sub_name);
+                   if (axis < 0)   bad_sub_fun_error(topfun, sub_name);
+
+                   // valid axis. replace: ⎕SQL.subfun with either
+                   // ⎕SQL[subfun] or with ⎕SQL[subfun;DB]
+                   //
+                   if (axis != 3 && axis != 4)   // ⎕SQL[subfun]
+                      {
+                        Value_P axis_val = IntScalar(axis, LOC);
+                        new (&tos[t + 1]) Token(TOK_AXIS, axis_val);
+                        tos[t + 2].clear(LOC);
+                        t += 2;
+                        progress = true;
+                      }
+                   else
+                      {
+                        /* map:      T0     T1  T2      T3  T4
+                              from:  ⎕SQL   .   query   DB  B
+                                to:  ⎕SQL3  [   DB      ]   B
+                           and:
+                              from:  ⎕SQL   .   update  DB  B
+                                to:  ⎕SQL4  [   DB      ]   B
+                         */
+                        const bool SQL_query = axis == 3;   // else: update
+                        if ((t + 4) >= tos.size())   // too few token
+                           {
+                             MORE_ERROR() << "*** Too few arguments for ⎕SQL."
+                                          << (SQL_query ? "query" : "update");
+                             SYNTAX_ERROR;
+                           }
+
+                        tos[t + 0] = SQL_query ? Quad_SQL_3::fun.get_token()
+                                               : Quad_SQL_3::fun.get_token();
+                        tos[t + 1] = Token(TOK_L_BRACK, int64_t(0));    // T1
+                        tos[t + 2].move(tos[t + 3], LOC);               // T2
+                        tos[t + 3] = Token(TOK_R_BRACK, int64_t(0));    // T3
+                        t += 3;
+                      }
+                 }
+      
+            }
+       }
+   return progress;
+}
+//----------------------------------------------------------------------------
+void
+Parser::bad_sub_fun_error(cFunction_P quad_fun, const UCS_string sub_name)
+{
+   MORE_ERROR() << sub_name << " is not a valid sub-function of "
+                << quad_fun->get_name() << ". See " << quad_fun->get_name()
+                << " '' for details.";
+   SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
 void
@@ -719,27 +974,29 @@ bool progress = false;
 
             case 2a. is fairly frequent with f being ⎕FIO or ⎕CR.
           */
-         if ((src + 2) < tos.ssize()          &&   // tos[src+2] exists
+         if ((src + 2) < tos.ssize()               &&   // tos[src+2] exists
              tos[src + 2].get_tag() == TOK_R_BRACK &&   // and is ]
              T1.get_Class() == TC_VALUE            &&   // value N
-             T1.get_apl_val()->is_int_scalar())
+             T1.get_apl_val()->is_int_scalar())         // scalar N
             {
               /* at this point we either have a function axis f[N] or else a
                  vector index V[N]. In some cases (system functions, APL
                  primitives) we can decide that here; if not then we have
                  to defer the decision to the Prefix parser.
                */
-              if (src > 0 && tos[src - 1].is_function())
+              if (src > 0 && tos[src - 1].is_function())   // function axis
                  {
-                   Value_P function_axis = T1.get_apl_val();
-                   Token tok_axis(TOK_AXIS, function_axis);
+                   const sAxis function_axis = T1.get_apl_val()
+                                             ->get_cfirst().get_int_value();
+
+                   Token tok_axis(TOK_FAXIS, function_axis);
                    new (&tos[src++]) Token(TOK_VOID);   // invalidate [
                    tos[src++].move(tok_axis, LOC);
                    new (&tos[src])   Token(TOK_VOID);   // invalidate ]
                    OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
                    progress = true;
                  }
-              else
+              else                                         // value axis
                  {
                    IndexExpr * idx = new IndexExpr(assign_state, LOC);
                    idx->add_index(T1.get_apl_val());
@@ -768,7 +1025,7 @@ Parser::optimize_short_primitives(Token_string & tos)
 bool progress = false;
    if (tos.ssize() < 4)   return false;   // too short to optimize
 
-// CERR << endl << "tos: ";   tos.print(CERR, false);
+// CERR << endl << "tos: ";   tos.print(CERR, 0);
 
    // create a list of 'terminal literals' from where the optimization
    //  may restart. For example:

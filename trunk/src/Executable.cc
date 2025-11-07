@@ -252,7 +252,7 @@ Token_string output;   // in reverse order
                         CERR << "Line " << line << endl
                              << "Offending token: (tag > TC_MAX_PERM) "
                              << tag << " " << tok << "\nStatement: ";
-                        loop(t, input.size())   CERR << "`" << input[t] << "  ";
+                        input.print(CERR, /* details */ 0);
                         CERR << endl;
                       }
 

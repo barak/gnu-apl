@@ -149,6 +149,9 @@ void
 Quad_FIO::clear()
 {
    // close open files, but leave stdin, stdout, and stderr open
+   // we move backwards from the end until only stdin, stdout, and stderr
+   // are left in open_files.
+   //
    while(open_files.size() > 3)
       {
          file_entry & fe = open_files.back();

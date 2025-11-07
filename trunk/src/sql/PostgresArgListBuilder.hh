@@ -59,12 +59,12 @@ class PostgresArgListBuilder : public ArgListBuilder {
 public:
     PostgresArgListBuilder( PostgresConnection *connection_in, const string &sql_in );
     virtual ~PostgresArgListBuilder();
-    virtual void append_string( const string &arg, int pos );
-    virtual void append_long( long arg, int pos );
-    virtual void append_double( double arg, int pos );
-    virtual void append_null( int pos );
-    virtual Value_P run_query( bool ignore_result );
-    virtual void clear_args( void );
+    virtual void append_string(const string &arg, int pos);
+    virtual void append_long(long arg, int pos);
+    virtual void append_double(double arg, int pos);
+    virtual void append_null(int pos);
+    virtual Value_P run_query();
+    virtual void clear_args();
 
 private:
     PostgresConnection *connection;

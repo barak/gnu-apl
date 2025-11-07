@@ -105,15 +105,18 @@ static int find_free_connection( void )
     return connections.size() - 1;
 }
 
-static Token open_database( Value_P A, Value_P B )
+static Token
+open_database(const Value & A, const Value & B)
 {
-    if( !A->is_apl_char_vector() ) {
-        MORE_ERROR() << "Illegal database name";
-        VALUE_ERROR;
-    }
-    UTF8_string type(A->get_UCS_ravel());
-    map<const string, Provider *>::iterator provider_iterator =
-                                            providers.find(type.c_str());
+    if (!A.is_apl_char_vector() )
+       {
+         MORE_ERROR() << "Illegal database name";
+         VALUE_ERROR;
+       }
+
+    UTF8_string type(A.get_UCS_ravel());
+    map<const string, Provider *>::iterator
+       provider_iterator = providers.find(type.c_str());
     if (provider_iterator == providers.end())
        {
          stringstream out;
@@ -123,7 +126,7 @@ static Token open_database( Value_P A, Value_P B )
        }
 
     int connection_index = find_free_connection();
-    connections[connection_index] = provider_iterator->second->open_database( B );
+    connections[connection_index] = provider_iterator->second->open_database(B);
 
     return Token( TOK_APL_VALUE1, IntScalar( connection_index , LOC ));
 }
@@ -133,7 +136,7 @@ static void throw_illegal_db_id( void )
     MORE_ERROR() << "Illegal database id";
     DOMAIN_ERROR;
 }
-
+//---------------------------------------------------------------------------
 static Connection *db_id_to_connection( int db_id )
 {
    if( db_id < 0 || db_id >= int(connections.size())) {
@@ -215,7 +218,7 @@ run_generic_one_query(ArgListBuilder *arg_list, Value_P B,
         }
     }
 
-    return arg_list->run_query( ignore_result );
+    return arg_list->run_query();
 }
 
 static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
@@ -272,35 +275,36 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
        }
 }
 //-----------------------------------------------------------------------------
-static Token run_query( Connection *conn, Value_P A, Value_P B )
+static Token
+run_query(Connection *conn, Value_P A, Value_P B)
 {
-    return Token( TOK_APL_VALUE1, run_generic( conn, A, B, true ) );
+    return Token(TOK_APL_VALUE1, run_generic(conn, A, B, true));
 }
 
 static Token run_update( Connection *conn, Value_P A, Value_P B )
 {
-    return Token( TOK_APL_VALUE1, run_generic( conn, A, B, false ) );
+    return Token(TOK_APL_VALUE1, run_generic( conn, A, B, false));
 }
 
 static Token run_transaction_begin( Value_P B )
 {
-    Connection *conn = value_to_db_id( B );
+Connection *conn = value_to_db_id(B);
     conn->transaction_begin();
     return Token( TOK_APL_VALUE1, Idx0( LOC ) );
 }
 
 static Token run_transaction_commit( Value_P B )
 {
-    Connection *conn = value_to_db_id( B );
+Connection *conn = value_to_db_id( B );
     conn->transaction_commit();
-    return Token( TOK_APL_VALUE1, Idx0( LOC ) );
+    return Token( TOK_APL_VALUE1, Idx0(LOC) );
 }
 
 static Token run_transaction_rollback( Value_P B )
 {
-    Connection *conn = value_to_db_id( B );
+Connection *conn = value_to_db_id(B);
     conn->transaction_rollback();
-    return Token( TOK_APL_VALUE1, Idx0( LOC ) );
+    return Token( TOK_APL_VALUE1, Idx0(LOC));
 }
 //---------------------------------------------------------------------------
 static Token
@@ -358,7 +362,9 @@ Value_P Z;
         Z = Value_P(shape, LOC);
         for (vector<ColumnDescriptor>::iterator i = cols.begin(); i != cols.end(); i++)
             {
-              Z->next_ravel_Pointer(make_string_cell(i->get_name(), LOC).get());
+              const UTF8_string utf(i->get_name().c_str());
+              Value_P ZZ(utf, LOC);
+              Z->next_ravel_Pointer(ZZ.get());
 
               Value_P type;
               if (i->get_type().size() == 0)
@@ -367,7 +373,9 @@ Value_P Z;
                  }
               else
                  {
-                   type = make_string_cell( i->get_type(), LOC);
+                    UTF8_string utf(i->get_type().c_str());
+                   Value_P ZZ(utf, LOC);
+                   Z->next_ravel_Pointer(ZZ.get());
                  }
               Z->next_ravel_Pointer(type.get());
             }
@@ -438,16 +446,16 @@ Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 
     switch( function_number ) {
     case 0:
-        return list_functions( CERR );
+        return list_functions(CERR);
 
     case 1:
-        return open_database( A, B );
+        return open_database(*A, *B);
 
     case 3:
-        return run_query( param_to_db( X ), A, B );
+        return run_query(param_to_db(X), A, B);
 
     case 4:
-        return run_update( param_to_db( X ), A, B );
+        return run_update(param_to_db(X), A, B);
 
     case 9:
         return show_cols( A, B );
@@ -477,10 +485,3 @@ get_function_mux( const char *function_name )
    return 0;
 }
 
-Value_P
-make_string_cell(const std::string &str, const char * loc)
-{
-const UCS_string ucs(UTF8_string(str.c_str()));
-Value_P Z(ucs, loc);
-   return Z;
-}

@@ -1336,7 +1336,11 @@ done:
 void
 Prefix::reduce_MISC_F_C_B()
 {
-   Assert1(prefix_len == 3);
+   Assert1(prefix_len == 3);   // F C B
+
+cFunction_P F = at0().get_function();
+Value_P     C = at1().get_function_axis();
+Value_P     B = at2().get_apl_val();
 
    if (saved_MISC.get_Class() == TC_INDEX)
       {
@@ -1351,30 +1355,13 @@ Prefix::reduce_MISC_F_C_B()
            }
       }
 
-   if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
+   if (at0().get_tag() == TOK_Quad_FIO && saved_MISC.get_Class() == TC_FUN12)
       {
-        // the user has mistakenly used a bracket index instead of a
-        // function axis. We must delete the current IndexExpr before
-        // throwing the syntax error.
+        // ⎕FIO[49] or ⎕FIO[-1] (operators)
         //
-        IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC
-                               << endl;
-        delete idx;
-        at1().clear(LOC);
-        SYNTAX_ERROR;
-      }
-
-   if (!at1().get_apl_val())   SYNTAX_ERROR;
-
-   if (at0().get_tag() == TOK_Quad_FIO &&
-       saved_MISC.get_Class() == TC_FUN12)
-      {
         DerivedFunction * derived =
                           Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived)   DerivedFunction(saved_MISC.get_token(),
-                                        at0().get_function(),
-                                        at1().get_apl_val(),  LOC);
+        new (derived)  Derived_LO_M_X(saved_MISC.get_token(), F, C, LOC);
         saved_MISC.get_token().clear(LOC);
         prefix_len = 2;   // only f ⎕FIO
         pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1382,12 +1369,11 @@ Prefix::reduce_MISC_F_C_B()
         return;
       }
 
-const Token result = at0().get_function()->eval_XB(at1().get_apl_val(),
-                                                   at2().get_apl_val());
-   if (push_error(result))   return;
+const Token Z = F->eval_XB(C, B);
+   if (push_error(Z))   return;
 
-   pop_args_push_result(result);
-   set_action(result);
+   pop_args_push_result(Z);
+   set_action(Z);
 }
 //----------------------------------------------------------------------------
 void
@@ -1413,19 +1399,23 @@ Prefix::reduce_A_M_B_()
 void
 Prefix::reduce_A_F_C_B()
 {
-   Assert1(prefix_len == 4);
+   Assert1(prefix_len == 4);   // A F C B
 
-   if (at2().get_ValueType() != TV_VAL)   SYNTAX_ERROR;
-   if (!at2().get_apl_val())              SYNTAX_ERROR;
+Value_P     A = at0().get_apl_val();
+cFunction_P F = at1().get_function();
+Value_P     C = at2().get_function_axis();
+Value_P     B = at3().get_apl_val();
 
-const Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
-                                                    at2().get_apl_val(),
-                                                    at3().get_apl_val());
+const Token Z = F->eval_AXB(A, C, B);
 
-   if (push_error(result))   return;
+   // result could be a value or an error
+   //
+   if (push_error(Z))   return;   // if result was an error
 
-   pop_args_push_result(result);
-   set_action(result);
+   // result was a value
+   //
+   pop_args_push_result(Z);
+   set_action(Z);
 }
 //----------------------------------------------------------------------------
 void
@@ -1440,9 +1430,11 @@ Prefix::reduce_F_M__()
 {
    Assert1(prefix_len == 2);
 
+cFunction_P M = at1().get_function();
+
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
+   new (derived) Derived_LO_M(at0(), M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1467,7 +1459,7 @@ Prefix::MM_is_FM(Function_PC pc)
 
        NOTE: if M1 is an operator then its left argument must either be a
              value or a function. Therefore the token in metaclass MISC,
-             i.e. ← → ; [ END or ( imply that M1 shall be a function F
+             i.e. ← → ; [ END or ( implies that M1 shall be a function F
              (which, unless M1 / ⌿ \ or ⍀) will rise a syntax error in
              reduce_F_M__().
     */
@@ -1535,8 +1527,10 @@ Prefix::reduce_A_M__()
 {
    Assert1(prefix_len == 2);
 
+cFunction_P M = at1().get_function();
+
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
+   new (derived) Derived_LO_M(at0(), M, LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1547,18 +1541,11 @@ Prefix::reduce_F_M_C_()
 {
    Assert1(prefix_len == 3);
 
-   if (at2().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+Value_P C = at2().get_function_axis();
 
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(),
-                                 at1().get_function(),
-                                 at2().get_axes(), LOC);
+   new (derived) Derived_LO_M_X(at0(), at1().get_function(), C, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1569,22 +1556,17 @@ Prefix::reduce_F_C_M_()
 {
    Assert1(prefix_len == 3);
 
-   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+cFunction_P M = at2().get_function();
+Value_P     C = at1().get_function_axis();
 
 DerivedFunction * F_C =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(),
-                             at1().get_axes(), LOC);
+   new (F_C) Derived_F_X(at0().get_function(), C, LOC);
 
 Token tok_F_C(TOK_FUN2, F_C);
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(tok_F_C, at2().get_function(), LOC);
+   new (derived) Derived_LO_M(tok_F_C, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1595,28 +1577,18 @@ Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
 
-   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
-
-   if (at3().get_tag() != TOK_AXIS)   // e.g. M[;2] instead of M[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+cFunction_P F  = at0().get_function();
+Value_P     FX = at1().get_function_axis();
+cFunction_P M  = at2().get_function();
+Value_P     MX = at3().get_function_axis();
 
 DerivedFunction * F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(), at1().get_axes(), LOC);
+   new (F_C) Derived_F_X(F, at1().get_axes(), LOC);
 
 Token tok_F_C(TOK_FUN2, F_C);
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(tok_F_C, at2().get_function(),
-                                          at3().get_axes(), LOC);
+   new (derived) Derived_LO_M_X(tok_F_C, M, MX, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1625,29 +1597,35 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_B_()
 {
-   // same as G2, except for ⍤
+Token &     F = at0();
+cFunction_P D = at1().get_function();
+Value_P     B = at2().get_apl_val();
+
+   // same as F D G, except for D = ⍤
    //
-   if (at1().get_function()->get_Id() != ID_OPER2_RANK)
+   if (D->get_Id() != ID_OPER2_RANK)
       {
          reduce_F_D_G_();
          return;
       }
 
-   // we have f ⍤ y_B with y_B glued beforehand. Unglue it.
+   // At this point we have f ⍤ [X] y_B with y_B glued in Parser.cc.
+   // Unglue it. NOTE that B is y (and not the real B).
    //
-Value_P y123;
-Value_P B;
-   Bif_OPER2_RANK::split_y123_B(at2().get_apl_val(), y123, B);
-Token new_y123(TOK_APL_VALUE1, y123);
+B->print_boxed(CERR << "B:", 4);
+Value_P y123_orig;
+Value_P B_orig;
+   Bif_OPER2_RANK::split_y123_B(B, y123_orig, B_orig);
+Token T_y123_orig(TOK_APL_VALUE1, y123_orig);
 
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), new_y123, LOC);
+   new (derived) Derived_LO_D_RO(F, D, T_y123_orig, LOC);
 
-const Token result(TOK_FUN2, derived);
+const Token Z(TOK_FUN2, derived);
 
-   if (!B)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
+   if (!B_orig)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
       {
-        pop_args_push_result(result);
+        pop_args_push_result(Z);
       }
    else      // a new B split off from the original B
       {
@@ -1660,9 +1638,9 @@ const Token result(TOK_FUN2, derived);
         pop_and_discard();   // pop C
         pop_and_discard();   // pop B (old)
 
-        Token new_B(TOK_APL_VALUE1, B);
+        Token new_B(TOK_APL_VALUE1, B_orig);
         Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(result, pc_D);
+        Token_loc tl_derived(Z, pc_D);
         push(tl_B);
         push(tl_derived);
       }
@@ -1897,9 +1875,11 @@ Value_P top_val = top_sym->get_var_value();
 void
 Prefix::reduce_F_D_G_()
 {
+   // bind F and G to D.
+   //
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), at2(), LOC);
+   new (derived) Derived_LO_D_RO(at0(), at1().get_function(), at2(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1908,6 +1888,11 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_C_B()
 {
+Token &     F = at0();
+cFunction_P D = at1().get_function();
+Value_P     C = at2().get_function_axis();
+Value_P     B = at3().get_apl_val();
+
    // reduce, except if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
    //
@@ -1928,30 +1913,24 @@ Prefix::reduce_F_D_C_B()
                return;
              }
         }
-   // we have f ⍤ [X] y_B with y_B glued beforehand. Unglue it.
+
+   // at this point we have f ⍤ [X] y_B. There may or may not com a left
+   // argument but our max token count is 4. We therefore bind
+   // F (aka. LO), D, and C together.
    //
-Value_P y123;
-Value_P B;
-   Bif_OPER2_RANK::split_y123_B(at3().get_apl_val(), y123, B);
-Token new_y123(TOK_APL_VALUE1, y123);
+Value_P y123_orig;
+Value_P B_orig;
+   Bif_OPER2_RANK::split_y123_B(B, y123_orig, B_orig);
+Token T_y123_orig(TOK_APL_VALUE1, y123_orig);
 
-   if (at2().get_tag() != TOK_AXIS)   // e.g. D[;2] instead of D[;2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
-
-Value_P v_idx = at2().get_axes();
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(),
-                                 v_idx, new_y123, LOC);
+   new (derived) Derived_LO_D_X_RO(F, D, C, T_y123_orig, LOC);
 
-const Token result(TOK_FUN2, derived);
+const Token Z(TOK_FUN2, derived);
 
-   if (!B)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
+   if (!B_orig)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
       {
-        pop_args_push_result(result);
+        pop_args_push_result(Z);
       }
    else      // a new B split off from the original B
       {
@@ -1965,9 +1944,9 @@ const Token result(TOK_FUN2, derived);
         pop_and_discard();   // pop C
         pop_and_discard();   // pop B (old)
 
-        Token new_B(TOK_APL_VALUE1, B);
+        Token new_B(TOK_APL_VALUE1, B_orig);
         Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(result, pc_D);
+        Token_loc tl_derived(Z, pc_D);
         push(tl_B);
         push(tl_derived);
       }
@@ -1981,13 +1960,13 @@ Prefix::reduce_A_C__()
 Value_P A = at0().get_apl_val();
 Value_P Z;
 
-   if (at1().get_tag() == TOK_AXIS)
+   if (at1().get_tag() == TOK_AXIS)   // [] or [IX]
       {
         Z = A->index(at1().get_apl_val().get());
       }
-   else
+   else                               // [I1; I2...]
       {
-        IndexExpr * idx =  &at1().get_index_val();
+        const IndexExpr * idx =  &at1().get_index_val();
         try
            {
              Z = A->index(*idx);
@@ -2050,7 +2029,7 @@ Value_P B = at3().get_apl_val();
       }
    else                               // [a;...]
       {
-        IndexExpr * idx = &at1().get_index_val();
+        const IndexExpr * idx = &at1().get_index_val();
         try
            {
              V->assign_indexed(*idx, B);

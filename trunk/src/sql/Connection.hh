@@ -35,13 +35,25 @@
 class ColumnDescriptor
 {
 public:
-    ColumnDescriptor( const string &name_in, const string &type_in ) : name( name_in ), type( type_in ) {}
-    ColumnDescriptor operator=( ColumnDescriptor &orig ) { return ColumnDescriptor( orig.name, orig.type ); }
-    const string &get_name( void ) { return name; }
-    const string &get_type( void ) { return type; }
+    ColumnDescriptor(const string &name_in, const string &type_in)
+    : name( name_in ),
+      type( type_in )
+    {}
+
+    ColumnDescriptor operator=(ColumnDescriptor &orig)
+       { return ColumnDescriptor( orig.name, orig.type); }
+
+    const string & get_name()
+        { return name; }
+
+    const string & get_type()
+        { return type; }
 
 private:
+   /// name of the colunmn
     const string name;
+
+   /// data type of the column
     const string type;
 };
 //----------------------------------------------------------------------------
@@ -49,16 +61,19 @@ class Connection
 {
 public:
     virtual ~Connection() {}
-    virtual ArgListBuilder *make_prepared_query( const string &sql ) = 0;
-    virtual ArgListBuilder *make_prepared_update( const string &sql ) = 0;
-    virtual void transaction_begin( void ) = 0;
-    virtual void transaction_commit( void ) = 0;
-    virtual void transaction_rollback( void ) = 0;
-    virtual void fill_tables( vector<string> &tables ) = 0;
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols ) = 0;
-    virtual const string make_positional_param( int pos ) = 0;
+    virtual ArgListBuilder *make_prepared_query(const string & sql)  = 0;
+    virtual ArgListBuilder *make_prepared_update(const string & sql) = 0;
+    virtual void transaction_begin()                                 = 0;
+    virtual void transaction_commit()                                = 0;
+    virtual void transaction_rollback()                              = 0;
+    virtual void fill_tables(vector<string> & tables)                = 0;
+    virtual void fill_cols(const string & table,
+                           vector<ColumnDescriptor> & cols)          = 0;
+    virtual const string make_positional_param(int pos)              = 0;
+    virtual const char * get_provider_name() const                   = 0;
+    virtual const char * get_provider_type() const                   = 0;
 
-    virtual const string replace_bind_args( const string &sql );
+    virtual const string replace_bind_args(const string & sql);
 };
 //----------------------------------------------------------------------------
 

@@ -34,7 +34,8 @@ TD(TOK_P_SYMB        , TC_SYMBOL    , TV_SYM  , ID_No_ID3       ) // (SYMBOL)
 TD(TOK_NUMERIC       , TC_NUMERIC   , TV_CHAR , ID_No_ID        )
 TD(TOK_INDEX         , TC_INDEX     , TV_INDEX, ID_No_ID        )
 TD(TOK_PINDEX        , TC_PINDEX    , TV_INDEX, ID_No_ID        ) // partial [;]
-TD(TOK_AXIS          , TC_INDEX     , TV_VAL  , ID_No_ID        )
+TD(TOK_AXIS          , TC_INDEX     , TV_VAL  , ID_No_ID        )  // [ value ]
+TD(TOK_FAXIS         , TC_INDEX     , TV_INT  , ID_No_ID        )  // [ integer ]
 TD(TOK_FUN0          , TC_FUN0      , TV_FUN  , ID_No_ID        ) // defined fn
 TD(TOK_FUN2          , TC_FUN2      , TV_FUN  , ID_No_ID        ) // defined fn
 TD(TOK_OPER1         , TC_OPER1     , TV_FUN  , ID_No_ID        ) // defined op
@@ -123,6 +124,8 @@ TD(TOK_Quad_EX       , TC_FUN1      , TV_FUN  , ID_Quad_EX      )
 TD(TOK_Quad_MX       , TC_FUN2      , TV_FUN  , ID_Quad_MX      )
 TD(TOK_Quad_RE       , TC_FUN2      , TV_FUN  , ID_Quad_RE      )
 TD(TOK_Quad_SQL      , TC_FUN2      , TV_FUN  , ID_Quad_SQL     )
+TD(TOK_Quad_SQL_3    , TC_FUN2      , TV_FUN  , ID_Quad_SQL_3   )
+TD(TOK_Quad_SQL_4    , TC_FUN2      , TV_FUN  , ID_Quad_SQL_4   )
 TD(TOK_Quad_SVQ      , TC_FUN1      , TV_FUN  , ID_Quad_SVQ     )
 TD(TOK_Quad_SVR      , TC_FUN1      , TV_FUN  , ID_Quad_SVR     )
 TD(TOK_Quad_SVS      , TC_FUN1      , TV_FUN  , ID_Quad_SVS     )

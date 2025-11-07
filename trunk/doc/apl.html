@@ -21,6 +21,10 @@ Copyright (C) 2013 Free Software Foundation, Inc. -->
 <link href="#Chapter-1" rel="next" title="Chapter 1">
 <style type="text/css">
 <!--
+
+/* CSS for HTML output of apl.texi */
+
+
 a.copiable-anchor {visibility: hidden; text-decoration: none; line-height: 0em}
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
@@ -36,6 +40,16 @@ span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
 span:hover a.copiable-anchor {visibility: visible}
 ul.no-bullet {list-style: none}
+pre.example { font-family: "Courier New", monospace;
+              font-size: 16 px; font-weight: bold; background: #EEF;
+              border:   2px solid black; border-radius: 10px;
+              padding: 1em 2em 1em 2em; }
+
+code { font-family: "Courier New", monospace;
+       font-size: 16 px; font-weight: bold; }
+
+
+
 -->
 </style>
 
@@ -52,7 +66,6 @@ ul.no-bullet {list-style: none}
 
 
 
-
 <div class="top" id="Top">
 <div class="header">
 <p>
@@ -60,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>October 25, 2025.
+<p>November 7, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -267,22 +280,34 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-Syntax-Alternatives" href="#Syntax-Alternatives">2.37.2.7 Syntax Alternatives</a></li>
       </ul></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e38">2.38 ⎕SQL - SQL Database Interface</a>
+    <li><a id="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e38">2.38 ⎕SI - State Indicator</a></li>
+    <li><a id="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e39">2.39 ⎕SQL - SQL Database Interface</a>
     <ul class="no-bullet">
-      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers" href="#g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers">2.38.1 ⎕SQL[0] ⍬ : display subfunction numbers</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names" href="#g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names">2.38.2 ⎕SQL[0] &rdquo; : display subfunction names</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">2.38.3 ⎕SQL[2] B : close database</a></li>
-      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">2.38.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
-      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">2.38.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">2.38.6 ⎕SQL[5] B : start transaction</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">2.38.7 ⎕SQL[6] B : commit transaction</a></li>
-      <li><a id="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.38.8 ⎕SQL[7] B : rollback transaction</a></li>
-      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.38.9 Z←⎕SQL[8] B : table names</a></li>
-      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.38.10 Z←⎕SQL[9] B : column names</a></li>
-      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number" href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">2.38.11 Z ← ⎕SQL[10] B : library version number</a></li>
-      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string" href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">2.38.12 Z ← ⎕SQL[11] B : library version string</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers" href="#g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers">2.39.1 ⎕SQL[0] ⍬ : display subfunction numbers</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names" href="#g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names">2.39.2 ⎕SQL[0] <code>''</code> : display subfunction names</a></li>
+      <li><a id="toc-ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database" href="#ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">2.39.3 ref ← A ⎕SQL[1] B : open database</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">2.39.4 ⎕SQL[2] B : close database</a></li>
+      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">2.39.5 Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
+      <li><a id="toc-Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">2.39.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">2.39.7 ⎕SQL[5] B : start transaction</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">2.39.8 ⎕SQL[6] B : commit transaction</a></li>
+      <li><a id="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.39.9 ⎕SQL[7] B : rollback transaction</a></li>
+      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.39.10 Z←⎕SQL[8] B : table names</a></li>
+      <li><a id="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.39.11 Z←⎕SQL[9] B : column names</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number" href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">2.39.12 Z ← ⎕SQL[10] B : library version number</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string" href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">2.39.13 Z ← ⎕SQL[11] B : library version string</a></li>
+      <li><a id="toc-SQLite-Quickstart" href="#SQLite-Quickstart">2.39.14 SQLite Quickstart</a>
+      <ul class="no-bullet">
+        <li><a id="toc-Deleting-a-Database" href="#Deleting-a-Database">2.39.14.1 Deleting a Database</a></li>
+        <li><a id="toc-Creating-a-new-Database" href="#Creating-a-new-Database">2.39.14.2 Creating a new Database</a></li>
+        <li><a id="toc-Creating-a-Database-Table" href="#Creating-a-Database-Table">2.39.14.3 Creating a Database Table</a></li>
+        <li><a id="toc-Excursus_003a-Dynamic-Query-Strings" href="#Excursus_003a-Dynamic-Query-Strings">2.39.14.4 Excursus: Dynamic Query Strings</a></li>
+        <li><a id="toc-Writing-an-APL-matrix-into-a-Database-Table" href="#Writing-an-APL-matrix-into-a-Database-Table">2.39.14.5 Writing an APL matrix into a Database Table</a></li>
+        <li><a id="toc-Reading-a-Database-Table-into-an-APL-Matrix" href="#Reading-a-Database-Table-into-an-APL-Matrix">2.39.14.6 Reading a Database Table into an APL Matrix</a></li>
+        <li><a id="toc-Updating-a-Database-Table" href="#Updating-a-Database-Table">2.39.14.7 Updating a Database Table</a></li>
+      </ul></li>
+      <li><a id="toc-Deleting-Rows-From-a-Database-Table" href="#Deleting-Rows-From-a-Database-Table">2.39.15 Deleting Rows From a Database Table</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e39">2.39 ⎕SI - State Indicator</a></li>
     <li><a id="toc-_005b_003f_005dSYL-_002d-System-limits" href="#Section-2_002e40">2.40 ⎕SYL - System limits</a>
     <ul class="no-bullet">
       <li><a id="toc-_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d" href="#g_t_005b_003f_005dSYL_005b1-2-3-4-5-6_003b_005d">2.40.1 ⎕SYL[1 2 3 4 5 6;]</a></li>
@@ -367,15 +392,13 @@ Next: <a href="#Chapter-2" accesskey="n" rel="next">Non-standard GNU APL Feature
  unpacked directory.
 </li></ul>
 
-<p>For the experienced, but impatient reader: it is the usual sequence
+<p>For the experienced, but impatient reader: it is the well-known sequence
 </p>
-<ul>
-<li> ./configure
-
-</li><li> make
-
-</li><li> make install
-</li></ul>
+<div class="example">
+<pre class="example">$ ./configure
+$ make
+$ sudo make install
+</pre></div>
 
 <p>On success, an executable file named &rsquo;apl&rsquo; will have been produced
 in the sub-directory &rsquo;src&rsquo;.
@@ -387,12 +410,15 @@ in the sub-directory &rsquo;src&rsquo;.
 <h3 class="section">1.2 Starting APL</h3>
 
 <p>Last things first: before explaining how to start APL, it is important to
- remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
- - these serve other purposes. Instead, you leave APL with the command
- )OFF or )off (on a separate line) like this:
+ remember how to stop (i.e. exit) it. Neither <b>^C</b> nor <b>^D</b> will stop
+APL - these serve other purposes. Instead, you leave APL with the command
+ <b>)OFF</b> or <b>)off</b> (on a separate line) like this:
 </p>
-<p>)OFF
-</p>
+<div class="example">
+<pre class="example">      )OFF
+</pre></div>
+
+
 <p>If APL is computing a function (and possibly caught in an endless loop),
 then you may have to press <b>^C</b> (this is called <i>ATTENTION</i> in APL) to
 return to APL&rsquo;s command mode so that the <b>)OFF</b> command can be entered.
@@ -404,23 +430,31 @@ history of your GNU APL commands will have been preserved. Having that said,
 APL is started like every other program - by entering its name and optional
 command line parameters, for example:
 </p>
-<p>$ apl
-</p>
+<div class="example">
+<pre class="example">$ apl
+</pre></div>
+
 <p>or:
 </p>
-<p>$ apl <b><tt>-id</tt></b> 1001
-</p>
+<div class="example">
+<pre class="example">$ apl -id 1001
+</pre></div>
+
 <p>GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called &rsquo;apl&rsquo; and is located in the current
 directory):
 </p>
-<p>#! ./apl 
-</p>
+<div class="example">
+<pre class="example">#! ./apl 
+</pre></div>
+
 <p>or (if the APL interpreter binary is not in the current directory but in
 /mypath/apl):
 </p>
-<p>#! /mypath/apl
-</p>
+<div class="example">
+<pre class="example">#! /mypath/apl
+</pre></div>
+
 <p>The path to the &rsquo;apl&rsquo; binary can be missing (like in the first example),
 relative, or absolute (second example). The exact details of how the first
 line of a GNU APL script shall look vary slightly among operating systems.
@@ -440,7 +474,7 @@ U+23FF range).
 <p>GNU APL understands the following command line options:
 </p>
 <ul>
-<li> <b><tt>-C new_root</tt></b>
+<li> <b>-C new_root</b>
 
 <p>perform chroot(&quot;new_root&quot;) followed by chdir(&quot;/&quot;). This restricts the access
 of the process running GNU APL to files in or below directory new_root, and
@@ -471,37 +505,37 @@ with the default configuration of GNU APL, GNU APL installs itself in
 new_root, however, /usr/local/bin is no longer accessible and one would need
 to copy /usr/local/bin/APserver to new_root/usr/local/bin/APserver
 
-</li><li> Depending on your platform, the process using -C may need root privileges.
+</li><li> Depending on your platform, the process using <b>-C</b> may need root privileges.
 
 </li></ul>
 
-</li><li> <b><tt>--cfg</tt></b>
+</li><li> <code>--cfg</code>
 
 <p>show ./configure options that were used to configure GNU APL, and exit.
 </p>
-</li><li> <b><tt>--[no]Color</tt></b>
+</li><li> <b>&ndash;[no]Color</b>
 
 <p>start with ]COLOR ON [OFF].
 </p>
-</li><li> <b><tt>--CPU_limit_secs sec</tt></b>
+</li><li> <b>&ndash;CPU_limit_secs sec</b>
 
 <p>set CPU time limit to <i>sec</i> seconds.
 </p>
-</li><li> <b><tt>-d</tt></b>
+</li><li> <code>-d</code>
 
 <p>run the APL interpreter (or APL script) in the background (i.e. as a daemon).
 For this to work you need to provide some input to the background process,
 e.g. via the -f option.
 </p>
-</li><li> <b><tt>--emacs</tt></b>
+</li><li> <code>--emacs</code>
 
 <p>run in (old) Emacs mode.
 </p>
-</li><li> <b><tt>--emacs_arg arg</tt></b>
+</li><li> <code>--emacs_arg arg</code>
 
 <p>run in (new) Emacs mode with argument arg.
 </p>
-</li><li> <b><tt>--eval line</tt></b>
+</li><li> <code>--eval line</code>
 
 <p>evaluate one APL <i>line</i> and exit (-s without -f is implied). This option
 can be given several times; in that case several lines will be executed in
@@ -510,53 +544,53 @@ options are normally processed by the shell before being passed to apl.
 Therefore quoting the argument of &ndash;eval may often be necessary and it is
 common wisdom to always quote the &ndash;eval argument.
 </p>
-</li><li> <b><tt>-f file</tt></b>
+</li><li> <code>-f file</code>
 
 <p>read input from <i>file</i> rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
 If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file or include the &ndash;OFF option.
 </p>
-</li><li> <b><tt>--gpl</tt></b>
+</li><li> <code>--gpl</code>
 
 <p>show GNU APL license (GPL) and exit.
 </p>
-</li><li> <b><tt>-L wsname</tt></b>
+</li><li> <code>-L wsname</code>
 
 <p>)LOAD wsname on start-up.
 </p>
-</li><li> <b><tt>--LX expr</tt></b>
+</li><li> <code>--LX expr</code>
 
 <p>execute <b>expr</b> first. The workspace behaves as if ⎕LX (latent
 expression) were set to <b>expr</b> in the workspace. This can be used,
 for example, to start the same workspace with different start-up values.
 </p>
-</li><li> <b><tt>-h</tt></b>, <b><tt>--help</tt></b>
+</li><li> <code>-h</code>, <code>--help</code>
 
 <p>print all command line options with a brief hint about what they do.
 </p>
-</li><li> <b><tt>--id proc</tt></b>
+</li><li> <code>--id proc</code>
 
 <p>use processor ID proc for this interpreter. If no ID is provided, then the
 first unused ID &gt; 1000 is taken by this interpreter and the ID becomes used
 as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 </p>
-</li><li> <b><tt>-l num</tt></b>
+</li><li> <code>-l num</code>
 
 <p>turn logging facility <b>num</b> ON (provided that dynamic logging was
 ./configure&rsquo;d). The logging facility 37 (start-up messages) is of particular
 importance for troubleshooting and it works even if dynamic logging
 was not ./configure&rsquo;d.
 </p>
-</li><li> <b><tt>--mem [memory-limit]</tt></b>
+</li><li> <code>--mem [memory-limit]</code>
 
 <p>tell the interpreter not to use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
 </p>
-<p>The interpreter will exit at start-up if <b><tt>--mem</tt></b> is used and:
+<p>The interpreter will exit at start-up if <code>-mem</code> is used and:
 </p>
 <ul>
 <li> the platform on which the interpreter runs has no /proc/meminfo, or
@@ -578,9 +612,9 @@ is the given amount in kB, MB, or GB.
 <p>For example:
 </p>
 <ul>
-<li> <b><tt>--mem</tt></b>      (50% of MemFree: in /proc/meminfo are guaranteed)
-</li><li> <b><tt>--mem 80%</tt></b>  (80% of MemFree: in /proc/meminfo are guaranteed)
-</li><li> <b><tt>--mem 5G</tt></b>   (5 GB are guaranteed)
+<li> <code>--mem</code>      (50% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <code>--mem 80%</code>  (80% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <code>--mem 5G</code>   (5 GB are guaranteed)
 </li></ul>
 
 <p>WARNING: The memory-limit is checked against parameter &rsquo;MemFree&rsquo; in
@@ -592,15 +626,15 @@ responsibility to prevent it), then ⎕WA becomes unreliable and the
 interpreter may crash badly (i.e. without a WS FULL error, and without
 any chance to )SAVE the workspace) when the available memory is exhausted.
 </p>
-</li><li> <b><tt>--echoCIN</tt></b>
+</li><li> <code>--echoCIN</code>
 copy the input line (after editing) to stdout. For creating session logs.
 
-</li><li> <b><tt>--noCIN</tt></b>
+</li><li> <code>--noCIN</code>
 
 <p>do not echo stdin to stdout. Almost a must for scripting (unless you
 intend to troubleshoot a script).
 </p>
-</li><li> <b><tt>--to_COUT</tt></b>
+</li><li> <code>--to_COUT</code>
 
 <p>normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
 when GNU APL is started in a script, the output of the script appears on
@@ -609,7 +643,7 @@ stdout (i.e. file descriptor 1) while the output of GNU APL appears on stderr.
 <p>This option redirects the stderr output of GNU APL to stdout. The same effect
 can be achieved with the option &quot;OUTPUT-TO-COUT Yes&quot; in a preferences file.
 </p>
-</li><li> <b><tt>--tcp_port PORT</tt></b>
+</li><li> <code>--tcp_port PORT</code>
 
 <p>this option starts GNU APL as a server that listens on TCP port PORT.
 Every TCP connection accepted by the server forks a new GNU APL instance
@@ -617,162 +651,162 @@ which has its stdin, stdout, and stderr redirected to the TCP connection.
 </p>
 <p>WARNING: This option is dangerous if PORT is directly exposed to the Internet!
 </p>
-</li><li> <b><tt>--noCONT</tt></b>
+</li><li> <code>--noCONT</code>
 
 <p>do not load a SETUP or CONTINUE workspace on start-up.
 </p>
-</li><li> <b><tt>--OFF</tt></b>
+</li><li> <code>--OFF</code>
 
 <p>This option causes GNU APL to perform an automatic )OFF command after the
 last line of the last input file (as per -f option) was executed.
 </p>
-</li><li> <b><tt>--PW COLS</tt></b>
+</li><li> <code>--PW COLS</code>
 
 <p>set the initial value of ⎕PW to COLS (min. 30, max. 10000)
 </p>
-</li><li> <b><tt>--[no]SV</tt></b>
+</li><li> <code>--[no]SV</code>
 
 <p>do [not] start APserver (a shared variable server) on start-up. This disables
 communication with other workspaces or auxiliary processors through
 shared variables.
 </p>
-</li><li> <b><tt>-p N</tt></b>
+</li><li> <code>-p N</code>
 
 <p>use profile number N in preferences files. A preference file may contain
 several sets of settings for different purposes; the profile number selects
 one of these sets.
 </p>
-</li><li> <b><tt>--par pproc</tt></b>
+</li><li> <code>--par pproc</code>
 
 <p>use processor parent ID pproc (default: no parent ID).
 </p>
-</li><li> <b><tt>--rawCIN</tt></b>
+</li><li> <code>--rawCIN</code>
 
 <p>do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
 are not wanted and can be turned off with this option.
 </p>
-</li><li> <b><tt>-s</tt></b>, <b><tt>--script</tt></b>
+</li><li> <code>-s</code>, <code>--script</code>
 
 <p>this option is an abbreviation for:
- <b><tt>--silent</tt></b> <b><tt>--noCIN</tt></b> <b><tt>--noCONT</tt></b> <b><tt>-f -</tt></b>
-which is a typical combination of options for APL scripts.
+ <code>--silent</code> <code>--noCIN</code> <code>--noCONT</code> <code>-f -</code>
+(which is a typical combination of options for APL scripts).
 </p>
-</li><li> <b><tt>-q</tt></b>, <b><tt>--silent</tt></b>
+</li><li> <code>-q</code>, <code>--silent</code>
 
 <p>suppress printing of the GNU APL welcome message. Useful for scripts.
 </p>
-</li><li> <b><tt>--safe</tt></b>
+</li><li> <code>--safe</code>
 
 <p>disable shared variables and native functions
 </p>
-</li><li> <b><tt>--show_bin_dir</tt></b>
+</li><li> <code>--show_bin_dir</code>
 
 <p>display the binary directory where, according to ./configure, the programs
 apl, APserver, AP100, and AP210 are installed. Then exit.
 </p>
-</li><li> <b><tt>--show_doc_dir</tt></b>
+</li><li> <code>--show_doc_dir</code>
 
 <p>display the directory where, according to ./configure, documentation files
 for GNU APL are installed. Then exit.
 </p>
-</li><li> <b><tt>--show_etc_dir</tt></b>
+</li><li> <code>--show_etc_dir</code>
 
 <p>display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 </p>
-</li><li> <b><tt>--show_lib_dir</tt></b>
+</li><li> <code>--show_lib_dir</code>
 
 <p>display the library directory where, according to ./configure, shared library
 files and the workspaces shipped with GNU APL are installed. Then exit.
 </p>
-</li><li> <b><tt>--show_src_dir</tt></b>
+</li><li> <code>--show_src_dir</code>
 
 <p>display the source directory where, according to ./configure, GNU APL
 was compiled. Then exit. This can be used, for example, by native functions
 that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 </p>
-</li><li> <b><tt>--show_all_dirs</tt></b>
+</li><li> <code>--show_all_dirs</code>
 
 <p>display all the directories above. Then exit.
 </p>
-</li><li> <b><tt>-T testcases ...</tt></b>
+</li><li> <code>-T testcases ...</code>
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
 the interpreter is compared with the expected output in the testcase file(s)
 and differences are marked. In addition a summary file is created that tells
 whether or not each of the testcases was successful.
 
-</li><li> <b><tt>--TM mode</tt></b>
+</li><li> <code>--TM mode</code>
 
 <p>test mode. This option specifies how the interpreter shall behave
-when running a number of testcases (as specified with the <b><tt>-T</tt></b> option).
+when running a number of testcases (as specified with the <code>-T</code> option).
 </p>
-<p><b><tt>--TM 0</tt></b> (default) run all testcases and exit after the last testcase.
+<p><code>--TM 0</code> (default) run all testcases and exit after the last testcase.
 </p>
-<p><b><tt>--TM 1</tt></b> like <b><tt>--TM 0</tt></b> if no error was detected.
+<p><code>--TM 1</code> like <code>--TM 0</code> if no error was detected.
 However, if one of the testcases has failed, then the interpreter
 does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 </p>
-<p><b><tt>--TM 2</tt></b> like <b><tt>--TM 1</tt></b>, but stay in the interpreter even if
+<p><code>--TM 2</code> like <code>--TM 1</code>, but stay in the interpreter even if
 all testcases have passed. This can be useful for quickly bringing the
 interpreter into a specific state and continue manual troubleshooting
 from that state.
 </p>
-<p><b><tt>--TM 3</tt></b> like <b><tt>--TM 1</tt></b>, but stop testcase execution after the
+<p><code>--TM 3</code> like <code>--TM 1</code>, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 </p>
-<p><b><tt>--TM 4</tt></b> like <b><tt>--TM 3</tt></b>, but exit after the first failed
+<p><code>--TM 4</code> like <code>--TM 3</code>, but exit after the first failed
 testcase. This is useful for automatic regression tests, where no errors
 are expected.
 </p>
-</li><li> <b><tt>--TR</tt></b>
+</li><li> <code>--TR</code>
 
 <p>executes test case files in random order.
 </p>
-</li><li> <b><tt>--TS</tt></b>
+</li><li> <code>--TS</code>
 
-<p>Normally, when the interpreter is run with the <b><tt>-T</tt></b> option,
+<p>Normally, when the interpreter is run with the <code>T</code> option,
 an existing summary.log file is overwritten without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overwriting it.
 </p>
-</li><li> <b><tt>-v</tt></b>, <b><tt>--version</tt></b>,
+</li><li> <code>-v</code>, <code>--version</code>,
 
 <p>show version information and exit.
 </p>
-</li><li> <b><tt>-u UID</tt></b>
+</li><li> <code>-u UID</code>
 
 <p>run as user with UID 0. This option can only be used by the root user (who
 then wants to run as a different user).
 </p>
-</li><li> <b><tt>-w milli</tt></b>
+</li><li> <code>-w milli</code>
 
 <p>wait milli milliseconds at start-up. Useful to give other programs that are
 started together with this interpreter time to initialize themselves.
 </p>
-</li><li> <b><tt>  +APPOPT</tt></b>
-</li><li> <b><tt> ++APPOPT ARG1</tt></b>
-</li><li> <b><tt>+++APPOPT ARG1 ARG2</tt></b>
+</li><li> <code>|  +APPOPT|</code>
+</li><li> <code>| ++APPOPT ARG1|</code>
+</li><li> <code>|+++APPOPT ARG1 ARG2|</code>
 </li><li> ...
 
-<p>Those command line options above that start with - are understood by the
+<p>Those command line options above that start with + are understood by the
    GNU APL binary and their arguments must follow the description given for
    them. In addition the interpreter also accepts command line options that
    start with +. However, these options are not checked by the interpreter
-   in any way, but are merely copied to ⎕ARG (see below). In these options,
+   in any way, but are merely copied to <b>⎕ARG</b> (see below). In these options,
    APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
    whitespace characters. The purpose of these options is to control aspects
    of the APL application from the command line.
 </p>
-</li><li> <b><tt>--</tt></b>
+</li><li> <code>-</code>
 
 <p>end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
 interpreter was invoked (similar to variable argv in main(int argc,
-char * argv[]) in C/C++). Option <b><tt>--</tt></b> can be used to separate command line
+char * argv[]) in C/C++). Option <code>-</code> can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
 </p>
@@ -782,7 +816,7 @@ applications.
 </p>
 <p><code>(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG</code> returns the options for the APL application.
 </p>
-<p>All command line options after <b><tt>--</tt></b> are ignored by the interpreter
+<p>All command line options after <code>-</code> are ignored by the interpreter
 (except for including them in ⎕ARG).
 </p>
 </li></ul>
@@ -938,8 +972,10 @@ current directory (i.e. &quot;.&quot;) is used and converted to an absolute path
 </p>
 <p>For example, if library-root is &quot;.&quot; then the command
 </p>
-<p>)LOAD 2 test
-</p>
+<div class="example">
+<pre class="example">)LOAD 2 test
+</pre></div>
+
 <p>will try to load the workspace file
 </p>
 <p>./wslib2/test.xml
@@ -1007,8 +1043,8 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e35">⎕PS - Print Style</a></li>
 <li><a href="#Section-2_002e36">⎕RE - Regular Expressions</a></li>
 <li><a href="#Section-2_002e37">⎕RVAL - Random APL value</a></li>
-<li><a href="#Section-2_002e38">⎕SQL - SQL Database Interface</a></li>
-<li><a href="#Section-2_002e39">⎕SI - State Indicator</a></li>
+<li><a href="#Section-2_002e38">⎕SI - State Indicator</a></li>
+<li><a href="#Section-2_002e39">⎕SQL - SQL Database Interface</a></li>
 <li><a href="#Section-2_002e40">⎕SYL - System limits</a></li>
 <li><a href="#Section-2_002e41">⎕XML  - XML Parsing</a></li>
 <li><a href="#Section-2_002e42">Conditionals</a></li>
@@ -1025,14 +1061,16 @@ Next: <a href="#Section-2_002e2" accesskey="n" rel="next">Axis argument in defin
 
 
 <p>As already mentioned, it is possible to write APL scripts. Similar to other
-script languages, an APL script is a text file whose first line is a
-&quot;shebang line&quot;, i.e. a line starting with <samp>#!</samp>, followed by the
+script languages, an APL script is a text file whose first line is a so-called
+&quot;shebang line&quot;, i.e. a line starting with <code>#!</code>, followed by the
 absolute path to the interpreter (in our case the GNU APL binary), followed
 by command line arguments that are passed on to the interpreter. In our case
 the shebang line could be, for example:
 </p>
-<pre class="verbatim">    #! /usr/local/bin/apl --id 1010
-</pre>
+<div class="example">
+<pre class="example">#! /usr/local/bin/apl --id 1010
+</pre></div>
+
 <p>There are essentially two ways to run an APL script: redirecting the script
 file to stdin of the interpreter or making the script executable and indicate
 apl as the script interpreter (followed by some command line arguments for
@@ -1056,15 +1094,20 @@ Next: <a href="#Subsection-2_002e1_002e2" accesskey="n" rel="next">Make the scri
 </div>
 <span id="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter"></span><h4 class="subsection">2.1.1 Redirect the script file to the stdin of the GNU APL interpreter</h4>
 
-<p>A file, say SCRIPT.apl, can be redirected to apl by redirection of the shell:
+<p>A file, say <b>SCRIPT.apl</b>, can be redirected to apl by redirection of
+the shell:
 </p>
-<pre class="verbatim">    apl &lt; SCRIPT.apl
-</pre>
-<p>Alternatively, the command line option -f or -s can be used:
+<div class="example">
+<pre class="example">$ apl &lt; SCRIPT.apl
+</pre></div>
+
+<p>Alternatively, the GNU APL command line option <b>-f</b> or <b>-s</b> can be used:
 </p>
-<pre class="verbatim">    apl -f SCRIPT.apl
-    apl -s SCRIPT.apl
-</pre>
+<div class="example">
+<pre class="example">$ apl -f SCRIPT.apl
+$ apl -s SCRIPT.apl
+</pre></div>
+
 <p>Both ways of redirecting the file are almost identical; in the first case
 redirection was performed by the shell running apl, while in the second case
 the redirecting of the file was performed by apl itself.
@@ -1079,18 +1122,20 @@ Next: <a href="#Subsection-2_002e1_002e3" accesskey="n" rel="next">How command l
 <span id="Make-the-script-file-executable"></span><h4 class="subsection">2.1.2 Make the script file executable</h4>
 
 <p>Alternatively the script can be made executable, specifying apl as its
-interpreter (see also <samp>'man 2 execve'</samp>). For this to work, the
+interpreter (see also <code>'man 2 execve'</code>). For this to work, the
 first line of the script must have a special format:
 </p>
-<pre class="verbatim">    #! /usr/local/bin/apl --script
-</pre>
-<p><b><tt>--script</tt></b> prevents: printing of a welcome banner, 
+<div class="example">
+<pre class="example">    #! /usr/local/bin/apl --script
+</pre></div>
+
+<p><code>--script</code> prevents: printing of a welcome banner, 
 echoing of stdin to stdout, automatic loading of a )CONTINUE workspace,
 and prevents starting a thread for shared variable communication.
 </p>
 <p>If the path to the interpreter is relative (which might be useful if you
 do not know in advance where the APL interpreter will be installed) then
-it must be in $PATH of the shell that runs the script.
+it must be in <b>$PATH</b> of the shell that runs the script.
 </p>
 <hr>
 </div>
@@ -1111,11 +1156,11 @@ passed on to APL. We briefly discuss both cases:
 <p>0. General Remark
 </p>
 <p>There is a convention in (not only) GNU APL, that the command line options
-(and possibly an optional option argument) that occur left of <b><tt>--</tt></b> are
+(and possibly an optional option argument) that occur left of <code>--</code> are
 options directed to (and understood by) the APL interpreter while the options
-right of <b><tt>--</tt></b> are passed to the APL application (and their exact format is
+right of <code>--</code> are passed to the APL application (and their exact format is
 then defined by the APL application). All command line options that were used
-to start APL can later be retrieved with the system variable ⎕ARG in APL.
+to start APL can later be retrieved with the system variable <b>⎕ARG</b> in APL.
 </p>
 <p>Example 1: APL started directly
 </p>
@@ -1123,8 +1168,9 @@ to start APL can later be retrieved with the system variable ⎕ARG in APL.
 The command line options for the interpreter are &ndash;silent, -l, and 37,
 while the options app1 and app2 are for the APL application:
 </p>
-<pre class="verbatim">$ apl --silent -l 37 -- app1 app2
-    ⊃⎕ARG
+<div class="example">
+<pre class="example">$ apl --silent -l 37 -- app1 app2
+      ⊃⎕ARG
 apl     
 --silent
 -l      
@@ -1132,7 +1178,8 @@ apl
 --      
 app1    
 app2    
-</pre>
+</pre></div>
+
 <p>Example 2: APL started indirectly
 </p>
 <p>A script is a text file which has execute permissions. The first line
@@ -1165,26 +1212,31 @@ on the shebang line of the script in a way that is described in &rsquo;man 2 exe
 <p>Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
 </p>
-<pre class="verbatim">#! /usr/local/bin/apl --id 1010 --script
+<div class="example">
+<pre class="example">#! /usr/local/bin/apl --id 1010 --script
 
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
+</pre></div>
 
-</pre>
 <p>Assume further that the script is started like this:
 </p>
-<pre class="verbatim">$ ./SCRIPT.apl sarg1 sarg2
-</pre>
+<div class="example">
+<pre class="example">$ ./SCRIPT.apl sarg1 sarg2
+</pre></div>
+
 <p>Then the following output, which shows the order of command line options
 as seen by ⎕ARG, is produced:
 </p>
-<pre class="verbatim">   ⊃⎕ARG
+<div class="example">
+<pre class="example">   ⊃⎕ARG
 /usr/local/bin/apl
 --script          
 ./SCRIPT.apl      
 sarg1             
 sarg2 
-</pre>
+</pre></div>
+
 <p>This suggests that the options and option arguments are constructed by execve()
 (the function that is eventually responsible for processing scripts in shells
 and other executables) in the following order:
@@ -1199,23 +1251,25 @@ and other executables) in the following order:
 </p>
 <p>CAUTION: as discussed in &rsquo;man 2 execve&rsquo; the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
-For that reason the optional interpreter argument should not be missing (you
+For that reason the optional interpreter argument should not be omitted (you
 can use &ndash; to provide at least one argument) and also not more than one
 argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 </p>
-<pre class="verbatim">/usr/local/bin/apl
-/usr/local/bin/apl --
-/usr/local/bin/apl -s
-/usr/local/bin/apl --script
-/usr/local/bin/apl -s --
-/usr/local/bin/apl --script --
-</pre>
-<p>The recommended form is: <tt>/usr/local/bin/apl --script</tt>.
+<div class="example">
+<pre class="example">$ /usr/local/bin/apl
+$ /usr/local/bin/apl --
+$ /usr/local/bin/apl -s
+$ /usr/local/bin/apl --script
+$ /usr/local/bin/apl -s --
+$ /usr/local/bin/apl --script --
+</pre></div>
+
+<p>The recommended form is: <code>|/usr/local/bin/apl --script|</code>.
 </p>
-<p>Note that <b><tt>--</tt></b> and any options that follow it on the shebang line
+<p>Note that <code>-</code> and any options that follow it on the shebang line
 MAY OR MAY NOT be included in ⎕ARG (this depends on the platform used).
-In contrast, options that follow <b><tt>--</tt></b> on the script command line
+In contrast, options that follow <code>-</code> on the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
 There is normally no point in passing any application options on the shebang
 line to APL because such parameters can more easily be provided directly
@@ -1224,14 +1278,14 @@ application options it may be convenient to make <b><tt>--</tt></b> the last
 option of the shebang so that the user of the script need not specify it
 manually.
 </p>
-<p>Using <b><tt>--</tt></b> on the shebang line of the script file usually prevents
-subsequent options on the shebang line from being interpreted as APL options
-(and, more importantly, from causing <b>unknown option</b> errors when GNU APL
-starts). At least under GNU/Linux with <b>bash</b> the subsequent options will
-be passed to the APL application via ⎕ARG.
+<p>Using <code>0-</code> on the shebang line of the script file usually prevents
+subsequent options on the shebang line from being interpreted as APL command
+line options (and, more importantly, from causing <b>unknown option</b> errors
+when GNU APL starts). At least under GNU/Linux with <b>bash</b> the subsequent
+options will be passed to the APL application via ⎕ARG.
 </p>
 <p>Depending on this exact behavior cannot be recommended. A cleaner approach
-is to use options starting with - or <b><tt>--</tt></b> only for the interpreter
+is to use options starting with - or <code>-</code> only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
 which contain no whitespace:
@@ -1274,8 +1328,10 @@ useful for scripting:
 interpreter. In the initial example above this would be a nested 3-element
 vector:
 </p>
-<pre class="verbatim">    /usr/local/bin/apl --id 1010
-</pre>
+<div class="example">
+<pre class="example">    /usr/local/bin/apl --id 1010
+</pre></div>
+
 </div>
 <div class="subsubsection" id="g_t_005b_003f_005dENV">
 <h4 class="subsubsection">2.1.4.2 ⎕ENV</h4>
@@ -1296,8 +1352,10 @@ whose argument is a filter for the name(s) of the variable(s) to be retrieved.
 <p>⎕ENV B returns all environment variables whose name starts with B.
 If ⍴B is 0, like:
 </p>
-<pre class="verbatim">    ⎕ENV ''
-</pre>
+<div class="example">
+<pre class="example">      ⎕ENV ''
+</pre></div>
+
 <p>then <b>all</b> environment variables of the process running GNU APL are
 returned.
 </p>
@@ -1323,21 +1381,25 @@ before the GNU APL interpreter is started.
 <p>If you need to create a longer static text, like the body of a web page,
 then you would normally construct it in APL like this:
 </p>
-<pre class="verbatim">BODY ← ⊂ 'First line'
-BODY ← BODY , ⊂ 'Second line'
-BODY ← BODY , ⊂ 'Third line'
+<div class="example">
+<pre class="example">      BODY ← ⊂ 'First line'
+      BODY ← BODY , ⊂ 'Second line'
+      BODY ← BODY , ⊂ 'Third line'
    ...
-</pre>
+</pre></div>
+
 <p>The above is obviously not very handy for longer texts. Instead you may
 write the following in a GNU APL script:
 </p>
-<pre class="verbatim">BODY←⎕INP 'END-OF-⎕INP'
+<div class="example">
+<pre class="example">      BODY←⎕INP 'END-OF-⎕INP'
 First line
 Second line
 Third line
    ...
 END-OF-⎕INP
-</pre>
+</pre></div>
+
 <p>This works like &quot;Here documents&quot; in <b>bash</b>. The right argument of ⎕INP is
 the end of text marker.
 </p>
@@ -1345,22 +1407,26 @@ the end of text marker.
 sequence from text to APL and back to the text, similar to PHP scripts.
 For example:
 </p>
-<pre class="verbatim">Z←'&lt;?apl' '?&gt;' ⎕INP 'END-OF-⎕INP'
+<div class="example">
+<pre class="example">      Z←'&lt;?apl' '?&gt;' ⎕INP 'END-OF-⎕INP'
 First line
 Time is now: &lt;?apl ⍕⎕TS ?&gt;
 Third line
 ...
 END-OF-⎕INP
-</pre>
+</pre></div>
+
 <p>This creates a mainly static text with a small dynamic plug-in computed by
 APL:
 </p>
-<pre class="verbatim">      ⊃Z
+<div class="example">
+<pre class="example">      ⊃Z
 First line                       
 Time is now: 2022 8 4 15 15 2 177
 Third line                       
 ...         
-</pre>
+</pre></div>
+
 <p>It should be noted that, while ⎕INP simplifies the construction of multi-line
 strings compared to standard APL, it has come of age and these days an even
 simpler feature - Multi-line strings as described below - is provided for the
@@ -1386,8 +1452,9 @@ a scalar if its length = 1. This is sometimes inconvenient and therefore
 double-quoted strings are more consistent in always being vectors regardless
 of their length. In other words, &rsquo;A&rsquo; is a scalar while &quot;A&quot; is a vector.
 
-</li><li> Double-quoted strings understand the standard C escape sequences
-for control character, such as \n for ASCII line feed, \t for ASCII TAB, etc.
+</li><li> Double-quoted strings understand the standard C escape sequences for
+control characters, such as <b>\n</b> for ASCII line feed, <b>\t</b> for ASCII TAB,
+etc.
 
 </li></ul>
 
@@ -1400,10 +1467,11 @@ Next: <a href="#Subsection-2_002e1_002e7" accesskey="n" rel="next">Automatic )MO
 </div>
 <span id="Multi_002dLine-Strings"></span><h4 class="subsection">2.1.6 Multi-Line Strings</h4>
 
-<p>A substantial disadvantage of ⎕INP is that it only works in immediate
+<p>A substantial disadvantage of <b>⎕INP</b> is that it only works in immediate
 execution mode (and consequently also in .apl scripts), but not the bodies of
 defined functions. Multi-line strings fill this gap for string literals that
-span several lines of text <b>inside</b> the body of defined functions.
+span several lines of text <b>inside</b> the body of defined functions (as well as
+in immediate execution mode and in scripts).
 Multi-Line strings have become more and more advanced (and elegant) over time.
 For this reason they currently come in different flavors (of which the older
 ones will eventually disappear).
@@ -1420,27 +1488,32 @@ ones will eventually disappear).
 for defined functions. The idea for the old-style multi-line strings was
 adopted from shells like <b>bash</b> where, for example,
 </p>
-<pre class="verbatim">echo &quot;Line1
+<div class="example">
+<pre class="example">echo &quot;Line1
    Line2&quot;
-</pre>
+</pre></div>
+
 <p>prints:
 </p>
-<pre class="verbatim">Line1
+<div class="example">
+<pre class="example">Line1
    Line2
-</pre>
-<p>In simple terms this means that as long as the number of &quot; characters is
-odd, the string remains open until the closing &quot; is found (which makes
+</pre></div>
+
+<p>In simple terms this means that as long as the number of <b>&quot;</b> characters is
+odd, the string remains open until the closing <b>&quot;</b> is found (which makes
 the number even again).
 </p>
 <p>Old-style multi-line strings are not allowed in immediate execution mode
 because they could easily be entered by mistake (by simply forgetting the
-terminating &quot; or &rsquo; of a standard string) and that would have obscured the
-familiar behavior of immediate execution mode. In function definition
-mode, the total number of function lines is known and it can therefore
-be checked if a multi-line string inside the function is properly terminated.
-Immediate execution mode, however, is open-ended and therefore a forgotten
-closing &quot; can lead to a fatal misinterpretation of (intended) string
-content as (unintended) APL code, with lots of nonsense error messages.
+terminating <b>&quot;</b>  or <b>&rsquo;</b>  of a standard string) and that would have
+obscured the familiar behavior of immediate execution mode. In function
+definition mode, the total number of function lines is known and it is
+therefore possible to check if a multi-line string inside the function
+is properly terminated. Immediate execution mode, however, is open-ended
+and therefore a forgotten closing <b>&quot;</b> can lead to a fatal misinterpretation
+of (intended) string content as (unintended) APL code, with lots of
+nonsense error messages.
 </p>
 <p>Like in <b>bash</b> and also other shells, an old-style multi-line string starts
 at the last &quot; on a line of a defined function that has an
@@ -1451,11 +1524,13 @@ APL value containing one nested string per line involved.
 <p>In immediate execution mode an old-style multi-line string yields, like
 in standard APL:
 </p>
-<pre class="verbatim">No string end found+
-</pre>
+<div class="example">
+<pre class="example">No string end found+
+</pre></div>
+
 <p>For example:
-</p><pre class="verbatim">
-∇Z←FOO
+</p><div class="example">
+<pre class="example">∇Z←FOO
  Z←&quot;ABC
  DEF
  GHIJK&quot;
@@ -1467,11 +1542,13 @@ in standard APL:
 ┃┃ABC┃ ┃ DEF┃ ┃ GHIJK┃┃
 ┃┗━━━┛ ┗━━━━┛ ┗━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>If the first string is empty then the nested value starts with an empty
 string, but completely empty lines in defined functions are ignored:
 </p>
-<pre class="verbatim">∇Z←FOO
+<div class="example">
+<pre class="example">∇Z←FOO
  Z←&quot;
 ABC
  DEF
@@ -1485,7 +1562,8 @@ ABC
 ┃┃ ┃ ┃ABC┃ ┃ DEF┃ ┃  GHIJK┃┃
 ┃┗━┛ ┗━━━┛ ┗━━━━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 </div>
 <div class="subsubsection" id="New_002dstyle-Multi_002dLine-Strings">
 <h4 class="subsubsection">2.1.6.2 New-style Multi-Line Strings</h4>
@@ -1523,7 +1601,8 @@ else string text.
 </li></ul>
 
 <p>Example:
-</p><pre class="verbatim"> 4 ⎕CR &quot;&quot;&quot;
+</p><div class="example">
+<pre class="example"> 4 ⎕CR &quot;&quot;&quot;
 ABC
  DEF
 
@@ -1534,7 +1613,8 @@ ABC
 ┃┃ABC┃ ┃ DEF┃ ┃ ┃ ┃  GHIJK┃┃
 ┃┗━━━┛ ┗━━━━┛ ┗━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>When entering new-style multi-line strings, the prompt is prefixed by → to
 indicate that a Multi-Line String is being entered.
 </p>
@@ -1564,7 +1644,8 @@ which leads to the problems above.
 <p>For this reason, GNU APL now also allows inline and multi-line strings
 like, for example:
 </p>
-<pre class="verbatim">      «Hello world»
+<div class="example">
+<pre class="example">      «Hello world»
 Hello world
 
       8 ⎕CR «««
@@ -1588,15 +1669,17 @@ Hello world
 ││Line 1│ │  Line 2││
 │└──────┘ └────────┘│
 └ϵ──────────────────┘
+</pre></div>
 
-</pre>
 <p>Another advantage of ««« ... »»» over &quot;&quot;&quot; ... &quot;&quot;&quot; is that a decent text
 editor (read: vi/vim) may jump back and forth between the corresponding
 opening « and closing » with a single key stroke (character % in vi/vim).
 For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
 </p>
-<pre class="verbatim">set matchpairs+=«:»
-</pre>
+<div class="example">
+<pre class="example">set matchpairs+=«:»
+</pre></div>
+
 <hr>
 </div>
 </div>
@@ -1613,7 +1696,8 @@ is indicated by a + at the end of the error message. The additional
 information is automatically discarded when the next non-empty line
 is entered. For example:
 </p>
-<pre class="verbatim">      &quot;ABC&quot;[4]
+<div class="example">
+<pre class="example">      &quot;ABC&quot;[4]
 INDEX ERROR+
       'ABC'[4]
       ^    ^
@@ -1623,8 +1707,8 @@ min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
 
       )MORE
 NO )MORE ERROR INFO
+</pre></div>
 
-</pre>
 <p>This is rather useful in purely interactive mode where the user can issue
 the )MORE command directly after an APL error has occurred to help figure
 out what exactly went wrong. In a script, however, the standard )MORE command
@@ -1641,7 +1725,8 @@ i.e. where to place the )MORE command in the script.
 <p>To make the )MORE command more useful for scripts, in GNU APL it can be
 augmented with an optional argument AUTO like this:
 </p>
-<pre class="verbatim">      )MORE AUTO ON
+<div class="example">
+<pre class="example">      )MORE AUTO ON
 Automatic )MORE is now: ON
       
       &quot;ABC&quot;[4]
@@ -1649,7 +1734,8 @@ min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
 INDEX ERROR+
       'ABC'[4]
       ^    ^
-</pre>
+</pre></div>
+
 <p>If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
 )MORE information is displayed before the standard 3-line APL error message.
 </p>
@@ -1670,44 +1756,51 @@ options for the script.
 </p>
 <p>Consider the following simple script called SCRIPT.apl in directory workspaces:
 </p>
-<pre class="verbatim">#! /usr/local/bin/apl --script
+<div class="example">
+<pre class="example">#! /usr/local/bin/apl --script
 
 ⊃⎕ARG   ⍝ show command line options
 )OFF    ⍝ leave the interpreter
-</pre>
+</pre></div>
+
 <p>If SCRIPT.apl is redirected to stdin of the APL interpreter:
 </p>
-<pre class="verbatim"> /usr/local/bin/apl --silent &lt;  ../workspaces/SCRIPT.apl
+<div class="example">
+<pre class="example"> /usr/local/bin/apl --silent &lt;  ../workspaces/SCRIPT.apl
 
  or
 
  /usr/local/bin/apl --silent -f ../workspaces/SCRIPT.apl
-</pre>
+</pre></div>
+
 <p>then the first line <samp>#! /usr/local/bin/apl --script</samp> of file SCRIPT.apl 
 is merely a comment (GNU APL accepts both the traditional APL character
-⍝ and the character # as start of a comment). The <b><tt>--script</tt></b> option
+⍝ and the character # as start of a comment). The <code>-script</code> option
 is therefore ignored and the following mix of input and output is
 shown on the screen. The input from the script is indented by the
 usual APL prompt of 6 blanks, while the output of the APL interpreter
 is not indented.
 </p>
-<pre class="verbatim">      #! /usr/local/bin/apl --script
+<div class="example">
+<pre class="example">      #! /usr/local/bin/apl --script
       
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
+</pre></div>
 
-</pre>
 <p>If we run the same script directly:
 </p>
-<pre class="verbatim">../workspaces/SCRIPT.apl
-</pre>
+<div class="example">
+<pre class="example">../workspaces/SCRIPT.apl
+</pre></div>
+
 <p>Then we get:
 </p>
-<pre class="verbatim">
- /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
+<div class="example">
+<pre class="example"> /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
+</pre></div>
 
-</pre>
-<p>The <b><tt>--script</tt></b> implies <b><tt>--noCIN</tt></b> so that the
+<p>The <code>-script</code> implies <code>-noCIN</code> so that the
 input lines for the interpreter are no longer echoed to the output.
 This is most likely what you want when writing a script.
 </p>
@@ -1718,31 +1811,33 @@ comes from function execve (see &rsquo;man 2 execve&rsquo;).
 </p>
 <p>If we provide an argument, say SCRIPTARG, to SCRIPT.apl:
 </p>
-<pre class="verbatim">../workspaces/SCRIPT.apl SCRIPTARG
-</pre>
+<div class="example">
+<pre class="example">../workspaces/SCRIPT.apl SCRIPTARG
+</pre></div>
+
 <p>then it shows up at the end of ⎕ARG:
 </p>
-<pre class="verbatim">
- /usr/local/bin/apl --script ../workspaces/SCRIPT.apl SCRIPTARG 
+<div class="example">
+<pre class="example"> /usr/local/bin/apl --script ../workspaces/SCRIPT.apl SCRIPTARG 
+</pre></div>
 
-</pre>
 <p>A final note on scripting in GNU APL is that the ∇-editor works slightly
 differently when it is used in a script. If a user edits an APL function
 interactively then an attempt to open an existing function with a full
 header gives a DEFN ERROR:
 </p>
-<pre class="verbatim">
-      ∇Z←FOO B
+<div class="example">
+<pre class="example">      ∇Z←FOO B
 [1] ∇
       
-            ∇Z←FOO B
+      ∇Z←FOO B
 DEFN ERROR+
       ∇Z←FOO B
              ^
       )MORE
 attempt to ∇-open existing function with new function header
+</pre></div>
 
-</pre>
 <p>In contrast to a user who can react to the DEFN ERROR, a script cannot detect
 this situation and would continue to push lines (which were intended to be
 the body of the defined function) into the APL interpreter. That would most
@@ -1769,8 +1864,8 @@ Next: <a href="#Section-2_002e3" accesskey="n" rel="next">Function Groups</a>, P
 <p>Defined functions and operators (including lambdas) accept an axis argument.
 For example:
 </p>
-<pre class="verbatim">
-∇Z←Average[X] B
+<div class="example">
+<pre class="example">∇Z←Average[X] B
  Z←(+/[X]B) ÷ (⍴B)[X]
 ∇
 
@@ -1779,8 +1874,8 @@ For example:
 
       Average[2] 5 5⍴⍳25
 3 8 13 18 23
+</pre></div>
 
-</pre>
 <p>Syntactically, the axis is used in the same way as for primitive functions
 and operators.
 </p>
@@ -1853,7 +1948,7 @@ following.
 <h4 class="subsection">2.3.1 Phase 1: Numerical Axis Argument</h4>
 
 <p>In the first phase, the number of functions per function group (at that time
-<b>⎕CR</b> and <b>⎕FIO</b> was fairly small. A subfunction of the function group was
+<b>⎕CR</b> and <b>⎕FIO</b>) was fairly small. A subfunction of the function group was
 selected as follows:
 </p>
 <ul>
@@ -1866,12 +1961,14 @@ selected as follows:
 
 <p>For example:
 </p>
-<pre class="verbatim">      4 ⎕CR B          ⍝ format B in a &quot;boxed&quot; fashion
+<div class="example">
+<pre class="example">      4 ⎕CR B          ⍝ format B in a &quot;boxed&quot; fashion
       18 ⎕CR B         ⍝ convert APL string B to an UTF8-encoded byte vector
 
       ⎕FIO[3] B        ⍝ fopen file B for reading
       A ⎕FIO[3] B      ⍝ fopen file B with mode A
-</pre>
+</pre></div>
+
 <p>In both cases was the subfunction selector an integer scalar.
 </p>
 </div>
@@ -1883,17 +1980,19 @@ and APL workspace named <b>FILE_IO</b>. This workspace contains one APL wrapper
 function for each numerical <b>⎕FIO</b> subfunction selector. These wrappers
 were trivial one-liners like these:
 </p>
-<pre class="verbatim">∇Zh ← As FIO∆fopen Bs
-⍝⍝ fopen(Bs, As) filename Bs
- Zh ← As ⎕FIO[3] Bs
-∇
+<div class="example">
+<pre class="example">      ∇Zh ← As FIO∆fopen Bs
+      ⍝⍝ fopen(Bs, As) filename Bs
+       Zh ← As ⎕FIO[3] Bs
+      ∇
 
-∇Zh ← FIO∆fopen_ro Bs
-⍝⍝ fopen(Bs, &quot;r&quot;) filename Bs
- Zh ← ⎕FIO[3] Bs
-∇
-</pre>
-<p>APL programs would <b>)COPY</b>ing the workspace and them use normal defined
+      ∇Zh ← FIO∆fopen_ro Bs
+      ⍝⍝ fopen(Bs, &quot;r&quot;) filename Bs
+       Zh ← ⎕FIO[3] Bs
+      ∇
+</pre></div>
+
+<p>APL programs would <b>)COPY</b> the workspace and then use normal defined
 functions instead of <b>⎕FIO</b> with an axis argiment or <b>⎕CR</b> with a left
 argument.  The development of the <b>FILE_IO</b> suggested that APL users have
 a preference of names over numbers to select a subfunction.
@@ -1904,12 +2003,14 @@ function that implemented them.
 </p>
 <p>The phase 1 example above would now become the slightly better readable:
 </p>
-<pre class="verbatim">      'style_boxed'_⎕CR B        ⍝ format B in a &quot;boxed&quot; fashion
+<div class="example">
+<pre class="example">      'style_boxed' ⎕CR B        ⍝ format B in a &quot;boxed&quot; fashion
       'string_to_UTF8' ⎕CR B     ⍝ convert APL string B to UTF8
 
       ⎕FIO['fopen'] B            ⍝ fopen file B for reading
       A ⎕FIO['fopen'] B          ⍝ fopen file B with mode A
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Phase-3_003a-Member-Notation">
 <h4 class="subsection">2.3.3 Phase 3: Member Notation</h4>
@@ -1918,12 +2019,14 @@ function that implemented them.
 axis argument with a member notation. The phase 1 and 2 examples above would
 now become:
 </p>
-<pre class="verbatim">      ⎕CR.style_boxed B       ⍝ format B in a &quot;boxed&quot; fashion
+<div class="example">
+<pre class="example">      ⎕CR.style_boxed B       ⍝ format B in a &quot;boxed&quot; fashion
       ⎕CR.string_to_UTF8 B    ⍝ convert APL string B to UTF8
 
       ⎕FIO.fopen B            ⍝ fopen file B for reading
       A ⎕FIO.fopen B          ⍝ fopen file B with mode A
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Subfunction-Lists">
 <h4 class="subsection">2.3.4 Subfunction Lists</h4>
@@ -1952,8 +2055,8 @@ Next: <a href="#Section-2_002e5" accesskey="n" rel="next">Comparison Rules</a>, 
 
 <p>The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user&rsquo;s keyboard,
-but can also be a file if APL scripting, the <b><tt>-f</tt></b> option,
-or the <b><tt>-T</tt></b> option is used.
+but can also be a file if APL scripting, the <code>f</code> option,
+or the <code>T</code> option is used.
 </p>
 <p>The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional
@@ -2061,14 +2164,16 @@ context of sorting (i.e. for ⍋ or ⍒). This is because for =, ≠, &lt;, ≤,
 or &gt; either a RANK ERROR or a LENGTH ERROR is raised if the ranks or shapes
 of A and B do not match:
 </p>
-<pre class="verbatim">      (9 8) &lt; (1 2 3)
+<div class="example">
+<pre class="example">      (9 8) &lt; (1 2 3)
 LENGTH ERROR
       9 8&lt;1 2 3
       ^  ^
 
       ⍋(9 8) (1 2 3)
 1 2
-</pre>
+</pre></div>
+
 <p>The reason for comparing complex numbers first by their real parts and then
 by their imaginary part and not, for example, first by their magnitude and
 then by their angle is that the chosen order gives more consistent results
@@ -2081,22 +2186,26 @@ vectors) may give unexpected results because shorter strings come before
 longer strings. For example, &rsquo;Zoo&rsquo; comes <b>before</b> &rsquo;Adam&rsquo; even
 though one might expect the opposite.
 </p>
-<pre class="verbatim">      Z[⍋Z ← 'Adam' 'Zoo']
+<div class="example">
+<pre class="example">      Z[⍋Z ← 'Adam' 'Zoo']
  Zoo Adam 
 
       Z[⍋Z ← 'Adam' 'Zora']
  Adam Zora
-</pre>
+</pre></div>
+
 <p>This pitfall can be avoided by enforcing the same length for all strings
 being compared or sorted. A simple way to achieve that is the use of
 <b>⊂[2]⊃</b> like this (assuming ⎕IO←1):
 </p>
-<pre class="verbatim">      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
+<div class="example">
+<pre class="example">      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
  Adam Zoo  
 
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zora']
  Adam Zora
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -2151,8 +2260,10 @@ limited form.
 
 <p>A statement of the form
 </p>
-<pre class="verbatim">      FUN ← { body_statement } 
-</pre>
+<div class="example">
+<pre class="example">      FUN ← { body_statement } 
+</pre></div>
+
 <p>creates a named lambda. A body_statement can contain variable names ⍺ and ⍵
 as well as function names ⍶ and ⍹ which are replaced by the actual arguments
 of the lambda. If both ⍺ and ⍵ are present in body_statement then the lambda
@@ -2169,13 +2280,16 @@ name for an axis argument.
 </p>
 <p>The way a named lambda is implemented in GNU APL is that the expression
 </p>
-<pre class="verbatim">      FUN ← { body_expression }
-</pre>
+<div class="example">
+<pre class="example">      FUN ← { body_expression }
+</pre></div>
+
 <p>is translated to a two-line function ⎕FX &rsquo;lambda_header&rsquo; &rsquo;body_expression&rsquo;.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">      )FNS
+<div class="example">
+<pre class="example">      )FNS
 
       SUM ← { ⍺ + ⍵ }
       )FNS
@@ -2186,14 +2300,17 @@ DEFN ERROR+
              ^
       )more
 function is a lambda
-</pre>
+</pre></div>
+
 <p>Even though named lambdas are included in function lists along with other
 user defined functions, they must be listed using ⎕CR &rsquo;name&rsquo;:
 </p>
-<pre class="verbatim">      ⎕CR 'SUM'
+<div class="example">
+<pre class="example">      ⎕CR 'SUM'
 λ←⍺ λ1 ⍵
 λ← ⍺ + ⍵ 
-</pre>
+</pre></div>
+
 <p>The lambda_header is automatically deduced from the presence or absence
 of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹) in the
 body_expression and from whether the body_expression is empty (no λ←) or
@@ -2207,13 +2324,14 @@ as for the header in normal defined functions: they are added at the end
 with semicolons as separators. In the above example one could add local
 variables C and D like this:
 </p>
-<pre class="verbatim">      SUM ← { ⍺ + ⍵ ;C;D }
+<div class="example">
+<pre class="example">      SUM ← { ⍺ + ⍵ ;C;D }
 
       ⎕CR 'SUM'
 λ←⍺ λ1 ⍵;C;D 
 λ← ⍺ + ⍵     
+</pre></div>
 
-</pre>
 <p>If a named lambda is created inside a function, then the name of the lambda
 (i.e. the name left of ← { ... }) can be made a local variable of the
 function in which the named lambda is created. This creates a lambda with
@@ -2234,11 +2352,11 @@ is certainly a bad idea.
 name. This is often used together with the EACH operator.
 For example:
 </p>
-<pre class="verbatim">
-      { ⍴ , ⍵ } ¨ 'a' 'ab' 'abc'
+<div class="example">
+<pre class="example">      { ⍴ , ⍵ } ¨ 'a' 'ab' 'abc'
  1  2  3 
+</pre></div>
 
-</pre>
 <p>Unnamed lambdas are automatically local in scope (similar to labels). They can
 be passed as function arguments to operators. However, unnamed lambdas are NOT
 inserted into the symbol table of the interpreter. They are therefore not
@@ -2301,13 +2419,15 @@ typically one-liners that briefly explain what a function is supposed to do.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">∇Z←A SUM B
+<div class="example">
+<pre class="example">∇Z←A SUM B
  ⍝⍝ Return the sum of A and B          ← ]DOXY comment:  (double ⍝)
  ⍝  A: numeric                         ← &quot;normal&quot; APL comments (single ⍝) ...
  ⍝  B: numeric
  Z←A + B
 ∇
-</pre>
+</pre></div>
+
 <p>But please <b>note the following</b>: in the original <b>doxygen</b> program
 (for C, C++, or other languages) source code lines may be a mix of code
 and comments (including doxygen comments). In the <b>]DOXY</b> command of GNU
@@ -2411,7 +2531,8 @@ used, etc.) without the need to prepend every line with ⍝ or #.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">#!/usr/local/bin/apl
+<div class="example">
+<pre class="example">#!/usr/local/bin/apl
 
 ⍝ see documentation at the end of this file
 
@@ -2420,8 +2541,8 @@ used, etc.) without the need to prepend every line with ⍝ or #.
 ]NEXTFILE
 
 This workspace does the following...
+</pre></div>
 
-</pre>
 
 </div>
 <div class="subsection" id="g_t_005dPUSHFILE">
@@ -2584,12 +2705,14 @@ Next: <a href="#Section-2_002e16" accesskey="n" rel="next">User-defined Commands
 <p>GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
 lowercase:
 </p>
-<pre class="verbatim">      $2a
+<div class="example">
+<pre class="example">      $2a
 42
 
       $2A
 42
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -2610,8 +2733,10 @@ following.
 <p>A user-defined command ]NEW_COMMAND is created with the debug command
 ]USERCMD like this:
 </p>
-<pre class="verbatim">      ]USERCMD ]NEW_COMMAND APL_FUNCTION [mode]
-</pre>
+<div class="example">
+<pre class="example">      ]USERCMD ]NEW_COMMAND APL_FUNCTION [mode]
+</pre></div>
+
 <p>APL_FUNCTION is an APL function that will be called when the command is
 entered in immediate execution mode. The entire line entered by the user,
 starting at ]NEW_COMMAND, is the right argument of APL_FUNCTION. If mode is
@@ -2625,9 +2750,11 @@ command is created.
 <p>A single user-defined command ]UCMD, or all user-defined commands can
 be deleted like this:
 </p>
-<pre class="verbatim">      ]USERCMD REMOVE ]UCMD
+<div class="example">
+<pre class="example">      ]USERCMD REMOVE ]UCMD
       ]USERCMD REMOVE-ALL
-</pre>
+</pre></div>
+
 <hr>
 </div>
 <div class="section" id="Section-2_002e17">
@@ -2658,8 +2785,10 @@ for returning multiple results from a function.
 names, separated by &rsquo;.&rsquo;. In the following we will use uppercase names for
 structured variables and lowercase names for their members. For example:
 </p>
-<pre class="verbatim">      PERSON.address.street
-</pre>
+<div class="example">
+<pre class="example">      PERSON.address.street
+</pre></div>
+
 <p>is a structured variable <b>PERSON</b>, which has a member <b>address</b>,
 and <b>PERSON.address</b> is a structured (sub-)variable of PERSON which has
 a member <b>street</b>.
@@ -2675,18 +2804,24 @@ the structured nature of a plain APL value can be restored with 38 ⎕CR.
 <p>A structured variable is created by assigning a value to one of its members.
 For example:
 </p>
-<pre class="verbatim">      PERSON.firstname ← 'Jane' ⍝ create variable PERSON with member 'firstname'
+<div class="example">
+<pre class="example">      PERSON.firstname ← 'Jane' ⍝ create variable PERSON with member 'firstname'
       PERSON.lastname  ← 'Doe'  ⍝ add a second member 'lastname' to PERSON
-</pre>
+</pre></div>
+
 <p>The depth of a newly created member can be more than one. In this case the
 intermediate members are created automatically. For example:
 </p>
-<pre class="verbatim">      PERSON.address.street ← '42 Main Street' ⍝ implicitly creates PERSON.address
-</pre>
+<div class="example">
+<pre class="example">      PERSON.address.street ← '42 Main Street' ⍝ implicitly creates PERSON.address
+</pre></div>
+
 <p>Empty structured variables can be created with <b>38 ⎕CR</b>:
 </p>
-<pre class="verbatim">      EMPTY ← 38 ⎕CR CAPACITY ← 32
-</pre>
+<div class="example">
+<pre class="example">      EMPTY ← 38 ⎕CR CAPACITY ← 32
+</pre></div>
+
 <p>Note: A structured variable is automatically expanded when new members are
 added to it. From time to time this expansion exceeds the space allocated
 for the members of the variable and then the existing members need to be
@@ -2700,21 +2835,25 @@ with all its members. In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with <b>⎕EX</b> or
 <b>)ERASE</b>:
 </p>
-<pre class="verbatim">      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
+<div class="example">
+<pre class="example">      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
       )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
 NOT ERASED: PERSON.address
-</pre>
+</pre></div>
+
 <p>After having been created, the members of a structured variable can be
 referenced and overwritten just like normal variables:
 </p>
-<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
+<div class="example">
+<pre class="example">      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
       PERSON.address.street   ⍝ reference member address.street of PERSON
 42 Main Street
 
       PERSON.address.street ←  '44 Main Street'   ⍝ overwrite address.street
       PERSON.address.street
 44 Main Street
-</pre>
+</pre></div>
+
 <p>The members of a structured variable form a tree of (sub-) variables, similar
 to the file system on a computer. This tree has:
 </p>
@@ -2731,7 +2870,8 @@ directly after a new empty variable was created with <b>38 ⎕CR</b>.
 <p>Due to their tree-like structure, structured variables need to be printed
 somewhat differently than normal APL variables. For example:
 </p>
-<pre class="verbatim">      PERSON
+<div class="example">
+<pre class="example">      PERSON
 .firstname: ┌→───┐
             │Jane│
             └────┘
@@ -2744,12 +2884,14 @@ somewhat differently than normal APL variables. For example:
 .address.street: ┌→─────────────┐
                  │44 Main Street│
                  └──────────────┘
-</pre>
+</pre></div>
+
 <p>Only the leafs of a deeply structured variable can have values and, as a
 precaution, assigning a value to a non-leaf (including the root) raises
 a DOMAIN ERROR:
 </p>
-<pre class="verbatim">      B.b.c←'leaf-Abc'        ⍝ OK, since B.b.c will be a leaf
+<div class="example">
+<pre class="example">      B.b.c←'leaf-Abc'        ⍝ OK, since B.b.c will be a leaf
       B.b←42                  ⍝ will fail since B.b is not a leaf
 DOMAIN ERROR+
       B.b←42
@@ -2762,17 +2904,20 @@ member access: cannot override non-leaf member A.b
       B.b ← 'leaf-Ab'         ⍝ now OK, since B.b will now become a (new) leaf
 
       )SIC
-</pre>
+</pre></div>
+
 <p>On the other hand, assigning a structured variable to the leaf of another
 structured variable is valid and concatenates the members:
 </p>
-<pre class="verbatim">      )ERASE A
+<div class="example">
+<pre class="example">      )ERASE A
       A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.c
       C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
       A.b.c ← C               ⍝ overwrite leaf A.b.c of A
       A.b.c.d.e
 leaf-cde
-</pre>
+</pre></div>
+
 <p>The file <b>src/testcases/Structured_variable.tc</b> contains the examples
 above (and more) 
 </p>
@@ -2803,7 +2948,8 @@ also be indexed with a string. That can be useful if keys are being computed
 or passed as function arguments. However, unlike indexing of APL arrays with
 numbers, only one key per (bracket-) index is permitted.
 </p>
-<pre class="verbatim">   A.key ← 42
+<div class="example">
+<pre class="example">   A.key ← 42
    A.key
 42
    A['key']
@@ -2814,12 +2960,13 @@ numbers, only one key per (bracket-) index is permitted.
    A['key' 'key']   ⍝ not allowed even though 'key' is a valid member
 DOMAIN ERROR
       D['key' 'key']
+</pre></div>
 
-</pre>
 <p>Strings that do not follow the rules for variable names can be used with
 bracket index, but not with the .member syntax:
 </p>
-<pre class="verbatim">      ASSOC ← 38 ⎕CR 8
+<div class="example">
+<pre class="example">      ASSOC ← 38 ⎕CR 8
       KEY←'key.dot'   ⍝ works, but avoid such keys
       ASSOC[KEY]←42
       ASSOC[KEY]
@@ -2839,7 +2986,8 @@ member access: structure ASSOC has no member key
 44
       ASSOC['key.dot']   ⍝ works: one key containing '.'
 43
-</pre>
+</pre></div>
+
 <p>This is because ASSOC.key.dot above is being tokenized by the APL parser into
 [ASSOC] [key] [dot], while &rsquo;key.dot&rsquo; is a single key. The example above (with
 different values for ASSOC.key.dot and for ASSOC[&rsquo;key.dot&rsquo;] demonstrates why
@@ -2849,7 +2997,8 @@ such keys are better avoided.
 structured variable, repeated bracket index (or dyadic PICK) can be used to
 access deeper nesting levels:
 </p>
-<pre class="verbatim">      D.b.c←42
+<div class="example">
+<pre class="example">      D.b.c←42
       D['b.c']   ⍝ will fail
 INDEX ERROR+
       D['b.c']
@@ -2866,8 +3015,8 @@ member access: member b.c was not found. The valid members are:
       'b' 'c' ⊃ D   ⍝ fails: 'b' 'c' is 'bc'
       &quot;b&quot; &quot;c&quot; ⊃ D   ⍝ works
 42
+</pre></div>
 
-</pre>
 <p>In the above examples each bracket index (or each element of PICK) discards the
 current top-level structure and descends into the structured sub-variable of
 the chosen member. In this case PICK is more efficient since repeated bracket
@@ -2893,10 +3042,12 @@ reorganization of the variable, but to create a large enough variable
 <p>If that is not possible (because the (performance-) problem has occurred after
 the variable was created, then one can manually increase the capacity like this:
 </p>
-<pre class="verbatim">      TMP ← 39 ⎕CR ASSOC_ARRAY   ⍝ save ASSOC_ARRAY as normal APL array
+<div class="example">
+<pre class="example">      TMP ← 39 ⎕CR ASSOC_ARRAY   ⍝ save ASSOC_ARRAY as normal APL array
       ⊣ ⎕EX 'ASSOC_ARRAY'        ⍝ erase it so that it can be assigned
       ASSOC_ARRAY ← 38 ⎕CR TMP   ⍝ new associative array with ≥ twice the size
-</pre>
+</pre></div>
+
 <p>As a rule of thumb, associative arrays will be fast as long their capacity is
 more than twice the number of their members. The expression ASSOC_ARRAY[;1]
 returns all keys (= members) of ASSOC_ARRAY, therefore the number of members
@@ -2954,8 +3105,8 @@ the shape of X, but one-element A or B are scalar extended to the shape of X.
 </li></ul>
 
 <p>Example:
-</p><pre class="verbatim">
-      A←2 3⍴'abcdef'
+</p><div class="example">
+<pre class="example">      A←2 3⍴'abcdef'
       B←2 3⍴⍳6
       X←2 3⍴0 1 0 1 0 1
       A ⊢[X] B
@@ -2969,7 +3120,8 @@ a*c
   '*' ⊢[X] B
 * 2 *
 4 * 6
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -3004,19 +3156,21 @@ arguments,
 </p>
 <p>For example, using  5 ⎕CR (4⍴256)⊤X to display X in hex:
 </p>
-<pre class="verbatim">      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
+<div class="example">
+<pre class="example">      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
 ABBADEAD
       5 ⎕CR (4⍴256)⊤   B←$00FF00FF
 00FF00FF
 
       5 ⎕CR (4⍴256)⊤   2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
 00BA00AD
+</pre></div>
 
-</pre>
 <p>With the bit-wise <b>And</b> (⊤∧) the same can be achieved in a simpler fashion
 and far more efficiently:
 </p>
-<pre class="verbatim">      ⍝ Traditional AND
+<div class="example">
+<pre class="example">      ⍝ Traditional AND
       5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
 ABBADEAD
       5 ⎕CR (4⍴256)⊤   B←$00FF00FF
@@ -3025,7 +3179,8 @@ ABBADEAD
       ⍝ bit-wise AND
       5 ⎕CR (4⍴256)⊤   A ⊤∧ B
 00BA00AD
-</pre>
+</pre></div>
+
 <ul class="section-toc">
 <li><a href="#Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_003d_002c-and-_005b_003f_005d_005b_003f_005d" accesskey="1">Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠</a></li>
 <li><a href="#Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d" accesskey="2">Monadic ⊤∨ and ⊤⍱</a></li>
@@ -3038,13 +3193,15 @@ ABBADEAD
 <p>The dyadic forms of <b>⊤∧</b>, <b>⊤∨</b>, <b>⊤⍲</b>, and <b>⊤⍱</b> are simply the bit-wise
 variants of their Boolean counterparts:
 </p>
-<pre class="verbatim">      A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
+<div class="example">
+<pre class="example">      A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
       A ⊤∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
       A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
       A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
       A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
       A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ aka. NXOR or XNOR
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d">
 <h4 class="subsection">2.19.2 Monadic ⊤∨ and ⊤⍱</h4>
@@ -3054,9 +3211,11 @@ and <b>⊤⍱</b> do.
 Formally monadic <b>⊤∨</b> and <b>⊤⍱</b> are dyadic <b>⊤∨</b> and <b>⊤⍱</b> with
 a left argument of 0:
 </p>
-<pre class="verbatim">      ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
+<div class="example">
+<pre class="example">      ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
-</pre>
+</pre></div>
+
 <p>Even though Or-ing a Boolean vector with 0 itself has no effect, the
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic <b>⊤∨</b> and inversion
@@ -3070,7 +3229,8 @@ function.
 </p>
 <p>Monadic <b>⊤∨ B</b> converts near-integer values B into true integers:
 </p>
-<pre class="verbatim">      26 ⎕CR    1            ⍝ integer
+<div class="example">
+<pre class="example">      26 ⎕CR    1            ⍝ integer
 16
       26 ⎕CR    1.1          ⍝ real
 32
@@ -3080,14 +3240,17 @@ function.
 32
       26 ⎕CR    ⊤∨ 1.1÷1.1   ⍝ integer
 16
-</pre>
+</pre></div>
+
 <p>That also works for complex numbers with a near-zero imaginary part:
 </p>
-<pre class="verbatim">      26 ⎕CR    1.1J0÷1.1      ⍝ real
+<div class="example">
+<pre class="example">      26 ⎕CR    1.1J0÷1.1      ⍝ real
 32
       26 ⎕CR    ⊤∨ 1.1J0÷1.1      ⍝ integer
 16
-</pre>
+</pre></div>
+
 <p>As a matter of fact, <b>⊤∨</b> works for all near-Gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since Gaussian and non-Gaussian
 complex numbers have the same cell type in GNU APL.
@@ -3137,7 +3300,8 @@ as well. This can be useful for masking purposes such as extracting the lower
 </p>
 <p>The characters involved are treated as 32 bit quantities:
 </p>
-<pre class="verbatim">      5⎕CR 'A'
+<div class="example">
+<pre class="example">      5⎕CR 'A'
 41
       5⎕CR ⊤⍱'A'            ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
 BE
@@ -3146,7 +3310,8 @@ BE
 255 255 255 190
       256 256 256 256⊤$FFFFFFBE
 255 255 255 190
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -3240,8 +3405,8 @@ Let ⍴B=(M, N).
 <p>* <b>B = Q +.× M N↑R</b>.
 </p>
 <p>Example 1 (real B)
-</p><pre class="verbatim">
-      ⊢B←3 3⍴ 1 1 3 2 4 2 4 8 7
+</p><div class="example">
+<pre class="example">      ⊢B←3 3⍴ 1 1 3 2 4 2 4 8 7
 1 1 3
 2 4 2
 4 8 7
@@ -3280,12 +3445,12 @@ Let ⍴B=(M, N).
 ┃  .0000 1.0000  .0000┃
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
+</pre></div>
 
-</pre>
 <p>Example 2 (complex over-determined B)
 </p>
-<pre class="verbatim">
-      B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
+<div class="example">
+<pre class="example">      B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
       (Q R Ri)←⌹[⎕CT]B
 
@@ -3312,8 +3477,8 @@ Let ⍴B=(M, N).
 3J1  2J3 4J5   1J3
 1J4  9J9 9J6   2J7
 2J10 7J6 9J8  10J10
+</pre></div>
 
-</pre>
 <p>Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 </p>
@@ -3448,7 +3613,8 @@ QR-factorization of <b>B</b> was already computed.
 </p>
 <p>Indeed:
 </p>
-<pre class="verbatim">      B←?5 5⍴100   ⍝ a random matrix B
+<div class="example">
+<pre class="example">      B←?5 5⍴100   ⍝ a random matrix B
       (Q T Ti)←⌹[2]B
       (⌹B) = Ti∘⍉Q
 1 1 1 1 1
@@ -3456,7 +3622,8 @@ QR-factorization of <b>B</b> was already computed.
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
-</pre>
+</pre></div>
+
 <p>The computation of <b>⍉Q</b> and <b>Ti∘⍉Q</b> is considerably faster than the
 computation of <b>⌹B</b> if <b>B</b> is large.
 </p>
@@ -3478,8 +3645,10 @@ monadic form.
 <p>Calling ⎕CR monadically without an axis and with an empty right argument
 shows a list of all functions provided by ⎕CR:
 </p>
-<pre class="verbatim">      ⎕CR ''
-</pre>
+<div class="example">
+<pre class="example">      ⎕CR ''
+</pre></div>
+
 <p>Say a <b>byte vector</b> is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
 vectors are frequently used arguments and results of ⎕FIO functions.
@@ -3549,10 +3718,12 @@ the first 4 bytes of Z are the tag in big endian byte order, the next 4 bytes
 are the length of B except the tag, and the rest of Z is B except the tag.
 </p>
 <p>Example:
-</p><pre class="verbatim">      Tag←55   ⍝ hex 37
+</p><div class="example">
+<pre class="example">      Tag←55   ⍝ hex 37
       5 ⎕CR 33 ⎕CR Tag,'Value'
 000000370000000556616C7565
-</pre>
+</pre></div>
+
 <p>A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and 34 ⎕CR
 is the transmission of a tagged byte vector over e.g a TCP socket:
 </p>
@@ -3561,9 +3732,11 @@ is the transmission of a tagged byte vector over e.g a TCP socket:
   T,Data →→→ 33 ⎕CR T,Data   →→→TCP connection→→→   34 ⎕CR T,Data →→→ T,Data
 </p>
 <p>Example:
-</p><pre class="verbatim">      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
+</p><div class="example">
+<pre class="example">      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
 55 Value
-</pre>
+</pre></div>
+
 <p>The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
 receiver can be sent back-to-back over a TCP connection or similar in such
 a way that the receiver knows exactly after which byte a TLV ends (and possibly
@@ -3630,7 +3803,8 @@ path of a shared library and B is the name of the function in APL.
 implementation of a native function for reading and writing files (fopen(),
 fclose(), ...), For example:
 </p>
-<pre class="verbatim">      ⍝ fix native function in lib_file_io.so as FILE_IO
+<div class="example">
+<pre class="example">      ⍝ fix native function in lib_file_io.so as FILE_IO
       ⍝
       'lib_file_io.so' ⎕FX 'FILE_IO'
 FILE_IO
@@ -3657,7 +3831,8 @@ FILE_IO
    Zh ← As FUN[ 3] Bs    fopen(Bs, As) filename Bs mode As
    Zh ←    FUN[ 3] Bs    fopen(Bs, &quot;r&quot;) filename Bs
       ...
-</pre>
+</pre></div>
+
 <p>Recent versions of GNU APL have replaced the native FILE_IO function above by
 the system function ⎕FIO. ⎕FIO need not be ⎕FX&rsquo;ed and is otherwise backward
 compatible to the native function. New function numbers are, however, only
@@ -3792,7 +3967,8 @@ solved by ⎕DLX is also known as the &quot;exact cover problem&quot;
 for finding all solutions of the 8 Queens problem on a chess board (which
 probably every programmer has programmed at some point in time):
 </p>
-<pre class="verbatim">      RC←8↑'1' ◊ D←15↑¯8↑'2'   ⍝ helpers for constructing Q8
+<div class="example">
+<pre class="example">      RC←8↑'1' ◊ D←15↑¯8↑'2'   ⍝ helpers for constructing Q8
       ⍝     rows   cols   diag1    diag2
       Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
       Z←¯1 ⎕DLX Q8
@@ -3811,8 +3987,8 @@ Q + + + + + + +
  + + + + + + Q + 
  + Q + + + + + + 
  + + + Q + + + + 
+</pre></div>
 
-</pre>
 <p>Obviously Z contains solutions for the 8 Queens problem; the total number of
 solutions is well known to be 92 and we showed only the first three and the
 last solution above.
@@ -3830,7 +4006,8 @@ then we would get the solutions of the 8 tower problem. However, we continue
 and add 15 more constraints for each of the two diagonals. The resulting
 constraint matrix Q8 is this:
 </p>
-<pre class="verbatim">      Q8
+<div class="example">
+<pre class="example">      Q8
 
 1       1              2                     2
 1        1              2                   2 
@@ -3896,12 +4073,13 @@ constraint matrix Q8 is this:
        1     1       2           2            
        1      1       2         2             
        1       1       2       2              
-</pre>
+</pre></div>
+
 <p>To see what, for example, the first solution looks like and how it relates
 to the constraints matrix Q8:
 </p>
-<pre class="verbatim">
-      ⍝ the rows in Q8 of the first solution
+<div class="example">
+<pre class="example">      ⍝ the rows in Q8 of the first solution
       ⍝
       Z[1]
  1 14 24 27 39 44 50 61 
@@ -3928,8 +4106,8 @@ to the constraints matrix Q8:
       +⌿ ' '≠ Q8[⊃Z[1];] 
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
       1 0 0 0 0 1
+</pre></div>
 
-</pre>
 <p>And that&rsquo;s it: call ⎕DLX to get the solution(s). In general all problems that
 can be solved by ⎕DLX contain 3 steps:
 </p>
@@ -3979,7 +4157,8 @@ the meaning of the arguments.
 <p>Calling ⎕FIO monadically without an axis and with an empty right argument
 shows a list of all functions provided by ⎕FIO:
 </p>
-<pre class="verbatim">      ⎕FIO ''
+<div class="example">
+<pre class="example">      ⎕FIO ''
    Functions provided by ⎕FIO...
 
    Legend: a - address family, IPv4 address, port (or errno)
@@ -4081,8 +4260,8 @@ Benchmarking functions:
         Ai ⎕FIO[202] Bs    set monadic parallel threshold for primitive Bs
            ⎕FIO[203] Bs    get dyadic parallel threshold for primitive Bs
         Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs
+</pre></div>
 
-</pre>
 <p>A new feature of ⎕FIO (which is not available with the native function FILE_IO)
 is ⎕FIO[49]. ⎕FIO[49] is a monadic operator which takes a monadic conversion
 function as function argument. For example:
@@ -4279,7 +4458,8 @@ A ⎕MAP B also accepts a vector instead of a N×2 matrix:
 </p>
 <p>Examples:
 </p>
-<pre class="verbatim">      ⍝ the map A
+<div class="example">
+<pre class="example">      ⍝ the map A
       ⊢A←5 2⍴'eEwWaAzZ92'
 eE    ⍝ map 'e' → 'E'
 wW    ⍝ map 'w' → 'W'
@@ -4298,8 +4478,8 @@ HAlloWEEn
       A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
+</pre></div>
 
-</pre>
 <p>NOTES:
 </p><ul>
 <li> The keys of the mapping A (i.e. the elements in column A[;1]) must be
@@ -4328,7 +4508,8 @@ sub-values of B (though never of A). This can be achieved by enclosing A as
 shown in the examples below.
 </p></li></ul>
 
-<pre class="verbatim">      A←5 2⍴'eEwWaAzZ92'
+<div class="example">
+<pre class="example">      A←5 2⍴'eEwWaAzZ92'
       B←'Hal' 'low' 'een'   ⍝ nested B
       4 ⎕CR A ⎕MAP B        ⍝ non-recursive (none of the keys in A[;1] matches)
 ┏→━━━━━━━━━━━━━━━━┓
@@ -4343,7 +4524,8 @@ shown in the examples below.
 ┃┃HAl┃ ┃loW┃ ┃EEn┃┃
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -4361,7 +4543,8 @@ statistical operations such as covariance, eigensystems, and so on, along
 with random number generation in several statistical distributions. Particular
 operations are selected through the use of the axis specifier <b>x</b>:
 </p>
-<pre class="verbatim">            ⎕MX[1] B       (monadic) Determinant
+<div class="example">
+<pre class="example">            ⎕MX[1] B       (monadic) Determinant
         (A) ⎕MX[2] B       (nomadic) Cross product
           A ⎕MX[3] B       (dyadic)  Vector angle
             ⎕MX[4] B       (monadic) Eigenvector
@@ -4375,7 +4558,8 @@ operations are selected through the use of the axis specifier <b>x</b>:
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
             ⎕MX[14] B      (monadic) Set RNG seed
-</pre>
+</pre></div>
+
 <p>(These may by shown by entering ⎕MX &rdquo; or ⎕MX[0]0 on the APL command line.)
 In the function list above, <b>A</b> indicates a mandatory left argument,
 while (<b>A</b>) indicates an optional left argument. The right argument <b>B</b>
@@ -4403,10 +4587,11 @@ of <b>⎕MX[X]</b> is always mandatory.
 numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑⍴B)
 (i.e. a square matrix). For Example:
 </p>
-<pre class="verbatim">      mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
+<div class="example">
+<pre class="example">      mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
 ¯164J76
+</pre></div>
 
-</pre>
 </div>
 <div class="subsection" id="Cross-Product">
 <h4 class="subsection">2.32.2 Cross Product</h4>
@@ -4416,13 +4601,15 @@ requires a numeric argument (real or complex) where ⍴⍴B = 2 and
 (↑⍴B)+1 = (1↓⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
 For Example:
 </p>
-<pre class="verbatim">      ⊢B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
+<div class="example">
+<pre class="example">      ⊢B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
 1  2  3J6  4
 5  6  7    8
 9 10 11   12
       ⎕MX[2] B
 0J48 0J¯72 0 0J24
-</pre>
+</pre></div>
+
 <p>For reasons I&rsquo;m not enough of a mathematician to understand, cross
 products are only valid in 3-space and 7-space, so the only valid monadic
 arguments are matrices of shapes [2 3] or [6 7]. However, ⎕MX, doesn&rsquo;t
@@ -4435,9 +4622,11 @@ appropriate method to compute them.
 <p>In dyadic form <b>A ⎕MX[2] B</b>, cross-product requires left and right
 arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 </p>
-<pre class="verbatim">      1 2 3j6 ⎕MX[2] 4 5 6
+<div class="example">
+<pre class="example">      1 2 3j6 ⎕MX[2] 4 5 6
 ¯3J¯30 6J24 ¯3
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Vector-Angle">
 <h4 class="subsection">2.32.3 Vector Angle</h4>
@@ -4445,9 +4634,11 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 <p>The vector angle operation ⎕MX[3] is dyadic and returns the angle between
 two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B:
 </p>
-<pre class="verbatim">      (⍳8) ⎕MX[3] 4j4+⍳8
+<div class="example">
+<pre class="example">      (⍳8) ⎕MX[3] 4j4+⍳8
 0.2515670406J0.09930859532
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Eigenvector">
 <h4 class="subsection">2.32.4 Eigenvector</h4>
@@ -4455,7 +4646,8 @@ two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A 
 <p>The eigenvector operation, ⎕MX[4], is monadic and returns the complex
 eigenvectors of real non-symetric square matrices:
 </p>
-<pre class="verbatim">      B
+<div class="example">
+<pre class="example">      B
 ¯1  1 ¯1 1
 ¯8  4 ¯2 1
 27  9  3 1
@@ -4466,16 +4658,19 @@ eigenvectors of real non-symetric square matrices:
   0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601  0.8396J0.04139
   0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601   0.8396J¯0.04139
  ¯0.1449             0.3566           0.9194           0.08118
-</pre>
+</pre></div>
+
 <p>where each row represents an eigenvector:
 </p>
-<pre class="verbatim">      E←⎕MX[4] B
+<div class="example">
+<pre class="example">      E←⎕MX[4] B
       E[⎕IO;]                   ⍝ first vector
 0.09988 0.1113 ¯0.2925 ¯0.9445
       E[⎕IO+1;]                 ⍝ second vector
 0.04308J0.009687 ¯0.07091J0.1389 0.5166J¯0.01601 0.8396J0.04139
       etc.
-</pre>
+</pre></div>
+
 <p>The eigenvalues are computed concurrently and the eignenvector matrix
 is sorted according to the descending magnitude of the corresponding
 eigenvalues.
@@ -4488,26 +4683,33 @@ eigenvalues.
 the same shape as that of the argument of the eigenvector operation. It
 returns a sorted complex vector of eigenvalues of the matrix argument:
 </p>
-<pre class="verbatim">      ⊢F←⎕MX[5] B
+<div class="example">
+<pre class="example">      ⊢F←⎕MX[5] B
 ¯6.414 5.546J3.085 5.546J¯3.085 2.323
-</pre>
+</pre></div>
+
 <p>The order of eigen vectors, <b>E</b> from above, is related to the order of
 the eigenvalues, <b>F</b>, by the relationship:
 </p>
-<pre class="verbatim">             E[k;] ⬄ F[k]
-</pre>
+<div class="example">
+<pre class="example">             E[k;] ⬄ F[k]
+</pre></div>
+
 <p>(Note that, from the above example:
 </p>
-<pre class="verbatim">      |F
+<div class="example">
+<pre class="example">      |F
 6.41391 6.346285607 6.346285607 2.3228
-</pre>
+</pre></div>
+
 <p>the order of the magnitude of the elements is descending, making the
 initial eigenvector, <b>E[⎕IO;]</b>, the dominant eigenvector and each
 successive eigenvector successively less significant.)
 </p>
 <p>Accordingly:
 </p>
-<pre class="verbatim">      4 ⎕CR (⊂⍉(1,⍴F)⍴F),(⊂E)
+<div class="example">
+<pre class="example">      4 ⎕CR (⊂⍉(1,⍴F)⍴F),(⊂E)
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
 ┃↓¯6.414       ┃ ↓  0.09988           0.1113         ¯0.2925          ¯0.9445          ┃┃
@@ -4517,7 +4719,8 @@ successive eigenvector successively less significant.)
 ┃┗━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛┃
 ┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
    Values            Vectors
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Ident">
 <h4 class="subsection">2.32.6 Ident</h4>
@@ -4525,12 +4728,14 @@ successive eigenvector successively less significant.)
 <p>The monadic ident operation, ⎕MX[6], takes a scalar real integer argument
 and returns a square identity matrix of that size:
 </p>
-<pre class="verbatim">      ⎕MX[6] 4  
+<div class="example">
+<pre class="example">      ⎕MX[6] 4  
 1 0 0 0
 0 1 0 0
 0 0 1 0
 0 0 0 1
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Rotation">
 <h4 class="subsection">2.32.7 Rotation</h4>
@@ -4538,10 +4743,12 @@ and returns a square identity matrix of that size:
 <p>The rotation operation, ⎕MX[7], is monadic and takes a real or complex
 scalar angle and returns a 2-space rotation matrix:
 </p>
-<pre class="verbatim">      ⎕MX[7] ○30÷180
+<div class="example">
+<pre class="example">      ⎕MX[7] ○30÷180
 0.866 ¯0.5
 0.5    0.866
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Homogeneous-transform">
 <h4 class="subsection">2.32.8 Homogeneous transform</h4>
@@ -4551,12 +4758,14 @@ a 3-space displacement vector and, as its right argument, a 3-space
 elemental rotation (i.e., independent rotations around the X, Y, and Z axes
 respectively) and returns the corresponding homogeneous matrix:
 </p>
-<pre class="verbatim">      1 2 3 ⎕MX[8] ○(30 45 60)÷180
+<div class="example">
+<pre class="example">      1 2 3 ⎕MX[8] ○(30 45 60)÷180
  0.6124 0.2803  0.7392 0
  0.3536 0.7392 ¯0.5732 0
 ¯0.7071 0.6124  0.3536 0
  1      2       3      1
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Norm">
 <h4 class="subsection">2.32.9 Norm</h4>
@@ -4565,7 +4774,8 @@ respectively) and returns the corresponding homogeneous matrix:
 numeric argument and returns a result of the same shape such that the sum
 of the squares of the elements equals 1:
 </p>
-<pre class="verbatim">      ⎕PP←10
+<div class="example">
+<pre class="example">      ⎕PP←10
       ⎕MX[9] 1 2 3 4
 0.1825741858 0.3651483717 0.5477225575 0.7302967433
       (⎕MX[9] 1 2 3 4)*2
@@ -4583,7 +4793,8 @@ of the squares of the elements equals 1:
 0.4200840252 0.4900980294 0.5601120336
       +/,(⎕MX[9] B)*2
 1
-</pre>
+</pre></div>
+
 <p>If the magnitude of the argument is zero, the operation returns an all-zero
 result with the same shape as the argument.
 </p>
@@ -4614,7 +4825,8 @@ argument is specified, it must be a scalar integer and the operation
 returns a random vector of that length. If a mean is applicable to a
 given distribution, it is set to 0.
 </p>
-<pre class="verbatim">      ⎕MX[10] 2
+<div class="example">
+<pre class="example">      ⎕MX[10] 2
 ¯1.0504575511
       ⎕MX[10] 2
 ¯2.9337180373
@@ -4623,7 +4835,8 @@ given distribution, it is set to 0.
       ⎕PP←4
       3 ⎕MX[10] 1j1
 ¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
-</pre>
+</pre></div>
+
 <img src="MX_distributions.png" alt="MX_distributions">
 
 <p>(This image is a plot of three 200-bucket histograms of 200000 samples
@@ -4632,17 +4845,21 @@ Student T distribution. See Histograms below.)
 </p>
 <p>An initial seed may be specified with
 </p>
-<pre class="verbatim">        ⎕MX[14] &lt;seed&gt;
-</pre>
+<div class="example">
+<pre class="example">        ⎕MX[14] &lt;seed&gt;
+</pre></div>
+
 <p>where &lt;seed&gt; is a single integer. This allows repeatable random sequences:
 </p>
-<pre class="verbatim">      ⊣⎕MX[14] 3
+<div class="example">
+<pre class="example">      ⊣⎕MX[14] 3
       4 ⎕MX[10] 1
 ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
       ⊣⎕MX[14] 3
       4 ⎕MX[10] 1
 ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Covariance">
 <h4 class="subsection">2.32.11 Covariance</h4>
@@ -4653,7 +4870,8 @@ variable, computes the covariance of each sample set with respect to
 every other sample set, and presents the covariances as a matrix. For
 example:
 </p>
-<pre class="verbatim">      ⊢B←3 4⍴?12⍴10
+<div class="example">
+<pre class="example">      ⊢B←3 4⍴?12⍴10
 5 8  1 9
 7 6  2 9
 6 5 10 4
@@ -4662,21 +4880,26 @@ example:
 12.91666667   9.333333333 ¯9.25
  9.333333333  8.666666667 ¯7.333333333
 ¯9.25        ¯7.333333333  6.916666667
-</pre>
+</pre></div>
+
 <p>In dyadic form, it computes the covariance of the argument vectors:
 </p>
-<pre class="verbatim">      1 2j6 3 4 ⎕MX[11] 4 3 2j5 1
+<div class="example">
+<pre class="example">      1 2j6 3 4 ⎕MX[11] 4 3 2j5 1
 ¯1.666666667J¯2.5
-</pre>
+</pre></div>
+
 <p>In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
 </p>
 <p>Sample variance can be computed by supplying the same argument on the
 left and right:
 </p>
-<pre class="verbatim">      A← 6 7 10 13 14 14 18 19 22 24
+<div class="example">
+<pre class="example">      A← 6 7 10 13 14 14 18 19 22 24
       A ⎕MX[11] A ⍝ or ⎕MX[11]⍨ A
 36.67777778 
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Histograms">
 <h4 class="subsection">2.32.12 Histograms</h4>
@@ -4689,13 +4912,17 @@ of each bucket is equal to the range of the samples, max - min, divided by
 the number of buckets. If the samples are complex, the imaginary components
 are ignored. As examples:
 </p>
-<pre class="verbatim">      4 ⎕MX[12] (⍳101)-⎕IO
+<div class="example">
+<pre class="example">      4 ⎕MX[12] (⍳101)-⎕IO
 25 25 25 26
-</pre>
+</pre></div>
+
 <p>The distribution curves above were the result of expressions like:
 </p>
-<pre class="verbatim">      200 ⎕MX[12] 200000 ⎕MX[10 0] 1
-</pre>
+<div class="example">
+<pre class="example">      200 ⎕MX[12] 200000 ⎕MX[10 0] 1
+</pre></div>
+
 <p>I.e. a 200-bucket histogram of a 200 thousand-member vector of 
 normally distributed samples with a standard deviation of 1.
 </p>
@@ -4709,15 +4936,18 @@ string containing the file name to be created or, if the name starts
 with a &ldquo;&gt;&rdquo;, appended to. The right argument may be a scalar, a
 vector, a matrix, or a string. For example:
 </p>
-<pre class="verbatim">      &quot;samples.txt&quot; ⎕MX[13] 34
+<div class="example">
+<pre class="example">      &quot;samples.txt&quot; ⎕MX[13] 34
       &quot;&gt;samples.txt&quot; ⎕MX[13] 3 4
       &quot;&gt;samples.txt&quot; ⎕MX[13] 3 4⍴⍳12
       &quot;&gt;samples.txt&quot; ⎕MX[13] &quot;example line&quot;
       &quot;&gt;samples.txt&quot; ⎕MX[13] &quot;example\nline&quot;
-</pre>
+</pre></div>
+
 <p>will create a file &ldquo;samples.txt&rdquo; containing:
 </p>
-<pre class="verbatim">34
+<div class="example">
+<pre class="example">34
 3 4
  1  2  3  4
  5  6  7  8 
@@ -4725,23 +4955,27 @@ vector, a matrix, or a string. For example:
 example line
 example
 line
-</pre>
+</pre></div>
+
 <p>Referring again to the distribution example, the plot data for that
 was created by:
 </p>
-<pre class="verbatim">    ∇
+<div class="example">
+<pre class="example">    ∇
 [0]   distro;v
 [1]   v←⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 0] 1
 [2]   v←v,⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 2] 8
 [3]   v←v,⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 3] 8
 [4]   v ⎕MX[13] 'MX_distribution.data'
     ∇
-</pre>
+</pre></div>
+
 <p>which created a 200-by-3 matrix, v, and printed it to the file
 MX_distribution.data, that being the format required for use by
 gnuplot:
 </p>
-<pre class="verbatim">   1   48    0
+<div class="example">
+<pre class="example">   1   48    0
    0  119    0 
    0  187    0 
    1  331    0
@@ -4754,25 +4988,30 @@ gnuplot:
       .
       .
   for 200 lines
-</pre>
+</pre></div>
+
 <p>Instead of a filename, <b>⎕MX[13]</b> also accepts an integer scalar which should
 be a file handle as returned by <b>⎕FIO[3]</b> aka. <b>⎕FIO.fopen</b>. This allows
 e.g. for texts before and/or after the value(s) printed by <b>⎕MX[13]</b>.
 For example:
 </p>
-<pre class="verbatim">      Heading←⎕CR.string_to_UTF8 &quot;Print: 10+⍳10\n\n&quot;   ⍝ a heading
+<div class="example">
+<pre class="example">      Heading←⎕CR.string_to_UTF8 &quot;Print: 10+⍳10\n\n&quot;   ⍝ a heading
       Value←10 + ⍳10                                   ⍝ a value
       Handle←&quot;w&quot; ⎕FIO.fopen &quot;/tmp/test&quot;                ⍝ open file for writing
       Heading ⎕FIO.fwrite Handle                       ⍝ write the heading
       Handle ⎕MX.print Value                           ⍝ write the value
       ⎕FIO.fclose Handle                               ⍝ close the file
-</pre>
+</pre></div>
+
 <p>which produces file <b>/tmp/test</b> with the following 3-line content:
 </p>
-<pre class="verbatim">Print: 10+⍳10
+<div class="example">
+<pre class="example">Print: 10+⍳10
 
 11 12 13 14 15 16 17 18 19 20 
-</pre>
+</pre></div>
+
 <hr>
 </div>
 </div>
@@ -4790,7 +5029,8 @@ colors for plot lines, points, and grids, etc.
 </p>
 <p>The general syntax of ⎕PLOT is:
 </p>
-<pre class="verbatim">   ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
+<div class="example">
+<pre class="example">   ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with specified default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
@@ -4799,7 +5039,8 @@ colors for plot lines, points, and grids, etc.
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
    ⎕PLOT ¯3      ⍝ close all plot windows
    ⎕PLOT ¯6      ⍝ return all open plot window handles H
-</pre>
+</pre></div>
+
 <ul class="section-toc">
 <li><a href="#The-Plot-Data-B" accesskey="1">The Plot Data B</a></li>
 <li><a href="#The-Plot-Attributes-A" accesskey="2">The Plot Attributes A</a></li>
@@ -4831,15 +5072,19 @@ placed (after some scaling) at position (x, y) of the plot. The X-range
 and the Y-range [Ymin ... Ymax] of the plot is determined by the imaginary
 parts of B. That is:
 </p>
-<pre class="verbatim">Xmin ← ⌊/,9○B    ⍝ smallest real part of B
+<div class="example">
+<pre class="example">Xmin ← ⌊/,9○B    ⍝ smallest real part of B
 Xmax ← ⌈/,9○B    ⍝ largest real part of B
 Ymin ← ⌊/,11○B   ⍝ smallest imaginary part of B
 Ymax ← ⌈/,11○B   ⍝ largest imaginary part of B
-</pre>
+</pre></div>
+
 <p>Example (plot a circle (actually: a regular 20-gon)):
 </p>
-<pre class="verbatim">      ⎕PLOT +⌿1 0J1×[1]1 2 ∘.○ (0,⍳2×N) × ○÷N←10
-</pre>
+<div class="example">
+<pre class="example">      ⎕PLOT +⌿1 0J1×[1]1 2 ∘.○ (0,⍳2×N) × ○÷N←10
+</pre></div>
+
 <p>produces this plot window (only visible in the HTML version of this document;
 in text mode see file <b>doc/PLOT_circle.png</b>):
 </p>
@@ -4854,15 +5099,19 @@ placed at position (N, x) of the plot. The X-range is then
 [⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Y<sub>min</sub> ... Y<sub>max</sub>] of the
 plot is determined by the values of B. That is:
 </p>
-<pre class="verbatim">Xmin ← ⎕IO             ⍝ smallest real part of B
+<div class="example">
+<pre class="example">Xmin ← ⎕IO             ⍝ smallest real part of B
 Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
 Ymin ← ⌊/,B            ⍝ smallest value in B
 Ymax ← ⌈/,B            ⍝ largest value in B
-</pre>
+</pre></div>
+
 <p>Example:
 </p>
-<pre class="verbatim">      ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
-</pre>
+<div class="example">
+<pre class="example">      ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
+</pre></div>
+
 <p>produces this plot window (only visible in the HTML version of this document;
 in text mode see file <b>doc/PLOT_zigzag.png</b>):
 </p>
@@ -4885,8 +5134,8 @@ the arguments. The list of arguments grows over time and therefore the list
 displayed by <b>⎕PLOT ⍬</b> may be more up-to-date than this description.
 For example:
 </p>
-<pre class="verbatim">
-   ⎕PLOT Usage:
+<div class="example">
+<pre class="example">   ⎕PLOT Usage:
 
    ⎕PLOT B     with ⍴⍴B &gt; 0: plot B with default attribute values
    ⎕PLOT B     with integer scalar B: special ⎕PLOT functions
@@ -4984,8 +5233,8 @@ point_style-N:      1              (= plot_points: ● )
 point_size-N:       8 pixel        (the outer diameter of the plot points)
 point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
+</pre></div>
 
-</pre>
 <p>There are 2 kinds of attributes: global attributes that affect the entire
 plot, and local (per-line) attributes that affect one of the plot lines
 (which corresponds to one row of B). One way to specify
@@ -4994,23 +5243,27 @@ multiple attributes in one go is to use multi-line strings.
 <p>For example (plot 2 lines of 10 random numbers each, named &quot;random row 1&quot; and
 &quot;random row 2&quot;):
 </p>
-<pre class="verbatim">      Data ← ?2 10⍴10   ⍝ two rows of random data
+<div class="example">
+<pre class="example">      Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← &quot;&quot;&quot;
 legend_name-1: Random Row 1
 legend_name-2: Random Row 2
                     &quot;&quot;&quot;
       Attributes ⎕PLOT Data
-</pre>
+</pre></div>
+
 <p>While specifying the plot attributes A in one place is most convenient for
 a single plot window or when the attributes are read from some external
 test file, it is sometimes simpler to specify the plot attributes
 individually. This can be done by using a structured APL variable as left
 argument A:
 </p>
-<pre class="verbatim">Attributes.legend_name_1 ← &quot;Random Row 1&quot;
+<div class="example">
+<pre class="example">Attributes.legend_name_1 ← &quot;Random Row 1&quot;
 Attributes.legend_name_2 ← &quot;Random Row 2&quot;
       Attributes ⎕PLOT Data
-</pre>
+</pre></div>
+
 <p>Note that (for syntactical reasons) the separation between the line attribute
 and the line number is <b>_</b> (underscore) if <b>A</b> is specified as
 a structured APL value and <b>-</b> (minus) if A is specified as a string
@@ -5023,8 +5276,10 @@ See <a href="#Output-File-Format">Output File Format</a> below.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">      ⊣ ( ⊂ &quot;output_filename: /tmp/bitmap.png&quot; ) ⎕PLOT 1 3 1 4 2
-</pre>
+<div class="example">
+<pre class="example">      ⊣ ( ⊂ &quot;output_filename: /tmp/bitmap.png&quot; ) ⎕PLOT 1 3 1 4 2
+</pre></div>
+
 <p>writes the plot of a a zigzag curve to file <b>/tmp/bitmap.png</b>.
 </p>
 <p><b>Caution</b>: ⎕PLOT with attribute <b>output_filename</b> overwrites existing
@@ -5040,9 +5295,11 @@ _N suffix.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
+<div class="example">
+<pre class="example">Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
 Attributes.line_width_2 ← 4   ⍝ except plot line 2: 4 pixels thick
-</pre>
+</pre></div>
+
 <p>As of GNU APL 1.9, ⎕PLOT legends may be dragged to other locations within a
 plot window using the usual click and drag GUI technique.
 </p>
@@ -5086,11 +5343,14 @@ and seconds). For them the X coordinate (time) is, according to the *nix time
 conventions, seconds since midnight 1970. Since this number of seconds is not
 easy to compute in APL, <b>⎕FIO.secs_epoch</b> comes to rescue:
 </p>
-<pre class="verbatim">Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
-</pre>
+<div class="example">
+<pre class="example">Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
+</pre></div>
+
 <p>An example for plotting the quarterly values <b>1 3 4 2</b> is:
 </p>
-<pre class="verbatim">      )CLEAR
+<div class="example">
+<pre class="example">      )CLEAR
 
 SPQ ← 91×24×60×60                 ⍝ seconds per quarter
 Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
@@ -5101,8 +5361,8 @@ Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
 ATT.format_X ← &quot;Q-%Q/%y&quot;          ⍝ X-axis ticks: quarter and year
 
 ATT ⎕PLOT X + 0J1×Y
+</pre></div>
 
-</pre>
 <p>Sometimes it is more convenient to display the exact X coordinates of the
 plot points along the X axis instead of drawing an X-grid and visually
 guessing the X-values between the vertical grid lines. This can be achieved
@@ -5369,7 +5629,8 @@ the GNU APL color model into a PNG file.
 <div class="subsection" id="APL-Examples">
 <h4 class="subsection">2.34.4 APL Examples</h4>
 
-<pre class="verbatim">      ⍝ load PNG file image.png
+<div class="example">
+<pre class="example">      ⍝ load PNG file image.png
       Image ← ⎕PNG 'image.png'
 
       ⍝ display the image
@@ -5394,7 +5655,8 @@ the GNU APL color model into a PNG file.
 
       ⍝ paint all pixels of a monochrome image blue
       RGB_Blue ← 0 0 1 ⍀ Mono
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -5469,13 +5731,17 @@ libpcre2 and enables ⎕RE if the library (and its header files) are found.
 cover the most likely use cases of ⎕RE, while the long form gives more control
 over the format of the result produced by ⎕RE:
 </p>
-<pre class="verbatim">Z ← A ⎕RE B      (short form, no axis)
+<div class="example">
+<pre class="example">Z ← A ⎕RE B      (short form, no axis)
 Z ← A ⎕RE[X] B   (long form, with axis X)
-</pre>
+</pre></div>
+
 <p>The short form is equivalent to the long form with an empty axis:
 </p>
-<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE[''] B
-</pre>
+<div class="example">
+<pre class="example">    A ⎕RE B   ←→   A ⎕RE[''] B
+</pre></div>
+
 <p>It therefore suffices to explain the long form. The long form has 3 different
 arguments A, B, and X.
 </p>
@@ -5508,8 +5774,10 @@ to libpcre2), or
 <p>In the second case above, the result of ⎕RE is conceptually the same as if
 the EACH operator had been applied to ⎕RE:
 </p>
-<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE ¨ B
-</pre>
+<div class="example">
+<pre class="example">    A ⎕RE B   ←→   A ⎕RE ¨ B
+</pre></div>
+
 <p>The libpcre2 first compiles A into an internal representation that improves
 the speed of matching B. As a consequence, if several strings shall be matched
 with the same regular expression A, then it is (sometimes considerably) faster
@@ -5588,7 +5856,8 @@ compress (dyadic /).
 
 <p>The following examples may better explain the nature of the output flags:
 </p>
-<pre class="verbatim">      ⍝ return (first) matched string
+<div class="example">
+<pre class="example">      ⍝ return (first) matched string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
@@ -5611,7 +5880,8 @@ compress (dyadic /).
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>In the absence of a &rsquo;g&rsquo; flag (see below) the results of output formats
 ⊂ and / are identical; if &rsquo;g&rsquo; is present, however, then they may differ.
 </p>
@@ -5622,7 +5892,8 @@ compress (dyadic /).
 <p>The default behavior of ⎕RE is to return only the first match of A in B.
 The &rsquo;g&rsquo; flag causes ⎕RE to return all matches instead. For example:
 </p>
-<pre class="verbatim">      ⍝ return first match as string
+<div class="example">
+<pre class="example">      ⍝ return first match as string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
@@ -5673,15 +5944,18 @@ The &rsquo;g&rsquo; flag causes ⎕RE to return all matches instead. For example
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>Please note that the &rsquo;g&rsquo; flag increments the depth of the result of the output
 formats &rsquo;string&rsquo; and &rsquo;position/length&rsquo;, but not of the result of output formats
 &rsquo;partition&rsquo; and &rsquo;compress&rsquo;.
 </p>
 <p>The output formats ⊂ and / are related like this:
 </p>
-<pre class="verbatim">      A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
-</pre>
+<div class="example">
+<pre class="example">      A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
+</pre></div>
+
 
 </div>
 <div class="subsubsection" id="the-_005b_003f_005dRE-error-flag-E">
@@ -5691,7 +5965,8 @@ formats &rsquo;string&rsquo; and &rsquo;position/length&rsquo;, but not of the r
 the regular expression A is found in B. It is sometimes more convenient to
 raise an error if no match is found. This can be achieved with the E flag:
 </p>
-<pre class="verbatim">       4 ⎕CR 'g..' ⎕RE[''] '__foo___fun____fox'
+<div class="example">
+<pre class="example">       4 ⎕CR 'g..' ⎕RE[''] '__foo___fun____fox'
 ┏⊖┓
 ┃0┃
 ┗━┛
@@ -5701,16 +5976,18 @@ DOMAIN ERROR+
       ^            ^
       )MORE
 No match
-</pre>
+</pre></div>
+
 <p>The &rsquo;E&rsquo; flag has no effect if the &rsquo;g&rsquo; flag is also given because in that case
 it is natural to check the length of the result:
 </p>
-<pre class="verbatim">      4 ⎕CR 'g..' ⎕RE['Eg'] '__foo___fun____fox'
+<div class="example">
+<pre class="example">      4 ⎕CR 'g..' ⎕RE['Eg'] '__foo___fun____fox'
 ┏⊖┓
 ┃0┃
 ┗━┛
+</pre></div>
 
-</pre>
 </div>
 </div>
 <div class="subsection" id="Complex-Matches">
@@ -5743,16 +6020,19 @@ how the results look.
 regular expression which contains two 1-character sub-expressions (.).
 The result is therefore the top-level match plus two 1-character sub-matches:
 </p>
-<pre class="verbatim">      4 ⎕CR 'f(.)(.)' ⎕RE[''] '__foo___fun____fox'
+<div class="example">
+<pre class="example">      4 ⎕CR 'f(.)(.)' ⎕RE[''] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→┓ ┏→┓┃
 ┃┃foo┃ ┃o┃ ┃o┃┃
 ┃┗━━━┛ ┗━┛ ┗━┛┃
 ┗∊━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>Matching all instead of only the first then gives:
 </p>
-<pre class="verbatim">      4 ⎕CR 'f(.)(.)' ⎕RE['g'] '__foo___fun____fox'
+<div class="example">
+<pre class="example">      4 ⎕CR 'f(.)(.)' ⎕RE['g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓┃
 ┃┃┏→━━┓ ┏→┓ ┏→┓┃ ┃┏→━━┓ ┏→┓ ┏→┓┃ ┃┏→━━┓ ┏→┓ ┏→┓┃┃
@@ -5760,10 +6040,12 @@ The result is therefore the top-level match plus two 1-character sub-matches:
 ┃┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃┃
 ┃┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 <p>The same for the pos+len output format:
 </p>
-<pre class="verbatim">      4 ⎕CR 'f(.)(.)' ⎕RE['↓'] '__foo___fun____fox'
+<div class="example">
+<pre class="example">      4 ⎕CR 'f(.)(.)' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━┓
 ┃2 3 ┏→━━┓ ┏→━━┓┃
 ┃    ┃3 1┃ ┃4 1┃┃
@@ -5777,7 +6059,8 @@ The result is therefore the top-level match plus two 1-character sub-matches:
 ┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
 ┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-</pre>
+</pre></div>
+
 
 <hr>
 </div>
@@ -5785,7 +6068,7 @@ The result is therefore the top-level match plus two 1-character sub-matches:
 <div class="section" id="Section-2_002e37">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e38" accesskey="n" rel="next">⎕SQL - SQL Database Interface</a>, Previous: <a href="#Section-2_002e36" accesskey="p" rel="prev">⎕RE - Regular Expressions</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e38" accesskey="n" rel="next">⎕SI - State Indicator</a>, Previous: <a href="#Section-2_002e36" accesskey="p" rel="prev">⎕RE - Regular Expressions</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005b_003f_005dRVAL-_002d-Random-APL-value"></span><h3 class="section">2.37 ⎕RVAL - Random APL value</h3>
 
@@ -5824,11 +6107,13 @@ followed by one or more calls of monadic ⎕RVAL B.
 <p>The default properties, i.e. the properties used unless they were overridden
 by dyadic A ⎕RVAL B, are:
 </p>
-<pre class="verbatim">Rank:  0
+<div class="example">
+<pre class="example">Rank:  0
 Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
 Type:  0 1 0 0 0       (only integer random values)
 Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
-</pre>
+</pre></div>
+
 <p>With these default properties, every call of monadic ⎕RVAL B returns an
 integer scalar.
 </p>
@@ -5880,13 +6165,17 @@ the same reason, the state of ⎕RVAL survives )CLEAR.
 <p>The current state of ⎕RVAL&rsquo;s random number generator can be retrieved
 with:
 </p>
-<pre class="verbatim">      STATE ← 0 ⎕RVAL ''
-</pre>
+<div class="example">
+<pre class="example">      STATE ← 0 ⎕RVAL ''
+</pre></div>
+
 <p>The state changes with every call of monadic ⎕RVAL. The random number generator
 can later be restored to the same state like this:
 </p>
-<pre class="verbatim">      0 ⎕RVAL STATE
-</pre>
+<div class="example">
+<pre class="example">      0 ⎕RVAL STATE
+</pre></div>
+
 <p>Restoring the state is needed when the same sequence of random values shall
 be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
@@ -5957,10 +6246,12 @@ query the current setting for 2 ⎕RVAL.
 </p>
 <p>Example:
 </p>
-<pre class="verbatim">1 ⎕RVAL 2        ⍝ produce matrices
+<div class="example">
+<pre class="example">1 ⎕RVAL 2        ⍝ produce matrices
 2 ⎕RVAL 3 ¯10    ⍝ the first axis of every matrix will have length 3, and
                  ⍝ the last axis of every matrix will vary between 0 and 10
-</pre>
+</pre></div>
+
 <p>This will produce scalars, vectors with a fixed length of 3 and matrices
 with 3 rows and between 0 and 10 columns.
 </p>
@@ -6000,13 +6291,15 @@ query the current setting for 3 ⎕RVAL.
 </p>
 <p>Example:
 </p>
-<pre class="verbatim">      1 ⎕RVAL 2         ⍝ produce matrices
+<div class="example">
+<pre class="example">      1 ⎕RVAL 2         ⍝ produce matrices
       2 ⎕RVAL 3 3       ⍝ produce 3×3 matrices
       3 ⎕RVAL 0 50 50   ⍝ produce a mix of integer and real values
       ⎕RVAL 0
 ¯975954163190248487                   0.5892132425
 7677327503669503253 2152001972871424768
-</pre>
+</pre></div>
+
 </div>
 <div class="subsubsection" id="Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">
 <h4 class="subsubsection">2.37.2.5 Control of a maximum depth: 4 ⎕RVAL B</h4>
@@ -6041,7 +6334,8 @@ a list of arguments for dyadic <b>⎕RVAL</b>:
 of ⎕RVAL as described above. If no prior dyadic call of ⎕RVAL was made then
 the properties have the following defaults:
 </p>
-<pre class="verbatim">      1 ⎕RVAL ⍬    ⍝ rank (scalar)
+<div class="example">
+<pre class="example">      1 ⎕RVAL ⍬    ⍝ rank (scalar)
 0
 
       2 ⎕RVAL ⍬    ⍝ shape (not used since rank = 0)
@@ -6052,7 +6346,8 @@ the properties have the following defaults:
 
       4 ⎕RVAL ⍬    ⍝ max. depth (not used since probability of NESTED = 0)
 4
-</pre>
+</pre></div>
+
 <p>That is, by default, ⎕RVAL ⍬ produces random integer scalars.
 </p>
 <p>It is sometimes convenient to be able to change the properties of the next
@@ -6061,7 +6356,8 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
 </p>
 <p>Let 4=⍴B. Then
 </p>
-<pre class="verbatim">   Z←⎕RVAL B does essentially:
+<div class="example">
+<pre class="example">   Z←⎕RVAL B does essentially:
 
    B[1]←1 ⎕RVAL B[1]
    B[2]←2 ⎕RVAL B[2]
@@ -6074,15 +6370,17 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
    B[2]←2 ⎕RVAL B[2]
    B[3]←3 ⎕RVAL B[3]
    B[4]←4 ⎕RVAL B[4]
-</pre>
+</pre></div>
+
 <p>If 4 &gt; ⍴B then the missing properties are not changed.
 </p>
 <p>Examples:
 </p>
-<pre class="verbatim">⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
+<div class="example">
+<pre class="example">⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
 ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
+</pre></div>
 
-</pre>
 </div>
 <div class="subsubsection" id="Syntax-Alternatives">
 <h4 class="subsubsection">2.37.2.7 Syntax Alternatives</h4>
@@ -6090,12 +6388,14 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
 <p>For an improved readability, ⎕RVAL also accepts string arguments for its left
 argument A and also the subfunction notation:
 </p>
-<pre class="verbatim">      0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
+<div class="example">
+<pre class="example">      0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
       1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
       2 ⎕RVAL B  ←→  'shape' ⎕RVAL B  ←→  ⎕RVAL.shape B
       3 ⎕RVAL B  ←→   'type' ⎕RVAL B  ←→  ⎕RVAL.type  B
       4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
-</pre>
+</pre></div>
+
 <hr>
 </div>
 </div>
@@ -6103,251 +6403,16 @@ argument A and also the subfunction notation:
 <div class="section" id="Section-2_002e38">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e39" accesskey="n" rel="next">⎕SI - State Indicator</a>, Previous: <a href="#Section-2_002e37" accesskey="p" rel="prev">⎕RVAL - Random APL value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e39" accesskey="n" rel="next">⎕SQL - SQL Database Interface</a>, Previous: <a href="#Section-2_002e37" accesskey="p" rel="prev">⎕RVAL - Random APL value</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></span><h3 class="section">2.38 ⎕SQL - SQL Database Interface</h3>
-
-<p>⎕SQL was kindly contributed by Elias Mårtenson.
-</p>
-<p>As of GNU APL 1.6, the native function SQL has been replaced by the
-system function ⎕SQL, described below. ⎕SQL has an axis argument that
-selects a sub-function of ⎕SQL.
-</p>
-<ul class="section-toc">
-<li><a href="#g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers" accesskey="1">⎕SQL[0] ⍬ : display subfunction numbers</a></li>
-<li><a href="#g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names" accesskey="2">⎕SQL[0] &rdquo; : display subfunction names</a></li>
-<li><a href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" accesskey="3">⎕SQL[2] B : close database</a></li>
-<li><a href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" accesskey="4">Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
-<li><a href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" accesskey="5">Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
-<li><a href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" accesskey="6">⎕SQL[5] B : start transaction</a></li>
-<li><a href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" accesskey="7">⎕SQL[6] B : commit transaction</a></li>
-<li><a href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" accesskey="8">⎕SQL[7] B : rollback transaction</a></li>
-<li><a href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" accesskey="9">Z←⎕SQL[8] B : table names</a></li>
-<li><a href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">Z←⎕SQL[9] B : column names</a></li>
-<li><a href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">Z ← ⎕SQL[10] B : library version number</a></li>
-<li><a href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">Z ← ⎕SQL[11] B : library version string</a></li>
-</ul>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers">
-<h4 class="subsection">2.38.1 ⎕SQL[0] ⍬ : display subfunction numbers</h4>
-
-<pre class="verbatim">   Valid sub-function numbers for ⎕SQL...
-
-   Legend: Fs - database file name (path)
-           Ty - database type ('sqlite' or 'postgres')
-           Db - database handle (small integer)
-           Qs - SQL query string
-           Pv - query parameters (APL values, to be bound to Qs)
-           Ts - name of a table in the database
-
-           ⎕SQL[0] ''       ⍝ list the ⎕SQL function names
-           ⎕SQL[0] ⍬        ⍝ list the ⎕SQL function numbers
-   Db ← Ty ⎕SQL[1] Fs       ⍝ open database Fs &amp; return a handle for it
-           ⎕SQL[2] Db       ⍝ close database handle Db
-        Qs ⎕SQL[3, Db] Pv   ⍝ send SQL query Qs
-        Qs ⎕SQL[4, Db] Pv   ⍝ send SQL update Qs
-           ⎕SQL[5] Db       ⍝ begin a transaction
-           ⎕SQL[6] Db       ⍝ commit the current transaction
-           ⎕SQL[7] Db       ⍝ roll the current transaction back
-           ⎕SQL[8] Db       ⍝ list the tables in database Db
-        Db ⎕SQL[9] Ts       ⍝ list the column names and types of table Tn
-   Vn ← Db ⎕SQL[10] Ty      ⍝ return the provider version number for type Ty
-   Vs ← Db ⎕SQL[11] Ty      ⍝ return the provider version string for type Ty
-</pre>
-<p>The axis argument [0] is optional; one can also use <b>⎕SQL ⍬</b>.
-</p>
-</div>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names">
-<h4 class="subsection">2.38.2 ⎕SQL[0] &rdquo; : display subfunction names</h4>
-
-<p>As of <b>SVN version 1901</b>, ⎕SQL has been promoted to be a Function Group.
-Instead of function nunbers one can use function names with the following
-syntax:
-</p>
-<pre class="verbatim">      ⎕SQL[0] ''
-      With a small performance penalty, ⎕SQL also accepts the following
-      sub-function names instead of sub-function numbers as axis argument:
-
-   Legend: Fs - database file name (path)
-           Ty - database type ('sqlite' or 'postgres')
-           Db - database handle (small integer)
-           Qs - SQL query string
-           Pv - query parameters (APL values, to be bound to Qs)
-           Ts - name of a table in the database
-           Vi - DB provider version number (integer)
-           Vs - DB provider version string
-
-       ⎕SQL[0] ''      ←→  ⎕SQL.list ''        ⍝ list ⎕SQL function names
-       ⎕SQL[0] ⍬       ←→  ⎕SQL.list ⍬         ⍝ list ⎕SQL function numbers)
-    Ty ⎕SQL[1] Fs      ←→  ⎕SQL.open Fs        ⍝ open the database file Fs
-       ⎕SQL[2] Db      ←→  ⎕SQL.close Db       ⍝ close a database handle Db
-    Qs ⎕SQL[3, Db]     ←→  ⎕SQL.query (Db B)   ⍝ SQL database query
-    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update         ⍝ SQL database update
-       ⎕SQL[5] Db   Pv ←→  ⎕SQL.begin          ⍝ begin a transaction
-       ⎕SQL[6] Db      ←→  ⎕SQL.commit         ⍝ end a transaction
-       ⎕SQL[7] Db      ←→  ⎕SQL.rollback       ⍝ roll a transaction back
-       ⎕SQL[8] Db      ←→  ⎕SQL.tables         ⍝ show all tables
-    Db ⎕SQL[9] Ts      ←→  ⎕SQL.columns        ⍝ show the columns of a table
-       ⎕SQL[10] Ty     ←→  ⎕SQL.version        ⍝ SQL provider version number
-       ⎕SQL[11] Ty     ←→  ⎕SQL.vstring        ⍝ SQL provider version string
-
-end @verbatim
-
-Like for ⎕SQL[0] ⍬ above is the axis argument [0] is optional; one can also 
-use @b{⎕SQL ''} instead of ⎕SQL[0] ''.
-
-@c ............................................................................
-@subsection ref ← A ⎕SQL[1] B : open database
-
-@verbatim
-      type  ⎕SQL[1] file
-</pre>
-<p>Connect to database of type A using connection arguments B. The result is a
-database handle <b>ref</b> to be used in the other ⎕SQL functions.
-</p>
-<p><b>A</b> must be a string indicating the database type. Currently supported
-values are &rsquo;postgresql&rsquo; and &rsquo;sqlite&rsquo;.
-</p>
-<p><b>B</b> is the connection parameters which depends on the type of
-database:
-</p>
-<p>- For type≡&rsquo;sqlite&rsquo;: the argument is string pointing to the
-    database file.
-</p>
-<p>- For type≡&rsquo;postgresql&rsquo;, the argument is a standard connect
-    string as described in the PostgreSQL documentation.
-</p>
-<p>This function returns a database handle that should be used when
-using other SQL functions. This value should be seen as an opaque
-handle. It is, however, guaranteed that the handle is a scalar
-value.
-</p>
-</div>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">
-<h4 class="subsection">2.38.3 ⎕SQL[2] B : close database</h4>
-
-<pre class="verbatim">      ⎕SQL[2] ref
-</pre>
-<p>Disconnect from database <b>ref</b>.
-</p>
-<p>B is the database handle that should be disconnected. After this
-function has been called, no further operations are to be performed
-on this handle. Future calls to ⎕SQL[1] may reuse previously
-disconnected handles.
-</p>
-</div>
-<div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">
-<h4 class="subsection">2.38.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</h4>
-
-<pre class="verbatim">      query ⎕SQL[3, ref] params
-</pre>
-<p>Execute a select statement and return the result table.
-</p>
-<p>The axis parameter indicates the database handle.
-</p>
-<p>A is a select statement to be executed. Positional parameters can
-be supplied by specifying a question mark &quot;?&quot; in the statement.
-</p>
-<p>B is an array containing the values for the positional parameters.
-If the array is of rank 2, the statement will be executed multiple
-times with each row being the values for each call.
-</p>
-<p>The return value Z is a rank-2 array representing the result of the
-select statement. Null values are returned as ⍬ and empty strings
-are returned as &rdquo;.
-</p>
-</div>
-<div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">
-<h4 class="subsection">2.38.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</h4>
-
-<pre class="verbatim">      query ⎕SQL[4, ref] params
-</pre>
-<p>Execute an SQL statement that does not return a result.
-</p>
-<p>This function is identical to SQL∆Select with the exception that it
-is used on statements which do not return a result table.
-</p>
-</div>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">
-<h4 class="subsection">2.38.6 ⎕SQL[5] B : start transaction</h4>
-
-<pre class="verbatim">      ⎕SQL[5] ref
-</pre>
-<p>Begin a transaction.
-</p>
-</div>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">
-<h4 class="subsection">2.38.7 ⎕SQL[6] B : commit transaction</h4>
-
-<pre class="verbatim">      ⎕SQL[6] ref
-</pre>
-<p>Commit a transaction.
-</p>
-</div>
-<div class="subsection" id="g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">
-<h4 class="subsection">2.38.8 ⎕SQL[7] B : rollback transaction</h4>
-
-<pre class="verbatim">      ⎕SQL[7] ref
-</pre>
-<p>Rolls back the current transaction.
-</p>
-</div>
-<div class="subsection" id="Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">
-<h4 class="subsection">2.38.9 Z←⎕SQL[8] B : table names</h4>
-
-<pre class="verbatim">      ⎕SQL[8] ref
-</pre>
-<p>Return an array containing the name of all tables.
-</p>
-</div>
-<div class="subsection" id="Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">
-<h4 class="subsection">2.38.10 Z←⎕SQL[9] B : column names</h4>
-
-<pre class="verbatim">      ref  ⎕SQL[9] table
-</pre>
-<p>Return an array containing information about the columns in the
-given table. Currently, the column layout is as follows:
-</p>
-<p>Name
-  Type
-</p>
-<p>More columns containing additional information may be added in a future
-release.
-</p>
-
-</div>
-<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">
-<h4 class="subsection">2.38.11 Z ← ⎕SQL[10] B : library version number</h4>
-
-<p>Return the version number (integer scalar) of the library that was used
-to implement the database type <b>B</b>. Depending on the SQL libraries
-detected by ./configure, ⎕SQL may support no, one, or more than one
-kind of SQL database type.
-</p>
-</div>
-<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">
-<h4 class="subsection">2.38.12 Z ← ⎕SQL[11] B : library version string</h4>
-
-<p>Return the version string of the library that was used to implement the
-database type <b>B</b>. Depending on the SQL libraries
-detected by ./configure, ⎕SQL may support no, one, or more than one
-kind of SQL database type.
-</p>
-<hr>
-</div>
-</div>
-<div class="section" id="Section-2_002e39">
-<div class="header">
-<p>
-Next: <a href="#Section-2_002e40" accesskey="n" rel="next">⎕SYL - System limits</a>, Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SQL - SQL Database Interface</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
-</div>
-<span id="g_t_005b_003f_005dSI-_002d-State-Indicator"></span><h3 class="section">2.39 ⎕SI - State Indicator</h3>
+<span id="g_t_005b_003f_005dSI-_002d-State-Indicator"></span><h3 class="section">2.38 ⎕SI - State Indicator</h3>
 
 <p>⎕SI returns aspects of the current State Indicator, similar to the standard
 command )SI. This can be used, for example, to create debug functions similar
 to the assert() macro in C/C++:
 </p>
-<pre class="verbatim">
-∇Assert B;COND;LOC;VAR
+<div class="example">
+<pre class="example">∇Assert B;COND;LOC;VAR
  →(1≡B)⍴0
  ' '
  COND←7↓,¯2 ⎕SI 4
@@ -6366,8 +6431,8 @@ to the assert() macro in C/C++:
  '************************************************&lt;/pre&gt;'
  →
 ∇
+</pre></div>
 
-</pre>
 <p>The right argument of ⎕SI specifies which aspect of the State Indicator
 shall be returned:
 </p>
@@ -6411,16 +6476,748 @@ the caller, and so on.
 
 <hr>
 </div>
+<div class="section" id="Section-2_002e39">
+<div class="header">
+<p>
+Next: <a href="#Section-2_002e40" accesskey="n" rel="next">⎕SYL - System limits</a>, Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SI - State Indicator</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></span><h3 class="section">2.39 ⎕SQL - SQL Database Interface</h3>
+
+<p>⎕SQL was kindly contributed by Elias Mårtenson.
+</p>
+<p>As of GNU APL 1.6, the native function SQL has been replaced by the
+system function ⎕SQL, described below. ⎕SQL has an axis argument that
+selects a sub-function of ⎕SQL.
+</p>
+<ul class="section-toc">
+<li><a href="#g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers" accesskey="1">⎕SQL[0] ⍬ : display subfunction numbers</a></li>
+<li><a href="#g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names" accesskey="2">⎕SQL[0] <code>''</code> : display subfunction names</a></li>
+<li><a href="#ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database" accesskey="3">ref ← A ⎕SQL[1] B : open database</a></li>
+<li><a href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" accesskey="4">⎕SQL[2] B : close database</a></li>
+<li><a href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" accesskey="5">Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
+<li><a href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" accesskey="6">Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
+<li><a href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" accesskey="7">⎕SQL[5] B : start transaction</a></li>
+<li><a href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" accesskey="8">⎕SQL[6] B : commit transaction</a></li>
+<li><a href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" accesskey="9">⎕SQL[7] B : rollback transaction</a></li>
+<li><a href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">Z←⎕SQL[8] B : table names</a></li>
+<li><a href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">Z←⎕SQL[9] B : column names</a></li>
+<li><a href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">Z ← ⎕SQL[10] B : library version number</a></li>
+<li><a href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">Z ← ⎕SQL[11] B : library version string</a></li>
+<li><a href="#SQLite-Quickstart">SQLite Quickstart</a></li>
+<li><a href="#Deleting-Rows-From-a-Database-Table">Deleting Rows From a Database Table</a></li>
+</ul>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers">
+<h4 class="subsection">2.39.1 ⎕SQL[0] ⍬ : display subfunction numbers</h4>
+
+<p>The system function ⎕SQL is divided into a number of sub-functions. The
+desired sub-function of ⎕SQL is selected by means of a numeric axis argument:
+</p>
+<div class="example">
+<pre class="example">    Valid (sub-)function numbers for ⎕SQL:
+
+    Legend: Fs - database file name (path)
+            Ty - database type ('sqlite' or 'postgres')
+            Db - database handle (small integer)
+            Qs - SQL query string
+            Pv - query parameters (APL values, to be bound to Qs)
+            Ts - name of a table in the database (string)
+            Vi - DB provider (library) version (integer)
+            Vs - DB provider (library) version (string)
+
+            ⎕SQL[0] ''        list the ⎕SQL (sub-)function names
+            ⎕SQL[0] ⍬         list the ⎕SQL (sub-)function numbers
+    Db ← Ty ⎕SQL[1] Fs        open database Fs &amp; return a handle for it
+            ⎕SQL[2] Db        close database handle Db
+         Qs ⎕SQL[3, Db] Pv    perform SQL query Qs
+         Qs ⎕SQL[4, Db] Pv    perform SQL update Qs
+            ⎕SQL[5] Db        begin a transaction
+            ⎕SQL[6] Db        commit the current transaction
+            ⎕SQL[7] Db        roll the current transaction back
+            ⎕SQL[8] Db        list the tables in database Db
+         Db ⎕SQL[9] Ts        list the column names and types of table Tn
+    Vi ←    ⎕SQL[10] Ty       the provider version number for type Ty
+    Vs ←    ⎕SQL[11] Ty       the provider version string for type Ty
+</pre></div>
+
+<p>The axis argument [0] is optional; one can also use <b>⎕SQL ⍬</b>.
+</p>
+</div>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_0027_0027-_003a-display-subfunction-names">
+<h4 class="subsection">2.39.2 ⎕SQL[0] <code>''</code> : display subfunction names</h4>
+
+<p>As of <b>SVN version 1901</b>, ⎕SQL has been promoted to be a function group.
+Instead of the function nunbers above, one can therefore also use function
+names with the following syntax:
+</p>
+<div class="example">
+<pre class="example">    With a small performance penalty, ⎕SQL also accepts the following
+    sub-function names instead of sub-function numbers as axis argument:
+
+    Legend: Fs - database file name (path)
+            Ty - database type ('sqlite' or 'postgres')
+            Db - database handle (small integer)
+            Qs - SQL query string
+            Pv - query parameters (APL values, to be bound to Qs)
+            Ts - name of a table in the database (string)
+            Vi - DB provider (library) version (integer)
+            Vs - DB provider (library) version (string)
+
+       ⎕SQL[5]         ←→  ⎕SQL.begin         ⍝ begin a transaction
+       ⎕SQL[9]         ←→  ⎕SQL.columns       ⍝ show the columns of a table
+       ⎕SQL[6]         ←→  ⎕SQL.commit        ⍝ end a transaction
+       ⎕SQL[2]         ←→  ⎕SQL.close         ⍝ close a database handle
+       ⎕SQL[0]         ←→  ⎕SQL.list ''       ⍝ ⎕SQL function names/numbers
+       ⎕SQL[1] Fs      ←→  ⎕SQL.open          ⍝ open the database file
+       ⎕SQL[3, Db] Pv  ←→  ⎕SQL.query Db Pv   ⍝ SQL database query
+       ⎕SQL[7] Db      ←→  ⎕SQL.rollback      ⍝ roll a transaction back
+       ⎕SQL[8] Db      ←→  ⎕SQL.tables        ⍝ show all tables
+    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update Db Pv  ⍝ SQL database update
+       ⎕SQL[10]        ←→  ⎕SQL.version       ⍝ SQL provider version number
+       ⎕SQL[11]        ←→  ⎕SQL.vstring       ⍝ SQL provider version string
+</pre></div>
+
+<p><b>NOTE:</b> The mapping from function numbers to function names of a function
+group does not allow for non-scalar axis arguments (such as <b>[3, Db]</b>)
+for <b>query</b> or <b>[4, Db]</b> for <b>update</b>. For that reason, the <b>Db</b>
+argument of functions <b>query</b> and <b>update</b> had to be moved from the
+second item in the axis argument to the first item of the right value argument,
+and the right argument <b>Pv</b> (aka. query parameters) of the function axis
+is now the (nested) second argument of the right argument in the named
+function symtax.
+</p>
+<p>Like for <b>⎕SQL[0] ⍬</b> above is the axis argument [0] optional; one can
+therefore also use <b>⎕SQL &rdquo;</b> instead of <b>⎕SQL[0] &rdquo;</b>.
+</p>
+</div>
+<div class="subsection" id="ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">
+<h4 class="subsection">2.39.3 ref ← A ⎕SQL[1] B : open database</h4>
+
+<div class="example">
+<pre class="example">      type  ⎕SQL[1] file
+</pre></div>
+
+<p>Connect to database of type A using connection arguments B. The result is a
+database handle <b>ref</b> to be used in the other ⎕SQL functions.
+</p>
+<p><b>A</b> must be a string indicating the database type. Currently supported
+values are &rsquo;postgresql&rsquo; and &rsquo;sqlite&rsquo;.
+</p>
+<p><b>B</b> is the connection parameters which depends on the type of
+database:
+</p>
+<p>- For type≡&rsquo;sqlite&rsquo;: the argument is string pointing to the
+    database file.
+</p>
+<p>- For type≡&rsquo;postgresql&rsquo;, the argument is a standard connect
+    string as described in the PostgreSQL documentation.
+</p>
+<p>This function returns a database handle that should be used when
+using other SQL functions. This value should be seen as an opaque
+handle. It is, however, guaranteed that the handle is a scalar
+value.
+</p>
+</div>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">
+<h4 class="subsection">2.39.4 ⎕SQL[2] B : close database</h4>
+
+<div class="example">
+<pre class="example">      ⎕SQL[2] ref
+</pre></div>
+
+<p>Disconnect from database <b>ref</b>.
+</p>
+<p>B is the database handle that should be disconnected. After this
+function has been called, no further operations are to be performed
+on this handle. Future calls to ⎕SQL[1] may reuse previously
+disconnected handles.
+</p>
+</div>
+<div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">
+<h4 class="subsection">2.39.5 Z ← A ⎕SQL[3, ref] B : database query (with result)</h4>
+
+<div class="example">
+<pre class="example">      query ⎕SQL[3, ref] params
+</pre></div>
+
+<p>Execute a select statement and return the result table.
+</p>
+<p>The axis parameter indicates the database handle.
+</p>
+<p>A is a select statement to be executed. Positional parameters can
+be supplied by specifying a question mark &quot;?&quot; in the statement.
+</p>
+<p>B is an array containing the values for the positional parameters.
+If the array is of rank 2, the statement will be executed multiple
+times with each row being the values for each call.
+</p>
+<p>The return value Z is a rank-2 array representing the result of the
+select statement. Null values are returned as ⍬ and empty strings
+are returned as &rdquo;.
+</p>
+</div>
+<div class="subsection" id="Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">
+<h4 class="subsection">2.39.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</h4>
+
+<div class="example">
+<pre class="example">      query ⎕SQL[4, ref] params
+</pre></div>
+
+<p>Execute an SQL statement that does not return a result.
+</p>
+<p>This function is identical to SQL∆Select with the exception that it
+is used on statements which do not return a result table.
+</p>
+</div>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">
+<h4 class="subsection">2.39.7 ⎕SQL[5] B : start transaction</h4>
+
+<div class="example">
+<pre class="example">      ⎕SQL[5] ref
+</pre></div>
+
+<p>Begin a transaction.
+</p>
+</div>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">
+<h4 class="subsection">2.39.8 ⎕SQL[6] B : commit transaction</h4>
+
+<div class="example">
+<pre class="example">      ⎕SQL[6] ref
+</pre></div>
+
+<p>Commit a transaction.
+</p>
+</div>
+<div class="subsection" id="g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">
+<h4 class="subsection">2.39.9 ⎕SQL[7] B : rollback transaction</h4>
+
+<div class="example">
+<pre class="example">      ⎕SQL[7] ref
+</pre></div>
+
+<p>Rolls back the current transaction.
+</p>
+</div>
+<div class="subsection" id="Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">
+<h4 class="subsection">2.39.10 Z←⎕SQL[8] B : table names</h4>
+
+<div class="example">
+<pre class="example">      ⎕SQL[8] ref
+</pre></div>
+
+<p>Return an array containing the name of all tables.
+</p>
+</div>
+<div class="subsection" id="Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">
+<h4 class="subsection">2.39.11 Z←⎕SQL[9] B : column names</h4>
+
+<div class="example">
+<pre class="example">      ref  ⎕SQL[9] table
+</pre></div>
+
+<p>Return an array containing information about the columns in the
+given table. Currently, the column layout is as follows:
+</p>
+<p>Name
+  Type
+</p>
+<p>More columns containing additional information may be added in a future
+release.
+</p>
+
+</div>
+<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">
+<h4 class="subsection">2.39.12 Z ← ⎕SQL[10] B : library version number</h4>
+
+<p>Return the version number (integer scalar) of the library that was used
+to implement the database type <b>B</b>. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type (the database type is sometimes refered to as
+&quot;SQL provider).
+</p>
+</div>
+<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">
+<h4 class="subsection">2.39.13 Z ← ⎕SQL[11] B : library version string</h4>
+
+<p>Return the version string of the library that was used to implement the
+database type <b>B</b>. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type (the database type is sometimes refered to as
+&quot;SQL provider).
+</p>
+</div>
+<div class="subsection" id="SQLite-Quickstart">
+<h4 class="subsection">2.39.14 SQLite Quickstart</h4>
+
+<p><b>SQL</b> is a powerful query language with many functions for manipulating
+the data that is stored in the tables of databases. Similarly, APL is
+a powerful language with many functions for manipulating the data stored
+in matrices (the APL conterpart of SQL database tables). The overlap in
+functionality between SQL and APL is considerable. That means that an APL
+programmer always has the follwing options:
+</p>
+<ul>
+<li> Manipulate SQL database tables directly. This requires a detailed
+      understanding of the SQL query lannguage.
+
+</li><li> Manipulate the data in APL. That means:
+  <ul>
+<li> Reading SQL database tables (or parts of them) into APL matrices,
+  </li><li> manipulate the matrices in APL, and
+  </li><li> write the result back into the SQL tables.
+  </li></ul>
+<p>This approach requires only rather basic knowledge of the SQL query
+  lannguage. It might have a small performance panalty, but that performance
+  penalty will only be noticable if the databases involved are huge.
+</p></li><li> A mix of the options above, e.g if performance matters.
+</li></ul>
+
+<p>This SQLite Quickstart follows the second option. The basic SQL operations
+explained in this Quickstart are:
+</p>
+<ul>
+<li> deleting a database,
+</li><li> creating a new database,
+</li><li> creating a database table,
+</li><li> writing an APL matrix into a database table,
+</li><li> reading a database table into an APL matrix,
+</li><li> updating a database table, and
+</li><li> deleting rows from a database table.
+</li></ul>
+
+<ul class="section-toc">
+<li><a href="#Deleting-a-Database" accesskey="1">Deleting a Database</a></li>
+<li><a href="#Creating-a-new-Database" accesskey="2">Creating a new Database</a></li>
+<li><a href="#Creating-a-Database-Table" accesskey="3">Creating a Database Table</a></li>
+<li><a href="#Excursus_003a-Dynamic-Query-Strings" accesskey="4">Excursus: Dynamic Query Strings</a></li>
+<li><a href="#Writing-an-APL-matrix-into-a-Database-Table" accesskey="5">Writing an APL matrix into a Database Table</a></li>
+<li><a href="#Reading-a-Database-Table-into-an-APL-Matrix" accesskey="6">Reading a Database Table into an APL Matrix</a></li>
+<li><a href="#Updating-a-Database-Table" accesskey="7">Updating a Database Table</a></li>
+</ul>
+<div class="subsubsection" id="Deleting-a-Database">
+<h4 class="subsubsection">2.39.14.1 Deleting a Database</h4>
+
+<p>In order to have a well-defined starting point we delete any
+already existing database. In SQLite every database is contained
+in a single file, frequently named <b>db.sqlite</b>.
+</p>
+<p><b>CAUTION:</b> The <b>⎕FIO.unlink</b> command below will erase any existing
+database without a warning.
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      ⍝ delete any existing database
+      ⍝
+      Filename ← &quot;db.sqlite&quot;                ⍝ name of the database to be deleted
+      ⎕FIO.strerror ⎕FIO.unlink Filename
+Success
+
+      ⍝ verify that it was deleted
+      ⍝
+      ⎕FIO.strerror ⎕FIO.unlink Filename
+No such file or directory
+</pre></div>
+
+<p><b>NOTES:</b> An SQLite database can be closed in two ways: using <b>⎕FIO.unlink</b>
+as shown above, or with an SQL query such as
+<b>&quot;DROP DATABASE IF EXISTS db.sqlite&quot;</b>. However, to issue an SQL query we
+would need to create an SQL connection to a database that we do not yet have
+at this point.
+</p>
+<p>For databases that are more complex than <b>SQLite</b>, an SQL query or a utility
+program shipped with the database might be required. For example, postgreSQL
+comes with a program named <b>dropdb</b> that deletes a database. Such programs
+can be called from APL with the <b>)HOST</b> command or with <b>⎕FIO.fork_daemon</b>. 
+</p>
+</div>
+<div class="subsubsection" id="Creating-a-new-Database">
+<h4 class="subsubsection">2.39.14.2 Creating a new Database</h4>
+
+<p>To read from or write into a database we need a database handle (sometimes
+called a database connection) for it:
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      ⍝ create a new (and empty) database
+      ⍝
+      Filename ← 'db.sqlite'            ⍝ name of the database to be created
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ create the database
+
+      ⎕SQL.close DB                     ⍝ and close it
+</pre></div>
+
+<p><b>NOTES:</b> If a file with the given <b>Filename</b> already exists, then
+<b>⎕SQL.open</b> simply connects to it and returns a handle (a small integer)
+for the connection. The handle is used like a file descri[tor for an open
+file in the operating system. The handle is later used for subsequent database
+operations of ⎕SQL (until the connection is closed).
+</p>
+<p>If no file with the given <b>Filename</b> exists, then <b>⎕SQL.open</b>
+creates a file with than name and then connects to it. It is possible to have
+several such connections to different databases at the same time. It is also
+possible to have several connections to the same database at the same time
+(and then one should use database transactions to avoid conflicts with the
+data written to the same database via different connections).
+</p>
+<p><b>postgreSQL</b> is shipped with programs <b>createdb</b> for creating databases,
+<b>createuser</b> for creating database users, and <b>psql</b> for various other
+database administration tasks. These programs can be called from APL with
+the <b>)HOST</b> command or with <b>⎕FIO.fork_daemon</b>.
+</p>
+</div>
+<div class="subsubsection" id="Creating-a-Database-Table">
+<h4 class="subsubsection">2.39.14.3 Creating a Database Table</h4>
+
+<p>An SQL database is a set of tables. The next step after a new database was
+created and a connection to it was opened is to define one or more tables
+in the database. Every table has one or more named columns and zero or more
+rows. Every column has attributes, some of which are mandatory (e.g. the
+column name and in some SQL dialects the data type) while others are optional
+(e.g. the data type in other SQL dialects or the size of the items in the
+column). Creating a database table means to specify a name for a table and
+to specify the attributes of the table columns.
+</p>
+<p>In this quickstart we create a table named <b>EMPLOYEES</b> with 5 columns named
+<b>ID</b>, <b>NAME</b>, <b>ADDRESS</b>, <b>AGE</b>, and <b>SALARY</b>.
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      ⍝ define an SQL Query string Qs that creates a table
+      ⍝
+      Qs ← ,⊃«««
+      CREATE TABLE EMPLOYEES(
+             ID      INT  NOT NULL PRIMARY KEY,
+             NAME    TEXT NOT NULL,
+             AGE     INT  NOT NULL,
+             ADDRESS CHAR(50),
+             SALARY  REAL);
+             »»»
+
+      ⍝ perform the SQL query according to query string Qs.
+      ⍝
+      Qs ⎕SQL.query DB ⍬
+
+      ⍝ show the tables in the database
+      ⍝
+      ⎕SQL.tables DB
+ EMPLOYEES 
+
+      DB ⎕SQL.columns 'EMPLOYEES'
+ ID      INT      
+ NAME    TEXT     
+ AGE     INT      
+ ADDRESS CHAR(50) 
+ SALARY  REAL     
+
+      ⎕SQL.close DB                     ⍝ and close DB
+</pre></div>
+
+<p><b>NOTES:</b> As we see above, SQL query strings tend to be quite long. We could
+have removed most of the blanks and all of the linefeeds in the query string
+above, but readability of the SQL query would have suffered a lot by doing
+that. Instead we used a multi-line GNU APL script ««« ... »»» for the query
+text, disclose it (which turns the APL vector of strings into an APL matrix,
+and finally ravel it (to make it a string).
+</p>
+<p>Many SQL query strings contain strings themselves, e.g. for column names that
+contain blanks or for string values in columns. IOW, the query string is a
+string that contains other strings. To avoid the need to escape the SQL quotes
+inside (quoted) APL strings we have quoted the multi-line query string with
+««« ... »»» instead of &quot;&quot;&quot; ... &quot;&quot;&quot; or &rdquo;&rsquo; ... &rdquo;&rsquo;.
+</p>
+<p>The right argument of <b>⎕SQL.query</b> is <b>DB ⍬</b> (and not simply <b>DB</b> as
+in other ⎕SQL functions). This is because an SQL query string can have
+parameters as we will see below. The query string above has no parameters and
+therefore the parameter list for the query string is <b>⍬</b> aka. <b>⍳0</b>.
+</p>
+<p>Finally, SQL table columns have names, but SQL table rows do not. It is
+therefore common practice (though not required) that the first column of a
+table is a unique integer ID that identifies the row and can later be used
+to quickly locate the row in a large database.
+</p>
+</div>
+<div class="subsubsection" id="Excursus_003a-Dynamic-Query-Strings">
+<h4 class="subsubsection">2.39.14.4 Excursus: Dynamic Query Strings</h4>
+
+<p>The SQL query strings <b>(Qs)</b> used so far were <b>static</b>, which means that
+they are sent verbatim to the database machinery. In the following we will
+also use SQL query strings that are are a mix of static text and the character <b>%</b> in the query string. In other SQL dialects the placeholders
+may be different. For example in <b>postgreSQL</b> the placeholders in a query
+string are <b>$1</b>, <b>$2</b>, <b>$3</b>, and so forth.
+</p>
+<p>The placeholders in a dynamic query string are replaced by
+string is to the database machinery. For example:
+</p>
+<div class="example">
+<pre class="example">      ⍝ dynamic query string Qs
+      ⍝
+      Qs ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY
+               VALUES(?,  ?,    ?,   ?,       ?);
+           »»»
+
+      ⍝ query string parameters
+      ⍝
+      PARAMS ← 1 &quot;Paul&quot; 32 &quot;California&quot; 20000
+
+      ⍝ number of placeholders in Qs
+      ⍝
+      +/Qs = '?'
+5
+
+      ⍝ number of parameters (shall be equal to the number of placeholders)
+      ⍝
+      ⍴PARAMS
+5
+
+      ⍝ the (intermediate) result of replacing the placeholders in the dynamic
+      ⍝ query string Qs would then be this static query string:
+      ⍝
+      RESULT ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY
+               VALUES(1, &quot;Paul&quot;, 32, &quot;California&quot;, 20000);
+                 »»»
+</pre></div>
+
+<p>The example above shows the binding of query string parameters to query
+strings for the case where the rank of the parameters is ≤ 1. <b>⎕SQL</b> also
+supports parameters with rank 2; in that case the query is repeated for
+every row of the parameter matrix. I.e. the placeholders in same query
+string <b>Qs</b> are being replaced with every row of the parameter matrix
+before the result of each replacement is sent as a (static) query to the
+database machinery. This feature makes it rather simple to write an APL
+matrix (= query parameter) to the database.
+</p>
+<p>Dynamic query strings are allowed in two ⎕SQL subfunctions: in function 3
+(⎕SQL.query) and in function 4 (⎕SQL.update). The syntax differs slightly
+beween ⎕SQL function numbers and ⎕SQL function names:
+</p>
+<div class="example">
+<pre class="example">      Qs ⎕SQL.query DB PARAMS       ⍝ ⎕SQL subfunction name
+      Qs ⎕SQL[3, DB] PARAMS         ⍝ ⎕SQL subfunction number
+
+      Qs ⎕SQL.update DB PARAMS      ⍝ ⎕SQL subfunction name
+      Qs ⎕SQL[4, DB] PARAMS         ⍝ ⎕SQL subfunction number
+</pre></div>
+
+<p>For rank 2 parameters shall the number of placeholders be equal to the
+number of colums of the APL matrix. If a query string contains no placeholders
+then the parameters shall be ⍬ (aka. ⍳0).
+</p>
+</div>
+<div class="subsubsection" id="Writing-an-APL-matrix-into-a-Database-Table">
+<h4 class="subsubsection">2.39.14.5 Writing an APL matrix into a Database Table</h4>
+
+<p>Now suppose that we have an APL matrix with the same columns as our
+SQL table created above.
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      MATRIX ← 4 5⍴0
+      MATRIX[1;] ← 1 'Paul'   32 'California' 20000.00
+      MATRIX[2;] ← 2 'Allan'  25 'Texas'      15000.00
+      MATRIX[3;] ← 3 'Teddy'  23 'Norway'     20000.00
+      MATRIX[4;] ← 4 'Gunnar' 26 'Sweden'     18000.00
+
+      ⍝ show MATRXIX
+      ⍝
+      8 ⎕CR MATRIX
+┌→─────────────────────────────┐
+↓┌→───┐   32 ┌→─────────┐ 20000│
+││Paul│      │California│      │
+│└────┘      └──────────┘      │
+│┌→────┐  25 ┌→────┐      15000│
+││Allan│     │Texas│           │
+│└─────┘     └─────┘           │
+│┌→────┐  23 ┌→─────┐     20000│
+││Teddy│     │Norway│          │
+│└─────┘     └──────┘          │
+│┌→─────┐ 26 ┌→─────┐     18000│
+││Gunnar│    │Sweden│          │
+│└──────┘    └──────┘          │
+└ϵ─────────────────────────────┘
+</pre></div>
+
+<p>This <b>MATRIX</b> can then be written (more precisely: appended) to the
+database table <b>EMPLOYEES</b> like this:
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY)
+                     VALUES(?,  ?,    ?,   ?,       ?);
+           »»»
+     Qs ⎕SQL.query DB MATRIX
+
+      ⎕SQL.close DB                     ⍝ and close DB
+</pre></div>
+
+</div>
+<div class="subsubsection" id="Reading-a-Database-Table-into-an-APL-Matrix">
+<h4 class="subsubsection">2.39.14.6 Reading a Database Table into an APL Matrix</h4>
+
+<p>Reading a matrix back from a database table uses a <b>SELECT</b> query. <b>SELECT</b>
+is the counterpart of indexed reference or indexed assignment in APL and works,
+like in APL, in both directions (i.e. reading from tables and writing to
+tables). In a <b>SELECT</b> query one can select specific rows and columns of the
+table, which is left as an exercise for the reader. In this quickstart we want
+to keep things simple and read an entire table back:
+</p>
+<p>Due to the absence of a binding mechanism is reading back of an SQL table
+into an APL matrix even simpler:
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      SELECT * FROM EMPLOYEES;
+             »»»
+
+      RESULT ← Qs ⎕SQL.query DB ⍬
+      RESULT
+ 1 Paul   32 California 20000 
+ 2 Allan  25 Texas      15000 
+ 3 Teddy  23 Norway     20000 
+ 4 Gunnar 26 Sweden     18000 
+
+      ⍴RESULT
+4 5
+
+      ⎕SQL.close DB                     ⍝ and close DB
+</pre></div>
+
+<p><b>NOTES:</b> The <b>*</b> in the query string stands for <b>all columns</b> of the
+table. <b>*</b> is NOT a placeholder because it is not replaced with a parameter.
+One can also retrieve a only subset of columns by using a comma separated list
+of column names instead of <b>*</b> (similar to indexed reference in APL).
+</p>
+
+</div>
+<div class="subsubsection" id="Updating-a-Database-Table">
+<h4 class="subsubsection">2.39.14.7 Updating a Database Table</h4>
+
+<p>The ⎕SQL sub-functions introduced so far suffice, at least in principle. The
+APL programmer can read a table from the database into APL, analyse and/or
+modify it in APL, and optionally writeit back into the database.
+</p>
+<p>There is, however, one case where this approach becomes arbitrarily
+ inefficient: a large database with only a small change. In that case it
+is far more efficient to make a change directly in the database, i.e. without
+transferring the entire database back and forth between APL and SQL.
+This is achieved with an SQL UPDATE query, and <b>⎕SQL.uopdate</b> does
+exactly that.
+</p>
+<p>Suppose we want to increase Teddy&rsquo;s salary from 20000 to 22000. Then:
+</p>
+<div class="example">
+<pre class="example">      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      UPDATE EMPLOYEES SET SALARY=? WHERE ID=?;
+             »»»
+
+      Qs ⎕SQL.query DB (22000 3)        ⍝ update column SALARY in row 3
+
+      ⍝ check result
+      Qs ← ,⊃«««
+      SELECT * FROM EMPLOYEES;
+             »»»
+
+      RESULT ← Qs ⎕SQL.query DB ⍬
+      RESULT
+ 1 Paul   32 California 20000 
+ 2 Allan  25 Texas      15000 
+ 3 Teddy  23 Norway     22000 
+ 4 Gunnar 26 Sweden     18000 
+
+      ⍴RESULT
+4 5
+
+      ⎕SQL.close DB                     ⍝ and close DB
+</pre></div>
+
+<p><b>NOTES:</b>  an <b>UPDATE</b> query in SQL is pretty much what an indexed
+assignment in APL. In the example above we changed a single column <b>SALARY</b>
+in a single row <b>ID</b> in the database table <b>COMPANY</b>. The placeholder
+<b>%</b> in <b>SET SALARY=%</b> was set to parameter 22000 and the place holder in 
+<b>where ID=?</b> was set to Terry&rsquo;s row with <b>ID</b>. Like in APL one can,
+however, also change multiple rows and/or multiple columns in a database table.
+To change multiple columns one can set a comma separated list of column namesi
+in the <b>SET</b> clause (or <b>*</b> for all columns). For multiple rows one can
+set multiple rows in the <b>WHERE</b> clause. Omitting the <b>WHERE</b> clause
+updates all rows (similar to <b>*</b> for columns) in the database.
+For example:
+</p>
+<div class="example">
+<pre class="example">      UPDATE COMPANY SET AGE=?, SALARY=? WHERE ID IN (?, ?, ?);
+</pre></div>
+
+<p>The shape of a parameter matrix for an SQL <b>UPDATE</b> must, of course,
+match the number of selected rows and columns.
+</p>
+
+</div>
+</div>
+<div class="subsection" id="Deleting-Rows-From-a-Database-Table">
+<h4 class="subsection">2.39.15 Deleting Rows From a Database Table</h4>
+
+<p>Like <b>UPDATE</b> queries are efficient for changing large tables of a database,
+there is also an SQL query for deleting one or more rows of a database:
+</p>
+<div class="example">
+<pre class="example">      Qs←«DELETE FROM COMPANY WHERE ID=?;»                ⍝ delete one row
+      Qs←«DELETE FROM COMPANY WHERE ID IN (?, ?, ?);»     ⍝ delete 3 rows
+      Qs←«DELETE FROM COMPANY;»                           ⍝ delete all (!) rows
+
+      Qs ⎕SQL.query DB B
+</pre></div>
+
+<p>As usual, the number of rows must match the number of placeholders in the
+query parameter <b>B</b> (an APL vector).
+</p>
+<hr>
+</div>
+</div>
 <div class="section" id="Section-2_002e40">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e41" accesskey="n" rel="next">⎕XML  - XML Parsing</a>, Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕SI - State Indicator</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e41" accesskey="n" rel="next">⎕XML  - XML Parsing</a>, Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕SQL - SQL Database Interface</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005b_003f_005dSYL-_002d-System-limits"></span><h3 class="section">2.40 ⎕SYL - System limits</h3>
 
 <p>System variable ⎕SYL shows a number of system limits when referenced:
 </p>
-<pre class="verbatim">      ⎕SYL
+<div class="example">
+<pre class="example">      ⎕SYL
  SI depth limit          (0 = no limit)                    0 
  number of values limit  (0 = no limit)                    0 
  total ravel bytes limit (0 = no limit)                    0 
@@ -6447,7 +7244,8 @@ Next: <a href="#Section-2_002e41" accesskey="n" rel="next">⎕XML  - XML Parsing
  max. cores (per max_cores())                              1 
  current cores (per core_count())                          1 
  print length limit (0 = no limit)                         0 
-</pre>
+</pre></div>
+
 <p>Most system limits are read-only; attempting to assign ⎕SYL will result
 in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable. Some read-only limits can
@@ -6481,8 +7279,10 @@ become non-responding.
 </p>
 <p>Example (stop execution if function call stack exceeds 20):
 </p>
-<pre class="verbatim">      ⎕SYL[1;2]←20
-</pre>
+<div class="example">
+<pre class="example">      ⎕SYL[1;2]←20
+</pre></div>
+
 <p>Note that small APL values (up to a configurable number of ravel elements)
 count as values (in the number of values limit), but not in the total ravel
 bytes limit (the ravel does not allocate memory in addition to the
@@ -6518,11 +7318,11 @@ be useful to limit the amount of data printed. If the ravel length of,
 say, VALUE exceeds ⎕SYL[27;2] (i.e. if ⎕SYL[27;2] ≤ ⍴,VALUE) then SH↑VALUE
 is printed instead of VALUE. The shape SH is computed like this:
 </p>
-<pre class="verbatim">
-      SH←⍴VALUE
+<div class="example">
+<pre class="example">      SH←⍴VALUE
       while (ravel-length(SH) ≥ ⎕SYL[27;2]) { divide longest axis in SH by 2 }
+</pre></div>
 
-</pre>
 <hr>
 </div>
 </div>
@@ -6549,7 +7349,8 @@ manipulations of APL character strings that are formatted according
 to the XML standard. The anticipated procedure for such modifications
 is something like:
 </p>
-<pre class="verbatim">      XML_string ← &quot;&lt;A&gt;&lt;B&gt;&lt;C&gt;Hello&lt;/C&gt;&lt;/B&gt;&lt;/A&gt;&quot;   ⍝ input data (usually from an .xml file)
+<div class="example">
+<pre class="example">      XML_string ← &quot;&lt;A&gt;&lt;B&gt;&lt;C&gt;Hello&lt;/C&gt;&lt;/B&gt;&lt;/A&gt;&quot;   ⍝ input data (usually from an .xml file)
       APL ← ⎕XML XML_string       ⍝ convert XML_string to associative array APL
       ABC ← APL.a.b.c             ⍝ retrieve node a.b.c in APL
       APL.a.b.c ← ABC, &quot; World&quot;   ⍝ modify node a.b.c in APL
@@ -6559,7 +7360,8 @@ is something like:
 Hello
       Z     ⍝ the modified XML string
 &lt;A&gt;&lt;B&gt;&lt;C&gt;Hello World&lt;/C&gt;&lt;/B&gt;&lt;/A&gt;&quot;
-</pre>
+</pre></div>
+
 <p>The scope (functionality) of ⎕XML is then:
 </p>
 <ul>
@@ -6781,14 +7583,16 @@ be contained in a single associative array.
 </p>
 <p>Examples of APL member names (assuming ⎕IO←1):
 </p>
-<pre class="verbatim">      ⍙1              ⍝ the first member in every XML node. Its value is the node tag.
+<div class="example">
+<pre class="example">      ⍙1              ⍝ the first member in every XML node. Its value is the node tag.
       ∆1declaration   ⍝ the first member in most XML documents. E.g. &lt;?xml version= ...&gt;
       ∆2text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
       ∆3doctype       ⍝ DTD in XML documents that have one. E.g. &lt;!DOCTYPE  ...
       _6Workspace     ⍝ Sub-array for &lt;Workspace ... at position 6.
       ⍙1wsid          ⍝ first attribute wsid from e.g. &lt;Workspace wsid=...
       ⍙2year          ⍝ second attribute year
-</pre>
+</pre></div>
+
 </div>
 <div class="subsection" id="Monadic-_005b_003f_005dXML">
 <h4 class="subsection">2.41.4 Monadic ⎕XML</h4>
@@ -6818,7 +7622,8 @@ of the function number ↑A.
 </p>
 <p>In the following examples, let
 </p>
-<pre class="verbatim">      XML←36 ⎕CR &quot;&quot;&quot;
+<div class="example">
+<pre class="example">      XML←36 ⎕CR &quot;&quot;&quot;
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
   &lt;Document&gt;
     &lt;Tag1 name='tag1'&gt;   &lt;!-- first tag --&gt;
@@ -6831,7 +7636,8 @@ of the function number ↑A.
 &quot;&quot;&quot;
 
 APL←⎕XML XML
-</pre>
+</pre></div>
+
 <p>Then
 </p>
 <ul>
@@ -6854,7 +7660,8 @@ inverse function ¯3 ⎕XML which converts a 3-item vector as produced by 3 ⎕X
 back into an APL member name indicating the category (i.e. _, ∆, or ⍙)
 and the name from the XML tag:
 
-<pre class="verbatim">            8 ⎕CR (C P N)←3 ⎕XML &quot;∆2comment&quot;
+<div class="example">
+<pre class="example">            8 ⎕CR (C P N)←3 ⎕XML &quot;∆2comment&quot;
 ┌→────────────┐
 │∆ 2 ┌→──────┐│
 │    │comment││
@@ -6870,12 +7677,13 @@ comment
 
       ¯3 ⎕XML C P N   ⍝ inverse of 3 ⎕XML
 ∆2comment
+</pre></div>
 
-</pre>
 </li><li> <b>Z←4 ⎕XML B</b> is a string that shows the member names of the
  associative array B in a tree-like fashion. For example:
 
-<pre class="verbatim">      ⊃35⎕CR 4 ⎕XML APL
+<div class="example">
+<pre class="example">      ⊃35⎕CR 4 ⎕XML APL
 XML                     
  │                      
  └─── Document          
@@ -6883,11 +7691,13 @@ XML
        └─── Tag1        
              │          
              └─── Subtag
-</pre>
+</pre></div>
+
 </li><li> <b>Z←5 ⎕XML B</b> is like 4 ⎕XML but displays not only the XML tags but
 also other XML nodes (declarations, attributes, etc.):
 
-<pre class="verbatim">      ⊃35⎕CR 5 ⎕XML APL
+<div class="example">
+<pre class="example">      ⊃35⎕CR 5 ⎕XML APL
 XML                               
  │                                
  ├─── _1∆declaration              
@@ -6907,11 +7717,13 @@ XML
        │     │     └─── _3∆text   
        │     └─── _5∆text         
        └─── _3∆text               
-</pre>
+</pre></div>
+
 </li><li> <b>Z←6 ⎕XML B</b> is like 4 ⎕XML but displays not only the member
 name but the entire path to the member:
 
-<pre class="verbatim">      ⊃35⎕CR 6 ⎕XML APL
+<div class="example">
+<pre class="example">      ⊃35⎕CR 6 ⎕XML APL
 XML                                             
  │                                              
  └─── ._3_Document                              
@@ -6919,12 +7731,14 @@ XML
        └─── ._3_Document._2_Tag1                
              │                                  
              └─── ._3_Document._2_Tag1._4_Subtag
-</pre>
+</pre></div>
+
 </li><li> <b>Z←7 ⎕XML B</b> returns a list of all members in a depth-first order.
 This list can be used as an iterator to traverse the entire tree (and possibly
 filter out items along the way).
 
-<pre class="verbatim">      ⊃7 ⎕XML APL
+<div class="example">
+<pre class="example">      ⊃7 ⎕XML APL
 ._1∆declaration                          
 ._2∆text                                 
 ._18∆text                                
@@ -6945,30 +7759,36 @@ filter out items along the way).
 ._3_Document._2_Tag1._4_Subtag._1∆text   
 ._3_Document._2_Tag1._4_Subtag._2∆comment
 ._3_Document._2_Tag1._4_Subtag._3∆text   
-</pre>
+</pre></div>
+
 </li><li> <b>Z←8 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 those members that are related to tags (the tag name ⍙ and tag attributes)
 are returned:
 
-<pre class="verbatim">      ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
+<div class="example">
+<pre class="example">      ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
 ._3Document.⍙1····················
 ._3Document._2Tag1.⍙1·············
 ._3Document._2Tag1.⍙2name·········
 ._3Document._2Tag1._4Subtag.⍙1····
 ._3Document._2Tag1._4Subtag.⍙2name
-</pre>
+</pre></div>
+
 </li><li> <b>Z←9 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 synthesized members other than ∆text are returned:
 
-<pre class="verbatim">      ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
+<div class="example">
+<pre class="example">      ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
 .∆1declaration·······················
 ._3Document._2Tag1.∆2comment·········
 ._3Document._2Tag1._4Subtag.∆2comment
-</pre>
+</pre></div>
+
 </li><li> <b>Z←10 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 synthesized ∆text members are returned:
 
-<pre class="verbatim">.∆2text···························
+<div class="example">
+<pre class="example">.∆2text···························
 ._3Document.∆1text················
 ._3Document._2Tag1.∆1text·········
 ._3Document._2Tag1.∆3text·········
@@ -6977,38 +7797,46 @@ synthesized ∆text members are returned:
 ._3Document._2Tag1.∆5text·········
 ._3Document.∆3text················
 .∆18text··························
-</pre>
+</pre></div>
+
 </li><li> <b>Z←11 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the tag
 names are returned:
 
-<pre class="verbatim">      ⊃11 ⎕XML APL   ⍝ all tag member names
+<div class="example">
+<pre class="example">      ⊃11 ⎕XML APL   ⍝ all tag member names
 ._3Document················
 ._3Document._2Tag1·········
 ._3Document._2Tag1._4Subtag
-</pre>
+</pre></div>
+
 </li><li> <b>Z←12 ⎕XML B</b> is like Z←7 ⎕XML B, except that all member
 names of B are returned without descending into the sub-tree:
 
-<pre class="verbatim">      ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
+<div class="example">
+<pre class="example">      ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
 .∆1declaration
 .∆2text·······
 ._3Document···
 .∆18text······
-</pre>
+</pre></div>
+
 <p>This variant may also be useful for structured variables that were not
 created by ⎕XML.
 </p>
 </li><li> <b>Z←13 ⎕XML B</b> shows the (flat) tag names in B, but but does
 not descend into any sub-tree of B.
 
-<pre class="verbatim">     ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
+<div class="example">
+<pre class="example">     ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
  ._3Document 
-</pre>
+</pre></div>
+
 </li><li> <b>Z←(14 &quot;member-name&quot;) ⎕XML B</b> shows the next member in B
 after &quot;member-name&quot;. It can be used as an iterator that walks through
 the tags. An empty member name returns the first member:
 
-<pre class="verbatim">      APL ← ⎕XML XML←&quot;&lt;ROOT&gt;&lt;A/&gt;&lt;B/&gt;&lt;C/&gt;&lt;/ROOT&gt;&quot;
+<div class="example">
+<pre class="example">      APL ← ⎕XML XML←&quot;&lt;ROOT&gt;&lt;A/&gt;&lt;B/&gt;&lt;C/&gt;&lt;/ROOT&gt;&quot;
 
       (14 &quot;&quot;) ⎕XML APL._1ROOT   ⍝ get first member in APL._1ROOT
 ⍙1
@@ -7019,8 +7847,8 @@ _2B
       (14 &quot;_2B&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._2B
 _3C
       (14 &quot;_3C&quot;) ⎕XML APL._1ROOT   ⍝ last member: will be empty
-
-</pre></li></ul>
+</pre></div>
+</li></ul>
 
 </div>
 <div class="subsection" id="XML-Queries">
@@ -7168,31 +7996,41 @@ For example,
 </p>
 <ol>
 <li> <b>switch/case</b>:
-<pre class="verbatim">    →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
+<div class="example">
+<pre class="example">    →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
 L1: CASE1 ◊ →L_endcase        ⍝ case 1:
 L2: CASE2 ◊ →L_endcase        ⍝ case 2:
 ...
 LN: CASEn                     ⍝ case N:
 L_endcase:
-</pre>
+</pre></div>
+
 </li><li> <b>loop</b>:
-<pre class="verbatim"> Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
-</pre>
+<div class="example">
+<pre class="example"> Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
+</pre></div>
+
 </li><li> <b>one-sided if</b>:
-<pre class="verbatim">  →(!COND) / L_endif   ⍝ jump over the THEN clause
+<div class="example">
+<pre class="example">  →(!COND) / L_endif   ⍝ jump over the THEN clause
   THEN
 L_endif:
-</pre>
+</pre></div>
+
 <p>or, not uncommon and shorter, but less portable and less readable:
 </p>
-<pre class="verbatim">  →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
-</pre>
+<div class="example">
+<pre class="example">  →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
+</pre></div>
+
 </li><li> <b>two-sided if/else</b>:
-<pre class="verbatim">  →COND ↓ L_else L_then
+<div class="example">
+<pre class="example">  →COND ↓ L_else L_then
 L_then: THEN ◊ →L_endif
 L_else: ELSE
 L_endif:
-</pre></li></ol>
+</pre></div>
+</li></ol>
 
 <p>A closer look at these cases reveals that there is not much room for
 syntax improvements in cases 1. (switch) and 2. (loop). The introduction of
@@ -7232,11 +8070,15 @@ syntax:
 </p>
 <ul>
 <li> <b>one-sided if/else</b>:
-<pre class="verbatim">      COND →→ THEN ←←
-</pre>
+<div class="example">
+<pre class="example">      COND →→ THEN ←←
+</pre></div>
+
 </li><li> <b>two-sided if/else</b>:
-<pre class="verbatim">      COND →→ THEN ←→ ELSE ←←
-</pre>
+<div class="example">
+<pre class="example">      COND →→ THEN ←→ ELSE ←←
+</pre></div>
+
 </li></ul>
 
 <p>For this syntax to work, the following rules must be followed:
@@ -7271,7 +8113,8 @@ syntax:
 </li></ul>
 
 <p>Examples:
-</p><pre class="verbatim">      ⍝ short format. Valid in immediate execution and in defined functions
+</p><div class="example">
+<pre class="example">      ⍝ short format. Valid in immediate execution and in defined functions
       ⍝
       X←5 ◊ X≥0 →→ X 'is positive' ←→ X 'is negative' ←←
  5 is positive 
@@ -7321,8 +8164,8 @@ Fatal error in defined function line [2]. You may now:
     change the faulty line  with:  [2] ..., or 
     delete the faulty line  with:  [∆2], or
     cancel editing with:  [→]∇.
+</pre></div>
 
-</pre>
 <p>The recommended usage of corresponding →→, ←→, and ←← token is to:
 </p>
 <ul>
@@ -7346,8 +8189,10 @@ Next: <a href="#Section-2_002e44" accesskey="n" rel="next">Monadic ≠ (Nub Siev
 <p>In standard APL, the inner product Z of two matrices A and B as known from
 linear algebra, is:
 </p>
-<pre class="verbatim">      Z←A +.× B      ⍝ the most frequent special case of A f.g B
-</pre>
+<div class="example">
+<pre class="example">      Z←A +.× B      ⍝ the most frequent special case of A f.g B
+</pre></div>
+
 <p>However, the inner product in APL is more general than the inner product in
 linear algebra. In the general case <b>A f.g B</b> may the functions <b>f</b>
 and <b>g</b> also be non-scalar APL primitives or even defined functions.
@@ -7393,7 +8238,8 @@ column-vector before <b>A∘B</b> is computed. In this context, the term
 
 <p>Examples:
 </p>
-<pre class="verbatim">      M←2 2⍴1 2 3 4   ⍝ a matrix
+<div class="example">
+<pre class="example">      M←2 2⍴1 2 3 4   ⍝ a matrix
       V←10 11         ⍝ a vector
 
       M +.× V
@@ -7417,7 +8263,8 @@ column-vector before <b>A∘B</b> is computed. In this context, the term
 1 2
       ⍴M∘V       ⍝ the result is column vector
 2 1
-</pre>
+</pre></div>
+
 </li><li> <b>A +.× B</b> requires that the number of columns in <b>A</b> is equal to
 the number of rows in <b>B</b>. In contrast, <b>A∘B</b> has no such requirement
 and will add 0-columns to <b>A</b> resp. 0-rows to <b>B</b> to match the shapes
@@ -7441,15 +8288,19 @@ same shape as <b>B</b> and:
 <p><b>Z[i]</b> is 1 if <b>B[i]</b> is the first occurrence of <b>B[i]</b> in <b>B</b> and
 0 otherwise. For vectors <b>B</b> this can also be expressed as:
 </p>
-<pre class="verbatim">      ≠ B ←→ (B⍳B)=(⍳⍴B)
-</pre>
+<div class="example">
+<pre class="example">      ≠ B ←→ (B⍳B)=(⍳⍴B)
+</pre></div>
+
 <p>Examples:
 </p>
-<pre class="verbatim">      ≠'Hello, World.'
+<div class="example">
+<pre class="example">      ≠'Hello, World.'
 1 1 1 0 1 1 1 1 0 1 0 1 1
       ≠ 1 (2 3) 4 (2 3) 5 6
 1 1 1 0 1 1
-</pre>
+</pre></div>
+
 
 
 
@@ -7544,10 +8395,12 @@ variable is correctly set. For German, that would be &quot;de_DE.utf8&quot;, lik
 even if your xmodmap is correct. You can check your setting by executing the
 program &rsquo;locale&rsquo;. If it shows warnings like these:
 </p>
-<pre class="verbatim">locale: Cannot set LC_CTYPE to default locale: No such file or directory
+<div class="example">
+<pre class="example">locale: Cannot set LC_CTYPE to default locale: No such file or directory
 locale: Cannot set LC_MESSAGES to default locale: No such file or directory
 locale: Cannot set LC_ALL to default locale: No such file or directory
-</pre>
+</pre></div>
+
 <p>then something is wrong and you should check your LANG setting and installed
 locales.
 </p>
@@ -7565,7 +8418,8 @@ Next: <a href="#Chapter-6" accesskey="n" rel="next">Libraries Contributed by GNU
 
 <p>The top-level directory of the GNU APL project has a structure like this:
 </p>
-<pre class="verbatim">    apl-1.9/
+<div class="example">
+<pre class="example">    apl-1.9/
     ├── autom4te.cache
     ├── build
     ├── debian
@@ -7587,7 +8441,8 @@ Next: <a href="#Chapter-6" accesskey="n" rel="next">Libraries Contributed by GNU
     ├── wslib3
     ├── wslib4
     └── wslib5
-</pre>
+</pre></div>
+
 <p>Most of these directories are contained in the project tar file
 (e.g. apl-1.9.tar.gz) and some are created during the build of GNU APL. Only
 the directories in the top-level are shown above.
@@ -7628,7 +8483,8 @@ that are optional and typically require the installation of additional
 libraries on the build machine. The ./configure script in the top-level
 directory determines, which optional components shall be included in the build.
 </p>
-<pre class="verbatim">    apl-1.9/
+<div class="example">
+<pre class="example">    apl-1.9/
     ├── src
         ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
@@ -7636,7 +8492,8 @@ directory determines, which optional components shall be included in the build.
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
         ├── testcases               dito
-</pre>
+</pre></div>
+
 <p>GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases
 </p>

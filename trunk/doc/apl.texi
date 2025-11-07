@@ -3,11 +3,6 @@
 @documentencoding UTF-8
 @settitle GNU APL
 
-@c BOP: Bold OPtion
-@macro BOP{opt}
-@b{@verb{|-\opt\|}}
-@end macro
-
 @c ============================================================================
 @c ====== Part 2: Summary Description and Copyright ===========================
 @c ============================================================================
@@ -102,15 +97,13 @@ APL is built and installed like this:
  unpacked directory.
 @end itemize
 
-For the experienced, but impatient reader: it is the usual sequence
+For the experienced, but impatient reader: it is the well-known sequence
 
-@itemize
-@item ./configure
-
-@item make
-
-@item make install
-@end itemize
+@example
+$ ./configure
+$ make
+$ sudo make install
+@end example
 
 On success, an executable file named 'apl' will have been produced
 in the sub-directory 'src'.
@@ -120,11 +113,14 @@ File README contains further instructions about the installation GNU APL.
 @section Starting APL
 
 Last things first: before explaining how to start APL, it is important to
- remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
- - these serve other purposes. Instead, you leave APL with the command
- )OFF or )off (on a separate line) like this:
+ remember how to stop (i.e. exit) it. Neither @b{^C} nor @b{^D} will stop
+APL - these serve other purposes. Instead, you leave APL with the command
+ @b{)OFF} or @b{)off} (on a separate line) like this:
 
+@example
       )OFF
+@end example
+
 
 If APL is computing a function (and possibly caught in an endless loop),
 then you may have to press @b{^C} (this is called @i{ATTENTION} in APL) to
@@ -137,22 +133,30 @@ history of your GNU APL commands will have been preserved. Having that said,
 APL is started like every other program - by entering its name and optional
 command line parameters, for example:
 
+@example
 $ apl
+@end example
 
 or:
 
-$ apl @BOP{id} 1001
+@example
+$ apl -id 1001
+@end example
 
 GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called 'apl' and is located in the current
 directory):
 
+@example
 #! ./apl 
+@end example
 
 or (if the APL interpreter binary is not in the current directory but in
 /mypath/apl):
 
+@example
 #! /mypath/apl
+@end example
 
 The path to the 'apl' binary can be missing (like in the first example),
 relative, or absolute (second example). The exact details of how the first
@@ -173,7 +177,7 @@ GNU APL understands the following command line options:
 @itemize @bullet
 
 @item
-@BOP{C new_root}
+@b{-C new_root}
 
 perform chroot("new_root") followed by chdir("/"). This restricts the access
 of the process running GNU APL to files in or below directory new_root, and
@@ -209,44 +213,42 @@ new_root, however, /usr/local/bin is no longer accessible and one would need
 to copy /usr/local/bin/APserver to new_root/usr/local/bin/APserver
 
 @item
-Depending on your platform, the process using -C may need root privileges.
+Depending on your platform, the process using @b{-C} may need root privileges.
 
 @end itemize
 
-@item
-@BOP{-cfg}
+@item @code{--cfg}
 
 show ./configure options that were used to configure GNU APL, and exit.
 
-@item
-@BOP{-[no]Color}
+@item @b{--[no]Color}
 
 start with ]COLOR ON [OFF].
 
 @item
-@BOP{-CPU_limit_secs sec}
+@b{--CPU_limit_secs sec}
 
 set CPU time limit to @i{sec} seconds.
 
 @item
-@BOP{d}
+@code{-d}
 
 run the APL interpreter (or APL script) in the background (i.e. as a daemon).
 For this to work you need to provide some input to the background process,
 e.g. via the -f option.
 
 @item
-@BOP{-emacs}
+@code{--emacs}
 
 run in (old) Emacs mode.
 
 @item
-@BOP{-emacs_arg arg}
+@code{--emacs_arg arg}
 
 run in (new) Emacs mode with argument arg.
 
 @item
-@BOP{-eval line}
+@code{--eval line}
 
 evaluate one APL @i{line} and exit (-s without -f is implied). This option
 can be given several times; in that case several lines will be executed in
@@ -256,7 +258,7 @@ Therefore quoting the argument of --eval may often be necessary and it is
 common wisdom to always quote the --eval argument.
 
 @item
-@BOP{f file}
+@code{-f file}
 
 read input from @i{file} rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
@@ -264,29 +266,29 @@ If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file or include the --OFF option.
 
 @item
-@BOP{-gpl}
+@code{--gpl}
 
 show GNU APL license (GPL) and exit.
 
 @item
-@BOP{L wsname}
+@code{-L wsname}
 
 )LOAD wsname on start-up.
 
 @item
-@BOP{-LX expr}
+@code{--LX expr}
 
 execute @b{expr} first. The workspace behaves as if ⎕LX (latent
 expression) were set to @b{expr} in the workspace. This can be used,
 for example, to start the same workspace with different start-up values.
 
 @item
-@BOP{h}, @BOP{-help}
+@code{-h}, @code{--help}
 
 print all command line options with a brief hint about what they do.
 
 @item
-@BOP{-id proc}
+@code{--id proc}
 
 use processor ID proc for this interpreter. If no ID is provided, then the
 first unused ID > 1000 is taken by this interpreter and the ID becomes used
@@ -294,7 +296,7 @@ as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 
 @item
-@BOP{l num}
+@code{-l num}
 
 turn logging facility @b{num} ON (provided that dynamic logging was
 ./configure'd). The logging facility 37 (start-up messages) is of particular
@@ -302,14 +304,14 @@ importance for troubleshooting and it works even if dynamic logging
 was not ./configure'd.
 
 @item
-@BOP{-mem [memory-limit]}
+@code{--mem [memory-limit]}
 
 tell the interpreter not to use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
 
-The interpreter will exit at start-up if @BOP{-mem} is used and:
+The interpreter will exit at start-up if @code{-mem} is used and:
 
 @itemize
 @item the platform on which the interpreter runs has no /proc/meminfo, or
@@ -331,9 +333,9 @@ is the given amount in kB, MB, or GB.
 For example:
 
 @itemize
-@item @BOP{-mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
-@item @BOP{-mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
-@item @BOP{-mem 5G}   (5 GB are guaranteed)
+@item @code{--mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
+@item @code{--mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
+@item @code{--mem 5G}   (5 GB are guaranteed)
 @end itemize
 
 WARNING: The memory-limit is checked against parameter 'MemFree' in
@@ -346,17 +348,17 @@ interpreter may crash badly (i.e. without a WS FULL error, and without
 any chance to )SAVE the workspace) when the available memory is exhausted.
 
 @item
-@BOP{-echoCIN}
+@code{--echoCIN}
 copy the input line (after editing) to stdout. For creating session logs.
 
 @item
-@BOP{-noCIN}
+@code{--noCIN}
 
 do not echo stdin to stdout. Almost a must for scripting (unless you
 intend to troubleshoot a script).
 
 @item
-@BOP{-to_COUT}
+@code{--to_COUT}
 
 normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
 when GNU APL is started in a script, the output of the script appears on
@@ -366,7 +368,7 @@ This option redirects the stderr output of GNU APL to stdout. The same effect
 can be achieved with the option "OUTPUT-TO-COUT Yes" in a preferences file.
 
 @item
-@BOP{-tcp_port PORT}
+@code{--tcp_port PORT}
 
 this option starts GNU APL as a server that listens on TCP port PORT.
 Every TCP connection accepted by the server forks a new GNU APL instance
@@ -375,90 +377,90 @@ which has its stdin, stdout, and stderr redirected to the TCP connection.
 WARNING: This option is dangerous if PORT is directly exposed to the Internet!
 
 @item
-@BOP{-noCONT}
+@code{--noCONT}
 
 do not load a SETUP or CONTINUE workspace on start-up.
 
 @item
-@BOP{-OFF}
+@code{--OFF}
 
 This option causes GNU APL to perform an automatic )OFF command after the
 last line of the last input file (as per -f option) was executed.
 
 @item
-@BOP{-PW COLS}
+@code{--PW COLS}
 
 set the initial value of ⎕PW to COLS (min. 30, max. 10000)
 
 @item
-@BOP{-[no]SV}
+@code{--[no]SV}
 
 do [not] start APserver (a shared variable server) on start-up. This disables
 communication with other workspaces or auxiliary processors through
 shared variables.
 
 @item
-@BOP{p N}
+@code{-p N}
 
 use profile number N in preferences files. A preference file may contain
 several sets of settings for different purposes; the profile number selects
 one of these sets.
 
 @item
-@BOP{-par pproc}
+@code{--par pproc}
 
 use processor parent ID pproc (default: no parent ID).
 
 @item
-@BOP{-rawCIN}
+@code{--rawCIN}
 
 do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
 are not wanted and can be turned off with this option.
 
 @item
-@BOP{s}, @BOP{-script}
+@code{-s}, @code{--script}
 
 this option is an abbreviation for:
- @BOP{-silent} @BOP{-noCIN} @BOP{-noCONT} @BOP{f -}
-which is a typical combination of options for APL scripts.
+ @code{--silent} @code{--noCIN} @code{--noCONT} @code{-f -}
+(which is a typical combination of options for APL scripts).
 
 @item
-@BOP{q}, @BOP{-silent}
+@code{-q}, @code{--silent}
 
 suppress printing of the GNU APL welcome message. Useful for scripts.
 
 @item
-@BOP{-safe}
+@code{--safe}
 
 disable shared variables and native functions
 
 @item
-@BOP{-show_bin_dir}
+@code{--show_bin_dir}
 
 display the binary directory where, according to ./configure, the programs
 apl, APserver, AP100, and AP210 are installed. Then exit.
 
 @item
-@BOP{-show_doc_dir}
+@code{--show_doc_dir}
 
 display the directory where, according to ./configure, documentation files
 for GNU APL are installed. Then exit.
 
 @item
-@BOP{-show_etc_dir}
+@code{--show_etc_dir}
 
 display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 
 @item
-@BOP{-show_lib_dir}
+@code{--show_lib_dir}
 
 display the library directory where, according to ./configure, shared library
 files and the workspaces shipped with GNU APL are installed. Then exit.
 
 @item
-@BOP{-show_src_dir}
+@code{--show_src_dir}
 
 display the source directory where, according to ./configure, GNU APL
 was compiled. Then exit. This can be used, for example, by native functions
@@ -466,12 +468,12 @@ that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 
 @item
-@BOP{-show_all_dirs}
+@code{--show_all_dirs}
 
 display all the directories above. Then exit.
 
 @item
-@BOP{T testcases ...}
+@code{-T testcases ...}
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
 the interpreter is compared with the expected output in the testcase file(s)
@@ -479,81 +481,81 @@ and differences are marked. In addition a summary file is created that tells
 whether or not each of the testcases was successful.
 
 @item
-@BOP{-TM mode}
+@code{--TM mode}
 
 test mode. This option specifies how the interpreter shall behave
-when running a number of testcases (as specified with the @BOP{T} option).
+when running a number of testcases (as specified with the @code{-T} option).
 
-@BOP{-TM 0} (default) run all testcases and exit after the last testcase.
+@code{--TM 0} (default) run all testcases and exit after the last testcase.
 
-@BOP{-TM 1} like @BOP{-TM 0} if no error was detected.
+@code{--TM 1} like @code{--TM 0} if no error was detected.
 However, if one of the testcases has failed, then the interpreter
 does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 
-@BOP{-TM 2} like @BOP{-TM 1}, but stay in the interpreter even if
+@code{--TM 2} like @code{--TM 1}, but stay in the interpreter even if
 all testcases have passed. This can be useful for quickly bringing the
 interpreter into a specific state and continue manual troubleshooting
 from that state.
 
-@BOP{-TM 3} like @BOP{-TM 1}, but stop testcase execution after the
+@code{--TM 3} like @code{--TM 1}, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 
-@BOP{-TM 4} like @BOP{-TM 3}, but exit after the first failed
+@code{--TM 4} like @code{--TM 3}, but exit after the first failed
 testcase. This is useful for automatic regression tests, where no errors
 are expected.
 
 @item
-@BOP{-TR}
+@code{--TR}
 
 executes test case files in random order.
 
 @item
-@BOP{-TS}
+@code{--TS}
 
-Normally, when the interpreter is run with the @BOP{T} option,
+Normally, when the interpreter is run with the @code{T} option,
 an existing summary.log file is overwritten without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overwriting it.
 
 @item
-@BOP{v}, @BOP{-version},
+@code{-v}, @code{--version},
 
 show version information and exit.
 
 @item
-@BOP{u UID}
+@code{-u UID}
 
 run as user with UID 0. This option can only be used by the root user (who
 then wants to run as a different user).
 
 @item
-@BOP{w milli}
+@code{-w milli}
 
 wait milli milliseconds at start-up. Useful to give other programs that are
 started together with this interpreter time to initialize themselves.
 
-@item @b{@verb{|  +APPOPT|}}
-@item @b{@verb{| ++APPOPT ARG1|}}
-@item @b{@verb{|+++APPOPT ARG1 ARG2|}}
+@item @code{|  +APPOPT|}
+@item @code{| ++APPOPT ARG1|}
+@item @code{|+++APPOPT ARG1 ARG2|}
 @item ...
 
-   Those command line options above that start with - are understood by the
+   Those command line options above that start with + are understood by the
    GNU APL binary and their arguments must follow the description given for
    them. In addition the interpreter also accepts command line options that
    start with +. However, these options are not checked by the interpreter
-   in any way, but are merely copied to ⎕ARG (see below). In these options,
+   in any way, but are merely copied to @b{⎕ARG} (see below). In these options,
    APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
    whitespace characters. The purpose of these options is to control aspects
    of the APL application from the command line.
 
 @item
-@BOP{-}
+@code{-}
 
 end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
 interpreter was invoked (similar to variable argv in main(int argc,
-char * argv[]) in C/C++). Option @BOP{-} can be used to separate command line
+char * argv[]) in C/C++). Option @code{-} can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
 
@@ -563,7 +565,7 @@ Thus,
 
 @code{(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG} returns the options for the APL application.
 
-All command line options after @BOP{-} are ignored by the interpreter
+All command line options after @code{-} are ignored by the interpreter
 (except for including them in ⎕ARG).
 
 @end itemize
@@ -718,7 +720,9 @@ current directory (i.e. ".") is used and converted to an absolute path.
 
 For example, if library-root is "." then the command
 
+@example
 )LOAD 2 test
+@end example
 
 will try to load the workspace file
 
@@ -804,15 +808,15 @@ There are a few hopefully useful features in GNU APL:
 @end menu
 
 As already mentioned, it is possible to write APL scripts. Similar to other
-script languages, an APL script is a text file whose first line is a
-"shebang line", i.e. a line starting with @option{#!}, followed by the
+script languages, an APL script is a text file whose first line is a so-called
+"shebang line", i.e. a line starting with @code{#!}, followed by the
 absolute path to the interpreter (in our case the GNU APL binary), followed
 by command line arguments that are passed on to the interpreter. In our case
 the shebang line could be, for example:
 
-@verbatim
-    #! /usr/local/bin/apl --id 1010
-@end verbatim
+@example
+#! /usr/local/bin/apl --id 1010
+@end example
 
 There are essentially two ways to run an APL script: redirecting the script
 file to stdin of the interpreter or making the script executable and indicate
@@ -823,18 +827,19 @@ apl).
 @node Subsection 2.1.1
 @subsection Redirect the script file to the stdin of the GNU APL interpreter
 
-A file, say SCRIPT.apl, can be redirected to apl by redirection of the shell:
+A file, say @b{SCRIPT.apl}, can be redirected to apl by redirection of
+the shell:
 
-@verbatim
-    apl < SCRIPT.apl
-@end verbatim
+@example
+$ apl < SCRIPT.apl
+@end example
 
-Alternatively, the command line option -f or -s can be used:
+Alternatively, the GNU APL command line option @b{-f} or @b{-s} can be used:
 
-@verbatim
-    apl -f SCRIPT.apl
-    apl -s SCRIPT.apl
-@end verbatim
+@example
+$ apl -f SCRIPT.apl
+$ apl -s SCRIPT.apl
+@end example
 
 Both ways of redirecting the file are almost identical; in the first case
 redirection was performed by the shell running apl, while in the second case
@@ -845,20 +850,20 @@ the redirecting of the file was performed by apl itself.
 @subsection Make the script file executable
 
 Alternatively the script can be made executable, specifying apl as its
-interpreter (see also @option{'man 2 execve'}). For this to work, the
+interpreter (see also @code{'man 2 execve'}). For this to work, the
 first line of the script must have a special format:
 
-@verbatim
+@example
     #! /usr/local/bin/apl --script
-@end verbatim
+@end example
 
-@BOP{-script} prevents: printing of a welcome banner, 
+@code{--script} prevents: printing of a welcome banner, 
 echoing of stdin to stdout, automatic loading of a )CONTINUE workspace,
 and prevents starting a thread for shared variable communication.
 
 If the path to the interpreter is relative (which might be useful if you
 do not know in advance where the APL interpreter will be installed) then
-it must be in $PATH of the shell that runs the script.
+it must be in @b{$PATH} of the shell that runs the script.
 
 @c ............................................................................
 @node Subsection 2.1.3
@@ -874,11 +879,11 @@ passed on to APL. We briefly discuss both cases:
 0. General Remark
 
 There is a convention in (not only) GNU APL, that the command line options
-(and possibly an optional option argument) that occur left of @BOP{-} are
+(and possibly an optional option argument) that occur left of @code{--} are
 options directed to (and understood by) the APL interpreter while the options
-right of @BOP{-} are passed to the APL application (and their exact format is
+right of @code{--} are passed to the APL application (and their exact format is
 then defined by the APL application). All command line options that were used
-to start APL can later be retrieved with the system variable ⎕ARG in APL.
+to start APL can later be retrieved with the system variable @b{⎕ARG} in APL.
 
 Example 1: APL started directly
 
@@ -886,9 +891,9 @@ We start APL with some command line options and display them with ⎕ARG.
 The command line options for the interpreter are --silent, -l, and 37,
 while the options app1 and app2 are for the APL application:
 
-@verbatim
+@example
 $ apl --silent -l 37 -- app1 app2
-    ⊃⎕ARG
+      ⊃⎕ARG
 apl     
 --silent
 -l      
@@ -896,7 +901,7 @@ apl
 --      
 app1    
 app2    
-@end verbatim
+@end example
 
 Example 2: APL started indirectly
 
@@ -930,31 +935,30 @@ on the shebang line of the script in a way that is described in 'man 2 execve'.
 Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
 
-@verbatim
+@example
 #! /usr/local/bin/apl --id 1010 --script
 
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
-
-@end verbatim
+@end example
 
 Assume further that the script is started like this:
 
-@verbatim
+@example
 $ ./SCRIPT.apl sarg1 sarg2
-@end verbatim
+@end example
 
 Then the following output, which shows the order of command line options
 as seen by ⎕ARG, is produced:
 
-@verbatim
+@example
    ⊃⎕ARG
 /usr/local/bin/apl
 --script          
 ./SCRIPT.apl      
 sarg1             
 sarg2 
-@end verbatim
+@end example
 
 This suggests that the options and option arguments are constructed by execve()
 (the function that is eventually responsible for processing scripts in shells
@@ -970,25 +974,25 @@ and other executables) in the following order:
 
 CAUTION: as discussed in 'man 2 execve' the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
-For that reason the optional interpreter argument should not be missing (you
+For that reason the optional interpreter argument should not be omitted (you
 can use -- to provide at least one argument) and also not more than one
 argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 
-@verbatim
-/usr/local/bin/apl
-/usr/local/bin/apl --
-/usr/local/bin/apl -s
-/usr/local/bin/apl --script
-/usr/local/bin/apl -s --
-/usr/local/bin/apl --script --
-@end verbatim
+@example
+$ /usr/local/bin/apl
+$ /usr/local/bin/apl --
+$ /usr/local/bin/apl -s
+$ /usr/local/bin/apl --script
+$ /usr/local/bin/apl -s --
+$ /usr/local/bin/apl --script --
+@end example
 
-The recommended form is: @verb{|/usr/local/bin/apl --script|}.
+The recommended form is: @code{|/usr/local/bin/apl --script|}.
 
-Note that @BOP{-} and any options that follow it on the shebang line
+Note that @code{-} and any options that follow it on the shebang line
 MAY OR MAY NOT be included in ⎕ARG (this depends on the platform used).
-In contrast, options that follow @BOP{-} on the script command line
+In contrast, options that follow @code{-} on the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
 There is normally no point in passing any application options on the shebang
 line to APL because such parameters can more easily be provided directly
@@ -997,14 +1001,14 @@ application options it may be convenient to make @b{@verb{|--|}} the last
 option of the shebang so that the user of the script need not specify it
 manually.
 
-Using @BOP{-} on the shebang line of the script file usually prevents
-subsequent options on the shebang line from being interpreted as APL options
-(and, more importantly, from causing @b{unknown option} errors when GNU APL
-starts). At least under GNU/Linux with @b{bash} the subsequent options will
-be passed to the APL application via ⎕ARG.
+Using @code{0-} on the shebang line of the script file usually prevents
+subsequent options on the shebang line from being interpreted as APL command
+line options (and, more importantly, from causing @b{unknown option} errors
+when GNU APL starts). At least under GNU/Linux with @b{bash} the subsequent
+options will be passed to the APL application via ⎕ARG.
 
 Depending on this exact behavior cannot be recommended. A cleaner approach
-is to use options starting with - or @BOP{-} only for the interpreter
+is to use options starting with - or @code{-} only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
 which contain no whitespace:
@@ -1036,9 +1040,9 @@ The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
 vector:
 
-@verbatim
+@example
     /usr/local/bin/apl --id 1010
-@end verbatim
+@end example
 
 @subsubsection ⎕ENV
 
@@ -1058,9 +1062,9 @@ whose argument is a filter for the name(s) of the variable(s) to be retrieved.
 ⎕ENV B returns all environment variables whose name starts with B.
 If ⍴B is 0, like:
 
-@verbatim
-    ⎕ENV ''
-@end verbatim
+@example
+      ⎕ENV ''
+@end example
 
 then @b{all} environment variables of the process running GNU APL are
 returned.
@@ -1085,24 +1089,24 @@ before the GNU APL interpreter is started.
 If you need to create a longer static text, like the body of a web page,
 then you would normally construct it in APL like this:
 
-@verbatim
-BODY ← ⊂ 'First line'
-BODY ← BODY , ⊂ 'Second line'
-BODY ← BODY , ⊂ 'Third line'
+@example
+      BODY ← ⊂ 'First line'
+      BODY ← BODY , ⊂ 'Second line'
+      BODY ← BODY , ⊂ 'Third line'
    ...
-@end verbatim
+@end example
 
 The above is obviously not very handy for longer texts. Instead you may
 write the following in a GNU APL script:
 
-@verbatim
-BODY←⎕INP 'END-OF-⎕INP'
+@example
+      BODY←⎕INP 'END-OF-⎕INP'
 First line
 Second line
 Third line
    ...
 END-OF-⎕INP
-@end verbatim
+@end example
 
 This works like "Here documents" in @b{bash}. The right argument of ⎕INP is
 the end of text marker.
@@ -1111,25 +1115,25 @@ the end of text marker.
 sequence from text to APL and back to the text, similar to PHP scripts.
 For example:
 
-@verbatim
-Z←'<?apl' '?>' ⎕INP 'END-OF-⎕INP'
+@example
+      Z←'<?apl' '?>' ⎕INP 'END-OF-⎕INP'
 First line
 Time is now: <?apl ⍕⎕TS ?>
 Third line
 ...
 END-OF-⎕INP
-@end verbatim
+@end example
 
 This creates a mainly static text with a small dynamic plug-in computed by
 APL:
 
-@verbatim
+@example
       ⊃Z
 First line                       
 Time is now: 2022 8 4 15 15 2 177
 Third line                       
 ...         
-@end verbatim
+@end example
 
 It should be noted that, while ⎕INP simplifies the construction of multi-line
 strings compared to standard APL, it has come of age and these days an even
@@ -1151,8 +1155,9 @@ a scalar if its length = 1. This is sometimes inconvenient and therefore
 double-quoted strings are more consistent in always being vectors regardless
 of their length. In other words, 'A' is a scalar while "A" is a vector.
 
-@item Double-quoted strings understand the standard C escape sequences
-for control character, such as \n for ASCII line feed, \t for ASCII TAB, etc.
+@item Double-quoted strings understand the standard C escape sequences for
+control characters, such as @b{\n} for ASCII line feed, @b{\t} for ASCII TAB,
+etc.
 
 @end itemize
 
@@ -1160,10 +1165,11 @@ for control character, such as \n for ASCII line feed, \t for ASCII TAB, etc.
 @node Subsection 2.1.6
 @subsection Multi-Line Strings
 
-A substantial disadvantage of ⎕INP is that it only works in immediate
+A substantial disadvantage of @b{⎕INP} is that it only works in immediate
 execution mode (and consequently also in .apl scripts), but not the bodies of
 defined functions. Multi-line strings fill this gap for string literals that
-span several lines of text @b{inside} the body of defined functions.
+span several lines of text @b{inside} the body of defined functions (as well as
+in immediate execution mode and in scripts).
 Multi-Line strings have become more and more advanced (and elegant) over time.
 For this reason they currently come in different flavors (of which the older
 ones will eventually disappear).
@@ -1174,31 +1180,32 @@ Old-style multi-line strings were the first attempt to provide long strings
 for defined functions. The idea for the old-style multi-line strings was
 adopted from shells like @b{bash} where, for example,
 
-@verbatim
+@example
 echo "Line1
    Line2"
-@end verbatim
+@end example
 
 prints:
 
-@verbatim
+@example
 Line1
    Line2
-@end verbatim
+@end example
 
-In simple terms this means that as long as the number of " characters is
-odd, the string remains open until the closing " is found (which makes
+In simple terms this means that as long as the number of @b{"} characters is
+odd, the string remains open until the closing @b{"} is found (which makes
 the number even again).
 
 Old-style multi-line strings are not allowed in immediate execution mode
 because they could easily be entered by mistake (by simply forgetting the
-terminating " or ' of a standard string) and that would have obscured the
-familiar behavior of immediate execution mode. In function definition
-mode, the total number of function lines is known and it can therefore
-be checked if a multi-line string inside the function is properly terminated.
-Immediate execution mode, however, is open-ended and therefore a forgotten
-closing " can lead to a fatal misinterpretation of (intended) string
-content as (unintended) APL code, with lots of nonsense error messages.
+terminating @b{"}  or @b{'}  of a standard string) and that would have
+obscured the familiar behavior of immediate execution mode. In function
+definition mode, the total number of function lines is known and it is
+therefore possible to check if a multi-line string inside the function
+is properly terminated. Immediate execution mode, however, is open-ended
+and therefore a forgotten closing @b{"} can lead to a fatal misinterpretation
+of (intended) string content as (unintended) APL code, with lots of
+nonsense error messages.
 
 Like in @b{bash} and also other shells, an old-style multi-line string starts
 at the last " on a line of a defined function that has an
@@ -1209,13 +1216,12 @@ APL value containing one nested string per line involved.
 In immediate execution mode an old-style multi-line string yields, like
 in standard APL:
 
-@verbatim
+@example
 No string end found+
-@end verbatim
+@end example
 
 For example:
-@verbatim
-
+@example
 ∇Z←FOO
  Z←"ABC
  DEF
@@ -1228,12 +1234,12 @@ For example:
 ┃┃ABC┃ ┃ DEF┃ ┃ GHIJK┃┃
 ┃┗━━━┛ ┗━━━━┛ ┗━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 If the first string is empty then the nested value starts with an empty
 string, but completely empty lines in defined functions are ignored:
 
-@verbatim
+@example
 ∇Z←FOO
  Z←"
 ABC
@@ -1248,7 +1254,7 @@ ABC
 ┃┃ ┃ ┃ABC┃ ┃ DEF┃ ┃  GHIJK┃┃
 ┃┗━┛ ┗━━━┛ ┗━━━━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 @subsubsection New-style Multi-Line Strings
 
@@ -1285,7 +1291,7 @@ else string text.
 @end itemize
 
 Example:
-@verbatim
+@example
  4 ⎕CR """
 ABC
  DEF
@@ -1297,7 +1303,7 @@ ABC
 ┃┃ABC┃ ┃ DEF┃ ┃ ┃ ┃  GHIJK┃┃
 ┃┗━━━┛ ┗━━━━┛ ┗━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 When entering new-style multi-line strings, the prompt is prefixed by → to
 indicate that a Multi-Line String is being entered.
@@ -1326,7 +1332,7 @@ which leads to the problems above.
 For this reason, GNU APL now also allows inline and multi-line strings
 like, for example:
 
-@verbatim
+@example
       «Hello world»
 Hello world
 
@@ -1351,17 +1357,16 @@ Hello world
 ││Line 1│ │  Line 2││
 │└──────┘ └────────┘│
 └ϵ──────────────────┘
-
-@end verbatim
+@end example
 
 Another advantage of ««« ... »»» over """ ... """ is that a decent text
 editor (read: vi/vim) may jump back and forth between the corresponding
 opening « and closing » with a single key stroke (character % in vi/vim).
 For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
 
-@verbatim
+@example
 set matchpairs+=«:»
-@end verbatim
+@end example
 
 @c ............................................................................
 @node Subsection 2.1.7
@@ -1373,7 +1378,7 @@ is indicated by a + at the end of the error message. The additional
 information is automatically discarded when the next non-empty line
 is entered. For example:
 
-@verbatim
+@example
       "ABC"[4]
 INDEX ERROR+
       'ABC'[4]
@@ -1384,8 +1389,7 @@ min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
 
       )MORE
 NO )MORE ERROR INFO
-
-@end verbatim
+@end example
 
 This is rather useful in purely interactive mode where the user can issue
 the )MORE command directly after an APL error has occurred to help figure
@@ -1403,7 +1407,7 @@ i.e. where to place the )MORE command in the script.
 To make the )MORE command more useful for scripts, in GNU APL it can be
 augmented with an optional argument AUTO like this:
 
-@verbatim
+@example
       )MORE AUTO ON
 Automatic )MORE is now: ON
       
@@ -1412,7 +1416,7 @@ min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
 INDEX ERROR+
       'ABC'[4]
       ^    ^
-@end verbatim
+@end example
 
 If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
 )MORE information is displayed before the standard 3-line APL error message.
@@ -1429,54 +1433,51 @@ options for the script.
 
 Consider the following simple script called SCRIPT.apl in directory workspaces:
 
-@verbatim
+@example
 #! /usr/local/bin/apl --script
 
 ⊃⎕ARG   ⍝ show command line options
 )OFF    ⍝ leave the interpreter
-@end verbatim
+@end example
 
 If SCRIPT.apl is redirected to stdin of the APL interpreter:
 
-@verbatim
+@example
  /usr/local/bin/apl --silent <  ../workspaces/SCRIPT.apl
 
  or
 
  /usr/local/bin/apl --silent -f ../workspaces/SCRIPT.apl
-@end verbatim
+@end example
 
 then the first line @option{#! /usr/local/bin/apl --script} of file SCRIPT.apl 
 is merely a comment (GNU APL accepts both the traditional APL character
-⍝ and the character # as start of a comment). The @BOP{-script} option
+⍝ and the character # as start of a comment). The @code{-script} option
 is therefore ignored and the following mix of input and output is
 shown on the screen. The input from the script is indented by the
 usual APL prompt of 6 blanks, while the output of the APL interpreter
 is not indented.
 
-@verbatim
+@example
       #! /usr/local/bin/apl --script
       
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
-
-@end verbatim
+@end example
 
 If we run the same script directly:
 
-@verbatim
+@example
 ../workspaces/SCRIPT.apl
-@end verbatim
+@end example
 
 Then we get:
 
-@verbatim
-
+@example
  /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
+@end example
 
-@end verbatim
-
-The @BOP{-script} implies @BOP{-noCIN} so that the
+The @code{-script} implies @code{-noCIN} so that the
 input lines for the interpreter are no longer echoed to the output.
 This is most likely what you want when writing a script.
 
@@ -1487,36 +1488,32 @@ comes from function execve (see 'man 2 execve').
 
 If we provide an argument, say SCRIPTARG, to SCRIPT.apl:
 
-@verbatim
+@example
 ../workspaces/SCRIPT.apl SCRIPTARG
-@end verbatim
+@end example
 
 then it shows up at the end of ⎕ARG:
 
-@verbatim
-
+@example
  /usr/local/bin/apl --script ../workspaces/SCRIPT.apl SCRIPTARG 
-
-@end verbatim
+@end example
 
 A final note on scripting in GNU APL is that the ∇-editor works slightly
 differently when it is used in a script. If a user edits an APL function
 interactively then an attempt to open an existing function with a full
 header gives a DEFN ERROR:
 
-@verbatim
-
+@example
       ∇Z←FOO B
 [1] ∇
       
-            ∇Z←FOO B
+      ∇Z←FOO B
 DEFN ERROR+
       ∇Z←FOO B
              ^
       )MORE
 attempt to ∇-open existing function with new function header
-
-@end verbatim
+@end example
 
 In contrast to a user who can react to the DEFN ERROR, a script cannot detect
 this situation and would continue to push lines (which were intended to be
@@ -1538,8 +1535,7 @@ with the new one and no DEFN ERROR is raised.
 Defined functions and operators (including lambdas) accept an axis argument.
 For example:
 
-@verbatim
-
+@example
 ∇Z←Average[X] B
  Z←(+/[X]B) ÷ (⍴B)[X]
 ∇
@@ -1549,8 +1545,7 @@ For example:
 
       Average[2] 5 5⍴⍳25
 3 8 13 18 23
-
-@end verbatim
+@end example
 
 Syntactically, the axis is used in the same way as for primitive functions
 and operators.
@@ -1613,7 +1608,7 @@ following.
 @subsection Phase 1: Numerical Axis Argument
 
 In the first phase, the number of functions per function group (at that time
-@b{⎕CR} and @b{⎕FIO} was fairly small. A subfunction of the function group was
+@b{⎕CR} and @b{⎕FIO}) was fairly small. A subfunction of the function group was
 selected as follows:
 
 @itemize
@@ -1626,13 +1621,13 @@ selected as follows:
 
 For example:
 
-@verbatim
+@example
       4 ⎕CR B          ⍝ format B in a "boxed" fashion
       18 ⎕CR B         ⍝ convert APL string B to an UTF8-encoded byte vector
 
       ⎕FIO[3] B        ⍝ fopen file B for reading
       A ⎕FIO[3] B      ⍝ fopen file B with mode A
-@end verbatim
+@end example
 
 In both cases was the subfunction selector an integer scalar.
 
@@ -1644,19 +1639,19 @@ and APL workspace named @b{FILE_IO}. This workspace contains one APL wrapper
 function for each numerical @b{⎕FIO} subfunction selector. These wrappers
 were trivial one-liners like these:
 
-@verbatim
-∇Zh ← As FIO∆fopen Bs
-⍝⍝ fopen(Bs, As) filename Bs
- Zh ← As ⎕FIO[3] Bs
-∇
+@example
+      ∇Zh ← As FIO∆fopen Bs
+      ⍝⍝ fopen(Bs, As) filename Bs
+       Zh ← As ⎕FIO[3] Bs
+      ∇
 
-∇Zh ← FIO∆fopen_ro Bs
-⍝⍝ fopen(Bs, "r") filename Bs
- Zh ← ⎕FIO[3] Bs
-∇
-@end verbatim
+      ∇Zh ← FIO∆fopen_ro Bs
+      ⍝⍝ fopen(Bs, "r") filename Bs
+       Zh ← ⎕FIO[3] Bs
+      ∇
+@end example
 
-APL programs would @b{)COPY}ing the workspace and them use normal defined
+APL programs would @b{)COPY} the workspace and then use normal defined
 functions instead of @b{⎕FIO} with an axis argiment or @b{⎕CR} with a left
 argument.  The development of the @b{FILE_IO} suggested that APL users have
 a preference of names over numbers to select a subfunction.
@@ -1667,13 +1662,13 @@ function that implemented them.
 
 The phase 1 example above would now become the slightly better readable:
 
-@verbatim
-      'style_boxed'_⎕CR B        ⍝ format B in a "boxed" fashion
+@example
+      'style_boxed' ⎕CR B        ⍝ format B in a "boxed" fashion
       'string_to_UTF8' ⎕CR B     ⍝ convert APL string B to UTF8
 
       ⎕FIO['fopen'] B            ⍝ fopen file B for reading
       A ⎕FIO['fopen'] B          ⍝ fopen file B with mode A
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Phase 3: Member Notation
@@ -1682,13 +1677,13 @@ The third phase aims at further improving the readability. It replaces the
 axis argument with a member notation. The phase 1 and 2 examples above would
 now become:
 
-@verbatim
+@example
       ⎕CR.style_boxed B       ⍝ format B in a "boxed" fashion
       ⎕CR.string_to_UTF8 B    ⍝ convert APL string B to UTF8
 
       ⎕FIO.fopen B            ⍝ fopen file B for reading
       A ⎕FIO.fopen B          ⍝ fopen file B with mode A
-@end verbatim
+@end example
 
 @subsection Subfunction Lists
 
@@ -1710,8 +1705,8 @@ Let @b{FOO} be a function group. Then:
 
 The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user's keyboard,
-but can also be a file if APL scripting, the @BOP{f} option,
-or the @BOP{T} option is used.
+but can also be a file if APL scripting, the @code{f} option,
+or the @code{T} option is used.
 
 The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional
@@ -1826,7 +1821,7 @@ context of sorting (i.e. for ⍋ or ⍒). This is because for =, ≠, <, ≤, �
 or > either a RANK ERROR or a LENGTH ERROR is raised if the ranks or shapes
 of A and B do not match:
 
-@verbatim
+@example
       (9 8) < (1 2 3)
 LENGTH ERROR
       9 8<1 2 3
@@ -1834,7 +1829,7 @@ LENGTH ERROR
 
       ⍋(9 8) (1 2 3)
 1 2
-@end verbatim
+@end example
 
 The reason for comparing complex numbers first by their real parts and then
 by their imaginary part and not, for example, first by their magnitude and
@@ -1848,25 +1843,25 @@ vectors) may give unexpected results because shorter strings come before
 longer strings. For example, 'Zoo' comes @b{before} 'Adam' even
 though one might expect the opposite.
 
-@verbatim
+@example
       Z[⍋Z ← 'Adam' 'Zoo']
  Zoo Adam 
 
       Z[⍋Z ← 'Adam' 'Zora']
  Adam Zora
-@end verbatim
+@end example
 
 This pitfall can be avoided by enforcing the same length for all strings
 being compared or sorted. A simple way to achieve that is the use of
 @b{⊂[2]⊃} like this (assuming ⎕IO←1):
 
-@verbatim
+@example
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
  Adam Zoo  
 
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zora']
  Adam Zora
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -1902,9 +1897,9 @@ limited form.
 
 A statement of the form
 
-@verbatim
-      FUN ← { body_statement } 
-@end verbatim
+@example
+      FUN ← @{ body_statement @} 
+@end example
 
 creates a named lambda. A body_statement can contain variable names ⍺ and ⍵
 as well as function names ⍶ and ⍹ which are replaced by the actual arguments
@@ -1922,18 +1917,18 @@ name for an axis argument.
 
 The way a named lambda is implemented in GNU APL is that the expression
 
-@verbatim
-      FUN ← { body_expression }
-@end verbatim
+@example
+      FUN ← @{ body_expression @}
+@end example
 
 is translated to a two-line function ⎕FX 'lambda_header' 'body_expression'.
 
 For example:
 
-@verbatim
+@example
       )FNS
 
-      SUM ← { ⍺ + ⍵ }
+      SUM ← @{ ⍺ + ⍵ @}
       )FNS
 SUM
       ∇SUM[⎕]∇
@@ -1942,16 +1937,16 @@ DEFN ERROR+
              ^
       )more
 function is a lambda
-@end verbatim
+@end example
 
 Even though named lambdas are included in function lists along with other
 user defined functions, they must be listed using ⎕CR 'name':
 
-@verbatim
+@example
       ⎕CR 'SUM'
 λ←⍺ λ1 ⍵
 λ← ⍺ + ⍵ 
-@end verbatim
+@end example
 
 The lambda_header is automatically deduced from the presence or absence
 of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹) in the
@@ -1966,14 +1961,13 @@ as for the header in normal defined functions: they are added at the end
 with semicolons as separators. In the above example one could add local
 variables C and D like this:
 
-@verbatim
-      SUM ← { ⍺ + ⍵ ;C;D }
+@example
+      SUM ← @{ ⍺ + ⍵ ;C;D @}
 
       ⎕CR 'SUM'
 λ←⍺ λ1 ⍵;C;D 
 λ← ⍺ + ⍵     
-
-@end verbatim
+@end example
 
 If a named lambda is created inside a function, then the name of the lambda
 (i.e. the name left of ← @{ ... @}) can be made a local variable of the
@@ -1994,12 +1988,10 @@ An unnamed lambda is an expression inside @{ @} but without assigning it to a
 name. This is often used together with the EACH operator.
 For example:
 
-@verbatim
-
-      { ⍴ , ⍵ } ¨ 'a' 'ab' 'abc'
+@example
+      @{ ⍴ , ⍵ @} ¨ 'a' 'ab' 'abc'
  1  2  3 
-
-@end verbatim
+@end example
 
 Unnamed lambdas are automatically local in scope (similar to labels). They can
 be passed as function arguments to operators. However, unnamed lambdas are NOT
@@ -2056,14 +2048,14 @@ typically one-liners that briefly explain what a function is supposed to do.
 
 For example:
 
-@verbatim
+@example
 ∇Z←A SUM B
  ⍝⍝ Return the sum of A and B          ← ]DOXY comment:  (double ⍝)
  ⍝  A: numeric                         ← "normal" APL comments (single ⍝) ...
  ⍝  B: numeric
  Z←A + B
 ∇
-@end verbatim
+@end example
 
 But please @b{note the following}: in the original @b{doxygen} program
 (for C, C++, or other languages) source code lines may be a mix of code
@@ -2146,7 +2138,7 @@ used, etc.) without the need to prepend every line with ⍝ or #.
 
 For example:
 
-@verbatim
+@example
 #!/usr/local/bin/apl
 
 ⍝ see documentation at the end of this file
@@ -2156,8 +2148,7 @@ For example:
 ]NEXTFILE
 
 This workspace does the following...
-
-@end verbatim
+@end example
 
 
 @c ............................................................................
@@ -2293,13 +2284,13 @@ be enabled via ./configure (see README-2-configure).
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
 lowercase:
 
-@verbatim
+@example
       $2a
 42
 
       $2A
 42
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -2316,9 +2307,9 @@ following.
 A user-defined command ]NEW_COMMAND is created with the debug command
 ]USERCMD like this:
 
-@verbatim
+@example
       ]USERCMD ]NEW_COMMAND APL_FUNCTION [mode]
-@end verbatim
+@end example
 
 APL_FUNCTION is an APL function that will be called when the command is
 entered in immediate execution mode. The entire line entered by the user,
@@ -2333,10 +2324,10 @@ command is created.
 A single user-defined command ]UCMD, or all user-defined commands can
 be deleted like this:
 
-@verbatim
+@example
       ]USERCMD REMOVE ]UCMD
       ]USERCMD REMOVE-ALL
-@end verbatim
+@end example
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.17
@@ -2359,9 +2350,9 @@ The different sub-variables of a structured variable are accessed by the
 names, separated by '.'. In the following we will use uppercase names for
 structured variables and lowercase names for their members. For example:
 
-@verbatim
+@example
       PERSON.address.street
-@end verbatim
+@end example
 
 is a structured variable @b{PERSON}, which has a member @b{address},
 and @b{PERSON.address} is a structured (sub-)variable of PERSON which has
@@ -2378,23 +2369,23 @@ the structured nature of a plain APL value can be restored with 38 ⎕CR.
 A structured variable is created by assigning a value to one of its members.
 For example:
 
-@verbatim
+@example
       PERSON.firstname ← 'Jane' ⍝ create variable PERSON with member 'firstname'
       PERSON.lastname  ← 'Doe'  ⍝ add a second member 'lastname' to PERSON
-@end verbatim
+@end example
 
 The depth of a newly created member can be more than one. In this case the
 intermediate members are created automatically. For example:
 
-@verbatim
+@example
       PERSON.address.street ← '42 Main Street' ⍝ implicitly creates PERSON.address
-@end verbatim
+@end example
 
 Empty structured variables can be created with @b{38 ⎕CR}:
 
-@verbatim
+@example
       EMPTY ← 38 ⎕CR CAPACITY ← 32
-@end verbatim
+@end example
 
 Note: A structured variable is automatically expanded when new members are
 added to it. From time to time this expansion exceeds the space allocated
@@ -2409,16 +2400,16 @@ with all its members. In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with @b{⎕EX} or
 @b{)ERASE}:
 
-@verbatim
+@example
       )ERASE PERSON.address      ⍝ OK, PERSON.address exists
       )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
 NOT ERASED: PERSON.address
-@end verbatim
+@end example
 
 After having been created, the members of a structured variable can be
 referenced and overwritten just like normal variables:
 
-@verbatim
+@example
       PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
       PERSON.address.street   ⍝ reference member address.street of PERSON
 42 Main Street
@@ -2426,7 +2417,7 @@ referenced and overwritten just like normal variables:
       PERSON.address.street ←  '44 Main Street'   ⍝ overwrite address.street
       PERSON.address.street
 44 Main Street
-@end verbatim
+@end example
 
 The members of a structured variable form a tree of (sub-) variables, similar
 to the file system on a computer. This tree has:
@@ -2444,7 +2435,7 @@ directly after a new empty variable was created with @b{38 ⎕CR}.
 Due to their tree-like structure, structured variables need to be printed
 somewhat differently than normal APL variables. For example:
 
-@verbatim
+@example
       PERSON
 .firstname: ┌→───┐
             │Jane│
@@ -2458,13 +2449,13 @@ somewhat differently than normal APL variables. For example:
 .address.street: ┌→─────────────┐
                  │44 Main Street│
                  └──────────────┘
-@end verbatim
+@end example
 
 Only the leafs of a deeply structured variable can have values and, as a
 precaution, assigning a value to a non-leaf (including the root) raises
 a DOMAIN ERROR:
 
-@verbatim
+@example
       B.b.c←'leaf-Abc'        ⍝ OK, since B.b.c will be a leaf
       B.b←42                  ⍝ will fail since B.b is not a leaf
 DOMAIN ERROR+
@@ -2478,19 +2469,19 @@ member access: cannot override non-leaf member A.b
       B.b ← 'leaf-Ab'         ⍝ now OK, since B.b will now become a (new) leaf
 
       )SIC
-@end verbatim
+@end example
 
 On the other hand, assigning a structured variable to the leaf of another
 structured variable is valid and concatenates the members:
 
-@verbatim
+@example
       )ERASE A
       A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.c
       C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
       A.b.c ← C               ⍝ overwrite leaf A.b.c of A
       A.b.c.d.e
 leaf-cde
-@end verbatim
+@end example
 
 The file @b{src/testcases/Structured_variable.tc} contains the examples
 above (and more) 
@@ -2521,7 +2512,7 @@ also be indexed with a string. That can be useful if keys are being computed
 or passed as function arguments. However, unlike indexing of APL arrays with
 numbers, only one key per (bracket-) index is permitted.
 
-@verbatim
+@example
    A.key ← 42
    A.key
 42
@@ -2533,13 +2524,12 @@ numbers, only one key per (bracket-) index is permitted.
    A['key' 'key']   ⍝ not allowed even though 'key' is a valid member
 DOMAIN ERROR
       D['key' 'key']
-
-@end verbatim
+@end example
 
 Strings that do not follow the rules for variable names can be used with
 bracket index, but not with the .member syntax:
 
-@verbatim
+@example
       ASSOC ← 38 ⎕CR 8
       KEY←'key.dot'   ⍝ works, but avoid such keys
       ASSOC[KEY]←42
@@ -2560,7 +2550,7 @@ member access: structure ASSOC has no member key
 44
       ASSOC['key.dot']   ⍝ works: one key containing '.'
 43
-@end verbatim
+@end example
 
 This is because ASSOC.key.dot above is being tokenized by the APL parser into
 [ASSOC] [key] [dot], while 'key.dot' is a single key. The example above (with
@@ -2571,7 +2561,7 @@ Even though (one) bracket index can only access the top-level members of a
 structured variable, repeated bracket index (or dyadic PICK) can be used to
 access deeper nesting levels:
 
-@verbatim
+@example
       D.b.c←42
       D['b.c']   ⍝ will fail
 INDEX ERROR+
@@ -2589,8 +2579,7 @@ member access: member b.c was not found. The valid members are:
       'b' 'c' ⊃ D   ⍝ fails: 'b' 'c' is 'bc'
       "b" "c" ⊃ D   ⍝ works
 42
-
-@end verbatim
+@end example
 
 In the above examples each bracket index (or each element of PICK) discards the
 current top-level structure and descends into the structured sub-variable of
@@ -2617,11 +2606,11 @@ reorganization of the variable, but to create a large enough variable
 If that is not possible (because the (performance-) problem has occurred after
 the variable was created, then one can manually increase the capacity like this:
 
-@verbatim
+@example
       TMP ← 39 ⎕CR ASSOC_ARRAY   ⍝ save ASSOC_ARRAY as normal APL array
       ⊣ ⎕EX 'ASSOC_ARRAY'        ⍝ erase it so that it can be assigned
       ASSOC_ARRAY ← 38 ⎕CR TMP   ⍝ new associative array with ≥ twice the size
-@end verbatim
+@end example
 
 As a rule of thumb, associative arrays will be fast as long their capacity is
 more than twice the number of their members. The expression ASSOC_ARRAY[;1]
@@ -2674,8 +2663,7 @@ the shape of X, but one-element A or B are scalar extended to the shape of X.
 @end itemize
 
 Example:
-@verbatim
-
+@example
       A←2 3⍴'abcdef'
       B←2 3⍴⍳6
       X←2 3⍴0 1 0 1 0 1
@@ -2690,7 +2678,7 @@ a*c
   '*' ⊢[X] B
 * 2 *
 4 * 6
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -2724,7 +2712,7 @@ arguments,
 
 For example, using  5 ⎕CR (4⍴256)⊤X to display X in hex:
 
-@verbatim
+@example
       5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
 ABBADEAD
       5 ⎕CR (4⍴256)⊤   B←$00FF00FF
@@ -2732,13 +2720,12 @@ ABBADEAD
 
       5 ⎕CR (4⍴256)⊤   2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
 00BA00AD
-
-@end verbatim
+@end example
 
 With the bit-wise @b{And} (⊤∧) the same can be achieved in a simpler fashion
 and far more efficiently:
 
-@verbatim
+@example
       ⍝ Traditional AND
       5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
 ABBADEAD
@@ -2748,7 +2735,7 @@ ABBADEAD
       ⍝ bit-wise AND
       5 ⎕CR (4⍴256)⊤   A ⊤∧ B
 00BA00AD
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
@@ -2756,14 +2743,14 @@ ABBADEAD
 The dyadic forms of @b{⊤∧}, @b{⊤∨}, @b{⊤⍲}, and @b{⊤⍱} are simply the bit-wise
 variants of their Boolean counterparts:
 
-@verbatim
+@example
       A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
       A ⊤∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
       A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
       A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
       A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
       A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ aka. NXOR or XNOR
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Monadic ⊤∨ and ⊤⍱
@@ -2773,10 +2760,10 @@ and @b{⊤⍱} do.
 Formally monadic @b{⊤∨} and @b{⊤⍱} are dyadic @b{⊤∨} and @b{⊤⍱} with
 a left argument of 0:
 
-@verbatim
+@example
       ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
-@end verbatim
+@end example
 
 Even though Or-ing a Boolean vector with 0 itself has no effect, the
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
@@ -2791,7 +2778,7 @@ Monadic @b{⊤⍱ B} is the bit-wise @b{Not} function of its argument:
 
 Monadic @b{⊤∨ B} converts near-integer values B into true integers:
 
-@verbatim
+@example
       26 ⎕CR    1            ⍝ integer
 16
       26 ⎕CR    1.1          ⍝ real
@@ -2802,16 +2789,16 @@ Monadic @b{⊤∨ B} converts near-integer values B into true integers:
 32
       26 ⎕CR    ⊤∨ 1.1÷1.1   ⍝ integer
 16
-@end verbatim
+@end example
 
 That also works for complex numbers with a near-zero imaginary part:
 
-@verbatim
+@example
       26 ⎕CR    1.1J0÷1.1      ⍝ real
 32
       26 ⎕CR    ⊤∨ 1.1J0÷1.1      ⍝ integer
 16
-@end verbatim
+@end example
 
 As a matter of fact, @b{⊤∨} works for all near-Gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since Gaussian and non-Gaussian
@@ -2862,7 +2849,7 @@ as well. This can be useful for masking purposes such as extracting the lower
 
 The characters involved are treated as 32 bit quantities:
 
-@verbatim
+@example
       5⎕CR 'A'
 41
       5⎕CR ⊤⍱'A'            ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
@@ -2872,7 +2859,7 @@ BE
 255 255 255 190
       256 256 256 256⊤$FFFFFFBE
 255 255 255 190
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -2946,8 +2933,7 @@ Let ⍴B=(M, N).
 * @b{B = Q +.× M N↑R}.
 
 Example 1 (real B)
-@verbatim
-
+@example
       ⊢B←3 3⍴ 1 1 3 2 4 2 4 8 7
 1 1 3
 2 4 2
@@ -2987,13 +2973,11 @@ Example 1 (real B)
 ┃  .0000 1.0000  .0000┃
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
-
-@end verbatim
+@end example
 
 Example 2 (complex over-determined B)
 
-@verbatim
-
+@example
       B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
 
       (Q R Ri)←⌹[⎕CT]B
@@ -3021,8 +3005,7 @@ Example 2 (complex over-determined B)
 3J1  2J3 4J5   1J3
 1J4  9J9 9J6   2J7
 2J10 7J6 9J8  10J10
-
-@end verbatim
+@end example
 
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
@@ -3147,7 +3130,7 @@ Since @b{B = Q∘T}, it follows that @b{B⁻¹ = T⁻¹∘Q⁻¹ = Ti∘⍉Q}.
 
 Indeed:
 
-@verbatim
+@example
       B←?5 5⍴100   ⍝ a random matrix B
       (Q T Ti)←⌹[2]B
       (⌹B) = Ti∘⍉Q
@@ -3156,7 +3139,7 @@ Indeed:
 1 1 1 1 1
 1 1 1 1 1
 1 1 1 1 1
-@end verbatim
+@end example
 
 The computation of @b{⍉Q} and @b{Ti∘⍉Q} is considerably faster than the
 computation of @b{⌹B} if @b{B} is large.
@@ -3172,9 +3155,9 @@ monadic form.
 Calling ⎕CR monadically without an axis and with an empty right argument
 shows a list of all functions provided by ⎕CR:
 
-@verbatim
+@example
       ⎕CR ''
-@end verbatim
+@end example
 
 Say a @b{byte vector} is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
@@ -3245,11 +3228,11 @@ the first 4 bytes of Z are the tag in big endian byte order, the next 4 bytes
 are the length of B except the tag, and the rest of Z is B except the tag.
 
 Example:
-@verbatim
+@example
       Tag←55   ⍝ hex 37
       5 ⎕CR 33 ⎕CR Tag,'Value'
 000000370000000556616C7565
-@end verbatim
+@end example
 
 A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and 34 ⎕CR
 is the transmission of a tagged byte vector over e.g a TCP socket:
@@ -3259,10 +3242,10 @@ is the transmission of a tagged byte vector over e.g a TCP socket:
   T,Data →→→ 33 ⎕CR T,Data   →→→TCP connection→→→   34 ⎕CR T,Data →→→ T,Data
 
 Example:
-@verbatim
+@example
       34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
 55 Value
-@end verbatim
+@end example
 
 The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
 receiver can be sent back-to-back over a TCP connection or similar in such
@@ -3325,7 +3308,7 @@ The GNU APL package contains a shared library file_io.so that contains the
 implementation of a native function for reading and writing files (fopen(),
 fclose(), ...), For example:
 
-@verbatim
+@example
       ⍝ fix native function in lib_file_io.so as FILE_IO
       ⍝
       'lib_file_io.so' ⎕FX 'FILE_IO'
@@ -3353,7 +3336,7 @@ FILE_IO
    Zh ← As FUN[ 3] Bs    fopen(Bs, As) filename Bs mode As
    Zh ←    FUN[ 3] Bs    fopen(Bs, "r") filename Bs
       ...
-@end verbatim
+@end example
 
 Recent versions of GNU APL have replaced the native FILE_IO function above by
 the system function ⎕FIO. ⎕FIO need not be ⎕FX'ed and is otherwise backward
@@ -3484,12 +3467,12 @@ If all that sounds weird and useless, consider the following APL program
 for finding all solutions of the 8 Queens problem on a chess board (which
 probably every programmer has programmed at some point in time):
 
-@verbatim
+@example
       RC←8↑'1' ◊ D←15↑¯8↑'2'   ⍝ helpers for constructing Q8
       ⍝     rows   cols   diag1    diag2
-      Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
+      Q8←⊃@{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO@} ¨ ⍳64
       Z←¯1 ⎕DLX Q8
-      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, 3, and 92
+      @{⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)@} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, 3, and 92
  A1 B5 C8 D6 G2 E3 F7 H4 
  A1 B6 C8 D3 E7 F4 G2 H5 
  A1 B7 C4 E8 D6 G5 F2 H3 
@@ -3504,8 +3487,7 @@ Q + + + + + + +
  + + + + + + Q + 
  + Q + + + + + + 
  + + + Q + + + + 
-
-@end verbatim
+@end example
 
 Obviously Z contains solutions for the 8 Queens problem; the total number of
 solutions is well known to be 92 and we showed only the first three and the
@@ -3524,7 +3506,7 @@ then we would get the solutions of the 8 tower problem. However, we continue
 and add 15 more constraints for each of the two diagonals. The resulting
 constraint matrix Q8 is this:
 
-@verbatim
+@example
       Q8
 
 1       1              2                     2
@@ -3591,13 +3573,12 @@ constraint matrix Q8 is this:
        1     1       2           2            
        1      1       2         2             
        1       1       2       2              
-@end verbatim
+@end example
 
 To see what, for example, the first solution looks like and how it relates
 to the constraints matrix Q8:
 
-@verbatim
-
+@example
       ⍝ the rows in Q8 of the first solution
       ⍝
       Z[1]
@@ -3605,7 +3586,7 @@ to the constraints matrix Q8:
 
       ⍝ the first solution translated back into the problem domain
       ⍝
-      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1]
+      @{⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)@} ¨ ⊃Z[1]
  A1 B6 C8 D3 E7 F4 G2 H5 
 
       ⍝ the constraints of the rows of the first solution
@@ -3625,8 +3606,7 @@ to the constraints matrix Q8:
       +⌿ ' '≠ Q8[⊃Z[1];] 
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
       1 0 0 0 0 1
-
-@end verbatim
+@end example
 
 And that's it: call ⎕DLX to get the solution(s). In general all problems that
 can be solved by ⎕DLX contain 3 steps:
@@ -3667,7 +3647,7 @@ For example, ⎕FIO[3] corresponds to fopen() and 'man fopen' explains what fope
 Calling ⎕FIO monadically without an axis and with an empty right argument
 shows a list of all functions provided by ⎕FIO:
 
-@verbatim
+@example
       ⎕FIO ''
    Functions provided by ⎕FIO...
 
@@ -3770,8 +3750,7 @@ Benchmarking functions:
         Ai ⎕FIO[202] Bs    set monadic parallel threshold for primitive Bs
            ⎕FIO[203] Bs    get dyadic parallel threshold for primitive Bs
         Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs
-
-@end verbatim
+@end example
 
 A new feature of ⎕FIO (which is not available with the native function FILE_IO)
 is ⎕FIO[49]. ⎕FIO[49] is a monadic operator which takes a monadic conversion
@@ -3944,7 +3923,7 @@ A ⎕MAP B also accepts a vector instead of a N×2 matrix:
 
 Examples:
 
-@verbatim
+@example
       ⍝ the map A
       ⊢A←5 2⍴'eEwWaAzZ92'
 eE    ⍝ map 'e' → 'E'
@@ -3964,8 +3943,7 @@ HAlloWEEn
       A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
-
-@end verbatim
+@end example
 
 NOTES:
 @itemize @bullet
@@ -3999,7 +3977,7 @@ sub-values of B (though never of A). This can be achieved by enclosing A as
 shown in the examples below.
 @end itemize
 
-@verbatim
+@example
       A←5 2⍴'eEwWaAzZ92'
       B←'Hal' 'low' 'een'   ⍝ nested B
       4 ⎕CR A ⎕MAP B        ⍝ non-recursive (none of the keys in A[;1] matches)
@@ -4015,7 +3993,7 @@ shown in the examples below.
 ┃┃HAl┃ ┃loW┃ ┃EEn┃┃
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -4029,7 +4007,7 @@ statistical operations such as covariance, eigensystems, and so on, along
 with random number generation in several statistical distributions. Particular
 operations are selected through the use of the axis specifier @b{x}:
 
-@verbatim
+@example
             ⎕MX[1] B       (monadic) Determinant
         (A) ⎕MX[2] B       (nomadic) Cross product
           A ⎕MX[3] B       (dyadic)  Vector angle
@@ -4044,7 +4022,7 @@ operations are selected through the use of the axis specifier @b{x}:
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
             ⎕MX[14] B      (monadic) Set RNG seed
-@end verbatim
+@end example
 
 (These may by shown by entering ⎕MX '' or ⎕MX[0]0 on the APL command line.)
 In the function list above, @b{A} indicates a mandatory left argument,
@@ -4058,11 +4036,10 @@ The determinant operation, ⎕MX[1], is monadic and is valid only for
 numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑⍴B)
 (i.e. a square matrix). For Example:
 
-@verbatim
+@example
       mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
 ¯164J76
-
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Cross Product
@@ -4072,14 +4049,14 @@ requires a numeric argument (real or complex) where ⍴⍴B = 2 and
 (↑⍴B)+1 = (1↓⍴B), (i.e. a matrix of N-1 rows of length-N vectors).
 For Example:
 
-@verbatim
+@example
       ⊢B←3 4⍴ 1 2 3j6 4 5 6 7 8 9 10 11 12
 1  2  3J6  4
 5  6  7    8
 9 10 11   12
       ⎕MX[2] B
 0J48 0J¯72 0 0J24
-@end verbatim
+@end example
 
 For reasons I'm not enough of a mathematician to understand, cross
 products are only valid in 3-space and 7-space, so the only valid monadic
@@ -4093,10 +4070,10 @@ appropriate method to compute them.
 In dyadic form @b{A ⎕MX[2] B}, cross-product requires left and right
 arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 
-@verbatim
+@example
       1 2 3j6 ⎕MX[2] 4 5 6
 ¯3J¯30 6J24 ¯3
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Vector Angle
@@ -4104,10 +4081,10 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 The vector angle operation ⎕MX[3] is dyadic and returns the angle between
 two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B:
 
-@verbatim
+@example
       (⍳8) ⎕MX[3] 4j4+⍳8
 0.2515670406J0.09930859532
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Eigenvector
@@ -4115,7 +4092,7 @@ two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A 
 The eigenvector operation, ⎕MX[4], is monadic and returns the complex
 eigenvectors of real non-symetric square matrices:
 
-@verbatim
+@example
       B
 ¯1  1 ¯1 1
 ¯8  4 ¯2 1
@@ -4127,18 +4104,18 @@ eigenvectors of real non-symetric square matrices:
   0.04308J0.009687  ¯0.07091J0.1389   0.5166J¯0.01601  0.8396J0.04139
   0.04308J¯0.009687 ¯0.07091J¯0.1389  0.5166J0.01601   0.8396J¯0.04139
  ¯0.1449             0.3566           0.9194           0.08118
-@end verbatim
+@end example
 
 where each row represents an eigenvector:
 
-@verbatim
+@example
       E←⎕MX[4] B
       E[⎕IO;]                   ⍝ first vector
 0.09988 0.1113 ¯0.2925 ¯0.9445
       E[⎕IO+1;]                 ⍝ second vector
 0.04308J0.009687 ¯0.07091J0.1389 0.5166J¯0.01601 0.8396J0.04139
       etc.
-@end verbatim
+@end example
 
 The eigenvalues are computed concurrently and the eignenvector matrix
 is sorted according to the descending magnitude of the corresponding
@@ -4151,24 +4128,24 @@ The eigenvalue operation, ⎕MX[5], is also monadic with an argument of
 the same shape as that of the argument of the eigenvector operation. It
 returns a sorted complex vector of eigenvalues of the matrix argument:
 
-@verbatim
+@example
       ⊢F←⎕MX[5] B
 ¯6.414 5.546J3.085 5.546J¯3.085 2.323
-@end verbatim
+@end example
 
 The order of eigen vectors, @b{E} from above, is related to the order of
 the eigenvalues, @b{F}, by the relationship:
 
-@verbatim
+@example
              E[k;] ⬄ F[k]
-@end verbatim
+@end example
 
 (Note that, from the above example:
 
-@verbatim
+@example
       |F
 6.41391 6.346285607 6.346285607 2.3228
-@end verbatim
+@end example
 
 the order of the magnitude of the elements is descending, making the
 initial eigenvector, @b{E[⎕IO;]}, the dominant eigenvector and each
@@ -4176,7 +4153,7 @@ successive eigenvector successively less significant.)
 
 Accordingly:
 
-@verbatim
+@example
       4 ⎕CR (⊂⍉(1,⍴F)⍴F),(⊂E)
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┃
@@ -4187,7 +4164,7 @@ Accordingly:
 ┃┗━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛┃
 ┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
    Values            Vectors
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Ident
@@ -4195,13 +4172,13 @@ Accordingly:
 The monadic ident operation, ⎕MX[6], takes a scalar real integer argument
 and returns a square identity matrix of that size:
 
-@verbatim
+@example
       ⎕MX[6] 4  
 1 0 0 0
 0 1 0 0
 0 0 1 0
 0 0 0 1
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Rotation
@@ -4209,11 +4186,11 @@ and returns a square identity matrix of that size:
 The rotation operation, ⎕MX[7], is monadic and takes a real or complex
 scalar angle and returns a 2-space rotation matrix:
 
-@verbatim
+@example
       ⎕MX[7] ○30÷180
 0.866 ¯0.5
 0.5    0.866
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Homogeneous transform
@@ -4223,13 +4200,13 @@ a 3-space displacement vector and, as its right argument, a 3-space
 elemental rotation (i.e., independent rotations around the X, Y, and Z axes
 respectively) and returns the corresponding homogeneous matrix:
 
-@verbatim
+@example
       1 2 3 ⎕MX[8] ○(30 45 60)÷180
  0.6124 0.2803  0.7392 0
  0.3536 0.7392 ¯0.5732 0
 ¯0.7071 0.6124  0.3536 0
  1      2       3      1
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Norm
@@ -4238,7 +4215,7 @@ The monadic norm operation, ⎕MX[9], takes a real or complex non-scalar
 numeric argument and returns a result of the same shape such that the sum
 of the squares of the elements equals 1:
 
-@verbatim
+@example
       ⎕PP←10
       ⎕MX[9] 1 2 3 4
 0.1825741858 0.3651483717 0.5477225575 0.7302967433
@@ -4257,7 +4234,7 @@ of the squares of the elements equals 1:
 0.4200840252 0.4900980294 0.5601120336
       +/,(⎕MX[9] B)*2
 1
-@end verbatim
+@end example
 
 If the magnitude of the argument is zero, the operation returns an all-zero
 result with the same shape as the argument.
@@ -4292,7 +4269,7 @@ argument is specified, it must be a scalar integer and the operation
 returns a random vector of that length. If a mean is applicable to a
 given distribution, it is set to 0.
 
-@verbatim
+@example
       ⎕MX[10] 2
 ¯1.0504575511
       ⎕MX[10] 2
@@ -4302,7 +4279,7 @@ given distribution, it is set to 0.
       ⎕PP←4
       3 ⎕MX[10] 1j1
 ¯1.134J¯1.453 1.111J¯0.1916 ¯1.106J¯0.9383
-@end verbatim
+@end example
 
 @image{MX_distributions}
 
@@ -4312,20 +4289,20 @@ Student T distribution. See Histograms below.)
 
 An initial seed may be specified with
 
-@verbatim
+@example
         ⎕MX[14] <seed>
-@end verbatim
+@end example
 
 where <seed> is a single integer. This allows repeatable random sequences:
 
-@verbatim
+@example
       ⊣⎕MX[14] 3
       4 ⎕MX[10] 1
 ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
       ⊣⎕MX[14] 3
       4 ⎕MX[10] 1
 ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Covariance
@@ -4336,7 +4313,7 @@ variable, computes the covariance of each sample set with respect to
 every other sample set, and presents the covariances as a matrix. For
 example:
 
-@verbatim
+@example
       ⊢B←3 4⍴?12⍴10
 5 8  1 9
 7 6  2 9
@@ -4346,25 +4323,25 @@ example:
 12.91666667   9.333333333 ¯9.25
  9.333333333  8.666666667 ¯7.333333333
 ¯9.25        ¯7.333333333  6.916666667
-@end verbatim
+@end example
 
 In dyadic form, it computes the covariance of the argument vectors:
 
-@verbatim
+@example
       1 2j6 3 4 ⎕MX[11] 4 3 2j5 1
 ¯1.666666667J¯2.5
-@end verbatim
+@end example
 
 In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
 
 Sample variance can be computed by supplying the same argument on the
 left and right:
 
-@verbatim
+@example
       A← 6 7 10 13 14 14 18 19 22 24
       A ⎕MX[11] A ⍝ or ⎕MX[11]⍨ A
 36.67777778 
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Histograms
@@ -4377,16 +4354,16 @@ of each bucket is equal to the range of the samples, max - min, divided by
 the number of buckets. If the samples are complex, the imaginary components
 are ignored. As examples:
 
-@verbatim
+@example
       4 ⎕MX[12] (⍳101)-⎕IO
 25 25 25 26
-@end verbatim
+@end example
 
 The distribution curves above were the result of expressions like:
 
-@verbatim
+@example
       200 ⎕MX[12] 200000 ⎕MX[10 0] 1
-@end verbatim
+@end example
 
 I.e. a 200-bucket histogram of a 200 thousand-member vector of 
 normally distributed samples with a standard deviation of 1.
@@ -4400,17 +4377,17 @@ string containing the file name to be created or, if the name starts
 with a ``>'', appended to. The right argument may be a scalar, a
 vector, a matrix, or a string. For example:
 
-@verbatim
+@example
       "samples.txt" ⎕MX[13] 34
       ">samples.txt" ⎕MX[13] 3 4
       ">samples.txt" ⎕MX[13] 3 4⍴⍳12
       ">samples.txt" ⎕MX[13] "example line"
       ">samples.txt" ⎕MX[13] "example\nline"
-@end verbatim
+@end example
 
 will create a file ``samples.txt'' containing:
 
-@verbatim
+@example
 34
 3 4
  1  2  3  4
@@ -4419,12 +4396,12 @@ will create a file ``samples.txt'' containing:
 example line
 example
 line
-@end verbatim
+@end example
 
 Referring again to the distribution example, the plot data for that
 was created by:
 
-@verbatim
+@example
     ∇
 [0]   distro;v
 [1]   v←⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 0] 1
@@ -4432,13 +4409,13 @@ was created by:
 [3]   v←v,⍉1 200⍴200 ⎕MX[12] 200000 ⎕MX[10 3] 8
 [4]   v ⎕MX[13] 'MX_distribution.data'
     ∇
-@end verbatim
+@end example
 
 which created a 200-by-3 matrix, v, and printed it to the file
 MX_distribution.data, that being the format required for use by
 gnuplot:
 
-@verbatim
+@example
    1   48    0
    0  119    0 
    0  187    0 
@@ -4452,29 +4429,29 @@ gnuplot:
       .
       .
   for 200 lines
-@end verbatim
+@end example
 
 Instead of a filename, @b{⎕MX[13]} also accepts an integer scalar which should
 be a file handle as returned by @b{⎕FIO[3]} aka. @b{⎕FIO.fopen}. This allows
 e.g. for texts before and/or after the value(s) printed by @b{⎕MX[13]}.
 For example:
 
-@verbatim
+@example
       Heading←⎕CR.string_to_UTF8 "Print: 10+⍳10\n\n"   ⍝ a heading
       Value←10 + ⍳10                                   ⍝ a value
       Handle←"w" ⎕FIO.fopen "/tmp/test"                ⍝ open file for writing
       Heading ⎕FIO.fwrite Handle                       ⍝ write the heading
       Handle ⎕MX.print Value                           ⍝ write the value
       ⎕FIO.fclose Handle                               ⍝ close the file
-@end verbatim
+@end example
 
 which produces file @b{/tmp/test} with the following 3-line content:
 
-@verbatim
+@example
 Print: 10+⍳10
 
 11 12 13 14 15 16 17 18 19 20 
-@end verbatim
+@end example
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.33
@@ -4487,7 +4464,7 @@ colors for plot lines, points, and grids, etc.
 
 The general syntax of ⎕PLOT is:
 
-@verbatim
+@example
    ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with specified default attributes overridden
@@ -4497,7 +4474,7 @@ The general syntax of ⎕PLOT is:
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
    ⎕PLOT ¯3      ⍝ close all plot windows
    ⎕PLOT ¯6      ⍝ return all open plot window handles H
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection The Plot Data B
@@ -4519,18 +4496,18 @@ placed (after some scaling) at position (x, y) of the plot. The X-range
 and the Y-range [Ymin ... Ymax] of the plot is determined by the imaginary
 parts of B. That is:
 
-@verbatim
+@example
 Xmin ← ⌊/,9○B    ⍝ smallest real part of B
 Xmax ← ⌈/,9○B    ⍝ largest real part of B
 Ymin ← ⌊/,11○B   ⍝ smallest imaginary part of B
 Ymax ← ⌈/,11○B   ⍝ largest imaginary part of B
-@end verbatim
+@end example
 
 Example (plot a circle (actually: a regular 20-gon)):
 
-@verbatim
+@example
       ⎕PLOT +⌿1 0J1×[1]1 2 ∘.○ (0,⍳2×N) × ○÷N←10
-@end verbatim
+@end example
 
 produces this plot window (only visible in the HTML version of this document;
 in text mode see file @b{doc/PLOT_circle.png}):
@@ -4544,18 +4521,18 @@ placed at position (N, x) of the plot. The X-range is then
 [⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Y@sub{min} ... Y@sub{max}] of the
 plot is determined by the values of B. That is:
 
-@verbatim
+@example
 Xmin ← ⎕IO             ⍝ smallest real part of B
 Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
 Ymin ← ⌊/,B            ⍝ smallest value in B
 Ymax ← ⌈/,B            ⍝ largest value in B
-@end verbatim
+@end example
 
 Example:
 
-@verbatim
+@example
       ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
-@end verbatim
+@end example
 
 produces this plot window (only visible in the HTML version of this document;
 in text mode see file @b{doc/PLOT_zigzag.png}):
@@ -4577,8 +4554,7 @@ the arguments. The list of arguments grows over time and therefore the list
 displayed by @b{⎕PLOT ⍬} may be more up-to-date than this description.
 For example:
 
-@verbatim
-
+@example
    ⎕PLOT Usage:
 
    ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values
@@ -4677,8 +4653,7 @@ point_style-N:      1              (= plot_points: ● )
 point_size-N:       8 pixel        (the outer diameter of the plot points)
 point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
-
-@end verbatim
+@end example
 
 There are 2 kinds of attributes: global attributes that affect the entire
 plot, and local (per-line) attributes that affect one of the plot lines
@@ -4688,14 +4663,14 @@ multiple attributes in one go is to use multi-line strings.
 For example (plot 2 lines of 10 random numbers each, named "random row 1" and
 "random row 2"):
 
-@verbatim
+@example
       Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← """
 legend_name-1: Random Row 1
 legend_name-2: Random Row 2
                     """
       Attributes ⎕PLOT Data
-@end verbatim
+@end example
 
 While specifying the plot attributes A in one place is most convenient for
 a single plot window or when the attributes are read from some external
@@ -4703,11 +4678,11 @@ test file, it is sometimes simpler to specify the plot attributes
 individually. This can be done by using a structured APL variable as left
 argument A:
 
-@verbatim
+@example
 Attributes.legend_name_1 ← "Random Row 1"
 Attributes.legend_name_2 ← "Random Row 2"
       Attributes ⎕PLOT Data
-@end verbatim
+@end example
 
 Note that (for syntactical reasons) the separation between the line attribute
 and the line number is @b{_} (underscore) if @b{A} is specified as
@@ -4721,9 +4696,9 @@ with the name of the file provided as the value of the attribute.
 
 For example:
 
-@verbatim
+@example
       ⊣ ( ⊂ "output_filename: /tmp/bitmap.png" ) ⎕PLOT 1 3 1 4 2
-@end verbatim
+@end example
 
 writes the plot of a a zigzag curve to file @b{/tmp/bitmap.png}.
 
@@ -4740,10 +4715,10 @@ _N suffix.
 
 For example:
 
-@verbatim
+@example
 Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
 Attributes.line_width_2 ← 4   ⍝ except plot line 2: 4 pixels thick
-@end verbatim
+@end example
 
 As of GNU APL 1.9, ⎕PLOT legends may be dragged to other locations within a
 plot window using the usual click and drag GUI technique.
@@ -4784,13 +4759,13 @@ and seconds). For them the X coordinate (time) is, according to the *nix time
 conventions, seconds since midnight 1970. Since this number of seconds is not
 easy to compute in APL, @b{⎕FIO.secs_epoch} comes to rescue:
 
-@verbatim
+@example
 Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
-@end verbatim
+@end example
 
 An example for plotting the quarterly values @b{1 3 4 2} is:
 
-@verbatim
+@example
       )CLEAR
 
 SPQ ← 91×24×60×60                 ⍝ seconds per quarter
@@ -4802,8 +4777,7 @@ Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
 ATT.format_X ← "Q-%Q/%y"          ⍝ X-axis ticks: quarter and year
 
 ATT ⎕PLOT X + 0J1×Y
-
-@end verbatim
+@end example
 
 Sometimes it is more convenient to display the exact X coordinates of the
 plot points along the X axis instead of drawing an X-grid and visually
@@ -5049,7 +5023,7 @@ the GNU APL color model into a PNG file.
 @c ............................................................................
 @subsection APL Examples
 
-@verbatim
+@example
       ⍝ load PNG file image.png
       Image ← ⎕PNG 'image.png'
 
@@ -5075,7 +5049,7 @@ the GNU APL color model into a PNG file.
 
       ⍝ paint all pixels of a monochrome image blue
       RGB_Blue ← 0 0 1 ⍀ Mono
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -5131,16 +5105,16 @@ If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX ERROR when
 cover the most likely use cases of ⎕RE, while the long form gives more control
 over the format of the result produced by ⎕RE:
 
-@verbatim
+@example
 Z ← A ⎕RE B      (short form, no axis)
 Z ← A ⎕RE[X] B   (long form, with axis X)
-@end verbatim
+@end example
 
 The short form is equivalent to the long form with an empty axis:
 
-@verbatim
+@example
     A ⎕RE B   ←→   A ⎕RE[''] B
-@end verbatim
+@end example
 
 It therefore suffices to explain the long form. The long form has 3 different
 arguments A, B, and X.
@@ -5172,9 +5146,9 @@ to libpcre2), or
 In the second case above, the result of ⎕RE is conceptually the same as if
 the EACH operator had been applied to ⎕RE:
 
-@verbatim
+@example
     A ⎕RE B   ←→   A ⎕RE ¨ B
-@end verbatim
+@end example
 
 The libpcre2 first compiles A into an internal representation that improves
 the speed of matching B. As a consequence, if several strings shall be matched
@@ -5244,7 +5218,7 @@ compress (dyadic /).
 
 The following examples may better explain the nature of the output flags:
 
-@verbatim
+@example
       ⍝ return (first) matched string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
@@ -5268,7 +5242,7 @@ The following examples may better explain the nature of the output flags:
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 In the absence of a 'g' flag (see below) the results of output formats
 ⊂ and / are identical; if 'g' is present, however, then they may differ.
@@ -5278,7 +5252,7 @@ In the absence of a 'g' flag (see below) the results of output formats
 The default behavior of ⎕RE is to return only the first match of A in B.
 The 'g' flag causes ⎕RE to return all matches instead. For example:
 
-@verbatim
+@example
       ⍝ return first match as string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
@@ -5330,7 +5304,7 @@ The 'g' flag causes ⎕RE to return all matches instead. For example:
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 Please note that the 'g' flag increments the depth of the result of the output
 formats 'string' and 'position/length', but not of the result of output formats
@@ -5338,9 +5312,9 @@ formats 'string' and 'position/length', but not of the result of output formats
 
 The output formats ⊂ and / are related like this:
 
-@verbatim
+@example
       A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
-@end verbatim
+@end example
 
 
 @subsubsection the ⎕RE error flag E
@@ -5349,7 +5323,7 @@ The default behavior of ⎕RE is to return an empty result if no match of
 the regular expression A is found in B. It is sometimes more convenient to
 raise an error if no match is found. This can be achieved with the E flag:
 
-@verbatim
+@example
        4 ⎕CR 'g..' ⎕RE[''] '__foo___fun____fox'
 ┏⊖┓
 ┃0┃
@@ -5360,18 +5334,17 @@ DOMAIN ERROR+
       ^            ^
       )MORE
 No match
-@end verbatim
+@end example
 
 The 'E' flag has no effect if the 'g' flag is also given because in that case
 it is natural to check the length of the result:
 
-@verbatim
+@example
       4 ⎕CR 'g..' ⎕RE['Eg'] '__foo___fun____fox'
 ┏⊖┓
 ┃0┃
 ┗━┛
-
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Complex Matches
@@ -5403,18 +5376,18 @@ The regular expression A ← 'f(.)(.)' used in the example below is a top-level
 regular expression which contains two 1-character sub-expressions (.).
 The result is therefore the top-level match plus two 1-character sub-matches:
 
-@verbatim
+@example
       4 ⎕CR 'f(.)(.)' ⎕RE[''] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→┓ ┏→┓┃
 ┃┃foo┃ ┃o┃ ┃o┃┃
 ┃┗━━━┛ ┗━┛ ┗━┛┃
 ┗∊━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 Matching all instead of only the first then gives:
 
-@verbatim
+@example
       4 ⎕CR 'f(.)(.)' ⎕RE['g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓┃
@@ -5423,11 +5396,11 @@ Matching all instead of only the first then gives:
 ┃┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃┃
 ┃┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 The same for the pos+len output format:
 
-@verbatim
+@example
       4 ⎕CR 'f(.)(.)' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━┓
 ┃2 3 ┏→━━┓ ┏→━━┓┃
@@ -5442,7 +5415,7 @@ The same for the pos+len output format:
 ┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
 ┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-@end verbatim
+@end example
 
 
 @c ----------------------------------------------------------------------------
@@ -5480,12 +5453,12 @@ followed by one or more calls of monadic ⎕RVAL B.
 The default properties, i.e. the properties used unless they were overridden
 by dyadic A ⎕RVAL B, are:
 
-@verbatim
+@example
 Rank:  0
 Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
 Type:  0 1 0 0 0       (only integer random values)
 Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
-@end verbatim
+@end example
 
 With these default properties, every call of monadic ⎕RVAL B returns an
 integer scalar.
@@ -5532,16 +5505,16 @@ the same reason, the state of ⎕RVAL survives )CLEAR.
 The current state of ⎕RVAL's random number generator can be retrieved
 with:
 
-@verbatim
+@example
       STATE ← 0 ⎕RVAL ''
-@end verbatim
+@end example
 
 The state changes with every call of monadic ⎕RVAL. The random number generator
 can later be restored to the same state like this:
 
-@verbatim
+@example
       0 ⎕RVAL STATE
-@end verbatim
+@end example
 
 Restoring the state is needed when the same sequence of random values shall
 be generated again. The random number generators of ? and ⎕RVAL are
@@ -5615,11 +5588,11 @@ query the current setting for 2 ⎕RVAL.
 
 Example:
 
-@verbatim
+@example
 1 ⎕RVAL 2        ⍝ produce matrices
 2 ⎕RVAL 3 ¯10    ⍝ the first axis of every matrix will have length 3, and
                  ⍝ the last axis of every matrix will vary between 0 and 10
-@end verbatim
+@end example
 
 This will produce scalars, vectors with a fixed length of 3 and matrices
 with 3 rows and between 0 and 10 columns.
@@ -5663,14 +5636,14 @@ query the current setting for 3 ⎕RVAL.
 
 Example:
 
-@verbatim
+@example
       1 ⎕RVAL 2         ⍝ produce matrices
       2 ⎕RVAL 3 3       ⍝ produce 3×3 matrices
       3 ⎕RVAL 0 50 50   ⍝ produce a mix of integer and real values
       ⎕RVAL 0
 ¯975954163190248487                   0.5892132425
 7677327503669503253 2152001972871424768
-@end verbatim
+@end example
 
 @subsubsection Control of a maximum depth: 4 ⎕RVAL B
 
@@ -5702,7 +5675,7 @@ The properties of that next value can be controlled by the dyadic calls
 of ⎕RVAL as described above. If no prior dyadic call of ⎕RVAL was made then
 the properties have the following defaults:
 
-@verbatim
+@example
       1 ⎕RVAL ⍬    ⍝ rank (scalar)
 0
 
@@ -5714,7 +5687,7 @@ the properties have the following defaults:
 
       4 ⎕RVAL ⍬    ⍝ max. depth (not used since probability of NESTED = 0)
 4
-@end verbatim
+@end example
 
 That is, by default, ⎕RVAL ⍬ produces random integer scalars.
 
@@ -5724,7 +5697,7 @@ dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
 
 Let 4=⍴B. Then
 
-@verbatim
+@example
    Z←⎕RVAL B does essentially:
 
    B[1]←1 ⎕RVAL B[1]
@@ -5738,264 +5711,39 @@ Let 4=⍴B. Then
    B[2]←2 ⎕RVAL B[2]
    B[3]←3 ⎕RVAL B[3]
    B[4]←4 ⎕RVAL B[4]
-@end verbatim
+@end example
 
 If 4 > ⍴B then the missing properties are not changed.
 
 Examples:
 
-@verbatim
+@example
 ⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
 ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
-
-@end verbatim
+@end example
 
 @subsubsection Syntax Alternatives
 
 For an improved readability, ⎕RVAL also accepts string arguments for its left
 argument A and also the subfunction notation:
 
-@verbatim
+@example
       0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
       1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
       2 ⎕RVAL B  ←→  'shape' ⎕RVAL B  ←→  ⎕RVAL.shape B
       3 ⎕RVAL B  ←→   'type' ⎕RVAL B  ←→  ⎕RVAL.type  B
       4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
-@end verbatim
+@end example
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.38
-@section ⎕SQL - SQL Database Interface
-
-⎕SQL was kindly contributed by Elias Mårtenson.
-
-As of GNU APL 1.6, the native function SQL has been replaced by the
-system function ⎕SQL, described below. ⎕SQL has an axis argument that
-selects a sub-function of ⎕SQL.
-
-@c ............................................................................
-@subsection ⎕SQL[0] ⍬ : display subfunction numbers
-
-@verbatim
-   Valid sub-function numbers for ⎕SQL...
-
-   Legend: Fs - database file name (path)
-           Ty - database type ('sqlite' or 'postgres')
-           Db - database handle (small integer)
-           Qs - SQL query string
-           Pv - query parameters (APL values, to be bound to Qs)
-           Ts - name of a table in the database
-
-           ⎕SQL[0] ''       ⍝ list the ⎕SQL function names
-           ⎕SQL[0] ⍬        ⍝ list the ⎕SQL function numbers
-   Db ← Ty ⎕SQL[1] Fs       ⍝ open database Fs & return a handle for it
-           ⎕SQL[2] Db       ⍝ close database handle Db
-        Qs ⎕SQL[3, Db] Pv   ⍝ send SQL query Qs
-        Qs ⎕SQL[4, Db] Pv   ⍝ send SQL update Qs
-           ⎕SQL[5] Db       ⍝ begin a transaction
-           ⎕SQL[6] Db       ⍝ commit the current transaction
-           ⎕SQL[7] Db       ⍝ roll the current transaction back
-           ⎕SQL[8] Db       ⍝ list the tables in database Db
-        Db ⎕SQL[9] Ts       ⍝ list the column names and types of table Tn
-   Vn ← Db ⎕SQL[10] Ty      ⍝ return the provider version number for type Ty
-   Vs ← Db ⎕SQL[11] Ty      ⍝ return the provider version string for type Ty
-@end verbatim
-
-The axis argument [0] is optional; one can also use @b{⎕SQL ⍬}.
-
-@subsection ⎕SQL[0] '' : display subfunction names
-
-As of @b{SVN version 1901}, ⎕SQL has been promoted to be a Function Group.
-Instead of function nunbers one can use function names with the following
-syntax:
-
-@verbatim
-      ⎕SQL[0] ''
-      With a small performance penalty, ⎕SQL also accepts the following
-      sub-function names instead of sub-function numbers as axis argument:
-
-   Legend: Fs - database file name (path)
-           Ty - database type ('sqlite' or 'postgres')
-           Db - database handle (small integer)
-           Qs - SQL query string
-           Pv - query parameters (APL values, to be bound to Qs)
-           Ts - name of a table in the database
-           Vi - DB provider version number (integer)
-           Vs - DB provider version string
-
-       ⎕SQL[0] ''      ←→  ⎕SQL.list ''        ⍝ list ⎕SQL function names
-       ⎕SQL[0] ⍬       ←→  ⎕SQL.list ⍬         ⍝ list ⎕SQL function numbers)
-    Ty ⎕SQL[1] Fs      ←→  ⎕SQL.open Fs        ⍝ open the database file Fs
-       ⎕SQL[2] Db      ←→  ⎕SQL.close Db       ⍝ close a database handle Db
-    Qs ⎕SQL[3, Db]     ←→  ⎕SQL.query (Db B)   ⍝ SQL database query
-    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update         ⍝ SQL database update
-       ⎕SQL[5] Db   Pv ←→  ⎕SQL.begin          ⍝ begin a transaction
-       ⎕SQL[6] Db      ←→  ⎕SQL.commit         ⍝ end a transaction
-       ⎕SQL[7] Db      ←→  ⎕SQL.rollback       ⍝ roll a transaction back
-       ⎕SQL[8] Db      ←→  ⎕SQL.tables         ⍝ show all tables
-    Db ⎕SQL[9] Ts      ←→  ⎕SQL.columns        ⍝ show the columns of a table
-       ⎕SQL[10] Ty     ←→  ⎕SQL.version        ⍝ SQL provider version number
-       ⎕SQL[11] Ty     ←→  ⎕SQL.vstring        ⍝ SQL provider version string
-
-end @verbatim
-
-Like for ⎕SQL[0] ⍬ above is the axis argument [0] is optional; one can also 
-use @b{⎕SQL ''} instead of ⎕SQL[0] ''.
-
-@c ............................................................................
-@subsection ref ← A ⎕SQL[1] B : open database
-
-@verbatim
-      type  ⎕SQL[1] file
-@end verbatim
-
-Connect to database of type A using connection arguments B. The result is a
-database handle @b{ref} to be used in the other ⎕SQL functions.
-
-@b{A} must be a string indicating the database type. Currently supported
-values are 'postgresql' and 'sqlite'.
-
-@b{B} is the connection parameters which depends on the type of
-database:
-
-  - For type≡'sqlite': the argument is string pointing to the
-    database file.
-
-  - For type≡'postgresql', the argument is a standard connect
-    string as described in the PostgreSQL documentation.
-
-This function returns a database handle that should be used when
-using other SQL functions. This value should be seen as an opaque
-handle. It is, however, guaranteed that the handle is a scalar
-value.
-
-@c ............................................................................
-@subsection ⎕SQL[2] B : close database
-
-@verbatim
-      ⎕SQL[2] ref
-@end verbatim
-
-Disconnect from database @b{ref}.
-
-B is the database handle that should be disconnected. After this
-function has been called, no further operations are to be performed
-on this handle. Future calls to ⎕SQL[1] may reuse previously
-disconnected handles.
-
-@c ............................................................................
-@subsection Z ← A ⎕SQL[3, ref] B : database query (with result)
-
-@verbatim
-      query ⎕SQL[3, ref] params
-@end verbatim
-
-Execute a select statement and return the result table.
-
-The axis parameter indicates the database handle.
-
-A is a select statement to be executed. Positional parameters can
-be supplied by specifying a question mark "?" in the statement.
-
-B is an array containing the values for the positional parameters.
-If the array is of rank 2, the statement will be executed multiple
-times with each row being the values for each call.
-
-The return value Z is a rank-2 array representing the result of the
-select statement. Null values are returned as ⍬ and empty strings
-are returned as ''.
-
-@c ............................................................................
-@subsection Z ← A ⎕SQL[4, ref] B : database query (w/o result)
-
-@verbatim
-      query ⎕SQL[4, ref] params
-@end verbatim
-
-Execute an SQL statement that does not return a result.
-
-This function is identical to SQL∆Select with the exception that it
-is used on statements which do not return a result table.
-
-@c ............................................................................
-@subsection ⎕SQL[5] B : start transaction
-
-@verbatim
-      ⎕SQL[5] ref
-@end verbatim
-
-Begin a transaction.
-
-@c ............................................................................
-@subsection ⎕SQL[6] B : commit transaction
-
-@verbatim
-      ⎕SQL[6] ref
-@end verbatim
-
-Commit a transaction.
-
-@c ............................................................................
-@subsection ⎕SQL[7] B : rollback transaction
-
-@verbatim
-      ⎕SQL[7] ref
-@end verbatim
-
-Rolls back the current transaction.
-
-@c ............................................................................
-@subsection Z←⎕SQL[8] B : table names
-
-@verbatim
-      ⎕SQL[8] ref
-@end verbatim
-
-Return an array containing the name of all tables.
-
-@c ............................................................................
-@subsection Z←⎕SQL[9] B : column names
-
-@verbatim
-      ref  ⎕SQL[9] table
-@end verbatim
-
-Return an array containing information about the columns in the
-given table. Currently, the column layout is as follows:
-
-  Name
-  Type
-
-More columns containing additional information may be added in a future
-release.
-
-
-@c ............................................................................
-@subsection Z ← ⎕SQL[10] B : library version number
-
-Return the version number (integer scalar) of the library that was used
-to implement the database type @b{B}. Depending on the SQL libraries
-detected by ./configure, ⎕SQL may support no, one, or more than one
-kind of SQL database type.
-
-@c ............................................................................
-@subsection Z ← ⎕SQL[11] B : library version string
-
-Return the version string of the library that was used to implement the
-database type @b{B}. Depending on the SQL libraries
-detected by ./configure, ⎕SQL may support no, one, or more than one
-kind of SQL database type.
-
-@c ----------------------------------------------------------------------------
-@node    Section 2.39
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
 command )SI. This can be used, for example, to create debug functions similar
 to the assert() macro in C/C++:
 
-@verbatim
-
+@example
 ∇Assert B;COND;LOC;VAR
  →(1≡B)⍴0
  ' '
@@ -6015,8 +5763,7 @@ to the assert() macro in C/C++:
  '************************************************</pre>'
  →
 ∇
-
-@end verbatim
+@end example
 
 The right argument of ⎕SI specifies which aspect of the State Indicator
 shall be returned:
@@ -6067,12 +5814,686 @@ the caller, and so on.
 
 
 @c ----------------------------------------------------------------------------
+@node    Section 2.39
+@section ⎕SQL - SQL Database Interface
+
+⎕SQL was kindly contributed by Elias Mårtenson.
+
+As of GNU APL 1.6, the native function SQL has been replaced by the
+system function ⎕SQL, described below. ⎕SQL has an axis argument that
+selects a sub-function of ⎕SQL.
+
+@c ............................................................................
+@subsection ⎕SQL[0] ⍬ : display subfunction numbers
+
+The system function ⎕SQL is divided into a number of sub-functions. The
+desired sub-function of ⎕SQL is selected by means of a numeric axis argument:
+
+@example
+    Valid (sub-)function numbers for ⎕SQL:
+
+    Legend: Fs - database file name (path)
+            Ty - database type ('sqlite' or 'postgres')
+            Db - database handle (small integer)
+            Qs - SQL query string
+            Pv - query parameters (APL values, to be bound to Qs)
+            Ts - name of a table in the database (string)
+            Vi - DB provider (library) version (integer)
+            Vs - DB provider (library) version (string)
+
+            ⎕SQL[0] ''        list the ⎕SQL (sub-)function names
+            ⎕SQL[0] ⍬         list the ⎕SQL (sub-)function numbers
+    Db ← Ty ⎕SQL[1] Fs        open database Fs & return a handle for it
+            ⎕SQL[2] Db        close database handle Db
+         Qs ⎕SQL[3, Db] Pv    perform SQL query Qs
+         Qs ⎕SQL[4, Db] Pv    perform SQL update Qs
+            ⎕SQL[5] Db        begin a transaction
+            ⎕SQL[6] Db        commit the current transaction
+            ⎕SQL[7] Db        roll the current transaction back
+            ⎕SQL[8] Db        list the tables in database Db
+         Db ⎕SQL[9] Ts        list the column names and types of table Tn
+    Vi ←    ⎕SQL[10] Ty       the provider version number for type Ty
+    Vs ←    ⎕SQL[11] Ty       the provider version string for type Ty
+@end example
+
+The axis argument [0] is optional; one can also use @b{⎕SQL ⍬}.
+
+@subsection ⎕SQL[0] @code{''} : display subfunction names
+
+As of @b{SVN version 1901}, ⎕SQL has been promoted to be a function group.
+Instead of the function nunbers above, one can therefore also use function
+names with the following syntax:
+
+@example
+    With a small performance penalty, ⎕SQL also accepts the following
+    sub-function names instead of sub-function numbers as axis argument:
+
+    Legend: Fs - database file name (path)
+            Ty - database type ('sqlite' or 'postgres')
+            Db - database handle (small integer)
+            Qs - SQL query string
+            Pv - query parameters (APL values, to be bound to Qs)
+            Ts - name of a table in the database (string)
+            Vi - DB provider (library) version (integer)
+            Vs - DB provider (library) version (string)
+
+       ⎕SQL[5]         ←→  ⎕SQL.begin         ⍝ begin a transaction
+       ⎕SQL[9]         ←→  ⎕SQL.columns       ⍝ show the columns of a table
+       ⎕SQL[6]         ←→  ⎕SQL.commit        ⍝ end a transaction
+       ⎕SQL[2]         ←→  ⎕SQL.close         ⍝ close a database handle
+       ⎕SQL[0]         ←→  ⎕SQL.list ''       ⍝ ⎕SQL function names/numbers
+       ⎕SQL[1] Fs      ←→  ⎕SQL.open          ⍝ open the database file
+       ⎕SQL[3, Db] Pv  ←→  ⎕SQL.query Db Pv   ⍝ SQL database query
+       ⎕SQL[7] Db      ←→  ⎕SQL.rollback      ⍝ roll a transaction back
+       ⎕SQL[8] Db      ←→  ⎕SQL.tables        ⍝ show all tables
+    Qs ⎕SQL[4, Db] Pv  ←→  ⎕SQL.update Db Pv  ⍝ SQL database update
+       ⎕SQL[10]        ←→  ⎕SQL.version       ⍝ SQL provider version number
+       ⎕SQL[11]        ←→  ⎕SQL.vstring       ⍝ SQL provider version string
+@end example
+
+@b{NOTE:} The mapping from function numbers to function names of a function
+group does not allow for non-scalar axis arguments (such as @b{[3, Db]})
+for @b{query} or @b{[4, Db]} for @b{update}. For that reason, the @b{Db}
+argument of functions @b{query} and @b{update} had to be moved from the
+second item in the axis argument to the first item of the right value argument,
+and the right argument @b{Pv} (aka. query parameters) of the function axis
+is now the (nested) second argument of the right argument in the named
+function symtax.
+
+Like for @b{⎕SQL[0] ⍬} above is the axis argument [0] optional; one can
+therefore also use @b{⎕SQL ''} instead of @b{⎕SQL[0] ''}.
+
+@c ............................................................................
+@subsection ref ← A ⎕SQL[1] B : open database
+
+@example
+      type  ⎕SQL[1] file
+@end example
+
+Connect to database of type A using connection arguments B. The result is a
+database handle @b{ref} to be used in the other ⎕SQL functions.
+
+@b{A} must be a string indicating the database type. Currently supported
+values are 'postgresql' and 'sqlite'.
+
+@b{B} is the connection parameters which depends on the type of
+database:
+
+  - For type≡'sqlite': the argument is string pointing to the
+    database file.
+
+  - For type≡'postgresql', the argument is a standard connect
+    string as described in the PostgreSQL documentation.
+
+This function returns a database handle that should be used when
+using other SQL functions. This value should be seen as an opaque
+handle. It is, however, guaranteed that the handle is a scalar
+value.
+
+@c ............................................................................
+@subsection ⎕SQL[2] B : close database
+
+@example
+      ⎕SQL[2] ref
+@end example
+
+Disconnect from database @b{ref}.
+
+B is the database handle that should be disconnected. After this
+function has been called, no further operations are to be performed
+on this handle. Future calls to ⎕SQL[1] may reuse previously
+disconnected handles.
+
+@c ............................................................................
+@subsection Z ← A ⎕SQL[3, ref] B : database query (with result)
+
+@example
+      query ⎕SQL[3, ref] params
+@end example
+
+Execute a select statement and return the result table.
+
+The axis parameter indicates the database handle.
+
+A is a select statement to be executed. Positional parameters can
+be supplied by specifying a question mark "?" in the statement.
+
+B is an array containing the values for the positional parameters.
+If the array is of rank 2, the statement will be executed multiple
+times with each row being the values for each call.
+
+The return value Z is a rank-2 array representing the result of the
+select statement. Null values are returned as ⍬ and empty strings
+are returned as ''.
+
+@c ............................................................................
+@subsection Z ← A ⎕SQL[4, ref] B : database query (w/o result)
+
+@example
+      query ⎕SQL[4, ref] params
+@end example
+
+Execute an SQL statement that does not return a result.
+
+This function is identical to SQL∆Select with the exception that it
+is used on statements which do not return a result table.
+
+@c ............................................................................
+@subsection ⎕SQL[5] B : start transaction
+
+@example
+      ⎕SQL[5] ref
+@end example
+
+Begin a transaction.
+
+@c ............................................................................
+@subsection ⎕SQL[6] B : commit transaction
+
+@example
+      ⎕SQL[6] ref
+@end example
+
+Commit a transaction.
+
+@c ............................................................................
+@subsection ⎕SQL[7] B : rollback transaction
+
+@example
+      ⎕SQL[7] ref
+@end example
+
+Rolls back the current transaction.
+
+@c ............................................................................
+@subsection Z←⎕SQL[8] B : table names
+
+@example
+      ⎕SQL[8] ref
+@end example
+
+Return an array containing the name of all tables.
+
+@c ............................................................................
+@subsection Z←⎕SQL[9] B : column names
+
+@example
+      ref  ⎕SQL[9] table
+@end example
+
+Return an array containing information about the columns in the
+given table. Currently, the column layout is as follows:
+
+  Name
+  Type
+
+More columns containing additional information may be added in a future
+release.
+
+
+@c ............................................................................
+@subsection Z ← ⎕SQL[10] B : library version number
+
+Return the version number (integer scalar) of the library that was used
+to implement the database type @b{B}. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type (the database type is sometimes refered to as
+"SQL provider).
+
+@c ............................................................................
+@subsection Z ← ⎕SQL[11] B : library version string
+
+Return the version string of the library that was used to implement the
+database type @b{B}. Depending on the SQL libraries
+detected by ./configure, ⎕SQL may support no, one, or more than one
+kind of SQL database type (the database type is sometimes refered to as
+"SQL provider).
+
+@c ----------------------------------------------------------------------------
+@subsection SQLite Quickstart
+
+@b{SQL} is a powerful query language with many functions for manipulating
+the data that is stored in the tables of databases. Similarly, APL is
+a powerful language with many functions for manipulating the data stored
+in matrices (the APL conterpart of SQL database tables). The overlap in
+functionality between SQL and APL is considerable. That means that an APL
+programmer always has the follwing options:
+
+@itemize
+
+@item Manipulate SQL database tables directly. This requires a detailed
+      understanding of the SQL query lannguage.
+
+@item Manipulate the data in APL. That means:
+  @itemize
+  @item Reading SQL database tables (or parts of them) into APL matrices,
+  @item manipulate the matrices in APL, and
+  @item write the result back into the SQL tables.
+  @end itemize
+  This approach requires only rather basic knowledge of the SQL query
+  lannguage. It might have a small performance panalty, but that performance
+  penalty will only be noticable if the databases involved are huge.
+@item A mix of the options above, e.g if performance matters.
+@end itemize
+
+This SQLite Quickstart follows the second option. The basic SQL operations
+explained in this Quickstart are:
+
+@itemize
+@item deleting a database,
+@item creating a new database,
+@item creating a database table,
+@item writing an APL matrix into a database table,
+@item reading a database table into an APL matrix,
+@item updating a database table, and
+@item deleting rows from a database table.
+@end itemize
+
+@subsubsection Deleting a Database
+
+In order to have a well-defined starting point we delete any
+already existing database. In SQLite every database is contained
+in a single file, frequently named @b{db.sqlite}.
+
+@b{CAUTION:} The @b{⎕FIO.unlink} command below will erase any existing
+database without a warning.
+
+@example
+      )CLEAR
+CLEAR WS
+
+      ⍝ delete any existing database
+      ⍝
+      Filename ← "db.sqlite"                ⍝ name of the database to be deleted
+      ⎕FIO.strerror ⎕FIO.unlink Filename
+Success
+
+      ⍝ verify that it was deleted
+      ⍝
+      ⎕FIO.strerror ⎕FIO.unlink Filename
+No such file or directory
+@end example
+
+@b{NOTES:} An SQLite database can be closed in two ways: using @b{⎕FIO.unlink}
+as shown above, or with an SQL query such as
+@b{"DROP DATABASE IF EXISTS db.sqlite"}. However, to issue an SQL query we
+would need to create an SQL connection to a database that we do not yet have
+at this point.
+
+For databases that are more complex than @b{SQLite}, an SQL query or a utility
+program shipped with the database might be required. For example, postgreSQL
+comes with a program named @b{dropdb} that deletes a database. Such programs
+can be called from APL with the @b{)HOST} command or with @b{⎕FIO.fork_daemon}. 
+
+@subsubsection Creating a new Database
+
+To read from or write into a database we need a database handle (sometimes
+called a database connection) for it:
+
+@example
+      )CLEAR
+CLEAR WS
+
+      ⍝ create a new (and empty) database
+      ⍝
+      Filename ← 'db.sqlite'            ⍝ name of the database to be created
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ create the database
+
+      ⎕SQL.close DB                     ⍝ and close it
+@end example
+
+@b{NOTES:} If a file with the given @b{Filename} already exists, then
+@b{⎕SQL.open} simply connects to it and returns a handle (a small integer)
+for the connection. The handle is used like a file descri[tor for an open
+file in the operating system. The handle is later used for subsequent database
+operations of ⎕SQL (until the connection is closed).
+
+If no file with the given @b{Filename} exists, then @b{⎕SQL.open}
+creates a file with than name and then connects to it. It is possible to have
+several such connections to different databases at the same time. It is also
+possible to have several connections to the same database at the same time
+(and then one should use database transactions to avoid conflicts with the
+data written to the same database via different connections).
+
+@b{postgreSQL} is shipped with programs @b{createdb} for creating databases,
+@b{createuser} for creating database users, and @b{psql} for various other
+database administration tasks. These programs can be called from APL with
+the @b{)HOST} command or with @b{⎕FIO.fork_daemon}.
+
+@subsubsection Creating a Database Table
+
+An SQL database is a set of tables. The next step after a new database was
+created and a connection to it was opened is to define one or more tables
+in the database. Every table has one or more named columns and zero or more
+rows. Every column has attributes, some of which are mandatory (e.g. the
+column name and in some SQL dialects the data type) while others are optional
+(e.g. the data type in other SQL dialects or the size of the items in the
+column). Creating a database table means to specify a name for a table and
+to specify the attributes of the table columns.
+
+In this quickstart we create a table named @b{EMPLOYEES} with 5 columns named
+@b{ID}, @b{NAME}, @b{ADDRESS}, @b{AGE}, and @b{SALARY}.
+
+@example
+      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      ⍝ define an SQL Query string Qs that creates a table
+      ⍝
+      Qs ← ,⊃«««
+      CREATE TABLE EMPLOYEES(
+             ID      INT  NOT NULL PRIMARY KEY,
+             NAME    TEXT NOT NULL,
+             AGE     INT  NOT NULL,
+             ADDRESS CHAR(50),
+             SALARY  REAL);
+             »»»
+
+      ⍝ perform the SQL query according to query string Qs.
+      ⍝
+      Qs ⎕SQL.query DB ⍬
+
+      ⍝ show the tables in the database
+      ⍝
+      ⎕SQL.tables DB
+ EMPLOYEES 
+
+      DB ⎕SQL.columns 'EMPLOYEES'
+ ID      INT      
+ NAME    TEXT     
+ AGE     INT      
+ ADDRESS CHAR(50) 
+ SALARY  REAL     
+
+      ⎕SQL.close DB                     ⍝ and close DB
+@end example
+
+@b{NOTES:} As we see above, SQL query strings tend to be quite long. We could
+have removed most of the blanks and all of the linefeeds in the query string
+above, but readability of the SQL query would have suffered a lot by doing
+that. Instead we used a multi-line GNU APL script ««« ... »»» for the query
+text, disclose it (which turns the APL vector of strings into an APL matrix,
+and finally ravel it (to make it a string).
+
+Many SQL query strings contain strings themselves, e.g. for column names that
+contain blanks or for string values in columns. IOW, the query string is a
+string that contains other strings. To avoid the need to escape the SQL quotes
+inside (quoted) APL strings we have quoted the multi-line query string with
+««« ... »»» instead of """ ... """ or ''' ... '''.
+
+The right argument of @b{⎕SQL.query} is @b{DB ⍬} (and not simply @b{DB} as
+in other ⎕SQL functions). This is because an SQL query string can have
+parameters as we will see below. The query string above has no parameters and
+therefore the parameter list for the query string is @b{⍬} aka. @b{⍳0}.
+
+Finally, SQL table columns have names, but SQL table rows do not. It is
+therefore common practice (though not required) that the first column of a
+table is a unique integer ID that identifies the row and can later be used
+to quickly locate the row in a large database.
+
+@subsubsection Excursus: Dynamic Query Strings
+
+The SQL query strings @b{(Qs)} used so far were @b{static}, which means that
+they are sent verbatim to the database machinery. In the following we will
+also use SQL query strings that are @c{dynamic}. Such dynamic query string
+are a mix of static text and @c{Placeholders}. In SQLite placeholders are
+the character @b{%} in the query string. In other SQL dialects the placeholders
+may be different. For example in @b{postgreSQL} the placeholders in a query
+string are @b{$1}, @b{$2}, @b{$3}, and so forth.
+
+The placeholders in a dynamic query string are replaced by
+@c{query string parameters} before the resulting static query
+string is to the database machinery. For example:
+
+@example
+      ⍝ dynamic query string Qs
+      ⍝
+      Qs ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY
+               VALUES(?,  ?,    ?,   ?,       ?);
+           »»»
+
+      ⍝ query string parameters
+      ⍝
+      PARAMS ← 1 "Paul" 32 "California" 20000
+
+      ⍝ number of placeholders in Qs
+      ⍝
+      +/Qs = '?'
+5
+
+      ⍝ number of parameters (shall be equal to the number of placeholders)
+      ⍝
+      ⍴PARAMS
+5
+
+      ⍝ the (intermediate) result of replacing the placeholders in the dynamic
+      ⍝ query string Qs would then be this static query string:
+      ⍝
+      RESULT ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY
+               VALUES(1, "Paul", 32, "California", 20000);
+                 »»»
+@end example
+
+The example above shows the binding of query string parameters to query
+strings for the case where the rank of the parameters is ≤ 1. @b{⎕SQL} also
+supports parameters with rank 2; in that case the query is repeated for
+every row of the parameter matrix. I.e. the placeholders in same query
+string @b{Qs} are being replaced with every row of the parameter matrix
+before the result of each replacement is sent as a (static) query to the
+database machinery. This feature makes it rather simple to write an APL
+matrix (= query parameter) to the database.
+
+Dynamic query strings are allowed in two ⎕SQL subfunctions: in function 3
+(⎕SQL.query) and in function 4 (⎕SQL.update). The syntax differs slightly
+beween ⎕SQL function numbers and ⎕SQL function names:
+
+@example
+      Qs ⎕SQL.query DB PARAMS       ⍝ ⎕SQL subfunction name
+      Qs ⎕SQL[3, DB] PARAMS         ⍝ ⎕SQL subfunction number
+
+      Qs ⎕SQL.update DB PARAMS      ⍝ ⎕SQL subfunction name
+      Qs ⎕SQL[4, DB] PARAMS         ⍝ ⎕SQL subfunction number
+@end example
+
+For rank 2 parameters shall the number of placeholders be equal to the
+number of colums of the APL matrix. If a query string contains no placeholders
+then the parameters shall be ⍬ (aka. ⍳0).
+
+@subsubsection Writing an APL matrix into a Database Table
+
+Now suppose that we have an APL matrix with the same columns as our
+SQL table created above.
+
+@example
+      )CLEAR
+CLEAR WS
+
+      MATRIX ← 4 5⍴0
+      MATRIX[1;] ← 1 'Paul'   32 'California' 20000.00
+      MATRIX[2;] ← 2 'Allan'  25 'Texas'      15000.00
+      MATRIX[3;] ← 3 'Teddy'  23 'Norway'     20000.00
+      MATRIX[4;] ← 4 'Gunnar' 26 'Sweden'     18000.00
+
+      ⍝ show MATRXIX
+      ⍝
+      8 ⎕CR MATRIX
+┌→─────────────────────────────┐
+↓┌→───┐   32 ┌→─────────┐ 20000│
+││Paul│      │California│      │
+│└────┘      └──────────┘      │
+│┌→────┐  25 ┌→────┐      15000│
+││Allan│     │Texas│           │
+│└─────┘     └─────┘           │
+│┌→────┐  23 ┌→─────┐     20000│
+││Teddy│     │Norway│          │
+│└─────┘     └──────┘          │
+│┌→─────┐ 26 ┌→─────┐     18000│
+││Gunnar│    │Sweden│          │
+│└──────┘    └──────┘          │
+└ϵ─────────────────────────────┘
+@end example
+
+This @b{MATRIX} can then be written (more precisely: appended) to the
+database table @b{EMPLOYEES} like this:
+
+@example
+      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      INSERT INTO EMPLOYEES(ID, NAME, AGE, ADDRESS, SALARY)
+                     VALUES(?,  ?,    ?,   ?,       ?);
+           »»»
+     Qs ⎕SQL.query DB MATRIX
+
+      ⎕SQL.close DB                     ⍝ and close DB
+@end example
+
+@subsubsection Reading a Database Table into an APL Matrix
+
+Reading a matrix back from a database table uses a @b{SELECT} query. @b{SELECT}
+is the counterpart of indexed reference or indexed assignment in APL and works,
+like in APL, in both directions (i.e. reading from tables and writing to
+tables). In a @b{SELECT} query one can select specific rows and columns of the
+table, which is left as an exercise for the reader. In this quickstart we want
+to keep things simple and read an entire table back:
+
+Due to the absence of a binding mechanism is reading back of an SQL table
+into an APL matrix even simpler:
+
+@example
+      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      SELECT * FROM EMPLOYEES;
+             »»»
+
+      RESULT ← Qs ⎕SQL.query DB ⍬
+      RESULT
+ 1 Paul   32 California 20000 
+ 2 Allan  25 Texas      15000 
+ 3 Teddy  23 Norway     20000 
+ 4 Gunnar 26 Sweden     18000 
+
+      ⍴RESULT
+4 5
+
+      ⎕SQL.close DB                     ⍝ and close DB
+@end example
+
+@b{NOTES:} The @b{*} in the query string stands for @b{all columns} of the
+table. @b{*} is NOT a placeholder because it is not replaced with a parameter.
+One can also retrieve a only subset of columns by using a comma separated list
+of column names instead of @b{*} (similar to indexed reference in APL).
+
+
+@subsubsection Updating a Database Table
+
+The ⎕SQL sub-functions introduced so far suffice, at least in principle. The
+APL programmer can read a table from the database into APL, analyse and/or
+modify it in APL, and optionally writeit back into the database.
+
+There is, however, one case where this approach becomes arbitrarily
+ inefficient: a large database with only a small change. In that case it
+is far more efficient to make a change directly in the database, i.e. without
+transferring the entire database back and forth between APL and SQL.
+This is achieved with an SQL UPDATE query, and @b{⎕SQL.uopdate} does
+exactly that.
+
+Suppose we want to increase Teddy's salary from 20000 to 22000. Then:
+
+@example
+      )CLEAR
+CLEAR WS
+
+      Filename ← 'db.sqlite'            ⍝ name of the database to be used
+      Type ← 'sqlite'                   ⍝ database type
+      DB ← Type ⎕SQL.open Filename      ⍝ open the database
+
+      Qs ← ,⊃«««
+      UPDATE EMPLOYEES SET SALARY=? WHERE ID=?;
+             »»»
+
+      Qs ⎕SQL.query DB (22000 3)        ⍝ update column SALARY in row 3
+
+      ⍝ check result
+      Qs ← ,⊃«««
+      SELECT * FROM EMPLOYEES;
+             »»»
+
+      RESULT ← Qs ⎕SQL.query DB ⍬
+      RESULT
+ 1 Paul   32 California 20000 
+ 2 Allan  25 Texas      15000 
+ 3 Teddy  23 Norway     22000 
+ 4 Gunnar 26 Sweden     18000 
+
+      ⍴RESULT
+4 5
+
+      ⎕SQL.close DB                     ⍝ and close DB
+@end example
+
+@b{NOTES:}  an @b{UPDATE} query in SQL is pretty much what an indexed
+assignment in APL. In the example above we changed a single column @b{SALARY}
+in a single row @b{ID} in the database table @b{COMPANY}. The placeholder
+@b{%} in @b{SET SALARY=%} was set to parameter 22000 and the place holder in 
+@b{where ID=?} was set to Terry's row with @b{ID}. Like in APL one can,
+however, also change multiple rows and/or multiple columns in a database table.
+To change multiple columns one can set a comma separated list of column namesi
+in the @b{SET} clause (or @b{*} for all columns). For multiple rows one can
+set multiple rows in the @b{WHERE} clause. Omitting the @b{WHERE} clause
+updates all rows (similar to @b{*} for columns) in the database.
+For example:
+
+@example
+      UPDATE COMPANY SET AGE=?, SALARY=? WHERE ID IN (?, ?, ?);
+@end example
+
+The shape of a parameter matrix for an SQL @b{UPDATE} must, of course,
+match the number of selected rows and columns.
+
+@c ----------------------------------------------------------------------------
+
+@subsection Deleting Rows From a Database Table
+
+Like @b{UPDATE} queries are efficient for changing large tables of a database,
+there is also an SQL query for deleting one or more rows of a database:
+
+@example
+      Qs←«DELETE FROM COMPANY WHERE ID=?;»                ⍝ delete one row
+      Qs←«DELETE FROM COMPANY WHERE ID IN (?, ?, ?);»     ⍝ delete 3 rows
+      Qs←«DELETE FROM COMPANY;»                           ⍝ delete all (!) rows
+
+      Qs ⎕SQL.query DB B
+@end example
+
+As usual, the number of rows must match the number of placeholders in the
+query parameter @b{B} (an APL vector).
+
+@c ----------------------------------------------------------------------------
 @node    Section 2.40
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
 
-@verbatim
+@example
       ⎕SYL
  SI depth limit          (0 = no limit)                    0 
  number of values limit  (0 = no limit)                    0 
@@ -6100,7 +6521,7 @@ System variable ⎕SYL shows a number of system limits when referenced:
  max. cores (per max_cores())                              1 
  current cores (per core_count())                          1 
  print length limit (0 = no limit)                         0 
-@end verbatim
+@end example
 
 Most system limits are read-only; attempting to assign ⎕SYL will result
 in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
@@ -6129,9 +6550,9 @@ become non-responding.
 
 Example (stop execution if function call stack exceeds 20):
 
-@verbatim
+@example
       ⎕SYL[1;2]←20
-@end verbatim
+@end example
 
 Note that small APL values (up to a configurable number of ravel elements)
 count as values (in the number of values limit), but not in the total ravel
@@ -6165,12 +6586,10 @@ be useful to limit the amount of data printed. If the ravel length of,
 say, VALUE exceeds ⎕SYL[27;2] (i.e. if ⎕SYL[27;2] ≤ ⍴,VALUE) then SH↑VALUE
 is printed instead of VALUE. The shape SH is computed like this:
 
-@verbatim
-
+@example
       SH←⍴VALUE
-      while (ravel-length(SH) ≥ ⎕SYL[27;2]) { divide longest axis in SH by 2 }
-
-@end verbatim
+      while (ravel-length(SH) ≥ ⎕SYL[27;2]) @{ divide longest axis in SH by 2 @}
+@end example
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.41
@@ -6184,7 +6603,7 @@ manipulations of APL character strings that are formatted according
 to the XML standard. The anticipated procedure for such modifications
 is something like:
 
-@verbatim
+@example
       XML_string ← "<A><B><C>Hello</C></B></A>"   ⍝ input data (usually from an .xml file)
       APL ← ⎕XML XML_string       ⍝ convert XML_string to associative array APL
       ABC ← APL.a.b.c             ⍝ retrieve node a.b.c in APL
@@ -6195,7 +6614,7 @@ is something like:
 Hello
       Z     ⍝ the modified XML string
 <A><B><C>Hello World</C></B></A>"
-@end verbatim
+@end example
 
 The scope (functionality) of ⎕XML is then:
 
@@ -6416,7 +6835,7 @@ be contained in a single associative array.
 
 Examples of APL member names (assuming ⎕IO←1):
 
-@verbatim
+@example
       ⍙1              ⍝ the first member in every XML node. Its value is the node tag.
       ∆1declaration   ⍝ the first member in most XML documents. E.g. <?xml version= ...>
       ∆2text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
@@ -6424,7 +6843,7 @@ Examples of APL member names (assuming ⎕IO←1):
       _6Workspace     ⍝ Sub-array for <Workspace ... at position 6.
       ⍙1wsid          ⍝ first attribute wsid from e.g. <Workspace wsid=...
       ⍙2year          ⍝ second attribute year
-@end verbatim
+@end example
 
 @c ............................................................................
 @subsection Monadic ⎕XML
@@ -6453,7 +6872,7 @@ of the function number ↑A.
 
 In the following examples, let
 
-@verbatim
+@example
       XML←36 ⎕CR """
 <?xml version='1.0' encoding='UTF-8'?>
   <Document>
@@ -6467,7 +6886,7 @@ In the following examples, let
 """
 
 APL←⎕XML XML
-@end verbatim
+@end example
 
 Then
 
@@ -6491,7 +6910,7 @@ inverse function ¯3 ⎕XML which converts a 3-item vector as produced by 3 ⎕X
 back into an APL member name indicating the category (i.e. _, ∆, or ⍙)
 and the name from the XML tag:
 
-@verbatim
+@example
             8 ⎕CR (C P N)←3 ⎕XML "∆2comment"
 ┌→────────────┐
 │∆ 2 ┌→──────┐│
@@ -6508,13 +6927,12 @@ comment
 
       ¯3 ⎕XML C P N   ⍝ inverse of 3 ⎕XML
 ∆2comment
-
-@end verbatim
+@end example
 
 @item @b{Z←4 ⎕XML B} is a string that shows the member names of the
  associative array B in a tree-like fashion. For example:
 
-@verbatim
+@example
       ⊃35⎕CR 4 ⎕XML APL
 XML                     
  │                      
@@ -6523,12 +6941,12 @@ XML
        └─── Tag1        
              │          
              └─── Subtag
-@end verbatim
+@end example
 
 @item @b{Z←5 ⎕XML B} is like 4 ⎕XML but displays not only the XML tags but
 also other XML nodes (declarations, attributes, etc.):
 
-@verbatim
+@example
       ⊃35⎕CR 5 ⎕XML APL
 XML                               
  │                                
@@ -6549,12 +6967,12 @@ XML
        │     │     └─── _3∆text   
        │     └─── _5∆text         
        └─── _3∆text               
-@end verbatim
+@end example
 
 @item @b{Z←6 ⎕XML B} is like 4 ⎕XML but displays not only the member
 name but the entire path to the member:
 
-@verbatim
+@example
       ⊃35⎕CR 6 ⎕XML APL
 XML                                             
  │                                              
@@ -6563,13 +6981,13 @@ XML
        └─── ._3_Document._2_Tag1                
              │                                  
              └─── ._3_Document._2_Tag1._4_Subtag
-@end verbatim
+@end example
 
 @item @b{Z←7 ⎕XML B} returns a list of all members in a depth-first order.
 This list can be used as an iterator to traverse the entire tree (and possibly
 filter out items along the way).
 
-@verbatim
+@example
       ⊃7 ⎕XML APL
 ._1∆declaration                          
 ._2∆text                                 
@@ -6591,35 +7009,35 @@ filter out items along the way).
 ._3_Document._2_Tag1._4_Subtag._1∆text   
 ._3_Document._2_Tag1._4_Subtag._2∆comment
 ._3_Document._2_Tag1._4_Subtag._3∆text   
-@end verbatim
+@end example
 
 @item @b{Z←8 ⎕XML B} is like Z←7 ⎕XML B, except that only the subset of
 those members that are related to tags (the tag name ⍙ and tag attributes)
 are returned:
 
-@verbatim
+@example
       ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
 ._3Document.⍙1····················
 ._3Document._2Tag1.⍙1·············
 ._3Document._2Tag1.⍙2name·········
 ._3Document._2Tag1._4Subtag.⍙1····
 ._3Document._2Tag1._4Subtag.⍙2name
-@end verbatim
+@end example
 
 @item @b{Z←9 ⎕XML B} is like Z←7 ⎕XML B, except that only the subset of
 synthesized members other than ∆text are returned:
 
-@verbatim
+@example
       ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
 .∆1declaration·······················
 ._3Document._2Tag1.∆2comment·········
 ._3Document._2Tag1._4Subtag.∆2comment
-@end verbatim
+@end example
 
 @item @b{Z←10 ⎕XML B} is like Z←7 ⎕XML B, except that only the subset of
 synthesized ∆text members are returned:
 
-@verbatim
+@example
 .∆2text···························
 ._3Document.∆1text················
 ._3Document._2Tag1.∆1text·········
@@ -6629,28 +7047,28 @@ synthesized ∆text members are returned:
 ._3Document._2Tag1.∆5text·········
 ._3Document.∆3text················
 .∆18text··························
-@end verbatim
+@end example
 
 @item @b{Z←11 ⎕XML B} is like Z←7 ⎕XML B, except that only the tag
 names are returned:
 
-@verbatim
+@example
       ⊃11 ⎕XML APL   ⍝ all tag member names
 ._3Document················
 ._3Document._2Tag1·········
 ._3Document._2Tag1._4Subtag
-@end verbatim
+@end example
 
 @item @b{Z←12 ⎕XML B} is like Z←7 ⎕XML B, except that all member
 names of B are returned without descending into the sub-tree:
 
-@verbatim
+@example
       ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
 .∆1declaration
 .∆2text·······
 ._3Document···
 .∆18text······
-@end verbatim
+@end example
 
 This variant may also be useful for structured variables that were not
 created by ⎕XML.
@@ -6658,16 +7076,16 @@ created by ⎕XML.
 @item @b{Z←13 ⎕XML B} shows the (flat) tag names in B, but but does
 not descend into any sub-tree of B.
 
-@verbatim
+@example
      ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
  ._3Document 
-@end verbatim
+@end example
 
 @item @b{Z←(14 "member-name") ⎕XML B} shows the next member in B
 after "member-name". It can be used as an iterator that walks through
 the tags. An empty member name returns the first member:
 
-@verbatim
+@example
       APL ← ⎕XML XML←"<ROOT><A/><B/><C/></ROOT>"
 
       (14 "") ⎕XML APL._1ROOT   ⍝ get first member in APL._1ROOT
@@ -6679,8 +7097,7 @@ _2B
       (14 "_2B") ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._2B
 _3C
       (14 "_3C") ⎕XML APL._1ROOT   ⍝ last member: will be empty
-
-@end verbatim
+@end example
 @end itemize
 
 @c ............................................................................
@@ -6818,40 +7235,40 @@ For example,
 
 @enumerate
 @item @b{switch/case}:
-@verbatim
+@example
     →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
 L1: CASE1 ◊ →L_endcase        ⍝ case 1:
 L2: CASE2 ◊ →L_endcase        ⍝ case 2:
 ...
 LN: CASEn                     ⍝ case N:
 L_endcase:
-@end verbatim
+@end example
 
 @item @b{loop}:
-@verbatim
+@example
  Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
-@end verbatim
+@end example
 
 @item @b{one-sided if}:
-@verbatim
+@example
   →(!COND) / L_endif   ⍝ jump over the THEN clause
   THEN
 L_endif:
-@end verbatim
+@end example
 
 or, not uncommon and shorter, but less portable and less readable:
 
-@verbatim
+@example
   →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
-@end verbatim
+@end example
 
 @item @b{two-sided if/else}:
-@verbatim
+@example
   →COND ↓ L_else L_then
 L_then: THEN ◊ →L_endif
 L_else: ELSE
 L_endif:
-@end verbatim
+@end example
 @end enumerate
 
 A closer look at these cases reveals that there is not much room for
@@ -6891,14 +7308,14 @@ syntax:
 
 @itemize
 @item @b{one-sided if/else}:
-@verbatim
+@example
       COND →→ THEN ←←
-@end verbatim
+@end example
 
 @item @b{two-sided if/else}:
-@verbatim
+@example
       COND →→ THEN ←→ ELSE ←←
-@end verbatim
+@end example
 
 @end itemize
 
@@ -6935,7 +7352,7 @@ For this syntax to work, the following rules must be followed:
 @end itemize
 
 Examples:
-@verbatim
+@example
       ⍝ short format. Valid in immediate execution and in defined functions
       ⍝
       X←5 ◊ X≥0 →→ X 'is positive' ←→ X 'is negative' ←←
@@ -6986,8 +7403,7 @@ Fatal error in defined function line [2]. You may now:
     change the faulty line  with:  [2] ..., or 
     delete the faulty line  with:  [∆2], or
     cancel editing with:  [→]∇.
-
-@end verbatim
+@end example
 
 The recommended usage of corresponding →→, ←→, and ←← token is to:
 
@@ -7006,9 +7422,9 @@ Like shown in the examples above.
 In standard APL, the inner product Z of two matrices A and B as known from
 linear algebra, is:
 
-@verbatim
+@example
       Z←A +.× B      ⍝ the most frequent special case of A f.g B
-@end verbatim
+@end example
 
 However, the inner product in APL is more general than the inner product in
 linear algebra. In the general case @b{A f.g B} may the functions @b{f}
@@ -7055,7 +7471,7 @@ column-vector before @b{A∘B} is computed. In this context, the term
 
 Examples:
 
-@verbatim
+@example
       M←2 2⍴1 2 3 4   ⍝ a matrix
       V←10 11         ⍝ a vector
 
@@ -7080,7 +7496,7 @@ Examples:
 1 2
       ⍴M∘V       ⍝ the result is column vector
 2 1
-@end verbatim
+@end example
 
 @item @b{A +.× B} requires that the number of columns in @b{A} is equal to
 the number of rows in @b{B}. In contrast, @b{A∘B} has no such requirement
@@ -7100,18 +7516,18 @@ same shape as @b{B} and:
 @b{Z[i]} is 1 if @b{B[i]} is the first occurrence of @b{B[i]} in @b{B} and
 0 otherwise. For vectors @b{B} this can also be expressed as:
 
-@verbatim
+@example
       ≠ B ←→ (B⍳B)=(⍳⍴B)
-@end verbatim
+@end example
 
 Examples:
 
-@verbatim
+@example
       ≠'Hello, World.'
 1 1 1 0 1 1 1 1 0 1 0 1 1
       ≠ 1 (2 3) 4 (2 3) 5 6
 1 1 1 0 1 1
-@end verbatim
+@end example
 
 
 
@@ -7188,11 +7604,11 @@ A misspelling of the language can cause APL characters to become unavailable,
 even if your xmodmap is correct. You can check your setting by executing the
 program 'locale'. If it shows warnings like these:
 
-@verbatim
+@example
 locale: Cannot set LC_CTYPE to default locale: No such file or directory
 locale: Cannot set LC_MESSAGES to default locale: No such file or directory
 locale: Cannot set LC_ALL to default locale: No such file or directory
-@end verbatim
+@end example
 
 then something is wrong and you should check your LANG setting and installed
 locales.
@@ -7206,7 +7622,7 @@ As far as xterm is concerned, the xterm command line options --u8, --lc, and
 
 The top-level directory of the GNU APL project has a structure like this:
 
-@verbatim
+@example
     apl-1.9/
     ├── autom4te.cache
     ├── build
@@ -7229,7 +7645,7 @@ The top-level directory of the GNU APL project has a structure like this:
     ├── wslib3
     ├── wslib4
     └── wslib5
-@end verbatim
+@end example
 
 Most of these directories are contained in the project tar file
 (e.g. apl-1.9.tar.gz) and some are created during the build of GNU APL. Only
@@ -7266,7 +7682,7 @@ that are optional and typically require the installation of additional
 libraries on the build machine. The ./configure script in the top-level
 directory determines, which optional components shall be included in the build.
 
-@verbatim
+@example
     apl-1.9/
     ├── src
         ├── APs                     APs for ⎕SVO and friends
@@ -7275,7 +7691,7 @@ directory determines, which optional components shall be included in the build.
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
         ├── testcases               dito
-@end verbatim
+@end example
 
 GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases

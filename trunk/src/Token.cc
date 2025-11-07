@@ -218,6 +218,10 @@ operator << (ostream & out, const Token & token)
                      out << *val;
                   return out << "]";
                 }
+             if (token.get_tag() == TOK_FAXIS)
+                {
+                  return out << "[" << token.get_int_val() << "]";
+                }
              FIXME;
 
         case TC_SYMBOL:
@@ -257,6 +261,39 @@ Token::ChangeTag(TokenTag new_tag)
    Assert((tag & TV_MASK) == (new_tag & TV_MASK));
    // tag is ia const TokenTag, so we cheat a little here.
    const_cast<TokenTag &>(tag) = new_tag;
+}
+//----------------------------------------------------------------------------
+Value_P
+Token::get_function_axis() const
+{
+   if (get_tag() == TOK_INDEX)  // axis has semicolons
+      {
+        MORE_ERROR() << "Invalid function axis rank.";
+        AXIS_ERROR;
+      }
+
+   if (get_tag() == TOK_AXIS)   // axis is an APL value
+      {
+        Value_P Z = get_apl_val();
+        if (+Z)   return Z;
+        MORE_ERROR() << "Invalid function axis []";
+        AXIS_ERROR;
+      }
+
+   if (get_tag() == TOK_FAXIS)   // axis is an integer
+      {
+        const sAxis axis = get_int_val();
+        if (axis == -1)   // [ ]
+           {
+             MORE_ERROR() << "Invalid elided function axis [ ]";
+             AXIS_ERROR;
+           }
+        return IntScalar(axis, LOC);
+      }
+
+   Q1(*this);
+   MORE_ERROR() << "Invalid Token type for function axis.";
+   AXIS_ERROR;
 }
 //----------------------------------------------------------------------------
 int
@@ -584,7 +621,7 @@ UCS_string ucs;
              else if (get_tag() == TOK_SEMICOL)
                 ucs.append(UNI_SEMICOLON);
              else
-                Assert(0);
+                FIXME;
              break;
 
         case TC_R_BRACK:
@@ -642,6 +679,13 @@ UCS_string ucs;
                   ret << "]";
                   return ret;
                 }
+
+             if (get_tag() == TOK_FAXIS)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "[" << get_int_val() << "]";
+                }
+             FIXME;
 
         case TC_VOID:
              {
@@ -820,14 +864,14 @@ Token_string::replace_segment(const Token_string & src, ShapeItem pos)
 void
 Token_string::print(ostream & out, int details) const
 {
-const bool PC  = details    & 1;
+const bool PC  = details & 1;
 const bool VAL = details & 2;
 
    loop(pc, size())
        {
          const Token & tok = at(pc);
          if (PC)   out << "    [PC=" << setw(2) << pc << "] ";
-         out << "`" << tok;
+         out << "⏩" << tok;
          if (VAL)
             {
               switch(tok.get_ValueType())

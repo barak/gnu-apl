@@ -134,6 +134,10 @@ public:
    Token(TokenTag tg, ErrorCode ec)
    : tag(tg) { Assert(tg == TOK_ERROR);   value.int_vals[0] = ec; }
 
+   /// Construct a token for a \b function \b axis
+   Token(TokenTag tg, sAxis fnum)
+   : tag(tg) { Assert(tg == TOK_FAXIS);   value.int_vals[0] = fnum; }
+
    /// Construct a token for a \b Symbol
    Token(TokenTag tg, Symbol * sp)
    : tag(tg) { Assert(get_ValueType() == TV_SYM);  value.sym_ptr = sp; }
@@ -260,17 +264,12 @@ public:
    Value_P * get_apl_valp() const
       { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
 
-   /// clear this token, properly clearing Value token
+   /// clear this token, properly clearing its Value token (if any)
    void clear(const char * loc)
       {
          if (is_apl_val())   value.apl_val.reset();
          new (this) Token();
       }
-
-   /// return the axis specification of this token (expect non-zero axes)
-   Value_P get_nonzero_axes() const
-      { Assert1(!!value.apl_val && (get_tag() == TOK_AXIS));
-        return value._apl_val(); }
 
    /// return the axis specification of this token
    Value_P get_axes() const
@@ -299,6 +298,10 @@ public:
    /// return the cFunction_P value of this token
    cFunction_P get_function() const
       { if (!is_function())   SYNTAX_ERROR;   return value.function; }
+
+   /// return the function axis specification of this token and check its
+   /// dimension. That is, throw AXIS error for [] anf for  [;...]
+   Value_P get_function_axis() const;
 
    /// return value usage counter
    int value_use_count() const;

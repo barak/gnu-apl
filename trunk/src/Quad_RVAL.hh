@@ -84,6 +84,9 @@ protected:
    /// choose an integer value at random according to distribution \b dist
    static int choose_integer(const vector<int> & dist);
 
+   /// a random 64-bit IEEE floating point number
+   static double random_ieee();
+
    /// initialize the next ravel cell of \b Z with a random character
    static void random_character(Value & Z);
 

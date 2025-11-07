@@ -441,6 +441,7 @@ dist_doc_DATA = \
 	apl.1					\
 	apl.texi				\
 	apl.info				\
+	apl-info.css			\
 	apl.html				\
 	libapl.texi				\
 	libapl.info				\
@@ -987,8 +988,8 @@ uninstall-info-am:
 
 # apl.texi in HTML format
 #
-apl.html:   apl.texi
-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
+apl.html:   apl.texi apl-info.css
+	$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
 
 # apl.texi in info format
 #

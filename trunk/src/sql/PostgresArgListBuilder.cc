@@ -164,7 +164,7 @@ const double D = strtod(content, &endptr);
 }
 
 Value_P
-PostgresArgListBuilder::run_query( bool ignore_result )
+PostgresArgListBuilder::run_query()
 {
 const int n = args.size();
 const int array_len = n == 0 ? 1 : n;
@@ -180,17 +180,17 @@ vector<int>          formats(array_len, 0);
           arg->update(&types[0], &values[0], &lengths[0], &formats[0], i);
         }
 
-    PostgresResultWrapper result(PQexecParams(connection->get_db(),
-                                              sql.c_str(), n, NULL,
-                                              &values[0], &lengths[0],
-                                              &formats[0], 0));
+          PostgresResultWrapper result(PQexecParams(connection->get_db(),
+                                       sql.c_str(), n, NULL,
+                                       &values[0], &lengths[0],
+                                       &formats[0], 0));
 
-    ExecStatusType status = PQresultStatus( result.get_result() );
-    Value_P db_result_value;
+ExecStatusType status = PQresultStatus( result.get_result() );
+Value_P db_result_value;
 
     if (status == PGRES_COMMAND_OK)
        {
-         db_result_value = Str0( LOC );
+         db_result_value = Str0(LOC);
        }
     else if(status == PGRES_TUPLES_OK)
        {
