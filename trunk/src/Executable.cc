@@ -991,11 +991,11 @@ int lambda_num = 0;
              {
                switch(body[b1].get_tag())
                   {
-                    case TOK_L_CURLY:
+                    case TOK_L_CURLY:   // opening {
                          ++curly_level;
                          continue;
 
-                    case TOK_R_CURLY:
+                    case TOK_R_CURLY:   // closing }
                          if (0 == --curly_level)
                             {
                               end = b1;
@@ -1400,7 +1400,8 @@ UserFunction * ufun = get_exec_ufun();
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
-   // clear errors that may have occured before
+   // clear any errors that may have occured before
+   //
    if (Error * err = Workspace::get_error())   err->clear_error_code();
 
 ExecuteList * fun = new ExecuteList(data, loc);
@@ -1412,21 +1413,21 @@ ExecuteList * fun = new ExecuteList(data, loc);
              << "------------------- ExecuteList::fix() --" << endl;
       }
 
-   {
-     Error * err = Workspace::get_error();
-     if (err && err->get_error_code())
-        {
-          Log(LOG_UserFunction__fix)
-             {
-                CERR << "fix pmode=execute list failed with error "
-                     << Error::error_name(err->get_error_code()) << endl;
-             }
-
-          err->set_parser_loc(0);
-          delete fun;
-          return 0;
-        }
-   }
+   if (Error * err = Workspace::get_error())
+      {
+        if (err->get_error_code())
+           {
+             Log(LOG_UserFunction__fix)
+                {
+                   CERR << "fix pmode=execute list failed with error "
+                        << Error::error_name(err->get_error_code()) << endl;
+                }
+     
+             err->set_parser_loc(0);
+             delete fun;
+             return 0;
+           }
+      }
 
    try
       {
@@ -1480,6 +1481,31 @@ StatementList * fun = new StatementList(data, loc);
       }
    catch (Error & e)
       {
+         if (e.get_error_code() == E_UNBALANCED_L_CURLY)
+            {
+              int curly_level = 0;
+              loop(d, data.size())
+                  {
+                    const Unicode uni = data[d];
+                    if (uni == UNI_L_CURLY)        // opening {
+                       {
+                         ++curly_level;
+                       }
+                    else if (uni == UNI_R_CURLY)   // closing }
+                       {
+                         --curly_level;
+                       }
+                    else if (uni == UNI_COMMENT)
+                      {
+                        MORE_ERROR() << "Invalid comment (⍝) in { ... }";
+                      }
+                    else if (uni == UNI_NUMBER_SIGN)
+                      {
+                        MORE_ERROR() << "Invalid comment (#) in { ... }";
+                      }
+                  }
+            }
+
         Log(LOG_UserFunction__fix)
            CERR << "parse_body_line(line 0) failed" << endl;
         delete fun;

@@ -1365,7 +1365,8 @@ UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 int signature = SIG_FUN | SIG_Z;
 int t = 0;
 
-ShapeItem semi = -1;
+ShapeItem header_semi    = -1;
+ShapeItem header_comment = -1;
    while (t < text.ssize())
        {
          switch(text[t++])
@@ -1376,24 +1377,35 @@ ShapeItem semi = -1;
               case UNI_OMEGA_UNDERBAR: signature |= SIG_RO;   continue;
               case UNI_ALPHA:          signature |= SIG_A;    continue;
 
-              case UNI_SEMICOLON:      if (semi == -1)   semi = t - 1;
-                                       continue;
+              case UNI_SEMICOLON:
+                   if (header_semi == -1)   header_semi = t - 1;
+                   continue;
 
-              case UNI_LF:             break;   // header line done
-              default:                 continue;
+              case UNI_NUMBER_SIGN:
+              case UNI_COMMENT:
+                   header_comment = t;
+                   while (t < text.ssize() && text[t] != UNI_LF)   ++t;
+                   ++t;                            // skip LF
+                   break;                          // header line done
+
+              case UNI_LF:             break;      // header line done
+                   break;
+              default:                 continue;   // still in header
             }
 
-         break;   // header done
+         break;   // while (t < text.ssize())
        }
 
    // discard leading spaces
    //
    while (t < text.ssize() && text[t] == UNI_SPACE)   ++t;
 
-UCS_string body_text;
+UCS_string body_text;   // the rest of text after the header
+
    for (; t < text.ssize(); ++t)   body_text.append(text[t]);
 
    while (body_text.back() == UNI_LF)  body_text.pop_back();
+if (header_comment)   {}
 
 Token_string body;
    {
@@ -1404,9 +1416,9 @@ Token_string body;
      body.push_back(tok_endl);
    }
 
-   if (semi != -1)
+   if (header_semi != -1)
       {
-        for (ShapeItem s = semi; text[s] != UNI_LF; ++s)
+        for (ShapeItem s = header_semi; text[s] != UNI_LF; ++s)
            {
              body_text.append(text[s]);
            }
