@@ -31,12 +31,12 @@ class Symbol;
 /// a line number like 1.2 while editing it
 struct LineLabel
 {
-   /// empty constuctor
+   /// empty constructor
    LineLabel()
    : ln_major(0)
    {}
 
-   /// constuctor: line mj
+   /// constructor: line mj
    LineLabel(int mj)
    : ln_major(mj)
    {}
@@ -167,10 +167,11 @@ protected:
    /// restore function
    const char * execute_escape();
 
-   /// create a new function.
+   /// create a new function. Return a non-zero error text on error.
    const char * open_new_function();
 
-   /// open an existing function, or create a new one.
+   /// open an existing function, or create a new one. Return a non-zero
+   // error text on error.
    const char * open_existing_function(const UCS_string & name);
 
    /// return true if \b ucs starts with an axis

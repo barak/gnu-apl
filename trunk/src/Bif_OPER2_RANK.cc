@@ -21,6 +21,64 @@
 /** @file
 */
 
+/*
+    This file implements: (A) f ⍤ y B
+                     and: (A) f ⍤[X] y B.
+
+    IBM APL2 defines none of them,
+    ISO 13751 defines the first, but not the axis variant, and
+    NARS defines both.
+
+   The implentation is roughly this:
+
+   1. The N-dimensional case is reshaped to the case where A and B are vectors
+   2. Function f is iterated over B (and, in the dyadic case A).
+   3. The result of the iterations is reshaped and disclosed to the desired form.
+
+   Since f can be a defined function (or, for that matter, a lambds), its
+   computation is implemented as a macro (like for other operators with defined
+   functrions. In theory built-in functions could be implemented entirely in
+   C++, but we believe that ⍤ is so rarely used that this would not be worth
+   the effort. The macros used are:
+
+   For: f ⍤ y B (monadic):
+
+   ∇Z←(LO Z__LO_RANK_X5_B) [X5] B;LB;rho_B;N_max;N;LZ;rho_Z
+    (X5 LB rho_B LZ rho_Z)←X5 ◊ B←(LZ,LB)⍴B ◊ N_max←LZ+N←⎕IO ◊ Z←LZ⍴0
+    Z[N]←⊂LO rho_B⍴B[N;] ◊ 0 → N_max>N←N+1
+    →(X5≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0
+    WITH_AXES:           Z←⊃[X5]rho_Z⍴Z
+   ∇
+
+   For: A f ⍤ y B (dyadic):
+
+   ∇Z←A (LO Z__A_LO_RANK_X7_B)[X7] B;LA;rho_A;LB;rho_B;N_max;N;LZ;rho_Z
+    (X7 LA rho_A LB rho_B LZ rho_Z)←X7 ◊ A←(LZ,LA)⍴A ◊ B←(LZ,LB)⍴B
+    N_max←LZ+N←⎕IO ◊ Z←LZ⍴0
+    Z[N]←⊂(rho_A⍴A[N;]) LO rho_B⍴B[N;] ◊ 0 → N_max>N←N+1
+    →(X7≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0
+    WITH_AXES:           Z←⊃[X7]rho_Z⍴Z
+   ∇
+
+   In both cases conforms 30 ⎕CR all items of the result to the same shape.
+
+   Terminology (mostly from ISO): The shape of an argument (A or B) is ibeing
+   divided into a higher part (called frame (-shape)) and a lower part (called
+   chunk (-shape), For example:
+
+         ⍴B  ←→  (⍴frame) , (⍴chunk)
+
+   The point where the shapes are split into frame and chunk is defined by
+   vector y (which is the right function (!) argument RO of the dyadic
+   operator ⍤. y may have 1, 2, or 3 items which implies a 3-item vector Y:
+   
+         Y ←→ { ⌽3⍴⌽⍵ } y   i.e.
+
+         y1        ←→  y1 y1 y1
+         y1 y2     ←→  y2 y1 y2
+         y1 y2 y3  ←→  y1 y2 y3
+ */
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER2_RANK.hh"
 #include "IntCell.hh"
@@ -31,7 +89,7 @@
 Bif_OPER2_RANK   Bif_OPER2_RANK::fun;
 
 /* general comment: we use the term 'chunk' instead of 'p-rank' to avoid
- * confusion with the rank of a value
+   confusion with the rank of a value
  */
 
 //----------------------------------------------------------------------------
@@ -41,9 +99,7 @@ Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B) const
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-sRank rank_chunk_B = B->get_rank();
-   y123_to_B(y.get_apl_val(), rank_chunk_B);
-
+const sRank rank_chunk_B = y123_to_chunk_B_rank(y.get_apl_val(), B->get_rank());
    return do_LyXB(LO, Value_P(), B, rank_chunk_B);
 }
 //----------------------------------------------------------------------------
@@ -53,9 +109,7 @@ Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B) const
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-sRank rank_chunk_B = B->get_rank();
-
-   y123_to_B(y.get_apl_val(), rank_chunk_B);
+const sRank rank_chunk_B = y123_to_chunk_B_rank(y.get_apl_val(), B->get_rank());
 
    return do_LyXB(LO, X, B, rank_chunk_B);
 }
@@ -65,11 +119,16 @@ Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, sRank rank_chunk_B)
 {
 cFunction_P LO = _LO.get_function();
    Assert(LO);
-   if (!LO->has_result())   DOMAIN_ERROR;
+   if (!LO->has_result())
+      {
+        MORE_ERROR() << "f ⍤ y B: function f returns no result";
+        DOMAIN_ERROR;
+      }
 
    // split shape of B into high (=frame) and low (= chunk) shapes.
    //
-const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
+const sRank frame_B_rank = B->get_rank() - rank_chunk_B;
+const Shape shape_Z = B->get_shape().frame_shape(frame_B_rank);
    if (shape_Z.is_empty())
       {
         Value_P Fill_B = Bif_F12_TAKE::first(*B);
@@ -80,26 +139,56 @@ const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_B = B->get_shape().low_shape(rank_chunk_B);
+   if (+X)   // ⍤ with axis
+      {
+        loop(x, X->element_count())
+            {
+              const APL_Integer axis = X->get_cravel(x).get_int_value();
+              if (axis != B->get_rank())
+                 {
+                   MORE_ERROR() << "f ⍤[X] B: invalid axis " << axis
+                                << " of B (with ⍴⍴B = " << B->get_rank()
+                                << ") in X.";
+                   RANK_ERROR;
+                 }
+            }
+      }
 
-Value_P vsh_B(shape_B.get_rank(), LOC);
-   vsh_B->set_proto_Int();   // prototype
-   loop(sh, shape_B.get_rank())
-       vsh_B->next_ravel_Int(shape_B.get_shape_item(sh));
-   vsh_B->check_value(LOC);
+const Shape shape_B = B->get_shape().chunk_shape(rank_chunk_B);
 
-Value_P vsh_Z(shape_Z.get_rank(), LOC);
-   loop(sh, shape_Z.get_rank())
-       vsh_Z->next_ravel_Int(shape_Z.get_shape_item(sh));
-   vsh_Z->check_value(LOC);
+Value_P vsh_B(LOC, &shape_B);   // vsh_B ← ⍴B
+Value_P vsh_Z(LOC, &shape_Z);   // vsh_Z ← ⍴Z
 
+   /* X5 is the macro argument B of Macro::MAC_Z__LO_RANK_X5_B, which
+      does the following:
+
+      B ← (LZ,LB) ◊ Z ← LZ⍴0
+      for every result item Z[N]: Z[N] ← ⊂ LO B[N;]
+      Z←rho_Z⍴Z and disclose Z:
+         either with: 30 ⎕CR          if LO ⍤ B  (no axis)
+         or with:     ⊃[X5]           if LO ⍤ [X]B
+  
+      X5[0] the axis for the final disclose of rho_Z⍴Z if: f⍤[X] B
+            and -1 if no final disclose needed, i.e.if:    f ⍤ B 
+      X5[1] LB: the lower part of ⍴B
+      X5[2] rho_B: the shape of one rank-y6 cell of B
+      X5[3] LZ: the upper part of ⍴Z (= number of LO calls)
+      X5[4] rho_Z: the final shape of Z (before 30 ⎕CR)
+    */
 Value_P X5(5, LOC);
-   if (!X)   X5->next_ravel_Int(-1);            // ¯1 means no X
-   else      X5->next_ravel_Pointer(X.get());
+   if (!X)   X5->next_ravel_Int(-1);            // no X:  f ⍤ y B
+   else if (X->is_simple_scalar())   // X → ,X
+      {
+        Value_P X1(1, LOC);
+        X1->next_ravel_Int(X->get_cfirst().get_int_value());
+        X1->check_value(LOC);
+        X5->next_ravel_Pointer(X1.get());   // with X: f ⍤[X] y B
+      }
+   else      X5->next_ravel_Pointer(X.get());   // with X: f ⍤[X] y B
 
    X5->next_ravel_Int(shape_B.get_volume());    // LB
    X5->next_ravel_Pointer(vsh_B.get());         // rho_B
-   X5->next_ravel_Int(shape_Z.get_volume());    // N_max
+   X5->next_ravel_Int(shape_Z.get_volume());    // LZ
    X5->next_ravel_Pointer(vsh_Z.get());         // rho_Z
    X5->check_value(LOC);
 
@@ -140,26 +229,56 @@ Bif_OPER2_RANK::do_ALyXB(Value_P A, sRank rank_chunk_A, Token & _LO,
 {
 cFunction_P LO = _LO.get_function();
    Assert(LO);
-   if (!LO->has_result())   DOMAIN_ERROR;
-
-sRank rk_A_frame = A->get_rank() - rank_chunk_A;   // rk_A_frame is y8
-sRank rk_B_frame = B->get_rank() - rank_chunk_B;   // rk_B_frame is y9
-
-   // if both high-ranks are 0, then return A LO B.
-   //
-   if (rk_A_frame == 0 && rk_B_frame == 0)   return LO->eval_AB(A, B);
-
-   // split shapes of A1 and B1 into high (frame) and low (chunk) shapes.
-   // Even though A and B have the same shape, rk_A_frame and rk_B_frame
-   // could be different, leading to different split shapes for A and B
-   //
-const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
-                                 : A->get_shape().high_shape(rk_A_frame);
-
-   if (rk_A_frame && rk_B_frame)   // A and B frames non-scalar
+   if (!LO->has_result())
       {
-        if (rk_A_frame != rk_B_frame)                           RANK_ERROR;
-        if (shape_Z != A->get_shape().high_shape(rk_A_frame))   LENGTH_ERROR;
+        MORE_ERROR() << "A f ⍤ y B: function f returns no result";
+        DOMAIN_ERROR;
+      }
+
+sRank frame_A_rank = A->get_rank() - rank_chunk_A;   // frame_A_rank is y8
+sRank frame_B_rank = B->get_rank() - rank_chunk_B;   // frame_B_rank is y9
+
+   // if both high-ranks are 0 (i.e. high shapes are ⍬), then return A LO B.
+   //
+   if (frame_A_rank == 0 && frame_B_rank == 0)   return LO->eval_AB(A, B);
+
+   /* Otherwise at least one of the frame ranks is > 0.
+      split shapes of A1 and B1 into high (frame) and low (chunk) shapes.
+      Even cwif A and B have the same shape, frame_A_rank and frame_B_rank
+      could be different, leading to differently split shapes for A and B
+
+      Non-scalar frame ranks must be equal and their shapes must match.
+    */
+const Shape shape_Z = frame_B_rank ? B->get_shape().frame_shape(frame_B_rank)
+                                   : A->get_shape().frame_shape(frame_A_rank);
+
+   if (+X)   // ⍤ with axis
+      {
+        loop(x, X->element_count())
+            {
+              const APL_Integer axis = X->get_cravel(x).get_int_value();
+              if (axis != B->get_rank())
+                 {
+                   MORE_ERROR() << "A f ⍤[X] B: invalid axis " << axis
+                                << " of B (with ⍴⍴B = " << B->get_rank()
+                                << ") in X.";
+                   RANK_ERROR;
+                 }
+
+              if (axis != A->get_rank())
+                 {
+                   MORE_ERROR() << "A f ⍤[X] B: invalid axis " << axis
+                                << " of A (with ⍴⍴A = " << A->get_rank()
+                                << ") in X.";
+                   RANK_ERROR;
+                 }
+            }
+      }
+
+   if (frame_A_rank && frame_B_rank)   // A and B frames non-scalar
+      {
+        if (frame_A_rank != frame_B_rank)                          RANK_ERROR;
+        if (shape_Z != A->get_shape().frame_shape(frame_A_rank))   LENGTH_ERROR;
       }
 
    if (shape_Z.is_empty())
@@ -182,45 +301,71 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape low_A = A->get_shape().low_shape(rank_chunk_A);
-const Shape low_B = B->get_shape().low_shape(rank_chunk_B);
+const Shape low_A = A->get_shape().chunk_shape(rank_chunk_A);
+const Shape low_B = B->get_shape().chunk_shape(rank_chunk_B);
 
 Value_P vsh_A(LOC, &low_A);
 Value_P vsh_B(LOC, &low_B);
 Value_P vsh_Z(LOC, &shape_Z);
 
+   /* X7 is the macro argument B of Macro::MAC_Z__LO_RANK_X7_B, which
+      does the following:
+
+      A← (LZ,LA)⍴A ◊ B ←(LZ,LB)⍴B ◊ Z ← LZ⍴0
+      for every result item Z[N]: Z[N] ← ⊂ A[N;] LO B[N;]
+      Z←rho_Z⍴Z and disclose Z:
+         either with: 30 ⎕CR          if LO ⍤ B  (no axis)
+         or with:     ⊃[X7]           if LO ⍤ [X]B
+  
+      X7[0] the axis for the final disclose of rho_Z⍴Z if: f⍤[X] B
+            and -1 if no final disclose needed, i.e.if:    f ⍤ B 
+      X7[1] LA: the lower part of ⍴A
+      X7[2] rho_A: the shape of one rank-y6 cell of A
+      X7[3] LB: the lower part of ⍴B
+      X7[4] rho_B: the shape of one rank-y6 cell of B
+      X7[5] LZ: the upper part of ⍴Z (= number of LO calls)
+      X7[6] rho_Z: the final shape of Z (before 30 ⎕CR)
+    */
 Value_P X7(7, LOC);
-   if (!X)   X7->next_ravel_Int(-1);                    // no X
-   else      X7->next_ravel_Value(X.get());
+   if (!X)   X7->next_ravel_Int(-1);                 // no X:   A ⍤ y B
+   else      X7->next_ravel_Value(X.get());          // with X: A ⍤[X] y B
 
    X7->next_ravel_Int(low_A.get_volume());           // LA
-   X7->next_ravel_Value(vsh_A.get());
+   X7->next_ravel_Value(vsh_A.get());                // rho_A
    X7->next_ravel_Int(low_B.get_volume());           // LB
-   X7->next_ravel_Value(vsh_B.get());
-   X7->next_ravel_Int(shape_Z.get_volume());         // N_max
+   X7->next_ravel_Value(vsh_B.get());                // rho_B
+   X7->next_ravel_Int(shape_Z.get_volume());         // LZ
    X7->next_ravel_Value(vsh_Z.get());
    X7->check_value(LOC);
    return Macro::get_macro(Macro::MAC_Z__A_LO_RANK_X7_B)
                            ->eval_ALXB(A, _LO, X7, B);
 }
 //----------------------------------------------------------------------------
-void
-Bif_OPER2_RANK::y123_to_B(Value_P y123, sRank & rank_B)
+sRank
+Bif_OPER2_RANK::y123_to_chunk_B_rank(Value_P y123, sRank rank_B)
 {
-   // y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
-   // "frame" and a (lower-dimensions) "chunk" as specified by y123.
+   /* y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
+      "frame" and a (lower-dimensions) "chunk" as specified by y123.
 
-   // 1. on entry rank_B is the rank of B.
-   //
-   //    Remember the rank of B to limit rank_B
-   //    if values in y123 should exceed them.
-   //
-const sRank rk_B = rank_B;
+      Let Z ← A f ⍤ y123 B. Then y123 is the chunk ranks of Z, A, and B.
 
-   if (!y123)                   VALUE_ERROR;
-   if ( y123->get_rank() > 1)   DOMAIN_ERROR;
+      See ISO p. 124, 125
+    */
 
-   // 2. the number of elements in y determine how rank_B shall be computed:
+   if (!y123)
+      {
+        MORE_ERROR() << "(A) f ∘ y B without y ";
+        VALUE_ERROR;
+      }
+
+   if ( y123->get_rank() > 1)
+      {
+        MORE_ERROR() << "(A) f ∘ y B with ⍴⍴y = " << y123->get_rank()
+                     << " (expecting 1 ≥ ⍴⍴y 1).";
+        RANK_ERROR;
+      }
+
+   // 2. the number of elements in y determines rank_B:
    //
    //                    -- monadic f⍤ --       -- dyadic f⍤ --
    //          	        rank_A     rank_B       rank_A   rank_B
@@ -230,26 +375,41 @@ const sRank rk_B = rank_B;
    // yM yA yB :        N/A        yM           yA       yB
    // ---------------------------------------------------------
 
+   /* Set y3 to ↑ ⌽3⍴⌽y1. We need only y3 but check that all items of y123
+      are integers. Note that:
+
+      ⌽3⍴⌽ 1      ←→  1 1 1
+      ⌽3⍴⌽ 1 2    ←→  2 1 2
+      ⌽3⍴⌽ 1 2 3  ←→  1 2 3
+             │ │      │
+             │ │      └──── take
+             └─┴─────────── check
+    */
+sRank y3;
+
    switch(y123->element_count())
       {
-        case 1: rank_B = y123->get_cfirst().get_near_int();   break;
+        case 1:  y3 = y123->get_cfirst().get_near_int();    // take
+                 break;
 
-        case 2:          y123->get_cfirst().get_near_int();
-                rank_B = y123->get_cravel(1).get_near_int();   break;
+        case 2:       y123->get_cfirst().get_near_int();    // check
+                 y3 = y123->get_cravel(1).get_near_int();   // take
+                 break;
 
-        case 3: rank_B = y123->get_cfirst().get_near_int();
-                         y123->get_cravel(1).get_near_int();
-                         y123->get_cravel(2).get_near_int();   break;
+        case 3:  y3 = y123->get_cfirst().get_near_int();    // take
+                      y123->get_cravel(1).get_near_int();   // check
+                      y123->get_cravel(2).get_near_int();   // check
+                      break;
 
-        default: LENGTH_ERROR;
+        default: // ISO p. 124 (monadic) p. 125 (dyadic)
+                 MORE_ERROR() << "(A) f ∘ y B with ⍴y = "
+                              << y123->element_count() << " (not 1, 2, or 3)";
+                 LENGTH_ERROR;
       }
 
-   // 3. adjust rank_B if they exceed its initial value or
-   // if it is negative
-   //
-   if (rank_B > rk_B)   rank_B = rk_B;
-   if (rank_B < 0)      rank_B += rk_B;
-   if (rank_B < 0)      rank_B = 0;
+const sRank y5 = y3 > rank_B ? rank_B : y3;
+sRank y6 = y5;   if (y5 < 0)   y6 = y5 > 0 ? y5 : 0;
+   return y6;
 }
 //----------------------------------------------------------------------------
 void
@@ -308,51 +468,63 @@ const sRank rk_B = rank_B;
 }
 //----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B)
+Bif_OPER2_RANK::split_y_B(Value_P y123_B, Value_P & y123, Value_P & B)
 {
-   // The ISO standard and NARS define the reduction pattern for the RANK
-   // operator ⍤ as:
-   //
-   // Z ← A f ⍤ y B		(ISO)
-   // Z ←   f ⍤ y B		(ISO)
-   // Z ← A f ⍤ [X] y B		(NARS)
-   // Z ←   f ⍤ [X] y B		(NARS)
-   //
-   // GNU APL may bind y to B at tokenization time if y and B are constants
-   // This function tries to "unbind" its argument y123_B into the original
-   // components y123 (= y in the standard) and B. The tokenization time
-   // binding is shown as y123:B
-   //
-   //    Usage               y123   : B        Result:   j123       B
-   //-------------------------------------------------------------------------
-   // 1.   f ⍤ (y123):B...   nested   any                y123       B
-   // 2.  (f ⍤ y123:⍬)       simple   empty              y123       -
-   // 3.   f ⍤ y123:(B)      simple   nested skalar      y123       B
-   // 4a.  f ⍤ y123:B...     simple   any                y123       B...
-   //
+   /* The ISO standard and NARS define the reduction patterns for the RANK
+      operator ⍤ as:
+     
+      Z ← A f ⍤ y B		    (ISO and NARS)
+      Z ←   f ⍤ y B		    (ISO and NARS)
+      Z ← A f ⍤ [X] y B		(NARS only)
+      Z ←   f ⍤ [X] y B		(NARS only)
 
-   // y123_B shall be a scalar or vector
+      We say y123 instead of y here to indicate that y has 1, 2, or 3 items.
+
+      If y and B are integer literals then GNU APL will bind y to B at
+      tokenization time.
+
+      This function tries to "unbind" its argument y123_B into the original
+      components y123 (= y in the ISO standard) and B. y123 can be an integer
+      scalar IS or an integer vector IV (with 1-3 items). B can be a scalar
+      BS or an nested scalar Bn of any type.
+
+     Parser::fix_RANK_syntax() makes sure that leading integers literals
+     are not stranded together with items of B. Although that avoids an
+     incorrect mixing of y and B literals, it can not ensure that the
+     first item of y123_B is a scalar (e.g. f ⍤ N B with scalar variable N
+     or niladic function N returning a scalar). It does guarantee, however,
+     that the first item of y123_B is really y123_B and that subsequent
+     items of belong to B. The possible cases are therefore:
+
+     case   y123_B      y123     B         Note
+     ────────────────────────────────────────────────────────────────────────
+      1.     nested,B    ↑y123_B  1↓y123_B  nested from fix_RANK_syntax()
+      2.     simple,B    ↑y123_B  1↓y123_B  simple from variable or niladic N
+     ────────────────────────────────────────────────────────────────────────
+    */
+
+   // in both cases is y123_B a vector
    //
-   if (y123_B->get_rank() > 1)
+   if (y123_B->get_rank() != 1)
       {
-        BACKTRACE
-        MORE_ERROR() << "f⍤j B: ⍴⍴ = " << y123_B->get_rank();
+        MORE_ERROR() << "f⍤y B: ⍴⍴B = " << y123_B->get_rank()
+                     << " (expecting a vector y)";
         RANK_ERROR;
       }
 
 const ShapeItem length = y123_B->element_count();
    if (length == 0)
       {
-        MORE_ERROR() << "f⍤j B: ⍴j = " << length;
+        MORE_ERROR() << "f⍤y B: invalid empth y (⍴y = 0)";
         LENGTH_ERROR;
       }
 
    // check for case 1 (the only one with nested first element)
    //
-   if (y123_B->get_cfirst().is_pointer_cell())   // (y123)
+   if (y123_B->get_cfirst().is_pointer_cell())   // case 1: (y123)
       {
          y123 = y123_B->get_cfirst().get_pointer_value();
-         if (length == 1)        // empty B
+         if (length == 1)        // scalar y123 and empty B
             {
             }
          else if (length == 2)   // skalar B

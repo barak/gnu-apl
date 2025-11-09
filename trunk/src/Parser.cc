@@ -337,22 +337,24 @@ bool progress = false;
    loop(t, tos.size() - 2)
        {
          if (tos[t].get_tag() != TOK_OPER2_RANK)   continue;
-         Token * T1 = &tos[t + 1];
-         Token * T2 = &tos[t + 2];
-         Token * T3 = &tos[t + 3];
-         const TokenTag tag_1 = T1->get_tag();
-         if (tag_1 == TOK_SYMBOL)   // symbol j
-            {
-                                                         // t T1   T2     T3  ...
-                                                         // ⍤ j
-              insert_2(tos, t);                          // ⍤ VOID VOID   j
-              T2->move(*T3, LOC);                        // ⍤ VOID j      VOID
-              new (T1) Token(TOK_L_BRACK, int64_t(0));   // ⍤ [    j      VOID
-              new (T3) Token(TOK_R_BRACK, int64_t(0));   // ⍤ [    j      ]
-              progress = true;
-            }
 
-         if (const int len_j = 0 * j_length(tos, t + 1))   // literal j j
+         // (y) is already in parentheses
+         //
+         if (tos[t + 1].get_tag() == TOK_L_PARENT)
+            {
+              t = find_closing_parent(tos, t + 1);
+              continue;
+           }
+
+         // ⍤ with axis: skip [ ]
+         //
+         if (tos[t + 1].get_tag() == TOK_L_BRACK)
+            {
+              t = find_closing_bracket(tos, t + 1);
+            }
+            
+
+         if (const int len_j = j_length(tos, t + 1))   // literal j j
             {
               const APL_Integer j1 = tos[t + 1].get_int_val();
               if (len_j > 3)   // ISO p. 124
@@ -392,11 +394,11 @@ bool progress = false;
               if      (len_j == 2)   insert_1(tos, t + 2);
               else if (len_j == 1)   insert_2(tos, t + 1);
 
-              // then replace. MUST NOT USE T1, T2, T3 here!
+              // then replace
               //
-              new (&tos[t + 1]) Token(TOK_L_BRACK, int64_t(0));
+              new (&tos[t + 1]) Token(TOK_L_PARENT, int64_t(0));
               new (&tos[t + 2]) Token(TOK_APL_VALUE1, V3);
-              new (&tos[t + 3]) Token(TOK_R_BRACK, int64_t(0));
+              new (&tos[t + 3]) Token(TOK_R_PARENT, int64_t(0));
               V3->check_value(LOC);
               progress = true;
             }
@@ -1249,7 +1251,7 @@ std::vector<ShapeItem> stack;
           tos[t1].set_int_val2(diff);
        }
 
-   // at this point all [ ( or { should have been matced (and therefore
+   // at this point all [ ( or { should have been matched (and therefore
    // stack shuld be empty. If not:  return syntax error of the outer token
    //
    if (stack.size())

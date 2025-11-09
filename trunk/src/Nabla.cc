@@ -423,7 +423,7 @@ bool hdr_has_vars;
              //
              // case 2.
              if (const char * loc =
-                              open_existing_function(fun_symbol->get_name()))
+                       open_existing_function(fun_symbol->get_name()))
                 return loc;
 
              if (hdr_has_vars)
@@ -719,6 +719,13 @@ Nabla::open_new_function()
    Log(LOG_nabla)
       UERR << "creating new function with header '"
            << fun_header << "'" << endl;
+
+   // check for lambda
+   //
+   if (fun_header.contains(UNI_LAMBDA))
+       {
+         CERR << "\n*** WARNING: trying to edit a lambda? Don't!***" << endl;
+       }
 
    function_existed = false;
    lines.push_back(FunLine(0, fun_header));

@@ -2002,11 +2002,29 @@ generated for unnamed lambdas in order to provide a name in places where a
 function name is needed.
 
 @c ............................................................................
-@subsection Limitations of Lambdas
+@subsection Limitations of GNU APL Lambdas
 
 There are a number of features related to lambdas that are present in other
-APL interpreters but that are NOT implemented in GNU APL. This includes
+APL interpreters but that are @b{NOT} implemented in GNU APL. This includes
 multiple statements, guards, lexical scoping, and probably more.
+
+The primary reason for these limitations in not the lazyness of the GNU APL
+author, but the fact that the lambdas in other APL dialects introduce a 
+execution semantics that is very different from the execution semantics of
+@i{properly} defined functions (i.e. those created with the ∇-editor or
+with @b{⎕FX}. For example, a properly defined function returns with @b{→0}
+or after its last line was executed, while the lambdas in other dialects
+also returns after the first non-committed value was computed (i.e. in the
+middle of a multi-line function and without any @b{→0} (and without any 
+warnings). The GNU APL author is an old-fashioned programmer from the APL1
+aera who considers it outright dangerous to have two kinds of functions that
+very much look the same (the only difference being the argument names @b{⍺}
+and @b{⍵}), but that behave fundamentally different.
+
+In contrast, GNU APL tries to keep the same execution semantics for lambdas
+and for properly defined functions. As one of the consequences, you
+@i{should not} create or modify a lambdas with @b{⎕FX} or with the ∇-editor
+(it may be possible for debugging purposes, but then it is asking for trouble).
 
 
 @c ----------------------------------------------------------------------------

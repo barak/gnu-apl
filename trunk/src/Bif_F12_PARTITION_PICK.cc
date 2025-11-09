@@ -437,7 +437,15 @@ Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
          perm_cB.add_shape_item(sh_X.get_shape_item(x));
        }
 
-   Assert(perm_cB.get_rank() == cB->get_rank());
+   if (perm_cB.get_rank() != cB->get_rank())
+      {
+        MORE_ERROR() << "⊃[X] B: the number of disclosed axes ("
+                     << perm_cB.get_rank()
+                     << ") in X does not match the number of\n"
+                        " axes (" << cB->get_rank() << ") in B. That is, "
+                        "⍴⍴X ≠ ⌈/∈⍴¨⍴¨⍴¨B";
+        RANK_ERROR;
+      }
 
    return Bif_F12_TRANSPOSE::transpose(perm_cB, cB.get());
 }

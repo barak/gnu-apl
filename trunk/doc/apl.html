@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>November 7, 2025.
+<p>November 9, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -148,7 +148,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
     <ul class="no-bullet">
       <li><a id="toc-Named-Lambdas" href="#Named-Lambdas">2.8.1 Named Lambdas</a></li>
       <li><a id="toc-Unnamed-Lambdas" href="#Unnamed-Lambdas">2.8.2 Unnamed Lambdas</a></li>
-      <li><a id="toc-Limitations-of-Lambdas" href="#Limitations-of-Lambdas">2.8.3 Limitations of Lambdas</a></li>
+      <li><a id="toc-Limitations-of-GNU-APL-Lambdas" href="#Limitations-of-GNU-APL-Lambdas">2.8.3 Limitations of GNU APL Lambdas</a></li>
     </ul></li>
     <li><a id="toc-_005dDOXY-Command" href="#Section-2_002e9">2.9 ]DOXY Command</a></li>
     <li><a id="toc-Commands-_0029COPY_005fONCE_002c-_0029DUMP_002c-and-DUMP_002dHTML" href="#Section-2_002e10">2.10 Commands )COPY_ONCE, )DUMP, and DUMP-HTML</a>
@@ -2253,7 +2253,7 @@ limited form.
 <ul class="section-toc">
 <li><a href="#Named-Lambdas" accesskey="1">Named Lambdas</a></li>
 <li><a href="#Unnamed-Lambdas" accesskey="2">Unnamed Lambdas</a></li>
-<li><a href="#Limitations-of-Lambdas" accesskey="3">Limitations of Lambdas</a></li>
+<li><a href="#Limitations-of-GNU-APL-Lambdas" accesskey="3">Limitations of GNU APL Lambdas</a></li>
 </ul>
 <div class="subsection" id="Named-Lambdas">
 <h4 class="subsection">2.8.1 Named Lambdas</h4>
@@ -2366,12 +2366,30 @@ generated for unnamed lambdas in order to provide a name in places where a
 function name is needed.
 </p>
 </div>
-<div class="subsection" id="Limitations-of-Lambdas">
-<h4 class="subsection">2.8.3 Limitations of Lambdas</h4>
+<div class="subsection" id="Limitations-of-GNU-APL-Lambdas">
+<h4 class="subsection">2.8.3 Limitations of GNU APL Lambdas</h4>
 
 <p>There are a number of features related to lambdas that are present in other
-APL interpreters but that are NOT implemented in GNU APL. This includes
+APL interpreters but that are <b>NOT</b> implemented in GNU APL. This includes
 multiple statements, guards, lexical scoping, and probably more.
+</p>
+<p>The primary reason for these limitations in not the lazyness of the GNU APL
+author, but the fact that the lambdas in other APL dialects introduce a 
+execution semantics that is very different from the execution semantics of
+<i>properly</i> defined functions (i.e. those created with the ∇-editor or
+with <b>⎕FX</b>. For example, a properly defined function returns with <b>→0</b>
+or after its last line was executed, while the lambdas in other dialects
+also returns after the first non-committed value was computed (i.e. in the
+middle of a multi-line function and without any <b>→0</b> (and without any 
+warnings). The GNU APL author is an old-fashioned programmer from the APL1
+aera who considers it outright dangerous to have two kinds of functions that
+very much look the same (the only difference being the argument names <b>⍺</b>
+and <b>⍵</b>), but that behave fundamentally different.
+</p>
+<p>In contrast, GNU APL tries to keep the same execution semantics for lambdas
+and for properly defined functions. As one of the consequences, you
+<i>should not</i> create or modify a lambdas with <b>⎕FX</b> or with the ∇-editor
+(it may be possible for debugging purposes, but then it is asking for trouble).
 </p>
 
 <hr>

@@ -89,11 +89,11 @@ public:
    Shape abs() const;
 
    /// return a shape with the upper \b cnt dimensions of this shape
-   Shape high_shape(uRank cnt) const
+   Shape frame_shape(uRank cnt) const
       { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
 
    /// return a shape with the lower \b cnt dimensions of this shape
-   Shape low_shape(uRank cnt) const
+   Shape chunk_shape(uRank cnt) const
       { Assert(cnt <= get_rank());
         return Shape(cnt, rho + (get_rank() - cnt)); }
 

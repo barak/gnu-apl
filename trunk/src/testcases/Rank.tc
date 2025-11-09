@@ -1,17 +1,7 @@
 ⍝ Rank
 ⍝ ----------------------------------
 
-      )ERASE ∆N
-      ∇Z←A ∆N B
-       ⍝ create some variables like N1, N21, ... A is the prefix
-       ⍝ (like 'N') and B is the numeric suffix of the variable name.
-       ⍝
-           →(2=⎕NC 'A')⍴DYA ◊ Z←⍳10∣B ◊ →(B<10)⍴0 ◊ Z←Z∘.+⍨10×∆N B←⌊B÷10 ◊ →0
-       DYA:→(1=⍴B)⍴ONE ◊ Z←A ∆N¨ B ◊ Z←0 0⍴⍬ ◊ →0
-       ONE:Z←∆N B ◊ ⍎ A,(⍕B),'←Z'  ◊ Z←0 0⍴⍬
-      ∇
-
-      'N' ∆N 2 3 5 34 233 234
+)COPY ISO-13751.apl
 
        ,⍤2 N233
 111 112 113 121 122 123 131 132 133
@@ -63,9 +53,8 @@
 
       ⍝ NARS:
       ⍝
-      L←'abcdef' ◊ R←⍳⍴L
 
-      L ,⍤0 R                       ⍝ a.k.a. L,[1.5] R
+      c6 ,⍤0 (⍳6)                       ⍝ a.k.a. L,[1.5] R
 a 1
 b 2
 c 3
@@ -73,7 +62,7 @@ d 4
 e 5
 f 6
 
-      L (,⍤0) R                       ⍝ a.k.a. L,[1.5] R
+      c6 (,⍤0) (⍳6)                       ⍝ a.k.a. L,[1.5] R
 a 1
 b 2
 c 3
@@ -81,7 +70,7 @@ d 4
 e 5
 f 6
 
-      L ,⍤(,0) R                       ⍝ a.k.a. L,[1.5] R
+      c6 ,⍤(,0) (⍳6)                       ⍝ a.k.a. L,[1.5] R
 a 1
 b 2
 c 3
@@ -89,7 +78,7 @@ d 4
 e 5
 f 6
 
-      L ,⍤0,⊂R                       ⍝ a.k.a. L,[1.5] R
+      c6 ,⍤0,⊂⍳6                       ⍝ a.k.a. L,[1.5] R
 a 1
 b 2
 c 3
@@ -99,19 +88,19 @@ f 6
 
       ⍝ with axis...
       ⍝
-      L ,⍤[1] 0 R                   ⍝ a.k.a. L,[0.5] R
+      c6 ,⍤[1] 0 (⍳6)                   ⍝ a.k.a. L,[0.5] R
 a b c d e f
 1 2 3 4 5 6
 
-      L (,⍤[1] 0) R                   ⍝ a.k.a. L,[0.5] R
+      c6 (,⍤[1] 0) (⍳6)                   ⍝ a.k.a. L,[0.5] R
 a b c d e f
 1 2 3 4 5 6
 
-      L ,⍤[1] (,0) R                   ⍝ a.k.a. L,[0.5] R
+      c6 ,⍤[1] (,0) (⍳6)                   ⍝ a.k.a. L,[0.5] R
 a b c d e f
 1 2 3 4 5 6
 
-      L ,⍤[1] 0 ,⊂R                   ⍝ a.k.a. L,[0.5] R
+      c6 ,⍤[1] 0 ,⊂(⍳6)                   ⍝ a.k.a. L,[0.5] R
 a b c d e f
 1 2 3 4 5 6
 

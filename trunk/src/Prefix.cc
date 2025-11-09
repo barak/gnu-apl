@@ -1597,9 +1597,9 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_B_()
 {
-Token &     F = at0();
+Token &     F_LO = at0();
 cFunction_P D = at1().get_function();
-Value_P     B = at2().get_apl_val();
+Value_P   y_B = at2().get_apl_val();
 
    // same as F D G, except for D = ⍤
    //
@@ -1612,14 +1612,15 @@ Value_P     B = at2().get_apl_val();
    // At this point we have f ⍤ [X] y_B with y_B glued in Parser.cc.
    // Unglue it. NOTE that B is y (and not the real B).
    //
-B->print_boxed(CERR << "B:", 4);
-Value_P y123_orig;
 Value_P B_orig;
-   Bif_OPER2_RANK::split_y123_B(B, y123_orig, B_orig);
-Token T_y123_orig(TOK_APL_VALUE1, y123_orig);
-
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_D_RO(F, D, T_y123_orig, LOC);
+   {
+     Value_P y123_orig;
+     Bif_OPER2_RANK::split_y_B(y_B, y123_orig, B_orig);
+     Token T_y123_orig_RO(TOK_APL_VALUE1, y123_orig);
+
+     new (derived) Derived_LO_D_RO(F_LO, D, T_y123_orig_RO, LOC);
+   }
 
 const Token Z(TOK_FUN2, derived);
 
@@ -1888,10 +1889,10 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_C_B()
 {
-Token &     F = at0();
+Token &     F_LO = at0();
 cFunction_P D = at1().get_function();
 Value_P     C = at2().get_function_axis();
-Value_P     B = at3().get_apl_val();
+Value_P   y_B = at3().get_apl_val();
 
    // reduce, except if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
@@ -1914,17 +1915,19 @@ Value_P     B = at3().get_apl_val();
              }
         }
 
-   // at this point we have f ⍤ [X] y_B. There may or may not com a left
-   // argument but our max token count is 4. We therefore bind
-   // F (aka. LO), D, and C together.
+   // at this point we have (A) f ⍤ [X] y_B. There may or may not come a left
+   // argument A but our max token count is 4. We therefore bind
+   // F (aka. LO), D, C, and T_y123_orig_RO together.
    //
-Value_P y123_orig;
 Value_P B_orig;
-   Bif_OPER2_RANK::split_y123_B(B, y123_orig, B_orig);
-Token T_y123_orig(TOK_APL_VALUE1, y123_orig);
-
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_D_X_RO(F, D, C, T_y123_orig, LOC);
+   {
+     Value_P y123_orig;
+     Bif_OPER2_RANK::split_y_B(y_B, y123_orig, B_orig);
+     Token T_y123_orig_RO(TOK_APL_VALUE1, y123_orig);
+
+     new (derived) Derived_LO_D_X_RO(F_LO, D, C, T_y123_orig_RO, LOC);
+   }
 
 const Token Z(TOK_FUN2, derived);
 

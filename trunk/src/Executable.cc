@@ -1356,7 +1356,11 @@ void
 Executable::increment_refcount(const char * loc)
 {
    Assert1(get_exec_ufun());
-   Assert(get_exec_ufun()->is_lambda());
+   if (!get_exec_ufun()->is_lambda())
+      {
+        MORE_ERROR() << "Attempt to edit a lambda";
+        DEFN_ERROR;
+      }
 
    ++refcount;
 

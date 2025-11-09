@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 7, 2025.  This manual briefly documents GNU APL, an interpreter
+November 9, 2025.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -1861,13 +1861,33 @@ Occasionally the names λ1, λ2, ...  may show up in commands like )SIS.
 These names are automatically generated for unnamed lambdas in order to
 provide a name in places where a function name is needed.
 
-2.8.3 Limitations of Lambdas
-----------------------------
+2.8.3 Limitations of GNU APL Lambdas
+------------------------------------
 
 There are a number of features related to lambdas that are present in
 other APL interpreters but that are NOT implemented in GNU APL. This
 includes multiple statements, guards, lexical scoping, and probably
 more.
+
+   The primary reason for these limitations in not the lazyness of the
+GNU APL author, but the fact that the lambdas in other APL dialects
+introduce a execution semantics that is very different from the
+execution semantics of properly defined functions (i.e.  those created
+with the ∇-editor or with ⎕FX. For example, a properly defined function
+returns with →0 or after its last line was executed, while the lambdas
+in other dialects also returns after the first non-committed value was
+computed (i.e.  in the middle of a multi-line function and without any
+→0 (and without any warnings).  The GNU APL author is an old-fashioned
+programmer from the APL1 aera who considers it outright dangerous to
+have two kinds of functions that very much look the same (the only
+difference being the argument names ⍺ and ⍵), but that behave
+fundamentally different.
+
+   In contrast, GNU APL tries to keep the same execution semantics for
+lambdas and for properly defined functions.  As one of the consequences,
+you should not create or modify a lambdas with ⎕FX or with the ∇-editor
+(it may be possible for debugging purposes, but then it is asking for
+trouble).
 
 
 File: apl.info,  Node: Section 2.9,  Next: Section 2.10,  Prev: Section 2.8,  Up: Chapter 2
@@ -8604,60 +8624,60 @@ Node: Section 2.561289
 Node: Section 2.665786
 Node: Section 2.765959
 Node: Section 2.866589
-Node: Section 2.970886
-Node: Section 2.1073257
-Node: Section 2.1175346
-Node: Section 2.1276919
-Node: Section 2.1378700
-Node: Section 2.1480629
-Node: Section 2.1581570
-Node: Section 2.1681841
-Node: Section 2.1783252
-Node: Section 2.1894155
-Node: Section 2.1996702
-Node: Section 2.20103647
-Node: Section 2.21105150
-Node: Section 2.22115957
-Node: Section 2.23121869
-Node: Section 2.24125242
-Node: Section 2.25125533
-Node: Section 2.26136386
-Node: Section 2.27136658
-Node: Section 2.28143711
-Node: Section 2.29146165
-Node: Section 2.30146834
-Node: Section 2.31148485
-Node: Section 2.32152409
-Node: Section 2.33166694
-Node: Output File Format183467
-Node: Section 2.34184642
-Node: Section 2.35194077
-Node: Section 2.36195096
-Node: Section 2.37210331
-Node: Section 2.38221526
-Node: Section 2.39223710
-Node: Section 2.40249822
-Node: Section 2.41254362
-Node: Section 2.42275461
-Node: Section 2.43286672
-Node: Section 2.44289942
-Node: Chapter 3290457
-Node: Chapter 4292965
-Node: Chapter 5294106
-Node: Section 5.1295753
-Node: Section 5.2297073
-Node: Section 5.3297433
-Node: Section 5.4297675
-Node: Section 5.5298337
-Node: Section 5.6298815
-Node: Section 5.7299588
-Node: Section 5.8300014
-Node: Chapter 6300416
-Node: Section 6.1300835
-Node: Section 6.2301522
-Node: Chapter 7302353
-Node: Section 7.1302856
-Node: Section 7.2328169
+Node: Section 2.972069
+Node: Section 2.1074440
+Node: Section 2.1176529
+Node: Section 2.1278102
+Node: Section 2.1379883
+Node: Section 2.1481812
+Node: Section 2.1582753
+Node: Section 2.1683024
+Node: Section 2.1784435
+Node: Section 2.1895338
+Node: Section 2.1997885
+Node: Section 2.20104830
+Node: Section 2.21106333
+Node: Section 2.22117140
+Node: Section 2.23123052
+Node: Section 2.24126425
+Node: Section 2.25126716
+Node: Section 2.26137569
+Node: Section 2.27137841
+Node: Section 2.28144894
+Node: Section 2.29147348
+Node: Section 2.30148017
+Node: Section 2.31149668
+Node: Section 2.32153592
+Node: Section 2.33167877
+Node: Output File Format184650
+Node: Section 2.34185825
+Node: Section 2.35195260
+Node: Section 2.36196279
+Node: Section 2.37211514
+Node: Section 2.38222709
+Node: Section 2.39224893
+Node: Section 2.40251005
+Node: Section 2.41255545
+Node: Section 2.42276644
+Node: Section 2.43287855
+Node: Section 2.44291125
+Node: Chapter 3291640
+Node: Chapter 4294148
+Node: Chapter 5295289
+Node: Section 5.1296936
+Node: Section 5.2298256
+Node: Section 5.3298616
+Node: Section 5.4298858
+Node: Section 5.5299520
+Node: Section 5.6299998
+Node: Section 5.7300771
+Node: Section 5.8301197
+Node: Chapter 6301599
+Node: Section 6.1302018
+Node: Section 6.2302705
+Node: Chapter 7303536
+Node: Section 7.1304039
+Node: Section 7.2329352
 
 End Tag Table
 
