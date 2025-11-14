@@ -32,6 +32,7 @@
 #include <ostream>
 
 #include "Assert.hh"
+#include "FileBuffers.hh"
 #include "UCS_string.hh"
 
 using namespace std;
@@ -198,6 +199,13 @@ public:
    /// true if xterm/color is on
    static bool color_enabled();
 
+   /// return the current column (chars since last LF).
+   static int get_column()
+       { return output_column; }
+
+   /// the current output column
+   static int output_column;
+
 protected:
    /// true if colors were changed (and then reset_colors() shall reset
    /// them when leaving the interpreter
@@ -209,14 +217,6 @@ protected:
    /// true if colors are currently enabled (by XTERM command)
    static bool colors_enabled;
 };
-
-/// a filebuf for stdin echo
-class CinOut : public filebuf
-{
-   /// overloaded filebuf::overflow
-   virtual int overflow(int c);
-};
-extern CinOut CIN_filebuf;
 
 /// an ostream for stdin echo and a few editing capabilities
 class CIN_ostream : public ostream

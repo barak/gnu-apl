@@ -315,6 +315,183 @@ int count = 0;
    return count;
 }
 //----------------------------------------------------------------------------
+ostream &
+Prefix::print_token_value(ostream & out, const Token & tok)
+{
+const TokenClass tc = tok.get_Class();
+   if (tc == TC_SYMBOL)
+      {
+        out << "SYMBOL(";
+        const Symbol * sym = tok.get_sym_ptr();
+        out << sym->get_name();
+        return out << ")";
+      }
+
+   if (tc == TC_VALUE)
+      {
+        const TokenTag tag = tok.get_tag();
+        if      (tag == TOK_APL_VALUE1)   out << "VALUE1(";
+        else if (tag == TOK_APL_VALUE2)   out << "VALUE2(";
+        else if (tag == TOK_APL_VALUE3)   out << "VALUE3(";
+        else if (tag == TOK_APL_VALUE4)   out << "VALUE4(";
+        else                              out << "VALUE?(";
+
+        Value_P value = tok.get_apl_val();
+        if (+value)
+           {
+             const Shape & shape = value->get_shape();
+             out << "⍴";
+             loop(r, shape.get_rank())
+                 {
+                   r && out << ";";
+                   out << shape.get_shape_item(r);
+                 }
+             out << "≡" << int(value->compute_depth()) << " ";
+             int count = value->element_count();
+             const bool more = count > 3;
+             if (more)   count = 3;
+             if (count == 0)   out << "⊖";   // empty
+             loop(c, count)
+                 {
+                   c && out << " ";
+                   const Cell & cell = value->get_cravel(c);
+                   if (cell.is_integer_cell())
+                      {
+                        out << cell.get_int_value();
+                      }
+                   else if (cell.is_float_cell())
+                      {
+                        out << "FLT";
+                      }
+                   else if (cell.is_complex_cell())
+                      {
+                        out << "CPLX";
+                      }
+                   else if (cell.is_pointer_cell())
+                      {
+                        out << "⊂";
+                      }
+                 }
+             more && out << "....";
+           }
+        else
+           {
+             out << "0";
+           }
+        return out << ")";
+      }
+   else
+      {
+        out << (Token::class_name(tc) + 3);
+      }
+   return out;
+}
+//----------------------------------------------------------------------------
+ostream &
+Prefix::print_patterns(ostream & out, int which)
+{
+const bool on_stack = which & 1;
+const bool ahead    = which & 2;
+const bool reverse  = which & 4;   // print ahead in APL order
+
+   if (on_stack)   // print token on the stack
+      {
+        int Nval = 0, Nfun = 0, Nop1 = 0, Nop2 = 0;
+        loop (s, ssize())
+             {
+               const Token & tok = at(s).get_token();
+               switch(tok.get_Class())
+                  {
+                    case TC_FUN12:    ++Nfun;      break;
+                    case TC_OPER1:    ++Nop1;      break;
+                    case TC_OPER2:    ++Nop2;      break;
+                    case TC_VALUE:    ++Nval;      break;
+                    default: break;
+                  }
+             }
+        const char * AB[4]  = { "A", "B",  "-", "-" };
+        const char * ARB[4] = { "A", "RO", "B", "-" };
+        const char * FG[4]  = { "F", "G",  "-", "-" };
+        const char ** V = AB;
+        const char ** F = FG;
+
+        if      (Nval <= 1)   V = AB + 1;
+        else if (Nval >  2)   V = ARB;
+
+        int sepa = 0;
+        out << "«";
+        loop (s, ssize())
+             {
+               if (sepa++)   out << " ";
+
+               const Token & tok = at(s).get_token();
+               switch(const TokenClass tc = tok.get_Class())
+                  {
+                    case TC_ASSIGN:   out << "ASS";    break;
+                    case TC_R_ARROW:  out << "BRA";    break;
+                    case TC_L_BRACK:  out << "LBRA";   break;
+                    case TC_R_BRACK:  out << "RBRA";   break;
+                    case TC_END:      out << "END";    break;
+                    case TC_FUN0:     out << "N";      break;
+                    case TC_FUN12:    out << *F++;     break;
+                    case TC_INDEX:    out << "C";      break;
+                    case TC_OPER1:    out << "M";      break;
+                    case TC_OPER2:    out << "D";      break;
+                    case TC_L_PARENT: out << "LPAR";   break;
+                    case TC_R_PARENT: out << "RPAR";   break;
+                    case TC_RETURN:   out << "RET";    break;
+                    case TC_SYMBOL:   out << "SYM";    break;
+                    case TC_VALUE:    out << *V++;      break;
+                    default: out << "TC_" << int(tc);
+                  }
+             }
+        out << "»";
+      }
+
+   if (on_stack && ahead)   out << " ";   // both
+
+   if (ahead)   // print token ahead
+      {
+        int sepa = 0;
+        if (reverse)
+           {
+             size_t end_of_statement = body.size() - 1;
+             for (size_t pc = PC; pc < body.size(); ++pc)
+                 {
+                   if (body[pc].get_Class() == TC_END)
+                      {
+                        end_of_statement = pc;
+                        break;
+                      }
+                 }
+
+             for (int pc = end_of_statement - 1; pc >= PC; --pc)
+                 {
+                   if (sepa++)   out << " ";
+                   const TokenClass tc = body[pc].get_Class();
+                   out << (Token::class_name(tc ) + 3);   // w/o TC_
+                 }
+
+             if (end_of_statement != body.size() - 1)
+                {
+                  if (sepa++)   out << " ";
+                  out << "END";
+                }
+           }
+        else
+           {
+             for (size_t pc = PC; pc < body.size(); ++pc)
+                 {
+                   if (sepa++)   out << " ";
+                   const TokenClass tc = body[pc].get_Class();
+                   out << (Token::class_name(tc ) + 3);   // w/o TC_
+                   if (tc == TC_END)   break;   // end of statement
+                 }
+           }
+      }
+   return out;
+}
+//----------------------------------------------------------------------------
 bool
 Prefix::value_expected() const
 {
@@ -727,6 +904,13 @@ const Prefix::Phrase Prefix::hash_table[] =
 Token
 Prefix::reduce_statements()
 {
+   Log(LOG_Reduce_XXX)
+      {
+       loop(s, si.get_depth())   CERR << "    ";   // indent
+        CERR << "Reduce Statement (in APL order): ";
+        print_patterns(CERR, 6) << endl;
+      }
+
    Log(LOG_prefix_parser)
       {
         CERR << endl << "changed to Prefix[si=" << si.get_level()
@@ -741,30 +925,58 @@ grow:    // aka. SHIFT
    // the current stack does not contain a valid phrase.
    // Push one more token onto the stack and continue
    //
-   if (push_next_token())   return Token(TOK_SI_PUSHED);
+   Log(LOG_Shift_XXX)
+      {
+        loop(s, si.get_depth() + 1)   CERR << "    ";   // indent
+        CERR << "Shift[" << ssize() << "]: ";
+        print_token_value(CERR, body[PC]) << " into ";
+        print_patterns(CERR, 1);
+      }
+
+   if (push_next_token())
+      {
+        Log(LOG_Shift_XXX)   CERR << "pushed )SI.";
+        return Token(TOK_SI_PUSHED);
+      }
+
+   Log(LOG_Shift_XXX)
+      {
+        while (Output::get_column() < 50)   CERR << " ";
+        CERR << " yields: ";
+        print_patterns(CERR, 3) << endl;
+      }
 
 again:   // aka. REDUCE
    Log(LOG_prefix_parser)   print_stack(CERR, LOC);
 
    // search longest prefixes in phrase table...
    //
-   find_best_phrase();   // set best_phrase
-   if (best_phrase == 0)   goto grow;
+   find_best_phrase();                  // set best_phrase
+   if (best_phrase == 0)   goto grow;   // no best_phrase
 
    // found a reducible prefix. See if the next token class binds stronger
    // than best_phrase->prio
    //
    if (check_next_binding())   goto grow;
 
-   Log(LOG_prefix_parser)  CERR
-      << "   phrase #" <<  (best_phrase - hash_table)
-      << ": " << best_phrase->phrase_name
-      << " matches, prio " << best_phrase->prio
-      << ", calling reduce_" << best_phrase->reduce_name
-      << "()" << endl;
+   Log(LOG_prefix_parser)
+      {
+        CERR << "   phrase #" <<  (best_phrase - hash_table)
+             << ": " << best_phrase->phrase_name
+             << " matches, prio " << best_phrase->prio
+             << ", calling reduce_" << best_phrase->reduce_name
+             << "()" << endl;
+      }
+
+   prefix_len = best_phrase->phrase_len;
+   Log(LOG_Reduce_XXX)
+      {
+        loop(s, si.get_depth() + 1)   CERR << "    ";   // indent
+        CERR << "Match[" << prefix_len << "]: calling: reduce_"
+             << best_phrase->reduce_name << "()" << endl;
+      }
 
    action = RA_FIXME;   // to detect missing 'action = ' in a reduce_XXX()
-   prefix_len = best_phrase->phrase_len;
    if (best_phrase->misc)   // MISC phrase: save X and remove it
       {
         Assert(!has_MISC());
@@ -779,6 +991,13 @@ again:   // aka. REDUCE
     */
 const uint64_t inst = instance;
    (this->*best_phrase->reduce_fun)();
+
+   Log(LOG_Reduce_XXX)
+      {
+        while (Output::get_column() < 50)   CERR << " ";
+        CERR << " yields: ";
+        print_patterns(CERR, 3) << endl;
+      }
 
    if (inst != Workspace::SI_top()->get_prefix().instance)
       {
@@ -1597,7 +1816,7 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_B_()
 {
-Token &     F_LO = at0();
+Token &  F_LO = at0();
 cFunction_P D = at1().get_function();
 Value_P   y_B = at2().get_apl_val();
 
@@ -1609,41 +1828,57 @@ Value_P   y_B = at2().get_apl_val();
          return;
       }
 
-   // At this point we have f ⍤ [X] y_B with y_B glued in Parser.cc.
-   // Unglue it. NOTE that B is y (and not the real B).
-   //
-Value_P B_orig;
+   /* At this point we have f ⍤ y_B with y_B stranded together in Parser.cc.
+      Unstrand y_B into y and (maybe) B. NOTE that B is y (and not the real B).
+     
+      There may or may not be a left A on the way. Since f can be nomadic
+      we do not know if a left argument A for f⍤ is coming and we have to
+      create a derived function instead of calling >eval_ALRB() or eval_LRB()
+      of ⍤ directly.
+    */
+Value_P val_B;   // the original B (before stranding j and B).
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    {
-     Value_P y123_orig;
-     Bif_OPER2_RANK::split_y_B(y_B, y123_orig, B_orig);
-     Token T_y123_orig_RO(TOK_APL_VALUE1, y123_orig);
+     Value_P y123;
+     Bif_OPER2_RANK::unstrand_y_B(y_B, y123, val_B);
+     Token T_RO(TOK_APL_VALUE1, y123);
 
-     new (derived) Derived_LO_D_RO(F_LO, D, T_y123_orig_RO, LOC);
+     new (derived) Derived_LO_D_RO(F_LO, D, T_RO, LOC);
    }
 
-const Token Z(TOK_FUN2, derived);
+   /* for unstrand() there are 2 main cases:
+ 
+      case 1: y and B were stranded into y_B, for example: f ⍤ y B.
+              In this case unstrand_y_B() returns y and a valid B
 
-   if (!B_orig)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
-      {
-        pop_args_push_result(Z);
-      }
-   else      // a new B split off from the original B
+      case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
+              f ⍤ y SYM In this case unstrand_y_B() returns only y and no
+              valid B. The right argument B is waiting on the stack (at
+              at3() for f⍤B, or at at4() for (f⍤B), or at a5() for ((f⍤B)),
+              and so on.
+    */
+const Token dD(TOK_FUN2, derived);
+
+   if (+val_B)   // case 1 (valid B)
       {
         // save locations of ⍤ and B
         //
         const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(2).get_PC();
 
-        pop_and_discard();   // pop F
-        pop_and_discard();   // pop C
-        pop_and_discard();   // pop B (old)
+        pop_and_discard();   // pop F_LO
+        pop_and_discard();   // pop D
+        pop_and_discard();   // pop y_B
 
-        Token new_B(TOK_APL_VALUE1, B_orig);
-        Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(Z, pc_D);
-        push(tl_B);
-        push(tl_derived);
+        Token B(TOK_APL_VALUE1, val_B);
+        Token_loc tloc_B(B, pc_B);
+        Token_loc tloc_dD(dD, pc_D);
+        push(tloc_B);    // was y_B
+        push(tloc_dD);   // was D
+      }
+   else    // case 2: only y123, but no B (e.g. (f ⍤ 1 2 3) B
+      {
+        pop_args_push_result(dD);
       }
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1889,15 +2124,15 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_C_B()
 {
-Token &     F_LO = at0();
+Token &  F_LO = at0();
 cFunction_P D = at1().get_function();
 Value_P     C = at2().get_function_axis();
 Value_P   y_B = at3().get_apl_val();
 
-   // reduce, except if another dyadic operator is coming. In that case
+   // reduce, unless if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
    //
-   if (PC < Function_PC(body.ssize()))
+   if (PC < Function_PC(body.ssize()))   // more token ahead
         {
           const Token & tok = body[PC];
           TokenClass next =  tok.get_Class();
@@ -1915,43 +2150,59 @@ Value_P   y_B = at3().get_apl_val();
              }
         }
 
-   // at this point we have (A) f ⍤ [X] y_B. There may or may not come a left
-   // argument A but our max token count is 4. We therefore bind
-   // F (aka. LO), D, C, and T_y123_orig_RO together.
-   //
-Value_P B_orig;
+   /* At this point we have: (A) f ⍤[X] y_B with y_B stranded together in Parser.cc.
+      Unstrand y_B into y and (maybe) B. NOTE that B is y (and not the real B).
+     
+      There may or may not be a left A on the way. Since f can be nomadic
+      we do not know if a left argument A for f⍤ is coming and we have to
+      create a derived function instead of calling >eval_ALRB() or eval_LRB()
+      of ⍤ directly.
+    */
+Value_P val_B;   // the original B (before stranding j and B).
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    {
-     Value_P y123_orig;
-     Bif_OPER2_RANK::split_y_B(y_B, y123_orig, B_orig);
-     Token T_y123_orig_RO(TOK_APL_VALUE1, y123_orig);
+     Value_P y123;
+     Bif_OPER2_RANK::unstrand_y_B(y_B, y123, val_B);
+     Token T_y123_orig_RO(TOK_APL_VALUE1, y123);
 
      new (derived) Derived_LO_D_X_RO(F_LO, D, C, T_y123_orig_RO, LOC);
    }
 
-const Token Z(TOK_FUN2, derived);
+   /* for unstrand() there are 2 main cases:
+ 
+      case 1: y and B were stranded into y_B, for example: f ⍤ y B.
+              In this case unstrand_y_B() returns y and a valid B
 
-   if (!B_orig)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
-      {
-        pop_args_push_result(Z);
-      }
-   else      // a new B split off from the original B
+      case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
+              f ⍤ y SYM In this case unstrand_y_B() returns only y and no
+              valid B. The right argument B is waiting on the stack (at
+              at4() for f⍤B, or at at5() for (f⍤B), or at a6() for ((f⍤B)),
+              and so on.
+    */
+const Token dD(TOK_FUN2, derived);
+
+   if (+val_B)   // case 1 (valid B)
       {
         // save locations of ⍤ and B
         //
         const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(3).get_PC();
 
-        pop_and_discard();   // pop F
+        pop_and_discard();   // pop F_LO
         pop_and_discard();   // pop D
         pop_and_discard();   // pop C
-        pop_and_discard();   // pop B (old)
+        pop_and_discard();   // pop y_B
 
-        Token new_B(TOK_APL_VALUE1, B_orig);
-        Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(Z, pc_D);
-        push(tl_B);
-        push(tl_derived);
+        Token B(TOK_APL_VALUE1, val_B);
+        Token_loc tloc_B(B, pc_B);
+        Token_loc tloc_dD(dD, pc_D);
+        push(tloc_B);    // was y_B
+        push(tloc_dD);   // was D
+      }
+   else    // case 2: only y123, but no B (e.g. (f ⍤[X] 1 2 3) B
+
+      {
+        pop_args_push_result(dD);
       }
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)

@@ -299,6 +299,7 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
                  DOMAIN_ERROR;
       }
 
+// extra_frame draws an extra frame even if B is not nested.
 bool extra_frame = false;
    switch(a)
       {

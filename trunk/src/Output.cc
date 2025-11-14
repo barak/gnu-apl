@@ -23,7 +23,6 @@
 
 #include "Common.hh"
 #include "Command.hh"
-#include "DiffOut.hh"
 #include "InputFile.hh"
 #include "LineInput.hh"
 #include "Output.hh"
@@ -44,8 +43,10 @@ int Output::color_CERR_background = 8;
 int Output::color_UERR_foreground = 5;
 int Output::color_UERR_background = 8;
 
+int Output::output_column = 0;
+
 /// a filebuf for CERR
-ErrOut CERR_filebuf;
+ErrOut_filebuf CERR_filebuf;
 
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
@@ -53,7 +54,7 @@ DiffOut UERR_filebuf(true);
 // Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
 #ifndef apl_TARGET_ANDROID
 
-CinOut CIN_filebuf;
+CinOut_filebuf CIN_filebuf;
 CIN_ostream CIN;
 
 ostream COUT(&DOUT_filebuf);
@@ -66,9 +67,9 @@ extern ostream & get_CERR();
 ostream & get_CERR()
 {
    if (UserPreferences::uprefs.output_to_cout)
-      return ErrOut::used ? CERR : cout;
+      return ErrOut_filebuf::used ? CERR : cout;
    else
-      return ErrOut::used ? CERR : cerr;
+      return ErrOut_filebuf::used ? CERR : cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
@@ -120,7 +121,7 @@ char Output::ESC_Delete_1     [MAX_ESC_LEN] = CSI "3;" "\0" "~";   ///< Key Del
 
 //----------------------------------------------------------------------------
 int
-CinOut::overflow(int c)
+CinOut_filebuf::overflow(int c)
 {
 PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
@@ -129,17 +130,25 @@ PERFORMANCE_START(cerr_perf)
    cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0x80) == 0)      ++Output::output_column;   // ASCII
+   else if ((c & 0xC0) == 0xC0)   ++Output::output_column;   // first UTF
    return 0;
 }
 //----------------------------------------------------------------------------
 int
-ErrOut::overflow(int c)
+ErrOut_filebuf::overflow(int c)
 {
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
    if (UserPreferences::uprefs.output_to_cout)   cout << char(c);
    else                                          cerr << char(c);
+
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0x80) == 0)      ++Output::output_column;   // ASCII
+   else if ((c & 0xC0) == 0xC0)   ++Output::output_column;   // first UTF
+
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;

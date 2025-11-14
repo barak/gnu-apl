@@ -354,13 +354,13 @@ protected:
    void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
-   const Executable * read_Execute();
+   const Executable * read_SI_Execute();
 
    /// read ◊ Executable
-   const Executable * read_Statement();
+   const Executable * read_SI_Statement();
 
    /// read a user defined Executable
-   const Executable * read_UserFunction();
+   const Executable * read_SI_UserFunction();
 
    /// read a lambda
    Executable * read_lambda(const UTF8 * lambda_name);

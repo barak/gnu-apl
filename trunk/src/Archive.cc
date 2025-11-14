@@ -2305,8 +2305,9 @@ UCS_string text;
         UserFunction * ufun = 0;
         if (text[0] == UNI_LAMBDA)
            {
+             const char * creator = ")LOAD λ";
              ufun = UserFunction::fix_lambda(symbol, text);
-             ufun->increment_refcount(LOC);   // since we pushed it below
+             ufun->increment_refcount(LOC, creator);
            }
         else
            {
@@ -2417,7 +2418,7 @@ UCS_string  name_UCS(name_UTF);
         return;
       }
 
-const int depth = find_int_attr("stack-size", false, 10);
+const int SI_depth = find_int_attr("stack-size", false, 10);
 
    // lookup symbol, trying ⎕xx first
    //
@@ -2451,7 +2452,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         // we prepare vids for )COPY or )PCOPY, so we do not create a symbol
         // and care only for the top level
         //
-        if (no_copy || (depth == 0))
+        if (no_copy || (SI_depth == 0))
            {
              Log(LOG_archive)   err << "        skipped at " << LOC << endl;
              skip_to_tag("/Symbol");
@@ -2500,7 +2501,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
 
    if (copying)
       {
-        if (no_copy || (depth == 0))
+        if (no_copy || (SI_depth == 0))
            {
              skip_to_tag("/Symbol");
              return;
@@ -2526,7 +2527,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
       }
    Assert(symbol);
 
-   loop(d, depth)
+   loop(d, SI_depth)
       {
         // for )COPY skip d > 0
         //
@@ -2544,7 +2545,8 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         else if (is_tag("Shared-Variable"))   read_Shared_Variable(d, *symbol);
       }
 
-   Assert(symbol->value_stack_size() == depth);
+   // the same symbol may have been localized in
+   Assert(symbol->value_stack_size() >= SI_depth);
    next_tag(LOC);
    expect_tag("/Symbol", LOC);
 }
@@ -2646,9 +2648,9 @@ const int pc = find_int_attr("pc", false, 10);
 
 const Executable * exec = 0;
    next_tag(LOC);
-   if      (is_tag("Execute"))        exec = read_Execute();
-   else if (is_tag("Statements"))     exec = read_Statement();
-   else if (is_tag("UserFunction"))   exec = read_UserFunction();
+   if      (is_tag("Execute"))        exec = read_SI_Execute();
+   else if (is_tag("Statements"))     exec = read_SI_Statement();
+   else if (is_tag("UserFunction"))   exec = read_SI_UserFunction();
    else    Assert(0 && "Bad tag at " LOC); 
 
    Assert(lev == level);
@@ -2670,7 +2672,7 @@ StateIndicator * si = Workspace::SI_top();
 }
 //----------------------------------------------------------------------------
 const Executable *
-XML_Loading_Archive::read_Execute()
+XML_Loading_Archive::read_SI_Execute()
 {
    next_tag(LOC);
    expect_tag("UCS", LOC);
@@ -2687,7 +2689,7 @@ ExecuteList * exec = ExecuteList::fix(text, LOC);
 }
 //----------------------------------------------------------------------------
 const Executable *
-XML_Loading_Archive::read_Statement()
+XML_Loading_Archive::read_SI_Statement()
 {
    next_tag(LOC);
    expect_tag("UCS", LOC);
@@ -2704,7 +2706,7 @@ StatementList * exec = StatementList::fix(text, LOC);
 }
 //----------------------------------------------------------------------------
 const Executable *
-XML_Loading_Archive::read_UserFunction()
+XML_Loading_Archive::read_SI_UserFunction()
 {
 const int macro_num = find_int_attr("macro-num", true, 10);
    if (macro_num != -1)
@@ -2742,7 +2744,8 @@ UCS_string lambda = read_UCS();
 Symbol dummy(ID_No_ID);
 UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
    Assert(ufun);
-   ufun->increment_refcount(LOC);   // since we push it below
+const char * creator = ")LOAD )SI λ";
+   ufun->increment_refcount(LOC, creator);
 
    next_tag(LOC);
    expect_tag("/UserFunction", LOC);

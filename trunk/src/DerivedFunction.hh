@@ -28,7 +28,7 @@
 #include "Function.hh"
 #include "Output.hh"
 
-//----------------------------------------------------------------------------
+//============================================================================
 /** base class for all Derived_XXX classes. Used to bind an axis and/or left
     and/or right function or operator arguments to a function or operator.
 
@@ -128,7 +128,7 @@ protected:
    ~DerivedFunction();
 };
 //============================================================================
-/// A dyadic operator axis bound to its left and right function.
+/// A dyadic operator bound to its left and right function. E.g. +.× ←→ (+.×)
 class Derived_LO_D_RO: public DerivedFunction
 {
 public:
@@ -152,7 +152,7 @@ public:
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
 //============================================================================
-/// A dyadic operator axis bound to its left and right function and its axis.
+/// A dyadic operator bound to its left and right functions and its axis.
 class Derived_LO_D_X_RO : public DerivedFunction
 {
 public:
@@ -172,7 +172,7 @@ public:
    virtual Token eval_B(Value_P B) const;
 };
 //============================================================================
-/// A monadic operator axis bound to its left function.
+/// A monadic operator bound to its left function. E.g. +/ ←→ (+/)
 class Derived_LO_M: public DerivedFunction
 {
 public:
@@ -196,7 +196,8 @@ public:
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
 //============================================================================
-/// A monadic operator axis bound to its left function and to its axis.
+/// A monadic operator bound to its left function and to its axis.
+/// E.g. +/[X] ←→ (+/[X])
 class Derived_LO_M_X: public DerivedFunction
 {
 public:
@@ -221,7 +222,7 @@ public:
 
 };
 //============================================================================
-/// A function axis bound to its function (not operaator)..
+/// A function axis bound to its function (not operaator). E.g. f[X] ←→ (f[X])
 class Derived_F_X : public DerivedFunction
 {
 public:
@@ -286,5 +287,5 @@ protected:
    /// the number of elements in \b cache
    size_t idx;
 };
-//----------------------------------------------------------------------------
+//============================================================================
 #endif // __DERIVED_FUNCTION__DEFINED__

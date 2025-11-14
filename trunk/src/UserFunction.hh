@@ -39,7 +39,7 @@ class UserFunction : public Function, public Executable
 {
 public:
    /// constructor for a lambda
-   UserFunction(Fun_signature sig, int lambda_num,
+   UserFunction(Fun_signature sig, Lambda_number lambda_num,
                 const UCS_string & text, Token_string & body,
                 const vector<Symbol *> & lvars);
 

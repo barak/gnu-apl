@@ -349,6 +349,12 @@ enum Fun_signature
    SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
 };
 //----------------------------------------------------------------------------
+/// (unnamed) lambda number
+enum Lambda_number
+{
+   LAMBDA_NUM_0 = 0   // first (or named) lambda
+};
+//----------------------------------------------------------------------------
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {

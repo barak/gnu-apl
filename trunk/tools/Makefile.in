@@ -440,6 +440,7 @@ lines_SOURCES = lines.cc
 ncurses_emul_SOURCES = ncurses_emul.cc
 ncurses_emul_LIBS = -lncurses -ltinfo
 TLV_server_SOURCES = TLV_server.c
+unicodes_used_DOURCES = unicodes_used.cc
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 all: all-am
 

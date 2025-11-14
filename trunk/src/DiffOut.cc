@@ -23,7 +23,6 @@
 
 #include "Avec.hh"
 #include "Common.hh"
-#include "DiffOut.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"
 #include "Output.hh"
@@ -44,6 +43,9 @@ PERFORMANCE_START(cout_perf)
    //
    if (expand_LF && c == '\n')   cout << "\r";
 
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0x80) == 0)      ++Output::output_column;   // ASCII
+   else if ((c & 0xC0) == 0xC0)   ++Output::output_column;   // first UTF
    cout << char(c);
 
    if (!InputFile::is_validating())

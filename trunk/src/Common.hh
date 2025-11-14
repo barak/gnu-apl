@@ -460,7 +460,7 @@ using namespace std;
 
 /// a function to be used if CERR might not (yet) be initialized. Returns cerr
 /// in that case.
-extern std::ostream & get_CERR();
+extern std::ostream & get_CERR();   // defined in: Output.cc 
 
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)

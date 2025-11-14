@@ -352,16 +352,13 @@ bool
 Symbol::assign_named_lambda(cFunction_P lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.back();
-const UserFunction * ufun = lambda->get_func_ufun();
-   Assert(ufun);
-const Executable * uexec = ufun;
-   Assert(uexec);
-
    switch(vs.get_NC())
       {
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
+               // a lambda with the same name already exists. Remove it.
+               //
                cFunction_P old_fun = vs.get_function();
                Assert(old_fun);
                if (!old_fun->is_lambda())   SYNTAX_ERROR;
@@ -385,10 +382,19 @@ const Executable * uexec = ufun;
              /* fall through */
 
         case NC_UNUSED_USER_NAME:
-             vs.set_function(lambda);
-             const_cast<UserFunction *>(ufun)->increment_refcount(LOC);
-             if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
-             return false;
+             {
+               const UserFunction * ufun = lambda->get_func_ufun();
+               Assert(ufun);
+               UTF8_string creator = ufun->get_name();
+               creator.append("←λ");
+               
+ 
+               vs.set_function(lambda);
+               const_cast<UserFunction *>(ufun)
+                         ->increment_refcount(LOC, creator.c_str());
+               if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
+               return false;
+             }
 
         default: SYNTAX_ERROR;
       }

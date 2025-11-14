@@ -51,7 +51,7 @@ dist_doc_DATA =				\
 	apl.1					\
 	apl.texi				\
 	apl.info				\
-	apl-info.css			\    
+	apl-info.css			\
 	apl.html				\
 	libapl.texi				\
 	libapl.info				\

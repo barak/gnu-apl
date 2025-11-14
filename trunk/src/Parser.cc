@@ -315,15 +315,19 @@ bool
 Parser::fix_RANK_syntax(Token_string & tos)
 {
 bool progress = false;
-   /* Z ← A ⍤ j B  or  Z ← ⍤ j B 
+   /* Z ← A ⍤ y B  or  Z ← ⍤ Y B 
      
       where j is a near-int-vector of length 1, 2, or 3
 
       Collecting the items of such an expression can make the expression
       ambiguous. We therefore translate the above expression into:
 
-       Z ← A ⍤[j] B  resp.Z ← ⍤[j] B 
+      This function normalizes y to a 3-item vector as follows:
 
+      A.   literal y1        →   Value_P Y ← y1 y1 y1
+      B.   literal y1 j2     →   Value_P Y ← y2 y1 y2
+      C.   literal y1 j2 j3  →   Value_P Y ← y1 y2 y3
+           
       v is a scalar or vector with 3 ≥ ⍴,v and it defines the splitting points
       of ⍴Z, ⍴A, and ⍴B. (Up to) 3 splitting points V are needed and they are
       defined by V3 ← ⌽3⍴⌽v (see ISO p. 124).
@@ -334,11 +338,14 @@ bool progress = false;
       ⌽3⍴⌽ 1 2   ←→ 2 1 2   ⍝ same splitting point for Z and B
       ⌽3⍴⌽ 1 2 3 ←→ 1 2 3
     */
-   loop(t, tos.size() - 2)
+
+   // should not use loop() here since tos.size() varies inside the loop.
+   //
+   for (ShapeItem t = 0; t < ShapeItem(tos.size() - 2); ++t)
        {
          if (tos[t].get_tag() != TOK_OPER2_RANK)   continue;
 
-         // (y) is already in parentheses
+         // if y is already in parentheses: skip (...)
          //
          if (tos[t + 1].get_tag() == TOK_L_PARENT)
             {

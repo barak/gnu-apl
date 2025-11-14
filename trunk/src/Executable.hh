@@ -168,7 +168,7 @@ public:
       { return refcount; }
 
    /// increment the reference counter
-   void increment_refcount(const char * loc);
+   void increment_refcount(const char * loc, const char * creator);
 
    /// decrement the reference counter
    void decrement_refcount(const char * loc);
@@ -212,7 +212,8 @@ protected:
 
    /// extract one lambda expressions from body and store it in lambdas
    /// body[b] is { and body[bend] is }.
-   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend, int lambda_num);
+   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend,
+                              Lambda_number lambda_num);
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.

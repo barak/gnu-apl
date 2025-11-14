@@ -25,7 +25,6 @@
 #include <iostream>
 
 #include "Common.hh"
-#include "DiffOut.hh"
 #include "DynamicObject.hh"
 #include "Logging.hh"
 #include "Macro.hh"
@@ -58,8 +57,8 @@ static_Objects::~static_Objects()
 #define DO_INFO(m, l)   extern static_Objects info_ ## l; \
                         static_Objects info_ ## l  (LOC, m);
 
-INFO(ErrOut::used, __LINE__)
-bool ErrOut::used = false;
+INFO(ErrOut_filebuf::used, __LINE__)
+bool ErrOut_filebuf::used = false;
 
 // prerequisites for Workspace::the_workspace...
 

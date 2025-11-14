@@ -246,7 +246,11 @@ UserFunction * fun = UserFunction::fix(text, error_line, false, LOC,
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (text[0] == UNI_LAMBDA)   fun->increment_refcount(LOC);
+   if (text[0] == UNI_LAMBDA)
+      {
+        const char * creator = "⎕FX";
+        fun->increment_refcount(LOC, creator);
+      }
 
    fun->set_exec_properties(exec_props);
 

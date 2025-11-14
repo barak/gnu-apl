@@ -252,7 +252,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
-/// draw a 🞤 or 🞫 with given \b size around P0
+/// draw a cross with thw given \b size around P0
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
            double size, int size2)
@@ -263,14 +263,14 @@ draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
 const double half = 0.5*size;
    if (size2 == 0)   size2 = 2;   // default line thickness
    cairo_set_line_width(cr, 1.0*size2);   // 1 pixel = 2 cairo
-   if (plus)   // 🞤
+   if (plus)   // +
       {
         cairo_move_to(cr, P0.x - half, P0.y);
         cairo_line_to(cr, P0.x + half, P0.y);
         cairo_move_to(cr, P0.x, P0.y + half);
         cairo_line_to(cr, P0.x, P0.y - half);
       }
-   else        // 🞫
+   else        // ×
       {
         const double dlta = 0.707106781*half;
         cairo_move_to(cr, P0.x - dlta, P0.y + dlta);
@@ -292,14 +292,19 @@ const bool es = ! (point_style & 1);   // even style
    switch(point_style)
       {
         case 0:                                                   return;
+
         case 1: draw_circle(cr, P,     outer_color, outer_dia);   break;   // ●
+
         case 2:                                                            // ▲
         case 3: draw_delta( cr, P, es, outer_color, outer_dia);   break;   // ▼
+
         case 4:                                                            // ◆
         case 5: draw_quad(  cr, P, es, outer_color, outer_dia);   break;   // ■
-        case 6:                                                            // 🞤
+
+        case 6:                                                            // +
         case 7: draw_cross( cr, P, es, outer_color, outer_dia,
-                                                    inner_dia);   return; // 🞫
+                                                    inner_dia);   return; // ×
+
         default: cerr << "⎕PLOT: Invalid point style: "
                       << point_style << endl;                     return;
       }

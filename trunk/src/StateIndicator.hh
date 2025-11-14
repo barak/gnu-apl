@@ -159,6 +159,13 @@ public:
    int get_safe_execution_depth() const
       { return safe_execution_depth; }
 
+   /// return the depth of this )SI entry
+   int get_depth() const
+       {
+         int ret = 0;
+         for (const StateIndicator * p = this; p->parent; p = p->parent)  ++ret;
+         return ret;
+       }
    /// set safe_execution mode
    void set_safe_execution_depth()
       {

@@ -197,11 +197,11 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
 	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
+	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
+	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -370,11 +370,11 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
 	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
+	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
+	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -522,11 +522,11 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
 	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
+	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
+	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -1301,11 +1301,11 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
 	Command.cc Command.def Command.hh Common.cc Common.hh \
 	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
+	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
+	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \

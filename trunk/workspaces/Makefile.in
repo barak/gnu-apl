@@ -323,16 +323,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-dist_doc_DATA = APL_CGI.apl		\
-		RUBIK.apl		        \
-		SCRIPT.apl		        \
-		ScalarBenchmark.apl	    \
-		Scalar2.apl		        \
-		Scalar3.apl		        \
-		Simple_SQL.apl	        \
-		sudoku.apl		        \
-		sudoku_DLX.apl
-
+dist_doc_DATA = 
 all: all-am
 
 .SUFFIXES:
@@ -549,6 +540,15 @@ uninstall-am: uninstall-dist_docDATA
 
 .PRECIOUS: Makefile
 
+		APL_CGI.apl				\
+		RUBIK.apl		        \
+		SCRIPT.apl		        \
+		ScalarBenchmark.apl	    \
+		Scalar2.apl		        \
+		Scalar3.apl		        \
+		Simple_SQL.apl	        \
+		sudoku.apl		        \
+		sudoku_DLX.apl
 
 distclean:
 

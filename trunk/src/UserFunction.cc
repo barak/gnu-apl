@@ -102,7 +102,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
 }
 //----------------------------------------------------------------------------
 // conatructor for a lambda
-UserFunction::UserFunction(Fun_signature sig, int lambda_num,
+UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
                            const UCS_string & text, Token_string & lambda_body,
                            const vector<Symbol *> & lvars)
   : Function(ID_USER_SYMBOL, TOK_FUN0),
@@ -1346,66 +1346,64 @@ cFunction_P old_function = symbol->get_function();
 UserFunction *
 UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 {
-   // NOTE: only called from Archive::read_Function to adjust the different
-   // texts of normal defined functions (where local vars are in the header)
-   // and lambdas (where the local vars are at the end of the lambda).
+   // NOTE: only called from Archive::read_Function(). extract the local
+   //       vars the first line of text,
+   //
 
-   /* Example: consider {⍺+⍵;LOCAL}
+   /* Example: consider;
 
-      the )SAVE'd function body is:
+      ⎕FX 'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'
 
-      λ←⍺ λ1 ⍵;LOCAL
-      λ← ⍺+⍵
+      ⎕FX currently raises a DEFN ERROR, but will nevertheless
+      create function 'Test'. Note that { ... } cannot produce this
+      directly due to the ⍝ (which comments out the closing } ).
 
-      this function restores it to:
+      Test will be )SAVEd (and later be )LOADed as:
 
-      λ← ⍺+⍵;LOCAL
+      λ←λ1 ⍵ ;C;D ⍝⍝ π times Ʃ⍵
+      λ←○+/⍵
 
+      I.e. ⎕CR 'Test' is a plain string with 2 lines, each ending with ASCII_NL.
     */
+
+   // split text into header_text, lvars_text, comment, and body_text, and
+   // compute the signature.
+   //
+UCS_string header_text, lvars_text, comment, body_text;
+UCS_string * dest = &header_text;
 int signature = SIG_FUN | SIG_Z;
-int t = 0;
 
-ShapeItem header_semi    = -1;
-ShapeItem header_comment = -1;
-   while (t < text.ssize())
+
+   loop(t, text.size())
        {
-         switch(text[t++])
+         const Unicode uni = text[t];
+         switch(uni)
             {
-              case UNI_CHI:            signature |= SIG_X;    continue;
-              case UNI_OMEGA:          signature |= SIG_B;    continue;
-              case UNI_ALPHA_UNDERBAR: signature |= SIG_LO;   continue;
-              case UNI_OMEGA_UNDERBAR: signature |= SIG_RO;   continue;
-              case UNI_ALPHA:          signature |= SIG_A;    continue;
-
-              case UNI_SEMICOLON:
-                   if (header_semi == -1)   header_semi = t - 1;
-                   continue;
-
-              case UNI_NUMBER_SIGN:
-              case UNI_COMMENT:
-                   header_comment = t;
-                   while (t < text.ssize() && text[t] != UNI_LF)   ++t;
-                   ++t;                            // skip LF
-                   break;                          // header line done
-
-              case UNI_LF:             break;      // header line done
+              case UNI_CHI:            signature |= SIG_X;    break;
+              case UNI_OMEGA:          signature |= SIG_B;    break;
+              case UNI_ALPHA_UNDERBAR: signature |= SIG_LO;   break;
+              case UNI_OMEGA_UNDERBAR: signature |= SIG_RO;   break;
+              case UNI_ALPHA:          signature |= SIG_A;    break;
+              case UNI_SEMICOLON:      dest = &lvars_text;    break;
+              case UNI_NUMBER_SIGN:    dest = &comment;       break;
+              case UNI_COMMENT:        dest = &comment;       break;
+              case UNI_SPACE:
+                   if (dest == &lvars_text)   dest = &comment;
                    break;
-              default:                 continue;   // still in header
-            }
 
-         break;   // while (t < text.ssize())
+              case UNI_LF:   // end of header
+                   dest = 0;
+                   for (++t; t < text.ssize();)   body_text.append(text[t++]);
+                   break;                          // header line done
+              default:                                        break;
+            }
+           
+         if (dest)   dest->append(uni);
        }
 
-   // discard leading spaces
-   //
-   while (t < text.ssize() && text[t] == UNI_SPACE)   ++t;
-
-UCS_string body_text;   // the rest of text after the header
-
-   for (; t < text.ssize(); ++t)   body_text.append(text[t]);
-
-   while (body_text.back() == UNI_LF)  body_text.pop_back();
-if (header_comment)   {}
+   lvars_text.remove_trailing_whitespaces();
+   body_text.remove_trailing_whitespaces();
+   body_text.append(comment);
 
 Token_string body;
    {
@@ -1416,32 +1414,37 @@ Token_string body;
      body.push_back(tok_endl);
    }
 
-   if (header_semi != -1)
-      {
-        for (ShapeItem s = header_semi; text[s] != UNI_LF; ++s)
-           {
-             body_text.append(text[s]);
-           }
-      }
+   // append lvars_text to body (as in e.g. { ... ;C;D }. This will also
+   // parse the lvars_text needed below.
+   //
+   body_text.append(lvars_text);
 
 const Parser parser(PM_FUNCTION, LOC, false);
-   if (/* const ErrorCode ec = */ parser.parse(body_text, body, true))
+
+   // if parsing fails at this point, then something is wrong in )SAVE
+   //
+   if (const ErrorCode ec = parser.parse(body_text, body, true))
       {
-        CERR << "Parsing '" << body_text << "' failed" << endl;
+        CERR << "Parsing '" << body_text << "' failed (" << ec << ")." << endl;
         return 0;
       }
 
 vector<Symbol *> local_vars;
-   while (body.ssize() >= 2)
+UCS_string var;
+   while (body.size() >= 2)
       {
-        const size_t semi = body.ssize() - 2;
-        if (body[semi]    .get_tag() != TOK_SEMICOL)   break;
-        if (body[semi + 1].get_Class() != TC_SYMBOL)   break;
-        local_vars.push_back(body[semi + 1].get_sym_ptr());
-        body.resize(semi);   // leave ENDL and RETURN_SYMBOL
+        const Token & Tsem = body[body.size() - 2];
+        const Token & Tsym = body[body.size() - 1];
+        if (Tsem.get_tag() == TOK_SEMICOL && Tsym.get_Class() == TC_SYMBOL)
+           {
+             local_vars.push_back(Tsym.get_sym_ptr());
+             body.resize(body.size() - 2);
+           }
+        else break;
       }
 
-UserFunction * ufun = new UserFunction(Fun_signature(signature), 0,
+UserFunction * ufun = new UserFunction(Fun_signature(signature),
+                                       LAMBDA_NUM_0,
                                        body_text, body, local_vars);
    return ufun;
 }

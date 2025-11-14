@@ -251,8 +251,14 @@ public:
         prefix_len = 0;
       }
 
-   /// print the current stack
+   /// print the current stack to \b out
    void print_stack(ostream & out, const char * loc) const;
+
+   /// print the current stack before or after shift/reduce to \b out
+   ostream & print_patterns(ostream & out, int which);
+
+   /// print a token and its value in a brief form.
+   ostream & print_token_value(ostream & out, const Token & tok);
 
    /// jump to new PC
    void goto_PC(Function_PC new_pc)

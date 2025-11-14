@@ -980,7 +980,7 @@ Executable::setup_lambdas()
    //
    reverse_each_statement(body);
 
-int lambda_num = 0;
+Lambda_number lambda_num = LAMBDA_NUM_0;
    loop(b, body.size())
        {
          if (body[b].get_tag() != TOK_L_CURLY)   continue;   // not {
@@ -1008,7 +1008,8 @@ int lambda_num = 0;
                   }
              }
          Assert(end != -1);
-         b = setup_one_lambda(b, end, ++lambda_num);
+         lambda_num = Lambda_number(lambda_num + 1);
+         b = setup_one_lambda(b, end, lambda_num);
        }
 
    // redo the token reversion of the body so that the body token and the
@@ -1021,7 +1022,8 @@ int lambda_num = 0;
 }
 //----------------------------------------------------------------------------
 ShapeItem
-Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
+Executable::setup_one_lambda(ShapeItem b, ShapeItem bend,
+                             Lambda_number lambda_num)
 {
    // called with this->body in forward (APL-) order, i.e  { ... }
    //
@@ -1082,7 +1084,7 @@ const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
 UserFunction * ufun = new UserFunction(signature, lambda_num,
                                        lambda_text, lambda_body, local_vars);
 
-   ufun->increment_refcount(LOC);
+   ufun->increment_refcount(LOC, "λ" );
 
    // put a token for the lambda at the place where the { was.
    // That replaces, for example, (in forward notation):
@@ -1353,12 +1355,14 @@ Executable::reverse_all_token(Token_string & tos)
 }
 //----------------------------------------------------------------------------
 void
-Executable::increment_refcount(const char * loc)
+Executable::increment_refcount(const char * loc, const char * creator)
 {
-   Assert1(get_exec_ufun());
-   if (!get_exec_ufun()->is_lambda())
+const UserFunction * ufun = get_exec_ufun();
+   Assert1(ufun);
+   if (!ufun->is_lambda())
       {
-        MORE_ERROR() << "Attempt to edit a lambda";
+        MORE_ERROR() << "Attempt (of " << creator <<
+                        ") to create or edit a lambda. Use { ... } instead.";
         DEFN_ERROR;
       }
 

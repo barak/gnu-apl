@@ -1,5 +1,6 @@
 
-dist_doc_DATA =	APL_CGI.apl		\
+dist_doc_DATA =	
+		APL_CGI.apl				\
 		RUBIK.apl		        \
 		SCRIPT.apl		        \
 		ScalarBenchmark.apl	    \
