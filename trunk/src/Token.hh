@@ -169,7 +169,7 @@ public:
    Token(TokenTag tg, Value_P vp)
    : tag(tg)
    { Assert1(get_ValueType() == TV_VAL);
-     Assert(!!vp);   new (&value.apl_val) Value_P(vp); }
+     Assert(+vp);   new (&value.apl_val) Value_P(vp); }
 
    /// Construct a token for an index
    Token(TokenTag tg, IndexExpr & idx);

@@ -34,7 +34,7 @@ Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    if (RO.get_ValueType() == TV_VAL)   // integer count
       return eval_form_1(A, LO, RO.get_apl_val(), B);
-   else
+   else                               // Boolean termonation function
       return eval_form_2(A, LO, RO, B);
 }
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    if (RO.get_ValueType() == TV_VAL)   // integer count
       return eval_form_1(Value_P(), LO, RO.get_apl_val(), B);
-   else
+   else                               // Boolean termonation function
       return eval_form_2(Value_P(), LO, RO, B);
 }
 //----------------------------------------------------------------------------
@@ -96,6 +96,52 @@ cFunction_P RO = _RO.get_function();   Assert(RO);
         B = LO_Z;
         LO_Z.clear(LOC);
       }
+}
+//----------------------------------------------------------------------------
+void
+Bif_OPER2_POWER::unstrand_RO_B(Value_P N_B, Value_P & N, Value_P & B)
+{
+   /* Dyalog defines the reduction patterns for the POWER OPERATOR (Form 1) as:
+`
+      Z ← (A) (f ⍣ N) B
+
+      i.e. A may be optional (depending on f) and the parentheses in (f ⍣ N)
+      are required. GNU APL allows (like for the RANK operator in ISO) f ⍣ N
+      without parentheses (provided that N is a scalar or 1-item value)
+    */
+
+   if (N_B->get_rank() > 1)
+      {
+        MORE_ERROR() << "f⍣N B: ⍴⍴B = " << N_B->get_rank()
+                     << " (expecting ⍴⍴N ≤ 1)";
+        RANK_ERROR;
+      }
+
+   if (N_B->element_count() == 1)   // N_B is not a strand, e.g. (f ⍣ N) B
+      {
+        N = N_B;
+        return;
+      }
+
+   if (N_B->element_count() != 2)
+      {
+        MORE_ERROR() << "f⍣N B: ⍴⍴B = " << N_B->get_rank()
+                     << " (expecting ⍴N = 1)";
+        LENGTH_ERROR;
+      }
+
+const Cell & first = N_B->get_cfirst();
+   if (!(first.is_numeric() && first.is_near_int()))
+      {
+        MORE_ERROR() << "f⍣N B: N is not an integer scalar";
+        DOMAIN_ERROR;
+      }
+
+   N = IntScalar(first.get_int_value(), LOC);
+const Cell & second = N_B->get_cravel(1);
+   B = Value_P(LOC);
+   B->next_ravel_Cell(second);
+   B->check_value(LOC);
 }
 //----------------------------------------------------------------------------
 // the eval_form_1() function is for LO ⍣ N B and A LO ⍣ N B variants

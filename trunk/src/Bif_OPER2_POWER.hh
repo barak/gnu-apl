@@ -36,6 +36,9 @@ public:
    /// constructor
    Bif_OPER2_POWER() : PrimitiveOperator(TOK_OPER2_POWER) {}
 
+   /// split strand N_B into scalar N and B
+   static void unstrand_RO_B(Value_P RO_B, Value_P & RO, Value_P & B);
+
    /// overloaded Function::eval_ALRB()
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 

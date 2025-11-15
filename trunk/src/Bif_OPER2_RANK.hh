@@ -36,8 +36,8 @@ public:
    /// constructor
    Bif_OPER2_RANK() : PrimitiveOperator(TOK_OPER2_RANK) {}
 
-   /// split y B into y and B
-   static void unstrand_y_B(Value_P y123_B, Value_P & y123, Value_P & B);
+   /// split strand y_B into vector y and B
+   static void unstrand_RO_B(Value_P RO_B, Value_P & RO, Value_P & B);
 
    static Bif_OPER2_RANK  fun;      ///< Built-in function
 

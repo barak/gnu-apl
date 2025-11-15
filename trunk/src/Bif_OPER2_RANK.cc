@@ -468,7 +468,7 @@ const sRank rk_B = rank_B;
 }
 //----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::unstrand_y_B(Value_P y123_B, Value_P & y123, Value_P & B)
+Bif_OPER2_RANK::unstrand_RO_B(Value_P y123_B, Value_P & y123, Value_P & B)
 {
    /* The ISO standard and NARS define the reduction patterns for the RANK
       operator ⍤ as:
@@ -508,7 +508,7 @@ Bif_OPER2_RANK::unstrand_y_B(Value_P y123_B, Value_P & y123, Value_P & B)
    if (y123_B->get_rank() > 1)
       {
         MORE_ERROR() << "f⍤y B: ⍴⍴B = " << y123_B->get_rank()
-                     << " (expecting ⍴⍴ y = 1)";
+                     << " (expecting ⍴⍴y = 1)";
         RANK_ERROR;
       }
 

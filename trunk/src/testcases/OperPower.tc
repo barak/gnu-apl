@@ -1,33 +1,45 @@
 ⍝ OperPower.tc
 ⍝ ----------------------------------
 
-      ⊣ ⎕FX 'Z←A PLUS B' 'Z←A + B'
-      ⊣ ⎕FX 'Z←A EQUIV B' 'Z←A ≡ B'
-      ⊣ ⎕FX 'Z←A EQUAL B' 'Z←A = B'
+      PLUS  ← { ⍺ + ⍵ }
+      EQUIV ← { ⍺ ≡ ⍵ }
+      EQUAL ← { ⍺ = ⍵ }
 
       ⍝ numeric RO
       ⍝
       2 (+ ⍣ 40) 5
 85
 
+      ⍝ numeric RO w/o parentheses (GNU APL extension)
+      ⍝
+      2 + ⍣ 40 5
+85
+
+      ⍝ numeric RO defined function LO
+      ⍝
       2 (PLUS ⍣ 40) 5
 85
 
-      ⍝ primitive LO
+      ⍝ numeric RO defined function LO w/o parentheses
+      ⍝
+      2 PLUS ⍣ 40 5
+85
+
+      ⍝ primitive RO
       ⍝
       ({2+⍵÷2}⍣≡) 9
 4
       ({2+⍵÷2}⍣=) 9
 4
 
-      ⍝ defined LO
+      ⍝ defined RO
       ⍝
       ({2+⍵÷2}⍣EQUIV) 9
 4
       ({2+⍵÷2}⍣EQUAL) 9
 4
 
-      ⍝ inverse
+      ⍝ inverse (integer N < 0)
       ⍝
       2 (+ ⍣ 40) 5
 85
@@ -39,29 +51,32 @@
       2 (- ⍣ ¯40) 5
 85
 
-      ⍝ Dyalog examples
+      ⍝ Dyalog examples (MasterinDyalogAPL.pdf)
       ⍝
+
+      ⍝ 8.3 - Left Argument (All Forms) p. 417
       3(×⍣4)2
 162
 
-       ⎕RL ← 1
+      ⍝ Spe-3.1 p. 427
+      ⎕RL ← 1
       Stupid ← {? ⍺ + ⍵ ⊣ ⎕←'⍺=',(⍕⍺),' ⍵=',⍕⍵}
-10 (Stupid ⍣ <) 20
+      10 (Stupid ⍣ <) 20
 ⍺=10 ⍵=20
 12
 
+      ⍝ dito w/o parentheses
+      ⎕RL ← 1
+      10 Stupid ⍣ < 20
+⍺=10 ⍵=20
+12
 
       ⍝ regression
       ⍝
       {1+÷⍵}⍣2 ⊢ 2 
 1.666666667
 
-      )CHECK
-OK      - no stale functions
-OK      - no stale values
-OK      - no stale indices
-OK      - no duplicate parents
-
+      )CHECK BRIEF
 
 ⍝ ==================================
 

@@ -40,34 +40,43 @@ enum { MAX_REDUCTION_LEN = 6 };
 /// how to continue after return from a reduce_XXX() function
 enum R_action
 {
-   /** repeat phrase matching with current stack. Called after the current
-       stack was changed and phrase matching should be repeated without
-       fetching a new token. This is the "normal" case after a phrase has
-       reduced the stack. **/
+   /** repeat phrase matching with the current stack. Returned  after the
+       current stack was modified and phrase matching should be repeated
+       without shifting a new token into the stack of \b this parser.
+
+       This is the "normal" case after a phrase has reduced the stack by means
+       of some reduce_XXX() function.
+    **/
    RA_CONTINUE = 0,
 
-   /// push next token and repeat phrase matching with current stack
+   /** shift the next token into the stack and repeat phrase matching with
+       the current stack.
+
+        This is the "normal" action when no matching phrase was found for
+        the current stack.
+    **/
    RA_PUSH_NEXT = 1,   // aka. SHIFT
 
-   /// return from parser with result arg[0]
+   /// return from \b parser to the calling parser with result \b arg[0]
    RA_RETURN = 2,
 
-   /// return from parser and continue in pushed SI
+   /// suspend \b this parser and continue in the parser of the pushed SI
+   /// entry (until the pushed parser returns with RA_RETURN).
    RA_SI_PUSHED = 3,
 
-   /// internal error: action was not set by reduce_XXX() function
+   /// internal error: action was not set by some reduce_XXX() function
    RA_FIXME  = 4,
 };
 //----------------------------------------------------------------------------
 /// a class for reducing all statements of an Executable
 class Prefix
 {
-   friend class XML_Loading_Archive;
-   friend class XML_Saving_Archive;
+   friend class XML_Loading_Archive;   // to )LOAD a parser from an .xml file
+   friend class XML_Saving_Archive;    // to )SAVE a parser into an .xml file
 
 public:
    /// constructor
-   Prefix(StateIndicator & _si, const Token_string & _body);
+   Prefix(StateIndicator & _si, const Token_string & body);
 
    /// destructor
    void clean_up();

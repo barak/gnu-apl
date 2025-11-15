@@ -22,6 +22,7 @@
 */
 
 #include "Bif_OPER2_RANK.hh"
+#include "Bif_OPER2_POWER.hh"
 #include "Common.hh"
 #include "DerivedFunction.hh"
 #include "Executable.hh"
@@ -1818,48 +1819,59 @@ Prefix::reduce_F_D_B_()
 {
 Token &  F_LO = at0();
 cFunction_P D = at1().get_function();
-Value_P   y_B = at2().get_apl_val();
+Value_P   RO  = at2().get_apl_val();
 
-   // same as F D G, except for D = ⍤
+
+   // same as F D G, except for D = ⍤ or ⍣
    //
-   if (D->get_Id() != ID_OPER2_RANK)
+const Id id_D = D->get_Id();
+   if (id_D != ID_OPER2_RANK && id_D != ID_OPER2_POWER)
       {
          reduce_F_D_G_();
          return;
       }
 
-   /* At this point we have f ⍤ y_B with y_B stranded together in Parser.cc.
-      Unstrand y_B into y and (maybe) B. NOTE that B is y (and not the real B).
+   /* At this point we have:
+ 
+      f ⍤ RO with RO←(y B) that were stranded together in Parser.cc, or else
+      f ⍣ RO with RO←(N B) that were stranded together in Parser.cc.
+
+      Unstrand RO into y resp. N and (maybe) B. NOTE that in this context
+      B is y resp. N of the strand RO and not the real right argument B of
+      (f ⍤ RO) B resp. (f ⍣ RO) B.
      
       There may or may not be a left A on the way. Since f can be nomadic
       we do not know if a left argument A for f⍤ is coming and we have to
       create a derived function instead of calling >eval_ALRB() or eval_LRB()
       of ⍤ directly.
     */
-Value_P val_B;   // the original B (before stranding j and B).
+Value_P value_B;   // the original B (before stranding RO and B).
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    {
-     Value_P y123;
-     Bif_OPER2_RANK::unstrand_y_B(y_B, y123, val_B);
-     Token T_RO(TOK_APL_VALUE1, y123);
+     Value_P value_RO;   // j123 (for ⍤) or N (for ⍣)
+     if (id_D == ID_OPER2_RANK)
+        Bif_OPER2_RANK::unstrand_RO_B(RO, value_RO, value_B);
+     else
+        Bif_OPER2_POWER::unstrand_RO_B(RO, value_RO, value_B);
 
-     new (derived) Derived_LO_D_RO(F_LO, D, T_RO, LOC);
+     Token tok_RO(TOK_APL_VALUE1, value_RO);
+     new (derived) Derived_LO_D_RO(F_LO, D, tok_RO, LOC);
    }
 
-   /* for unstrand() there are 2 main cases:
+   /* for unstrand_RO_B() there are 2 main cases:
  
       case 1: y and B were stranded into y_B, for example: f ⍤ y B.
-              In this case unstrand_y_B() returns y and a valid B
+              In this case unstrand_RO_B() returns y and a valid B
 
       case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
-              f ⍤ y SYM In this case unstrand_y_B() returns only y and no
+              f ⍤ y SYM In this case unstrand_RO_B() returns only y and no
               valid B. The right argument B is waiting on the stack (at
               at3() for f⍤B, or at at4() for (f⍤B), or at a5() for ((f⍤B)),
               and so on.
     */
 const Token dD(TOK_FUN2, derived);
 
-   if (+val_B)   // case 1 (valid B)
+   if (+value_B)   // case 1 (valid B)
       {
         // save locations of ⍤ and B
         //
@@ -1870,7 +1882,7 @@ const Token dD(TOK_FUN2, derived);
         pop_and_discard();   // pop D
         pop_and_discard();   // pop y_B
 
-        Token B(TOK_APL_VALUE1, val_B);
+        Token B(TOK_APL_VALUE1, value_B);
         Token_loc tloc_B(B, pc_B);
         Token_loc tloc_dD(dD, pc_D);
         push(tloc_B);    // was y_B
@@ -2158,30 +2170,30 @@ Value_P   y_B = at3().get_apl_val();
       create a derived function instead of calling >eval_ALRB() or eval_LRB()
       of ⍤ directly.
     */
-Value_P val_B;   // the original B (before stranding j and B).
+Value_P value_B;   // the original B (before stranding j and B).
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    {
      Value_P y123;
-     Bif_OPER2_RANK::unstrand_y_B(y_B, y123, val_B);
+     Bif_OPER2_RANK::unstrand_RO_B(y_B, y123, value_B);
      Token T_y123_orig_RO(TOK_APL_VALUE1, y123);
 
      new (derived) Derived_LO_D_X_RO(F_LO, D, C, T_y123_orig_RO, LOC);
    }
 
-   /* for unstrand() there are 2 main cases:
+   /* for unstrand_RO_B() there are 2 main cases:
  
       case 1: y and B were stranded into y_B, for example: f ⍤ y B.
-              In this case unstrand_y_B() returns y and a valid B
+              In this case unstrand_RO_B() returns y and a valid B
 
       case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
-              f ⍤ y SYM In this case unstrand_y_B() returns only y and no
+              f ⍤ y SYM In this case unstrand_RO_B() returns only y and no
               valid B. The right argument B is waiting on the stack (at
               at4() for f⍤B, or at at5() for (f⍤B), or at a6() for ((f⍤B)),
               and so on.
     */
 const Token dD(TOK_FUN2, derived);
 
-   if (+val_B)   // case 1 (valid B)
+   if (+value_B)   // case 1 (valid B)
       {
         // save locations of ⍤ and B
         //
@@ -2193,7 +2205,7 @@ const Token dD(TOK_FUN2, derived);
         pop_and_discard();   // pop C
         pop_and_discard();   // pop y_B
 
-        Token B(TOK_APL_VALUE1, val_B);
+        Token B(TOK_APL_VALUE1, value_B);
         Token_loc tloc_B(B, pc_B);
         Token_loc tloc_dD(dD, pc_D);
         push(tloc_B);    // was y_B
