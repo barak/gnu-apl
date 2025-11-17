@@ -1558,9 +1558,9 @@ Prefix::reduce_MISC_F_C_B()
 {
    Assert1(prefix_len == 3);   // F C B
 
-cFunction_P F = at0().get_function();
-Value_P     C = at1().get_function_axis();
-Value_P     B = at2().get_apl_val();
+cMonOP  M = at0().get_function();
+Value_P C = at1().get_function_axis();
+Value_P B = at2().get_apl_val();
 
    if (saved_MISC.get_Class() == TC_INDEX)
       {
@@ -1579,9 +1579,10 @@ Value_P     B = at2().get_apl_val();
       {
         // ⎕FIO[49] or ⎕FIO[-1] (operators)
         //
+        Token & LO = saved_MISC.get_token();
         DerivedFunction * derived =
                           Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived)  Derived_LO_M_X(saved_MISC.get_token(), F, C, LOC);
+        new (derived)  Derived_LO_M_X(LO, M, C, LOC);
         saved_MISC.get_token().clear(LOC);
         prefix_len = 2;   // only f ⎕FIO
         pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1589,7 +1590,7 @@ Value_P     B = at2().get_apl_val();
         return;
       }
 
-const Token Z = F->eval_XB(C, B);
+const Token Z = M->eval_XB(C, B);
    if (push_error(Z))   return;
 
    pop_args_push_result(Z);
@@ -1650,11 +1651,12 @@ Prefix::reduce_F_M__()
 {
    Assert1(prefix_len == 2);
 
-cFunction_P M = at1().get_function();
+Token & LO_F = at0();
+cMonOP     M = at1().get_function();
 
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_M(at0(), M, LOC);
+   new (derived) Derived_LO_M(LO_F, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1747,10 +1749,11 @@ Prefix::reduce_A_M__()
 {
    Assert1(prefix_len == 2);
 
-cFunction_P M = at1().get_function();
+Token & LO_A = at0();
+cMonOP     M = at1().get_function();
 
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_M(at0(), M, LOC);
+   new (derived) Derived_LO_M(LO_A, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1761,11 +1764,13 @@ Prefix::reduce_F_M_C_()
 {
    Assert1(prefix_len == 3);
 
-Value_P C = at2().get_function_axis();
+Token & LO_F = at0();
+cMonOP     M = at1().get_function();
+Value_P C      = at2().get_function_axis();
 
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_M_X(at0(), at1().get_function(), C, LOC);
+   new (derived) Derived_LO_M_X(LO_F, M, C, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1776,14 +1781,15 @@ Prefix::reduce_F_C_M_()
 {
    Assert1(prefix_len == 3);
 
-cFunction_P M = at2().get_function();
-Value_P     C = at1().get_function_axis();
+cFunction_P LO_F = at0().get_function();
+Value_P        C = at1().get_function_axis();
+cMonOP         M = at2().get_function();
 
-DerivedFunction * F_C =
+DerivedFunction * derived_F_C =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) Derived_F_X(at0().get_function(), C, LOC);
+   new (derived_F_C) Derived_F_X(LO_F, C, LOC);
 
-Token tok_F_C(TOK_FUN2, F_C);
+Token tok_F_C(TOK_FUN2, derived_F_C);
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
    new (derived) Derived_LO_M(tok_F_C, M, LOC);
@@ -1798,14 +1804,14 @@ Prefix::reduce_F_C_M_C()
    Assert1(prefix_len == 4);
 
 cFunction_P F  = at0().get_function();
-Value_P     FX = at1().get_function_axis();
-cFunction_P M  = at2().get_function();
+Value_P     FX = at1().get_axes();
+cMonOP      M  = at2().get_function();
 Value_P     MX = at3().get_function_axis();
 
-DerivedFunction * F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) Derived_F_X(F, at1().get_axes(), LOC);
+DerivedFunction * derived_F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
+   new (derived_F_C) Derived_F_X(F, FX, LOC);
 
-Token tok_F_C(TOK_FUN2, F_C);
+Token tok_F_C(TOK_FUN2, derived_F_C);
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
    new (derived) Derived_LO_M_X(tok_F_C, M, MX, LOC);
@@ -1817,10 +1823,9 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_B_()
 {
-Token &  F_LO = at0();
-cFunction_P D = at1().get_function();
-Value_P   RO  = at2().get_apl_val();
-
+Token &  LO_F = at0();
+cDyaOP   D    = at1().get_function();
+Value_P  RO_B = at2().get_apl_val();
 
    // same as F D G, except for D = ⍤ or ⍣
    //
@@ -1850,12 +1855,12 @@ DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    {
      Value_P value_RO;   // j123 (for ⍤) or N (for ⍣)
      if (id_D == ID_OPER2_RANK)
-        Bif_OPER2_RANK::unstrand_RO_B(RO, value_RO, value_B);
+        Bif_OPER2_RANK::unstrand_RO_B(RO_B, value_RO, value_B);
      else
-        Bif_OPER2_POWER::unstrand_RO_B(RO, value_RO, value_B);
+        Bif_OPER2_POWER::unstrand_RO_B(RO_B, value_RO, value_B);
 
      Token tok_RO(TOK_APL_VALUE1, value_RO);
-     new (derived) Derived_LO_D_RO(F_LO, D, tok_RO, LOC);
+     new (derived) Derived_LO_D_RO(LO_F, D, tok_RO, LOC);
    }
 
    /* for unstrand_RO_B() there are 2 main cases:
@@ -1878,7 +1883,7 @@ const Token dD(TOK_FUN2, derived);
         const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(2).get_PC();
 
-        pop_and_discard();   // pop F_LO
+        pop_and_discard();   // pop LO_F
         pop_and_discard();   // pop D
         pop_and_discard();   // pop y_B
 
@@ -2125,9 +2130,13 @@ Prefix::reduce_F_D_G_()
 {
    // bind F and G to D.
    //
+Token &     LO_F = at0();
+cFunction_P D    = at1().get_function();
+Token &     RO_G = at2();
+
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) Derived_LO_D_RO(at0(), at1().get_function(), at2(), LOC);
+   new (derived) Derived_LO_D_RO(LO_F, D, RO_G, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -2136,10 +2145,10 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_C_B()
 {
-Token &  F_LO = at0();
-cFunction_P D = at1().get_function();
-Value_P     C = at2().get_function_axis();
-Value_P   y_B = at3().get_apl_val();
+Token &   LO_F = at0();
+cDyaOP    D = at1().get_function();
+Value_P   C = at2().get_function_axis();
+Value_P y_B = at3().get_apl_val();
 
    // reduce, unless if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
@@ -2177,7 +2186,7 @@ DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
      Bif_OPER2_RANK::unstrand_RO_B(y_B, y123, value_B);
      Token T_y123_orig_RO(TOK_APL_VALUE1, y123);
 
-     new (derived) Derived_LO_D_X_RO(F_LO, D, C, T_y123_orig_RO, LOC);
+     new (derived) Derived_LO_D_X_RO(LO_F, D, C, T_y123_orig_RO, LOC);
    }
 
    /* for unstrand_RO_B() there are 2 main cases:
@@ -2200,7 +2209,7 @@ const Token dD(TOK_FUN2, derived);
         const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(3).get_PC();
 
-        pop_and_discard();   // pop F_LO
+        pop_and_discard();   // pop LO_F
         pop_and_discard();   // pop D
         pop_and_discard();   // pop C
         pop_and_discard();   // pop y_B

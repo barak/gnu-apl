@@ -35,7 +35,7 @@ DerivedFunction::DerivedFunction(Token * LO, cFunction_P F_or_M_or_D,
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(LO ? *LO : Token()),
      oper(F_or_M_or_D),
-     right_fun(RO ? *RO : Token() ),
+     right_arg(RO ? *RO : Token() ),
      axis(X)
 {
    Assert1(oper);
@@ -51,7 +51,7 @@ const char * sepa = "";
            }
         CERR << "F";
         sepa = ", ";
-        if (right_fun.get_tag() != TOK_VOID)
+        if (right_arg.get_tag() != TOK_VOID)
            {
              CERR << sepa << "RO";
              sepa = ", ";
@@ -83,7 +83,7 @@ DerivedFunction::destroy_derived(const char * loc)
       }
 
    left_arg.clear(loc);
-   right_fun.clear(loc);
+   right_arg.clear(loc);
    axis.clear(loc);
 }
 //----------------------------------------------------------------------------
@@ -174,11 +174,11 @@ UCS_string name;
    name << oper->get_name();
    if (+axis)   name << "[]";
 
-   if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
+   if (right_arg.get_tag() != TOK_VOID)   // dyadic operator
       {
         name << " ";
-        if (right_fun.is_function())
-           name << right_fun.get_function()->get_name();
+        if (right_arg.is_function())
+           name << right_arg.get_function()->get_name();
         else
            name << "VAL";
       }
@@ -214,10 +214,10 @@ UCS_string ind(indent, UNI_SPACE);
    oper->print(out);
    if (+axis)   out << "Axis: " << *axis << endl;
 
-   if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
+   if (right_arg.get_tag() != TOK_VOID)   // dyadic operator
       {
          out << ind << "Right Function:  ";
-        if (right_fun.is_function())   right_fun.get_function()->print(out);
+        if (right_arg.is_function())   right_arg.get_function()->print(out);
         else                           out << "VAL";
       }
 
@@ -245,10 +245,10 @@ Derived_LO_M::eval_B(Value_P B) const
 {
    Log(LOG_FunOperX)   entering("DerivedFunction", "eval_B");
 
-   if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
+   if (right_arg.get_tag() != TOK_VOID)   // dyadic operator
       {
         Token & left  = const_cast<Token &>(left_arg);
-        Token & right = const_cast<Token &>(right_fun);
+        Token & right = const_cast<Token &>(right_arg);
         return oper->eval_LRB(left, right, B);
       }
    else                                   // monadic operator
@@ -321,7 +321,7 @@ Derived_LO_D_RO::eval_AB(Value_P A, Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_RO", "eval_AB");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRB(A, left, right, B);
 }
 //----------------------------------------------------------------------------
@@ -331,7 +331,7 @@ Derived_LO_D_RO::eval_B(Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_RO", "eval_B");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRB(left, right, B);
 }
 //----------------------------------------------------------------------------
@@ -341,7 +341,7 @@ Derived_LO_D_RO::eval_AXB(Value_P A, Value_P X, Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_RO", "eval_AXB");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRXB(A, left, right, X, B);
 }
 //----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ Derived_LO_D_RO::eval_XB(Value_P X, Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_RO", "eval_XB");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRXB(left, right, X, B);
 }
 //============================================================================
@@ -361,7 +361,7 @@ Derived_LO_D_X_RO::eval_AB(Value_P A, Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_X_RO", "eval_AB");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRXB(A, left, right, axis, B);
 }
 //----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ Derived_LO_D_X_RO::eval_B(Value_P B) const
    Log(LOG_FunOperX)   entering("Derived_LO_D_X_RO", "eval_B");
 
 Token & left  = const_cast<Token &>(left_arg);
-Token & right = const_cast<Token &>(right_fun);
+Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRXB(left, right, axis, B);
 }
 //============================================================================

@@ -39,7 +39,7 @@
 class DerivedFunction : public Function
 {
 public:
-   /// default constructor (for DerivedFunctionCache)
+   /// default constructor (for DerivedFunctionCache items)
    DerivedFunction() : Function(TOK_FUN0)   {}
 
    /// deallocate resources held by this DerivedFunction
@@ -73,7 +73,7 @@ public:
    /// return the right operand (or 0) of this derived function
    cFunction_P get_RO() const
       {
-        return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
+        return right_arg.get_tag() == TOK_VOID ? 0 : right_arg.get_function();
       }
 
    /// return the axis argument (or 0 if none) of this derived function
@@ -98,7 +98,7 @@ protected:
    virtual bool may_push_SI() const
       { return   oper->may_push_SI()
         || (left_arg .is_function() && left_arg .get_function()->may_push_SI())
-        || (right_fun.is_function() && right_fun.get_function()->may_push_SI());
+        || (right_arg.is_function() && right_arg.get_function()->may_push_SI());
       }
 
    /// overloaded Function::locate_X()
@@ -119,7 +119,7 @@ protected:
    //  Acording to lrm p. 35, the right operand is a function or array (even
    //  though no primitive dyadic operator takes an array as right operand).
    // Token are ephemeral, therefore we need a copy here.
-   Token right_fun;
+   Token right_arg;
 
    /// the axis for \b mon_oper, or 0 if no axis
    Value_P axis;

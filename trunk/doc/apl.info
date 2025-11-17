@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 9, 2025.  This manual briefly documents GNU APL, an interpreter
-for APL as described in ISO standard 13751, aka.  "Programming Language
-APL, Extended".
+November 17, 2025.  This manual briefly documents GNU APL, an
+interpreter for APL as described in ISO standard 13751, aka.
+"Programming Language APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -6816,9 +6816,10 @@ condionals were these:
   3. to support 2., lengthy keywords shall be avoided in favour of the
      original APL style, and
   4. the syntax needs to only support those cases where the standard APL
-     flow control (i.e.  →N) becomes cumbersome.  There is absolutely no
+     flow control (i.e.  →N) becomes cumbersome.  There is no obvious
      benefit in introducing a new (and redundant) syntax when the
-     standard APL mechanism is already completely adequate.
+     standard APL mechanism is already completely adequate.  IOW: Why
+     would :Goto Label be any better than :→Label?
 
    As to the last point, almost every flow control case (in a standards
 compliant APL program) falls into one of the following categories
@@ -6901,10 +6902,10 @@ With the above considerations in mind, GNU APL decided for the following
 syntax:
 
    • one-sided if/else:
-                COND →→ THEN ←←
+                COND →→ THEN-statement(s) ←←
 
    • two-sided if/else:
-                COND →→ THEN ←→ ELSE ←←
+                COND →→ THEN-statement(s) ←→ ELSE-statement(s) ←←
 
    For this syntax to work, the following rules must be followed:
 
@@ -6930,7 +6931,7 @@ syntax:
           of COND is a committed value (and therefore not displayed).
 
         • The THEN clause shall be one or more valid statements,
-          separated by ◊ for more than one statement.
+          possibly separated by ◊ for more than one statement.
 
         • The ELSE clause (if present) shall be one or more valid
           statements, separated by ◊ for more than one statement.
@@ -6994,6 +6995,70 @@ syntax:
    • never mix the short and long forms
 
    Like shown in the examples above.
+
+2.42.3 Possible Pitfalls
+------------------------
+
+In APL, as well as in C/C++ (and most other languages), an expression is
+also a statement, but not vice versa.  Expressions yield a value, while
+statements may not.
+
+   In C/C++ there are conditional statements and conditional
+expressions:
+
+        if (COND) { IF-statements } else { ELSE-statements }   // conditional statement
+
+        (COND) ? IF-value : ELSE-value                         // conditional expression
+
+   GNU APL also has conditional statements and conditional expressions:
+
+           COND →→ IF-statements ←→ ELSE-statements ←←    ⍝ conditional statement
+
+           IF-value ⊢[COND] ELSE-value                    ⍝ conditional statement
+
+   If a value is needed, e.g.  for assigning it to a variable, but the
+expression becomes too long to fit in a single line, then one can
+replicate the assigment in both of the IF and the ELSE clauses:
+
+        // C/C++
+        x = -5;
+        Result = (x < 0) ? "negative" : "positive";                         // OK
+        Result = if (x < 0) { "negative"; } else { "positive"; }            // syntax error
+        if (x < 0) { Result = "negative"; } else { Result = "positive"; }   // OK
+
+        ⍝ GNU APL
+        X←¯5
+        Result ← "positive" ⊢[X < 0] "negative"                     ⍝ OK
+        Result ← (X < 0) →→ ⊣"negative" ←→ ⊣"positive" ←←           ⍝ ???
+        Result
+     1
+
+        (X < 0) →→ Result ← "negative" ←→ Result ← "positive" ←←    ⍝ OK
+        Result
+     negative
+
+   The possibly unexpected result of the APL condional in the line with
+comment ⍝ ???  above has worked as follows:
+
+  1. ‘Result ← (X < 0)’ therefore ‘result ← 1’ (and not ‘"negative"’ !),
+     and then
+  2. ‘"negative"’ committed value ‘⊣"negative"’ (discarded).
+
+   Needless to say that, as in the example above, an assignment of a
+conditional statement to a variable is, although possible, a dubious
+programming style that should be avoided for the sake of readability.
+
+   In C/C++, the condition of a conditional statement MUST bew put in
+parentheses, while the condition of a conditional expression MAY be put
+in parentheses.
+
+   In GNU APL the condition of a conditional statement MAY be put in
+parentheses, while the condition of conditional expression MUST be put
+in brackets (since it is the axis argument X of A ⊢[X] B.. It is a good
+programming practice in C/C++ and in GNU APL to always put the condition
+into parentheses even if that if not syntactically required.  Some
+people even use double parentheses to emphasize the condition of a
+conditional statement or expression.
 
 
 File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
@@ -8659,25 +8724,25 @@ Node: Section 2.39224893
 Node: Section 2.40251005
 Node: Section 2.41255545
 Node: Section 2.42276644
-Node: Section 2.43287855
-Node: Section 2.44291125
-Node: Chapter 3291640
-Node: Chapter 4294148
-Node: Chapter 5295289
-Node: Section 5.1296936
-Node: Section 5.2298256
-Node: Section 5.3298616
-Node: Section 5.4298858
-Node: Section 5.5299520
-Node: Section 5.6299998
-Node: Section 5.7300771
-Node: Section 5.8301197
-Node: Chapter 6301599
-Node: Section 6.1302018
-Node: Section 6.2302705
-Node: Chapter 7303536
-Node: Section 7.1304039
-Node: Section 7.2329352
+Node: Section 2.43290657
+Node: Section 2.44293927
+Node: Chapter 3294442
+Node: Chapter 4296950
+Node: Chapter 5298091
+Node: Section 5.1299738
+Node: Section 5.2301058
+Node: Section 5.3301418
+Node: Section 5.4301660
+Node: Section 5.5302322
+Node: Section 5.6302800
+Node: Section 5.7303573
+Node: Section 5.8303999
+Node: Chapter 6304401
+Node: Section 6.1304820
+Node: Section 6.2305507
+Node: Chapter 7306338
+Node: Section 7.1306841
+Node: Section 7.2332154
 
 End Tag Table
 
