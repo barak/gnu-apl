@@ -1758,6 +1758,8 @@ UCS_ASCII_string::UCS_ASCII_string(TokenClass tc)
         case TC_QUOTE:    append_ASCII("TC_QUOTE");      return;
         case TC_L_CURLY:  append_ASCII("TC_L_CURLY");    return;
         case TC_R_CURLY:  append_ASCII("TC_R_CURLY");    return;
+        case TC_LIT_ITEM: append_ASCII("TC_LIT_ITEM");   return;
+        case TC_LIT_GRP:  append_ASCII("TC_LIT_GRP");    return;
 
          default: ;
       }

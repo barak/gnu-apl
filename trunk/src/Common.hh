@@ -432,22 +432,6 @@ struct YMDhmsu
    int micro;    ///< microseconds 0-999999
 };
 //----------------------------------------------------------------------------
-/// the properties of one subfunction
-struct sub_function_info
-{
-  int          axis;          ///< integer axis for the fun[N] syntax
-  const char * sub_name;      ///< name in the fun['name'] or fun.name syntaces
-  int          valence;       ///< the valence(s) (optional)
-  const char * description;   ///< description (optional)
-};
-
-extern void list_all_mappings(ostream & out, const char * top_fun,
-                              const sub_function_info * subfuns,
-                              size_t subfun_count);
-//----------------------------------------------------------------------------
-/// helper for bsearch() in subfun_to_axis
-extern int axis_compare(const void * key, const void * info);
-//----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)   { return common_new(size); }

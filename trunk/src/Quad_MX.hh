@@ -41,24 +41,25 @@ public:
 
   enum MX_ops
      {
-       OP_MIN = 0,
-#define op_entry(enum, axis, _sub_name, _valence, _desc) OP_ ## enum = axis,
+       OP_LIST = 0,
+#define mx_def(axis, _sub_name, _desc, _valence, enum) OP_ ## enum = axis,
 #include "Quad_MX.def"
      };
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
-
    static Quad_MX fun;          ///< Built-in function.
 
-  /// properties of subfunctions
-  static sub_function_info sub_function_infos[];   ///< all subfunctions
-
 protected:
+   /// properties of subfunctions
+   static const FunctionGroup::function_info subfunction_infos[];
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
   /// a matrix suitable for libgsl
   class Matrix
      {
@@ -194,13 +195,6 @@ protected:
   static Value_P monadicRotation(Value_P B);
 
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
-
-  /// list functions and their syntaces
-  static void list_functions(bool mapping);
-
-  /// list one item
-  static void list_item(ostream & out, int idx, int valence,
-                        const char * description);
 
   /// true if the random number generators were initialized
   static bool rng_initialised;

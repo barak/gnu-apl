@@ -35,21 +35,77 @@ using namespace std;
 class UCS_string;
 class Value;
 
-//----------------------------------------------------------------------------
+//============================================================================
 /// one byte (= 7-bit character !) of an ASCII string
 typedef char ASCII;
 
 /// one byte (not character !( of a UTF8 encoded Unicode (RFC 3629) string
 typedef uint8_t UTF8;
 
-//----------------------------------------------------------------------------
+//============================================================================
 /// frequently used cast to const UTF8 *
 inline const UTF8 *
 utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//----------------------------------------------------------------------------
+//============================================================================
+/// a light-weigth UTF8-encoded string
+class UTF8_literal
+{
+public:
+   /// constuctor. Its argument \b utf must have infinite lifetime,
+   /// such as C/C++ literals. Otherwise use new char[] or strdup().
+   //
+   UTF8_literal(const char * utf)
+   : bytes(utf8P(utf)),
+     byte_count(0),
+     char_count(0)
+   { if (utf)
+        {
+          while (const char u = *utf++)
+             {
+               ++byte_count;
+               if ((u & 0xC0) != 0x80)   ++char_count;
+              }
+        }
+   }
+
+   /// return the (UTF8 encoding of) the  characters of \b this string.
+   const UTF8 * operator()() const
+      { return bytes; }
+
+   /// return the number of characters (not bytes (!)) of \b this string.
+   int get_char_count() const
+      { return char_count; }
+
+   /// return the number of bytes (not characters (!)) of \b this string.
+   int get_byte_count() const
+      { return byte_count; }
+
+   /// compare \b this UTF8_literal with another UTF8_literal
+   bool operator < (const UTF8_literal & other) const
+      { return compare(other) < 0; } 
+
+   /// compare function for bsearch()
+   int compare(const UTF8_literal other) const
+      { return strcmp(charP(this->bytes), charP(other.bytes)); }
+
+   /// compare \b this UTF8_literal with another UTF8_literal
+   bool operator ==(const UTF8_literal & other) const
+      { return compare(other) == 0; } 
+
+protected:
+   /// the bytes of the string
+   const UTF8 * bytes;
+
+   /// the number of bytes (not characters (!)) of this literal
+   int byte_count;
+
+   /// the number of characters (not bytes (!)) of this literal
+   int char_count;
+};
+//============================================================================
 /// frequently used cast to UTF8 *
 inline UTF8 *
 utf8P(ASCII * cp)

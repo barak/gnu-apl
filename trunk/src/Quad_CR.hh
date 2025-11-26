@@ -35,7 +35,7 @@ class Quad_CR : public QuadFunction
 {
 public:
    /// Constructor
-   Quad_CR() : QuadFunction(TOK_Quad_CR) {}
+   Quad_CR();
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
@@ -47,13 +47,6 @@ public:
    /// ⎕CR[X] B  ←→  X ⎕CR B
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
-
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis()
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
 
    /// compute \b a ⎕CR \b B
    static Value_P do_CR(APL_Integer a, const Value * B, PrintContext pctx);
@@ -75,10 +68,19 @@ public:
 
 protected:
    /// a mapping between function names and function numbers
-   static sub_function_info sub_functions[];
+   static const FunctionGroup::function_info subfunction_infos[];
 
-   /// list all ⎕CR functions
-   static Token list_functions(ostream & out, bool mapping);
+   /// overloaded FunctionGroup::get_legend
+   virtual const char * get_legend(FunctionGroup::Legend_type lt) const;
+
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                 const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+      virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// do eval_B() with extra spaces removed
    static Token do_eval_B(const Value * B, bool remove_extra_spaces);

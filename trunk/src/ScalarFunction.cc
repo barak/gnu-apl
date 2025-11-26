@@ -262,10 +262,15 @@ CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
                    const PJob_scalar_B j1(Z1, B1);
                    tctx.joblist_B.add_job(j1);
                  }
-              else
+              else   // empty B1
                  {
                    Value_P Z1 = CLONE_P(B1, LOC);
-                   Z1->to_type(/* numeric */ true);
+
+                   // lrm p. 56: the fill function for primitive scalar
+                   // functions is numeric even if the (empty) argumenti
+                   //  has type character.
+                   //
+                   Z1->to_type(/* force_numeric */ true);
                    new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
                  }
               Parallel::release_lock(jobs_lock);
@@ -714,7 +719,11 @@ ScalarFunction::do_eval_fill_B(Value_P B) const
     */
 Value_P Z = B->clone(LOC);
    Z->check_value(LOC);
-   Z->to_type(/* numeric */ true);
+
+   // lrm p. 56: the fill function for primitive scalar functions is numeric
+   // even if the (empty) argument has type character.
+   //
+   Z->to_type(/* force_numeric */ true);
    Z->check_value(LOC);
 
    return Token(TOK_APL_VALUE1, Z);

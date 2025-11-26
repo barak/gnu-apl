@@ -18,24 +18,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef op_entry
-    //  ( enum,             axis, sub_function    valence, description,                    )
-op_entry( HELP,                0, "",                   1, "(help for ⎕MX)"                )
-op_entry( DETERMINANT,         1, "determinant",        1, "Determinant of B"              )
-op_entry( CROSS_PRODUCT,       2, "cross_product",      3, "Cross product"                 )
-op_entry( VECTOR_ANGLE,        3, "vector_angle",       2, "Angle between vectors A and B" )
-op_entry( EIGENVECTORS,        4, "eigenvector",        1, "Eigenvector"                   )
-op_entry( EIGENVALUES,         5, "eigenvalue",         1, "Eigenvalue"                    )
-op_entry( IDENT,               6, "ident",              1, "Identity matrix"               )
-op_entry( ROTATION_MATRIX,     7, "rotation_matrix",    1, "Rotation matrix"               )
-op_entry( HOMOGENEOUS_MATRIX,  8, "homogeneous_matrix", 2, "Homogeneous matrix"            )
-op_entry( NORM,                9, "norm",               1, "Norm of B"                     )
-op_entry( RANDOMS,            10, "randoms",            3, "Randoms"                       )
-op_entry( COVARIANCE,         11, "covariance",         3, "Covariance"                    )
-op_entry( HISTOGRAM,          12, "histogram",          2, "Histogram"                     )
-op_entry( PRINT,              13, "print",              2, "Print B to file A"             )
-op_entry( SET_RNG_SEED,       14, "set_rng_seed",       1, "Set RNG seed"                  )
- 
-#undef op_entry
-#endif // op_entry
+#ifdef mx_def
+mx_def(   0, list              , "print ⎕MX subfunctions"       , 1, HELP              )
+mx_def(   1, determinant       , "Determinant of B"             , 1, DETERMINANT       )
+mx_def(   2, cross_product     , "Cross product"                , 3, CROSS_PRODUCT     )
+mx_def(   3, vector_angle      , "Angle between vectors A and B", 2, VECTOR_ANGLE      )
+mx_def(   4, eigenvector       , "Eigenvector"                  , 1, EIGENVECTORS      )
+mx_def(   5, eigenvalue        , "Eigenvalue"                   , 1, EIGENVALUES       )
+mx_def(   6, ident             , "Identity matrix"              , 1, IDENT             )
+mx_def(   7, rotation_matrix   , "Rotation matrix"              , 1, ROTATION_MATRIX   )
+mx_def(   8, homogeneous_matrix, "Homogeneous matrix"           , 2, HOMOGENEOUS_MATRIX)
+mx_def(   9, norm              , "Norm of B"                    , 1, NORM              )
+mx_def(  10, randoms           , "Randoms"                      , 3, RANDOMS           )
+mx_def(  11, covariance        , "Covariance"                   , 3, COVARIANCE        )
+mx_def(  12, histogram         , "Histogram"                    , 2, HISTOGRAM         )
+mx_def(  13, print             , "Print B to file A"            , 2, PRINT             )
+mx_def(  14, set_rng_seed      , "Set RNG seed"                 , 1, SET_RNG_SEED      )
+# undef mx_def
+#else
+# error "macro mx_def() was not #define'd"
+#endif // mx_def
 

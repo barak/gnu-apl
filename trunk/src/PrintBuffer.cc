@@ -771,7 +771,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         return;
       }
 
-   // draw │ left and right
+   // draw │ on the left and on the right
    //
    loop(y, get_row_count())
       {
@@ -785,7 +785,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 
       }
 
-   // draw ─ on top and bottom.
+   // draw ─ above the top and nelow the bottom.
    //
 UCS_string hori(get_column_count(), HORI);
 
@@ -794,62 +794,74 @@ UCS_string hori(get_column_count(), HORI);
 
    // draw the corners ┌, └, ┐, and ┘
    //
-   set_char(0,                      0,                   NE);   // e.g. ╔
-   set_char(0,                      get_row_count() - 1, SE);   // e.g. ╚
-   set_char(get_column_count() - 1, 0,                   NW);   // e.g. ╗
-   set_char(get_column_count() - 1, get_row_count() - 1, SW);   // e.g. ╝
+   {
+     const int XX = get_column_count() - 1;
+     const int YY = get_row_count() - 1;
+     set_char(0,  0, NE);   // e.g. ╔
+     set_char(0,  YY,SE);   // e.g. ╚
+     set_char(XX, 0, NW);   // e.g. ╗
+     set_char(XX, YY,SW);   // e.g. ╝
+   }
 
-   // draw other decorators
+   // maybe draw frame decorators
    //
-   if (shape.get_rank() > 0)               // → on top frame line
-      {
-        set_char(1, 0, UNI_RIGHT_ARROW);
-
-        if (style & PST_NARS)   // numbers indicating axis lengths
-           {
-             UCS_string ucs;
-             ucs.append_number(shape.get_last_shape_item());
-             if (ucs.ssize() < (get_column_count() - 2))
-                {
-                  loop(u, ucs.ssize())   set_char(u + 1, 0, ucs[u]);
-                }
-           }
-      }
-
-   if (shape.get_rank() > 1)               // ↓ on lefyt frame line
-      {
-        set_char(0, 1, UNI_DOWN_ARROW);
-        if (style & PST_NARS)
-           {
-             UCS_string ucs;
-             loop(r, shape.get_rank() - 1)
-                {
-                  if (r)   ucs.append(VERT);
-                  ucs.append_number(shape.get_shape_item(r));
-                }
-             if (ucs.ssize() < get_row_count() - 2)
-                {
-                  loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
-                }
-           }
-      }
-
-   if (depth)                      // ϵ on bottom frame line
-      {
-        loop(d, depth - 1)
-            if (d + 1 < get_column_count() - 1)
-               set_char(1 + d, get_row_count() - 1, UNI_ELEMENT);
-      }
-
-   if (style & PST_EMPTY_LAST)   // last (X-) dimension is empty
-      {
-        set_char(1, 0, UNI_CIRCLE_BAR);   // ⊖
-      }
-
-   if (style & PST_EMPTY_NLAST)   // a non-last (Y-) dimension is empty
-      {
-        set_char(0, 1, UNI_CIRCLE_STILE);   // ⌽
-      }
+    if (!(style & PST_PLAIN))
+       {
+         if (shape.get_rank() > 0)               // → on top frame line
+            {
+              if (style & PST_NARS)   // digit(s) indicating axis lengths
+                 {
+                   UCS_string ucs;
+                   ucs.append_number(shape.get_last_shape_item());
+                   if (ucs.ssize() < (get_column_count() - 2))
+                      {
+                        loop(u, ucs.ssize())   set_char(u + 1, 0, ucs[u]);
+                      }
+                 }
+              else   // IBM DISPLAY workspace style
+                 {
+                   set_char(1, 0, UNI_RIGHT_ARROW);
+                 }
+            }
+       
+         if (shape.get_rank() > 1)               // ↓ on left frame line
+            {
+              if (style & PST_NARS)
+                 {
+                   UCS_string ucs;
+                   loop(r, shape.get_rank() - 1)
+                      {
+                        if (r)   ucs.append(VERT);
+                        ucs.append_number(shape.get_shape_item(r));
+                      }
+                   if (ucs.ssize() < get_row_count() - 2)
+                      {
+                        loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
+                      }
+                 }
+              else   // IBM DISPLAY workspace style
+                 {
+                   set_char(0, 1, UNI_DOWN_ARROW);
+                 }
+            }
+       
+         if (depth)                      // ϵ on bottom frame line
+            {
+              loop(d, depth - 1)
+                  if (d + 1 < get_column_count() - 1)
+                     set_char(1 + d, get_row_count() - 1, UNI_ELEMENT);
+            }
+       
+         if (style & PST_EMPTY_LAST)   // last (X-) dimension is empty
+            {
+              set_char(1, 0, UNI_CIRCLE_BAR);   // ⊖
+            }
+       
+         if (style & PST_EMPTY_NLAST)   // a non-last (Y-) dimension is empty
+            {
+              set_char(0, 1, UNI_CIRCLE_STILE);   // ⌽
+            }
+       }
 
    Assert(is_rectangular());
 }

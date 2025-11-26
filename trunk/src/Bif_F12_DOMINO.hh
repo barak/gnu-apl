@@ -35,9 +35,7 @@ class Bif_F12_DOMINO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
-   Bif_F12_DOMINO()
-   : NonscalarFunction_default_identity(TOK_F12_DOMINO)
-   {}
+   Bif_F12_DOMINO();
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
@@ -60,15 +58,16 @@ public:
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
 protected:
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
 
-   /// overloaded Function::subfun_to_axis
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+   /// overloaded FunctionGroup::print_fun_syntax()
+  virtual void print_fun_syntax(ostream & out,
+                                const function_info & info) const;
 
-  /// list functions and their syntaces
-  static void list_functions(bool mapping);
+   /// overloaded FunctionGroup::print_map_syntax()
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// compute the Q matrix of B = QR
    static void QR_Helzer(Value_P Z, bool need_complex, ShapeItem rows,

@@ -1430,7 +1430,6 @@ const Parser parser(PM_FUNCTION, LOC, false);
       }
 
 vector<Symbol *> local_vars;
-UCS_string var;
    while (body.size() >= 2)
       {
         const Token & Tsem = body[body.size() - 2];

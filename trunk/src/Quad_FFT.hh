@@ -38,15 +38,19 @@ class Quad_FFT : public QuadFunction
 {
 public:
    /// Constructor.
-   Quad_FFT()
-      : QuadFunction(TOK_Quad_FFT)
-      {
-        system_wisdom_loaded = false;
-      }
+   Quad_FFT();
 
-   static Quad_FFT  fun;          ///< Built-in function.
+   static Quad_FFT fun;   ///< Built-in function.
 
 protected:
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                 const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+      virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
@@ -54,19 +58,12 @@ protected:
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_XB().
-   /// FFTCR[X] B  ←→  X ⎕FFT B
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { return eval_AB(X, B); }
+   /// ⎕FFT[X] B  ←→  X ⎕FFT B
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis()
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
-
-  /// list functions and their syntaces
-  static void list_functions(bool mapping);
+   /// compute FFT with mode \b A of B
+   Token do_eval_AorX_B(const Value & A_or_X, Fun_signature sig_AorX,
+                                        Fun_signature sig_fun, Value_P B) const;
 
    /// window function for sample n of N with parameters a = a0, a1, ...
    typedef double (*window_function)(ShapeItem n, ShapeItem N);
@@ -125,6 +122,9 @@ protected:
 
    /// true if fftw_import_system_wisdom() was called
    static bool system_wisdom_loaded;
+
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
 };
 
 #endif // __Quad_FFT_DEFINED__

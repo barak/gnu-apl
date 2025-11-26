@@ -244,33 +244,83 @@ enum PrintStyle
    PST_NARS          = 0x00080000,       ///< NARS APL ⎕FMT style
    PST_QUOTE_CHARS   = 0x00100000,       ///< quote chars and strings
    PST_PRETTY        = 0x00200000,       ///< print control characters nicely
+   PST_PLAIN         = 0x00400000,       ///< do not print shape decorators
 
-   PR_APL            = PST_MATRIX,       ///< normal APL output
-   PR_APL_MIN        = PST_MATRIX        ///< normal APL output w/o E0 and ...0
+   /// normal APL output
+   PR_APL            = PST_MATRIX,
+
+   /// normal APL output exponent E0 and trailing 0s omitted
+   PR_APL_MIN        = 0
+                     | PST_MATRIX
                      | PST_NO_FRACT_0
                      | PST_NO_EXPO_0,
-   PR_APL_FUN        = PST_INPUT,        ///< ⎕CR function
-   PR_Quad           = PST_INPUT,        ///< ⎕ output
-   PR_QUOTE_Quad     = PST_NONE,         ///< ⍞ output
-   PR_BOXED_CHAR     = PST_MATRIX
-                     | PST_CS_ASCII,     ///< 2 ⎕CR (ASCII chars)
-   PR_BOXED_GRAPHIC  = PST_MATRIX
+
+   /// ⎕CR function display
+   PR_APL_FUN        = PST_INPUT,
+
+   // ⎕ output
+   PR_Quad           = PST_INPUT,
+
+   /// ⍞ output
+   PR_QUOTE_Quad     = PST_NONE,
+
+   // 2 ⎕CR (boxed with ASCII chars)
+   PR_BOXED_CHAR     = 0
+                     | PST_MATRIX
+                     | PST_CS_ASCII,
+
+   /// 2 ⎕CR (boxed with thick line graphics chars)
+   PR_BOXED_GRAPHIC  = 0
+                     | PST_MATRIX
                      | PST_PRETTY
-                     | PST_CS_THICK,     ///< 3/4 ⎕CR (graphic characters)
-   PR_BOXED_GRAPHIC1 = PST_MATRIX
+                     | PST_CS_THICK,
+
+   /// 7/8 ⎕CR (boxed with thin line graphics chars)
+   PR_BOXED_GRAPHIC1 = 0
+                     | PST_MATRIX
                      | PST_PRETTY
-                     | PST_CS_THIN,      ///< 7/8 ⎕CR (graphic characters)
-   PR_BOXED_GRAPHIC2 = PST_MATRIX
+                     | PST_CS_THIN,
+
+   /// 9 ⎕CR (boxed with thick line graphics chars in a double box)
+   PR_BOXED_GRAPHIC2 = 0
+                     | PST_MATRIX
                      | PST_PRETTY
                      | PST_CS_THICK 
                      | PST_CS_DOUBLE << 4, ///< DISPLAY graphic in double box
-   PR_BOXED_GRAPHIC3 = PST_MATRIX
+
+   /// 29 ⎕CR (boxed with thick line graphics chars, but strings quoted)
+   PR_BOXED_GRAPHIC3 = 0
+                     | PST_MATRIX
                      | PST_PRETTY
                      | PST_CS_THICK
-                     | PST_QUOTE_CHARS,    ///<  29 ⎕CR (quoted chars)
-   PR_NARS           = PR_BOXED_GRAPHIC  | PST_NARS,  ///< NARS APL style
-   PR_NARS1          = PR_BOXED_GRAPHIC1 | PST_NARS,  ///< NARS APL style,
-   PR_NARS2          = PR_BOXED_GRAPHIC2 | PST_NARS,  ///< NARS APL style,
+                     | PST_QUOTE_CHARS,
+
+   /// 46 ⎕CR (8 ⎕CR but without frame decorators)
+   PR_BOXED_GRAPHIC4 = 0
+                     | PST_PRETTY
+                     | PST_CS_THIN
+                     | PST_PLAIN,
+
+   /// 47 ⎕CR (4 ⎕CR but without frame decorators)
+   PR_BOXED_GRAPHIC5 = 0
+                     | PST_PRETTY
+                     | PST_CS_THICK
+                     | PST_PLAIN,
+
+   /// 20 ⎕CR (2 ⎕CR in NARS style (shape lengths instead of ↓ and →)
+   PR_NARS           = 0
+                     | PR_BOXED_GRAPHIC
+                     | PST_NARS,
+
+   /// 21 ⎕CR (7 ⎕CR in NARS style (shape lengths instead of ↓ and →)
+   PR_NARS1          = 0
+                     | PR_BOXED_GRAPHIC1
+                     | PST_NARS,
+
+   /// 22 ⎕CR (9 ⎕CR in NARS style (shape lengths instead of ↓ and →)
+   PR_NARS2          = 0
+                     | PR_BOXED_GRAPHIC2
+                     | PST_NARS,
 };
 //----------------------------------------------------------------------------
 /// an offset into the body of a user-defined function. If we consider the APL

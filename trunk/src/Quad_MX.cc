@@ -59,37 +59,18 @@ Quad_MX Quad_MX::fun;
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 
-sub_function_info Quad_MX::sub_function_infos[] = {
-#define op_entry(enum, _axis, sub, val, desc) \
-   { Quad_MX::OP_ ## enum, sub, val, desc },
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info Quad_MX::subfunction_infos[] =
+{
+#define mx_def(axis, sub_name, comm_2, valence, enum) \
+   { axis, #sub_name, "", comm_2, valence },
 #include "Quad_MX.def"
-                                                  };
-enum { OP_MAX = sizeof(Quad_MX::sub_function_infos)
-              / sizeof(sub_function_info) };
-
+};
 //----------------------------------------------------------------------------
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
-  /* sort sub_function_infos alphabetically.
-     It is small, so a simple O(n²) algo suffices.
-     sorting is needed for:
-
-     (1) bsearch() in subfun_to_axis(), and
-     (2) list_functions() with mapping == true.
-   */
-const int count = sizeof(sub_function_infos) / sizeof(sub_function_info);
-
-  loop(i, count)
-  for (ShapeItem j = i + 1; j < count; ++j)
-      {
-        if (strcmp(sub_function_infos[i].sub_name,
-                   sub_function_infos[j].sub_name) > 0)
-           {;
-             const sub_function_info tmp = sub_function_infos[i];
-             sub_function_infos[i] = sub_function_infos[j];
-             sub_function_infos[j] = tmp;
-           }
-      }
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕MX");
 }
 //----------------------------------------------------------------------------
 Quad_MX::Matrix *
@@ -1078,47 +1059,22 @@ Dcomplex angles[3];
 }
 //----------------------------------------------------------------------------
 void
-Quad_MX::list_functions(bool mapping)
-{
-ostream & out = CERR;
-  if (mapping)
-     {
-       // ⎕MX "": print the number to name mappings like:
-       //
-       // ⎕MX[1]  ←→  ⎕MX['determinant']        ←→  ⎕MX.determinant
-       //
-       enum { SUB_COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info) };
-       list_all_mappings(out, "⎕MX", sub_function_infos, SUB_COUNT);
-     }
-  else
-     {
-       out << "\nValid ⎕MX[*] indices are:\n\n";
-
-#define op_entry(enum, _axis, desc, valence, sub) \
-  list_item(out, OP_ ## enum, valence, desc);
-#include "Quad_MX.def"
-
-       out << "\n    where {A} shall mean that A is optional" << endl;
-     }
-}
-//----------------------------------------------------------------------------
-void
-Quad_MX::list_item(ostream & out, int idx, int valence,
-                   const char * description)
+Quad_MX::print_fun_syntax(ostream & out,
+                          const FunctionGroup::function_info & info) const
 {
 char descr[40];
-  snprintf(descr, sizeof(descr), "⎕MX[%2u] B", idx);
+  SPRINTF(descr, "⎕MX[%2u] B", info.axis);
       
   out << "    ";
-  switch(valence)
+  switch(info.valence)
      {
        case 1:  out << "    ";   break;
        case 2:  out << "  A ";   break;
        case 3:  out << "{A} ";   break;
        default: FIXME;
      }
-  out << descr << "    ";
-  switch(valence)
+  out << descr << "    ⍝ ";
+  switch(info.valence)
      {
        case 1:  out << "(monadic) ";   break;
        case 2:  out << "(dyadic)  ";   break;
@@ -1126,7 +1082,18 @@ char descr[40];
        default: FIXME;
      }
       
-  out << description << endl;
+  out << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_MX::print_map_syntax(ostream & out,
+                          const FunctionGroup::function_info & info) const
+{
+const UTF8_literal name = info.function_name;
+const int blanks = max_function_name_length - name.get_char_count();
+
+   out << "    ⎕MX[" << setw(2) << info.axis << "]  ←→  ⎕MX['" << name << "']"
+       << UCS_string(blanks, UNI_SPACE) << "  ←→  ⎕MX." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token
@@ -1145,8 +1112,8 @@ Quad_MX::eval_B(Value_P B) const
 
   // at this point, B is an empty vector (supposedly character or numerical).
   //
-  if (B->get_cfirst().is_character_cell())      list_functions(true);
-  else if (B->get_cfirst().is_integer_cell())   list_functions(false);
+  if (B->get_cfirst().is_character_cell())      list_functions(CERR);
+  else if (B->get_cfirst().is_integer_cell())   list_mappings(CERR);
   else                                          DOMAIN_ERROR;
 
   return Token(TOK_APL_VALUE1, Idx0_0(LOC));
@@ -1155,7 +1122,7 @@ Quad_MX::eval_B(Value_P B) const
 Token
 Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-MX_ops op = OP_MIN;
+MX_ops op = OP_LIST;
 int modifier = 0;
 
   if (X->is_numeric_scalar())
@@ -1174,17 +1141,20 @@ int modifier = 0;
       SYNTAX_ERROR;
     }
  
-  if (op < OP_MIN || int(op) >= OP_MAX)
+  if (op < OP_LIST || int(op) >= subfun_count)
      {
-       MORE_ERROR() << "Function specifier " << op << " is out of range.";
+       MORE_ERROR() << "Subfunction number " << op << " is out of range.";
        AXIS_ERROR;
      }
 
-Value_P Z;
+Value_P Z = Idx0_0(LOC);
   switch(op)
     {
-      case OP_MIN:            Z = Idx0_0(LOC);
-                                  list_functions(false);          break;
+      case OP_LIST:
+           if (B->get_cfirst().is_character_cell())      list_functions(CERR);
+           else if (B->get_cfirst().is_integer_cell())   list_mappings(CERR);
+           else                                          DOMAIN_ERROR;
+           break;
       case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A, B);   break;
       case OP_VECTOR_ANGLE:       Z = vectorAngle(A, B);          break;
       case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation(16, A, B);   break;
@@ -1192,15 +1162,9 @@ Value_P Z;
       case OP_HISTOGRAM:          Z = histogram(A, B);            break;
       case OP_RANDOMS:            Z = randoms(&A, B, modifier);   break;
       case OP_PRINT:              Z = printit(A, B);              break;
-      case OP_DETERMINANT:        // fall through
-      case OP_EIGENVECTORS:       // fall through
-      case OP_EIGENVALUES:        // fall through
-      case OP_IDENT:              // fall through
-      case OP_ROTATION_MATRIX:    // fall through
-      case OP_NORM:               MORE_ERROR() << "Not a dyadic function.";
-                                  SYNTAX_ERROR;                    break;
-      default:   MORE_ERROR() << "⎕MX[" << op << "] is not dyadic.";
-                 VALENCE_ERROR;
+
+      default: MORE_ERROR() << "⎕MX[" << op << "] is not dyadic.";
+               VALENCE_ERROR;
     }
 
   Z->check_value(LOC);
@@ -1210,7 +1174,7 @@ Value_P Z;
 Token
 Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
-MX_ops op = OP_MIN;
+MX_ops op = OP_LIST;
 int modifier = 0;
 
   if (X->is_numeric_scalar())   // op only
@@ -1229,7 +1193,7 @@ int modifier = 0;
       SYNTAX_ERROR;
     }
 
-  if (op < OP_MIN || int(op) >= OP_MAX)
+  if (op < OP_LIST || int(op) >= subfun_count)
      {
        MORE_ERROR() << "Function specifier " << op << " is out of range.";
        AXIS_ERROR;
@@ -1238,7 +1202,11 @@ int modifier = 0;
 Value_P Z = Idx0_0(LOC);
   switch(op)
     {
-      case OP_MIN:                list_functions(false);               break;
+      case OP_LIST:
+           if (B->get_cfirst().is_character_cell())      list_functions(COUT);
+           else if (B->get_cfirst().is_integer_cell())   list_mappings(COUT);
+           else                                          DOMAIN_ERROR;
+           break;
       case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
            //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
       case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
@@ -1257,31 +1225,6 @@ Value_P Z = Idx0_0(LOC);
   Z->check_value(LOC);
   return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
-sAxis
-Quad_MX::subfun_to_axis(const UCS_string & name) const
-{
-const UTF8_string function_name_utf8(name);
-const char * function_name = function_name_utf8.c_str();
-
-  // Note: cannot use FUN_INFO_COUNT = FUN_INFO_SIZE / sizeof(sub_function_infos)
-  //       since Apple complains with a bogus error.
-  enum { FUN_INFO_SIZE  = sizeof(sub_function_info),
-         FUN_INFO_COUNT = OP_MAX
-       };
-
-  if (const void * vp = bsearch(function_name, sub_function_infos,
-                                FUN_INFO_COUNT, FUN_INFO_SIZE, axis_compare))
-     {
-       // found: vp is a fun_info *
-       const sub_function_info * info =
-             reinterpret_cast<const sub_function_info *>(vp);
-       if (info->valence)   return info->axis;
-     }
-
-  return -1;    // not found
-}
-//----------------------------------------------------------------------------
 
 #else //====================not apl_GSL =====================================
  

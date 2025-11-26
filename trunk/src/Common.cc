@@ -203,58 +203,6 @@ APL_time_us when = now();
    interrupt_context.interrupt_when = when;
 }
 //----------------------------------------------------------------------------
-int
-axis_compare(const void * key, const void * info)
-{
-   return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const sub_function_info *>
-                                     (info)->sub_name);
-}
-//----------------------------------------------------------------------------
-void
-list_mapping(ostream & out, const char * top_fun, int idx,
-             size_t max_idx_len, const char * subfun, size_t max_subfun_len)
-{
-  out << "      " << top_fun << "[" << setw(max_idx_len) << idx
-      << "]  ←→  " << top_fun << "['" << subfun << "']"
-      << UCS_string(max_subfun_len - strlen(subfun), UNI_SPACE)
-      << "  ←→  " << top_fun << "." << subfun << endl;
-}
-//----------------------------------------------------------------------------
-void
-list_all_mappings(ostream & out, const char * top_fun,
-                  const sub_function_info * sub_functions, size_t subfun_count)
-{
-   // figure the maximum idx and funxtion name lengths
-   //
-size_t max_idx_len  = 1;
-size_t max_name_len = 1;
-   loop(idx, subfun_count)
-       {
-         size_t idx_len = 1;
-         if (sub_functions[idx].axis >  9)   idx_len = 2;
-         if (sub_functions[idx].axis <  0)   idx_len = 2;
-         if (sub_functions[idx].axis < -9)   idx_len = 3;
-         if (max_idx_len < idx_len)   max_idx_len = idx_len;
-
-         const size_t name_len = strlen(sub_functions[idx].sub_name);
-         if (max_name_len < name_len)   max_name_len = name_len;
-       }
-
-   out <<
-   "      With a small performance penalty, " << top_fun <<
-   "[ ] also accepts the " "following\n"
-       "      strings instead of function numbers as axis argument:\n\n";
-
-   loop(idx, subfun_count)
-       {
-         list_mapping(out, top_fun, sub_functions[idx].axis, max_idx_len,
-                                    sub_functions[idx].sub_name, max_name_len);
-       }
-   out << "\n      For a more detailed description of all sub-functions:\n\n"
-          "      " << top_fun << " ⍬" << endl;
-}
-//----------------------------------------------------------------------------
 
 // Probes...
 

@@ -417,6 +417,13 @@ operator <<(ostream & os, const UTF8_string & utf)
    loop(c, utf.size())   os << utf[c];
    return os;
 }
+//----------------------------------------------------------------------------
+/// declared in PrintOperator.hh
+ostream &
+operator <<(ostream & os, const UTF8_literal & utf)
+{
+   return os << utf();
+}
 //============================================================================
 int
 UTF8_filebuf::overflow(int c)

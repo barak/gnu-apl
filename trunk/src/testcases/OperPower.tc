@@ -71,6 +71,14 @@
 ⍺=10 ⍵=20
 12
 
+      ⍝ https://aplwiki.com/wiki/Strand_notation
+      ⍝
+      2 (×⍣3) 2
+16
+
+      2×⍣3 ⊢2
+16
+
       ⍝ regression
       ⍝
       {1+÷⍵}⍣2 ⊢ 2 

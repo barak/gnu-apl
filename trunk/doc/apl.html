@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>November 17, 2025.
+<p>November 26, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -1062,7 +1062,7 @@ Next: <a href="#Section-2_002e2" accesskey="n" rel="next">Axis argument in defin
 
 
 <p>As already mentioned, it is possible to write APL scripts. Similar to other
-script languages, an APL script is a text file whose first line is a so-called
+nscript languages, an APL script is a text file whose first line is a so-called
 &quot;shebang line&quot;, i.e. a line starting with <code>#!</code>, followed by the
 absolute path to the interpreter (in our case the GNU APL binary), followed
 by command line arguments that are passed on to the interpreter. In our case
@@ -1897,17 +1897,24 @@ Next: <a href="#Section-2_002e4" accesskey="n" rel="next">Colored Output</a>, Pr
 
 <p>In the old APL1 every function of the interpreter was represented by a single
 APL character. More precisely, the character represented 1, 2, or 3
-subfunctions and the subfunction wwas selected by the number of arguments
-provided, i.e. 1 for monadic functions, 2 for dyadic functions or monadic
-functions with axis, or 3 for dyadic functions with axis. The APL character
-itself was designed in a way that made it easy to remember which functions it
-represented. 
+subfunctions and the subfunction was selected by the number of arguments
+provided:
+</p>
+<ul>
+<li> 1 for monadic functions,
+</li><li> 2 or monadic functions with axis,
+</li><li> 2 for dyadic functions (w/o axis), or
+</li><li> 3 for dyadic functions with axis.
+</li></ul>
+
+<p>The APL character itself was designed in a way that made it easy to
+remember which functions it represented. 
 </p>
 <p>Unfortunately this 1:1 relationship between APL characters and interpreter
 functions did not scale very well. As the number of functions increased,
 a new and, at that time, better scalable concept was introduced: ⎕-functions
 (and variables). The APL standards define only a small number (less than 20)
-of them , but different APL vendors were eagerly adding more system functions
+of them, but different APL vendors were eagerly adding more system functions
 to represent their proprietary extensions to th APL language. And so did
 GNU APL. With ⎕-functions the original visual appearance that helped to
 remember the many functions was replaced by abbreviations. That is, for
@@ -1919,9 +1926,11 @@ functions for various purposes. For such a large number the ⎕-function
 approach is no longer scalable (try to remember 100 abbreviations and
 think about the readability of the code using them!). Rather than adding a
 new ⎕-function for every new function, GNU APL tries to keep the number
-of ⎕-functions small by representing many interpreter functions by a single
-⎕-function. We call such a ⎕-function a <b>function group</b>. The
-interpreter functions of a function group are somehow related by their
+of ⎕-functions as small as resonable and by grouping several interpreter
+functions into subfunction of a single top-level ⎕-function.
+</p>
+<p>We call such a top-level ⎕-function a <b>function group</b>. The subfunction
+functions of a function group are somehow related by their
 purpose. The function groups of GNU APL are:
 </p>
 <ul>
@@ -1933,7 +1942,7 @@ purpose. The function groups of GNU APL are:
 </li><li> <b>⎕MX</b>: a collection of <b>M</b>atri<b>x</b> functions
   functions
 </li><li> <b>⎕RVAL</b>: generation of <b>R</b>andom APL <b>Val</b>ues
-</li><li> <b>SQL</b>:  an nterface to <b>SQL databases</b>
+</li><li> <b>SQL</b>:  an interface to <b>SQL databases</b>
 </li></ul>
 
 <p>The syntax for function groups has evolved in 3 phases as elucidated in the
@@ -1949,15 +1958,16 @@ following.
 <h4 class="subsection">2.3.1 Phase 1: Numerical Axis Argument</h4>
 
 <p>In the first phase, the number of functions per function group (at that time
-<b>⎕CR</b> and <b>⎕FIO</b>) was fairly small. A subfunction of the function group was
-selected as follows:
+<b>⎕CR</b> and <b>⎕FIO</b>) was fairly small. A subfunction of the function group
+was selected as follows:
 </p>
 <ul>
-<li> if all functions in the function group were monadic (as in <b>⎕CR</b>),
-  then the subfunction was selected by the left argument of the function group.
-</li><li> otherwise (as in <b>⎕FIO</b>) the individual subfunctions could be
-  monadic, dyadic, or nomadic and the subfunction was selected by an axis
-  argument of the function group.
+<li> If all functions in the function group were monadic (as is
+      the case in <b>⎕CR</b>), then the subfunction was selected by
+      the left argument of the function group.
+</li><li> Otherwise (as is the case in <b>⎕FIO</b>) the individual subfunction
+      could be monadic, dyadic, or nomadic and the subfunction was selected
+      by an axis argument of the function group.
 </li></ul>
 
 <p>For example:
@@ -1977,7 +1987,7 @@ selected as follows:
 <h4 class="subsection">2.3.2 Phase 2: String Axis Argument</h4>
 
 <p>Shortly after introducing the syntax of phase 1, GNU APL users began to develop
-and APL workspace named <b>FILE_IO</b>. This workspace contains one APL wrapper
+an APL workspace named <b>FILE_IO</b>. This workspace contains one APL wrapper
 function for each numerical <b>⎕FIO</b> subfunction selector. These wrappers
 were trivial one-liners like these:
 </p>
@@ -1993,8 +2003,8 @@ were trivial one-liners like these:
       ∇
 </pre></div>
 
-<p>APL programs would <b>)COPY</b> the workspace and then use normal defined
-functions instead of <b>⎕FIO</b> with an axis argiment or <b>⎕CR</b> with a left
+<p>APL programs would <b>)COPY</b> this workspace and then use its normal defined
+functions instead of <b>⎕FIO</b> with an axis argument or <b>⎕CR</b> with a left
 argument.  The development of the <b>FILE_IO</b> suggested that APL users have
 a preference of names over numbers to select a subfunction.
 </p>
@@ -2034,8 +2044,8 @@ now become:
 
 <p>If the number of subfunctions becomes large, then remembering all subfunction
 names of a function group is still a problem. To avoid the need to consult
-other documentation, all function groups provide lists that show their
-subfunctions and the syntaces of them.
+other documentation while programming, all function groups provide lists
+that show their subfunctions and their syntax.
 </p>
 <p>Let <b>FOO</b> be a function group. Then:
 </p>
@@ -3674,7 +3684,7 @@ vectors are frequently used arguments and results of ⎕FIO functions.
 </p>
 <p>Let Z←A ⎕CR B.
 </p>
-<p>Then the left argument A of ⎕CR selects one of several sub-functions of ⎕CR:
+<p>Then the left argument A of ⎕CR selects one of several subfunctions of ⎕CR:
 </p>
 <p>A=0-4 or 7-9, or 29: various formatting styles (boxed, APL input/output, etc.).
 Just try them out.
@@ -3828,7 +3838,7 @@ fclose(), ...), For example:
       'lib_file_io.so' ⎕FX 'FILE_IO'
 FILE_IO
 
-      ⍝ show overview of sub-functions in FILE_IO
+      ⍝ show overview of subfunctions in FILE_IO
       ⍝
       FILE_IO ''
    Functions provided by this library.
@@ -6506,7 +6516,7 @@ Next: <a href="#Section-2_002e40" accesskey="n" rel="next">⎕SYL - System limit
 </p>
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below. ⎕SQL has an axis argument that
-selects a sub-function of ⎕SQL.
+selects a subfunction of ⎕SQL.
 </p>
 <ul class="section-toc">
 <li><a href="#g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers" accesskey="1">⎕SQL[0] ⍬ : display subfunction numbers</a></li>
@@ -6528,8 +6538,8 @@ selects a sub-function of ⎕SQL.
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_005b_003f_005d-_003a-display-subfunction-numbers">
 <h4 class="subsection">2.39.1 ⎕SQL[0] ⍬ : display subfunction numbers</h4>
 
-<p>The system function ⎕SQL is divided into a number of sub-functions. The
-desired sub-function of ⎕SQL is selected by means of a numeric axis argument:
+<p>The system function ⎕SQL is divided into a number of subfunctions. The
+desired subfunction of ⎕SQL is selected by means of a numeric axis argument:
 </p>
 <div class="example">
 <pre class="example">    Valid (sub-)function numbers for ⎕SQL:
@@ -6570,7 +6580,7 @@ names with the following syntax:
 </p>
 <div class="example">
 <pre class="example">    With a small performance penalty, ⎕SQL also accepts the following
-    sub-function names instead of sub-function numbers as axis argument:
+    subfunction names instead of subfunction numbers as axis argument:
 
     Legend: Fs - database file name (path)
             Ty - database type ('sqlite' or 'postgres')
@@ -7139,7 +7149,7 @@ of column names instead of <b>*</b> (similar to indexed reference in APL).
 <div class="subsubsection" id="Updating-a-Database-Table">
 <h4 class="subsubsection">2.39.14.7 Updating a Database Table</h4>
 
-<p>The ⎕SQL sub-functions introduced so far suffice, at least in principle. The
+<p>The ⎕SQL subfunction introduced so far suffice, at least in principle. The
 APL programmer can read a table from the database into APL, analyse and/or
 modify it in APL, and optionally writeit back into the database.
 </p>

@@ -36,19 +36,68 @@ bool Quad_FFT::system_wisdom_loaded = false;
 #include <fftw3.h>
 #include "ComplexCell.hh"
 
+const FunctionGroup::function_info Quad_FFT::subfunction_infos[] =
+{
+#define fftdef(N, fun, comm) { N, #fun, "", comm, -1 },
+
+  fftdef(-15,flat_top_window       ,"no FFT; Z is B × flat-top window"        )
+  fftdef(-14,blackman_nuttal_window,"no FFT; Z is B × Blackman-Nuttal window" )
+  fftdef(-13,blackman_harris_window, "no FFT; Z is B × Blackman-Harris window" )
+  fftdef(-12,blackman_window       ,"no FFT; Z is B × Blackman window"        )
+  fftdef(-11,hamming_window        ,"no FFT; Z is B × Hamming window"         )
+  fftdef(-10,hann_window           ,"no FFT; Z is B × Hann window"            )
+  fftdef( -1,inverse_fft           ,"Z is the inverse FFT of B"               )
+  fftdef(  0,fft                   ,"Z is FFT without window; same as ⎕FFT B" )
+  fftdef( 10,fft_hann              ,"Z is FFT with Hann window"               )
+  fftdef( 11,fft_hamming           ,"Z is FFT with Hamming window"            )
+  fftdef( 12,fft_blackman          ,"Z is FFT with Blackman window"           )
+  fftdef( 13,fft_blackman_harris   ,"Z is FFT with Blackman-Harris window"    )
+  fftdef( 14,fft_blackman_nuttal   ,"Z is FFT with Blackman-Nuttal window"    )
+  fftdef( 15,fft_flat_top          ,"Z is FFT with flat-top window"           )
+};
+
+//----------------------------------------------------------------------------
+Quad_FFT::Quad_FFT()
+      : QuadFunction(TOK_Quad_FFT)
+{
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕FFT");
+
+   system_wisdom_loaded = false;
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_fun_syntax(ostream & out,
+                           const function_info & info) const
+{
+const sRank axis = info.axis;
+   out << "    Z ← ";
+   if      (axis < -9)   out << "¯"  << -axis;
+   else if (axis <  0)   out << " ¯" << -axis;
+   else if (axis < 10)   out << "  " <<   axis;
+   else                  out << " "  <<   axis;
+   out<< " ⎕FFT B   ⍝ " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_map_syntax(ostream & out,
+                           const function_info & info) const
+{
+char NN[10];   SPRINTF(NN, "%3d", int(info.axis));
+const UTF8_literal name = info.function_name;
+const int blanks = max_function_name_length - name.get_char_count();
+
+   out << "    " << NN << " ⎕FFT  ←→  ⎕FFT['" << name << "']"
+       << UCS_string(blanks, UNI_SPACE) << "  ←→  ⎕FFT." << name << endl;
+}
 //----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
-   if (B->is_vector() && B->element_count() == 0)   // empty vector
-      {
-        if (B->get_cfirst().is_character_cell())      list_functions(true);
-        else if (B->get_cfirst().is_integer_cell())   list_functions(false);
-        else                                          DOMAIN_ERROR;
-        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
-      }
-
-   return do_fft(FFTW_FORWARD, B, 0);
+   if (B->element_count())   return do_fft(FFTW_FORWARD, B, 0);
+   if (B->is_str0())         return list_functions(CERR);
+   if (B->is_zilde())        return list_mappings(CERR);
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 void
@@ -244,11 +293,21 @@ Value_P Z(B->get_shape(), LOC);
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
-   if (A->get_rank() > 1)         RANK_ERROR;
-   if (A->element_count() != 1)   LENGTH_ERROR;
-
-const APL_Integer what = A->get_cfirst().get_int_value();
-   switch(what)
+  return do_eval_AorX_B(*A, SIG_A, SIG_A_F2_B, B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_XB(Value_P X, Value_P B) const
+{
+  return do_eval_AorX_B(*X, SIG_X, SIG_F1_X_B, B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Fun_signature sig_AorX, 
+                         Fun_signature sig_fun, Value_P B) const
+{
+const sAxis mode = value_to_subfun(A_or_X, sig_AorX, sig_fun);
+   switch(mode)
       {
         case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
         case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
@@ -268,25 +327,14 @@ const APL_Integer what = A->get_cfirst().get_int_value();
         case -15: return do_window(B, &flat_top);
       }
 
-   MORE_ERROR() << "Invalid mode A (= " << what
-        << ") of A ⎕FFT B. Valid modes are:\n"
-"    A=¯15: no FFT, return (B × Flat-Top window)\n"
-"    A=¯14: no FFT, return (B × Blackman-Nuttal window)\n"
-"    A=¯13: no FFT, return (B × Blackman-Harris window)\n"
-"    A=¯12: no FFT, return (B × Blackman window)\n"
-"    A=¯11: no FFT, return (B × Hamming window)\n"
-"    A=¯10: no FFT, return (B × Hann window)\n"
-"\n"
-"    A=¯1: inverse FFT\n"
-"    A=0:  forward FFT (no window) of B\n"
-"\n"
-"    A=10: forward FFT(B × Hann window)\n"
-"    A=11: forward FFT(B × Hamming window)\n"
-"    A=12: forward FFT(B × Blackman window)\n"
-"    A=13: forward FFT(B × Blackman-Harris window)\n"
-"    A=14: forward FFT(B × Blackman-Nuttal window)\n"
-"    A=15: forward FFT(B × Flat-Top window)\n";
-
+   // at this point A_or_X was numeric and invalid.
+   //
+   MORE_ERROR() << get_signature_string(sig_fun)
+                << ": invalid function number "
+                << (sig_AorX == SIG_X ? "X" : "A")
+                << " (= " << mode << ").\n"
+                   "    See ⎕FFT '' or ⎕FFT ⍬ for a list "
+                   "of valid function numbers.";
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -312,76 +360,7 @@ ShapeItem rlen = 1;
          rlen *= axis_len;
        }
 }
-//------------------------------------------------------------------------------
-/// sub function names. Keep them sorted by subfunction name.
-const sub_function_info sub_function_infos[] = {
-  { -13, "blackman_harris_window", -1, 0 },
-  { -14, "blackman_nuttal_window", -1, 0 },
-  { -12, "blackman_window",        -1, 0 },
-  {   0, "fft",                    -1, 0 },
-  {  12, "fft_blackman",           -1, 0 },
-  {  13, "fft_blackman_harris",    -1, 0 },
-  {  14, "fft_blackman_nuttal",    -1, 0 },
-  {  15, "fft_flat_top",           -1, 0 },
-  {  11, "fft_hamming",            -1, 0 },
-  {  10, "fft_hann",               -1, 0 },
-  { -15, "flat_top_window",        -1, 0 },
-  { -11, "hamming",                -1, 0 },
-  { -10, "hann",                   -1, 0 },
-  {  -1, "inverse_fft",            -1, 0 },
-                                               };
-
-sAxis
-Quad_FFT::subfun_to_axis(const UCS_string & name) const
-{
-UTF8_string name_utf(name);
-const char * function_name = name_utf.c_str();
-
-  enum { SF_SIZE = sizeof(sub_function_info),
-         SF_COUNT = sizeof(sub_function_infos)  / SF_SIZE };
-
- if (const void * vp = bsearch(function_name, sub_function_infos,
-                               SF_COUNT, SF_SIZE, axis_compare))
-      return reinterpret_cast<const sub_function_info *>(vp)->axis;
-
-  return -1;    // not found
-}
-//------------------------------------------------------------------------------
-void
-Quad_FFT::list_functions(bool mapping)
-{
-ostream & out = CERR;
-  if (mapping)
-     {
-       // ⎕FFT "": print the number to name mappings like:
-       //
-       // ⎕FFT[0]  ←→  ⎕FFT['fft']        ←→  ⎕FFT.fft
-       //
-       enum { SUB_COUNT =
-              sizeof(sub_function_infos) / sizeof(sub_function_info) };
-       list_all_mappings(out, "⎕FFT", sub_function_infos, SUB_COUNT);
-     }
-  else
-     {
-       out <<
-       "    ⎕FFT[¯15] B : B × flat-top window\n"
-       "    ⎕FFT[¯14] B : B × Blackman-Nuttal window\n"
-       "    ⎕FFT[¯13] B : B × Blackman-Harris window\n"
-       "    ⎕FFT[¯12] B : B × Blackman window\n"
-       "    ⎕FFT[¯11] B : B × Hamming window\n"
-       "    ⎕FFT[¯10] B : B × Hann window\n"
-       "    ⎕FFT[ ¯1] B : inverse FFT\n"
-       "    ⎕FFT[  0] B : forward FFT (same as ⎕FFT B)\n"
-       "    ⎕FFT[ 10] B : FFT with Hann window\n"
-       "    ⎕FFT[ 11] B : FFT with Hamming window\n"
-       "    ⎕FFT[ 12] B : FFT with Blackman window\n"
-       "    ⎕FFT[ 13] B : FFT with Blackman-Harris window\n"
-       "    ⎕FFT[ 14] B : FFT with Blackman-Nuttal window\n"
-       "    ⎕FFT[ 15] B : FFT with flat-top window\n"
-           << endl;
-     }
-}
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #else
 

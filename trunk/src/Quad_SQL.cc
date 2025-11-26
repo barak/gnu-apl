@@ -57,36 +57,32 @@ Quad_SQL_4 Quad_SQL_4::fun;   // ⎕SQL[4, DB]
 #endif
 
 //----------------------------------------------------------------------------
-int
-Quad_SQL::function_name_to_int(const char * function_name)
+const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
 {
-  if (0 == strcmp(function_name, "list"))       return  0;
-  if (0 == strcmp(function_name, "open"))       return  1;
-  if (0 == strcmp(function_name, "close"))      return  2;
-  if (0 == strcmp(function_name, "query"))      return  3;
-  if (0 == strcmp(function_name, "update"))     return  4;
-  if (0 == strcmp(function_name, "begin"))      return  5;
-  if (0 == strcmp(function_name, "commit"))     return  6;
-  if (0 == strcmp(function_name, "rollback"))   return  7;
-  if (0 == strcmp(function_name, "tables"))     return  8;
-  if (0 == strcmp(function_name, "columns"))    return  9;
-  if (0 == strcmp(function_name, "version"))    return 10;
-  if (0 == strcmp(function_name, "vstring"))    return 11;
-
-  MORE_ERROR() << "Invalid sub-function name '" << function_name
-               <<"'for ⎕SQL.\nNOTE: ⎕SQL.list ⍬ will show the valid "
-                 "sub-function names.";
-  return -1;   // invalid function name
-}
-
+#define sql_def(N, name, map_comm, fun_comm) \
+   { N, #name, map_comm, fun_comm, -1 },
+   sql_def(  0, list     , "begin a transaction"        , "")
+   sql_def(  1, open     , "show the columns of a table", "")
+   sql_def(  2, close    , "end a transaction"          , "")
+   sql_def(  3, query    , "close a database handle"    , "")
+   sql_def(  4, update   , "⎕SQL function names/numbers", "")
+   sql_def(  5, begin    , "open database file"         , "")
+   sql_def(  6, commit   , "SQL database query"         , "")
+   sql_def(  7, rollback , "roll a transaction back"    , "")
+   sql_def(  8, tables   , "show all tables"            , "")
+   sql_def(  9, columns  , "SQL database update"        , "")
+   sql_def( 10, version  , "SQL provider version number", "")
+   sql_def( 11, vstring  , "SQL provider version string", "")
+};
 //----------------------------------------------------------------------------
-sAxis
-Quad_SQL::subfun_to_axis(const UCS_string & name) const
+Quad_SQL::Quad_SQL()
+   : QuadFunction(TOK_Quad_SQL)
 {
-const UTF8_string name_utf(name);
-   return function_name_to_int(name_utf.c_str());
-}
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕SQL");
 
+   init_provider_map();
+}
 //----------------------------------------------------------------------------
 void
 Quad_SQL::close_all_connections()
@@ -132,91 +128,99 @@ Provider * postgresProvider = new PostgresProvider();
 #endif
 }
 //----------------------------------------------------------------------------
-Quad_SQL::Quad_SQL()
-   : QuadFunction(TOK_Quad_SQL)
-{
-   init_provider_map();
-}
-//----------------------------------------------------------------------------
 Quad_SQL::~Quad_SQL()
 {
    loop(p, SQL_providers.size())   delete SQL_providers[p];
    SQL_providers.clear();
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_SQL::list_functions(ostream & out, bool mapping)
+const char * Quad_SQL::get_legend(Legend_type lt) const
 {
-const char * legend =
-"    Legend: Fs - database file name (path)\n"
-"            Ty - database type ('sqlite' or 'postgres')\n"
-"            Db - database handle (small integer)\n"
-"            Qs - SQL query string\n"
-"            Pv - query parameters (APL values, to be bound to Qs)\n"
-"            Ts - name of a table in the database (string)\n"
-"            Vi - DB provider (library) version (integer)\n"
-"            Vs - DB provider (library) version (string)\n"
+   switch(lt)
+      {
+        default:             return "";
+        case LET_FUN_PREFIX:
+        case LET_MAP_PREFIX: return
+"    ┌─── Legend ────────────────────────────────────────────────┐\n"
+"    │    Db - database handle (small integer)                   │\n"
+"    │    Fs - database file name (path)                         │\n"
+"    │    Pv - query parameters (APL values, to be bound to Qs)  │\n"
+"    │    Qs - SQL query string                                  │\n"
+"    │    Ts - name of a table in the database (string)          │\n"
+"    │    Ty - database type ('sqlite' or 'postgres')            │\n"
+"    │    Vi - DB provider (library) version (integer)           │\n"
+"    │    Vs - DB provider (library) version (string)            │\n"
+"    └───────────────────────────────────────────────────────────┘\n"
 "\n";
-
-   if (mapping)
-      {
-        // ⎕SQL "": print the (axis-)number to function name mappings
-        //
-        const char * map[] = {
-    "   ⎕SQL[5]       ", "begin       ", "begin a transaction"         ,
-    "   ⎕SQL[9]       ", "columns     ", "show the columns of a table" ,
-    "   ⎕SQL[6]       ", "commit      ", "end a transaction"           ,
-    "   ⎕SQL[2]       ", "close       ", "close a database handle"     ,
-    "   ⎕SQL[0]       ", "list ''     ", "⎕SQL function names/numbers" ,
-    "   ⎕SQL[1]       ", "open        ", "open database file"          ,
-    "   ⎕SQL[3, Db] Pv", "query Db Pv ", "SQL database query"          ,
-    "   ⎕SQL[7]       ", "rollback    ", "roll a transaction back"     ,
-    "   ⎕SQL[8]       ", "tables      ", "show all tables"             ,
-    "   ⎕SQL[4, Db] Pv", "update Db Pv", "SQL database update"         ,
-    "   ⎕SQL[10]      ", "version     ", "SQL provider version number" ,
-    "   ⎕SQL[11]      ", "vstring     ", "SQL provider version string" ,
-    0                  , 0               , 0 };
-
-        out <<
-"    With a small performance penalty, ⎕SQL also accepts the following\n"
-"    sub-function names instead of sub-function numbers as axis argument:\n\n"
-             << legend;
-
-        for (const char ** m = map; *m;) 
-            {
-              out << "    "        << *m++;           // axis syntax
-              out << "  ←→  ⎕SQL." << *m++;           // name syntax
-              out << "  ⍝ "        << *m++ << endl;   // comment
-             }
       }
-   else
-      {
-         const char * funs[] = {
-   "        ⎕SQL[0] ''    ", "list the ⎕SQL (sub-)function names"         ,
-   "        ⎕SQL[0] ⍬     ", "list the ⎕SQL (sub-)function numbers"       ,
-   "Db ← Ty ⎕SQL[1] Fs    ", "open database Fs & return a handle for it"  ,
-   "        ⎕SQL[2] Db    ", "close database handle Db"                   ,
-   "     Qs ⎕SQL[3, Db] Pv", "perform SQL query Qs"                       ,
-   "     Qs ⎕SQL[4, Db] Pv", "perform SQL update Qs"                      ,
-   "        ⎕SQL[5] Db    ", "begin a transaction"                        ,
-   "        ⎕SQL[6] Db    ", "commit the current transaction"             ,
-   "        ⎕SQL[7] Db    ", "roll the current transaction back"          ,
-   "        ⎕SQL[8] Db    ", "list the tables in database Db"             ,
-   "     Db ⎕SQL[9] Ts    ", "list the column names and types of table Tn",
-   "Vi ←    ⎕SQL[10] Ty   ", "the provider version number for type Ty"    ,
-   "Vs ←    ⎕SQL[11] Ty   ", "the provider version string for type Ty"    ,
-   0                       , 0 };
+}
+//----------------------------------------------------------------------------
+Token
+Quad_SQL::list_functions(ostream & out) const
+{
+   out << "\n"
+          "⎕SQL is a function group. It is comprized of "
+                "the following (sub-)functions:\n"
+          "\n"
+       << get_legend(LET_FUN_PREFIX)
+       << "    ⎕SQL ''   ⍝ display this list\n"
+          "    ⎕SQL ⍬    ⍝ display syntax alternatives for ⎕SQL\n"
+          "\n";
 
-         out << "    Valid (sub-)function numbers for ⎕SQL:\n\n" << legend;
+const char * funs[] =
+{
+   "        ⎕SQL[ 0] ''    ", "display the ⎕SQL (sub-)function names"      ,
+   "        ⎕SQL[ 0] ⍬     ", "display the ⎕SQL (sub-)function numbers"    ,
+   "Db ← Ty ⎕SQL[ 1] Fs    ", "open database Fs & return a handle for it"  ,
+   "        ⎕SQL[ 2] Db    ", "close database handle Db"                   ,
+   "     Qs ⎕SQL[ 3, Db] Pv", "perform SQL query Qs"                       ,
+   "     Qs ⎕SQL[ 4, Db] Pv", "perform SQL update Qs"                      ,
+   "        ⎕SQL[ 5] Db    ", "begin a transaction"                        ,
+   "        ⎕SQL[ 6] Db    ", "commit the current transaction"             ,
+   "        ⎕SQL[ 7] Db    ", "roll the current transaction back"          ,
+   "Z  ←    ⎕SQL[ 8] Db    ", "the tables in database Db"                  ,
+   "Z  ← Db ⎕SQL[ 9] Ts    ", "the column names and types of table Ts"     ,
+   "Vi ←    ⎕SQL[10] Ty   ", "the provider version number for DB type Ty" ,
+   "Vs ←    ⎕SQL[11] Ty   ", "the provider version string for DB type Ty" ,
+   0                       , 0
+ };
 
-        for (const char ** f = funs; *f;)
-             {
-               out << "    " << *f++;           // axis syntax
-               out << "    " << *f++ << endl;   // comment
-             }
-      }
+   for (const char ** f = funs; *f; )
+       {
+         out << " " << *f++;
+         out << "   ⍝ " << *f++ << endl;
+       }
 
-   return Str0(LOC);
+   out << "\nThe functions of ⎕SQL"
+          " can be called with one of several syntax alternatives.\n"
+          "The syntax alternatives for ⎕SQL can be displayed with:\n\n";
+
+   COUT << "      ⎕SQL ⍬   ⍝ display the syntax alternatives for ⎕SQL\n\n";
+
+   return Token();
+}
+//----------------------------------------------------------------------------
+void
+Quad_SQL::print_map_syntax(ostream & out, const function_info & info) const
+{
+const sAxis axis = info.axis;
+const UTF8_literal name = info.function_name;
+
+   // print axis number syntax
+   //
+   out << "    ⎕SQL[" << axis;
+   if (axis == 3 || axis == 4)   out << ", Db] Pv"; 
+   else                          out << "]       ";
+
+   // print member name syntax
+   //
+   out << "  ←→  ⎕SQL." << name;
+
+   if (axis == 3 || axis == 4)   out << " Db Pv";
+   while (Output::get_column() < 44)    out << UNI_SPACE;
+
+   // comment
+   out << "⍝ " << info.comment_map << endl;   // comment
 }
 //----------------------------------------------------------------------------
 int
@@ -652,14 +656,9 @@ Quad_SQL::eval_B(Value_P B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
+   if (B->is_zilde())   return list_mappings(CERR);
+   if (B->is_str0())    return list_functions(CERR);
    if (B->element_count() != 0)   LENGTH_ERROR;
-
-   if (B->get_cfirst().is_character_cell())
-      return Token(TOK_APL_VALUE1, list_functions(COUT, true));
-
-   if (B->get_cfirst().is_integer_cell())
-      return Token(TOK_APL_VALUE1, list_functions(COUT, false));
-
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -667,7 +666,7 @@ Token
 Quad_SQL::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
-   return Token(TOK_APL_VALUE1, list_functions(COUT, false));
+   return list_functions(COUT);
 }
 //----------------------------------------------------------------------------
 Token
@@ -680,7 +679,8 @@ const bool map = B->get_cfirst().is_character_cell();
 
     switch(function_number)
        {
-         case  0: return Token(TOK_APL_VALUE1, list_functions(CERR, map));
+         case  0: if (map)   return list_mappings(CERR);
+                  else       return list_functions(CERR);
          case  1: VALENCE_ERROR;
          case  2: return close_database(B);
          case  3:
@@ -724,7 +724,7 @@ const APL_Integer function_number = X->get_cfirst().get_near_int();
 
    switch(function_number)
       {
-        case  0: return Token(TOK_APL_VALUE1, list_functions(CERR, false));
+        case  0: return list_functions(CERR);
         case  1: return Token(TOK_APL_VALUE1, open_database(*A, *B));
         case  2: VALENCE_ERROR;
         case  3: return Token(TOK_APL_VALUE1, run_query(*A, *X, *B));

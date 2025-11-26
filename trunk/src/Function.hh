@@ -36,20 +36,139 @@ class Workspace;
 class UserFunction;
 class RavelIterator;
 
-/* Naming conventions:
+/* Naming conventions for the virtual eval_XXX() functions (in the order of
+   appearance in suffix XXX (from left to right).
 
-   A: left argument
-   L: left function
-   R: right function
-   X: axis
-   B: right argument
+   A: left value argument (functions and operators)
+   L: left function argument (monadic and dyadic operators)
+   R: right function argument  (dyadic operators)
+   X: axis argument (functions and operators)
+   B: right value argument (functions and operators)
 
-   default implementation for axis function: ignore axis
+   default implementation functions with axis: ignore axis
 */
+//----------------------------------------------------------------------------
+/** additional functionality for functions with named sub-functions.
+    I.e one of ⌹, ⎕CR, ⎕FFT, FIO, ⎕MX, ⎕RVAL, or ⎕SQL.
+  */
+class FunctionGroup
+{
+protected:
+   /// information pertaining to one subfunction
+   struct function_info
+      {
+        /// the function axis (= function number)
+        sAxis axis;
+
+        /// the function name (for e.g. ⎕XXX.function_name) in Prefix.cc
+        const char * function_name;
+
+        /// the comment in ⎕XXX '' (mapping == true; currently only used
+        /// by  ⎕SQL only).
+        /// the syntax table is sorted by function names
+        const char * comment_map;
+
+        /// the comment in ⎕XXX ⍬ (mapping = false).
+        /// the syntax table is sorted by function number
+        const char * comment_fun;
+
+        /// ther function valence, -1 if not specified
+        int valence;
+      };
+
+public:
+   /// default constructor (for functions that are NOT function groups)
+   FunctionGroup()
+   : group_name(0),
+     sorted_by_name(0),
+     sorted_by_axis(0),
+     subfun_count(0),
+     max_function_name_length(0)
+   {}
+
+   /// initialize \b sorted_by_name and \b sorted_by_axis.
+   void init_function_group(const function_info * infos, size_t count,
+                            const char * group_name);
+
+   /// return \b true if \b this function has (named) sub-functions.
+   /// Most do not.
+   bool has_subfuns() const
+      { return subfun_count != 0; }
+
+   /// return a function number (pseudo-axis) for subfunction \b name,
+   /// or -1 if \b name is not a valid subfunction name
+   ///
+   sAxis subfun_to_axis(const UCS_string & subfun_name) const;
+
+   /// return a function number (pseudo-axis) for \b value. \b value shall
+   /// be an integer scalar, or else a valid subfunction name (APL string).
+   sAxis value_to_subfun(const Value & value, Fun_signature axis,
+                                              Fun_signature fun) const;
+   //
+   /// print some help (not for )HELP, but for ⎕XXX ⍬).
+   /// The help for )HELP is defined in \b Help.def
+   Token list_functions(ostream & out) const;
+
+   /// print the syntax variants for all subfunctions.
+   Token list_mappings(ostream & out) const;
+
+   /// static texts before and after syntax tables
+   enum Legend_type
+      {
+        LET_FUN_PREFIX,   ///< ⎕XXX '' starr
+        LET_FUN_SUFFIX,   ///< ⎕XXX '' end
+        LET_MAP_PREFIX,   ///< ⎕XXX ⍬ starr
+        LET_MAP_SUFFIX,   ///< ⎕XXX ⍬ end
+      };
+
+protected:
+   /// helper function to print a 1-line function help.
+   virtual const char * get_legend(Legend_type lt) const
+      { return ""; }   // for non-FunctionGroups
+
+   /// helper function to print the subfunction function syntax
+   virtual void print_fun_syntax(ostream & out, const function_info &) const
+      { out << "*** missing FunctionGroup::print_fun_syntax()" << endl; }
+
+   /// helper function to print the subfunction syntax mapping
+   virtual void print_map_syntax(ostream & out, const function_info &) const
+      { out << "*** missing FunctionGroup::print_map_syntax()" << endl; }
+
+   /// compare names (helper for bsearch())
+   static int compare_function_name(const void * info1, const void * info2);
+
+   /// compare axes (helper for bsearch())
+   static int compare_function_axis(const void * info1, const void * info2);
+ 
+   /// return the function_info for function name \b name
+   const function_info * get_info_by_name(const UTF8_literal name) const;
+
+   /// return the function_info for function axis \b axis
+   const function_info * get_info_by_axis(uAxis axis) const;
+
+   /// return the signature \b sig as string
+   UCS_string get_signature_string(Fun_signature sig) const;
+
+   /// the group name (⎕CR, ⎕FFT, ... Only non-zero if this functiuon is a group
+   /// (ass opposed to being a function without subfunctions).
+   const char * group_name;
+
+   /// the table, sorted by function name
+   const function_info ** sorted_by_name;
+
+   /// the table, sorted by function number (= axis)
+   const function_info ** sorted_by_axis = 0;
+
+   /// the number of subfunctions
+   int subfun_count;
+
+   /// the longest subfunction name (for tabular output)
+   size_t max_function_name_length;
+};
 //----------------------------------------------------------------------------
 /** The base class for all functions (user defined or system functions).  */
 /// Base class for all APL functions and operators (system or defined)
-class Function : public NamedObject
+class Function : public NamedObject, public FunctionGroup
 {
 public:
    /// constructor for most functions
@@ -146,8 +265,8 @@ public:
    /// For non-user defined functions, throw DOMAIN_ERROR.
    virtual bool has_result() const = 0;
 
-   /// return true iff the function has and axis (system defined functions
-   /// always have an axis even thogh most of them ignore it).
+   /// return true iff the function has and axis (system functions
+   /// always have an axis even though most of them ignore it).
    virtual bool has_axis() const    { return true; }
 
    /// overloaded NamedObject::get_function()
@@ -217,31 +336,31 @@ public:
    /// monadic operator, 1 argument
    virtual Token eval_LB(Token & LO, Value_P B) const;
 
-   /// plain function, 1 argument, with axis
+   /// plain function, 1 argument, plus axis
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// monadic operator, 2 arguments
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
-   /// plain function, 2 arguments, with axis
+   /// plain function, 2 arguments, plus axis
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// dyadic operator, 1 arguments
    virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
-   /// monadic operator, 1 arguments, with axis
+   /// monadic operator, 1 arguments, plus axis
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// dyadic operator, 2 arguments
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
-   /// monadic operator, 2 arguments, with axis
+   /// monadic operator, 2 arguments, plus axis
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
-   /// dyadic operator, 1 arguments, with axis
+   /// dyadic operator, 1 arguments, plus axis
    virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
-   /// dyadic operator, 2 arguments, with axis
+   /// dyadic operator, 2 arguments, plus axis
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
                             Value_P X, Value_P B) const;
 
@@ -269,15 +388,6 @@ public:
    /// return axis (non-0 only for derived functions)
    virtual Value_P * locate_X() const
       { return 0; }
-
-   /// return true if this function has (named) sub-functions, i.e.
-   /// this function is either ⎕FIO or ⎕CR.
-   virtual bool has_subfuns() const
-      { return false; }
-
-   /// return a (pseudo-) axis number for subfunction \b name
-   virtual sAxis subfun_to_axis(const UCS_string & name) const
-      { return -1; }
 
    /// return the signature of this function (currently only valid
    /// for user-defined functions)

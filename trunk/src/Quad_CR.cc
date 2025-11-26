@@ -30,117 +30,79 @@
 #include "Quad_CR.hh"
 #include "Symbol.hh"
 #include "Tokenizer.hh"
+#include "UCS_string.hh"
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
-sub_function_info Quad_CR::sub_functions[] =
+const FunctionGroup::function_info Quad_CR::subfunction_infos[] =
 {
-#define crdef(N, name)   { N, #name, -1, 0 },
+#define crdef(N, name, comm_2)   { N, #name, "", comm_2, -1 },
 #include "Quad_CR.def"
 };
 //----------------------------------------------------------------------------
-Token
-Quad_CR::list_functions(ostream & out, bool mapping)
+Quad_CR::Quad_CR()
+ : QuadFunction(TOK_Quad_CR)
 {
-   if (mapping)
+   // note: ⎕CR is instantiated twice, once for the static Quad_CR::fun,
+   // and once in Workspace::Workspace() fotr macro support
+   //
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕CR");
+}
+//----------------------------------------------------------------------------
+const char *
+Quad_CR::get_legend(FunctionGroup::Legend_type lt) const
+{
+   switch(lt)
       {
-         out <<
-"      With a small performance penalty, ⎕CR also accepts the following "
-"strings\n      instead of function numbers as left argument:\n\n";
+        default: return "";
 
-         loop(f, sizeof(sub_functions)/sizeof(sub_function_info))
-             {
-               const size_t N = sub_functions[f].axis;
-               char NN[10];   SPRINTF(NN, "%2d", int(N));
-               const char * name = sub_functions[f].sub_name;
-               out << "      " << NN << " ⎕CR  ←→"
-                   << UCS_string(24 - strlen(name), UNI_SPACE)
-                   << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
-             }
+        case LET_FUN_PREFIX: return
+"   ┌─── Legend:───────────────────────────────────────────────────┐\n"
+"   │    b - byte vector (vector of integers between -128 and 255) │\n"
+"   │    h - hex string (characters 0-9 or A-F resp. a-f)          │\n"
+"   │    i - integer vector                                        │\n"
+"   │    l - string of (\\n-terminated) lines                       │\n"
+"   │    m - character matrix                                      │\n"
+"   │    n - nested vector of strings                              │\n"
+"   │    r - base64 string according to RFC 4648                   │\n"
+"   │    s - string                                                │\n"
+"   │    t - token                                                 │\n"
+"   │    v - T,V (integer tag T and byte vector V)                 │\n"
+"   └──────────────────────────────────────────────────────────────┘\n"
+"\n";
 
-         out << "\n      For a more detailed description of all functions:\n\n"
-                "      ⎕CR ⍬" << endl;
+   case LET_MAP_SUFFIX: return
+"\n"
+"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M.\n";
       }
-   else
-      {
-   out <<
-"   Functions provided by A ⎕CR B...\n"
-"\n"
-"   Legend: b - byte vector (vector of integers between -128 and 255)\n"
-"           h - hex string (characters 0-9 or A-F resp. a-f)\n"
-"           i - integer vector\n"
-"           l - string of (\\n-terminated) lines\n"
-"           m - character matrix\n"
-"           n - nested vector of strings\n"
-"           r - base64 string according to RFC 4648\n"
-"           s - string\n"
-"           t - token\n"
-"           v - T,V (integer tag T and byte vector V)\n"
-"\n"
-"   Zm ←  0 ⎕CR B     Zm is B in APL output format\n"
-"   Zs ←  1 ⎕CR B     Zs is B in APL input format\n"
-"   Zm ←  2 ⎕CR B     Zm is B boxed using ASCII characters\n"
-"   Zm ←  3 ⎕CR B     Zm is B boxed using line-drawing characters\n"
-"   Zm ←  4 ⎕CR B     3 ⎕CR B + extra frame\n"
-"   Zs ←  5 ⎕CR Bb    Zs is Bb in (uppercase) HEX\n"
-"   Zs ←  6 ⎕CR Bb    Zs is Bb in (lowercase) hex\n"
-"   Zm ←  7 ⎕CR B     like 3 ⎕CR B with thin lines\n"
-"   Zm ←  8 ⎕CR B     like 4 ⎕CR B with thin lines\n"
-"   Zm ←  9 ⎕CR B     like 4 ⎕CR B with double-line outer frame\n"
-"   Zs ← 10 ⎕CR Bs    Zs is an APL expression producing variable(-name) Bs\n"
-"   Zs ← 11 ⎕CR B     value B → CDR (Common Data Representation) string Zs\n"
-"   Z  ← 12 ⎕CR Bs    CDR string Bs → value Z\n"
-"   Zb ← 13 ⎕CR Bh    hex string Bh → byte vector Z\n"
-"   Zh ← 14 ⎕CR B     Zs is 6 ⎕CR 11 ⎕CR B (Value → CDR → HEX)\n"
-"   Z  ← 15 ⎕CR Bh    Z is 11 ⎕CR 6 ⎕CR B (HEX → CDR → Value)\n"
-"   Zr ← 16 ⎕CR Bs    string Bs → base64 string Z (RFC 4648)\n"
-"   Zs ← 17 ⎕CR Br    base64 string Br → string Zs (RFC 4648)\n"
-"   Zb ← 18 ⎕CR Bs    UCS string Bs → UTF8 encoded byte vector Zb (⍴Z ≥ ⍴B)\n"
-"   Zs ← 19 ⎕CR Bb    UTF8 encoded byte vector Bb → UCS string Zs (⍴Z ≤ ⍴B)\n"
-"   Zm ← 20 ⎕CR B     4 ⎕CR B, but in NARS style (length instead of ↓ or →)\n"
-"   Zm ← 21 ⎕CR B     20 ⎕CR B but using thin lines\n"
-"   Zm ← 22 ⎕CR B     20 ⎕CR B with double-line outer frame\n"
-"   Zm ← 23 ⎕CR B     20 ⎕CR B with thick lines + extra frame\n"
-"   Zm ← 24 ⎕CR B     20 ⎕CR B using thin lines + extra frame\n"
-"   Zm ← 25 ⎕CR B     20 ⎕CR B with double-line extra frame\n"
-"   Zi ← 26 ⎕CR B     Zi is the cell types of corresponding items in B\n"
-"   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integers\n"
-"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as integers\n"
-"   Zm ← 29 ⎕CR B     4 ⎕CR B with strings being quoted + extra frame\n"
-"   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
-"   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
-"   Zn ← 32 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
-"   Zb ← 33 ⎕CR Bv    Zb is a TLV with Tag ↑Bv and Value 1↓Bv\n"
-"   Zv ← 34 ⎕CR Bb    TLV Bb to Tag ↑Z and Value 1↓Z\n"
-"   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
-"   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
-"   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
-"   Z  ← 38 ⎕CR Bi    empty structured variable with capacity Bi\n"
-"   Z  ← 39 ⎕CR Bi    structured variable capacity Bi\n"
-"   Zi ← 40 ⎕CR Bi    pack boolean Bi (experimental, don't use!)\n"
-"   Zi ← 41 ⎕CR Bi    unpack boolean Bi (experimental, don't use!)\n"
-"   Zt ← 42 ⎕CR Bs    tokenize APL statement(s) Bs\n"
-"   Zt ← 43 ⎕CR Bs    parse APL statement(s) Bs\n"
-"   Zs ← 44 ⎕CR Bt    decode token(s) or token tag(s) Bt\n"
-"   Z  ← 45 ⎕CR B     print value addresses, return B\n"
-"\n"
-"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
-      }
-  return Token(TOK_APL_VALUE1, Str0(LOC));
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::print_fun_syntax(ostream & out,
+                          const function_info & info) const
+{
+   out << "    " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::print_map_syntax(ostream & out,
+                          const function_info & info) const
+{
+char NN[10];   SPRINTF(NN, "%2d", int(info.axis));
+const UTF8_literal name = info.function_name;
+   out << "      " << NN << " ⎕CR  ←→"
+       << UCS_string(24 - name.get_char_count(), UNI_SPACE)
+       << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_CR::eval_B(Value_P B) const
 {
-   if (B->element_count() == 0)   // ⎕CR '' : print help
-      {
-        if (B->get_cfirst().is_character_cell())
-           return list_functions(CERR, true);
-        if (B->get_cfirst().is_integer_cell())
-           return list_functions(CERR, false);
-      }
-
-   return do_eval_B(B.get(), true);
+   if (B->element_count())                    return do_eval_B(B.get(), true);
+   if (B->get_cfirst().is_character_cell())   return list_functions(CERR);
+   if (B->get_cfirst().is_integer_cell())     return list_mappings(CERR);
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
@@ -216,28 +178,13 @@ Value_P Z(shape_Z, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-sAxis
-Quad_CR::subfun_to_axis(const UCS_string & name) const
-{
-UTF8_string name_utf(name);
-const char * function_name = name_utf.c_str();
-
-  enum { SF_SIZE = sizeof(sub_function_info),
-         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
-
- if (const void * vp = bsearch(function_name, sub_functions,
-                               SF_COUNT, SF_SIZE, axis_compare))
-      return reinterpret_cast<const sub_function_info *>(vp)->axis;
-
-  return -1;    // not found
-}
-//----------------------------------------------------------------------------
 Token
 Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
 int sub_function = -1;
 
-   if (A->get_rank() > 1)                    RANK_ERROR;
+   if (A->get_rank() > 1)   RANK_ERROR;
+
    if (A->is_char_array())   // function name, e.g. "APL_expression"
       {
         UCS_string ucs_A(*A);
@@ -256,7 +203,7 @@ int sub_function = -1;
         sub_function = A->get_cfirst().get_int_value();
       }
 
-   if (sub_function == 45)   // filter (i= return B)
+   if (sub_function == 45)   // filter (= return B)
       {
         do_CR45(B.get());
         return Token(TOK_APL_VALUE1, B);
@@ -299,7 +246,7 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
                  DOMAIN_ERROR;
       }
 
-// extra_frame draws an extra frame even if B is not nested.
+// extra_frame draws an extra frame (even if B is not nested).
 bool extra_frame = false;
    switch(a)
       {
@@ -308,7 +255,9 @@ bool extra_frame = false;
         case 23:
         case 24:
         case 25:
-        case 29: extra_frame = true;
+        case 29:
+        case 46:
+        case 47: extra_frame = true;
 
       }
 
@@ -320,13 +269,13 @@ bool extra_frame = false;
 
         case  0: FRAME(PR_APL)
         case  1: FRAME(PR_APL_FUN)
-        case  2: FRAME(PR_BOXED_CHAR)
+        case  2: FRAME(PR_BOXED_CHAR)           // fraed with ASCII chars
         case  3: FRAME(PR_BOXED_GRAPHIC)
-        case  4: FRAME(PR_BOXED_GRAPHIC)
+        case  4: FRAME(PR_BOXED_GRAPHIC)       // with extra frame
         case  5:                               // byte-vector → HEX
         case  6: return do_CR5_6(a, B);        // byte-vector → hex
         case  7: FRAME(PR_BOXED_GRAPHIC1)
-        case  8: FRAME(PR_BOXED_GRAPHIC1)
+        case  8: FRAME(PR_BOXED_GRAPHIC1)       // with extra frame
         case  9: FRAME(PR_BOXED_GRAPHIC2)
         case 10: return do_CR10(B);
         case 11: return do_CR11(B);            // Value → CDR conversion
@@ -341,13 +290,13 @@ bool extra_frame = false;
         case 20: FRAME(PR_NARS)
         case 21: FRAME(PR_NARS1)
         case 22: FRAME(PR_NARS2)
-        case 23: FRAME(PR_NARS)
-        case 24: FRAME(PR_NARS1)
-        case 25: FRAME(PR_NARS2)
+        case 23: FRAME(PR_NARS)                // with extra frame
+        case 24: FRAME(PR_NARS1)               // with extra frame
+        case 25: FRAME(PR_NARS2)               // with extra frame
         case 26: return do_CR26(B);            // Cell types
         case 27:                               // value as int
         case 28: return do_CR27_28(a, B);      // value2 as int
-        case 29: FRAME(PR_BOXED_GRAPHIC3)
+        case 29: FRAME(PR_BOXED_GRAPHIC3)      // with extra frame
         case 30: return do_CR30(B);            // conform B (for ⍤ macro)
         case 31:                               // ⎕INP helper
         case 32: return do_CR31_32(a, B);      // ⎕INP helper
@@ -363,6 +312,8 @@ bool extra_frame = false;
         case 42: return do_CR42_43(B, false);  // tokenize B
         case 43: return do_CR42_43(B, true);   // parse B
         case 44: return do_CR44(B);            // decode token tags
+        case 46: FRAME(PR_BOXED_GRAPHIC4)
+        case 47: FRAME(PR_BOXED_GRAPHIC5)
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;

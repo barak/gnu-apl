@@ -83,6 +83,8 @@ enum TokenClass
    TC_QUOTE         = 0x1A,   // ' or "
    TC_L_CURLY       = 0x1B,   // {
    TC_R_CURLY       = 0x1C,   // }
+   TC_LIT_ITEM      = 0x1D,   // literal item, e.g. 1, 3.141, 'a', or 2J3
+   TC_LIT_GRP        = 0x1E,   // literal group, e.g. (1 2 3) or 'abc'
 
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,

@@ -240,9 +240,9 @@ TD(TOK_APL_VALUE4    , TC_VALUE     , TV_VAL  , ID_APL_VALUE4   ) // optimized
 TD(TOK_BRANCH        , TC_R_ARROW   , TV_INT  , ID_BRANCH       ) // →N
 TD(TOK_NOBRANCH      , TC_R_ARROW   , TV_NONE , ID_BRANCH       ) // →⍬
 TD(TOK_CHARACTER     , TC_VALUE     , TV_CHAR , ID_CHARACTER    )
-TD(TOK_INTEGER       , TC_VALUE     , TV_INT  , ID_INTEGER      )
-TD(TOK_REAL          , TC_VALUE     , TV_FLT  , ID_REAL         )
-TD(TOK_COMPLEX       , TC_VALUE     , TV_CPX  , ID_COMPLEX      )
+TD(TOK_INTEGER       , TC_LIT_ITEM  , TV_INT  , ID_INTEGER      )
+TD(TOK_REAL          , TC_LIT_ITEM  , TV_FLT  , ID_REAL         )
+TD(TOK_COMPLEX       , TC_LIT_ITEM  , TV_CPX  , ID_COMPLEX      )
 TD(TOK_ERROR         , TC_SI_LEAVE  , TV_INT  , ID_ERROR        )
 TD(TOK_QUAD_ES_BRA   , TC_SI_LEAVE  , TV_VAL  , ID_ES_BRA       ) // ⎕ES helper
 TD(TOK_QUAD_ES_COM   , TC_SI_LEAVE  , TV_VAL  , ID_ES_COM       ) // ⎕ES helper

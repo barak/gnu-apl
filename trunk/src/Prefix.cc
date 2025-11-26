@@ -2662,7 +2662,17 @@ Prefix::reduce_END_B__()
 {
    Assert1(prefix_len == 2);
 
-   if (ssize() != 2)   syntax_error(LOC);
+   if (ssize() != 2)
+      {
+        UCS_string & more = MORE_ERROR();
+        more << "non-empty stack at end of statement:";
+        loop(s, ssize())
+           {
+             const TokenClass tc = at(s).get_Class();
+             more << " " << Token::class_name(tc);
+           }
+        syntax_error(LOC);
+      }
 
 const Token END = pop().get_token();   // pop END
 const bool end_of_line = END.get_tag() == TOK_ENDL;

@@ -35,7 +35,7 @@
 #include "Symbol.hh"
 #include "Value.hh"
 
-//----------------------------------------------------------------------------
+//============================================================================
 void
 Function::get_attributes(int mode, Value & Z) const
 {
@@ -232,12 +232,282 @@ Function::eval_identity_fun(Value_P B, sAxis axis) const
                      << " has no identity function";
   DOMAIN_ERROR;
 }
+//============================================================================
+void
+FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted,
+                                   size_t count, const char * grp_name)
+{
+   // only called from true FunctionGroups (⎕CR, ⎕FIO, ...)
+   Assert(unsorted);
+
+   group_name = grp_name;
+  subfun_count = count;
+
+  sorted_by_name = new const function_info *[subfun_count];   // never deleted
+  sorted_by_axis = new const function_info *[subfun_count];   // never deleted
+   loop(c, count)
+      {
+        sorted_by_name[c] = unsorted + c;   // not yet sorted
+        sorted_by_axis[c] = unsorted + c;   // not yet sorted
+        max_function_name_length = max(max_function_name_length,
+                                       strlen(unsorted[c].function_name));
+      }
+
+   // subfun_count is relatively small, and this function is called
+   // only once (per function group). We can therefore iafford to use a
+   // simple O(n²) exchange sort.
+   //
+
+   // sort sort_by_name and sorted_by_axis
+   //
+   loop(c, subfun_count)
+   for (int j = c + 1; j < subfun_count; ++j)
+       {
+         // sort names
+         //
+         {
+           if (UTF8_literal(sorted_by_name[j]->function_name) <
+               UTF8_literal(sorted_by_name[c]->function_name))
+              {
+                const function_info * tmp = sorted_by_name[c];
+                sorted_by_name[c] = sorted_by_name[j];
+                sorted_by_name[j] = tmp;
+              }
+         }
+
+         // sort axis
+         //
+         {
+           if (sorted_by_axis[j]->axis < sorted_by_axis[c]->axis)
+              {
+                const function_info * tmp = sorted_by_axis[c];
+                sorted_by_axis[c] = sorted_by_axis[j];
+                sorted_by_axis[j] = tmp;
+              }
+         }
+       }
+
+   // check that sorted_by_name is sorted ascendingly
+   //
+   loop(c, subfun_count - 1)
+       {
+         const function_info * info_0 = sorted_by_name[c];
+         const function_info * info_1 = sorted_by_name[c + 1];
+
+         // CERR << "NAME " << c << ": " << info_0->function_name << endl;
+         Assert(UTF8_literal(info_0->function_name) <
+                UTF8_literal(info_1->function_name));
+       }
+
+   // check that sorted_by_axis is sorted ascendingly
+   //
+   loop(c, subfun_count - 1)
+       {
+         const function_info * info_0 = sorted_by_axis[c];
+         const function_info * info_1 = sorted_by_axis[c + 1];
+         // CERR << "AXIS " << c << ": " << int(info_0->axis) << endl;
+
+         Assert(info_0->axis < info_1->axis);
+       }
+
+   // check that all names can be found
+   //
+   loop(sub, subfun_count)
+       {
+         const function_info & info = unsorted[sub];
+
+         {
+           const UTF8_literal key = info.function_name;
+           const function_info * found = get_info_by_name(key);
+           Assert_fatal(found);
+           Assert_fatal(UTF8_literal(found->function_name) == key);
+         }
+
+         {
+           const sAxis key = info.axis;
+           const function_info * found = get_info_by_axis(key);
+           Assert_fatal(found);
+           Assert_fatal(found->axis == key);
+         }
+       }
+}
 //----------------------------------------------------------------------------
+int
+FunctionGroup::compare_function_name(const void * vp_key, const void * vp_info)
+{
+const UTF8_literal & key =
+      *reinterpret_cast<const UTF8_literal *>(vp_key);
+const FunctionGroup::function_info * info =
+      *reinterpret_cast<const FunctionGroup::function_info * const*>(vp_info);
+
+   return key.compare(info->function_name);
+}
+//----------------------------------------------------------------------------
+int
+FunctionGroup::compare_function_axis(const void * vp_key, const void * vp_info)
+{
+const sAxis & key = *reinterpret_cast<const sAxis *>(vp_key);
+const FunctionGroup::function_info * info =
+      *reinterpret_cast<const FunctionGroup::function_info * const*>(vp_info);
+const sAxis axis = info->axis;
+   return key - axis;
+}
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info *
+FunctionGroup::get_info_by_name(const UTF8_literal name) const
+{
+const void * ret = bsearch(&name,                            // key
+                           sorted_by_name,                   // base
+                           subfun_count,                     // nmemb
+                           sizeof(const function_info *),    // size
+                           compare_function_name);           // compar
+
+   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
+   return *reinterpret_cast<const function_info * const *>(ret);
+}
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info *
+FunctionGroup::get_info_by_axis(uAxis axis) const
+{
+const void * ret = bsearch(&axis,                           // key
+                           sorted_by_axis,                  // base
+                           subfun_count,                    // nmemb
+                           sizeof(const function_info *),   // size
+                           compare_function_axis);          // compar
+                     
+   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
+   return *reinterpret_cast<const function_info * const *>(ret);
+}
+//----------------------------------------------------------------------------
+sAxis
+FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
+{
+   if (subfun_count)
+      {
+        const UTF8_string name_utf(subfun_name);
+        const UTF8_literal name_literal(name_utf.c_str());
+        if (const function_info * info = get_info_by_name(name_literal))
+           {
+             return info->axis;   // found
+           }
+      }
+
+   return -1;   // not found (or no real FunctionGroup)
+}
+//----------------------------------------------------------------------------
+sAxis
+FunctionGroup::value_to_subfun(const Value & value, Fun_signature sig_AorX,
+                               Fun_signature sig_fun) const
+{
+   if (value.is_int_scalar())   // function number
+      {
+        // we do not check (here) if the number is valid. The caller will.
+        //
+        return value.get_cfirst().get_int_value();   // but possibly invalid
+      }
+
+   if (value.is_char_string())   // function name
+      {
+        const UCS_string name(value);
+        const sAxis axis = subfun_to_axis(name);
+        if (axis >= 0)   return axis;   // valid axis
+
+        MORE_ERROR() << get_signature_string(sig_fun)
+         << ": invalid subfunction name "
+         << (sig_AorX == SIG_X ? "X" : "A")
+         << " (= '" << name << "').";
+
+        DOMAIN_ERROR;
+      }
+
+   if (value.get_rank() > 1)   RANK_ERROR;
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+FunctionGroup::list_functions(ostream & out) const
+{
+   out << "\n"
+       << group_name << " is a function group. It is comprized of "
+                        "the following (sub-)functions:\n"
+          "\n"
+       << get_legend(LET_FUN_PREFIX)
+       << "    " << group_name << " ''   ⍝ display this list\n"
+       << "    " << group_name << " ⍬    ⍝ display syntax alternatives for "
+       << group_name << "\n\n";
+
+
+   loop(c, subfun_count)
+      {
+        const function_info & info = *sorted_by_axis[c];
+        print_fun_syntax(out, info);
+      }
+
+   out << get_legend(LET_FUN_SUFFIX);
+
+   out << "\nThe functions of " << group_name
+       << " can be called with one of several syntax alternatives.\n"
+          "The syntax alternatives for " << group_name
+       << " can be displayed with:\n\n";
+
+   COUT << "      " << group_name << " ⍬   ⍝ display the "
+        << " syntax alternatives for " << group_name << "\n\n";
+
+   return Token();
+}
+//----------------------------------------------------------------------------
+Token
+FunctionGroup::list_mappings(ostream & out) const
+{
+   out << "\n"
+          "The syntax alternatives for the functions of "
+       << group_name << " are:\n"
+         "\n";
+
+   out << get_legend(LET_MAP_PREFIX);
+
+   loop(c, subfun_count)
+      {
+        const function_info & info = *sorted_by_name[c];
+        print_map_syntax(out, info);
+      }
+   out << get_legend(LET_MAP_SUFFIX);
+
+   out  << "\nTo display a brief description of the functions:\n\n";
+   COUT << "      " << group_name << " ⍬   ⍝ display function descriptions\n\n";
+
+   return Token();
+}
+
+//----------------------------------------------------------------------------
+UCS_string
+FunctionGroup::get_signature_string(Fun_signature sig) const
+{
+UCS_string ret;
+
+   if (sig & SIG_Z)        ret << "Z←";
+   if (sig & SIG_A)        ret << "A ";
+   if (sig & SIG_LORO)   // operator
+      {
+                           ret << "(LO " << group_name;
+        if (sig & SIG_X)   ret << "[X]";
+        if (sig & SIG_RO)  ret << "RO";
+         ret << ")";
+      }
+   else                   // plain function
+      {
+                           ret << group_name;
+        if (sig & SIG_X)   ret << "[X]";
+      }
+   if (sig & SIG_B)        ret << " B";
+   return ret;
+}
+//============================================================================
 ostream &
 operator << (ostream & out, const Function & fun)
 {
    fun.print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//============================================================================
 

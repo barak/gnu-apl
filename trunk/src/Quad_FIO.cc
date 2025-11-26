@@ -77,54 +77,19 @@ union SockAddr
    // If the axis is missing, then a list of functions implemented by
    // ⎕FIO is displayed
 
-sub_function_info Quad_FIO::sub_functions[] =
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info Quad_FIO::subfunction_infos[] =
 {
-#define fio_def(N, name)   { N, #name, -1, 0 },
+#define fio_def(N, name)   { N, #name, "", "", -1 },
 #include "Quad_FIO.def"
 };
-//----------------------------------------------------------------------------
-int
-Quad_FIO::axis_compare(const void * key, const void * sf)
-{
-   return strcasecmp(reinterpret_cast<const char *>(key),
-             reinterpret_cast<const sub_function_info *>(sf)->sub_name);
-}
-//----------------------------------------------------------------------------
-int
-Quad_FIO::function_name_to_int(const char * function_name)
-{
-  enum { SF_SIZE = sizeof(sub_function_info),
-         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
-
-#if 0
-   // check that sub_functions are sorted by function name...
-   //
-   loop(f, SF_COUNT - 1)
-       if (strcmp(sub_functions[f].key, sub_functions[f+1].key) >= 0)
-          {
-            // mismatch...
-            Q1(sub_functions[f].key)
-            Q1(sub_functions[f+1].key)
-          }
-#endif
-
-  if (const void * vp = bsearch(function_name, sub_functions,
-                                SF_COUNT, SF_SIZE, axis_compare))
-      return reinterpret_cast<const sub_function_info *>(vp)->axis;
-
-  return -1;    // not found
-}
-//----------------------------------------------------------------------------
-sAxis
-Quad_FIO::subfun_to_axis(const UCS_string & name) const
-{
-const UTF8_string name_utf(name);
-   return function_name_to_int(name_utf.c_str());
-}
 //----------------------------------------------------------------------------
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕FIO");
+
    // init stdin, stdout, stderr, and maybe fd 3 
    //
 file_entry f0(stdin, STDIN_FILENO);
@@ -1019,153 +984,145 @@ const Shape sh_Z(Z->get_valid_item_count());
 }
 //----------------------------------------------------------------------------
 Token
-Quad_FIO::list_functions(ostream & out, bool mapping)
+Quad_FIO::list_functions(ostream & out) const
 {
-   if (mapping)
-      {
-         // ⎕FIO "": print the number to name mappings like:
-         //
-         // ⎕FIO[20]  ←→  ⎕FIO['mkdir']        ←→  ⎕FIO.mkdir
-         //
-         out <<
-"      With a small performance penalty, ⎕FIO also accepts the following "
-"strings\n      instead of function numbers as axis argument:\n\n";
-
-         loop(f, sizeof(sub_functions)/sizeof(sub_function_info))
-             {
-               const int N = sub_functions[f].axis;
-               char NN[10];   SPRINTF(NN, "%2d", N);
-               const char * name = sub_functions[f].sub_name;
-               out << "      ⎕FIO[" << NN
-                   << "]  ←→  ⎕FIO['" << name << "']"
-                   << UCS_string(13 - strlen(name), UNI_SPACE)
-                   << "←→  ⎕FIO." << name << endl;
-             }
-
-         out << "\n      For a more detailed description of all functions:\n\n"
-                "      ⎕FIO ⍬" << endl;
-      }
-   else
-      {
-       out <<
-"   Functions provided by ⎕FIO...\n"
+   out << "\n"
+       << "⎕FIO is a function group. It is comprized of "
+                        "the following (sub-)functions:\n"
 "\n"
-"   Legend: a - address family, IPv4 address, port (or errno)\n"
-"           b - byte(s) (Integer(s) in the range [0-255])\n"
-"           d - table of dirent structs\n"
-"           e - error code (integer as per errno.h)\n"
-"           f - format string (printf(), scanf())\n"
-"           h - file handle (small integer)\n"
-"           i - integer\n"
-"           n - names (nested vector of strings)\n"
-"           p - path (filename string)\n"
-"           s - string\n"
-"           u - time divisor: 1       - second\n"
-"                             1000    - milli second\n"
-"                             1000000 - micro second\n"
-"           y4 - seconds, wday, yday, dst (daylight saving time)\n"
-"           y67- year, mon, day, hour, minute, second, [dst]\n"
-"           y9 - year, mon, day, hour, minute, second, wday, yday, dst\n"
-"           A1, A2, ...  nested vector with elements A1, A2, ...\n"
+"   ┌─── Legend:────────────────────────────────────────────────────┐\n"
+"   │    a - address family, IPv4 address, port (or errno)          │\n"
+"   │    b - byte(s) (Integer(s) in the range [0-255])              │\n"
+"   │    d - table of dirent structs                                │\n"
+"   │    e - error code (integer as per errno.h)                    │\n"
+"   │    f - format string (printf(), scanf())                      │\n"
+"   │    h - file handle (small integer)                            │\n"
+"   │    i - integer                                                │\n"
+"   │    n - names (nested vector of strings)                       │\n"
+"   │    p - path (filename string)                                 │\n"
+"   │    s - string                                                 │\n"
+"   │    u - time divisor: 1       - second                         │\n"
+"   │                      1000    - milli second                   │\n"
+"   │                      1000000 - micro second                   │\n"
+"   │    y4 - seconds, wday, yday, dst (daylight saving time)       │\n"
+"   │    y67- year, mon, day, hour, minute, second, [dst]           │\n"
+"   │    y9 - year, mon, day, hour, minute, second, wday, yday, dst │\n"
+"   │    A1, A2, ...  nested vector with elements A1, A2, ...       │\n"
+"   └───────────────────────────────────────────────────────────────┘\n"
 "\n"
-"           ⎕FIO      ⍬    print this text on stderr\n"
-"           ⎕FIO     ''    print function-number to -name mapping on stderr\n"
-"           ⎕FIO      0    return a list of open file descriptors\n"
-"        '' ⎕FIO      ⍬    print this text on stdout\n"
-"           ⎕FIO     ''    print function-number to -name mapping on stdout\n"
-"           ⎕FIO[ 0] ''    print this text on stderr\n"
-"        '' ⎕FIO[ 0] ''    print this text on stdout\n"
+"           ⎕FIO      ⍬   ⍝ print this text on stderr\n"
+"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stderr\n"
+"           ⎕FIO      0   ⍝ return a list of open file descriptors\n"
+"        '' ⎕FIO      ⍬   ⍝ print this text on stdout\n"
+"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stdout\n"
+"           ⎕FIO[ 0] ''   ⍝ print this text on stderr\n"
+"        '' ⎕FIO[ 0] ''   ⍝ print this text on stdout\n"
 "\n"
-"   Zi ←    ⎕FIO[ 1] ''    errno (of last call)\n"
-"   Zs ←    ⎕FIO[ 2] Be    strerror(Be)\n"
-"   Zh ← As ⎕FIO[ 3] Bp    fopen(Bs, As) filename Bp mode As\n"
-"   Zh ←    ⎕FIO[ 3] Bp    fopen(Bs, \"r\") filename Bp\n"
+"   Zi ←    ⎕FIO[ 1] ''   ⍝ errno (of last call)\n"
+"   Zs ←    ⎕FIO[ 2] Be   ⍝ strerror(Be)\n"
+"   Zh ← As ⎕FIO[ 3] Bp   ⍝ fopen(Bs, As) filename Bp mode As\n"
+"   Zh ←    ⎕FIO[ 3] Bp   ⍝ fopen(Bs, \"r\") filename Bp\n"
 "\n"
 "File I/O functions:\n"
 "\n"
-"   Ze ←    ⎕FIO[ 4] Bh    fclose(Bh)\n"
-"   Ze ←    ⎕FIO[ 5] Bh    errno (of the last call using Bh)\n"
-"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF
+"   Ze ←    ⎕FIO[ 4] Bh   ⍝ fclose(Bh)\n"
+"   Ze ←    ⎕FIO[ 5] Bh   ⍝ errno (of the last call using Bh)\n"
+"   Zb ←    ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, " << SMALL_BUF
                                           << ", Bh) 1 byte per Zb\n"
-"   Zb ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
-"   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ab, Bh) 1 byte per Ab\n"
-"   Zb ←    ⎕FIO[ 8] Bh    fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
-"   Zb ← Ai ⎕FIO[ 8] Bh    fgets(Zb, Ai, Bh) 1 byte per Zb\n"
-"   Zb ←    ⎕FIO[ 9] Bh    fgetc(Zb, Bh) 1 byte\n"
-"   Zi ←    ⎕FIO[10] Bh    feof(Bh)\n"
-"   Ze ←    ⎕FIO[11] Bh    ferror(Bh)\n"
-"   Zi ←    ⎕FIO[12] Bh    ftell(Bh)\n"
-"   Zi ← Ai ⎕FIO[13] Bh    fseek(Bh, Ai, SEEK_SET)\n"
-"   Zi ← Ai ⎕FIO[14] Bh    fseek(Bh, Ai, SEEK_CUR)\n"
-"   Zi ← Ai ⎕FIO[15] Bh    fseek(Bh, Ai, SEEK_END)\n"
-"   Zi ←    ⎕FIO[16] Bh    fflush(Bh)\n"
-"   Zi ←    ⎕FIO[17] Bh    fsync(Bh)\n"
-"   Zi ←    ⎕FIO[18] Bh    fstat(Bh)\n"
-"   Zi ←    ⎕FIO[19] Bh    unlink(Bc)\n"
-"   Zi ←    ⎕FIO[20] Bh    mkdir(Bc, 0777)\n"
-"   Zi ← Ai ⎕FIO[20] Bh    mkdir(Bc, AI)\n"
-"   Zi ←    ⎕FIO[21] Bh    rmdir(Bc)\n"
-"   Zi ← A  ⎕FIO[22] 1     printf(         A1, A2...) format A1\n"
-"   Zi ← A  ⎕FIO[22] 2     fprintf(stderr, A1, A2...) format A1\n"
-"   Zi ← A  ⎕FIO[22] Bh    fprintf(Bh,     A1, A2...) format A1\n"
-"   Zi ← Ac ⎕FIO[23] Bh    fwrite(Ac, 1, ⍴Ac, Bh) 1 Unicode per Ac, Output UTF8\n"
-"   Zh ← As ⎕FIO[24] Bs    popen(Bs, As) command Bs mode As\n"
-"   Zh ←    ⎕FIO[24] Bs    popen(Bs, \"r\") command Bs\n"
-"   Ze ←    ⎕FIO[25] Bh    pclose(Bh)\n"
-"   Zb ←    ⎕FIO[26] Bp    return entire file Bp as byte vector\n"
-"   Zs ← Ap ⎕FIO[27] Bp    rename file Ap to Bp\n"
-"   Zd ←    ⎕FIO[28] Bp    return content of directory Bp\n"
-"   Zn ←    ⎕FIO[29] Bp    return file names in directory Bp\n"
-"   Zs ←    ⎕FIO 30        getcwd()\n"
-"   Zn ← As ⎕FIO[31] Bs    access(As, Bp) As ϵ 'RWXF'\n"
-"   Zh ←    ⎕FIO[32] Bi    socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
-"   Ze ← Aa ⎕FIO[33] Bh    bind(Bh, Aa)\n"
-"   Ze ←    ⎕FIO[34] Bh    listen(Bh, 10)\n"
-"   Ze ← Ai ⎕FIO[34] Bh    listen(Bh, Ai)\n"
-"   Za ←    ⎕FIO[35] Bh    accept(Bh)\n"
-"   Ze ← Aa ⎕FIO[36] Bh    connect(Bh, Aa)\n"
-"   Zb ←    ⎕FIO[37] Bh    recv(Bh, Zb, " << SMALL_BUF << ", 0) 1 byte per Zb\n"
-"   Zb ← Ai ⎕FIO[37] Bh    recv(Bb, Zi, Ai, 0) 1 byte per Zb\n"
-"   Zi ← Ab ⎕FIO[38] Bh    send(Bh, Ab, ⍴Ab, 0) 1 byte per Ab\n"
-"   Zi ← Ac ⎕FIO[39] Bh    send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8\n"
-"   Zi ←    ⎕FIO[40] B     select(B_read, B_write, B_exception, B_timeout)\n"
-"   Zi ←    ⎕FIO[41] Bh    read(Bh, Zi, " << SMALL_BUF << ") 1 byte per Zi\n"
-"   Zb ← Ai ⎕FIO[41] Bh    read(Bh, Zb, Ai) 1 byte per Zb\n"
-"   Zi ← Ab ⎕FIO[42] Bh    write(Bh, Ab, ⍴Ab) 1 byte per Ab\n"
-"   Zi ← Ac ⎕FIO[43] Bh    write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8\n"
-"   Za ←    ⎕FIO[44] Bh    getsockname(Bh)\n"
-"   Za ←    ⎕FIO[45] Bh    getpeername(Bh)\n"
-"   Zi ← Ai ⎕FIO[46] Bh    getsockopt(Bh, A_level, A_optname, Zi)\n"
-"   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
-"   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
-"   Zs ←    ⎕FIO[49] Bp    return entire file Bp as nested lines\n"
-"   Zs ← LO ⎕FIO[49] Bp    ⎕FIO[49] Bp and pipe each line through LO.\n"
-"   Zi ←    ⎕FIO[50] Bu    gettimeofday()\n"
-"   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-"   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-"   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-"   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
-"   Ze ← Af ⎕FIO[55] Bs    sscanf(Bs, Af) Af is the format string\n"
-"   Zs ← As ⎕FIO[56] Bp    write nested lines As to file named Bp\n"
-"   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
-"   Zs ← Af ⎕FIO[58] B     snprintf(Af, B...) As is the format string\n"
-"   Zi ← Ai ⎕FIO[59] Bh    fcntl(Bh, Ai...) file control\n"
-"   Zi ←    ⎕FIO[60] Bi    return a Bi-byte random integer (for setting ⎕RL)\n"
-"   Zi ← 0  ⎕FIO[60] Bi    same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
-"   Zb ← 1  ⎕FIO[60] Bi    return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
-"   Zi ←    ⎕FIO[61] Bv    seconds since 1/1/1970; Bv←YYYY [MM DD [HH MM SS]]\n"
+"   Zb ← Ai ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[ 7] Bh   ⍝ fwrite(Ab, 1, ⍴Ab, Bh) 1 byte per Ab\n"
+"   Zb ←    ⎕FIO[ 8] Bh   ⍝ fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[ 8] Bh   ⍝ fgets(Zb, Ai, Bh) 1 byte per Zb\n"
+"   Zb ←    ⎕FIO[ 9] Bh   ⍝ fgetc(Zb, Bh) 1 byte\n"
+"   Zi ←    ⎕FIO[10] Bh   ⍝ feof(Bh)\n"
+"   Ze ←    ⎕FIO[11] Bh   ⍝ ferror(Bh)\n"
+"   Zi ←    ⎕FIO[12] Bh   ⍝ ftell(Bh)\n"
+"   Zi ← Ai ⎕FIO[13] Bh   ⍝ fseek(Bh, Ai, SEEK_SET)\n"
+"   Zi ← Ai ⎕FIO[14] Bh   ⍝ fseek(Bh, Ai, SEEK_CUR)\n"
+"   Zi ← Ai ⎕FIO[15] Bh   ⍝ fseek(Bh, Ai, SEEK_END)\n"
+"   Zi ←    ⎕FIO[16] Bh   ⍝ fflush(Bh)\n"
+"   Zi ←    ⎕FIO[17] Bh   ⍝ fsync(Bh)\n"
+"   Zi ←    ⎕FIO[18] Bh   ⍝ fstat(Bh)\n"
+"   Zi ←    ⎕FIO[19] Bh   ⍝ unlink(Bc)\n"
+"   Zi ←    ⎕FIO[20] Bh   ⍝ mkdir(Bc, 0777)\n"
+"   Zi ← Ai ⎕FIO[20] Bh   ⍝ mkdir(Bc, AI)\n"
+"   Zi ←    ⎕FIO[21] Bh   ⍝ rmdir(Bc)\n"
+"   Zi ← A  ⎕FIO[22] 1    ⍝ printf(         A1, A2...) format A1\n"
+"   Zi ← A  ⎕FIO[22] 2    ⍝ fprintf(stderr, A1, A2...) format A1\n"
+"   Zi ← A  ⎕FIO[22] Bh   ⍝ fprintf(Bh,     A1, A2...) format A1\n"
+"   Zi ← Ac ⎕FIO[23] Bh   ⍝ fwrite(Ac, 1, ⍴Ac, Bh) 1 Unicode per Ac, Output UTF8\n"
+"   Zh ← As ⎕FIO[24] Bs   ⍝ popen(Bs, As) command Bs mode As\n"
+"   Zh ←    ⎕FIO[24] Bs   ⍝ popen(Bs, \"r\") command Bs\n"
+"   Ze ←    ⎕FIO[25] Bh   ⍝ pclose(Bh)\n"
+"   Zb ←    ⎕FIO[26] Bp   ⍝ return entire file Bp as byte vector\n"
+"   Zs ← Ap ⎕FIO[27] Bp   ⍝ rename file Ap to Bp\n"
+"   Zd ←    ⎕FIO[28] Bp   ⍝ return content of directory Bp\n"
+"   Zn ←    ⎕FIO[29] Bp   ⍝ return file names in directory Bp\n"
+"   Zs ←    ⎕FIO 30       ⍝ getcwd()\n"
+"   Zn ← As ⎕FIO[31] Bs   ⍝ access(As, Bp) As ϵ 'RWXF'\n"
+"   Zh ←    ⎕FIO[32] Bi   ⍝ socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
+"   Ze ← Aa ⎕FIO[33] Bh   ⍝ bind(Bh, Aa)\n"
+"   Ze ←    ⎕FIO[34] Bh   ⍝ listen(Bh, 10)\n"
+"   Ze ← Ai ⎕FIO[34] Bh   ⍝ listen(Bh, Ai)\n"
+"   Za ←    ⎕FIO[35] Bh   ⍝ accept(Bh)\n"
+"   Ze ← Aa ⎕FIO[36] Bh   ⍝ connect(Bh, Aa)\n"
+"   Zb ←    ⎕FIO[37] Bh   ⍝ recv(Bh, Zb, " << SMALL_BUF << ", 0) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[37] Bh   ⍝ recv(Bb, Zi, Ai, 0) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[38] Bh   ⍝ send(Bh, Ab, ⍴Ab, 0) 1 byte per Ab\n"
+"   Zi ← Ac ⎕FIO[39] Bh   ⍝ send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8\n"
+"   Zi ←    ⎕FIO[40] B    ⍝ select(B_read, B_write, B_exception, B_timeout)\n"
+"   Zi ←    ⎕FIO[41] Bh   ⍝ read(Bh, Zi, " << SMALL_BUF << ") 1 byte per Zi\n"
+"   Zb ← Ai ⎕FIO[41] Bh   ⍝ read(Bh, Zb, Ai) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[42] Bh   ⍝ write(Bh, Ab, ⍴Ab) 1 byte per Ab\n"
+"   Zi ← Ac ⎕FIO[43] Bh   ⍝ write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8\n"
+"   Za ←    ⎕FIO[44] Bh   ⍝ getsockname(Bh)\n"
+"   Za ←    ⎕FIO[45] Bh   ⍝ getpeername(Bh)\n"
+"   Zi ← Ai ⎕FIO[46] Bh   ⍝ getsockopt(Bh, A_level, A_optname, Zi)\n"
+"   Ze ← Ai ⎕FIO[47] Bh   ⍝ setsockopt(Bh, A_level, A_optname, A_optval)\n"
+"   Ze ← As ⎕FIO[48] Bh   ⍝ fscanf(Bh, As)\n"
+"   Zs ←    ⎕FIO[49] Bp   ⍝ return entire file Bp as nested lines\n"
+"   Zs ← LO ⎕FIO[49] Bp   ⍝ ⎕FIO[49] Bp and pipe each line through LO.\n"
+"   Zi ←    ⎕FIO[50] Bu   ⍝ gettimeofday()\n"
+"   Zy4←    ⎕FIO[51] By67 ⍝ mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[52] Bi   ⍝ localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[53] Bi   ⍝ gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zi ←    ⎕FIO[54] Bs   ⍝ chdir(Bs)\n"
+"   Ze ← Af ⎕FIO[55] Bs   ⍝ sscanf(Bs, Af) Af is the format string\n"
+"   Zs ← As ⎕FIO[56] Bp   ⍝ write nested lines As to file named Bp\n"
+"   Zh ←    ⎕FIO[57] Bs   ⍝ fork() and execve(Bs, { Bs, 0}, {0})\n"
+"   Zs ← Af ⎕FIO[58] B    ⍝ snprintf(Af, B...) As is the format string\n"
+"   Zi ← Ai ⎕FIO[59] Bh   ⍝ fcntl(Bh, Ai...) file control\n"
+"   Zi ←    ⎕FIO[60] Bi   ⍝ return a Bi-byte random integer (for setting ⎕RL)\n"
+"   Zi ← 0  ⎕FIO[60] Bi   ⍝ same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
+"   Zb ← 1  ⎕FIO[60] Bi   ⍝ return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
+"   Zi ←    ⎕FIO[61] Bv   ⍝ seconds since 1/1/1970; Bv←YYYY [MM DD [HH MM SS]]\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
-"           ⎕FIO[200] Bi    clear statistics with ID Bi\n"
-"   Zn ←    ⎕FIO[201] Bi    get statistics with ID Bi\n"
-"           ⎕FIO[202] Bs    get monadic parallel threshold for primitive Bs\n"
-"        Ai ⎕FIO[202] Bs    set monadic parallel threshold for primitive Bs\n"
-"           ⎕FIO[203] Bs    get dyadic parallel threshold for primitive Bs\n"
-"        Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs\n";
-      }
+"           ⎕FIO[200] Bi   ⍝ clear statistics with ID Bi\n"
+"   Zn ←    ⎕FIO[201] Bi   ⍝ get statistics with ID Bi\n"
+"           ⎕FIO[202] Bs   ⍝ get monadic parallel threshold for primitive Bs\n"
+"        Ai ⎕FIO[202] Bs   ⍝ set monadic parallel threshold for primitive Bs\n"
+"           ⎕FIO[203] Bs   ⍝ get dyadic parallel threshold for primitive Bs\n"
+"        Ai ⎕FIO[203] Bs   ⍝ set dyadic parallel threshold for primitive Bs\n"
+"\n"
+"The functions of ⎕FIO can be called with one of several syntax alternatives.\n"
+"The syntax alternatives for ⎕FIO can be displayed with:\n\n";
 
-   return Token(TOK_APL_VALUE1, Str0(LOC));
+   COUT <<"      " << group_name << " ⍬   ⍝ display the "
+        << " syntax alternatives for " << group_name << "\n\n";
+
+   return Token();
+}
+//----------------------------------------------------------------------------
+void
+Quad_FIO::print_map_syntax(ostream & out, const function_info & info) const
+{
+const UTF8_literal name = info.function_name;
+const int blanks = max_function_name_length - name.get_char_count();
+
+   out << "    ⎕FIO[" << info.axis << "]  ←→  ⎕FIO['" << name << "']"
+       << UCS_string(blanks, UNI_SPACE) << "←→  ⎕FIO." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token
@@ -1177,10 +1134,8 @@ Quad_FIO::eval_B(Value_P B) const
 
    if (B->element_count() == 0)   // '' or ⍬
       {
-        if (B->get_cfirst().is_character_cell())
-           return list_functions(CERR, true);
-        if (B->get_cfirst().is_integer_cell())
-           return list_functions(CERR, false);
+        if (B->is_str0())    return list_functions(CERR);
+        if (B->is_zilde())   return list_mappings(CERR);
         DOMAIN_ERROR;
       }
 
@@ -1342,7 +1297,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         default: break;
       }
 
-   return list_functions(CERR, false);
+   return list_functions(CERR);
 
 out_errno:
    MORE_ERROR() << "⎕FIO[" << function_number
@@ -1426,13 +1381,8 @@ Quad_FIO::eval_AB(Value_P A, Value_P B) const
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (B->element_count() == 0)   // '' or ⍬
-      {
-        if (B->get_cfirst().is_character_cell())
-           return list_functions(CERR, true);
-        if (B->get_cfirst().is_integer_cell())
-           return list_functions(CERR, false);
-      }
+   if (B->is_str0())    return list_functions(CERR);
+   if (B->is_zilde())   return list_mappings(CERR);
 
 const APL_Integer function_number = B->get_cfirst().get_int_value();
    switch(function_number)
@@ -1465,7 +1415,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         default: break;
       }
 
-   return list_functions(COUT, false);
+   return list_functions(COUT);
 }
 //----------------------------------------------------------------------------
 Token
@@ -1577,8 +1527,7 @@ int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
         UCS_string ucs_X(*X);
-        UTF8_string utf_X(ucs_X);
-        function_number = function_name_to_int(utf_X.c_str());
+        function_number = subfun_to_axis(ucs_X);
         if (function_number == -1)
            {
              MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
@@ -1594,7 +1543,7 @@ int function_number = -1;
    switch(function_number)
       {
          case 0:   // list functions
-              return list_functions(CERR, false);
+              return list_functions(CERR);
 
          case 1:   // return (last) errno
               goto out_errno;
@@ -2504,8 +2453,7 @@ int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
         UCS_string ucs_X(*X);
-        UTF8_string utf_X(ucs_X);
-        function_number = function_name_to_int(utf_X.c_str());
+        function_number = subfun_to_axis(ucs_X);
         if (function_number == -1)
            {
              MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
@@ -2521,7 +2469,7 @@ int function_number = -1;
    switch(function_number)
       {
          case 0:   // list functions
-              return list_functions(COUT, false);
+              return list_functions(COUT);
 
          case 3:   // fopen(Bs, As) filename Bs mode As
               {

@@ -45,7 +45,7 @@ public:
    /// Destructor
    ~Quad_SQL();
 
-   static Quad_SQL  fun;          ///< Built-in function.
+   static Quad_SQL fun;          ///< Built-in function.
 
    /// close all open connections
    static void close_all_connections();
@@ -61,6 +61,9 @@ public:
 
 
 protected:
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
+
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
@@ -73,15 +76,15 @@ protected:
    /// overloaded Function::eval_XB().
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+   /// overloaded FunctionGroup::print_map_syntax()
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// list ⎕SQL functions
-   static Value_P list_functions(ostream & out, bool mapping);
+   Token list_functions(ostream & out) const;
+
+   /// overloaded FunctionGroup::get_legend()
+   virtual const char * get_legend(Legend_type lt) const;
 
    /// open a database, return its handle
    static Value_P open_database(const Value & A, const Value & B);
@@ -98,9 +101,6 @@ protected:
 
    /// return the version string of the SQL provider (synthesized as needed).
    static Value_P get_version_string(const UCS_string & ucs_B);
-
-   /// find function number for function name, -1 if not found
-   static int function_name_to_int(const char * function_name);
 
    /// run one SQL query
     static Value_P run_generic_one_query(ArgListBuilder * arg_list,

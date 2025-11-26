@@ -38,12 +38,19 @@ public:
    static Quad_RVAL  fun;          ///< Built-in function.
 
 protected:
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                 const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+      virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, do_eval_B(*B, 0)); }
+   virtual Token eval_B(Value_P B) const;
 
    /// do eval_AB(A, B);
    static Value_P do_eval_AB(int A, const Value & B);
@@ -53,18 +60,8 @@ protected:
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis()
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
-
-  /// list functions and their syntaces
-  static void list_functions(bool mapping);
-
    /// do eval_B(B);
-   static Value_P do_eval_B(const Value & B, int depth);
+   Value_P do_eval_B(const Value & B, int depth) const;
 
    /// set or return the state of the random generator
    static Value_P generator_state(const Value & B);
@@ -100,10 +97,13 @@ protected:
    static void random_complex(Value & Z);
 
    /// initialize the next ravel cell of \b Z with a random nested value
-   static void random_nested(Value & Z, const Value & B, int depth);
+   void random_nested(Value & Z, const Value & B, int depth) const;
 
    /// return a 17-bit random number from random()
    static uint64_t rand17();
+
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
 
    /// the number of bytes in the state of the random number generator
    static size_t N;

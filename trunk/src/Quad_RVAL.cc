@@ -36,6 +36,16 @@ int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
 size_t      Quad_RVAL::N = 256;
 
+const FunctionGroup::function_info Quad_RVAL::subfunction_infos[] =
+{
+#define rvaldef(N, fun, comm_2) { N, #fun, "", comm_2, -1 },
+  rvaldef(0, state, "get (B=⍬) or set (B≠⍬) the random number generator state" )
+  rvaldef(1, rank,  "set the rank of subsequently returned random values"      )
+  rvaldef(2, shape, "set he shape of subsequently returned random values"      )
+  rvaldef(3, type,  "set the data type of subsequently returned random values" )
+  rvaldef(4, depth, "set the depth of subsequently returned random values"     )
+};
+
 Quad_RVAL  Quad_RVAL::fun;
 
 // ⎕RVAL depends on glibc, so we use it only in development mode
@@ -46,6 +56,9 @@ Quad_RVAL  Quad_RVAL::fun;
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕RVAL");
+
    N = 8;
    desired_maxdepth = 4;
    memset(state, 0, sizeof(state));
@@ -63,23 +76,25 @@ Quad_RVAL::Quad_RVAL()
    desired_types.push_back(0);   // no nested
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::do_eval_B(const Value & B, int depth)
+Token
+Quad_RVAL::eval_B(Value_P B) const
 {
-   if (B.get_rank() > 1)
+   if (B->is_str0())    return list_functions(CERR);
+   if (B->is_zilde())   return list_mappings(CERR);
+   if (B->is_empty())   DOMAIN_ERROR;
+   if (B->get_rank() > 1)
       {
-        MORE_ERROR() << "1<⍴⍴B in in ⎕RVAL B";
+        MORE_ERROR() << "⎕RVAL B: expecting 1 < ⍴⍴B.";
         RANK_ERROR;
       }
 
+   return Token(TOK_APL_VALUE1, do_eval_B(*B, 0));
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::do_eval_B(const Value & B, int depth) const
+{
 ShapeItem len_B = B.element_count();
-   if (B.is_vector() && len_B == 0)   // empty vector 
-      {
-        if (B.get_cfirst().is_character_cell())      list_functions(true);
-        else if (B.get_cfirst().is_integer_cell())   list_functions(false);
-        else                                         DOMAIN_ERROR;
-        return Idx0_0(LOC);
-      }
 
    if (len_B > 4)
       {
@@ -309,57 +324,21 @@ Value_P Z(N, LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
-/// sub function names. Keep them sorted by subfunction name.
-const sub_function_info sub_function_infos[] = {
-  { 4, "depth",  -1, 0 },
-  { 1, "rank",   -1, 0 },
-  { 2, "shape",  -1, 0 },
-  { 0, "state",  -1, 0 },
-  { 3, "type",   -1, 0 },
-                                               };
-
-sAxis
-Quad_RVAL::subfun_to_axis(const UCS_string & name) const
+void Quad_RVAL::print_fun_syntax(ostream & out,
+                                 const function_info & info) const
 {
-UTF8_string name_utf(name);
-const char * function_name = name_utf.c_str();
-
-  enum { SF_SIZE = sizeof(sub_function_info),
-         SF_COUNT = sizeof(sub_function_infos) / SF_SIZE };
-
- if (const void * vp = bsearch(function_name, sub_function_infos,
-                               SF_COUNT, SF_SIZE, axis_compare))
-      return reinterpret_cast<const sub_function_info *>(vp)->axis;
-
-  return -1;    // not found
+   out << "    ⎕RVAL[" << info.axis << "] B   ⍝ " << info.comment_fun << endl;
 }
 //----------------------------------------------------------------------------
-void
-Quad_RVAL::list_functions(bool mapping)
+void Quad_RVAL::print_map_syntax(ostream & out,
+                                 const function_info & info) const
 {
-ostream & out = CERR;
-  if (mapping)
-     {
-       // ⎕RVAL "": print the number to name mappings like:
-       //
-       // ⎕RVAL[1]  ←→  ⎕RVAL['rank']        ←→  ⎕RVAL.determinant
-       //
-       enum { COUNT = sizeof(sub_function_infos) / sizeof(sub_function_info) };
-       list_all_mappings(out, "⎕RVAL", sub_function_infos, COUNT);
-     }
-  else
-     {
-       out <<
-"\n"
-"Valid ⎕RVAL[*] indices are:\n"
-"\n"
-"    ⎕RVAL[0] B    state:  get (B=⍬) or set the random number generator state\n"
-"    ⎕RVAL[1] B    rank:   set the desired rank\n"
-"    ⎕RVAL[2] B    shape:  set he desired shape\n"
-"    ⎕RVAL[3] B    type:   set the desired data type(s)\n"
-"    ⎕RVAL[4] B    type:   set the desired depth\n"
-           << endl;
-     }
+const UTF8_literal name = info.function_name;
+const UCS_string blanks(max_function_name_length - name.get_char_count(),
+                        UNI_SPACE);
+
+   out << "   ⎕RVAL[" << info.axis << "]  ←→  ⎕RVAL['" << name << "']"
+       << blanks << "  ←→  ⎕RVAL." << name << endl;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -679,7 +658,7 @@ Quad_RVAL::random_complex(Value & Z)
 }
 //----------------------------------------------------------------------------
 void
-Quad_RVAL::random_nested(Value & Z, const Value & B, int depth)
+Quad_RVAL::random_nested(Value & Z, const Value & B, int depth) const
 {
 Value_P Zsub;
 

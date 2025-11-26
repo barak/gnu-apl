@@ -2624,14 +2624,16 @@ Value::to_type(bool force_numeric)
            {
              PointerCell & ptr_cell = reinterpret_cast<PointerCell &>(cell);
              ptr_cell.isolate(LOC);
-             ptr_cell.get_pointer_value()->to_type(false);
+             ptr_cell.get_pointer_value()->to_type(force_numeric);
            }
-        else if (cell.is_character_cell())
+        else if (cell.is_character_cell() && ! force_numeric)
            {
-             if (force_numeric)   set_ravel_Int(e, 0);
-             else                 set_ravel_Char(e, UNI_SPACE);
+             set_ravel_Char(e, UNI_SPACE);
            }
-        else                      set_ravel_Int(e, 0);
+        else
+           {
+             set_ravel_Int(e, 0);
+           }
       }
 }
 //----------------------------------------------------------------------------
@@ -2709,15 +2711,13 @@ Value::prototype(const char * loc) const
     **/
 
 const Cell & first = get_cfirst();
-   if (first.is_integer_cell())     return IntScalar(0, LOC);
+   if (first.is_numeric())          return IntScalar(0, LOC);
    if (first.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
    if (first.is_pointer_cell())
       {
-        Value_P B0 = first.get_pointer_value();
-        Value_P Z(B0->get_shape(), loc);
-
-        loop(z, Z->element_count())   Z->next_ravel_Proto(B0->get_cravel(z));
-        Z->check_value(LOC);
+        const PointerCell & sub = reinterpret_cast<const PointerCell &>(first);
+        Value_P Z = CLONE(sub.get_pointer_value().get(), LOC);
+        Z->to_type(false);
         return Z;
       }
 

@@ -121,17 +121,31 @@ public:
       { return is_scalar() &&
               !(get_cfirst().is_pointer_cell() || get_lval_cellowner()); }
 
-   /// return \b true iff \b this value is empty (some dimension is 0).
-   bool is_empty() const
-      { return shape.is_empty(); }
-
    /// return \b true iff \b this value is a numeric scalar.
    bool is_numeric_scalar() const
       { return  is_scalar() && get_cfirst().is_numeric(); }
 
-   /// return \b true iff \b this value is a character scalar
+   /// return \b true iff \b this value is a character scalar.
    bool is_character_scalar() const
       { return  is_scalar() && get_cfirst().is_character_cell(); }
+
+   /// return \b true iff \b this value is empty (some dimension is 0).
+   bool is_empty() const
+      { return shape.is_empty(); }
+
+   /// return \b true iff \b * \b this \b ≡ \b ⍬ (aka. \b ⍳0).
+   bool is_zilde() const
+      { return get_rank() == 1 &&
+               get_cols() == 0 &&
+               get_cfirst().is_integer_cell();
+      }
+
+   /// return \b true iff \b * \b this \b ≡ \b ''
+   bool is_str0() const
+      { return get_rank() == 1 &&
+               get_cols() == 0 &&
+               get_cfirst().is_character_cell();
+      }
 
    /// return \b true iff \b this value is a scalar or vector
    bool is_scalar_or_vector() const
