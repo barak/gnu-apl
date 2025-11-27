@@ -1521,26 +1521,8 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
    CHECK_SECURITY(disable_Quad_FIO);
 
    if (B->get_rank() > 1)   RANK_ERROR;
-   if (X->get_rank() > 1)   RANK_ERROR;
 
-int function_number = -1;
-   if (X->is_char_array())   // function name, e.g. "open"
-      {
-        UCS_string ucs_X(*X);
-        function_number = subfun_to_axis(ucs_X);
-        if (function_number == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_X << "')";
-             AXIS_ERROR;
-           }
-      }
-   else
-      {
-        function_number = X->get_cfirst().get_near_int();
-      }
-
-   switch(function_number)
+   switch(const int subfunction = value_to_subfun(*X))
       {
          case 0:   // list functions
               return list_functions(CERR);
@@ -1836,7 +1818,7 @@ int function_number = -1;
                 closedir(dir);
 
                 Shape shape_Z(entries.size());
-                if (function_number == 28)   // 5 by N matrix
+                if (subfunction == 28)   // 5 by N matrix
                    {
                      shape_Z.add_shape_item(5);
                    }
@@ -1846,7 +1828,7 @@ int function_number = -1;
                 loop(e, entries.size())
                    {
                      const dirent & dent = entries[e];
-                     if (function_number == 28)   // full dirent
+                     if (subfunction == 28)   // full dirent
                         {
                           // all platforms support inode number
                           //
@@ -1872,7 +1854,7 @@ int function_number = -1;
 #else
                           Z->next_ravel_1();
 #endif
-                        }   // function_number == 28
+                        }   // subfunction == 28
 
                      UCS_string filename(UTF8_string(dent.d_name));
                      Value_P Z_name(filename, LOC);
@@ -1886,7 +1868,7 @@ int function_number = -1;
 
          case 32:   // socket(Bi=AF_INET, SOCK_STREAM, 0)
               CHECK_SECURITY(disable_Quad_FIO__socket);
-              UNSAFE("socket", function_number);
+              UNSAFE("socket", subfunction);
               {
                 errno = 0;
                 APL_Integer domain = AF_INET;
@@ -2216,7 +2198,7 @@ int function_number = -1;
               {
                 if (B->element_count() != 1)   LENGTH_ERROR;
                 const time_t t = B->get_cfirst().get_int_value();
-                const tm * tmp = (function_number == 52) ? localtime(&t)
+                const tm * tmp = (subfunction == 52) ? localtime(&t)
                                                          : gmtime(&t);
                 if (tmp == 0)   DOMAIN_ERROR;
 
@@ -2268,7 +2250,7 @@ int function_number = -1;
                 Statistics * stat = Performance::get_statistics(b);
                 if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
 
-                if (function_number == 200)   // reset statistics
+                if (subfunction == 200)   // reset statistics
                    {
                      stat->reset();
                      return Token(TOK_APL_VALUE1, IntScalar(b, LOC));
@@ -2334,7 +2316,7 @@ int function_number = -1;
                    }
                 if (fun == 0)   DOMAIN_ERROR;
                 APL_Integer old_threshold;
-                if (function_number == 202)
+                if (subfunction == 202)
                    {
                      old_threshold = fun->get_monadic_threshold();
                    }
@@ -2349,14 +2331,8 @@ int function_number = -1;
          case 61:   // secs_epoch(Bh)
               return Token(TOK_APL_VALUE1, IntScalar(secs_epoch(*B), LOC));
 
-        default: break;
+        default: bad_subfun_number_ERROR(subfunction);
       }
-
-   MORE_ERROR() << "bad function number " << function_number <<
-                   " in Quad_FIO::eval_XB()";
-
-   CERR << "Bad eval_XB() function number: " << function_number << endl;
-   VALENCE_ERROR;
 
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
@@ -2447,26 +2423,9 @@ Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
-   if (X->get_rank() > 1)   RANK_ERROR;
 
-int function_number = -1;
-   if (X->is_char_array())   // function name, e.g. "open"
-      {
-        UCS_string ucs_X(*X);
-        function_number = subfun_to_axis(ucs_X);
-        if (function_number == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_X << "')";
-             AXIS_ERROR;
-           }
-      }
-   else
-      {
-        function_number = X->get_cfirst().get_near_int();
-      }
-
-   switch(function_number)
+const sAxis subfunction = value_to_subfun(*X);
+   switch(subfunction)
       {
          case 0:   // list functions
               return list_functions(COUT);
@@ -2879,7 +2838,7 @@ int function_number = -1;
                 const UCS_string format(*A.get());
                 File_or_String fos(file);
                 errno = 0;
-                return do_scanf(fos, format, function_number);
+                return do_scanf(fos, format, subfunction);
               }
 
          case 55:   // sscanf(Bh, A_format)
@@ -2888,7 +2847,7 @@ int function_number = -1;
                 const UCS_string data(*B.get());
                 File_or_String fos(&data);
                 errno = 0;
-                return do_scanf(fos, format, function_number);
+                return do_scanf(fos, format, subfunction);
               }
 
          case 56:   // write nested lines As to file Bs
@@ -3008,7 +2967,7 @@ int function_number = -1;
                    }
                 if (fun == 0)   DOMAIN_ERROR;
                 APL_Integer old_threshold;
-                if (function_number == 202)
+                if (subfunction == 202)
                    {
                      old_threshold = fun->get_monadic_threshold();
                      const_cast<Function *>(fun)
@@ -3024,18 +2983,12 @@ int function_number = -1;
                  return Token(TOK_APL_VALUE1, IntScalar(old_threshold, LOC));
               }
 
-        default: break;
+        default: bad_subfun_number_ERROR(subfunction);
       }
 
-   MORE_ERROR() << "bad function number " << function_number <<
-                   " in Quad_FIO::eval_AXB(). The monadic ⎕FIO[X] B is valid.";
-
-   CERR << "eval_AXB() function number: " << function_number << endl;
-   VALENCE_ERROR;
-
 out_errno:
-   MORE_ERROR() << "A ⎕FIO[" << function_number
-              << "] B failed: " << strerror(errno);
+   MORE_ERROR() << "A ⎕FIO[" << subfunction
+               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
 //----------------------------------------------------------------------------

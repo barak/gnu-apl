@@ -226,46 +226,16 @@ const ShapeItem ec = Z->element_count();
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
-int function_number = -1;
+const sAxis subfunction = value_to_subfun(*A);
 
-   // A shall be a scalar int (function number) or a string (function name)
-   //
-   if (A->is_char_array())   // function name, e.g. "APL_expression"
-      {
-        UCS_string ucs_A(*A);
-        UTF8_string utf_A(ucs_A);
-        function_number = subfun_to_axis(UTF8_string(utf_A.c_str()));
-        if (function_number == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_A << "')";
-             DOMAIN_ERROR;
-           }
-      }
-   else
-      {
-        if (!A->is_scalar())
-           {
-             MORE_ERROR() << "non-scalar A in A ⎕RVAL B";
-             RANK_ERROR;
-           }
-
-        if (!A->is_int_scalar())
-           {
-             MORE_ERROR() << "non-integer A in A ⎕RVAL B";
-             DOMAIN_ERROR;
-           }
-        function_number = A->get_cfirst().get_int_value();
-      }
-
-Value_P Z = do_eval_AB(function_number, *B);
+Value_P Z = do_eval_AB(subfunction, *B);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_RVAL::do_eval_AB(int function_A, const Value & B)
+Quad_RVAL::do_eval_AB(int subfunction, const Value & B)
 {
-   switch(function_A)
+   switch(subfunction)
       {
         case 0: return generator_state(B);
         case 1: return result_rank(B);
@@ -274,8 +244,7 @@ Quad_RVAL::do_eval_AB(int function_A, const Value & B)
         case 4: return result_maxdepth(B);
       }
 
-   MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
-   DOMAIN_ERROR;
+   fun.bad_subfun_number_ERROR(subfunction);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -686,12 +655,6 @@ Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
    N = 8;
-}
-//----------------------------------------------------------------------------
-sAxis
-Quad_RVAL::subfun_to_axis(const UCS_string & name) const
-{
-   return -1;
 }
 //----------------------------------------------------------------------------
 Value_P

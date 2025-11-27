@@ -803,6 +803,34 @@ const Token_loc tloc(tok, old_PC);
    return false;   // )SI not pushed
 }
 //----------------------------------------------------------------------------
+Fun_signature
+Prefix::get_current_signature()
+{
+   // this function is called after some eval_XXX() was invoked and
+   // computes the signature XXX from the current stack.
+   //
+const Prefix & prefix = Workspace::SI_top()->get_prefix();
+const int prefix_len = prefix.prefix_len;
+
+int ret = SIG_NONE;
+   Assert(prefix_len > 1);   // at least FUN B
+   if (prefix.Class_at(prefix_len - 1) == TC_VALUE)   ret |= SIG_B;
+   if (prefix.Class_at(0) == TC_VALUE)                ret |= SIG_A;
+   loop(p, prefix_len)
+       {
+         switch(prefix.Class_at(p))
+            {
+              case TC_FUN12: ret |= SIG_FUN;   break;
+              case TC_OPER1: ret |= SIG_LO;    break;
+              case TC_OPER2: ret |= SIG_OP2;   break;
+              case TC_INDEX: ret |= SIG_X;     break;
+              default:       ;
+            }
+       }
+
+   return Fun_signature(ret);
+}
+//----------------------------------------------------------------------------
 #ifdef PREFIX_HASH
 inline void
 Prefix::find_best_phrase()

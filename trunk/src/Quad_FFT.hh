@@ -62,8 +62,7 @@ protected:
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// compute FFT with mode \b A of B
-   Token do_eval_AorX_B(const Value & A_or_X, Fun_signature sig_AorX,
-                                        Fun_signature sig_fun, Value_P B) const;
+   Token do_eval_AorX_B(const Value & A_or_X, Value_P B) const;
 
    /// window function for sample n of N with parameters a = a0, a1, ...
    typedef double (*window_function)(ShapeItem n, ShapeItem N);

@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 26, 2025.  This manual briefly documents GNU APL, an
+November 27, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -4054,21 +4054,23 @@ The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an
 integer specifying the distribution of the randoms generated.  At
 present, the distibutions supported are:
 
-  0. Normal
+   • x=0: Normal distribution (default)
+   • x=1: Lognormal distribution
+   • x=2: Chi Squared distribution
+   • x=3: Student T distribution
 
-  1. Lognormal
+   If x is not specified then the normal distribution is used.
 
-  2. Chi Squared
+   The right argument B of ⎕MX B is a real or complex scalar that
+specifies the desired standard deviation.  If B is complex, the value
+returned is also complex with random real and imaginary components.
 
-  3. Student T
+   If the optional left argument A is specified, then A must be a scalar
+integer and Z←A ⎕MX B and the operation returns a random vector Z with A
+= ⍴Z.
 
-   The default if x is not specified is the normal distribution.  The
-right argument is a single real or complex value that specifies the
-required standard deviation.  If this value is complex, the value
-returned is also complex with random real and imaginary components.  If
-a left argument is specified, it must be a scalar integer and the
-operation returns a random vector of that length.  If a mean is
-applicable to a given distribution, it is set to 0.
+   If a mean value is applicable for the selected distribution, then it
+is set to 0.
 
            ⎕MX[10] 2
      ¯1.0504575511
@@ -8722,36 +8724,36 @@ Node: Section 2.29147479
 Node: Section 2.30148148
 Node: Section 2.31149799
 Node: Section 2.32153723
-Node: Section 2.33168008
-Node: Output File Format184781
-Node: Section 2.34185956
-Node: Section 2.35195391
-Node: Section 2.36196410
-Node: Section 2.37211645
-Node: Section 2.38222840
-Node: Section 2.39225024
-Node: Section 2.40251129
-Node: Section 2.41255669
-Node: Section 2.42276768
-Node: Section 2.43290781
-Node: Section 2.44294051
-Node: Chapter 3294566
-Node: Chapter 4297074
-Node: Chapter 5298215
-Node: Section 5.1299862
-Node: Section 5.2301182
-Node: Section 5.3301542
-Node: Section 5.4301784
-Node: Section 5.5302446
-Node: Section 5.6302924
-Node: Section 5.7303697
-Node: Section 5.8304123
-Node: Chapter 6304525
-Node: Section 6.1304944
-Node: Section 6.2305631
-Node: Chapter 7306462
-Node: Section 7.1306965
-Node: Section 7.2332278
+Node: Section 2.33168152
+Node: Output File Format184925
+Node: Section 2.34186100
+Node: Section 2.35195535
+Node: Section 2.36196554
+Node: Section 2.37211789
+Node: Section 2.38222984
+Node: Section 2.39225168
+Node: Section 2.40251273
+Node: Section 2.41255813
+Node: Section 2.42276912
+Node: Section 2.43290925
+Node: Section 2.44294195
+Node: Chapter 3294710
+Node: Chapter 4297218
+Node: Chapter 5298359
+Node: Section 5.1300006
+Node: Section 5.2301326
+Node: Section 5.3301686
+Node: Section 5.4301928
+Node: Section 5.5302590
+Node: Section 5.6303068
+Node: Section 5.7303841
+Node: Section 5.8304267
+Node: Chapter 6304669
+Node: Section 6.1305088
+Node: Section 6.2305775
+Node: Chapter 7306606
+Node: Section 7.1307109
+Node: Section 7.2332422
 
 End Tag Table
 

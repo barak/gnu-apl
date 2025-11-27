@@ -181,36 +181,16 @@ Value_P Z(shape_Z, LOC);
 Token
 Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
-int sub_function = -1;
+const sAxis subfunction = value_to_subfun(*A);
 
-   if (A->get_rank() > 1)   RANK_ERROR;
-
-   if (A->is_char_array())   // function name, e.g. "APL_expression"
-      {
-        UCS_string ucs_A(*A);
-        UTF8_string utf_A(ucs_A);
-        sub_function = subfun_to_axis(UTF8_string(utf_A.c_str()));
-        if (sub_function == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_A << "')";
-             DOMAIN_ERROR;
-           }
-      }
-   else
-      {
-        if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
-        sub_function = A->get_cfirst().get_int_value();
-      }
-
-   if (sub_function == 45)   // filter (= return B)
+   if (subfunction == 45)   // filter (= return B)
       {
         do_CR45(B.get());
         return Token(TOK_APL_VALUE1, B);
       }
 
 PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-Value_P Z = do_CR(sub_function, B.get(), pctx);
+Value_P Z = do_CR(subfunction, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

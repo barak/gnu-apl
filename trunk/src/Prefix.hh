@@ -364,6 +364,9 @@ public:
    static void adjust_right_caret(Function_PC2 & range,
                                   const Token_string & failed_statement);
 
+   /// the signature of the current eval_XXX() function (0 if none).
+   static Fun_signature get_current_signature();
+
 protected:
    /// push the next token onto the stack. Return \b true iff )SI was pushed.
    //  called often but from the same place in reduce_statements()

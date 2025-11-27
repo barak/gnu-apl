@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>November 26, 2025.
+<p>November 27, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -4832,27 +4832,29 @@ result with the same shape as the argument.
 <div class="subsection" id="Randoms">
 <h4 class="subsection">2.32.10 Randoms</h4>
 
-<p>The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an integer
-specifying the distribution of the randoms generated. At present, the
-distibutions supported are:
+<p>The nomadic randoms operation, <b>⎕MX[10]</b> or <b>⎕MX[10 x]</b> where <b>x</b>
+is an integer specifying the distribution of the randoms generated.
+At present, the distibutions supported are:
 </p>
-<ol start="0">
-<li> Normal
+<ul>
+<li> <b>x=0</b>: Normal distribution (default)
+</li><li> <b>x=1</b>: Lognormal distribution
+</li><li> <b>x=2</b>: Chi Squared distribution
+</li><li> <b>x=3</b>: Student T distribution
+</li></ul>
 
-</li><li> Lognormal
-
-</li><li> Chi Squared
-
-</li><li> Student T
-</li></ol>
-
-<p>The default if <b>x</b> is not specified is the normal distribution. The
-right argument is a single real or complex value that specifies the
-required standard deviation. If this value is complex, the value returned
-is also complex with random real and imaginary components. If a left
-argument is specified, it must be a scalar integer and the operation
-returns a random vector of that length. If a mean is applicable to a
-given distribution, it is set to 0.
+<p>If <b>x</b> is not specified then the normal distribution is used.
+</p>
+<p>The right argument <b>B</b> of <b>⎕MX B</b> is a real or complex scalar
+that specifies the desired standard deviation. If <b>B</b> is complex,
+the value returned is also complex with random real and imaginary components.
+</p>
+<p>If the optional left argument <b>A</b> is specified, then <b>A</b> must be a
+scalar integer and <b>Z←A ⎕MX B</b>  and the operation returns a random vector
+<b>Z</b> with <b>A = ⍴Z</b>.
+</p>
+<p>If a mean value is  applicable for the selected distribution, then it is
+set to <b>0</b>.
 </p>
 <div class="example">
 <pre class="example">      ⎕MX[10] 2

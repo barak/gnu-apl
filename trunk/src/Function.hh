@@ -102,8 +102,7 @@ public:
 
    /// return a function number (pseudo-axis) for \b value. \b value shall
    /// be an integer scalar, or else a valid subfunction name (APL string).
-   sAxis value_to_subfun(const Value & value, Fun_signature axis,
-                                              Fun_signature fun) const;
+   sAxis value_to_subfun(const Value & A_or_X) const;
    //
    /// print some help (not for )HELP, but for ⎕XXX ⍬).
    /// The help for )HELP is defined in \b Help.def
@@ -111,6 +110,12 @@ public:
 
    /// print the syntax variants for all subfunctions.
    Token list_mappings(ostream & out) const;
+
+   /// complain about an invalid subfunctioon name
+   void bad_subfun_name_ERROR(const UCS_string sub_name) const GNUC__noreturn;
+
+   /// complain about an invalid subfunctioon name
+   void bad_subfun_number_ERROR(int number) const GNUC__noreturn;
 
    /// static texts before and after syntax tables
    enum Legend_type

@@ -1112,24 +1112,22 @@ Quad_MX::eval_B(Value_P B) const
 
   // at this point, B is an empty vector (supposedly character or numerical).
   //
-  if (B->get_cfirst().is_character_cell())      list_functions(CERR);
-  else if (B->get_cfirst().is_integer_cell())   list_mappings(CERR);
-  else                                          DOMAIN_ERROR;
-
-  return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+  if (B->is_str0())    return list_functions(CERR);
+  if (B->is_zilde())   return list_mappings(CERR);
+  DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-MX_ops op = OP_LIST;
+MX_ops op    = OP_LIST;
 int modifier = 0;
 
-  if (X->is_numeric_scalar())
+  if (X->is_int_scalar() || X->is_char_string())   // op only
      {
-       op = MX_ops(X->get_sole_integer());
+       op = MX_ops(value_to_subfun(*X));
      }
-  else if (X->is_vector())
+  else if (X->is_vector())                         // op and modifier
      {
        const ShapeItem X_count = X->element_count();
        op = MX_ops(X->get_cravel(0).get_int_value());
@@ -1138,23 +1136,20 @@ int modifier = 0;
   else
     {
       MORE_ERROR() << "Axis X of ⎕MX[X] expects an integer function specifier.";
-      SYNTAX_ERROR;
+      DOMAIN_ERROR;
     }
  
-  if (op < OP_LIST || int(op) >= subfun_count)
-     {
-       MORE_ERROR() << "Subfunction number " << op << " is out of range.";
-       AXIS_ERROR;
-     }
+  if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
 
-Value_P Z = Idx0_0(LOC);
+Value_P Z;
   switch(op)
     {
       case OP_LIST:
-           if (B->get_cfirst().is_character_cell())      list_functions(CERR);
-           else if (B->get_cfirst().is_integer_cell())   list_mappings(CERR);
-           else                                          DOMAIN_ERROR;
+           if (B->is_str0())    return list_functions(CERR);
+           if (B->is_zilde())   return list_mappings(CERR);
+           DOMAIN_ERROR;
            break;
+
       case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A, B);   break;
       case OP_VECTOR_ANGLE:       Z = vectorAngle(A, B);          break;
       case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation(16, A, B);   break;
@@ -1174,14 +1169,14 @@ Value_P Z = Idx0_0(LOC);
 Token
 Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
-MX_ops op = OP_LIST;
+MX_ops op    = OP_LIST;
 int modifier = 0;
 
-  if (X->is_numeric_scalar())   // op only
+  if (X->is_int_scalar() || X->is_char_string())   // op only
     {
-      op = MX_ops(X->get_sole_integer());
+      op = MX_ops(value_to_subfun(*X));
     }
-  else if (X->is_vector())   // op and modifier
+  else if (X->is_vector())                         // op and modifier
     {
       const ShapeItem X_count = X->element_count();
       op = MX_ops(X->get_cravel(0).get_int_value());
@@ -1193,34 +1188,30 @@ int modifier = 0;
       SYNTAX_ERROR;
     }
 
-  if (op < OP_LIST || int(op) >= subfun_count)
-     {
-       MORE_ERROR() << "Function specifier " << op << " is out of range.";
-       AXIS_ERROR;
-    }
+  if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
 
 Value_P Z = Idx0_0(LOC);
-  switch(op)
-    {
-      case OP_LIST:
-           if (B->get_cfirst().is_character_cell())      list_functions(COUT);
-           else if (B->get_cfirst().is_integer_cell())   list_mappings(COUT);
-           else                                          DOMAIN_ERROR;
-           break;
-      case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
-           //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
-      case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
-      case OP_DETERMINANT:        Z = determinant(B);                  break;
-      case OP_COVARIANCE:         Z = monadicCovariance(B);            break;
-      case OP_NORM:               Z = norm(B);                         break;
-      case OP_EIGENVECTORS:       Z = eigenvectors(B);                 break;
-      case OP_EIGENVALUES:        Z = eigenvalues(B);                  break;
-      case OP_IDENT:              Z = ident(B);                        break;
-      case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
-      case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
-      default:   MORE_ERROR() << "⎕MX[" << op << "] is not monadic.";
-                 VALENCE_ERROR;
-    }
+   switch(op)
+      {
+        case OP_LIST:
+             if (B->is_str0())   return  list_functions(COUT);
+             if (B->is_zilde())   return list_mappings(COUT);
+             DOMAIN_ERROR;
+       
+        case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
+             //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
+        case OP_RANDOMS:            Z = randoms(nullptr, B, modifier);   break;
+        case OP_DETERMINANT:        Z = determinant(B);                  break;
+        case OP_COVARIANCE:         Z = monadicCovariance(B);            break;
+        case OP_NORM:               Z = norm(B);                         break;
+        case OP_EIGENVECTORS:       Z = eigenvectors(B);                 break;
+        case OP_EIGENVALUES:        Z = eigenvalues(B);                  break;
+        case OP_IDENT:              Z = ident(B);                        break;
+        case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
+        case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
+        default:   MORE_ERROR() << "⎕MX[" << op << "] is not monadic.";
+                   VALENCE_ERROR;
+      }
 
   Z->check_value(LOC);
   return Token(TOK_APL_VALUE1, Z);
@@ -1260,12 +1251,6 @@ Token
 Quad_MX::eval_XB(Value_P X, Value_P B) const
 {
   return eval_B(B);
-}
-//----------------------------------------------------------------------------
-sAxis
-Quad_MX::subfun_to_axis(const UCS_string & name) const
-{
-  return -1;
 }
 //----------------------------------------------------------------------------
 

@@ -61,16 +61,16 @@ const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
 {
 #define sql_def(N, name, map_comm, fun_comm) \
    { N, #name, map_comm, fun_comm, -1 },
-   sql_def(  0, list     , "begin a transaction"        , "")
-   sql_def(  1, open     , "show the columns of a table", "")
-   sql_def(  2, close    , "end a transaction"          , "")
-   sql_def(  3, query    , "close a database handle"    , "")
-   sql_def(  4, update   , "⎕SQL function names/numbers", "")
-   sql_def(  5, begin    , "open database file"         , "")
-   sql_def(  6, commit   , "SQL database query"         , "")
+   sql_def(  0, list     , "⎕SQL function names/numbers", "")
+   sql_def(  1, open     , "open database file"         , "")
+   sql_def(  2, close    , "close a database handle"    , "")
+   sql_def(  3, query    , "SQL database query"         , "")
+   sql_def(  4, update   , "SQL database update"        , "")
+   sql_def(  5, begin    , "begin a transaction"        , "")
+   sql_def(  6, commit   , "end a transaction"          , "")
    sql_def(  7, rollback , "roll a transaction back"    , "")
    sql_def(  8, tables   , "show all tables"            , "")
-   sql_def(  9, columns  , "SQL database update"        , "")
+   sql_def(  9, columns  , "show the columns of a table", "")
    sql_def( 10, version  , "SQL provider version number", "")
    sql_def( 11, vstring  , "SQL provider version string", "")
 };
@@ -674,10 +674,11 @@ Quad_SQL::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
-const int function_number = X->get_cfirst().get_near_int( );
+const sAxis subfunction = value_to_subfun(*X);
+
 const bool map = B->get_cfirst().is_character_cell();
 
-    switch(function_number)
+    switch(subfunction)
        {
          case  0: if (map)   return list_mappings(CERR);
                   else       return list_functions(CERR);
@@ -695,9 +696,7 @@ const bool map = B->get_cfirst().is_character_cell();
          case 11: return Token(TOK_APL_VALUE1,
                                get_version_string(UCS_string(*B)));
 
-         default: MORE_ERROR() << "⎕SQL[X] B: Illegal function number X="
-                               << function_number;
-                  DOMAIN_ERROR;
+         default: bad_subfun_number_ERROR(subfunction);
        }
 }
 //----------------------------------------------------------------------------

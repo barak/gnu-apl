@@ -293,21 +293,20 @@ Value_P Z(B->get_shape(), LOC);
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
-  return do_eval_AorX_B(*A, SIG_A, SIG_A_F2_B, B);
+  return do_eval_AorX_B(*A, B);
 }
 //----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_XB(Value_P X, Value_P B) const
 {
-  return do_eval_AorX_B(*X, SIG_X, SIG_F1_X_B, B);
+  return do_eval_AorX_B(*X, B);
 }
 //----------------------------------------------------------------------------
 Token
-Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Fun_signature sig_AorX, 
-                         Fun_signature sig_fun, Value_P B) const
+Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Value_P B) const
 {
-const sAxis mode = value_to_subfun(A_or_X, sig_AorX, sig_fun);
-   switch(mode)
+const sAxis subfunction = value_to_subfun(A_or_X);
+   switch(subfunction)
       {
         case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
         case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
@@ -327,15 +326,7 @@ const sAxis mode = value_to_subfun(A_or_X, sig_AorX, sig_fun);
         case -15: return do_window(B, &flat_top);
       }
 
-   // at this point A_or_X was numeric and invalid.
-   //
-   MORE_ERROR() << get_signature_string(sig_fun)
-                << ": invalid function number "
-                << (sig_AorX == SIG_X ? "X" : "A")
-                << " (= " << mode << ").\n"
-                   "    See ⎕FFT '' or ⎕FFT ⍬ for a list "
-                   "of valid function numbers.";
-   DOMAIN_ERROR;
+   bad_subfun_number_ERROR(subfunction);
 }
 //----------------------------------------------------------------------------
 void
@@ -363,12 +354,6 @@ ShapeItem rlen = 1;
 //----------------------------------------------------------------------------
 
 #else
-
-sAxis
-Quad_FFT::subfun_to_axis(const UCS_string & name) const
-{
-  return -1;
-}
 
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);

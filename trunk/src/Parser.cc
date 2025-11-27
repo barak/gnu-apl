@@ -730,7 +730,7 @@ bool progress = false;
                    const UCS_string sub_name = subfun_symbol->get_name();
                    const Function * topfun = tos[t].get_function();
                    const sAxis axis = topfun->subfun_to_axis(sub_name);
-                   if (axis < 0)   bad_sub_fun_error(topfun, sub_name);
+                   if (axis < 0)   topfun->bad_subfun_name_ERROR(sub_name);
 
                    // valid axis. replace: topfun . subfun with topfun [subfun]
                    //
@@ -746,7 +746,7 @@ bool progress = false;
                    const UCS_string sub_name = subfun_symbol->get_name();
                    const Function * topfun = tos[t].get_function();
                    const sAxis axis = topfun->subfun_to_axis(sub_name);
-                   if (axis < 0)   bad_sub_fun_error(topfun, sub_name);
+                   if (axis < 0)   topfun->bad_subfun_name_ERROR(sub_name);
 
                    // valid axis. replace: ⎕SQL.subfun with either
                    // ⎕SQL[subfun] or with ⎕SQL[subfun;DB]
@@ -788,15 +788,6 @@ bool progress = false;
             }
        }
    return progress;
-}
-//----------------------------------------------------------------------------
-void
-Parser::bad_sub_fun_error(cFunction_P quad_fun, const UCS_string sub_name)
-{
-   MORE_ERROR() << sub_name << " is not a valid sub-function of "
-                << quad_fun->get_name() << ". See " << quad_fun->get_name()
-                << " '' for details.";
-   SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
 void

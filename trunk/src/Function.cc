@@ -31,6 +31,7 @@
 #include "IntCell.hh"
 #include "Output.hh"
 #include "Parser.hh"
+#include "Prefix.hh"
 #include "PrintOperator.hh"
 #include "Symbol.hh"
 #include "Value.hh"
@@ -396,31 +397,31 @@ FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
 }
 //----------------------------------------------------------------------------
 sAxis
-FunctionGroup::value_to_subfun(const Value & value, Fun_signature sig_AorX,
-                               Fun_signature sig_fun) const
+FunctionGroup::value_to_subfun(const Value & A_or_X) const
 {
-   if (value.is_int_scalar())   // function number
+   if (A_or_X.is_int_scalar())   // function number
       {
         // we do not check (here) if the number is valid. The caller will.
         //
-        return value.get_cfirst().get_int_value();   // but possibly invalid
+        return A_or_X.get_cfirst().get_int_value();   // but possibly invalid
       }
 
-   if (value.is_char_string())   // function name
+   if (A_or_X.is_char_string())   // function name
       {
-        const UCS_string name(value);
+        const UCS_string name(A_or_X);
         const sAxis axis = subfun_to_axis(name);
         if (axis >= 0)   return axis;   // valid axis
 
-        MORE_ERROR() << get_signature_string(sig_fun)
-         << ": invalid subfunction name "
-         << (sig_AorX == SIG_X ? "X" : "A")
+        const Fun_signature signature = Prefix::get_current_signature();
+        const char * AX = signature & SIG_X ? "X" : "A";
+        MORE_ERROR() << get_signature_string(signature)
+         << ": invalid subfunction name " << AX
          << " (= '" << name << "').";
 
         DOMAIN_ERROR;
       }
 
-   if (value.get_rank() > 1)   RANK_ERROR;
+   if (A_or_X.get_rank() > 1)   RANK_ERROR;
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -478,7 +479,28 @@ FunctionGroup::list_mappings(ostream & out) const
 
    return Token();
 }
+//----------------------------------------------------------------------------
+void
+FunctionGroup::bad_subfun_name_ERROR(const UCS_string sub_name) const
+{
+   MORE_ERROR() << sub_name << " is not a valid subfunction of " << group_name
+                << ".\nSee: " << group_name << " '' "
+                   "or: " << group_name << " ⍬ for a list of valid names.";
+   SYNTAX_ERROR;
+}
+//----------------------------------------------------------------------------
+void
+FunctionGroup::bad_subfun_number_ERROR(int number) const
+{
+const Fun_signature signature = Prefix::get_current_signature();
+const char * AX = signature & SIG_X ? "X" : "A";
 
+   MORE_ERROR() << get_signature_string(signature)
+                << ": invalid subfunction number " << AX << " (= " << number
+                << ").\nSee: " << group_name << " '' or: " << group_name
+                << " ⍬ for a list of valid numbers.";
+   DOMAIN_ERROR;
+}
 //----------------------------------------------------------------------------
 UCS_string
 FunctionGroup::get_signature_string(Fun_signature sig) const

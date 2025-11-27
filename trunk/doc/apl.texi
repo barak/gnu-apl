@@ -4272,31 +4272,29 @@ result with the same shape as the argument.
 @c ............................................................................
 @subsection Randoms
 
-The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an integer
-specifying the distribution of the randoms generated. At present, the
-distibutions supported are:
+The nomadic randoms operation, @b{⎕MX[10]} or @b{⎕MX[10 x]} where @b{x}
+is an integer specifying the distribution of the randoms generated.
+At present, the distibutions supported are:
 
-@enumerate 0
-@item
-Normal
+@itemize
+@item @b{x=0}: Normal distribution (default)
+@item @b{x=1}: Lognormal distribution
+@item @b{x=2}: Chi Squared distribution
+@item @b{x=3}: Student T distribution
+@end itemize
 
-@item
-Lognormal
+If @b{x} is not specified then the normal distribution is used.
 
-@item
-Chi Squared
+The right argument @b{B} of @b{⎕MX B} is a real or complex scalar
+that specifies the desired standard deviation. If @b{B} is complex,
+the value returned is also complex with random real and imaginary components.
 
-@item
-Student T
-@end enumerate
+If the optional left argument @b{A} is specified, then @b{A} must be a
+scalar integer and @b{Z←A ⎕MX B}  and the operation returns a random vector
+@b{Z} with @b{A = ⍴Z}.
 
-The default if @b{x} is not specified is the normal distribution. The
-right argument is a single real or complex value that specifies the
-required standard deviation. If this value is complex, the value returned
-is also complex with random real and imaginary components. If a left
-argument is specified, it must be a scalar integer and the operation
-returns a random vector of that length. If a mean is applicable to a
-given distribution, it is set to 0.
+If a mean value is  applicable for the selected distribution, then it is
+set to @b{0}.
 
 @example
       ⎕MX[10] 2

@@ -118,12 +118,7 @@ protected:
    /// axis like XXX[num]
    static bool map_function_groups(Token_string & tos);
 
-   /// complain abount an invalid sub-function name (of ⎕CR and friends)
-   static void bad_sub_fun_error(cFunction_P quad_fun,
-                                 const UCS_string sub_name);
-
    /** Replace:
-
        ∧∧, ∨∨, ⍲⍲, and ⍱⍱    with their bitwise variant,
        ⎕FIO.function_name    with ⎕FIO[X] (via subfun_to_axis(function_name))
     */
