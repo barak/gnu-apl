@@ -262,12 +262,18 @@ void
 Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
    Log(LOG_error_throw)
-      CERR << endl
-           << "throwing " << Error::error_name(code) << " at " << loc << endl;
+      {
+        CERR << "\nthrowing " << Error::error_name(code)
+             << " at " << loc << endl;
+      }
 
    Log(LOG_verbose_error)   BACKTRACE
 
-   MORE_ERROR() << Error::error_name(code);
+   // set )MORE error (unless the caller has done so)
+   if (!Workspace::more_error().size())   // not yet done
+      {
+        MORE_ERROR() << Error::error_name(code);
+      }
 
 Error error(code, loc);
    error.parser_loc = par_loc;

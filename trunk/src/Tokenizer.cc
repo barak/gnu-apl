@@ -223,14 +223,17 @@ Unicode_source src(input);
               case TC_OPER2:
                    if (tok.get_tag() == TOK_OPER2_INNER && src.rest_len())
                       {
-                        // tok is a dot. This could mean that . is either
-                        //
-                        // the start of a number:     e.g. +.3
-                        // or an operator:            e.g. +.*
-                        // or a syntax error:         e.g. Done.
-                        //
-                        if (src.rest_len() == 1)   // syntax error
-                           Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
+                        /* tok is a dot. This could mean that . is either
+                          
+                           case 1:   the start of a number:     e.g. +.3
+                           case 2:   or an operator:            e.g. +.*
+                           case 3:   or a syntax error:         e.g. Done.
+                         */
+                        if (src.rest_len() == 1)   // case 3: syntax error
+                           {
+                             MORE_ERROR() << "no digit before or after '.'.";
+                             Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
+                           }
 
                         Unicode uni_1 = src[1];
                         const Token tok_1 = Avec::uni_to_token(uni_1, LOC);
@@ -688,7 +691,7 @@ Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos,
    // real 'R' real   // magnitude + angle in radian
 
 const Int_or_Double real_val = tokenize_real(src);
-   if (!real_val.is_valid)
+   if (!real_val.is_valid)   // tokenize_real() sets )MORE info
       {
         rest_2 = src.rest_len();
         Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
@@ -696,6 +699,13 @@ const Int_or_Double real_val = tokenize_real(src);
 
    if (src.skip_if(UNI_J) || src.skip_if(UNI_j))   // e.g. 3J4
       {
+        // a complex number in real + imag format
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing imaginary part I in complex number RjI.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double imag_val = tokenize_real(src);
         if (!imag_val.is_valid)   // not a complex number
            {
@@ -725,6 +735,13 @@ const Int_or_Double real_val = tokenize_real(src);
       }
    else if (src.skip_if(UNI_D) || src.skip_if(UNI_d))   // e.g. 1D90 → 0J1
       {
+        // a complex number in magnitude + degrees format
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing angle D in complex number MdD.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double degrees = tokenize_real(src);
         if (!degrees.is_valid)   // not a complex number
            {
@@ -759,6 +776,13 @@ const Int_or_Double real_val = tokenize_real(src);
       }
    else if (src.skip_if(UNI_R) || src.skip_if(UNI_r))   // 1r3.141592654 → ¯1J0
       {
+        // a complex number in magnitude + radians format
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing angle R in complex number MrR.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double radian = tokenize_real(src);
         if (!radian.is_valid)   // not a complex number
            {
@@ -915,12 +939,15 @@ bool dot_seen = false;      // the decimal . was seen
    if (int_digits.size()   == 0  &&   // empty integer part, and
        fract_digits.size() == 0)      // empty fractional part
       {
-        // mantisssa is empty. This is either a syntax error (by the user)
-        // or caused by discarding leading 0s in int_digits. If the mantissa
-        // is 0 here, then the exponent does not matter.
-        //
-        return skipped_0 ? Int_or_Double(APL_Integer(0))   // valid 0
-                         : Int_or_Double();                // syntax error
+        /* the mantisssa is empty. There are two possibilities:
+
+           1. input was correct (e.g. 0. ), but the 0 was skipped above.;
+           2. syntax error by the user ( . without digits)
+         */
+        if (skipped_0)    return Int_or_Double(APL_Integer(0));   // case 1
+
+        MORE_ERROR() << "expecting 0. or 0. but not . without digits.";
+        return Int_or_Double();                     // case 2: syntax error
       }
 
    // exponent part (but could also be a name starting with E or e)
@@ -948,8 +975,12 @@ bool dot_seen = false;      // the decimal . was seen
            }
       }
 
-   // second dot (which id a syntax error)?
-   if (src.skip_if(UNI_FULLSTOP) && dot_seen)   return Int_or_Double();
+   // second dot (which is a syntax error)?
+   if (src.skip_if(UNI_FULLSTOP) && dot_seen)
+      {
+        MORE_ERROR() << "Two . in a number.";
+        return Int_or_Double();
+      }
 
    // set expo to the optional Ennn (if any) in iii.fff.Ennn)
    //

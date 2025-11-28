@@ -599,8 +599,8 @@ union { double f;
              };
 
         u.bytes[7] = EXPO_MSB;                // SIGN + and exponent MSBs
-        u.bytes[6] = EXPO_LSB << 4            // exponent LSBs
-                   | (rand64 >> 56) & 0x0F;   // 52 bit fraction MSBs
+        u.bytes[6] = (EXPO_LSB << 4)          // exponent LSBs
+                   | (rand64 >> 56 & 0x0F);   // 52 bit fraction MSBs
         u.bytes[5] = rand64 >> 40;            // 52 bit fraction
         u.bytes[4] = rand64 >> 32;            // 52 bit fraction
         u.bytes[3] = rand64 >> 24;            // 52 bit fraction
