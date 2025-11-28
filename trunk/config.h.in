@@ -545,6 +545,9 @@
 /* X11 is available ? */
 #undef apl_X11
 
+/* XCB is available ? */
+#undef apl_XCB
+
 /* APserver listen port name */
 #undef cfg_APSERVER_PATH
 

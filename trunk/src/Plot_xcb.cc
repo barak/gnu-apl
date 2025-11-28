@@ -1021,7 +1021,9 @@ const int verbosity = w_props.get_verbosity();
          draw_triangle(pctx, verbosity, PM, HM, P1, H1, P3, H3);
          draw_triangle(pctx, verbosity, PM, HM, P3, H3, P2, H2);
          draw_triangle(pctx, verbosity, PM, HM, P2, H2, P0, H0);
-#else
+
+#else   // not 0
+
          /* Option B...
 
             fold surface-square along its shorter edge

@@ -510,5 +510,9 @@ protected:
    Function_PC pc;
 };
 //----------------------------------------------------------------------------
+/// complain about missing ioptional functions, libraries, and/or packages
+/// needed by ⎕XXX function qfun.
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
 
 #endif // __TOKEN_HH_DEFINED__

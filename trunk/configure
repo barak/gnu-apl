@@ -721,6 +721,8 @@ apl_SQLITE3_TRUE
 SQLITE3_VERSION
 SQLITE3_LDFLAGS
 SQLITE3_CFLAGS
+apl_XCB_FALSE
+apl_XCB_TRUE
 apl_X11_FALSE
 apl_X11_TRUE
 XMKMF
@@ -20440,9 +20442,16 @@ fi
 # wrap multiple tests into a single dash function from which we may
 # return prematurely (which m4 can't) if a sub-test fails...
 #
+# The total result of this script is apl_X11 which tells if X11 and XCB
+# are available or not.
+#
+# Unfortunately apl_X11 was kind of a misnomer and we therefore# migrate it
+# to apl_XCB instead.
+#
 dash_test_X11()
 { {
-apl_X11=no
+apl_X11=no      # old name
+apl_XCB=no      # new name
 
 local have_x                   # 'yes', 'no', or 'disabled' by AC_PATH_X()
 local x_includes x_libraries   # also set by AC_PATH_X(), normally empty
@@ -20678,6 +20687,7 @@ printf "%s\n" "libraries $x_libraries, headers $x_includes" >&6; }
 fi
  } ; test "x$have_x" != "xyes" && return
 
+# check for header files (#include'd in Plot_xcb.cc)
        for ac_header in xcb/xcb.h X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -20694,7 +20704,7 @@ fi
 
 done
 
-# xcb/xproto.h needs xcb/xcb.h
+# xcb/xproto.h #include's xcb/xcb.h
 ac_fn_cxx_check_header_compile "$LINENO" "xcb/xproto.h" "ac_cv_header_xcb_xproto_h" "#include <xcb/xcb.h>
 "
 if test "x$ac_cv_header_xcb_xproto_h" = xyes
@@ -20749,7 +20759,7 @@ then :
 else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
-
+  # sets apl_have_opt_lib
 test "x$apl_have_opt_lib" = "xno" && return
 
  apl_have_opt_lib=yes
@@ -20796,7 +20806,7 @@ then :
 else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
-
+   # sets apl_have_opt_lib
 test "x$apl_have_opt_lib" = "xno" && return
 
  apl_have_opt_lib=yes
@@ -20844,22 +20854,29 @@ else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
 
-test "x$apl_have_opt_lib" = "xno" && return
+test "x$apl_have_opt_lib" = "xno" && return # sets apl_have_opt_lib
 
+# at this point all libraries needed for XCB are installed
 apl_X11=yes
+apl_XCB=yes
 } }
 
 # call dash_test_X11() above and set result variables...
 #
 dash_test_X11   # set apl_X11 to yes or no.
 
-# export apl_X11 to config.h
+# export apl_X11 and apl_XCB to config.h
 if test "x$apl_X11" = "xyes"; then
 
 printf "%s\n" "#define apl_X11 1" >>confdefs.h
 
+
+printf "%s\n" "#define apl_XCB 1" >>confdefs.h
+
 else
    printf "%s\n" "#define apl_X11 0" >>confdefs.h
+
+   printf "%s\n" "#define apl_XCB 0" >>confdefs.h
 
 fi
 
@@ -20872,9 +20889,17 @@ else
   apl_X11_FALSE=
 fi
 
+ if test "x$apl_XCB" = "xyes"; then
+  apl_XCB_TRUE=
+  apl_XCB_FALSE='#'
+else
+  apl_XCB_TRUE='#'
+  apl_XCB_FALSE=
+fi
 
 
-   test "x$apl_X11" != "xyes" && printf "%s\n" "   └──── may affect: ⎕PLOT"
+
+   test "x$apl_XCB" != "xyes" && printf "%s\n" "   └──── may affect: ⎕PLOT"
 
 
 # check if libfftw3 is installed and usable
@@ -22180,10 +22205,10 @@ fi
 
    test "x$apl_GTK3" != "xyes" && printf "%s\n" "   └──── may affect: ⎕PLOT, will affect ⎕PNG"
 
-# summarize apl_GTK3 and apl_X11 as apl_GUI
+# summarize apl_GTK3 and apl_XCB as apl_GUI
 apl_GUI=no
 test "x$apl_GTK3" = "xyes" && apl_GUI=yes
-test "x$apl_X11" = "xyes"  && apl_GUI=yes
+test "x$apl_XCB" = "xyes"  && apl_GUI=yes
 
 # backtrace() seem to have been moved from libexecinfo to GLIBC_2.2.5,
 # so we do not test fore it anymore.
@@ -23427,6 +23452,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_X11_TRUE}" && test -z "${apl_X11_FALSE}"; then
   as_fn_error $? "conditional \"apl_X11\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${apl_XCB_TRUE}" && test -z "${apl_XCB_FALSE}"; then
+  as_fn_error $? "conditional \"apl_XCB\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_SQLITE3_TRUE}" && test -z "${apl_SQLITE3_FALSE}"; then
@@ -25983,7 +26012,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)
     apl_SQLITE3:                 $apl_SQLITE3	(may affect: ⎕SQL)
     apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
-    apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
+    apl_XCB                      $apl_XCB	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
 

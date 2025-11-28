@@ -766,21 +766,26 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 
 const APL_Integer Z = ++next_handle;
    sem_wait(all_PLOT_windows_sema);
+
       {
 #if apl_GTK3   // GTK
 
    plot_main_GTK(w_props, Z);   // pushes a GTK_context into all_PLOT_windows.
+   sem_post(all_PLOT_windows_sema);
+   sem_wait(expose_sema);   // blocks until window shown
 
-#else          // XCB
+#elif apl_GTK
 
 pthread_t th;
    pthread_create(&th, 0, plot_main_XCB, w_props);   // pushes a XCB_context
+   sem_wait(expose_sema);   // blocks until window shown
+
+#else   // neither GTK nor XCB
+
+   sem_post(all_PLOT_windows_sema);
 
 #endif
       }
-   sem_post(all_PLOT_windows_sema);
-
-   sem_wait(expose_sema);   // blocks until window shown
 
    if (w_props->get_with_border())
       {

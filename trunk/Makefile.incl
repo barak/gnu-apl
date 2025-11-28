@@ -43,6 +43,24 @@ develop:
         ./configure  --enable-maintainer-mode DEVELOP_WANTED=yes CXX_WERROR=yes
 	make all
 
+###############################################################################
+# a shortcut to ./configure with all optional libs missing
+#
+.PHONY: no_libs
+no_libs:
+	CXXFLAGS="-fstrict-aliasing -rdynamic -gdwarf-2" \
+        ./configure  --enable-maintainer-mode DEVELOP_WANTED=yes CXX_WERROR=yes
+	@sed -i \
+	-e "s/HAVE_LIBPCRE2_32 1/HAVE_LIBPCRE2_32 0/" \
+	-e "s/HAVE_LIBC 1/HAVE_LIBC 0/"               \
+	-e "s/apl_SQLITE3 1/apl_SQLITE3 0/"           \
+	-e "s/apl_POSTGRES 1/apl_POSTGRES 0/"         \
+	-e "s/apl_FFT 1/apl_FFT 0/"                   \
+	-e "s/apl_GSL 1/apl_GSL 0/"                   \
+	-e "s/apl_PCRE 1/apl_PCRE 0/"                 \
+	-e "s/apl_X11 1/apl_X11 0/"                   \
+	-e "s/apl_X11 1/apl_XCB 0/"                   \
+	-e "s/apl_GTK3 1/apl_GTK3 0/"          config.h
 
 ###############################################################################
 # a shortcut to ./configure for compiling the python library

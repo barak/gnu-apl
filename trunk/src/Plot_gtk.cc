@@ -24,13 +24,13 @@
 
 #include "Common.hh"
 #if HAVE_LOCALE_H
-#include <locale.h>
+# include <locale.h>
 #endif
 
 #if apl_GTK3 && apl_X11
 
-#include <X11/Xlib.h>
-#include <gtk/gtk.h>
+# include <X11/Xlib.h>
+# include <gtk/gtk.h>
 
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
@@ -1359,7 +1359,7 @@ const int verbosity = w_props.get_verbosity();
             Option B seems to look better.
          */
 
-#if 0    /* Option A...
+# if 0    /* Option A...
 
             interpolate middle point PM with height HM and split the
             square P0-P1-P2-P3 into 4 triangles with common point PM
@@ -1377,7 +1377,7 @@ const int verbosity = w_props.get_verbosity();
          draw_triangle(pctx, verbosity, PM, HM, P3, H3, P2, H2);
          draw_triangle(pctx, verbosity, PM, HM, P2, H2, P0, H0);
 
-#else    /* Option B...
+# else    /* Option B...
 
             fold surface-square along its shorter edge
           */
@@ -1392,7 +1392,7 @@ const int verbosity = w_props.get_verbosity();
               draw_triangle(cr, pctx, verbosity, P0, H0, P1, H1, P2, H2);
               draw_triangle(cr, pctx, verbosity, P3, H3, P1, H1, P2, H2);
             }
-#endif
+# endif   // Option A/B.
        }
 
    // 2. draw lines between plot points
@@ -1425,15 +1425,15 @@ const int verbosity = w_props.get_verbosity();
          const double Z3 = data.get_Z(row + 1, col + 1);
          const Pixel_XY P3 = w_props.valXYZ2pixelXY(X3, Y3, Z3);
 
-#if 0
-         // debug: plot points as vertical lines
-         //
-         const Pixel_XY xy0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
-                                                     w_props.get_min_Y(),
-                                                     data.get_Z(row, col));
+# if 0    // debug: plot points as vertical lines
+          //
+          const Pixel_XY xy0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
+                                                      w_props.get_min_Y(),
+                                                      data.get_Z(row, col));
          draw_line(pctx, pctx.line, xy0, P0);
          continue;
-#endif
+# endif   // 0
+
          draw_line(cr, line_color, 1, line_width, P0, P1);
          if (row == (data.get_row_count() - 2))   // last row
             draw_line(cr, line_color, 1, line_width, P2, P3);
@@ -1494,7 +1494,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
 // linked properly... In our case every event handler has a trailing
 // GTK_context * pctc argument
 
-#define Event_handler(name, ...)                                \
+# define Event_handler(name, ...)                               \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
@@ -1800,10 +1800,10 @@ Plot_window_properties & w_props =
         pthread_t thread = 0;
         pthread_create(&thread, 0, gtk_main_wrapper, 0);
 
-#if HAVE_PTHREAD_SETNAME_NP
+# if HAVE_PTHREAD_SETNAME_NP
          // show with e.g.   ps H -o 'pid tid cmd comm'
          pthread_setname_np(thread, "apl/GTK");
-#endif
+# endif
       }
 
 GTK_context * pctx = new GTK_context(w_props, handle);
@@ -1859,7 +1859,7 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 
    gtk_widget_show_all(pctx->window);
 
-#define Connect_signal(instance, signal_name, callback)               \
+# define Connect_signal(instance, signal_name, callback)               \
    g_signal_connect(instance, signal_name, G_CALLBACK(callback), pctx);
 
    Connect_signal(pctx->window,                 "hide", Hide)

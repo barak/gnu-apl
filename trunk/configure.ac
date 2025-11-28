@@ -271,7 +271,7 @@ AC_STRUCT_ST_BLOCKS
 apl_TOPIC([checks for optional (not strictly required) libraries])
 
 m4_include([m4/check_X11.m4])
-   apl_NYES($apl_X11) && AS_ECHO(["   └──── may affect: ⎕PLOT"])
+   apl_NYES($apl_XCB) && AS_ECHO(["   └──── may affect: ⎕PLOT"])
 
 m4_include([m4/check_FFT.m4])
    apl_NYES($apl_FFT) && AS_ECHO(["   └──── will affect: ⎕FFT"])
@@ -299,10 +299,10 @@ m4_include([m4/check_GSL.m4])
 m4_include([m4/check_GTK.m4])
    apl_NYES($apl_GTK3) && AS_ECHO(["   └──── may affect: ⎕PLOT, will affect ⎕PNG"])
 
-# summarize apl_GTK3 and apl_X11 as apl_GUI
+# summarize apl_GTK3 and apl_XCB as apl_GUI
 apl_GUI=no
 apl_YES($apl_GTK3) && apl_GUI=yes
-apl_YES($apl_X11)  && apl_GUI=yes
+apl_YES($apl_XCB)  && apl_GUI=yes
 
 # backtrace() seem to have been moved from libexecinfo to GLIBC_2.2.5,
 # so we do not test fore it anymore.
@@ -1028,7 +1028,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)
     apl_SQLITE3:                 $apl_SQLITE3	(may affect: ⎕SQL)
     apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
-    apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
+    apl_XCB                      $apl_XCB	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
 

@@ -663,15 +663,15 @@ Quad_RVAL::Quad_RVAL()
    N = 8;
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::do_eval_B(const Value & B, int depth) const
+Token
+Quad_RVAL::eval_B(Value_P B) const
 {
     MORE_ERROR() <<
 "⎕RVAL is only available on platforms that have glibc.\n"
 "Your platform is lacking initstate_r() (and probably others).";
 
    SYNTAX_ERROR;
-   return Value_P();
+   return Token();
 }
 //----------------------------------------------------------------------------
 Token
