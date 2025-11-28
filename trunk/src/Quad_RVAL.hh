@@ -57,8 +57,7 @@ protected:
 
    /// overloaded Function::eval_XB().
    /// ⎕RVAL[X] B  ←→  X ⎕RVAL B
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { return eval_AB(X, B); }
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// do eval_B(B);
    Value_P do_eval_B(const Value & B, int depth) const;

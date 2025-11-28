@@ -232,6 +232,12 @@ Value_P Z = do_eval_AB(subfunction, *B);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
+Token
+Quad_RVAL::eval_XB(Value_P X, Value_P B) const
+{
+   return eval_AB(X, B);
+}
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::do_eval_AB(int subfunction, const Value & B)
 {

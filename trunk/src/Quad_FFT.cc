@@ -363,10 +363,24 @@ Quad_FFT::Quad_FFT()
 }
 //----------------------------------------------------------------------------
 
+Token Quad_FFT::eval_AB(Value_P A, Value_P B) const 
+{
+   return eval_B(B);
+}
+//----------------------------------------------------------------------------
+
+Token Quad_FFT::eval_XB(Value_P A, Value_P B) const 
+{
+   return eval_B(B);
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
+{
+}
+//----------------------------------------------------------------------------
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
-
-Token Quad_FFT::eval_AB(Value_P A, Value_P B) const { return eval_B(B); }
 
 Token
 Quad_FFT::eval_B(Value_P B) const
