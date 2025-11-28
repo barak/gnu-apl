@@ -658,7 +658,7 @@ Quad_RVAL::Quad_RVAL()
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_RVAL::do_eval_B(const Value & B, int depth)
+Quad_RVAL::do_eval_B(const Value & B, int depth) const
 {
     MORE_ERROR() <<
 "⎕RVAL is only available on platforms that have glibc.\n"
@@ -677,6 +677,29 @@ Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 
    SYNTAX_ERROR;
    return Token();
+}
+//----------------------------------------------------------------------------
+Token
+Quad_RVAL::eval_XB(Value_P A, Value_P B) const
+{
+    MORE_ERROR() <<
+"⎕RVAL is only available on platforms that have glibc.\n"
+"Your platform is lacking initstate_r() (and probably others).";
+
+   SYNTAX_ERROR;
+   return Token();
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::print_fun_syntax(ostream & out,
+                            const FunctionGroup::function_info & info) const
+{
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::print_map_syntax(ostream & out,
+                            const FunctionGroup::function_info & info) const
+{
 }
 //----------------------------------------------------------------------------
 #endif   // HAVE_LIBC

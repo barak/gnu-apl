@@ -397,18 +397,11 @@ const bool reverse  = which & 4;   // print ahead in APL order
 
    if (on_stack)   // print token on the stack
       {
-        int Nval = 0, Nfun = 0, Nop1 = 0, Nop2 = 0;
+        int Nval = 0;
         loop (s, ssize())
              {
                const Token & tok = at(s).get_token();
-               switch(tok.get_Class())
-                  {
-                    case TC_FUN12:    ++Nfun;      break;
-                    case TC_OPER1:    ++Nop1;      break;
-                    case TC_OPER2:    ++Nop2;      break;
-                    case TC_VALUE:    ++Nval;      break;
-                    default: break;
-                  }
+               if (tok.get_Class() == TC_VALUE)   ++Nval;
              }
         const char * AB[4]  = { "A", "B",  "-", "-" };
         const char * ARB[4] = { "A", "RO", "B", "-" };

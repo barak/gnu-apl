@@ -1508,6 +1508,10 @@ StatementList * fun = new StatementList(data, loc);
                         MORE_ERROR() << "Invalid comment (#) in { ... }";
                       }
                   }
+              if (curly_level < 0)          // too many }
+                 MORE_ERROR() << "Unbalanced (too many) }";
+              else if (curly_level > 0)     // too many {
+                 MORE_ERROR() << "Unbalanced (too many) {";
             }
 
         Log(LOG_UserFunction__fix)

@@ -355,6 +355,14 @@ ShapeItem rlen = 1;
 
 #else
 
+//----------------------------------------------------------------------------
+Quad_FFT::Quad_FFT()
+   : QuadFunction(TOK_Quad_FFT)
+{
+   system_wisdom_loaded = false;
+}
+//----------------------------------------------------------------------------
+
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
 

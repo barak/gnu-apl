@@ -46,7 +46,7 @@ public:
 #include "Quad_MX.def"
      };
 
-   static Quad_MX fun;          ///< Built-in function.
+   static Quad_MX fun;   ///< Built-in function.
 
 protected:
    /// properties of subfunctions
@@ -61,11 +61,11 @@ protected:
                                  const function_info & info) const;
 
   /// a matrix suitable for libgsl
-  class Matrix
+  class GSL_Matrix
      {
        public:
          /// constructor: un-initialzed r×c matrix
-         Matrix(int r, int c)
+         GSL_Matrix(int r, int c)
          : krows(r),
            kcols(c),
            vals(r * c)
@@ -132,13 +132,13 @@ protected:
   virtual Token eval_B(Value_P B) const;
 
   /// return the cros product of all rows in \b mtx
-  static vector<Dcomplex> getCross(Matrix * mtx);
+  static vector<Dcomplex> getCross(GSL_Matrix * mtx);
 
   /// return mtx with \b row and \b col removed
-  static Matrix * genCofactor(Matrix * mtx, int row, int col);
+  static GSL_Matrix * genCofactor(GSL_Matrix * mtx, int row, int col);
 
   /// return the determinant of \b mtx
-  static Dcomplex getDet(Matrix * mtx);
+  static Dcomplex getDet(GSL_Matrix * mtx);
 
   /// return the magnitude of \b v
   static Dcomplex magnitude(vector<Dcomplex> & v);
@@ -147,7 +147,7 @@ protected:
   static void normalise(vector<double> & v);
 
   /// generate a matrix suitable for libgsl
-  static Matrix * genMtx(Value_P B, bool padded);
+  static GSL_Matrix * genMtx(Value_P B, bool padded);
 
   /// return the eigenvectors of \b B
   static Value_P eigenvectors(Value_P B);
@@ -188,7 +188,7 @@ protected:
   static Value_P dyadicCovariance(const Value_P A, const Value_P B);
 
   /// return random numbers
-  static Value_P randoms(const Value_P * opt_A, const Value_P B, int modifier);
+  static Value_P randoms(Value_P opt_A, Value_P B, int dist);
 
   static Value_P norm(const Value_P B);
 

@@ -34,6 +34,10 @@ mx_def(  11, covariance        , "Covariance"                   , 3, COVARIANCE 
 mx_def(  12, histogram         , "Histogram"                    , 2, HISTOGRAM         )
 mx_def(  13, print             , "Print B to file A"            , 2, PRINT             )
 mx_def(  14, set_rng_seed      , "Set RNG seed"                 , 1, SET_RNG_SEED      )
+mx_def( 100, normal_dist       , "Same as ⎕MX[10, 0]"           , 3, RANDOMS_100        )
+mx_def( 101, log_normal_dist   , "Same as ⎕MX[10, 1]"           , 3, RANDOMS_101        )
+mx_def( 102, chi_square_dist   , "Same as ⎕MX[10, 2]"           , 3, RANDOMS_102        )
+mx_def( 104, t_dist            , "Same as ⎕MX[10, 3]"           , 3, RANDOMS_103        )
 # undef mx_def
 #else
 # error "macro mx_def() was not #define'd"
