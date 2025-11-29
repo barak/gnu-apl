@@ -1333,10 +1333,12 @@ ShapeItem skipped = 0;
          while ((s + 1) < ShapeItem(tos.size()) &&
                 tos[s + 1].get_Class() == TC_VALUE)
             {
-               Token t;
-               t.move(tos[s - skipped], LOC);
-               Value::glue(tos[s - skipped], t, tos[s + 1], LOC);
-               s += 1;   skipped += 1;
+               Token tmp;
+               tmp.move(tos[s - skipped], LOC);
+               Value_P Z = Value::glue(tmp, tos[s + 1], LOC);
+               // Value::glue(tos[s - skipped], t, tos[s + 1], LOC);
+               new (&tos[s - skipped]) Token(TOK_APL_VALUE3, Z);
+               s ++;   skipped ++;
             }
       }
 

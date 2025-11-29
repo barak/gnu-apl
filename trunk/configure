@@ -878,6 +878,7 @@ with_android
 with_erlang
 with_libapl
 with_python
+with_optional_libs
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1583,6 +1584,7 @@ Optional Packages:
   --with-erlang           enable to build the Erlang interface
   --with-libapl           enable to build libapl.so
   --with-python           enable to build python extension lib_gnu_apl.so
+  --with-optional_libs    disable to prevent the use of optional libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -19993,7 +19995,7 @@ fi
 done
 
 # keep libraries in inverse-alphabetic order so ./configure prints them
-# in inverse-alphabetic order
+# in alphabetic order
 #
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for tparm in -ltinfo" >&5
 printf %s "checking for tparm in -ltinfo... " >&6; }
@@ -25984,8 +25986,56 @@ if test "x$WANT1_SQLITE3" = "xyes"; then
    fi
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if any of the optional libraries shall be used" >&5
+printf %s "checking if any of the optional libraries shall be used... " >&6; }
+
+# Check whether --with-optional_libs was given.
+if test ${with_optional_libs+y}
+then :
+  withval=$with_optional_libs; cfg_OPTIONAL_LIBS=$withval
+else $as_nop
+  cfg_OPTIONAL_LIBS=yes
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $cfg_OPTIONAL_LIBS" >&5
+printf "%s\n" "$cfg_OPTIONAL_LIBS" >&6; }
+
+# we haven't found an easy way to figure if AC_CHECK_LIB([c], ...) was
+# successful. We do that by cunsulting $LIBS.
+apl_LIBC=no
+for LIBs_Lib in $LIBS; do
+    if test "$LIBs_Lib" = "-lc"; then apl_LIBC=yes; fi
+done
+
+config_nolib() {
+    # set variables $2... in config.h to 0
+    #
+    tag=$1 ; shift
+    printf "%s\n" "       disabling $tag ($*)"
+    for macro in  $*; do
+        sed -i "s/#define $macro 1/#define $macro 0/" config.h
+        shift
+    done
+}
+
+if test "x$cfg_OPTIONAL_LIBS" = "xno"; then
+    config_nolib FFT        apl_FFT
+    config_nolib GSL        apl_GSL
+    config_nolib GTK        apl_GTK3
+    config_nolib GUI        apl_GUI
+    config_nolib LIBC       HAVE_LIBC
+    config_nolib PCRE       HAVE_LIBPCRE2_32 apl_PCRE
+    config_nolib PNG        apl_PNG
+    config_nolib POSTGRES   apl_POSTGRES
+    config_nolib SQLITE     apl_SQLITE3
+    config_nolib X11        apl_X11
+    config_nolib XCB        apl_XCB
+    printf "%s\n" "    patching config.h done."
+    apl_LIBC=no
+fi
+
 printf "%s\n" "
-$as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
+$as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     # A. command line arguments for ./configure
     #
@@ -26015,6 +26065,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_XCB                      $apl_XCB	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
+    apl_LIBC:                    $apl_LIBC	(affects: ⎕RVAL)
 
     Special Build targets:
         Android:                 $apl_TARGET_ANDROID

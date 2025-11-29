@@ -295,6 +295,17 @@ RATIONAL_NUMBERS_WANTED=yes
 
     ./configure RATIONAL_NUMBERS_WANTED=yes
 
+without-optional_libs
+   This option pretends that any of yje optional library is missing.
+   It patches the config.h file produced by ./configure (though not the LIBS
+   shell variable set by ./configure). IOW: the compiler is told that these
+   libraries are not available, but the liker will still link agains them
+   (with no effect). The purpose of this option is to compile (for test
+   purposes) also those paths in the GNU APL source code that were disabled
+   by the presence of an optional library. Example:
+
+    ./configure --without-optional_libs
+
 -------------------------------------------------------------------------------
 
 The typical setting for users that are not interested in troubleshooting

@@ -2080,8 +2080,8 @@ AxesBitmap ret = 0;
    return ret;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue(Token & result, const Token & token_A, const Token & token_B, const char * loc)
+Value_P
+Value::glue(const Token & token_A, const Token & token_B, const char * loc)
 {
 Value_P A = token_A.get_apl_val();
 Value_P B = token_B.get_apl_val();
@@ -2089,114 +2089,117 @@ Value_P B = token_B.get_apl_val();
 const bool strand_A = token_A.get_tag() == TOK_APL_VALUE3;
 const bool strand_B = token_B.get_tag() == TOK_APL_VALUE3;
 
-   if (strand_A)
+   // in this context, a strand is an (open) strand, i.e. a strand to which
+   // another item can be glued. The result is always an open strand (so
+   // the caller must put it into an TOK_APL_VALUE3).
+   //
+   if (strand_A)   // A is a strand
       {
-        if (strand_B)   glue_strand_strand(result, A, B, loc);
-        else            glue_strand_closed(result, A, B, loc);
+        if (strand_B)   return glue_strand_strand(*A, *B, loc);
+        else            return glue_strand_item(*A, *B, loc);
       }
-   else
+   else            // A is an item
       {
-        if (strand_B)   glue_closed_strand(result, A, B, loc);
-        else            glue_closed_closed(result, A, B, loc);
+        if (strand_B)   return glue_item_strand(*A, *B, loc);
+        else            return glue_item_item(*A, *B, loc);
       }
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_strand_strand(Token & result, Value_P A, Value_P B,
+Value_P
+Value::glue_strand_strand(const Value & strand_A, const Value & strand_B,
                           const char * loc)
 {
-   // glue two strands A and B
+   // glue two strands A and B together
    //
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = B->element_count();
+const ShapeItem len_A = strand_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
 
    Log(LOG_glue)
       {
-        CERR << "gluing strands " << endl << *A
-             << "with shape " << A->get_shape() << endl
-             << " and " << endl << *B << endl
-             << "with shape " << B->get_shape() << endl;
+        CERR << "gluing strands " << endl << strand_A
+             << "with shape " << strand_A.get_shape() << endl
+             << " and " << endl << strand_B << endl
+             << "with shape " << strand_B.get_shape() << endl;
       }
 
-   Assert(A->is_scalar_or_vector());
-   Assert(B->is_scalar_or_vector());
+   Assert(strand_A.is_scalar_or_vector());
+   Assert(strand_B.is_scalar_or_vector());
 
 Value_P Z(len_A + len_B, LOC);
 
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
+   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_strand_closed(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_strand_item(const Value & strand_A, Value & item_B,
+                        const char * loc)
 {
    // glue a strand A to new item B
    //
    Log(LOG_glue)
       {
-        CERR << "gluing strand " << endl << *A
-             << " to non-strand " << endl << *B << endl;
+        CERR << "gluing strand " << endl << strand_A
+             << " to item " << endl << item_B << endl;
       }
 
-   Assert(A->is_scalar_or_vector());
+   Assert(strand_A.is_scalar_or_vector());
 
-const ShapeItem len_A = A->element_count();
+const ShapeItem len_A = strand_A.element_count();
 Value_P Z(len_A + 1, LOC);
 
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
+   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
+   Z->next_ravel_Value(&item_B);
 
-   Z->next_ravel_Value(B.get());
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_closed_strand(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_item_strand(Value & item_A, const Value & strand_B,
+                        const char * loc)
 {
    // glue a new item A to the strand B
    //
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = B->element_count();
+const ShapeItem len_A = item_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
    Log(LOG_glue)
       {
-        CERR << "gluing non-strand[" << len_A << "] " << endl << *A
-             << " to strand[" << len_B << "] " << endl << *B << endl;
+        CERR << "gluing item[" << len_A << "] " << endl << item_A
+             << " to strand[" << len_B << "] " << endl << strand_B << endl;
       }
 
-   Assert(B->is_scalar_or_vector());
+   Assert(strand_B.is_scalar_or_vector());
 
 Value_P Z(len_B + 1, LOC);
-   Z->next_ravel_Value(A.get());
+   Z->next_ravel_Value(&item_A);
 
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_closed_closed(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_item_item(Value & item_A, Value & item_B, const char * loc)
 {
-   // glue two non-strands together, starting a strand
+   // glue two items together, starting a strand
    //
    Log(LOG_glue)
       {
-        CERR << "gluing two non-strands " << endl << *A
-             << " and " << endl << *B << endl;
+        CERR << "gluing two items " << endl << item_A
+             << " and " << endl << item_B << endl;
       }
 
 Value_P Z(2, LOC);
-   Z->next_ravel_Value(A.get());
-   Z->next_ravel_Value(B.get());
+   Z->next_ravel_Value(&item_A);
+   Z->next_ravel_Value(&item_B);
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
 void

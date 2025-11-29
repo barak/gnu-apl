@@ -253,7 +253,7 @@ AC_CHECK_FUNCS([                                             \
                ],, apl_missing_functions=$(($apl_missing_functions + 1)))
 
 # keep libraries in inverse-alphabetic order so ./configure prints them
-# in inverse-alphabetic order
+# in alphabetic order
 #
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
@@ -1000,8 +1000,50 @@ if apl_YES($WANT1_SQLITE3); then
    fi
 fi
 
+AC_MSG_CHECKING([if any of the optional libraries shall be used])
+AC_ARG_WITH( [optional_libs],
+             [AS_HELP_STRING([--with-optional_libs],
+                      [disable to prevent the use of optional libraries])],
+             [cfg_OPTIONAL_LIBS=$withval],
+             [cfg_OPTIONAL_LIBS=yes])
+AC_MSG_RESULT([$cfg_OPTIONAL_LIBS])
+
+# we haven't found an easy way to figure if AC_CHECK_LIB([c], ...) was
+# successful. We do that by cunsulting $LIBS.
+apl_LIBC=no
+for LIBs_Lib in $LIBS; do
+    if test "$LIBs_Lib" = "-lc"; then apl_LIBC=yes; fi
+done
+
+config_nolib() {
+    # set variables $2... in config.h to 0
+    #
+    tag=$1 ; shift
+    AS_ECHO(["       disabling $tag ($*)"])
+    for macro in  $*; do
+        sed -i "s/#define $macro 1/#define $macro 0/" config.h
+        shift
+    done
+}
+
+if apl_NO($cfg_OPTIONAL_LIBS); then
+    config_nolib FFT        apl_FFT
+    config_nolib GSL        apl_GSL
+    config_nolib GTK        apl_GTK3
+    config_nolib GUI        apl_GUI
+    config_nolib LIBC       HAVE_LIBC
+    config_nolib PCRE       HAVE_LIBPCRE2_32 apl_PCRE
+    config_nolib PNG        apl_PNG
+    config_nolib POSTGRES   apl_POSTGRES
+    config_nolib SQLITE     apl_SQLITE3
+    config_nolib X11        apl_X11
+    config_nolib XCB        apl_XCB
+    AS_ECHO(["    patching config.h done."])
+    apl_LIBC=no
+fi
+
 AS_ECHO(["
-$as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
+$as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     # A. command line arguments for ./configure
     #
@@ -1031,6 +1073,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_XCB                      $apl_XCB	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
+    apl_LIBC:                    $apl_LIBC	(affects: ⎕RVAL)
 
     Special Build targets:
         Android:                 $apl_TARGET_ANDROID

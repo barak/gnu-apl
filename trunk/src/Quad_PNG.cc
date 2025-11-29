@@ -32,12 +32,9 @@
 #endif   // HAVE_LOCALE_H
 
 #include "Quad_PNG.hh"
+#include "Token.hh"
 
 Quad_PNG  Quad_PNG::fun;
-
-#include "Token.hh"
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
 
 /// PNG_GTK defines whether ⎕PNG B with ⍴⍴B ←→ 3 (display of a PNG file in a
 /// GTK window  shall be supported, Requires libgtk in addition to libnpng.

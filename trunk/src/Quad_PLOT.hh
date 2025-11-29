@@ -112,6 +112,9 @@ protected:
    /// Destructor.
    ~Quad_PLOT();
 
+   /// initialize the GUI
+   static void load_driver(Plot_window_properties * w_props, int handle);
+
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
@@ -149,6 +152,9 @@ protected:
 
    /// whether to print some debug info during plotting
    static int verbosity;
+
+   /// \b true after the GUI driver (GTK or XCB) was initialized.
+   static bool driver_loaded;
 };
 
 #endif // __Quad_PLOT_DEFINED__

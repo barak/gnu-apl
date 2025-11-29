@@ -1263,9 +1263,6 @@ Quad_MX::eval_AB(Value_P A, Value_P B) const
   return eval_B(B);
 }
 //----------------------------------------------------------------------------
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
 Token
 Quad_MX::eval_B(Value_P B) const
 {

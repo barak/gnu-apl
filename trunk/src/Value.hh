@@ -471,24 +471,8 @@ public:
       }
 
    /// glue two values.
-   static void glue(Token & token, const Token & token_A, const Token & token_B,
-                    const char * loc);
-
-   /// glue strands A and B
-   static void glue_strand_strand(Token & result, Value_P A, Value_P B,
-                                  const char * loc);
-
-   /// glue strands A and strand B
-   static void glue_strand_closed(Token & result, Value_P A, Value_P B,
-                                  const char * loc);
-
-   /// glue closed A and closed B
-   static void glue_closed_strand(Token & result, Value_P A, Value_P B,
-                                  const char * loc);
-
-   /// glue closed A and closed B
-   static void glue_closed_closed(Token & result, Value_P A, Value_P B,
-                                  const char * loc);
+   static Value_P glue(const Token & token_A, const Token & token_B,
+                       const char * loc);
 
    /// return the number of Value_P pointing to \b this value
    int get_owner_count() const
@@ -873,7 +857,7 @@ public:
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
 
-      /// increment the number of (smart-) pointers to this value
+   /// increment the number of (smart-) pointers to this value
    void increment_owner_count(const char * loc)
       {
         const char * cp_this = charP(this);
@@ -882,20 +866,21 @@ public:
         ++owner_count;
       }
 
-      /// decrement the number of (smart-) pointers to this value and delete
-      /// this value if no more pointers exist
-      void decrement_owner_count(const char * loc)
-         {
-           const char * cp_this = charP(this);
-           Assert1(cp_this);
-           Assert1(check_ptr == (cp_this + 7));
-           Assert1(owner_count > 0);
+   /// decrement the number of (smart-) pointers to this value and delete
+   /// this value if no more pointers exist
+   void decrement_owner_count(const char * loc)
+      {
+        const char * cp_this = charP(this);
+        Assert1(cp_this);
+        Assert1(check_ptr == (cp_this + 7));
+        Assert1(owner_count > 0);
 
-           // NOTE: the desctructor (triggered by 'delete this' below) will
-           // check check_ptr and then set check_ptr = 0, o on't do it here.
-           //
-           if (--owner_count == 0)   delete this;
-         }
+        // NOTE: the destructor (triggered by 'delete this' below) will
+        // check 'check_ptr' and then set 'check_ptr' = 0. We therefore
+        // don't clear 'check_ptr' here.
+        //
+        if (--owner_count == 0)   delete this;   // mo more owners
+      }
 
    /// check if WS is FULL after allocating value with \b cell_count items
    static bool check_WS_FULL(const char * args, ShapeItem cell_count,
@@ -923,6 +908,22 @@ public:
    Value_P clone(const char * loc) const;
 
 protected:
+   /// glue items A and B; both non-const to increase their owner count.
+   static Value_P glue_item_item(Value & item_A, Value & item_B,
+                                 const char * loc);
+
+   /// glue item A and strand B; A non-const to increase its owner count.
+   static Value_P glue_item_strand(Value & item_A, const Value & strand_B,
+                                   const char * loc);
+
+   /// glue strand A and item B; B non-const to increase its owner count.
+   static Value_P glue_strand_item(const Value & strand_A, Value & item_B,
+                                   const char * loc);
+
+   /// glue strands A and B
+   static Value_P glue_strand_strand(const Value & strand_A,
+                                     const Value & strand_B, const char * loc);
+
    /// check that this left-value is consistent.
    void check_lval_consistency() const;
 

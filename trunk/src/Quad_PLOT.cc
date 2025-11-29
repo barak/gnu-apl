@@ -32,7 +32,7 @@
 // always require libX11
 //
 # if defined( HAVE_LIBX11 )
-#  define MISSING1 ""
+#  define MISSING_libX11 ""
 # else
 #  define MISSING_LIBS 1
 #  define MISSING1 " libX11.so"
@@ -65,17 +65,17 @@
 
 # if defined( HAVE_LIBXCB )
 #  define MISSING2 ""
-# else
+# else   // not HAVE_LIBXCB
 #  define MISSING_LIBS 1
 #  define MISSING2 " libxcb.so"
-#endif       // HAVE_LIBXCB
+# endif   // (don't) HAVE_LIBXCB
 
 # if defined( HAVE_LIBX11_XCB )
 #  define MISSING3 ""
-# else
+# else   // not HAVE_LIBX11_XCB
 #  define MISSING_LIBS 1
 #  define MISSING3 " libX11-xcb.so"
-#endif       // HAVE_LIBX11_XCB
+# endif       // (don't) HAVE_LIBX11_XCB
 
 # if ! defined( HAVE_XCB_XCB_H )
 #  define MISSING_LIBS 1
@@ -105,40 +105,9 @@ sem_t __expose_sema;
 sem_t * Quad_PLOT::expose_sema = &__expose_sema;
 
 int Quad_PLOT::verbosity = 0;
+bool Quad_PLOT::driver_loaded = false;
 
-#if defined(MISSING_LIBS)
-//----------------------------------------------------------------------------
-Quad_PLOT::Quad_PLOT()
-  : QuadFunction(TOK_Quad_PLOT)
-{
-   verbosity = 0;
-}
-//----------------------------------------------------------------------------
-Quad_PLOT::~Quad_PLOT()
-{
-}
-//----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_B(Value_P B) const
-{
-   MORE_ERROR() <<
-      "⎕PLOT is not available because some of its build prerequisites "
-      "(in particular\n" MISSING1 MISSING2 MISSING3 MISSING4
-      ") were either missing,\n" 
-      " or were explicitly disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_AB(Value_P A, Value_P B) const
-{
-   return eval_B(B);
-}
-//----------------------------------------------------------------------------
-
-#else   // not defined(WHY_NOT)
+#if ! defined(MISSING_LIBS)
 
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
@@ -202,6 +171,11 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 
    if (B->get_rank() > 3)        RANK_ERROR;
    if (B->element_count() < 2)   LENGTH_ERROR;
+
+#if ! (apl_GTK || apl_XCB)
+   MORE_ERROR() << "No suitable GUI library (i.e. GTK or X11/XCB) found).";
+   SYNTAX_ERROR;
+#endif
 
    // plot window with default attributes
    //
@@ -303,6 +277,11 @@ Token
 Quad_PLOT::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_PLOT);
+
+#if ! (apl_GTK || apl_XCB)
+   MORE_ERROR() << "No suitable GUI library (i.e. GTK or X11/XCB) found).";
+   SYNTAX_ERROR;
+#endif
 
    if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
       {
@@ -737,6 +716,32 @@ const ShapeItem data_points = rows * cols;
    return data;
 }
 //----------------------------------------------------------------------------
+void
+Quad_PLOT::load_driver(Plot_window_properties * w_props, int handle)
+{
+   if (driver_loaded)   return;
+
+#if apl_GTK3   // GTK
+
+   plot_main_GTK(w_props, handle);   // pushes a GTK_context into all_PLOT_windows.
+   sem_post(all_PLOT_windows_sema);
+   sem_wait(expose_sema);   // blocks until window shown
+
+#elif apl_XCB   // not GTK but apl_XCB
+
+pthread_t th;
+   pthread_create(&th, 0, plot_main_XCB, w_props);   // pushes a XCB_context
+   sem_wait(expose_sema);   // blocks until window shown
+
+#else   // neither apl_GTK3 nor apl_GTK3
+
+   sem_post(all_PLOT_windows_sema);
+
+#endif
+
+   driver_loaded = true;
+}
+//----------------------------------------------------------------------------
 APL_Integer
 Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
                         const Plot_data * data)
@@ -767,25 +772,7 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 const APL_Integer Z = ++next_handle;
    sem_wait(all_PLOT_windows_sema);
 
-      {
-#if apl_GTK3   // GTK
-
-   plot_main_GTK(w_props, Z);   // pushes a GTK_context into all_PLOT_windows.
-   sem_post(all_PLOT_windows_sema);
-   sem_wait(expose_sema);   // blocks until window shown
-
-#elif apl_GTK
-
-pthread_t th;
-   pthread_create(&th, 0, plot_main_XCB, w_props);   // pushes a XCB_context
-   sem_wait(expose_sema);   // blocks until window shown
-
-#else   // neither GTK nor XCB
-
-   sem_post(all_PLOT_windows_sema);
-
-#endif
-      }
+   load_driver(w_props, Z);
 
    if (w_props->get_with_border())
       {
@@ -870,5 +857,39 @@ Quad_PLOT::PLOT_context::remove_handle(Handle handle)
    return 0;
 }
 //----------------------------------------------------------------------------
-#endif // defined(WHY_NOT)
+//
+#else   // defined(MISSING_LIBS)
+
+//----------------------------------------------------------------------------
+Quad_PLOT::Quad_PLOT()
+  : QuadFunction(TOK_Quad_PLOT)
+{
+   verbosity = 0;
+}
+//----------------------------------------------------------------------------
+Quad_PLOT::~Quad_PLOT()
+{
+}
+//----------------------------------------------------------------------------
+Token
+Quad_PLOT::eval_AB(Value_P A, Value_P B) const
+{
+   return eval_B(B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_PLOT::eval_B(Value_P B) const
+{
+   MORE_ERROR() <<
+      "⎕PLOT is not available because some of its build prerequisites "
+      "(in particular\n" MISSING1 MISSING2 MISSING3 MISSING4
+      ") were either missing,\n" 
+      " or were explicitly disabled in ./configure.";
+
+   SYNTAX_ERROR;
+   return Token();
+}
+//----------------------------------------------------------------------------
+
+#endif // (not) defined(MISSING_LIBS)
 

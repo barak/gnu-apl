@@ -403,9 +403,6 @@ Value_P Z(shape, LOC);
 
 #else // ! HAVE_LIBPCRE2_32
 
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {

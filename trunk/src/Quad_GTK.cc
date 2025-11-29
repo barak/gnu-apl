@@ -950,9 +950,6 @@ const size_t wlen = write(fd, path, TLV_len);
 #else   // ! apl_GTK3 or ! apl_X11
 
 //----------------------------------------------------------------------------
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
 Token
 Quad_GTK::eval_B(Value_P B) const
 {

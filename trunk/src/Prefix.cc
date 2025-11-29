@@ -2545,8 +2545,8 @@ Prefix::reduce_A_B__()
 {
    Assert1(prefix_len == 2);
 
-Token result;
-   Value::glue(result, at0(), at1(), LOC);
+Value_P Z = Value::glue(at0(), at1(), LOC);
+Token result(TOK_APL_VALUE3, Z);
    pop_args_push_result(result);
 
    set_action(result);

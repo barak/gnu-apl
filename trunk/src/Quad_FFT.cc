@@ -379,9 +379,6 @@ Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
 {
 }
 //----------------------------------------------------------------------------
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
