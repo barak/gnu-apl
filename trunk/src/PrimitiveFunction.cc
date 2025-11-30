@@ -1064,78 +1064,56 @@ Bif_F12_ELEMENT::do_eval_B(const Value * B)
 {
    // enlist
    //
+   // lrm p. 118, ⍴⍴Z = 1, ⍴Z = number of simple scalars in B
+   //
    if (B->element_count() == 0)   // empty argument
       {
-        Value_P Z(ShapeItem(0), LOC);   // empty vector with proto ' ' or '0'
-        const Cell * C = &B->get_cfirst();
-        bool left = false;
-        for (;;)
+        const Cell * C0 = &B->get_cproto();
+        if (C0->is_numeric())
+           {
+             Value_P Z(1, LOC);
+             Z->next_ravel_Int(0);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_character_cell())
+           {
+             Value_P Z(1, LOC);
+             Z->next_ravel_Char(UNI_SPACE);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_lval_cell())
+           {
+             // (∈⍬)←value is a noop
+             //
+             Value_P Z(ShapeItem(0), LOC);
+             new (&Z->get_wproto()) LvalCell(0, 0);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_pointer_cell())
             {
-              if (C->is_pointer_cell())
-                 {
-                   C = &C->get_pointer_value()->get_cfirst();
-                   continue;
-                 }
-
-              if (left && C->is_lval_cell())
-                 {
-                   C = C->get_lval_value();
-                   if (C == 0)
-                      {
-                        CERR << "0-pointer at " LOC << endl;
-                        FIXME;
-                      }
-                   else if (C->is_pointer_cell())
-                      {
-                        C = &C->get_pointer_value()->get_cfirst();
-                      }
-                   else
-                      {
-                        const LvalCell & C_lval =
-                              reinterpret_cast<LvalCell &>(C);
-                        Value * owner = C_lval.get_cell_owner();
-                        new (&Z->get_wproto())
-                            LvalCell(C_lval.get_lval_value(), owner);
-                        break;
-                      }
-                 }
-
-              if (C->is_numeric())
-                 {
-                   Z->set_proto_Int();
-                   break;
-                 }
-
-              if (C->is_character_cell())
-                 {
-                   Z->set_proto_Spc();
-                   break;
-                 }
-
-              if (C->is_lval_cell())
-                 {
-                   const LvalCell & C_lval = reinterpret_cast<LvalCell &>(C);
-                   left = C_lval.get_cell_owner() != 0;
-                   C = C->get_lval_value();
-                   continue;
-                 }
-
-               // not reached
-               //
-               FIXME;
+             return do_eval_B(C0->get_pointer_value().get());
             }
 
-        Z->check_value(LOC);
-        return  Z;
+
+        // not reached
+        //
+        FIXME;
       }
 
 const ShapeItem len_Z = B->get_enlist_count();
+
 Value_P Z(len_Z, LOC);
 
    if (B->get_lval_cellowner())   B->enlist_left(*Z);
    else                           B->enlist_right(*Z);
 
-   Z->set_default(*B, LOC);
+   Assert(len_Z);   // cannot be empty
    Z->check_value(LOC);
    return Z;
 }

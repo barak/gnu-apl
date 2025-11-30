@@ -31,7 +31,7 @@ Quad_FFT   Quad_FFT::fun;
 
 bool Quad_FFT::system_wisdom_loaded = false;
 
-#if defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
+#if apl_FFT
 
 #include <fftw3.h>
 #include "ComplexCell.hh"
@@ -353,7 +353,7 @@ ShapeItem rlen = 1;
 }
 //----------------------------------------------------------------------------
 
-#else
+#else   // not apl_FFT
 
 //----------------------------------------------------------------------------
 Quad_FFT::Quad_FFT()
@@ -372,6 +372,10 @@ Token Quad_FFT::eval_AB(Value_P A, Value_P B) const
 Token Quad_FFT::eval_XB(Value_P A, Value_P B) const 
 {
    return eval_B(B);
+}
+void
+Quad_FFT::print_fun_syntax(ostream & out, const function_info & info) const
+{
 }
 //----------------------------------------------------------------------------
 void

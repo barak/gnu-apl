@@ -1436,21 +1436,32 @@ Value::get_enlist_count() const
 const ShapeItem ec = element_count();
 ShapeItem count = ec;
 
+   // take care of non-simple cells...
+   //
    loop(c, ec)
        {
          const Cell & cell = get_cravel(c);
          if (cell.is_pointer_cell())
             {
-               count--;   // the pointer cell
+               count--;   // deduct the pointer cell
                count += cell.get_pointer_value()->get_enlist_count();
             }
          else if (cell.is_lval_cell())
             {
-              Cell * cp = cell.get_lval_value();
-              if (cp && cp->is_pointer_cell())
+              if (Cell * cp = cell.get_lval_value())   // valid Lval cell
                  {
-                   count--;
-                   count += cp->get_pointer_value()->get_enlist_count();
+                   if (cp->is_pointer_cell())
+                      {
+                        count--;   // deduct the pointer cell
+                        count += cp->get_pointer_value()->get_enlist_count();
+                      }
+
+                   // otherwise the Lval cell points to a cell and was
+                   // counted correctly
+                 }
+              else   // invalid Lval cel
+                 {
+                   count--;   // deduct the Lval cell
                  }
             }
        }
