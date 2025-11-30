@@ -341,7 +341,7 @@ bool progress = false;
 
    // should not use loop() here since tos.size() varies inside the loop.
    //
-   for (ShapeItem t = 0; t < ShapeItem(tos.size() - 2); ++t)
+   for (int t = 0; t < (int(tos.size()) - 2); ++t)
        {
          if (tos[t].get_tag() != TOK_OPER2_RANK)   continue;
 
