@@ -74,7 +74,7 @@ ostream & get_CERR()
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
 
-/// CSI sequence for ANSI/VT100 escape sequences (ESC [)
+/// CSI sequence for ANSI/VT100 terminals (ESC [)
 #define CSI "\x1B["
 
 /// VT100 escape sequence to change to cin color

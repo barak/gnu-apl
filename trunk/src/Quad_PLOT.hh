@@ -46,7 +46,10 @@ enum
 //  into a .png file
 enum { SAVE_BORDER_DELAY_ms = 100 };
 
-/// The class implementing ⎕PLOT
+/** The class implementing ⎕PLOT. \b Quad_PLOT implements the APL
+    side of plotting, while the actual output work is performed by
+    plot drivers for different GUI environments (X11/XCB or GTK).
+ **/
 class Quad_PLOT : public QuadFunction
 {
 public:
@@ -105,6 +108,15 @@ public:
    /// (to make doxygen happy, but only implemented if NOT apl_GTK3
    static void * plot_main_XCB(void * vp_props);
 
+   enum Plot_driver
+      {
+        PltDrv_GTK = 0,
+        PltDrv_XCB,
+        PltDrv_ASCII,
+        PltDrv_COUNT
+        
+      };
+
    static int get_verbosity()
       { return verbosity; }
 
@@ -113,7 +125,8 @@ protected:
    ~Quad_PLOT();
 
    /// initialize the GUI
-   static void load_driver(Plot_window_properties * w_props, int handle);
+   static void load_driver(Plot_window_properties * w_props, int handle,
+                           Plot_driver driver_type);
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -154,7 +167,7 @@ protected:
    static int verbosity;
 
    /// \b true after the GUI driver (GTK or XCB) was initialized.
-   static bool driver_loaded;
+   static bool XCB_driver_loaded;
 };
 
 #endif // __Quad_PLOT_DEFINED__

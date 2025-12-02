@@ -26,6 +26,9 @@
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
+/// a shared buffer for SPRINTF of various error texts.
+static char tmp_error[80];
+
 //----------------------------------------------------------------------------
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
@@ -284,9 +287,9 @@ const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
    /*
-       called with leading whitespaces in att_and_val removed.
+       called with leading whitespaces in 'att_and_val' removed.
 
-       att_and_val is a string specifying one of:
+       'att_and_val' is a string specifying one of:
 
        1. a window attribute, e.g.:   origin_X: 100                 , or
        2. a line attribute,   e.g.:   point_color-1:  #000000       , or
@@ -361,10 +364,22 @@ int line_number = -1;
         // figure the line number in the attribute name, for example in
         // line_color-2. No line number means all lines.
         //
-        const int line = strtoll(minus + 1, 0, 10) - Workspace::get_IO();
-        if (line < 0)             return "line number ≤ ⎕IO";
-        if (line >= line_count)   return 0;   // silently ignore
-        line_number = line;
+        const int line1 = strtoll(minus + 1, 0, 10);    // ⎕IO..⎕IO+line_count
+        const int line0 = line1 - Workspace::get_IO();   // 0..line_count - 1
+        if (line0 < 0)
+           {
+             SPRINTF(tmp_error, "invalid line number (=%d) < ⎕IO(=%d)",
+                     line1, line1 - line0);
+             return tmp_error;
+           }
+
+        if (line0 >= line_count)
+           {
+             SPRINTF(tmp_error, "invalid line number (=%d) > line count (=%d)",
+                     line1, line_count);
+             return tmp_error;
+           }
+        line_number = line0;
       }
 
 # define ldef(ty,  na,  val, _descr)                                       \
@@ -389,7 +404,8 @@ int line_number = -1;
             }
 # include "Quad_PLOT.def"
 
-   return "Bad or unknown window attribute.";
+   SPRINTF(tmp_error, "Unknown attribute A.%s", att_and_val);
+   return tmp_error;
 }
 //----------------------------------------------------------------------------
 bool

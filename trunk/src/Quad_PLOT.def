@@ -1,6 +1,7 @@
 #ifdef gdef
 gdef(String,   caption,        "⎕PLOT", "plot window caption")
 gdef(String,   output_filename,     "", "output file name")
+gdef(String,   gui_driver,          "", "GUI driver")
 gdef(uint32_t, auto_close,           0, "= do not close X window automatically)\n"
 "                   (1)             (= close if file was written successfully)\n"
 "                   (2)             (= always close X window automatically")

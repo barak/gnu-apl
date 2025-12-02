@@ -48,7 +48,7 @@ protected:
                                  const function_info & info) const;
 
    /// overloaded FunctionGroup::print_map_syntax()
-      virtual void print_map_syntax(ostream & out,
+   virtual void print_map_syntax(ostream & out,
                                  const function_info & info) const;
 
    /// overloaded Function::eval_AB()

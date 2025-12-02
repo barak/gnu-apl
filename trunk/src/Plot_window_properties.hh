@@ -60,7 +60,7 @@ public:
    /// return true iff the user has dictated a window caption
    bool get_user_caption() const   { return user_caption; }
 
-   // get_XXX() and set_XXX() functions for weindow properties
+   // get_XXX() and set_XXX() functions for window properties
 # define gdef(ty,  na,  _val, _descr)                                     \
   /** return the value of na **/                                         \
   ty get_ ## na() const   { return na; }                                 \
@@ -340,7 +340,7 @@ protected:
    const bool show_legend;
 
    /// a list of properties that have been set alreay (to protect them from
-   /// from being overwridden in set_all_XXX() functions. Every 16-bit item
+   /// from being overwritten in set_all_XXX() functions. Every 16-bit item
    /// of \b properties_set is the line (upper 8 bits) and the property number
    /// (lower 8 bits).
    vector<uint16_t> properties_set;

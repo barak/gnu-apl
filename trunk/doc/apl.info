@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 27, 2025.  This manual briefly documents GNU APL, an
-interpreter for APL as described in ISO standard 13751, aka.
-"Programming Language APL, Extended".
+December 2, 2025.  This manual briefly documents GNU APL, an interpreter
+for APL as described in ISO standard 13751, aka.  "Programming Language
+APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -2532,7 +2532,7 @@ O(1).  Also, ⊢B is marginally faster than ⎕←B.
 
    Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 
-   Let Z←A ⊣[X] B. Then:
+   Let Z←A ⊢[X] B. Then:
 
    • if X is a one-element vector and ↑X is 0 then Z ≡ A,
    • if X is a one-element vector and ↑X is 1 then Z ≡ B,
@@ -4253,7 +4253,13 @@ window size, colors for plot lines, points, and grids, etc.
 
 * Menu:
 
+* The Plot Data B::
+* The Plot Attributes A::
+* Plot Window Handling::
 * Output File Format::
+
+
+File: apl.info,  Node: The Plot Data B,  Next: The Plot Attributes A,  Up: Section 2.33
 
 2.33.1 The Plot Data B
 ----------------------
@@ -4320,11 +4326,14 @@ doing so makes little sense.  If at least one item of the plot data B is
 complex, then all real items in B are taken as complex with imaginary
 part 0.
 
+
+File: apl.info,  Node: The Plot Attributes A,  Next: Plot Window Handling,  Prev: The Plot Data B,  Up: Section 2.33
+
 2.33.2 The Plot Attributes A
 ----------------------------
 
 There are a number of attributes like colors, point sizes, line widths,
-etc.  that control how the resulting plot will look.
+etc.  that control how the resulting plot will look like.
 
    Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a
 list of the arguments.  The list of arguments grows over time and
@@ -4430,10 +4439,14 @@ description.  For example:
      point_size2-N:      0 pixel        (the inner diameter of the plot points)
      legend_name-N:                     (the name of plot line N in the legend)
 
-   There are 2 kinds of attributes: global attributes that affect the
-entire plot, and local (per-line) attributes that affect one of the plot
-lines (which corresponds to one row of B). One way to specify multiple
-attributes in one go is to use multi-line strings.
+   There are 2 kinds of attributes: window attributes that affect the
+entire plot, and line attributes that affect one of the plot lines
+(which correspond to one row of B). For example, the background color of
+the plot is a window attribute, while the line color is a line
+attribute.  Line attributes have a -N suffix, where N starts at ⎕IO.
+
+   One way to specify multiple attributes in one go is to use multi-line
+strings.
 
    For example (plot 2 lines of 10 random numbers each, named "random
 row 1" and "random row 2"):
@@ -4455,8 +4468,40 @@ variable as left argument A:
      Attributes.legend_name_2 ← "Random Row 2"
            Attributes ⎕PLOT Data
 
-   Note that (for syntactical reasons) the separation between the line
-attribute and the line number is _ (underscore) if A is specified as a
+   PITFALL: if A is specified as a structured APL Value then:
+   • attribute names must follow the GNU APL member name syntax, and
+     therefore
+   • the (line-) attribute name is separated from its line number by an
+     _ (underscore), and
+   • string values must be quoted.
+
+   • the (line-) attribute name is separated from its line number by a -
+     (minus), and
+   • string values must not be quoted.
+
+   For example:
+           DATA ← 1○.1×⍳100
+           ⍝ structured variable A1
+           ⍝
+           A1.point_style_1 ← 2             ⍝ separator: _ (underscore)
+           A1.gui_driver    ← 'ASCII'       ⍝ string value quoted
+           A1 ⎕PLOT DATA
+
+
+           ⍝ multi-line string A2
+           A2←«««
+           point_style-1:    2             ⍝ separator: - (minus)
+           gui_driver:       ASCII         ⍝ string value not quited
+              »»»
+           A2 ⎕PLOT DATA
+
+           A2 ⎕PLOT 1○.1×⍳100
+     A ⎕PLOT 1○.1×⍳100
+
+
+
+   that (for syntactical reasons) the separation between line attribute
+name and the line number is _ (underscore) if A is specified as a
 structured APL value and - (minus) if A is specified as a string of
 lines.
 
@@ -4552,6 +4597,9 @@ X-coordinates are evenly distributed along their axis while the Y and
 Z-coordinates are not.  For this reason there is no gridY_variable or
 gridZ_variable.
 
+
+File: apl.info,  Node: Plot Window Handling,  Next: Output File Format,  Prev: The Plot Attributes A,  Up: Section 2.33
+
 2.33.3 Plot Window Handling
 ---------------------------
 
@@ -4579,7 +4627,7 @@ The above corresponds to the typical method(s) for closing windows on
 most systems.
 
 
-File: apl.info,  Node: Output File Format,  Up: Section 2.33
+File: apl.info,  Node: Output File Format,  Prev: Plot Window Handling,  Up: Section 2.33
 
 2.33.4 Output File Format
 -------------------------
@@ -8725,35 +8773,38 @@ Node: Section 2.30148148
 Node: Section 2.31149799
 Node: Section 2.32153723
 Node: Section 2.33168152
-Node: Output File Format184925
-Node: Section 2.34186100
-Node: Section 2.35195535
-Node: Section 2.36196554
-Node: Section 2.37211789
-Node: Section 2.38222984
-Node: Section 2.39225168
-Node: Section 2.40251273
-Node: Section 2.41255813
-Node: Section 2.42276912
-Node: Section 2.43290925
-Node: Section 2.44294195
-Node: Chapter 3294710
-Node: Chapter 4297218
-Node: Chapter 5298359
-Node: Section 5.1300006
-Node: Section 5.2301326
-Node: Section 5.3301686
-Node: Section 5.4301928
-Node: Section 5.5302590
-Node: Section 5.6303068
-Node: Section 5.7303841
-Node: Section 5.8304267
-Node: Chapter 6304669
-Node: Section 6.1305088
-Node: Section 6.2305775
-Node: Chapter 7306606
-Node: Section 7.1307109
-Node: Section 7.2332422
+Node: The Plot Data B169369
+Node: The Plot Attributes A171983
+Node: Plot Window Handling185178
+Node: Output File Format186509
+Node: Section 2.34187713
+Node: Section 2.35197148
+Node: Section 2.36198167
+Node: Section 2.37213402
+Node: Section 2.38224597
+Node: Section 2.39226781
+Node: Section 2.40252886
+Node: Section 2.41257426
+Node: Section 2.42278525
+Node: Section 2.43292538
+Node: Section 2.44295808
+Node: Chapter 3296323
+Node: Chapter 4298831
+Node: Chapter 5299972
+Node: Section 5.1301619
+Node: Section 5.2302939
+Node: Section 5.3303299
+Node: Section 5.4303541
+Node: Section 5.5304203
+Node: Section 5.6304681
+Node: Section 5.7305454
+Node: Section 5.8305880
+Node: Chapter 6306282
+Node: Section 6.1306701
+Node: Section 6.2307388
+Node: Chapter 7308219
+Node: Section 7.1308722
+Node: Section 7.2334035
 
 End Tag Table
 

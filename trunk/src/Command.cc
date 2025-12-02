@@ -1211,8 +1211,10 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
                         "  Z ← A " << prim << " B";         break;
         case  3: out << "   monadic primitive function (with axis):"
                         "  Z ← " << prim << "[X] B";      break;
+        case  4: out << "   dyadic primitive function (with axis):"
+                        "  Z ← A " << prim << "[X] B";      break;
 
-        default: FIXME;
+        default: FIXME;   // error in Help.def
       }
 
    if (*name)   out << "  ("  << name  <<  ")";

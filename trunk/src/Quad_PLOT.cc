@@ -90,7 +90,8 @@
 #include "Common.hh"
 #include "Quad_PLOT.hh"
 
-using namespace std;
+extern void do_plot_ASCII(const Plot_window_properties & w_props,
+                          const Plot_data & data);
 
 Quad_PLOT  Quad_PLOT::fun;
 
@@ -105,7 +106,16 @@ sem_t __expose_sema;
 sem_t * Quad_PLOT::expose_sema = &__expose_sema;
 
 int Quad_PLOT::verbosity = 0;
-bool Quad_PLOT::driver_loaded = false;
+
+#if apl_GTK
+const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_GTK;
+#elif apl_XCB
+const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_XCB;
+#else
+const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
+#endif
+
+bool Quad_PLOT::XCB_driver_loaded = false;
 
 #if ! defined(MISSING_LIBS)
 
@@ -205,7 +215,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    // do_plot_data takes ownership of w_props and will delete w_props
    //
 const APL_Integer Z = do_plot_data(w_props, data);
-   return Token(TOK_APL_VALUE1, IntScalar(Z, LOC));
+   return Token(TOK_APL_VALUE2, IntScalar(Z, LOC));
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -215,15 +225,16 @@ Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
       {
         loop(row, A.get_rows())
             {
-              const Cell & att_name = A.get_cravel(2*row);
+              const Cell & att_name = A.get_cravel(2*row);       // A[row; 1]
+              const Cell & att_val  = A.get_cravel(2*row + 1);   // A[row; 2]
               if (att_name.is_pointer_cell())   // used entry in A
                  {
                    const UCS_string ucs = att_name.get_pointer_value()
                                                  ->get_UCS_ravel();
-                   if (const char * error = w_props->set_attribute(ucs,
-                                                  A.get_cravel(2*row + 1)))
+                   if (const char * error = w_props->set_attribute(ucs, att_val))
                       {
-                        MORE_ERROR() << error << " in ⎕PLOT attribute ." << ucs;
+                        MORE_ERROR() << "A ⎕PLOT B: " << error
+                                     << " in attribute A." << ucs;
                         return E_DOMAIN_ERROR;
                       }
                  }
@@ -277,11 +288,6 @@ Token
 Quad_PLOT::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_PLOT);
-
-#if ! (apl_GTK || apl_XCB)
-   MORE_ERROR() << "No suitable GUI library (i.e. GTK or X11/XCB) found).";
-   SYNTAX_ERROR;
-#endif
 
    if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
       {
@@ -717,37 +723,57 @@ const ShapeItem data_points = rows * cols;
 }
 //----------------------------------------------------------------------------
 void
-Quad_PLOT::load_driver(Plot_window_properties * w_props, int handle)
+Quad_PLOT::load_driver(Plot_window_properties * w_props, int handle,
+                       Plot_driver driver_type)
 {
-   if (driver_loaded)   return;
+#if apl_GTK3
+   if (driver_type == PltDrv_GTK)
+      {
+        plot_main_GTK(w_props, handle);   // pushes a GTK_context into all_PLOT_windows.
+        sem_post(all_PLOT_windows_sema);
+        sem_wait(expose_sema);   // blocks until window shown
+        Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
+        return;
+      }
+#endif // apl_GTK
 
-#if apl_GTK3   // GTK
+#if apl_XCB
+   if (driver_type == PltDrv_XCB && !XCB_driver_loaded)
+      {
+        // start a thread that pushes a XCB_context and that posts the
+        // expose_sema after its plot window was exposed.
+        //
+        pthread_t th;
+        pthread_create(&th, 0, plot_main_XCB, w_props);
+        sem_wait(expose_sema);   // blocks until window shown
+        XCB_driver_loaded = true;
+        Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
+        return;
+      }
+#endif // apl_GTK
 
-   plot_main_GTK(w_props, handle);   // pushes a GTK_context into all_PLOT_windows.
-   sem_post(all_PLOT_windows_sema);
-   sem_wait(expose_sema);   // blocks until window shown
-
-#elif apl_XCB   // not GTK but apl_XCB
-
-pthread_t th;
-   pthread_create(&th, 0, plot_main_XCB, w_props);   // pushes a XCB_context
-   sem_wait(expose_sema);   // blocks until window shown
-
-#else   // neither apl_GTK3 nor apl_GTK3
-
-   sem_post(all_PLOT_windows_sema);
-
-#endif
-
-   driver_loaded = true;
+   // neither GTK nor XCB. Use ASCII fallback
+   if (driver_type == PltDrv_ASCII)
+      {
+        sem_post(all_PLOT_windows_sema);
+        Log(LOG_Quad_PLOT)   CERR << "Plot ASCII needs no driver." << endl;
+      }
 }
 //----------------------------------------------------------------------------
+// the ⎕PLOT workhorse
 APL_Integer
 Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
                         const Plot_data * data)
 {
    w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
+
+   if (default_plot_driver == PltDrv_ASCII ||   // no GUI available, or
+       w_props->get_gui_driver() == "ASCII")    // ASCII requested
+      {
+        do_plot_ASCII(*w_props, *data);
+        return 0;
+      }
 
    // check (possibly again) for empty plot ranges which could be caused
    // by bad plot data but also by bad window properties.
@@ -772,7 +798,7 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 const APL_Integer Z = ++next_handle;
    sem_wait(all_PLOT_windows_sema);
 
-   load_driver(w_props, Z);
+   load_driver(w_props, Z, PltDrv_GTK);
 
    if (w_props->get_with_border())
       {

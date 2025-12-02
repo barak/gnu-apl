@@ -2681,7 +2681,7 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 
 Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 
-Let @b{Z←A ⊣[X] B}. Then:
+Let @b{Z←A ⊢[X] B}. Then:
 
 @itemize
 @item if X is a one-element vector and ↑X is 0 then Z ≡ A,
@@ -4504,6 +4504,7 @@ The general syntax of ⎕PLOT is:
 @end example
 
 @c ............................................................................
+@node The Plot Data B
 @subsection The Plot Data B
 
 The plot data @b{B} can be a vector (for a single plot line to be drawn)
@@ -4541,6 +4542,7 @@ in text mode see file @b{doc/PLOT_circle.png}):
 
 @image{PLOT_circle}
 
+@c ............................................................................
 @subsubsection Real Plot Data B
 
 On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
@@ -4571,10 +4573,11 @@ makes little sense. If at least one item of the plot data B is complex, then
 all real items in B are taken as complex with imaginary part 0.
 
 @c ............................................................................
+@node The Plot Attributes A
 @subsection The Plot Attributes A
 
 There are a number of attributes like colors, point sizes, line widths,
-etc. that control how the resulting plot will look.
+etc. that control how the resulting plot will look like.
 
 Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
 the arguments. The list of arguments grows over time and therefore the list
@@ -4682,9 +4685,13 @@ point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
 @end example
 
-There are 2 kinds of attributes: global attributes that affect the entire
-plot, and local (per-line) attributes that affect one of the plot lines
-(which corresponds to one row of B). One way to specify
+There are 2 kinds of attributes: @b{window attributes} that affect the entire
+plot, and @b{line  attributes} that affect one of the plot lines
+(which correspond to one row of @b{B}). For example, the background color
+of the plot is a window attribute, while the line color is a line attribute.
+Line attributes have a @b{-N} suffix, where @b{N} starts at @b{⎕IO}.
+
+One way to specify
 multiple attributes in one go is to use multi-line strings.
 
 For example (plot 2 lines of 10 random numbers each, named "random row 1" and
@@ -4711,10 +4718,47 @@ Attributes.legend_name_2 ← "Random Row 2"
       Attributes ⎕PLOT Data
 @end example
 
-Note that (for syntactical reasons) the separation between the line attribute
-and the line number is @b{_} (underscore) if @b{A} is specified as
-a structured APL value and @b{-} (minus) if A is specified as a string
-of lines.
+@b{PITFALL:} if @b{A} is specified as a structured APL Value then:
+@itemize
+@item attribute names must follow the GNU APL member name syntax, and therefore
+@item the (line-) attribute name is separated from its line number by an
+      @b{_} (underscore), and
+@item string values must be quoted.
+@end itemize
+
+@itemize
+@item the (line-) attribute name is separated from its line number by a
+      @b{-} (minus), and
+@item string values must not be quoted.
+@end itemize
+
+For example:
+@example
+      DATA ← 1○.1×⍳100
+      ⍝ structured variable A1
+      ⍝
+      A1.point_style_1 ← 2             ⍝ separator: _ (underscore)
+      A1.gui_driver    ← 'ASCII'       ⍝ string value quoted
+      A1 ⎕PLOT DATA
+
+   
+      ⍝ multi-line string A2
+      A2←«««
+      point_style-1:    2             ⍝ separator: - (minus)
+      gui_driver:       ASCII         ⍝ string value not quited
+         »»»
+      A2 ⎕PLOT DATA
+
+      A2 ⎕PLOT 1○.1×⍳100
+A ⎕PLOT 1○.1×⍳100
+
+
+@end example
+
+that (for syntactical reasons) the separation between
+line attribute name and the line number is @b{_} (underscore) if @b{A}
+is specified as a structured APL value and @b{-} (minus) if @b{A}
+is specified as a string of lines.
 
 If the global attribute @b{output_filename} is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
@@ -4815,6 +4859,7 @@ reason there is no @b{gridY_variable} or @b{gridZ_variable}.
 
 
 @c ............................................................................
+@node Plot Window Handling
 @subsection Plot Window Handling
 
 Each call of ⎕PLOT with some plot data @b{B} opens a separate window in the X

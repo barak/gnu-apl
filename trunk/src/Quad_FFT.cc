@@ -393,5 +393,5 @@ const char * pkgs[] = { "libfftw3-dev", 0 };
    return missing_files("⎕FFT", libs, hdrs, pkgs);
 }
 
-#endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
+#endif // (not) apl_FFT
 

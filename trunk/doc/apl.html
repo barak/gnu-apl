@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>November 27, 2025.
+<p>December 2, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -231,16 +231,16 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
     </ul></li>
     <li><a id="toc-_005b_003f_005dPLOT-_002d-Plot-Data" href="#Section-2_002e33">2.33 ⎕PLOT - Plot Data</a>
     <ul class="no-bullet">
-      <li><a id="toc-The-Plot-Data-B" href="#The-Plot-Data-B">2.33.1 The Plot Data B</a>
+      <li><a id="toc-The-Plot-Data-B-1" href="#The-Plot-Data-B">2.33.1 The Plot Data B</a>
       <ul class="no-bullet">
         <li><a id="toc-Complex-Plot-Data-B" href="#Complex-Plot-Data-B">2.33.1.1 Complex Plot Data B</a></li>
         <li><a id="toc-Real-Plot-Data-B" href="#Real-Plot-Data-B">2.33.1.2 Real Plot Data B</a></li>
       </ul></li>
-      <li><a id="toc-The-Plot-Attributes-A" href="#The-Plot-Attributes-A">2.33.2 The Plot Attributes A</a>
+      <li><a id="toc-The-Plot-Attributes-A-1" href="#The-Plot-Attributes-A">2.33.2 The Plot Attributes A</a>
       <ul class="no-bullet">
         <li><a id="toc-Tick-formatting-_0028GTK-only_0029" href="#Tick-formatting-_0028GTK-only_0029">2.33.2.1 Tick formatting (GTK only)</a></li>
       </ul></li>
-      <li><a id="toc-Plot-Window-Handling" href="#Plot-Window-Handling">2.33.3 Plot Window Handling</a></li>
+      <li><a id="toc-Plot-Window-Handling-1" href="#Plot-Window-Handling">2.33.3 Plot Window Handling</a></li>
       <li><a id="toc-Output-File-Format-1" href="#Output-File-Format">2.33.4 Output File Format</a></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dPNG-_002d-Portable-Network-Graphics" href="#Section-2_002e34">2.34 ⎕PNG - Portable Network Graphics</a>
@@ -3123,7 +3123,7 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 </p>
 <p>Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 </p>
-<p>Let <b>Z←A ⊣[X] B</b>. Then:
+<p>Let <b>Z←A ⊢[X] B</b>. Then:
 </p>
 <ul>
 <li> if X is a one-element vector and ↑X is 0 then Z ≡ A,
@@ -5078,8 +5078,13 @@ colors for plot lines, points, and grids, etc.
 <li><a href="#Plot-Window-Handling" accesskey="3">Plot Window Handling</a></li>
 <li><a href="#Output-File-Format" accesskey="4">Output File Format</a></li>
 </ul>
+<hr>
 <div class="subsection" id="The-Plot-Data-B">
-<h4 class="subsection">2.33.1 The Plot Data B</h4>
+<div class="header">
+<p>
+Next: <a href="#The-Plot-Attributes-A" accesskey="n" rel="next">The Plot Attributes A</a>, Up: <a href="#Section-2_002e33" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="The-Plot-Data-B-1"></span><h4 class="subsection">2.33.1 The Plot Data B</h4>
 
 <p>The plot data <b>B</b> can be a vector (for a single plot line to be drawn)
 or a matrix (in that case one plot line per matrix row is drawn, by default
@@ -5152,13 +5157,18 @@ in text mode see file <b>doc/PLOT_zigzag.png</b>):
 makes little sense. If at least one item of the plot data B is complex, then
 all real items in B are taken as complex with imaginary part 0.
 </p>
+<hr>
 </div>
 </div>
 <div class="subsection" id="The-Plot-Attributes-A">
-<h4 class="subsection">2.33.2 The Plot Attributes A</h4>
+<div class="header">
+<p>
+Next: <a href="#Plot-Window-Handling" accesskey="n" rel="next">Plot Window Handling</a>, Previous: <a href="#The-Plot-Data-B" accesskey="p" rel="prev">The Plot Data B</a>, Up: <a href="#Section-2_002e33" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="The-Plot-Attributes-A-1"></span><h4 class="subsection">2.33.2 The Plot Attributes A</h4>
 
 <p>There are a number of attributes like colors, point sizes, line widths,
-etc. that control how the resulting plot will look.
+etc. that control how the resulting plot will look like.
 </p>
 <p>Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
 the arguments. The list of arguments grows over time and therefore the list
@@ -5266,9 +5276,13 @@ point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
 </pre></div>
 
-<p>There are 2 kinds of attributes: global attributes that affect the entire
-plot, and local (per-line) attributes that affect one of the plot lines
-(which corresponds to one row of B). One way to specify
+<p>There are 2 kinds of attributes: <b>window attributes</b> that affect the entire
+plot, and <b>line  attributes</b> that affect one of the plot lines
+(which correspond to one row of <b>B</b>). For example, the background color
+of the plot is a window attribute, while the line color is a line attribute.
+Line attributes have a <b>-N</b> suffix, where <b>N</b> starts at <b>⎕IO</b>.
+</p>
+<p>One way to specify
 multiple attributes in one go is to use multi-line strings.
 </p>
 <p>For example (plot 2 lines of 10 random numbers each, named &quot;random row 1&quot; and
@@ -5295,10 +5309,47 @@ Attributes.legend_name_2 ← &quot;Random Row 2&quot;
       Attributes ⎕PLOT Data
 </pre></div>
 
-<p>Note that (for syntactical reasons) the separation between the line attribute
-and the line number is <b>_</b> (underscore) if <b>A</b> is specified as
-a structured APL value and <b>-</b> (minus) if A is specified as a string
-of lines.
+<p><b>PITFALL:</b> if <b>A</b> is specified as a structured APL Value then:
+</p><ul>
+<li> attribute names must follow the GNU APL member name syntax, and therefore
+</li><li> the (line-) attribute name is separated from its line number by an
+      <b>_</b> (underscore), and
+</li><li> string values must be quoted.
+</li></ul>
+
+<ul>
+<li> the (line-) attribute name is separated from its line number by a
+      <b>-</b> (minus), and
+</li><li> string values must not be quoted.
+</li></ul>
+
+<p>For example:
+</p><div class="example">
+<pre class="example">      DATA ← 1○.1×⍳100
+      ⍝ structured variable A1
+      ⍝
+      A1.point_style_1 ← 2             ⍝ separator: _ (underscore)
+      A1.gui_driver    ← 'ASCII'       ⍝ string value quoted
+      A1 ⎕PLOT DATA
+
+   
+      ⍝ multi-line string A2
+      A2←«««
+      point_style-1:    2             ⍝ separator: - (minus)
+      gui_driver:       ASCII         ⍝ string value not quited
+         »»»
+      A2 ⎕PLOT DATA
+
+      A2 ⎕PLOT 1○.1×⍳100
+A ⎕PLOT 1○.1×⍳100
+
+
+</pre></div>
+
+<p>that (for syntactical reasons) the separation between
+line attribute name and the line number is <b>_</b> (underscore) if <b>A</b>
+is specified as a structured APL value and <b>-</b> (minus) if <b>A</b>
+is specified as a string of lines.
 </p>
 <p>If the global attribute <b>output_filename</b> is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
@@ -5402,10 +5453,15 @@ distributed along their axis while the Y and Z-coordinates are not. For this
 reason there is no <b>gridY_variable</b> or <b>gridZ_variable</b>.
 </p>
 
+<hr>
 </div>
 </div>
 <div class="subsection" id="Plot-Window-Handling">
-<h4 class="subsection">2.33.3 Plot Window Handling</h4>
+<div class="header">
+<p>
+Next: <a href="#Output-File-Format" accesskey="n" rel="next">Output File Format</a>, Previous: <a href="#The-Plot-Attributes-A" accesskey="p" rel="prev">The Plot Attributes A</a>, Up: <a href="#Section-2_002e33" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Plot-Window-Handling-1"></span><h4 class="subsection">2.33.3 Plot Window Handling</h4>
 
 <p>Each call of ⎕PLOT with some plot data <b>B</b> opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
@@ -5435,7 +5491,7 @@ corresponds to the typical method(s) for closing windows on most systems.
 <div class="subsection" id="Output-File-Format">
 <div class="header">
 <p>
-Up: <a href="#Section-2_002e33" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Plot-Window-Handling" accesskey="p" rel="prev">Plot Window Handling</a>, Up: <a href="#Section-2_002e33" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Output-File-Format-1"></span><h4 class="subsection">2.33.4 Output File Format</h4>
 
