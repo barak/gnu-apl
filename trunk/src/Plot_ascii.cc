@@ -126,6 +126,7 @@ Unicode u1;
         case 0:   return;   // no grid
         case 1:  u1 = Unicode(0x2500);   break;   // │
         case 2:  u1 = Unicode(0x2504);   break;   // 
+        default: u1 = Unicode(0x2500);   break;   // │
       }
 
 const int W1 = W - 1;
@@ -152,6 +153,7 @@ Unicode u1, u2;
         case 0:   return;   // no grid
         case 1:  u1 = Unicode(0x2502);   u2 = Unicode(0x253C);   break;   // │ ┼
         case 2:  u1 = Unicode(0x2506);   u2 = Unicode(0x253C);   break;   // ┆ ┼
+        default: u1 = Unicode(0x2502);   u2 = Unicode(0x253C);   break;   // │ ┼
       }
 
 const int W1 = W - 1;
