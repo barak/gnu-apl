@@ -67,8 +67,8 @@ log_def(0, Quad_TF                     , "⎕TF details                         
 log_def(0, Quad_PLOT                   , "⎕PLOT details                       ")
 log_def(0, IfElse                      , "details of COND →→ THEN ←→ ELSE ←←  ")
 log_def(0, Quad_RVAL                   , "details of the ⎕RVAL computation    ")
-log_def(0, Shift_XXX                   , "Prefix shift/reduce                 ")
-log_def(0, Reduce_XXX                  , "Prefix shift/reduce                 ")
+log_def(0, Shift_XXX                   , "Prefix shift/reduce (detailed_      ")
+log_def(0, Reduce_XXX                  , "Prefix shift/reduce (matches only)  ")
 
 #undef log_def
 

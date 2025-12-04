@@ -10,64 +10,94 @@
 enum VT100_color
 {
   VT100_NONE    = -1,
-  VT100_black   =  0,
-  VT100_red     =  1,
-  VT100_green   =  2,
-  VT100_yellow  =  3,
-  VT100_blue    =  4,
-  VT100_magenta =  5,
-  VT100_cyan    =  6,
-  VT100_white   =  7,
+
+  // dark colors
+  //
+  VT100_dark_black     =  0,
+  VT100_dark_red       =  1,
+  VT100_dark_green     =  2,
+  VT100_dark_yellow    =  3,
+  VT100_dark_blue      =  4,
+  VT100_dark_magenta   =  5,
+  VT100_dark_cyan      =  6,
+  VT100_dark_white     =  7,
+
+  // bright colors. Dark foreground is 3x while bright foreground is 9x.
+  // Dark background is 4x while bright background is 10x for color x.
+  // Therefore bright vcolors are black colors + 60.
+  //
+  VT100_bright_black   =  60,
+  VT100_bright_red     =  61,
+  VT100_bright_green   =  62,
+  VT100_bright_yellow  =  63,
+  VT100_bright_blue    =  64,
+  VT100_bright_magenta =  65,
+  VT100_bright_cyan    =  66,
+  VT100_bright_white   =  67,
 };
 //----------------------------------------------------------------------------
 /// convert a 32-bit rgb value to its nearest VT100 color
 
-const uint32_t VT100_RGB[8] =
+const struct
 {
-  0x000000,   // VT100_black
-  0xFF0000,   // VT100_red
-  0x00FF00,   // VT100_green
-  0xFFFF00,   // VT100_yellow
-  0x0000FF,   // VT100_blue
-  0xFF00FF,   // VT100_magenta
-  0x00FFFF,   // VT100_cyan
-  0xFFFFFF,   // VT100_white
-};
+  VT100_color vt100;
+  int r, g, b;
+} VT100_RGB[16] =
+{
+  { VT100_dark_black    ,    0,   0,   0 },
+  { VT100_dark_red      ,  255,   0,   0 },
+  { VT100_dark_green    ,    0, 255,   0 },
+  { VT100_dark_yellow   ,  255, 255,   0 },
+  { VT100_dark_blue     ,    0,   0, 255 },
+  { VT100_dark_magenta  ,  255,   0, 255 },
+  { VT100_dark_cyan     ,    0, 255, 255 },
+  { VT100_dark_white    ,  255, 255, 255 },
+                                      
+  { VT100_bright_black  ,  128, 128, 128 },
+  { VT100_bright_red    ,  255, 128, 128 },
+  { VT100_bright_green  ,  128, 255, 128 },
+  { VT100_bright_yellow ,  255, 255, 128 },
+  { VT100_bright_blue   ,  128, 128, 255 },
+  { VT100_bright_magenta,  255, 128, 255 },
+  { VT100_bright_cyan   ,  128, 255, 255 },
+  { VT100_bright_white  ,  255, 255, 255 },
+};                    
 
-/// return the VT100 color index that is closest to the RGB value \b tgb
 VT100_color
 round_color(uint32_t rgb)
-{
-VT100_color best_idx = VT100_black;
+{ 
+VT100_color best_idx = VT100_dark_black;
 uint32_t best_sq = 0x40000;   // > 3*FF*FF
-   loop(j, 8)
+   loop(j, sizeof(VT100_RGB) / sizeof(*VT100_RGB))
       {
-        const uint32_t RGB = VT100_RGB[j];
-        const uint32_t R = RGB >> 16 & 0xFF;
-        const uint32_t G = RGB >>  8 & 0xFF;
-        const uint32_t B = RGB >>  0 & 0xFF;
+        const uint32_t R = VT100_RGB[j].r;
+        const uint32_t G = VT100_RGB[j].g;
+        const uint32_t B = VT100_RGB[j].b;
+
         const uint32_t r = rgb >> 16 & 0xFF;
         const uint32_t g = rgb >>  8 & 0xFF;
         const uint32_t b = rgb >>  0 & 0xFF;
+
         const uint32_t R_r = R - r;
         const uint32_t G_g = G - g;
         const uint32_t B_b = B - b;
+
         const uint32_t sq = R_r*R_r + G_g*G_g + B_b*B_b;
-        if (best_sq > sq)
+        if (best_sq > sq)   // sq is closer
            {
              best_idx = VT100_color(j);
              best_sq = sq;
            }
       }
 
-   return best_idx;
+   return VT100_RGB[best_idx].vt100;
 };
 //----------------------------------------------------------------------------
 struct ASCII_Point
 {
    ASCII_Point()
    : uni(UNI_SPACE),          // blank
-         color(VT100_black)   // black
+         color(VT100_dark_black)   // black
    {}
 
    Unicode uni;
@@ -91,7 +121,11 @@ public:
    void draw_plot_line(const Plot_window_properties & w_props, int row,
                        const Plot_data & data);
 
-   void emit(ostream & out);
+   /// print canvas to screen
+   void emit(ostream & out, const Plot_window_properties & w_props);
+
+   /// return canvas as APL value
+   Value_P emit_value(const Plot_window_properties & w_props);
 
 protected:
    void draw_horizontal_grid(const Plot_window_properties & w_props);
@@ -119,7 +153,7 @@ ASCII_canvas::draw_horizontal_grid(const Plot_window_properties & w_props)
 {
    // draw horizontal lines along the Y axis
    //
-VT100_color color = round_color(w_props.get_gridX_color());
+const VT100_color color = round_color(w_props.get_gridX_color());
 Unicode u1;
    switch(w_props.get_gridX_style())
       {
@@ -145,7 +179,7 @@ ASCII_canvas::draw_vertical_grid(const Plot_window_properties & w_props)
 {
    // draw vertical lines along the X axis
    //
-VT100_color color = round_color(w_props.get_gridY_color());
+const VT100_color color = round_color(w_props.get_gridY_color());
 
 Unicode u1, u2;
    switch(w_props.get_gridX_style())
@@ -160,8 +194,8 @@ const int W1 = W - 1;
 const int H1 = H - 1;
    for (int x = 9; x < W1; x += 10)
        {
-         set_point(x,  0, Unicode(0x2564), VT100_black);   // ╤ 
-         set_point(x, H1, Unicode(0x2567), VT100_black);   // ╧
+         set_point(x,  0, Unicode(0x2564), VT100_dark_black);   // ╤ 
+         set_point(x, H1, Unicode(0x2567), VT100_dark_black);   // ╧
          for (int y = 1; y < H1; ++y)
              {
                if (get_point(x, y).uni == UNI_SPACE)
@@ -175,32 +209,33 @@ const int H1 = H - 1;
 void
 ASCII_canvas::draw_grid(const Plot_window_properties & w_props)
 {
+const VT100_color color = VT100_dark_black;
    // draw outer frame
    //
    loop(x, W)
        {
-         set_point(x,  0,  Unicode(0x2550), VT100_black);   // ═
-         set_point(x, H-1, Unicode(0x2550), VT100_black);   // ═
+         set_point(x,  0,  Unicode(0x2550), color);   // ═
+         set_point(x, H-1, Unicode(0x2550), color);   // ═
        }
 
    loop(y, H)
        {
-         set_point( 0,  y, Unicode(0x2551), VT100_black);   // ║
-         set_point(W-1, y, Unicode(0x2551), VT100_black);   // ║
+         set_point( 0,  y, Unicode(0x2551), color);   // ║
+         set_point(W-1, y, Unicode(0x2551), color);   // ║
        }
 
-   set_point( 0,   0,  Unicode(0x2554), VT100_black);
-   set_point(W-1,  0,  Unicode(0x2557), VT100_black);
-   set_point( 0,  H-1, Unicode(0x255A), VT100_black);
-   set_point(W-1, H-1, Unicode(0x255D), VT100_black);
+   set_point( 0,   0,  Unicode(0x2554), color);   // ╔
+   set_point( 0,  H-1, Unicode(0x255A), color);   // ╚
+   set_point(W-1,  0,  Unicode(0x2557), color);   // ╗
+   set_point(W-1, H-1, Unicode(0x255D), color);   // ╝
 
    draw_horizontal_grid(w_props);
    draw_vertical_grid(w_props);
 }
 //----------------------------------------------------------------------------
 void
-ASCII_canvas::draw_plot_line(const Plot_window_properties & w_props, int row,
-                             const Plot_data & data)
+ASCII_canvas::draw_plot_line(const Plot_window_properties & w_props,
+                             int row, const Plot_data & data)
 {
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp = *l_props[row];
@@ -262,14 +297,14 @@ const VT100_color color = round_color(lp.get_point_color());
 }
 //----------------------------------------------------------------------------
 void
-ASCII_canvas::emit(ostream & out)
+ASCII_canvas::emit(ostream & out, const Plot_window_properties & w_props)
 {
+VT100_color bg_color = round_color(w_props.get_canvas_color());
 
-                  //   [0]   [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]
-                  //                             FG             BG
-char vt100_color[] = { 0x1B, '[', '0', ';', '3', '0', ';', '4', '8', 'm', 0 };
-char & foreground = vt100_color[5];
-VT100_color color = VT100_NONE;
+   // reset all character attributes and set the background color
+   cerr << "\x1B[0;" << (40 + bg_color) << 'm';
+
+VT100_color color = VT100_NONE;   // to force an initial color change
    loop(h, H)
        {
          loop(w, W)
@@ -277,20 +312,60 @@ VT100_color color = VT100_NONE;
                const ASCII_Point & point = get_point(w, h);
                if (point.uni != UNI_SPACE && color != point.color)
                   {
-                    foreground = '0' + point.color;
-                    // fprintf(stdout, "%s", vt100_color);
-                    cerr << vt100_color;
                     color = point.color;
+                    cerr << "\x1B[" << (30 + color) << 'm';
                   }
-               cerr << point.uni ;
+
+               cerr << point.uni;
              }
-         cerr << "\n";
+
+         // end of line: switch back to COUT color
+         //
+         cerr << Output::color_COUT << Output::clear_EOL
+              << "\n" "\x1B[0;" << (40 + bg_color) << 'm';
        }
-   Output::set_color_mode(Output::COLM_OUTPUT);
-   Output::set_color_mode(Output::COLM_INPUT);
+
+   cerr << Output::color_CIN << Output::clear_EOL << "\n";
 }
 //----------------------------------------------------------------------------
-void
+Value_P
+ASCII_canvas::emit_value(const Plot_window_properties & w_props)
+{
+const Shape shape_Z(3, H, W);
+Value_P Z(shape_Z, LOC);
+
+   // character plane
+   //
+   loop(h, H)
+   loop(w, W)
+       {
+         const ASCII_Point & point = get_point(w, h);
+         Z->next_ravel_Char(point.uni);
+       }
+
+   // vt100 foreground color plane
+   //
+   loop(h, H)
+   loop(w, W)
+       {
+         const ASCII_Point & point = get_point(w, h);
+         Z->next_ravel_Int(point.color);
+       }
+
+   // vt100 background color plane
+   //
+const VT100_color color = round_color(w_props.get_canvas_color());
+   loop(h, H)
+   loop(w, W)
+       {
+         Z->next_ravel_Int(color);
+       }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
 do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
 {
    // usable area
@@ -308,8 +383,9 @@ ASCII_canvas ctx(H, W);
          ctx.draw_plot_line(w_props, row, data);
        }
 
-   // output
+   // output to screen
    //
-   ctx.emit(cerr);
+   ctx.emit(cerr, w_props);
+   return ctx.emit_value(w_props);
 }
 //----------------------------------------------------------------------------

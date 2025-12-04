@@ -90,7 +90,7 @@
 #include "Common.hh"
 #include "Quad_PLOT.hh"
 
-extern void do_plot_ASCII(const Plot_window_properties & w_props,
+extern Value_P do_plot_ASCII(const Plot_window_properties & w_props,
                           const Plot_data & data);
 
 Quad_PLOT  Quad_PLOT::fun;
@@ -107,15 +107,13 @@ sem_t * Quad_PLOT::expose_sema = &__expose_sema;
 
 int Quad_PLOT::verbosity = 0;
 
-#if apl_GTK
+#if apl_GTK3
 const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_GTK;
 #elif apl_XCB
 const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_XCB;
 #else
 const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
 #endif
-
-bool Quad_PLOT::XCB_driver_loaded = false;
 
 #if ! defined(MISSING_LIBS)
 
@@ -164,8 +162,8 @@ using namespace std;
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
 {
-   __sem_init(all_PLOT_windows_sema, 0, 1);
-   __sem_init(expose_sema, 1, 0);
+   __sem_init(all_PLOT_windows_sema, /* thread sema */ 0, /* value */ 1);
+   __sem_init(expose_sema,           /* thread sema */ 0, /* value */ 0);
    verbosity = 0;
 }
 //----------------------------------------------------------------------------
@@ -182,7 +180,7 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
    if (B->get_rank() > 3)        RANK_ERROR;
    if (B->element_count() < 2)   LENGTH_ERROR;
 
-#if ! (apl_GTK || apl_XCB)
+#if ! (apl_GTK3 || apl_XCB)
    MORE_ERROR() << "No suitable GUI library (i.e. GTK or X11/XCB) found).";
    SYNTAX_ERROR;
 #endif
@@ -211,6 +209,13 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
         throw_apl_error(ec, LOC);
       }
    if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
+
+   if (default_plot_driver == PltDrv_ASCII ||   // no GUI available, or
+       w_props->get_gui_driver() == "ASCII")    // ASCII requested
+      {
+        Value_P Z = do_plot_ASCII(*w_props, *data);
+        return Token(TOK_APL_VALUE2, Z);
+      }
 
    // do_plot_data takes ownership of w_props and will delete w_props
    //
@@ -318,8 +323,14 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
          WS_FULL;
       }
 
+   if (default_plot_driver == PltDrv_ASCII)     // no GUI available
+      {
+        Value_P Z = do_plot_ASCII(*w_props, *data);
+        return Token(TOK_APL_VALUE2, Z);
+      }
+
 const APL_Integer Z = do_plot_data(w_props, data);
-   return Token(TOK_APL_VALUE1, IntScalar(Z, LOC));
+   return Token(TOK_APL_VALUE2, IntScalar(Z, LOC));
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -726,38 +737,49 @@ void
 Quad_PLOT::load_driver(Plot_window_properties * w_props, int handle,
                        Plot_driver driver_type)
 {
-#if apl_GTK3
-   if (driver_type == PltDrv_GTK)
+Plot_driver driver;
+const string driver_attr = w_props->get_gui_driver();
+     
+   if      (driver_attr == "")        driver = default_plot_driver;
+   else if (driver_attr == "GTK")     driver = PltDrv_GTK;
+   else if (driver_attr == "XCB")     driver = PltDrv_XCB;
+   else if (driver_attr == "ASCII")   driver = PltDrv_ASCII;
+   else
+           {
+             MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver '"
+                          << driver_attr.c_str() << "'";
+             DOMAIN_ERROR;
+           }
+
+   if (driver == PltDrv_GTK)
       {
-        plot_main_GTK(w_props, handle);   // pushes a GTK_context into all_PLOT_windows.
-        sem_post(all_PLOT_windows_sema);
+        // plot_main_GTK() pushes a new GTK_context into variable
+        // Quad_PLOT::all_PLOT_windows and  posts expose_sema after
+        // its plot window was exposed.
+        //
+        plot_main_GTK(w_props, handle);
         sem_wait(expose_sema);   // blocks until window shown
+        sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
         return;
       }
-#endif // apl_GTK
 
-#if apl_XCB
-   if (driver_type == PltDrv_XCB && !XCB_driver_loaded)
+   if (driver == PltDrv_XCB)
       {
-        // start a thread that pushes a XCB_context and that posts the
+        // start a thread that pushes a XCB_context and then posts the
         // expose_sema after its plot window was exposed.
         //
         pthread_t th;
         pthread_create(&th, 0, plot_main_XCB, w_props);
         sem_wait(expose_sema);   // blocks until window shown
-        XCB_driver_loaded = true;
+        sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
         return;
       }
-#endif // apl_GTK
 
    // neither GTK nor XCB. Use ASCII fallback
-   if (driver_type == PltDrv_ASCII)
-      {
-        sem_post(all_PLOT_windows_sema);
-        Log(LOG_Quad_PLOT)   CERR << "Plot ASCII needs no driver." << endl;
-      }
+   Assert(driver == PltDrv_ASCII);
+   Log(LOG_Quad_PLOT)   CERR << "Plot ASCII needs no driver." << endl;
 }
 //----------------------------------------------------------------------------
 // the ⎕PLOT workhorse
@@ -768,37 +790,30 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
    w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
 
-   if (default_plot_driver == PltDrv_ASCII ||   // no GUI available, or
-       w_props->get_gui_driver() == "ASCII")    // ASCII requested
-      {
-        do_plot_ASCII(*w_props, *data);
-        return 0;
-      }
-
    // check (possibly again) for empty plot ranges which could be caused
    // by bad plot data but also by bad window properties.
    //
    if (w_props->get_min_X() >= w_props->get_max_X())
       {
-        MORE_ERROR() << "empty X range in A ⎕PLOT B";
+        MORE_ERROR() << "A ⎕PLOT B: empty X range in A.";
         DOMAIN_ERROR;
       }
    if (w_props->get_min_Y() >= w_props->get_max_Y())
       {
-        MORE_ERROR() << "empty Y range in A ⎕PLOT B";
+        MORE_ERROR() << "A ⎕PLOT B: empty Y range in A.";
         DOMAIN_ERROR;
       }
 
    if (w_props->get_min_Z() >= w_props->get_max_Z())
       {
-        MORE_ERROR() << "empty Z range in A ⎕PLOT B";
+        MORE_ERROR() << "A ⎕PLOT B: eZ range in A.";
         DOMAIN_ERROR;
       }
 
 const APL_Integer Z = ++next_handle;
    sem_wait(all_PLOT_windows_sema);
-
-   load_driver(w_props, Z, PltDrv_GTK);
+       load_driver(w_props, Z, PltDrv_GTK);
+   sem_post(all_PLOT_windows_sema);
 
    if (w_props->get_with_border())
       {
@@ -832,6 +847,13 @@ Quad_PLOT::help()
 "   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values\n"
 "   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions\n"
 "   A ⎕PLOT B   plot B with attribute overrides specified by A\n"
+"           ├────────  0: verbosity OFF\n"
+"           ├──────── ¯1: show X events\n"
+"           ├──────── ¯2: show data\n"
+"           ├──────── ¯3: close all windows\n"
+"           ├──────── ¯4: show rendering\n"
+"           ├─────── ¯6: show open handles\n"
+"           └──── N > 0: close window N\n"
 "\n"
 "   A is a nested vector of strings.\n"
 "   Each string A[i] has the form \"Attribute: Value\"\n"

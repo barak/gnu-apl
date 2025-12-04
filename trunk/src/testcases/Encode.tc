@@ -56,6 +56,32 @@
 1 1
 7 1
 
+⍝ ----------------------------------
+
+      ⍝ Encode with axis (GNU APL extension)...
+      ⍝
+      2⊤[4] 13   ⍝ 4 digit radix
+1 1 0 1
+
+      2⊥1 1 0 1   ⍝ proof
+13
+
+      2⊤[5] ¯13   ⍝ 5 digit radix, negative B
+1 0 0 1 1
+
+      32 - 2⊥1 0 0 1 1   ⍝ proof
+13
+
+      ⍝ automatic radix length detection
+      ⍝
+      2⊤[0] 13   ⍝ 4 digit radix
+1 1 0 1
+
+      2⊤[0] ¯13   ⍝ 5 digit radix, negative B
+1 0 0 1 1
+
+⍝ ----------------------------------
+
       ⍝ Regression
       ⍝
       1⊤2

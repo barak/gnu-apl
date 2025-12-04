@@ -1820,7 +1820,7 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    else   // default caption ("⎕PLOT": add the handle
      {
        char cc[50];
-       SPRINTF(cc, "%s %d", w_props.get_caption().c_str(), pctx->handle);
+       SPRINTF(cc, "%s-GTK %d", w_props.get_caption().c_str(), pctx->handle);
        gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
      }
 

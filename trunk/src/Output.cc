@@ -77,16 +77,16 @@ Output::ColorMode Output::color_mode = COLM_UNDEF;
 /// CSI sequence for ANSI/VT100 terminals (ESC [)
 #define CSI "\x1B["
 
-/// VT100 escape sequence to change to cin color
+/// VT100 escape sequence to change to the CIN color
 char Output::color_CIN[MAX_ESC_LEN] = CSI "0;30;47m";
 
-/// VT100 escape sequence to change to cout color
+/// VT100 escape sequence to change to the COUT color
 char Output::color_COUT[MAX_ESC_LEN] = CSI "0;39;49m";
 
-/// VT100 escape sequence to change to cerr color
+/// VT100 escape sequence to change to the CERR color
 char Output::color_CERR[MAX_ESC_LEN] = CSI "0;35;49m";
 
-/// VT100 escape sequence to change to uerr color
+/// VT100 escape sequence to change to the UERR color
 char Output::color_UERR[MAX_ESC_LEN] = CSI "0;35;49m";
 
 /// VT100 escape sequence to reset colors to their default
@@ -131,8 +131,7 @@ PERFORMANCE_START(cerr_perf)
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    if      (c == '\n')            Output::output_column = 0;
-   else if ((c & 0x80) == 0)      ++Output::output_column;   // ASCII
-   else if ((c & 0xC0) == 0xC0)   ++Output::output_column;   // first UTF
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
    return 0;
 }
 //----------------------------------------------------------------------------
@@ -146,8 +145,7 @@ PERFORMANCE_START(cerr_perf)
    else                                          cerr << char(c);
 
    if      (c == '\n')            Output::output_column = 0;
-   else if ((c & 0x80) == 0)      ++Output::output_column;   // ASCII
-   else if ((c & 0xC0) == 0xC0)   ++Output::output_column;   // first UTF
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
 
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
@@ -203,13 +201,9 @@ Output::set_color_mode(Output::ColorMode mode)
    switch(color_mode)
       {
         case COLM_INPUT:  cerr << color_CIN  << clear_EOL;   break;
-
         case COLM_OUTPUT: cout << color_COUT << clear_EOL;   break;
-
         case COLM_ERROR:  cerr << color_CERR << clear_EOL;   break;
-
         case COLM_UERROR: cout << color_UERR << clear_EOL;   break;
-
         default: break;
       }
 }

@@ -1059,6 +1059,106 @@ APL_Complex bc = iB->get_complex_value();   // the value being decoded
        }
 }
 //----------------------------------------------------------------------------
+Token
+Bif_F12_ENCODE::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   // A ⊤[X] B  ←→ (X⍴A)⊤B   for X > 0, or
+   //              (Q⍴A)⊤B   for X = 0 and Q computed from B
+   //
+const APL_Integer A0 = A->get_sole_integer();   // may throw RANK_ERROR or LENGTH_ERROR
+
+   /// radix 0 means that an item of of B overflows entirely into its leading element
+   /// (which is the item itself).
+   if (A0 == 0)   return Token(TOK_APL_VALUE1, B);
+
+APL_Integer X0 = X->get_sole_integer();   // may throw RANK_ERROR or LENGTH_ERROR
+   if (X0 < 0)   DOMAIN_ERROR;
+
+   if (X0 == 0)   X0 = get_X0(A0, *B);   // compute X0 from B
+
+Value_P new_A(X0, LOC);
+   loop(x, X0)   new_A->next_ravel_Int(A0);
+   new_A->check_value(LOC);
+   return eval_AB(new_A, B);
+}
+//----------------------------------------------------------------------------
+int
+Bif_F12_ENCODE::get_X0(APL_Integer A0, const Value & B)
+{
+   // X0 == 0.   // compute X0 from B
+   //
+int64_t min_B = 0x7FFFFFFFFFFFFFFF;   // smallest item in B
+int64_t max_B = 0x8000000000000000;   // largest item in B
+   loop(b, B.element_count())
+      {
+        const Cell & cell = B.get_cravel(b);
+        if (cell.is_integer_cell())
+           {
+             const APL_Integer value = cell.get_int_value();
+             if (min_B > value)   min_B = value;
+             if (max_B < value)   max_B = value;
+           }
+        else if (cell.is_float_cell())
+           {
+             const APL_Integer value = cell.get_near_int();
+             if (min_B > value)   min_B = value;
+             if (max_B < value)   max_B = value;
+           }
+        else if (cell.is_complex_cell())
+           {
+             // there is no irect way to get the near-int values of ComplexCell, s owe
+             // split it into two FloatCells.
+             const FloatCell real_cell(cell.get_real_value());
+             const FloatCell imag_cell(cell.get_imag_value());
+             if (!(real_cell.is_near_int64_t() && imag_cell.is_near_int64_t()))
+                {
+                  MORE_ERROR() << "A ⊤[X] B: complex number " << cell
+                               << " in B is not near int.";
+                  DOMAIN_ERROR;
+                }
+
+             const APL_Integer real_value = real_cell.get_near_int();
+             if (min_B > real_value)   min_B = real_value;
+             if (max_B < real_value)   max_B = real_value;
+             const APL_Integer imag_value = imag_cell.get_near_int();
+             if (min_B > imag_value)   min_B = imag_value;
+             if (max_B < imag_value)   max_B = imag_value;
+           }
+        else
+           {
+             MORE_ERROR() << "A ⊤[X] B: invalid Cell type in B";
+             DOMAIN_ERROR;
+           }
+      }
+
+const uint64_t abs_A0 = A0 < 0 ? -A0 : A0;
+const uint64_t log_A0 = 0x8000000000000000 / abs_A0;
+
+uint64_t abs_min_B = min_B;
+   if (min_B < 0 && abs_min_B != 0x8000000000000000)   abs_min_B = - min_B;
+
+uint32_t min_N = 0;   // number of digits for abs_min_B
+   for (uint64_t min_V = 1; min_V < abs_min_B; min_V *= A0)
+       {
+         ++min_N;
+         if (min_N >= log_A0)   DOMAIN_ERROR;
+       }
+
+uint64_t abs_max_B = max_B;
+   if (max_B < 0 && abs_max_B != 0x8000000000000000)   abs_max_B = - max_B;
+uint32_t max_N = 0;   // number of digits for abs_min_B
+   for (uint64_t max_V = 1; max_V < abs_max_B; max_V *= A0)
+       {
+         ++max_N;
+         if (max_N >= log_A0)   DOMAIN_ERROR;
+       }
+
+const int N = max_N > min_N ? max_N : min_N;
+
+   // if any B is negative, then add a sign digit
+   return (min_B < 0) ? N + 1 : N;
+}
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_ELEMENT::do_eval_B(const Value * B)
 {

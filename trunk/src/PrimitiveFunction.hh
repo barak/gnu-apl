@@ -271,9 +271,16 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
    static Bif_F12_ENCODE  fun;   ///< Built-in function
 
 protected:
+   /// return the (minimum) number of digits needed to represent every
+   /// item in B in a number system with base A0.
+   static int get_X0(APL_Integer A0, const Value & B);
+
    /// encode *ib() according to A (integer A and b)
    static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
                           const ConstRavel_P & iA,

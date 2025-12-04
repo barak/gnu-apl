@@ -50,8 +50,6 @@ Quad_RVAL  Quad_RVAL::fun;
 
 // ⎕RVAL depends on glibc, so we use it only in development mode
 
-#if HAVE_LIBC
-
 //----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
@@ -653,59 +651,4 @@ const int32_t rnd = random();
    return (rnd ^ (rnd >> 16)) & 0x1FFFF;
 }
 //----------------------------------------------------------------------------
-
-#else    // not HAVE_LIBC
-
-//----------------------------------------------------------------------------
-Quad_RVAL::Quad_RVAL()
-   : QuadFunction(TOK_Quad_RVAL)
-{
-   N = 8;
-}
-//----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_B(Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕RVAL is only available on platforms that have glibc.\n"
-"Your platform is lacking initstate_r() (and probably others).";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_AB(Value_P A, Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕RVAL is only available on platforms that have glibc.\n"
-"Your platform is lacking initstate_r() (and probably others).";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_XB(Value_P A, Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕RVAL is only available on platforms that have glibc.\n"
-"Your platform is lacking initstate_r() (and probably others).";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::print_fun_syntax(ostream & out,
-                            const FunctionGroup::function_info & info) const
-{
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::print_map_syntax(ostream & out,
-                            const FunctionGroup::function_info & info) const
-{
-}
-//----------------------------------------------------------------------------
-#endif   // HAVE_LIBC
+// EOF

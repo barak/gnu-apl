@@ -856,8 +856,8 @@ int rcnt = 0;   // assume error
 
    if (!rng_initialised)
      {
-       std::seed_seq rseq{1, 2, 3, 4,  5};
-       std::seed_seq iseq{6, 7, 8, 9, 10};
+       std::seed_seq rseq{1, 2, 3, 4,  5};   // real
+       std::seed_seq iseq{6, 7, 8, 9, 10};   // imag
        rgen.seed(rseq);
        igen.seed(iseq);
        rng_initialised = true;

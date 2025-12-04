@@ -764,30 +764,31 @@ unction Groups
 * Section 2.17::  Structured Variables and Associative Arrays
 * Section 2.18::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 * Section 2.19::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
-* Section 2.20::  Generalized ⍳
-* Section 2.21::  ⌹[X] - Matrix Factorizations
-* Section 2.22::  Dyadic ⎕CR
-* Section 2.23::  Dyadic ⎕FX (Native Functions)
-* Section 2.24::  ⎕ARG  - Interpreter command line arguments
-* Section 2.25::  ⎕DLX  - Knuth's Dancing Links Algorithm
-* Section 2.26::  ⎕ENV  - Environment Variable
-* Section 2.27::  ⎕FIO  - File I/O Functions
-* Section 2.28::  ⎕FFT  - Fast Fourier Transform
-* Section 2.29::  ⎕GTK  - GTK Interface
-* Section 2.30::  ⎕JSON - JSON Parsing
-* Section 2.31::  ⎕MAP  - Map Value
-* Section 2.32::  ⎕MX   - Matrix/Statistics
-* Section 2.33::  ⎕PLOT - Plot Data
-* Section 2.34::  ⎕PNG  - Portable Network Graphics
-* Section 2.35::  ⎕PS   - Print Style
-* Section 2.36::  ⎕RE   - Regular Expressions
-* Section 2.37::  ⎕RVAL - Random APL value
-* Section 2.38::  ⎕SQL  - SQL Database Interface
-* Section 2.39::  ⎕SI   - State Indicator
-* Section 2.40::  ⎕SYL  - System limits
-* Section 2.41::  ⎕XML  - XML Parsing
-* Section 2.42::  Conditionals
-* Section 2.43::  Matrix Product
+* Section 2.20::  ⊥ with Axis
+* Section 2.21::  Generalized ⍳
+* Section 2.22::  ⌹[X] - Matrix Factorizations
+* Section 2.23::  Dyadic ⎕CR
+* Section 2.24::  Dyadic ⎕FX (Native Functions)
+* Section 2.25::  ⎕ARG  - Interpreter command line arguments
+* Section 2.26::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 2.27::  ⎕ENV  - Environment Variable
+* Section 2.28::  ⎕FIO  - File I/O Functions
+* Section 2.29::  ⎕FFT  - Fast Fourier Transform
+* Section 2.30::  ⎕GTK  - GTK Interface
+* Section 2.31::  ⎕JSON - JSON Parsing
+* Section 2.32::  ⎕MAP  - Map Value
+* Section 2.33::  ⎕MX   - Matrix/Statistics
+* Section 2.34::  ⎕PLOT - Plot Data
+* Section 2.35::  ⎕PNG  - Portable Network Graphics
+* Section 2.36::  ⎕PS   - Print Style
+* Section 2.37::  ⎕RE   - Regular Expressions
+* Section 2.38::  ⎕RVAL - Random APL value
+* Section 2.39::  ⎕SQL  - SQL Database Interface
+* Section 2.40::  ⎕SI   - State Indicator
+* Section 2.41::  ⎕SYL  - System limits
+* Section 2.42::  ⎕XML  - XML Parsing
+* Section 2.43::  Conditionals
+* Section 2.44::  Matrix Product
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -2893,6 +2894,101 @@ BE
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.20
+@section ⊤ (Encode) with Axis
+
+The dyadic primitive function @b{A ⊥ B} (Decode) computes the values of @b{B}.
+in a number system with radices @b{A}. The most common case is a homogeneous
+radix, i.e. all items of @b{A} are the same. In that case the radix @b{A} can
+be specified as a scalar @b{A} which will be scalar-extended to the length
+of @b{B} (more preisely: to @b{↑⍴B}). For example:
+
+@example
+      2 2 2 2 ⊥ 1 1 0 1
+13
+
+      2⊥1 1 0 1              ⍝ scalar extension of 2 to length 4
+13
+
+      ((⍴B)⍴2) ⊤ B←1 1 0 1   ⍝ scalar extension of 2 to ↑⍴B
+13
+@end example
+
+The dyadic primitive function @b{A ⊤ B} (Encode) computes the representation
+of @b{B} in a number system whose radices are @b{A}. The most common case is
+also a homogeneous radix @b{A}. In this sense, Encode is the inverse function
+of Decode. Unfortunately Encode can not scalar extend the radix @b{A} because
+the shapes of its arguments do not provide sufficient information to determine
+the radix length that shall be used. As a consequence:
+
+@itemize
+@item the user needs to provide the radix @b{A} with the proper length for
+the items in @b{B},
+@item if more radix items than needed are provided, then the result contains
+leading 0s (which is sort of OK), but
+@item if less radix items than needed are provided, then a kind of oberflow
+occurs and the first item of the result, unlike the other items, exceeds
+the radix.
+@item The IBM language reference manual proposes to use the APL expression
+@b{⌊1∣+A⍟(∣B)+A=0} for the length of the radix @b{A}.
+@end itemize
+
+In order to improve on this, GNU APL offers the possibility to automatically
+(and without using @b{A⍟B} to do so). The solution implemented in GNU APL is
+to provide the optimal radix length as an axis argument. There are two use
+cases for the axis argument:
+
+@itemize
+@item if the proper radix length is known, say @b{N > 0} , then the length is
+given as axis argument. In this case the left argument of @b{A⊤B} is simplified:
+@example
+      (N⍴↑A)⊤B   ←→   A⊤[N]B   ⍝ radix length is known
+@end example
+This case frequently occurs when integer(s) @b{B} are encoded into hexadecimal
+8-bit bytes (i.e. radix length 2), words (i.e. radix length 4) or long words
+ (i.e. radix length 4),
+@item otherwise the radix length is not known; this case is specified as axis
+argument @b{0}. This is the case where @b{⌊1∣+A⍟(∣B)+A=0} would be needed, and
+it simplifies @b{A⊤B} even more:
+@example
+      ((⌊1∣+A⍟(∣B)+A=0)⍴↑A)⊤B   ←→   A⊤[0]B   ⍝ unknown radix length
+@end example
+@end itemize
+
+Please note the following:
+
+@itemize
+
+@item Obviously the case @b{N>0} is faster than the case @b{N=0} because the
+user has taken over radix length computation. However, @b{A⊤[N]B} is still
+faster than the classical @b{(N⍴↑A)⊤B}.
+@item If all items in @b{B} are non-negative, then the case @b{N=0} uses
+the optimal radix length for unsigned numbers, i.e. @i{without a sign}.
+The result can be used in what is known as @i{unsigned base-A arithmetic}.
+@item  If some item of @b{B} is negative, then the case @b{N=0} uses a radix
+length that @i{includes} a sign (i@i{two's complement arithmetic} if @b{A=2}).
+The sign is @b{0} for the non-negative items of @b{B} and @b{A-1} for the
+negative items of @b{B}.
+@end itemize
+
+Examples:
+@example
+      2⊤[4] 13           ⍝ 4 digit radix, positive B
+1 1 0 1
+
+      2⊥1 1 0 1          ⍝ proof
+13
+
+      2⊤[5] ¯13          ⍝ 5 digit radix, negative B
+1 0 0 1 1
+
+      32 - 2⊥1 0 0 1 1   ⍝ proof
+13
+
+@end example
+
+
+@c ----------------------------------------------------------------------------
+@node    Section 2.21
 @section Generalized ⍳
 
 @c ............................................................................
@@ -2925,7 +3021,7 @@ if the item was not found).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.21
+@node    Section 2.22
 @section ⌹[X] - QR and LQ Factorizations
 
 @c ............................................................................
@@ -3174,7 +3270,7 @@ The computation of @b{⍉Q} and @b{Ti∘⍉Q} is considerably faster than the
 computation of @b{⌹B} if @b{B} is large.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.22
+@node    Section 2.23
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -3324,7 +3420,7 @@ values or values being assigned.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.23
+@node    Section 2.24
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -3401,7 +3497,7 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.24
+@node    Section 2.25
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
@@ -3409,7 +3505,7 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.25
+@node    Section 2.26
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -3653,7 +3749,7 @@ sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.26
+@node    Section 2.27
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
@@ -3661,7 +3757,7 @@ GNU APL. @xref{Section 2.1}.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.27
+@node    Section 2.28
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -3805,7 +3901,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.28
+@node    Section 2.29
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -3862,7 +3958,7 @@ few hours, though, so that creating it will not pay off for most mortals.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.29
+@node    Section 2.30
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp ToolKit) is a rather powerful library for creating graphical user
@@ -3876,7 +3972,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.30
+@node    Section 2.31
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -3922,7 +4018,7 @@ is large.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.31
+@node    Section 2.32
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
@@ -4026,7 +4122,7 @@ shown in the examples below.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.32
+@node    Section 2.33
 @section ⎕MX - Matrix/Statistics
 
 ⎕MX was kindly contributed by Henrik Moller
@@ -4481,7 +4577,7 @@ Print: 10+⍳10
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.33
+@node    Section 2.34
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -4912,7 +5008,7 @@ the @b{libgtk-3} option.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.34
+@node    Section 2.35
 @section ⎕PNG - Portable Network Graphics
 
 Portable Network Graphics is a file format for images, defined in
@@ -5125,7 +5221,7 @@ the GNU APL color model into a PNG file.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.35
+@node    Section 2.36
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -5152,7 +5248,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.36
+@node    Section 2.37
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -5491,7 +5587,7 @@ The same for the pos+len output format:
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.37
+@node    Section 2.38
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -5562,19 +5658,16 @@ A=4 controls a maximum depth of the subsequent random APL values.
 
 @subsubsection Control of the underlying random number generator: 0 ⎕RVAL B
 
-⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
-only available on platforms which use glibc, for example all GNU/Linux
-systems.
+Every random number generator has a state (similar to @b{⎕RL} for @b{'?'}).
+While the primitive @b{?} keeps its state in @b{⎕RL}, i.e. in the workspace,
+⎕RVAL has no associated system variable like i@b{⎕RL} which keeps its state.
+Instead, the user needs to store the state of i@b{⎕RVAL} in a workspace
+variable if the workspace shall be stored and continued at a later point.
+This rarely happens, therefore no effort was spent on implementing another
+system variable. For the same reasonxi does, the state of @b{⎕RVAL}
+survive @b{)CLEAR}.
 
-Every random number generator has a state (similar to ⎕RL for '?'). While
-the primitive ? keeps its state in ⎕RL, i.e. in the workspace, ⎕RVAL has
-no associated system variable like ⎕RL which keeps its state. Instead,
-the user needs to store the state of ⎕RVAL in a workspace variable if the
-workspace shall be stored and continued at a later point. This rarely happens,
-therefore no effort was spent on implementing another system variable. For
-the same reason, the state of ⎕RVAL survives )CLEAR.
-
-The current state of ⎕RVAL's random number generator can be retrieved
+The current state of @b{⎕RVAL}'s random number generator can be retrieved
 with:
 
 @example
@@ -5808,7 +5901,7 @@ argument A and also the subfunction notation:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.38
+@node    Section 2.39
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -5886,7 +5979,7 @@ the caller, and so on.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.39
+@node    Section 2.40
 @section ⎕SQL - SQL Database Interface
 
 ⎕SQL was kindly contributed by Elias Mårtenson.
@@ -6560,7 +6653,7 @@ As usual, the number of rows must match the number of placeholders in the
 query parameter @b{B} (an APL vector).
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.40
+@node    Section 2.41
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -6664,7 +6757,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.41
+@node    Section 2.42
 @section ⎕XML  - XML Parsing
 
 @c ............................................................................
@@ -7190,7 +7283,7 @@ follow these top-level steps:
 @end enumerate
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.42
+@node    Section 2.43
 @section Conditionals
 
 @b{WARNING}: GNU APL conditionals are experimental. Use them with care and
@@ -7562,7 +7655,7 @@ that if not syntactically required. Some people even use double parentheses to
 emphasize the condition of a conditional statement or expression.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.43
+@node    Section 2.44
 @section Matrix Product
 
 In standard APL, the inner product Z of two matrices A and B as known from
@@ -7653,7 +7746,7 @@ of @b{A} and @b{B}. Naturally, the multiplications of these 0-columns or
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.44
+@node    Section 2.45
 @section Monadic ≠ (Nub Sieve)
 
 The nub sieve @b{Z←≠B} of a value @b{B} is a Boolean vector @b{Z} with the

@@ -1403,7 +1403,7 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
    else   // default caption: ⎕PLOT
       {
        char cc[50];
-       SPRINTF(cc, "%s %d", w_props.get_caption().c_str(), handle);
+       SPRINTF(cc, "%s-XCB %d", w_props.get_caption().c_str(), handle);
        pctx.caption = strdup(cc);
       }
 

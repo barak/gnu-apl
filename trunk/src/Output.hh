@@ -41,23 +41,23 @@ using namespace std;
  The classes below are used to combine normal user I/O and automatic
  testcase execution. It works like this:
 
-       (cin)
+       (CIN)
          │
          │
          V
      ┌───────┐             ┌───────────────────┐
-     │ Input │ <────────   │ testcase files(s) │
+     │ Input │  <────────  │ testcase files(s) │
      └───┬───┘             └───────────────────┘
-         │                           |
-         │                           |
-         V                           |
-      ┌─────┐                        |
-      │ APL │                        |
-      └──┬──┘                        |
-         │                           |
-         │                           |
-         ├───────────────────────┐   |
-         │                       │   |
+         │                           │
+         │                           │
+         V                           │
+      ┌─────┐                        │
+      │ APL │                        │
+      └──┬──┘                        │
+         │                           │
+         │      -T testcase          │
+         ├───────────────────────┐   │
+         │                       │   │
          │                       V   V
          │                    ┌─────────┐
          │                    │ compare │
@@ -65,7 +65,7 @@ using namespace std;
          │                         │
          │                         │
          V                         V
-       (cout)                (test results)
+       (COUT)                (test results)
 
  */
 
