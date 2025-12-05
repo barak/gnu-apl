@@ -27,7 +27,7 @@ noinst_PROGRAMS = APL_keyboard       \
 # endif
 # endif
 
-dist_noinst_SCRIPTS = check_src memory_benchmark.cc
+dist_noinst_SCRIPTS = check_src plotlibs memory_benchmark.cc
 
 APL_keyboard_SOURCES       = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def

@@ -550,7 +550,7 @@ const TokenTag tag = result.get_tag();
 Value_P B(result.get_apl_val());
    Assert(+B);
 
-   // print values, but not TOK_APL_VALUE2 (comited value)
+   // print values, but not TOK_APL_VALUE2 (aka. commited value)
    //
 bool print_value = result.get_Class() == TC_VALUE && tag != TOK_APL_VALUE2;
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,62 +29,83 @@
 
 #include "Common.hh"
 
-// always require libX11
-//
-# if defined( HAVE_LIBX11 )
-#  define MISSING_libX11 ""
-# else
-#  define MISSING_LIBS 1
-#  define MISSING1 " libX11.so"
-#endif       // HAVE_LIBX11
+// X11
 
-#if apl_GTK3                            // ======== GTK based ⎕PLOT ========
+#if HAVE_LIBX11
+# define MISSING_LIBX11 ""
+#else   // not HAVE_LIBX11
+# define MISSING_LIBX11 " libX11.so"
+#endif   // (don't) HAVE_LIBX11
 
-# if defined( HAVE_LIBGTK_3 )
-#  define MISSING2 ""
-# else
-#  define MISSING_LIBS 1
-#  define MISSING2 " libgtk-3.so"
-#endif       // HAVE_LIBGTK_3_0
+#if HAVE_X11_XLIB_H
+# define MISSING_X11_XLIB_H ""
+#else   // not HAVE_X11_XLIB_H
+# define MISSING_X11_XLIB_H " X11/Xlib.h"
+#endif   // (don't) HAVE_X11_XLIB_H
 
-# if defined( HAVE_LIBGDK_3 )
-#  define MISSING3 ""
-# else
-#  define MISSING_LIBS 1
-#  define MISSING3 " libgdk-3.so"
-#endif       // HAVE_LIBGTK_3_0
+#if HAVE_X11_XUTIL_H
+# define MISSING_X11_XUTIL_H ""
+#else   // not HAVE_X11_XUTIL_H
+# define MISSING_X11_XUTIL_H " X11/Xutil.h"
+#endif   // (don't) HAVE_X11_XUTIL_H
 
-# if defined( HAVE_LIBCAIRO )
-#  define MISSING4 ""
-# else
-#  define MISSING_LIBS 1
-#  define MISSING4 " libcairo.so"
-#endif       // HAVE_LIBGTK_3_0
+// X11 summary
+#define MISSING_X11 \
+    MISSING_LIBX11 \
+    MISSING_X11_XLIB_H \
+    MISSING_X11_XUTIL_H
 
-#else    // don't apl_GTK3:             // ======== XCB based ⎕PLOT ========
+// XCB
 
-# if defined( HAVE_LIBXCB )
-#  define MISSING2 ""
-# else   // not HAVE_LIBXCB
-#  define MISSING_LIBS 1
-#  define MISSING2 " libxcb.so"
-# endif   // (don't) HAVE_LIBXCB
+#if HAVE_LIBX11_XCB
+# define MISSING_LIBX11_XCB ""
+#else   // not HAVE_LIBX11_XCB
+# define MISSING_LIBX11_XCB " libX11-xcb.so"
+#endif   // (don't) HAVE_LIBX11_XCB
 
-# if defined( HAVE_LIBX11_XCB )
-#  define MISSING3 ""
-# else   // not HAVE_LIBX11_XCB
-#  define MISSING_LIBS 1
-#  define MISSING3 " libX11-xcb.so"
-# endif       // (don't) HAVE_LIBX11_XCB
+#if HAVE_LIBXCB
+# define MISSING_LIBXCB ""
+#else   // not HAVE_LIBXCB
+# define MISSING_LIBXCB " libX11-xcb.so"
+#endif   // (don't) HAVE_LIBXCB
 
-# if ! defined( HAVE_XCB_XCB_H )
-#  define MISSING_LIBS 1
-#  define MISSING4 " xcb/xcb.h"
-# else
-#  define MISSING4 ""
-# endif      // HAVE_XCB_XCB_H
+#if HAVE_X11_XLIB_XCB_H
+# define MISSING_X11_XLIB_XCB_H ""
+#else   // not HAVE_X11_XLIB_XCB_H
+# define MISSING_X11_XLIB_XCB_H " X11/Xlib-xcb.h"
+#endif   // (don't) HAVE_X11_XLIB_XCB_H
 
-#endif   // apl_GTK3                    // ======== GTK vs. XCB ========
+#if HAVE_XCB_XCB_H
+# define MISSING_XCB_XCB_H ""
+#else   // not HAVE_XCB_XCB_H
+# define MISSING_XCB_XCB_H " xcb/xcb.h"
+#endif   // (don't) HAVE_XCB_XCB_H
+
+// XCB summary
+#define MISSING_XCB \
+    MISSING_LIBX11_XCB \
+    MISSING_LIBXCB \
+    MISSING_X11_XLIB_XCB_H \
+    MISSING_XCB_XCB_H
+
+// GTK
+
+#if HAVE_LIBGTK_3
+# define MISSING_LIBGTK_3 ""
+#else   // not HAVE_LIBGTK_3
+# define MISSING_LIBGTK_3 " libgtk-3.so"
+#endif   // (don't) HAVE_LIBGTK_3
+
+#if HAVE_LIBCAIRO
+# define MISSING_LIBCAIRO ""
+#else   // not HAVE_LIBCAIRO
+# define MISSING_LIBCAIRO " libcairo.so"
+#endif   // (don't) HAVE_LIBCAIRO
+
+// GTK summary
+#define MISSING_GTK \
+    MISSING_LIBGTK_3 \
+    MISSING_LIBCAIRO
 
 #include "Avec.hh"
 #include "Common.hh"
@@ -114,13 +135,6 @@ const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_XCB;
 #else
 const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
 #endif
-
-#if ! defined(MISSING_LIBS)
-
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-# include <xcb/xcb.h>
-# include <xcb/xproto.h>
 
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
@@ -180,11 +194,6 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
    if (B->get_rank() > 3)        RANK_ERROR;
    if (B->element_count() < 2)   LENGTH_ERROR;
 
-#if ! (apl_GTK3 || apl_XCB)
-   MORE_ERROR() << "No suitable GUI library (i.e. GTK or X11/XCB) found).";
-   SYNTAX_ERROR;
-#endif
-
    // plot window with default attributes
    //
 Plot_data * data = setup_data(*B);
@@ -210,12 +219,41 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
       }
    if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
 
-   if (default_plot_driver == PltDrv_ASCII ||   // no GUI available, or
-       w_props->get_gui_driver() == "ASCII")    // ASCII requested
+   // plot driver selection. The user may or may not have requested a particular
+   // driver
+   //
+   if (w_props->get_gui_driver() == "GTK")    // GTK requested
+      {
+#if not apl_GTK3
+        MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK, but GTK was "
+                        "not (completely) installed.\nMissing:"
+                        MISSING_X11 MISSING_GTK;
+        DOMAIN_ERROR;
+#endif
+      }
+   else if (w_props->get_gui_driver() == "XCB")    // XCB requested
+      {
+#if not apl_XCB
+        MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB, but XCB was "
+                        "not (completely) installed.\nMissing:"
+                        MISSING_X11 MISSING_XCB;
+        DOMAIN_ERROR;
+#endif
+      }
+   else if (w_props->get_gui_driver() == "" ||      // no driver requested
+            w_props->get_gui_driver() == "ASCII")   // ASCII requested
       {
         Value_P Z = do_plot_ASCII(*w_props, *data);
         return Token(TOK_APL_VALUE2, Z);
       }
+   else
+      {
+        MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver "
+                     << w_props->get_gui_driver().c_str();
+        DOMAIN_ERROR;
+      }
+
+   // from here on we use GTK or XCB...
 
    // do_plot_data takes ownership of w_props and will delete w_props
    //
@@ -734,12 +772,12 @@ const ShapeItem data_points = rows * cols;
 }
 //----------------------------------------------------------------------------
 void
-Quad_PLOT::load_driver(Plot_window_properties * w_props, int handle,
-                       Plot_driver driver_type)
+Quad_PLOT::start_GUI(Plot_window_properties * w_props, int handle,
+                     Plot_driver driver_type)
 {
 Plot_driver driver;
 const string driver_attr = w_props->get_gui_driver();
-     
+ 
    if      (driver_attr == "")        driver = default_plot_driver;
    else if (driver_attr == "GTK")     driver = PltDrv_GTK;
    else if (driver_attr == "XCB")     driver = PltDrv_XCB;
@@ -753,6 +791,7 @@ const string driver_attr = w_props->get_gui_driver();
 
    if (driver == PltDrv_GTK)
       {
+#if apl_GTK3
         // plot_main_GTK() pushes a new GTK_context into variable
         // Quad_PLOT::all_PLOT_windows and  posts expose_sema after
         // its plot window was exposed.
@@ -762,10 +801,18 @@ const string driver_attr = w_props->get_gui_driver();
         sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
         return;
+#else   // not apl_GTK3
+
+   MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK requested, "
+                   "but GTK was not completely installed.\n"
+                   "Missing: " MISSING_X11 MISSING_GTK;
+   DOMAIN_ERROR;
+#endif   // (not) apl_GTK3
       }
 
    if (driver == PltDrv_XCB)
       {
+#if apl_XCB
         // start a thread that pushes a XCB_context and then posts the
         // expose_sema after its plot window was exposed.
         //
@@ -775,11 +822,19 @@ const string driver_attr = w_props->get_gui_driver();
         sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
         return;
+#else   // not apl_XCB
+   MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB requested, "
+                   "but XCB was not completely installed.\n"
+                   "Missing: " MISSING_X11 MISSING_XCB;
+   DOMAIN_ERROR;
+#endif   // (not) apl_XCB
       }
 
    // neither GTK nor XCB. Use ASCII fallback
    Assert(driver == PltDrv_ASCII);
-   Log(LOG_Quad_PLOT)   CERR << "Plot ASCII needs no driver." << endl;
+   Log(LOG_Quad_PLOT)
+      CERR << "gui_driver: " << driver_attr.c_str() 
+           << " (no driver needed)." << endl;
 }
 //----------------------------------------------------------------------------
 // the ⎕PLOT workhorse
@@ -812,7 +867,7 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 
 const APL_Integer Z = ++next_handle;
    sem_wait(all_PLOT_windows_sema);
-       load_driver(w_props, Z, PltDrv_GTK);
+       start_GUI(w_props, Z, PltDrv_GTK);
    sem_post(all_PLOT_windows_sema);
 
    if (w_props->get_with_border())
@@ -905,39 +960,3 @@ Quad_PLOT::PLOT_context::remove_handle(Handle handle)
    return 0;
 }
 //----------------------------------------------------------------------------
-//
-#else   // defined(MISSING_LIBS)
-
-//----------------------------------------------------------------------------
-Quad_PLOT::Quad_PLOT()
-  : QuadFunction(TOK_Quad_PLOT)
-{
-   verbosity = 0;
-}
-//----------------------------------------------------------------------------
-Quad_PLOT::~Quad_PLOT()
-{
-}
-//----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_AB(Value_P A, Value_P B) const
-{
-   return eval_B(B);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_B(Value_P B) const
-{
-   MORE_ERROR() <<
-      "⎕PLOT is not available because some of its build prerequisites "
-      "(in particular\n" MISSING1 MISSING2 MISSING3 MISSING4
-      ") were either missing,\n" 
-      " or were explicitly disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-
-#endif // (not) defined(MISSING_LIBS)
-

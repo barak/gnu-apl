@@ -302,9 +302,15 @@ without-optional_libs
    libraries are not available, but the liker will still link agains them
    (with no effect). The purpose of this option is to compile (for test
    purposes) also those paths in the GNU APL source code that were disabled
-   by the presence of an optional library. Example:
+   by the presence of an optional library. Examples:
 
     ./configure --without-optional_libs
+
+    ./configure --without-optional_libs  \
+                --enable-maintainer-mode \
+                 DEVELOP_WANTED=yes      \
+                 DYNAMIC_LOG_WANTED=yes  \
+                 CXX_WERROR=yes
 
 -------------------------------------------------------------------------------
 

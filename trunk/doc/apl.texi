@@ -2896,11 +2896,12 @@ BE
 @node    Section 2.20
 @section ⊤ (Encode) with Axis
 
-The dyadic primitive function @b{A ⊥ B} (Decode) computes the values of @b{B}.
-in a number system with radices @b{A}. The most common case is a homogeneous
-radix, i.e. all items of @b{A} are the same. In that case the radix @b{A} can
-be specified as a scalar @b{A} which will be scalar-extended to the length
-of @b{B} (more preisely: to @b{↑⍴B}). For example:
+The dyadic primitive function @b{A ⊥ B} (Decode) computes the @b{values}
+of @b{B} in a number system with radices @b{A}. The most common case is
+a homogeneous radix, i.e. all items of @b{A} are the same. In that case
+the radix @b{A} can be specified as a scalar @b{A} which will be
+scalar-extended to the length of @b{B} (more precisely: to @b{↑⍴B}).
+For example:
 
 @example
       2 2 2 2 ⊥ 1 1 0 1
@@ -2913,61 +2914,83 @@ of @b{B} (more preisely: to @b{↑⍴B}). For example:
 13
 @end example
 
-The dyadic primitive function @b{A ⊤ B} (Encode) computes the representation
+The dyadic primitive function @b{A ⊤ B} (Encode) computes the @i{representation}
 of @b{B} in a number system whose radices are @b{A}. The most common case is
-also a homogeneous radix @b{A}. In this sense, Encode is the inverse function
-of Decode. Unfortunately Encode can not scalar extend the radix @b{A} because
-the shapes of its arguments do not provide sufficient information to determine
-the radix length that shall be used. As a consequence:
+again a homogeneous radix @b{A}. In this sense, Encode is the inverse function
+of Decode. Unfortunately Encode can not scalar extend the radix @b{A}. This
+is because the shapes of its arguments do not provide sufficient information
+to determine the radix length that shall be used. As a consequence:
 
 @itemize
-@item the user needs to provide the radix @b{A} with the proper length for
-the items in @b{B},
+@item the user needs to provide the radix @b{A} as a vector with identical
+      items and with a length that is suitable for the items in @b{B},
 @item if more radix items than needed are provided, then the result contains
-leading 0s (which is sort of OK), but
-@item if less radix items than needed are provided, then a kind of oberflow
-occurs and the first item of the result, unlike the other items, exceeds
-the radix.
-@item The IBM language reference manual proposes to use the APL expression
-@b{⌊1∣+A⍟(∣B)+A=0} for the length of the radix @b{A}.
+      leading 0s (which is sort of OK because no information is lost), but
+@item if less radix items than needed are provided, then an oberflow
+      occurs and the result is truncated.  This is awkward because, for example
+      
+@example
+      2 2 2 2 2 2 2 2 ⊤ 1000     ⍝ radix too short for 1000
+1 1 1 0 1 0 0 0
+
+      2 ⊥ 1 1 1 0 1 0 0 0        ⍝ therefore not 1000 !!!
+232
+      232 + (2⋆8) + (2⋆9)        ⍝ add missing items
+1000
+@end example
+
+@item The IBM APL2 language reference manual proposes to use the APL expression
+@b{⌊1∣+A⍟(∣B)+A=0} for the optimal length of the radix @b{A}.
 @end itemize
 
+We call a radix length @b{⍴A} @i{optimal} if it is neither too long nor to short.
+In that case the result has no leading zeros and @b{B ≡ A⊥A⊤N}. For an optimal
+radix length are @b{A⊤} and @b{A⊥} the inverse functions of each other.
+
 In order to improve on this, GNU APL offers the possibility to automatically
-(and without using @b{A⍟B} to do so). The solution implemented in GNU APL is
-to provide the optimal radix length as an axis argument. There are two use
-cases for the axis argument:
+(and without using @b{A⍟B}) compute the optimal radix length from @b{A}
+and @b{B}. The solution implemented in GNU APL is to provide the optimal
+radix length as an axis argument. There are two different cases for the axis
+argument:
 
 @itemize
-@item if the proper radix length is known, say @b{N > 0} , then the length is
-given as axis argument. In this case the left argument of @b{A⊤B} is simplified:
+@item If the optimal radix length is known, say @b{N > 0}, then the radix length
+is given as axis argument @b{N>0}. In this case the left argument of @b{A⊤B} is
+slightly simplified:
+
 @example
-      (N⍴↑A)⊤B   ←→   A⊤[N]B   ⍝ radix length is known
+      (N⍴↑A) ⊤ B   ←→   A ⊤[N] B   ⍝ optimal radix length N>0 is known
 @end example
+
 This case frequently occurs when integer(s) @b{B} are encoded into hexadecimal
-8-bit bytes (i.e. radix length 2), words (i.e. radix length 4) or long words
- (i.e. radix length 4),
-@item otherwise the radix length is not known; this case is specified as axis
-argument @b{0}. This is the case where @b{⌊1∣+A⍟(∣B)+A=0} would be needed, and
-it simplifies @b{A⊤B} even more:
+8-bit (i.e. radix length = 2 hex digits), 16-bit words (i.e. radix
+length = 4 hex digits), 32-bit longs (i.e. radix length = 8 hex digits),
+or 64-bit long longs (i.e. radix length = 16 hex digits).
+
+@item Otherwise the radix length is not known; this case is specified as axis
+argument @b{0}. This is also the case where @b{⌊1∣+A⍟(∣B)+A=0} would be needed,
+and it simplifies @b{A⊤B} considerably:
+
 @example
-      ((⌊1∣+A⍟(∣B)+A=0)⍴↑A)⊤B   ←→   A⊤[0]B   ⍝ unknown radix length
+      ((⌊1∣+A⍟(∣B)+A=0)⍴↑A) ⊤ B   ←→   A ⊤ [0]B   ⍝ unknown radix length
 @end example
 @end itemize
 
 Please note the following:
 
 @itemize
-
 @item Obviously the case @b{N>0} is faster than the case @b{N=0} because the
-user has taken over radix length computation. However, @b{A⊤[N]B} is still
-faster than the classical @b{(N⍴↑A)⊤B}.
+      user has taken over radix length computation. However, @b{A⊤[N]B} is still
+      faster than the classical @b{(N⍴↑A)⊤B}.
+
 @item If all items in @b{B} are non-negative, then the case @b{N=0} uses
-the optimal radix length for unsigned numbers, i.e. @i{without a sign}.
-The result can be used in what is known as @i{unsigned base-A arithmetic}.
-@item  If some item of @b{B} is negative, then the case @b{N=0} uses a radix
-length that @i{includes} a sign (i@i{two's complement arithmetic} if @b{A=2}).
-The sign is @b{0} for the non-negative items of @b{B} and @b{A-1} for the
-negative items of @b{B}.
+      the optimal radix length for unsigned numbers, i.e. @i{without a sign}.
+      The result can be used in what is known as @i{unsigned base-A arithmetic}.
+
+@item If some item of @b{B} is negative, then the case @b{N=0} uses a radix
+      length that @i{includes} a sign (aka. @i{two's complement arithmetic} if
+      @b{A=2}).  The sign is @b{0} for the non-negative items of @b{B} and
+      @b{A-1} for the negative items of @b{B} (= 1 for binary encodings).
 @end itemize
 
 Examples:

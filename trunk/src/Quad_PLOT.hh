@@ -83,7 +83,7 @@ enum { SAVE_BORDER_DELAY_ms = 100 };
        when a plot window was exposed (shown). Posted by GTK and XCB after the
        plot window was shown. At this point has finishied drawing the initial
        plot window and only reacts to (mouse-) events like window resize,
-       window close, etc. It is also the point where Quad_PLOT::load_driver()
+       window close, etc. It is also the point where Quad_PLOT::start_GUI()
        (and therefore also eval_AB() rersp. eval_B() return. This is to make
        eval_AB() rersp. eval_B() kind of atomic operations.
 
@@ -172,8 +172,8 @@ protected:
    ~Quad_PLOT();
 
    /// initialize the GUI
-   static void load_driver(Plot_window_properties * w_props, int handle,
-                           Plot_driver driver_type);
+   static void start_GUI(Plot_window_properties * w_props, int handle,
+                         Plot_driver driver_type);
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;

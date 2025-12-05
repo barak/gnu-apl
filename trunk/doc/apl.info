@@ -2728,11 +2728,11 @@ File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  
 2.20 ⊤ (Encode) with Axis
 =========================
 
-The dyadic primitive function A ⊥ B (Decode) computes the values of B.
-in a number system with radices A. The most common case is a homogeneous
+The dyadic primitive function A ⊥ B (Decode) computes the values of B in
+a number system with radices A. The most common case is a homogeneous
 radix, i.e.  all items of A are the same.  In that case the radix A can
 be specified as a scalar A which will be scalar-extended to the length
-of B (more preisely: to ↑⍴B). For example:
+of B (more precisely: to ↑⍴B). For example:
 
            2 2 2 2 ⊥ 1 1 0 1
      13
@@ -2745,52 +2745,76 @@ of B (more preisely: to ↑⍴B). For example:
 
    The dyadic primitive function A ⊤ B (Encode) computes the
 representation of B in a number system whose radices are A. The most
-common case is also a homogeneous radix A. In this sense, Encode is the
+common case is again a homogeneous radix A. In this sense, Encode is the
 inverse function of Decode.  Unfortunately Encode can not scalar extend
-the radix A because the shapes of its arguments do not provide
+the radix A. This is because the shapes of its arguments do not provide
 sufficient information to determine the radix length that shall be used.
 As a consequence:
 
-   • the user needs to provide the radix A with the proper length for
-     the items in B,
+   • the user needs to provide the radix A as a vector with identical
+     items and with a length that is suitable for the items in B,
    • if more radix items than needed are provided, then the result
-     contains leading 0s (which is sort of OK), but
-   • if less radix items than needed are provided, then a kind of
-     oberflow occurs and the first item of the result, unlike the other
-     items, exceeds the radix.
-   • The IBM language reference manual proposes to use the APL
-     expression ⌊1∣+A⍟(∣B)+A=0 for the length of the radix A.
+     contains leading 0s (which is sort of OK because no information is
+     lost), but
+   • if less radix items than needed are provided, then an oberflow
+     occurs and the result is truncated.  This is awkward because, for
+     example
+
+                2 2 2 2 2 2 2 2 ⊤ 1000     ⍝ radix too short for 1000
+          1 1 1 0 1 0 0 0
+
+                2 ⊥ 1 1 1 0 1 0 0 0        ⍝ therefore not 1000 !!!
+          232
+                232 + (2⋆8) + (2⋆9)        ⍝ add missing items
+          1000
+
+   • The IBM APL2 language reference manual proposes to use the APL
+     expression ⌊1∣+A⍟(∣B)+A=0 for the optimal length of the radix A.
+
+   We call a radix length ⍴A optimal if it is neither too long nor to
+short.  In that case the result has no leading zeros and B ≡ A⊥A⊤N. For
+an optimal radix length are A⊤ and A⊥ the inverse functions of each
+other.
 
    In order to improve on this, GNU APL offers the possibility to
-automatically (and without using A⍟B to do so).  The solution
-implemented in GNU APL is to provide the optimal radix length as an axis
-argument.  There are two use cases for the axis argument:
+automatically (and without using A⍟B) compute the optimal radix length
+from A and B. The solution implemented in GNU APL is to provide the
+optimal radix length as an axis argument.  There are two different cases
+for the axis argument:
 
-   • if the proper radix length is known, say N > 0 , then the length is
-     given as axis argument.  In this case the left argument of A⊤B is
-     simplified:
-                (N⍴↑A)⊤B   ←→   A⊤[N]B   ⍝ radix length is known
+   • If the optimal radix length is known, say N > 0, then the radix
+     length is given as axis argument N>0.  In this case the left
+     argument of A⊤B is slightly simplified:
+
+                (N⍴↑A) ⊤ B   ←→   A ⊤[N] B   ⍝ optimal radix length N>0 is known
+
      This case frequently occurs when integer(s) B are encoded into
-     hexadecimal 8-bit bytes (i.e.  radix length 2), words (i.e.  radix
-     length 4) or long words (i.e.  radix length 4),
-   • otherwise the radix length is not known; this case is specified as
-     axis argument 0.  This is the case where ⌊1∣+A⍟(∣B)+A=0 would be
-     needed, and it simplifies A⊤B even more:
-                ((⌊1∣+A⍟(∣B)+A=0)⍴↑A)⊤B   ←→   A⊤[0]B   ⍝ unknown radix length
+     hexadecimal 8-bit (i.e.  radix length = 2 hex digits), 16-bit words
+     (i.e.  radix length = 4 hex digits), 32-bit longs (i.e.  radix
+     length = 8 hex digits), or 64-bit long longs (i.e.  radix length =
+     16 hex digits).
+
+   • Otherwise the radix length is not known; this case is specified as
+     axis argument 0.  This is also the case where ⌊1∣+A⍟(∣B)+A=0 would
+     be needed, and it simplifies A⊤B considerably:
+
+                ((⌊1∣+A⍟(∣B)+A=0)⍴↑A) ⊤ B   ←→   A ⊤ [0]B   ⍝ unknown radix length
 
    Please note the following:
 
    • Obviously the case N>0 is faster than the case N=0 because the user
      has taken over radix length computation.  However, A⊤[N]B is still
      faster than the classical (N⍴↑A)⊤B.
+
    • If all items in B are non-negative, then the case N=0 uses the
      optimal radix length for unsigned numbers, i.e.  without a sign.
      The result can be used in what is known as unsigned base-A
      arithmetic.
+
    • If some item of B is negative, then the case N=0 uses a radix
-     length that includes a sign (itwo’s complement arithmetic if A=2).
-     The sign is 0 for the non-negative items of B and A-1 for the
-     negative items of B.
+     length that includes a sign (aka.  two’s complement arithmetic if
+     A=2).  The sign is 0 for the non-negative items of B and A-1 for
+     the negative items of B (= 1 for binary encodings).
 
    Examples:
            2⊤[4] 13           ⍝ 4 digit radix, positive B
@@ -8841,52 +8865,52 @@ Node: Section 2.1784600
 Node: Section 2.1895503
 Node: Section 2.1998050
 Node: Section 2.20104995
-Node: Section 2.21108604
-Node: Section 2.22110107
-Node: Section 2.23120914
-Node: Section 2.24126825
-Node: Section 2.25130197
-Node: Section 2.26130488
-Node: Section 2.27141341
-Node: Section 2.28141613
-Node: Section 2.29148666
-Node: Section 2.30151120
-Node: Section 2.31151789
-Node: Section 2.32153440
-Node: Section 2.33157364
-Node: Section 2.34171793
-Node: The Plot Data B173010
-Node: The Plot Attributes A175624
-Node: Plot Window Handling188819
-Node: Output File Format190150
-Node: Section 2.35191354
-Node: Section 2.36200789
-Node: Section 2.37201808
-Node: Section 2.38217043
-Node: Section 2.39228085
-Node: Section 2.40230269
-Node: Section 2.41256374
-Node: Section 2.42260914
-Node: Section 2.43282013
-Node: Section 2.44296026
-Node: Section 2.45299296
-Node: Chapter 3299811
-Node: Chapter 4302319
-Node: Chapter 5303460
-Node: Section 5.1305107
-Node: Section 5.2306427
-Node: Section 5.3306787
-Node: Section 5.4307029
-Node: Section 5.5307691
-Node: Section 5.6308169
-Node: Section 5.7308942
-Node: Section 5.8309368
-Node: Chapter 6309770
-Node: Section 6.1310189
-Node: Section 6.2310876
-Node: Chapter 7311707
-Node: Section 7.1312210
-Node: Section 7.2337523
+Node: Section 2.21109431
+Node: Section 2.22110934
+Node: Section 2.23121741
+Node: Section 2.24127652
+Node: Section 2.25131024
+Node: Section 2.26131315
+Node: Section 2.27142168
+Node: Section 2.28142440
+Node: Section 2.29149493
+Node: Section 2.30151947
+Node: Section 2.31152616
+Node: Section 2.32154267
+Node: Section 2.33158191
+Node: Section 2.34172620
+Node: The Plot Data B173837
+Node: The Plot Attributes A176451
+Node: Plot Window Handling189646
+Node: Output File Format190977
+Node: Section 2.35192181
+Node: Section 2.36201616
+Node: Section 2.37202635
+Node: Section 2.38217870
+Node: Section 2.39228912
+Node: Section 2.40231096
+Node: Section 2.41257201
+Node: Section 2.42261741
+Node: Section 2.43282840
+Node: Section 2.44296853
+Node: Section 2.45300123
+Node: Chapter 3300638
+Node: Chapter 4303146
+Node: Chapter 5304287
+Node: Section 5.1305934
+Node: Section 5.2307254
+Node: Section 5.3307614
+Node: Section 5.4307856
+Node: Section 5.5308518
+Node: Section 5.6308996
+Node: Section 5.7309769
+Node: Section 5.8310195
+Node: Chapter 6310597
+Node: Section 6.1311016
+Node: Section 6.2311703
+Node: Chapter 7312534
+Node: Section 7.1313037
+Node: Section 7.2338350
 
 End Tag Table
 

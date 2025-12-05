@@ -428,7 +428,7 @@ top_srcdir = @top_srcdir@
 # memory_benchmark_CXXFLAGS = -Wall
 # endif
 # endif
-dist_noinst_SCRIPTS = check_src memory_benchmark.cc
+dist_noinst_SCRIPTS = check_src plotlibs memory_benchmark.cc
 APL_keyboard_SOURCES = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES = APL_keyboard_show.cc

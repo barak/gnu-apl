@@ -3354,11 +3354,12 @@ Next: <a href="#Section-2_002e21" accesskey="n" rel="next">Generalized ⍳</a>, 
 </div>
 <span id="g_t_005b_003f_005d-_0028Encode_0029-with-Axis"></span><h3 class="section">2.20 ⊤ (Encode) with Axis</h3>
 
-<p>The dyadic primitive function <b>A ⊥ B</b> (Decode) computes the values of <b>B</b>.
-in a number system with radices <b>A</b>. The most common case is a homogeneous
-radix, i.e. all items of <b>A</b> are the same. In that case the radix <b>A</b> can
-be specified as a scalar <b>A</b> which will be scalar-extended to the length
-of <b>B</b> (more preisely: to <b>↑⍴B</b>). For example:
+<p>The dyadic primitive function <b>A ⊥ B</b> (Decode) computes the <b>values</b>
+of <b>B</b> in a number system with radices <b>A</b>. The most common case is
+a homogeneous radix, i.e. all items of <b>A</b> are the same. In that case
+the radix <b>A</b> can be specified as a scalar <b>A</b> which will be
+scalar-extended to the length of <b>B</b> (more precisely: to <b>↑⍴B</b>).
+For example:
 </p>
 <div class="example">
 <pre class="example">      2 2 2 2 ⊥ 1 1 0 1
@@ -3371,44 +3372,65 @@ of <b>B</b> (more preisely: to <b>↑⍴B</b>). For example:
 13
 </pre></div>
 
-<p>The dyadic primitive function <b>A ⊤ B</b> (Encode) computes the representation
+<p>The dyadic primitive function <b>A ⊤ B</b> (Encode) computes the <i>representation</i>
 of <b>B</b> in a number system whose radices are <b>A</b>. The most common case is
-also a homogeneous radix <b>A</b>. In this sense, Encode is the inverse function
-of Decode. Unfortunately Encode can not scalar extend the radix <b>A</b> because
-the shapes of its arguments do not provide sufficient information to determine
-the radix length that shall be used. As a consequence:
+again a homogeneous radix <b>A</b>. In this sense, Encode is the inverse function
+of Decode. Unfortunately Encode can not scalar extend the radix <b>A</b>. This
+is because the shapes of its arguments do not provide sufficient information
+to determine the radix length that shall be used. As a consequence:
 </p>
 <ul>
-<li> the user needs to provide the radix <b>A</b> with the proper length for
-the items in <b>B</b>,
+<li> the user needs to provide the radix <b>A</b> as a vector with identical
+      items and with a length that is suitable for the items in <b>B</b>,
 </li><li> if more radix items than needed are provided, then the result contains
-leading 0s (which is sort of OK), but
-</li><li> if less radix items than needed are provided, then a kind of oberflow
-occurs and the first item of the result, unlike the other items, exceeds
-the radix.
-</li><li> The IBM language reference manual proposes to use the APL expression
-<b>⌊1∣+A⍟(∣B)+A=0</b> for the length of the radix <b>A</b>.
+      leading 0s (which is sort of OK because no information is lost), but
+</li><li> if less radix items than needed are provided, then an oberflow
+      occurs and the result is truncated.  This is awkward because, for example
+      
+<div class="example">
+<pre class="example">      2 2 2 2 2 2 2 2 ⊤ 1000     ⍝ radix too short for 1000
+1 1 1 0 1 0 0 0
+
+      2 ⊥ 1 1 1 0 1 0 0 0        ⍝ therefore not 1000 !!!
+232
+      232 + (2⋆8) + (2⋆9)        ⍝ add missing items
+1000
+</pre></div>
+
+</li><li> The IBM APL2 language reference manual proposes to use the APL expression
+<b>⌊1∣+A⍟(∣B)+A=0</b> for the optimal length of the radix <b>A</b>.
 </li></ul>
 
+<p>We call a radix length <b>⍴A</b> <i>optimal</i> if it is neither too long nor to short.
+In that case the result has no leading zeros and <b>B ≡ A⊥A⊤N</b>. For an optimal
+radix length are <b>A⊤</b> and <b>A⊥</b> the inverse functions of each other.
+</p>
 <p>In order to improve on this, GNU APL offers the possibility to automatically
-(and without using <b>A⍟B</b> to do so). The solution implemented in GNU APL is
-to provide the optimal radix length as an axis argument. There are two use
-cases for the axis argument:
+(and without using <b>A⍟B</b>) compute the optimal radix length from <b>A</b>
+and <b>B</b>. The solution implemented in GNU APL is to provide the optimal
+radix length as an axis argument. There are two different cases for the axis
+argument:
 </p>
 <ul>
-<li> if the proper radix length is known, say <b>N &gt; 0</b> , then the length is
-given as axis argument. In this case the left argument of <b>A⊤B</b> is simplified:
+<li> If the optimal radix length is known, say <b>N &gt; 0</b>, then the radix length
+is given as axis argument <b>N&gt;0</b>. In this case the left argument of <b>A⊤B</b> is
+slightly simplified:
+
 <div class="example">
-<pre class="example">      (N⍴↑A)⊤B   ←→   A⊤[N]B   ⍝ radix length is known
+<pre class="example">      (N⍴↑A) ⊤ B   ←→   A ⊤[N] B   ⍝ optimal radix length N&gt;0 is known
 </pre></div>
+
 <p>This case frequently occurs when integer(s) <b>B</b> are encoded into hexadecimal
-8-bit bytes (i.e. radix length 2), words (i.e. radix length 4) or long words
- (i.e. radix length 4),
-</p></li><li> otherwise the radix length is not known; this case is specified as axis
-argument <b>0</b>. This is the case where <b>⌊1∣+A⍟(∣B)+A=0</b> would be needed, and
-it simplifies <b>A⊤B</b> even more:
+8-bit (i.e. radix length = 2 hex digits), 16-bit words (i.e. radix
+length = 4 hex digits), 32-bit longs (i.e. radix length = 8 hex digits),
+or 64-bit long longs (i.e. radix length = 16 hex digits).
+</p>
+</li><li> Otherwise the radix length is not known; this case is specified as axis
+argument <b>0</b>. This is also the case where <b>⌊1∣+A⍟(∣B)+A=0</b> would be needed,
+and it simplifies <b>A⊤B</b> considerably:
+
 <div class="example">
-<pre class="example">      ((⌊1∣+A⍟(∣B)+A=0)⍴↑A)⊤B   ←→   A⊤[0]B   ⍝ unknown radix length
+<pre class="example">      ((⌊1∣+A⍟(∣B)+A=0)⍴↑A) ⊤ B   ←→   A ⊤ [0]B   ⍝ unknown radix length
 </pre></div>
 </li></ul>
 
@@ -3416,15 +3438,17 @@ it simplifies <b>A⊤B</b> even more:
 </p>
 <ul>
 <li> Obviously the case <b>N&gt;0</b> is faster than the case <b>N=0</b> because the
-user has taken over radix length computation. However, <b>A⊤[N]B</b> is still
-faster than the classical <b>(N⍴↑A)⊤B</b>.
+      user has taken over radix length computation. However, <b>A⊤[N]B</b> is still
+      faster than the classical <b>(N⍴↑A)⊤B</b>.
+
 </li><li> If all items in <b>B</b> are non-negative, then the case <b>N=0</b> uses
-the optimal radix length for unsigned numbers, i.e. <i>without a sign</i>.
-The result can be used in what is known as <i>unsigned base-A arithmetic</i>.
+      the optimal radix length for unsigned numbers, i.e. <i>without a sign</i>.
+      The result can be used in what is known as <i>unsigned base-A arithmetic</i>.
+
 </li><li> If some item of <b>B</b> is negative, then the case <b>N=0</b> uses a radix
-length that <i>includes</i> a sign (i<i>two&rsquo;s complement arithmetic</i> if <b>A=2</b>).
-The sign is <b>0</b> for the non-negative items of <b>B</b> and <b>A-1</b> for the
-negative items of <b>B</b>.
+      length that <i>includes</i> a sign (aka. <i>two&rsquo;s complement arithmetic</i> if
+      <b>A=2</b>).  The sign is <b>0</b> for the non-negative items of <b>B</b> and
+      <b>A-1</b> for the negative items of <b>B</b> (= 1 for binary encodings).
 </li></ul>
 
 <p>Examples:

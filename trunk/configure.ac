@@ -1022,6 +1022,7 @@ config_nolib() {
     AS_ECHO(["       disabling $tag ($*)"])
     for macro in  $*; do
         sed -i "s/#define $macro 1/#define $macro 0/" config.h
+        eval "$macro=no"
         shift
     done
 }
@@ -1029,15 +1030,17 @@ config_nolib() {
 if apl_NO($cfg_OPTIONAL_LIBS); then
     config_nolib FFT        apl_FFT
     config_nolib GSL        apl_GSL
-    config_nolib GTK        apl_GTK3
     config_nolib GUI        apl_GUI
     config_nolib LIBC       HAVE_LIBC
-    config_nolib PCRE       HAVE_LIBPCRE2_32 apl_PCRE
+    config_nolib PCRE       apl_PCRE HAVE_LIBPCRE2_32
     config_nolib PNG        apl_PNG
-    config_nolib POSTGRES   apl_POSTGRES
-    config_nolib SQLITE     apl_SQLITE3
-    config_nolib X11        apl_X11
-    config_nolib XCB        apl_XCB
+    config_nolib POSTGRES   apl_SQL  apl_POSTGRES HAVE_POSTGRESQL
+    config_nolib SQLITE     apl_SQL  apl_SQLITE3  HAVE_SQLITE3
+    config_nolib X11        apl_X11  HAVE_LIBX11 \
+                                     HAVE_X11_XLIB_H HAVE_X11_XUTIL_H
+    config_nolib XCB        apl_XCB  XCB HAVE_LIBXCB \
+                                     HAVE_X11_XLIB_XCB_H HAVE_XCB_XCB_H 
+    config_nolib GTK        apl_GTK3 GTK HAVE_LIBGTK_3 HAVE_LIBCAIRO
     AS_ECHO(["    patching config.h done."])
     apl_LIBC=no
 fi
