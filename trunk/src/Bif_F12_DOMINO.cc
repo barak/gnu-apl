@@ -1013,6 +1013,8 @@ const ShapeItem ec_B = B.element_count();
    if (ec_A == 0 )   LENGTH_ERROR;
    if (ec_B == 0 )   LENGTH_ERROR;
 
+TODO;
+
 Value_P Z(2, LOC);   // quotient Q and remainder R
 
    // if the degree of A is less than the degree of B, then the quotient
@@ -1057,7 +1059,7 @@ vector<Cell *> PR;         PR.reserve(ec_A);
 
          has factor cell_type VT_INT ot CT_REAL, but the compiler (gcc)
          says that it has CT_BASE. Not sure if that is a compiler error
-         or not.
+         or not. We trivk the vcompiler by using Cell *s.
  */
 Cell factor, scaled_B, diff_R_B;
 Cell * p_factor = &factor;
