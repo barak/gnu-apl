@@ -437,6 +437,10 @@ SUBDIRS = DALY
 #
 info_TEXINFOS = 
 man1_MANS = apl.1
+
+# NOTE that the .html version of aspl.text refers
+# to some of the files in dist_doc_DATA.
+#
 dist_doc_DATA = \
 	apl.1					\
 	apl.texi				\

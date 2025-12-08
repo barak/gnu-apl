@@ -376,7 +376,7 @@ AC_COMPILE_IFELSE(
                [Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available])
     ],
     [HAVE_IOCTL_TIOCGWINSZ=no])
-AC_MSG_RESULT([$HAVE_TIOCGWINSZ])
+AC_MSG_RESULT([$HAVE_IOCTL_TIOCGWINSZ])
 
 ######################## pthread_setname_np() check #######################
 # see if pthread_setname_np is available

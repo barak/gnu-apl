@@ -47,6 +47,9 @@ libapl.info: libapl.texi
 	$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 
+# NOTE that the .html version of aspl.text refers
+# to some of the files in dist_doc_DATA.
+#
 dist_doc_DATA =				\
 	apl.1					\
 	apl.texi				\

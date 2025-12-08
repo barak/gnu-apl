@@ -159,8 +159,6 @@ const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
 # include <math.h>
 # include <stdlib.h>
 # include <string.h>
-# include <xcb/xcb.h>
-# include <xcb/xproto.h>
 
 # include <iostream>
 # include <iomanip>

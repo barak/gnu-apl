@@ -549,13 +549,13 @@ const bool A_zero = A->is_near_zero();
         const APL_Integer gcd = FloatCell::gcd(b, a);
         if (b == gcd)   return IntCell::zI(Z, a/gcd);
         return FloatCell::zR(Z, a/gcd, b/gcd);
-#else
-        const APL_Float i_quot = a / b;
+#else   // not cfg_RATIONAL_NUMBERS_WANTED
+        const APL_Integer i_quot = a / b;
         const APL_Float r_quot = a / APL_Float(b);
 
         if (a != i_quot * b)   return FloatCell::zF(Z, r_quot);
-        else                   return FloatCell::zF(Z, i_quot);
-#endif
+        else                   return IntCell::zI(Z, i_quot);
+#endif   // (not) cfg_RATIONAL_NUMBERS_WANTED
       }
 
    // delegate to A

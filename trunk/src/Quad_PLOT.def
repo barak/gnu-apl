@@ -1,7 +1,7 @@
 #ifdef gdef
 gdef(String,   caption,        "⎕PLOT", "plot window caption")
 gdef(String,   output_filename,     "", "output file name")
-gdef(String,   gui_driver,          "", "GUI driver")
+gdef(String,   gui_driver,          "", "GUI driver (GTK, XCB, or ASCII")
 gdef(uint32_t, auto_close,           0, "= do not close X window automatically)\n"
 "                   (1)             (= close if file was written successfully)\n"
 "                   (2)             (= always close X window automatically")
@@ -55,16 +55,16 @@ gdef(String,   format_X,            "", "format for X-axis ticks (GTK only))\n"
 "                    %sT1%T2...%Tn  (static texts for ticks)\n"
 "                    %G, %g         grid line number (starting at 1 or )\n"
 "                    %v             value\n"
-"                    %S             (seconds SS)\n"
-"                    %I             (minutes MM)\n"
-"                    %H, %h         (hours HH or h/hh)\n"
-"                    %D, %d         (day DD or d/dd)\n"
-"                    %M, %m         (month MM or m/mm)\n"
-"                    %q             (quarter 0..3)\n"
-"                    %Q             (quarter 1..4)\n"
-"                    %Y, %y         (year YYYY or yy")
-gdef(String,   format_Y,            "", "format for Y-axis (dito)")
-gdef(String,   format_Z,            "", "format for Z-axis (dito)")
+"                    %S             seconds {SS)\n"
+"                    %I             minutes {MM)\n"
+"                    %H, %h         hours {HH or h/hh)\n"
+"                    %D, %d         day {DD or d/dd)\n"
+"                    %M, %m         month {MM or m/mm)\n"
+"                    %q             quarter {0..3)\n"
+"                    %Q             quarter {1..4)\n"
+"                    %Y, %y         year {YYYY or yy")
+gdef(String,   format_Y,            "", "format for Y-axis ticks (dito)")
+gdef(String,   format_Z,            "", "format for Z-axis ticks (dito)")
 #endif
 
 #ifdef ldef
@@ -77,8 +77,8 @@ ldef(uint32_t, point_style,          1, "= plot_points: ● )\n"
 "                   (3)             (= plot_points: ▼ )\n"
 "                   (4)             (= plot_points: ◆ )\n"
 "                   (5)             (= plot_points: ■ )\n"
-"                   (6)             (= plot_points: 🞤   (GTK only)\n"
-"                   (7)             (= plot_points: 🞫   (GTK only")
+"                   (6)             (= plot_points: ✚   (GTK only)\n"
+"                   (7)             (= plot_points: ✖   (GTK only")
 ldef(Pixel_X,  point_size,           8, "the outer diameter of the plot points")
 ldef(Pixel_X,  point_size2,          0, "the inner diameter of the plot points")
 ldef(String,   legend_name,         "", "the name of plot line N in the legend")

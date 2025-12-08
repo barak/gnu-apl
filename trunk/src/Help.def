@@ -575,8 +575,13 @@ help_def(1, "→", "Goto",
          "Go to line B",
          "")
 
-help_def(1, "∇", "Function definition",
-         "Enter or leave the del editor for defined functions",
+help_def(-6, "∇", "Defined Function editor",
+       "\n      ∇{A} FUN {B}         Create and edit function FUN\n"
+         "      ∇{A} (LOP OP1) B     Create and edit monadic operator OP1\n"
+         "      ∇{A} (LO OP2 RO) B   Create and edit dyadic doperator OP2\n"
+         "      ∇FUN                 Edit existing function FUN\n"
+         "      ∇FUN[⎕]∇             Display existing function FUN\n"
+         "      ∇                    End of editing.",
          "")
 
 // APL primitive operators (except those that are also functions)

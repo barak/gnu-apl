@@ -22361,8 +22361,8 @@ else $as_nop
   HAVE_IOCTL_TIOCGWINSZ=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $HAVE_TIOCGWINSZ" >&5
-printf "%s\n" "$HAVE_TIOCGWINSZ" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $HAVE_IOCTL_TIOCGWINSZ" >&5
+printf "%s\n" "$HAVE_IOCTL_TIOCGWINSZ" >&6; }
 
 ######################## pthread_setname_np() check #######################
 # see if pthread_setname_np is available

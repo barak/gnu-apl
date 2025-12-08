@@ -434,6 +434,24 @@ UCS_string::UCS_string(const Cell & cell)
         return;
       }
 
+   if (cell.is_integer_cell())
+      {
+        append_number(cell.get_int_value());
+        return;
+      }
+
+   if (cell.is_float_cell())
+      {
+        append_double(cell.get_int_value());
+        return;
+      }
+
+   if (cell.is_complex_cell())
+      {
+        append_complex(cell.get_real_value(), cell.get_imag_value());
+        return;
+      }
+
    Assert(cell.is_pointer_cell());
 const Value & value = *cell.get_pointer_value().get();
 

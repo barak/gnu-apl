@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 4, 2025.
+<p>December 6, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -243,6 +243,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       </ul></li>
       <li><a id="toc-Plot-Window-Handling-1" href="#Plot-Window-Handling">2.34.3 Plot Window Handling</a></li>
       <li><a id="toc-Output-File-Format-1" href="#Output-File-Format">2.34.4 Output File Format</a></li>
+      <li><a id="toc-GUI-driver-1" href="#GUI-driver">2.34.5 GUI driver</a></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dPNG-_002d-Portable-Network-Graphics" href="#Section-2_002e35">2.35 ⎕PNG - Portable Network Graphics</a>
     <ul class="no-bullet">
@@ -5202,6 +5203,7 @@ colors for plot lines, points, and grids, etc.
 <li><a href="#The-Plot-Attributes-A" accesskey="2">The Plot Attributes A</a></li>
 <li><a href="#Plot-Window-Handling" accesskey="3">Plot Window Handling</a></li>
 <li><a href="#Output-File-Format" accesskey="4">Output File Format</a></li>
+<li><a href="#GUI-driver" accesskey="5">GUI driver</a></li>
 </ul>
 <hr>
 <div class="subsection" id="The-Plot-Data-B">
@@ -5295,17 +5297,26 @@ Next: <a href="#Plot-Window-Handling" accesskey="n" rel="next">Plot Window Handl
 <p>There are a number of attributes like colors, point sizes, line widths,
 etc. that control how the resulting plot will look like.
 </p>
-<p>Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
-the arguments. The list of arguments grows over time and therefore the list
-displayed by <b>⎕PLOT ⍬</b> may be more up-to-date than this description.
-For example:
+<p>Similar to function groups like <b>⎕CR</b> or <b>⎕FIO</b>, an empty argument
+<b>B</b> in monadic <b>⎕PLOT B</b> displays a list of the arguments. The list of
+arguments grows over time and therefore the list displayed by <b>⎕PLOT ⍬</b>
+may be more up-to-date than this description. For example:
 </p>
 <div class="example">
-<pre class="example">   ⎕PLOT Usage:
+<pre class="example">      ⎕PLOT ''
+
+   ⎕PLOT Usage:
 
    ⎕PLOT B     with ⍴⍴B &gt; 0: plot B with default attribute values
    ⎕PLOT B     with integer scalar B: special ⎕PLOT functions
    A ⎕PLOT B   plot B with attribute overrides specified by A
+           ├────────  0: verbosity OFF
+           ├──────── ¯1: show X events
+           ├──────── ¯2: show data
+           ├──────── ¯3: close all windows
+           ├──────── ¯4: show rendering
+           ├─────── ¯6: show open handles
+           └──── N &gt; 0: close window N
 
    A is a nested vector of strings.
    Each string A[i] has the form &quot;Attribute: Value&quot;
@@ -5317,6 +5328,7 @@ For example:
 
 caption:            ⎕PLOT          (plot window caption)
 output_filename:                   (output file name)
+gui_driver:                        (GUI driver: GTK, XCB, or ASCII)
 auto_close:         0              (= do not close X window automatically)
                    (1)             (= close if file was written successfully)
                    (2)             (= always close X window automatically)
@@ -5366,18 +5378,18 @@ rangeZ_min:         0.0            (the start of the Z range to be plotted)
 rangeZ_max:         0.0            (the end of the Z range to be plotted)
 origin_X:           100 pixel      (X position offset of the origin)
 origin_Y:           100 pixel      (Y position offset of the origin)
-format_X:           (none)         (format for X-axis ticks (GTK only))
+format_X:                          (format for X-axis ticks (GTK only))
                     %sT1%T2...%Tn  (static texts for ticks)
                     %G, %g         grid line number (starting at 1 or )
                     %v             value
-                    %S             (seconds SS)
-                    %I             (minutes MM)
-                    %H, %h         (hours HH or h/hh)
-                    %D, %d         (day DD or d/dd)
-                    %M, %m         (month MM or m/mm)
-                    %q             (quarter 0..3)
-                    %Q             (quarter 1..4)
-                    %Y, %y         (year YYYY or yy)
+                    %S             seconds (SS)
+                    %I             minutes (MM)
+                    %H, %h         hours (HH or h/hh)
+                    %D, %d         day (DD or d/dd)
+                    %M, %m         month (MM or m/mm)
+                    %q             quarter (0..3)
+                    %Q             quarter (1..4)
+                    %Y, %y         year (YYYY or yy)
 format_Y:                          (format for Y-axis (dito))
 format_Z:                          (format for Z-axis (dito))
 
@@ -5394,8 +5406,8 @@ point_style-N:      1              (= plot_points: ● )
                    (3)             (= plot_points: ▼ )
                    (4)             (= plot_points: ◆ )
                    (5)             (= plot_points: ■ )
-                   (6)             (= plot_points: 🞤   (GTK only)
-                   (7)             (= plot_points: 🞫   (GTK only)
+                   (6)             (= plot_points: ✚   (GTK only)
+                   (7)             (= plot_points: ✖   (GTK only)
 point_size-N:       8 pixel        (the outer diameter of the plot points)
 point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
@@ -5468,14 +5480,8 @@ Attributes.legend_name_2 ← &quot;Random Row 2&quot;
       A2 ⎕PLOT 1○.1×⍳100
 A ⎕PLOT 1○.1×⍳100
 
-
 </pre></div>
 
-<p>that (for syntactical reasons) the separation between
-line attribute name and the line number is <b>_</b> (underscore) if <b>A</b>
-is specified as a structured APL value and <b>-</b> (minus) if <b>A</b>
-is specified as a string of lines.
-</p>
 <p>If the global attribute <b>output_filename</b> is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
 with the name of the file provided as the value of the attribute.
@@ -5616,7 +5622,7 @@ corresponds to the typical method(s) for closing windows on most systems.
 <div class="subsection" id="Output-File-Format">
 <div class="header">
 <p>
-Previous: <a href="#Plot-Window-Handling" accesskey="p" rel="prev">Plot Window Handling</a>, Up: <a href="#Section-2_002e34" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#GUI-driver" accesskey="n" rel="next">GUI driver</a>, Previous: <a href="#Plot-Window-Handling" accesskey="p" rel="prev">Plot Window Handling</a>, Up: <a href="#Section-2_002e34" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Output-File-Format-1"></span><h4 class="subsection">2.34.4 Output File Format</h4>
 
@@ -5642,6 +5648,96 @@ to exist for some time, but bug fixes and new features will only be made for
 the <b>libgtk-3</b> option.
 </p>
 
+<hr>
+</div>
+<div class="subsection" id="GUI-driver">
+<div class="header">
+<p>
+Previous: <a href="#Output-File-Format" accesskey="p" rel="prev">Output File Format</a>, Up: <a href="#Section-2_002e34" accesskey="u" rel="up">⎕PLOT - Plot Data</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="GUI-driver-1"></span><h4 class="subsection">2.34.5 GUI driver</h4>
+
+<p><b>⎕PLOT</b> provides 3 different ways to generate its output, called
+ <i>GUI drivers</i>. Two of these drivers (<b>GTK and XCB</b>) are optional,
+while third third driver <b>ASCII</b> is not.  Optional means that the
+<b>./configure</b> script, which is executed as the first step in the
+compilation of GNU APL, determines if the prerequisite for an optional
+driver are satisfied. IOW an optional driver is only available for <b>⎕PLOT</b>
+if the libraries and C/C++ header files needed to compile the driver are
+installed at the time where GNU APL is being compiled. The <b>ASCII</b> driver
+merely generates ESC squences for VT100 terminals and does therefore not
+depend on additional libraries.
+</p>
+<p>For the monadic <b>⎕PLOT B</b>, the driver used by <b>⎕PLOT</b> is chosen as follows:
+</p>
+<ul>
+<li> GTK if available, otherwise
+</li><li> XCB if available, otherwise
+</li><li> ASCII
+</li></ul>
+
+<p>For the dyadic <b>A ⎕PLOT B</b>, the driver used is the same, but the choice made
+by <b>./configure</b> can be overridden by the plot window attribute
+<b>gui_driver</b>. The default for this plot window attribute is empty, which
+means that the decision of <b>./configure</b> shall be used (like in the monadic
+case where no plot attributes can be specified).
+</p>
+<p>The plot driver also affects the type of result returned by <b>⎕PLOT</b>:
+</p>
+<ul>
+<li> drivers <b>GTK</b> and <b>XCB</b> return an integer scalar <b>H</b> (a plot 
+      window handle) that can later be used from APL to programmatically
+      close the plot window (i.e. with <b>⎕PLOT H</b>) with that handle.
+      (Alternatively a GTK or XCB plot window can be closed by clicking
+      the close button of the plot window).
+
+</li><li> driver <b>ASCII</b> returns a 3-dimensional APL value <b>Z</b>, where:
+    <ul>
+<li> <b>Z[1;;]</b> is a character matrix with the Unicode characters used
+          to draw the plot window,
+    </li><li> <b>Z[2;;]</b> is an integer matrix with the the forground colors
+          (in terms of <b>VT100</b> terminal colors), and
+    </li><li> <b>Z[3;;]</b> is an integer matrix with the the backround colors
+          (again in terms of <b>VT100</b> terminal colors).
+    </li></ul>
+</li></ul>
+
+<p>The <b>VT100</b>  colors returnd by the ASCII driver are essentially 4-bit RGB
+values with the following integer encoding:
+</p>
+<ul>
+<li> <b>0 = 0b000</b>: (dark) black,
+</li><li> <b>1 = 0b001</b>: (dark) red,
+</li><li> <b>2 = 0b010</b>: (dark) green,
+</li><li> <b>3 = 0b011</b>: (dark) yellow,
+</li><li> <b>4 = 0b100</b>: (dark) blue,
+</li><li> <b>5 = 0b101</b>: (dark) magenta,
+</li><li> <b>6 = 0b110</b>: (dark) cyan,
+</li><li> <b>7 = 0b111</b>: (dark) white (kind of grey),
+<pre class="verbatim"></pre></li><li> <b>60 = 60 + 0b000</b>: bright black (another kind of grey),
+</li><li> <b>61 = 60 + 0b001</b>: bright red,
+</li><li> <b>62 = 60 + 0b010</b>: bright green,
+</li><li> <b>63 = 60 + 0b011</b>: bright yellow,
+</li><li> <b>64 = 60 + 0b100</b>: bright blue,
+</li><li> <b>65 = 60 + 0b101</b>: bright magenta,
+</li><li> <b>66 = 60 + 0b110</b>: bright cyan, and
+</li><li> <b>67 = 60 + 0b111</b>: bright white
+</li></ul>
+
+<p>The <b>ASCII</b> driver returns its result as a committed value (so that the
+plot window is not drawn twice if the value is not assigned to a variable).
+Naturally the <b>ASCII</b> driver can not support most of the <b>⎕PLOT</b> atrributes
+like a true graphical driver like <b>GTK</b> or <b>XCB</b>. But at least the color
+attributes are honored by rounding 3×8-bit RGB values to their nearest 4-bit
+<b>VT100</b> color.
+</p>
+<p>The <b>XCB</b> driver was the first driver for <b>⎕PLOT</b> but has since become
+somewhat obsolete. It has limitation when it comes to the dusplay of texts
+(in particular for APL characters). The long-term GNU APL design strategy
+is therefore <b>GTK</b> in favour of the good old <b>XCB</b>. <b>XCB</b> will still
+be supported for a while, but new features will only be added to the
+<b>GTK</b> driver.
+</p>
 <hr>
 </div>
 </div>

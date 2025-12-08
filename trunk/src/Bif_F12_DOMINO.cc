@@ -143,7 +143,7 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
    // X shall be a scalar with:
    //
-   // a. real EPS < 1 (aka. rcond) for backward compatibility (not used),
+   // a. real EPS < 1 (aka. rcond) for backward compatibility (not used), or
    // b. integer 0 for the QR factorization with the Helzer algorithm, or
    // c. integer 1 for the QR factorization with LApack
    //
@@ -182,7 +182,7 @@ double EPS = Workspace::get_CT();
 
    if (algo == ALGO_BAD)   // none of the above
       {
-        MORE_ERROR() << "Bad algorithm in X of ⌹[X]B";
+        MORE_ERROR() << "⌹[X]B: Invalid algorithm X";
         DOMAIN_ERROR;
       }
 
@@ -391,7 +391,13 @@ const UCS_string blanks(max_function_name_length - name.get_char_count(),
 Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   TODO;
+const APL_Integer X0 = X->get_sole_integer();
+   if (X0 == 0)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
+   if (X0 == 1)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
+   if (X0 == 2)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
+
+   MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 /// print debug infos for \b this real matrix
@@ -857,6 +863,260 @@ mB.debug("[13] B");
 
          --rows;
        }
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::print_polynomial(const Value & B)
+{
+Value_P A(LOC);
+   A->next_ravel_Char(UNI_x);
+   A->check_value(LOC);
+   return print_polynomial(*A, B);
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
+{
+   if (A.get_rank() > 1)   RANK_ERROR;
+   if (B.get_rank() > 1)   RANK_ERROR;
+   if (!A.is_char_array())
+      {
+         MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A";
+         DOMAIN_ERROR;
+      }
+
+const UCS_string var_name(A);
+const Unicode powers[10] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3, 
+                             UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7, 
+                             UNI_PAD_U8, UNI_PAD_U9 };
+                             
+UCS_string poly;
+
+const ShapeItem ec_B = B.element_count();
+
+bool plus = false;
+   loop(b, ec_B)
+      {
+        // power
+        const int power = ec_B - b - 1;
+
+        const Cell & coeff = B.get_cravel(power);
+        char coeff_cp[40];
+        if (coeff.is_integer_cell())
+           {
+             SPRINTF(coeff_cp, "%d", int(coeff.get_int_value()));
+           }
+        else if (coeff.is_float_cell())
+           {
+             SPRINTF(coeff_cp, "%.2f", coeff.get_real_value());
+           }
+        else if (coeff.is_complex_cell())
+           {
+             SPRINTF(coeff_cp, "%.2fj%.2f", coeff.get_real_value(),
+                                            coeff.get_imag_value());
+           }
+
+        // hide the entire term if coefficient is 0.
+        // 
+        if (coeff.is_near_zero())   continue;
+
+        // term is nonzero. hide + before the first term
+        //
+        if (plus)   poly.append_ASCII(" + ");
+        plus = true;
+
+       // hide X⁰
+       //
+       if (power == 0)   // hide X⁰, but show coefficient
+          {
+            poly << coeff_cp;
+            break;
+          }
+
+        // show coefficient, but only if ≠ 1
+        //
+        if (!coeff.is_near_one())   poly << coeff_cp;
+
+       // show indeterminant
+       poly.append(var_name);
+
+       if (power == 1)   continue;
+
+        if (power < 10)   // single digit power
+           {
+             poly.append(powers[power]);
+           }
+        else              // multi digit power
+           {
+             UCS_string pow;
+
+             // power in reverse order
+             //
+             for (size_t p = power; p; p /= 10)
+                 {
+                   pow.append(powers[p % 10]);
+                 }
+
+             loop(p, pow.size())   poly.append(pow[pow.size() - p - 1]);
+           }
+      }
+
+   return Value_P(poly, LOC);
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::polynomial_product(const Value & A, const Value & B)
+{
+   if (A.get_rank() > 1)   RANK_ERROR;
+   if (B.get_rank() > 1)   RANK_ERROR;
+
+const ShapeItem ec_A = A.element_count();
+const ShapeItem ec_B = B.element_count();
+
+   if (ec_A == 0)   LENGTH_ERROR;
+   if (ec_B == 0)   LENGTH_ERROR;
+
+   loop(a, ec_A)   if (!A.get_cravel(a).is_numeric())   DOMAIN_ERROR;
+   loop(b, ec_B)   if (!B.get_cravel(b).is_numeric())   DOMAIN_ERROR;
+
+const ShapeItem ec_Z = ec_A + ec_B - 1;
+Value_P Z(ec_Z, LOC);
+
+   loop(z, ec_Z)   Z->next_ravel_0();
+
+   loop(a, ec_A)
+   loop(b, ec_B)
+      {
+        const ShapeItem z = a + b;
+        const Cell & cell_A = A.get_cravel(a);
+        const Cell & cell_B = B.get_cravel(b);
+        Cell cell_BA;
+        cell_B.bif_multiply(&cell_BA, &cell_A);   // BA←B×A
+
+        Cell & cell_Z = Z->get_wravel(z);
+        cell_Z.bif_add(&cell_Z, &cell_BA);        // Z←Z+BA
+      }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::polynomial_quotient(const Value & A, const Value & B)
+{
+   if (A.get_rank() > 1)   RANK_ERROR;
+   if (B.get_rank() > 1)   RANK_ERROR;
+
+const ShapeItem ec_A = A.element_count();
+const ShapeItem ec_B = B.element_count();
+
+   if (ec_A == 0 )   LENGTH_ERROR;
+   if (ec_B == 0 )   LENGTH_ERROR;
+
+Value_P Z(2, LOC);   // quotient Q and remainder R
+
+   // if the degree of A is less than the degree of B, then the quotient
+   // Q←A÷B is 0 and the remainder A∣B is B.
+   //
+   if (ec_A < ec_B)
+      {
+        Value_P Qu(1, LOC);   // q₀ of the polynomial)
+        Qu->next_ravel_0();   // scalar 0
+        Qu->check_value(LOC);
+        Z->next_ravel_Pointer(Qu.get());   // quotient 0
+        Value_P Rem = CLONE(&B, LOC);
+        Z->next_ravel_Pointer(Rem.get());         // and remainder B
+        Z->check_value(LOC);
+        return Z;
+      }
+
+const ShapeItem ec_Q = ec_A - ec_B + 1;
+
+Value_P Z1(ec_Q, LOC);   // (partial) quotients, initially undefined
+const ShapeItem ec_R = ec_A;
+Value_P R(ec_R, LOC);   // (partial) remainders, initially A
+   loop(r, ec_R)   R->next_ravel_Cell(A.get_cravel(r));
+   R->check_value(LOC);
+
+vector<const Cell *> PB;   PB.reserve(ec_B);
+vector<Cell *> PQ;         PQ.reserve(ec_Q);
+vector<Cell *> PR;         PR.reserve(ec_A);
+
+   // we want writable A and Q kin place and therefore use a separate memory
+   // area for them.
+   //
+   loop(b, ec_B)   PB.push_back(  &B.get_cravel(ec_B - b - 1));
+   loop(q, ec_Q)   PQ.push_back(&Z1->get_wravel(ec_Q - q - 1));
+   loop(r, ec_R)   PR.push_back( &R->get_wravel(ec_R - r - 1));
+
+/*
+   CAUTION: after
+
+         Cell factor;
+         cell_B->bif_divide(&factor, cell_R);
+
+         has factor cell_type VT_INT ot CT_REAL, but the compiler (gcc)
+         says that it has CT_BASE. Not sure if that is a compiler error
+         or not.
+ */
+Cell factor, scaled_B, diff_R_B;
+Cell * p_factor = &factor;
+Cell * p_scaled_B = &scaled_B;
+Cell * p_diff_R_B = &diff_R_B;
+
+   loop(q, ec_Q)
+       {
+         /* 1. divide the leading coefficients and store it in PQ
+           
+               R = B × (R ÷ B) = R × factor.
+          */
+         {
+           const Cell * cell_R = PR[q];   // dividend
+           if (cell_R->is_near_zero())
+              {
+                Z1->next_ravel_0();
+                continue;
+              }
+
+           const Cell * cell_B = PB[0];
+           cell_B->bif_divide(p_factor, cell_R);   // factor = R ÷ B
+           Z1->next_ravel_Cell(*p_factor);
+         }
+
+         // 2. subtract scaled B from R
+         //
+         loop (b, ec_B)
+             {
+               Cell * cell_R = PR[q + b];
+               PB[b]->bif_multiply(p_scaled_B, p_factor);   // R × factor
+               p_scaled_B->bif_subtract(p_diff_R_B, cell_R);   //  R - scaled_B
+               cell_R->init(*p_diff_R_B, *R, LOC);
+             }
+       }
+   Z1->check_value(LOC);
+   Assert(size_t(ec_Q) == PQ.size());
+
+   // construct the result
+   //
+Value_P Qu(ec_Q, LOC);   // A÷B
+   loop(q, ec_Q)
+      {
+         Qu->next_ravel_Cell(*PQ[ec_Q - q - 1]);
+      }
+   Qu->check_value(LOC);
+
+Value_P Rem(ec_R, LOC);   // remainder A∣B
+
+   loop(r, ec_R)
+      {
+         Rem->next_ravel_Cell(*PR[ec_R - r - 1]);
+      }
+   Rem->check_value(LOC);
+   Z->next_ravel_Value(Qu.get());
+   Z->next_ravel_Value(Rem.get());
+   Z->check_value(LOC);
+TODO;
+   return Z;
 }
 //----------------------------------------------------------------------------
 

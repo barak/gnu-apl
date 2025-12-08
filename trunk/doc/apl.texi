@@ -4698,17 +4698,26 @@ all real items in B are taken as complex with imaginary part 0.
 There are a number of attributes like colors, point sizes, line widths,
 etc. that control how the resulting plot will look like.
 
-Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
-the arguments. The list of arguments grows over time and therefore the list
-displayed by @b{⎕PLOT ⍬} may be more up-to-date than this description.
-For example:
+Similar to function groups like @b{⎕CR} or @b{⎕FIO}, an empty argument
+@b{B} in monadic @b{⎕PLOT B} displays a list of the arguments. The list of
+arguments grows over time and therefore the list displayed by @b{⎕PLOT ⍬}
+may be more up-to-date than this description. For example:
 
 @example
+      ⎕PLOT ''
+
    ⎕PLOT Usage:
 
    ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values
    ⎕PLOT B     with integer scalar B: special ⎕PLOT functions
    A ⎕PLOT B   plot B with attribute overrides specified by A
+           ├────────  0: verbosity OFF
+           ├──────── ¯1: show X events
+           ├──────── ¯2: show data
+           ├──────── ¯3: close all windows
+           ├──────── ¯4: show rendering
+           ├─────── ¯6: show open handles
+           └──── N > 0: close window N
 
    A is a nested vector of strings.
    Each string A[i] has the form "Attribute: Value"
@@ -4720,6 +4729,7 @@ For example:
 
 caption:            ⎕PLOT          (plot window caption)
 output_filename:                   (output file name)
+gui_driver:                        (GUI driver: GTK, XCB, or ASCII)
 auto_close:         0              (= do not close X window automatically)
                    (1)             (= close if file was written successfully)
                    (2)             (= always close X window automatically)
@@ -4769,18 +4779,18 @@ rangeZ_min:         0.0            (the start of the Z range to be plotted)
 rangeZ_max:         0.0            (the end of the Z range to be plotted)
 origin_X:           100 pixel      (X position offset of the origin)
 origin_Y:           100 pixel      (Y position offset of the origin)
-format_X:           (none)         (format for X-axis ticks (GTK only))
+format_X:                          (format for X-axis ticks (GTK only))
                     %sT1%T2...%Tn  (static texts for ticks)
                     %G, %g         grid line number (starting at 1 or )
                     %v             value
-                    %S             (seconds SS)
-                    %I             (minutes MM)
-                    %H, %h         (hours HH or h/hh)
-                    %D, %d         (day DD or d/dd)
-                    %M, %m         (month MM or m/mm)
-                    %q             (quarter 0..3)
-                    %Q             (quarter 1..4)
-                    %Y, %y         (year YYYY or yy)
+                    %S             seconds (SS)
+                    %I             minutes (MM)
+                    %H, %h         hours (HH or h/hh)
+                    %D, %d         day (DD or d/dd)
+                    %M, %m         month (MM or m/mm)
+                    %q             quarter (0..3)
+                    %Q             quarter (1..4)
+                    %Y, %y         year (YYYY or yy)
 format_Y:                          (format for Y-axis (dito))
 format_Z:                          (format for Z-axis (dito))
 
@@ -4797,8 +4807,8 @@ point_style-N:      1              (= plot_points: ● )
                    (3)             (= plot_points: ▼ )
                    (4)             (= plot_points: ◆ )
                    (5)             (= plot_points: ■ )
-                   (6)             (= plot_points: 🞤   (GTK only)
-                   (7)             (= plot_points: 🞫   (GTK only)
+                   (6)             (= plot_points: ✚   (GTK only)
+                   (7)             (= plot_points: ✖   (GTK only)
 point_size-N:       8 pixel        (the outer diameter of the plot points)
 point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
@@ -4871,13 +4881,7 @@ For example:
       A2 ⎕PLOT 1○.1×⍳100
 A ⎕PLOT 1○.1×⍳100
 
-
 @end example
-
-that (for syntactical reasons) the separation between
-line attribute name and the line number is @b{_} (underscore) if @b{A}
-is specified as a structured APL value and @b{-} (minus) if @b{A}
-is specified as a string of lines.
 
 If the global attribute @b{output_filename} is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
@@ -5029,6 +5033,95 @@ For backward compatibility, the @b{libxcb} option for ⎕PLOT will continue
 to exist for some time, but bug fixes and new features will only be made for
 the @b{libgtk-3} option.
 
+
+@c ............................................................................
+@node GUI driver
+@subsection GUI driver
+
+@b{⎕PLOT} provides 3 different ways to generate its output, called
+ @i{GUI drivers}. Two of these drivers (@b{GTK and XCB}) are optional,
+while third third driver @b{ASCII} is not.  Optional means that the
+@b{./configure} script, which is executed as the first step in the
+compilation of GNU APL, determines if the prerequisite for an optional
+driver are satisfied. IOW an optional driver is only available for @b{⎕PLOT}
+if the libraries and C/C++ header files needed to compile the driver are
+installed at the time where GNU APL is being compiled. The @b{ASCII} driver
+merely generates ESC squences for VT100 terminals and does therefore not
+depend on additional libraries.
+
+For the monadic @b{⎕PLOT B}, the driver used by @b{⎕PLOT} is chosen as follows:
+
+@itemize
+@item GTK if available, otherwise
+@item XCB if available, otherwise
+@item ASCII
+@end itemize
+
+For the dyadic @b{A ⎕PLOT B}, the driver used is the same, but the choice made
+by @b{./configure} can be overridden by the plot window attribute
+@b{gui_driver}. The default for this plot window attribute is empty, which
+means that the decision of @b{./configure} shall be used (like in the monadic
+case where no plot attributes can be specified).
+
+The plot driver also affects the type of result returned by @b{⎕PLOT}:
+
+@itemize
+@item drivers @b{GTK} and @b{XCB} return an integer scalar @b{H} (a plot 
+      window handle) that can later be used from APL to programmatically
+      close the plot window (i.e. with @b{⎕PLOT H}) with that handle.
+      (Alternatively a GTK or XCB plot window can be closed by clicking
+      the close button of the plot window).
+
+@item driver @b{ASCII} returns a 3-dimensional APL value @b{Z}, where:
+    @itemize
+    @item @b{Z[1;;]} is a character matrix with the Unicode characters used
+          to draw the plot window,
+    @item @b{Z[2;;]} is an integer matrix with the the forground colors
+          (in terms of @b{VT100} terminal colors), and
+    @item @b{Z[3;;]} is an integer matrix with the the backround colors
+          (again in terms of @b{VT100} terminal colors).
+    @end itemize
+@end itemize
+
+The @b{VT100}  colors returnd by the ASCII driver are essentially 4-bit RGB
+values with the following integer encoding:
+
+@itemize
+@item @b{0 = 0b000}: (dark) black,
+@item @b{1 = 0b001}: (dark) red,
+@item @b{2 = 0b010}: (dark) green,
+@item @b{3 = 0b011}: (dark) yellow,
+@item @b{4 = 0b100}: (dark) blue,
+@item @b{5 = 0b101}: (dark) magenta,
+@item @b{6 = 0b110}: (dark) cyan,
+@item @b{7 = 0b111}: (dark) white (kind of grey),
+@ifhtml
+@verbatim
+@end verbatim
+@end ifhtml
+@item @b{60 = 60 + 0b000}: bright black (another kind of grey),
+@item @b{61 = 60 + 0b001}: bright red,
+@item @b{62 = 60 + 0b010}: bright green,
+@item @b{63 = 60 + 0b011}: bright yellow,
+@item @b{64 = 60 + 0b100}: bright blue,
+@item @b{65 = 60 + 0b101}: bright magenta,
+@item @b{66 = 60 + 0b110}: bright cyan, and
+@item @b{67 = 60 + 0b111}: bright white
+@end itemize
+
+The @b{ASCII} driver returns its result as a committed value (so that the
+plot window is not drawn twice if the value is not assigned to a variable).
+Naturally the @b{ASCII} driver can not support most of the @b{⎕PLOT} atrributes
+like a true graphical driver like @b{GTK} or @b{XCB}. But at least the color
+attributes are honored by rounding 3×8-bit RGB values to their nearest 4-bit
+@b{VT100} color.
+
+The @b{XCB} driver was the first driver for @b{⎕PLOT} but has since become
+somewhat obsolete. It has limitation when it comes to the dusplay of texts
+(in particular for APL characters). The long-term GNU APL design strategy
+is therefore @b{GTK} in favour of the good old @b{XCB}. @b{XCB} will still
+be supported for a while, but new features will only be added to the
+@b{GTK} driver.
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.35

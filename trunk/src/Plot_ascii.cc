@@ -114,7 +114,7 @@ public:
       {}
 
    ~ASCII_canvas()
-        { delete points; }
+        { delete [] points; }
 
    void draw_grid(const Plot_window_properties & w_props);
 

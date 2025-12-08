@@ -79,6 +79,18 @@ protected:
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
 
+   /// return the polynomial B with indeterminant A as APL string
+   static Value_P print_polynomial(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P print_polynomial(const Value & B);
+
+   /// return the product A×B of polynomilals A and B
+   static Value_P polynomial_product(const Value & A, const Value & B);
+
+   /// return the quotient A÷B of polynomilals A and B
+   static Value_P polynomial_quotient(const Value & A, const Value & B);
+
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 
