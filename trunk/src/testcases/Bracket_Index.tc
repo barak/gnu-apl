@@ -223,3 +223,19 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+      ⍝ Regression (APL Wiki, 9.12.2025).
+      ⍝
+
+∇Z←(LO oper RO) B
+ Z←B
+∇
+
+∇Z←(LO opex RO) [X] B
+ Z←B
+∇
+
+      1 oper 'xyz' [2] 3
+3
+
+
+

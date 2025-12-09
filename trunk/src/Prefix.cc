@@ -1147,9 +1147,19 @@ TokenClass next = TC_INVALID;   // assume no bext
 bool
 Prefix::do_shift(TokenClass next) const
 {
+   /* resolve a shift/reduce conflict.
+
+       at0() ist the (in APL order) current token
+       at1() ist the (in APL order) token right of the current token
+       next is the class of the token left of at0()
+    */
    switch(at0().get_Class())
       {
         case TC_VALUE:
+             // value [] binds stronger than anthing
+             //
+             if (ssize() > 1 && at1().get_Class() == TC_INDEX)   return false;
+
              if (next == TC_OPER2)           // DOP B
                 {
                   return true;

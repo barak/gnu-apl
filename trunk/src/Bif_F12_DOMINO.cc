@@ -868,10 +868,10 @@ mB.debug("[13] B");
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & B)
 {
-Value_P A(LOC);
-   A->next_ravel_Char(UNI_x);
-   A->check_value(LOC);
-   return print_polynomial(*A, B);
+const UTF8_string var_utf("x");
+const UCS_string var(var_utf);
+const UCS_string Z = print_polynomial(var, B);
+   return Value_P(Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -886,6 +886,13 @@ Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
       }
 
 const UCS_string var_name(A);
+const UCS_string Z_ucs = print_polynomial(var_name, B);
+   return Value_P(Z_ucs, LOC);
+}
+//----------------------------------------------------------------------------
+UCS_string
+Bif_F12_DOMINO::print_polynomial(const UCS_string & var, const Value & B)
+{
 const Unicode powers[10] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3, 
                              UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7, 
                              UNI_PAD_U8, UNI_PAD_U9 };
@@ -938,7 +945,7 @@ bool plus = false;
         if (!coeff.is_near_one())   poly << coeff_cp;
 
        // show indeterminant
-       poly.append(var_name);
+       poly.append(var);
 
        if (power == 1)   continue;
 
@@ -961,7 +968,7 @@ bool plus = false;
            }
       }
 
-   return Value_P(poly, LOC);
+   return poly;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -1013,111 +1020,103 @@ const ShapeItem ec_B = B.element_count();
    if (ec_A == 0 )   LENGTH_ERROR;
    if (ec_B == 0 )   LENGTH_ERROR;
 
-TODO;
-
-Value_P Z(2, LOC);   // quotient Q and remainder R
-
    // if the degree of A is less than the degree of B, then the quotient
    // Q←A÷B is 0 and the remainder A∣B is B.
    //
    if (ec_A < ec_B)
       {
-        Value_P Qu(1, LOC);   // q₀ of the polynomial)
-        Qu->next_ravel_0();   // scalar 0
-        Qu->check_value(LOC);
-        Z->next_ravel_Pointer(Qu.get());   // quotient 0
-        Value_P Rem = CLONE(&B, LOC);
-        Z->next_ravel_Pointer(Rem.get());         // and remainder B
+        Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
+        {
+          Value_P Z1(1, LOC);   // q₀ of the polynomial)
+          Z1->next_ravel_0();   // scalar 0
+          Z1->check_value(LOC);
+          Z->next_ravel_Pointer(Z1.get());   // quotient 0
+        }
+
+        {
+          Value_P Z2 = CLONE(&B, LOC);
+          Z->next_ravel_Pointer(Z2.get());         // and remainder B
+        }
         Z->check_value(LOC);
         return Z;
       }
 
 const ShapeItem ec_Q = ec_A - ec_B + 1;
 
-Value_P Z1(ec_Q, LOC);   // (partial) quotients, initially undefined
-const ShapeItem ec_R = ec_A;
-Value_P R(ec_R, LOC);   // (partial) remainders, initially A
-   loop(r, ec_R)   R->next_ravel_Cell(A.get_cravel(r));
-   R->check_value(LOC);
+typedef complex<double> Complex;
+vector<Complex> PB;   PB.reserve(ec_B);
+vector<Complex> PQ;   PQ.reserve(ec_Q);
+vector<Complex> PR;   PR.reserve(ec_A + ec_B - 1);
+   loop(a, ec_A)
+       {
+         const Cell & cell = A.get_cravel(ec_A - a - 1);
+          PR.push_back(Complex(cell.get_real_value(), cell.get_imag_value()));
+       }
+   loop(b, ec_B - 1)   PR.push_back(0);
 
-vector<const Cell *> PB;   PB.reserve(ec_B);
-vector<Cell *> PQ;         PQ.reserve(ec_Q);
-vector<Cell *> PR;         PR.reserve(ec_A);
-
-   // we want writable A and Q kin place and therefore use a separate memory
-   // area for them.
-   //
-   loop(b, ec_B)   PB.push_back(  &B.get_cravel(ec_B - b - 1));
-   loop(q, ec_Q)   PQ.push_back(&Z1->get_wravel(ec_Q - q - 1));
-   loop(r, ec_R)   PR.push_back( &R->get_wravel(ec_R - r - 1));
-
-/*
-   CAUTION: after
-
-         Cell factor;
-         cell_B->bif_divide(&factor, cell_R);
-
-         has factor cell_type VT_INT ot CT_REAL, but the compiler (gcc)
-         says that it has CT_BASE. Not sure if that is a compiler error
-         or not. We trivk the vcompiler by using Cell *s.
- */
-Cell factor, scaled_B, diff_R_B;
-Cell * p_factor = &factor;
-Cell * p_scaled_B = &scaled_B;
-Cell * p_diff_R_B = &diff_R_B;
+   loop(b, ec_B)
+       {
+         const Cell & cell = B.get_cravel(ec_B - b - 1);
+          PB.push_back(Complex(cell.get_real_value(), cell.get_imag_value()));
+       }
 
    loop(q, ec_Q)
        {
+CERR << "POLY: "; loop(q1, ec_Q) CERR << " " << PR[q1].real(); CERR << endl;
          /* 1. divide the leading coefficients and store it in PQ
            
                R = B × (R ÷ B) = R × factor.
           */
-         {
-           const Cell * cell_R = PR[q];   // dividend
-           if (cell_R->is_near_zero())
-              {
-                Z1->next_ravel_0();
-                continue;
-              }
+         const Complex & Rq = PR[q];   // dividend
+         if (Cell::is_near_zero(Rq.real()) &&
+             Cell::is_near_zero(Rq.imag()))
+            {
+              PQ.push_back(0);
+              continue;
+            }
 
-           const Cell * cell_B = PB[0];
-           cell_B->bif_divide(p_factor, cell_R);   // factor = R ÷ B
-           Z1->next_ravel_Cell(*p_factor);
-         }
+         const Complex factor = Rq / PB[0];
+         PQ.push_back(factor);
 
          // 2. subtract scaled B from R
          //
-         loop (b, ec_B)
-             {
-               Cell * cell_R = PR[q + b];
-               PB[b]->bif_multiply(p_scaled_B, p_factor);   // R × factor
-               p_scaled_B->bif_subtract(p_diff_R_B, cell_R);   //  R - scaled_B
-               cell_R->init(*p_diff_R_B, *R, LOC);
-             }
+         loop(b, ec_B)   PR[q + b] -= factor * PB[b];
        }
-   Z1->check_value(LOC);
    Assert(size_t(ec_Q) == PQ.size());
 
+CERR << "final Q: "; loop(q, PQ.size()) CERR << " " << PQ[q].real(); CERR << endl;
+CERR << "final R: "; loop(q, PR.size()) CERR << " " << PR[q].real(); CERR << endl;
    // construct the result
    //
-Value_P Qu(ec_Q, LOC);   // A÷B
+Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
+Value_P Z1(ec_Q, LOC);   // A÷B
    loop(q, ec_Q)
       {
-         Qu->next_ravel_Cell(*PQ[ec_Q - q - 1]);
+         const Complex z = PQ[ec_Q - q - 1];
+         const double r = z.real();
+         const double i = z.imag();
+         if (!Cell::is_near_zero(i))           Z1->next_ravel_Complex(r, i);
+         else if (!Cell::is_near_int64_t(r))   Z1->next_ravel_Number(r);
+         else                           Z1->next_ravel_Int(Cell::near_int(r));
       }
-   Qu->check_value(LOC);
+   Z1->check_value(LOC);
 
-Value_P Rem(ec_R, LOC);   // remainder A∣B
+Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
 
-   loop(r, ec_R)
-      {
-         Rem->next_ravel_Cell(*PR[ec_R - r - 1]);
-      }
-   Rem->check_value(LOC);
-   Z->next_ravel_Value(Qu.get());
-   Z->next_ravel_Value(Rem.get());
+   loop(b, ec_B - 1)
+       {
+         const Complex z = PR[ec_Q + b];
+         const double re = z.real();
+         const double im = z.imag();
+         if (!Cell::is_near_zero(im))           Z2->next_ravel_Complex(re, im);
+         else if (!Cell::is_near_int64_t(re))   Z2->next_ravel_Number(re);
+         else                           Z2->next_ravel_Int(Cell::near_int(re));
+       }
+   Z2->check_value(LOC);
+
+   Z->next_ravel_Value(Z1.get());
+   Z->next_ravel_Value(Z2.get());
    Z->check_value(LOC);
-TODO;
    return Z;
 }
 //----------------------------------------------------------------------------
