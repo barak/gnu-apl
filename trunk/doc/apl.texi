@@ -3311,7 +3311,24 @@ B ←→ b₀ + b₁X + b₂X² + ... + bₙXⁿ
 This interpretation easily extends to APL values of higher rank, i.e.
 matrices are polynomials of two indeterminants @b{X} and @b{Y}, values of
 rank 3 are polynomials of three indeterminants @b{X}, @b{Y}, and @b{Z},
-and so on.
+and so on. In this case, assuming @b{⎕IO←0}:
+
+@itemize
+@item An APL value @b{P} with rank @b{r←⍴⍴P} represents a polynomial with
+      @b{r} indeterminants.
+@item The item @b{P[k;m;n;...]} is the coefficient of the polynomial term
+      that has the indeterminant powers @b{XᵏYᵐZⁿ}...
+@item The vector @b{P[;0;0;...]} are the coefficients of the polynomial terms
+with only powers of @b{X}, 
+@item The vector @b{P[0;;0;...]} are the coefficients of the polynomial terms
+      with only powers of @b{Y}, 
+@item The vector @b{P[0;0;;...]} are the coefficients of the polynomial terms
+      with only powers of @b{Z},
+@item and so on. The other items of @b{P} are coeffiecients of the polynomial
+      terms with mixed powers of the different indeterminants.
+@item The item @b{P[[0;0;0;...} aka. @b{↑P} is the constant term of the
+      polinomial.
+@end itemize
 
 Function @b{⌹[7] B}, aka. @b{⌹.poly_print B} returns a string with this
 interpretation. In its monadic form @b{⌹[7] B} it uses the names

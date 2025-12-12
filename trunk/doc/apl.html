@@ -3808,8 +3808,25 @@ vector <b>B</b> is a polynomial of (a single) indeterminant <b>X</b>:
 <p>This interpretation easily extends to APL values of higher rank, i.e.
 matrices are polynomials of two indeterminants <b>X</b> and <b>Y</b>, values of
 rank 3 are polynomials of three indeterminants <b>X</b>, <b>Y</b>, and <b>Z</b>,
-and so on.
+and so on. In this case, assuming <b>⎕IO←0</b>:
 </p>
+<ul>
+<li> An APL value <b>P</b> with rank <b>r←⍴⍴P</b> represents a polynomial with
+      <b>r</b> indeterminants.
+</li><li> The item <b>P[k;m;n;...]</b> is the coefficient of the polynomial term
+      that has the indeterminant powers <b>XᵏYᵐZⁿ</b>...
+</li><li> The vector <b>P[;0;0;...]</b> are the coefficients of the polynomial terms
+with only powers of <b>X</b>, 
+</li><li> The vector <b>P[0;;0;...]</b> are the coefficients of the polynomial terms
+      with only powers of <b>Y</b>, 
+</li><li> The vector <b>P[0;0;;...]</b> are the coefficients of the polynomial terms
+      with only powers of <b>Z</b>,
+</li><li> and so on. The other items of <b>P</b> are coeffiecients of the polynomial
+      terms with mixed powers of the different indeterminants.
+</li><li> The item <b>P[[0;0;0;...</b> aka. <b>↑P</b> is the constant term of the
+      polinomial.
+</li></ul>
+
 <p>Function <b>⌹[7] B</b>, aka. <b>⌹.poly_print B</b> returns a string with this
 interpretation. In its monadic form <b>⌹[7] B</b> it uses the names
 <b>x</b>, <b>y</b>, <b>z</b>, ... for the indeterminants of the polynomial.

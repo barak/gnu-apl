@@ -3117,7 +3117,23 @@ B is a polynomial of (a single) indeterminant X:
 
    This interpretation easily extends to APL values of higher rank, i.e.
 matrices are polynomials of two indeterminants X and Y, values of rank 3
-are polynomials of three indeterminants X, Y, and Z, and so on.
+are polynomials of three indeterminants X, Y, and Z, and so on.  In this
+case, assuming ⎕IO←0:
+
+   • An APL value P with rank r←⍴⍴P represents a polynomial with r
+     indeterminants.
+   • The item P[k;m;n;...]  is the coefficient of the polynomial term
+     that has the indeterminant powers XᵏYᵐZⁿ...
+   • The vector P[;0;0;...]  are the coefficients of the polynomial
+     terms with only powers of X,
+   • The vector P[0;;0;...]  are the coefficients of the polynomial
+     terms with only powers of Y,
+   • The vector P[0;0;;...]  are the coefficients of the polynomial
+     terms with only powers of Z,
+   • and so on.  The other items of P are coeffiecients of the
+     polynomial terms with mixed powers of the different indeterminants.
+   • The item P[[0;0;0;...  aka.  ↑P is the constant term of the
+     polinomial.
 
    Function ⌹[7] B, aka.  ⌹.poly_print B returns a string with this
 interpretation.  In its monadic form ⌹[7] B it uses the names x, y, z,
@@ -9061,51 +9077,51 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Section 2.23126081
-Node: Section 2.24131992
-Node: Section 2.25135364
-Node: Section 2.26135655
-Node: Section 2.27146508
-Node: Section 2.28146780
-Node: Section 2.29153833
-Node: Section 2.30156287
-Node: Section 2.31156956
-Node: Section 2.32158607
-Node: Section 2.33162531
-Node: Section 2.34176960
-Node: The Plot Data B178192
-Node: The Plot Attributes A180806
-Node: Plot Window Handling194341
-Node: Output File Format195672
-Node: GUI driver196895
-Node: Section 2.35200450
-Node: Section 2.36209885
-Node: Section 2.37210904
-Node: Section 2.38226139
-Node: Section 2.39237181
-Node: Section 2.40239365
-Node: Section 2.41265470
-Node: Section 2.42270010
-Node: Section 2.43291109
-Node: Section 2.44305122
-Node: Section 2.45308392
-Node: Chapter 3308907
-Node: Chapter 4311415
-Node: Chapter 5312556
-Node: Section 5.1314203
-Node: Section 5.2315523
-Node: Section 5.3315883
-Node: Section 5.4316125
-Node: Section 5.5316787
-Node: Section 5.6317265
-Node: Section 5.7318038
-Node: Section 5.8318464
-Node: Chapter 6318866
-Node: Section 6.1319285
-Node: Section 6.2319972
-Node: Chapter 7320803
-Node: Section 7.1321306
-Node: Section 7.2346619
+Node: Section 2.23126876
+Node: Section 2.24132787
+Node: Section 2.25136159
+Node: Section 2.26136450
+Node: Section 2.27147303
+Node: Section 2.28147575
+Node: Section 2.29154628
+Node: Section 2.30157082
+Node: Section 2.31157751
+Node: Section 2.32159402
+Node: Section 2.33163326
+Node: Section 2.34177755
+Node: The Plot Data B178987
+Node: The Plot Attributes A181601
+Node: Plot Window Handling195136
+Node: Output File Format196467
+Node: GUI driver197690
+Node: Section 2.35201245
+Node: Section 2.36210680
+Node: Section 2.37211699
+Node: Section 2.38226934
+Node: Section 2.39237976
+Node: Section 2.40240160
+Node: Section 2.41266265
+Node: Section 2.42270805
+Node: Section 2.43291904
+Node: Section 2.44305917
+Node: Section 2.45309187
+Node: Chapter 3309702
+Node: Chapter 4312210
+Node: Chapter 5313351
+Node: Section 5.1314998
+Node: Section 5.2316318
+Node: Section 5.3316678
+Node: Section 5.4316920
+Node: Section 5.5317582
+Node: Section 5.6318060
+Node: Section 5.7318833
+Node: Section 5.8319259
+Node: Chapter 6319661
+Node: Section 6.1320080
+Node: Section 6.2320767
+Node: Chapter 7321598
+Node: Section 7.1322101
+Node: Section 7.2347414
 
 End Tag Table
 
