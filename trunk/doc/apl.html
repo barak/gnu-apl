@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 6, 2025.
+<p>December 11, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -190,14 +190,17 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <li><a id="toc-Generalized-monadic-_005b_003f_005d" href="#Generalized-monadic-_005b_003f_005d">2.21.1 Generalized monadic ⍳</a></li>
       <li><a id="toc-Generalized-dyadic-_005b_003f_005d" href="#Generalized-dyadic-_005b_003f_005d">2.21.2 Generalized dyadic ⍳</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-QR-and-LQ-Factorizations" href="#Section-2_002e22">2.22 ⌹[X] - QR and LQ Factorizations</a>
+    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-Miscellaneous-Matrix-and-Vector-Operations" href="#Section-2_002e22">2.22 ⌹[X] - Miscellaneous Matrix and Vector Operations</a>
     <ul class="no-bullet">
       <li><a id="toc-_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations" href="#g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations">2.22.1 ⌹[1] and ⌹[2] - QR Factorizations</a></li>
       <li><a id="toc-The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d" href="#The-Impact-of-_005b_003f_005dCT-for-_005b_003f_005d">2.22.2 The Impact of ⎕CT for ⌹</a>
       <ul class="no-bullet">
         <li><a id="toc-A_005b_003f_005dB-and-_005b_003f_005dB" href="#A_005b_003f_005dB-and-_005b_003f_005dB">2.22.2.1 A⌹B and ⌹B</a></li>
-        <li><a id="toc-_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B" href="#g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B">2.22.2.2 ⌹[X] B: Factorizations of B</a></li>
+        <li><a id="toc-_005b_003f_005d_005bX_005d-B_003a-Various-Factorizations-of-B" href="#g_t_005b_003f_005d_005bX_005d-B_003a-Various-Factorizations-of-B">2.22.2.2 ⌹[X] B: Various Factorizations of B</a></li>
         <li><a id="toc-Matrix-Inverse" href="#Matrix-Inverse">2.22.2.3 Matrix Inverse</a></li>
+        <li><a id="toc-_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B">2.22.2.4 ⌹[7] B: Print Polynomial B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e23">2.23 Dyadic ⎕CR</a></li>
@@ -1030,7 +1033,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e19">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a></li>
 <li><a href="#Section-2_002e20">⊤ (Encode) with Axis</a></li>
 <li><a href="#Section-2_002e21">Generalized ⍳</a></li>
-<li><a href="#Section-2_002e22">⌹[X] - QR and LQ Factorizations</a></li>
+<li><a href="#Section-2_002e22">⌹[X] - Miscellaneous Matrix and Vector Operations</a></li>
 <li><a href="#Section-2_002e23">Dyadic ⎕CR</a></li>
 <li><a href="#Section-2_002e24">Dyadic ⎕FX (Native Functions)</a></li>
 <li><a href="#Section-2_002e25">⎕ARG - Interpreter command line arguments</a></li>
@@ -3474,7 +3477,7 @@ and it simplifies <b>A⊤B</b> considerably:
 <div class="section" id="Section-2_002e21">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e22" accesskey="n" rel="next">⌹[X] - QR and LQ Factorizations</a>, Previous: <a href="#Section-2_002e20" accesskey="p" rel="prev">⊤ (Encode) with Axis</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e22" accesskey="n" rel="next">⌹[X] - Miscellaneous Matrix and Vector Operations</a>, Previous: <a href="#Section-2_002e20" accesskey="p" rel="prev">⊤ (Encode) with Axis</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Generalized-_005b_003f_005d"></span><h3 class="section">2.21 Generalized ⍳</h3>
 
@@ -3520,7 +3523,7 @@ if the item was not found).
 <p>
 Next: <a href="#Section-2_002e23" accesskey="n" rel="next">Dyadic ⎕CR</a>, Previous: <a href="#Section-2_002e21" accesskey="p" rel="prev">Generalized ⍳</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005d_005bX_005d-_002d-QR-and-LQ-Factorizations"></span><h3 class="section">2.22 ⌹[X] - QR and LQ Factorizations</h3>
+<span id="g_t_005b_003f_005d_005bX_005d-_002d-Miscellaneous-Matrix-and-Vector-Operations"></span><h3 class="section">2.22 ⌹[X] - Miscellaneous Matrix and Vector Operations</h3>
 
 <ul class="section-toc">
 <li><a href="#g_t_005b_003f_005d_005b1_005d-and-_005b_003f_005d_005b2_005d-_002d-QR-Factorizations" accesskey="1">⌹[1] and ⌹[2] - QR Factorizations</a></li>
@@ -3646,8 +3649,11 @@ in the various <b>⌹</b> functions.
 </p>
 <ul class="section-toc">
 <li><a href="#A_005b_003f_005dB-and-_005b_003f_005dB" accesskey="1">A⌹B and ⌹B</a></li>
-<li><a href="#g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B" accesskey="2">⌹[X] B: Factorizations of B</a></li>
+<li><a href="#g_t_005b_003f_005d_005bX_005d-B_003a-Various-Factorizations-of-B" accesskey="2">⌹[X] B: Various Factorizations of B</a></li>
 <li><a href="#Matrix-Inverse" accesskey="3">Matrix Inverse</a></li>
+<li><a href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" accesskey="4">⌹[7] B: Print Polynomial B</a></li>
+<li><a href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" accesskey="5">A ⌹[8] B: Multiply Polynomials A and B</a></li>
+<li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
 <h4 class="subsubsection">2.22.2.1 A⌹B and ⌹B</h4>
@@ -3692,8 +3698,8 @@ matrix <b>B</b> then there are two possibilities:
 </li></ol>
 
 </div>
-<div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B_003a-Factorizations-of-B">
-<h4 class="subsubsection">2.22.2.2 ⌹[X] B: Factorizations of B</h4>
+<div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B_003a-Various-Factorizations-of-B">
+<h4 class="subsubsection">2.22.2.2 ⌹[X] B: Various Factorizations of B</h4>
 
 <p>The numeric scalar <b>X</b> chooses one of several algorithms that computes a 
 factorization (aka. decomposition) of a matrix <b>B</b>:
@@ -3782,6 +3788,112 @@ QR-factorization of <b>B</b> was already computed.
 <p>The computation of <b>⍉Q</b> and <b>Ti∘⍉Q</b> is considerably faster than the
 computation of <b>⌹B</b> if <b>B</b> is large.
 </p>
+
+</div>
+<div class="subsubsection" id="g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B">
+<h4 class="subsubsection">2.22.2.4 ⌹[7] B: Print Polynomial B</h4>
+
+<p>Let <b>B ← b₀ b₁ b₂ ... bₙ</b>. The standard interpretation of this vector
+<b>B</b> in APL is that <b>B</b> is an element of a vector space over the
+field <b>ℝ</b> or <b>ℂ</b>. The elementary APL primitives <b>+</b>, <b>-</b>, <b>×</b>
+and <b>÷</b>, but also the more powerful primitives <b>+.×</b> and <b>⌹</b>,
+and last but not least the scalar extension mechanism of several primitive
+are tailored for this interpretation.
+</p>
+<p>However, another and less common interpretation of <b>B</b> is this:
+vector <b>B</b> is a polynomial of (a single) indeterminant <b>X</b>:
+</p>
+<p>B ←→ b₀ + b₁X + b₂X² + ... + bₙXⁿ
+</p>
+<p>This interpretation easily extends to APL values of higher rank, i.e.
+matrices are polynomials of two indeterminants <b>X</b> and <b>Y</b>, values of
+rank 3 are polynomials of three indeterminants <b>X</b>, <b>Y</b>, and <b>Z</b>,
+and so on.
+</p>
+<p>Function <b>⌹[7] B</b>, aka. <b>⌹.poly_print B</b> returns a string with this
+interpretation. In its monadic form <b>⌹[7] B</b> it uses the names
+<b>x</b>, <b>y</b>, <b>z</b>, ... for the indeterminants of the polynomial.
+In its dyadic form <b>A ⌹[7] B</b> does i<b>A</b> specify the names that shall
+be used. Two forms are supported for <b>A</b>: the characters of a plain APL
+string <b>(⍴A == ⍴⍴B)</b> is understood as a list of single character
+indeterminants. iAlternatively A list of nested strings <b>A</b> (again with
+<b>(⍴A == ⍴⍴B)</b>) is understood as N different indeterminant names. For example:
+</p>
+<div class="example">
+<pre class="example">      ⍝ monadic, 1 indeterminant
+      ⌹.poly_print ⎕←POLY←3 2 1
+3 2 1
+x² + 2x + 3
+
+      ⍝ monadic, 2 indeterminants
+      ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+1 2 3
+4 5 6
+6x²y + 5xy + 4y + 3x² + 2x + 1
+
+      ⍝ monadic, 3 indeterminants
+      ⌹.poly_print ⎕←POLY←3 3⍴⍳9
+1 2 3
+4 5 6
+7 8 9
+9x²y² + 8xy² + 7y² + 6x²y + 5xy + 4y + 3x² + 2x + 1
+
+      ⍝ dyadic, two 1-character indeterminants X and Y
+      'XY' ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+1 2 3
+4 5 6
+6X²Y + 5XY + 4Y + 3X² + 2X + 1
+
+      ⍝ dyadic, two named indeterminants _Foo and _Bar
+      '_Foo' '_Bar' ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+1 2 3
+4 5 6
+6_Foo²_Bar + 5_Foo_Bar + 4_Bar + 3_Foo² + 2_Foo + 1
+
+</pre></div>
+ 
+</div>
+<div class="subsubsection" id="A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">
+<h4 class="subsubsection">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</h4>
+
+<p>The scalar APL primitives <b>+</b> and <b>-</b> can be used for vectors
+and for polynomials alike. In contrast, the multiplication of two polynomials 
+<b>A</b>  and <b>B</b> is different from the scalar multiplication <b>A×B</b> and is 
+also different from the vector multiplication <b>A +.× B</b>.
+</p>
+<p>Dyadic <b>A ⌹[8] B</b> aka. <b>A ⌹.poly_multiply B</b> fills this gap and computes
+the product of two polynomials. For example:
+</p>
+<div class="example">
+<pre class="example">      &quot;A:&quot;    (⌹.poly_print A ← 4 0 0 6 3 1)
+ A: x⁵ + 3x⁴ + 6x³ + 4 
+
+      &quot;B:&quot;    (⌹.poly_print B ← 5 0 2)
+ B: 2x² + 5 
+
+      &quot;PROD:&quot; (⌹.poly_print PROD ← A ⌹.poly_multiply B)
+ PROD: 2x⁷ + 6x⁶ + 17x⁵ + 15x⁴ + 30x³ + 8x² + 20 
+</pre></div>
+
+</div>
+<div class="subsubsection" id="A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">
+<h4 class="subsubsection">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</h4>
+
+<p>The scalar APL primitives <b>+</b> and <b>-</b> can be used for vectors
+and for polynomials alike. In contrast, the division of a polynomial
+<b>A</b> by a polynomial <b>B</b> is different from the scalar division <b>A÷B</b>
+and is  also different from the matrix division <b>A ⌹.× B</b>.
+</p>
+<p>Dyadic <b>A ⌹[9] B</b> aka. <b>A ⌹.poly_divide B</b> fills this gap and computes
+the quotient of two polynomials. Since polynomials form a ring (and not a
+field) the quotient is not always a polynomial (at least not one with
+non-negative exponents). For this reason <b>A ⌹.poly_divide B</b> performs
+a division with remainder and the result is a pair <b>(Quotient, Remainder)</b>
+ where <b>Remainder</b> is a polynomial with a degree smaller that the degree
+of polynomial <b>B</b>. That is, <b>⍴Remainder = ¯1+⍴B</b>.
+</p>
+<p>Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+</p>
 <hr>
 </div>
 </div>
@@ -3789,7 +3901,7 @@ computation of <b>⌹B</b> if <b>B</b> is large.
 <div class="section" id="Section-2_002e23">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e24" accesskey="n" rel="next">Dyadic ⎕FX (Native Functions)</a>, Previous: <a href="#Section-2_002e22" accesskey="p" rel="prev">⌹[X] - QR and LQ Factorizations</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e24" accesskey="n" rel="next">Dyadic ⎕FX (Native Functions)</a>, Previous: <a href="#Section-2_002e22" accesskey="p" rel="prev">⌹[X] - Miscellaneous Matrix and Vector Operations</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Dyadic-_005b_003f_005dCR"></span><h3 class="section">2.23 Dyadic ⎕CR</h3>
 

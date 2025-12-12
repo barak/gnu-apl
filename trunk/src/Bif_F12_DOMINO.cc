@@ -46,6 +46,9 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def( 4, lq_fact        , "LQ factorization of B (libgsl algorithm)" )
   domino_def( 5, ql_fact        , "QL factorization of B (libgsl algorithm)" )
   domino_def( 6, lu_fact        , "LU factorization of B (libgsl algorithm)" )
+  domino_def( 7, poly_print     , "print polynomial B"                       )
+  domino_def( 8, poly_multiply  , "polynomial A × polynomial B"              )
+  domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"              )
 #undef domino_def
 };
 //----------------------------------------------------------------------------
@@ -178,6 +181,7 @@ double EPS = Workspace::get_CT();
         else if (x0 == 5)   algo = ALGO_QL_GSL;
         else if (x0 == 6)   algo = ALGO_LU_GSL;
 #endif
+        else if (x0 == 7)   return Token(TOK_APL_VALUE1, print_polynomial(*B));
       }
 
    if (algo == ALGO_BAD)   // none of the above
@@ -372,9 +376,17 @@ Bif_F12_DOMINO::print_fun_syntax(ostream & out,
                                 const function_info & info) const
 {
 const uAxis axis = info.axis;
-   if (axis == 6)   out << "    (P U Li)";   // LU factorization
-   else             out << "    (Q R Ri)";   // QR factorizations
-   out << " ← ⌹[" << axis << "] B   ⍝ " << info.comment_fun << endl;
+   switch(axis)
+      {
+        default: out << "    (Q R Ri)";   break;   // QR factorizations
+        case 6:  out << "    (P U Li)";   break;   // LU factorization
+        case 7:  out << "          Zs";   break;   // print polynomial
+        case 8:
+        case 9:  out << "       Zpoly";   break;   // 
+      }
+   if (axis == 8 || axis == 9)   out << "← A ";   // dyadic
+   else                          out << "←   ";
+   out << "⌹[" << axis << "] B   ⍝ " << info.comment_fun << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -392,9 +404,10 @@ Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const APL_Integer X0 = X->get_sole_integer();
-   if (X0 == 0)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
-   if (X0 == 1)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
-   if (X0 == 2)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
+   if (X0 < 7)   VALENCE_ERROR;
+   if (X0 == 7)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
+   if (X0 == 8)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
+   if (X0 == 9)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
 
    MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
    DOMAIN_ERROR;
@@ -868,103 +881,183 @@ mB.debug("[13] B");
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & B)
 {
-const UTF8_string var_utf("x");
-const UCS_string var(var_utf);
-const UCS_string Z = print_polynomial(var, B);
+const uRank rank_B = B.get_rank();
+   if (rank_B > 8)   RANK_ERROR;
+
+const char * xyz = "xyzuwvst";
+UCS_string_vector vars;   vars.reserve(8);
+   loop(v, rank_B)
+       {
+         const Unicode var = Unicode(xyz[v]);
+         const UCS_string var_ucs(var);
+         vars.push_back(var_ucs);
+       }
+
+const UCS_string Z = print_polynomial(vars, B);
    return Value_P(Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
 {
-   if (A.get_rank() > 1)   RANK_ERROR;
-   if (B.get_rank() > 1)   RANK_ERROR;
-   if (!A.is_char_array())
+   /* A is a vector of names for the indeterminants (typically
+      'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
+      the indeterminants.
+     
+      We support the following variants of A and B:
+
+      1. 1-dimensional B and single string A (varname = indeterminant)
+      2. N-dimensional B and single string A (N 1-character indeterminants)
+      3. N-dimensional B and N strings A (N variable-length indeterminants)
+    */
+const ShapeItem ec_A = A.element_count();
+
+   if (A.get_rank() > 1)   RANK_ERROR;   // neither name nor vector of names
+
+UCS_string_vector vars;
+   if (A.is_char_array())   // case 1. or 2.
       {
-         MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A";
-         DOMAIN_ERROR;
+        if (B.get_rank() <= 1)   // case 1. (single indeterminant)
+           {
+             const UCS_string x(A);
+             vars.push_back(x);
+           }
+        else                      // case 2: N 1-character indeterminant
+           {
+             if (ec_A != B.get_rank())   LENGTH_ERROR;
+             loop(a, ec_A)
+                 {
+                   const UCS_string x(A.get_cravel(a).get_char_value());
+                   vars.push_back(x);
+                 }
+           }
+      }
+   else                     // case 3.
+      {
+        // every axis of B is one indeterminant of the polynomial
+        //
+        if (B.get_rank() > ec_A)   LENGTH_ERROR;
+        loop(a, ec_A)
+            {
+              const Cell & cell = A.get_cravel(a);
+              const Value & x = *cell.get_pointer_value();
+              if (!x.is_char_array())
+                 {
+                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
+                                 << a << "]";
+                    DOMAIN_ERROR;
+                 }
+              const UCS_string var(x);
+              vars.push_back(var);
+            }
       }
 
-const UCS_string var_name(A);
-const UCS_string Z_ucs = print_polynomial(var_name, B);
+const UCS_string Z_ucs = print_polynomial(vars, B);
    return Value_P(Z_ucs, LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string
-Bif_F12_DOMINO::print_polynomial(const UCS_string & var, const Value & B)
+Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
+                                 const Value & B)
 {
-const Unicode powers[10] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3, 
-                             UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7, 
-                             UNI_PAD_U8, UNI_PAD_U9 };
+const Unicode expos[10] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3, 
+                            UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7, 
+                            UNI_PAD_U8, UNI_PAD_U9 };
                              
+const sRank rank_B = B.get_rank();
+const ShapeItem ec_B = B.element_count();
 UCS_string poly;
 
-const ShapeItem ec_B = B.element_count();
-
-bool plus = false;
-   loop(b, ec_B)
+int plus = 0;
+   loop(n, ec_B)
       {
-        // power
-        const int power = ec_B - b - 1;
+        const size_t b = ec_B - n - 1;
+        const Cell & coeff = B.get_cravel(b);
+        if (coeff.is_near_zero())   continue;   // hide zero coefficients
 
-        const Cell & coeff = B.get_cravel(power);
+        // print non-zero coefficient. Start with a +, except before the
+        // first term.
+        //
+        if (plus++)   poly.append_ASCII(" + ");
+
         char coeff_cp[40];
-        if (coeff.is_integer_cell())
+        if (coeff.is_integer_cell())   // integer coefficient
            {
              SPRINTF(coeff_cp, "%d", int(coeff.get_int_value()));
            }
-        else if (coeff.is_float_cell())
+        else if (coeff.is_float_cell())   // real coefficient
            {
              SPRINTF(coeff_cp, "%.2f", coeff.get_real_value());
            }
-        else if (coeff.is_complex_cell())
+        else if (coeff.is_complex_cell())   // comple coefficient
            {
              SPRINTF(coeff_cp, "%.2fj%.2f", coeff.get_real_value(),
                                             coeff.get_imag_value());
            }
-
-        // hide the entire term if coefficient is 0.
-        // 
-        if (coeff.is_near_zero())   continue;
-
-        // term is nonzero. hide + before the first term
-        //
-        if (plus)   poly.append_ASCII(" + ");
-        plus = true;
-
-       // hide X⁰
-       //
-       if (power == 0)   // hide X⁰, but show coefficient
-          {
-            poly << coeff_cp;
-            break;
-          }
-
-        // show coefficient, but only if ≠ 1
-        //
-        if (!coeff.is_near_one())   poly << coeff_cp;
-
-       // show indeterminant
-       poly.append(var);
-
-       if (power == 1)   continue;
-
-        if (power < 10)   // single digit power
+        else
            {
-             poly.append(powers[power]);
+             MORE_ERROR() << "A ⌹.poly_print B: non-numeric coefficient in B";
+             DOMAIN_ERROR;
            }
-        else              // multi digit power
+
+        /* at this point there are 3 cases:
+         
+           a. polynomial coefficient b₀:       print b₀ (w/o indeterminants)
+           b. polynomial coefficient 1:        hide coefficient
+           c. polynomial coefficient bₙ ≠ 1:   print bₙ
+         */
+
+        if (b == 0)                            //  case a.
            {
-             UCS_string pow;
+              // the final (constant) coefficient must be printed because
+              // there is no indeterminant X (more precisely the indeterminant
+              // X is X⁰ == 1).
+              //
+              poly.append_ASCII(coeff_cp);
+              continue;   // done.
+           }
 
-             // power in reverse order
+        if (!coeff.is_near_one())   poly << coeff_cp;   // case c.
+
+        if (b == 0)   break;   // constant b₀ has no indeterminant(s)
+
+        // show the indeterminant()
+        //
+        const Shape powers = B.get_shape().offset_to_index(b, /* ⎕IO */0);
+
+       // show non-zero indeterminants
+       //
+       loop(p, rank_B)
+           {
+             const size_t power = powers.get_shape_item(p);
+             if (power == 0)   continue;   // hide indeterminants I⁰
+
+             // show the indeterminant, e.g. Xⁿ
              //
-             for (size_t p = power; p; p /= 10)
-                 {
-                   pow.append(powers[p % 10]);
-                 }
+             if (power == 0)   continue;   // hide factor X⁰ (== 1) completely
 
-             loop(p, pow.size())   poly.append(pow[pow.size() - p - 1]);
+             poly.append(vars[p]);   // name of the indeterminant
+             if (power == 1)
+                {
+                  // hide exponent 1 (since X¹ == X).
+                }
+             else if (power < 10)   // single digit exponent
+                {
+                  poly.append(expos[power]);
+                }
+             else              // multi digit power
+                {
+                  UCS_string pow;
+
+                  // power in reverse order
+                  //
+                  for (size_t p = power; p; p /= 10)
+                      {
+                        pow.append(expos[p % 10]);
+                      }
+
+                  loop(p, pow.size())   poly.append(pow[pow.size() - p - 1]);
+                }
            }
       }
 
@@ -974,35 +1067,95 @@ bool plus = false;
 Value_P
 Bif_F12_DOMINO::polynomial_product(const Value & A, const Value & B)
 {
-   if (A.get_rank() > 1)   RANK_ERROR;
-   if (B.get_rank() > 1)   RANK_ERROR;
+   // the rank is the number of indeterminants (which should be the same for
+   // A and B).
+   //
+const sRank rank = A.get_rank();
 
 const ShapeItem ec_A = A.element_count();
 const ShapeItem ec_B = B.element_count();
 
-   if (ec_A == 0)   LENGTH_ERROR;
-   if (ec_B == 0)   LENGTH_ERROR;
+   if (ec_A == 0)   LENGTH_ERROR;   // at least a₀ is required
+   if (ec_B == 0)   LENGTH_ERROR;   // at least b₀ is required
 
    loop(a, ec_A)   if (!A.get_cravel(a).is_numeric())   DOMAIN_ERROR;
    loop(b, ec_B)   if (!B.get_cravel(b).is_numeric())   DOMAIN_ERROR;
 
-const ShapeItem ec_Z = ec_A + ec_B - 1;
-Value_P Z(ec_Z, LOC);
+Shape shape_Z;
+   loop(r, rank)
+       {
+         shape_Z.add_shape_item(A.get_shape_item(r) +
+                                B.get_shape_item(r) - 1);
+       }
 
-   loop(z, ec_Z)   Z->next_ravel_0();
+   typedef complex<double> Complex;
+vector<Complex> vZ(shape_Z.get_volume(), Complex(0));
 
    loop(a, ec_A)
-   loop(b, ec_B)
-      {
-        const ShapeItem z = a + b;
+       {
         const Cell & cell_A = A.get_cravel(a);
-        const Cell & cell_B = B.get_cravel(b);
-        Cell cell_BA;
-        cell_B.bif_multiply(&cell_BA, &cell_A);   // BA←B×A
+        if (cell_A.is_near_zero())   continue;
+        const Shape idx_A = A.get_shape().offset_to_index(a, /* ⎕IO */ 0);
+        loop(b, ec_B)
+           {
+             const Cell & cell_B = B.get_cravel(b);
+             if (cell_B.is_near_zero())   continue;
+             const Shape idx_B = B.get_shape().offset_to_index(b, /* ⎕IO */ 0);
 
-        Cell & cell_Z = Z->get_wravel(z);
-        cell_Z.bif_add(&cell_Z, &cell_BA);        // Z←Z+BA
-      }
+             // at this point A and B are non-zero coefficients, and
+             // idx_A and idx_B are the powers of their indeterminants
+             //
+             // Compute the product of the powers
+             //
+             Shape idx_AB;
+             loop(r, rank)   // loop over the indeterminants
+                 {
+                   // the product of powers is the sum of the exponents
+                   //
+                   idx_AB.add_shape_item(idx_A.get_shape_item(r) +
+                                         idx_B.get_shape_item(r));
+                 }
+
+             const ShapeItem pos = shape_Z.ravel_pos(idx_AB);
+             const double real_a = cell_A.get_real_value();
+             const double real_b = cell_B.get_real_value();
+             if (cell_A.is_near_real() && cell_B.is_near_real())
+                {
+                  vZ[pos] = Complex(vZ[pos].real() + real_a * real_b, 0);
+                }
+             else
+                {
+                  const double imag_a = cell_A.get_imag_value();
+                  const double imag_b = cell_B.get_imag_value();
+                  vZ[pos] = Complex(vZ[pos].real() + real_a * real_b
+                                                   - imag_a * imag_b,
+                                    vZ[pos].imag() + real_a * imag_b
+                                                   + imag_a * real_b);
+
+                }
+           }
+       }
+
+   // construct the result
+   //
+Value_P Z(shape_Z, LOC);
+   loop(z, shape_Z.get_volume())
+       {
+         const double real_z = vZ[z].real();
+         const double imag_z = vZ[z].imag();
+         if (!Cell::is_near_zero(imag_z))   // complex coefficient
+             {
+               Z->next_ravel_Complex(real_z, imag_z);
+             }
+         else if (Cell::is_near_zero(real_z))   // 0J0
+             {
+               Z->next_ravel_0();
+             }
+          else
+             {
+               Z->next_ravel_Number(real_z);
+             }
+       }
 
    Z->check_value(LOC);
    return Z;
@@ -1041,81 +1194,178 @@ const ShapeItem ec_B = B.element_count();
         return Z;
       }
 
-const ShapeItem ec_Q = ec_A - ec_B + 1;
-
-typedef complex<double> Complex;
-vector<Complex> PB;   PB.reserve(ec_B);
-vector<Complex> PQ;   PQ.reserve(ec_Q);
-vector<Complex> PR;   PR.reserve(ec_A + ec_B - 1);
+   // check if complex is needed and remember the powers of B with
+   // non-0 coefficients.
+   //
+vector<size_t> powers_B;   powers_B.reserve(ec_B);
+bool need_complex = false;
    loop(a, ec_A)
        {
-         const Cell & cell = A.get_cravel(ec_A - a - 1);
-          PR.push_back(Complex(cell.get_real_value(), cell.get_imag_value()));
+          if (A.get_cravel(a).is_complex_cell())
+             {
+               need_complex = true;
+               break;
+             }
        }
-   loop(b, ec_B - 1)   PR.push_back(0);
 
    loop(b, ec_B)
        {
-         const Cell & cell = B.get_cravel(ec_B - b - 1);
-          PB.push_back(Complex(cell.get_real_value(), cell.get_imag_value()));
+         const Cell & cell = B.get_cravel(b);
+         if (cell.is_near_zero())   continue;
+         powers_B.push_back(b);   // remember b
+         if (cell.is_complex_cell())   need_complex = true;
        }
 
-   loop(q, ec_Q)
-       {
-CERR << "POLY: "; loop(q1, ec_Q) CERR << " " << PR[q1].real(); CERR << endl;
-         /* 1. divide the leading coefficients and store it in PQ
-           
-               R = B × (R ÷ B) = R × factor.
-          */
-         const Complex & Rq = PR[q];   // dividend
-         if (Cell::is_near_zero(Rq.real()) &&
-             Cell::is_near_zero(Rq.imag()))
-            {
-              PQ.push_back(0);
-              continue;
-            }
+const ShapeItem ec_Q = ec_A - ec_B + 1;
 
-         const Complex factor = Rq / PB[0];
-         PQ.push_back(factor);
-
-         // 2. subtract scaled B from R
-         //
-         loop(b, ec_B)   PR[q + b] -= factor * PB[b];
-       }
-   Assert(size_t(ec_Q) == PQ.size());
-
-CERR << "final Q: "; loop(q, PQ.size()) CERR << " " << PQ[q].real(); CERR << endl;
-CERR << "final R: "; loop(q, PR.size()) CERR << " " << PR[q].real(); CERR << endl;
-   // construct the result
-   //
 Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
-Value_P Z1(ec_Q, LOC);   // A÷B
-   loop(q, ec_Q)
+   if (need_complex)
       {
-         const Complex z = PQ[ec_Q - q - 1];
-         const double r = z.real();
-         const double i = z.imag();
-         if (!Cell::is_near_zero(i))           Z1->next_ravel_Complex(r, i);
-         else if (!Cell::is_near_int64_t(r))   Z1->next_ravel_Number(r);
-         else                           Z1->next_ravel_Int(Cell::near_int(r));
+        typedef complex<double> Complex;
+        vector<Complex> D;   D.reserve(ec_B);              // divisor
+        vector<Complex> Q;   Q.reserve(ec_Q);              // quotient
+        vector<Complex> R;   R.reserve(ec_A + ec_B - 1);   // remainder
+        loop(a, ec_A)
+            {
+              const Cell & cell = A.get_cravel(ec_A - a - 1);
+               R.push_back(Complex(cell.get_real_value(),
+                                   cell.get_imag_value()));
+            }
+        loop(b, ec_B - 1)   R.push_back(0);
+       
+        loop(b, ec_B)
+            {
+              const Cell & cell = B.get_cravel(ec_B - b - 1);
+               D.push_back(Complex(cell.get_real_value(),
+                                   cell.get_imag_value()));
+            }
+       
+        loop(q, ec_Q)
+            {
+              /* 1. divide the leading coefficients and store it in PQ
+                
+                    R = B × (R ÷ B) = R × factor.
+               */
+              const Complex & Rq = R[q];   // dividend
+              if (Cell::is_near_zero(Rq.real()) &&
+                  Cell::is_near_zero(Rq.imag()))
+                 {
+                   Q.push_back(0);
+                   continue;
+                 }
+       
+              const Complex factor = Rq / D[0];
+              Q.push_back(factor);
+       
+              // 2. subtract scaled B from R
+              //
+              loop(n, powers_B.size())
+                  {
+                    const size_t b = powers_B[n];
+                    R[q + b] -= factor * D[b];
+                  }
+            }
+        Assert(size_t(ec_Q) == Q.size());
+       
+        // construct the result
+        //
+        Value_P Z1(ec_Q, LOC);   // A÷B
+        loop(q, ec_Q)
+           {
+              const Complex z = Q[ec_Q - q - 1];
+              const double r = z.real();
+              const double i = z.imag();
+              if (!Cell::is_near_zero(i))          Z1->next_ravel_Complex(r, i);
+              else if (!Cell::is_near_int64_t(r))  Z1->next_ravel_Number(r);
+              else                       Z1->next_ravel_Int(Cell::near_int(r));
+           }
+        Z1->check_value(LOC);
+       
+        Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
+       
+        loop(b, ec_B - 1)
+            {
+              const Complex z = R[ec_Q + b];
+              const double re = z.real();
+              const double im = z.imag();
+              if (!Cell::is_near_zero(im))      Z2->next_ravel_Complex(re, im);
+              else if (!Cell::is_near_int64_t(re))   Z2->next_ravel_Number(re);
+              else                      Z2->next_ravel_Int(Cell::near_int(re));
+            }
+        Z2->check_value(LOC);
+       
+        Z->next_ravel_Value(Z1.get());
+         Z->next_ravel_Value(Z2.get());
       }
-   Z1->check_value(LOC);
+   else   // real coefficients
+      {
+        vector<double> D;   D.reserve(ec_B);              // divisor
+        vector<double> Q;   Q.reserve(ec_Q);              // quotient
+        vector<double> R;   R.reserve(ec_A + ec_B - 1);   // remainder
+        loop(a, ec_A)
+            {
+              const Cell & cell = A.get_cravel(ec_A - a - 1);
+               R.push_back(cell.get_real_value());
+            }
+        loop(b, ec_B - 1)   R.push_back(0);
+       
+        loop(b, ec_B)
+            {
+              const Cell & cell = B.get_cravel(ec_B - b - 1);
+               D.push_back(cell.get_real_value());
+            }
+       
+        loop(q, ec_Q)
+            {
+              /* 1. divide the leading coefficients and store it in PQ
+                
+                    R = B × (R ÷ B) = R × factor.
+               */
+              const double Rq = R[q];   // dividend
+              if (Cell::is_near_zero(Rq))
+                 {
+                   Q.push_back(0);
+                   continue;
+                 }
+       
+              const double factor = Rq / D[0];
+              Q.push_back(factor);
+       
+              // 2. subtract scaled B from R
+              //
+              loop(n, powers_B.size())
+                  {
+                    const size_t b = powers_B[n];
+                    R[q + b] -= factor * D[b];
+                  }
+            }
+        Assert(size_t(ec_Q) == Q.size());
+       
+        // construct the result
+        //
+        Value_P Z1(ec_Q, LOC);   // A÷B
+        loop(q, ec_Q)
+           {
+              const double r = Q[ec_Q - q - 1];
+              if (!Cell::is_near_int64_t(r))   Z1->next_ravel_Number(r);
+              else                     Z1->next_ravel_Int(Cell::near_int(r));
+           }
+        Z1->check_value(LOC);
+       
+        Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
+       
+        loop(b, ec_B - 1)
+            {
+              const double re = R[ec_Q + b];
+              if (!Cell::is_near_int64_t(re))   Z2->next_ravel_Number(re);
+              else                 Z2->next_ravel_Int(Cell::near_int(re));
+            }
+        Z2->check_value(LOC);
+       
+        Z->next_ravel_Value(Z1.get());
+         Z->next_ravel_Value(Z2.get());
+      }
 
-Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
-
-   loop(b, ec_B - 1)
-       {
-         const Complex z = PR[ec_Q + b];
-         const double re = z.real();
-         const double im = z.imag();
-         if (!Cell::is_near_zero(im))           Z2->next_ravel_Complex(re, im);
-         else if (!Cell::is_near_int64_t(re))   Z2->next_ravel_Number(re);
-         else                           Z2->next_ravel_Int(Cell::near_int(re));
-       }
-   Z2->check_value(LOC);
-
-   Z->next_ravel_Value(Z1.get());
-   Z->next_ravel_Value(Z2.get());
    Z->check_value(LOC);
    return Z;
 }

@@ -225,17 +225,18 @@ OK      - no duplicate parents
 
       ⍝ Regression (APL Wiki, 9.12.2025).
       ⍝
-
 ∇Z←(LO oper RO) B
- Z←B
+ Z←RO B
 ∇
 
 ∇Z←(LO opex RO) [X] B
- Z←B
+ Z←RO (⎕NC 'X') B
 ∇
+     1 oper 'xyz' [2] 3
+y 3
 
-      1 oper 'xyz' [2] 3
-3
+      1 opex 'xyz' [2] 3
+y 0 3
 
 
 

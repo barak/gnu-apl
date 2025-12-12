@@ -10,6 +10,8 @@ gdef(uint32_t, with_border,         1, "= write plot area and window borders)\n"
 gdef(Pixel_X,  pw_pos_X,            50, "plot window position X")
 gdef(Pixel_Y,  pw_pos_Y,            50, "plot window position Y")
 gdef(Pixel_X,  border_width,        10, "width of the window border")
+gdef(uint32_t, terminal_cols,       80, "terminal columns (ASCII driver)")
+gdef(uint32_t, terminal_rows,       24, "terminal rows (ASCII driver)")
 gdef(Pixel_X,  pa_width,           600, "plotarea width")
 gdef(Pixel_Y,  pa_height,          400, "plotarea height")
 gdef(Pixel_X,  pa_border_L,         50, "pixels left of the plotarea")

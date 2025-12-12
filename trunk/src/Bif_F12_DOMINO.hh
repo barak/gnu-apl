@@ -83,7 +83,8 @@ protected:
    static Value_P print_polynomial(const Value & A, const Value & B);
 
    /// return the polynomial B with indeterminant A as APL string
-   static UCS_string print_polynomial(const UCS_string & var, const Value & B);
+   static UCS_string print_polynomial(const UCS_string_vector & vars,
+                                      const Value & B);
 
    /// return the polynomial B with indeterminant 'x' as APL string
    static Value_P print_polynomial(const Value & B);

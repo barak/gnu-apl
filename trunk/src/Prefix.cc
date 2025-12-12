@@ -976,10 +976,13 @@ again:   // aka. REDUCE
    find_best_phrase();                  // set best_phrase
    if (best_phrase == 0)   goto grow;   // no best_phrase
 
-   // found a reducible prefix. See if the next token class binds stronger
-   // than best_phrase->prio
-   //
-   if (check_next_binding())   goto grow;
+   /* found a reducible prefix. See if the next token class binds stronger
+      than best_phrase->prio.
+
+      If best_phrase->prio ≥ BS_ANY_BRA then we reduce immediately,
+      since ALWAYS [ ] has the strongest binding.
+    */
+   if (best_phrase->prio < BS_ANY_BRA && check_next_binding())   goto grow;
 
    Log(LOG_prefix_parser)
       {
@@ -1156,10 +1159,6 @@ Prefix::do_shift(TokenClass next) const
    switch(at0().get_Class())
       {
         case TC_VALUE:
-             // value [] binds stronger than anthing
-             //
-             if (ssize() > 1 && at1().get_Class() == TC_INDEX)   return false;
-
              if (next == TC_OPER2)           // DOP B
                 {
                   return true;

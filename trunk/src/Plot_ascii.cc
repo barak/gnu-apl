@@ -370,10 +370,8 @@ do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
 {
    // usable area
    //
-const int H = 24;
-const int W = 80;
-//ASCII_Point canvas[H*W];
-
+const int H = w_props.get_terminal_rows();
+const int W = w_props.get_terminal_cols();
 ASCII_canvas ctx(H, W);
 
    ctx.draw_grid(w_props);

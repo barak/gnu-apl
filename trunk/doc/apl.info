@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 6, 2025.  This manual briefly documents GNU APL, an interpreter
-for APL as described in ISO standard 13751, aka.  "Programming Language
-APL, Extended".
+December 11, 2025.  This manual briefly documents GNU APL, an
+interpreter for APL as described in ISO standard 13751, aka.
+"Programming Language APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 7.
@@ -702,7 +702,7 @@ unction Groups
 * Section 2.19::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
 * Section 2.20::  ⊥ with Axis
 * Section 2.21::  Generalized ⍳
-* Section 2.22::  ⌹[X] - Matrix Factorizations
+* Section 2.22::  ⌹[X] - Miscellaneous Matrix and Vector Operations
 * Section 2.23::  Dyadic ⎕CR
 * Section 2.24::  Dyadic ⎕FX (Native Functions)
 * Section 2.25::  ⎕ARG  - Interpreter command line arguments
@@ -2867,8 +2867,8 @@ vector (if the item was found) or - different from the standard case (!)
 
 File: apl.info,  Node: Section 2.22,  Next: Section 2.23,  Prev: Section 2.21,  Up: Chapter 2
 
-2.22 ⌹[X] - QR and LQ Factorizations
-====================================
+2.22 ⌹[X] - Miscellaneous Matrix and Vector Operations
+======================================================
 
 2.22.1 ⌹[1] and ⌹[2] - QR Factorizations
 ----------------------------------------
@@ -3022,8 +3022,8 @@ columns of some matrix B then there are two possibilities:
      matrices that are nearly linearly dependent tend to produce
      significant rounding errors in the result.
 
-2.22.2.2 ⌹[X] B: Factorizations of B
-....................................
+2.22.2.2 ⌹[X] B: Various Factorizations of B
+............................................
 
 The numeric scalar X chooses one of several algorithms that computes a
 factorization (aka.  decomposition) of a matrix B:
@@ -3100,6 +3100,102 @@ QR-factorization of B was already computed.
 
    The computation of ⍉Q and Ti∘⍉Q is considerably faster than the
 computation of ⌹B if B is large.
+
+2.22.2.4 ⌹[7] B: Print Polynomial B
+...................................
+
+Let B ← b₀ b₁ b₂ ...  bₙ.  The standard interpretation of this vector B
+in APL is that B is an element of a vector space over the field ℝ or ℂ.
+The elementary APL primitives +, -, × and ÷, but also the more powerful
+primitives +.× and ⌹, and last but not least the scalar extension
+mechanism of several primitive are tailored for this interpretation.
+
+   However, another and less common interpretation of B is this: vector
+B is a polynomial of (a single) indeterminant X:
+
+   B ←→ b₀ + b₁X + b₂X² + ...  + bₙXⁿ
+
+   This interpretation easily extends to APL values of higher rank, i.e.
+matrices are polynomials of two indeterminants X and Y, values of rank 3
+are polynomials of three indeterminants X, Y, and Z, and so on.
+
+   Function ⌹[7] B, aka.  ⌹.poly_print B returns a string with this
+interpretation.  In its monadic form ⌹[7] B it uses the names x, y, z,
+...  for the indeterminants of the polynomial.  In its dyadic form A
+⌹[7] B does iA specify the names that shall be used.  Two forms are
+supported for A: the characters of a plain APL string (⍴A == ⍴⍴B) is
+understood as a list of single character indeterminants.  iAlternatively
+A list of nested strings A (again with (⍴A == ⍴⍴B)) is understood as N
+different indeterminant names.  For example:
+
+           ⍝ monadic, 1 indeterminant
+           ⌹.poly_print ⎕←POLY←3 2 1
+     3 2 1
+     x² + 2x + 3
+
+           ⍝ monadic, 2 indeterminants
+           ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+     1 2 3
+     4 5 6
+     6x²y + 5xy + 4y + 3x² + 2x + 1
+
+           ⍝ monadic, 3 indeterminants
+           ⌹.poly_print ⎕←POLY←3 3⍴⍳9
+     1 2 3
+     4 5 6
+     7 8 9
+     9x²y² + 8xy² + 7y² + 6x²y + 5xy + 4y + 3x² + 2x + 1
+
+           ⍝ dyadic, two 1-character indeterminants X and Y
+           'XY' ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+     1 2 3
+     4 5 6
+     6X²Y + 5XY + 4Y + 3X² + 2X + 1
+
+           ⍝ dyadic, two named indeterminants _Foo and _Bar
+           '_Foo' '_Bar' ⌹.poly_print ⎕←POLY←2 3⍴⍳6
+     1 2 3
+     4 5 6
+     6_Foo²_Bar + 5_Foo_Bar + 4_Bar + 3_Foo² + 2_Foo + 1
+
+
+2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B
+...............................................
+
+The scalar APL primitives + and - can be used for vectors and for
+polynomials alike.  In contrast, the multiplication of two polynomials A
+and B is different from the scalar multiplication A×B and is also
+different from the vector multiplication A +.× B.
+
+   Dyadic A ⌹[8] B aka.  A ⌹.poly_multiply B fills this gap and computes
+the product of two polynomials.  For example:
+
+           "A:"    (⌹.poly_print A ← 4 0 0 6 3 1)
+      A: x⁵ + 3x⁴ + 6x³ + 4
+
+           "B:"    (⌹.poly_print B ← 5 0 2)
+      B: 2x² + 5
+
+           "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
+      PROD: 2x⁷ + 6x⁶ + 17x⁵ + 15x⁴ + 30x³ + 8x² + 20
+
+2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B
+......................................................
+
+The scalar APL primitives + and - can be used for vectors and for
+polynomials alike.  In contrast, the division of a polynomial A by a
+polynomial B is different from the scalar division A÷B and is also
+different from the matrix division A ⌹.× B.
+
+   Dyadic A ⌹[9] B aka.  A ⌹.poly_divide B fills this gap and computes
+the quotient of two polynomials.  Since polynomials form a ring (and not
+a field) the quotient is not always a polynomial (at least not one with
+non-negative exponents).  For this reason A ⌹.poly_divide B performs a
+division with remainder and the result is a pair (Quotient, Remainder)
+where Remainder is a polynomial with a degree smaller that the degree of
+polynomial B. That is, ⍴Remainder = ¯1+⍴B.
+
+   Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
 
 
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
@@ -8922,81 +9018,81 @@ Tag Table:
 Node: Top383
 Node: Chapter 11571
 Node: Chapter 224233
-Node: Section 2.126362
-Node: Subsection 2.1.127596
-Node: Subsection 2.1.228265
-Node: Subsection 2.1.329089
-Node: Subsection 2.1.435003
-Node: Subsection 2.1.538891
-Node: Subsection 2.1.639752
-Node: Subsection 2.1.748217
-Node: Subsection 2.1.850023
-Node: Section 2.253432
-Node: Section 2.354224
-Node: Section 2.460172
-Node: Section 2.561454
-Node: Section 2.665951
-Node: Section 2.766124
-Node: Section 2.866754
-Node: Section 2.972234
-Node: Section 2.1074605
-Node: Section 2.1176694
-Node: Section 2.1278267
-Node: Section 2.1380048
-Node: Section 2.1481977
-Node: Section 2.1582918
-Node: Section 2.1683189
-Node: Section 2.1784600
-Node: Section 2.1895503
-Node: Section 2.1998050
-Node: Section 2.20104995
-Node: Section 2.21109431
-Node: Section 2.22110934
-Node: Section 2.23121741
-Node: Section 2.24127652
-Node: Section 2.25131024
-Node: Section 2.26131315
-Node: Section 2.27142168
-Node: Section 2.28142440
-Node: Section 2.29149493
-Node: Section 2.30151947
-Node: Section 2.31152616
-Node: Section 2.32154267
-Node: Section 2.33158191
-Node: Section 2.34172620
-Node: The Plot Data B173852
-Node: The Plot Attributes A176466
-Node: Plot Window Handling190001
-Node: Output File Format191332
-Node: GUI driver192555
-Node: Section 2.35196110
-Node: Section 2.36205545
-Node: Section 2.37206564
-Node: Section 2.38221799
-Node: Section 2.39232841
-Node: Section 2.40235025
-Node: Section 2.41261130
-Node: Section 2.42265670
-Node: Section 2.43286769
-Node: Section 2.44300782
-Node: Section 2.45304052
-Node: Chapter 3304567
-Node: Chapter 4307075
-Node: Chapter 5308216
-Node: Section 5.1309863
-Node: Section 5.2311183
-Node: Section 5.3311543
-Node: Section 5.4311785
-Node: Section 5.5312447
-Node: Section 5.6312925
-Node: Section 5.7313698
-Node: Section 5.8314124
-Node: Chapter 6314526
-Node: Section 6.1314945
-Node: Section 6.2315632
-Node: Chapter 7316463
-Node: Section 7.1316966
-Node: Section 7.2342279
+Node: Section 2.126383
+Node: Subsection 2.1.127617
+Node: Subsection 2.1.228286
+Node: Subsection 2.1.329110
+Node: Subsection 2.1.435024
+Node: Subsection 2.1.538912
+Node: Subsection 2.1.639773
+Node: Subsection 2.1.748238
+Node: Subsection 2.1.850044
+Node: Section 2.253453
+Node: Section 2.354245
+Node: Section 2.460193
+Node: Section 2.561475
+Node: Section 2.665972
+Node: Section 2.766145
+Node: Section 2.866775
+Node: Section 2.972255
+Node: Section 2.1074626
+Node: Section 2.1176715
+Node: Section 2.1278288
+Node: Section 2.1380069
+Node: Section 2.1481998
+Node: Section 2.1582939
+Node: Section 2.1683210
+Node: Section 2.1784621
+Node: Section 2.1895524
+Node: Section 2.1998071
+Node: Section 2.20105016
+Node: Section 2.21109452
+Node: Section 2.22110955
+Node: Section 2.23125735
+Node: Section 2.24131646
+Node: Section 2.25135018
+Node: Section 2.26135309
+Node: Section 2.27146162
+Node: Section 2.28146434
+Node: Section 2.29153487
+Node: Section 2.30155941
+Node: Section 2.31156610
+Node: Section 2.32158261
+Node: Section 2.33162185
+Node: Section 2.34176614
+Node: The Plot Data B177846
+Node: The Plot Attributes A180460
+Node: Plot Window Handling193995
+Node: Output File Format195326
+Node: GUI driver196549
+Node: Section 2.35200104
+Node: Section 2.36209539
+Node: Section 2.37210558
+Node: Section 2.38225793
+Node: Section 2.39236835
+Node: Section 2.40239019
+Node: Section 2.41265124
+Node: Section 2.42269664
+Node: Section 2.43290763
+Node: Section 2.44304776
+Node: Section 2.45308046
+Node: Chapter 3308561
+Node: Chapter 4311069
+Node: Chapter 5312210
+Node: Section 5.1313857
+Node: Section 5.2315177
+Node: Section 5.3315537
+Node: Section 5.4315779
+Node: Section 5.5316441
+Node: Section 5.6316919
+Node: Section 5.7317692
+Node: Section 5.8318118
+Node: Chapter 6318520
+Node: Section 6.1318939
+Node: Section 6.2319626
+Node: Chapter 7320457
+Node: Section 7.1320960
+Node: Section 7.2346273
 
 End Tag Table
 
