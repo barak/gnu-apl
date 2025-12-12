@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 11, 2025.
+<p>December 12, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -3865,7 +3865,9 @@ also different from the vector multiplication <b>A +.× B</b>.
 the product of two polynomials. For example:
 </p>
 <div class="example">
-<pre class="example">      &quot;A:&quot;    (⌹.poly_print A ← 4 0 0 6 3 1)
+<pre class="example">      ⍝ single indeterminant x
+      ⍝
+      &quot;A:&quot;    (⌹.poly_print A ← 4 0 0 6 3 1)
  A: x⁵ + 3x⁴ + 6x³ + 4 
 
       &quot;B:&quot;    (⌹.poly_print B ← 5 0 2)
@@ -3873,6 +3875,17 @@ the product of two polynomials. For example:
 
       &quot;PROD:&quot; (⌹.poly_print PROD ← A ⌹.poly_multiply B)
  PROD: 2x⁷ + 6x⁶ + 17x⁵ + 15x⁴ + 30x³ + 8x² + 20 
+
+      ⍝ two indeterminants x and y
+      ⍝
+      &quot;A:&quot;    (⌹.poly_print A ← 2 2⍴0 1 1 0)
+ A: x + y 
+
+      &quot;B:&quot;    (⌹.poly_print B ← 2 2⍴0 ¯1 1 0)
+ B: x - y 
+
+      &quot;PROD:&quot; (⌹.poly_print PROD ← A ⌹.poly_multiply B)
+ PROD: x² - y² 
 </pre></div>
 
 </div>

@@ -3367,6 +3367,8 @@ Dyadic @b{A ⌹[8] B} aka. @b{A ⌹.poly_multiply B} fills this gap and computes
 the product of two polynomials. For example:
 
 @example
+      ⍝ single indeterminant x
+      ⍝
       "A:"    (⌹.poly_print A ← 4 0 0 6 3 1)
  A: x⁵ + 3x⁴ + 6x³ + 4 
 
@@ -3375,6 +3377,17 @@ the product of two polynomials. For example:
 
       "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
  PROD: 2x⁷ + 6x⁶ + 17x⁵ + 15x⁴ + 30x³ + 8x² + 20 
+
+      ⍝ two indeterminants x and y
+      ⍝
+      "A:"    (⌹.poly_print A ← 2 2⍴0 1 1 0)
+ A: x + y 
+
+      "B:"    (⌹.poly_print B ← 2 2⍴0 ¯1 1 0)
+ B: x - y 
+
+      "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
+ PROD: x² - y² 
 @end example
 
 @c ----------------------------------------------------------------------------

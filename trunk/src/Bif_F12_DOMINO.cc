@@ -968,31 +968,71 @@ const sRank rank_B = B.get_rank();
 const ShapeItem ec_B = B.element_count();
 UCS_string poly;
 
-int plus = 0;
+int term = 0;
    loop(n, ec_B)
       {
         const size_t b = ec_B - n - 1;
         const Cell & coeff = B.get_cravel(b);
         if (coeff.is_near_zero())   continue;   // hide zero coefficients
 
-        // print non-zero coefficient. Start with a +, except before the
+        // print non-zero coefficient. Start with the sign, except before the
         // first term.
         //
-        if (plus++)   poly.append_ASCII(" + ");
-
-        char coeff_cp[40];
+        char coeff_value[40] = { 0 };
+        const char * coeff_sign = "";
         if (coeff.is_integer_cell())   // integer coefficient
            {
-             SPRINTF(coeff_cp, "%d", int(coeff.get_int_value()));
+             int value = coeff.get_int_value();
+             const bool negative = value < 0;
+             if (term++)   // subsequent term: alwayz needs sign
+                {
+                  if (negative)
+                     {
+                       coeff_sign = " - ";
+                       value = - value;
+                     }
+                  else
+                     {
+                       coeff_sign = " + ";
+                     }
+                }
+             else          // first term
+                {
+                  if (negative)   coeff_sign = "-";
+                }
+             if (value != 1)   SPRINTF(coeff_value, "%d", value);
            }
         else if (coeff.is_float_cell())   // real coefficient
            {
-             SPRINTF(coeff_cp, "%.2f", coeff.get_real_value());
+             double value = coeff.get_real_value();
+             const bool negative = value < 0;
+             if (term++)   // subsequent term: alwayz needs sign
+                {
+                  if (negative)
+                     {
+                       coeff_sign = " - ";
+                       value = - value;
+                     }
+                  else
+                     {
+                       coeff_sign = " + ";
+                     }
+                }
+             else          // first term
+                {
+                  if (negative)   coeff_sign = "-";
+                }
+             SPRINTF(coeff_value, "%.2f", value);
            }
         else if (coeff.is_complex_cell())   // comple coefficient
            {
-             SPRINTF(coeff_cp, "%.2fj%.2f", coeff.get_real_value(),
-                                            coeff.get_imag_value());
+             if (term++)   // subsequent term
+                {
+                  poly.append_ASCII(" + ");
+               }
+             const double c_real = coeff.get_real_value();
+             const double c_imag = coeff.get_imag_value();
+             SPRINTF(coeff_value, "%.2fj%.2f", c_real, c_imag);
            }
         else
            {
@@ -1013,13 +1053,18 @@ int plus = 0;
               // there is no indeterminant X (more precisely the indeterminant
               // X is X⁰ == 1).
               //
-              poly.append_ASCII(coeff_cp);
-              continue;   // done.
+              poly << coeff_sign << coeff_value;
+              continue;   // done (no indeterminants.
            }
 
-        if (!coeff.is_near_one())   poly << coeff_cp;   // case c.
-
-        if (b == 0)   break;   // constant b₀ has no indeterminant(s)
+        if (coeff.is_near_one())
+           {
+             poly << coeff_sign;
+           }
+        else
+           {
+             poly << coeff_sign << coeff_value;   // case c.
+           }
 
         // show the indeterminant()
         //

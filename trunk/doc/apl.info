@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 11, 2025.  This manual briefly documents GNU APL, an
+December 12, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -3170,6 +3170,8 @@ different from the vector multiplication A +.× B.
    Dyadic A ⌹[8] B aka.  A ⌹.poly_multiply B fills this gap and computes
 the product of two polynomials.  For example:
 
+           ⍝ single indeterminant x
+           ⍝
            "A:"    (⌹.poly_print A ← 4 0 0 6 3 1)
       A: x⁵ + 3x⁴ + 6x³ + 4
 
@@ -3178,6 +3180,17 @@ the product of two polynomials.  For example:
 
            "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
       PROD: 2x⁷ + 6x⁶ + 17x⁵ + 15x⁴ + 30x³ + 8x² + 20
+
+           ⍝ two indeterminants x and y
+           ⍝
+           "A:"    (⌹.poly_print A ← 2 2⍴0 1 1 0)
+      A: x + y
+
+           "B:"    (⌹.poly_print B ← 2 2⍴0 ¯1 1 0)
+      B: x - y
+
+           "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
+      PROD: x² - y²
 
 2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B
 ......................................................
@@ -9048,51 +9061,51 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Section 2.23125735
-Node: Section 2.24131646
-Node: Section 2.25135018
-Node: Section 2.26135309
-Node: Section 2.27146162
-Node: Section 2.28146434
-Node: Section 2.29153487
-Node: Section 2.30155941
-Node: Section 2.31156610
-Node: Section 2.32158261
-Node: Section 2.33162185
-Node: Section 2.34176614
-Node: The Plot Data B177846
-Node: The Plot Attributes A180460
-Node: Plot Window Handling193995
-Node: Output File Format195326
-Node: GUI driver196549
-Node: Section 2.35200104
-Node: Section 2.36209539
-Node: Section 2.37210558
-Node: Section 2.38225793
-Node: Section 2.39236835
-Node: Section 2.40239019
-Node: Section 2.41265124
-Node: Section 2.42269664
-Node: Section 2.43290763
-Node: Section 2.44304776
-Node: Section 2.45308046
-Node: Chapter 3308561
-Node: Chapter 4311069
-Node: Chapter 5312210
-Node: Section 5.1313857
-Node: Section 5.2315177
-Node: Section 5.3315537
-Node: Section 5.4315779
-Node: Section 5.5316441
-Node: Section 5.6316919
-Node: Section 5.7317692
-Node: Section 5.8318118
-Node: Chapter 6318520
-Node: Section 6.1318939
-Node: Section 6.2319626
-Node: Chapter 7320457
-Node: Section 7.1320960
-Node: Section 7.2346273
+Node: Section 2.23126081
+Node: Section 2.24131992
+Node: Section 2.25135364
+Node: Section 2.26135655
+Node: Section 2.27146508
+Node: Section 2.28146780
+Node: Section 2.29153833
+Node: Section 2.30156287
+Node: Section 2.31156956
+Node: Section 2.32158607
+Node: Section 2.33162531
+Node: Section 2.34176960
+Node: The Plot Data B178192
+Node: The Plot Attributes A180806
+Node: Plot Window Handling194341
+Node: Output File Format195672
+Node: GUI driver196895
+Node: Section 2.35200450
+Node: Section 2.36209885
+Node: Section 2.37210904
+Node: Section 2.38226139
+Node: Section 2.39237181
+Node: Section 2.40239365
+Node: Section 2.41265470
+Node: Section 2.42270010
+Node: Section 2.43291109
+Node: Section 2.44305122
+Node: Section 2.45308392
+Node: Chapter 3308907
+Node: Chapter 4311415
+Node: Chapter 5312556
+Node: Section 5.1314203
+Node: Section 5.2315523
+Node: Section 5.3315883
+Node: Section 5.4316125
+Node: Section 5.5316787
+Node: Section 5.6317265
+Node: Section 5.7318038
+Node: Section 5.8318464
+Node: Chapter 6318866
+Node: Section 6.1319285
+Node: Section 6.2319972
+Node: Chapter 7320803
+Node: Section 7.1321306
+Node: Section 7.2346619
 
 End Tag Table
 
