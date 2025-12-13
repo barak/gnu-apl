@@ -1000,7 +1000,7 @@ int term = 0;
                 {
                   if (negative)   coeff_sign = "-";
                 }
-             if (value != 1)   SPRINTF(coeff_value, "%d", value);
+             SPRINTF(coeff_value, "%d", value);
            }
         else if (coeff.is_float_cell())   // real coefficient
            {
