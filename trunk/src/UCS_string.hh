@@ -181,8 +181,8 @@ public:
    /// return a string like this, but with pad chars mapped to spaces
    UCS_string no_pad() const;
 
-   /// return this string reversed (i.e. characters from back to front).
-   UCS_string reverse() const;
+   /// reverse the characters in \b this string
+   void reverse();
 
    /// return true if \b this string starts with # or ⍝ or x:
    bool is_comment_or_label() const;
@@ -435,14 +435,6 @@ public:
    /// (with \b fract_digits fractional digits).
    static UCS_string from_double_to_fixed(APL_Float value, int fract_digits);
 
-   /// convert double \b value to an UCS_string with \b quad_pp significant
-   /// digits in scaled (exponential) format
-   static UCS_string from_double_expo_pp(APL_Float value, int quad_pp);
-
-   /// convert double \b value to an UCS_string with \b quad_pp significant
-   /// digits in fixed point format
-   static UCS_string from_double_fixed_pp(APL_Float value, int quad_pp);
-
    /// return the total number of UCS_strings
    static ShapeItem get_total_count()
       { return total_count; }
@@ -451,6 +443,10 @@ public:
    static bool compare_names(const UCS_string & n1,
                              const UCS_string & n2, const void *)
       { return n2.compare(n1) == COMP_LT; }
+
+   /// print (non-negative) n as power (like 2 in N²)
+   //
+   static UCS_string power(size_t n);
 
 protected:
    /// the total number of UCS_strings

@@ -24,6 +24,7 @@
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "ComplexCell.hh"
+#include "Tokenizer.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
@@ -49,6 +50,8 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def( 7, poly_print     , "print polynomial B"                       )
   domino_def( 8, poly_multiply  , "polynomial A × polynomial B"              )
   domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"              )
+  domino_def(10, poly_divide2   , "polynomial A ÷ polynomial B"              )
+  domino_def(11, poly_scan      , "string B to polynomial"                   )
 #undef domino_def
 };
 //----------------------------------------------------------------------------
@@ -175,13 +178,14 @@ double EPS = Workspace::get_CT();
         APL_Integer x0 = X0.get_int_value();
         if      (x0 <= 1)   algo = ALGO_QR_HELZER;
 #if apl_GSL
-        else if (x0 == 2)   algo = ALGO_QR_GSL;
-        else if (x0 == 3)   algo = ALGO_RQ_GSL;
-        else if (x0 == 4)   algo = ALGO_LQ_GSL;
-        else if (x0 == 5)   algo = ALGO_QL_GSL;
-        else if (x0 == 6)   algo = ALGO_LU_GSL;
+        else if (x0 ==  2)   algo = ALGO_QR_GSL;
+        else if (x0 ==  3)   algo = ALGO_RQ_GSL;
+        else if (x0 ==  4)   algo = ALGO_LQ_GSL;
+        else if (x0 ==  5)   algo = ALGO_QL_GSL;
+        else if (x0 ==  6)   algo = ALGO_LU_GSL;
 #endif
-        else if (x0 == 7)   return Token(TOK_APL_VALUE1, print_polynomial(*B));
+        else if (x0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(*B));
+        else if (x0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(*B));
       }
 
    if (algo == ALGO_BAD)   // none of the above
@@ -404,10 +408,12 @@ Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const APL_Integer X0 = X->get_sole_integer();
-   if (X0 < 7)   VALENCE_ERROR;
-   if (X0 == 7)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
-   if (X0 == 8)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
-   if (X0 == 9)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
+   if (X0 < 7)     VALENCE_ERROR;
+   if (X0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
+   if (X0 ==  8)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
+   if (X0 ==  9)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
+   if (X0 == 10)   return Token(TOK_APL_VALUE1, polynomial_quotient2(*A, *B));
+   if (X0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(*A, *B));
 
    MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
    DOMAIN_ERROR;
@@ -960,112 +966,99 @@ UCS_string
 Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
                                  const Value & B)
 {
-const Unicode expos[10] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3, 
-                            UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7, 
-                            UNI_PAD_U8, UNI_PAD_U9 };
+const UTF8_string expos_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
+const UCS_string expos(expos_utf);
                              
 const sRank rank_B = B.get_rank();
 const ShapeItem ec_B = B.element_count();
 UCS_string poly;
 
 int term = 0;
-   loop(n, ec_B)
+   loop(n, ec_B)   // loop over terms
       {
         const size_t b = ec_B - n - 1;
         const Cell & coeff = B.get_cravel(b);
-        if (coeff.is_near_zero())   continue;   // hide zero coefficients
 
-        // print non-zero coefficient. Start with the sign, except before the
-        // first term.
-        //
-        char coeff_value[40] = { 0 };
-        const char * coeff_sign = "";
-        if (coeff.is_integer_cell())   // integer coefficient
+        if (coeff.is_near_zero())   continue;   // hide zero terms entirely
+
+        const bool subsequent_term = term++;
+
+        // hide coefficient 1 (unless the term is constant)
+        if (coeff.is_near_one())
            {
-             int value = coeff.get_int_value();
-             const bool negative = value < 0;
-             if (term++)   // subsequent term: alwayz needs sign
+             if (subsequent_term)   poly << " + ";
+             if (b == 0)            poly << "1";
+           }
+        else if (coeff.is_near_int() && coeff.get_checked_near_int() == -1)
+           {
+             if (subsequent_term && b)   poly << " - ";
+             else if (subsequent_term)   poly << " - 1";
+             else if (b == 0)            poly << "¨1";
+             else                        poly << "-";
+           }
+        else if (coeff.is_integer_cell())   // integer coefficient
+           {
+             const int value = coeff.get_int_value();
+             if (value < 0)
                 {
-                  if (negative)
-                     {
-                       coeff_sign = " - ";
-                       value = - value;
-                     }
-                  else
-                     {
-                       coeff_sign = " + ";
-                     }
+                  if (subsequent_term)   poly << " - " << - value;
+                  else                   poly << "¯"   << - value;
                 }
-             else          // first term
+             else
                 {
-                  if (negative)   coeff_sign = "-";
+                  if (subsequent_term)   poly << " + " << value;
+                  else                   poly << value;
                 }
-             SPRINTF(coeff_value, "%d", value);
            }
         else if (coeff.is_float_cell())   // real coefficient
            {
-             double value = coeff.get_real_value();
-             const bool negative = value < 0;
-             if (term++)   // subsequent term: alwayz needs sign
+             const double value = coeff.get_real_value();
+             if (value < 0)
                 {
-                  if (negative)
-                     {
-                       coeff_sign = " - ";
-                       value = - value;
-                     }
-                  else
-                     {
-                       coeff_sign = " + ";
-                     }
+                   if (subsequent_term)   poly << " - " << - value;
+                   else                   poly << "¯"   << - value;
                 }
-             else          // first term
+             else
                 {
-                  if (negative)   coeff_sign = "-";
+                  if (subsequent_term)   poly << " + " << value;
+                  else                   poly << value;
                 }
-             SPRINTF(coeff_value, "%.2f", value);
            }
         else if (coeff.is_complex_cell())   // comple coefficient
            {
-             if (term++)   // subsequent term
+             double c_real = coeff.get_real_value();
+             double c_imag = coeff.get_imag_value();
+             if (c_real < 0 && c_imag < 0)
                 {
-                  poly.append_ASCII(" + ");
+                  if (subsequent_term)
+                     poly << " - " << (-c_real) << (-c_imag);
+                  else
+                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
+                }
+             else if (c_real < 0)   // and c_imag > 0
+                {
+                  if (subsequent_term)
+                     poly << " - " << (-c_real) << "J" << c_imag;
+                  else
+                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
+                }
+             else if (c_imag < 0)   // and c_real > 0
+               {
+                  if (subsequent_term)   poly << " + ";
+                  poly << c_real << "J¯" << (-c_imag);
                }
-             const double c_real = coeff.get_real_value();
-             const double c_imag = coeff.get_imag_value();
-             SPRINTF(coeff_value, "%.2fj%.2f", c_real, c_imag);
+             else   // both positive
+                {
+                  if (subsequent_term)   poly << " + ";
+                  poly << c_real << "J" << c_imag;
+                }
            }
         else
            {
              MORE_ERROR() << "A ⌹.poly_print B: non-numeric coefficient in B";
              DOMAIN_ERROR;
            }
-
-        /* at this point there are 3 cases:
          
-           a. polynomial coefficient b₀:       print b₀ (w/o indeterminants)
-           b. polynomial coefficient 1:        hide coefficient
-           c. polynomial coefficient bₙ ≠ 1:   print bₙ
-         */
-
-        if (b == 0)                            //  case a.
-           {
-              // the final (constant) coefficient must be printed because
-              // there is no indeterminant X (more precisely the indeterminant
-              // X is X⁰ == 1).
-              //
-              poly << coeff_sign << coeff_value;
-              continue;   // done (no indeterminants.
-           }
-
-        if (coeff.is_near_one())
-           {
-             poly << coeff_sign;
-           }
-        else
-           {
-             poly << coeff_sign << coeff_value;   // case c.
-           }
-
         // show the indeterminant()
         //
         const Shape powers = B.get_shape().offset_to_index(b, /* ⎕IO */0);
@@ -1106,6 +1099,9 @@ int term = 0;
            }
       }
 
+   // if poly is empty then set c₀ = 0;
+   //
+   if (poly.size() == 0)   poly.append(UNI_0);
    return poly;
 }
 //----------------------------------------------------------------------------
@@ -1410,6 +1406,370 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
         Z->next_ravel_Value(Z1.get());
          Z->next_ravel_Value(Z2.get());
       }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::polynomial_quotient2(const Value & A, const Value & B)
+{
+   TODO;
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const Value & B)
+{
+const uRank rank_B = B.get_rank();
+   if (rank_B > 8)   RANK_ERROR;
+
+const char * xyz = "xyzuwvst";
+UCS_string_vector vars;   vars.reserve(8);
+   loop(v, 8)
+       {
+         const Unicode var = Unicode(xyz[v]);
+         const UCS_string var_ucs(var);
+         vars.push_back(var_ucs);
+       }
+
+   return scan_polynomial(vars, B);
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const Value & A, const Value & B)
+{
+   /* A is a vector of names for the indeterminants (typically
+      'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
+      the indeterminants.
+     
+      We support the following variants of A and B:
+
+      1. 1-dimensional B and single string A (varname = indeterminant)
+      2. N-dimensional B and single string A (N 1-character indeterminants)
+      3. N-dimensional B and N strings A (N variable-length indeterminants)
+    */
+const ShapeItem ec_A = A.element_count();
+
+   if (A.get_rank() > 1)   RANK_ERROR;   // neither name nor vector of names
+
+UCS_string_vector vars;
+   if (A.is_char_array())   // case 1. or 2.
+      {
+        if (B.get_rank() <= 1)   // case 1. (single indeterminant)
+           {
+             const UCS_string x(A);
+             vars.push_back(x);
+           }
+        else                      // case 2: N 1-character indeterminant
+           {
+             if (ec_A != B.get_rank())   LENGTH_ERROR;
+             loop(a, ec_A)
+                 {
+                   const UCS_string x(A.get_cravel(a).get_char_value());
+                   vars.push_back(x);
+                 }
+           }
+      }
+   else                     // case 3.
+      {
+        // every axis of B is one indeterminant of the polynomial
+        //
+        if (B.get_rank() > ec_A)   LENGTH_ERROR;
+        loop(a, ec_A)
+            {
+              const Cell & cell = A.get_cravel(a);
+              const Value & x = *cell.get_pointer_value();
+              if (!x.is_char_array())
+                 {
+                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
+                                 << a << "]";
+                    DOMAIN_ERROR;
+                 }
+              const UCS_string var(x);
+              vars.push_back(var);
+            }
+      }
+
+   return scan_polynomial(vars, B);
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const UCS_string_vector & vars, const Value & B)
+{
+const UTF8_string expos_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
+const UCS_string expos(expos_utf);
+
+   if (B.get_rank() > 1)     RANK_ERROR;
+   if (!B.is_char_array())   DOMAIN_ERROR;
+
+UCS_string text(B);
+   text.remove_leading_and_trailing_whitespaces();
+Unicode_source src(text);
+
+struct Term
+   {
+     Term(char _sign)
+     : sign(_sign),
+       real_val(1.0),   // default: 1.0 if not provided
+       imag_val(0.0)    // default: J0.0 if not provided
+       {}
+
+     bool operator ==(const Term & other) const
+        {
+           if (indefs.size() != other.indefs.size())   return false;
+           loop(j, indefs.size())
+               if (indefs[j] != other.indefs[j])   return false;
+           return true;
+        }
+
+     vector<int> indefs;
+
+     char sign;   ///< '+' '-' or 0
+     double real_val, imag_val;
+   };
+
+vector<Term> terms;
+   // fake a sign for the first term of B (unless it has one).
+   //
+   if (!src.has_more())   LENGTH_ERROR;
+   if (*src != '+' && *src != '-')   terms.push_back(Term('+'));
+
+bool got_j = false;
+   while (src.has_more())
+     {
+       Term & T = terms.back();
+       switch(const Unicode uni = *src)
+          {
+             case UNI_SPACE:
+                  ++src;
+                  continue;
+
+             case '+': 
+             case '-': terms.push_back(Term(uni));
+                        ++src;
+                       continue;
+
+             case 'J': 
+             case 'j': got_j = true;
+                       continue;
+
+             case '0'...'9':
+             case UNI_OVERBAR:
+                       if (got_j)
+                          {
+                            const Tokenizer::Int_or_Double id =
+                                  Tokenizer::tokenize_real(src);
+                            if (!id.is_valid)   DOMAIN_ERROR;
+                            T.imag_val = id.get_double();
+                            got_j = false;
+                          }
+                       else
+                          {
+                            const Tokenizer::Int_or_Double id =
+                                  Tokenizer::tokenize_real(src);
+                            if (!id.is_valid)   DOMAIN_ERROR;
+                            T.real_val = id.get_double();
+                          }
+                       continue;
+
+             default: if (Avec::is_symbol_char(uni))   // indeterminant & power
+                         {
+                           // extract the indeterminant name(s). Could be more
+                           // than one, e.g. xy². We use the longest in vars.
+                           //
+                           UCS_string indeterminants;
+                           loop(r, src.rest_len())
+                               {
+                                 const Unicode ind = src[r];
+                                 if (Avec::is_symbol_char(ind))
+                                    {
+                                      indeterminants.append(ind);
+                                    }
+                                 else break;
+
+                               }
+
+                           int found = -1;
+                           size_t found_len = 0;
+                           loop(v, vars.size())
+                               {
+                                 const UCS_string & var = vars[v];
+                                 if (indeterminants.starts_with(var) &&
+                                     found_len < var.size())
+                                    {
+                                      found = v;
+                                      found_len = var.size();
+                                    }
+                               }
+                           if (found == -1)
+                              {
+                                MORE_ERROR() << "A ⌹[11] B: no prefix of '"
+                                             << indeterminants << "' in A.";
+                                DOMAIN_ERROR;
+                              }
+
+                           // found the indeterminant.
+                           //
+                           while (int(T.indefs.size()) < (found + 1))
+                                 {
+                                   T.indefs.push_back(0);
+                                 }
+                           if (T.indefs[found])   // duplicate
+                              {
+                                MORE_ERROR() <<
+                                "⌹[11] B: duplicate indeterminant '"
+                                 << vars[found] << "' in term.";
+                                DOMAIN_ERROR;
+                              }
+                           T.indefs[found] = 1;   // for now
+
+                           src.skip(vars[found].size());   // skip name
+
+                           // optional indeterminant power
+                           //
+                           if (src.has_more() && expos.contains(*src))
+                              {
+                                // power present
+                                //
+                                int power = 0;
+                                while (src.has_more() && expos.contains(*src))
+                                      {
+                                       power *= 10;
+                                       loop(e, expos.size())
+                                           {
+                                             if (expos[e] == *src)
+                                                {
+                                                  power += e;
+                                                  break;
+                                                }
+                                           }
+                                        T.indefs[found] = power;
+                                        ++src;
+                                      }
+                              }
+
+                         }
+                      else   // unexpected case
+                         {
+                           MORE_ERROR() << "⌹[11] B: Invalid character '"
+                                        << uni << "' in polynomial B.";
+                           DOMAIN_ERROR;
+                         }
+          }
+     }
+
+   // check for duplicate terms
+   //
+   loop(t1, terms.size() - 1)
+   for (size_t t2 = t1 + 1; t2 < terms.size(); ++t2)
+       {
+         if (!(terms[t1] == terms[t2]))   continue;   // OK
+
+         const Term & term = terms[t1];
+
+         UCS_string & more = MORE_ERROR();
+         more << "⌹[11] B: duplicate term: ";
+         loop(var, term.indefs.size())
+             {
+               if (const int expo = term.indefs[var])
+                  {
+                    more << vars[var];
+                    if (expo > 1) more << UCS_string::power(expo);
+                  }
+             }
+         
+         DOMAIN_ERROR;
+       }
+
+   // construct the result.
+   //
+
+   // A. figure the largestindefinite
+   //
+vector<int> max_powers(8, -1);
+   loop(t, terms.size())
+       {
+         const Term & term = terms[t];
+         loop (i, term.indefs.size())
+             {
+               const int expo = term.indefs[i];
+               max_powers[i] = max(max_powers[i], expo);
+             }
+       }
+
+   // figure the largest indeterminant present in the terms.
+   // This largest indeterminant determines the rabk of Z.
+   //
+int max_var = -1;
+   loop(r, 8)   if (max_powers[r] != -1)   max_var = r;
+
+   // construct the shape of Z. Each max_powers[r] determines the corresponding
+   // axis length of Z (+1 for the constant term).
+   //
+Shape shape_Z;
+   loop(r, max_var + 1)   shape_Z.add_shape_item(max_powers[r] + 1);
+
+Value_P Z(shape_Z, LOC);
+   loop(e, Z->element_count())   Z->next_ravel_0();
+
+   // fill in the terms
+   //
+   loop(t, terms.size())   // loop over terms
+       {
+         const Term & term = terms[t];
+         Cell * dest = &Z->get_wfirst();
+         // CERR << "\nTERM " << t << ":" << endl;
+
+         // compute the position of the term in Z
+         //
+         if (term.indefs.size())   // no, not constant
+            {
+              Shape index;
+              loop(r, shape_Z.get_rank())   index.add_shape_item(0);
+
+              loop (v, term.indefs.size())
+                  {
+                    const int expo = term.indefs[v];
+                    index.set_shape_item(v, expo);
+                  }
+
+              dest += shape_Z.ravel_pos(index);
+            }
+
+         if (term.imag_val != 0)                      // complex coefficient
+            {
+              if (term.sign == '-')
+                 {
+                   new (dest) ComplexCell(-term.real_val, -term.imag_val);
+                 }
+              else
+                 {
+                   new (dest) ComplexCell(term.real_val, term.imag_val);
+                 }
+            }
+         else if (Cell::is_near_int(term.real_val))   // integer coefficient
+            {
+              if (term.sign == '-')
+                 {
+                   new (dest) IntCell(Cell::near_int(-term.real_val));
+                 }
+              else
+                 {
+                   new (dest) IntCell(Cell::near_int(term.real_val));
+                 }
+            }
+         else                                         // real coefficient
+            {
+              if (term.sign == '-')
+                 {
+                   new (&dest) FloatCell(-term.real_val);
+                 }
+              else
+                 {
+                   new (&dest) FloatCell(term.real_val);
+                 }
+            }
+       }
 
    Z->check_value(LOC);
    return Z;

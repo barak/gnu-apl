@@ -95,6 +95,19 @@ protected:
    /// return the quotient A÷B of polynomilals A and B
    static Value_P polynomial_quotient(const Value & A, const Value & B);
 
+   /// return the quotient A÷B of polynomilals A and B
+   static Value_P polynomial_quotient2(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P scan_polynomial(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P scan_polynomial(const Value & B);
+
+   /// return the polynomial B with indeterminant A as APL string
+   static Value_P scan_polynomial(const UCS_string_vector & vars,
+                                  const Value & B);
+
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 

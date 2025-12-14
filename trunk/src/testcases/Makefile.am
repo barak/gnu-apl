@@ -106,6 +106,7 @@ dist_noinst_DATA =                              \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
         PiTimes.tc                              \
+        Polynomials.tc                          \
         Power.tc                                \
         Quad_AF.tc                              \
         Quad_AI.tc                              \

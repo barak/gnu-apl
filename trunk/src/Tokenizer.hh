@@ -158,6 +158,9 @@ public:
    /// tokenize a primitive (1-character) function
    static Token tokenize_function(Unicode uni);
 
+   /// tokenize a real number (integer or floating point).
+   static Int_or_Double tokenize_real(Unicode_source &src);
+
 protected:
    /// tokenize UCS string \b input into token string \b tos.
    void do_tokenize(const UCS_string & input, Token_string & tos,
@@ -183,9 +186,6 @@ protected:
 
    /// tokenize a hex number (integer).
    static Int_or_Double tokenize_hex(Unicode_source &src);
-
-   /// tokenize a real number (integer or floating point).
-   static Int_or_Double tokenize_real(Unicode_source &src);
 
    /// a locale-independent sscanf()
    static int scan_real(const char * strg, APL_Float & result, 

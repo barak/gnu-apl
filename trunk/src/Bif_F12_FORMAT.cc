@@ -881,7 +881,8 @@ size_t d = data.size();
 
    if ((flt_mask & BIT_9) && ucs.all_zeroes())   ucs.clear();
 
-   return ucs.reverse();
+   ucs.reverse();
+   return ucs;
 }
 //----------------------------------------------------------------------------
 UCS_string

@@ -838,12 +838,15 @@ UCS_string ret;
    return ret;
 }
 //----------------------------------------------------------------------------
-UCS_string
-UCS_string::reverse() const
+void
+UCS_string::reverse()
 {
-UCS_string ret;
-   for (int s = size(); s > 0;)   ret.append(at(--s));
-   return ret;
+   loop(s, size() / 2)
+      {
+        const Unicode tmp = at(s);
+        at(s) = at(size() - s - 1);
+        at(size() - s - 1) = tmp;
+      }
 }
 //----------------------------------------------------------------------------
 bool
@@ -1603,6 +1606,19 @@ UCS_string ret;
 const int ret_len = ret.size();
    ret.round_last_digit();
    while (ret.ssize() > ret_len)   ret.pop_back();
+   return ret;
+}
+//----------------------------------------------------------------------------
+UCS_string
+UCS_string::power(size_t n)
+{
+const Unicode expos[] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3,
+                          UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7,
+                          UNI_PAD_U8, UNI_PAD_U9 };
+
+UCS_string ret;
+   do { ret.append(expos[n % 10]);   n /= 10; }   while (n);
+   ret.reverse();
    return ret;
 }
 //----------------------------------------------------------------------------
