@@ -216,7 +216,8 @@ UCS_string_vector names;
         if (which == LIST_NAMES)   // append .NC
            {
              name.append(UNI_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().get_NC());
+             name.append_number(list[l]->value_stack.back()
+                                        .get_NC() & NC_case_mask);
            }
         names.push_back(name);
       }
