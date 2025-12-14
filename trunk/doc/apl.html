@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 12, 2025.
+<p>December 14, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -201,6 +201,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B">2.22.2.4 ⌹[7] B: Print Polynomial B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
+        <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">2.22.2.7 ⌹[11] B: Scan Polynomial B</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e23">2.23 Dyadic ⎕CR</a></li>
@@ -3654,6 +3655,7 @@ in the various <b>⌹</b> functions.
 <li><a href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" accesskey="4">⌹[7] B: Print Polynomial B</a></li>
 <li><a href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" accesskey="5">A ⌹[8] B: Multiply Polynomials A and B</a></li>
 <li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
+<li><a href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" accesskey="7">⌹[11] B: Scan Polynomial B</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
 <h4 class="subsubsection">2.22.2.1 A⌹B and ⌹B</h4>
@@ -3923,6 +3925,25 @@ a division with remainder and the result is a pair <b>(Quotient, Remainder)</b>
 of polynomial <b>B</b>. That is, <b>⍴Remainder = ¯1+⍴B</b>.
 </p>
 <p>Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+</p>
+</div>
+<div class="subsubsection" id="g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">
+<h4 class="subsubsection">2.22.2.7 ⌹[11] B: Scan Polynomial B</h4>
+
+<p><b>⌹[11] B</b> aka. <b>⌹.poly_scan B</b> is the inverse function of <b>⌹[7] B</b>.
+It converts a string <b>B</b> (in the format produced by <b>⌹poly_print B</b> and
+returns the corresponding APL value.
+</p>
+<div class="example">
+<pre class="example">      ⌹.poly_scan &quot;1 + 2xy + 3y²&quot;
+1 0 3
+0 2 0
+</pre></div>
+
+<p><b>NOTE</b> that rearranging the same terms of a polynomial in a different order
+leads to the same APL value. Therefore <b>Z←⌹[7] ⌹[11] B</b> reproduces the same
+terms as <b>B</b>, but in the order defined by <b>⌹[7]</b> (decreasing powers of the
+first variable, then decreasing powers of the second variable, and so on).
 </p>
 <hr>
 </div>

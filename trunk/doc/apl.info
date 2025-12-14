@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 12, 2025.  This manual briefly documents GNU APL, an
+December 14, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -3225,6 +3225,23 @@ where Remainder is a polynomial with a degree smaller that the degree of
 polynomial B. That is, ⍴Remainder = ¯1+⍴B.
 
    Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+
+2.22.2.7 ⌹[11] B: Scan Polynomial B
+...................................
+
+⌹[11] B aka.  ⌹.poly_scan B is the inverse function of ⌹[7] B. It
+converts a string B (in the format produced by ⌹poly_print B and returns
+the corresponding APL value.
+
+           ⌹.poly_scan "1 + 2xy + 3y²"
+     1 0 3
+     0 2 0
+
+   NOTE that rearranging the same terms of a polynomial in a different
+order leads to the same APL value.  Therefore Z←⌹[7] ⌹[11] B reproduces
+the same terms as B, but in the order defined by ⌹[7] (decreasing powers
+of the first variable, then decreasing powers of the second variable,
+and so on).
 
 
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
@@ -9077,51 +9094,51 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Section 2.23126876
-Node: Section 2.24132787
-Node: Section 2.25136159
-Node: Section 2.26136450
-Node: Section 2.27147303
-Node: Section 2.28147575
-Node: Section 2.29154628
-Node: Section 2.30157082
-Node: Section 2.31157751
-Node: Section 2.32159402
-Node: Section 2.33163326
-Node: Section 2.34177755
-Node: The Plot Data B178987
-Node: The Plot Attributes A181601
-Node: Plot Window Handling195136
-Node: Output File Format196467
-Node: GUI driver197690
-Node: Section 2.35201245
-Node: Section 2.36210680
-Node: Section 2.37211699
-Node: Section 2.38226934
-Node: Section 2.39237976
-Node: Section 2.40240160
-Node: Section 2.41266265
-Node: Section 2.42270805
-Node: Section 2.43291904
-Node: Section 2.44305917
-Node: Section 2.45309187
-Node: Chapter 3309702
-Node: Chapter 4312210
-Node: Chapter 5313351
-Node: Section 5.1314998
-Node: Section 5.2316318
-Node: Section 5.3316678
-Node: Section 5.4316920
-Node: Section 5.5317582
-Node: Section 5.6318060
-Node: Section 5.7318833
-Node: Section 5.8319259
-Node: Chapter 6319661
-Node: Section 6.1320080
-Node: Section 6.2320767
-Node: Chapter 7321598
-Node: Section 7.1322101
-Node: Section 7.2347414
+Node: Section 2.23127500
+Node: Section 2.24133411
+Node: Section 2.25136783
+Node: Section 2.26137074
+Node: Section 2.27147927
+Node: Section 2.28148199
+Node: Section 2.29155252
+Node: Section 2.30157706
+Node: Section 2.31158375
+Node: Section 2.32160026
+Node: Section 2.33163950
+Node: Section 2.34178379
+Node: The Plot Data B179611
+Node: The Plot Attributes A182225
+Node: Plot Window Handling195760
+Node: Output File Format197091
+Node: GUI driver198314
+Node: Section 2.35201869
+Node: Section 2.36211304
+Node: Section 2.37212323
+Node: Section 2.38227558
+Node: Section 2.39238600
+Node: Section 2.40240784
+Node: Section 2.41266889
+Node: Section 2.42271429
+Node: Section 2.43292528
+Node: Section 2.44306541
+Node: Section 2.45309811
+Node: Chapter 3310326
+Node: Chapter 4312834
+Node: Chapter 5313975
+Node: Section 5.1315622
+Node: Section 5.2316942
+Node: Section 5.3317302
+Node: Section 5.4317544
+Node: Section 5.5318206
+Node: Section 5.6318684
+Node: Section 5.7319457
+Node: Section 5.8319883
+Node: Chapter 6320285
+Node: Section 6.1320704
+Node: Section 6.2321391
+Node: Chapter 7322222
+Node: Section 7.1322725
+Node: Section 7.2348038
 
 End Tag Table
 
