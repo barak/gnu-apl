@@ -1366,21 +1366,6 @@ UCS_string::operator <<(const Shape & shape)
    return *this;
 }
 //----------------------------------------------------------------------------
-bool
-UCS_string::lexical_before(const UCS_string other) const
-{
-   loop(u, size())
-      {
-        if (u >= other.ssize())   return false;   // other is a prefix of this
-        if (at(u) < other.at(u))   return true;
-        if (at(u) > other.at(u))   return false;
-      }
-
-   // at this point the common part of this and other is equal, If other
-   // is longer then this is a prefix of other (and this comes before other)
-   return other.size() > size();
-}
-//----------------------------------------------------------------------------
 ostream &
 UCS_string::dump(ostream & out) const
 {

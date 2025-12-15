@@ -1024,7 +1024,7 @@ int term = 0;
                   else                   poly << value;
                 }
            }
-        else if (coeff.is_complex_cell())   // comple coefficient
+        else if (coeff.is_complex_cell())   // complex coefficient
            {
              double c_real = coeff.get_real_value();
              double c_imag = coeff.get_imag_value();
@@ -1316,14 +1316,13 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
               const Complex z = Q[ec_Q - q - 1];
               const double r = z.real();
               const double i = z.imag();
-              if (!Cell::is_near_zero(i))          Z1->next_ravel_Complex(r, i);
+              if      (!Cell::is_near_zero(i))     Z1->next_ravel_Complex(r, i);
               else if (!Cell::is_near_int64_t(r))  Z1->next_ravel_Number(r);
-              else                       Z1->next_ravel_Int(Cell::near_int(r));
+              else                     Z1->next_ravel_Int(Cell::near_int(r));
            }
         Z1->check_value(LOC);
        
-        Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
-       
+        Value_P Z2(ec_B - 1, LOC);   // remainder A∣B
         loop(b, ec_B - 1)
             {
               const Complex z = R[ec_Q + b];
@@ -1392,8 +1391,8 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
               else                     Z1->next_ravel_Int(Cell::near_int(r));
            }
         Z1->check_value(LOC);
-       
-        Value_P Z2(ec_Q - ec_B - 1, LOC);   // remainder A∣B
+
+        Value_P Z2(ec_B - 1, LOC);   // remainder A∣B
        
         loop(b, ec_B - 1)
             {

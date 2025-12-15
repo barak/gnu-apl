@@ -137,42 +137,49 @@ SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
 {
 UCS_string from;
 UCS_string to;
-   {
-     const bool bad_from_to = Command::parse_from_to(from, to, from_to);
-     if (bad_from_to)
-        {
-          CERR << "bad range argument" << endl;
-          MORE_ERROR() << "bad range argument " << from_to
-               << ", expecting from-to";
+   if ( Command::parse_from_to(from, to, from_to))
+      {
+        CERR << "bad range argument" << endl;
+        MORE_ERROR() << "bad range argument " << from_to
+                     << ", expecting from-to";
           return;
-        }
-   }
+      }
 
    // put those symbols into 'list' that satisfy 'which'
    //
 std::vector<Symbol *> list;
-int symbol_count = 0;
+int symbol_count = 0;   // for )SYMBOLS
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
          for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
-               if (sym->get_name()[0] == UNI_MUE)   continue;   // macro
+               const UCS_string symbol_name = sym->get_name();
+               if (symbol_name[0] == UNI_MUE)   continue;   // hide macros
                ++symbol_count;
 
                // check range
                //
-               if (from.size() && sym->get_name().lexical_before(from))
+               if (from.size() && symbol_name.compare(from) == COMP_LT)
                   {
                     // CERR << "'" << sym->get_name() << "' comes before '"
-                    //       << from << "'" << endl;
+                    //        << from << "'" << endl;
                     continue;
                   }
-               if (to.size() && to.lexical_before(sym->get_name()))
+
+               if (to.size())   // to was provided
                   {
-                    // CERR << "'" << to << "' comes before '"
-                    //      << sym->get_name() << "'" << endl;
-                    continue;
+                    if (symbol_name.compare(to) == COMP_LT)   {}   // in range
+                    else if (symbol_name.starts_with(to))     {}   // in range
+                    else
+                       {
+                         // CERR << "'" << to << "' comes before '"
+                         //       << sym->get_name() << "'" << endl;
+                         continue;
+                       }
                   }
+
+               // CERR << "'" << sym->get_name() << "' is between '"
+               //      << from << "' and '" << to << "'" << endl;
 
                if (sym->value_stack.size() == 0)
                   {

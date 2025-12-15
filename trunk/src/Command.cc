@@ -1867,8 +1867,13 @@ UCS_string_vector directories;
 
          // check the range of the name (if any)...
          //
-         if (from.size() && filename.lexical_before(from))   continue;
-         if (to.size() && to.lexical_before(filename))       continue;
+         if (from.size() && filename.compare(from) == COMP_LT)   continue;
+         if (to.size())   // to was provided
+            {
+              if (filename.compare(to) == COMP_LT)   {}    // in range
+              else if (filename.starts_with(to))     {}    // in range
+              else                             continue;   // out og range
+            }
 
          if (is_directory(entry, path))
             {
@@ -3186,9 +3191,9 @@ bool got_minus = false;
 
    if (s == user_arg.ssize())   return false;   // case 1.: OK
 
-   // copy left of - to from
+   // copy left of '-' to from
    //
-   while (s < user_arg.ssize()   &&
+   while (s < user_arg.ssize()  &&
               user_arg[s] > ' ' &&
               user_arg[s] != '-')  from.append(user_arg[s++]);
 
@@ -3196,13 +3201,17 @@ bool got_minus = false;
    //
    while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
-   if (s < user_arg.ssize() && user_arg[s] == '-') { ++s;   got_minus = true; }
+   if (s < user_arg.ssize() && user_arg[s] == '-')
+      {
+        ++s;
+        got_minus = true;
+      }
 
    // skip spaces before to
    //
    while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
 
-   // copy right of - to from
+   // copy right of '-' to from
    //
    while (s < user_arg.ssize() && user_arg[s] > ' ')  to.append(user_arg[s++]);
 
@@ -3214,11 +3223,7 @@ bool got_minus = false;
 
    if (!got_minus)   to = from;   // case 2.
 
-   if (from.size() == 0 && to.size() == 0) return true;   // error: single -
-
-   // "increment" TO so that we can compare ITEM < TO
-   //
-   if (to.size())   to.back() = Unicode(to.back() + 1);
+   if (!(from.size() || to.size()))   return true;   // error: single '-'
 
    return false;   // OK
 }

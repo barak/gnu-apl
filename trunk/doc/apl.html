@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 14, 2025.
+<p>December 15, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -3935,15 +3935,28 @@ It converts a string <b>B</b> (in the format produced by <b>⌹poly_print B</b> 
 returns the corresponding APL value.
 </p>
 <div class="example">
-<pre class="example">      ⌹.poly_scan &quot;1 + 2xy + 3y²&quot;
+<pre class="example">      ⊢Z←⌹.poly_scan &quot;1 + 2xy + 3y²&quot;
 1 0 3
 0 2 0
+
+      ⌹.poly_print Z
+2xy + 3y² + 1
 </pre></div>
 
-<p><b>NOTE</b> that rearranging the same terms of a polynomial in a different order
-leads to the same APL value. Therefore <b>Z←⌹[7] ⌹[11] B</b> reproduces the same
-terms as <b>B</b>, but in the order defined by <b>⌹[7]</b> (decreasing powers of the
-first variable, then decreasing powers of the second variable, and so on).
+<p><b>NOTE</b> that the terms of a polynomial are commutative. The same set of terms,
+summed up in different orders, defines the same polynomial. Therefore:
+</p>
+<p><b>M ≡ ⌹.poly_scan ⌹.poly_print M</b>
+</p>
+<p>however:
+</p>
+<p><b>P ≡ ⌹.poly_print ⌹.poly_scan P</b>
+</p>
+<p>holds only if the terms in <b>P</b> occur in the same order as produced
+by <b>⌹.poly_print</b>.  The order produced by <b>⌹.poly_print B</b> is the
+the reversed ravel order of B (i.e. <b>⌽,B</b> which runs fom the highest
+exponent of the first variable on the left to the constant term (if any)
+of the polynomial on the right.
 </p>
 <hr>
 </div>

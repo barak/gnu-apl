@@ -216,9 +216,6 @@ public:
    /// the inverse of \b un_escape().
    UCS_string do_escape(bool double_quoted) const;
 
-   /// case-sensitive comparison: Return true iff \b this comes before \b other
-   bool lexical_before(const UCS_string other) const;
-
    /// dump \b this string to out (like U+nnn U+mmm ... )
    ostream & dump(ostream & out) const;
 
