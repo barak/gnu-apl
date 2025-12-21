@@ -1834,8 +1834,7 @@ UCS_string from;
 UCS_string to;
    if (range)
       {
-        const bool bad_from_to = parse_from_to(from, to, *range);
-        if (bad_from_to)
+        if (parse_from_to(from, to, *range))
            {
              CERR << "bad range argument" << endl;
              MORE_ERROR() << "bad range argument " << *range
@@ -1867,13 +1866,7 @@ UCS_string_vector directories;
 
          // check the range of the name (if any)...
          //
-         if (from.size() && filename.compare(from) == COMP_LT)   continue;
-         if (to.size())   // to was provided
-            {
-              if (filename.compare(to) == COMP_LT)   {}    // in range
-              else if (filename.starts_with(to))     {}    // in range
-              else                             continue;   // out og range
-            }
+         if (!filename.is_in_range(from, to))   continue;
 
          if (is_directory(entry, path))
             {

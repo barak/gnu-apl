@@ -108,6 +108,10 @@ protected:
    static Value_P scan_polynomial(const UCS_string_vector & vars,
                                   const Value & B);
 
+   /// run (python-) script \b script with command line arguments \b args
+   static void run_script(const UTF8_string & script, const UTF8_string & args,
+                          UCS_string_vector & result);
+
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 

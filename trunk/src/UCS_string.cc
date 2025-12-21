@@ -741,9 +741,8 @@ UCS_string::starts_with(const char * prefix) const
         if (uni != Unicode(pc))   return false;
       }
 
-   // strings match, but prefix is longer
-   //
-   return false;
+   // match, unless prefix is longer than this string
+   return *prefix == 0;
 }
 //----------------------------------------------------------------------------
 bool 
@@ -1656,6 +1655,24 @@ UCS_string::contains(Unicode uni) const
 {
    loop(u, size())   if (at(u) == uni)   return true;
    return false;
+}
+//----------------------------------------------------------------------------
+bool
+UCS_string::is_in_range(const UCS_string & from, const UCS_string & to) const
+{
+   if (from.size())   // from provided
+      {
+         if (this->starts_with(from))          return true;
+         if (this->compare(from) == COMP_LT)   return false;
+      }
+
+   if (to.size())   // to provided
+      {
+         if (this->starts_with(to))          return true;
+         if (this->compare(to) == COMP_GT)   return false;
+      }
+
+   return true;
 }
 //----------------------------------------------------------------------------
 UCS_string

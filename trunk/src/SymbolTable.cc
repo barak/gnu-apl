@@ -159,30 +159,13 @@ int symbol_count = 0;   // for )SYMBOLS
 
                // check range
                //
-               if (from.size() && symbol_name.compare(from) == COMP_LT)
-                  {
-                    // CERR << "'" << sym->get_name() << "' comes before '"
-                    //        << from << "'" << endl;
-                    continue;
-                  }
-
-               if (to.size())   // to was provided
-                  {
-                    if (symbol_name.compare(to) == COMP_LT)   {}   // in range
-                    else if (symbol_name.starts_with(to))     {}   // in range
-                    else
-                       {
-                         // CERR << "'" << to << "' comes before '"
-                         //       << sym->get_name() << "'" << endl;
-                         continue;
-                       }
-                  }
-
-               // CERR << "'" << sym->get_name() << "' is between '"
-               //      << from << "' and '" << to << "'" << endl;
+               if (!symbol_name.is_in_range(from, to))   continue;
 
                if (sym->value_stack.size() == 0)
                   {
+                    // a value_stack size of 0 means that the name is
+                    // currently not used.
+                    //
                     if (which == LIST_ALL)   list.push_back(sym);
                     continue;
                   }

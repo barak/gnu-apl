@@ -24,6 +24,8 @@
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "ComplexCell.hh"
+#include "LibPaths.hh"
+#include "Polynomial.hh"
 #include "Tokenizer.hh"
 #include "Value.hh"
 #include "Workspace.hh"
@@ -41,17 +43,17 @@ Bif_F12_DOMINO Bif_F12_DOMINO::fun;    // ⌹
 const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
 {
 #define domino_def(N, name, comm_2) { N, #name, "", comm_2, -1 },
-  domino_def( 1, qr_fact_helzer , "QR factorization of B (Helzer algorithm)" )
-  domino_def( 2, qr_fact_gsl    , "QR factorization of B (libgsl algorithm)" )
-  domino_def( 3, rq_fact        , "RQ factorization of B (libgsl algorithm)" )
-  domino_def( 4, lq_fact        , "LQ factorization of B (libgsl algorithm)" )
-  domino_def( 5, ql_fact        , "QL factorization of B (libgsl algorithm)" )
-  domino_def( 6, lu_fact        , "LU factorization of B (libgsl algorithm)" )
-  domino_def( 7, poly_print     , "print polynomial B"                       )
-  domino_def( 8, poly_multiply  , "polynomial A × polynomial B"              )
-  domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"              )
-  domino_def(10, poly_divide2   , "polynomial A ÷ polynomial B"              )
-  domino_def(11, poly_scan      , "string B to polynomial"                   )
+  domino_def( 1, qr_fact_helzer , "QR factorization of B (Helzer algorithm)"  )
+  domino_def( 2, qr_fact_gsl    , "QR factorization of B (libgsl algorithm)"  )
+  domino_def( 3, rq_fact        , "RQ factorization of B (libgsl algorithm)"  )
+  domino_def( 4, lq_fact        , "LQ factorization of B (libgsl algorithm)"  )
+  domino_def( 5, ql_fact        , "QL factorization of B (libgsl algorithm)"  )
+  domino_def( 6, lu_fact        , "LU factorization of B (libgsl algorithm)"  )
+  domino_def( 7, poly_print     , "print polynomial B"                        )
+  domino_def( 8, poly_multiply  , "polynomial A × polynomial B"               )
+  domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"               )
+  domino_def(10, poly_divideN   , "polynomial A ÷ polynomial B (multivariate)")
+  domino_def(11, poly_scan      , "string B to polynomial"                    )
 #undef domino_def
 };
 //----------------------------------------------------------------------------
@@ -382,15 +384,17 @@ Bif_F12_DOMINO::print_fun_syntax(ostream & out,
 const uAxis axis = info.axis;
    switch(axis)
       {
-        default: out << "    (Q R Ri)";   break;   // QR factorizations
-        case 6:  out << "    (P U Li)";   break;   // LU factorization
-        case 7:  out << "          Zs";   break;   // print polynomial
-        case 8:
-        case 9:  out << "       Zpoly";   break;   // 
+        default: out << "    (Q R Ri)";    break;   // QR factorizations
+        case  6:  out << "    (P U Li)";   break;   // LU factorization
+        case  7:  out << "          Zs";   break;   // print polynomial
+        case  8:
+        case  9:
+        case 10:
+        case 11:  out << "       Zpoly";   break;   // 
       }
    if (axis == 8 || axis == 9)   out << "← A ";   // dyadic
    else                          out << "←   ";
-   out << "⌹[" << axis << "] B   ⍝ " << info.comment_fun << endl;
+   out << "⌹[" << setw(2) << axis << "] B   ⍝ " << info.comment_fun << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -639,7 +643,7 @@ const ShapeItem D = M < N ? M : N;   // length of the diagonal
       {
         /* R is under-specified. We want to invert only M M↑R,
            which requires some re-ordering of R:
-          
+
               ├──────── N ────────┤        ├────── M ──────┤
            ┬  ╔═════════C═════════╗     ┬  ╔═════════C═════╗
            │  ║               │   ║     │  ║               ║
@@ -909,7 +913,7 @@ Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
    /* A is a vector of names for the indeterminants (typically
       'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
       the indeterminants.
-     
+
       We support the following variants of A and B:
 
       1. 1-dimensional B and single string A (varname = indeterminant)
@@ -966,9 +970,9 @@ UCS_string
 Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
                                  const Value & B)
 {
-const UTF8_string expos_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
-const UCS_string expos(expos_utf);
-                             
+const UTF8_string expo_digits_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
+const UCS_string expo_digits(expo_digits_utf);
+
 const sRank rank_B = B.get_rank();
 const ShapeItem ec_B = B.element_count();
 UCS_string poly;
@@ -1058,7 +1062,7 @@ int term = 0;
              MORE_ERROR() << "A ⌹.poly_print B: non-numeric coefficient in B";
              DOMAIN_ERROR;
            }
-         
+
         // show the indeterminant()
         //
         const Shape powers = B.get_shape().offset_to_index(b, /* ⎕IO */0);
@@ -1081,7 +1085,7 @@ int term = 0;
                 }
              else if (power < 10)   // single digit exponent
                 {
-                  poly.append(expos[power]);
+                  poly.append(expo_digits[power]);
                 }
              else              // multi digit power
                 {
@@ -1091,7 +1095,7 @@ int term = 0;
                   //
                   for (size_t p = power; p; p /= 10)
                       {
-                        pow.append(expos[p % 10]);
+                        pow.append(expo_digits[p % 10]);
                       }
 
                   loop(p, pow.size())   poly.append(pow[pow.size() - p - 1]);
@@ -1111,7 +1115,12 @@ Bif_F12_DOMINO::polynomial_product(const Value & A, const Value & B)
    // the rank is the number of indeterminants (which should be the same for
    // A and B).
    //
-const sRank rank = A.get_rank();
+Shape shape_A = A.get_shape();
+Shape shape_B = B.get_shape();
+   while (shape_A.get_rank() < shape_B.get_rank())   shape_A.add_shape_item(1);
+   while (shape_B.get_rank() < shape_A.get_rank())   shape_B.add_shape_item(1);
+const sRank rank = shape_A.get_rank();
+   Assert(shape_A.get_rank() == shape_B.get_rank());
 
 const ShapeItem ec_A = A.element_count();
 const ShapeItem ec_B = B.element_count();
@@ -1125,8 +1134,8 @@ const ShapeItem ec_B = B.element_count();
 Shape shape_Z;
    loop(r, rank)
        {
-         shape_Z.add_shape_item(A.get_shape_item(r) +
-                                B.get_shape_item(r) - 1);
+         shape_Z.add_shape_item(shape_A.get_shape_item(r) +
+                                shape_B.get_shape_item(r) - 1);
        }
 
    typedef complex<double> Complex;
@@ -1136,12 +1145,12 @@ vector<Complex> vZ(shape_Z.get_volume(), Complex(0));
        {
         const Cell & cell_A = A.get_cravel(a);
         if (cell_A.is_near_zero())   continue;
-        const Shape idx_A = A.get_shape().offset_to_index(a, /* ⎕IO */ 0);
+        const Shape idx_A = shape_A.offset_to_index(a, /* ⎕IO */ 0);
         loop(b, ec_B)
            {
              const Cell & cell_B = B.get_cravel(b);
              if (cell_B.is_near_zero())   continue;
-             const Shape idx_B = B.get_shape().offset_to_index(b, /* ⎕IO */ 0);
+             const Shape idx_B = shape_B.offset_to_index(b, /* ⎕IO */ 0);
 
              // at this point A and B are non-zero coefficients, and
              // idx_A and idx_B are the powers of their indeterminants
@@ -1273,18 +1282,18 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
                                    cell.get_imag_value()));
             }
         loop(b, ec_B - 1)   R.push_back(0);
-       
+
         loop(b, ec_B)
             {
               const Cell & cell = B.get_cravel(ec_B - b - 1);
                D.push_back(Complex(cell.get_real_value(),
                                    cell.get_imag_value()));
             }
-       
+
         loop(q, ec_Q)
             {
               /* 1. divide the leading coefficients and store it in PQ
-                
+
                     R = B × (R ÷ B) = R × factor.
                */
               const Complex & Rq = R[q];   // dividend
@@ -1294,10 +1303,10 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
                    Q.push_back(0);
                    continue;
                  }
-       
+
               const Complex factor = Rq / D[0];
               Q.push_back(factor);
-       
+
               // 2. subtract scaled B from R
               //
               loop(n, powers_B.size())
@@ -1307,7 +1316,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
                   }
             }
         Assert(size_t(ec_Q) == Q.size());
-       
+
         // construct the result
         //
         Value_P Z1(ec_Q, LOC);   // A÷B
@@ -1321,7 +1330,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
               else                     Z1->next_ravel_Int(Cell::near_int(r));
            }
         Z1->check_value(LOC);
-       
+
         Value_P Z2(ec_B - 1, LOC);   // remainder A∣B
         loop(b, ec_B - 1)
             {
@@ -1333,32 +1342,31 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
               else                      Z2->next_ravel_Int(Cell::near_int(re));
             }
         Z2->check_value(LOC);
-       
+
         Z->next_ravel_Value(Z1.get());
          Z->next_ravel_Value(Z2.get());
       }
    else   // real coefficients
       {
-        vector<double> D;   D.reserve(ec_B);              // divisor
-        vector<double> Q;   Q.reserve(ec_Q);              // quotient
-        vector<double> R;   R.reserve(ec_A + ec_B - 1);   // remainder
+        vector<double> D;   D.reserve(ec_B);   // divisor
+        vector<double> Q;   Q.reserve(ec_Q);   // quotient
+        vector<double> R;   R.reserve(ec_A);   // remainder
         loop(a, ec_A)
             {
               const Cell & cell = A.get_cravel(ec_A - a - 1);
                R.push_back(cell.get_real_value());
             }
-        loop(b, ec_B - 1)   R.push_back(0);
-       
+
         loop(b, ec_B)
             {
               const Cell & cell = B.get_cravel(ec_B - b - 1);
                D.push_back(cell.get_real_value());
             }
-       
+
         loop(q, ec_Q)
             {
               /* 1. divide the leading coefficients and store it in PQ
-                
+
                     R = B × (R ÷ B) = R × factor.
                */
               const double Rq = R[q];   // dividend
@@ -1367,10 +1375,10 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
                    Q.push_back(0);
                    continue;
                  }
-       
+
               const double factor = Rq / D[0];
               Q.push_back(factor);
-       
+
               // 2. subtract scaled B from R
               //
               loop(n, powers_B.size())
@@ -1380,7 +1388,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
                   }
             }
         Assert(size_t(ec_Q) == Q.size());
-       
+
         // construct the result
         //
         Value_P Z1(ec_Q, LOC);   // A÷B
@@ -1393,7 +1401,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
         Z1->check_value(LOC);
 
         Value_P Z2(ec_B - 1, LOC);   // remainder A∣B
-       
+
         loop(b, ec_B - 1)
             {
               const double re = R[ec_Q + b];
@@ -1401,7 +1409,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
               else                 Z2->next_ravel_Int(Cell::near_int(re));
             }
         Z2->check_value(LOC);
-       
+
         Z->next_ravel_Value(Z1.get());
          Z->next_ravel_Value(Z2.get());
       }
@@ -1413,8 +1421,142 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
 Value_P
 Bif_F12_DOMINO::polynomial_quotient2(const Value & A, const Value & B)
 {
-   TODO;
+   // divide multivariate polynomials.
+   //
+   // the rank of a polynomial is the number of indeterminants.
+   // They must be the same for A and B
+   //
+const int rank = A.get_rank();
+   if (rank != sRank(B.get_rank()))
+      {
+        MORE_ERROR() << "A ⌹.poly_quotient2 B: ⍴⍴A=" << rank
+                     << " (= number of indeterminants in A; ⍴⍴B="
+                     << B.get_rank() << " (= number of\n"
+                        "    indeterminants in B. Omitted indeterminants "
+                        "count.";
+        RANK_ERROR;
+      }
+
+   if (A.element_count() == 0 )   LENGTH_ERROR;
+   if (B.element_count() == 0 )   LENGTH_ERROR;
+
+Polynomial R(A);                 // remainder
+Polynomial D(B);                 // divisor
+Polynomial Q;                    // quotient
+Polynomial T;                    // temp remainder
+
+   if (R.needs_complex())   TODO;
+   if (D.needs_complex())   TODO;
+
+const Poly_term term_D_max = D.extract_LT();
+
+   while (R.size())
+         {
+           // 1. pick a large coefficient in R
+           //
+           const Poly_term term_R = R.extract_LT();
+           if (!term_R.is_multiple_of(term_D_max))
+              {
+                // if term_R is not a multiple of term_D then we move it
+                // from the current remainder to the final remainder.
+                //
+                T.push_back(term_R);
+                continue;
+              }
+
+           const Poly_term factor = term_R / term_D_max;
+           Q.push_back(factor);
+
+           // remove multiples of B from R
+           //
+           loop(d, D.size())
+               {
+                 const Poly_term scaled_D = factor * D[d];
+                 R.subtract_term(scaled_D);
+               }
+            }
+
+        // construct the result
+        //
+Value_P Z1 = Q.to_value();
+Value_P Z2 = T.to_value();
+Value_P Z(2, LOC);
+   Z->next_ravel_Value(Z1.get());
+   Z->next_ravel_Value(Z2.get());
+   Z->check_value(LOC);
+   return Z;
 }
+//----------------------------------------------------------------------------
+#if 0 // not used
+void
+Bif_F12_DOMINO::run_script(const UTF8_string & script,
+                           const UTF8_string & args,
+                           UCS_string_vector & result)
+{
+   // bin_path is where the GNU APL binary gets installed. We expect script
+   // to live in the same directory (or in ./ during development). If both
+   // exist then we use ./script (so we can develop it without running
+   // make install after every change of the script..
+   //
+const char * bin_path = LibPaths::get_APL_bin_path();
+UTF8_string script_path("/.");
+   script_path.append(script);
+   if (access(script_path.c_str(), R_OK))   // no ./script
+      {
+          script_path = UTF8_string(bin_path);
+          script_path += '/';
+          script_path.append(script);
+          if (access(script_path.c_str(), R_OK))   // no bin_path/script
+             {
+               MORE_ERROR() << "Installation problem: No readable file '"
+                            << script << "' (in directory . or "
+                            << bin_path << ")";
+               DOMAIN_ERROR;
+             }
+      }
+
+   // construct command
+   //
+const char * pythons[] = { "python3", "python" };
+FILE * fp_python = 0;
+   loop(p, sizeof(pythons) / sizeof(*pythons))
+       {
+         UTF8_string cmd(pythons[p]);
+         cmd += ' ';
+         cmd.append_UTF8(script_path);
+         cmd += ' ';
+         cmd.append_UTF8(args);
+         fp_python = popen(cmd.c_str(), "r");
+         if (fp_python)   break;
+      }
+
+   if (fp_python == 0)
+      {
+        MORE_ERROR() << "A ⌹.poly_quotient2 B: Could not start python.";
+        DOMAIN_ERROR;
+      }
+
+enum { BUFSIZE = 80 };
+char buffer[BUFSIZE + 1];
+   for (;;)
+       {
+           const char * s = fgets(buffer, BUFSIZE, fp_python);
+           if (s == 0)   break;
+           buffer[BUFSIZE] = 0;   // to secure strlen()
+           size_t len = strlen(buffer);
+           if (buffer[len - 1] == '\n')   buffer[--len] = 0;   // trailing \n
+           if (buffer[len - 1] == '\r')   buffer[--len] = 0;   // trailing \r
+           if (len == 0)   continue;
+           // COUT << "──── " << buffer << " ────" << endl;
+           const UTF8_string buffer_utf(buffer);
+           const UCS_string buffer_ucs(buffer_utf);
+           result.push_back(buffer_ucs);
+       }
+
+   // pclose() returns ECHILD even if the script runs successfully.
+   pclose(fp_python);
+}
+#endif
 //----------------------------------------------------------------------------
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const Value & B)
@@ -1440,7 +1582,7 @@ Bif_F12_DOMINO::scan_polynomial(const Value & A, const Value & B)
    /* A is a vector of names for the indeterminants (typically
       'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
       the indeterminants.
-     
+
       We support the following variants of A and B:
 
       1. 1-dimensional B and single string A (varname = indeterminant)
@@ -1495,9 +1637,6 @@ UCS_string_vector vars;
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const UCS_string_vector & vars, const Value & B)
 {
-const UTF8_string expos_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
-const UCS_string expos(expos_utf);
-
    if (B.get_rank() > 1)     RANK_ERROR;
    if (!B.is_char_array())   DOMAIN_ERROR;
 
@@ -1505,38 +1644,19 @@ UCS_string text(B);
    text.remove_leading_and_trailing_whitespaces();
 Unicode_source src(text);
 
-struct Term
-   {
-     Term(char _sign)
-     : sign(_sign),
-       real_val(1.0),   // default: 1.0 if not provided
-       imag_val(0.0)    // default: J0.0 if not provided
-       {}
-
-     bool operator ==(const Term & other) const
-        {
-           if (indefs.size() != other.indefs.size())   return false;
-           loop(j, indefs.size())
-               if (indefs[j] != other.indefs[j])   return false;
-           return true;
-        }
-
-     vector<int> indefs;
-
-     char sign;   ///< '+' '-' or 0
-     double real_val, imag_val;
-   };
-
-vector<Term> terms;
-   // fake a sign for the first term of B (unless it has one).
+   // scanner state
    //
-   if (!src.has_more())   LENGTH_ERROR;
-   if (*src != '+' && *src != '-')   terms.push_back(Term('+'));
-
+char term_sign = '+';
 bool got_j = false;
+bool got_overbar = false;
+
+vector<Poly_term> terms;
+Poly_term T;
+   if (src.has_more() && *src == '-')   { term_sign = '-';   ++src; }
+   T.set_real(got_overbar, term_sign, 1.0);
+
    while (src.has_more())
      {
-       Term & T = terms.back();
        switch(const Unicode uni = *src)
           {
              case UNI_SPACE:
@@ -1544,7 +1664,10 @@ bool got_j = false;
                   continue;
 
              case '+': 
-             case '-': terms.push_back(Term(uni));
+             case '-': terms.push_back(T);
+                       new (&T) Poly_term;
+                       term_sign = uni;
+                       T.set_real(got_overbar, term_sign, 1.0);
                         ++src;
                        continue;
 
@@ -1552,131 +1675,39 @@ bool got_j = false;
              case 'j': got_j = true;
                        continue;
 
+             case UNI_OVERBAR: got_overbar = true;
+                  ++src;
+                  continue;
+
              case '0'...'9':
-             case UNI_OVERBAR:
-                       if (got_j)
-                          {
-                            const Tokenizer::Int_or_Double id =
-                                  Tokenizer::tokenize_real(src);
-                            if (!id.is_valid)   DOMAIN_ERROR;
-                            T.imag_val = id.get_double();
-                            got_j = false;
-                          }
-                       else
-                          {
-                            const Tokenizer::Int_or_Double id =
-                                  Tokenizer::tokenize_real(src);
-                            if (!id.is_valid)   DOMAIN_ERROR;
-                            T.real_val = id.get_double();
-                          }
+                       T.scan_coefficient(src, term_sign, got_j, got_overbar);
                        continue;
 
-             default: if (Avec::is_symbol_char(uni))   // indeterminant & power
-                         {
-                           // extract the indeterminant name(s). Could be more
-                           // than one, e.g. xy². We use the longest in vars.
-                           //
-                           UCS_string indeterminants;
-                           loop(r, src.rest_len())
-                               {
-                                 const Unicode ind = src[r];
-                                 if (Avec::is_symbol_char(ind))
-                                    {
-                                      indeterminants.append(ind);
-                                    }
-                                 else break;
-
-                               }
-
-                           int found = -1;
-                           size_t found_len = 0;
-                           loop(v, vars.size())
-                               {
-                                 const UCS_string & var = vars[v];
-                                 if (indeterminants.starts_with(var) &&
-                                     found_len < var.size())
-                                    {
-                                      found = v;
-                                      found_len = var.size();
-                                    }
-                               }
-                           if (found == -1)
-                              {
-                                MORE_ERROR() << "A ⌹[11] B: no prefix of '"
-                                             << indeterminants << "' in A.";
-                                DOMAIN_ERROR;
-                              }
-
-                           // found the indeterminant.
-                           //
-                           while (int(T.indefs.size()) < (found + 1))
-                                 {
-                                   T.indefs.push_back(0);
-                                 }
-                           if (T.indefs[found])   // duplicate
-                              {
-                                MORE_ERROR() <<
-                                "⌹[11] B: duplicate indeterminant '"
-                                 << vars[found] << "' in term.";
-                                DOMAIN_ERROR;
-                              }
-                           T.indefs[found] = 1;   // for now
-
-                           src.skip(vars[found].size());   // skip name
-
-                           // optional indeterminant power
-                           //
-                           if (src.has_more() && expos.contains(*src))
-                              {
-                                // power present
-                                //
-                                int power = 0;
-                                while (src.has_more() && expos.contains(*src))
-                                      {
-                                       power *= 10;
-                                       loop(e, expos.size())
-                                           {
-                                             if (expos[e] == *src)
-                                                {
-                                                  power += e;
-                                                  break;
-                                                }
-                                           }
-                                        T.indefs[found] = power;
-                                        ++src;
-                                      }
-                              }
-
-                         }
-                      else   // unexpected case
-                         {
-                           MORE_ERROR() << "⌹[11] B: Invalid character '"
-                                        << uni << "' in polynomial B.";
-                           DOMAIN_ERROR;
-                         }
+             default: T.scan_indeterminants(vars, src);
           }
      }
+   terms.push_back(T); 
 
    // check for duplicate terms
    //
    loop(t1, terms.size() - 1)
    for (size_t t2 = t1 + 1; t2 < terms.size(); ++t2)
        {
-         if (!(terms[t1] == terms[t2]))   continue;   // OK
+         if (!(terms[t1].same_expos(terms[t2])))   continue;   // OK
 
-         const Term & term = terms[t1];
+         const Poly_term & term = terms[t1];
 
          UCS_string & more = MORE_ERROR();
          more << "⌹[11] B: duplicate term: ";
-         loop(var, term.indefs.size())
+         loop(var, term.expos.size())
              {
-               if (const int expo = term.indefs[var])
+               if (const int expo = term.expos[var])
                   {
                     more << vars[var];
                     if (expo > 1) more << UCS_string::power(expo);
                   }
              }
-         
+
          DOMAIN_ERROR;
        }
 
@@ -1688,10 +1719,10 @@ bool got_j = false;
 vector<int> max_powers(8, -1);
    loop(t, terms.size())
        {
-         const Term & term = terms[t];
-         loop (i, term.indefs.size())
+         const Poly_term & term = terms[t];
+         loop (i, term.expos.size())
              {
-               const int expo = term.indefs[i];
+               const int expo = term.expos[i];
                max_powers[i] = max(max_powers[i], expo);
              }
        }
@@ -1715,58 +1746,37 @@ Value_P Z(shape_Z, LOC);
    //
    loop(t, terms.size())   // loop over terms
        {
-         const Term & term = terms[t];
+         const Poly_term & term = terms[t];
          Cell * dest = &Z->get_wfirst();
          // CERR << "\nTERM " << t << ":" << endl;
 
          // compute the position of the term in Z
          //
-         if (term.indefs.size())   // no, not constant
+         if (term.expos.size())   // no, not constant
             {
               Shape index;
               loop(r, shape_Z.get_rank())   index.add_shape_item(0);
 
-              loop (v, term.indefs.size())
+              loop (v, term.expos.size())
                   {
-                    const int expo = term.indefs[v];
+                    const int expo = term.expos[v];
                     index.set_shape_item(v, expo);
                   }
 
               dest += shape_Z.ravel_pos(index);
             }
 
-         if (term.imag_val != 0)                      // complex coefficient
+         if (term.get_imag() != 0)                      // complex coefficient
             {
-              if (term.sign == '-')
-                 {
-                   new (dest) ComplexCell(-term.real_val, -term.imag_val);
-                 }
-              else
-                 {
-                   new (dest) ComplexCell(term.real_val, term.imag_val);
-                 }
+              new (dest) ComplexCell(term.get_real(), term.get_imag());
             }
-         else if (Cell::is_near_int(term.real_val))   // integer coefficient
+         else if (Cell::is_near_int(term.get_real()))   // integer coefficient
             {
-              if (term.sign == '-')
-                 {
-                   new (dest) IntCell(Cell::near_int(-term.real_val));
-                 }
-              else
-                 {
-                   new (dest) IntCell(Cell::near_int(term.real_val));
-                 }
+              new (dest) IntCell(Cell::near_int(term.get_real()));
             }
          else                                         // real coefficient
             {
-              if (term.sign == '-')
-                 {
-                   new (&dest) FloatCell(-term.real_val);
-                 }
-              else
-                 {
-                   new (&dest) FloatCell(term.real_val);
-                 }
+              new (&dest) FloatCell(term.get_real());
             }
        }
 

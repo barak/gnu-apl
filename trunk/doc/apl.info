@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 15, 2025.  This manual briefly documents GNU APL, an
+December 21, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -3224,9 +3224,125 @@ division with remainder and the result is a pair (Quotient, Remainder)
 where Remainder is a polynomial with a degree smaller that the degree of
 polynomial B. That is, ⍴Remainder = ¯1+⍴B.
 
-   Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+   NOTE: A ⌹[9] B is limited to polynomials with 1 indeterminant.
 
-2.22.2.7 ⌹[11] B: Scan Polynomial B
+2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
+......................................................................
+
+The limitiation of A ⌹[10] B to handle only polynomials with one
+indeterminan is lifted with A ⌹[10].  However, some caution needs to be
+exercized, as described in the following.
+
+   A polynomial is the sum of zero or more terms.  The terms of a
+polynomial are commonly called monomials.
+
+   In the set of all monomials an order, that is a relation < between
+any two elements of the set needs to be defined.  In the simple cases of
+dividing integers or polynomials with only one indeterminant the order <
+is canonical:
+
+   • order of integer: 0 < 1 < 2 < 3 ...
+   • order of polynomials: x⁰ < x¹ < x² < x³ ...
+
+   An order between monomials need not only satisfy the general
+requirements of an order (i.e.  being reflexive, antisymmetric, and
+transitive), but also the following:
+
+   • if x^{⍺} < x^{β} then x^{γ}x^{⍺} < x^{γ}x^{β} for all γ, and
+   • M ≥ 0 for every monomial M
+
+   The general problem with multivariate polynomials (i.e.  polynomials
+with more than one indeterminant, such as x² + y²) is then that the
+quotient and remainder of two multivariate polinomials is not unique but
+it depends on the order defined between its monomials.  The division of
+integers and of polynomials with one indeterminant is based on their
+canonical order, which results in a unique quotient and a unique
+remainder in these cases.  In contrast there can be several different
+orders between the monomials of a multivariate polynomial, and these
+different orders leads to different quotients and remainders.
+
+   For example:
+     Let
+           f = x2y + xy2 + y2,
+           g₁ = xy − 1, and
+           g₂ = y² − 1.
+
+     Dividing f by g₁ and then by g₂ gives:
+
+           f = (x + y)(xy − 1)  +  (y² − 1)  +  (x + y + 1)
+             = (x + y) g₁       +      g₂    +  (x + y + 1)
+
+     However, dividing f by g₂ and then by g₁ gives:
+
+           f = x(xy − 1)  +  (x + 1)(y² − 1)  +  (2x + 1)
+             = x g₁       +  ((x + 1) g₂      +  (2x + 1)
+
+
+   This ambiguity is resolved by always dividing a polynomial by its
+largest term, where the largest term is in turn defined by the order of
+the mononomials that was chosen.  IOW: a monomial order defines the
+which of the monomial terms of a polynomial is its largest term, and in
+every step of the division the largest term is being annihilated (by
+subtracting a multiple of the divisor from it).
+
+   Now, a commonly used order in the division of polynomials, and also
+the order used by A ⌹[10] B is the lexicographic order.  This order of
+monomials with indeterminants x, y, and z can be defined as follows:
+
+   • the constant coefficient of each monomial is ignored;
+   • the smallest element is 0,
+   • followed by monomials with only indeterminant z (which are ordered
+     by increasing powers of z,
+   • followed by monomials with only indeterminants y and z (which are
+     ordered by increasing powers of y,
+   • followed by monomials with only indeterminant x, y and z (which are
+     ordered by increasing powers of x,
+   • and so on.
+
+   For example: x < x², xy < xyz, y < x⁸, and y⁸ < x in the
+lexicographic order.
+
+   With these prerequisites, the division algorithm of GNU APL (which
+was inspired by
+<https://lall.stanford.edu/ee464/lectures/groebner_bases.pdf>) is this:
+
+           Let LT(p) denote the largest term in polynomial p, and let       (1)
+
+           q₁ = q₂ = ... = qₙ = 0   ⍝ quotient                              (1a)
+           r  = 0                   ⍝ remainder                             (1b)
+           p = f                    ⍝ dividend                              (1c)
+
+           while p ≠ 0:                                                     (2)
+                 let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+                 if such an i exists then:                                  (3a)
+                       qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
+                       p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+                 otherwise:                                                 (3b)
+                       r = r + lt(p)                                        (5a)
+                       p = p - lt(gᵢ)                                       (5b)
+
+   The algorithm divides polynomial f by polynomial g = g₁ + g₂ + ...  +
+gₙ and yields a quotient q = q₁ + q₂ + ...  + qₘ and a remainder r = r₁
++ r₂ + ...  + rₖ.  In every step the largest term in p is annihilated by
+"moving" it to either q (after dividing it by lt(gᵢ) if that is
+possible) or to r (if not).  Obviously:
+
+   • The divisor g does not change at all,
+   • p gets shorter and shorter in each iteration and therefore the
+     algorithm terminates after at most n iterations.  In addition the
+     subtraction in 4b certainly annihilates the leading term of p, but
+     could also annihilate other monomials of p (which then also reduces
+     the number of iterations performed).
+   • The quotient q grows as new quotients are being added in step 4b.
+   • The remainder r also grows as new items are added in step 5a.  In
+     the integer and polynomial with one indeterminant cases is the
+     length of the remainder limited by the degree of the dividend (so
+     the remainder of dividing e.g.  x³ + ax² + bx + c by anything has
+     always no more than 3 momomials).  In contrast a polynomial with a
+     max.  power of, say, 3 but 4 indeterminants can have up to 4⁴ = 256
+     momomials.
+
+2.22.2.8 ⌹[11] B: Scan Polynomial B
 ...................................
 
 ⌹[11] B aka.  ⌹.poly_scan B is the inverse function of ⌹[7] B. It
@@ -9107,51 +9223,51 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Section 2.23127806
-Node: Section 2.24133717
-Node: Section 2.25137089
-Node: Section 2.26137380
-Node: Section 2.27148233
-Node: Section 2.28148505
-Node: Section 2.29155558
-Node: Section 2.30158012
-Node: Section 2.31158681
-Node: Section 2.32160332
-Node: Section 2.33164256
-Node: Section 2.34178685
-Node: The Plot Data B179917
-Node: The Plot Attributes A182531
-Node: Plot Window Handling196066
-Node: Output File Format197397
-Node: GUI driver198620
-Node: Section 2.35202175
-Node: Section 2.36211610
-Node: Section 2.37212629
-Node: Section 2.38227864
-Node: Section 2.39238906
-Node: Section 2.40241090
-Node: Section 2.41267195
-Node: Section 2.42271735
-Node: Section 2.43292834
-Node: Section 2.44306847
-Node: Section 2.45310117
-Node: Chapter 3310632
-Node: Chapter 4313140
-Node: Chapter 5314281
-Node: Section 5.1315928
-Node: Section 5.2317248
-Node: Section 5.3317608
-Node: Section 5.4317850
-Node: Section 5.5318512
-Node: Section 5.6318990
-Node: Section 5.7319763
-Node: Section 5.8320189
-Node: Chapter 6320591
-Node: Section 6.1321010
-Node: Section 6.2321697
-Node: Chapter 7322528
-Node: Section 7.1323031
-Node: Section 7.2348344
+Node: Section 2.23133508
+Node: Section 2.24139419
+Node: Section 2.25142791
+Node: Section 2.26143082
+Node: Section 2.27153935
+Node: Section 2.28154207
+Node: Section 2.29161260
+Node: Section 2.30163714
+Node: Section 2.31164383
+Node: Section 2.32166034
+Node: Section 2.33169958
+Node: Section 2.34184387
+Node: The Plot Data B185619
+Node: The Plot Attributes A188233
+Node: Plot Window Handling201768
+Node: Output File Format203099
+Node: GUI driver204322
+Node: Section 2.35207877
+Node: Section 2.36217312
+Node: Section 2.37218331
+Node: Section 2.38233566
+Node: Section 2.39244608
+Node: Section 2.40246792
+Node: Section 2.41272897
+Node: Section 2.42277437
+Node: Section 2.43298536
+Node: Section 2.44312549
+Node: Section 2.45315819
+Node: Chapter 3316334
+Node: Chapter 4318842
+Node: Chapter 5319983
+Node: Section 5.1321630
+Node: Section 5.2322950
+Node: Section 5.3323310
+Node: Section 5.4323552
+Node: Section 5.5324214
+Node: Section 5.6324692
+Node: Section 5.7325465
+Node: Section 5.8325891
+Node: Chapter 6326293
+Node: Section 6.1326712
+Node: Section 6.2327399
+Node: Chapter 7328230
+Node: Section 7.1328733
+Node: Section 7.2354046
 
 End Tag Table
 

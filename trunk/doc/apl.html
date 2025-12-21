@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 15, 2025.
+<p>December 21, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -201,7 +201,8 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B">2.22.2.4 ⌹[7] B: Print Polynomial B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
-        <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">2.22.2.7 ⌹[11] B: Scan Polynomial B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029">2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
+        <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">2.22.2.8 ⌹[11] B: Scan Polynomial B</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e23">2.23 Dyadic ⎕CR</a></li>
@@ -3655,7 +3656,8 @@ in the various <b>⌹</b> functions.
 <li><a href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" accesskey="4">⌹[7] B: Print Polynomial B</a></li>
 <li><a href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" accesskey="5">A ⌹[8] B: Multiply Polynomials A and B</a></li>
 <li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
-<li><a href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" accesskey="7">⌹[11] B: Scan Polynomial B</a></li>
+<li><a href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" accesskey="7">A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
+<li><a href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" accesskey="8">⌹[11] B: Scan Polynomial B</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
 <h4 class="subsubsection">2.22.2.1 A⌹B and ⌹B</h4>
@@ -3924,11 +3926,141 @@ a division with remainder and the result is a pair <b>(Quotient, Remainder)</b>
  where <b>Remainder</b> is a polynomial with a degree smaller that the degree
 of polynomial <b>B</b>. That is, <b>⍴Remainder = ¯1+⍴B</b>.
 </p>
-<p>Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+<p><b>NOTE:</b> <b>A ⌹[9] B</b> is limited to polynomials with 1 indeterminant.
 </p>
 </div>
+<div class="subsubsection" id="A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029">
+<h4 class="subsubsection">2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</h4>
+
+<p>The limitiation of <b>A ⌹[10] B</b> to handle only polynomials with one 
+indeterminan is lifted with <b>A ⌹[10]</b>. However, some caution needs to be
+exercized, as described in the following.
+</p>
+<p>A <i>polynomial</i> is the sum of zero or more <i>terms</i>. The terms of a
+polynomial are commonly called <i>monomials</i>.
+</p>
+<p>In the set of all <i>monomials</i> an <i>order</i>, that is a relation <b>&lt;</b> between
+any two elements of the set needs to be defined. In the
+simple cases of dividing integers or polynomials with only one indeterminant
+the order <b>&lt;</b> is canonical:
+</p>
+<ul>
+<li> order of integer: 0 &lt; 1 &lt; 2 &lt; 3 ...
+</li><li> order of polynomials: x⁰ &lt; x¹ &lt; x² &lt; x³ ...
+</li></ul>
+
+<p>An order between <i>monomials</i> need not only satisfy the general requirements
+of an order (i.e. being reflexive, antisymmetric, and transitive), but also
+the following:
+</p>
+<ul>
+<li> if x<sup>⍺</sup> &lt; x<sup>β</sup> then x<sup>γ</sup>x<sup>⍺</sup> &lt; x<sup>γ</sup>x<sup>β</sup>
+      for all γ, and
+</li><li> M ≥ 0 for every monomial M
+</li></ul>
+
+<p>The general problem with multivariate polynomials (i.e. polynomials with more
+than one indeterminant, such as <b>x² + y²</b>) is then that the quotient and 
+remainder of two multivariate polinomials is not unique but it depends on
+the order defined between its monomials. The division of integers and
+of polynomials with one indeterminant is based on their canonical order,
+which results in a unique quotient and a unique remainder in these cases.
+In contrast there can be several different orders between the monomials
+of a multivariate polynomial, and these different orders leads to different
+quotients and remainders.
+</p>
+<p>For example:
+</p><div class="example">
+<pre class="example">Let
+      f = x2y + xy2 + y2,
+      g₁ = xy − 1, and
+      g₂ = y² − 1.
+
+Dividing f by g₁ and then by g₂ gives:
+
+      f = (x + y)(xy − 1)  +  (y² − 1)  +  (x + y + 1)
+        = (x + y) g₁       +      g₂    +  (x + y + 1)
+
+However, dividing f by g₂ and then by g₁ gives:
+
+      f = x(xy − 1)  +  (x + 1)(y² − 1)  +  (2x + 1)
+        = x g₁       +  ((x + 1) g₂      +  (2x + 1)
+
+</pre></div>
+
+<p>This ambiguity is resolved by always dividing a polynomial by
+its <i>largest term</i>, where the largest term is in turn defined
+by the order of the mononomials that was chosen. IOW: a monomial order
+defines the which of the monomial terms of a polynomial is its largest term,
+and in every step of the division the largest term is being annihilated
+(by subtracting a multiple of the divisor from it).
+</p>
+<p>Now, a commonly used order in the division of polynomials, and also the order
+used by <b>A ⌹[10] B</b> is the <i>lexicographic order</i>. This order
+of monomials with indeterminants x, y, and z can be defined as follows:
+</p>
+<ul>
+<li> the constant coefficient of each monomial is ignored;
+</li><li> the smallest element is <b>0</b>,
+</li><li> followed by monomials with only indeterminant <b>z</b>
+      (which are ordered by increasing powers of <b>z</b>,
+</li><li> followed by monomials with only indeterminants <b>y</b> and <b>z</b>
+      (which are ordered by increasing powers of <b>y</b>,
+</li><li> followed by monomials with only indeterminant <b>x</b>, <b>y</b> and <b>z</b>
+      (which are ordered by increasing powers of <b>x</b>,
+</li><li> and so on.
+</li></ul>
+ 
+<p>For example: <b>x &lt; x²</b>, <b>xy &lt; xyz</b>, <b>y &lt; x⁸</b>, and <b>y⁸ &lt; x</b> in the
+lexicographic order.
+</p>
+<p>With these prerequisites, the division algorithm of GNU APL (which was
+inspired by <a href="https://lall.stanford.edu/ee464/lectures/groebner_bases.pdf">https://lall.stanford.edu/ee464/lectures/groebner_bases.pdf</a>)
+is this:
+</p>
+<div class="example">
+<pre class="example">      Let LT(p) denote the largest term in polynomial p, and let       (1)
+
+      q₁ = q₂ = ... = qₙ = 0   ⍝ quotient                              (1a)
+      r  = 0                   ⍝ remainder                             (1b)
+      p = f                    ⍝ dividend                              (1c)
+
+      while p ≠ 0:                                                     (2)
+            let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+            if such an i exists then:                                  (3a)
+                  qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
+                  p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+            otherwise:                                                 (3b)
+                  r = r + lt(p)                                        (5a)
+                  p = p - lt(gᵢ)                                       (5b)
+</pre></div>
+
+<p>The algorithm divides polynomial <b>f</b> by polynomial
+<b>g = g₁ + g₂ + ... + gₙ</b> and yields a quotient <b>q = q₁ + q₂ + ... + qₘ</b>
+and a remainder <b>r = r₁ + r₂ + ... + rₖ</b>. In every step the largest term in
+<b>p</b> is annihilated by &quot;moving&quot; it to either q (after dividing it by lt(gᵢ)
+if that is possible) or to r (if not). Obviously:
+</p>
+<ul>
+<li> The divisor <b>g</b> does not change at all,
+</li><li> <b>p</b> gets shorter and shorter in each iteration and therefore the
+      algorithm terminates after at most <b>n</b> iterations. In addition the
+      subtraction in <b>4b</b> certainly annihilates the leading term of <b>p</b>,
+      but <i>could</i> also annihilate other monomials of <b>p</b> (which then also
+      reduces the number of iterations performed).
+</li><li> The quotient <b>q</b> grows as new quotients are being added in
+      step <b>4b</b>.
+</li><li> The remainder <b>r</b> also grows as new items are added in step <b>5a</b>.
+      In the integer and polynomial with one indeterminant cases is the length
+      of the remainder limited by the degree of the dividend (so the
+      remainder of dividing e.g. <b>x³ + ax² + bx + c</b> by anything has always
+      no more than 3 momomials). In contrast a polynomial with a max. power
+      of, say, 3 but 4 indeterminants can have up to 4⁴ = 256 momomials.
+</li></ul>
+
+</div>
 <div class="subsubsection" id="g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">
-<h4 class="subsubsection">2.22.2.7 ⌹[11] B: Scan Polynomial B</h4>
+<h4 class="subsubsection">2.22.2.8 ⌹[11] B: Scan Polynomial B</h4>
 
 <p><b>⌹[11] B</b> aka. <b>⌹.poly_scan B</b> is the inverse function of <b>⌹[7] B</b>.
 It converts a string <b>B</b> (in the format produced by <b>⌹poly_print B</b> and

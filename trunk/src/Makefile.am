@@ -119,6 +119,7 @@ common_SOURCES += PrimitiveFunction.cc					PrimitiveFunction.hh
 common_SOURCES += 										PrimitiveOperator.hh
 common_SOURCES += PrintBuffer.cc						PrintBuffer.hh
 common_SOURCES += 										PrintContext.hh
+common_SOURCES += Polynomial.cc							Polynomial.hh
 common_SOURCES += 										PrintOperator.hh
 common_SOURCES += QR_factorization_GSL.cc               QR_factorization_GSL.hh
 common_SOURCES += QuadFunction.cc						QuadFunction.hh

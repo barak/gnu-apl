@@ -405,6 +405,10 @@ public:
    /// return true if \b this string contains \b uni
    bool contains(Unicode uni) const;
 
+   /// return \b true iff \b this string is in the range \b from (including)
+   /// to 'b to (including).
+   bool is_in_range(const UCS_string & from, const UCS_string & to) const;
+
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)
       { vector<Unicode>::erase(begin() + pos); }

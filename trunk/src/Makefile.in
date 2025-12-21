@@ -217,39 +217,40 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QR_factorization_GSL.cc QR_factorization_GSL.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_MX.cc Quad_MX.def \
-	Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc \
-	Quad_PNG.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh QR_factorization_GSL.cc \
+	QR_factorization_GSL.hh QuadFunction.cc QuadFunction.hh \
+	ProcessorID.cc ProcessorID.hh Quad_CR.cc Quad_CR.def \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc \
+	Quad_MAP.hh Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
+	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Simple_string.hh SymbolTable.cc SymbolTable.hh \
+	SystemLimits.def SystemLimits.hh SystemVariable.cc \
+	SystemVariable.def SystemVariable.hh TabExpansion.cc \
+	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
+	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
@@ -310,7 +311,7 @@ am__objects_8 = $(am__objects_3) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Plot_data.lo \
 	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
-	lib_gnu_apl_la-PrintBuffer.lo \
+	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-Polynomial.lo \
 	lib_gnu_apl_la-QR_factorization_GSL.lo \
 	lib_gnu_apl_la-QuadFunction.lo lib_gnu_apl_la-ProcessorID.lo \
 	lib_gnu_apl_la-Quad_CR.lo lib_gnu_apl_la-Quad_DLX.lo \
@@ -392,39 +393,40 @@ am__libapl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QR_factorization_GSL.cc QR_factorization_GSL.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_MX.cc Quad_MX.def \
-	Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc \
-	Quad_PNG.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh QR_factorization_GSL.cc \
+	QR_factorization_GSL.hh QuadFunction.cc QuadFunction.hh \
+	ProcessorID.cc ProcessorID.hh Quad_CR.cc Quad_CR.def \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc \
+	Quad_MAP.hh Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
+	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Simple_string.hh SymbolTable.cc SymbolTable.hh \
+	SystemLimits.def SystemLimits.hh SystemVariable.cc \
+	SystemVariable.def SystemVariable.hh TabExpansion.cc \
+	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
+	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -476,31 +478,31 @@ am__objects_16 = $(am__objects_11) libapl_la-Archive.lo \
 	libapl_la-Prefix.lo libapl_la-Plot_line_properties.lo \
 	libapl_la-Plot_data.lo libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrintBuffer.lo \
-	libapl_la-QR_factorization_GSL.lo libapl_la-QuadFunction.lo \
-	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
-	libapl_la-Quad_DLX.lo libapl_la-Quad_FFT.lo \
-	libapl_la-Quad_FIO.lo libapl_la-Quad_FX.lo \
-	libapl_la-Quad_GTK.lo libapl_la-Quad_JSON.lo \
-	libapl_la-Quad_MAP.lo libapl_la-Quad_MX.lo \
-	libapl_la-Quad_PLOT.lo libapl_la-Quad_PNG.lo \
-	libapl_la-Quad_RE.lo libapl_la-Quad_RL.lo \
-	libapl_la-Quad_RVAL.lo libapl_la-Quad_SQL.lo \
-	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
-	libapl_la-Quad_WA.lo libapl_la-Quad_XML.lo \
-	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
-	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
-	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
-	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
-	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
-	libapl_la-TabExpansion.lo libapl_la-Thread_context.lo \
-	libapl_la-Token.lo libapl_la-Tokenizer.lo \
-	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
-	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
-	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
-	libapl_la-Value.lo libapl_la-ValueHistory.lo \
-	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
-	$(am__objects_15)
+	libapl_la-Polynomial.lo libapl_la-QR_factorization_GSL.lo \
+	libapl_la-QuadFunction.lo libapl_la-ProcessorID.lo \
+	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
+	libapl_la-Quad_FFT.lo libapl_la-Quad_FIO.lo \
+	libapl_la-Quad_FX.lo libapl_la-Quad_GTK.lo \
+	libapl_la-Quad_JSON.lo libapl_la-Quad_MAP.lo \
+	libapl_la-Quad_MX.lo libapl_la-Quad_PLOT.lo \
+	libapl_la-Quad_PNG.lo libapl_la-Quad_RE.lo \
+	libapl_la-Quad_RL.lo libapl_la-Quad_RVAL.lo \
+	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
+	libapl_la-Quad_TF.lo libapl_la-Quad_WA.lo \
+	libapl_la-Quad_XML.lo libapl_la-RealCell.lo libapl_la-sbrk.lo \
+	libapl_la-Shape.lo libapl_la-ScalarFunction.lo \
+	libapl_la-Security.lo libapl_la-StateIndicator.lo \
+	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
+	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
+	libapl_la-SystemVariable.lo libapl_la-TabExpansion.lo \
+	libapl_la-Thread_context.lo libapl_la-Token.lo \
+	libapl_la-Tokenizer.lo libapl_la-UCS_string.lo \
+	libapl_la-UCS_string_vector.lo libapl_la-UserFunction.lo \
+	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
+	libapl_la-UTF8_string.lo libapl_la-Value.lo \
+	libapl_la-ValueHistory.lo libapl_la-Workspace.lo \
+	libapl_la-static_Objects.lo $(am__objects_12) \
+	$(am__objects_13) $(am__objects_14) $(am__objects_15)
 @apl_TARGET_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_16) \
 @apl_TARGET_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -546,39 +548,40 @@ am__apl_SOURCES_DIST = main.cc Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QR_factorization_GSL.cc QR_factorization_GSL.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_MX.cc Quad_MX.def \
-	Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc \
-	Quad_PNG.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh QR_factorization_GSL.cc \
+	QR_factorization_GSL.hh QuadFunction.cc QuadFunction.hh \
+	ProcessorID.cc ProcessorID.hh Quad_CR.cc Quad_CR.def \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc \
+	Quad_MAP.hh Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
+	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Simple_string.hh SymbolTable.cc SymbolTable.hh \
+	SystemLimits.def SystemLimits.hh SystemVariable.cc \
+	SystemVariable.def SystemVariable.hh TabExpansion.cc \
+	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
+	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -631,18 +634,19 @@ am__objects_24 = $(am__objects_19) apl-Archive.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
 	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
-	apl-QR_factorization_GSL.$(OBJEXT) apl-QuadFunction.$(OBJEXT) \
-	apl-ProcessorID.$(OBJEXT) apl-Quad_CR.$(OBJEXT) \
-	apl-Quad_DLX.$(OBJEXT) apl-Quad_FFT.$(OBJEXT) \
-	apl-Quad_FIO.$(OBJEXT) apl-Quad_FX.$(OBJEXT) \
-	apl-Quad_GTK.$(OBJEXT) apl-Quad_JSON.$(OBJEXT) \
-	apl-Quad_MAP.$(OBJEXT) apl-Quad_MX.$(OBJEXT) \
-	apl-Quad_PLOT.$(OBJEXT) apl-Quad_PNG.$(OBJEXT) \
-	apl-Quad_RE.$(OBJEXT) apl-Quad_RL.$(OBJEXT) \
-	apl-Quad_RVAL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
-	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
-	apl-Quad_WA.$(OBJEXT) apl-Quad_XML.$(OBJEXT) \
-	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-Polynomial.$(OBJEXT) apl-QR_factorization_GSL.$(OBJEXT) \
+	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
+	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
+	apl-Quad_FFT.$(OBJEXT) apl-Quad_FIO.$(OBJEXT) \
+	apl-Quad_FX.$(OBJEXT) apl-Quad_GTK.$(OBJEXT) \
+	apl-Quad_JSON.$(OBJEXT) apl-Quad_MAP.$(OBJEXT) \
+	apl-Quad_MX.$(OBJEXT) apl-Quad_PLOT.$(OBJEXT) \
+	apl-Quad_PNG.$(OBJEXT) apl-Quad_RE.$(OBJEXT) \
+	apl-Quad_RL.$(OBJEXT) apl-Quad_RVAL.$(OBJEXT) \
+	apl-Quad_SQL.$(OBJEXT) apl-Quad_SVx.$(OBJEXT) \
+	apl-Quad_TF.$(OBJEXT) apl-Quad_WA.$(OBJEXT) \
+	apl-Quad_XML.$(OBJEXT) apl-RealCell.$(OBJEXT) \
+	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
@@ -722,7 +726,8 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-Plot_line_properties.Po \
 	./$(DEPDIR)/apl-Plot_window_properties.Po \
 	./$(DEPDIR)/apl-Plot_xcb.Po ./$(DEPDIR)/apl-PointerCell.Po \
-	./$(DEPDIR)/apl-Prefix.Po ./$(DEPDIR)/apl-PrimitiveFunction.Po \
+	./$(DEPDIR)/apl-Polynomial.Po ./$(DEPDIR)/apl-Prefix.Po \
+	./$(DEPDIR)/apl-PrimitiveFunction.Po \
 	./$(DEPDIR)/apl-PrintBuffer.Po ./$(DEPDIR)/apl-ProcessorID.Po \
 	./$(DEPDIR)/apl-QR_factorization_GSL.Po \
 	./$(DEPDIR)/apl-QuadFunction.Po ./$(DEPDIR)/apl-Quad_CR.Po \
@@ -814,6 +819,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo \
@@ -928,6 +934,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Plot_window_properties.Plo \
 	./$(DEPDIR)/libapl_la-Plot_xcb.Plo \
 	./$(DEPDIR)/libapl_la-PointerCell.Plo \
+	./$(DEPDIR)/libapl_la-Polynomial.Plo \
 	./$(DEPDIR)/libapl_la-Prefix.Plo \
 	./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/libapl_la-PrintBuffer.Plo \
@@ -1327,36 +1334,37 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QR_factorization_GSL.cc QR_factorization_GSL.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_MX.cc Quad_MX.def \
-	Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc \
-	Quad_PNG.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh Simple_string.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh $(am__append_7) $(am__append_10) \
-	$(am__append_11) $(am__append_14)
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh QR_factorization_GSL.cc \
+	QR_factorization_GSL.hh QuadFunction.cc QuadFunction.hh \
+	ProcessorID.cc ProcessorID.hh Quad_CR.cc Quad_CR.def \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc \
+	Quad_MAP.hh Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
+	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Simple_string.hh SymbolTable.cc SymbolTable.hh \
+	SystemLimits.def SystemLimits.hh SystemVariable.cc \
+	SystemVariable.def SystemVariable.hh TabExpansion.cc \
+	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
+	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	$(am__append_7) $(am__append_10) $(am__append_11) \
+	$(am__append_14)
 pkglib_LTLIBRARIES = $(am__append_15) $(am__append_16)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
@@ -1643,6 +1651,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_window_properties.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_xcb.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PointerCell.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Polynomial.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Prefix.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrintBuffer.Po@am__quote@ # am--include-marker
@@ -1758,6 +1767,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
@@ -1873,6 +1883,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_window_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_xcb.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PointerCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Polynomial.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Prefix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
@@ -2441,6 +2452,13 @@ lib_gnu_apl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrintBuffer.cc' object='lib_gnu_apl_la-PrintBuffer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+
+lib_gnu_apl_la-Polynomial.lo: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Polynomial.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Polynomial.Tpo -c -o lib_gnu_apl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Polynomial.Tpo $(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='lib_gnu_apl_la-Polynomial.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
 
 lib_gnu_apl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Tpo -c -o lib_gnu_apl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
@@ -3302,6 +3320,13 @@ libapl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrintBuffer.cc' object='libapl_la-PrintBuffer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+
+libapl_la-Polynomial.lo: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Polynomial.lo -MD -MP -MF $(DEPDIR)/libapl_la-Polynomial.Tpo -c -o libapl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Polynomial.Tpo $(DEPDIR)/libapl_la-Polynomial.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='libapl_la-Polynomial.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
 
 libapl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/libapl_la-QR_factorization_GSL.Tpo -c -o libapl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
@@ -4640,6 +4665,20 @@ apl-PrintBuffer.obj: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PrintBuffer.obj `if test -f 'PrintBuffer.cc'; then $(CYGPATH_W) 'PrintBuffer.cc'; else $(CYGPATH_W) '$(srcdir)/PrintBuffer.cc'; fi`
 
+apl-Polynomial.o: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Polynomial.o -MD -MP -MF $(DEPDIR)/apl-Polynomial.Tpo -c -o apl-Polynomial.o `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Polynomial.Tpo $(DEPDIR)/apl-Polynomial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='apl-Polynomial.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Polynomial.o `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+
+apl-Polynomial.obj: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Polynomial.obj -MD -MP -MF $(DEPDIR)/apl-Polynomial.Tpo -c -o apl-Polynomial.obj `if test -f 'Polynomial.cc'; then $(CYGPATH_W) 'Polynomial.cc'; else $(CYGPATH_W) '$(srcdir)/Polynomial.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Polynomial.Tpo $(DEPDIR)/apl-Polynomial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='apl-Polynomial.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Polynomial.obj `if test -f 'Polynomial.cc'; then $(CYGPATH_W) 'Polynomial.cc'; else $(CYGPATH_W) '$(srcdir)/Polynomial.cc'; fi`
+
 apl-QR_factorization_GSL.o: QR_factorization_GSL.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QR_factorization_GSL.o -MD -MP -MF $(DEPDIR)/apl-QR_factorization_GSL.Tpo -c -o apl-QR_factorization_GSL.o `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QR_factorization_GSL.Tpo $(DEPDIR)/apl-QR_factorization_GSL.Po
@@ -5717,6 +5756,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-Plot_window_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_xcb.Po
 	-rm -f ./$(DEPDIR)/apl-PointerCell.Po
+	-rm -f ./$(DEPDIR)/apl-Polynomial.Po
 	-rm -f ./$(DEPDIR)/apl-Prefix.Po
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
@@ -5832,6 +5872,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
@@ -5947,6 +5988,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo
@@ -6131,6 +6173,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-Plot_window_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_xcb.Po
 	-rm -f ./$(DEPDIR)/apl-PointerCell.Po
+	-rm -f ./$(DEPDIR)/apl-Polynomial.Po
 	-rm -f ./$(DEPDIR)/apl-Prefix.Po
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
@@ -6246,6 +6289,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
@@ -6361,6 +6405,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo

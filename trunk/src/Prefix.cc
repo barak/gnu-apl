@@ -831,12 +831,23 @@ Prefix::find_best_phrase()
 const int s_max = ssize() < 4 ? ssize() : 4;
 const int s_max_1 = s_max - 1;
 unsigned int hash[4] = { at0().get_Class() };
+
+   /* compute s_max_1 hash values from the token classes, starting at at(0).
+      That is:
+
+      hash[0] =                                    TC₀
+      hash[1] =                         TC₀ << 5 | TC₁
+      hash[3] = TC₀ <<             10 | TC₁ << 5 | TC₂
+      hash[4] = TC₀ << 15 | TC₁ << 10 | TC₂ << 5 | TC₃
+    */
    for (int s = 0; s < s_max_1;)
        {
          const int prev = s++;
          hash[s] = hash[prev] | Class_at(s) << 5*s;
        }
 
+   // match hashes in hash_table, from longest to shortest phrases
+   //
    rev_loop(s, s_max)
        {
          const unsigned int hash_s = hash[s];
@@ -852,7 +863,7 @@ unsigned int hash[4] = { at0().get_Class() };
 inline void
 Prefix::find_best_phrase()
 {
-   best_phrase = 0;   // assume nbothing found
+   best_phrase = 0;   // assume nothing found
 
 // CERR << "\nfind_best_phrase(): size=" << size() << endl;
 // print_stack(CERR, LOC);

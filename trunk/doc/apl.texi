@@ -3423,7 +3423,137 @@ a division with remainder and the result is a pair @b{(Quotient, Remainder)}
  where @b{Remainder} is a polynomial with a degree smaller that the degree
 of polynomial @b{B}. That is, @b{⍴Remainder = ¯1+⍴B}.
 
-Currently A ⌹[9] B is limited to polynomials with 1 indeterminant.
+@b{NOTE:} @b{A ⌹[9] B} is limited to polynomials with 1 indeterminant.
+
+@c ----------------------------------------------------------------------------
+@subsubsection A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
+
+The limitiation of @b{A ⌹[10] B} to handle only polynomials with one 
+indeterminan is lifted with @b{A ⌹[10]}. However, some caution needs to be
+exercized, as described in the following.
+
+A @i{polynomial} is the sum of zero or more @i{terms}. The terms of a
+polynomial are commonly called @i{monomials}.
+
+In the set of all @i{monomials} an @i{order}, that is a relation @b{<} between
+any two elements of the set needs to be defined. In the
+simple cases of dividing integers or polynomials with only one indeterminant
+the order @b{<} is canonical:
+
+@itemize
+@item order of integer: 0 < 1 < 2 < 3 ...
+@item order of polynomials: x⁰ < x¹ < x² < x³ ...
+@end itemize
+
+An order between @i{monomials} need not only satisfy the general requirements
+of an order (i.e. being reflexive, antisymmetric, and transitive), but also
+the following:
+
+@itemize
+@item if x@sup{⍺} < x@sup{β} then x@sup{γ}x@sup{⍺} < x@sup{γ}x@sup{β}
+      for all γ, and
+@item M ≥ 0 for every monomial M
+@end itemize
+
+The general problem with multivariate polynomials (i.e. polynomials with more
+than one indeterminant, such as @b{x² + y²}) is then that the quotient and 
+remainder of two multivariate polinomials is not unique but depend on
+the order defined between its monomials. The division of integers and
+of polynomials with one indeterminant is based on their canonical order,
+which results in a unique quotient and a unique remainder in these cases.
+In contrast there can be several different orders between the monomials
+of a multivariate polynomial, and these different orders leads to different
+quotients and remainders.
+
+For example:
+@example
+Let
+      f = x2y + xy2 + y2,
+      g₁ = xy − 1, and
+      g₂ = y² − 1.
+
+Dividing f by g₁ and then by g₂ gives:
+
+      f = (x + y)(xy − 1)  +  (y² − 1)  +  (x + y + 1)
+        = (x + y) g₁       +      g₂    +  (x + y + 1)
+
+However, dividing f by g₂ and then by g₁ gives:
+
+      f = x(xy − 1)  +  (x + 1)(y² − 1)  +  (2x + 1)
+        = x g₁       +  ((x + 1) g₂      +  (2x + 1)
+
+@end example
+
+This ambiguity is resolved by always dividing a polynomial by
+its @i{largest term}, where the largest term is in turn defined
+by the order of the mononomials that was chosen. IOW: a monomial order
+defines the which of the monomial terms of a polynomial is its largest term,
+and in every step of the division the largest term is being annihilated
+(by subtracting a multiple of the divisor from it).
+
+Now, a commonly used order in the division of polynomials, and also the order
+used by @b{A ⌹[10] B} is the @i{lexicographic order}. This order
+of monomials with indeterminants x, y, and z can be defined as follows:
+
+@itemize
+@item the constant coefficient of each monomial is ignored;
+@item the smallest element is @b{0},
+@item followed by monomials with only indeterminant @b{z}
+      (which are ordered by increasing powers of @b{z},
+@item followed by monomials with only indeterminants @b{y} and @b{z}
+      (which are ordered by increasing powers of @b{y},
+@item followed by monomials with only indeterminant @b{x}, @b{y} and @b{z}
+      (which are ordered by increasing powers of @b{x},
+@item and so on.
+@end itemize
+ 
+For example: @b{x < x²}, @b{xy < xyz}, @b{y < x⁸}, and @b{y⁸ < x} in the
+lexicographic order.
+
+With these prerequisites, the division algorithm of GNU APL (which was
+inspired by @url{https://lall.stanford.edu/ee464/lectures/groebner_bases.pdf})
+is this:
+
+@example
+      Let LT(p) denote the largest term in polynomial p, and let       (1)
+
+      q₁ = q₂ = ... = qₙ = 0   ⍝ quotient                              (1a)
+      r  = 0                   ⍝ remainder                             (1b)
+      p = f                    ⍝ dividend                              (1c)
+
+      while p ≠ 0:                                                     (2)
+            let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+            if such an i exists then:                                  (3a)
+                  qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
+                  p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+            otherwise:                                                 (3b)
+                  r = r + lt(p)                                        (5a)
+                  p = p - lt(gᵢ)                                       (5b)
+@end example
+
+The algorithm divides polynomial @b{f} by polynomial
+@b{g = g₁ + g₂ + ... + gₙ} and yields a quotient @b{q = q₁ + q₂ + ... + qₘ}
+and a remainder @b{r = r₁ + r₂ + ... + rₖ}. In every iteration the largest
+term in @b{p} is annihilated by "moving" it to either i@b{q} (after
+dividing it by @b{lt(gᵢ)) if that is possible) or else to @b{r}
+(if not). Obviously:
+
+@itemize
+@item The divisor @b{g} does not change at all,
+@item @b{p} gets shorter and shorter in each iteration and therefore the
+      algorithm terminates after at most @b{n} iterations. In addition the
+      subtraction in @b{4b} certainly annihilates the leading term of @b{p},
+      but @i{could} also annihilate other monomials of @b{p} (which then also
+      reduces the number of iterations performed).
+@item The quotient @b{q} grows as new quotients are being added in
+      step @b{4b}.
+@item The remainder @b{r} also grows as new items are added in step @b{5a}.
+      In the integer and polynomial with one indeterminant cases is the length
+      of the remainder limited by the degree of the dividend (so the
+      remainder of dividing e.g. @b{x³ + ax² + bx + c} by anything has always
+      no more than 3 momomials). In contrast a polynomial with a max. power
+      of, say, 3 but 4 indeterminants can have up to 4⁴ = 256 momomials.
+@end itemize
 
 @c ----------------------------------------------------------------------------
 @subsubsection ⌹[11] B: Scan Polynomial B
