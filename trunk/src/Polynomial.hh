@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include "APL_types.hh"
 #include "Shape.hh"
 #include "Value.hh"
 
@@ -33,16 +34,16 @@ class Unicode_source;   // Tokenizer.hh
 
     An exponent 0 is a an omitted indeterminat (since X⁰ = 1).
  **/
-class Poly_term
+class Monomial
 {
    typedef complex<double> Complex;
 public:
-   Poly_term()
+   Monomial()
    : coefficient(0.0)
    {}
 
    /// constructor: term with indefnitess as per indefs
-   Poly_term(Complex coeff, const Shape & indefs)
+   Monomial(Complex coeff, const Shape & indefs)
    : coefficient(coeff)
      {
        loop(n, indefs.get_rank())   expos.push_back(indefs.get_shape_item(n));
@@ -88,7 +89,7 @@ public:
       }
 
    /// comparator (aka. lexical order)
-   bool operator <(const Poly_term & other) const
+   bool operator <(const Monomial & other) const
       {
         Assert(expos.size() == other.expos.size());
         loop(n, expos.size())
@@ -101,7 +102,7 @@ public:
 
    /// return \b true iff \b this polynomial is a multiple of the polynomial
    /// \b factor.
-  bool is_multiple_of(const Poly_term & factor) const
+  bool is_multiple_of(const Monomial & factor) const
       {
         Assert(expos.size() == factor.expos.size());
         loop(n, expos.size())
@@ -124,7 +125,7 @@ public:
       { coefficient = - coefficient; }
 
    /// return \b this divided by \b divisor.
-   Poly_term operator /(const Poly_term & divisor) const
+   Monomial operator /(const Monomial & divisor) const
       {
         Assert(expos.size() == divisor.expos.size());
         Shape quot;
@@ -133,11 +134,11 @@ public:
               Assert(expos[n] >= divisor.expos[n]);
               quot.add_shape_item(expos[n] - divisor.expos[n]);
             }
-        return Poly_term(coefficient / divisor.coefficient, quot);
+        return Monomial(coefficient / divisor.coefficient, quot);
       }
 
    /// return \b this times \b factor.
-   Poly_term operator *(const Poly_term & factor) const
+   Monomial operator *(const Monomial & factor) const
       {
         Assert(expos.size() == factor.expos.size());
         Shape prod;
@@ -145,12 +146,12 @@ public:
             {
               prod.add_shape_item(expos[n] + factor.expos[n]);
             }
-        return Poly_term(coefficient * factor.coefficient, prod);
+        return Monomial(coefficient * factor.coefficient, prod);
       }
 
    /// return \b true if \b this and \b other have the same exponents of
    /// their indeterminants
-   bool same_expos(const Poly_term & other) const
+   bool same_expos(const Monomial & other) const
       {
         if (expos.size() != other.expos.size())   return false;
         loop(n, expos.size())   if (expos[n] != other.expos[n])   return false;
@@ -179,6 +180,11 @@ public:
            }
       }
 
+   /// return the (user-defined) value to be used for comparing \b rhis
+   /// monomial with
+   /// other monomials
+   int get_order(const Value & order) const;
+
    /// scan the coeffient in \b src.
    void scan_coefficient(Unicode_source & src, char term_sign,
                          bool & got_j, bool & got_overbar);
@@ -203,6 +209,9 @@ public:
            }
       }
 
+   /// return \b this polynomial as an APL value
+   Value_P to_value() const;
+
    /// print \b this term
    ostream & print(ostream & out, bool firsti = true) const;
 
@@ -213,7 +222,7 @@ public:
    vector<int> expos;   ///< the (powers of) the indeterminants
 };
 //============================================================================
-class Polynomial : public vector<Poly_term>
+class Polynomial : public vector<Monomial>
 {
 public:
    typedef complex<double> Complex;
@@ -270,31 +279,29 @@ public:
        }
 
    /// return (the index of) the largest term (aka. LT).
-   size_t LT_pos() const
-      {
-        size_t pos = 0;
-        for (size_t t = 1; t < size(); ++t)
-            {
-              if (at(pos) < at(t))   pos = t;
-            }
-        return pos;
-      }
+   size_t LT_pos(const Value * order) const;
 
    /// remove the largest term from \b this polynomial and return it.
-   Poly_term extract_LT()
+   Monomial extract_LT(const Value * order)
       {
-        const size_t pos = LT_pos();
-        Poly_term result = at(pos);
+        const size_t pos = LT_pos(order);
+        Monomial result = at(pos);
         erase(begin() + pos);
         return result;
       }
 
+   /// return the largest term from \b this polynomial.
+   Monomial get_LT(const Value * order)
+      {
+        return at(LT_pos(order));
+      }
+
    /// subtract term \b term from polynomial poly
-   void subtract_term(const Poly_term & other)
+   void subtract_term(const Monomial & other)
       {
         loop(t, size())
             {
-              Poly_term & term = at(t);
+              Monomial & term = at(t);
               if (term.same_expos(other))   // compatible term
                  {
                    term.subtract_coefficient(other.get_coefficient());

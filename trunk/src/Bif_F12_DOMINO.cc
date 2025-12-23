@@ -54,6 +54,7 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"               )
   domino_def(10, poly_divideN   , "polynomial A ÷ polynomial B (multivariate)")
   domino_def(11, poly_scan      , "string B to polynomial"                    )
+  domino_def(12, poly_divideNO  , "polynomial A ÷ polynomial B (with order)"  )
 #undef domino_def
 };
 //----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ Bif_F12_DOMINO::Bif_F12_DOMINO()
    : NonscalarFunction_default_identity(TOK_F12_DOMINO)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⍞");
+   init_function_group(subfunction_infos, count, "⌹");
 }
 //----------------------------------------------------------------------------
 Token
@@ -382,19 +383,29 @@ Bif_F12_DOMINO::print_fun_syntax(ostream & out,
                                 const function_info & info) const
 {
 const uAxis axis = info.axis;
+
+const char * Z = "";   // result
    switch(axis)
       {
-        default: out << "    (Q R Ri)";    break;   // QR factorizations
-        case  6:  out << "    (P U Li)";   break;   // LU factorization
-        case  7:  out << "          Zs";   break;   // print polynomial
+        default: Z = "    (Q R Ri)";   break;   // QR factorizations
+        case  6: Z = "    (P U Li)";   break;   // LU factorization
+        case  7: Z = "          Zs";   break;   // print polynomial
         case  8:
         case  9:
         case 10:
-        case 11:  out << "       Zpoly";   break;   // 
+        case 11:
+        case 12: Z = "       Zpoly";   break;   // 
       }
-   if (axis == 8 || axis == 9)   out << "← A ";   // dyadic
-   else                          out << "←   ";
-   out << "⌹[" << setw(2) << axis << "] B   ⍝ " << info.comment_fun << endl;
+
+const char * A = "←   ";   // left arg
+
+   if (axis >= 8 && axis <= 10)   A = "← A ";   // dyadic
+
+   out << Z << "   " << A << "⌹[" << setw(2) << axis << "] B   ⍝ "
+       << info.comment_fun << endl;
+   if (axis == 10)
+   out << Z << A << "LO ⌹[" << setw(2) << axis << "] B   ⍝ "
+       << "dito with optional monomial order LO" << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -413,11 +424,15 @@ Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const APL_Integer X0 = X->get_sole_integer();
    if (X0 < 7)     VALENCE_ERROR;
-   if (X0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
-   if (X0 ==  8)   return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
-   if (X0 ==  9)   return Token(TOK_APL_VALUE1, polynomial_quotient(*A, *B));
-   if (X0 == 10)   return Token(TOK_APL_VALUE1, polynomial_quotient2(*A, *B));
-   if (X0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(*A, *B));
+   switch(X0)
+      {
+        case  7: return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
+        case  8: return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
+        case  9: return Token(TOK_APL_VALUE1, poly_quotient(*A, *B));
+        case 10: return Token(TOK_APL_VALUE1, poly_quotient_NO(*A, *B, 0, 0));
+        case 11: return Token(TOK_APL_VALUE1, scan_polynomial(*A, *B));
+        case 12: return Token(TOK_APL_VALUE1, poly_quotient_N(*A, *B));
+      }
 
    MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
    DOMAIN_ERROR;
@@ -1212,7 +1227,7 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_DOMINO::polynomial_quotient(const Value & A, const Value & B)
+Bif_F12_DOMINO::poly_quotient(const Value & A, const Value & B)
 {
    if (A.get_rank() > 1)   RANK_ERROR;
    if (B.get_rank() > 1)   RANK_ERROR;
@@ -1419,7 +1434,8 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_DOMINO::polynomial_quotient2(const Value & A, const Value & B)
+Bif_F12_DOMINO::poly_quotient_NO(const Value & A, const Value & B,
+                              const Value * order_A, const Value * order_B)
 {
    // divide multivariate polynomials.
    //
@@ -1429,8 +1445,9 @@ Bif_F12_DOMINO::polynomial_quotient2(const Value & A, const Value & B)
 const int rank = A.get_rank();
    if (rank != sRank(B.get_rank()))
       {
-        MORE_ERROR() << "A ⌹.poly_quotient2 B: ⍴⍴A=" << rank
-                     << " (= number of indeterminants in A; ⍴⍴B="
+        const char * sub_fun = order_A ? "poly_divideNO" : "poly_divideN";
+        MORE_ERROR() << "A ⌹." << sub_fun << " B: ⍴⍴A="
+                     << rank << " (= number of indeterminants in A; ⍴⍴B="
                      << B.get_rank() << " (= number of\n"
                         "    indeterminants in B. Omitted indeterminants "
                         "count.";
@@ -1440,21 +1457,42 @@ const int rank = A.get_rank();
    if (A.element_count() == 0 )   LENGTH_ERROR;
    if (B.element_count() == 0 )   LENGTH_ERROR;
 
-Polynomial R(A);                 // remainder
-Polynomial D(B);                 // divisor
-Polynomial Q;                    // quotient
-Polynomial T;                    // temp remainder
+Polynomial R(A);   // remainder
+Polynomial D(B);   // divisor
+Polynomial Q;      // quotient
+Polynomial T;      // temp remainder
 
    if (R.needs_complex())   TODO;
    if (D.needs_complex())   TODO;
 
-const Poly_term term_D_max = D.extract_LT();
+const Monomial term_R_max = R.get_LT(order_A);
+const Monomial term_D_max = D.extract_LT(order_B);
+   if (order_A)
+      {
+        Assert(order_B);
+        if (term_R_max.get_order(*order_A) < term_D_max.get_order(*order_B))
+           {
+             // R is already smaller than D: return it.
+             //
+             return A.clone(LOC);
+           }
+      }
+   else   // default (lexicographic) order
+      {
+        Assert(!order_B);
+        if (term_R_max < term_D_max)
+           {
+             // R is already smaller than D: return it.
+             //
+             return A.clone(LOC);
+           }
+      }
 
    while (R.size())
          {
            // 1. pick a large coefficient in R
            //
-           const Poly_term term_R = R.extract_LT();
+           const Monomial term_R = R.extract_LT(order_A);
            if (!term_R.is_multiple_of(term_D_max))
               {
                 // if term_R is not a multiple of term_D then we move it
@@ -1464,14 +1502,14 @@ const Poly_term term_D_max = D.extract_LT();
                 continue;
               }
 
-           const Poly_term factor = term_R / term_D_max;
+           const Monomial factor = term_R / term_D_max;
            Q.push_back(factor);
 
            // remove multiples of B from R
            //
            loop(d, D.size())
                {
-                 const Poly_term scaled_D = factor * D[d];
+                 const Monomial scaled_D = factor * D[d];
                  R.subtract_term(scaled_D);
                }
             }
@@ -1485,6 +1523,71 @@ Value_P Z(2, LOC);
    Z->next_ravel_Value(Z2.get());
    Z->check_value(LOC);
    return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::poly_quotient_N(const Value & A, const Value & B)
+{
+   // A contains 2 "planes": the real polynomial A[1;...] and the item
+   // order A[2;...] for the corresponding coefficient in A[1[...].
+   //
+   if (A.get_rank() <= 2)   RANK_ERROR;
+   if (B.get_rank() <= 2)   RANK_ERROR;
+
+   if (A.get_shape_item(0) != 2)
+      {
+        MORE_ERROR() << "A ⌹.poly_divideNO B: ↑⍴A must be 2 (polynomial "
+                        "A[1;...] and\nmonomial order A[2;...])";
+        LENGTH_ERROR;
+      }
+
+const Shape shape_A = A.get_shape().without_axis(0);
+Value_P poly_A(shape_A, LOC);   // A[1;...]
+Value_P order_A(shape_A, LOC);  // A[2;...]
+   {
+     const ShapeItem len = shape_A.get_volume();
+
+     const Cell & order0 = A.get_cravel(len);
+     if (!order0.is_near_zero())
+        {
+          MORE_ERROR() << "A ⌹.poly_divideNO B: the order value ("
+                       << order0 << ") of the constant term is ≠ 0.";
+          DOMAIN_ERROR;
+        }
+
+     const Cell * cell = &A.get_cfirst();
+
+     loop(l, len)   poly_A->next_ravel_Cell(*cell++);
+     loop(l, len)   order_A->next_ravel_Cell(*cell++);
+
+     poly_A->check_value(LOC);
+     order_A->check_value(LOC);
+   }
+
+const Shape shape_B = B.get_shape().without_axis(0);
+Value_P poly_B(shape_B, LOC);   // B[1;...]
+Value_P order_B(shape_B, LOC);  // B[2;...]
+   {
+     const ShapeItem len = shape_B.get_volume();
+
+     const Cell & order0 = B.get_cravel(len);
+     if (!order0.is_near_zero())
+        {
+          MORE_ERROR() << "B ⌹.poly_divideNO B: the order value ("
+                       << order0 << ") of the constant term is ≠ 0.";
+          DOMAIN_ERROR;
+        }
+
+     const Cell * cell = &B.get_cfirst();
+
+     loop(l, len)   poly_B->next_ravel_Cell(*cell++);
+     loop(l, len)   order_B->next_ravel_Cell(*cell++);
+
+     poly_B->check_value(LOC);
+     order_B->check_value(LOC);
+   }
+
+   return poly_quotient_NO(*poly_A, *poly_B, order_A.get(), order_B.get());
 }
 //----------------------------------------------------------------------------
 #if 0 // not used
@@ -1650,8 +1753,8 @@ char term_sign = '+';
 bool got_j = false;
 bool got_overbar = false;
 
-vector<Poly_term> terms;
-Poly_term T;
+vector<Monomial> terms;
+Monomial T;
    if (src.has_more() && *src == '-')   { term_sign = '-';   ++src; }
    T.set_real(got_overbar, term_sign, 1.0);
 
@@ -1665,7 +1768,7 @@ Poly_term T;
 
              case '+': 
              case '-': terms.push_back(T);
-                       new (&T) Poly_term;
+                       new (&T) Monomial;
                        term_sign = uni;
                        T.set_real(got_overbar, term_sign, 1.0);
                         ++src;
@@ -1695,7 +1798,7 @@ Poly_term T;
        {
          if (!(terms[t1].same_expos(terms[t2])))   continue;   // OK
 
-         const Poly_term & term = terms[t1];
+         const Monomial & term = terms[t1];
 
          UCS_string & more = MORE_ERROR();
          more << "⌹[11] B: duplicate term: ";
@@ -1719,7 +1822,7 @@ Poly_term T;
 vector<int> max_powers(8, -1);
    loop(t, terms.size())
        {
-         const Poly_term & term = terms[t];
+         const Monomial & term = terms[t];
          loop (i, term.expos.size())
              {
                const int expo = term.expos[i];
@@ -1746,7 +1849,7 @@ Value_P Z(shape_Z, LOC);
    //
    loop(t, terms.size())   // loop over terms
        {
-         const Poly_term & term = terms[t];
+         const Monomial & term = terms[t];
          Cell * dest = &Z->get_wfirst();
          // CERR << "\nTERM " << t << ":" << endl;
 

@@ -987,7 +987,7 @@ Token
 Quad_FIO::list_functions(ostream & out) const
 {
    out << "\n"
-       << "⎕FIO is a function group. It is comprized of "
+       << "⎕FIO is a function group. It is comprised of "
                         "the following (sub-)functions:\n"
 "\n"
 "   ┌─── Legend:────────────────────────────────────────────────────┐\n"

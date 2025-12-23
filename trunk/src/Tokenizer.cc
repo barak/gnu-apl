@@ -946,7 +946,7 @@ bool dot_seen = false;      // the decimal . was seen
          */
         if (skipped_0)    return Int_or_Double(APL_Integer(0));   // case 1
 
-        MORE_ERROR() << "expecting 0. or 0. but not . without digits.";
+        MORE_ERROR() << "expecting 0. or .0 but not . without digits.";
         return Int_or_Double();                     // case 2: syntax error
       }
 

@@ -159,7 +159,7 @@ Token
 Quad_SQL::list_functions(ostream & out) const
 {
    out << "\n"
-          "⎕SQL is a function group. It is comprized of "
+          "⎕SQL is a function group. It is comprised of "
                 "the following (sub-)functions:\n"
           "\n"
        << get_legend(LET_FUN_PREFIX)

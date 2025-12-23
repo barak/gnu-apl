@@ -429,7 +429,7 @@ Token
 FunctionGroup::list_functions(ostream & out) const
 {
    out << "\n"
-       << group_name << " is a function group. It is comprized of "
+       << group_name << " is a function group. It is comprised of "
                         "the following (sub-)functions:\n"
           "\n"
        << get_legend(LET_FUN_PREFIX)

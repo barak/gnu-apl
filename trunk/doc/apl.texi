@@ -3429,11 +3429,26 @@ of polynomial @b{B}. That is, @b{⍴Remainder = ¯1+⍴B}.
 @subsubsection A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
 
 The limitiation of @b{A ⌹[10] B} to handle only polynomials with one 
-indeterminan is lifted with @b{A ⌹[10]}. However, some caution needs to be
-exercized, as described in the following.
+indeterminan is lifted with @b{A ⌹[10]} aka. @b{A ⌹.poly_divideN B}.
+The suffix @b{N} shall indicate that the number off indefinites is > 1.
+However, some caution needs to be exercized when using this function,
+as described in the following.
 
 A @i{polynomial} is the sum of zero or more @i{terms}. The terms of a
 polynomial are commonly called @i{monomials}.
+
+@b{Tip}: to list, for example, all possible monomials of a polymomial with
+three indeterminants x, y, and z and at most powers of 3:
+
+@example
+      ⍝ show all monomials of indeterminants x, y, z
+       ⍝ and max.powers 0, 1, and 2 (in lexicographic order)
+      ⍝
+      ⌹.poly_print 3 3 3⍴1
+x²y²z² + x²y²z + x²y² + x²yz² + x²yz + x²y + x²z² + x²z + x² + xy²z² + xy²z + 
+      xy² + xyz² + xyz + xy + xz² + xz + x + y²z² + y²z + y² + yz² + yz + y + 
+      z² + z + 1
+@end example
 
 In the set of all @i{monomials} an @i{order}, that is a relation @b{<} between
 any two elements of the set needs to be defined. In the
@@ -3487,26 +3502,14 @@ However, dividing f by g₂ and then by g₁ gives:
 This ambiguity is resolved by always dividing a polynomial by
 its @i{largest term}, where the largest term is in turn defined
 by the order of the mononomials that was chosen. IOW: a monomial order
-defines the which of the monomial terms of a polynomial is its largest term,
-and in every step of the division the largest term is being annihilated
-(by subtracting a multiple of the divisor from it).
+defines the which of the monomials of a polynomial is its largest monomials,
+and in every iteration of the division the largest monomial is being
+annihilated (by subtracting a multiple of the divisor from it).
 
 Now, a commonly used order in the division of polynomials, and also the order
-used by @b{A ⌹[10] B} is the @i{lexicographic order}. This order
-of monomials with indeterminants x, y, and z can be defined as follows:
+used by @b{A ⌹[10] B}, is the @i{lexicographic order} of the polynomials.
+@xref{Scan Polynomial B, Scan Polynomial}.
 
-@itemize
-@item the constant coefficient of each monomial is ignored;
-@item the smallest element is @b{0},
-@item followed by monomials with only indeterminant @b{z}
-      (which are ordered by increasing powers of @b{z},
-@item followed by monomials with only indeterminants @b{y} and @b{z}
-      (which are ordered by increasing powers of @b{y},
-@item followed by monomials with only indeterminant @b{x}, @b{y} and @b{z}
-      (which are ordered by increasing powers of @b{x},
-@item and so on.
-@end itemize
- 
 For example: @b{x < x²}, @b{xy < xyz}, @b{y < x⁸}, and @b{y⁸ < x} in the
 lexicographic order.
 
@@ -3522,20 +3525,20 @@ is this:
       p = f                    ⍝ dividend                              (1c)
 
       while p ≠ 0:                                                     (2)
-            let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+            let i be the smallest i such that LT(gᵢ) divides LT(p).    (3)
             if such an i exists then:                                  (3a)
-                  qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
-                  p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+                  qᵢ = qᵢ + LT(p) ÷ LT(gᵢ)                             (4a)
+                  p = p - gᵢ × LT(r) ÷ LT(gᵢ)                          (4b)
             otherwise:                                                 (3b)
-                  r = r + lt(p)                                        (5a)
-                  p = p - lt(gᵢ)                                       (5b)
+                  r = r + LT(p)                                        (5a)
+                  p = p - LT(gᵢ)                                       (5b)
 @end example
 
 The algorithm divides polynomial @b{f} by polynomial
 @b{g = g₁ + g₂ + ... + gₙ} and yields a quotient @b{q = q₁ + q₂ + ... + qₘ}
 and a remainder @b{r = r₁ + r₂ + ... + rₖ}. In every iteration the largest
 term in @b{p} is annihilated by "moving" it to either i@b{q} (after
-dividing it by @b{lt(gᵢ)) if that is possible) or else to @b{r}
+dividing it by @b{LT(gᵢ)} if that is possible) or else to @b{r}
 (if not). Obviously:
 
 @itemize
@@ -3556,6 +3559,93 @@ dividing it by @b{lt(gᵢ)) if that is possible) or else to @b{r}
 @end itemize
 
 @c ----------------------------------------------------------------------------
+@subsubsection A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)
+
+As explained above, different monomial orders of a polynomial can lead
+to different quotients and remainders when dividing them. This iproblem
+is addressed by @b{A ⌹[11] B} aka. @b{A ⌹.poly_divideNO B}.
+The suffix @b{NO} shall indicate that the number off indefinites is > 1,
+and that a user defined monomial order shall be used.
+
+Let @b{P} be a polynimial. An monomial order @b{O} for @b{P} is then 
+a matrix with the following properties:
+
+@itemize
+@item O has the same shape as P: (⍴P) ≡ (⍴O).
+@item ↑O (the order value of the contant term of the polynomial) is 0
+@end itemize
+
+In addition, as already mentioned above, the order defined by @b{O} shall be
+consistent: if x@sup{⍺} < x@sup{β} then x@sup{γ}x@sup{⍺} < x@sup{γ}x@sup{β}
+for all γ in @b{O}. @b{A ⌹.poly_divideNO B} checks that @b{↑O = 0} but not
+the consistency of @b{O}. If the consistency condition is violated, then
+in the best case the results are incorrect, and in the worst case the division
+algorithm may not terminate.
+
+For example, given a Polynomial @b{P}, the lexicographic order of @b{P} can
+be constrocted as follows:
+
+@example
+      ⍝ construct the lexicographical order of all possible monom in P
+      ⍝
+      ORDER←-⎕IO-(⍴P)⍴⍳×/⍴P
+@end example
+
+After an order @b{O} has been created for a polynomial @b{P}, both can be
+appended to create an argument for @b{A ⌹.poly_divideNO B}:
+
+@example
+      ⍝ append the desired monomial order O to a polynomial P.
+      ⍝
+      PO ← (2,⍴P)⍴(,P),,O
+@end example
+
+Putting the pieces together:
+
+@example
+      ⍝ create the dividend
+      ⍝
+      "A:" A←⌹.poly_scan "x³ - x² - xy² - 2x + y² + 4"
+ A:    4 0  1 
+     ¯2 0 ¯1 
+     ¯1 0  0 
+      1 0  0 
+
+      ⍝ create the divisor
+      ⍝
+      "B:" B←⌹.poly_scan "x - y"
+ B:   0 ¯1 
+      1  0 
+
+      ⍝ create the monomial orders for A and B
+      ⍝
+      ORDER_A←-⎕IO-(⍴A)⍴⍳×/⍴A
+      ORDER_B←-⎕IO-(⍴B)⍴⍳×/⍴B
+
+      ⍝ append the orders to their polynomial
+      ⍝
+      ARG_A ← (2,⍴A)⍴(,A),,ORDER_A
+      ARG_B ← (2,⍴B)⍴(,B),,ORDER_B
+
+      ⍝ call ⌹.poly_divideN and poly_divideNO
+      ⍝
+      (Q1 R1) ←     A ⌹.poly_divideN B
+      (Q2 R2) ← ARG_A ⌹.poly_divideNO ARG_B
+
+      ⍝ the result should be the same, because
+      ⍝ ORDER_A is what ⌹.poly_divideN uses.
+      ⍝ 
+      (Q1 R1) ≡ (Q2 R2)
+1
+@end example
+
+
+
+
+
+
+@c ----------------------------------------------------------------------------
+@node    Scan Polynomial B
 @subsubsection ⌹[11] B: Scan Polynomial B
 
 @b{⌹[11] B} aka. @b{⌹.poly_scan B} is the inverse function of @b{⌹[7] B}.
@@ -3581,10 +3671,34 @@ however:
 @b{P ≡ ⌹.poly_print ⌹.poly_scan P}
 
 holds only if the terms in @b{P} occur in the same order as produced
-by @b{⌹.poly_print}.  The order produced by @b{⌹.poly_print B} is the
-the reversed ravel order of B (i.e. @b{⌽,B} which runs fom the highest
-exponent of the first variable on the left to the constant term (if any)
-of the polynomial on the right.
+by @b{⌹.poly_print}.  The order in which @b{⌹.poly_print B} prints the terms
+of a polynimial @b{B} is what is known as the @b{lexicographic order},
+which can, in this context, be defined as follows:
+
+A sequence of vectors is in lexicographic order (or: 
+@i{ordered lexicographically}), if every smaller item i@b{a} in the sequence
+comes before every larger item @b{b} in the sequence. Where @b{smaller}
+resp, @b{larger} is defined as follows:
+
+@itemize
+@item Let @b{a = a₀ a₁ ... aₙ},
+@item let @b{b = b₀ b₁ ... bₙ},
+@item let @b{∆ = ∆₀ ∆₁ ... ∆ₙ} with @b{∆ⱼ = bⱼ - aⱼ}, and
+@item let @b{j} be the smallest @b{j} such that @b{∆ⱼ ≠ 0}.
+      That is: the first @b{j-1} items of @b{a} and @b{b} are equal)
+      and @b{j} is the first position at which vectors @b{a} and @b{b} differ.
+@item Then:
+  @itemize
+  @item If  @b{∆ⱼ > 0} then @b{a <@sub{lex} b} (i.e. @b{a} is smaller than @b{b}
+        and @b{b} is larger than @b{a}).
+  @item Otherwise @b{∆ⱼ < 0} and then @b{b <@sub{lex} a} (i.e. @b{a} is
+        larger than @b{b} and @b{b} is smaller than @b{a}).
+  @end itemize
+@end itemize
+
+The lexicographic order is also defined for vectors of different lengths,
+but in this context all vectors compared have the same length (number of
+indeterminants).
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.23
@@ -3817,9 +3931,8 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 @node    Section 2.25
 @section ⎕ARG - Interpreter command line arguments
 
-⎕ARG contains the command line arguments with which GNU APL was invoked.
+@b{⎕ARG} contains the command line arguments with which GNU APL was invoked.
 @xref{Section 2.1}.
-
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.26

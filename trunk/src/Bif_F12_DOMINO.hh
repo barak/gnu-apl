@@ -29,8 +29,10 @@
 #include "PrimitiveFunction.hh"
 
 //----------------------------------------------------------------------------
-/** primitive functions matrix divide and matrix invert */
-/// The class implementing ⌹
+/** primitive functions matrix divide and matrix inverti (and a number
+    of nonstandard GNMNU APL functions 
+ */
+/// The class implementing ⌹.
 class Bif_F12_DOMINO : public NonscalarFunction_default_identity
 {
 public:
@@ -92,11 +94,16 @@ protected:
    /// return the product A×B of polynomilals A and B
    static Value_P polynomial_product(const Value & A, const Value & B);
 
-   /// return the quotient A÷B of polynomilals A and B
-   static Value_P polynomial_quotient(const Value & A, const Value & B);
+   /// return the quotient A÷B of polynomilals A and B (1 indeterminant)
+   static Value_P poly_quotient(const Value & A, const Value & B);
+
+   /// return the quotient A÷B of polynomilals A and B (with orders)
+   static Value_P poly_quotient_NO(const Value & A, const Value & B,
+                                   const Value * optional_order_A,
+                                   const Value * optional_order_B);
 
    /// return the quotient A÷B of polynomilals A and B
-   static Value_P polynomial_quotient2(const Value & A, const Value & B);
+   static Value_P poly_quotient_N(const Value & A, const Value & B);
 
    /// return the polynomial B with indeterminant 'x' as APL string
    static Value_P scan_polynomial(const Value & A, const Value & B);

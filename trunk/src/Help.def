@@ -571,6 +571,10 @@ help_def(2, "←", "Assignment",
          "Assign the value of B to A",
          "")
 
+help_def(2, "←", "I-Beam",
+         "Not used in GNU APL",
+         "")
+
 help_def(1, "→", "Goto",
          "Go to line B",
          "")
@@ -581,7 +585,8 @@ help_def(-6, "∇", "Defined Function editor",
          "      ∇{A} (LO OP2 RO) B   Create and edit dyadic doperator OP2\n"
          "      ∇FUN                 Edit existing function FUN\n"
          "      ∇FUN[⎕]∇             Display existing function FUN\n"
-         "      ∇                    End of editing.",
+         "      ∇                    End of editing\n"
+         "      ⍫                    End of editing (and lock the function).",
          "")
 
 // APL primitive operators (except those that are also functions)

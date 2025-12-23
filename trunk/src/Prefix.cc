@@ -1616,19 +1616,36 @@ Value_P B = at2().get_apl_val();
            }
       }
 
-   if (at0().get_tag() == TOK_Quad_FIO && saved_MISC.get_Class() == TC_FUN12)
+   // ⎕FIO and ⌹ are primarily functions, but have subfunctions that are
+   // operators. If saved_MISC is a function, then M was possibly called
+   // as an operator and we derive it here if the subfunction was anindeed
+   // an operator.
+   //
+   if (saved_MISC.get_Class() == TC_FUN12)
       {
-        // ⎕FIO[49] or ⎕FIO[-1] (operators)
+        // C may have more than one item, so we should call get_sole_integer()
+        // only after having checked that M is ⎕FIO The subfunction which is
+        // an operator is ⎕FIO[49] aka. ⎕FIO,read_text
         //
-        Token & LO = saved_MISC.get_token();
-        DerivedFunction * derived =
-                          Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived)  Derived_LO_M_X(LO, M, C, LOC);
-        saved_MISC.get_token().clear(LOC);
-        prefix_len = 2;   // only f ⎕FIO
-        pop_args_push_result(Token(TOK_FUN2, derived));
-        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
-        return;
+        const TokenTag tag_M = at0().get_tag();
+        if (tag_M == TOK_Quad_FIO && C->get_sole_integer() == 49)
+           {
+             Token & LO = saved_MISC.get_token();
+             DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+             new (derived)  Derived_LO_M_X(LO, M, C, LOC);
+             clear_MISC(LOC);
+
+             const Function_PC pc_M = at(0).get_PC();   // PC of M
+             pop_and_discard();   // pop M
+             pop_and_discard();   // pop C
+                                  // but leave B
+             Token tok_Derived(TOK_FUN2, derived);
+             Token_loc tl_Derived(tok_Derived, pc_M);
+             push(tl_Derived);
+             prefix_len = 2;   // only f ⎕FIO resp. f ⌹
+             set_action(RA_CONTINUE);   // match again (w/o SHIFT)
+             return;
+           }
       }
 
 const Token Z = M->eval_XB(C, B);
@@ -1695,8 +1712,7 @@ Prefix::reduce_F_M__()
 Token & LO_F = at0();
 cMonOP     M = at1().get_function();
 
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(LO_F, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1793,7 +1809,7 @@ Prefix::reduce_A_M__()
 Token & LO_A = at0();
 cMonOP     M = at1().get_function();
 
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(LO_A, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
@@ -1809,8 +1825,7 @@ Token & LO_F = at0();
 cMonOP     M = at1().get_function();
 Value_P C      = at2().get_function_axis();
 
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M_X(LO_F, M, C, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1826,13 +1841,12 @@ cFunction_P LO_F = at0().get_function();
 Value_P        C = at1().get_function_axis();
 cMonOP         M = at2().get_function();
 
-DerivedFunction * derived_F_C =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived_F_C = Workspace::get_fun_oper_slot(LOC);
    new (derived_F_C) Derived_F_X(LO_F, C, LOC);
 
 Token tok_F_C(TOK_FUN2, derived_F_C);
 DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+   Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(tok_F_C, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1849,12 +1863,11 @@ Value_P     FX = at1().get_axes();
 cMonOP      M  = at2().get_function();
 Value_P     MX = at3().get_function_axis();
 
-DerivedFunction * derived_F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived_F_C = Workspace::get_fun_oper_slot(LOC);
    new (derived_F_C) Derived_F_X(F, FX, LOC);
 
 Token tok_F_C(TOK_FUN2, derived_F_C);
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M_X(tok_F_C, M, MX, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1892,7 +1905,7 @@ const Id id_D = D->get_Id();
       of ⍤ directly.
     */
 Value_P value_B;   // the original B (before stranding RO and B).
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    {
      Value_P value_RO;   // j123 (for ⍤) or N (for ⍣)
      if (id_D == ID_OPER2_RANK)
@@ -2175,8 +2188,7 @@ Token &     LO_F = at0();
 cFunction_P D    = at1().get_function();
 Token &     RO_G = at2();
 
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    new (derived) Derived_LO_D_RO(LO_F, D, RO_G, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -2221,7 +2233,7 @@ Value_P y_B = at3().get_apl_val();
       of ⍤ directly.
     */
 Value_P value_B;   // the original B (before stranding j and B).
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
+DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
    {
      Value_P y123;
      Bif_OPER2_RANK::unstrand_RO_B(y_B, y123, value_B);

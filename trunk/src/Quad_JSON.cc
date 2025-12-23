@@ -467,7 +467,7 @@ size_t token0 = 0;
    if (token0 != tokens_B.size())
       {
         MORE_ERROR() <<
-        "⎕JSON B: there were extra token in B (tokenized: " << tokens_B.size()
+        "⎕JSON B: there were extra tokens in B (tokenized: " << tokens_B.size()
         << ", but processed: " << token0 <<
         ").\n    The JSON string must be one serialized value.";
         LENGTH_ERROR;

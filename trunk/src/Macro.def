@@ -183,7 +183,7 @@ mac_def(   Z__nA_LO_REDUCE_X4_B,
 mac_def(  Z__LO_SCAN_X4_B,
   " Z←(LO Z__LO_SCAN_X4_B) [X4] B;B3;T;H;M;M_max;L;a;N;I;I_max\n"
 " (X4 H M_max L)←X4 ◊ I_max←⎕IO+⍴I←,⍳⍴Z←B3←(H M_max L)⍴B ◊ N←⎕IO - 1\n"
-" (H a L)←⊃I[N←N+1]          ◊ 0 → a=⎕IO ◊ M←1 ◊ T←B3[H;a;L]\n"
+" (H a L)←⊃I[N←N+1]          ◊  0 → a=⎕IO ◊ M←1 ◊ T←B3[H;a;L]\n"
 " T← ⊂((⊃B3[H;a-M;L]) LO ⊃T) ◊  0 → a>M←M+1\n"
 " Z[H;a;L]←T                 ◊ ¯2 → I_max>N+1\n"
 " Z←(⍴B)⍴Z\n")

@@ -46,7 +46,7 @@
   rw_sv_def(Quad_PR,   "PR",    "Prompt Replacement"           )
   rw_sv_def(Quad_PS,   "PS",    "Print Style"                  )
   rw_sv_def(Quad_PW,   "PW",    "Print Width"                  )
-  rw_sv_def(Quad_R,    "R",     "Right Argment"                )
+  rw_sv_def(Quad_R,    "R",     "Right Argument"               )
   rw_sv_def(Quad_RL,   "RL",    "Random Link"                  )
   rw_sv_def(Quad_SYL,  "SYL",   "SYstem Limits"                )
   rw_sv_def(Quad_TZ,   "TZ",    "Time Zone"                    )

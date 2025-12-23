@@ -2617,7 +2617,7 @@ const int levels = find_int_attr("levels", false, 10);
 "\n"
 "*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
 "    workspace. The )SI stack was reconstructed to the extent possible.\n"
-"    We stronly recommend to perform )SIC and then )DUMP the workspace under\n"
+"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
 "    a different name.\n" << endl;
 
              // skip rest of <StateIndicator>

@@ -225,30 +225,6 @@ const int other_rank = other.get_rank();
    return other_idx == other_rank;
 }
 //----------------------------------------------------------------------------
-int
-Shape::poly_max() const
-{
-int ret = 0;
-   loop(r, rho_rho)   if (ret < rho[r])   ret = rho[r];
-   return ret;
-}
-//----------------------------------------------------------------------------
-int
-Shape::poly_sum() const
-{
-int ret = 0;
-   loop(r, rho_rho)   ret += rho[r];
-   return ret;
-}
-//----------------------------------------------------------------------------
-int
-Shape::poly_divides(const Shape & other) const
-{
-   Assert(rho_rho == other.rho_rho);
-   loop(r, rho_rho)   if (rho[r] > other.rho[r])   return false;
-   return true;
-}
-//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Shape & shape)
 {

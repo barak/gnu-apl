@@ -192,6 +192,10 @@ public:
    StateIndicator * get_parent() const
       { return parent; }
 
+   /// return uninitialized memory for a new derived function
+   DerivedFunction * get_fun_oper_slot(const char * loc)
+      { return fun_oper_cache.get(loc); }
+
    /// return the immediate child SI (if any) of \b this )SI entry
    const StateIndicator * find_child() const;
 

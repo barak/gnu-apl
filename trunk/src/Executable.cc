@@ -654,6 +654,9 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
 Function_PC start = get_statement_start(body_from_to.low);
 Function_PC end = get_statement_end(body_from_to.high);
 
+   if (body_from_to.low == -1)    body_from_to.low = start;
+   if (body_from_to.high == -1)   body_from_to.high = end;
+
    Assert(start   <= body_from_to.low);
    Assert(body_from_to.low  <= body_from_to.high);
    if (body_from_to.high > end)   body_from_to.high = end;

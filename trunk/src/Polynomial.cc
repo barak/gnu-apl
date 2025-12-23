@@ -22,12 +22,13 @@
 */
 
 #include "Common.hh"
+#include "Function.hh"
 #include "Polynomial.hh"
 #include "Tokenizer.hh"
 
 //============================================================================
 void
-Poly_term::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
+Monomial::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
                             bool & got_overbar)
 {
 const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
@@ -45,7 +46,7 @@ const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
 }
 //----------------------------------------------------------------------------
 void
-Poly_term::scan_indeterminants(const UCS_string_vector & vars,
+Monomial::scan_indeterminants(const UCS_string_vector & vars,
                                Unicode_source & src)
 {
    if (!Avec::is_symbol_char(*src))   // expected: indeterminant & power
@@ -130,8 +131,40 @@ size_t found_len = 0;
       }
 }
 //-----------------------------------------------------------------------
+Value_P
+Monomial::to_value() const
+{
+Value_P Z(expos.size() + 1, LOC);
+
+   if (Cell::is_near_zero(coefficient.imag()))       // real coefficient
+      {
+        Z->next_ravel_Number(coefficient.real());
+      }
+   else if (!Cell::is_near_int(coefficient.imag()))   // complex coefficient
+      {
+        Z->next_ravel_Complex(coefficient.real(), coefficient.imag());
+      }
+
+   loop(e, expos.size())   Z->next_ravel_Int(expos[e]);
+
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------
+int
+Monomial::get_order(const Value & order) const
+{
+   // find the index of this monomial in order.
+   //
+Shape index;
+   loop(e, expos.size())   index.add_shape_item(expos[e]);
+
+const ShapeItem offset = order.get_shape().ravel_pos(index);
+   return order.get_cravel(offset).get_int_value();
+}
+//-----------------------------------------------------------------------
 ostream &
-Poly_term::print(ostream & out, bool first) const
+Monomial::print(ostream & out, bool first) const
 {
 Complex coeff = coefficient;
    if (Cell::is_near_zero(coeff.real()) &&
@@ -187,7 +220,7 @@ Polynomial::Polynomial(const Value & value)
          const Complex coeff(cell.get_real_value(),
                              cell.get_imag_value());
          const Shape shape = value.get_shape().offset_to_index(v, /*⎕IO*/ 0);
-         const Poly_term term(coeff, shape);
+         const Monomial term(coeff, shape);
          push_back(term);
        }
 }
@@ -199,29 +232,54 @@ Polynomial::print(ostream & out) const
 
    // find largest
    //
-const Poly_term * largest = &at(0);
+const Monomial * largest = &at(0);
    for (size_t j = 1; j < size(); ++j)
        {
-         const Poly_term * tj = &at(j);
+         const Monomial * tj = &at(j);
          if (*largest < *tj)   largest = tj;
        }
 
    loop(t, size())
        {
          largest->print(out, t == 0);
-         const Poly_term * next = 0;
+         const Monomial * next = 0;
          loop(t, size())
              {
-               const Poly_term * tj = &at(t);
+               const Monomial * tj = &at(t);
                if (tj == largest)      continue;
                if (*largest < *tj)     continue;
                if (next == 0)          next = tj;
                else if (*next < *tj)   next = tj;
              }
-         //Assert(next);
+         Assert(next);
          largest = next;
        }
    return out;
+}
+//----------------------------------------------------------------------------
+size_t
+Polynomial::LT_pos(const Value * order) const
+{
+size_t pos = 0;
+
+   if (order)   // user-defined order beyween monomials
+      {
+        int ord = at(0).get_order(*order);
+        for (size_t t = 1; t < size(); ++t)
+            {
+              const int ord_t = at(t).get_order(*order);
+              if (ord < ord_t)   { pos = t;   ord = ord_t; }
+            }
+      }
+
+   /// no user defined order, use lexicographical order
+   ///
+   for (size_t t = 1; t < size(); ++t)
+       {
+         if (at(pos) < at(t))   pos = t;
+       }
+   return pos;
+
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -235,7 +293,7 @@ Shape shape_Z;
         int max_expo = 0;
         loop(t, size())
             {
-              const Poly_term & term = at(t);
+              const Monomial & term = at(t);
               const ShapeItem len = term.get_indeterminant_power(r);
               if (max_expo < len)   max_expo = len;
             }
@@ -247,7 +305,7 @@ Value_P Z(shape_Z, LOC);
 
    loop(t, size())
        {
-         const Poly_term & term = at(t);
+         const Monomial & term = at(t);
          const Shape index = term.to_shape();
          const ShapeItem pos_Z = shape_Z.ravel_pos(index);
          Complex coeff = term.get_coefficient();

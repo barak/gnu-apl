@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 21, 2025.
+<p>December 23, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -202,7 +202,8 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029">2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
-        <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">2.22.2.8 ⌹[11] B: Scan Polynomial B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029" href="#A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029">2.22.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</a></li>
+        <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#Scan-Polynomial-B">2.22.2.9 ⌹[11] B: Scan Polynomial B</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e23">2.23 Dyadic ⎕CR</a></li>
@@ -3657,7 +3658,8 @@ in the various <b>⌹</b> functions.
 <li><a href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" accesskey="5">A ⌹[8] B: Multiply Polynomials A and B</a></li>
 <li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
 <li><a href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" accesskey="7">A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
-<li><a href="#g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" accesskey="8">⌹[11] B: Scan Polynomial B</a></li>
+<li><a href="#A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029" accesskey="8">A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</a></li>
+<li><a href="#Scan-Polynomial-B" accesskey="9">⌹[11] B: Scan Polynomial B</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
 <h4 class="subsubsection">2.22.2.1 A⌹B and ⌹B</h4>
@@ -3933,12 +3935,27 @@ of polynomial <b>B</b>. That is, <b>⍴Remainder = ¯1+⍴B</b>.
 <h4 class="subsubsection">2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</h4>
 
 <p>The limitiation of <b>A ⌹[10] B</b> to handle only polynomials with one 
-indeterminan is lifted with <b>A ⌹[10]</b>. However, some caution needs to be
-exercized, as described in the following.
+indeterminan is lifted with <b>A ⌹[10]</b> aka. <b>A ⌹.poly_divideN B</b>.
+The suffix <b>N</b> shall indicate that the number off indefinites is &gt; 1.
+However, some caution needs to be exercized when using this function,
+as described in the following.
 </p>
 <p>A <i>polynomial</i> is the sum of zero or more <i>terms</i>. The terms of a
 polynomial are commonly called <i>monomials</i>.
 </p>
+<p><b>Tip</b>: to list, for example, all possible monomials of a polymomial with
+three indeterminants x, y, and z and at most powers of 3:
+</p>
+<div class="example">
+<pre class="example">      ⍝ show all monomials of indeterminants x, y, z
+       ⍝ and max.powers 0, 1, and 2 (in lexicographic order)
+      ⍝
+      ⌹.poly_print 3 3 3⍴1
+x²y²z² + x²y²z + x²y² + x²yz² + x²yz + x²y + x²z² + x²z + x² + xy²z² + xy²z + 
+      xy² + xyz² + xyz + xy + xz² + xz + x + y²z² + y²z + y² + yz² + yz + y + 
+      z² + z + 1
+</pre></div>
+
 <p>In the set of all <i>monomials</i> an <i>order</i>, that is a relation <b>&lt;</b> between
 any two elements of the set needs to be defined. In the
 simple cases of dividing integers or polynomials with only one indeterminant
@@ -3961,7 +3978,7 @@ the following:
 
 <p>The general problem with multivariate polynomials (i.e. polynomials with more
 than one indeterminant, such as <b>x² + y²</b>) is then that the quotient and 
-remainder of two multivariate polinomials is not unique but it depends on
+remainder of two multivariate polinomials is not unique but depend on
 the order defined between its monomials. The division of integers and
 of polynomials with one indeterminant is based on their canonical order,
 which results in a unique quotient and a unique remainder in these cases.
@@ -3991,26 +4008,14 @@ However, dividing f by g₂ and then by g₁ gives:
 <p>This ambiguity is resolved by always dividing a polynomial by
 its <i>largest term</i>, where the largest term is in turn defined
 by the order of the mononomials that was chosen. IOW: a monomial order
-defines the which of the monomial terms of a polynomial is its largest term,
-and in every step of the division the largest term is being annihilated
-(by subtracting a multiple of the divisor from it).
+defines the which of the monomials of a polynomial is its largest monomials,
+and in every iteration of the division the largest monomial is being
+annihilated (by subtracting a multiple of the divisor from it).
 </p>
 <p>Now, a commonly used order in the division of polynomials, and also the order
-used by <b>A ⌹[10] B</b> is the <i>lexicographic order</i>. This order
-of monomials with indeterminants x, y, and z can be defined as follows:
+used by <b>A ⌹[10] B</b>, is the <i>lexicographic order</i> of the polynomials.
+See <a href="#Scan-Polynomial-B">Scan Polynomial</a>.
 </p>
-<ul>
-<li> the constant coefficient of each monomial is ignored;
-</li><li> the smallest element is <b>0</b>,
-</li><li> followed by monomials with only indeterminant <b>z</b>
-      (which are ordered by increasing powers of <b>z</b>,
-</li><li> followed by monomials with only indeterminants <b>y</b> and <b>z</b>
-      (which are ordered by increasing powers of <b>y</b>,
-</li><li> followed by monomials with only indeterminant <b>x</b>, <b>y</b> and <b>z</b>
-      (which are ordered by increasing powers of <b>x</b>,
-</li><li> and so on.
-</li></ul>
- 
 <p>For example: <b>x &lt; x²</b>, <b>xy &lt; xyz</b>, <b>y &lt; x⁸</b>, and <b>y⁸ &lt; x</b> in the
 lexicographic order.
 </p>
@@ -4026,20 +4031,21 @@ is this:
       p = f                    ⍝ dividend                              (1c)
 
       while p ≠ 0:                                                     (2)
-            let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+            let i be the smallest i such that LT(gᵢ) divides LT(p).    (3)
             if such an i exists then:                                  (3a)
-                  qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
-                  p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+                  qᵢ = qᵢ + LT(p) ÷ LT(gᵢ)                             (4a)
+                  p = p - gᵢ × LT(r) ÷ LT(gᵢ)                          (4b)
             otherwise:                                                 (3b)
-                  r = r + lt(p)                                        (5a)
-                  p = p - lt(gᵢ)                                       (5b)
+                  r = r + LT(p)                                        (5a)
+                  p = p - LT(gᵢ)                                       (5b)
 </pre></div>
 
 <p>The algorithm divides polynomial <b>f</b> by polynomial
 <b>g = g₁ + g₂ + ... + gₙ</b> and yields a quotient <b>q = q₁ + q₂ + ... + qₘ</b>
-and a remainder <b>r = r₁ + r₂ + ... + rₖ</b>. In every step the largest term in
-<b>p</b> is annihilated by &quot;moving&quot; it to either q (after dividing it by lt(gᵢ)
-if that is possible) or to r (if not). Obviously:
+and a remainder <b>r = r₁ + r₂ + ... + rₖ</b>. In every iteration the largest
+term in <b>p</b> is annihilated by &quot;moving&quot; it to either i<b>q</b> (after
+dividing it by <b>LT(gᵢ)</b> if that is possible) or else to <b>r</b>
+(if not). Obviously:
 </p>
 <ul>
 <li> The divisor <b>g</b> does not change at all,
@@ -4059,8 +4065,100 @@ if that is possible) or to r (if not). Obviously:
 </li></ul>
 
 </div>
-<div class="subsubsection" id="g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B">
-<h4 class="subsubsection">2.22.2.8 ⌹[11] B: Scan Polynomial B</h4>
+<div class="subsubsection" id="A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029">
+<h4 class="subsubsection">2.22.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</h4>
+
+<p>As explained above, different monomial orders of a polynomial can lead
+to different quotients and remainders when dividing them. This iproblem
+is addressed by <b>A ⌹[11] B</b> aka. <b>A ⌹.poly_divideNO B</b>.
+The suffix <b>NO</b> shall indicate that the number off indefinites is &gt; 1,
+and that a user defined monomial order shall be used.
+</p>
+<p>Let <b>P</b> be a polynimial. An monomial order <b>O</b> for <b>P</b> is then 
+a matrix with the following properties:
+</p>
+<ul>
+<li> O has the same shape as P: (⍴P) ≡ (⍴O).
+</li><li> ↑O (the order value of the contant term of the polynomial) is 0
+</li></ul>
+
+<p>In addition, as already mentioned above, the order defined by <b>O</b> shall be
+consistent: if x<sup>⍺</sup> &lt; x<sup>β</sup> then x<sup>γ</sup>x<sup>⍺</sup> &lt; x<sup>γ</sup>x<sup>β</sup>
+for all γ in <b>O</b>. <b>A ⌹.poly_divideNO B</b> checks that <b>↑O = 0</b> but not
+the consistency of <b>O</b>. If the consistency condition is violated, then
+in the best case the results are incorrect, and in the worst case the division
+algorithm may not terminate.
+</p>
+<p>For example, given a Polynomial <b>P</b>, the lexicographic order of <b>P</b> can
+be constrocted as follows:
+</p>
+<div class="example">
+<pre class="example">      ⍝ construct the lexicographical order of all possible monom in P
+      ⍝
+      ORDER←-⎕IO-(⍴P)⍴⍳×/⍴P
+</pre></div>
+
+<p>After an order <b>O</b> has been created for a polynomial <b>P</b>, both can be
+appended to create an argument for <b>A ⌹.poly_divideNO B</b>:
+</p>
+<div class="example">
+<pre class="example">      ⍝ append the desired monomial order O to a polynomial P.
+      ⍝
+      PO ← (2,⍴P)⍴(,P),,O
+</pre></div>
+
+<p>Putting the pieces together:
+</p>
+<div class="example">
+<pre class="example">      ⍝ create the dividend
+      ⍝
+      &quot;A:&quot; A←⌹.poly_scan &quot;x³ - x² - xy² - 2x + y² + 4&quot;
+ A:    4 0  1 
+     ¯2 0 ¯1 
+     ¯1 0  0 
+      1 0  0 
+
+      ⍝ create the divisor
+      ⍝
+      &quot;B:&quot; B←⌹.poly_scan &quot;x - y&quot;
+ B:   0 ¯1 
+      1  0 
+
+      ⍝ create the monomial orders for A and B
+      ⍝
+      ORDER_A←-⎕IO-(⍴A)⍴⍳×/⍴A
+      ORDER_B←-⎕IO-(⍴B)⍴⍳×/⍴B
+
+      ⍝ append the orders to their polynomial
+      ⍝
+      ARG_A ← (2,⍴A)⍴(,A),,ORDER_A
+      ARG_B ← (2,⍴B)⍴(,B),,ORDER_B
+
+      ⍝ call ⌹.poly_divideN and poly_divideNO
+      ⍝
+      (Q1 R1) ←     A ⌹.poly_divideN B
+      (Q2 R2) ← ARG_A ⌹.poly_divideNO ARG_B
+
+      ⍝ the result should be the same, because
+      ⍝ ORDER_A is what ⌹.poly_divideN uses.
+      ⍝ 
+      (Q1 R1) ≡ (Q2 R2)
+1
+</pre></div>
+
+
+
+
+
+
+<hr>
+</div>
+<div class="subsubsection" id="Scan-Polynomial-B">
+<div class="header">
+<p>
+ &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B"></span><h4 class="subsubsection">2.22.2.9 ⌹[11] B: Scan Polynomial B</h4>
 
 <p><b>⌹[11] B</b> aka. <b>⌹.poly_scan B</b> is the inverse function of <b>⌹[7] B</b>.
 It converts a string <b>B</b> (in the format produced by <b>⌹poly_print B</b> and
@@ -4085,10 +4183,34 @@ summed up in different orders, defines the same polynomial. Therefore:
 <p><b>P ≡ ⌹.poly_print ⌹.poly_scan P</b>
 </p>
 <p>holds only if the terms in <b>P</b> occur in the same order as produced
-by <b>⌹.poly_print</b>.  The order produced by <b>⌹.poly_print B</b> is the
-the reversed ravel order of B (i.e. <b>⌽,B</b> which runs fom the highest
-exponent of the first variable on the left to the constant term (if any)
-of the polynomial on the right.
+by <b>⌹.poly_print</b>.  The order in which <b>⌹.poly_print B</b> prints the terms
+of a polynimial <b>B</b> is what is known as the <b>lexicographic order</b>,
+which can, in this context, be defined as follows:
+</p>
+<p>A sequence of vectors is in lexicographic order (or: 
+<i>ordered lexicographically</i>), if every smaller item i<b>a</b> in the sequence
+comes before every larger item <b>b</b> in the sequence. Where <b>smaller</b>
+resp, <b>larger</b> is defined as follows:
+</p>
+<ul>
+<li> Let <b>a = a₀ a₁ ... aₙ</b>,
+</li><li> let <b>b = b₀ b₁ ... bₙ</b>,
+</li><li> let <b>∆ = ∆₀ ∆₁ ... ∆ₙ</b> with <b>∆ⱼ = bⱼ - aⱼ</b>, and
+</li><li> let <b>j</b> be the smallest <b>j</b> such that <b>∆ⱼ ≠ 0</b>.
+      That is: the first <b>j-1</b> items of <b>a</b> and <b>b</b> are equal)
+      and <b>j</b> is the first position at which vectors <b>a</b> and <b>b</b> differ.
+</li><li> Then:
+  <ul>
+<li> If  <b>∆ⱼ &gt; 0</b> then <b>a &lt;<sub>lex</sub> b</b> (i.e. <b>a</b> is smaller than <b>b</b>
+        and <b>b</b> is larger than <b>a</b>).
+  </li><li> Otherwise <b>∆ⱼ &lt; 0</b> and then <b>b &lt;<sub>lex</sub> a</b> (i.e. <b>a</b> is
+        larger than <b>b</b> and <b>b</b> is smaller than <b>a</b>).
+  </li></ul>
+</li></ul>
+
+<p>The lexicographic order is also defined for vectors of different lengths,
+but in this context all vectors compared have the same length (number of
+indeterminants).
 </p>
 <hr>
 </div>
@@ -4338,10 +4460,9 @@ Next: <a href="#Section-2_002e26" accesskey="n" rel="next">⎕DLX - Knuth&rsquo;
 </div>
 <span id="g_t_005b_003f_005dARG-_002d-Interpreter-command-line-arguments"></span><h3 class="section">2.25 ⎕ARG - Interpreter command line arguments</h3>
 
-<p>⎕ARG contains the command line arguments with which GNU APL was invoked.
+<p><b>⎕ARG</b> contains the command line arguments with which GNU APL was invoked.
 See <a href="#Section-2_002e1">APL Scripting</a>.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e26">

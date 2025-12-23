@@ -495,7 +495,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
       }
    else
       {
-        CERR << "Unsupprted CDR type " << vtype << endl;
+        CERR << "Unsupported CDR type " << vtype << endl;
         Assert(0 && "Bad/unsupported CDR type");
       }
 

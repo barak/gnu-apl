@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 21, 2025.  This manual briefly documents GNU APL, an
+December 23, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -3230,11 +3230,24 @@ polynomial B. That is, ⍴Remainder = ¯1+⍴B.
 ......................................................................
 
 The limitiation of A ⌹[10] B to handle only polynomials with one
-indeterminan is lifted with A ⌹[10].  However, some caution needs to be
-exercized, as described in the following.
+indeterminan is lifted with A ⌹[10] aka.  A ⌹.poly_divideN B. The suffix
+N shall indicate that the number off indefinites is > 1.  However, some
+caution needs to be exercized when using this function, as described in
+the following.
 
    A polynomial is the sum of zero or more terms.  The terms of a
 polynomial are commonly called monomials.
+
+   Tip: to list, for example, all possible monomials of a polymomial
+with three indeterminants x, y, and z and at most powers of 3:
+
+           ⍝ show all monomials of indeterminants x, y, z
+            ⍝ and max.powers 0, 1, and 2 (in lexicographic order)
+           ⍝
+           ⌹.poly_print 3 3 3⍴1
+     x²y²z² + x²y²z + x²y² + x²yz² + x²yz + x²y + x²z² + x²z + x² + xy²z² + xy²z +
+           xy² + xyz² + xyz + xy + xz² + xz + x + y²z² + y²z + y² + yz² + yz + y +
+           z² + z + 1
 
    In the set of all monomials an order, that is a relation < between
 any two elements of the set needs to be defined.  In the simple cases of
@@ -3254,7 +3267,7 @@ transitive), but also the following:
    The general problem with multivariate polynomials (i.e.  polynomials
 with more than one indeterminant, such as x² + y²) is then that the
 quotient and remainder of two multivariate polinomials is not unique but
-it depends on the order defined between its monomials.  The division of
+depend on the order defined between its monomials.  The division of
 integers and of polynomials with one indeterminant is based on their
 canonical order, which results in a unique quotient and a unique
 remainder in these cases.  In contrast there can be several different
@@ -3281,23 +3294,13 @@ different orders leads to different quotients and remainders.
    This ambiguity is resolved by always dividing a polynomial by its
 largest term, where the largest term is in turn defined by the order of
 the mononomials that was chosen.  IOW: a monomial order defines the
-which of the monomial terms of a polynomial is its largest term, and in
-every step of the division the largest term is being annihilated (by
-subtracting a multiple of the divisor from it).
+which of the monomials of a polynomial is its largest monomials, and in
+every iteration of the division the largest monomial is being
+annihilated (by subtracting a multiple of the divisor from it).
 
    Now, a commonly used order in the division of polynomials, and also
-the order used by A ⌹[10] B is the lexicographic order.  This order of
-monomials with indeterminants x, y, and z can be defined as follows:
-
-   • the constant coefficient of each monomial is ignored;
-   • the smallest element is 0,
-   • followed by monomials with only indeterminant z (which are ordered
-     by increasing powers of z,
-   • followed by monomials with only indeterminants y and z (which are
-     ordered by increasing powers of y,
-   • followed by monomials with only indeterminant x, y and z (which are
-     ordered by increasing powers of x,
-   • and so on.
+the order used by A ⌹[10] B, is the lexicographic order of the
+polynomials.  *Note Scan Polynomial: Scan Polynomial B.
 
    For example: x < x², xy < xyz, y < x⁸, and y⁸ < x in the
 lexicographic order.
@@ -3313,19 +3316,19 @@ was inspired by
            p = f                    ⍝ dividend                              (1c)
 
            while p ≠ 0:                                                     (2)
-                 let i be the smallest i such that lt(gᵢ) divides lt(p).    (3)
+                 let i be the smallest i such that LT(gᵢ) divides LT(p).    (3)
                  if such an i exists then:                                  (3a)
-                       qᵢ = qᵢ + lt(p) ÷ lt(gᵢ)                             (4a)
-                       p = p - gᵢ × lt(r) ÷ lt(gᵢ)                          (4b)
+                       qᵢ = qᵢ + LT(p) ÷ LT(gᵢ)                             (4a)
+                       p = p - gᵢ × LT(r) ÷ LT(gᵢ)                          (4b)
                  otherwise:                                                 (3b)
-                       r = r + lt(p)                                        (5a)
-                       p = p - lt(gᵢ)                                       (5b)
+                       r = r + LT(p)                                        (5a)
+                       p = p - LT(gᵢ)                                       (5b)
 
    The algorithm divides polynomial f by polynomial g = g₁ + g₂ + ...  +
 gₙ and yields a quotient q = q₁ + q₂ + ...  + qₘ and a remainder r = r₁
-+ r₂ + ...  + rₖ.  In every step the largest term in p is annihilated by
-"moving" it to either q (after dividing it by lt(gᵢ) if that is
-possible) or to r (if not).  Obviously:
++ r₂ + ...  + rₖ.  In every iteration the largest term in p is
+annihilated by "moving" it to either iq (after dividing it by LT(gᵢ) if
+that is possible) or else to r (if not).  Obviously:
 
    • The divisor g does not change at all,
    • p gets shorter and shorter in each iteration and therefore the
@@ -3342,7 +3345,83 @@ possible) or to r (if not).  Obviously:
      max.  power of, say, 3 but 4 indeterminants can have up to 4⁴ = 256
      momomials.
 
-2.22.2.8 ⌹[11] B: Scan Polynomial B
+2.22.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)
+....................................................................
+
+As explained above, different monomial orders of a polynomial can lead
+to different quotients and remainders when dividing them.  This iproblem
+is addressed by A ⌹[11] B aka.  A ⌹.poly_divideNO B. The suffix NO shall
+indicate that the number off indefinites is > 1, and that a user defined
+monomial order shall be used.
+
+   Let P be a polynimial.  An monomial order O for P is then a matrix
+with the following properties:
+
+   • O has the same shape as P: (⍴P) ≡ (⍴O).
+   • ↑O (the order value of the contant term of the polynomial) is 0
+
+   In addition, as already mentioned above, the order defined by O shall
+be consistent: if x^{⍺} < x^{β} then x^{γ}x^{⍺} < x^{γ}x^{β} for all γ
+in O. A ⌹.poly_divideNO B checks that ↑O = 0 but not the consistency of
+O. If the consistency condition is violated, then in the best case the
+results are incorrect, and in the worst case the division algorithm may
+not terminate.
+
+   For example, given a Polynomial P, the lexicographic order of P can
+be constrocted as follows:
+
+           ⍝ construct the lexicographical order of all possible monom in P
+           ⍝
+           ORDER←-⎕IO-(⍴P)⍴⍳×/⍴P
+
+   After an order O has been created for a polynomial P, both can be
+appended to create an argument for A ⌹.poly_divideNO B:
+
+           ⍝ append the desired monomial order O to a polynomial P.
+           ⍝
+           PO ← (2,⍴P)⍴(,P),,O
+
+   Putting the pieces together:
+
+           ⍝ create the dividend
+           ⍝
+           "A:" A←⌹.poly_scan "x³ - x² - xy² - 2x + y² + 4"
+      A:    4 0  1
+          ¯2 0 ¯1
+          ¯1 0  0
+           1 0  0
+
+           ⍝ create the divisor
+           ⍝
+           "B:" B←⌹.poly_scan "x - y"
+      B:   0 ¯1
+           1  0
+
+           ⍝ create the monomial orders for A and B
+           ⍝
+           ORDER_A←-⎕IO-(⍴A)⍴⍳×/⍴A
+           ORDER_B←-⎕IO-(⍴B)⍴⍳×/⍴B
+
+           ⍝ append the orders to their polynomial
+           ⍝
+           ARG_A ← (2,⍴A)⍴(,A),,ORDER_A
+           ARG_B ← (2,⍴B)⍴(,B),,ORDER_B
+
+           ⍝ call ⌹.poly_divideN and poly_divideNO
+           ⍝
+           (Q1 R1) ←     A ⌹.poly_divideN B
+           (Q2 R2) ← ARG_A ⌹.poly_divideNO ARG_B
+
+           ⍝ the result should be the same, because
+           ⍝ ORDER_A is what ⌹.poly_divideN uses.
+           ⍝
+           (Q1 R1) ≡ (Q2 R2)
+     1
+
+
+File: apl.info,  Node: Scan Polynomial B
+
+2.22.2.9 ⌹[11] B: Scan Polynomial B
 ...................................
 
 ⌹[11] B aka.  ⌹.poly_scan B is the inverse function of ⌹[7] B. It
@@ -3367,10 +3446,30 @@ Therefore:
    P ≡ ⌹.poly_print ⌹.poly_scan P
 
    holds only if the terms in P occur in the same order as produced by
-⌹.poly_print.  The order produced by ⌹.poly_print B is the the reversed
-ravel order of B (i.e.  ⌽,B which runs fom the highest exponent of the
-first variable on the left to the constant term (if any) of the
-polynomial on the right.
+⌹.poly_print.  The order in which ⌹.poly_print B prints the terms of a
+polynimial B is what is known as the lexicographic order, which can, in
+this context, be defined as follows:
+
+   A sequence of vectors is in lexicographic order (or: ordered
+lexicographically), if every smaller item ia in the sequence comes
+before every larger item b in the sequence.  Where smaller resp, larger
+is defined as follows:
+
+   • Let a = a₀ a₁ ...  aₙ,
+   • let b = b₀ b₁ ...  bₙ,
+   • let ∆ = ∆₀ ∆₁ ...  ∆ₙ with ∆ⱼ = bⱼ - aⱼ, and
+   • let j be the smallest j such that ∆ⱼ ≠ 0.  That is: the first j-1
+     items of a and b are equal) and j is the first position at which
+     vectors a and b differ.
+   • Then:
+        • If ∆ⱼ > 0 then a <_{lex} b (i.e.  a is smaller than b and b is
+          larger than a).
+        • Otherwise ∆ⱼ < 0 and then b <_{lex} a (i.e.  a is larger than
+          b and b is smaller than a).
+
+   The lexicographic order is also defined for vectors of different
+lengths, but in this context all vectors compared have the same length
+(number of indeterminants).
 
 
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
@@ -9223,51 +9322,52 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Section 2.23133508
-Node: Section 2.24139419
-Node: Section 2.25142791
-Node: Section 2.26143082
-Node: Section 2.27153935
-Node: Section 2.28154207
-Node: Section 2.29161260
-Node: Section 2.30163714
-Node: Section 2.31164383
-Node: Section 2.32166034
-Node: Section 2.33169958
-Node: Section 2.34184387
-Node: The Plot Data B185619
-Node: The Plot Attributes A188233
-Node: Plot Window Handling201768
-Node: Output File Format203099
-Node: GUI driver204322
-Node: Section 2.35207877
-Node: Section 2.36217312
-Node: Section 2.37218331
-Node: Section 2.38233566
-Node: Section 2.39244608
-Node: Section 2.40246792
-Node: Section 2.41272897
-Node: Section 2.42277437
-Node: Section 2.43298536
-Node: Section 2.44312549
-Node: Section 2.45315819
-Node: Chapter 3316334
-Node: Chapter 4318842
-Node: Chapter 5319983
-Node: Section 5.1321630
-Node: Section 5.2322950
-Node: Section 5.3323310
-Node: Section 5.4323552
-Node: Section 5.5324214
-Node: Section 5.6324692
-Node: Section 5.7325465
-Node: Section 5.8325891
-Node: Chapter 6326293
-Node: Section 6.1326712
-Node: Section 6.2327399
-Node: Chapter 7328230
-Node: Section 7.1328733
-Node: Section 7.2354046
+Node: Scan Polynomial B135360
+Node: Section 2.23137234
+Node: Section 2.24143145
+Node: Section 2.25146517
+Node: Section 2.26146808
+Node: Section 2.27157661
+Node: Section 2.28157933
+Node: Section 2.29164986
+Node: Section 2.30167440
+Node: Section 2.31168109
+Node: Section 2.32169760
+Node: Section 2.33173684
+Node: Section 2.34188113
+Node: The Plot Data B189345
+Node: The Plot Attributes A191959
+Node: Plot Window Handling205494
+Node: Output File Format206825
+Node: GUI driver208048
+Node: Section 2.35211603
+Node: Section 2.36221038
+Node: Section 2.37222057
+Node: Section 2.38237292
+Node: Section 2.39248334
+Node: Section 2.40250518
+Node: Section 2.41276623
+Node: Section 2.42281163
+Node: Section 2.43302262
+Node: Section 2.44316275
+Node: Section 2.45319545
+Node: Chapter 3320060
+Node: Chapter 4322568
+Node: Chapter 5323709
+Node: Section 5.1325356
+Node: Section 5.2326676
+Node: Section 5.3327036
+Node: Section 5.4327278
+Node: Section 5.5327940
+Node: Section 5.6328418
+Node: Section 5.7329191
+Node: Section 5.8329617
+Node: Chapter 6330019
+Node: Section 6.1330438
+Node: Section 6.2331125
+Node: Chapter 7331956
+Node: Section 7.1332459
+Node: Section 7.2357772
 
 End Tag Table
 

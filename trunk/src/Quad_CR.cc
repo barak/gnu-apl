@@ -563,7 +563,7 @@ UCS_string ind_var_level = indent;   ind_var_level << var_level;
       }
 
    text << value.nz_element_count()
-        << "⍴0   ⍝ L" << level << " zeros";                          PUSH_TEXT
+        << "⍴0   ⍝ L" << level << " zeroes";                         PUSH_TEXT
 
 size_t nested_count = 0;
 size_t simple_count = 0;

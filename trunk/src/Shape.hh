@@ -262,19 +262,6 @@ public:
    ///of length 1
    bool conforms_to(const Shape & other) const;
 
-   /// interpret \b this as the exponents of the indeterminants a polynomial;
-   /// return the maximum exponent. IOW: return the longest axis.
-   int poly_max() const;
-
-   /// interpret \b this as the exponents of the indeterminants a polynomial;
-   /// return the sum of the exponents.
-   int poly_sum() const;
-
-   /// interpret \b this as the exponents of the indeterminants a polynomial;
-   /// return \b true if \b this divides \b other. IOW; the exponents of
-   /// \b this polynmial do not exceed the exponents of \b other.
-   int poly_divides(const Shape & other) const;
-
 protected:
    /// the rank (number of valid shape items)
    sRank rho_rho;

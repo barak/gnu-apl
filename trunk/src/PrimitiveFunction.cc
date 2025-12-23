@@ -572,7 +572,7 @@ ShapeItem * weight_Z = ALLOCA(ShapeItem, rank_Z);
                    const APL_Integer qio = Workspace::get_IO();
                    MORE_ERROR() << "A⍉B: axis " << (qio + z)
                                 << " is missing in A; "
-                                   "A should contain all integers " << qio
+                                   "A should contain only integers " << qio
                                 << "..." << (qio + rank_Z) << ".";
                    DOMAIN_ERROR;
                  }

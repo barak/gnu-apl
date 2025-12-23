@@ -8,7 +8,7 @@ LENGTH ERROR+
       ⎕JSON ' 33 44 '
       ^
       )MORE
-⎕JSON B: there were extra token in B (tokenized: 2, but processed: 1).
+⎕JSON B: there were extra tokens in B (tokenized: 2, but processed: 1).
     The JSON string must be one serialized value.
 
       ⍝ missing array separator
