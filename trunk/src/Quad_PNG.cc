@@ -332,7 +332,7 @@ Value_P Z(shape_Z, LOC);
 #endif  // (not) PNG_LIBS
 }
 //-----------------------------------------------------------------------------
-#if PNG_LIB
+#if PNG_LIBS
 Token
 Quad_PNG::eval_B(Value_P B) const
 {
@@ -667,7 +667,7 @@ UTF8 * scanline = RGB;
 #endif   // PNG_LIBS
 }
 //-----------------------------------------------------------------------------
-#if PNG_LIB
+#if PNG_LIBS
 Token
 Quad_PNG::eval_AB(Value_P A, Value_P B) const
 {
