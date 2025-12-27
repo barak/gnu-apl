@@ -1799,6 +1799,7 @@ int line = 0;
             CERR << "Bad macro format in file " << filename
                  << " line " << line << endl;
        }
+   fclose(f);
 }
 //----------------------------------------------------------------------------
 void

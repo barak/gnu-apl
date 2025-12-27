@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 23, 2025.
+<p>December 27, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -200,10 +200,11 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-Matrix-Inverse" href="#Matrix-Inverse">2.22.2.3 Matrix Inverse</a></li>
         <li><a id="toc-_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B">2.22.2.4 ⌹[7] B: Print Polynomial B</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B">2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B</a></li>
-        <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028univariate_0029" href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028univariate_0029">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029">2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
         <li><a id="toc-A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029" href="#A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029">2.22.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</a></li>
         <li><a id="toc-_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B" href="#Scan-Polynomial-B">2.22.2.9 ⌹[11] B: Scan Polynomial B</a></li>
+        <li><a id="toc-A-_005b_003f_005d_005b20_005d-B_003a-Integral-B" href="#Integral-B">2.22.2.10 A ⌹[20] B: Integral B</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e23">2.23 Dyadic ⎕CR</a></li>
@@ -3656,10 +3657,11 @@ in the various <b>⌹</b> functions.
 <li><a href="#Matrix-Inverse" accesskey="3">Matrix Inverse</a></li>
 <li><a href="#g_t_005b_003f_005d_005b7_005d-B_003a-Print-Polynomial-B" accesskey="4">⌹[7] B: Print Polynomial B</a></li>
 <li><a href="#A-_005b_003f_005d_005b8_005d-B_003a-Multiply-Polynomials-A-and-B" accesskey="5">A ⌹[8] B: Multiply Polynomials A and B</a></li>
-<li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B</a></li>
+<li><a href="#A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028univariate_0029" accesskey="6">A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)</a></li>
 <li><a href="#A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029" accesskey="7">A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</a></li>
 <li><a href="#A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029" accesskey="8">A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</a></li>
 <li><a href="#Scan-Polynomial-B" accesskey="9">⌹[11] B: Scan Polynomial B</a></li>
+<li><a href="#Integral-B">A ⌹[20] B: Integral B</a></li>
 </ul>
 <div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
 <h4 class="subsubsection">2.22.2.1 A⌹B and ⌹B</h4>
@@ -3912,8 +3914,8 @@ the product of two polynomials. For example:
 </pre></div>
 
 </div>
-<div class="subsubsection" id="A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B">
-<h4 class="subsubsection">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B</h4>
+<div class="subsubsection" id="A-_005b_003f_005d_005b9_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028univariate_0029">
+<h4 class="subsubsection">2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)</h4>
 
 <p>The scalar APL primitives <b>+</b> and <b>-</b> can be used for vectors
 and for polynomials alike. In contrast, the division of a polynomial
@@ -4146,17 +4148,12 @@ appended to create an argument for <b>A ⌹.poly_divideNO B</b>:
 1
 </pre></div>
 
-
-
-
-
-
 <hr>
 </div>
 <div class="subsubsection" id="Scan-Polynomial-B">
 <div class="header">
 <p>
- &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Integral-B" accesskey="n" rel="next">A ⌹[20] B: Integral B</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005b_003f_005d_005b11_005d-B_003a-Scan-Polynomial-B"></span><h4 class="subsubsection">2.22.2.9 ⌹[11] B: Scan Polynomial B</h4>
 
@@ -4214,6 +4211,68 @@ indeterminants).
 </p>
 <hr>
 </div>
+<div class="subsubsection" id="Integral-B">
+<div class="header">
+<p>
+Previous: <a href="#Scan-Polynomial-B" accesskey="p" rel="prev">⌹[11] B: Scan Polynomial B</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="A-_005b_003f_005d_005b20_005d-B_003a-Integral-B"></span><h4 class="subsubsection">2.22.2.10 A ⌹[20] B: Integral B</h4>
+
+<p>Function <b>A ⌹[20] B</b> aka. <b>A ⌹.integral B</b> computes the integral of
+expression <b>B</b>. For example:
+</p>
+<div class="example">
+<pre class="example">      ⍝ monadic (same as A=1)
+      ⍝
+      ⌹.integral &quot;sqrt(x³)&quot;
+2*x*sqrt(x³)/5
+
+      ⍝ A=1 : vector result
+      ⍝
+      1 ⌹.integral &quot;sqrt(x³)&quot;
+2*x*sqrt(x³)/5
+
+      ⍝ A=2 : matrix result
+      ⍝
+      2 ⌹.integral &quot;sqrt(x³)&quot;
+      _____
+2⋅x⋅╲╱  x³ 
+───────────
+     5     
+</pre></div>
+
+<p><b>NOTE</b>: The implementation of <b>⌹[20]</b> depends on <b>python</b>. It also
+depends on the python package <b>sympy</b> which does the actual computation
+of the integral. Normally the GNU APL configure script determines which
+optional libraries for GNU APL are present and compiles FGNU APL accordingly.
+In the python case this is not possible because python and its packages
+can be installed globally (by a privilreged user such as <b>root</b>) or by
+a unprivilreged user (e.g. below her home directory). It could therefore
+happen that e.g. python is available for the user that installs GNU APL, 
+but not for a user that uses the installed GNU APL. The GNU APL
+<b>./configure</b> has no way to detect such a situation. For this reason
+GNU APL checks at runtime (i.e. when ⌹.integral is used) if python and
+<b>sympy</b>  are installed (and raises a <b>DOMAIN ERROR</b> if not).
+</p>
+<p>Now to the arguments of <b>⌹[20]</b>. The right argument <b>B</b> is a string
+with the expression for which the integral shall be computed. The syntax
+of <b>B</b> ia pretty much defined by <b>sympy</b>.
+</p>
+<p>The left argument <b>A</b> is a vector of options. Currently only one option
+is defined which defines the format of the result:
+</p>
+<ul>
+<li> : A=1 : the result is a string (see example above)
+</li><li> : A=2 : the result is a character matrix (see example above). The
+       matrix is primarily created by the sympy function <b>pretty()</b>
+       (which is unfortunately not formally specified). For this reason
+       is <b>A=2</b> somewhat experimental and may produce a garbled output in
+       some cases.
+</li></ul>
+
+
+<hr>
+</div>
 </div>
 </div>
 <div class="section" id="Section-2_002e23">
@@ -4223,12 +4282,12 @@ Next: <a href="#Section-2_002e24" accesskey="n" rel="next">Dyadic ⎕FX (Native 
 </div>
 <span id="Dyadic-_005b_003f_005dCR"></span><h3 class="section">2.23 Dyadic ⎕CR</h3>
 
-<p>The ⎕CR function has an optional left argument that selects one of several
-formatting styles and conversion functions in addition to the well-known
-monadic form.
+<p>The <b>⎕CR</b> function has now an optional left argument that selects one of
+several formatting styles and conversion functions in addition to the
+well-known monadic form.
 </p>
-<p>Calling ⎕CR monadically without an axis and with an empty right argument
-shows a list of all functions provided by ⎕CR:
+<p>Calling <b>⎕CR</b> monadically without an axis and with an empty right argument
+shows a list of all functions provided by <b>⎕CR</b>:
 </p>
 <div class="example">
 <pre class="example">      ⎕CR ''
@@ -4238,7 +4297,7 @@ shows a list of all functions provided by ⎕CR:
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
 vectors are frequently used arguments and results of ⎕FIO functions.
 </p>
-<p>Let Z←A ⎕CR B.
+<p>Let <b>Z←A ⎕CR B</b>.
 </p>
 <p>Then the left argument A of ⎕CR selects one of several subfunctions of ⎕CR:
 </p>

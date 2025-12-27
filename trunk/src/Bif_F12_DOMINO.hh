@@ -119,6 +119,9 @@ protected:
    static void run_script(const UTF8_string & script, const UTF8_string & args,
                           UCS_string_vector & result);
 
+   /// return the integral for B.
+   static Value_P integral(const Value * A, const Value & B);
+
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 

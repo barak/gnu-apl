@@ -2,6 +2,10 @@
 # NOTE: without 'no-dependencies' make target distclean won't work.
 # AUTOMAKE_OPTIONS = no-dependencies
 
+bin_SCRIPTS = integral.py
+integral.py:
+	touch integral.py
+
 EXTRA_DIRS =
 if ! apl_TARGET_ANDROID
 EXTRA_DIRS += APs emacs_mode sql workspaces
@@ -121,6 +125,7 @@ common_SOURCES += PrintBuffer.cc						PrintBuffer.hh
 common_SOURCES += 										PrintContext.hh
 common_SOURCES += Polynomial.cc							Polynomial.hh
 common_SOURCES += 										PrintOperator.hh
+common_SOURCES += PythonPipe.cc							PythonPipe.hh
 common_SOURCES += QR_factorization_GSL.cc               QR_factorization_GSL.hh
 common_SOURCES += QuadFunction.cc						QuadFunction.hh
 common_SOURCES += ProcessorID.cc						ProcessorID.hh

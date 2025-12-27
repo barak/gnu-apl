@@ -26,6 +26,7 @@
 #include "ComplexCell.hh"
 #include "LibPaths.hh"
 #include "Polynomial.hh"
+#include "PythonPipe.hh"
 #include "Tokenizer.hh"
 #include "Value.hh"
 #include "Workspace.hh"
@@ -55,6 +56,7 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def(10, poly_divideN   , "polynomial A ÷ polynomial B (multivariate)")
   domino_def(11, poly_scan      , "string B to polynomial"                    )
   domino_def(12, poly_divideNO  , "polynomial A ÷ polynomial B (with order)"  )
+  domino_def(20, integral       , "compute integral for B"                    )
 #undef domino_def
 };
 //----------------------------------------------------------------------------
@@ -189,6 +191,7 @@ double EPS = Workspace::get_CT();
 #endif
         else if (x0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(*B));
         else if (x0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(*B));
+        else if (x0 == 20)   return Token(TOK_APL_VALUE1, integral(0, *B));
       }
 
    if (algo == ALGO_BAD)   // none of the above
@@ -432,6 +435,7 @@ const APL_Integer X0 = X->get_sole_integer();
         case 10: return Token(TOK_APL_VALUE1, poly_quotient_NO(*A, *B, 0, 0));
         case 11: return Token(TOK_APL_VALUE1, scan_polynomial(*A, *B));
         case 12: return Token(TOK_APL_VALUE1, poly_quotient_N(*A, *B));
+        case 20: return Token(TOK_APL_VALUE1, integral(A.get(), *B));
       }
 
    MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
@@ -1660,6 +1664,96 @@ char buffer[BUFSIZE + 1];
    pclose(fp_python);
 }
 #endif
+//----------------------------------------------------------------------------
+Value_P
+Bif_F12_DOMINO::integral(const Value * A, const Value & B)
+{
+int printer = 1;
+   if (A)   // optional attributes
+      {
+        if (A->get_rank() > 1)        RANK_ERROR;
+        if (A->element_count() > 1)   LENGTH_ERROR;
+        printer = A->get_cravel(0).get_int_value();
+      }
+
+   // B shall be a character string with the expression to be integrated
+   //
+   if (!B.is_char_string())
+      {
+        if (B.get_rank() > 1)        RANK_ERROR;
+        DOMAIN_ERROR;
+      }
+
+const char * script = "integral.py";
+PythonPipe p(script);
+   {
+     // a successfully started python script should print the following
+     // messages when started.
+     //
+     const char * start_up[] = { "<→WRAPPER-STARTED→>.",
+                                 "<→MODULES-IMPORTED→>."
+                               };
+     loop(m, sizeof(start_up) / sizeof(const char *))
+         {
+           const char * expected = start_up[m];
+           const UCS_string message = p.read();
+           if (message != expected)
+              {
+                MORE_ERROR() << "Error starting python script '" << script<< "'.\n"
+                                "Expected '" << expected <<
+                                "' but got '" << message << "'.";
+                DOMAIN_ERROR;
+              }
+         }
+   }
+
+   {
+     char cc[10];   SPRINTF(cc, "%d", printer);
+     p.write(cc);
+   }
+
+   UCS_string BB(B);
+   p.write(UCS_string(B));
+   const UTF8_string DONE_utf("<→DONE→>.");
+   const UCS_string DONE(DONE_utf);
+
+UCS_string_vector result;
+   for (;;)
+       {
+         const UTF8_string response_utf(p.read());
+         const UCS_string response(response_utf);
+
+         // the "normal" end of the python script is <!DONE!>. followed by
+         // the script name.
+         if (response.starts_with(DONE))   break;
+
+         result.push_back(response);
+
+         // the "abnormal" end of the python script, e.g. when a stack traces id
+         // printed, is <!END-OF-FILE!>. This message comes from PythonPipe::read()
+         // and NOT from the oython script.
+         //
+         if (response == "<!END-OF-FILE!>.")   break;
+       }
+
+const ShapeItem rows = result.size();
+ShapeItem cols = 0;
+   loop(z, rows)
+      {
+        cols = max(size_t(cols), result[z].size());
+      }
+
+Value_P Z(rows, cols, LOC);
+   loop(r, rows)
+      {
+        const ShapeItem len = result[r].size();
+        loop(c, len)         Z->next_ravel_Char(result[r][c]);
+        loop(c, cols - len)   Z->next_ravel_Char(UNI_SPACE);
+      }
+
+   Z->check_value(LOC);
+   return Z;
+}
 //----------------------------------------------------------------------------
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const Value & B)

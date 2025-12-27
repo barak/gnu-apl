@@ -152,6 +152,13 @@ protected:
         OOT on_off_toggle;   ///< turn lid On, Off, or Toggle it
       };
 
+   /// return True if \b cmd starts with \b prefix
+   static bool is_command(const UCS_string & cmd, const char * prefix)
+      {
+        const size_t prefix_len = strlen(prefix);
+        return cmd.starts_iwith(prefix) &&
+               (prefix_len == cmd.size() || cmd[prefix_len] <= UNI_SPACE);
+      }
    /// )BOXING: select output format for APL values
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 

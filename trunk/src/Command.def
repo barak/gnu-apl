@@ -43,7 +43,7 @@ cmd_def(")DUMP"     ,DUMP(out, args, false, true) ,"[[lib] wsname]"          ,oL
 cmd_def(")ERASE"    ,ERASE(out, args)             ,"symbol ..."              ,SYMBOLS    )
 cmd_def(")FNS"      ,FNS(out, arg)                ,"[from-to]"               ,oFROM_oTO  )
 cmd_def(")HELP"     ,HELP(out, arg)               ,"[primitive]"             ,PRIMITIVE  )
-cmd_def(")HIST"     ,HISTORY(out, arg)            ,"[CLEAR]"                 ,oCLEAR     )
+cmd_def(")HISTORY"  ,HISTORY(out, arg)            ,"[CLEAR]"                 ,oCLEAR     )
 cmd_def(")HOST"     ,HOST(out, arg)               ,"command ..."             ,HOSTCMD    )
 cmd_def(")IN"       ,IN(out, args, false)         ,"filename [object...]"    ,FILENAME   )
 cmd_def(")LIBS"     ,LIBS(out, args)              ,"[[lib] path]"            ,oLIB_oPATH )

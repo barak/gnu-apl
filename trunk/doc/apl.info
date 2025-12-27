@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 23, 2025.  This manual briefly documents GNU APL, an
+December 27, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -3208,8 +3208,8 @@ the product of two polynomials.  For example:
            "PROD:" (⌹.poly_print PROD ← A ⌹.poly_multiply B)
       PROD: x² - y²
 
-2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B
-......................................................
+2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)
+...................................................................
 
 The scalar APL primitives + and - can be used for vectors and for
 polynomials alike.  In contrast, the division of a polynomial A by a
@@ -3419,7 +3419,7 @@ appended to create an argument for A ⌹.poly_divideNO B:
      1
 
 
-File: apl.info,  Node: Scan Polynomial B
+File: apl.info,  Node: Scan Polynomial B,  Next: Integral B
 
 2.22.2.9 ⌹[11] B: Scan Polynomial B
 ...................................
@@ -3472,12 +3472,66 @@ lengths, but in this context all vectors compared have the same length
 (number of indeterminants).
 
 
+File: apl.info,  Node: Integral B,  Prev: Scan Polynomial B
+
+2.22.2.10 A ⌹[20] B: Integral B
+...............................
+
+Function A ⌹[20] B aka.  A ⌹.integral B computes the integral of
+expression B. For example:
+
+           ⍝ monadic (same as A=1)
+           ⍝
+           ⌹.integral "sqrt(x³)"
+     2*x*sqrt(x³)/5
+
+           ⍝ A=1 : vector result
+           ⍝
+           1 ⌹.integral "sqrt(x³)"
+     2*x*sqrt(x³)/5
+
+           ⍝ A=2 : matrix result
+           ⍝
+           2 ⌹.integral "sqrt(x³)"
+           _____
+     2⋅x⋅╲╱  x³
+     ───────────
+          5
+
+   NOTE: The implementation of ⌹[20] depends on python.  It also depends
+on the python package sympy which does the actual computation of the
+integral.  Normally the GNU APL configure script determines which
+optional libraries for GNU APL are present and compiles FGNU APL
+accordingly.  In the python case this is not possible because python and
+its packages can be installed globally (by a privilreged user such as
+root) or by a unprivilreged user (e.g.  below her home directory).  It
+could therefore happen that e.g.  python is available for the user that
+installs GNU APL, but not for a user that uses the installed GNU APL.
+The GNU APL ./configure has no way to detect such a situation.  For this
+reason GNU APL checks at runtime (i.e.  when ⌹.integral is used) if
+python and sympy are installed (and raises a DOMAIN ERROR if not).
+
+   Now to the arguments of ⌹[20].  The right argument B is a string with
+the expression for which the integral shall be computed.  The syntax of
+B ia pretty much defined by sympy.
+
+   The left argument A is a vector of options.  Currently only one
+option is defined which defines the format of the result:
+
+   • : A=1 : the result is a string (see example above)
+   • : A=2 : the result is a character matrix (see example above).  The
+     matrix is primarily created by the sympy function pretty() (which
+     is unfortunately not formally specified).  For this reason is A=2
+     somewhat experimental and may produce a garbled output in some
+     cases.
+
+
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
 
 2.23 Dyadic ⎕CR
 ===============
 
-The ⎕CR function has an optional left argument that selects one of
+The ⎕CR function has now an optional left argument that selects one of
 several formatting styles and conversion functions in addition to the
 well-known monadic form.
 
@@ -9322,52 +9376,53 @@ Node: Section 2.1998071
 Node: Section 2.20105016
 Node: Section 2.21109452
 Node: Section 2.22110955
-Node: Scan Polynomial B135360
-Node: Section 2.23137234
-Node: Section 2.24143145
-Node: Section 2.25146517
-Node: Section 2.26146808
-Node: Section 2.27157661
-Node: Section 2.28157933
-Node: Section 2.29164986
-Node: Section 2.30167440
-Node: Section 2.31168109
-Node: Section 2.32169760
-Node: Section 2.33173684
-Node: Section 2.34188113
-Node: The Plot Data B189345
-Node: The Plot Attributes A191959
-Node: Plot Window Handling205494
-Node: Output File Format206825
-Node: GUI driver208048
-Node: Section 2.35211603
-Node: Section 2.36221038
-Node: Section 2.37222057
-Node: Section 2.38237292
-Node: Section 2.39248334
-Node: Section 2.40250518
-Node: Section 2.41276623
-Node: Section 2.42281163
-Node: Section 2.43302262
-Node: Section 2.44316275
-Node: Section 2.45319545
-Node: Chapter 3320060
-Node: Chapter 4322568
-Node: Chapter 5323709
-Node: Section 5.1325356
-Node: Section 5.2326676
-Node: Section 5.3327036
-Node: Section 5.4327278
-Node: Section 5.5327940
-Node: Section 5.6328418
-Node: Section 5.7329191
-Node: Section 5.8329617
-Node: Chapter 6330019
-Node: Section 6.1330438
-Node: Section 6.2331125
-Node: Chapter 7331956
-Node: Section 7.1332459
-Node: Section 7.2357772
+Node: Scan Polynomial B135386
+Node: Integral B137279
+Node: Section 2.23139414
+Node: Section 2.24145329
+Node: Section 2.25148701
+Node: Section 2.26148992
+Node: Section 2.27159845
+Node: Section 2.28160117
+Node: Section 2.29167170
+Node: Section 2.30169624
+Node: Section 2.31170293
+Node: Section 2.32171944
+Node: Section 2.33175868
+Node: Section 2.34190297
+Node: The Plot Data B191529
+Node: The Plot Attributes A194143
+Node: Plot Window Handling207678
+Node: Output File Format209009
+Node: GUI driver210232
+Node: Section 2.35213787
+Node: Section 2.36223222
+Node: Section 2.37224241
+Node: Section 2.38239476
+Node: Section 2.39250518
+Node: Section 2.40252702
+Node: Section 2.41278807
+Node: Section 2.42283347
+Node: Section 2.43304446
+Node: Section 2.44318459
+Node: Section 2.45321729
+Node: Chapter 3322244
+Node: Chapter 4324752
+Node: Chapter 5325893
+Node: Section 5.1327540
+Node: Section 5.2328860
+Node: Section 5.3329220
+Node: Section 5.4329462
+Node: Section 5.5330124
+Node: Section 5.6330602
+Node: Section 5.7331375
+Node: Section 5.8331801
+Node: Chapter 6332203
+Node: Section 6.1332622
+Node: Section 6.2333309
+Node: Chapter 7334140
+Node: Section 7.1334643
+Node: Section 7.2359956
 
 End Tag Table
 

@@ -2342,16 +2342,16 @@ int
 Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
 int spair[2];
-   if (socketpair(AF_UNIX, SOCK_DGRAM, 0, spair))
+   if (socketpair(AF_UNIX, SOCK_STREAM, 0, spair))
       {
-        MORE_ERROR() << "socketpair() failed: " << strerror(errno);
+        MORE_ERROR() << "⎕FIO[49]: socketpair() failed: " << strerror(errno);
         DOMAIN_ERROR;
       }
 
 const pid_t child = fork();
    if (child == -1)
       {
-        MORE_ERROR() << "fork() failed: " << strerror(errno);
+        MORE_ERROR() << "⎕FIO[49]: fork() failed: " << strerror(errno);
         DOMAIN_ERROR;
       }
 

@@ -219,7 +219,7 @@ UCS_string_vector args = split_arg(arg);
 
    // clear the )MORE info, unless the command itself is )MORE
    //
-   if (!cmd.starts_iwith(")MORE"))   // command is not )MORE.
+   if (!is_command(cmd, ")MORE"))   // command is not )MORE.
       {
         // clear )MORE info unless cmd itself is )MORE
         //
@@ -227,7 +227,7 @@ UCS_string_vector args = split_arg(arg);
       }
 
 #define cmd_def(cmd_str, cmd_XXX, garg, _hint)                            \
-   if (cmd.starts_iwith(cmd_str))                                         \
+   if (is_command(cmd, cmd_str))                                         \
       { if (check_params(out, cmd_str, args.size(), garg))   return true; \
         cmd_ ## cmd_XXX; return false; }
 #include "Command.def"
@@ -236,7 +236,8 @@ UCS_string_vector args = split_arg(arg);
    //
    loop(u, Workspace::get_user_commands().size())
        {
-         if (cmd.starts_iwith(Workspace::get_user_commands()[u].prefix))
+         const UTF8_string ucmd(Workspace::get_user_commands()[u].prefix);
+         if (is_command(cmd, ucmd.c_str()))
             {
               do_USERCMD(out, line, orig_line, cmd, args, u);
               return true;

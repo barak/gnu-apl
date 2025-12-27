@@ -3408,7 +3408,7 @@ the product of two polynomials. For example:
 @end example
 
 @c ----------------------------------------------------------------------------
-@subsubsection A ⌹[9] B: Divide Polynomial A by Polynomial B
+@subsubsection A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)
 
 The scalar APL primitives @b{+} and @b{-} can be used for vectors
 and for polynomials alike. In contrast, the division of a polynomial
@@ -3639,11 +3639,6 @@ Putting the pieces together:
 1
 @end example
 
-
-
-
-
-
 @c ----------------------------------------------------------------------------
 @node    Scan Polynomial B
 @subsubsection ⌹[11] B: Scan Polynomial B
@@ -3701,15 +3696,72 @@ but in this context all vectors compared have the same length (number of
 indeterminants).
 
 @c ----------------------------------------------------------------------------
+@node    Integral B
+@subsubsection A ⌹[20] B: Integral B
+
+Function @b{A ⌹[20] B} aka. @b{A ⌹.integral B} computes the integral of
+expression @b{B}. For example:
+
+@example
+      ⍝ monadic (same as A=1)
+      ⍝
+      ⌹.integral "sqrt(x³)"
+2*x*sqrt(x³)/5
+
+      ⍝ A=1 : vector result
+      ⍝
+      1 ⌹.integral "sqrt(x³)"
+2*x*sqrt(x³)/5
+
+      ⍝ A=2 : matrix result
+      ⍝
+      2 ⌹.integral "sqrt(x³)"
+      _____
+2⋅x⋅╲╱  x³ 
+───────────
+     5     
+@end example
+
+@b{NOTE}: The implementation of @b{⌹[20]} depends on @b{python}. It also
+depends on the python package @b{sympy} which does the actual computation
+of the integral. Normally the GNU APL configure script determines which
+optional libraries for GNU APL are present and compiles FGNU APL accordingly.
+In the python case this is not possible because python and its packages
+can be installed globally (by a privilreged user such as @b{root}) or by
+a unprivilreged user (e.g. below her home directory). It could therefore
+happen that e.g. python is available for the user that installs GNU APL, 
+but not for a user that uses the installed GNU APL. The GNU APL
+@b{./configure} has no way to detect such a situation. For this reason
+GNU APL checks at runtime (i.e. when ⌹.integral is used) if python and
+@b{sympy}  are installed (and raises a @b{DOMAIN ERROR} if not).
+
+Now to the arguments of @b{⌹[20]}. The right argument @b{B} is a string
+with the expression for which the integral shall be computed. The syntax
+of @b{B} ia pretty much defined by @b{sympy}.
+
+The left argument @b{A} is a vector of options. Currently only one option
+is defined which defines the format of the result:
+
+@itemize
+@item: A=1 : the result is a string (see example above)
+@item: A=2 : the result is a character matrix (see example above). The
+       matrix is primarily created by the sympy function @b{pretty()}
+       (which is unfortunately not formally specified). For this reason
+       is @b{A=2} somewhat experimental and may produce a garbled output in
+       some cases.
+@end itemize
+
+
+@c ----------------------------------------------------------------------------
 @node    Section 2.23
 @section Dyadic ⎕CR
 
-The ⎕CR function has an optional left argument that selects one of several
-formatting styles and conversion functions in addition to the well-known
-monadic form.
+The @b{⎕CR} function has now an optional left argument that selects one of
+several formatting styles and conversion functions in addition to the
+well-known monadic form.
 
-Calling ⎕CR monadically without an axis and with an empty right argument
-shows a list of all functions provided by ⎕CR:
+Calling @b{⎕CR} monadically without an axis and with an empty right argument
+shows a list of all functions provided by @b{⎕CR}:
 
 @example
       ⎕CR ''
@@ -3719,7 +3771,7 @@ Say a @b{byte vector} is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
 vectors are frequently used arguments and results of ⎕FIO functions.
 
-Let Z←A ⎕CR B.
+Let @b{Z←A ⎕CR B}.
 
 Then the left argument A of ⎕CR selects one of several subfunctions of ⎕CR:
 

@@ -295,6 +295,36 @@ public:
    void prepend(Unicode uni)
       { insert(0, uni); }
 
+   /// return true if \b this and \b other are equal (same length and same
+   /// characters).
+   bool operator ==(const UCS_string & other) const
+      { return compare(other) == COMP_EQ; }
+
+   /// return false if \b this and \b other are equal (same length and same
+   /// characters).
+   bool operator !=(const UCS_string & other) const
+      { return compare(other) != COMP_EQ; }
+
+   /// return true if \b this and \b UCS_string(other) are equal (same
+   /// length and same characters).
+   bool operator ==(const UTF8_string & other) const
+      { return compare(UCS_string(other)) == COMP_EQ; }
+
+   /// return false if \b this and \b UCS_string(other) are equal (same
+   /// length and same characters).
+   bool operator !=(const UTF8_string & other) const
+      { return compare(UCS_string(other)) != COMP_EQ; }
+
+   /// return true if \b this and \b UTF8__string(other) are equal (same
+   /// length and same characters).
+   bool operator ==(const char * other) const
+      { return compare(UTF8_string(other)) == COMP_EQ; }
+
+   /// return false if \b this and \b UTF8__string(other) are equal (same
+   /// length and same characters).
+   bool operator !=(const char * other) const
+      { return compare(UTF8_string(other)) != COMP_EQ; }
+
    /// return \b this string and \b other concatenated
    UCS_string operator +(const UCS_string & other) const
       { UCS_string ret(*this);   ret.append(other);   return ret; }
