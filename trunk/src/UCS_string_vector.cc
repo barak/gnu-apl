@@ -54,7 +54,8 @@ const ShapeItem name_len = val.get_cols();
                      }
                   else if (uni == UNI_ALPHA  || uni == UNI_ALPHA_UNDERBAR ||
                            uni == UNI_OMEGA  || uni == UNI_OMEGA_UNDERBAR ||
-                           uni == UNI_LAMBDA || uni == UNI_CHI)
+                           uni == UNI_LAMBDA || uni == UNI_CHI            ||
+                           uni == UNI_QUOTE_Quad)
                      {
                        name.append(uni);
                        continue;

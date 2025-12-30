@@ -49,7 +49,7 @@ This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. "Programming Language APL, Extended".
 
 This manual for GNU APL can be distributed under the terms of the
-GNU Free Documentation License, *Note Chapter 7.
+GNU Free Documentation License, *Note Chapter 8.
 
 This manual does NOT describe APL itself; there exist a number of good books
 and texts about APL. We would like to refer the reader to the following:
@@ -70,9 +70,10 @@ therefore it must be expanded with e.g. @b{gunzip} before it can be read.
 * Chapter 2::    Non-standard GNU APL Features
 * Chapter 3::    Limitations and Missing Features
 * Chapter 4::    Internationalization
-* Chapter 5::    Project Structure
-* Chapter 6::    Libraries Contributed by GNU APL Users
-* Chapter 7::    Licenses for GNU APL and this Manual
+* Chapter 5::    Vector Notation
+* Chapter 6::    Project Structure
+* Chapter 7::    Libraries Contributed by GNU APL Users
+* Chapter 8::    Licenses for this GNU APL Manual and for GNU APL
 @end menu
 
 @c ============================================================================
@@ -3722,35 +3723,46 @@ expression @b{B}. For example:
      5     
 @end example
 
-@b{NOTE}: The implementation of @b{⌹[20]} depends on @b{python}. It also
+@b{NOTE}: The implementation of @b{⌹.integral} depends on @b{python}. It also
 depends on the python package @b{sympy} which does the actual computation
-of the integral. Normally the GNU APL configure script determines which
-optional libraries for GNU APL are present and compiles FGNU APL accordingly.
+of the integral. Normally the GNU APL @b{./configure} script determines which
+optional libraries for GNU APL are present and compiles GNU APL accordingly.
 In the python case this is not possible because python and its packages
 can be installed globally (by a privilreged user such as @b{root}) or by
 a unprivilreged user (e.g. below her home directory). It could therefore
 happen that e.g. python is available for the user that installs GNU APL, 
 but not for a user that uses the installed GNU APL. The GNU APL
 @b{./configure} has no way to detect such a situation. For this reason
-GNU APL checks at runtime (i.e. when ⌹.integral is used) if python and
+GNU APL checks at runtime (i.e. when @b{⌹.integral} is used) if python and
 @b{sympy}  are installed (and raises a @b{DOMAIN ERROR} if not).
 
-Now to the arguments of @b{⌹[20]}. The right argument @b{B} is a string
+Now to the arguments of @b{⌹.integral}. The right argument @b{B} is a string
 with the expression for which the integral shall be computed. The syntax
-of @b{B} ia pretty much defined by @b{sympy}.
+of @b{B} ia pretty much defined by @b{sympy}. A maybe noteworthy difference
+between strings understood by @b{⌹.integral} and strings understood by
+@b{sympy} is that powers in @b{sympy} cwhave to be written as e.g. @b{a**n},
+while @b{⌹.integral} also understands @b{aⁿ}.
 
 The left argument @b{A} is a vector of options. Currently only one option
 is defined which defines the format of the result:
 
 @itemize
-@item: A=1 : the result is a string (see example above)
-@item: A=2 : the result is a character matrix (see example above). The
-       matrix is primarily created by the sympy function @b{pretty()}
-       (which is unfortunately not formally specified). For this reason
-       is @b{A=2} somewhat experimental and may produce a garbled output in
-       some cases.
+@item @b{A[1]=1} : the result is a string (see example above)
+@item @b{A[1]=2} : the result is a character matrix (see example above). The
+      matrix is primarily created by the sympy function @b{pretty()}
+      (which is unfortunately not formally specified). For this reason
+      is @b{A[1]=2} somewhat experimental and may produce a garbled output in
+      some cases.
+@item @b{A[1]=3} : the result is a string in a simple to parse
+      format.
+@item @b{A[1]=4} : the result is a string in LATEX format.
+@item @b{A[1]=5} : the result is a character matrix in Math_ML format.
+@item @b{A[1]=6} : the result is a character matrix in Dot format.
 @end itemize
 
+@b{MathML} is an XML-based industry standard for mathematical expressions.
+
+@b{Dot} is a program for printing directed graphs.
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.23
@@ -3767,73 +3779,92 @@ shows a list of all functions provided by @b{⎕CR}:
       ⎕CR ''
 @end example
 
-Say a @b{byte vector} is an integer vector with numbers having a (signed or
-unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
-vectors are frequently used arguments and results of ⎕FIO functions.
+@b{Definition}: A @i{byte vector} is an integer (!) vector with numbers
+having a (signed or unsigned) 8-bit value (i.e. a value from -128 to 255
+inclusive). Such byte vectors are frequently used arguments and results
+of @b{⎕FIO} functions.
 
 Let @b{Z←A ⎕CR B}.
 
-Then the left argument A of ⎕CR selects one of several subfunctions of ⎕CR:
+Then the left argument @b{A} of @b{⎕CR} selects one of several subfunctions
+of @b{⎕CR}:
 
-A=0-4 or 7-9, or 29: various formatting styles (boxed, APL input/output, etc.).
-Just try them out.
+@itemize
+@item @b{A∈0 1 2 3 4 7 8 9 29}: various formatting styles (boxed, 
+      APL input/output, etc.).  Just try them out.
 
-A=5 or 6: convert byte vector B to a string of uppercase or lowercase
-hex digits respectively. Every byte in B becomes 2 characters in Z.
+@item @b{A∈5 6}: convert byte vector B to a string of uppercase or lowercase
+i     hex digits respectively. Every byte in @b{B} becomes 2 characters
+      in @b{Z}.
 
-A=10: convert variable named in B to an APL expression producing it.
+@item @b{A=10}: convert variable named in @b{B} to an APL expression
+      producing it.
 
-A=11: convert value B to byte vector Z in CDR ("Common Data Representation",
-an IBM standard) format (similar to 3 ⎕TF).
+@item @b{A=11}: convert value @b{B} to byte vector @b{Z} in CDR ("Common Data
+      Representation", an IBM standard) format (similar to @b{3 ⎕TF}).
 
-A=12: convert byte vector B in CDR format to value Z.
+@item @b{A=12}: convert byte vector @b{B} in CDR format to value @b{Z}.
 
-A=13: convert hex string B to byte vector Z.
+@item @b{A=13}: convert hex string @b{B} to byte vector @b{Z}.
 
 If a conversion has an inverse conversion (like 12 being the inverse of 11)
 then the inverse conversion can be expressed as the negative of the conversion
-number. For example, 12 ⎕CR B is the same as ¯11 ⎕CR B.
+number. For example, @b{12 ⎕CR B} is the same as @b{¯11 ⎕CR B}.
 
-A=14: conversion 11 followed by conversion 13 (Value to hex string in
-CDR format)
+@item @b{A=14}: conversion 11 followed by conversion 13 (Value to hex string
+      in CDR format)
 
-A=15: conversion 13 followed by conversion 12 (hex string in CDR format
-to Value)
+@item @b{A=15}: conversion 13 followed by conversion 12 (hex string in CDR
+      format to Value)
 
-A=16: encode byte vector B into Z (base64 encoding, RFC 4648)
+@item @b{A=16}: encode byte vector B into @b{Z} (base64 encoding, @b{RFC 4648})
 
-A=17: decode base64 vector B into byte vector Z (base64 encoding, RFC 4648)
+@item @b{A=17}: decode base64 vector @b{B} into byte vector @b{Z} (base64
+      encoding, @b{RFC 4648})
 
-A=18: convert text vector B into byte vector Z (UTF8 encoding, RFC 3629) 
+@item @b{A=18}: convert text vector @b{B} into byte vector @b{Z} (UTF8 encoding,
+      @b{RFC 3629}) 
 
-A=19: convert byte vector B into text vector Z (UTF8 encoding, RFC 3629)
+@item @b{A=19}: convert byte vector B into text vector @b{Z} (UTF8 encoding,
+      @b{RFC 3629})
 
-A=20-25: like 3,4,7-9 but using a formatting similar to NARS APL ⎕FMT
-(showing the axis lengths as numbers instead of → and ↓)
+@item @b{A=20-25}: like 3,4,i or 7-9 but using a formatting similar to
+      NARS APL @b{⎕FMT} (showing the axis lengths as numbers instead of
+      @b{→} and @b{↓})
 
-A=26: Z is the cell types of the ravel elements of B (2: character,
-16: integer, 32: real number, 64: complex number.
+@item @b{A=26}: @b{Z} is the cell types of the ravel elements of @b{B}, i.e.
+      @itemize
+      @item @b{2}: character,
+      @item @b{16}: integer,
+      @item @b{32}: real number,
+      @item @b{64}: complex number.
+@end itemize
 
-A=27: Z[I] is the primary data representation (for example the real part 
-of a complex number, or the numerator of a rational number) of B[I].
+@item @b{A=27}: Z[I] is the primary data representation (for example the
+      real part  of a complex number, or the numerator of a rational number)
+      of B[I].
 
-A=28: Z[I] is the additional data representation (for example the imaginary
-part of a complex number, or the denominator of a rational number) of B[I].
+@item @b{A=28}: Z[I] is the additional data representation (for example
+      the imaginary part of a complex number, or the denominator of a
+      rational number) of B[I].
 
-A=30: Z is B with all top-level elements conformed to a common rank and
-shape (as required by the ⍤ operator). This conversion is primarily used 
-internally by the GNU APL interpreter.
+@item @b{A=30}: @b{Z} is B with all top-level elements conformed to a common
+      rank and shape (as required by the @b{⍤} operator). This conversion is
+      primarily used  internally by the GNU APL interpreter.
 
-A=31 or A=32: These conversions are used internally by ⎕INP.
+@item @b{A∈31 32}: These conversions are used internally by @b{⎕INP}.
 
-A=33: convert tagged byte vector to a TLV (Tag/Length/Value) buffer. The TLV
-buffer can be sent over a byte stream (socket) and easily decoded at the other
-end. Say B = B[1], B[2], ..., B[n] such that B1 is an Integer (the tag) and
-B[j] is a character in the range 0-255 for j > 1. Let Z←33 ⎕CR B with
-Z = Z[1], Z[2], ... Z[m]. Then Z[1 2 3 4] is the 4 byte tag, Z[5 6 7 8]
-is the 4 byte data length (n-1) == (m - 8) and 1↓B == 8 ↓ Z. In other words,
-the first 4 bytes of Z are the tag in big endian byte order, the next 4 bytes
-are the length of B except the tag, and the rest of Z is B except the tag.
+@item @b{A=33}: convert tagged byte vector to a TLV (Tag/Length/Value)
+      buffer. The TLV buffer can be sent over a byte stream (socket) and
+      easily decoded at the other end. Say @b{B = B[1], B[2], ..., B[n]} such
+     that @b{B1} is an Integer (the tag) and @b{B[j]} is a character in the
+     range 0-255 for j > 1.
+     Let @b{Z←33 ⎕CR B} with @b{Z = Z[1], Z[2], ... Z[m]}. Then @b{Z[1 2 3 4]}
+     is the 4 byte tag, @b{Z[5 6 7 8]} is the 4 byte data length
+     (n-1) = (m - 8), and @b{1↓B == 8 ↓ Z}. In other words, the first 4 bytes
+     of @b{Z} are the tag in big endian byte order, the next 4 bytes are the
+     length of @b{B} except the tag, and the rest of @b{Z} is @b{B} except
+     the tag.
 
 Example:
 @example
@@ -3842,12 +3873,15 @@ Example:
 000000370000000556616C7565
 @end example
 
-A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and 34 ⎕CR
-is the transmission of a tagged byte vector over e.g a TCP socket:
+@item @b{A=34}: this is the inverse of @b{33 ⎕CR}. The intended use for
+@b{33 ⎕CR} and @b{34 ⎕CR} is the transmission of a tagged byte vector over
+e.g a TCP socket:
 
-  Sender                                          Receiver
-  ------                                          --------
-  T,Data →→→ 33 ⎕CR T,Data   →→→TCP connection→→→   34 ⎕CR T,Data →→→ T,Data
+@verbatim
+  Sender                                              Receiver
+  ──────                                              ────────
+  T,Data →→→ 33 ⎕CR T,Data   →→→ TCP connection →→→   34 ⎕CR T,Data →→→ T,Data
+@end verbatim
 
 Example:
 @example
@@ -3855,43 +3889,46 @@ Example:
 55 Value
 @end example
 
-The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
-receiver can be sent back-to-back over a TCP connection or similar in such
-a way that the receiver knows exactly after which byte a TLV ends (and possibly
-the next TLV, if any, starts). This is perfect for connections over which
-data is sent sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for
-encoding and decoding TLV byte buffers exchanged between GNU APL and
-processes that were forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+The TLVs constructed by @b{33 ⎕CR} by the sender and decoded with
+@b{34 ⎕CR} by the receiver can be sent back-to-back over a TCP connection
+or similar in such a way that the receiver knows exactly after which byte
+a TLV ends (and possibly the next TLV, if any, starts). This is perfect
+for connections over which data is sent sporadically. @b{33 ⎕CR} and
+@b{34 ⎕CR} are particularly useful for encoding and decoding TLV byte
+buffers exchanged between GNU APL and processes that were forked by
+GNU APL with @b{⎕FIO[57]} (aka. @b{fork()} and @b{execve()}).
 
-A=35: convert a string of lines (containing LF characters as line delimiters)
-to a nested vector of lines.
+@item @b{A=35}: convert a string of lines (containing LF characters as line
+      delimiters) to a nested vector of lines.
 
-A=36: the inverse of ⎕CR[35]. Convert a nested vector of lines to a string
-with lines terminated with LF characxters.
+@item @b{A=36}: the inverse of @b{⎕CR[35]}. Convert a nested vector of lines
+      to a string with lines terminated with LF characxters.
 
-A=37 Same as @b{⎕CR B} but without removing any indentation.
+@item @b{A=37}: Same as @b{⎕CR B} but without removing any indentation.
 
-A=38: Return an empty structured variable with (integer) capacity @b{Bi},
-or convert an N×2 matrix @b{B} to a structured variable.
+@item @b{A=38}: Return an empty structured variable with (integer)
+      capacity @b{Bi}, or convert an N×2 matrix @b{B} to a structured variable.
 
-A=39: convert a strucured variable @b{B} to an N×2 variable.
+@item @b{A=39}: convert a strucured variable @b{B} to an N×2 variable.
 
-A=40: pack a boolean variable Bi (experimental).
+@item @b{A=40}: pack a boolean variable Bi (experimental).
 
-A=41: unpack a boolean variable Bi (experimental).
+@item @b{A=41}: unpack a boolean variable Bi (experimental).
 
-A=42: tokenize the APL statement Bs.
+@item @b{A=42}: tokenize the APL statement Bs.
 
-A=43: parse the APL statement Bs.
+@item @b{A=43}: parse the APL statement Bs.
 
-A=44: decode the (integer) token tag B or the (nested) token B.
+@item @b{A=44}: decode the (integer) token tag B or the (nested) token B.
+@end itemize
 
-Most dyadic ⎕CR variants whose argument B is expected to be a byte vector throw:
+Most dyadic @b{⎕CR} variants whose argument @b{B} is expected to be a byte
+vector throw:
 
-@enumerate
+@itemize
 @item RANK ERROR if 1≠⍴⍴B
 @item DOMAIN ERROR if one of the B[j] is not a proper byte value
-@end enumerate
+@end itemize
 
 A proper byte value is either an integer in the range -128...255 inclusive,
 or a (Unicode) character with a code point between U+FF80 and U+FFFF
@@ -3901,6 +3938,9 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 
+@b{⎕CR} is a function group, therefore its subfunctions can be selected with
+a name. For example: monadic @b{⎕CR.hex_to_bytes} is the same as monadic
+@b{⎕CR[13]} or dyadic @b{13 ⎕CR}.
 
 @c ----------------------------------------------------------------------------
 @node    Section 2.24
@@ -8348,7 +8388,6 @@ Examples:
 
 @c ============================================================================
 @node Chapter 3
-
 @chapter Limitations and Missing Features
 
 GNU APL is an almost full implementation of the ISO standard 13751.
@@ -8432,7 +8471,409 @@ As far as xterm is concerned, the xterm command line options --u8, --lc, and
 
 @c ============================================================================
 @node Chapter 5
-@chapter Project Structure
+@chapter Vector Notation
+
+@menu
+* Section 5.1::   History
+* Section 5.2::   Standardization
+* Section 5.3::   Quotes from the lrm
+* Section 5.4::   Some APL2 Tests
+* Section 5.5::   Definitions
+* Section 5.6::   GNU APL Vector Notation
+@end menu
+
+This chapter describes details of the GNU APL vector notation. Unfortunately
+there exists misleading information concerning the GNU APL vector nontation
+on the public internet and the attempts of the author of this manual to have
+the misleading information corrected were not successful.
+
+@c ----------------------------------------------------------------------------
+@node Section 5.1
+@section History
+
+Vector Notation is as old as APL. The famous Book @i{APL \360: An interactive
+approach} by @b{Leonard Gilman} and @b{Allen J. Rose} introduces vector
+notation already on page 2, but without calling it vector notation.
+
+Quote:
+
+@example
+Or we can assign a string of numbers to a variable called X, and ask the
+computer to execute the command shown, + / X , with the response 17.1 :
+      X+-3 4 1.1 3 6
+      +/X
+17.1
+@end example
+
+The terms @i{vector notation} (used by IBM APL and by GNU APL) was
+apparently coined by @b{Kenneth Iverson} (@i{A Programming Lagnuage},
+p. 163) and the equivalent term @i{strand notation} is used by other
+APL vendors.
+
+
+@c ----------------------------------------------------------------------------
+@node Section 5.2
+@section Standardization
+
+The current ISO standard ISO/IEC 13751 @i{Programming Language APL, extended},
+in the following abbreviated as @b{iso},  does not formally define vector
+notation, but uses it all over the place in its examples.
+
+The IBM APL2 @i{Language Reference Manual}, in the following abbreviated as
+@b{lrm}, was the blueprint for GNU APL. The @b{lrm} describes vector notatation
+briefly. 
+
+
+@c ----------------------------------------------------------------------------
+@node Section 5.3
+@section Quotes from the lrm
+
+Different aspects of vector nortation are distributed over the @b{lrm}. To
+get a compressed view of the matter we quote the relevant pieces:
+
+@enumerate
+@item @b{lrm page 14}: @i{The juxtaposition of two or more arrays in an
+      expression results in a vector whose items are the arrays. Representing
+      a vector in this manner is called @b{vector notation}.}
+
+@item @b{lrm page 14}: @i{Characters in a vector consisting only of
+characters can be listed within one set of single quotation marks:
+      'FACE' ←→ ('F' 'A' 'C' 'E')}
+
+@item @b{lrm page 33}: @i{The hierarchy of binding strengths is listed
+      below in descending order.}
+@verbatim
+     Binding Strength            What Is Bound
+     ──────────────────────      ────────────────────────────────────
+     1. Brackets                 Brackets to what is on their left
+     2. Specification left       Left arrow to what is on its left
+     3. Right operand            Dyadic operator to its right operand
+     4. Vector                   Array to an array
+     5. Left operand             Operator to its left operand
+     6. Left argument            Function to its left argument
+     7. Right argument           Function to its right argument
+     8. Specification right      Left arrow to what is on its right
+     ════════════════════════════════════════════════════════════════
+@end verbatim
+    The binding strength 4. above is the one for vector notation. It defines
+    how the items of a vector notation are bound together (as opposed to being
+    bound to other tokens). For example: @b{1 2 3[2]} becomes @b{1 2 (3[2])}
+    because @b{[2]} binds stronger to @b{3} on its left than @b{3} binds to
+    @b{2} in its left (which then raises a @b{RANK ERROR} because @b{3} is
+    a scalar).
+@end enumerate
+
+
+@c ----------------------------------------------------------------------------
+@node Section 5.4
+@section Some APL2 Tests
+
+Before explaining the details of vector notation in GNU APL we would like
+to share the results of some tests performed with IBM APL2 (again the demo
+version for PCs).
+
+@subsection Test 1: Binding strength of []
+
+@example
+      ⍝ IBM APL2: Binding strength of []...
+
+      ⍝ Test 1a.
+      ⍝
+      1 2 3[2]
+RANK ERROR
+      1 2 3[2]
+          ^^
+
+      ⍝ Test 1b.
+      ⍝
+      'a' 'b' 'c'[2]
+RANK ERROR
+      'ab' 'c'[2]
+           ^  ^
+
+      ⍝ Test 1c.
+      ⍝
+      'abc'
+b
+@end example
+
+@b{Test 1a}: no surprise. @b{[]} has the strongest binding and raises a
+@b{RANK ERROR} when indexing the scalar @b{3}.
+
+@b{Test 1b}: no surprise. since it follows suit.
+
+@b{Test 1c}: no surprise for the binding strength. This test confirms
+the second quote on page 14 of the lrm.
+
+@subsection Test 1: Binding strength of the left operand
+
+For this test we create a defined function @b{SHOW_NC}, a monadic defined
+operator @b{OPER1}, and a dyadic defined operator @b{OPER2}:
+
+@example
+      ⍝ display the name class of B¯B
+      ⍝
+      ∇Z←SHOW_NC B¯B;N
+       N←8↑B,':'
+       →(¯1 0 1 2 3 4 = ⎕NC B¯B)/I U L V F O ◊ ++
+      I: →0, Z←(8↑B), ': Invalid Name'
+      U: →0, Z←(8↑B), ': Unused Name'
+      L: →0, Z←(8↑B), ': Label'
+      V: →0, Z←(8↑B), ': Value', ⍎B¯B
+      F: →0, Z←(8↑B), ': Function'
+      O: →0, Z←(8↑B), ': Operator'
+      ∇
+
+      ⍝ monadic operator
+      ⍝
+      ∇Z←A (LO OPER1) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'B'
+      ∇
+
+      ⍝ dyadic operator
+      ⍝
+      ∇Z←A (LO OPER2 RO) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'RO'
+       SHOW_NC 'B'
+      ∇
+@end example
+
+The somewhat strange looking argument name @b{B¯B} of @b{SHOW_NC} instead of
+the rather frequent @b{B} was chosen to avoid name conflicts between the
+right value argument of @b{SHOW_NC} and the right value argument the
+operators under test (like @b{OPER1} or @b{OPER2}). Then:
+
+@example
+      ⍝ Test 2a: binding of the left operand (literal LO)
+      ⍝
+      11 22 33 OPER1 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2b: binding of the left operand (parser LO)
+      ⍝
+      (UU VV WW)←11 22 33
+      UU VV WW OPER1 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2c. binding of the left operand (in parentheses)
+      ⍝
+      11 22 (33 OPER1) 1 2 3
+A       : 11
+LO      : Value  22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2d. binding of the right operand
+      ⍝
+      11 22 33 'lop' OPER1 'rop' 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33 lop
+OPER2   : Operator
+RO      : Value  rop
+B       : Value  1 2 3
+@end example
+
+The results are rather interesting. We will later on discuss a potential
+difference between vector notation at tokenization time and vector notation
+at execution time. The same outcome of tests @b{2a.} and @b{2b.} demonstrates
+that IBM APL2 handles both variants in the same fashion (supposedly because
+both cases are resolved at execution time).
+
+Test @b{2a.} proves that vector notation binds stronger than the left operand
+to its dyadic operator. Test @b{2c.} demonstrates how the binding strengths
+can be undermined with parentheses.
+
+Test @b{2d.} proves that the right operand binds stronger than vector notation.
+However, this case is interesting from an @b{iso}. Page 126 of @b{iso} gives
+the following example for the dyadic rank operator:
+
+@example
+      ⍝ example from ISO/IEC 13751 p.126
+      ⍝
+      0 1 2⌽∘0 1 'ABC'
+ABC
+BCA
+CAB
+@end example
+
+Comparing the results of Test @b{2d.} with GNU APL shows how @b{iso} believes
+their example should be parsed:
+
+@example
+      ⍝ Test 2e. (GNU APL):
+      ⍝
+      0 1 2(⌽⍤0 1) 'ABC'
+ABC
+BCA
+CAB
+
+      ⍝ Test 2f. (GNU APL):
+      ⍝ 
+      0 1 2(⌽⍤0) 1 'ABC'
+LENGTH ERROR
+      0 1 2(⌽⍤0 0 0)1 'ABC'
+      ^            ^
+@end example
+
+@b{NOTE}: It is not possible to run tests @b{2e.} and @b{2f.} in IBM APL2
+directly (because at least in the PC demo version of IBM APL2 the rank
+operator @b{⍤} is not implemented. However using our defined function
+@b{OPER2} above instead of @b{⍤} shows that IBM APL2 evaluates the ISO
+example as @b{0 1 2(⌽∘0) 1 'ABC'} (in accordance with @b{lrm}) and not
+as @b{0 1 2(⌽∘0 1) 'ABC'} as @b{iso} suggests.
+
+@b{Takeaways}: the tests above teach us the following:
+
+@itemize
+@item Vector notation differs between:
+      @itemize
+      @item The ISO standard for APL,
+      @item IBM APL2, and
+      @item APL implementation of other vendors (including GNU APL).
+      @end itemize
+@item It is therefore impossible to accomodate both the ISO standard and
+      IBM APL2 to 100% at the same time, but
+      @item GNU APL tries to be as close as possible to one of them,
+@item The issues highlited above can be easily avoided by always using
+      parentheses around operators and their operands (even though they
+      may appear to be redundant). These parentheses are the (only) key
+      to portable APL programs.
+@end itemize
+
+
+@c ----------------------------------------------------------------------------
+@node Section 5.5
+@section Definitions
+
+@b{Definition}: A @i{strand} consists of two (!) or more adjacent values in
+a defined function, or in a string being ⍎'ed, or on a line entered in
+immediate execution mode. Such values can be literals (like in @b{1 2 3}),
+but also values of variables or results of niladic functions. A strand is
+always a vector and we call the values in a strand the @i{items of the strand}.
+Strand items can be simple (i.e. numbers or single characters) or nested
+(strings or other strands). Strand items sre always (possibly nested)
+APL scalars.
+
+@b{Definition}: A @i{literal strand} is a strand whose items are only
+literals (including nested literals like in 1 2 (3 4) 5).
+
+@b{Definition}: An @i{extended literal strand} is a strand whose items are
+either literals (including nested literals) or iparticular simple primitive
+function with particular literal arguments.
+
+@b{Definition}: A @i{mixed strand} is a strand which is not a literal strand.
+
+@b{Definition}: A strand is @i{open} if more items can be appended to it.
+
+@b{Definition}: A strand is @i{closed} if it is not open.
+
+@b{Definition}: A strand is @i{nested} if at lease one of its items is nested.
+
+Examples:
+
+@example
+      1 2 3        ⍝ open literal strand
+
+      VAR←1 2 3
+      ∇Z←FOO
+       Z←1 2 3
+      ∇
+
+      1 VAR 3       ⍝ nested open mixed strand
+      1 FOO 3       ⍝ open mixed strand\
+
+      1 2 (3⍴4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+      1 2 (3/4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+
+      (1 2 3)       ⍝ closed literal strand
+      'abc'         ⍝ closed literal strand
+@end example
+
+
+@c ----------------------------------------------------------------------------
+@node Section 5.6
+@section GNU APL Vector Notation
+
+With the definitions from the previous section we can explain how GNU APL
+has implemented vector notation:
+
+1. GNU APL distinguishes between literal and mixed strands. literal strands
+   are combined into a single APL value at tokenization time. This is a
+   very effective optimization (which can be disabled at @b{./configure}
+   time). In contrast, mixed strands are created at prefix matching time, i.e.
+   when an APL expression is evaluated. The tokenizatio of APL expressions
+   happens only once, while prefix matching occurs every time when a
+   statement is being executed and therefore moving major parts of the strand
+   building from prefix matching time to tokenization time can bring
+   substantial performance benefits.
+
+2. The tokenization expands simple APL primitives with literal arguments and
+   short results into their literal equivalent. Currently the APL primitives
+   @b{N⍴B}, @b{N/B}, @b{N⌿B}, @b{,B}, @b{⍪B}, and @b{⊂B} are handled this way.
+
+3. The tokenization of literal strands has dedicated code for literal
+   arguments of the rank operator (@b{⍤}) to make make it working like described
+   in the ISO standard. This is, in contrast to defined operators, possible
+   because the ISO standard defines in very detail how its right operand
+   needs to look like and how deviations shall be handled (@b{DOMAIN ERROR},
+   @b{LENGTH ERROR} etc.
+
+4. The prefix matching of mixed strands builds the strand step-by-step
+   according to the following rules:
+
+@itemize
+@item two adjacent APL scalars @b{A} and @b{B} create a new open strand
+      (with two strand items). Each of the two scalars @b{A} or @b{B} can
+      be simple (like numbers or single characters) or nested (like strings
+      or closed strands).
+@item An APL scalar @b{A} adjacent to an open strand @b{B} preprends @b{A}
+      to @b{B}.  That is, @b{B←A, B}.
+@item An open strand @b{A} adjacent to an an APL scalar @b{B} appends @b{B} 
+      to @b{A}.  That is, @b{A←A, B}.
+@item the previous two rules prevent two adjacent open strands, because the
+      strand items of a potential open left strand @b{A} are prepended item
+      by item to an open right strand @b{B} (which prevents the creation of a
+      new open left strand while an open right strand exists,
+
+@item Like the normal APL evaluation, this procedure is preformed from the
+      right to the left.
+@item if an open strand hits a closing parenthesis then a new phrase matching
+      context is created in which the current procedure is abandoned until
+      the corresponding opening parentheses has been processed. The result
+      of the expression in parentheses is then taken as the next strand item
+      for the abandoned strand (if any).
+@item Any symbols encountered during this procedure are being resolved into
+      scalars (possibly enclosing them if they are not). Niladic functions are
+      called to obtain their result.
+@item Likewise, any literal strands that were created at tokenization time
+      are considered closed (which cause them to be enclosed when preprended
+      or appended to an open mixed strand).
+@item If a strand is open then any other token (functions, operators,
+      brackets, end-of-statement, etc.) closes it. The result is a single
+      value for the strand.
+@end itemize
+
+5. The operators @b{⍣} (power operator) and @b{⍤} (rank operator), whose
+   right operand can be identified by the rules given in @b{iso}) have
+   dedicated code that "unstrands" the right operand from a strand that
+   may have been mistakenly created in @b{3.} above.
+
+
+@c ============================================================================
+@node Chapter 6
+@chapter GNU APL Project Structure
 
 The top-level directory of the GNU APL project has a structure like this:
 
@@ -8472,17 +8913,17 @@ handful of README-XXX files that might be of interest when building GNU APL.
 The subdirectories are (in order of decreasing relevance):
 
 @menu
-* Section 5.1:: The subdirectory src
-* Section 5.2:: The subdirectory support-files
-* Section 5.3:: The subdirectory doc
-* Section 5.4:: The subdirectory HOWTOs
-* Section 5.5:: The subdirectories workspaces and wslib2 ... wslib5
-* Section 5.6:: The subdirectory m4
-* Section 5.7:: The subdirectories rpm, debian, and debian_tmp
-* Section 5.8:: The subdirectory tools
+* Section 6.1:: The subdirectory src
+* Section 6.2:: The subdirectory support-files
+* Section 6.3:: The subdirectory doc
+* Section 6.4:: The subdirectory HOWTOs
+* Section 6.5:: The subdirectories workspaces and wslib2 ... wslib5
+* Section 6.6:: The subdirectory m4
+* Section 6.7:: The subdirectories rpm, debian, and debian_tmp
+* Section 6.8:: The subdirectory tools
 @end menu
 
-@node Section 5.1
+@node Section 6.1
 @section The subdirectory src
 
 The subdirectory src contains all C++ source files that are needed to build
@@ -8510,20 +8951,20 @@ directory determines, which optional components shall be included in the build.
 GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases
 
-@node Section 5.2
+@node Section 6.2
 @section The subdirectory support-files
 
 The subdirectory support-file contains a number of configuration files that aim
 at making a standard keyboard produce APL characters. Details are explained in
 top-level file README-3-keyboard.
 
-@node Section 5.3
+@node Section 6.3
 @section The subdirectory doc
 
 The subdirectory doc is used to create @b{this} info file in different file
 formats (.info, .html).
 
-@node Section 5.4
+@node Section 6.4
 @section The subdirectory HOWTOs
 
 The subdirectory HOWTOs contains some documents that try to explain how some
@@ -8534,7 +8975,7 @@ in directory /usr/local/share/doc/apl by @b{make install} while the documents
 for GNU APL hackers (i.e. C++ programmers or trouble-shooters) are not
 installed by @b{make install}, but rather remain in the source tree.
 
-@node Section 5.5
+@node Section 6.5
 @section The subdirectories workspaces and wslib2 ... wslib5
 
 These directories (and their content) are, by default, copied to
@@ -8542,7 +8983,7 @@ These directories (and their content) are, by default, copied to
 others contain small workspaces or libraries for various purposes (mostly
 demonstrating the use of some non-standard APL features).
 
-@node Section 5.6
+@node Section 6.6
 @section The subdirectory m4
 
 The subdirectory m4 contains macros used by autoconf and automake. In most
@@ -8561,7 +9002,7 @@ Re-creating the ./configure script requires:
 @item running autoreconf
 @end itemize
 
-@node Section 5.7
+@node Section 6.7
 @section The subdirectories debian and debian_tmp
 
 These subdirectories are templates for building Debian
@@ -8569,7 +9010,7 @@ packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.
 
-@node Section 5.8
+@node Section 6.8
 @section The subdirectory tools
 
 GNU APL uses generated C++ code. The subdirectory tools contains the source
@@ -8578,7 +9019,7 @@ various purposes. These tools are typically used by GNU APL hackers and are
 therefore not installed by @b{make install}.
 
 @c ============================================================================
-@node Chapter 6
+@node Chapter 7
 @chapter Libraries Contributed by GNU APL Users
 
 Since the first release of GNU APL, a number of libraries, but also other
@@ -8586,11 +9027,11 @@ developments, have been made by users of GNU APL. Below are links to these
 contributions.
 
 @menu
-* Section 6.1::  The GNU APL Community Webpage
-* Section 6.2::  Core Libraries
+* Section 7.1::  The GNU APL Community Webpage
+* Section 7.2::  Core Libraries
 @end menu
 
-@node Section 6.1
+@node Section 7.1
 @section The GNU APL Community Webpage
 
 The GNU APL project maintains a web page that lists contributions made by
@@ -8607,7 +9048,7 @@ mean that your contribution was not considered worthwhile to be listed but
 more likely that it was overlooked. Just send an email to bug-apl@@gnu.org
 to fix that.
 
-@node Section 6.2
+@node Section 7.2
 @section Core Libraries
 
 There is a small number of libraries that are considered "core" APL because,
@@ -8631,21 +9072,21 @@ Component File System  (as required by ISO 13751)  by Blake McBride
 SQL
 
 @c ============================================================================
-@node Chapter 7
+@node Chapter 8
 @chapter Licenses for this GNU APL Manual and for GNU APL
 
 This manual for GNU APL is licensed under the GNU Free Documentation
-License, *Note Section 7.1:: below.
+License, *Note Section 8.1:: below.
 
 GNU APL itself is licensed under the GNU Public License version 3 or later
-(aka GPLv3+), *Note Section 7.2:: below.
+(aka GPLv3+), *Note Section 8.2:: below.
 
 @menu
-* Section 7.1::  The GNU Free Documentation License
-* Section 7.2::  The GNU General Public License
+* Section 8.1::  The GNU Free Documentation License
+* Section 8.2::  The GNU General Public License
 @end menu
 
-@node Section 7.1
+@node Section 8.1
 @section The GNU Free Documentation License
 
 @c The GNU Free Documentation License.
@@ -9147,7 +9588,7 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 
-@node Section 7.2
+@node Section 8.2
 @section The GNU GENERAL PUBLIC LICENSE
 
                     GNU GENERAL PUBLIC LICENSE

@@ -338,10 +338,10 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
    if (header.X())         header.X()->push();
 
    if (header.Z())         header.Z()->push();
-   header                        .A()->push_value(A);
+   /* ALWAYS */            header.A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
-   header                        .B()->push_value(B);
+   /* ALWAYS */            header.B()->push_value(B);
 
    header.eval_common();
 
@@ -1047,7 +1047,7 @@ UserFunction::optimize_label_vectors()
       → EXPR / L1, L2 ... Ln
       → EXPR / L1 L2 ... Ln
       → EXPR ⍴ L
-              ├── const B ──┤
+               ├── const B ──┤
 
       In these cases, the right argument of / or ⍴ is a constant, so we can
       resolve the label values of L or L1, ... Ln into a single APL value B.
@@ -1067,96 +1067,96 @@ UserFunction::optimize_label_vectors()
     */
 bool VOID_inserted = false;
    for (Function_PC pc = Function_PC(1); pc < body.ssize() - 3; ++pc)
-      {
-        vector<Function_PC> items_B;
-        const TokenTag tag_pc = body[pc].get_tag();
-        const Token & tok_pc_1 = body[pc - 1];   // token left of / or ⍴
-        const TokenClass class_pc_1 = tok_pc_1.get_Class();
-        if ((is_SLASH_or_BACKSLASH(tag_pc) || tag_pc == TOK_F12_RHO) &&
-            ( is_label(tok_pc_1) || class_pc_1 == TC_VALUE))
-           {
-             // collect items in right argument of / or ⍴
-             //
-             items_B.push_back(Function_PC(pc - 1));
-             for (Function_PC pos = pc - 2; pos >= 0; --pos)
-                 {
-                   const TokenTag tag_pos = body[pos].get_tag();
-                   const TokenClass class_pos = body[pos].get_Class();
-                   if (is_label(body[pos]))
-                      {
-                        items_B.push_back(Function_PC(pos));
-                      }
-                   else if (class_pos == TC_VALUE &&
-                            body[pos].get_apl_val()->is_int_scalar())
-                      {
-                        items_B.push_back(Function_PC(pos));
-                      }
-                   else if (tag_pos == TOK_F12_COMMA || tag_pos == TOK_F12_COMMA)
-                      {
-                        // skip , or ⍪
-                      }
-                   else if (pos == 0 || class_pos == TC_END)
-                      {
-                        break;   // for (int pos...)
-                      }
-                   else   // something else: do nothing
-                      {
-                        items_B.clear();
-                        break;
-                      }
-                 }
-           }
+       {
+         if (!body[pc].is_RHO_or_SLASH())        continue;
+         if (!is_label_or_value(body[pc - 1]))   continue;
 
-        if (items_B.size() == 0)   continue;   // for (Function_PC pc...
+         // at this point we have N⍴... or N/... or N⌿...
 
-        if (items_B.size() == 1)
-           {
-             // single item. If iot is a value then leave it as is.
-             // Otherwise resolve the label symbol.
-             //
-             const Function_PC pc0 = items_B[0];
-             Token & tok0 = body[pc0];
-             if (tok0.get_Class() == TC_SYMBOL)
-                {
-                  const Symbol * symbol = tok0.get_sym_ptr();
-                  const int64_t line = get_label_line(symbol);
-                  Value_P value = IntScalar(line, LOC);
-                  value->increment_owner_count(LOC);
-                  tok0 = Token(TOK_APL_VALUE1, value);
-                }
-           }
-        else   // vector B
-           {
-             Value_P B(items_B.size(), LOC);
-             loop(b, items_B.size())
-                 {
-                   const Function_PC pc_b = items_B[b];
-                   Token & tok_b = body[pc_b];
-                   if (tok_b.get_Class() == TC_SYMBOL)
-                      {
-                        const Symbol * symbol = tok_b.get_sym_ptr();
-                        const int64_t line = get_label_line(symbol);
-                        B->next_ravel_Int(line);
-                      }
-                   else if (tok_b.get_Class() == TC_VALUE)
-                      {
-                        const int64_t line = tok_b.get_apl_val()->get_cfirst()
-                                                  .get_int_value();
-                        B->next_ravel_Int(line);
-                      }
-                 }
-             B->check_value(LOC);
+         // collect items in the right argument B of /B. ⌿B, or ⍴B.
+         //
+         vector<Function_PC> items_B;
 
-             // items_B is decreasing, so back() < front()
-             for (Function_PC pc = items_B.back(); pc <= items_B.front(); ++pc)
+         items_B.push_back(Function_PC(pc - 1));
+         for (Function_PC pos = pc - 2; pos >= 0; --pos)
+             {
+               const TokenTag tag_pos = body[pos].get_tag();
+               const TokenClass class_pos = body[pos].get_Class();
+               if (is_label(body[pos]))
+                  {
+                    items_B.push_back(Function_PC(pos));
+                  }
+               else if (class_pos == TC_VALUE &&
+                        body[pos].get_apl_val()->is_int_scalar())
+                  {
+                    items_B.push_back(Function_PC(pos));
+                  }
+               else if (tag_pos == TOK_F12_COMMA ||
+                        tag_pos == TOK_F12_COMMA)
+                  {
+                    // skip , or ⍪
+                  }
+               else if (pos == 0 || class_pos == TC_END)
+                  {
+                    break;   // for (int pos...)
+                  }
+               else   // something else: do nothing
+                  {
+                    items_B.clear();
+                    break;
+                  }
+             }
+
+         if (items_B.size() == 0)   continue;   // for (Function_PC pc...
+
+         if (items_B.size() == 1)
+            {
+              // single item. If it is a value then leave it as is.
+              // Otherwise resolve the label symbol.
+              //
+              const Function_PC pc0 = items_B[0];
+              Token & tok0 = body[pc0];
+              if (tok0.get_Class() == TC_SYMBOL)
                  {
-                  body[pc].clear(LOC);
+                   const Symbol * symbol = tok0.get_sym_ptr();
+                   const int64_t line = get_label_line(symbol);
+                   Value_P value = IntScalar(line, LOC);
+                   value->increment_owner_count(LOC);
+                   tok0 = Token(TOK_APL_VALUE1, value);
                  }
-             body[items_B.back()] = Token(TOK_APL_VALUE1, B);
-             B->increment_owner_count(LOC);   // keep it
-             VOID_inserted = true;
+            }
+         else   // vector B
+            {
+              Value_P B(items_B.size(), LOC);
+              loop(b, items_B.size())
+                  {
+                    const Function_PC pc_b = items_B[b];
+                    Token & tok_b = body[pc_b];
+                    if (tok_b.get_Class() == TC_SYMBOL)
+                       {
+                         const Symbol * symbol = tok_b.get_sym_ptr();
+                         const int64_t line = get_label_line(symbol);
+                         B->next_ravel_Int(line);
+                       }
+                    else if (tok_b.get_Class() == TC_VALUE)
+                       {
+                         const int64_t line = tok_b.get_apl_val()->get_cfirst()
+                                                   .get_int_value();
+                         B->next_ravel_Int(line);
+                       }
+                  }
+              B->check_value(LOC);
+
+              // items_B is decreasing, so back() < front()
+              for (Function_PC pc = items_B.back(); pc <= items_B.front(); ++pc)
+                  {
+                    body[pc].clear(LOC);
+                  }
+              body[items_B.back()] = Token(TOK_APL_VALUE1, B);
+              B->increment_owner_count(LOC);   // keep it
+              VOID_inserted = true;
            }
-      }
+       }
 
    if (VOID_inserted)   remove_TOK_VOID();
 

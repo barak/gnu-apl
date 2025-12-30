@@ -247,13 +247,41 @@ public:
    Function_Line get_fun_line() const
       { Assert(get_ValueType() == TV_LIN);   return value.fun_line; }
 
-   /// return true iff \b this token has no value
+   /// return \b true iff \b this token has no value
    bool is_void() const
-      { return (get_ValueType() == TV_NONE); }
+      { return get_ValueType() == TV_NONE; }
 
    /// return true iff \b this token is an apl value
    bool is_apl_val() const
-      { return (get_ValueType() == TV_VAL); }
+      { return get_ValueType() == TV_VAL; }
+
+   /// return \b true iff \b this token is a function (or operator)
+   bool is_function() const
+      { return get_ValueType() == TV_FUN; }
+
+   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   bool is_SLASH_or_BACKSLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_OPER1_SCAN ||
+               id == ID_OPER1_REDUCE1 || id == ID_OPER1_SCAN1;
+      }
+
+   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   bool is_RHO_or_SLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_F12_RHO ||
+               id == ID_OPER1_REDUCE1;
+      }
+
+   /// return \b true iff \b this token is END or ENDL
+   bool is_ENDx() const
+      { return tag == TOK_END || tag == TOK_ENDL; }
+
+   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
+   bool is_COND() const
+      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
 
    /// return the Value_P value of this token. The token could be TOK_NO_VALUE;
    /// in that case VALUE_ERROR is thrown.
@@ -282,18 +310,6 @@ public:
    /// return the IndexExpr value of this token
    IndexExpr & get_index_val() const
       { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
-
-   /// return b true iff \b this token is a function (or operator)
-   bool is_function() const
-      { return (get_ValueType() == TV_FUN); }
-
-   /// return \b true iff \b this token is END or ENDL
-   bool is_ENDx() const
-      { return tag == TOK_END || tag == TOK_ENDL; }
-
-   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
-   bool is_COND() const
-      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
 
    /// return the cFunction_P value of this token
    cFunction_P get_function() const

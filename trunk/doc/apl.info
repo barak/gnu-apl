@@ -16,12 +16,12 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 27, 2025.  This manual briefly documents GNU APL, an
+December 30, 2025.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
-Free Documentation License, *Note Chapter 7.
+Free Documentation License, *Note Chapter 8.
 
    This manual does NOT describe APL itself; there exist a number of
 good books and texts about APL. We would like to refer the reader to the
@@ -42,9 +42,10 @@ ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
 * Chapter 2::    Non-standard GNU APL Features
 * Chapter 3::    Limitations and Missing Features
 * Chapter 4::    Internationalization
-* Chapter 5::    Project Structure
-* Chapter 6::    Libraries Contributed by GNU APL Users
-* Chapter 7::    Licenses for GNU APL and this Manual
+* Chapter 5::    Vector Notation
+* Chapter 6::    Project Structure
+* Chapter 7::    Libraries Contributed by GNU APL Users
+* Chapter 8::    Licenses for this GNU APL Manual and for GNU APL
 
 
 File: apl.info,  Node: Chapter 1,  Next: Chapter 2,  Prev: Top,  Up: Top
@@ -3498,10 +3499,10 @@ expression B. For example:
      ───────────
           5
 
-   NOTE: The implementation of ⌹[20] depends on python.  It also depends
-on the python package sympy which does the actual computation of the
-integral.  Normally the GNU APL configure script determines which
-optional libraries for GNU APL are present and compiles FGNU APL
+   NOTE: The implementation of ⌹.integral depends on python.  It also
+depends on the python package sympy which does the actual computation of
+the integral.  Normally the GNU APL ./configure script determines which
+optional libraries for GNU APL are present and compiles GNU APL
 accordingly.  In the python case this is not possible because python and
 its packages can be installed globally (by a privilreged user such as
 root) or by a unprivilreged user (e.g.  below her home directory).  It
@@ -3511,19 +3512,31 @@ The GNU APL ./configure has no way to detect such a situation.  For this
 reason GNU APL checks at runtime (i.e.  when ⌹.integral is used) if
 python and sympy are installed (and raises a DOMAIN ERROR if not).
 
-   Now to the arguments of ⌹[20].  The right argument B is a string with
-the expression for which the integral shall be computed.  The syntax of
-B ia pretty much defined by sympy.
+   Now to the arguments of ⌹.integral.  The right argument B is a string
+with the expression for which the integral shall be computed.  The
+syntax of B ia pretty much defined by sympy.  A maybe noteworthy
+difference between strings understood by ⌹.integral and strings
+understood by sympy is that powers in sympy cwhave to be written as e.g.
+a**n, while ⌹.integral also understands aⁿ.
 
    The left argument A is a vector of options.  Currently only one
 option is defined which defines the format of the result:
 
-   • : A=1 : the result is a string (see example above)
-   • : A=2 : the result is a character matrix (see example above).  The
+   • A[1]=1 : the result is a string (see example above)
+   • A[1]=2 : the result is a character matrix (see example above).  The
      matrix is primarily created by the sympy function pretty() (which
-     is unfortunately not formally specified).  For this reason is A=2
-     somewhat experimental and may produce a garbled output in some
-     cases.
+     is unfortunately not formally specified).  For this reason is
+     A[1]=2 somewhat experimental and may produce a garbled output in
+     some cases.
+   • A[1]=3 : the result is a string in a simple to parse format.
+   • A[1]=4 : the result is a string in LATEX format.
+   • A[1]=5 : the result is a character matrix in Math_ML format.
+   • A[1]=6 : the result is a character matrix in Dot format.
+
+   MathML is an XML-based industry standard for mathematical
+expressions.
+
+   Dot is a program for printing directed graphs.
 
 
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
@@ -3540,135 +3553,144 @@ argument shows a list of all functions provided by ⎕CR:
 
            ⎕CR ''
 
-   Say a byte vector is an integer vector with numbers having a (signed
-or unsigned) 8-bit value (i.e.  a value from -128 to 255 inclusive).
-Such byte vectors are frequently used arguments and results of ⎕FIO
-functions.
+   Definition: A byte vector is an integer (!)  vector with numbers
+having a (signed or unsigned) 8-bit value (i.e.  a value from -128 to
+255 inclusive).  Such byte vectors are frequently used arguments and
+results of ⎕FIO functions.
 
    Let Z←A ⎕CR B.
 
    Then the left argument A of ⎕CR selects one of several subfunctions
 of ⎕CR:
 
-   A=0-4 or 7-9, or 29: various formatting styles (boxed, APL
-input/output, etc.).  Just try them out.
+   • A∈0 1 2 3 4 7 8 9 29: various formatting styles (boxed, APL
+     input/output, etc.).  Just try them out.
 
-   A=5 or 6: convert byte vector B to a string of uppercase or lowercase
-hex digits respectively.  Every byte in B becomes 2 characters in Z.
+   • A∈5 6: convert byte vector B to a string of uppercase or lowercase
+     i hex digits respectively.  Every byte in B becomes 2 characters in
+     Z.
 
-   A=10: convert variable named in B to an APL expression producing it.
+   • A=10: convert variable named in B to an APL expression producing
+     it.
 
-   A=11: convert value B to byte vector Z in CDR ("Common Data
-Representation", an IBM standard) format (similar to 3 ⎕TF).
+   • A=11: convert value B to byte vector Z in CDR ("Common Data
+     Representation", an IBM standard) format (similar to 3 ⎕TF).
 
-   A=12: convert byte vector B in CDR format to value Z.
+   • A=12: convert byte vector B in CDR format to value Z.
 
-   A=13: convert hex string B to byte vector Z.
+   • A=13: convert hex string B to byte vector Z.
 
-   If a conversion has an inverse conversion (like 12 being the inverse
-of 11) then the inverse conversion can be expressed as the negative of
-the conversion number.  For example, 12 ⎕CR B is the same as ¯11 ⎕CR B.
+     If a conversion has an inverse conversion (like 12 being the
+     inverse of 11) then the inverse conversion can be expressed as the
+     negative of the conversion number.  For example, 12 ⎕CR B is the
+     same as ¯11 ⎕CR B.
 
-   A=14: conversion 11 followed by conversion 13 (Value to hex string in
-CDR format)
+   • A=14: conversion 11 followed by conversion 13 (Value to hex string
+     in CDR format)
 
-   A=15: conversion 13 followed by conversion 12 (hex string in CDR
-format to Value)
+   • A=15: conversion 13 followed by conversion 12 (hex string in CDR
+     format to Value)
 
-   A=16: encode byte vector B into Z (base64 encoding, RFC 4648)
+   • A=16: encode byte vector B into Z (base64 encoding, RFC 4648)
 
-   A=17: decode base64 vector B into byte vector Z (base64 encoding, RFC
-4648)
+   • A=17: decode base64 vector B into byte vector Z (base64 encoding,
+     RFC 4648)
 
-   A=18: convert text vector B into byte vector Z (UTF8 encoding, RFC
-3629)
+   • A=18: convert text vector B into byte vector Z (UTF8 encoding, RFC
+     3629)
 
-   A=19: convert byte vector B into text vector Z (UTF8 encoding, RFC
-3629)
+   • A=19: convert byte vector B into text vector Z (UTF8 encoding, RFC
+     3629)
 
-   A=20-25: like 3,4,7-9 but using a formatting similar to NARS APL ⎕FMT
-(showing the axis lengths as numbers instead of → and ↓)
+   • A=20-25: like 3,4,i or 7-9 but using a formatting similar to NARS
+     APL ⎕FMT (showing the axis lengths as numbers instead of → and ↓)
 
-   A=26: Z is the cell types of the ravel elements of B (2: character,
-16: integer, 32: real number, 64: complex number.
+   • A=26: Z is the cell types of the ravel elements of B, i.e.
+        • 2: character,
+        • 16: integer,
+        • 32: real number,
+        • 64: complex number.
 
-   A=27: Z[I] is the primary data representation (for example the real
-part of a complex number, or the numerator of a rational number) of
-B[I].
+   • A=27: Z[I] is the primary data representation (for example the real
+     part of a complex number, or the numerator of a rational number) of
+     B[I].
 
-   A=28: Z[I] is the additional data representation (for example the
-imaginary part of a complex number, or the denominator of a rational
-number) of B[I].
+   • A=28: Z[I] is the additional data representation (for example the
+     imaginary part of a complex number, or the denominator of a
+     rational number) of B[I].
 
-   A=30: Z is B with all top-level elements conformed to a common rank
-and shape (as required by the ⍤ operator).  This conversion is primarily
-used internally by the GNU APL interpreter.
+   • A=30: Z is B with all top-level elements conformed to a common rank
+     and shape (as required by the ⍤ operator).  This conversion is
+     primarily used internally by the GNU APL interpreter.
 
-   A=31 or A=32: These conversions are used internally by ⎕INP.
+   • A∈31 32: These conversions are used internally by ⎕INP.
 
-   A=33: convert tagged byte vector to a TLV (Tag/Length/Value) buffer.
-The TLV buffer can be sent over a byte stream (socket) and easily
-decoded at the other end.  Say B = B[1], B[2], ..., B[n] such that B1 is
-an Integer (the tag) and B[j] is a character in the range 0-255 for j >
-1.  Let Z←33 ⎕CR B with Z = Z[1], Z[2], ...  Z[m].  Then Z[1 2 3 4] is
-the 4 byte tag, Z[5 6 7 8] is the 4 byte data length (n-1) == (m - 8)
-and 1↓B == 8 ↓ Z. In other words, the first 4 bytes of Z are the tag in
-big endian byte order, the next 4 bytes are the length of B except the
-tag, and the rest of Z is B except the tag.
+   • A=33: convert tagged byte vector to a TLV (Tag/Length/Value)
+     buffer.  The TLV buffer can be sent over a byte stream (socket) and
+     easily decoded at the other end.  Say B = B[1], B[2], ..., B[n]
+     such that B1 is an Integer (the tag) and B[j] is a character in the
+     range 0-255 for j > 1.  Let Z←33 ⎕CR B with Z = Z[1], Z[2], ...
+     Z[m].  Then Z[1 2 3 4] is the 4 byte tag, Z[5 6 7 8] is the 4 byte
+     data length (n-1) = (m - 8), and 1↓B == 8 ↓ Z. In other words, the
+     first 4 bytes of Z are the tag in big endian byte order, the next 4
+     bytes are the length of B except the tag, and the rest of Z is B
+     except the tag.
 
-   Example:
-           Tag←55   ⍝ hex 37
-           5 ⎕CR 33 ⎕CR Tag,'Value'
-     000000370000000556616C7565
+     Example:
+                Tag←55   ⍝ hex 37
+                5 ⎕CR 33 ⎕CR Tag,'Value'
+          000000370000000556616C7565
 
-   A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and
-34 ⎕CR is the transmission of a tagged byte vector over e.g a TCP
-socket:
+   • A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR
+     and 34 ⎕CR is the transmission of a tagged byte vector over e.g a
+     TCP socket:
 
-   Sender Receiver —— ——– T,Data →→→ 33 ⎕CR T,Data →→→TCP connection→→→
-34 ⎕CR T,Data →→→ T,Data
+       Sender                                              Receiver
+       ──────                                              ────────
+       T,Data →→→ 33 ⎕CR T,Data   →→→ TCP connection →→→   34 ⎕CR T,Data →→→ T,Data
 
-   Example:
-           34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
-     55 Value
+     Example:
+                34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
+          55 Value
 
-   The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR
-by the receiver can be sent back-to-back over a TCP connection or
-similar in such a way that the receiver knows exactly after which byte a
-TLV ends (and possibly the next TLV, if any, starts).  This is perfect
-for connections over which data is sent sporadically.  33 ⎕CR and 34 ⎕CR
-are particularly useful for encoding and decoding TLV byte buffers
-exchanged between GNU APL and processes that were forked by GNU APL with
-⎕FIO[57] (aka.  fork() and execve()).
+     The TLVs constructed by 33 ⎕CR by the sender and decoded with 34
+     ⎕CR by the receiver can be sent back-to-back over a TCP connection
+     or similar in such a way that the receiver knows exactly after
+     which byte a TLV ends (and possibly the next TLV, if any, starts).
+     This is perfect for connections over which data is sent
+     sporadically.  33 ⎕CR and 34 ⎕CR are particularly useful for
+     encoding and decoding TLV byte buffers exchanged between GNU APL
+     and processes that were forked by GNU APL with ⎕FIO[57] (aka.
+     fork() and execve()).
 
-   A=35: convert a string of lines (containing LF characters as line
-delimiters) to a nested vector of lines.
+   • A=35: convert a string of lines (containing LF characters as line
+     delimiters) to a nested vector of lines.
 
-   A=36: the inverse of ⎕CR[35].  Convert a nested vector of lines to a
-string with lines terminated with LF characxters.
+   • A=36: the inverse of ⎕CR[35].  Convert a nested vector of lines to
+     a string with lines terminated with LF characxters.
 
-   A=37 Same as ⎕CR B but without removing any indentation.
+   • A=37: Same as ⎕CR B but without removing any indentation.
 
-   A=38: Return an empty structured variable with (integer) capacity Bi,
-or convert an N×2 matrix B to a structured variable.
+   • A=38: Return an empty structured variable with (integer) capacity
+     Bi, or convert an N×2 matrix B to a structured variable.
 
-   A=39: convert a strucured variable B to an N×2 variable.
+   • A=39: convert a strucured variable B to an N×2 variable.
 
-   A=40: pack a boolean variable Bi (experimental).
+   • A=40: pack a boolean variable Bi (experimental).
 
-   A=41: unpack a boolean variable Bi (experimental).
+   • A=41: unpack a boolean variable Bi (experimental).
 
-   A=42: tokenize the APL statement Bs.
+   • A=42: tokenize the APL statement Bs.
 
-   A=43: parse the APL statement Bs.
+   • A=43: parse the APL statement Bs.
 
-   A=44: decode the (integer) token tag B or the (nested) token B.
+   • A=44: decode the (integer) token tag B or the (nested) token B.
 
    Most dyadic ⎕CR variants whose argument B is expected to be a byte
 vector throw:
 
-  1. RANK ERROR if 1≠⍴⍴B
-  2. DOMAIN ERROR if one of the B[j] is not a proper byte value
+   • RANK ERROR if 1≠⍴⍴B
+   • DOMAIN ERROR if one of the B[j] is not a proper byte value
 
    A proper byte value is either an integer in the range -128...255
 inclusive, or a (Unicode) character with a code point between U+FF80 and
@@ -3677,6 +3699,10 @@ between U+0000...U+00FF (inclusive, corresponding to an unsigned char or
 to a signed positive char in C/C++).  Real, Complex, or rational numbers
 are never proper byte values even if their value is close to an integer.
 Nor are nested APL values or values being assigned.
+
+   ⎕CR is a function group, therefore its subfunctions can be selected
+with a name.  For example: monadic ⎕CR.hex_to_bytes is the same as
+monadic ⎕CR[13] or dyadic 13 ⎕CR.
 
 
 File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  Up: Chapter 2
@@ -7931,8 +7957,398 @@ installed locales.
 
 File: apl.info,  Node: Chapter 5,  Next: Chapter 6,  Prev: Chapter 4,  Up: Top
 
-5 Project Structure
-*******************
+5 Vector Notation
+*****************
+
+* Menu:
+
+* Section 5.1::   History
+* Section 5.2::   Standardization
+* Section 5.3::   Quotes from the lrm
+* Section 5.4::   Some APL2 Tests
+* Section 5.5::   Definitions
+* Section 5.6::   GNU APL Vector Notation
+
+This chapter describes details of the GNU APL vector notation.
+Unfortunately there exists misleading information concerning the GNU APL
+vector nontation on the public internet and the attempts of the author
+of this manual to have the misleading information corrected were not
+successful.
+
+
+File: apl.info,  Node: Section 5.1,  Next: Section 5.2,  Up: Chapter 5
+
+5.1 History
+===========
+
+Vector Notation is as old as APL. The famous Book APL \360: An
+interactive approach by Leonard Gilman and Allen J. Rose introduces
+vector notation already on page 2, but without calling it vector
+notation.
+
+   Quote:
+
+     Or we can assign a string of numbers to a variable called X, and ask the
+     computer to execute the command shown, + / X , with the response 17.1 :
+           X+-3 4 1.1 3 6
+           +/X
+     17.1
+
+   The terms vector notation (used by IBM APL and by GNU APL) was
+apparently coined by Kenneth Iverson (A Programming Lagnuage, p.  163)
+and the equivalent term strand notation is used by other APL vendors.
+
+
+File: apl.info,  Node: Section 5.2,  Next: Section 5.3,  Prev: Section 5.1,  Up: Chapter 5
+
+5.2 Standardization
+===================
+
+The current ISO standard ISO/IEC 13751 Programming Language APL,
+extended, in the following abbreviated as iso, does not formally define
+vector notation, but uses it all over the place in its examples.
+
+   The IBM APL2 Language Reference Manual, in the following abbreviated
+as lrm, was the blueprint for GNU APL. The lrm describes vector
+notatation briefly.
+
+
+File: apl.info,  Node: Section 5.3,  Next: Section 5.4,  Prev: Section 5.2,  Up: Chapter 5
+
+5.3 Quotes from the lrm
+=======================
+
+Different aspects of vector nortation are distributed over the lrm.  To
+get a compressed view of the matter we quote the relevant pieces:
+
+  1. lrm page 14: The juxtaposition of two or more arrays in an
+     expression results in a vector whose items are the arrays.
+     Representing a vector in this manner is called vector notation.
+
+  2. lrm page 14: Characters in a vector consisting only of characters
+     can be listed within one set of single quotation marks: ’FACE’ ←→
+     (’F’ ’A’ ’C’ ’E’)
+
+  3. lrm page 33: The hierarchy of binding strengths is listed below in
+     descending order.
+          Binding Strength            What Is Bound
+          ──────────────────────      ────────────────────────────────────
+          1. Brackets                 Brackets to what is on their left
+          2. Specification left       Left arrow to what is on its left
+          3. Right operand            Dyadic operator to its right operand
+          4. Vector                   Array to an array
+          5. Left operand             Operator to its left operand
+          6. Left argument            Function to its left argument
+          7. Right argument           Function to its right argument
+          8. Specification right      Left arrow to what is on its right
+          ════════════════════════════════════════════════════════════════
+     The binding strength 4.  above is the one for vector notation.  It
+     defines how the items of a vector notation are bound together (as
+     opposed to being bound to other tokens).  For example: 1 2 3[2]
+     becomes 1 2 (3[2]) because [2] binds stronger to 3 on its left than
+     3 binds to 2 in its left (which then raises a RANK ERROR because 3
+     is a scalar).
+
+
+File: apl.info,  Node: Section 5.4,  Next: Section 5.5,  Prev: Section 5.3,  Up: Chapter 5
+
+5.4 Some APL2 Tests
+===================
+
+Before explaining the details of vector notation in GNU APL we would
+like to share the results of some tests performed with IBM APL2 (again
+the demo version for PCs).
+
+5.4.1 Test 1: Binding strength of []
+------------------------------------
+
+           ⍝ IBM APL2: Binding strength of []...
+
+           ⍝ Test 1a.
+           ⍝
+           1 2 3[2]
+     RANK ERROR
+           1 2 3[2]
+               ^^
+
+           ⍝ Test 1b.
+           ⍝
+           'a' 'b' 'c'[2]
+     RANK ERROR
+           'ab' 'c'[2]
+                ^  ^
+
+           ⍝ Test 1c.
+           ⍝
+           'abc'
+     b
+
+   Test 1a: no surprise.  [] has the strongest binding and raises a RANK
+ERROR when indexing the scalar 3.
+
+   Test 1b: no surprise.  since it follows suit.
+
+   Test 1c: no surprise for the binding strength.  This test confirms
+the second quote on page 14 of the lrm.
+
+5.4.2 Test 1: Binding strength of the left operand
+--------------------------------------------------
+
+For this test we create a defined function SHOW_NC, a monadic defined
+operator OPER1, and a dyadic defined operator OPER2:
+
+           ⍝ display the name class of B¯B
+           ⍝
+           ∇Z←SHOW_NC B¯B;N
+            N←8↑B,':'
+            →(¯1 0 1 2 3 4 = ⎕NC B¯B)/I U L V F O ◊ ++
+           I: →0, Z←(8↑B), ': Invalid Name'
+           U: →0, Z←(8↑B), ': Unused Name'
+           L: →0, Z←(8↑B), ': Label'
+           V: →0, Z←(8↑B), ': Value', ⍎B¯B
+           F: →0, Z←(8↑B), ': Function'
+           O: →0, Z←(8↑B), ': Operator'
+           ∇
+
+           ⍝ monadic operator
+           ⍝
+           ∇Z←A (LO OPER1) B
+            SHOW_NC 'A'
+            SHOW_NC 'LO'
+            SHOW_NC 'OPER1'
+            SHOW_NC 'B'
+           ∇
+
+           ⍝ dyadic operator
+           ⍝
+           ∇Z←A (LO OPER2 RO) B
+            SHOW_NC 'A'
+            SHOW_NC 'LO'
+            SHOW_NC 'OPER1'
+            SHOW_NC 'RO'
+            SHOW_NC 'B'
+           ∇
+
+   The somewhat strange looking argument name B¯B of SHOW_NC instead of
+the rather frequent B was chosen to avoid name conflicts between the
+right value argument of SHOW_NC and the right value argument the
+operators under test (like OPER1 or OPER2).  Then:
+
+           ⍝ Test 2a: binding of the left operand (literal LO)
+           ⍝
+           11 22 33 OPER1 1 2 3
+     A       : Unused Name
+     LO      : Value  11 22 33
+     OPER1   : Operator
+     B       : Value  1 2 3
+
+           ⍝ Test 2b: binding of the left operand (parser LO)
+           ⍝
+           (UU VV WW)←11 22 33
+           UU VV WW OPER1 1 2 3
+     A       : Unused Name
+     LO      : Value  11 22 33
+     OPER1   : Operator
+     B       : Value  1 2 3
+
+           ⍝ Test 2c. binding of the left operand (in parentheses)
+           ⍝
+           11 22 (33 OPER1) 1 2 3
+     A       : 11
+     LO      : Value  22 33
+     OPER1   : Operator
+     B       : Value  1 2 3
+
+           ⍝ Test 2d. binding of the right operand
+           ⍝
+           11 22 33 'lop' OPER1 'rop' 1 2 3
+     A       : Unused Name
+     LO      : Value  11 22 33 lop
+     OPER2   : Operator
+     RO      : Value  rop
+     B       : Value  1 2 3
+
+   The results are rather interesting.  We will later on discuss a
+potential difference between vector notation at tokenization time and
+vector notation at execution time.  The same outcome of tests 2a.  and
+2b.  demonstrates that IBM APL2 handles both variants in the same
+fashion (supposedly because both cases are resolved at execution time).
+
+   Test 2a.  proves that vector notation binds stronger than the left
+operand to its dyadic operator.  Test 2c.  demonstrates how the binding
+strengths can be undermined with parentheses.
+
+   Test 2d.  proves that the right operand binds stronger than vector
+notation.  However, this case is interesting from an iso.  Page 126 of
+iso gives the following example for the dyadic rank operator:
+
+           ⍝ example from ISO/IEC 13751 p.126
+           ⍝
+           0 1 2⌽∘0 1 'ABC'
+     ABC
+     BCA
+     CAB
+
+   Comparing the results of Test 2d.  with GNU APL shows how iso
+believes their example should be parsed:
+
+           ⍝ Test 2e. (GNU APL):
+           ⍝
+           0 1 2(⌽⍤0 1) 'ABC'
+     ABC
+     BCA
+     CAB
+
+           ⍝ Test 2f. (GNU APL):
+           ⍝
+           0 1 2(⌽⍤0) 1 'ABC'
+     LENGTH ERROR
+           0 1 2(⌽⍤0 0 0)1 'ABC'
+           ^            ^
+
+   NOTE: It is not possible to run tests 2e.  and 2f.  in IBM APL2
+directly (because at least in the PC demo version of IBM APL2 the rank
+operator ⍤ is not implemented.  However using our defined function OPER2
+above instead of ⍤ shows that IBM APL2 evaluates the ISO example as 0 1
+2(⌽∘0) 1 ’ABC’ (in accordance with lrm) and not as 0 1 2(⌽∘0 1) ’ABC’ as
+iso suggests.
+
+   Takeaways: the tests above teach us the following:
+
+   • Vector notation differs between:
+        • The ISO standard for APL,
+        • IBM APL2, and
+        • APL implementation of other vendors (including GNU APL).
+   • It is therefore impossible to accomodate both the ISO standard and
+     IBM APL2 to 100% at the same time, but
+   • GNU APL tries to be as close as possible to one of them,
+   • The issues highlited above can be easily avoided by always using
+     parentheses around operators and their operands (even though they
+     may appear to be redundant).  These parentheses are the (only) key
+     to portable APL programs.
+
+
+File: apl.info,  Node: Section 5.5,  Next: Section 5.6,  Prev: Section 5.4,  Up: Chapter 5
+
+5.5 Definitions
+===============
+
+Definition: A strand consists of two (!)  or more adjacent values in a
+defined function, or in a string being ⍎’ed, or on a line entered in
+immediate execution mode.  Such values can be literals (like in 1 2 3),
+but also values of variables or results of niladic functions.  A strand
+is always a vector and we call the values in a strand the items of the
+strand.  Strand items can be simple (i.e.  numbers or single characters)
+or nested (strings or other strands).  Strand items sre always (possibly
+nested) APL scalars.
+
+   Definition: A literal strand is a strand whose items are only
+literals (including nested literals like in 1 2 (3 4) 5).
+
+   Definition: An extended literal strand is a strand whose items are
+either literals (including nested literals) or iparticular simple
+primitive function with particular literal arguments.
+
+   Definition: A mixed strand is a strand which is not a literal strand.
+
+   Definition: A strand is open if more items can be appended to it.
+
+   Definition: A strand is closed if it is not open.
+
+   Definition: A strand is nested if at lease one of its items is
+nested.
+
+   Examples:
+
+           1 2 3        ⍝ open literal strand
+
+           VAR←1 2 3
+           ∇Z←FOO
+            Z←1 2 3
+           ∇
+
+           1 VAR 3       ⍝ nested open mixed strand
+           1 FOO 3       ⍝ open mixed strand\
+
+           1 2 (3⍴4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+           1 2 (3/4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+
+           (1 2 3)       ⍝ closed literal strand
+           'abc'         ⍝ closed literal strand
+
+
+File: apl.info,  Node: Section 5.6,  Prev: Section 5.5,  Up: Chapter 5
+
+5.6 GNU APL Vector Notation
+===========================
+
+With the definitions from the previous section we can explain how GNU
+APL has implemented vector notation:
+
+   1.  GNU APL distinguishes between literal and mixed strands.  literal
+strands are combined into a single APL value at tokenization time.  This
+is a very effective optimization (which can be disabled at ./configure
+time).  In contrast, mixed strands are created at prefix matching time,
+i.e.  when an APL expression is evaluated.  The tokenizatio of APL
+expressions happens only once, while prefix matching occurs every time
+when a statement is being executed and therefore moving major parts of
+the strand building from prefix matching time to tokenization time can
+bring substantial performance benefits.
+
+   2.  The tokenization expands simple APL primitives with literal
+arguments and short results into their literal equivalent.  Currently
+the APL primitives N⍴B, N/B, N⌿B, ,B, ⍪B, and ⊂B are handled this way.
+
+   3.  The tokenization of literal strands has dedicated code for
+literal arguments of the rank operator (⍤) to make make it working like
+described in the ISO standard.  This is, in contrast to defined
+operators, possible because the ISO standard defines in very detail how
+its right operand needs to look like and how deviations shall be handled
+(DOMAIN ERROR, LENGTH ERROR etc.
+
+   4.  The prefix matching of mixed strands builds the strand
+step-by-step according to the following rules:
+
+   • two adjacent APL scalars A and B create a new open strand (with two
+     strand items).  Each of the two scalars A or B can be simple (like
+     numbers or single characters) or nested (like strings or closed
+     strands).
+   • An APL scalar A adjacent to an open strand B preprends A to B. That
+     is, B←A, B.
+   • An open strand A adjacent to an an APL scalar B appends B to A.
+     That is, A←A, B.
+   • the previous two rules prevent two adjacent open strands, because
+     the strand items of a potential open left strand A are prepended
+     item by item to an open right strand B (which prevents the creation
+     of a new open left strand while an open right strand exists,
+
+   • Like the normal APL evaluation, this procedure is preformed from
+     the right to the left.
+   • if an open strand hits a closing parenthesis then a new phrase
+     matching context is created in which the current procedure is
+     abandoned until the corresponding opening parentheses has been
+     processed.  The result of the expression in parentheses is then
+     taken as the next strand item for the abandoned strand (if any).
+   • Any symbols encountered during this procedure are being resolved
+     into scalars (possibly enclosing them if they are not).  Niladic
+     functions are called to obtain their result.
+   • Likewise, any literal strands that were created at tokenization
+     time are considered closed (which cause them to be enclosed when
+     preprended or appended to an open mixed strand).
+   • If a strand is open then any other token (functions, operators,
+     brackets, end-of-statement, etc.)  closes it.  The result is a
+     single value for the strand.
+
+   5.  The operators ⍣ (power operator) and ⍤ (rank operator), whose
+right operand can be identified by the rules given in iso) have
+dedicated code that "unstrands" the right operand from a strand that may
+have been mistakenly created in 3.  above.
+
+
+File: apl.info,  Node: Chapter 6,  Next: Chapter 7,  Prev: Chapter 5,  Up: Top
+
+6 GNU APL Project Structure
+***************************
 
 The top-level directory of the GNU APL project has a structure like
 this:
@@ -7973,19 +8389,19 @@ interest when building GNU APL.
 
 * Menu:
 
-* Section 5.1:: The subdirectory src
-* Section 5.2:: The subdirectory support-files
-* Section 5.3:: The subdirectory doc
-* Section 5.4:: The subdirectory HOWTOs
-* Section 5.5:: The subdirectories workspaces and wslib2 ... wslib5
-* Section 5.6:: The subdirectory m4
-* Section 5.7:: The subdirectories rpm, debian, and debian_tmp
-* Section 5.8:: The subdirectory tools
+* Section 6.1:: The subdirectory src
+* Section 6.2:: The subdirectory support-files
+* Section 6.3:: The subdirectory doc
+* Section 6.4:: The subdirectory HOWTOs
+* Section 6.5:: The subdirectories workspaces and wslib2 ... wslib5
+* Section 6.6:: The subdirectory m4
+* Section 6.7:: The subdirectories rpm, debian, and debian_tmp
+* Section 6.8:: The subdirectory tools
 
 
-File: apl.info,  Node: Section 5.1,  Next: Section 5.2,  Up: Chapter 5
+File: apl.info,  Node: Section 6.1,  Next: Section 6.2,  Up: Chapter 6
 
-5.1 The subdirectory src
+6.1 The subdirectory src
 ========================
 
 The subdirectory src contains all C++ source files that are needed to
@@ -8013,9 +8429,9 @@ included in the build.
 contained in subdirectory src/testcases
 
 
-File: apl.info,  Node: Section 5.2,  Next: Section 5.3,  Prev: Section 5.1,  Up: Chapter 5
+File: apl.info,  Node: Section 6.2,  Next: Section 6.3,  Prev: Section 6.1,  Up: Chapter 6
 
-5.2 The subdirectory support-files
+6.2 The subdirectory support-files
 ==================================
 
 The subdirectory support-file contains a number of configuration files
@@ -8023,18 +8439,18 @@ that aim at making a standard keyboard produce APL characters.  Details
 are explained in top-level file README-3-keyboard.
 
 
-File: apl.info,  Node: Section 5.3,  Next: Section 5.4,  Prev: Section 5.2,  Up: Chapter 5
+File: apl.info,  Node: Section 6.3,  Next: Section 6.4,  Prev: Section 6.2,  Up: Chapter 6
 
-5.3 The subdirectory doc
+6.3 The subdirectory doc
 ========================
 
 The subdirectory doc is used to create this info file in different file
 formats (.info, .html).
 
 
-File: apl.info,  Node: Section 5.4,  Next: Section 5.5,  Prev: Section 5.3,  Up: Chapter 5
+File: apl.info,  Node: Section 6.4,  Next: Section 6.5,  Prev: Section 6.3,  Up: Chapter 6
 
-5.4 The subdirectory HOWTOs
+6.4 The subdirectory HOWTOs
 ===========================
 
 The subdirectory HOWTOs contains some documents that try to explain how
@@ -8047,9 +8463,9 @@ or trouble-shooters) are not installed by make install, but rather
 remain in the source tree.
 
 
-File: apl.info,  Node: Section 5.5,  Next: Section 5.6,  Prev: Section 5.4,  Up: Chapter 5
+File: apl.info,  Node: Section 6.5,  Next: Section 6.6,  Prev: Section 6.4,  Up: Chapter 6
 
-5.5 The subdirectories workspaces and wslib2 ... wslib5
+6.5 The subdirectories workspaces and wslib2 ... wslib5
 =======================================================
 
 These directories (and their content) are, by default, copied to
@@ -8058,9 +8474,9 @@ others contain small workspaces or libraries for various purposes
 (mostly demonstrating the use of some non-standard APL features).
 
 
-File: apl.info,  Node: Section 5.6,  Next: Section 5.7,  Prev: Section 5.5,  Up: Chapter 5
+File: apl.info,  Node: Section 6.6,  Next: Section 6.7,  Prev: Section 6.5,  Up: Chapter 6
 
-5.6 The subdirectory m4
+6.6 The subdirectory m4
 =======================
 
 The subdirectory m4 contains macros used by autoconf and automake.  In
@@ -8079,9 +8495,9 @@ script on the platform.
    • running autoreconf
 
 
-File: apl.info,  Node: Section 5.7,  Next: Section 5.8,  Prev: Section 5.6,  Up: Chapter 5
+File: apl.info,  Node: Section 6.7,  Next: Section 6.8,  Prev: Section 6.6,  Up: Chapter 6
 
-5.7 The subdirectories debian and debian_tmp
+6.7 The subdirectories debian and debian_tmp
 ============================================
 
 These subdirectories are templates for building Debian packages that
@@ -8090,9 +8506,9 @@ a scratch directory inside which the interpreter is being compiled when
 a Debian package is built.
 
 
-File: apl.info,  Node: Section 5.8,  Prev: Section 5.7,  Up: Chapter 5
+File: apl.info,  Node: Section 6.8,  Prev: Section 6.7,  Up: Chapter 6
 
-5.8 The subdirectory tools
+6.8 The subdirectory tools
 ==========================
 
 GNU APL uses generated C++ code.  The subdirectory tools contains the
@@ -8101,9 +8517,9 @@ small tools for various purposes.  These tools are typically used by GNU
 APL hackers and are therefore not installed by make install.
 
 
-File: apl.info,  Node: Chapter 6,  Next: Chapter 7,  Prev: Chapter 5,  Up: Top
+File: apl.info,  Node: Chapter 7,  Next: Chapter 8,  Prev: Chapter 6,  Up: Top
 
-6 Libraries Contributed by GNU APL Users
+7 Libraries Contributed by GNU APL Users
 ****************************************
 
 Since the first release of GNU APL, a number of libraries, but also
@@ -8112,13 +8528,13 @@ to these contributions.
 
 * Menu:
 
-* Section 6.1::  The GNU APL Community Webpage
-* Section 6.2::  Core Libraries
+* Section 7.1::  The GNU APL Community Webpage
+* Section 7.2::  Core Libraries
 
 
-File: apl.info,  Node: Section 6.1,  Next: Section 6.2,  Up: Chapter 6
+File: apl.info,  Node: Section 7.1,  Next: Section 7.2,  Up: Chapter 7
 
-6.1 The GNU APL Community Webpage
+7.1 The GNU APL Community Webpage
 =================================
 
 The GNU APL project maintains a web page that lists contributions made
@@ -8136,9 +8552,9 @@ listed but more likely that it was overlooked.  Just send an email to
 bug-apl@gnu.org to fix that.
 
 
-File: apl.info,  Node: Section 6.2,  Prev: Section 6.1,  Up: Chapter 6
+File: apl.info,  Node: Section 7.2,  Prev: Section 7.1,  Up: Chapter 7
 
-6.2 Core Libraries
+7.2 Core Libraries
 ==================
 
 There is a small number of libraries that are considered "core" APL
@@ -8162,26 +8578,26 @@ in the GNU APL packages that follows their contribution.
    SQL
 
 
-File: apl.info,  Node: Chapter 7,  Prev: Chapter 6,  Up: Top
+File: apl.info,  Node: Chapter 8,  Prev: Chapter 7,  Up: Top
 
-7 Licenses for this GNU APL Manual and for GNU APL
+8 Licenses for this GNU APL Manual and for GNU APL
 **************************************************
 
 This manual for GNU APL is licensed under the GNU Free Documentation
-License, *Note Section 7.1:: below.
+License, *Note Section 8.1:: below.
 
    GNU APL itself is licensed under the GNU Public License version 3 or
-later (aka GPLv3+), *Note Section 7.2:: below.
+later (aka GPLv3+), *Note Section 8.2:: below.
 
 * Menu:
 
-* Section 7.1::  The GNU Free Documentation License
-* Section 7.2::  The GNU General Public License
+* Section 8.1::  The GNU Free Documentation License
+* Section 8.2::  The GNU General Public License
 
 
-File: apl.info,  Node: Section 7.1,  Next: Section 7.2,  Up: Chapter 7
+File: apl.info,  Node: Section 8.1,  Next: Section 8.2,  Up: Chapter 8
 
-7.1 The GNU Free Documentation License
+8.1 The GNU Free Documentation License
 ======================================
 
                      Version 1.3, 3 November 2008
@@ -8661,9 +9077,9 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: apl.info,  Node: Section 7.2,  Prev: Section 7.1,  Up: Chapter 7
+File: apl.info,  Node: Section 8.2,  Prev: Section 8.1,  Up: Chapter 8
 
-7.2 The GNU GENERAL PUBLIC LICENSE
+8.2 The GNU GENERAL PUBLIC LICENSE
 ==================================
 
 GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
@@ -9344,85 +9760,92 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11571
-Node: Chapter 224233
-Node: Section 2.126383
-Node: Subsection 2.1.127617
-Node: Subsection 2.1.228286
-Node: Subsection 2.1.329110
-Node: Subsection 2.1.435024
-Node: Subsection 2.1.538912
-Node: Subsection 2.1.639773
-Node: Subsection 2.1.748238
-Node: Subsection 2.1.850044
-Node: Section 2.253453
-Node: Section 2.354245
-Node: Section 2.460193
-Node: Section 2.561475
-Node: Section 2.665972
-Node: Section 2.766145
-Node: Section 2.866775
-Node: Section 2.972255
-Node: Section 2.1074626
-Node: Section 2.1176715
-Node: Section 2.1278288
-Node: Section 2.1380069
-Node: Section 2.1481998
-Node: Section 2.1582939
-Node: Section 2.1683210
-Node: Section 2.1784621
-Node: Section 2.1895524
-Node: Section 2.1998071
-Node: Section 2.20105016
-Node: Section 2.21109452
-Node: Section 2.22110955
-Node: Scan Polynomial B135386
-Node: Integral B137279
-Node: Section 2.23139414
-Node: Section 2.24145329
-Node: Section 2.25148701
-Node: Section 2.26148992
-Node: Section 2.27159845
-Node: Section 2.28160117
-Node: Section 2.29167170
-Node: Section 2.30169624
-Node: Section 2.31170293
-Node: Section 2.32171944
-Node: Section 2.33175868
-Node: Section 2.34190297
-Node: The Plot Data B191529
-Node: The Plot Attributes A194143
-Node: Plot Window Handling207678
-Node: Output File Format209009
-Node: GUI driver210232
-Node: Section 2.35213787
-Node: Section 2.36223222
-Node: Section 2.37224241
-Node: Section 2.38239476
-Node: Section 2.39250518
-Node: Section 2.40252702
-Node: Section 2.41278807
-Node: Section 2.42283347
-Node: Section 2.43304446
-Node: Section 2.44318459
-Node: Section 2.45321729
-Node: Chapter 3322244
-Node: Chapter 4324752
-Node: Chapter 5325893
-Node: Section 5.1327540
-Node: Section 5.2328860
-Node: Section 5.3329220
-Node: Section 5.4329462
-Node: Section 5.5330124
-Node: Section 5.6330602
-Node: Section 5.7331375
-Node: Section 5.8331801
-Node: Chapter 6332203
-Node: Section 6.1332622
-Node: Section 6.2333309
-Node: Chapter 7334140
-Node: Section 7.1334643
-Node: Section 7.2359956
+Node: Chapter 11616
+Node: Chapter 224278
+Node: Section 2.126428
+Node: Subsection 2.1.127662
+Node: Subsection 2.1.228331
+Node: Subsection 2.1.329155
+Node: Subsection 2.1.435069
+Node: Subsection 2.1.538957
+Node: Subsection 2.1.639818
+Node: Subsection 2.1.748283
+Node: Subsection 2.1.850089
+Node: Section 2.253498
+Node: Section 2.354290
+Node: Section 2.460238
+Node: Section 2.561520
+Node: Section 2.666017
+Node: Section 2.766190
+Node: Section 2.866820
+Node: Section 2.972300
+Node: Section 2.1074671
+Node: Section 2.1176760
+Node: Section 2.1278333
+Node: Section 2.1380114
+Node: Section 2.1482043
+Node: Section 2.1582984
+Node: Section 2.1683255
+Node: Section 2.1784666
+Node: Section 2.1895569
+Node: Section 2.1998116
+Node: Section 2.20105061
+Node: Section 2.21109497
+Node: Section 2.22111000
+Node: Scan Polynomial B135431
+Node: Integral B137324
+Node: Section 2.23140064
+Node: Section 2.24146740
+Node: Section 2.25150112
+Node: Section 2.26150403
+Node: Section 2.27161256
+Node: Section 2.28161528
+Node: Section 2.29168581
+Node: Section 2.30171035
+Node: Section 2.31171704
+Node: Section 2.32173355
+Node: Section 2.33177279
+Node: Section 2.34191708
+Node: The Plot Data B192940
+Node: The Plot Attributes A195554
+Node: Plot Window Handling209089
+Node: Output File Format210420
+Node: GUI driver211643
+Node: Section 2.35215198
+Node: Section 2.36224633
+Node: Section 2.37225652
+Node: Section 2.38240887
+Node: Section 2.39251929
+Node: Section 2.40254113
+Node: Section 2.41280218
+Node: Section 2.42284758
+Node: Section 2.43305857
+Node: Section 2.44319870
+Node: Section 2.45323140
+Node: Chapter 3323655
+Node: Chapter 4326163
+Node: Chapter 5327304
+Node: Section 5.1327926
+Node: Section 5.2328658
+Node: Section 5.3329153
+Node: Section 5.4331293
+Node: Section 5.5336932
+Node: Section 5.6338683
+Node: Chapter 6342204
+Node: Section 6.1343867
+Node: Section 6.2345187
+Node: Section 6.3345547
+Node: Section 6.4345789
+Node: Section 6.5346451
+Node: Section 6.6346929
+Node: Section 6.7347702
+Node: Section 6.8348128
+Node: Chapter 7348530
+Node: Section 7.1348949
+Node: Section 7.2349636
+Node: Chapter 8350467
+Node: Section 8.1350970
+Node: Section 8.2376283
 
 End Tag Table
 

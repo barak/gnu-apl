@@ -73,12 +73,12 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 27, 2025.
+<p>December 30, 2025.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
 <p>This manual for GNU APL can be distributed under the terms of the
-GNU Free Documentation License, *Note Chapter 7.
+GNU Free Documentation License, *Note Chapter 8.
 </p>
 <p>This manual does NOT describe APL itself; there exist a number of good books
 and texts about APL. We would like to refer the reader to the following:
@@ -348,26 +348,39 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
     <li><a id="toc-Shared-Variables" href="#Shared-Variables">3.2 Shared Variables</a></li>
   </ul></li>
   <li><a id="toc-Internationalization" href="#Chapter-4">4 Internationalization</a></li>
-  <li><a id="toc-Project-Structure" href="#Chapter-5">5 Project Structure</a>
+  <li><a id="toc-Vector-Notation" href="#Chapter-5">5 Vector Notation</a>
   <ul class="no-bullet">
-    <li><a id="toc-The-subdirectory-src" href="#Section-5_002e1">5.1 The subdirectory src</a></li>
-    <li><a id="toc-The-subdirectory-support_002dfiles" href="#Section-5_002e2">5.2 The subdirectory support-files</a></li>
-    <li><a id="toc-The-subdirectory-doc" href="#Section-5_002e3">5.3 The subdirectory doc</a></li>
-    <li><a id="toc-The-subdirectory-HOWTOs" href="#Section-5_002e4">5.4 The subdirectory HOWTOs</a></li>
-    <li><a id="toc-The-subdirectories-workspaces-and-wslib2-_002e_002e_002e-wslib5" href="#Section-5_002e5">5.5 The subdirectories workspaces and wslib2 ... wslib5</a></li>
-    <li><a id="toc-The-subdirectory-m4" href="#Section-5_002e6">5.6 The subdirectory m4</a></li>
-    <li><a id="toc-The-subdirectories-debian-and-debian_005ftmp" href="#Section-5_002e7">5.7 The subdirectories debian and debian_tmp</a></li>
-    <li><a id="toc-The-subdirectory-tools" href="#Section-5_002e8">5.8 The subdirectory tools</a></li>
+    <li><a id="toc-History" href="#Section-5_002e1">5.1 History</a></li>
+    <li><a id="toc-Standardization" href="#Section-5_002e2">5.2 Standardization</a></li>
+    <li><a id="toc-Quotes-from-the-lrm" href="#Section-5_002e3">5.3 Quotes from the lrm</a></li>
+    <li><a id="toc-Some-APL2-Tests" href="#Section-5_002e4">5.4 Some APL2 Tests</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Test-1_003a-Binding-strength-of-_005b_005d" href="#Test-1_003a-Binding-strength-of-_005b_005d">5.4.1 Test 1: Binding strength of []</a></li>
+      <li><a id="toc-Test-1_003a-Binding-strength-of-the-left-operand" href="#Test-1_003a-Binding-strength-of-the-left-operand">5.4.2 Test 1: Binding strength of the left operand</a></li>
+    </ul></li>
+    <li><a id="toc-Definitions" href="#Section-5_002e5">5.5 Definitions</a></li>
+    <li><a id="toc-GNU-APL-Vector-Notation" href="#Section-5_002e6">5.6 GNU APL Vector Notation</a></li>
   </ul></li>
-  <li><a id="toc-Libraries-Contributed-by-GNU-APL-Users" href="#Chapter-6">6 Libraries Contributed by GNU APL Users</a>
+  <li><a id="toc-GNU-APL-Project-Structure" href="#Chapter-6">6 GNU APL Project Structure</a>
   <ul class="no-bullet">
-    <li><a id="toc-The-GNU-APL-Community-Webpage" href="#Section-6_002e1">6.1 The GNU APL Community Webpage</a></li>
-    <li><a id="toc-Core-Libraries" href="#Section-6_002e2">6.2 Core Libraries</a></li>
+    <li><a id="toc-The-subdirectory-src" href="#Section-6_002e1">6.1 The subdirectory src</a></li>
+    <li><a id="toc-The-subdirectory-support_002dfiles" href="#Section-6_002e2">6.2 The subdirectory support-files</a></li>
+    <li><a id="toc-The-subdirectory-doc" href="#Section-6_002e3">6.3 The subdirectory doc</a></li>
+    <li><a id="toc-The-subdirectory-HOWTOs" href="#Section-6_002e4">6.4 The subdirectory HOWTOs</a></li>
+    <li><a id="toc-The-subdirectories-workspaces-and-wslib2-_002e_002e_002e-wslib5" href="#Section-6_002e5">6.5 The subdirectories workspaces and wslib2 ... wslib5</a></li>
+    <li><a id="toc-The-subdirectory-m4" href="#Section-6_002e6">6.6 The subdirectory m4</a></li>
+    <li><a id="toc-The-subdirectories-debian-and-debian_005ftmp" href="#Section-6_002e7">6.7 The subdirectories debian and debian_tmp</a></li>
+    <li><a id="toc-The-subdirectory-tools" href="#Section-6_002e8">6.8 The subdirectory tools</a></li>
   </ul></li>
-  <li><a id="toc-Licenses-for-this-GNU-APL-Manual-and-for-GNU-APL" href="#Chapter-7">7 Licenses for this GNU APL Manual and for GNU APL</a>
+  <li><a id="toc-Libraries-Contributed-by-GNU-APL-Users" href="#Chapter-7">7 Libraries Contributed by GNU APL Users</a>
   <ul class="no-bullet">
-    <li><a id="toc-The-GNU-Free-Documentation-License" href="#Section-7_002e1">7.1 The GNU Free Documentation License</a></li>
-    <li><a id="toc-The-GNU-GENERAL-PUBLIC-LICENSE" href="#Section-7_002e2">7.2 The GNU GENERAL PUBLIC LICENSE</a></li>
+    <li><a id="toc-The-GNU-APL-Community-Webpage" href="#Section-7_002e1">7.1 The GNU APL Community Webpage</a></li>
+    <li><a id="toc-Core-Libraries" href="#Section-7_002e2">7.2 Core Libraries</a></li>
+  </ul></li>
+  <li><a id="toc-Licenses-for-this-GNU-APL-Manual-and-for-GNU-APL" href="#Chapter-8">8 Licenses for this GNU APL Manual and for GNU APL</a>
+  <ul class="no-bullet">
+    <li><a id="toc-The-GNU-Free-Documentation-License" href="#Section-8_002e1">8.1 The GNU Free Documentation License</a></li>
+    <li><a id="toc-The-GNU-GENERAL-PUBLIC-LICENSE" href="#Section-8_002e2">8.2 The GNU GENERAL PUBLIC LICENSE</a></li>
   </ul></li>
 </ul>
 </div>
@@ -4241,36 +4254,47 @@ expression <b>B</b>. For example:
      5     
 </pre></div>
 
-<p><b>NOTE</b>: The implementation of <b>⌹[20]</b> depends on <b>python</b>. It also
+<p><b>NOTE</b>: The implementation of <b>⌹.integral</b> depends on <b>python</b>. It also
 depends on the python package <b>sympy</b> which does the actual computation
-of the integral. Normally the GNU APL configure script determines which
-optional libraries for GNU APL are present and compiles FGNU APL accordingly.
+of the integral. Normally the GNU APL <b>./configure</b> script determines which
+optional libraries for GNU APL are present and compiles GNU APL accordingly.
 In the python case this is not possible because python and its packages
 can be installed globally (by a privilreged user such as <b>root</b>) or by
 a unprivilreged user (e.g. below her home directory). It could therefore
 happen that e.g. python is available for the user that installs GNU APL, 
 but not for a user that uses the installed GNU APL. The GNU APL
 <b>./configure</b> has no way to detect such a situation. For this reason
-GNU APL checks at runtime (i.e. when ⌹.integral is used) if python and
+GNU APL checks at runtime (i.e. when <b>⌹.integral</b> is used) if python and
 <b>sympy</b>  are installed (and raises a <b>DOMAIN ERROR</b> if not).
 </p>
-<p>Now to the arguments of <b>⌹[20]</b>. The right argument <b>B</b> is a string
+<p>Now to the arguments of <b>⌹.integral</b>. The right argument <b>B</b> is a string
 with the expression for which the integral shall be computed. The syntax
-of <b>B</b> ia pretty much defined by <b>sympy</b>.
+of <b>B</b> ia pretty much defined by <b>sympy</b>. A maybe noteworthy difference
+between strings understood by <b>⌹.integral</b> and strings understood by
+<b>sympy</b> is that powers in <b>sympy</b> cwhave to be written as e.g. <b>a**n</b>,
+while <b>⌹.integral</b> also understands <b>aⁿ</b>.
 </p>
 <p>The left argument <b>A</b> is a vector of options. Currently only one option
 is defined which defines the format of the result:
 </p>
 <ul>
-<li> : A=1 : the result is a string (see example above)
-</li><li> : A=2 : the result is a character matrix (see example above). The
-       matrix is primarily created by the sympy function <b>pretty()</b>
-       (which is unfortunately not formally specified). For this reason
-       is <b>A=2</b> somewhat experimental and may produce a garbled output in
-       some cases.
+<li> <b>A[1]=1</b> : the result is a string (see example above)
+</li><li> <b>A[1]=2</b> : the result is a character matrix (see example above). The
+      matrix is primarily created by the sympy function <b>pretty()</b>
+      (which is unfortunately not formally specified). For this reason
+      is <b>A[1]=2</b> somewhat experimental and may produce a garbled output in
+      some cases.
+</li><li> <b>A[1]=3</b> : the result is a string in a simple to parse
+      format.
+</li><li> <b>A[1]=4</b> : the result is a string in LATEX format.
+</li><li> <b>A[1]=5</b> : the result is a character matrix in Math_ML format.
+</li><li> <b>A[1]=6</b> : the result is a character matrix in Dot format.
 </li></ul>
 
-
+<p><b>MathML</b> is an XML-based industry standard for mathematical expressions.
+</p>
+<p><b>Dot</b> is a program for printing directed graphs.
+</p>
 <hr>
 </div>
 </div>
@@ -4293,74 +4317,93 @@ shows a list of all functions provided by <b>⎕CR</b>:
 <pre class="example">      ⎕CR ''
 </pre></div>
 
-<p>Say a <b>byte vector</b> is an integer vector with numbers having a (signed or
-unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
-vectors are frequently used arguments and results of ⎕FIO functions.
+<p><b>Definition</b>: A <i>byte vector</i> is an integer (!) vector with numbers
+having a (signed or unsigned) 8-bit value (i.e. a value from -128 to 255
+inclusive). Such byte vectors are frequently used arguments and results
+of <b>⎕FIO</b> functions.
 </p>
 <p>Let <b>Z←A ⎕CR B</b>.
 </p>
-<p>Then the left argument A of ⎕CR selects one of several subfunctions of ⎕CR:
+<p>Then the left argument <b>A</b> of <b>⎕CR</b> selects one of several subfunctions
+of <b>⎕CR</b>:
 </p>
-<p>A=0-4 or 7-9, or 29: various formatting styles (boxed, APL input/output, etc.).
-Just try them out.
-</p>
-<p>A=5 or 6: convert byte vector B to a string of uppercase or lowercase
-hex digits respectively. Every byte in B becomes 2 characters in Z.
-</p>
-<p>A=10: convert variable named in B to an APL expression producing it.
-</p>
-<p>A=11: convert value B to byte vector Z in CDR (&quot;Common Data Representation&quot;,
-an IBM standard) format (similar to 3 ⎕TF).
-</p>
-<p>A=12: convert byte vector B in CDR format to value Z.
-</p>
-<p>A=13: convert hex string B to byte vector Z.
-</p>
+<ul>
+<li> <b>A∈0 1 2 3 4 7 8 9 29</b>: various formatting styles (boxed, 
+      APL input/output, etc.).  Just try them out.
+
+</li><li> <b>A∈5 6</b>: convert byte vector B to a string of uppercase or lowercase
+i     hex digits respectively. Every byte in <b>B</b> becomes 2 characters
+      in <b>Z</b>.
+
+</li><li> <b>A=10</b>: convert variable named in <b>B</b> to an APL expression
+      producing it.
+
+</li><li> <b>A=11</b>: convert value <b>B</b> to byte vector <b>Z</b> in CDR (&quot;Common Data
+      Representation&quot;, an IBM standard) format (similar to <b>3 ⎕TF</b>).
+
+</li><li> <b>A=12</b>: convert byte vector <b>B</b> in CDR format to value <b>Z</b>.
+
+</li><li> <b>A=13</b>: convert hex string <b>B</b> to byte vector <b>Z</b>.
+
 <p>If a conversion has an inverse conversion (like 12 being the inverse of 11)
 then the inverse conversion can be expressed as the negative of the conversion
-number. For example, 12 ⎕CR B is the same as ¯11 ⎕CR B.
+number. For example, <b>12 ⎕CR B</b> is the same as <b>¯11 ⎕CR B</b>.
 </p>
-<p>A=14: conversion 11 followed by conversion 13 (Value to hex string in
-CDR format)
-</p>
-<p>A=15: conversion 13 followed by conversion 12 (hex string in CDR format
-to Value)
-</p>
-<p>A=16: encode byte vector B into Z (base64 encoding, RFC 4648)
-</p>
-<p>A=17: decode base64 vector B into byte vector Z (base64 encoding, RFC 4648)
-</p>
-<p>A=18: convert text vector B into byte vector Z (UTF8 encoding, RFC 3629) 
-</p>
-<p>A=19: convert byte vector B into text vector Z (UTF8 encoding, RFC 3629)
-</p>
-<p>A=20-25: like 3,4,7-9 but using a formatting similar to NARS APL ⎕FMT
-(showing the axis lengths as numbers instead of → and ↓)
-</p>
-<p>A=26: Z is the cell types of the ravel elements of B (2: character,
-16: integer, 32: real number, 64: complex number.
-</p>
-<p>A=27: Z[I] is the primary data representation (for example the real part 
-of a complex number, or the numerator of a rational number) of B[I].
-</p>
-<p>A=28: Z[I] is the additional data representation (for example the imaginary
-part of a complex number, or the denominator of a rational number) of B[I].
-</p>
-<p>A=30: Z is B with all top-level elements conformed to a common rank and
-shape (as required by the ⍤ operator). This conversion is primarily used 
-internally by the GNU APL interpreter.
-</p>
-<p>A=31 or A=32: These conversions are used internally by ⎕INP.
-</p>
-<p>A=33: convert tagged byte vector to a TLV (Tag/Length/Value) buffer. The TLV
-buffer can be sent over a byte stream (socket) and easily decoded at the other
-end. Say B = B[1], B[2], ..., B[n] such that B1 is an Integer (the tag) and
-B[j] is a character in the range 0-255 for j &gt; 1. Let Z←33 ⎕CR B with
-Z = Z[1], Z[2], ... Z[m]. Then Z[1 2 3 4] is the 4 byte tag, Z[5 6 7 8]
-is the 4 byte data length (n-1) == (m - 8) and 1↓B == 8 ↓ Z. In other words,
-the first 4 bytes of Z are the tag in big endian byte order, the next 4 bytes
-are the length of B except the tag, and the rest of Z is B except the tag.
-</p>
+</li><li> <b>A=14</b>: conversion 11 followed by conversion 13 (Value to hex string
+      in CDR format)
+
+</li><li> <b>A=15</b>: conversion 13 followed by conversion 12 (hex string in CDR
+      format to Value)
+
+</li><li> <b>A=16</b>: encode byte vector B into <b>Z</b> (base64 encoding, <b>RFC 4648</b>)
+
+</li><li> <b>A=17</b>: decode base64 vector <b>B</b> into byte vector <b>Z</b> (base64
+      encoding, <b>RFC 4648</b>)
+
+</li><li> <b>A=18</b>: convert text vector <b>B</b> into byte vector <b>Z</b> (UTF8 encoding,
+      <b>RFC 3629</b>) 
+
+</li><li> <b>A=19</b>: convert byte vector B into text vector <b>Z</b> (UTF8 encoding,
+      <b>RFC 3629</b>)
+
+</li><li> <b>A=20-25</b>: like 3,4,i or 7-9 but using a formatting similar to
+      NARS APL <b>⎕FMT</b> (showing the axis lengths as numbers instead of
+      <b>→</b> and <b>↓</b>)
+
+</li><li> <b>A=26</b>: <b>Z</b> is the cell types of the ravel elements of <b>B</b>, i.e.
+      <ul>
+<li> <b>2</b>: character,
+      </li><li> <b>16</b>: integer,
+      </li><li> <b>32</b>: real number,
+      </li><li> <b>64</b>: complex number.
+</li></ul>
+
+</li><li> <b>A=27</b>: Z[I] is the primary data representation (for example the
+      real part  of a complex number, or the numerator of a rational number)
+      of B[I].
+
+</li><li> <b>A=28</b>: Z[I] is the additional data representation (for example
+      the imaginary part of a complex number, or the denominator of a
+      rational number) of B[I].
+
+</li><li> <b>A=30</b>: <b>Z</b> is B with all top-level elements conformed to a common
+      rank and shape (as required by the <b>⍤</b> operator). This conversion is
+      primarily used  internally by the GNU APL interpreter.
+
+</li><li> <b>A∈31 32</b>: These conversions are used internally by <b>⎕INP</b>.
+
+</li><li> <b>A=33</b>: convert tagged byte vector to a TLV (Tag/Length/Value)
+      buffer. The TLV buffer can be sent over a byte stream (socket) and
+      easily decoded at the other end. Say <b>B = B[1], B[2], ..., B[n]</b> such
+     that <b>B1</b> is an Integer (the tag) and <b>B[j]</b> is a character in the
+     range 0-255 for j &gt; 1.
+     Let <b>Z←33 ⎕CR B</b> with <b>Z = Z[1], Z[2], ... Z[m]</b>. Then <b>Z[1 2 3 4]</b>
+     is the 4 byte tag, <b>Z[5 6 7 8]</b> is the 4 byte data length
+     (n-1) = (m - 8), and <b>1↓B == 8 ↓ Z</b>. In other words, the first 4 bytes
+     of <b>Z</b> are the tag in big endian byte order, the next 4 bytes are the
+     length of <b>B</b> except the tag, and the rest of <b>Z</b> is <b>B</b> except
+     the tag.
+
 <p>Example:
 </p><div class="example">
 <pre class="example">      Tag←55   ⍝ hex 37
@@ -4368,56 +4411,60 @@ are the length of B except the tag, and the rest of Z is B except the tag.
 000000370000000556616C7565
 </pre></div>
 
-<p>A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and 34 ⎕CR
-is the transmission of a tagged byte vector over e.g a TCP socket:
-</p>
-<p>Sender                                          Receiver
-  &mdash;&mdash;                                          &mdash;&mdash;&ndash;
-  T,Data →→→ 33 ⎕CR T,Data   →→→TCP connection→→→   34 ⎕CR T,Data →→→ T,Data
-</p>
+</li><li> <b>A=34</b>: this is the inverse of <b>33 ⎕CR</b>. The intended use for
+<b>33 ⎕CR</b> and <b>34 ⎕CR</b> is the transmission of a tagged byte vector over
+e.g a TCP socket:
+
+<pre class="verbatim">  Sender                                              Receiver
+  ──────                                              ────────
+  T,Data →→→ 33 ⎕CR T,Data   →→→ TCP connection →→→   34 ⎕CR T,Data →→→ T,Data
+</pre>
 <p>Example:
 </p><div class="example">
 <pre class="example">      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
 55 Value
 </pre></div>
 
-<p>The TLVs constructed by 33 ⎕CR by the sender and decoded with 34 ⎕CR by the
-receiver can be sent back-to-back over a TCP connection or similar in such
-a way that the receiver knows exactly after which byte a TLV ends (and possibly
-the next TLV, if any, starts). This is perfect for connections over which
-data is sent sporadically. 33 ⎕CR and 34 ⎕CR are particularly useful for
-encoding and decoding TLV byte buffers exchanged between GNU APL and
-processes that were forked by GNU APL with ⎕FIO[57] (aka. fork() and execve()).
+<p>The TLVs constructed by <b>33 ⎕CR</b> by the sender and decoded with
+<b>34 ⎕CR</b> by the receiver can be sent back-to-back over a TCP connection
+or similar in such a way that the receiver knows exactly after which byte
+a TLV ends (and possibly the next TLV, if any, starts). This is perfect
+for connections over which data is sent sporadically. <b>33 ⎕CR</b> and
+<b>34 ⎕CR</b> are particularly useful for encoding and decoding TLV byte
+buffers exchanged between GNU APL and processes that were forked by
+GNU APL with <b>⎕FIO[57]</b> (aka. <b>fork()</b> and <b>execve()</b>).
 </p>
-<p>A=35: convert a string of lines (containing LF characters as line delimiters)
-to a nested vector of lines.
+</li><li> <b>A=35</b>: convert a string of lines (containing LF characters as line
+      delimiters) to a nested vector of lines.
+
+</li><li> <b>A=36</b>: the inverse of <b>⎕CR[35]</b>. Convert a nested vector of lines
+      to a string with lines terminated with LF characxters.
+
+</li><li> <b>A=37</b>: Same as <b>⎕CR B</b> but without removing any indentation.
+
+</li><li> <b>A=38</b>: Return an empty structured variable with (integer)
+      capacity <b>Bi</b>, or convert an N×2 matrix <b>B</b> to a structured variable.
+
+</li><li> <b>A=39</b>: convert a strucured variable <b>B</b> to an N×2 variable.
+
+</li><li> <b>A=40</b>: pack a boolean variable Bi (experimental).
+
+</li><li> <b>A=41</b>: unpack a boolean variable Bi (experimental).
+
+</li><li> <b>A=42</b>: tokenize the APL statement Bs.
+
+</li><li> <b>A=43</b>: parse the APL statement Bs.
+
+</li><li> <b>A=44</b>: decode the (integer) token tag B or the (nested) token B.
+</li></ul>
+
+<p>Most dyadic <b>⎕CR</b> variants whose argument <b>B</b> is expected to be a byte
+vector throw:
 </p>
-<p>A=36: the inverse of ⎕CR[35]. Convert a nested vector of lines to a string
-with lines terminated with LF characxters.
-</p>
-<p>A=37 Same as <b>⎕CR B</b> but without removing any indentation.
-</p>
-<p>A=38: Return an empty structured variable with (integer) capacity <b>Bi</b>,
-or convert an N×2 matrix <b>B</b> to a structured variable.
-</p>
-<p>A=39: convert a strucured variable <b>B</b> to an N×2 variable.
-</p>
-<p>A=40: pack a boolean variable Bi (experimental).
-</p>
-<p>A=41: unpack a boolean variable Bi (experimental).
-</p>
-<p>A=42: tokenize the APL statement Bs.
-</p>
-<p>A=43: parse the APL statement Bs.
-</p>
-<p>A=44: decode the (integer) token tag B or the (nested) token B.
-</p>
-<p>Most dyadic ⎕CR variants whose argument B is expected to be a byte vector throw:
-</p>
-<ol>
+<ul>
 <li> RANK ERROR if 1≠⍴⍴B
 </li><li> DOMAIN ERROR if one of the B[j] is not a proper byte value
-</li></ol>
+</li></ul>
 
 <p>A proper byte value is either an integer in the range -128...255 inclusive,
 or a (Unicode) character with a code point between U+FF80 and U+FFFF
@@ -4427,7 +4474,10 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 </p>
-
+<p><b>⎕CR</b> is a function group, therefore its subfunctions can be selected with
+a name. For example: monadic <b>⎕CR.hex_to_bytes</b> is the same as monadic
+<b>⎕CR[13]</b> or dyadic <b>13 ⎕CR</b>.
+</p>
 <hr>
 </div>
 <div class="section" id="Section-2_002e24">
@@ -9181,7 +9231,6 @@ same shape as <b>B</b> and:
 <p>
 Next: <a href="#Chapter-4" accesskey="n" rel="next">Internationalization</a>, Previous: <a href="#Chapter-2" accesskey="p" rel="prev">Non-standard GNU APL Features</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-
 <span id="Limitations-and-Missing-Features"></span><h2 class="chapter">3 Limitations and Missing Features</h2>
 
 <p>GNU APL is an almost full implementation of the ISO standard 13751.
@@ -9247,7 +9296,7 @@ APL interpreter rather than adding auxiliary processors.
 <div class="chapter" id="Chapter-4">
 <div class="header">
 <p>
-Next: <a href="#Chapter-5" accesskey="n" rel="next">Project Structure</a>, Previous: <a href="#Chapter-3" accesskey="p" rel="prev">Limitations and Missing Features</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Chapter-5" accesskey="n" rel="next">Vector Notation</a>, Previous: <a href="#Chapter-3" accesskey="p" rel="prev">Limitations and Missing Features</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Internationalization"></span><h2 class="chapter">4 Internationalization</h2>
 
@@ -9281,9 +9330,452 @@ locales.
 <div class="chapter" id="Chapter-5">
 <div class="header">
 <p>
-Next: <a href="#Chapter-6" accesskey="n" rel="next">Libraries Contributed by GNU APL Users</a>, Previous: <a href="#Chapter-4" accesskey="p" rel="prev">Internationalization</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Chapter-6" accesskey="n" rel="next">GNU APL Project Structure</a>, Previous: <a href="#Chapter-4" accesskey="p" rel="prev">Internationalization</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Project-Structure"></span><h2 class="chapter">5 Project Structure</h2>
+<span id="Vector-Notation"></span><h2 class="chapter">5 Vector Notation</h2>
+
+
+<p>This chapter describes details of the GNU APL vector notation. Unfortunately
+there exists misleading information concerning the GNU APL vector nontation
+on the public internet and the attempts of the author of this manual to have
+the misleading information corrected were not successful.
+</p>
+<ul class="section-toc">
+<li><a href="#Section-5_002e1" accesskey="1">History</a></li>
+<li><a href="#Section-5_002e2" accesskey="2">Standardization</a></li>
+<li><a href="#Section-5_002e3" accesskey="3">Quotes from the lrm</a></li>
+<li><a href="#Section-5_002e4" accesskey="4">Some APL2 Tests</a></li>
+<li><a href="#Section-5_002e5" accesskey="5">Definitions</a></li>
+<li><a href="#Section-5_002e6" accesskey="6">GNU APL Vector Notation</a></li>
+</ul>
+<hr>
+<div class="section" id="Section-5_002e1">
+<div class="header">
+<p>
+Next: <a href="#Section-5_002e2" accesskey="n" rel="next">Standardization</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="History"></span><h3 class="section">5.1 History</h3>
+
+<p>Vector Notation is as old as APL. The famous Book <i>APL \360: An interactive
+approach</i> by <b>Leonard Gilman</b> and <b>Allen J. Rose</b> introduces vector
+notation already on page 2, but without calling it vector notation.
+</p>
+<p>Quote:
+</p>
+<div class="example">
+<pre class="example">Or we can assign a string of numbers to a variable called X, and ask the
+computer to execute the command shown, + / X , with the response 17.1 :
+      X+-3 4 1.1 3 6
+      +/X
+17.1
+</pre></div>
+
+<p>The terms <i>vector notation</i> (used by IBM APL and by GNU APL) was
+apparently coined by <b>Kenneth Iverson</b> (<i>A Programming Lagnuage</i>,
+p. 163) and the equivalent term <i>strand notation</i> is used by other
+APL vendors.
+</p>
+
+<hr>
+</div>
+<div class="section" id="Section-5_002e2">
+<div class="header">
+<p>
+Next: <a href="#Section-5_002e3" accesskey="n" rel="next">Quotes from the lrm</a>, Previous: <a href="#Section-5_002e1" accesskey="p" rel="prev">History</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Standardization"></span><h3 class="section">5.2 Standardization</h3>
+
+<p>The current ISO standard ISO/IEC 13751 <i>Programming Language APL, extended</i>,
+in the following abbreviated as <b>iso</b>,  does not formally define vector
+notation, but uses it all over the place in its examples.
+</p>
+<p>The IBM APL2 <i>Language Reference Manual</i>, in the following abbreviated as
+<b>lrm</b>, was the blueprint for GNU APL. The <b>lrm</b> describes vector notatation
+briefly. 
+</p>
+
+<hr>
+</div>
+<div class="section" id="Section-5_002e3">
+<div class="header">
+<p>
+Next: <a href="#Section-5_002e4" accesskey="n" rel="next">Some APL2 Tests</a>, Previous: <a href="#Section-5_002e2" accesskey="p" rel="prev">Standardization</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Quotes-from-the-lrm"></span><h3 class="section">5.3 Quotes from the lrm</h3>
+
+<p>Different aspects of vector nortation are distributed over the <b>lrm</b>. To
+get a compressed view of the matter we quote the relevant pieces:
+</p>
+<ol>
+<li> <b>lrm page 14</b>: <i>The juxtaposition of two or more arrays in an
+      expression results in a vector whose items are the arrays. Representing
+      a vector in this manner is called <b>vector notation</b>.</i>
+
+</li><li> <b>lrm page 14</b>: <i>Characters in a vector consisting only of
+characters can be listed within one set of single quotation marks:
+      &rsquo;FACE&rsquo; ←→ (&rsquo;F&rsquo; &rsquo;A&rsquo; &rsquo;C&rsquo; &rsquo;E&rsquo;)</i>
+
+</li><li> <b>lrm page 33</b>: <i>The hierarchy of binding strengths is listed
+      below in descending order.</i>
+<pre class="verbatim">     Binding Strength            What Is Bound
+     ──────────────────────      ────────────────────────────────────
+     1. Brackets                 Brackets to what is on their left
+     2. Specification left       Left arrow to what is on its left
+     3. Right operand            Dyadic operator to its right operand
+     4. Vector                   Array to an array
+     5. Left operand             Operator to its left operand
+     6. Left argument            Function to its left argument
+     7. Right argument           Function to its right argument
+     8. Specification right      Left arrow to what is on its right
+     ════════════════════════════════════════════════════════════════
+</pre><p>The binding strength 4. above is the one for vector notation. It defines
+    how the items of a vector notation are bound together (as opposed to being
+    bound to other tokens). For example: <b>1 2 3[2]</b> becomes <b>1 2 (3[2])</b>
+    because <b>[2]</b> binds stronger to <b>3</b> on its left than <b>3</b> binds to
+    <b>2</b> in its left (which then raises a <b>RANK ERROR</b> because <b>3</b> is
+    a scalar).
+</p></li></ol>
+
+
+<hr>
+</div>
+<div class="section" id="Section-5_002e4">
+<div class="header">
+<p>
+Next: <a href="#Section-5_002e5" accesskey="n" rel="next">Definitions</a>, Previous: <a href="#Section-5_002e3" accesskey="p" rel="prev">Quotes from the lrm</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Some-APL2-Tests"></span><h3 class="section">5.4 Some APL2 Tests</h3>
+
+<p>Before explaining the details of vector notation in GNU APL we would like
+to share the results of some tests performed with IBM APL2 (again the demo
+version for PCs).
+</p>
+<ul class="section-toc">
+<li><a href="#Test-1_003a-Binding-strength-of-_005b_005d" accesskey="1">Test 1: Binding strength of []</a></li>
+<li><a href="#Test-1_003a-Binding-strength-of-the-left-operand" accesskey="2">Test 1: Binding strength of the left operand</a></li>
+</ul>
+<div class="subsection" id="Test-1_003a-Binding-strength-of-_005b_005d">
+<h4 class="subsection">5.4.1 Test 1: Binding strength of []</h4>
+
+<div class="example">
+<pre class="example">      ⍝ IBM APL2: Binding strength of []...
+
+      ⍝ Test 1a.
+      ⍝
+      1 2 3[2]
+RANK ERROR
+      1 2 3[2]
+          ^^
+
+      ⍝ Test 1b.
+      ⍝
+      'a' 'b' 'c'[2]
+RANK ERROR
+      'ab' 'c'[2]
+           ^  ^
+
+      ⍝ Test 1c.
+      ⍝
+      'abc'
+b
+</pre></div>
+
+<p><b>Test 1a</b>: no surprise. <b>[]</b> has the strongest binding and raises a
+<b>RANK ERROR</b> when indexing the scalar <b>3</b>.
+</p>
+<p><b>Test 1b</b>: no surprise. since it follows suit.
+</p>
+<p><b>Test 1c</b>: no surprise for the binding strength. This test confirms
+the second quote on page 14 of the lrm.
+</p>
+</div>
+<div class="subsection" id="Test-1_003a-Binding-strength-of-the-left-operand">
+<h4 class="subsection">5.4.2 Test 1: Binding strength of the left operand</h4>
+
+<p>For this test we create a defined function <b>SHOW_NC</b>, a monadic defined
+operator <b>OPER1</b>, and a dyadic defined operator <b>OPER2</b>:
+</p>
+<div class="example">
+<pre class="example">      ⍝ display the name class of B¯B
+      ⍝
+      ∇Z←SHOW_NC B¯B;N
+       N←8↑B,':'
+       →(¯1 0 1 2 3 4 = ⎕NC B¯B)/I U L V F O ◊ ++
+      I: →0, Z←(8↑B), ': Invalid Name'
+      U: →0, Z←(8↑B), ': Unused Name'
+      L: →0, Z←(8↑B), ': Label'
+      V: →0, Z←(8↑B), ': Value', ⍎B¯B
+      F: →0, Z←(8↑B), ': Function'
+      O: →0, Z←(8↑B), ': Operator'
+      ∇
+
+      ⍝ monadic operator
+      ⍝
+      ∇Z←A (LO OPER1) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'B'
+      ∇
+
+      ⍝ dyadic operator
+      ⍝
+      ∇Z←A (LO OPER2 RO) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'RO'
+       SHOW_NC 'B'
+      ∇
+</pre></div>
+
+<p>The somewhat strange looking argument name <b>B¯B</b> of <b>SHOW_NC</b> instead of
+the rather frequent <b>B</b> was chosen to avoid name conflicts between the
+right value argument of <b>SHOW_NC</b> and the right value argument the
+operators under test (like <b>OPER1</b> or <b>OPER2</b>). Then:
+</p>
+<div class="example">
+<pre class="example">      ⍝ Test 2a: binding of the left operand (literal LO)
+      ⍝
+      11 22 33 OPER1 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2b: binding of the left operand (parser LO)
+      ⍝
+      (UU VV WW)←11 22 33
+      UU VV WW OPER1 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2c. binding of the left operand (in parentheses)
+      ⍝
+      11 22 (33 OPER1) 1 2 3
+A       : 11
+LO      : Value  22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ Test 2d. binding of the right operand
+      ⍝
+      11 22 33 'lop' OPER1 'rop' 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33 lop
+OPER2   : Operator
+RO      : Value  rop
+B       : Value  1 2 3
+</pre></div>
+
+<p>The results are rather interesting. We will later on discuss a potential
+difference between vector notation at tokenization time and vector notation
+at execution time. The same outcome of tests <b>2a.</b> and <b>2b.</b> demonstrates
+that IBM APL2 handles both variants in the same fashion (supposedly because
+both cases are resolved at execution time).
+</p>
+<p>Test <b>2a.</b> proves that vector notation binds stronger than the left operand
+to its dyadic operator. Test <b>2c.</b> demonstrates how the binding strengths
+can be undermined with parentheses.
+</p>
+<p>Test <b>2d.</b> proves that the right operand binds stronger than vector notation.
+However, this case is interesting from an <b>iso</b>. Page 126 of <b>iso</b> gives
+the following example for the dyadic rank operator:
+</p>
+<div class="example">
+<pre class="example">      ⍝ example from ISO/IEC 13751 p.126
+      ⍝
+      0 1 2⌽∘0 1 'ABC'
+ABC
+BCA
+CAB
+</pre></div>
+
+<p>Comparing the results of Test <b>2d.</b> with GNU APL shows how <b>iso</b> believes
+their example should be parsed:
+</p>
+<div class="example">
+<pre class="example">      ⍝ Test 2e. (GNU APL):
+      ⍝
+      0 1 2(⌽⍤0 1) 'ABC'
+ABC
+BCA
+CAB
+
+      ⍝ Test 2f. (GNU APL):
+      ⍝ 
+      0 1 2(⌽⍤0) 1 'ABC'
+LENGTH ERROR
+      0 1 2(⌽⍤0 0 0)1 'ABC'
+      ^            ^
+</pre></div>
+
+<p><b>NOTE</b>: It is not possible to run tests <b>2e.</b> and <b>2f.</b> in IBM APL2
+directly (because at least in the PC demo version of IBM APL2 the rank
+operator <b>⍤</b> is not implemented. However using our defined function
+<b>OPER2</b> above instead of <b>⍤</b> shows that IBM APL2 evaluates the ISO
+example as <b>0 1 2(⌽∘0) 1 &rsquo;ABC&rsquo;</b> (in accordance with <b>lrm</b>) and not
+as <b>0 1 2(⌽∘0 1) &rsquo;ABC&rsquo;</b> as <b>iso</b> suggests.
+</p>
+<p><b>Takeaways</b>: the tests above teach us the following:
+</p>
+<ul>
+<li> Vector notation differs between:
+      <ul>
+<li> The ISO standard for APL,
+      </li><li> IBM APL2, and
+      </li><li> APL implementation of other vendors (including GNU APL).
+      </li></ul>
+</li><li> It is therefore impossible to accomodate both the ISO standard and
+      IBM APL2 to 100% at the same time, but
+      </li><li> GNU APL tries to be as close as possible to one of them,
+</li><li> The issues highlited above can be easily avoided by always using
+      parentheses around operators and their operands (even though they
+      may appear to be redundant). These parentheses are the (only) key
+      to portable APL programs.
+</li></ul>
+
+
+<hr>
+</div>
+</div>
+<div class="section" id="Section-5_002e5">
+<div class="header">
+<p>
+Next: <a href="#Section-5_002e6" accesskey="n" rel="next">GNU APL Vector Notation</a>, Previous: <a href="#Section-5_002e4" accesskey="p" rel="prev">Some APL2 Tests</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Definitions"></span><h3 class="section">5.5 Definitions</h3>
+
+<p><b>Definition</b>: A <i>strand</i> consists of two (!) or more adjacent values in
+a defined function, or in a string being ⍎&rsquo;ed, or on a line entered in
+immediate execution mode. Such values can be literals (like in <b>1 2 3</b>),
+but also values of variables or results of niladic functions. A strand is
+always a vector and we call the values in a strand the <i>items of the strand</i>.
+Strand items can be simple (i.e. numbers or single characters) or nested
+(strings or other strands). Strand items sre always (possibly nested)
+APL scalars.
+</p>
+<p><b>Definition</b>: A <i>literal strand</i> is a strand whose items are only
+literals (including nested literals like in 1 2 (3 4) 5).
+</p>
+<p><b>Definition</b>: An <i>extended literal strand</i> is a strand whose items are
+either literals (including nested literals) or iparticular simple primitive
+function with particular literal arguments.
+</p>
+<p><b>Definition</b>: A <i>mixed strand</i> is a strand which is not a literal strand.
+</p>
+<p><b>Definition</b>: A strand is <i>open</i> if more items can be appended to it.
+</p>
+<p><b>Definition</b>: A strand is <i>closed</i> if it is not open.
+</p>
+<p><b>Definition</b>: A strand is <i>nested</i> if at lease one of its items is nested.
+</p>
+<p>Examples:
+</p>
+<div class="example">
+<pre class="example">      1 2 3        ⍝ open literal strand
+
+      VAR←1 2 3
+      ∇Z←FOO
+       Z←1 2 3
+      ∇
+
+      1 VAR 3       ⍝ nested open mixed strand
+      1 FOO 3       ⍝ open mixed strand\
+
+      1 2 (3⍴4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+      1 2 (3/4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+
+      (1 2 3)       ⍝ closed literal strand
+      'abc'         ⍝ closed literal strand
+</pre></div>
+
+
+<hr>
+</div>
+<div class="section" id="Section-5_002e6">
+<div class="header">
+<p>
+Previous: <a href="#Section-5_002e5" accesskey="p" rel="prev">Definitions</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="GNU-APL-Vector-Notation"></span><h3 class="section">5.6 GNU APL Vector Notation</h3>
+
+<p>With the definitions from the previous section we can explain how GNU APL
+has implemented vector notation:
+</p>
+<p>1. GNU APL distinguishes between literal and mixed strands. literal strands
+   are combined into a single APL value at tokenization time. This is a
+   very effective optimization (which can be disabled at <b>./configure</b>
+   time). In contrast, mixed strands are created at prefix matching time, i.e.
+   when an APL expression is evaluated. The tokenizatio of APL expressions
+   happens only once, while prefix matching occurs every time when a
+   statement is being executed and therefore moving major parts of the strand
+   building from prefix matching time to tokenization time can bring
+   substantial performance benefits.
+</p>
+<p>2. The tokenization expands simple APL primitives with literal arguments and
+   short results into their literal equivalent. Currently the APL primitives
+   <b>N⍴B</b>, <b>N/B</b>, <b>N⌿B</b>, <b>,B</b>, <b>⍪B</b>, and <b>⊂B</b> are handled this way.
+</p>
+<p>3. The tokenization of literal strands has dedicated code for literal
+   arguments of the rank operator (<b>⍤</b>) to make make it working like described
+   in the ISO standard. This is, in contrast to defined operators, possible
+   because the ISO standard defines in very detail how its right operand
+   needs to look like and how deviations shall be handled (<b>DOMAIN ERROR</b>,
+   <b>LENGTH ERROR</b> etc.
+</p>
+<p>4. The prefix matching of mixed strands builds the strand step-by-step
+   according to the following rules:
+</p>
+<ul>
+<li> two adjacent APL scalars <b>A</b> and <b>B</b> create a new open strand
+      (with two strand items). Each of the two scalars <b>A</b> or <b>B</b> can
+      be simple (like numbers or single characters) or nested (like strings
+      or closed strands).
+</li><li> An APL scalar <b>A</b> adjacent to an open strand <b>B</b> preprends <b>A</b>
+      to <b>B</b>.  That is, <b>B←A, B</b>.
+</li><li> An open strand <b>A</b> adjacent to an an APL scalar <b>B</b> appends <b>B</b> 
+      to <b>A</b>.  That is, <b>A←A, B</b>.
+</li><li> the previous two rules prevent two adjacent open strands, because the
+      strand items of a potential open left strand <b>A</b> are prepended item
+      by item to an open right strand <b>B</b> (which prevents the creation of a
+      new open left strand while an open right strand exists,
+
+</li><li> Like the normal APL evaluation, this procedure is preformed from the
+      right to the left.
+</li><li> if an open strand hits a closing parenthesis then a new phrase matching
+      context is created in which the current procedure is abandoned until
+      the corresponding opening parentheses has been processed. The result
+      of the expression in parentheses is then taken as the next strand item
+      for the abandoned strand (if any).
+</li><li> Any symbols encountered during this procedure are being resolved into
+      scalars (possibly enclosing them if they are not). Niladic functions are
+      called to obtain their result.
+</li><li> Likewise, any literal strands that were created at tokenization time
+      are considered closed (which cause them to be enclosed when preprended
+      or appended to an open mixed strand).
+</li><li> If a strand is open then any other token (functions, operators,
+      brackets, end-of-statement, etc.) closes it. The result is a single
+      value for the strand.
+</li></ul>
+
+<p>5. The operators <b>⍣</b> (power operator) and <b>⍤</b> (rank operator), whose
+   right operand can be identified by the rules given in <b>iso</b>) have
+   dedicated code that &quot;unstrands&quot; the right operand from a strand that
+   may have been mistakenly created in <b>3.</b> above.
+</p>
+
+<hr>
+</div>
+</div>
+<div class="chapter" id="Chapter-6">
+<div class="header">
+<p>
+Next: <a href="#Chapter-7" accesskey="n" rel="next">Libraries Contributed by GNU APL Users</a>, Previous: <a href="#Chapter-5" accesskey="p" rel="prev">Vector Notation</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="GNU-APL-Project-Structure"></span><h2 class="chapter">6 GNU APL Project Structure</h2>
 
 <p>The top-level directory of the GNU APL project has a structure like this:
 </p>
@@ -9324,22 +9816,22 @@ handful of README-XXX files that might be of interest when building GNU APL.
 </p>
 
 <ul class="section-toc">
-<li><a href="#Section-5_002e1" accesskey="1">The subdirectory src</a></li>
-<li><a href="#Section-5_002e2" accesskey="2">The subdirectory support-files</a></li>
-<li><a href="#Section-5_002e3" accesskey="3">The subdirectory doc</a></li>
-<li><a href="#Section-5_002e4" accesskey="4">The subdirectory HOWTOs</a></li>
-<li><a href="#Section-5_002e5" accesskey="5">The subdirectories workspaces and wslib2 ... wslib5</a></li>
-<li><a href="#Section-5_002e6" accesskey="6">The subdirectory m4</a></li>
-<li><a href="#Section-5_002e7" accesskey="7">The subdirectories debian and debian_tmp</a></li>
-<li><a href="#Section-5_002e8" accesskey="8">The subdirectory tools</a></li>
+<li><a href="#Section-6_002e1" accesskey="1">The subdirectory src</a></li>
+<li><a href="#Section-6_002e2" accesskey="2">The subdirectory support-files</a></li>
+<li><a href="#Section-6_002e3" accesskey="3">The subdirectory doc</a></li>
+<li><a href="#Section-6_002e4" accesskey="4">The subdirectory HOWTOs</a></li>
+<li><a href="#Section-6_002e5" accesskey="5">The subdirectories workspaces and wslib2 ... wslib5</a></li>
+<li><a href="#Section-6_002e6" accesskey="6">The subdirectory m4</a></li>
+<li><a href="#Section-6_002e7" accesskey="7">The subdirectories debian and debian_tmp</a></li>
+<li><a href="#Section-6_002e8" accesskey="8">The subdirectory tools</a></li>
 </ul>
 <hr>
-<div class="section" id="Section-5_002e1">
+<div class="section" id="Section-6_002e1">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e2" accesskey="n" rel="next">The subdirectory support-files</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e2" accesskey="n" rel="next">The subdirectory support-files</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-src"></span><h3 class="section">5.1 The subdirectory src</h3>
+<span id="The-subdirectory-src"></span><h3 class="section">6.1 The subdirectory src</h3>
 
 <p>The subdirectory src contains all C++ source files that are needed to build
 either the GNU APL interpreter itself, or libapl (a library that contains the
@@ -9368,12 +9860,12 @@ contained in subdirectory src/testcases
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e2">
+<div class="section" id="Section-6_002e2">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e3" accesskey="n" rel="next">The subdirectory doc</a>, Previous: <a href="#Section-5_002e1" accesskey="p" rel="prev">The subdirectory src</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e3" accesskey="n" rel="next">The subdirectory doc</a>, Previous: <a href="#Section-6_002e1" accesskey="p" rel="prev">The subdirectory src</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-support_002dfiles"></span><h3 class="section">5.2 The subdirectory support-files</h3>
+<span id="The-subdirectory-support_002dfiles"></span><h3 class="section">6.2 The subdirectory support-files</h3>
 
 <p>The subdirectory support-file contains a number of configuration files that aim
 at making a standard keyboard produce APL characters. Details are explained in
@@ -9381,24 +9873,24 @@ top-level file README-3-keyboard.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e3">
+<div class="section" id="Section-6_002e3">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e4" accesskey="n" rel="next">The subdirectory HOWTOs</a>, Previous: <a href="#Section-5_002e2" accesskey="p" rel="prev">The subdirectory support-files</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e4" accesskey="n" rel="next">The subdirectory HOWTOs</a>, Previous: <a href="#Section-6_002e2" accesskey="p" rel="prev">The subdirectory support-files</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-doc"></span><h3 class="section">5.3 The subdirectory doc</h3>
+<span id="The-subdirectory-doc"></span><h3 class="section">6.3 The subdirectory doc</h3>
 
 <p>The subdirectory doc is used to create <b>this</b> info file in different file
 formats (.info, .html).
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e4">
+<div class="section" id="Section-6_002e4">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e5" accesskey="n" rel="next">The subdirectories workspaces and wslib2 ... wslib5</a>, Previous: <a href="#Section-5_002e3" accesskey="p" rel="prev">The subdirectory doc</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e5" accesskey="n" rel="next">The subdirectories workspaces and wslib2 ... wslib5</a>, Previous: <a href="#Section-6_002e3" accesskey="p" rel="prev">The subdirectory doc</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-HOWTOs"></span><h3 class="section">5.4 The subdirectory HOWTOs</h3>
+<span id="The-subdirectory-HOWTOs"></span><h3 class="section">6.4 The subdirectory HOWTOs</h3>
 
 <p>The subdirectory HOWTOs contains some documents that try to explain how some
 of the non-standard features of GNU APL are intended to be used. These
@@ -9410,12 +9902,12 @@ installed by <b>make install</b>, but rather remain in the source tree.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e5">
+<div class="section" id="Section-6_002e5">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e6" accesskey="n" rel="next">The subdirectory m4</a>, Previous: <a href="#Section-5_002e4" accesskey="p" rel="prev">The subdirectory HOWTOs</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e6" accesskey="n" rel="next">The subdirectory m4</a>, Previous: <a href="#Section-6_002e4" accesskey="p" rel="prev">The subdirectory HOWTOs</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectories-workspaces-and-wslib2-_002e_002e_002e-wslib5"></span><h3 class="section">5.5 The subdirectories workspaces and wslib2 ... wslib5</h3>
+<span id="The-subdirectories-workspaces-and-wslib2-_002e_002e_002e-wslib5"></span><h3 class="section">6.5 The subdirectories workspaces and wslib2 ... wslib5</h3>
 
 <p>These directories (and their content) are, by default, copied to
 /usr/local/lib/apl by <b>make install</b>. Some subdirectories are empty while
@@ -9424,12 +9916,12 @@ demonstrating the use of some non-standard APL features).
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e6">
+<div class="section" id="Section-6_002e6">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e7" accesskey="n" rel="next">The subdirectories debian and debian_tmp</a>, Previous: <a href="#Section-5_002e5" accesskey="p" rel="prev">The subdirectories workspaces and wslib2 ... wslib5</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e7" accesskey="n" rel="next">The subdirectories debian and debian_tmp</a>, Previous: <a href="#Section-6_002e5" accesskey="p" rel="prev">The subdirectories workspaces and wslib2 ... wslib5</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-m4"></span><h3 class="section">5.6 The subdirectory m4</h3>
+<span id="The-subdirectory-m4"></span><h3 class="section">6.6 The subdirectory m4</h3>
 
 <p>The subdirectory m4 contains macros used by autoconf and automake. In most
 cases the top-level ./configure script can be used as is. If a platform on
@@ -9449,12 +9941,12 @@ be necessary to re-create the ./configure script on the platform.
 
 <hr>
 </div>
-<div class="section" id="Section-5_002e7">
+<div class="section" id="Section-6_002e7">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e8" accesskey="n" rel="next">The subdirectory tools</a>, Previous: <a href="#Section-5_002e6" accesskey="p" rel="prev">The subdirectory m4</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-6_002e8" accesskey="n" rel="next">The subdirectory tools</a>, Previous: <a href="#Section-6_002e6" accesskey="p" rel="prev">The subdirectory m4</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectories-debian-and-debian_005ftmp"></span><h3 class="section">5.7 The subdirectories debian and debian_tmp</h3>
+<span id="The-subdirectories-debian-and-debian_005ftmp"></span><h3 class="section">6.7 The subdirectories debian and debian_tmp</h3>
 
 <p>These subdirectories are templates for building Debian
 packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
@@ -9463,12 +9955,12 @@ when a Debian package is built.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-5_002e8">
+<div class="section" id="Section-6_002e8">
 <div class="header">
 <p>
-Previous: <a href="#Section-5_002e7" accesskey="p" rel="prev">The subdirectories debian and debian_tmp</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-6_002e7" accesskey="p" rel="prev">The subdirectories debian and debian_tmp</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">GNU APL Project Structure</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-subdirectory-tools"></span><h3 class="section">5.8 The subdirectory tools</h3>
+<span id="The-subdirectory-tools"></span><h3 class="section">6.8 The subdirectory tools</h3>
 
 <p>GNU APL uses generated C++ code. The subdirectory tools contains the source
 code for the code generator (phrase_gen) and also some other small tools for
@@ -9478,12 +9970,12 @@ therefore not installed by <b>make install</b>.
 <hr>
 </div>
 </div>
-<div class="chapter" id="Chapter-6">
+<div class="chapter" id="Chapter-7">
 <div class="header">
 <p>
-Next: <a href="#Chapter-7" accesskey="n" rel="next">Licenses for this GNU APL Manual and for GNU APL</a>, Previous: <a href="#Chapter-5" accesskey="p" rel="prev">Project Structure</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Chapter-8" accesskey="n" rel="next">Licenses for this GNU APL Manual and for GNU APL</a>, Previous: <a href="#Chapter-6" accesskey="p" rel="prev">GNU APL Project Structure</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Libraries-Contributed-by-GNU-APL-Users"></span><h2 class="chapter">6 Libraries Contributed by GNU APL Users</h2>
+<span id="Libraries-Contributed-by-GNU-APL-Users"></span><h2 class="chapter">7 Libraries Contributed by GNU APL Users</h2>
 
 <p>Since the first release of GNU APL, a number of libraries, but also other
 developments, have been made by users of GNU APL. Below are links to these
@@ -9491,16 +9983,16 @@ contributions.
 </p>
 
 <ul class="section-toc">
-<li><a href="#Section-6_002e1" accesskey="1">The GNU APL Community Webpage</a></li>
-<li><a href="#Section-6_002e2" accesskey="2">Core Libraries</a></li>
+<li><a href="#Section-7_002e1" accesskey="1">The GNU APL Community Webpage</a></li>
+<li><a href="#Section-7_002e2" accesskey="2">Core Libraries</a></li>
 </ul>
 <hr>
-<div class="section" id="Section-6_002e1">
+<div class="section" id="Section-7_002e1">
 <div class="header">
 <p>
-Next: <a href="#Section-6_002e2" accesskey="n" rel="next">Core Libraries</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">Libraries Contributed by GNU APL Users</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-7_002e2" accesskey="n" rel="next">Core Libraries</a>, Up: <a href="#Chapter-7" accesskey="u" rel="up">Libraries Contributed by GNU APL Users</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-GNU-APL-Community-Webpage"></span><h3 class="section">6.1 The GNU APL Community Webpage</h3>
+<span id="The-GNU-APL-Community-Webpage"></span><h3 class="section">7.1 The GNU APL Community Webpage</h3>
 
 <p>The GNU APL project maintains a web page that lists contributions made by
 GNU APL users:
@@ -9518,12 +10010,12 @@ to fix that.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-6_002e2">
+<div class="section" id="Section-7_002e2">
 <div class="header">
 <p>
-Previous: <a href="#Section-6_002e1" accesskey="p" rel="prev">The GNU APL Community Webpage</a>, Up: <a href="#Chapter-6" accesskey="u" rel="up">Libraries Contributed by GNU APL Users</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-7_002e1" accesskey="p" rel="prev">The GNU APL Community Webpage</a>, Up: <a href="#Chapter-7" accesskey="u" rel="up">Libraries Contributed by GNU APL Users</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Core-Libraries"></span><h3 class="section">6.2 Core Libraries</h3>
+<span id="Core-Libraries"></span><h3 class="section">7.2 Core Libraries</h3>
 
 <p>There is a small number of libraries that are considered &quot;core&quot; APL because,
 for example, the ISO standard requires their functionality, or because other
@@ -9548,31 +10040,31 @@ GNU APL packages that follows their contribution.
 <hr>
 </div>
 </div>
-<div class="chapter" id="Chapter-7">
+<div class="chapter" id="Chapter-8">
 <div class="header">
 <p>
-Previous: <a href="#Chapter-6" accesskey="p" rel="prev">Libraries Contributed by GNU APL Users</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Chapter-7" accesskey="p" rel="prev">Libraries Contributed by GNU APL Users</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Licenses-for-this-GNU-APL-Manual-and-for-GNU-APL"></span><h2 class="chapter">7 Licenses for this GNU APL Manual and for GNU APL</h2>
+<span id="Licenses-for-this-GNU-APL-Manual-and-for-GNU-APL"></span><h2 class="chapter">8 Licenses for this GNU APL Manual and for GNU APL</h2>
 
 <p>This manual for GNU APL is licensed under the GNU Free Documentation
-License, *Note Section 7.1:: below.
+License, *Note Section 8.1:: below.
 </p>
 <p>GNU APL itself is licensed under the GNU Public License version 3 or later
-(aka GPLv3+), *Note Section 7.2:: below.
+(aka GPLv3+), *Note Section 8.2:: below.
 </p>
 
 <ul class="section-toc">
-<li><a href="#Section-7_002e1" accesskey="1">The GNU Free Documentation License</a></li>
-<li><a href="#Section-7_002e2" accesskey="2">The GNU GENERAL PUBLIC LICENSE</a></li>
+<li><a href="#Section-8_002e1" accesskey="1">The GNU Free Documentation License</a></li>
+<li><a href="#Section-8_002e2" accesskey="2">The GNU GENERAL PUBLIC LICENSE</a></li>
 </ul>
 <hr>
-<div class="section" id="Section-7_002e1">
+<div class="section" id="Section-8_002e1">
 <div class="header">
 <p>
-Next: <a href="#Section-7_002e2" accesskey="n" rel="next">The GNU GENERAL PUBLIC LICENSE</a>, Up: <a href="#Chapter-7" accesskey="u" rel="up">Licenses for this GNU APL Manual and for GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-8_002e2" accesskey="n" rel="next">The GNU GENERAL PUBLIC LICENSE</a>, Up: <a href="#Chapter-8" accesskey="u" rel="up">Licenses for this GNU APL Manual and for GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-GNU-Free-Documentation-License"></span><h3 class="section">7.1 The GNU Free Documentation License</h3>
+<span id="The-GNU-Free-Documentation-License"></span><h3 class="section">8.1 The GNU Free Documentation License</h3>
 
 <div align="center">Version 1.3, 3 November 2008
 </div>
@@ -10042,12 +10534,12 @@ to permit their use in free software.
 </p>
 <hr>
 </div>
-<div class="section" id="Section-7_002e2">
+<div class="section" id="Section-8_002e2">
 <div class="header">
 <p>
-Previous: <a href="#Section-7_002e1" accesskey="p" rel="prev">The GNU Free Documentation License</a>, Up: <a href="#Chapter-7" accesskey="u" rel="up">Licenses for this GNU APL Manual and for GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-8_002e1" accesskey="p" rel="prev">The GNU Free Documentation License</a>, Up: <a href="#Chapter-8" accesskey="u" rel="up">Licenses for this GNU APL Manual and for GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="The-GNU-GENERAL-PUBLIC-LICENSE"></span><h3 class="section">7.2 The GNU GENERAL PUBLIC LICENSE</h3>
+<span id="The-GNU-GENERAL-PUBLIC-LICENSE"></span><h3 class="section">8.2 The GNU GENERAL PUBLIC LICENSE</h3>
 
 <p>GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

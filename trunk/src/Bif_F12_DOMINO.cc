@@ -1736,6 +1736,13 @@ UCS_string_vector result;
          if (response == "<!END-OF-FILE!>.")   break;
        }
 
+   // remove a trailing empty line (if any)
+   //
+   if (result.size() > 1 && result.back().size() == 0)
+      {
+         result.pop_back();
+      }
+
 const ShapeItem rows = result.size();
 ShapeItem cols = 0;
    loop(z, rows)
@@ -1743,7 +1750,11 @@ ShapeItem cols = 0;
         cols = max(size_t(cols), result[z].size());
       }
 
-Value_P Z(rows, cols, LOC);
+Shape shape_Z;
+   if (rows > 1)   shape_Z.add_shape_item(rows);
+   shape_Z.add_shape_item(cols);
+
+Value_P Z(shape_Z, LOC);
    loop(r, rows)
       {
         const ShapeItem len = result[r].size();

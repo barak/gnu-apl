@@ -1101,6 +1101,13 @@ Quad_NC::get_NC(const UCS_string ucs)
    if (ucs.size() == 0)   return NC_INVALID;   // invalid name
 
 const Unicode uni = ucs[0];
+   if (uni == UNI_QUOTE_Quad)   // ⍞
+      {
+        if (ucs.size() == 1)   return NC_SYSTEM_VAR;
+        else                   return NC_INVALID;
+      }
+
+   if (uni == UNI_Quad_Quad && ucs.size() == 1)   return NC_SYSTEM_VAR;   // ⎕
 
    // system name ?
    {
@@ -1119,16 +1126,20 @@ const Unicode uni = ucs[0];
      // the caller may ask for e.g. ⍺123 but we accept ⍺ and friends only if
      // their lengths is 1.
      //
-     if (ucs.size() != 1)   sys = 0;    // more than one char
+     if (sys && ucs.size() != 1)   return NC_INVALID;
 
      if (Avec::is_quad(uni))   // distinguished name
         {
-          int len = 0;
-          const Token t = Workspace::get_quad(ucs, len);
-          if (len < 2)                      return NC_SYSTEM_VAR;   // ⎕ or ⍞
-          if (t.get_Class() == TC_VOID)     return NC_INVALID;
-          if (t.get_Class() == TC_SYMBOL)   sys = t.get_sym_ptr();
-          else                              return  NC_SYSTEM_FUN;
+          int len = 0;   // set by Workspace::get_quad()
+          const Token tok = Workspace::get_quad(ucs, len);
+          if (tok.get_Class() != TC_SYMBOL)   return NC_INVALID;
+
+          // NOTE: Workspace::get_quad() tolerates prefixes (e.g ⎕FFTxyz
+          // would be accepted since ⎕FFT is valid. This is OK for toenization,
+          // but not for ⎕NC. We therefore need to check the length as well.
+          //
+          sys = tok.get_sym_ptr();
+          if (sys->get_name().size() != ucs.size())   return NC_INVALID;
         }
     
      if (sys)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ

@@ -83,6 +83,76 @@ Dyadic
       D
  4 5 6 
 
+⍝ IBM APL2 compatibility ----------------------------------
+
+      ∇Z←SHOW_NC B¯B;N
+       N←8↑B,':'
+       →(¯1 0 1 2 3 4 = ⎕NC B¯B)/I U L V F O ◊ ++
+      I: →0, Z←(8↑B), ': Invalid Name'
+      U: →0, Z←(8↑B), ': Unused Name'
+      L: →0, Z←(8↑B), ': Label'
+      V: →0, Z←(8↑B), ': Value', ⍎B¯B
+      F: →0, Z←(8↑B), ': Function'
+      O: →0, Z←(8↑B), ': Operator'
+      ∇
+
+      ∇Z←A (LO OPER1) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'B'
+      ∇
+
+      ∇Z←A (LO OPER2 RO) B
+       SHOW_NC 'A'
+       SHOW_NC 'LO'
+       SHOW_NC 'OPER1'
+       SHOW_NC 'RO'
+       SHOW_NC 'B'
+      ∇
+
+      ⊣««« NOTE: IBM APL2 gives:
+
+      ⍝ binding of bracket index
+      ⍝
+      1 2 3[2]
+RANK ERROR
+
+      ⍝ binding of left operand (literal)
+      ⍝
+      11 22 33 OPER1 1 2 3
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ binding of left operand (parser)
+      ⍝
+      (UU VV WW)←11 22 33
+A       : Unused Name
+LO      : Value  11 22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ binding of left operand (in parentheses)
+      ⍝
+      11 22 (33 OPER1) 1 2 3
+A       : 11
+LO      : Value  22 33
+OPER1   : Operator
+B       : Value  1 2 3
+
+      ⍝ binding of left and right operands (literal)
+      ⍝
+      11 22 33 'lop' OPER2 'rop' 1 2 3
+A:      Value Unused Name
+LO:     Value lop
+OPER1:  Operator
+RO:     Value rop
+B:      Value 1 2 3
+       »»»
+
+
       ⍝ regression
       ⍝ 
       ≡⊂⍣4⍣6⊢'hello'

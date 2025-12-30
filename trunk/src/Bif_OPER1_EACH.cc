@@ -279,8 +279,8 @@ cFunction_P LO = _LO.get_function();
    Assert1(LO);
 
    if (LO->is_operator() &&
-       !is_SLASH_or_BACKSLASH(_LO.get_tag()))   SYNTAX_ERROR;
-   if (!(LO->get_signature() & SIG_B))          VALENCE_ERROR;
+       !_LO.is_SLASH_or_BACKSLASH())     SYNTAX_ERROR;
+   if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
 
    if (B->is_empty())
       {

@@ -90,7 +90,7 @@ DerivedFunction::destroy_derived(const char * loc)
 void
 DerivedFunction::entering(const char * class_name, const char * fun_name) const
 {
-   CERR << "entering class_name";
+   CERR << "entering " << class_name;
    print(CERR);
    CERR << "::" << fun_name << "() , this = " << voidP(this) << endl;
 }
@@ -98,13 +98,13 @@ DerivedFunction::entering(const char * class_name, const char * fun_name) const
 Token
 Derived_LO_M_X::eval_AB(Value_P A, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_AB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M_X", "eval_AB");
 
    if (left_arg.is_function())
       {
-        Token & left  = const_cast<Token &>(left_arg);
-        if (!axis)   return oper->eval_ALB(A, left, B);
-        else         return oper->eval_ALXB(A, left, axis, B);
+        Token & LO  = const_cast<Token &>(left_arg);
+        if (!axis)   return oper->eval_ALB(A, LO, B);
+        else         return oper->eval_ALXB(A, LO, axis, B);
       }
    else
       {
@@ -117,7 +117,7 @@ Derived_LO_M_X::eval_AB(Value_P A, Value_P B) const
 Token
 Derived_LO_M_X::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_AXB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M_X", "eval_AXB");
 
 Token & left  = const_cast<Token &>(left_arg);
    return oper->eval_ALXB(A, left, X, B);
@@ -126,7 +126,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token
 Derived_LO_M_X::eval_B(Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_B");
+   Log(LOG_FunOperX)   entering("Derived_LO_M_X", "eval_B");
 
    if (left_arg.is_function())   // normal operator
       {
@@ -145,7 +145,7 @@ Derived_LO_M_X::eval_B(Value_P B) const
 Token
 Derived_LO_M_X::eval_XB(Value_P X, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_XB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M_X", "eval_XB");
 
    if (left_arg.is_function())   // normal operator
       {
@@ -243,7 +243,7 @@ Derived_F_X::eval_AB(Value_P A, Value_P B) const
 Token
 Derived_LO_M::eval_B(Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_B");
+   Log(LOG_FunOperX)   entering("Derived_LO_M", "eval_B");
 
    if (right_arg.get_tag() != TOK_VOID)   // dyadic operator
       {
@@ -271,7 +271,7 @@ Derived_LO_M::eval_B(Value_P B) const
 Token
 Derived_LO_M::eval_XB(Value_P X, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_XB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M", "eval_XB");
 
    if (left_arg.is_function())   // normal operator
       {
@@ -290,7 +290,7 @@ Derived_LO_M::eval_XB(Value_P X, Value_P B) const
 Token
 Derived_LO_M::eval_AB(Value_P A, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_AB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M", "eval_AB");
 
    if (left_arg.is_function())
       {
@@ -309,7 +309,7 @@ Derived_LO_M::eval_AB(Value_P A, Value_P B) const
 Token
 Derived_LO_M::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   Log(LOG_FunOperX)   entering("DerivedFunction", "eval_AXB");
+   Log(LOG_FunOperX)   entering("Derived_LO_M", "eval_AXB");
 
 Token & left  = const_cast<Token &>(left_arg);
    return oper->eval_ALXB(A, left, X, B);

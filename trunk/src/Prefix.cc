@@ -421,22 +421,24 @@ const bool reverse  = which & 4;   // print ahead in APL order
                const Token & tok = at(s).get_token();
                switch(const TokenClass tc = tok.get_Class())
                   {
-                    case TC_ASSIGN:   out << "ASS";    break;
-                    case TC_R_ARROW:  out << "BRA";    break;
-                    case TC_L_BRACK:  out << "LBRA";   break;
-                    case TC_R_BRACK:  out << "RBRA";   break;
-                    case TC_END:      out << "END";    break;
-                    case TC_FUN0:     out << "N";      break;
-                    case TC_FUN12:    out << *F++;     break;
-                    case TC_INDEX:    out << "C";      break;
-                    case TC_OPER1:    out << "M";      break;
-                    case TC_OPER2:    out << "D";      break;
-                    case TC_L_PARENT: out << "LPAR";   break;
-                    case TC_R_PARENT: out << "RPAR";   break;
-                    case TC_RETURN:   out << "RET";    break;
-                    case TC_SYMBOL:   out << "SYM";    break;
-                    case TC_VALUE:    out << *V++;      break;
-                    default: out << "TC_" << int(tc);
+                    case TC_ASSIGN:   out << "←";          break;
+                    case TC_R_ARROW:  out << "→";          break;
+                    case TC_L_BRACK:  out << "[";          break;
+                    case TC_R_BRACK:  out << "]";          break;
+                    case TC_END:      out << "END";        break;
+                    case TC_FUN0:     out << "N";          break;
+                    case TC_FUN12:    out << *F++;         break;
+                    case TC_INDEX:    out << "C";          break;
+                    case TC_OPER1:    out << "M";          break;
+                    case TC_OPER2:    out << "D";          break;
+                    case TC_L_PARENT: out << "(";          break;
+                    case TC_R_PARENT: out << ")";          break;
+                    case TC_RETURN:   out << "RET";        break;
+                    case TC_SYMBOL:   out << "SYM";        break;
+                    case TC_VALUE:    out << *V++;         break;
+                    case TC_VOID:     out << "VOID";       break;
+                    case TC_SI_LEAVE: out << "SI_LEAVE";   break;
+                    default:          out << "-TC_" << int(tc);
                   }
              }
         out << "»";
@@ -463,7 +465,7 @@ const bool reverse  = which & 4;   // print ahead in APL order
                  {
                    if (sepa++)   out << " ";
                    const TokenClass tc = body[pc].get_Class();
-                   out << (Token::class_name(tc ) + 3);   // w/o TC_
+                   out << Token::short_class_name(tc);
                  }
 
              if (end_of_statement != body.size() - 1)
@@ -478,7 +480,7 @@ const bool reverse  = which & 4;   // print ahead in APL order
                  {
                    if (sepa++)   out << " ";
                    const TokenClass tc = body[pc].get_Class();
-                   out << (Token::class_name(tc ) + 3);   // w/o TC_
+                   out << Token::short_class_name(tc);
                    if (tc == TC_END)   break;   // end of statement
                  }
            }
@@ -1671,7 +1673,7 @@ const Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
 void
 Prefix::reduce_A_M_B_()
 {
-   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_B_();
+   if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_B_();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
@@ -1700,7 +1702,7 @@ const Token Z = F->eval_AXB(A, C, B);
 void
 Prefix::reduce_A_M_C_B()
 {
-   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_C_B();
+   if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_C_B();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
@@ -1791,7 +1793,7 @@ Prefix::MM_is_FM(Function_PC pc)
 void
 Prefix::reduce_M_M__()
 {
-   if (is_SLASH_or_BACKSLASH(at0().get_tag()) && MM_is_FM(PC))
+   if (at0().is_SLASH_or_BACKSLASH() && MM_is_FM(PC))
       {
         reduce_F_M__();
       }

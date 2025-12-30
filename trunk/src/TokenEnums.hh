@@ -230,12 +230,4 @@ swap(TokenTag & tag1, TokenTag & tag2)
    tag2 = tmp;
 }
 
-/// return true for / ⌿ \ and ⍀
-inline bool
-is_SLASH_or_BACKSLASH(TokenTag tag)
-{
-   return tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-          tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1;
-}
-
 #endif // __TOKENENUMS_HH_DEFINED__
