@@ -142,14 +142,15 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_DATA) \
-	$(am__pkginclude_HEADERS_DIST) $(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_SCRIPTS) \
+	$(dist_noinst_DATA) $(am__pkginclude_HEADERS_DIST) \
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" \
-	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgincludedir)"
+	"$(DESTDIR)$(distdir)" "$(DESTDIR)$(pkgincludedir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -672,7 +673,7 @@ apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
 apl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(apl_CXXFLAGS) \
 	$(CXXFLAGS) $(apl_LDFLAGS) $(LDFLAGS) -o $@
-SCRIPTS = $(bin_SCRIPTS)
+SCRIPTS = $(dist_SCRIPTS) $(dist_noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -1288,7 +1289,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = integral.py
+dist_noinst_SCRIPTS = integral.py
+dist_SCRIPTS = integral.py
+distdir = ${bindir}
 EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
 EXTRA_apl_SOURCES = $(am__append_4) $(am__append_6)
@@ -1587,12 +1590,12 @@ sql/apl-PostgresProvider.$(OBJEXT): sql/$(am__dirstamp) \
 apl$(EXEEXT): $(apl_OBJECTS) $(apl_DEPENDENCIES) $(EXTRA_apl_DEPENDENCIES) 
 	@rm -f apl$(EXEEXT)
 	$(AM_V_CXXLD)$(apl_LINK) $(apl_OBJECTS) $(apl_LDADD) $(LIBS)
-install-binSCRIPTS: $(bin_SCRIPTS)
+install-distSCRIPTS: $(dist_SCRIPTS)
 	@$(NORMAL_INSTALL)
-	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
+	@list='$(dist_SCRIPTS)'; test -n "$(distdir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(distdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(distdir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
@@ -1611,17 +1614,17 @@ install-binSCRIPTS: $(bin_SCRIPTS)
 	while read type dir files; do \
 	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
 	     test -z "$$files" || { \
-	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(distdir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(distdir)$$dir" || exit $$?; \
 	     } \
 	; done
 
-uninstall-binSCRIPTS:
+uninstall-distSCRIPTS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || exit 0; \
+	@list='$(dist_SCRIPTS)'; test -n "$(distdir)" || exit 0; \
 	files=`for p in $$list; do echo "$$p"; done | \
 	       sed -e 's,.*/,,;$(transform)'`; \
-	dir='$(DESTDIR)$(bindir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(distdir)'; $(am__uninstall_files_from_dir)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -5727,7 +5730,7 @@ all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(SCRIPTS) $(DATA) \
 		$(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgincludedir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(distdir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -6159,14 +6162,13 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-pkgincludeHEADERS
+install-data-am: install-distSCRIPTS install-pkgincludeHEADERS
 
 install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS install-binSCRIPTS \
-	install-pkglibLTLIBRARIES
+install-exec-am: install-binPROGRAMS install-pkglibLTLIBRARIES
 
 install-html: install-html-recursive
 
@@ -6580,7 +6582,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
+uninstall-am: uninstall-binPROGRAMS uninstall-distSCRIPTS \
 	uninstall-pkgincludeHEADERS uninstall-pkglibLTLIBRARIES
 
 .MAKE: $(am__recursive_targets) install-am install-strip
@@ -6591,8 +6593,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	cscopelist-am ctags ctags-am distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-binSCRIPTS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
+	install-binPROGRAMS install-data install-data-am \
+	install-distSCRIPTS install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
 	install-pkgincludeHEADERS install-pkglibLTLIBRARIES install-ps \
@@ -6601,13 +6603,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-binSCRIPTS uninstall-pkgincludeHEADERS \
+	uninstall-distSCRIPTS uninstall-pkgincludeHEADERS \
 	uninstall-pkglibLTLIBRARIES
 
 .PRECIOUS: Makefile
 
-integral.py:
-	touch integral.py
 
 # normally we would say:
 #

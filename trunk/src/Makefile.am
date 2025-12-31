@@ -2,9 +2,9 @@
 # NOTE: without 'no-dependencies' make target distclean won't work.
 # AUTOMAKE_OPTIONS = no-dependencies
 
-bin_SCRIPTS = integral.py
-integral.py:
-	touch integral.py
+dist_noinst_SCRIPTS = integral.py
+dist_SCRIPTS = integral.py
+distdir = ${bindir}
 
 EXTRA_DIRS =
 if ! apl_TARGET_ANDROID
