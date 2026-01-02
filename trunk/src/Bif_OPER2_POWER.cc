@@ -34,8 +34,11 @@ Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    if (RO.get_ValueType() == TV_VAL)   // integer count
       return eval_form_1(A, LO, RO.get_apl_val(), B);
-   else                               // Boolean termonation function
-      return eval_form_2(A, LO, RO, B);
+   if (RO.get_ValueType() == TV_INT)   // integer count
+      return eval_form_1(A, LO, IntScalar(RO.get_int_val(), LOC), B);
+
+   // Boolean termonation function
+   return eval_form_2(A, LO, RO, B);
 }
 //----------------------------------------------------------------------------
 Token

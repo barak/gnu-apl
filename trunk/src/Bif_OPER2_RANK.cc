@@ -254,6 +254,10 @@ const Shape shape_Z = frame_B_rank ? B->get_shape().frame_shape(frame_B_rank)
 
    if (+X)   // ⍤ with axis
       {
+        // X is the final disclose in the NARS variant of the
+        // rank operator. Every item X[i] of X should be an integer vector
+        // with ⍴X[i] ←→ ⍴⍴B
+        //
         loop(x, X->element_count())
             {
               const APL_Integer axis = X->get_cravel(x).get_int_value();

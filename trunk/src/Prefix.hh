@@ -28,10 +28,11 @@
 #include "PrintOperator.hh"
 #include "Token.hh"
 
+struct DerivedFunction;
 class Prefix;
+struct ReduceArg;
 class StateIndicator;
 class Token_string;
-struct ReduceArg;
 
 /// the max. number of token in one reduction
 enum { MAX_REDUCTION_LEN = 6 };
@@ -111,10 +112,6 @@ public:
    Function_PC get_range_low() const
       { return put ? content[0].get_PC() : get_lookahead_PC(); }
 
-   /// lookahead is a complete index. return \b true if it belongs to a value
-   /// (as opposed to a function axis).
-   bool value_expected() const;
-
    /// print the current range (PC from - PC to) on out
    void print_range(ostream & out) const;
 
@@ -185,9 +182,33 @@ public:
    Function_PC get_lookahead_PC() const
       { return saved_MISC.get_PC(); }
 
-   /// set the lookahead PC
+   /// set the PC of the lookahead token
    void set_lookahead_PC(Function_PC pc)
       { saved_MISC.set_PC(pc); }
+
+   /// reset statement to empty state (e.g. after →N)
+   void reset(const char * loc)
+      { clean_up();   put = 0;   assign_state = ASS_none;
+        clear_MISC(loc);
+        prefix_len = 0;
+      }
+
+   /// return the current PC
+   Function_PC get_PC() const
+      { return PC; }
+
+   /// print the current stack to \b out
+   void print_stack(ostream & out, const char * loc) const;
+
+   /// print the current stack before or after shift/reduce to \b out
+   ostream & print_patterns(ostream & out, int which);
+
+   /// print a token and its value in a brief form.
+   ostream & print_token_value(ostream & out, const Token & tok);
+
+   /// return the leftmost (top-of-stack) Token_loc (at put position)
+   Token_loc & tos()
+       { Assert1(put);   return content[put - 1]; }
 
    /// store one more token. push(A) in e.g. F B would produce A F B.
    /// IOW, push() works right-to-left of XXX in reduce_XXX().
@@ -253,29 +274,24 @@ public:
         saved_MISC.get_token().clear(loc);
       }
 
-   /// reset statement to empty state (e.g. after →N)
-   void reset(const char * loc)
-      { clean_up();   put = 0;   assign_state = ASS_none;
-        clear_MISC(loc);
-        prefix_len = 0;
-      }
-
-   /// print the current stack to \b out
-   void print_stack(ostream & out, const char * loc) const;
-
-   /// print the current stack before or after shift/reduce to \b out
-   ostream & print_patterns(ostream & out, int which);
-
-   /// print a token and its value in a brief form.
-   ostream & print_token_value(ostream & out, const Token & tok);
+   /// lookahead is a complete index. return \b true if it belongs to a value
+   /// (as opposed to a function axis).
+   bool value_expected() const;
 
    /// jump to new PC
    void goto_PC(Function_PC new_pc)
       { reset(LOC);   PC = new_pc; }
 
-   /// return the current PC
-   Function_PC get_PC() const
-      { return PC; }
+   /// adjust the right caret after a SYNTAX_ERROR
+   static void adjust_right_caret(Function_PC2 & range,
+                                  const Token_string & failed_statement);
+
+   /// the signature of the current eval_XXX() function (0 if none).
+   static Fun_signature get_current_signature();
+
+protected:
+   /// return uninitialized memory for a new derived function
+   DerivedFunction * get_fun_oper_slot(const char * loc) const;
 
    /// set the prefix parser action
    void set_action(R_action ra)
@@ -285,54 +301,18 @@ public:
 
    /// set the prefix parser action according to (result-) Token type.
    // Called (typically after some eval_XXX()) if the return class can not
-   // be predicted
-   // token classes.
-   void set_action(const Token & result)
-      {
-        switch(result.get_Class())
-           {
-             case TC_VALUE:
-             case TC_VOID:
-             case TC_END:
-             case TC_FUN2:
-                  set_action(RA_CONTINUE);
-                  return;
-
-             case TC_RETURN:
-                  // result was one of TOK_RETURN_EXEC, TOK_RETURN_STATS,
-                  // TOK_RETURN_VOID, or TOK_RETURN_SYMBOL.
-                  // The current context is complete and may or may not
-                  // have produced a value.
-                  //
-                  set_action(RA_RETURN);
-                  return;
-
-             case TC_SI_LEAVE:
-                  //
-                  // result was TOK_SI_PUSHED or TOK_ERROR
-                  if (result.get_tag() == TOK_ERROR)   set_action(RA_RETURN);
-                  else                                 set_action(RA_SI_PUSHED);
-                  return;
-
-             default: CERR << "CLASS = " << result.get_Class()
-                           << " at " << LOC << endl;
-                      FIXME;
-           }
-      }
+   // be predicted token classes.
+   void set_action(const Token & result);
 
    /// read and resolve the token class left of [ ... ], PC is at ']'
    bool is_value_bracket() const;
 
-   /// reeturn true if \b this prefix has a valid lookahead token
+   /// return true if \b this prefix has a valid lookahead token
    int has_MISC() const
       { return saved_MISC.get_token().get_tag() == TOK_VOID ? 0 : 1; }
 
    /// read and resolve the token class left of )
    bool is_value_parenthesis(int pc) const;
-
-   /// return the leftmost (top-of-stack) Token_loc (at put position)
-   Token_loc & tos()
-       { Assert1(put);   return content[put - 1]; }
 
    /// return the idx'th Token_loc (from put position)
    Token_loc & at(int idx)
@@ -360,14 +340,6 @@ public:
         uint8_t        sub_nodes[TC_MAX_PHRASE+1];   ///< parent nodes
       };
 
-   /// adjust the right caret after a SYNTAX_ERROR
-   static void adjust_right_caret(Function_PC2 & range,
-                                  const Token_string & failed_statement);
-
-   /// the signature of the current eval_XXX() function (0 if none).
-   static Fun_signature get_current_signature();
-
-protected:
    /// push the next token onto the stack. Return \b true iff )SI was pushed.
    //  called often but from the same place in reduce_statements()
    inline bool push_next_token();

@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 /** Primitive operator ⍤ (rank)
  */
-/// The class implementing ⍤ and ⍤[X]
+/// The class implementing ⍤[X] (NARS only) and ⍤.
 class Bif_OPER2_RANK : public PrimitiveOperator
 {
 public:

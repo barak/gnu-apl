@@ -104,12 +104,6 @@ Workspace::is_CLEAR_WS()
                     .compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ;
 }
 //----------------------------------------------------------------------------
-DerivedFunction *
-Workspace::get_fun_oper_slot(const char * loc)
-{
-   return Workspace::SI_top()->get_fun_oper_slot(loc);
-}
-//----------------------------------------------------------------------------
 void
 Workspace::push_SI(const Executable * fun, const char * loc)
 {

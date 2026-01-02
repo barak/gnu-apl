@@ -16,9 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 30, 2025.  This manual briefly documents GNU APL, an
-interpreter for APL as described in ISO standard 13751, aka.
-"Programming Language APL, Extended".
+January 2, 2026.  This manual briefly documents GNU APL, an interpreter
+for APL as described in ISO standard 13751, aka.  "Programming Language
+APL, Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
 Free Documentation License, *Note Chapter 8.
@@ -7967,7 +7967,8 @@ File: apl.info,  Node: Chapter 5,  Next: Chapter 6,  Prev: Chapter 4,  Up: Top
 * Section 5.3::   Quotes from the lrm
 * Section 5.4::   Some APL2 Tests
 * Section 5.5::   Definitions
-* Section 5.6::   GNU APL Vector Notation
+* Section 5.6::   Unexpected Stranding
+* Section 5.7::   GNU APL Vector Notation
 
 This chapter describes details of the GNU APL vector notation.
 Unfortunately there exists misleading information concerning the GNU APL
@@ -8031,7 +8032,7 @@ get a compressed view of the matter we quote the relevant pieces:
 
   3. lrm page 33: The hierarchy of binding strengths is listed below in
      descending order.
-          Binding Strength            What Is Bound
+             Binding Strength         What Is Bound
           ──────────────────────      ────────────────────────────────────
           1. Brackets                 Brackets to what is on their left
           2. Specification left       Left arrow to what is on its left
@@ -8045,8 +8046,8 @@ get a compressed view of the matter we quote the relevant pieces:
      The binding strength 4.  above is the one for vector notation.  It
      defines how the items of a vector notation are bound together (as
      opposed to being bound to other tokens).  For example: 1 2 3[2]
-     becomes 1 2 (3[2]) because [2] binds stronger to 3 on its left than
-     3 binds to 2 in its left (which then raises a RANK ERROR because 3
+     becomes 1 2 (3[2]) because [2] binds stronger to 3 left of it than
+     3 binds to 2 left of it (which then raises a RANK ERROR because 3
      is a scalar).
 
 
@@ -8091,11 +8092,11 @@ ERROR when indexing the scalar 3.
    Test 1c: no surprise for the binding strength.  This test confirms
 the second quote on page 14 of the lrm.
 
-5.4.2 Test 1: Binding strength of the left operand
+5.4.2 Test 2: Binding strength of the left operand
 --------------------------------------------------
 
-For this test we create a defined function SHOW_NC, a monadic defined
-operator OPER1, and a dyadic defined operator OPER2:
+For this test we create a monadic defined function SHOW_NC, a monadic
+defined operator OPER1, and a dyadic defined operator OPER2:
 
            ⍝ display the name class of B¯B
            ⍝
@@ -8161,7 +8162,7 @@ operators under test (like OPER1 or OPER2).  Then:
 
            ⍝ Test 2d. binding of the right operand
            ⍝
-           11 22 33 'lop' OPER1 'rop' 1 2 3
+           11 22 33 'lop' OPER2 'rop' 1 2 3
      A       : Unused Name
      LO      : Value  11 22 33 lop
      OPER2   : Operator
@@ -8233,21 +8234,38 @@ File: apl.info,  Node: Section 5.5,  Next: Section 5.6,  Prev: Section 5.4,  Up:
 5.5 Definitions
 ===============
 
-Definition: A strand consists of two (!)  or more adjacent values in a
-defined function, or in a string being ⍎’ed, or on a line entered in
-immediate execution mode.  Such values can be literals (like in 1 2 3),
-but also values of variables or results of niladic functions.  A strand
-is always a vector and we call the values in a strand the items of the
-strand.  Strand items can be simple (i.e.  numbers or single characters)
-or nested (strings or other strands).  Strand items sre always (possibly
-nested) APL scalars.
+Definition: A (complete) strand consists of two (!)  or more adjacent
+values in a defined function, or in a string being ⍎’ed, or on a line
+entered in immediate execution mode.  Such values can be literals (like
+in 1 2 3), but also values of variables or results of niladic functions.
+A strand is always a vector and we call the values in a strand the items
+of the strand.  Strand items can be simple (i.e.  numbers or single
+characters) or nested (strings or other strands).  Strand items are
+always (possibly nested) APL scalars.
 
    Definition: A literal strand is a strand whose items are only
-literals (including nested literals like in 1 2 (3 4) 5).
+literals (including nested literals like in 1 2 (3 4) 5).  Literal
+strands are created when an APL expression is tokenized.  At that point
+in time the literal strand is incomplete and more strand items may be
+added to it when the statement is executed.
+
+   Note: Strands are, in general, subject to what is known as unexpected
+stranding, which occurs when an operator accept values as operands.
+This is the case for the power operatror ⍣ and for the rank operator ⍤;
+both can have values as right operands.  The clean way of avoiding
+unexpected stranding is to put the operatorr and its operands into
+parentheses, but the iso does not do that and in order to make the
+examples in iso work, GNU APL has dedicated code for the rank and power
+operators that prevents unexpected stranding for their right operand and
+their right function value.  For defined operators this is not possuble
+because at tokenization time a defined operator is only a symbol whose
+name class at execution time is unknown at tokenization time of its
+caller.  For the same reason.  the binding strengths defined above can
+not cure this kind of unexpected stranding.
 
    Definition: An extended literal strand is a strand whose items are
-either literals (including nested literals) or iparticular simple
-primitive function with particular literal arguments.
+either literals (including nested literals) or particular simple
+primitive function is with particular literal arguments.
 
    Definition: A mixed strand is a strand which is not a literal strand.
 
@@ -8262,24 +8280,212 @@ nested.
 
            1 2 3        ⍝ open literal strand
 
-           VAR←1 2 3
-           ∇Z←FOO
+           1 2 (3⍴4) 5     ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+           1 2 (3/4) 5     ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+          'ab' (⍳3) 'ef'   ⍝ open extended literal strand ←→ 'ab' (1 2 3) 'ef'
+
+           VAR←1 2 3       ⍝ mixed strand item
+           ∇Z←FOO          ⍝ mixed strand item
             Z←1 2 3
            ∇
 
-           1 VAR 3       ⍝ nested open mixed strand
-           1 FOO 3       ⍝ open mixed strand\
-
-           1 2 (3⍴4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
-           1 2 (3/4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+           1 VAR 3         ⍝ nested open mixed strand
+           1 FOO 3         ⍝ nested open mixed strand
 
            (1 2 3)       ⍝ closed literal strand
            'abc'         ⍝ closed literal strand
 
 
-File: apl.info,  Node: Section 5.6,  Prev: Section 5.5,  Up: Chapter 5
+File: apl.info,  Node: Section 5.6,  Next: Section 5.7,  Prev: Section 5.5,  Up: Chapter 5
 
-5.6 GNU APL Vector Notation
+5.6 Unexpected Stranding
+========================
+
+Unexpected stranding (or better: false stranding) refers to a situation
+where the stranding of adjacent values leads to a wrong result.
+Unexpected stranding is not unexpected at all, as we will see in this
+section.
+
+   In non-nested APL interpreters, such as APL \360, the binding
+strength of strand items was the highest.  That was a wise decision
+which had two consequences:
+
+   • Expressions like 1 2 3[2] were always valid in APL \360 and
+     friends.  The current APL2 and, (for the sake of compatibility)
+     also GNU APL cases, where 1 2 3[2] raises a RANK ERROR, are merely
+     an unfortunate consequence of binding expressions in brackets
+     stronger than strand items.
+   • Similarly, the IBM APL2 design decision to bind right operand
+     stronger than strand items, together with the decision to allow
+     values as operands, create the possibility of false stranding.
+
+   Corollary 1: unexpected stranding was not an issue before binding
+strength in APL2 was introduced.
+
+   Corollary 2: The only binding strengths for which unexpected
+stranding can occur are those for that bind stronger than vector (i.e.
+strand item), i.e.  1.  bracket, 2.  specification left, and 3.  right
+operand.  Of these 3 binding strengths, only 3.  right operand conflicts
+with strand notation (because neither [...]  nor ← can be strand items.
+
+   To go into a little more detail we consider the following token
+sequences:
+
+                                                             ⍝ at tokenizatio time...
+         PRIMITIVE_FUNCTION         VALUE_A VALUE_B          ⍝  ├── expected
+         PRIMITIVE_DYADIC_OPERATOR  VALUE_A VALUE_B          ⍝  ├── unexpected
+         VALUE                      VALUE_A VALUE_B          ⍝  ├── expected
+         SYMBOL                     VALUE_A VALUE_B          ⍝  └── unknown
+
+                                                             ⍝ at execution time...
+         VALUE                      VALUE_A VALUE_B          ⍝  ├── expected
+         FUNCTION                   VALUE_A VALUE_B          ⍝  ├── expected
+         DYADIC_OPERATOR            VALUE_A VALUE_B          ⍝  └── unexpected
+
+   The fact that VALUE_A and VALUE_B are adjacent constitues what is
+known as a shift/reduce confict in compiler terminology.  Let’s add some
+parentheses to see how these shift/reduce conficts are, by means of the
+APL2 binding strength, supposed to be resolved:
+
+                                                             ⍝ at tokenizatio time...
+         PRIMITIVE_FUNCTION       ( VALUE_A   VALUE_B )      ⍝  ├── expected
+       ( PRIMITIVE_DYADIC_OPERATOR  VALUE_A ) VALUE_B        ⍝  ├── unexpected
+         VALUE                    ( VALUE_A   VALUE_B )      ⍝  ├── expected
+       ? SYMBOL                   ? VALUE_A ? VALUE_B ?      ⍝  └── unknown
+
+                                                             ⍝ at execution time...
+         VALUE                    ( VALUE_A   VALUE_B )      ⍝  ├── expected
+         FUNCTION                 ( VALUE_A   VALUE_B )      ⍝  ├── expected
+       ( DYADIC_OPERATOR            VALUE_A ) VALUE_B        ⍝  └── unexpected
+
+   The first four sequences occurs at tokenization time, the others at
+execution time.  The significant difference between primitive functions
+and primitive operators on the one hand and defined functions and
+defined operators on the other hand is that the parser "knows" in the
+first three cases if VALUE_A and VALUE_B shall be stranded together or
+not.  In the fourth case the parser cannot decide whether SYMBOL refers
+to a defined function (including functions derived from monadic
+operators), to a variable, or to a dyadic defined operator.  Therefore
+the parser can resolve the first three cases at tokenization time, i.e.
+bind VALUE_A to PRIMITIVE_DYADIC_OPERATOR or ito VALUE if so, and to
+VALUE_B otherwise.  Only the binding of SYMBOL is left over and will be
+decided at execution time.
+
+   At execution time, the first thing that happens is that SYMBOL is
+resolved to its current value (so its token class changes from SYMBOL to
+VALUE (for variables), or to FUNCTION (for defined functions), or to
+OPERATOR for defined operators.  At the time when the parser sees the
+pattern VALUE_A VALUE_B it can, with a lookahead of 1 token decide if
+the token VALUE_A shall be bound to it PRIMITIVE_DYADIC_OPERATOR, or
+stranded to its adjacxent value VALUE_B. To do this a so-called LALR-1
+parser suffices.  In simple terms: if the parser sees a
+PRIMITIVE_DYADIC_OPERATOR left of VALUE_A VALUE_B then it shifts VALUE_A
+(which will later on become the right operand of that operator) and
+otherwise it starts or continues strand building with VALUE_A. In iso
+terminology: the phrase evaluator for pattern VALUE_A VALUE_B stops the
+strand building (in compiler terminology it shifts VALUE_A) when the
+lookahead token is DYADIC_OPERATOR), and otherwise it continues the
+strand building (in compiler terminology it reduces the pattern VALUE_A
+VALUE_B).
+
+   As an aside: The ISO standard provides examples with strand notation
+that would be illegal in IBM APL2 (rank operator, page 126):
+
+           0 1 2 ⌽⍤0 1 'ABC'
+     ABC
+     BCA
+     CAB
+
+   In IBM APL2, the rightmost 0 would bind to ⍤ and not to the rightmost
+1, like in (parentheses added according to the APL bindig strength:
+
+           (0 1 2) (⌽ ⍤ 0) (1 'ABC')
+     LENGTH ERROR
+           0 1 2(⌽⍤0 0 0)1 'ABC'
+           ^            ^
+
+   What saves IBM here is only the fact that the the two primitive
+operators that accept values as right operands (the rank operator ⍤ and
+the power operator ⍣) are not implemented in IBM APL2.  In contrast GNU
+APL has implemented both operators and the iso examples work as shown in
+the standard.
+
+   The same iso example in Dyalog APL (who seem to be the inventor of
+these operators) does not work either (at least not without parentheses:
+
+           ⍝ Dyalog APL
+           ⍝
+           0 1 2 ⌽⍤0 1 'ABC'
+     SYNTAX ERROR: Missing right argument
+      0 1 2⌽⍤0 1 'ABC'
+           ∧
+
+           ⍝ Dyalog APL
+           ⍝
+           0 1 2 (⌽⍤0 1) 'ABC'
+     ABC
+     BCA
+     CAB
+
+   and 1 2 3[2] is valid in Dyalog APL, which suggests that Dyalog has
+not adapted the idea of binding strength but rather remains backward
+compatible with APL \360.
+
+5.6.1 Performance considerations
+--------------------------------
+
+But why bother?  The tokenizer could have made its life easier by only
+converting (number-) strings and quoted strings to APL values and
+postpone the resolution of shift/reduce conflicts to the execution
+phase.  To understand why it is important to perform as much of the
+strand building at tokenization time, have a look at the following,
+somwhat crude, APL code (which is not too uncommon in real life):
+
+           ∇Z←FOO N
+            Z←100⍴0 ◊ J←1
+            LOOP: Z[J]←J+1 2 3 4 5 6 7 8 9 10 ÷ →(100 < J←J+1)/LOOP
+           ∇
+
+   There are smarter ways to do that in APL, but before APL2 an APL
+programmer could corectly assume that 1 2 3 4 5 6 7 8 9 10 will be
+tokenized into a strand created at tokenization time, which would have
+been more efficient than e.g.  storing that term in an APL variable.
+That strand would have been a single APL value.
+
+   The tokenization of the LOOP line is pretty fast; the tokenizer runs
+once over the line and produces a strand as it goes.  MOst of the
+tokenization, such as converting number strings to integers is the same
+in both cases compared below.
+
+   Now, if the strand is built at tokenization time, then the strand is
+created once and becomes a single APL value.
+
+   If, however, the strand is built at execution time, then:
+
+   • the tokenization produces 10 scalar APL values,
+   • every iteration of the LOOP line creates 9 more values:
+        • 9 10
+        • 8 (9 10)
+        • 7 (8 (9 10))
+        • ...
+   • and each of the 9 steps in the strand creation requires a pattern
+     match for the pattern VALUE_A VALUE_B
+   • 
+   The function FOO would therefore create 900 more APL values and
+perform 900 more pattern matches compared to the strand creation at
+tokenization time.  GNU APL has further extended this principle to APL
+values that may not only contain literals but also a handful of
+primitives with literal argument.  For example, the APL expression:
+
+           ⍪3 4⍴"Hello"
+
+   would be tokenized into a single APL value.  This kind of
+optimization can be disabled at compile time.
+
+
+File: apl.info,  Node: Section 5.7,  Prev: Section 5.6,  Up: Chapter 5
+
+5.7 GNU APL Vector Notation
 ===========================
 
 With the definitions from the previous section we can explain how GNU
@@ -8288,11 +8494,11 @@ APL has implemented vector notation:
    1.  GNU APL distinguishes between literal and mixed strands.  literal
 strands are combined into a single APL value at tokenization time.  This
 is a very effective optimization (which can be disabled at ./configure
-time).  In contrast, mixed strands are created at prefix matching time,
+time).  In contrast, mixed strands are created at phrase matching time,
 i.e.  when an APL expression is evaluated.  The tokenizatio of APL
-expressions happens only once, while prefix matching occurs every time
+expressions happens only once, while phrase matching occurs every time
 when a statement is being executed and therefore moving major parts of
-the strand building from prefix matching time to tokenization time can
+the strand building from phrase matching time to tokenization time can
 bring substantial performance benefits.
 
    2.  The tokenization expands simple APL primitives with literal
@@ -8300,13 +8506,13 @@ arguments and short results into their literal equivalent.  Currently
 the APL primitives N⍴B, N/B, N⌿B, ,B, ⍪B, and ⊂B are handled this way.
 
    3.  The tokenization of literal strands has dedicated code for
-literal arguments of the rank operator (⍤) to make make it working like
-described in the ISO standard.  This is, in contrast to defined
-operators, possible because the ISO standard defines in very detail how
-its right operand needs to look like and how deviations shall be handled
-(DOMAIN ERROR, LENGTH ERROR etc.
+literal arguments of the power (⍣) and rank operators (⍤) to make make
+it working like described in the ISO standard.  This is, in contrast to
+defined operators, possible because the ISO standard defines in very
+detail how its right operand needs to look like and how deviations shall
+be handled (DOMAIN ERROR, LENGTH ERROR etc.
 
-   4.  The prefix matching of mixed strands builds the strand
+   4.  The phrase matching of mixed strands builds the strand
 step-by-step according to the following rules:
 
    • two adjacent APL scalars A and B create a new open strand (with two
@@ -8344,6 +8550,53 @@ right operand can be identified by the rules given in iso) have
 dedicated code that "unstrands" the right operand from a strand that may
 have been mistakenly created in 3.  above.
 
+5.7.1 Example
+-------------
+
+Consider the following APL statement:
+
+           ∇FOO
+            "Time is now: " ⎕TS
+           ∇
+
+   When function FOO is created its single function line is being
+tokenized.  The tokenization of the function line sees the string "Time
+is now: " which is a literal token wth 13 literal items (= single
+characters).  The result of the tokenization is therefore 2 tokens: the
+string and the system function ⎕TS. Naturally ⎕TS is the time stamp when
+function FOO is called and not the the time when function FOO is
+created.  Therefore the strand building stops at this point and leaves
+the string as an (incomplete) strand because the strand building can not
+predict when FOO will be called.  At this point the incomplete strand
+and the system function ⎕TS will become adjacent tokens in the function
+body of FOO.
+
+   Later on (or maybe never) FOO will be called.  The execution of FOO
+(which goes from right to left) first sees the niladic token ⎕TS, and
+evaluates it to an integer vector B, say 2026 1 1 18 5 6 194.  Values
+returned from functions, values of variables, and the literal strands
+from the tokenization are all closed and incomplete, and so is B at this
+point.  The execution then fetches the next token A, which is the
+string.  The two adjacent tokens A and B now match the pattern A B in
+the phrase table of the interpreter.  The corresponding phrase evaluator
+for that pattern then prepends the items in A to B and replaces the two
+tokens A and B with the new (single) token for the modified B. The next
+token is then an END (for end of staement) token which causes B to be
+printed.
+
+   A final remark: It should be noted, that the phrase table defined in
+iso is somewhat incomplete.  In particular the pattern A B above (which
+performs the strand building in the execution phase) is not present in
+iso.  Also, iso defines END tokens as used above, but no pattern in
+ehich they appear.  All this has the unfortunate consequence that vector
+notation is provided by every APL interpreter, but the details of it
+differ considerably.  For example, 1 2 3[2] could be 2 in one
+interpreter, but raise a RANK ERROR in another.  Even for different
+interpreters od the same vendor.  The only reliable way to write
+portable APL programs is to use (otherwise redundant) parentheses, in
+particular around operators and their operands, and around strands that
+are being indexed.
+
 
 File: apl.info,  Node: Chapter 6,  Next: Chapter 7,  Prev: Chapter 5,  Up: Top
 
@@ -8354,11 +8607,8 @@ The top-level directory of the GNU APL project has a structure like
 this:
 
          apl-1.9/
-         ├── autom4te.cache
          ├── build
          ├── debian
-         ├── debian_tmp
-         ├── devel_doc
          ├── doc
          ├── erlang
          ├── gnu-apl.d
@@ -9760,92 +10010,93 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11616
-Node: Chapter 224278
-Node: Section 2.126428
-Node: Subsection 2.1.127662
-Node: Subsection 2.1.228331
-Node: Subsection 2.1.329155
-Node: Subsection 2.1.435069
-Node: Subsection 2.1.538957
-Node: Subsection 2.1.639818
-Node: Subsection 2.1.748283
-Node: Subsection 2.1.850089
-Node: Section 2.253498
-Node: Section 2.354290
-Node: Section 2.460238
-Node: Section 2.561520
-Node: Section 2.666017
-Node: Section 2.766190
-Node: Section 2.866820
-Node: Section 2.972300
-Node: Section 2.1074671
-Node: Section 2.1176760
-Node: Section 2.1278333
-Node: Section 2.1380114
-Node: Section 2.1482043
-Node: Section 2.1582984
-Node: Section 2.1683255
-Node: Section 2.1784666
-Node: Section 2.1895569
-Node: Section 2.1998116
-Node: Section 2.20105061
-Node: Section 2.21109497
-Node: Section 2.22111000
-Node: Scan Polynomial B135431
-Node: Integral B137324
-Node: Section 2.23140064
-Node: Section 2.24146740
-Node: Section 2.25150112
-Node: Section 2.26150403
-Node: Section 2.27161256
-Node: Section 2.28161528
-Node: Section 2.29168581
-Node: Section 2.30171035
-Node: Section 2.31171704
-Node: Section 2.32173355
-Node: Section 2.33177279
-Node: Section 2.34191708
-Node: The Plot Data B192940
-Node: The Plot Attributes A195554
-Node: Plot Window Handling209089
-Node: Output File Format210420
-Node: GUI driver211643
-Node: Section 2.35215198
-Node: Section 2.36224633
-Node: Section 2.37225652
-Node: Section 2.38240887
-Node: Section 2.39251929
-Node: Section 2.40254113
-Node: Section 2.41280218
-Node: Section 2.42284758
-Node: Section 2.43305857
-Node: Section 2.44319870
-Node: Section 2.45323140
-Node: Chapter 3323655
-Node: Chapter 4326163
-Node: Chapter 5327304
-Node: Section 5.1327926
-Node: Section 5.2328658
-Node: Section 5.3329153
-Node: Section 5.4331293
-Node: Section 5.5336932
-Node: Section 5.6338683
-Node: Chapter 6342204
-Node: Section 6.1343867
-Node: Section 6.2345187
-Node: Section 6.3345547
-Node: Section 6.4345789
-Node: Section 6.5346451
-Node: Section 6.6346929
-Node: Section 6.7347702
-Node: Section 6.8348128
-Node: Chapter 7348530
-Node: Section 7.1348949
-Node: Section 7.2349636
-Node: Chapter 8350467
-Node: Section 8.1350970
-Node: Section 8.2376283
+Node: Chapter 11615
+Node: Chapter 224277
+Node: Section 2.126427
+Node: Subsection 2.1.127661
+Node: Subsection 2.1.228330
+Node: Subsection 2.1.329154
+Node: Subsection 2.1.435068
+Node: Subsection 2.1.538956
+Node: Subsection 2.1.639817
+Node: Subsection 2.1.748282
+Node: Subsection 2.1.850088
+Node: Section 2.253497
+Node: Section 2.354289
+Node: Section 2.460237
+Node: Section 2.561519
+Node: Section 2.666016
+Node: Section 2.766189
+Node: Section 2.866819
+Node: Section 2.972299
+Node: Section 2.1074670
+Node: Section 2.1176759
+Node: Section 2.1278332
+Node: Section 2.1380113
+Node: Section 2.1482042
+Node: Section 2.1582983
+Node: Section 2.1683254
+Node: Section 2.1784665
+Node: Section 2.1895568
+Node: Section 2.1998115
+Node: Section 2.20105060
+Node: Section 2.21109496
+Node: Section 2.22110999
+Node: Scan Polynomial B135430
+Node: Integral B137323
+Node: Section 2.23140063
+Node: Section 2.24146739
+Node: Section 2.25150111
+Node: Section 2.26150402
+Node: Section 2.27161255
+Node: Section 2.28161527
+Node: Section 2.29168580
+Node: Section 2.30171034
+Node: Section 2.31171703
+Node: Section 2.32173354
+Node: Section 2.33177278
+Node: Section 2.34191707
+Node: The Plot Data B192939
+Node: The Plot Attributes A195553
+Node: Plot Window Handling209088
+Node: Output File Format210419
+Node: GUI driver211642
+Node: Section 2.35215197
+Node: Section 2.36224632
+Node: Section 2.37225651
+Node: Section 2.38240886
+Node: Section 2.39251928
+Node: Section 2.40254112
+Node: Section 2.41280217
+Node: Section 2.42284757
+Node: Section 2.43305856
+Node: Section 2.44319869
+Node: Section 2.45323139
+Node: Chapter 3323654
+Node: Chapter 4326162
+Node: Chapter 5327303
+Node: Section 5.1327964
+Node: Section 5.2328696
+Node: Section 5.3329191
+Node: Section 5.4331329
+Node: Section 5.5336976
+Node: Section 5.6339984
+Node: Section 5.7348723
+Node: Chapter 6354688
+Node: Section 6.1356258
+Node: Section 6.2357578
+Node: Section 6.3357938
+Node: Section 6.4358180
+Node: Section 6.5358842
+Node: Section 6.6359320
+Node: Section 6.7360093
+Node: Section 6.8360519
+Node: Chapter 7360921
+Node: Section 7.1361340
+Node: Section 7.2362027
+Node: Chapter 8362858
+Node: Section 8.1363361
+Node: Section 8.2388674
 
 End Tag Table
 

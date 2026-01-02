@@ -30,16 +30,24 @@
       ⎕TZ
 6.2
 
-      ⍝ regression. This usually fails on 12/31 because ⎕TZ←12 already points
-      ⍝ to new tears day of the next year while TZ←¯12 is still `2/`3 of the
-      ⍝ previous year.
-      ⍝
-      ⎕TZ←12  ◊ T1←⎕TS
-      ⎕TZ←¯12 ◊ T2←⎕TS
-      ⍝ handle month-wrap caused by timezones on different days.
-      ⍝ The year-wrap is not handled because it is too rare,
-      ⍝
-      +/ (⊂(T1 - T2)[2 3])≡¨ (0 1) (1 ¯27) (1 ¯28) (1 ¯29) (1 ¯30)
+      ⎕TZ←12  ◊ T1←⎕TS         ⍝ timezone 12 (ahead)
+      ⎕TZ←¯12 ◊ T2←⎕TS         ⍝ timezone ¯12 (behind)
+      ∆_YEAR ← T1[1] - T2[1]   ⍝ 1 on 12/31
+      ∆_MON  ← T1[2] - T2[2]
+      ∆_DAY  ← T1[3] - T2[3]
+      ∆_YEAR ∈ 0 1                          ⍝ all valid year differences
+1
+      ∆_MON ∈ 0 1 ¯11                       ⍝ all valid month differences
+1
+      ∆_DAY ∈ 0 1 ¯27 ¯28 ¯29 ¯30           ⍝ all valid day differences
+1
+      (∆_YEAR = 0) ∨ (∆_MON = ¯11)          ⍝ end of the year
+1
+      (∆_MON ∈ 0 ¯11) ∨ (∆_DAY ∈ ¯27 ¯28)   ⍝ end of February
+1
+      (∆_MON ∈ 0 ¯11) ∨ (∆_DAY = ¯29)       ⍝ end of Apr, Jun, Sep, Nov
+1
+      (∆_MON = 0) ∨ (∆_DAY = ¯30)           ⍝ Jan, Mar, May, Jul, Aug, Oct, Dec
 1
 
 ⍝ ==================================

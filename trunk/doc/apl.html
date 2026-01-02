@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>December 30, 2025.
+<p>January 2, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -356,10 +356,17 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
     <li><a id="toc-Some-APL2-Tests" href="#Section-5_002e4">5.4 Some APL2 Tests</a>
     <ul class="no-bullet">
       <li><a id="toc-Test-1_003a-Binding-strength-of-_005b_005d" href="#Test-1_003a-Binding-strength-of-_005b_005d">5.4.1 Test 1: Binding strength of []</a></li>
-      <li><a id="toc-Test-1_003a-Binding-strength-of-the-left-operand" href="#Test-1_003a-Binding-strength-of-the-left-operand">5.4.2 Test 1: Binding strength of the left operand</a></li>
+      <li><a id="toc-Test-2_003a-Binding-strength-of-the-left-operand" href="#Test-2_003a-Binding-strength-of-the-left-operand">5.4.2 Test 2: Binding strength of the left operand</a></li>
     </ul></li>
     <li><a id="toc-Definitions" href="#Section-5_002e5">5.5 Definitions</a></li>
-    <li><a id="toc-GNU-APL-Vector-Notation" href="#Section-5_002e6">5.6 GNU APL Vector Notation</a></li>
+    <li><a id="toc-Unexpected-Stranding" href="#Section-5_002e6">5.6 Unexpected Stranding</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Performance-considerations" href="#Performance-considerations">5.6.1 Performance considerations</a></li>
+    </ul></li>
+    <li><a id="toc-GNU-APL-Vector-Notation" href="#Section-5_002e7">5.7 GNU APL Vector Notation</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Example" href="#Example">5.7.1 Example</a></li>
+    </ul></li>
   </ul></li>
   <li><a id="toc-GNU-APL-Project-Structure" href="#Chapter-6">6 GNU APL Project Structure</a>
   <ul class="no-bullet">
@@ -9346,7 +9353,8 @@ the misleading information corrected were not successful.
 <li><a href="#Section-5_002e3" accesskey="3">Quotes from the lrm</a></li>
 <li><a href="#Section-5_002e4" accesskey="4">Some APL2 Tests</a></li>
 <li><a href="#Section-5_002e5" accesskey="5">Definitions</a></li>
-<li><a href="#Section-5_002e6" accesskey="6">GNU APL Vector Notation</a></li>
+<li><a href="#Section-5_002e6" accesskey="6">Unexpected Stranding</a></li>
+<li><a href="#Section-5_002e7" accesskey="7">GNU APL Vector Notation</a></li>
 </ul>
 <hr>
 <div class="section" id="Section-5_002e1">
@@ -9417,7 +9425,7 @@ characters can be listed within one set of single quotation marks:
 
 </li><li> <b>lrm page 33</b>: <i>The hierarchy of binding strengths is listed
       below in descending order.</i>
-<pre class="verbatim">     Binding Strength            What Is Bound
+<pre class="verbatim">        Binding Strength         What Is Bound
      ──────────────────────      ────────────────────────────────────
      1. Brackets                 Brackets to what is on their left
      2. Specification left       Left arrow to what is on its left
@@ -9428,12 +9436,12 @@ characters can be listed within one set of single quotation marks:
      7. Right argument           Function to its right argument
      8. Specification right      Left arrow to what is on its right
      ════════════════════════════════════════════════════════════════
-</pre><p>The binding strength 4. above is the one for vector notation. It defines
-    how the items of a vector notation are bound together (as opposed to being
-    bound to other tokens). For example: <b>1 2 3[2]</b> becomes <b>1 2 (3[2])</b>
-    because <b>[2]</b> binds stronger to <b>3</b> on its left than <b>3</b> binds to
-    <b>2</b> in its left (which then raises a <b>RANK ERROR</b> because <b>3</b> is
-    a scalar).
+</pre><p>The binding strength <b>4.</b> above is the one for vector notation. It
+    defines how the items of a vector notation are bound together (as
+    opposed to being bound to other tokens). For example: <b>1 2 3[2]</b>
+    becomes <b>1 2 (3[2])</b> because <b>[2]</b> binds stronger to <b>3</b> left
+    of it than <b>3</b> binds to <b>2</b> left  of it (which then raises
+    a <b>RANK ERROR</b> because <b>3</b> is a scalar).
 </p></li></ol>
 
 
@@ -9452,7 +9460,7 @@ version for PCs).
 </p>
 <ul class="section-toc">
 <li><a href="#Test-1_003a-Binding-strength-of-_005b_005d" accesskey="1">Test 1: Binding strength of []</a></li>
-<li><a href="#Test-1_003a-Binding-strength-of-the-left-operand" accesskey="2">Test 1: Binding strength of the left operand</a></li>
+<li><a href="#Test-2_003a-Binding-strength-of-the-left-operand" accesskey="2">Test 2: Binding strength of the left operand</a></li>
 </ul>
 <div class="subsection" id="Test-1_003a-Binding-strength-of-_005b_005d">
 <h4 class="subsection">5.4.1 Test 1: Binding strength of []</h4>
@@ -9489,11 +9497,11 @@ b
 the second quote on page 14 of the lrm.
 </p>
 </div>
-<div class="subsection" id="Test-1_003a-Binding-strength-of-the-left-operand">
-<h4 class="subsection">5.4.2 Test 1: Binding strength of the left operand</h4>
+<div class="subsection" id="Test-2_003a-Binding-strength-of-the-left-operand">
+<h4 class="subsection">5.4.2 Test 2: Binding strength of the left operand</h4>
 
-<p>For this test we create a defined function <b>SHOW_NC</b>, a monadic defined
-operator <b>OPER1</b>, and a dyadic defined operator <b>OPER2</b>:
+<p>For this test we create a monadic defined function <b>SHOW_NC</b>, a monadic
+defined operator <b>OPER1</b>, and a dyadic defined operator <b>OPER2</b>:
 </p>
 <div class="example">
 <pre class="example">      ⍝ display the name class of B¯B
@@ -9562,7 +9570,7 @@ B       : Value  1 2 3
 
       ⍝ Test 2d. binding of the right operand
       ⍝
-      11 22 33 'lop' OPER1 'rop' 1 2 3
+      11 22 33 'lop' OPER2 'rop' 1 2 3
 A       : Unused Name
 LO      : Value  11 22 33 lop
 OPER2   : Operator
@@ -9644,25 +9652,42 @@ as <b>0 1 2(⌽∘0 1) &rsquo;ABC&rsquo;</b> as <b>iso</b> suggests.
 <div class="section" id="Section-5_002e5">
 <div class="header">
 <p>
-Next: <a href="#Section-5_002e6" accesskey="n" rel="next">GNU APL Vector Notation</a>, Previous: <a href="#Section-5_002e4" accesskey="p" rel="prev">Some APL2 Tests</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-5_002e6" accesskey="n" rel="next">Unexpected Stranding</a>, Previous: <a href="#Section-5_002e4" accesskey="p" rel="prev">Some APL2 Tests</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Definitions"></span><h3 class="section">5.5 Definitions</h3>
 
-<p><b>Definition</b>: A <i>strand</i> consists of two (!) or more adjacent values in
-a defined function, or in a string being ⍎&rsquo;ed, or on a line entered in
-immediate execution mode. Such values can be literals (like in <b>1 2 3</b>),
+<p><b>Definition</b>: A <i>(complete) strand</i> consists of two (!) or more adjacent
+values in a defined function, or in a string being ⍎&rsquo;ed, or on a line entered
+in immediate execution mode. Such values can be literals (like in <b>1 2 3</b>),
 but also values of variables or results of niladic functions. A strand is
 always a vector and we call the values in a strand the <i>items of the strand</i>.
 Strand items can be simple (i.e. numbers or single characters) or nested
-(strings or other strands). Strand items sre always (possibly nested)
+(strings or other strands). Strand items are always (possibly nested)
 APL scalars.
 </p>
 <p><b>Definition</b>: A <i>literal strand</i> is a strand whose items are only
-literals (including nested literals like in 1 2 (3 4) 5).
+literals (including nested literals like in 1 2 (3 4) 5). Literal strands are
+created when an APL expression is tokenized. At that point in time the
+literal strand is incomplete and more strand items may be added to it when
+the statement is executed.
+</p>
+<p><b>Note</b>: Strands are, in general, subject to what is known
+as <i>unexpected stranding</i>, which occurs when an operator accept values as
+operands. This is the case for the power operatror <b>⍣</b> and for the rank
+operator <b>⍤</b>; both can have values as right operands. The clean way of
+avoiding unexpected stranding is to put the operatorr and its operands
+into parentheses, but the <b>iso</b> does not do that and in order to make
+the examples in <b>iso</b> work, GNU APL has dedicated code for the rank and
+power operators that prevents unexpected stranding for their right operand
+and their right function value. For defined operators this is not possuble 
+because at tokenization time a defined operator is only a symbol whose
+name class at execution time is unknown at tokenization time of its caller.
+For the same reason. the binding strengths defined above can not cure this
+kind of unexpected stranding.
 </p>
 <p><b>Definition</b>: An <i>extended literal strand</i> is a strand whose items are
-either literals (including nested literals) or iparticular simple primitive
-function with particular literal arguments.
+either literals (including nested literals) or particular simple primitive
+function is with particular literal arguments.
 </p>
 <p><b>Definition</b>: A <i>mixed strand</i> is a strand which is not a literal strand.
 </p>
@@ -9677,16 +9702,17 @@ function with particular literal arguments.
 <div class="example">
 <pre class="example">      1 2 3        ⍝ open literal strand
 
-      VAR←1 2 3
-      ∇Z←FOO
+      1 2 (3⍴4) 5     ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+      1 2 (3/4) 5     ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+     'ab' (⍳3) 'ef'   ⍝ open extended literal strand ←→ 'ab' (1 2 3) 'ef' 
+
+      VAR←1 2 3       ⍝ mixed strand item
+      ∇Z←FOO          ⍝ mixed strand item
        Z←1 2 3
       ∇
 
-      1 VAR 3       ⍝ nested open mixed strand
-      1 FOO 3       ⍝ open mixed strand\
-
-      1 2 (3⍴4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
-      1 2 (3/4) 5   ⍝ open extended literal strand ←→ 1 2 4 4 4 5
+      1 VAR 3         ⍝ nested open mixed strand
+      1 FOO 3         ⍝ nested open mixed strand
 
       (1 2 3)       ⍝ closed literal strand
       'abc'         ⍝ closed literal strand
@@ -9698,9 +9724,221 @@ function with particular literal arguments.
 <div class="section" id="Section-5_002e6">
 <div class="header">
 <p>
-Previous: <a href="#Section-5_002e5" accesskey="p" rel="prev">Definitions</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-5_002e7" accesskey="n" rel="next">GNU APL Vector Notation</a>, Previous: <a href="#Section-5_002e5" accesskey="p" rel="prev">Definitions</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="GNU-APL-Vector-Notation"></span><h3 class="section">5.6 GNU APL Vector Notation</h3>
+<span id="Unexpected-Stranding"></span><h3 class="section">5.6 Unexpected Stranding</h3>
+
+<p><i>Unexpected stranding</i> (or better: <i>false stranding</i>) refers to a situation
+where the stranding of adjacent values leads to a wrong result. Unexpected
+stranding is not unexpected at all, as we will see in this section.
+</p>
+<p>In non-nested APL interpreters, such as APL \360, the binding strength of
+strand items was the highest. That was a wise decision which had two
+consequences:
+</p>
+<ul>
+<li> Expressions like <b>1 2 3[2]</b> were always valid in APL \360 and friends.
+      The current APL2 and, (for the sake of compatibility) also GNU APL cases,
+      where <b>1 2 3[2]</b> raises a RANK ERROR, are merely an unfortunate
+      consequence of binding expressions in brackets stronger than strand
+      items.
+</li><li> Similarly, the IBM APL2 design decision to bind right operand stronger 
+      than strand items, together with the decision to allow values as operands,
+      create the possibility of false stranding.
+</li></ul>
+
+<p><b>Corollary 1:</b> unexpected stranding was not an issue before binding strength
+in APL2 was introduced.
+</p>
+<p><b>Corollary 2:</b> The only binding strengths for which unexpected stranding
+can occur are those for that bind stronger than vector (i.e. strand item),
+i.e. <b>1. bracket</b>, <b>2. specification left</b>, and <b>3. right operand</b>.
+Of these 3 binding strengths, only <b>3. right operand</b> conflicts with
+strand notation (because neither <b>[...]</b> nor <b>←</b> can be strand items.
+</p>
+<p>To go into a little more detail we consider the following token sequences:
+</p>
+<div class="example">
+<pre class="example">                                                        ⍝ at tokenizatio time...
+    PRIMITIVE_FUNCTION         VALUE_A VALUE_B          ⍝  ├── expected
+    PRIMITIVE_DYADIC_OPERATOR  VALUE_A VALUE_B          ⍝  ├── unexpected
+    VALUE                      VALUE_A VALUE_B          ⍝  ├── expected
+    SYMBOL                     VALUE_A VALUE_B          ⍝  └── unknown
+
+                                                        ⍝ at execution time...
+    VALUE                      VALUE_A VALUE_B          ⍝  ├── expected
+    FUNCTION                   VALUE_A VALUE_B          ⍝  ├── expected
+    DYADIC_OPERATOR            VALUE_A VALUE_B          ⍝  └── unexpected
+</pre></div>
+
+<p>The fact that <b>VALUE_A</b> and <b>VALUE_B</b> are adjacent constitues what is
+known as a <i>shift/reduce confict</i> in compiler terminology. Let&rsquo;s add
+some parentheses to see how these shift/reduce conficts are, by means
+of the APL2 binding strength, supposed to be resolved:
+</p>
+<div class="example">
+<pre class="example">                                                        ⍝ at tokenizatio time...
+    PRIMITIVE_FUNCTION       ( VALUE_A   VALUE_B )      ⍝  ├── expected
+  ( PRIMITIVE_DYADIC_OPERATOR  VALUE_A ) VALUE_B        ⍝  ├── unexpected
+    VALUE                    ( VALUE_A   VALUE_B )      ⍝  ├── expected
+  ? SYMBOL                   ? VALUE_A ? VALUE_B ?      ⍝  └── unknown
+
+                                                        ⍝ at execution time...
+    VALUE                    ( VALUE_A   VALUE_B )      ⍝  ├── expected
+    FUNCTION                 ( VALUE_A   VALUE_B )      ⍝  ├── expected
+  ( DYADIC_OPERATOR            VALUE_A ) VALUE_B        ⍝  └── unexpected
+</pre></div>
+
+<p>The first four sequences occurs at tokenization time, the others at
+execution time. The significant difference between primitive functions
+and primitive operators on the one hand and defined functions and defined
+operators on the other hand is that the parser &quot;knows&quot; in the first three
+cases if <b>VALUE_A</b> and <b>VALUE_B</b> shall be stranded together or not.
+In the fourth case the parser cannot decide whether <b>SYMBOL</b> refers to a
+defined function (including functions derived from monadic operators),
+to a variable, or to a dyadic defined operator. Therefore the parser can
+resolve the first three cases at tokenization time, i.e. bind <b>VALUE_A</b>
+to <b>PRIMITIVE_DYADIC_OPERATOR</b> or ito <b>VALUE</b> if so, and to <b>VALUE_B</b>
+otherwise. Only the binding of <b>SYMBOL</b> is left over and will be decided
+at execution time.
+</p>
+<p>At execution time, the first thing that happens is that <b>SYMBOL</b> is resolved
+to its current value (so its token class changes from <b>SYMBOL</b> to <b>VALUE</b>
+(for variables),  or to <b>FUNCTION</b> (for defined functions), or to
+<b>OPERATOR</b> for defined operators. At the time when the parser sees the
+pattern <b>VALUE_A VALUE_B</b> it can, with a lookahead of 1 token decide
+if the token <b>VALUE_A</b> shall be bound to it <b>PRIMITIVE_DYADIC_OPERATOR</b>,
+or stranded to its adjacxent value <b>VALUE_B</b>. To do this a so-called
+<b>LALR-1</b> parser suffices. In simple terms: if the parser sees a
+<b>PRIMITIVE_DYADIC_OPERATOR</b> left of <b>VALUE_A VALUE_B</b> then it shifts
+<b>VALUE_A</b> (which will later on become the right operand of that operator)
+and otherwise it starts or continues strand building with <b>VALUE_A</b>.
+In <b>iso</b> terminology: the phrase evaluator for pattern <b>VALUE_A VALUE_B</b>
+stops the strand building (in compiler terminology it <b>shifts</b> <b>VALUE_A</b>)
+when the lookahead token is <b>DYADIC_OPERATOR</b>), and otherwise it continues
+the strand building (in compiler terminology it <b>reduces</b> the pattern
+<b>VALUE_A VALUE_B</b>). 
+</p>
+<p>As an aside: The ISO standard provides examples with strand notation
+that would be illegal in IBM APL2 (rank operator, page 126):
+</p>
+<div class="example">
+<pre class="example">      0 1 2 ⌽⍤0 1 'ABC'
+ABC
+BCA
+CAB
+</pre></div>
+
+<p>In IBM APL2, the rightmost <b>0</b> would bind to <b>⍤</b> and not to the rightmost
+<b>1</b>, like in (parentheses added according to the APL bindig strength:
+</p>
+<div class="example">
+<pre class="example">      (0 1 2) (⌽ ⍤ 0) (1 'ABC')
+LENGTH ERROR
+      0 1 2(⌽⍤0 0 0)1 'ABC'
+      ^            ^
+</pre></div>
+
+<p>What saves IBM here is only the fact that the the two primitive operators
+that accept values as right operands (the rank operator ⍤ and the power 
+operator ⍣) are not implemented in IBM APL2. In contrast GNU APL has
+implemented both operators and the <b>iso</b> examples work as shown in
+the standard.
+</p>
+<p>The same <b>iso</b> example in Dyalog APL (who seem to be the inventor of these
+operators) does not work either (at least not without parentheses:
+</p>
+<div class="example">
+<pre class="example">      ⍝ Dyalog APL
+      ⍝
+      0 1 2 ⌽⍤0 1 'ABC'
+SYNTAX ERROR: Missing right argument
+ 0 1 2⌽⍤0 1 'ABC'
+      ∧
+
+      ⍝ Dyalog APL
+      ⍝
+      0 1 2 (⌽⍤0 1) 'ABC'
+ABC
+BCA
+CAB
+</pre></div>
+
+<p>and <b>1 2 3[2]</b> is valid in Dyalog APL, which suggests that Dyalog has not
+adapted the idea of binding strength but rather remains backward compatible
+with APL \360.
+</p>
+<ul class="section-toc">
+<li><a href="#Performance-considerations" accesskey="1">Performance considerations</a></li>
+</ul>
+<div class="subsection" id="Performance-considerations">
+<h4 class="subsection">5.6.1 Performance considerations</h4>
+
+<p>But why bother? The tokenizer could have made its life easier by only
+converting (number-) strings and quoted strings to APL values and postpone
+the resolution of shift/reduce conflicts to the execution phase. To understand
+why it is important to perform as much of the strand building at tokenization
+time, have a look at the following, somwhat crude, APL code (which is not
+too uncommon in real life):
+</p>
+<div class="example">
+<pre class="example">      ∇Z←FOO N
+       Z←100⍴0 ◊ J←1
+       LOOP: Z[J]←J+1 2 3 4 5 6 7 8 9 10 ÷ →(100 &lt; J←J+1)/LOOP
+      ∇
+</pre></div>
+
+<p>There are smarter ways to do that in APL, but before APL2 an APL programmer
+could corectly assume that <b>1 2 3 4 5 6 7 8 9 10</b> will be tokenized into
+a strand created at tokenization time, which would have been more efficient
+than e.g. storing that term in an APL variable. That strand would have been
+a single APL value.
+</p>
+<p>The tokenization of the LOOP line is pretty fast; the tokenizer runs once
+over the line and produces a strand as it goes. MOst of the tokenization, such
+as converting number strings to integers is the same in both cases compared 
+below.
+</p>
+<p>Now, if the strand is built at tokenization time, then the strand is created
+once and becomes a single APL value.
+</p>
+<p>If, however, the strand is built at execution time, then:
+</p>
+<ul>
+<li> the tokenization produces 10 scalar APL values,
+</li><li> every iteration of the LOOP line creates 9 more values:
+      <ul>
+<li> 9 10
+      </li><li> 8 (9 10)
+      </li><li> 7 (8 (9 10))
+      </li><li> ...
+      </li></ul>
+</li><li> and each of the 9 steps in the strand creation requires a pattern
+      match for the pattern <b>VALUE_A VALUE_B</b>
+</li></ul>
+
+<p>The function FOO would therefore create 900 more APL values and perform
+900 more pattern matches compared to the strand creation at tokenization time.
+GNU APL has further extended this principle to APL values that may not only
+contain literals but also a handful of primitives with literal argument.
+For example, the APL expression:
+</p>
+<div class="example">
+<pre class="example">      ⍪3 4⍴&quot;Hello&quot;
+</pre></div>
+
+<p>would be tokenized into a single APL value. This kind of optimization
+can be disabled at compile time.
+</p>
+<hr>
+</div>
+</div>
+<div class="section" id="Section-5_002e7">
+<div class="header">
+<p>
+Previous: <a href="#Section-5_002e6" accesskey="p" rel="prev">Unexpected Stranding</a>, Up: <a href="#Chapter-5" accesskey="u" rel="up">Vector Notation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="GNU-APL-Vector-Notation"></span><h3 class="section">5.7 GNU APL Vector Notation</h3>
 
 <p>With the definitions from the previous section we can explain how GNU APL
 has implemented vector notation:
@@ -9708,11 +9946,11 @@ has implemented vector notation:
 <p>1. GNU APL distinguishes between literal and mixed strands. literal strands
    are combined into a single APL value at tokenization time. This is a
    very effective optimization (which can be disabled at <b>./configure</b>
-   time). In contrast, mixed strands are created at prefix matching time, i.e.
+   time). In contrast, mixed strands are created at phrase matching time, i.e.
    when an APL expression is evaluated. The tokenizatio of APL expressions
-   happens only once, while prefix matching occurs every time when a
+   happens only once, while phrase matching occurs every time when a
    statement is being executed and therefore moving major parts of the strand
-   building from prefix matching time to tokenization time can bring
+   building from phrase matching time to tokenization time can bring
    substantial performance benefits.
 </p>
 <p>2. The tokenization expands simple APL primitives with literal arguments and
@@ -9720,13 +9958,13 @@ has implemented vector notation:
    <b>N⍴B</b>, <b>N/B</b>, <b>N⌿B</b>, <b>,B</b>, <b>⍪B</b>, and <b>⊂B</b> are handled this way.
 </p>
 <p>3. The tokenization of literal strands has dedicated code for literal
-   arguments of the rank operator (<b>⍤</b>) to make make it working like described
-   in the ISO standard. This is, in contrast to defined operators, possible
-   because the ISO standard defines in very detail how its right operand
-   needs to look like and how deviations shall be handled (<b>DOMAIN ERROR</b>,
-   <b>LENGTH ERROR</b> etc.
+   arguments of the power (<b>⍣</b>) and rank operators (<b>⍤</b>) to make make
+   it working like described in the ISO standard. This is, in contrast to
+   defined operators, possible because the ISO standard defines in very
+   detail how its right operand needs to look like and how deviations shall
+   be handled (<b>DOMAIN ERROR</b>, <b>LENGTH ERROR</b> etc.
 </p>
-<p>4. The prefix matching of mixed strands builds the strand step-by-step
+<p>4. The phrase matching of mixed strands builds the strand step-by-step
    according to the following rules:
 </p>
 <ul>
@@ -9766,8 +10004,60 @@ has implemented vector notation:
    dedicated code that &quot;unstrands&quot; the right operand from a strand that
    may have been mistakenly created in <b>3.</b> above.
 </p>
+<ul class="section-toc">
+<li><a href="#Example" accesskey="1">Example</a></li>
+</ul>
+<div class="subsection" id="Example">
+<h4 class="subsection">5.7.1 Example</h4>
+
+<p>Consider the following APL statement:
+</p>
+<div class="example">
+<pre class="example">      ∇FOO
+       &quot;Time is now: &quot; ⎕TS
+      ∇
+</pre></div>
+
+<p>When function <b>FOO</b> is created its single function line is being tokenized.
+The tokenization of the function line sees the string &quot;Time is now: &quot; which
+is a literal token wth 13 literal items (= single characters). The result of
+the tokenization is therefore 2 tokens: the string and the system function
+<b>⎕TS</b>. Naturally <b>⎕TS</b> is the time stamp when function <b>FOO</b> is called
+and not the the time when function <b>FOO</b> is created. Therefore the strand
+building stops at this point and leaves the string as an (incomplete) strand
+because the strand building can not predict when <b>FOO</b> will be called. At
+this point the incomplete strand and the system function <b>⎕TS</b> will become
+adjacent tokens in the function body of <b>FOO</b>.
+</p>
+<p>Later on (or maybe never) <b>FOO</b> will be called. The execution of <b>FOO</b>
+(which goes from  right to left) first sees the niladic token <b>⎕TS</b>, and
+evaluates it to an integer vector <b>B</b>, say <b>2026 1 1 18 5 6 194</b>. Values
+returned from functions, values of variables, and the literal strands from
+the tokenization are all closed and incomplete, and so is <b>B</b> at this point.
+The execution then fetches the next token <b>A</b>, which is the string. The
+two adjacent tokens <b>A</b> and <b>B</b> now match the pattern <b>A B</b> in the
+phrase table of the interpreter. The corresponding phrase evaluator for
+that pattern then prepends the items in <b>A</b> to <b>B</b> and replaces the
+two tokens <b>A</b> and <b>B</b> with the new (single) token for the modified <b>B</b>.
+The next token is then an <b>END</b> (for end of staement) token which causes
+<b>B</b> to be printed.
+</p>
+<p><b>A final remark</b>: It should be noted, that the phrase table defined 
+in <b>iso</b> is somewhat incomplete. In particular the pattern <b>A B</b>
+above (which performs the strand building in the execution phase) is
+not present in <b>iso</b>. Also, <b>iso</b> defines <b>END</b> tokens as used
+above, but no pattern in ehich they appear. All this has the unfortunate
+consequence that vector notation is provided by every APL interpreter,
+but the details of it differ considerably. For example, <b>1 2 3[2]</b> could
+be <b>2</b> in one interpreter, but raise a <b>RANK ERROR</b> in another. Even
+for different interpreters od the same vendor. The only reliable way to
+write portable APL programs is to use (otherwise redundant) parentheses,
+in particular around operators and their operands, and around strands that
+are being indexed.
+</p>
 
 <hr>
+</div>
 </div>
 </div>
 <div class="chapter" id="Chapter-6">
@@ -9781,11 +10071,8 @@ Next: <a href="#Chapter-7" accesskey="n" rel="next">Libraries Contributed by GNU
 </p>
 <div class="example">
 <pre class="example">    apl-1.9/
-    ├── autom4te.cache
     ├── build
     ├── debian
-    ├── debian_tmp
-    ├── devel_doc
     ├── doc
     ├── erlang
     ├── gnu-apl.d

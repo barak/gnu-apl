@@ -280,7 +280,7 @@ am__leading_dot = .
 am__quote = 
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
-apl_BUILD_DATE = 2025-12-31 12:52:50 CET
+apl_BUILD_DATE = 2025-12-31 16:12:02 CET
 apl_BUILD_OS = Linux 5.15.0-161-generic x86_64
 bindir = ${exec_prefix}/bin
 build = x86_64-unknown-linux-gnu
@@ -324,7 +324,7 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 dist_noinst_DATA = preferences.in keyboard1.txt parallel_thresholds
-dist_DATA = preferences keyboard1.txt parallel_thresholds
+dist_DATA = preferences    keyboard1.txt parallel_thresholds
 distdir = ${sysconfdir}/gnu-apl.d
 all: all-am
 

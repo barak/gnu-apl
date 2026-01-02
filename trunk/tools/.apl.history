@@ -1,0 +1,70 @@
+⎕TX
+⎕TZ
+)off
+)help ⊢
+:q
+apl
+⎕TZ←12  ◊ T1←⎕TS   ⍝ ahead
+⎕TZ←¯12 ◊ T2←⎕TS   ⍝ behind
+T1[1] = T2[1]
+(⊂(T1 - T2)[2 3])≡¨ (0 1) (1 ¯27) (1 ¯28) (1 ¯29) (1 ¯30)
+)clear
+⎕TZ←12  ◊ T1←⎕TS   ⍝ ahead
+⎕TZ←¯12 ◊ T2←⎕TS   ⍝ behind
+YEAR_WRAP ← T1[1] ≠ T2[1]      ⍝ 1 on 12/13
+DIFF_M_D ← ⊂T1[2 3] - T2[2 3]
+DIFF_M_D ≡¨ (0 1)(1 ¯27)(1 ¯28)(1 ¯29)(1 ¯30)
+(2 3)∈(0 1)
+(2 3)∈(0 1){2 3)
+(2 3)∈(0 1)(2 3)
+(2 3)∈(0 1),(2 3)
+(2 3)∈(0 1)(2 3)
+(⊂(2 3))∈(0 1)(2 3)
+(⊂(2 3))∈(0 1)(2 4)
+⎕TZ←12  ◊ T1←⎕TS               ⍝ timezone 12 is ahead
+⎕TZ←¯12 ◊ T2←⎕TS               ⍝ timezone ¯12 is behind
+YEAR_WRAP ← T1[1] ≠ T2[1]      ⍝ 1 on 12/31
+DIFF_M_D ← ⊂T1[2 3] - T2[2 3]
+YEAR_WRAP ∨ DIFF_M_D ∈ (0 1)(1 ¯27)(1 ¯28)(1 ¯29)(1 ¯30)
+T1[2] - T2[2]
+⎕TZ←12  ◊ T1←⎕TS        ⍝ timezone 12 is ahead
+⎕TZ←¯12 ◊ T2←⎕TS        ⍝ timezone ¯12 is behind
+∆_YEAR ← T2[1] - T1[1]   ⍝ 1 on 12/31
+∆_MON  ← T2[2] - T1[2]
+∆_DAY  ← T2[3] - T1[3]
+(∆_MON = 11) ⊢[∆_YEAR = 1] (∆_MON∈0 1)
+(∆_MON = 1)  ⊢[∆_MON  = 1] (∆_DAY∈27 28 29 30)   ⍝ last day in month
+∆_MON
+⎕TZ←12  ◊ T1←⎕TS         ⍝ timezone 12 is ahead
+⎕TZ←¯12 ◊ T2←⎕TS         ⍝ timezone ¯12 is behind
+∆_YEAR ← T2[1] - T1[1]   ⍝ 1 on 12/31
+∆_MON  ← T2[2] - T1[2]
+∆_DAY  ← T2[3] - T1[3]
+∆_YEAR ∈ 0 1
+∆_YEAR
+∆_MON ∈ 0 1 11
+⎕TZ←12  ◊ T1←⎕TS         ⍝ timezone 12 is ahead
+⎕TZ←¯12 ◊ T2←⎕TS         ⍝ timezone ¯12 is behind
+∆_YEAR ← T1[1] - T2[1]   ⍝ 1 on 12/31
+∆_MON  ← T1[2] - T2[2]
+∆_DAY  ← T1[3] - T2[3]
+∆_YEAR
+∆_MON
+∆_MON ∈ 0 1 ¯11
+∆_DAY
+∆_DAY      ∆_DAY ∈ 0 ¯27 ¯28 ¯29 ¯30
+∆_DAY ∈ 0 ¯27 ¯28 ¯29 ¯30
+(∆_YEAR = 0) ∨ (∆_MON = ¯11)
+⎕TZ←12  ◊ T1←⎕TS         ⍝ timezone 12 is ahead
+⎕TZ←¯12 ◊ T2←⎕TS         ⍝ timezone ¯12 is behind
+∆_YEAR ← T1[1] - T2[1]   ⍝ 1 on 12/31
+∆_MON  ← T1[2] - T2[2]
+∆_DAY  ← T1[3] - T2[3]
+∆_YEAR ∈ 0 1
+∆_MON
+(∆_MON = ∈ 0 11) ∨ (∆_DAY ∈ ¯27 ¯28 ¯29)
+(∆_MON ∈ 0 11) ∨ (∆_DAY ∈ ¯27 ¯28 ¯29)
+∆_MON
+(∆_MON ∈ 0 ¯11) ∨ (∆_DAY ∈ ¯27 ¯28 ¯29)
+(∆_MON ∈ 0 ¯11) ∨ (∆_DAY ∈ ¯27 ¯28 ¯29)   ⍝ end of February
+)off

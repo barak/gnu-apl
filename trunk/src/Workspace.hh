@@ -193,10 +193,6 @@ public:
    /// return \b true if \b the_workspace is the CLEAR WS
    static bool is_CLEAR_WS();
 
-   /// return uninitialized memory for a derived function in the
-   /// in the fun_oper_cache of the top-level )SI entry
-   static DerivedFunction * get_fun_oper_slot(const char * loc);
-
    /// Create a new SI-entry on the SI stack.
    static void push_SI(const Executable * fun, const char * loc);
 

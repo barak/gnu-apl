@@ -187,6 +187,11 @@ operator << (ostream & out, const Token & token)
         return out << token.get_Id() << token.get_int_val();
       }
 
+   if (token.get_tag() == TOK_INTEGER)
+      {
+        return out << "INTEGER (" << token.get_int_val() << ") ";
+      }
+
    if (token.get_Id() > ID_No_ID2)   return out << token.get_Id();
 
    switch(token.get_Class())

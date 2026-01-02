@@ -1380,9 +1380,49 @@ Prefix::adjust_right_caret(Function_PC2 & range,
              }
        }
 }
-//============================================================================
+//----------------------------------------------------------------------------
+DerivedFunction *
+Prefix::get_fun_oper_slot(const char * loc) const
+{
+   return si.get_fun_oper_slot(LOC);
+}
+//----------------------------------------------------------------------------
+void
+Prefix::set_action(const Token & result)
+{
+   switch(result.get_Class())
+      {
+        case TC_VALUE:
+        case TC_VOID:
+        case TC_END:
+        case TC_FUN2:
+             set_action(RA_CONTINUE);
+             return;
+
+        case TC_RETURN:
+             // result was one of TOK_RETURN_EXEC, TOK_RETURN_STATS,
+             // TOK_RETURN_VOID, or TOK_RETURN_SYMBOL.
+             // The current context is complete and may or may not
+             // have produced a value.
+             //
+             set_action(RA_RETURN);
+             return;
+
+        case TC_SI_LEAVE:
+             //
+             // result was TOK_SI_PUSHED or TOK_ERROR
+             if (result.get_tag() == TOK_ERROR)   set_action(RA_RETURN);
+             else                                 set_action(RA_SI_PUSHED);
+             return;
+
+        default: CERR << "CLASS = " << result.get_Class()
+                      << " at " << LOC << endl;
+                 FIXME;
+      }
+}
+//=======================================================================
 //
-// phrase reduce functions...
+// e reduce functions...
 //
 //----------------------------------------------------------------------------
 void
@@ -1633,7 +1673,7 @@ Value_P B = at2().get_apl_val();
         if (tag_M == TOK_Quad_FIO && C->get_sole_integer() == 49)
            {
              Token & LO = saved_MISC.get_token();
-             DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+             DerivedFunction * derived = get_fun_oper_slot(LOC);
              new (derived)  Derived_LO_M_X(LO, M, C, LOC);
              clear_MISC(LOC);
 
@@ -1714,7 +1754,7 @@ Prefix::reduce_F_M__()
 Token & LO_F = at0();
 cMonOP     M = at1().get_function();
 
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(LO_F, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1811,7 +1851,7 @@ Prefix::reduce_A_M__()
 Token & LO_A = at0();
 cMonOP     M = at1().get_function();
 
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(LO_A, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
@@ -1827,7 +1867,7 @@ Token & LO_F = at0();
 cMonOP     M = at1().get_function();
 Value_P C      = at2().get_function_axis();
 
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M_X(LO_F, M, C, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1843,12 +1883,11 @@ cFunction_P LO_F = at0().get_function();
 Value_P        C = at1().get_function_axis();
 cMonOP         M = at2().get_function();
 
-DerivedFunction * derived_F_C = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived_F_C = get_fun_oper_slot(LOC);
    new (derived_F_C) Derived_F_X(LO_F, C, LOC);
 
 Token tok_F_C(TOK_FUN2, derived_F_C);
-DerivedFunction * derived =
-   Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M(tok_F_C, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1865,11 +1904,11 @@ Value_P     FX = at1().get_axes();
 cMonOP      M  = at2().get_function();
 Value_P     MX = at3().get_function_axis();
 
-DerivedFunction * derived_F_C = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived_F_C = get_fun_oper_slot(LOC);
    new (derived_F_C) Derived_F_X(F, FX, LOC);
 
 Token tok_F_C(TOK_FUN2, derived_F_C);
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_M_X(tok_F_C, M, MX, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1907,7 +1946,7 @@ const Id id_D = D->get_Id();
       of ⍤ directly.
     */
 Value_P value_B;   // the original B (before stranding RO and B).
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    {
      Value_P value_RO;   // j123 (for ⍤) or N (for ⍣)
      if (id_D == ID_OPER2_RANK)
@@ -2190,7 +2229,7 @@ Token &     LO_F = at0();
 cFunction_P D    = at1().get_function();
 Token &     RO_G = at2();
 
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    new (derived) Derived_LO_D_RO(LO_F, D, RO_G, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -2200,48 +2239,70 @@ DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
 void
 Prefix::reduce_F_D_C_B()
 {
-Token &   LO_F = at0();
-cDyaOP    D = at1().get_function();
-Value_P   C = at2().get_function_axis();
-Value_P y_B = at3().get_apl_val();
+Token & LO_F = at0();
+cDyaOP     D = at1().get_function();
+Value_P  X_C = at2().get_function_axis();
+Value_P RO_B = at3().get_apl_val();
+
+const Function_PC pc_D = at(1).get_PC();
 
    // reduce, unless if another dyadic operator is coming. In that case
-   // F belongs to the other operator and we simply continue.
+   // F is the right operand of the other operator (and not the left operand
+   // of D and we simply continue (because right operand binds stronger than
+   // left operand).
    //
    if (PC < Function_PC(body.ssize()))   // more token ahead
-        {
-          const Token & tok = body[PC];
-          TokenClass next =  tok.get_Class();
-          if (next == TC_SYMBOL)
-             {
-               Symbol * sym = tok.get_sym_ptr();
-               const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
-               next = sym->resolve_class(is_left_sym);
-             }
+      {
+        const Token & tok = body[PC];
+        TokenClass next =  tok.get_Class();
+        if (next == TC_SYMBOL)
+           {
+             Symbol * sym = tok.get_sym_ptr();
+             const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+             next = sym->resolve_class(is_left_sym);
+           }
 
-          if (next == TC_OPER2)
-             {
-               set_action(RA_PUSH_NEXT);   // aka. SHIFT
-               return;
-             }
-        }
+        if (next == TC_OPER2)
+           {
+             set_action(RA_PUSH_NEXT);   // aka. SHIFT
+             return;
+           }
+      }
 
-   /* At this point we have: (A) f ⍤[X] y_B with y_B stranded together in Parser.cc.
-      Unstrand y_B into y and (maybe) B. NOTE that B is y (and not the real B).
+   if (D != &Bif_OPER2_RANK::fun)   // the normal case
+      {
+        DerivedFunction * derived = get_fun_oper_slot(LOC);
+        new (derived) Derived_LO_D_RO(LO_F, D, at2(), LOC);
+        pop_and_discard();   // pop LO_F
+        pop_and_discard();   // pop D
+        pop_and_discard();   // pop C
+        Token tok_derived(TOK_FUN2, derived);
+        Token_loc tloc_D(tok_derived, pc_D);
+        push(tloc_D);
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
+        return;
+      }
+
+   /* At this point we have the special case: (A) f ⍤[X] y_B
+      with y_B stranded together in Parser.cc.  Unstrand y_B into y
+      and (maybe) B. NOTE that B is y (and not the real B).
      
       There may or may not be a left A on the way. Since f can be nomadic
       we do not know if a left argument A for f⍤ is coming and we have to
       create a derived function instead of calling >eval_ALRB() or eval_LRB()
       of ⍤ directly.
+
+      Note that X_C is the axes for LO_F (for the final disclose of the
+      NARS variant of ⍤ with axes.
     */
 Value_P value_B;   // the original B (before stranding j and B).
-DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
    {
      Value_P y123;
-     Bif_OPER2_RANK::unstrand_RO_B(y_B, y123, value_B);
+     Bif_OPER2_RANK::unstrand_RO_B(RO_B, y123, value_B);
      Token T_y123_orig_RO(TOK_APL_VALUE1, y123);
 
-     new (derived) Derived_LO_D_X_RO(LO_F, D, C, T_y123_orig_RO, LOC);
+     new (derived) Derived_LO_D_X_RO(LO_F, D, X_C, T_y123_orig_RO, LOC);
    }
 
    /* for unstrand_RO_B() there are 2 main cases:
@@ -2255,13 +2316,10 @@ DerivedFunction * derived = Workspace::get_fun_oper_slot(LOC);
               at4() for f⍤B, or at at5() for (f⍤B), or at a6() for ((f⍤B)),
               and so on.
     */
-const Token dD(TOK_FUN2, derived);
+const Token tok_derived(TOK_FUN2, derived);
 
    if (+value_B)   // case 1 (valid B)
       {
-        // save locations of ⍤ and B
-        //
-        const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(3).get_PC();
 
         pop_and_discard();   // pop LO_F
@@ -2271,14 +2329,16 @@ const Token dD(TOK_FUN2, derived);
 
         Token B(TOK_APL_VALUE1, value_B);
         Token_loc tloc_B(B, pc_B);
-        Token_loc tloc_dD(dD, pc_D);
+        Token_loc tloc_dD(tok_derived, pc_D);
         push(tloc_B);    // was y_B
         push(tloc_dD);   // was D
       }
    else    // case 2: only y123, but no B (e.g. (f ⍤[X] 1 2 3) B
-
       {
-        pop_args_push_result(dD);
+        // replace F, D, C, and B with derived. Note that B is RO and not
+        // the real B for derived.
+        //
+        pop_args_push_result(tok_derived);
       }
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -2579,11 +2639,57 @@ Prefix::reduce_A_B__()
 {
    Assert1(prefix_len == 2);
 
+   /* vector notation. Glue A and B together, unless A is the right operand
+      of a dyadic operator.
+
+      Right operand is the only case where vector notation binds weaker
+      (since bracket (i.e. B[...]) and specification left (i.e. ←A) ido
+      obviously not apply here.
+
+       The only cases where A is a right operand are:
+
+    */
+const int pc_A = at(0).get_PC();
+   if (body[pc_A + 1].get_Class() == TC_OPER2)   // case 1.
+      {
+        /* case 1:
+
+                  ┌────────── PC_A + 1
+                  │   ┌────── PC_A
+                  │   │ ┌──── PC_A - 1
+         ... LO OPER2 A B ...   and
+         */
+        set_action(RA_PUSH_NEXT);
+        return;
+      }
+
+   if (body[pc_A + 1].get_Class() == TC_R_PARENT)   // maybe case 2.
+      {
+        /* case 2:
+
+                    ┌───────────────── PC_A + 3 + n   (with n = 0 if single ')')
+                    │    ┌──────────── PC_A + 2 + n   (with n = 0 if single ')')
+                    │    │ ┌────────── PC_A + 1
+                    │    │ │ ┌──────── PC_A
+                    │    │ │ │ ┌────── PC_A - 1
+         ... ( LO OPER2 RO ) A B) ...
+         */
+        // normally there is only one ), but there could be more.
+        //
+        int pc_RPAR = pc_A + 1;   // rightmost RPAR
+        while (body[pc_RPAR + 1].get_Class() == TC_R_PARENT)   ++pc_RPAR;
+        if (body[pc_RPAR + 2].get_Class() == TC_OPER2)   // definitively case 2
+           {
+             set_action(RA_PUSH_NEXT);
+             return;
+           }
+      }
+
 Value_P Z = Value::glue(at0(), at1(), LOC);
-Token result(TOK_APL_VALUE3, Z);
+const Token result(TOK_APL_VALUE3, Z);
    pop_args_push_result(result);
 
-   set_action(result);
+   set_action(RA_CONTINUE);
 }
 //----------------------------------------------------------------------------
 /// pattern V ) ← B.

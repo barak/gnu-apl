@@ -31,3 +31,6 @@
  TEST_ASSERT B + 1
 ∇
 
+∇A ASSERT_EQUIV B
+ ASSERT (A) ≡ (B)
+∇

@@ -678,46 +678,46 @@ const ShapeItem end = ssize() - 2;   // excluding, 3 valid chars
        {
          switch(at(pos))
             {
-            case UNI_DOUBLE_QUOTE:   // """ or "..."
-                 if (at(pos + 1) == UNI_DOUBLE_QUOTE &&
-                     at(pos + 2) == UNI_DOUBLE_QUOTE)   return pos;   // """
-                 for (++pos; pos < end && at(pos) != UNI_DOUBLE_QUOTE; ++pos)
-                     {
-                       if (at(pos) == UNI_BACKSLASH)   ++pos;   // \X
-                     }
-                 break;
+              case UNI_DOUBLE_QUOTE:   // """ or "..."
+                   if (at(pos + 1) == UNI_DOUBLE_QUOTE &&
+                       at(pos + 2) == UNI_DOUBLE_QUOTE)   return pos;   // """
+                   for (++pos; pos < end && at(pos) != UNI_DOUBLE_QUOTE; ++pos)
+                       {
+                         if (at(pos) == UNI_BACKSLASH)   ++pos;   // \X
+                       }
+                   break;
 
-            case UNI_SINGLE_QUOTE:   // '...'
-                 for (++pos; pos < end && at(pos) != UNI_SINGLE_QUOTE; ++pos) ;
-                 break;
+              case UNI_SINGLE_QUOTE:   // '...'
+                   for (++pos; pos < end && at(pos) != UNI_SINGLE_QUOTE; ++pos) ;
+                   break;
+             
+              case UNI_NUMBER_SIGN:   // #
+              case UNI_COMMENT:       // ⍝
+                   return -1;
 
-            case UNI_NUMBER_SIGN:   // #
-            case UNI_COMMENT:       // ⍝
-                 return -1;
+              case UNI_LEFT_DAQ:   // ««« : expliciy start of multiline
+                   if (at(pos + 1) == UNI_LEFT_DAQ &&
+                       at(pos + 2) == UNI_LEFT_DAQ)
+                      {
+                        if (expect_end)
+                           CERR << "*** WARNING: see (second) ««« "
+                                   "when expecting the closing »»»" << endl;
+                        return pos;   // """
+                      }
 
-            case UNI_LEFT_DAQ:   // ««« : expliciy start of multiline
-                 if (at(pos + 1) == UNI_LEFT_DAQ &&
-                     at(pos + 2) == UNI_LEFT_DAQ)
-                    {
-                      if (expect_end)
-                         CERR << "*** WARNING: see (second) ««« "
-                                 "when expecting the closing »»»" << endl;
-                      return pos;   // """
-                    }
-
-            case UNI_RIGHT_DAQ:   // »»» : expliciy end of multiline
-                 if (at(pos + 1) == UNI_RIGHT_DAQ &&
-                     at(pos + 2) == UNI_RIGHT_DAQ)
-                    {
-                      if (!expect_end)
-                         CERR << "*** WARNING: see (closing) »»» "
-                                 "without prior «««" << endl;
-                      return pos;   // """
-                    }
+              case UNI_RIGHT_DAQ:   // »»» : expliciy end of multiline
+                   if (at(pos + 1) == UNI_RIGHT_DAQ &&
+                       at(pos + 2) == UNI_RIGHT_DAQ)
+                      {
+                        if (!expect_end)
+                           CERR << "*** WARNING: see (closing) »»» "
+                                   "without prior «««" << endl;
+                        return pos;   // """
+                      }
 
               default:   ;
             }
-       }
+       }   // loop(pos, end)
 
    return -1;   // not found
 }

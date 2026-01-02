@@ -75,27 +75,29 @@ protected:
    /// Parse token string \b tos (a statement without diamonds).
    static ErrorCode parse_statement(Token_string & tos, bool optimize);
 
-   /// find opening bracket; throw error if not found
+   /// find the opening bracket for \b tos[pos]; throw error if not found
    static int find_opening_bracket(const Token_string & tos, int pos);
 
-   /// find closing bracket; throw error if not found
+   /// find the closing bracket for \b tos[pos]; throw error if not found
    static int find_closing_bracket(const Token_string & tos, int pos);
 
-   /// find opening paranthesis; throw error if not found.
+   /// find the opening paranthesis for \b tos[pos]; throw error if not found.
    static int find_opening_parent(const Token_string & tos, int pos);
 
-   /// find closing paranthesis; throw error if not found.
+   /// find the closing paranthesis for \b tos[pos]; throw error if not found.
    static int find_closing_parent(const Token_string & tos, int pos);
 
-   /// insert one TOK_VOID token after \b pos in \b tos
+   /// find the opening curly bracket for \b tos[pos]; throw error if not found.
+   static int find_opening_curly(const Token_string & tos, int pos);
+
+   /// insert one TOK_VOID token AFTER \b pos in \b tos
    static void insert_1(Token_string & tos, int pos);
 
-   /// insert two TOK_VOID token after \b pos in \b tos
+   /// insert two TOK_VOID token AFTER \b pos in \b tos
    static void insert_2(Token_string & tos, int pos);
 
-   /// return the number of INT or near-INT, starting at
-   /// pos (and at most 4). Replace near-int floats and complex
-   /// literals with ints.
+   /// return the number of INT or near-INT tokens, starting at \b pos (and
+   /// at most 4). Replace near-int floats and complex /// literals with ints.
    static int j_length(Token_string & tos, int pos);
 
    /// Collect consecutive smaller APL values or value token into vectors
@@ -106,6 +108,9 @@ protected:
 
    /// Replace (V1, V2,...) with a single (nested) /// value.
    static bool collect_value_groups(Token_string & tos);
+
+   /// fix the syntax of the POWER (⍣) operator.
+   static bool fix_POWER_syntax(Token_string & tos);
 
    /// fix the syntax of the RANK (⍤) operator.
    static bool fix_RANK_syntax(Token_string & tos);

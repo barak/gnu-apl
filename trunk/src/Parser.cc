@@ -158,18 +158,21 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    /// fix the broken syntax of the RANK OPERATOR
    if (fix_RANK_syntax(tos))   parse_log(2, tos);;
 
+   /// fix the broken syntax of the RANK OPERATOR
+   if (fix_POWER_syntax(tos))   parse_log(3, tos);;
+
    // 1. convert (X) into X and ((X...)) into (X...)
    //
    if (remove_nongrouping_parantheses(tos))
       {
         remove_TOK_VOID(tos);
-        parse_log(3, tos);
+        parse_log(4, tos);
       }
 
    if (map_function_groups(tos))
       {
         remove_TOK_VOID(tos);
-        parse_log(4, tos);
+        parse_log(5, tos);
       }
 
    // 2. convert groups like '(' val val...')' into single APL values
@@ -182,7 +185,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         if (progress)
            {
              remove_TOK_VOID(tos);
-             parse_log(5, tos);
+             parse_log(6, tos);
            }
       }
 
@@ -191,7 +194,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    if (collect_constants(tos))
       {
         remove_TOK_VOID(tos);
-        parse_log(6, tos);
+        parse_log(7, tos);
       }
 
    /* parse_statement() is normally called with optimize == true; However,
@@ -212,7 +215,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         while (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
            remove_TOK_VOID(tos);
       }
-   parse_log(7, tos);
+   parse_log(8, tos);
 
    // 5. special case: single APL value (to speed up ⍎)
    //
@@ -221,19 +224,19 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         Log(LOG_parse)   CERR << "parse 5: single value " << tos[0] << endl;;
         return E_NO_ERROR;
       }
-   parse_log(8, tos);
+   parse_log(9, tos);
 
    // 6. mark symbol left of ← as LSYMB
    //
    mark_lsymb(tos);
-   parse_log(8, tos);
+   parse_log(10, tos);
 
    // 7. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
    if (optimize)
       {
         optimize_static_patterns(tos);
-        parse_log(10, tos);
+        parse_log(11, tos);
       }
 
    // 8. update the distances between ( and ), [ and ], or { and }. After
@@ -312,12 +315,87 @@ int len = 0;
 }
 //----------------------------------------------------------------------------
 bool
+Parser::fix_POWER_syntax(Token_string & tos)
+{
+   /* Z ← A ⍣ N B  or  Z ← ⍣ N B 
+
+      where N is a near-int scalar
+    */
+
+bool progress = false;
+
+   // must not use loop() here since tos.size() varies inside the loop.
+   //
+   for (int t = 0; t < (int(tos.size()) - 2); ++t)
+       {
+         if (tos[t].get_tag() != TOK_OPER2_POWER)
+            {
+              continue;   // next ⍣ (if any)
+            }
+
+         int pos_POWER = t;
+
+         // if N is already in parentheses: skip (...). In this case
+         // Prefix::reduce_A_B__() will take care after the expression
+         // in parentheses was evaluated.
+         //
+         if (tos[t + 1].get_tag() == TOK_L_PARENT)   // f ⍣ ( RO )
+            {
+              t = find_closing_parent(tos, t + 1);   // skip (...)
+              continue;                              // next ⍣ (if any)
+           }
+
+         int pos_RO = pos_POWER + 1;
+         const int len_N = j_length(tos, pos_RO);
+         if (len_N == 0)   continue;   // N is not literal
+
+         int pos_B = pos_RO + len_N;
+
+         if (tos[pos_B].get_Class() == TC_R_PARENT)   // ( LO ⍤ RO )
+            {
+              continue;
+            }
+
+         // at this point we have a literal N. We disambiguate it by
+         // putting LO ⍣ N in parentheses
+         //
+
+         // insert a left parenthesis
+         {
+           int pos_LO = pos_POWER - 1;
+           if (tos[pos_LO].get_Class() == TC_R_PARENT)   // ( LO )
+              {
+                pos_LO = find_opening_parent(tos, pos_LO);
+              }
+           else if (tos[pos_LO].get_Class() == TC_R_CURLY)   // ( LO )
+              {
+                pos_LO = find_opening_curly(tos, pos_LO);
+              }
+
+           insert_1(tos, pos_LO - 1);   // - 1 means insert before
+           new (&tos[pos_LO])   Token(TOK_L_PARENT, int64_t(0));
+           ++pos_B;
+         }
+
+         // insert a right parenthesis
+         {
+           insert_1(tos, pos_B - 1);   // - 1 means insert before
+           new (&tos[pos_B])   Token(TOK_R_PARENT, int64_t(0));
+         }
+
+         t += 2;   // for the new ( and )
+         progress = true;
+       }
+   return progress;
+}
+//----------------------------------------------------------------------------
+bool
 Parser::fix_RANK_syntax(Token_string & tos)
 {
 bool progress = false;
-   /* Z ← A ⍤ y B  or  Z ← ⍤ Y B 
+   /* Z ← A ⍤ y B  or  Z ← ⍤ y B 
      
-      where j is a near-int-vector of length 1, 2, or 3
+      where y is a near-int-vector of length 1, 2, or 3
 
       Collecting the items of such an expression can make the expression
       ambiguous. We therefore translate the above expression into:
@@ -339,76 +417,81 @@ bool progress = false;
       ⌽3⍴⌽ 1 2 3 ←→ 1 2 3
     */
 
-   // should not use loop() here since tos.size() varies inside the loop.
+   // must not use loop() here since tos.size() varies inside the loop.
    //
    for (int t = 0; t < (int(tos.size()) - 2); ++t)
        {
-         if (tos[t].get_tag() != TOK_OPER2_RANK)   continue;
-
-         // if y is already in parentheses: skip (...)
-         //
-         if (tos[t + 1].get_tag() == TOK_L_PARENT)
+         if (tos[t].get_tag() != TOK_OPER2_RANK)
             {
-              t = find_closing_parent(tos, t + 1);
-              continue;
+              continue;   // next ⍤ (if any)
+            }
+
+         int pos_RANK = t;
+
+         // if y is already in parentheses: skip (...). In this case
+         // Prefix::reduce_A_B__() will take care after the expression
+         // in parentheses was evaluated.
+         //
+         if (tos[t + 1].get_tag() == TOK_L_PARENT)   // f ⍤ ( RO )
+            {
+              t = find_closing_parent(tos, t + 1);   // skip (...)
+              continue;                              // next ⍤ (if any)
            }
 
-         // ⍤ with axis: skip [ ]
+         // ⍤ with axis: skip [ ]. ⍤ with axis is a GNU APL extension
+         // that provides as axis (as opposed to an operand).
          //
-         if (tos[t + 1].get_tag() == TOK_L_BRACK)
+         int pos_RO = pos_RANK + 1;
+         if (tos[pos_RO].get_tag() == TOK_L_BRACK)
             {
-              t = find_closing_bracket(tos, t + 1);
+              pos_RO = find_closing_bracket(tos, pos_RO) + 1;   // skip [...]
             }
-            
 
-         if (const int len_j = j_length(tos, t + 1))   // literal j j
+         const int len_y = j_length(tos, pos_RO);
+         if (len_y == 0)   continue;   // y is not literal
+
+         if (len_y > 3)   // ISO p. 124
             {
-              const APL_Integer j1 = tos[t + 1].get_int_val();
-              if (len_j > 3)   // ISO p. 124
-                 {
-                   MORE_ERROR() << "⍤ j B: j too long (⍴j = " << len_j << ")";
-                   LENGTH_ERROR;
-                 }
-
-              // create V3 ← ⌽3⍴⌽v
-              //
-              Value_P V3(3, LOC);
-              if (len_j == 3)        // 1 2 3 → 1 2 3
-                 {
-                   const APL_Integer j2 = tos[t + 2].get_int_val();
-                   const APL_Integer j3 = tos[t + 3].get_int_val();
-                   V3->next_ravel_Int(j1);
-                   V3->next_ravel_Int(j2);
-                   V3->next_ravel_Int(j3);
-                 }
-              else if (len_j == 2)   // 1 2 → 2 1 2
-                 {
-                   const APL_Integer j2 = tos[t + 2].get_int_val();
-                   V3->next_ravel_Int(j2);
-                   V3->next_ravel_Int(j1);
-                   V3->next_ravel_Int(j2);
-                 }
-              else       // 1 → 1 1 1
-                 {
-                   V3->next_ravel_Int(j1);
-                   V3->next_ravel_Int(j1);
-                   V3->next_ravel_Int(j1);
-                 }
-
-              // then replace j with [ V3 ]...
-
-              // first extend tos as needed.
-              if      (len_j == 2)   insert_1(tos, t + 2);
-              else if (len_j == 1)   insert_2(tos, t + 1);
-
-              // then replace
-              //
-              new (&tos[t + 1]) Token(TOK_L_PARENT, int64_t(0));
-              new (&tos[t + 2]) Token(TOK_APL_VALUE1, V3);
-              new (&tos[t + 3]) Token(TOK_R_PARENT, int64_t(0));
-              V3->check_value(LOC);
-              progress = true;
+              MORE_ERROR() << "⍤ y B: j too long (⍴j = " << len_y << ")";
+              LENGTH_ERROR;
             }
+
+         int pos_B = pos_RO + len_y;
+
+         if (tos[pos_B].get_Class() == TC_R_PARENT)   // ( LO ⍤ RO )
+            {
+              continue;
+            }
+
+         // at this point we have a literal y with 1, 2, or 3 items. We
+         // disambiguate it by putting LO ⍤ RO in parentheses
+         //
+
+         // insert a left parenthesis
+         {
+           int pos_LO = pos_RANK - 1;
+           if (tos[pos_LO].get_Class() == TC_R_PARENT)   // ( LO )
+              {
+                pos_LO = find_opening_parent(tos, pos_LO);
+              }
+           else if (tos[pos_LO].get_Class() == TC_R_CURLY)   // ( LO )
+              {
+                pos_LO = find_opening_curly(tos, pos_LO);
+              }
+
+           insert_1(tos, pos_LO - 1);   // - 1 means insert before
+           new (&tos[pos_LO])   Token(TOK_L_PARENT, int64_t(0));
+           ++pos_B;
+         }
+
+         // insert a right parenthesis
+         {
+           insert_1(tos, pos_B - 1);   // - 1 means insert before
+           new (&tos[pos_B])   Token(TOK_R_PARENT, int64_t(0));
+         }
+
+         t += 2;   // for the new ( and )
+         progress = true;
        }
 
    return progress;
@@ -570,6 +653,7 @@ int others = 0;
          else if (tos[p].get_tag() == TOK_R_BRACK)   ++others;
        }
 
+   MORE_ERROR() << "No closing ] for opening ]";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -593,6 +677,7 @@ int others = 0;
          else if (tos[p].get_tag() == TOK_R_BRACK)   ++others;
        }
 
+   MORE_ERROR() << "No opening [ for closing ]";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -616,6 +701,7 @@ int others = 0;
          else if (tos[p].get_Class() == TC_R_PARENT)   ++others;
        }
 
+   MORE_ERROR() << "No closing ) for opening (";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -639,6 +725,31 @@ int others = 0;
          else if (tos[p].get_Class() == TC_R_PARENT)   ++others;
        }
 
+   MORE_ERROR() << "No opening ( for closing )";
+   SYNTAX_ERROR;
+}
+//----------------------------------------------------------------------------
+int
+Parser::find_opening_curly(const Token_string & tos, int pos)
+{
+   Assert(tos[pos].get_Class() == TC_R_CURLY);
+
+int others = 0;
+
+   for (int p = pos - 1; p >= 0; --p)
+       {
+         Log(LOG_find_closing)
+            CERR << "find_opening_bracket() sees " << tos[p] << endl;
+
+         if (tos[p].get_Class() == TC_L_CURLY)
+            {
+             if (others == 0)   return p;
+             --others;
+            }
+         else if (tos[p].get_Class() == TC_R_CURLY)   ++others;
+       }
+
+   MORE_ERROR() << "No opening { for closing }";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -840,7 +951,7 @@ bool TOK_VOID_inserted = false;
                    continue;
 
               case TOK_F2_NAND:
-                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::fun);
+                   tos[t] = Token(TOK_F2_NAND_B, &Bif_F2_NAND_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
