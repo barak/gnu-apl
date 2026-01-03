@@ -768,35 +768,36 @@ unction Groups
 * Section 2.20::  ⊥ with Axis
 * Section 2.21::  Generalized ⍳
 * Section 2.22::  ⌹[X] - Miscellaneous Matrix and Vector Operations
-* Section 2.23::  Dyadic ⎕CR
-* Section 2.24::  Dyadic ⎕FX (Native Functions)
-* Section 2.25::  ⎕ARG  - Interpreter command line arguments
-* Section 2.26::  ⎕DLX  - Knuth's Dancing Links Algorithm
-* Section 2.27::  ⎕ENV  - Environment Variable
-* Section 2.28::  ⎕FIO  - File I/O Functions
-* Section 2.29::  ⎕FFT  - Fast Fourier Transform
-* Section 2.30::  ⎕GTK  - GTK Interface
-* Section 2.31::  ⎕JSON - JSON Parsing
-* Section 2.32::  ⎕MAP  - Map Value
-* Section 2.33::  ⎕MX   - Matrix/Statistics
-* Section 2.34::  ⎕PLOT - Plot Data
-* Section 2.35::  ⎕PNG  - Portable Network Graphics
-* Section 2.36::  ⎕PS   - Print Style
-* Section 2.37::  ⎕RE   - Regular Expressions
-* Section 2.38::  ⎕RVAL - Random APL value
-* Section 2.39::  ⎕SQL  - SQL Database Interface
-* Section 2.40::  ⎕SI   - State Indicator
-* Section 2.41::  ⎕SYL  - System limits
-* Section 2.42::  ⎕XML  - XML Parsing
-* Section 2.43::  Conditionals
-* Section 2.44::  Matrix Product
+* Section 2.23::  ⎕CC   - Character Classes
+* Section 2.24::  Dyadic ⎕CR
+* Section 2.25::  Dyadic ⎕FX (Native Functions)
+* Section 2.26::  ⎕ARG  - Interpreter command line arguments
+* Section 2.27::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 2.28::  ⎕ENV  - Environment Variable
+* Section 2.29::  ⎕FIO  - File I/O Functions
+* Section 2.30::  ⎕FFT  - Fast Fourier Transform
+* Section 2.31::  ⎕GTK  - GTK Interface
+* Section 2.32::  ⎕JSON - JSON Parsing
+* Section 2.33::  ⎕MAP  - Map Value
+* Section 2.34::  ⎕MX   - Matrix/Statistics
+* Section 2.35::  ⎕PLOT - Plot Data
+* Section 2.36::  ⎕PNG  - Portable Network Graphics
+* Section 2.37::  ⎕PS   - Print Style
+* Section 2.38::  ⎕RE   - Regular Expressions
+* Section 2.39::  ⎕RVAL - Random APL value
+* Section 2.40::  ⎕SQL  - SQL Database Interface
+* Section 2.41::  ⎕SI   - State Indicator
+* Section 2.42::  ⎕SYL  - System limits
+* Section 2.43::  ⎕XML  - XML Parsing
+* Section 2.44::  Conditionals
+* Section 2.45::  Matrix Product
 @end menu
 
 There are a few hopefully useful features in GNU APL:
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.1
+@node Section 2.1
 @section APL Scripting
 
 @menu
@@ -1532,7 +1533,7 @@ with the new one and no DEFN ERROR is raised.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.2
+@node Section 2.2
 @section Axis argument in defined functions
 
 Defined functions and operators (including lambdas) accept an axis argument.
@@ -1560,7 +1561,7 @@ Use this feature carefully!
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.3
+@node Section 2.3
 @section Function Groups
 
 In the old APL1 every function of the interpreter was represented by a single
@@ -1713,7 +1714,7 @@ Let @b{FOO} be a function group. Then:
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.4
+@node Section 2.4
 @section Colored Output
 
 The APL interpreter gets its input from the standard input (stdin),
@@ -1741,7 +1742,7 @@ contains a description of all possible color settings.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.5
+@node Section 2.5
 @section Comparison Rules
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥,
@@ -1878,14 +1879,14 @@ being compared or sorted. A simple way to achieve that is the use of
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.6
+@node Section 2.6
 @section Complex Numbers
 
 Complex numbers are fully supported.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.7
+@node Section 2.7
 @section Debug Commands
 
 In addition to the classical APL commands like )LOAD or )SAVE, GNU APL
@@ -1899,7 +1900,7 @@ Type )HELP or ]HELP in the interpreter for a list of all commands available.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.8
+@node Section 2.8
 @section Direct Functions (Lambdas)
 
 GNU APL supports direct functions (aka. lambdas), but only in a rather
@@ -2041,7 +2042,7 @@ and for properly defined functions. As one of the consequences, you
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.9
+@node Section 2.9
 @section ]DOXY Command
 
 A particularly useful debug command is ]DOXY. It dumps the current workspace
@@ -2105,7 +2106,7 @@ do regular APL comments).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.10
+@node Section 2.10
 @section Commands )COPY_ONCE, )DUMP, and DUMP-HTML
 
 In standard APL, workspaces are processed with the standard commands )LOAD,
@@ -2150,7 +2151,7 @@ in several )DUMP-ed or )SAVE-ed workspaces.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.11
+@node Section 2.11
 @section ]NEXTFILE and ]PUSHFILE Commands
 
 @c ............................................................................
@@ -2194,7 +2195,7 @@ command, the immediate execution context processing proceeds at the next
 line after the ]PUSHFILE command.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.12
+@node Section 2.12
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -2237,7 +2238,7 @@ function or variable name.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.13
+@node Section 2.13
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -2288,7 +2289,7 @@ toggles the state of logging facility N from OFF to ON and back.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.14
+@node Section 2.14
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
@@ -2309,7 +2310,7 @@ be enabled via ./configure (see README-2-configure).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.15
+@node Section 2.15
 @section Hex Numbers
 
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
@@ -2325,7 +2326,7 @@ lowercase:
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.16
+@node Section 2.16
 @section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
@@ -2361,7 +2362,7 @@ be deleted like this:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.17
+@node Section 2.17
 @section Structured Variables and Associative Arrays
 
 GNU APL has implemented two features that are closely related because, under
@@ -2650,7 +2651,7 @@ is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.18
+@node Section 2.18
 @section Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 
 Monadic ⊢ is the identity function. It returns its (committed or non-committed)
@@ -2713,7 +2714,7 @@ a*c
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.19
+@node Section 2.19
 @section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
@@ -2894,7 +2895,7 @@ BE
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.20
+@node Section 2.20
 @section ⊤ (Encode) with Axis
 
 The dyadic primitive function @b{A ⊥ B} (Decode) computes the @b{values}
@@ -3012,7 +3013,7 @@ Examples:
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.21
+@node Section 2.21
 @section Generalized ⍳
 
 @c ............................................................................
@@ -3045,7 +3046,7 @@ if the item was not found).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.22
+@node Section 2.22
 @section ⌹[X] - Miscellaneous Matrix and Vector Operations
 
 @c ............................................................................
@@ -3509,7 +3510,7 @@ annihilated (by subtracting a multiple of the divisor from it).
 
 Now, a commonly used order in the division of polynomials, and also the order
 used by @b{A ⌹[10] B}, is the @i{lexicographic order} of the polynomials.
-@xref{Scan Polynomial B, Scan Polynomial}.
+@xref{Subsection 2.22.1}.
 
 For example: @b{x < x²}, @b{xy < xyz}, @b{y < x⁸}, and @b{y⁸ < x} in the
 lexicographic order.
@@ -3641,7 +3642,7 @@ Putting the pieces together:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Scan Polynomial B
+@node Subsection 2.22.1
 @subsubsection ⌹[11] B: Scan Polynomial B
 
 @b{⌹[11] B} aka. @b{⌹.poly_scan B} is the inverse function of @b{⌹[7] B}.
@@ -3697,7 +3698,7 @@ but in this context all vectors compared have the same length (number of
 indeterminants).
 
 @c ----------------------------------------------------------------------------
-@node    Integral B
+@node Subsection 2.22.2
 @subsubsection A ⌹[20] B: Integral B
 
 Function @b{A ⌹[20] B} aka. @b{A ⌹.integral B} computes the integral of
@@ -3765,7 +3766,71 @@ is defined which defines the format of the result:
 @b{Dot} is a program for printing directed graphs.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.23
+@node Section 2.23
+@section  ⎕CC - Character Classes
+
+Some older APL interpreters (e.g. APL68000) had system variables for
+character classes, such as @b{⎕D} for digits 0..9 or @b{⎕A} for letters
+A..Z. GNU APL provides a single system function @b{⎕CC} for a similar
+purpose.
+
+@subsection  monadic ⎕CC B: Return character class
+
+@b{⎕CC B} returns all characters of character class(es) @b{B}. If @b{B} is an
+scalar then the result is a character vector, If @b{B} is an integer vector
+then the result is a nested vector of integer vectors, with one item per
+character class.
+
+@example
+      ⍝ character class 1: digits (old ⎕D)
+      ⍝
+      ⎕CC 1
+0123456789
+
+      ⍝ character class 2: uppercase letters A..Z (old ⎕A)
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+      ⍝ character class 3: lowercase letters a..z
+abcdefghijklmnopqrstuvwxyz
+
+      ...
+
+      ⍝ Line drawing characters
+      ⎕CC 7
+┌─┬─┐╒═╤═╕╓─╥─╖╔═╦═╗
+├─┼─┤╞═╪═╡╟─╫─╢╠═╬═╣
+└─┴─┘╘═╧═╛╙─╨─╜╚═╩═╝
+
+      ⍝ Some mathematical symbols
+      ⎕CC 8
+⎲⎛⎞⎡⎤⎧⎫
+⎳⎜⎟⎢⎥⎨⎬
+↔⎝⎠⎣⎦⎮⎮
+ℕℤℚℝℂ⎩⎭
+@end example
+
+
+@c ----------------------------------------------------------------------------
+@subsection  dyadic A ⎕CC B: Test character class
+
+The dyadic @b{A ⎕CC B} returns, for every item in A, integer @b{1} if the item
+is contained in one of the character classes @b{B} and @b{0} otherwise.
+
+@example
+      'a45Y' ⎕CC 1
+0 1 1 0
+
+      'a45Y' ⎕CC 1 2
+0 1 1 1
+
+       (⎕CC 7) ⎕CC 7
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+@end example
+
+@c ----------------------------------------------------------------------------
+@node Section 2.24
 @section Dyadic ⎕CR
 
 The @b{⎕CR} function has now an optional left argument that selects one of
@@ -3943,7 +4008,7 @@ a name. For example: monadic @b{⎕CR.hex_to_bytes} is the same as monadic
 @b{⎕CR[13]} or dyadic @b{13 ⎕CR}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.24
+@node Section 2.25
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -4020,14 +4085,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.25
+@node Section 2.26
 @section ⎕ARG - Interpreter command line arguments
 
 @b{⎕ARG} contains the command line arguments with which GNU APL was invoked.
 @xref{Section 2.1}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.26
+@node Section 2.27
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -4271,15 +4336,14 @@ sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.27
+@node Section 2.28
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 2.1}.
 
-
 @c ----------------------------------------------------------------------------
-@node    Section 2.28
+@node Section 2.29
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -4423,7 +4487,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.29
+@node Section 2.30
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -4480,7 +4544,7 @@ few hours, though, so that creating it will not pay off for most mortals.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.30
+@node Section 2.31
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp ToolKit) is a rather powerful library for creating graphical user
@@ -4494,7 +4558,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.31
+@node Section 2.32
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -4540,7 +4604,7 @@ is large.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.32
+@node Section 2.33
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
@@ -4644,7 +4708,7 @@ shown in the examples below.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.33
+@node Section 2.34
 @section ⎕MX - Matrix/Statistics
 
 ⎕MX was kindly contributed by Henrik Moller
@@ -5099,7 +5163,7 @@ Print: 10+⍳10
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.34
+@node Section 2.35
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -5122,7 +5186,7 @@ The general syntax of ⎕PLOT is:
 @end example
 
 @c ............................................................................
-@node The Plot Data B
+@node Subsection 2.34.1
 @subsection The Plot Data B
 
 The plot data @b{B} can be a vector (for a single plot line to be drawn)
@@ -5191,7 +5255,7 @@ makes little sense. If at least one item of the plot data B is complex, then
 all real items in B are taken as complex with imaginary part 0.
 
 @c ............................................................................
-@node The Plot Attributes A
+@node Subsection 2.34.2
 @subsection The Plot Attributes A
 
 There are a number of attributes like colors, point sizes, line widths,
@@ -5385,7 +5449,7 @@ A ⎕PLOT 1○.1×⍳100
 If the global attribute @b{output_filename} is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
 with the name of the file provided as the value of the attribute.
-@xref{Output File Format} below.
+@xref{Subsection 2.34.4} below.
 
 For example:
 
@@ -5481,7 +5545,7 @@ reason there is no @b{gridY_variable} or @b{gridZ_variable}.
 
 
 @c ............................................................................
-@node Plot Window Handling
+@node Subsection 2.34.3
 @subsection Plot Window Handling
 
 Each call of ⎕PLOT with some plot data @b{B} opens a separate window in the X
@@ -5508,7 +5572,7 @@ mouse or the keyboard (as opposed to programmatically with @b{⎕PLOT ¯3} or
 corresponds to the typical method(s) for closing windows on most systems.
 
 @c ............................................................................
-@node Output File Format
+@node Subsection 2.34.4
 @subsection Output File Format
 
 Early versions of ⎕PLOT were using @b{libxcb} to display the results of
@@ -5623,7 +5687,7 @@ be supported for a while, but new features will only be added to the
 @b{GTK} driver.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.35
+@node Section 2.36
 @section ⎕PNG - Portable Network Graphics
 
 Portable Network Graphics is a file format for images, defined in
@@ -5836,7 +5900,7 @@ the GNU APL color model into a PNG file.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.36
+@node Section 2.37
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -5863,7 +5927,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.37
+@node Section 2.38
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -6202,7 +6266,7 @@ The same for the pos+len output format:
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.38
+@node Section 2.39
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -6516,7 +6580,7 @@ argument A and also the subfunction notation:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.39
+@node Section 2.40
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -6594,7 +6658,7 @@ the caller, and so on.
 
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.40
+@node Section 2.41
 @section ⎕SQL - SQL Database Interface
 
 ⎕SQL was kindly contributed by Elias Mårtenson.
@@ -7268,7 +7332,7 @@ As usual, the number of rows must match the number of placeholders in the
 query parameter @b{B} (an APL vector).
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.41
+@node Section 2.42
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -7372,7 +7436,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.42
+@node Section 2.43
 @section ⎕XML  - XML Parsing
 
 @c ............................................................................
@@ -7898,7 +7962,7 @@ follow these top-level steps:
 @end enumerate
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.43
+@node Section 2.44
 @section Conditionals
 
 @b{WARNING}: GNU APL conditionals are experimental. Use them with care and
@@ -8270,7 +8334,7 @@ that if not syntactically required. Some people even use double parentheses to
 emphasize the condition of a conditional statement or expression.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.44
+@node Section 2.45
 @section Matrix Product
 
 In standard APL, the inner product Z of two matrices A and B as known from
@@ -8361,7 +8425,7 @@ of @b{A} and @b{B}. Naturally, the multiplications of these 0-columns or
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.45
+@node Section 2.46
 @section Monadic ≠ (Nub Sieve)
 
 The nub sieve @b{Z←≠B} of a value @b{B} is a Boolean vector @b{Z} with the

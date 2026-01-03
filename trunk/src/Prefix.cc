@@ -714,7 +714,7 @@ UCS_string & more = MORE_ERROR();
             {
               const Function * fun = tok.get_function();
               more << fun->get_name();
-              if (rightmost)   // rightmost token is a function
+              if (rightmost)   // rightmost token of the stack is a function
                  {
                    if (MAX_j < ssize())   more << "...";
 
@@ -722,6 +722,7 @@ UCS_string & more = MORE_ERROR();
                    // function.
                    more << "\nMissing mandatory right argument of function "
                         << fun->get_name() << "?";
+                   VALENCE_ERROR;
                  }
             }
          else

@@ -129,6 +129,7 @@ common_SOURCES += PythonPipe.cc							PythonPipe.hh
 common_SOURCES += QR_factorization_GSL.cc               QR_factorization_GSL.hh
 common_SOURCES += QuadFunction.cc						QuadFunction.hh
 common_SOURCES += ProcessorID.cc						ProcessorID.hh
+common_SOURCES += Quad_CC.cc							Quad_CC.hh
 common_SOURCES += Quad_CR.cc		Quad_CR.def			Quad_CR.hh
 common_SOURCES += Quad_DLX.cc							Quad_DLX.hh
 common_SOURCES += Quad_FFT.cc							Quad_FFT.hh

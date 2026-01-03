@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 2, 2026.  This manual briefly documents GNU APL, an interpreter
+January 3, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -704,28 +704,29 @@ unction Groups
 * Section 2.20::  ⊥ with Axis
 * Section 2.21::  Generalized ⍳
 * Section 2.22::  ⌹[X] - Miscellaneous Matrix and Vector Operations
-* Section 2.23::  Dyadic ⎕CR
-* Section 2.24::  Dyadic ⎕FX (Native Functions)
-* Section 2.25::  ⎕ARG  - Interpreter command line arguments
-* Section 2.26::  ⎕DLX  - Knuth’s Dancing Links Algorithm
-* Section 2.27::  ⎕ENV  - Environment Variable
-* Section 2.28::  ⎕FIO  - File I/O Functions
-* Section 2.29::  ⎕FFT  - Fast Fourier Transform
-* Section 2.30::  ⎕GTK  - GTK Interface
-* Section 2.31::  ⎕JSON - JSON Parsing
-* Section 2.32::  ⎕MAP  - Map Value
-* Section 2.33::  ⎕MX   - Matrix/Statistics
-* Section 2.34::  ⎕PLOT - Plot Data
-* Section 2.35::  ⎕PNG  - Portable Network Graphics
-* Section 2.36::  ⎕PS   - Print Style
-* Section 2.37::  ⎕RE   - Regular Expressions
-* Section 2.38::  ⎕RVAL - Random APL value
-* Section 2.39::  ⎕SQL  - SQL Database Interface
-* Section 2.40::  ⎕SI   - State Indicator
-* Section 2.41::  ⎕SYL  - System limits
-* Section 2.42::  ⎕XML  - XML Parsing
-* Section 2.43::  Conditionals
-* Section 2.44::  Matrix Product
+* Section 2.23::  ⎕CC   - Character Classes
+* Section 2.24::  Dyadic ⎕CR
+* Section 2.25::  Dyadic ⎕FX (Native Functions)
+* Section 2.26::  ⎕ARG  - Interpreter command line arguments
+* Section 2.27::  ⎕DLX  - Knuth’s Dancing Links Algorithm
+* Section 2.28::  ⎕ENV  - Environment Variable
+* Section 2.29::  ⎕FIO  - File I/O Functions
+* Section 2.30::  ⎕FFT  - Fast Fourier Transform
+* Section 2.31::  ⎕GTK  - GTK Interface
+* Section 2.32::  ⎕JSON - JSON Parsing
+* Section 2.33::  ⎕MAP  - Map Value
+* Section 2.34::  ⎕MX   - Matrix/Statistics
+* Section 2.35::  ⎕PLOT - Plot Data
+* Section 2.36::  ⎕PNG  - Portable Network Graphics
+* Section 2.37::  ⎕PS   - Print Style
+* Section 2.38::  ⎕RE   - Regular Expressions
+* Section 2.39::  ⎕RVAL - Random APL value
+* Section 2.40::  ⎕SQL  - SQL Database Interface
+* Section 2.41::  ⎕SI   - State Indicator
+* Section 2.42::  ⎕SYL  - System limits
+* Section 2.43::  ⎕XML  - XML Parsing
+* Section 2.44::  Conditionals
+* Section 2.45::  Matrix Product
 
 There are a few hopefully useful features in GNU APL:
 
@@ -3301,7 +3302,7 @@ annihilated (by subtracting a multiple of the divisor from it).
 
    Now, a commonly used order in the division of polynomials, and also
 the order used by A ⌹[10] B, is the lexicographic order of the
-polynomials.  *Note Scan Polynomial: Scan Polynomial B.
+polynomials.  *Note Subsection 2.22.1::.
 
    For example: x < x², xy < xyz, y < x⁸, and y⁸ < x in the
 lexicographic order.
@@ -3420,7 +3421,7 @@ appended to create an argument for A ⌹.poly_divideNO B:
      1
 
 
-File: apl.info,  Node: Scan Polynomial B,  Next: Integral B
+File: apl.info,  Node: Subsection 2.22.1,  Next: Subsection 2.22.2
 
 2.22.2.9 ⌹[11] B: Scan Polynomial B
 ...................................
@@ -3473,7 +3474,7 @@ lengths, but in this context all vectors compared have the same length
 (number of indeterminants).
 
 
-File: apl.info,  Node: Integral B,  Prev: Scan Polynomial B
+File: apl.info,  Node: Subsection 2.22.2,  Prev: Subsection 2.22.1
 
 2.22.2.10 A ⌹[20] B: Integral B
 ...............................
@@ -3541,7 +3542,68 @@ expressions.
 
 File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
 
-2.23 Dyadic ⎕CR
+2.23 ⎕CC - Character Classes
+============================
+
+Some older APL interpreters (e.g.  APL68000) had system variables for
+character classes, such as ⎕D for digits 0..9 or ⎕A for letters A..Z.
+GNU APL provides a single system function ⎕CC for a similar purpose.
+
+2.23.1 monadic ⎕CC B: Return character class
+--------------------------------------------
+
+⎕CC B returns all characters of character class(es) B. If B is an scalar
+then the result is a character vector, If B is an integer vector then
+the result is a nested vector of integer vectors, with one item per
+character class.
+
+           ⍝ character class 1: digits (old ⎕D)
+           ⍝
+           ⎕CC 1
+     0123456789
+
+           ⍝ character class 2: uppercase letters A..Z (old ⎕A)
+     ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+           ⍝ character class 3: lowercase letters a..z
+     abcdefghijklmnopqrstuvwxyz
+
+           ...
+
+           ⍝ Line drawing characters
+           ⎕CC 7
+     ┌─┬─┐╒═╤═╕╓─╥─╖╔═╦═╗
+     ├─┼─┤╞═╪═╡╟─╫─╢╠═╬═╣
+     └─┴─┘╘═╧═╛╙─╨─╜╚═╩═╝
+
+           ⍝ Some mathematical symbols
+           ⎕CC 8
+     ⎲⎛⎞⎡⎤⎧⎫
+     ⎳⎜⎟⎢⎥⎨⎬
+     ↔⎝⎠⎣⎦⎮⎮
+     ℕℤℚℝℂ⎩⎭
+
+2.23.2 dyadic A ⎕CC B: Test character class
+-------------------------------------------
+
+The dyadic A ⎕CC B returns, for every item in A, integer 1 if the item
+is contained in one of the character classes B and 0 otherwise.
+
+           'a45Y' ⎕CC 1
+     0 1 1 0
+
+           'a45Y' ⎕CC 1 2
+     0 1 1 1
+
+            (⎕CC 7) ⎕CC 7
+     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+
+File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  Up: Chapter 2
+
+2.24 Dyadic ⎕CR
 ===============
 
 The ⎕CR function has now an optional left argument that selects one of
@@ -3705,9 +3767,9 @@ with a name.  For example: monadic ⎕CR.hex_to_bytes is the same as
 monadic ⎕CR[13] or dyadic 13 ⎕CR.
 
 
-File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  Up: Chapter 2
+File: apl.info,  Node: Section 2.25,  Next: Section 2.26,  Prev: Section 2.24,  Up: Chapter 2
 
-2.24 Dyadic ⎕FX (Native Functions)
+2.25 Dyadic ⎕FX (Native Functions)
 ==================================
 
 A Native Function is a function that can be called in APL like a normal
@@ -3781,18 +3843,18 @@ into the system function ⎕FIO. The syntax of ⎕FIO is the same as for
 FILE_IO. The )CLEAR workspace command will close all open files.
 
 
-File: apl.info,  Node: Section 2.25,  Next: Section 2.26,  Prev: Section 2.24,  Up: Chapter 2
+File: apl.info,  Node: Section 2.26,  Next: Section 2.27,  Prev: Section 2.25,  Up: Chapter 2
 
-2.25 ⎕ARG - Interpreter command line arguments
+2.26 ⎕ARG - Interpreter command line arguments
 ==============================================
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 *Note Section 2.1::.
 
 
-File: apl.info,  Node: Section 2.26,  Next: Section 2.27,  Prev: Section 2.25,  Up: Chapter 2
+File: apl.info,  Node: Section 2.27,  Next: Section 2.28,  Prev: Section 2.26,  Up: Chapter 2
 
-2.26 ⎕DLX - Knuth’s Dancing Links Algorithm
+2.27 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
@@ -4030,18 +4092,18 @@ without using ⎕DLX) and sudoku_DLX.apl (which solves sudokus using
 ⎕DLX).
 
 
-File: apl.info,  Node: Section 2.27,  Next: Section 2.28,  Prev: Section 2.26,  Up: Chapter 2
+File: apl.info,  Node: Section 2.28,  Next: Section 2.29,  Prev: Section 2.27,  Up: Chapter 2
 
-2.27 ⎕ENV - Environment Variables
+2.28 ⎕ENV - Environment Variables
 =================================
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. *Note Section 2.1::.
 
 
-File: apl.info,  Node: Section 2.28,  Next: Section 2.29,  Prev: Section 2.27,  Up: Chapter 2
+File: apl.info,  Node: Section 2.29,  Next: Section 2.30,  Prev: Section 2.28,  Up: Chapter 2
 
-2.28 ⎕FIO - File I/O Functions
+2.29 ⎕FIO - File I/O Functions
 ==============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -4177,9 +4239,9 @@ and stored in Z. In other words,
      Z F¨Z←⎕FIO[49] 'filename'
 
 
-File: apl.info,  Node: Section 2.29,  Next: Section 2.30,  Prev: Section 2.28,  Up: Chapter 2
+File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  Up: Chapter 2
 
-2.29 ⎕FFT - Fast Fourier Transform
+2.30 ⎕FFT - Fast Fourier Transform
 ==================================
 
 For those interested in signal processing and the like, GNU APL provides
@@ -4234,9 +4296,9 @@ will take a few hours, though, so that creating it will not pay off for
 most mortals.
 
 
-File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  Up: Chapter 2
+File: apl.info,  Node: Section 2.31,  Next: Section 2.32,  Prev: Section 2.30,  Up: Chapter 2
 
-2.30 ⎕GTK - GTK Interface
+2.31 ⎕GTK - GTK Interface
 =========================
 
 GTK (Gimp ToolKit) is a rather powerful library for creating graphical
@@ -4250,9 +4312,9 @@ manual and has therefore been put into a separate document.  See:
 HOWTOs/Quad-GTK.html.
 
 
-File: apl.info,  Node: Section 2.31,  Next: Section 2.32,  Prev: Section 2.30,  Up: Chapter 2
+File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
 
-2.31 ⎕JSON - JSON Parsing
+2.32 ⎕JSON - JSON Parsing
 =========================
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -4266,14 +4328,14 @@ A (valid) JSON string is mapped to an APL value as follows:
    • JSON array ←→ APL vector
    • JSON object ←→ structured APL value (associative array)
 
-2.31.1 Monadic ⎕JSON
+2.32.1 Monadic ⎕JSON
 --------------------
 
 Z←⎕JSON B converts the string B into an APL value according to the
 mapping above.  If that fails then command )MORE provides information
 about the error and where in B the error was detected.
 
-2.31.2 Dyadic ⎕JSON
+2.32.2 Dyadic ⎕JSON
 -------------------
 
 Z←A ⎕JSON B performs one of the following conversions:
@@ -4294,9 +4356,9 @@ Z←A ⎕JSON B performs one of the following conversions:
      the number of keys in Z is large.
 
 
-File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
+File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
 
-2.32 ⎕MAP - Map Value
+2.33 ⎕MAP - Map Value
 =====================
 
 ⎕MAP changes the ravel items of its right argument according to a
@@ -4389,9 +4451,9 @@ these cases, A ⎕MAP B also accepts a vector instead of a N×2 matrix:
      ┗∊━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
+File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
 
-2.33 ⎕MX - Matrix/Statistics
+2.34 ⎕MX - Matrix/Statistics
 ============================
 
 ⎕MX was kindly contributed by Henrik Moller
@@ -4422,7 +4484,7 @@ line.)  In the function list above, A indicates a mandatory left
 argument, while (A) indicates an optional left argument.  The right
 argument B of ⎕MX[X] is always mandatory.
 
-2.33.1 Determinant
+2.34.1 Determinant
 ------------------
 
 The determinant operation, ⎕MX[1], is monadic and is valid only for
@@ -4432,7 +4494,7 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
            mx[1] 3 3⍴5 3 1 9 7j2 6 2 8 4j5
      ¯164J76
 
-2.33.2 Cross Product
+2.34.2 Cross Product
 --------------------
 
 The cross product operation, ⎕MX[2], is nomadic.  In monadic form, it
@@ -4462,7 +4524,7 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
            1 2 3j6 ⎕MX[2] 4 5 6
      ¯3J¯30 6J24 ¯3
 
-2.33.3 Vector Angle
+2.34.3 Vector Angle
 -------------------
 
 The vector angle operation ⎕MX[3] is dyadic and returns the angle
@@ -4472,7 +4534,7 @@ and ⍴A = ⍴B:
            (⍳8) ⎕MX[3] 4j4+⍳8
      0.2515670406J0.09930859532
 
-2.33.4 Eigenvector
+2.34.4 Eigenvector
 ------------------
 
 The eigenvector operation, ⎕MX[4], is monadic and returns the complex
@@ -4503,7 +4565,7 @@ eigenvectors of real non-symetric square matrices:
 is sorted according to the descending magnitude of the corresponding
 eigenvalues.
 
-2.33.5 Eigenvalue
+2.34.5 Eigenvalue
 -----------------
 
 The eigenvalue operation, ⎕MX[5], is also monadic with an argument of
@@ -4540,7 +4602,7 @@ successive eigenvector successively less significant.)
      ┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
         Values            Vectors
 
-2.33.6 Ident
+2.34.6 Ident
 ------------
 
 The monadic ident operation, ⎕MX[6], takes a scalar real integer
@@ -4552,7 +4614,7 @@ argument and returns a square identity matrix of that size:
      0 0 1 0
      0 0 0 1
 
-2.33.7 Rotation
+2.34.7 Rotation
 ---------------
 
 The rotation operation, ⎕MX[7], is monadic and takes a real or complex
@@ -4562,7 +4624,7 @@ scalar angle and returns a 2-space rotation matrix:
      0.866 ¯0.5
      0.5    0.866
 
-2.33.8 Homogeneous transform
+2.34.8 Homogeneous transform
 ----------------------------
 
 The homogeneous operation ⎕MX[8] is dyadic and takes as its left
@@ -4577,7 +4639,7 @@ matrix:
      ¯0.7071 0.6124  0.3536 0
       1      2       3      1
 
-2.33.9 Norm
+2.34.9 Norm
 -----------
 
 The monadic norm operation, ⎕MX[9], takes a real or complex non-scalar
@@ -4606,7 +4668,7 @@ sum of the squares of the elements equals 1:
    If the magnitude of the argument is zero, the operation returns an
 all-zero result with the same shape as the argument.
 
-2.33.10 Randoms
+2.34.10 Randoms
 ---------------
 
 The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an
@@ -4662,7 +4724,7 @@ sequences:
            4 ⎕MX[10] 1
      ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
 
-2.33.11 Covariance
+2.34.11 Covariance
 ------------------
 
 The covariance operation, ⎕MX[11], is nomadic.  In monadic form, it
@@ -4694,7 +4756,7 @@ left and right:
            A ⎕MX[11] A ⍝ or ⎕MX[11]⍨ A
      36.67777778
 
-2.33.12 Histograms
+2.34.12 Histograms
 ------------------
 
 The histogram operation, ⎕MX[12], is dyadic and requires a single
@@ -4715,7 +4777,7 @@ samples are complex, the imaginary components are ignored.  As examples:
    I.e.  a 200-bucket histogram of a 200 thousand-member vector of
 normally distributed samples with a standard deviation of 1.
 
-2.33.13 Print
+2.34.13 Print
 -------------
 
 The print operation, ⎕MX[13], is dyadic and provides an easy way to dump
@@ -4788,9 +4850,9 @@ allows e.g.  for texts before and/or after the value(s) printed by
      11 12 13 14 15 16 17 18 19 20
 
 
-File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
+File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
 
-2.34 ⎕PLOT - Plot Data
+2.35 ⎕PLOT - Plot Data
 ======================
 
 ⎕PLOT is a function for visualizing numerical APL values.  The values to
@@ -4812,16 +4874,16 @@ window size, colors for plot lines, points, and grids, etc.
 
 * Menu:
 
-* The Plot Data B::
-* The Plot Attributes A::
-* Plot Window Handling::
-* Output File Format::
+* Subsection 2.34.1::
+* Subsection 2.34.2::
+* Subsection 2.34.3::
+* Subsection 2.34.4::
 * GUI driver::
 
 
-File: apl.info,  Node: The Plot Data B,  Next: The Plot Attributes A,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.34.1,  Next: Subsection 2.34.2,  Up: Section 2.35
 
-2.34.1 The Plot Data B
+2.35.1 The Plot Data B
 ----------------------
 
 The plot data B can be a vector (for a single plot line to be drawn) or
@@ -4834,7 +4896,7 @@ all colors used, all diameters of points, and all thicknesses of the
 lines can be fine-tuned by overriding the default values (see dyadic A
 ⎕PLOT B below).
 
-2.34.1.1 Complex Plot Data B
+2.35.1.1 Complex Plot Data B
 ............................
 
 If a data item B[N] or B[row;N] is complex, say B[N] = x + iy.  then it
@@ -4858,7 +4920,7 @@ document; in text mode see file doc/PLOT_circle.png):
  [image src="PLOT_circle.png" ]
 
 
-2.34.1.2 Real Plot Data B
+2.35.1.2 Real Plot Data B
 .........................
 
 On the other hand, if a data item B[N] or B[row;N] is real, then it is
@@ -4887,9 +4949,9 @@ complex, then all real items in B are taken as complex with imaginary
 part 0.
 
 
-File: apl.info,  Node: The Plot Attributes A,  Next: Plot Window Handling,  Prev: The Plot Data B,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.34.2,  Next: Subsection 2.34.3,  Prev: Subsection 2.34.1,  Up: Section 2.35
 
-2.34.2 The Plot Attributes A
+2.35.2 The Plot Attributes A
 ----------------------------
 
 There are a number of attributes like colors, point sizes, line widths,
@@ -5072,7 +5134,7 @@ variable as left argument A:
    If the global attribute output_filename is given, then the plot is
 not only displayed in a window on the screen, but also written to a file
 with the name of the file provided as the value of the attribute.  *Note
-Output File Format:: below.
+Subsection 2.34.4:: below.
 
    For example:
 
@@ -5099,7 +5161,7 @@ or _N suffix.
    As of GNU APL 1.9, ⎕PLOT legends may be dragged to other locations
 within a plot window using the usual click and drag GUI technique.
 
-2.34.2.1 Tick formatting (GTK only)
+2.35.2.1 Tick formatting (GTK only)
 ...................................
 
 By default, the ticks on the X, Y, and Z axes show the naked value of
@@ -5162,9 +5224,9 @@ Z-coordinates are not.  For this reason there is no gridY_variable or
 gridZ_variable.
 
 
-File: apl.info,  Node: Plot Window Handling,  Next: Output File Format,  Prev: The Plot Attributes A,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.34.3,  Next: Subsection 2.34.4,  Prev: Subsection 2.34.2,  Up: Section 2.35
 
-2.34.3 Plot Window Handling
+2.35.3 Plot Window Handling
 ---------------------------
 
 Each call of ⎕PLOT with some plot data B opens a separate window in the
@@ -5191,9 +5253,9 @@ The above corresponds to the typical method(s) for closing windows on
 most systems.
 
 
-File: apl.info,  Node: Output File Format,  Next: GUI driver,  Prev: Plot Window Handling,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.34.4,  Next: GUI driver,  Prev: Subsection 2.34.3,  Up: Section 2.35
 
-2.34.4 Output File Format
+2.35.4 Output File Format
 -------------------------
 
 Early versions of ⎕PLOT were using libxcb to display the results of
@@ -5218,9 +5280,9 @@ to exist for some time, but bug fixes and new features will only be made
 for the libgtk-3 option.
 
 
-File: apl.info,  Node: GUI driver,  Prev: Output File Format,  Up: Section 2.34
+File: apl.info,  Node: GUI driver,  Prev: Subsection 2.34.4,  Up: Section 2.35
 
-2.34.5 GUI driver
+2.35.5 GUI driver
 -----------------
 
 ⎕PLOT provides 3 different ways to generate its output, called GUI
@@ -5298,9 +5360,9 @@ be supported for a while, but new features will only be added to the GTK
 driver.
 
 
-File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
+File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
 
-2.35 ⎕PNG - Portable Network Graphics
+2.36 ⎕PNG - Portable Network Graphics
 =====================================
 
 Portable Network Graphics is a file format for images, defined in *RFC
@@ -5310,7 +5372,7 @@ Portable Network Graphics is a file format for images, defined in *RFC
 well-compressed, well-specified standard for lossless bitmapped image
 files.’
 
-2.35.1 The GNU APL Color Model
+2.36.1 The GNU APL Color Model
 ------------------------------
 
 An image is a rectangular matrix of *Pixels* which makes APL the perfect
@@ -5415,7 +5477,7 @@ together).  For this reason 16-bit color components are quite an
 overkill and the 8-bit default therefore should be more than sufficient
 for most purposes.
 
-2.35.2 Monadic ⎕PNG
+2.36.2 Monadic ⎕PNG
 -------------------
 
 Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
@@ -5458,7 +5520,7 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
           calls).
         • ⎕PNG ¯6 returns a vector of all open ⎕PNG window handles.
 
-2.35.3 Dyadic ⎕PNG
+2.36.3 Dyadic ⎕PNG
 ------------------
 
 Dyadic *A ⎕PNG B* has only one purpose: to store an APL array in the GNU
@@ -5473,7 +5535,7 @@ APL color model into a PNG file.
      the combination of the general image format (as implied by *↑⍴B*)
      and resolution *A2* must be a valid one in the PNG standard.
 
-2.35.4 APL Examples
+2.36.4 APL Examples
 -------------------
 
            ⍝ load PNG file image.png
@@ -5503,9 +5565,9 @@ APL color model into a PNG file.
            RGB_Blue ← 0 0 1 ⍀ Mono
 
 
-File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
+File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
 
-2.36 ⎕PS - Print Style
+2.37 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -5532,9 +5594,9 @@ uses the same values.
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
+File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  Up: Chapter 2
 
-2.37 ⎕RE - Regular Expressions
+2.38 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -5542,7 +5604,7 @@ a powerful regular expression matching library.  "pcre" is an acronym
 for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 1997-2017 University of Cambridge, England.
 
-2.37.1 Preconditions
+2.38.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -5553,7 +5615,7 @@ are found.
    If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX
 ERROR when ⎕RE is used in an APL program.
 
-2.37.2 Syntax
+2.38.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -5570,7 +5632,7 @@ gives more control over the format of the result produced by ⎕RE:
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
 
-2.37.3 The Regular Expression A
+2.38.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -5582,7 +5644,7 @@ user of ⎕RE is referred to the description that comes with libpcre2.
 
    See in particular: man pcre2pattern
 
-2.37.4 The String(s) B Being Matched
+2.38.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either:
@@ -5614,7 +5676,7 @@ character vector.
    Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
-2.37.5 The Flags X
+2.38.5 The Flags X
 ------------------
 
 By default, i.e.  without an axis argument X or - equivalently - with an
@@ -5630,7 +5692,7 @@ character is a flag.  Each flag is either understood by (and then passed
 unmodified to) libpcre2 or else understood by ⎕RE itself (and then not
 passed to libpcre2).
 
-2.37.5.1 The libpcre2 flags: i, m, s, and x
+2.38.5.1 The libpcre2 flags: i, m, s, and x
 ...........................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -5644,7 +5706,7 @@ to the following libpcre2 flags:
    Please consult the libpcre2 documentation for a more detailed
 description of these flags.
 
-2.37.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
+2.38.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
 ......................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -5697,7 +5759,7 @@ flags:
 formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
-2.37.5.3 the ⎕RE global flag g
+2.38.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match of A in B.
@@ -5763,7 +5825,7 @@ of output formats ’partition’ and ’compress’.
 
            A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
 
-2.37.5.4 the ⎕RE error flag E
+2.38.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -5790,7 +5852,7 @@ that case it is natural to check the length of the result:
      ┃0┃
      ┗━┛
 
-2.37.6 Complex Matches
+2.38.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -5858,9 +5920,9 @@ two 1-character sub-matches:
      ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  Up: Chapter 2
+File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
 
-2.38 ⎕RVAL - Random APL value
+2.39 ⎕RVAL - Random APL value
 =============================
 
 The standard way to produce random numbers is the primitive function ?
@@ -5879,7 +5941,7 @@ other aspects like:
 case for ⎕RVAL is the production of test data for the interpreter, but
 ⎕RVAL might be useful for other purposes as well.
 
-2.38.1 General
+2.39.1 General
 --------------
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z, while
@@ -5901,7 +5963,7 @@ overridden by dyadic A ⎕RVAL B, are:
    With these default properties, every call of monadic ⎕RVAL B returns
 an integer scalar.
 
-2.38.2 Dyadic ⎕RVAL
+2.39.2 Dyadic ⎕RVAL
 -------------------
 
 The left argument A of A ⎕RVAL B determines which aspect of the
@@ -5919,7 +5981,7 @@ scalar:
 
    • A=4 controls a maximum depth of the subsequent random APL values.
 
-2.38.2.1 Control of the underlying random number generator: 0 ⎕RVAL B
+2.39.2.1 Control of the underlying random number generator: 0 ⎕RVAL B
 .....................................................................
 
 Every random number generator has a state (similar to ⎕RL for ’?’).
@@ -5946,7 +6008,7 @@ shall be generated again.  The random number generators of ?  and ⎕RVAL
 are independent; generating a random number or random value with one
 does not change the state of the other.
 
-2.38.2.2 Control of the ranks: 1 ⎕RVAL B
+2.39.2.2 Control of the ranks: 1 ⎕RVAL B
 ........................................
 
 The rank of subsequently generated random values can be controlled with
@@ -5981,7 +6043,7 @@ to query the current setting for 1 ⎕RVAL.
      with probability 30%, and matrices with probability 20%.  The
      numbers need not add up to 100, but will be scaled accordingly.
 
-2.38.2.3 Control of the shapes: 2 ⎕RVAL B
+2.39.2.3 Control of the shapes: 2 ⎕RVAL B
 .........................................
 
 The shapes of subsequently generated random values can be controlled
@@ -6012,7 +6074,7 @@ used to query the current setting for 2 ⎕RVAL.
    This will produce scalars, vectors with a fixed length of 3 and
 matrices with 3 rows and between 0 and 10 columns.
 
-2.38.2.4 Control of the data types: 3 ⎕RVAL B
+2.39.2.4 Control of the data types: 3 ⎕RVAL B
 .............................................
 
 The types (i.e.  CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of
@@ -6055,7 +6117,7 @@ to query the current setting for 3 ⎕RVAL.
      ¯975954163190248487                   0.5892132425
      7677327503669503253 2152001972871424768
 
-2.38.2.5 Control of a maximum depth: 4 ⎕RVAL B
+2.39.2.5 Control of a maximum depth: 4 ⎕RVAL B
 ..............................................
 
 If the probability of generating a nested value is > 0 then the depth of
@@ -6070,7 +6132,7 @@ depth;
    An empty B, e.g.  4 ⎕RVAL ⍬, will not change anything and can be used
 to query the current setting for 4 ⎕RVAL.
 
-2.38.2.6 monadic ⎕RVAL B
+2.39.2.6 monadic ⎕RVAL B
 ........................
 
 Calling ⎕RVAL monadically either produces one new random APL value or
@@ -6129,7 +6191,7 @@ non-empty B.
      ⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
      ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
 
-2.38.2.7 Syntax Alternatives
+2.39.2.7 Syntax Alternatives
 ............................
 
 For an improved readability, ⎕RVAL also accepts string arguments for its
@@ -6142,9 +6204,9 @@ left argument A and also the subfunction notation:
            4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
 
 
-File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
+File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  Up: Chapter 2
 
-2.39 ⎕SI - State Indicator
+2.40 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -6208,9 +6270,9 @@ the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  Up: Chapter 2
+File: apl.info,  Node: Section 2.41,  Next: Section 2.42,  Prev: Section 2.40,  Up: Chapter 2
 
-2.40 ⎕SQL - SQL Database Interface
+2.41 ⎕SQL - SQL Database Interface
 ==================================
 
 ⎕SQL was kindly contributed by Elias Mårtenson.
@@ -6219,7 +6281,7 @@ File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  
 system function ⎕SQL, described below.  ⎕SQL has an axis argument that
 selects a subfunction of ⎕SQL.
 
-2.40.1 ⎕SQL[0] ⍬ : display subfunction numbers
+2.41.1 ⎕SQL[0] ⍬ : display subfunction numbers
 ----------------------------------------------
 
 The system function ⎕SQL is divided into a number of subfunctions.  The
@@ -6253,7 +6315,7 @@ argument:
 
    The axis argument [0] is optional; one can also use ⎕SQL ⍬.
 
-2.40.2 ⎕SQL[0] ‘''’ : display subfunction names
+2.41.2 ⎕SQL[0] ‘''’ : display subfunction names
 -----------------------------------------------
 
 As of SVN version 1901, ⎕SQL has been promoted to be a function group.
@@ -6297,7 +6359,7 @@ symtax.
    Like for ⎕SQL[0] ⍬ above is the axis argument [0] optional; one can
 therefore also use ⎕SQL ” instead of ⎕SQL[0] ”.
 
-2.40.3 ref ← A ⎕SQL[1] B : open database
+2.41.3 ref ← A ⎕SQL[1] B : open database
 ----------------------------------------
 
            type  ⎕SQL[1] file
@@ -6320,7 +6382,7 @@ described in the PostgreSQL documentation.
 using other SQL functions.  This value should be seen as an opaque
 handle.  It is, however, guaranteed that the handle is a scalar value.
 
-2.40.4 ⎕SQL[2] B : close database
+2.41.4 ⎕SQL[2] B : close database
 ---------------------------------
 
            ⎕SQL[2] ref
@@ -6332,7 +6394,7 @@ function has been called, no further operations are to be performed on
 this handle.  Future calls to ⎕SQL[1] may reuse previously disconnected
 handles.
 
-2.40.5 Z ← A ⎕SQL[3, ref] B : database query (with result)
+2.41.5 Z ← A ⎕SQL[3, ref] B : database query (with result)
 ----------------------------------------------------------
 
            query ⎕SQL[3, ref] params
@@ -6352,7 +6414,7 @@ with each row being the values for each call.
 select statement.  Null values are returned as ⍬ and empty strings are
 returned as ”.
 
-2.40.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
+2.41.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
 ---------------------------------------------------------
 
            query ⎕SQL[4, ref] params
@@ -6362,35 +6424,35 @@ returned as ”.
    This function is identical to SQL∆Select with the exception that it
 is used on statements which do not return a result table.
 
-2.40.7 ⎕SQL[5] B : start transaction
+2.41.7 ⎕SQL[5] B : start transaction
 ------------------------------------
 
            ⎕SQL[5] ref
 
    Begin a transaction.
 
-2.40.8 ⎕SQL[6] B : commit transaction
+2.41.8 ⎕SQL[6] B : commit transaction
 -------------------------------------
 
            ⎕SQL[6] ref
 
    Commit a transaction.
 
-2.40.9 ⎕SQL[7] B : rollback transaction
+2.41.9 ⎕SQL[7] B : rollback transaction
 ---------------------------------------
 
            ⎕SQL[7] ref
 
    Rolls back the current transaction.
 
-2.40.10 Z←⎕SQL[8] B : table names
+2.41.10 Z←⎕SQL[8] B : table names
 ---------------------------------
 
            ⎕SQL[8] ref
 
    Return an array containing the name of all tables.
 
-2.40.11 Z←⎕SQL[9] B : column names
+2.41.11 Z←⎕SQL[9] B : column names
 ----------------------------------
 
            ref  ⎕SQL[9] table
@@ -6403,7 +6465,7 @@ table.  Currently, the column layout is as follows:
    More columns containing additional information may be added in a
 future release.
 
-2.40.12 Z ← ⎕SQL[10] B : library version number
+2.41.12 Z ← ⎕SQL[10] B : library version number
 -----------------------------------------------
 
 Return the version number (integer scalar) of the library that was used
@@ -6412,7 +6474,7 @@ detected by ./configure, ⎕SQL may support no, one, or more than one kind
 of SQL database type (the database type is sometimes refered to as "SQL
 provider).
 
-2.40.13 Z ← ⎕SQL[11] B : library version string
+2.41.13 Z ← ⎕SQL[11] B : library version string
 -----------------------------------------------
 
 Return the version string of the library that was used to implement the
@@ -6420,7 +6482,7 @@ database type B. Depending on the SQL libraries detected by ./configure,
 ⎕SQL may support no, one, or more than one kind of SQL database type
 (the database type is sometimes refered to as "SQL provider).
 
-2.40.14 SQLite Quickstart
+2.41.14 SQLite Quickstart
 -------------------------
 
 SQL is a powerful query language with many functions for manipulating
@@ -6455,7 +6517,7 @@ operations explained in this Quickstart are:
    • updating a database table, and
    • deleting rows from a database table.
 
-2.40.14.1 Deleting a Database
+2.41.14.1 Deleting a Database
 .............................
 
 In order to have a well-defined starting point we delete any already
@@ -6491,7 +6553,7 @@ example, postgreSQL comes with a program named dropdb that deletes a
 database.  Such programs can be called from APL with the )HOST command
 or with ⎕FIO.fork_daemon.
 
-2.40.14.2 Creating a new Database
+2.41.14.2 Creating a new Database
 .................................
 
 To read from or write into a database we need a database handle
@@ -6527,7 +6589,7 @@ createuser for creating database users, and psql for various other
 database administration tasks.  These programs can be called from APL
 with the )HOST command or with ⎕FIO.fork_daemon.
 
-2.40.14.3 Creating a Database Table
+2.41.14.3 Creating a Database Table
 ...................................
 
 An SQL database is a set of tables.  The next step after a new database
@@ -6604,7 +6666,7 @@ is therefore common practice (though not required) that the first column
 of a table is a unique integer ID that identifies the row and can later
 be used to quickly locate the row in a large database.
 
-2.40.14.4 Excursus: Dynamic Query Strings
+2.41.14.4 Excursus: Dynamic Query Strings
 .........................................
 
 The SQL query strings (Qs) used so far were static, which means that
@@ -6669,7 +6731,7 @@ differs slightly beween ⎕SQL function numbers and ⎕SQL function names:
 the number of colums of the APL matrix.  If a query string contains no
 placeholders then the parameters shall be ⍬ (aka.  ⍳0).
 
-2.40.14.5 Writing an APL matrix into a Database Table
+2.41.14.5 Writing an APL matrix into a Database Table
 .....................................................
 
 Now suppose that we have an APL matrix with the same columns as our SQL
@@ -6720,7 +6782,7 @@ database table EMPLOYEES like this:
 
            ⎕SQL.close DB                     ⍝ and close DB
 
-2.40.14.6 Reading a Database Table into an APL Matrix
+2.41.14.6 Reading a Database Table into an APL Matrix
 .....................................................
 
 Reading a matrix back from a database table uses a SELECT query.  SELECT
@@ -6762,7 +6824,7 @@ table into an APL matrix even simpler:
 can also retrieve a only subset of columns by using a comma separated
 list of column names instead of * (similar to indexed reference in APL).
 
-2.40.14.7 Updating a Database Table
+2.41.14.7 Updating a Database Table
 ...................................
 
 The ⎕SQL subfunction introduced so far suffice, at least in principle.
@@ -6826,7 +6888,7 @@ example:
    The shape of a parameter matrix for an SQL UPDATE must, of course,
 match the number of selected rows and columns.
 
-2.40.15 Deleting Rows From a Database Table
+2.41.15 Deleting Rows From a Database Table
 -------------------------------------------
 
 Like UPDATE queries are efficient for changing large tables of a
@@ -6843,9 +6905,9 @@ database:
 the query parameter B (an APL vector).
 
 
-File: apl.info,  Node: Section 2.41,  Next: Section 2.42,  Prev: Section 2.40,  Up: Chapter 2
+File: apl.info,  Node: Section 2.42,  Next: Section 2.43,  Prev: Section 2.41,  Up: Chapter 2
 
-2.41 ⎕SYL - System limits
+2.42 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -6883,7 +6945,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-2.41.1 ⎕SYL[1 2 3 4 5 6;]
+2.42.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -6915,20 +6977,20 @@ bytes limit together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-2.41.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+2.42.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-2.41.3 ⎕SYL[24 25 26;]
+2.42.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation for multi-core GNU
 APL. They are currently not used.
 
-2.41.4 ⎕SYL[27;]
+2.42.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -6943,12 +7005,12 @@ this:
            while (ravel-length(SH) ≥ ⎕SYL[27;2]) { divide longest axis in SH by 2 }
 
 
-File: apl.info,  Node: Section 2.42,  Next: Section 2.43,  Prev: Section 2.41,  Up: Chapter 2
+File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
 
-2.42 ⎕XML - XML Parsing
+2.43 ⎕XML - XML Parsing
 =======================
 
-2.42.1 Purpose
+2.43.1 Purpose
 --------------
 
 GNU APL provides ⎕XML as a means of performing elementary manipulations
@@ -6980,7 +7042,7 @@ like:
      document type declarations (DTDs), document validation, etc.)  in
      APL without much overhead.
 
-2.42.2 Some XML Terminology
+2.43.2 Some XML Terminology
 ---------------------------
 
 An XML document is a character string with a standardized format.  The
@@ -7055,7 +7117,7 @@ ignored by ⎕XML. As a consequence, entity declarations have no effect
 and only the predefined XML entities (i.e.  &, <, >, ’, and ") are
 recognized (and translated) by ⎕XML.
 
-2.42.3 How ⎕XML maps XML documents to APL Values
+2.43.3 How ⎕XML maps XML documents to APL Values
 ------------------------------------------------
 
 The principal mapping between XML strings and APL values is:
@@ -7181,7 +7243,7 @@ declarations, etc.  will be contained in a single associative array.
            ⍙1wsid          ⍝ first attribute wsid from e.g. <Workspace wsid=...
            ⍙2year          ⍝ second attribute year
 
-2.42.4 Monadic ⎕XML
+2.43.4 Monadic ⎕XML
 -------------------
 
 Z ← ⎕XML B converts APL string B that contains a valid XML document to
@@ -7197,7 +7259,7 @@ somewhat garbled.  This effect can be suppressed in 2 ways:
   1. set ⎕PW large enough, or
   2. prefix the string with ⊃35⎕CR as in the examples below.
 
-2.42.5 Dyadic ⎕XML
+2.43.5 Dyadic ⎕XML
 ------------------
 
 Z ← A ⎕XML B provides a number of convenience functions.  Its left
@@ -7407,7 +7469,7 @@ of the function number ↑A.
           _3C
                 (14 "_3C") ⎕XML APL._1ROOT   ⍝ last member: will be empty
 
-2.42.6 XML Queries
+2.43.6 XML Queries
 ------------------
 
 The different functions in dyadic ⎕XML are intended to construct XML
@@ -7426,16 +7488,16 @@ their details, but usually follow these top-level steps:
      APL)
 
 
-File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
+File: apl.info,  Node: Section 2.44,  Next: Section 2.45,  Prev: Section 2.43,  Up: Chapter 2
 
-2.43 Conditionals
+2.44 Conditionals
 =================
 
 WARNING: GNU APL conditionals are experimental.  Use them with care and
 avoid them, wherever possible, in favour of portability.  Neither the
 ISO APL standard, nor IBM APL2 provide conditionals.
 
-2.43.1 Design considerations.
+2.44.1 Design considerations.
 -----------------------------
 
 The author of GNU APL has, for a long time, hesitated to implement
@@ -7594,7 +7656,7 @@ end of the conditional:
 because the advantage in 2.  (shorter code) looks much smaller than the
 advantages of 1.  (e.g.  insertion of debug printouts into a clause).
 
-2.43.2 Syntax
+2.44.2 Syntax
 -------------
 
 With the above considerations in mind, GNU APL decided for the following
@@ -7695,7 +7757,7 @@ syntax:
 
    Like shown in the examples above.
 
-2.43.3 Possible Pitfalls
+2.44.3 Possible Pitfalls
 ------------------------
 
 In APL, as well as in C/C++ (and most other languages), an expression is
@@ -7760,9 +7822,9 @@ people even use double parentheses to emphasize the condition of a
 conditional statement or expression.
 
 
-File: apl.info,  Node: Section 2.44,  Next: Section 2.45,  Prev: Section 2.43,  Up: Chapter 2
+File: apl.info,  Node: Section 2.45,  Next: Section 2.46,  Prev: Section 2.44,  Up: Chapter 2
 
-2.44 Matrix Product
+2.45 Matrix Product
 ===================
 
 In standard APL, the inner product Z of two matrices A and B as known
@@ -7844,9 +7906,9 @@ the operator +.×:
      is not in fact performed, but optimized away.
 
 
-File: apl.info,  Node: Section 2.45,  Prev: Section 2.44,  Up: Chapter 2
+File: apl.info,  Node: Section 2.46,  Prev: Section 2.45,  Up: Chapter 2
 
-2.45 Monadic ≠ (Nub Sieve)
+2.46 Monadic ≠ (Nub Sieve)
 ==========================
 
 The nub sieve Z←≠B of a value B is a Boolean vector Z with the same
@@ -10012,91 +10074,92 @@ Tag Table:
 Node: Top383
 Node: Chapter 11615
 Node: Chapter 224277
-Node: Section 2.126427
-Node: Subsection 2.1.127661
-Node: Subsection 2.1.228330
-Node: Subsection 2.1.329154
-Node: Subsection 2.1.435068
-Node: Subsection 2.1.538956
-Node: Subsection 2.1.639817
-Node: Subsection 2.1.748282
-Node: Subsection 2.1.850088
-Node: Section 2.253497
-Node: Section 2.354289
-Node: Section 2.460237
-Node: Section 2.561519
-Node: Section 2.666016
-Node: Section 2.766189
-Node: Section 2.866819
-Node: Section 2.972299
-Node: Section 2.1074670
-Node: Section 2.1176759
-Node: Section 2.1278332
-Node: Section 2.1380113
-Node: Section 2.1482042
-Node: Section 2.1582983
-Node: Section 2.1683254
-Node: Section 2.1784665
-Node: Section 2.1895568
-Node: Section 2.1998115
-Node: Section 2.20105060
-Node: Section 2.21109496
-Node: Section 2.22110999
-Node: Scan Polynomial B135430
-Node: Integral B137323
-Node: Section 2.23140063
-Node: Section 2.24146739
-Node: Section 2.25150111
-Node: Section 2.26150402
-Node: Section 2.27161255
-Node: Section 2.28161527
-Node: Section 2.29168580
-Node: Section 2.30171034
-Node: Section 2.31171703
-Node: Section 2.32173354
-Node: Section 2.33177278
-Node: Section 2.34191707
-Node: The Plot Data B192939
-Node: The Plot Attributes A195553
-Node: Plot Window Handling209088
-Node: Output File Format210419
-Node: GUI driver211642
-Node: Section 2.35215197
-Node: Section 2.36224632
-Node: Section 2.37225651
-Node: Section 2.38240886
-Node: Section 2.39251928
-Node: Section 2.40254112
-Node: Section 2.41280217
-Node: Section 2.42284757
-Node: Section 2.43305856
-Node: Section 2.44319869
-Node: Section 2.45323139
-Node: Chapter 3323654
-Node: Chapter 4326162
-Node: Chapter 5327303
-Node: Section 5.1327964
-Node: Section 5.2328696
-Node: Section 5.3329191
-Node: Section 5.4331329
-Node: Section 5.5336976
-Node: Section 5.6339984
-Node: Section 5.7348723
-Node: Chapter 6354688
-Node: Section 6.1356258
-Node: Section 6.2357578
-Node: Section 6.3357938
-Node: Section 6.4358180
-Node: Section 6.5358842
-Node: Section 6.6359320
-Node: Section 6.7360093
-Node: Section 6.8360519
-Node: Chapter 7360921
-Node: Section 7.1361340
-Node: Section 7.2362027
-Node: Chapter 8362858
-Node: Section 8.1363361
-Node: Section 8.2388674
+Node: Section 2.126473
+Node: Subsection 2.1.127707
+Node: Subsection 2.1.228376
+Node: Subsection 2.1.329200
+Node: Subsection 2.1.435114
+Node: Subsection 2.1.539002
+Node: Subsection 2.1.639863
+Node: Subsection 2.1.748328
+Node: Subsection 2.1.850134
+Node: Section 2.253543
+Node: Section 2.354335
+Node: Section 2.460283
+Node: Section 2.561565
+Node: Section 2.666062
+Node: Section 2.766235
+Node: Section 2.866865
+Node: Section 2.972345
+Node: Section 2.1074716
+Node: Section 2.1176805
+Node: Section 2.1278378
+Node: Section 2.1380159
+Node: Section 2.1482088
+Node: Section 2.1583029
+Node: Section 2.1683300
+Node: Section 2.1784711
+Node: Section 2.1895614
+Node: Section 2.1998161
+Node: Section 2.20105106
+Node: Section 2.21109542
+Node: Section 2.22111045
+Node: Subsection 2.22.1135461
+Node: Subsection 2.22.2137361
+Node: Section 2.23140108
+Node: Section 2.24142019
+Node: Section 2.25148695
+Node: Section 2.26152067
+Node: Section 2.27152358
+Node: Section 2.28163211
+Node: Section 2.29163483
+Node: Section 2.30170536
+Node: Section 2.31172990
+Node: Section 2.32173659
+Node: Section 2.33175310
+Node: Section 2.34179234
+Node: Section 2.35193663
+Node: Subsection 2.34.1194889
+Node: Subsection 2.34.2197501
+Node: Subsection 2.34.3211030
+Node: Subsection 2.34.4212353
+Node: GUI driver213572
+Node: Section 2.36217126
+Node: Section 2.37226561
+Node: Section 2.38227580
+Node: Section 2.39242815
+Node: Section 2.40253857
+Node: Section 2.41256041
+Node: Section 2.42282146
+Node: Section 2.43286686
+Node: Section 2.44307785
+Node: Section 2.45321798
+Node: Section 2.46325068
+Node: Chapter 3325583
+Node: Chapter 4328091
+Node: Chapter 5329232
+Node: Section 5.1329893
+Node: Section 5.2330625
+Node: Section 5.3331120
+Node: Section 5.4333258
+Node: Section 5.5338905
+Node: Section 5.6341913
+Node: Section 5.7350652
+Node: Chapter 6356617
+Node: Section 6.1358187
+Node: Section 6.2359507
+Node: Section 6.3359867
+Node: Section 6.4360109
+Node: Section 6.5360771
+Node: Section 6.6361249
+Node: Section 6.7362022
+Node: Section 6.8362448
+Node: Chapter 7362850
+Node: Section 7.1363269
+Node: Section 7.2363956
+Node: Chapter 8364787
+Node: Section 8.1365290
+Node: Section 8.2390603
 
 End Tag Table
 

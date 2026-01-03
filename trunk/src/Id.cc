@@ -44,6 +44,7 @@
 #include "PrimitiveFunction.hh"
 #include "PrintOperator.hh"
 #include "QuadFunction.hh"
+#include "Quad_CC.hh"
 #include "Quad_DLX.hh"
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"

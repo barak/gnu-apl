@@ -78,7 +78,7 @@ bar
 
       foo
 1
-SYNTAX ERROR+
+VALENCE ERROR+
 bar[1]  ++
         ^^
 
@@ -93,7 +93,7 @@ bar
 
       foo
 1
-SYNTAX ERROR+
+VALENCE ERROR+
       bar
       ^ ^
 

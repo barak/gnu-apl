@@ -65,6 +65,7 @@
 //       class       ⎕-name   help text
   sf_def(Quad_AF,    "AF",    "Atomic Function"              )
   sf_def(Quad_AT,    "AT",    "Attributes"                   )
+  sf_def(Quad_CC,    "CC",    "Character Class"              )
   sf_def(Quad_CR,    "CR",    "Character Representation"     )
   sf_def(Quad_DL,    "DL",    "Delay"                        )
   sf_def(Quad_DLX,   "DLX",   "D. Knuth's Dancing Links"     )

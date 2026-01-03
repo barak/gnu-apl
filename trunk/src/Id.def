@@ -66,6 +66,7 @@ pp( COMPLEX            , ---          ,          )
 qf( CR                 , "⎕CR"        ,          )
 qv( CT                 , "⎕CT"        ,          )
 st( CHI                , "χ"          ,          )
+qf( CC                 , "⎕CC"        ,          )
                                     
 sf( F12_DECODE         , "⊥"          , = 0x4401 )   // D...
 st( DIAMOND            , "◊"          ,          )
