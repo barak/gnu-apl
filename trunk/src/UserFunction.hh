@@ -275,14 +275,6 @@ public:
    /// set trace or stop vector
    void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
 
-   /// transform a function body containing (old-style) multi-lines into a
-   /// standard function body
-   ErrorCode transform_old_multi_lines();
-
-   /// transform a function body containing (new-style) multi-lines into a
-   /// standard function body
-   ErrorCode transform_new_multi_lines();
-
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);
 
@@ -369,10 +361,10 @@ protected:
    std::vector<Function_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   std::vector<Function_Line> stop_lines;
+   vector<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   std::vector<Function_Line> trace_lines;
+   vector<Function_Line> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];
@@ -383,7 +375,7 @@ protected:
    /// the line number where an error has occurred (-1 if none)
    int error_line;
 
-   /// information about an error (if any)
+   /// information about an error (if any) when constructing \b this function
    const char * error_info;
 };
 //----------------------------------------------------------------------------

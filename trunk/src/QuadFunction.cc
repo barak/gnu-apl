@@ -145,7 +145,7 @@ Value_P Z(shape_Z, LOC);
            {
             const Unicode uni = B->get_cravel(b + c).get_char_value();
             if (uni == UNI_SPACE)   break;
-            symbol_name.append(uni);
+            symbol_name << uni;
            }
 
         const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
@@ -386,7 +386,7 @@ Value_P Z(3, LOC);
 
         Z->check_value(LOC);
         Token tok_Z(TOK_APL_VALUE1, Z);
-        result.move(tok_Z, LOC);
+        result.move_from(tok_Z, LOC);
         return;
       }
 
@@ -439,7 +439,7 @@ Value_P Z2(2, LOC);
 
    Z->check_value(LOC);
 Token tok_Z(TOK_APL_VALUE1, Z);
-   result.move(tok_Z, LOC);
+   result.move_from(tok_Z, LOC);
 }
 //============================================================================
 Token
@@ -479,7 +479,7 @@ Value_P Z(sh_Z, LOC);
         UCS_string ucs;
         while (*env)
            {
-             if (*env != '=')   ucs.append(Unicode(*env++));
+             if (*env != '=')   ucs << Unicode(*env++);
              else               break;
            }
         ++env;   // skip '='
@@ -487,7 +487,7 @@ Value_P Z(sh_Z, LOC);
         Value_P varname(ucs, LOC);
 
         ucs.clear();
-        while (*env)   ucs.append(Unicode(*env++));
+        while (*env)   ucs << Unicode(*env++);
 
         Value_P varval(ucs, LOC);
 
@@ -591,7 +591,7 @@ const ErrorCode ec = get_error_code(B);
              // the function were primitive.
              //
              UCS_string ufun_name(UTF8_string("      "));
-             ufun_name.append(ufun->get_name());
+             ufun_name << ufun->get_name();
              error.set_error_line_2(ufun_name, 6, -1);
              Workspace::pop_SI(LOC);
              StateIndicator::get_error(Workspace::SI_top()) = error;
@@ -1341,9 +1341,7 @@ const APL_Integer b = B->get_cfirst().get_near_int();
 
         case 3:  {
                    UCS_string fun_and_line(fun_name);
-                   fun_and_line.append(UNI_L_BRACK);
-                   fun_and_line.append_number(fun_line);
-                   fun_and_line.append(UNI_R_BRACK);
+                   fun_and_line << UNI_L_BRACK << fun_line << UNI_R_BRACK;
                    Z = Value_P(fun_and_line, LOC); 
                  }
                  break;
@@ -1421,9 +1419,7 @@ Value_P Z(len, LOC);
 
              case 3:  {
                         UCS_string fun_and_line(fun_name);
-                        fun_and_line.append(UNI_L_BRACK);
-                        fun_and_line.append_number(fun_line);
-                        fun_and_line.append(UNI_R_BRACK);
+                        fun_and_line << UNI_L_BRACK << fun_line << UNI_R_BRACK;
                         Value_P name_and_line(fun_and_line, LOC);
                         Z->next_ravel_Pointer(name_and_line.get());
                       }

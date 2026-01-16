@@ -67,8 +67,8 @@ UCS_string lvar_text;
            if (uni == UNI_CR)   continue;   // ignore CR
            if (uni == UNI_LF)   break;      // stop at LF
            if (uni == UNI_SEMICOLON)   in_signature = false;
-           if (in_signature)   signature_text.append(uni);
-           else                lvar_text.append(uni);
+           if (in_signature)   signature_text << uni;
+           else                lvar_text << uni;
          }
    }
 
@@ -102,8 +102,7 @@ UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
     sym_X(0),
     sym_B(0)
 {
-   function_name.append(UNI_LAMBDA);
-   function_name.append_number(lambda_num);
+   function_name << UNI_LAMBDA << lambda_num;
 
    if (!signature_is_valid(sig))
       {
@@ -454,20 +453,19 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
 UCS_string
 UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
-UCS_string u;
+UCS_string ucs;
 
-   if (sig & SIG_Z)      u.append_UTF8("λ←");
-   if (sig & SIG_A)      u.append_UTF8("⍺ ");
-   if (sig & SIG_LORO)   u.append_UTF8("(");
-   if (sig & SIG_LO)     u.append_UTF8("⍶ ");
-   u.append_UTF8("λ"); 
-   u.append_number(lambda_num); 
-   if (sig & SIG_RO)     u.append_UTF8(" ⍹ ");
-   if (sig & SIG_LORO)   u.append_UTF8(")");
-   if (sig & SIG_X)      u.append_UTF8("[χ]");
-   if (sig & SIG_B)      u.append_UTF8(" ⍵");
+   if (sig & SIG_Z)      ucs << "λ←";
+   if (sig & SIG_A)      ucs << "⍺ ";
+   if (sig & SIG_LORO)   ucs << "(";
+   if (sig & SIG_LO)     ucs << "⍶ ";
+   ucs << UNI_LAMBDA << lambda_num;
+   if (sig & SIG_RO)     ucs << " ⍹ ";
+   if (sig & SIG_LORO)   ucs << ")";
+   if (sig & SIG_X)      ucs << "[χ]";
+   if (sig & SIG_B)      ucs << " ⍵";
 
-   return u;
+   return ucs;
 }
 //----------------------------------------------------------------------------
 bool

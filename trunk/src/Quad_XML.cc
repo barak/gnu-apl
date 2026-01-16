@@ -311,7 +311,7 @@ bool tag_open = false;
                  {
                    if (start_tag_open)   // previous tag still open
                       {
-                        start_tag.append_UTF8("/>");
+                        start_tag << "/>";
                         entities.push_back(new UCS_string(start_tag));
                         start_tag_open = false;
                       }
@@ -322,30 +322,24 @@ bool tag_open = false;
 
                    start_tag_name = UCS_string(member_data);
                    start_tag.clear();
-                   start_tag.push_back(UNI_LESS);   // <
-                   start_tag.append(start_tag_name);
+                   start_tag << UNI_LESS << start_tag_name;   // <
                    start_tag_open = true;
                    tag_open = true;
                  }
               else                       // tag attribute
                  {
-                   if (!tag_open)
-                      {
-                        DOMAIN_ERROR;
-                      }
+                   if (!tag_open)    DOMAIN_ERROR;
 
-                   start_tag.push_back(UNI_SPACE);
-                   start_tag.append(UCS_string(name));
-                   start_tag.push_back(UNI_EQUAL);
-                   start_tag.append(XML_node::denormalize_attribute_value(
-                                              UCS_string(member_data), true));
+                   const UCS_string md(member_data);
+                   start_tag << UNI_SPACE << UCS_string(name) << UNI_EQUAL
+                             << XML_node::denormalize_attribute_value(md, true);
                  }
             }
          else   // ∆ or _
             {
               if (start_tag_open)   // start tag still open
                  {
-                   start_tag.append_UTF8(">");
+                   start_tag << UNI_GREATER;
                    entities.push_back(new UCS_string(start_tag));
                    start_tag_open = false;
                  }
@@ -371,14 +365,12 @@ bool tag_open = false;
       {
         if (start_tag_open)   // <TAG att=val att=val...   : close tag
            {
-             start_tag.append_UTF8("/>");
+             start_tag << "/>";
            }
         else                // <TAG> ...  : add end tag
            {
              start_tag.clear();
-             start_tag.append_UTF8("</");
-             start_tag.append(start_tag_name);
-             start_tag.push_back(UNI_GREATER);
+             start_tag << "</" << start_tag_name << UNI_GREATER;
            }
         entities.push_back(new UCS_string(start_tag));
       }
@@ -568,7 +560,7 @@ int level = 0;
                    else   // empty string
                       {
                         node = node->get_prev();   // move back
-                        garbage.append(node->get_next()->unlink());
+                        garbage.append_garbage(node->get_next()->unlink());
                       }
                    break;
 
@@ -627,7 +619,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    add_member(Z, UNI_DELTA, "declaration", position,
                               node->APL_value.get());
                    node = node->get_prev();   // move back
-                   garbage.append(node->get_next()->unlink());
+                   garbage.append_garbage(node->get_next()->unlink());
                    break;
 
               case NT_doctype:
@@ -642,7 +634,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    add_member(Z, UNI_DELTA, "doctype", position,
                               node->APL_value.get());
                    node = node->get_prev();   // move back
-                   garbage.append(node->get_next()->unlink());
+                   garbage.append_garbage(node->get_next()->unlink());
                    break;
 
               case NT_comment:
@@ -651,7 +643,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    add_member(Z, UNI_DELTA, "comment", position,
                               node->APL_value.get());
                    node = node->get_prev();
-                   garbage.append(node->get_next()->unlink());
+                   garbage.append_garbage(node->get_next()->unlink());
                    break;
 
               case NT_text:
@@ -659,7 +651,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    add_member(Z, UNI_DELTA, "text", position,
                               node->APL_value.get());
                    node = node->get_prev();
-                   garbage.append(node->get_next()->unlink());
+                   garbage.append_garbage(node->get_next()->unlink());
                    break;
 
               case NT_start_tag:
@@ -731,9 +723,9 @@ XML_node::add_member(Value * Z, Unicode first, const char * cp_member_name,
                      int number, Value * member_value)
 {
 UCS_string member_name(first);
-   if (number >= 0)   member_name.append_number(number);
+   if (number >= 0)   member_name << number;
 
-   member_name.append_UTF8(cp_member_name);
+   member_name << cp_member_name;
    Z->add_member(member_name, member_value);
 }
 //----------------------------------------------------------------------------
@@ -753,7 +745,7 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
          XML_node & sub = *(start.get_next());
          sub.position = position++;
 
-         garbage.append(sub.unlink());   // remove from start's level
+         garbage.append_garbage(sub.unlink());   // remove from start's level
 
          if (sub.get_node_type() == NT_end_tag)   break;
 
@@ -773,8 +765,8 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
               case NT_start_tag:
               case NT_leaf_tag:
                    {
-                      UCS_string member_name(UNI_UNDERSCORE);
-                      member_name.append(sub.get_tagname());
+                      UCS_string member_name;
+                      member_name << UNI_UNDERSCORE << sub.get_tagname();
                    start.APL_value->add_member(member_name,
                                                sub.APL_value.get());
                    }
@@ -1002,7 +994,7 @@ UCS_string ret;
            {
              if (a == 0 || a == (attval.ssize() - 1))
                 {
-                  ret.push_back(uni);
+                  ret << uni;
                   continue;
                 }
            }
@@ -1013,16 +1005,16 @@ UCS_string ret;
                    {
                      char cc[20];
                      SPRINTF(cc, "&#x%X;", uni);
-                     ret.append_UTF8(cc);
+                     ret << cc;
                    }
                    continue;
 
-              case UNI_LESS:         ret.append_UTF8("&lt;");     continue;
-              case UNI_GREATER:      ret.append_UTF8("&gt;");     continue;
-              case UNI_AMPERSAND:    ret.append_UTF8("&amp;");    continue;
-              case UNI_SINGLE_QUOTE: ret.append_UTF8("&apos;");   continue;
-              case UNI_DOUBLE_QUOTE: ret.append_UTF8("&quot;");   continue;
-              default: ret.push_back(uni);
+              case UNI_LESS:         ret << "&lt;";     continue;
+              case UNI_GREATER:      ret << "&gt;";     continue;
+              case UNI_AMPERSAND:    ret << "&amp;";    continue;
+              case UNI_SINGLE_QUOTE: ret << "&apos;";   continue;
+              case UNI_DOUBLE_QUOTE: ret << "&quot;";   continue;
+              default: ret << uni;
             }
       }
 
@@ -1075,8 +1067,8 @@ size_t end = start;
 
 UCS_string ret;
    Assert(position >= 0);
-   ret.append_number(position);
-   ret.append(UCS_string(src, start, end - start));
+   ret << position;
+   ret << UCS_string(src, start, end - start);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1154,7 +1146,7 @@ ShapeItem pos = 1;
 UCS_string ret;
 
    while (ucs[pos] >= UNI_0 && ucs[pos] <= UNI_9)   ++pos;   // skip digits
-   while (pos < ucs.ssize())   ret.push_back(ucs[pos++]);
+   while (pos < ucs.ssize())   ret << ucs[pos++];
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1411,12 +1403,12 @@ const APL_Integer position = b1.get_int_value();
       }
 
 UCS_string UCS_Z;
-   UCS_Z.push_back(b0.get_char_value());    // namespace (normally ∆, ⍙, or _)
-   UCS_Z.append_number(position);   // position
+   UCS_Z << b0.get_char_value();    // namespace (normally ∆, ⍙, or _)
+   UCS_Z << position;               // position
 
    if (b2.is_character_cell())   // single char name: OK
       {
-        UCS_Z.push_back(b2.get_char_value());
+        UCS_Z << b2.get_char_value();
       }
    else                     // multi char name (the normal case)
       {
@@ -1429,7 +1421,7 @@ UCS_string UCS_Z;
            }
 
          const ShapeItem len_B2 = B2->element_count();
-         loop(bb, len_B2)   UCS_Z.push_back(B2->get_cravel(bb).get_char_value());
+         loop(bb, len_B2)   UCS_Z << B2->get_cravel(bb).get_char_value();
       }
 
 Value_P Z(UCS_Z, LOC);
@@ -1500,7 +1492,7 @@ ShapeItem pos = 0;
    //
    if (category)   *category = val0;
    if (position)   *position = pos;
-   if (name)   { while (src < end)   (*name).push_back(src++->get_char_value()); }
+   if (name)   { while (src < end)   (*name) << src++->get_char_value(); }
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1545,20 +1537,19 @@ std::vector<const Cell *>member_values;
      // the continuation lines (if any) below the indentation above
      loop (p, prefix.size())
          {
-           loop(l, LEG_IND)              z.push_back(UNI_SPACE);
-           if (prefix[p] == UNI_SPACE)   z.push_back(UNI_SPACE);
-           else                          z.push_back(UNI_LINE_VERT);
-           loop(l, LEG_TOT - LEG_IND)    z.push_back(UNI_SPACE);
+           loop(l, LEG_IND)              z << UNI_SPACE;
+           if (prefix[p] == UNI_SPACE)   z << UNI_SPACE;
+           else                          z << UNI_LINE_VERT;
+           loop(l, LEG_TOT - LEG_IND)    z << UNI_SPACE;
          }
-     loop(l, LEG_IND)                    z.push_back(UNI_SPACE);
-     z.push_back(UNI_LINE_VERT);
-     z.push_back(UNI_LF);
+     loop(l, LEG_IND)                    z << UNI_SPACE;
+     z << UNI_LINE_VERT << UNI_LF;
    }
 
-   prefix.push_back(UNI_LINE_VERT_RIGHT);   // add ├
+   prefix << UNI_LINE_VERT_RIGHT;   // add ├
    loop(m, member_names.size())
       {
-        loop(l, LEG_IND)              z.push_back(UNI_SPACE);
+        loop(l, LEG_IND)              z << UNI_SPACE;
         Unicode last_char = prefix.back();
         const bool last_member = m == (member_names.ssize() - 1);
         if (last_member)
@@ -1569,28 +1560,23 @@ std::vector<const Cell *>member_values;
 
         loop(p, (prefix.size() - 1))
             {
-              if (prefix[p] == UNI_SPACE)   z.push_back(UNI_SPACE);
-              else                          z.push_back(UNI_LINE_VERT);
-              loop(l, LEG_TOT)   z.push_back(UNI_SPACE);
+              if (prefix[p] == UNI_SPACE)   z << UNI_SPACE;
+              else                          z << UNI_LINE_VERT;
+              loop(l, LEG_TOT)   z << UNI_SPACE;
             }
-        z.push_back(last_char);
-        loop(l, LEG_LEN)   z.push_back(UNI_LINE_HORI);
-        z.push_back(UNI_SPACE);
-        if (flags & tf_fullpath)
-           {
-             z.append(name_prefix);
-             z.push_back(UNI_FULLSTOP);
-           }
+        z << last_char;
+        loop(l, LEG_LEN)   z << UNI_LINE_HORI;
+        z << UNI_SPACE;
+        if (flags & tf_fullpath)   z << name_prefix << UNI_FULLSTOP;
 
-        z.append(member_names[m]);
-        z.push_back(UNI_LF);
+        z << member_names[m] << UNI_LF;
         if (!member_values[m]->is_pointer_cell())   continue;
 
         Value_P sub = member_values[m]->get_pointer_value();
         if (!sub->is_structured())   continue;
         UCS_string subname(name_prefix);
-        subname.push_back(UNI_FULLSTOP);
-        subname.append(member_names[m]);
+        subname << UNI_FULLSTOP;
+        subname << member_names[m];
         tree(*sub, z, prefix, subname, flags);
         if (last_member && prefix.size() > 1)
            {
@@ -1656,8 +1642,8 @@ std::vector<const Cell *>member_values;
    loop(m, member_names.size())
       {
         UCS_string path(name_prefix);
-        path.push_back(UNI_FULLSTOP);
-        path.append(member_names[m]);
+        path << UNI_FULLSTOP;
+        path << member_names[m];
 
         // see if the path is desired in the result. In most cases the
         // filter has suppressed them, so we only need to check the special

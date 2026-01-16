@@ -69,6 +69,10 @@ public:
    UCS_string(const UCS_string & ucs);
 
    /// constructor: copy of another UCS_string \b ucs, starting at \b pos
+   /// in \b ucs
+   UCS_string(const UCS_string & ucs, size_t pos);
+
+   /// constructor: copy of another UCS_string \b ucs, starting at \b pos
    /// in \b ucs and length \b len
    UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
@@ -158,7 +162,11 @@ public:
 
    /// return the start position of """ in \b this string or -1 if \b """
    /// is not contained in \b this string
-   ShapeItem multi_pos(bool expect_end) const;
+   ShapeItem multi_pos() const;
+
+   /// for a string (single quoted, double quoted, or DAQ (Double Arrow
+   /// Quotation Mark)) starting at \b pos, return its end.
+   ShapeItem string_end_pos(ShapeItem start_pos, bool throw_error) const;
 
    /// return true if \b this string contains any non-whitespace characters
    bool has_black() const;
@@ -248,6 +256,9 @@ public:
         remove_leading_whitespaces();
       }
 
+   /// increment pos white at(pos) is a whitespace
+   int skip_white(int pos) const;
+
    /// \b this is a command with optional args. Remove leading and trailing
    /// whitespaces, append args to rest, and remove args from this.
    void split_ws(UCS_string & rest);
@@ -262,30 +273,6 @@ public:
    /// remove the last character in \b this string
    void pop_back()
       { Assert(size() > 0); std::vector<Unicode>::pop_back(); }
-
-   /// append UCS_string suffix to \b this string
-   void append(const UCS_string & suffix)
-      {  loop(s, suffix.size())   push_back(suffix[s]); }
-
-   /// append 0-terminated ASCII string \b str to this string.
-   /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of
-   /// append_ASCII() if such interpretation is desired)
-   void append_ASCII(const char * ascii)
-      { while (const char cc = *ascii++)   push_back(Unicode(cc)); }
-
-   /// append 0-terminated UTF8 string str to \b this UCS_string.
-   // This is different from append_ASCII((const char * str):
-   ///
-   /// append_ascii() appends one Unicode per byte (i.e. strlen(str) in total),
-   /// without checking for UTF8 sequences.
-   ///
-   /// append_UTF8() appends one Unicode per UTF8 sequence (which is the same
-   /// if all characteras are ASCII, but less if not.
-   void append_UTF8(const UTF8 * str);
-
-   /// same as app(const UTF8 * str)
-   void append_UTF8(const char * str)
-      { append_UTF8(utf8P(str)); }
 
    /// more intuitive insert() function
    void insert(ShapeItem pos, Unicode uni)
@@ -327,15 +314,36 @@ public:
 
    /// return \b this string and \b other concatenated
    UCS_string operator +(const UCS_string & other) const
-      { UCS_string ret(*this);   ret.append(other);   return ret; }
+      { UCS_string ret(*this);
+        ret << other;
+        return ret;
+      }
+
+   /// append UTF8_string \b utf
+   UCS_string & operator <<(const UTF8_string & utf)
+      { const UCS_string ucs(utf);   return *this << ucs; }
 
    /// append C-string \b str
    UCS_string & operator <<(const char * str)
-      { append_UTF8(str);   return *this; }
+      { const UTF8_string utf(str);
+        return *this << utf;
+      }
+
+   /// append integer \b num
+   UCS_string & operator <<(int num)
+      { append_int(num);   return *this; }
+
+   /// append integer \b num
+   UCS_string & operator <<(unsigned long num)
+      { append_int(num);   return *this; }
+
+   /// append integer \b num
+   UCS_string & operator <<(unsigned int num)
+      { append_int(num);   return *this; }
 
    /// append number \b num
    UCS_string & operator <<(ShapeItem num)
-      { append_number(num);   return *this; }
+      { append_int(num);   return *this; }
 
    /// append \b shape
    UCS_string & operator <<(const Shape & shape);
@@ -344,9 +352,12 @@ public:
    UCS_string & operator <<(Unicode uni)
       { push_back(uni);   return *this; }
 
+   /// append a floating point number (in ASCII encoding like %f) to this string
+   UCS_string & operator << (double num);
+
    /// append UCS_string \b other
-   UCS_string & operator <<(const UCS_string & other)
-      {  append(other);   return *this; }
+   UCS_string & operator <<(const UCS_string & suffix)
+      { loop(s, suffix.size())   push_back(suffix[s]);   return *this; }
 
    /// compare \b this with UCS_string \b other
    Comp_result compare(const UCS_string & other) const
@@ -357,34 +368,15 @@ public:
       }
 
    /// append \b other in (single) quotes, doubling single quotes in \b other
-   void append_quoted(const UCS_string & other);
-
-   /// append number (in ASCII encoding like %d) to this string
-   void append_number(ShapeItem num);
-
-   /// append a floating point number (in ASCII encoding like %f) to this string
-   void append_double(double num);
-
-   /// append a complex number to this string
-   void append_complex(double real, double imag)
-      { append_double(real);   push_back(UNI_J);   append_double(imag); }
-
-   /// append number (in ASCII encoding like %X or %x) to this string
-   void append_hex(ShapeItem num, bool uppercase);
-
-   /// append shape (in APL encoding tke left arg of ↑) this string
-   void append_shape(const Shape & shape);
+   void append_single_quoted(const UCS_string & other);
 
    /// append members (like x.y.z) starting at members[m] and going backwards
    /// from the end of \b members to \b this string.
    void append_members(const vector<const UCS_string *> & members, int m);
 
-   /// append number (in ASCII encoding like %lf) to this string
-   void append_float(APL_Float num);
-
    /// overload vector::size() so that it returns a signed length
    ShapeItem ssize() const
-      { return  ShapeItem(vector<Unicode>::size()); }
+      { return  size(); }
 
    /// an iterator for UCS_strings
    class iterator
@@ -480,6 +472,13 @@ public:
    static UCS_string power(size_t n);
 
 protected:
+   // prevernt push_back() outside of this class. Use << instead.
+   void push_back(Unicode uni)
+      { std::vector<Unicode>::push_back(uni); }
+
+   /// append number (in ASCII encoding like %d) to this string
+   void append_int(ShapeItem num);
+
    /// the total number of UCS_strings
    static ShapeItem total_count;
 
@@ -516,7 +515,7 @@ public:
    /// constructor. The caller MUST have checked that all characters in
    /// cstring are ASCII. Only use it with C literals, not with const char *s.
    UCS_ASCII_string(const char * ascii)
-      { append_ASCII(ascii); }
+      { *this << ascii; }
 
    /// return \b tag in a readable form (e.g. TOK_LINE, TOK_SYMBOL, ...).
    UCS_ASCII_string(TokenTag tag);

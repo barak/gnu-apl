@@ -73,6 +73,7 @@ UserPreferences::UserPreferences()
      mem_arg(0),
      old_multi_line_strings(true),
      new_multi_line_strings(true),
+     multi_line_literals(true),
      nabla_to_history(1),   // if function was modified
      output_to_cout(false),
      randomize_testfiles(false),
@@ -1587,7 +1588,7 @@ int file_profile = 0;   // the current profile in the preferences file
                    else
                       {
                         line_history_path = UTF8_string(HOME);
-                        line_history_path.append_ASCII(arg + 1);
+                        line_history_path << (arg + 1);
                       }
                  }
               else line_history_path = UTF8_string(arg);
@@ -1633,18 +1634,22 @@ int file_profile = 0;   // the current profile in the preferences file
                    initial_PW_by_user = true;
                  }
             }
-         else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "Multi-Line-Strings"))
             {
               old_multi_line_strings = yes;
               new_multi_line_strings = yes;
             }
-         else if (!strcasecmp(opt, "NEW-MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "New-Multi-Line-Strings"))
             {
               new_multi_line_strings = yes;
             }
-         else if (!strcasecmp(opt, "OLD-MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "Old-Multi-Line-Strings"))
             {
               old_multi_line_strings = yes;
+            }
+         else if (!strcasecmp(opt, "Multi-Line-Literals"))
+            {
+              multi_line_literals = yes;
             }
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {

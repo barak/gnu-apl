@@ -26,6 +26,7 @@
 
 #include "Avec.hh"
 #include "Token.hh"
+#include "Token_string.hh"
 #include "UCS_string_vector.hh"
 
 class Error;
@@ -132,7 +133,8 @@ public:
    virtual Function_PC line_start(Function_Line line) const
       { return Function_PC_0; }
 
-   /// remove all TOK_VOID token from the body.
+   /// remove all TOK_VOID token from the body. \b UserFunction needs to
+   /// overload this function, e.g. to update its jump table.
    /// Return the number of tokens removed
    virtual VoidCount remove_TOK_VOID();
 
@@ -283,7 +285,7 @@ class StatementList : public Executable
 
 public:
    /// compute body token from text \b data
-   static StatementList * fix(const UCS_string & data, const char * loc);
+   static StatementList * fix(const UCS_string & data, Value_P suffix, const char * loc);
 
 protected:
    /// constructor

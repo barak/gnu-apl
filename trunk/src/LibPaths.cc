@@ -226,14 +226,11 @@ LibPaths::get_lib_dir(LibRef libref)
 UTF8_string ret(APL_lib_root);
    if (libref == LIB0)   // workspaces
       {
-        const UTF8_string subdir("/workspaces");
-        ret.append_UTF8(subdir);
+        ret << "/workspaces";
       }
    else                  // wslibN
       {
-        const UTF8_string subdir("/wslib");
-        ret.append_UTF8(subdir);
-        ret += libref + '0';
+        (ret << "/wslib") += (libref + '0');
       }
 
    return ret;
@@ -247,7 +244,7 @@ LibPaths::maybe_warn_ambiguous(int has_extension, const UTF8_string name,
    if (ext2 == 0)       return;   // no second extension
 
 UTF8_string filename_ext2 = name;
-   filename_ext2.append_ASCII(ext2);
+   filename_ext2 << ext2;
    if (access(filename_ext2.c_str(), F_OK))   return;   // not existing
 
    CERR << endl 
@@ -283,7 +280,7 @@ int has_extension = 0;   // assume name has neither extension ext1 nor ext2
         if (ext1)
            {
              UTF8_string filename_ext1 = lib_name.get_name();
-             filename_ext1.append_ASCII(ext1);
+             filename_ext1 << ext1;
              if (!access(filename_ext1.c_str(), F_OK))
                 {
                    // filename_ext1 exists, but filename_ext2 may exist as well.
@@ -298,7 +295,7 @@ int has_extension = 0;   // assume name has neither extension ext1 nor ext2
         if (ext2)
            {
              UTF8_string filename_ext2 = lib_name.get_name();
-             filename_ext2.append_ASCII(ext2);
+             filename_ext2 << ext2;
              if (!access(filename_ext2.c_str(), F_OK))   return filename_ext2;
            }
 
@@ -310,7 +307,7 @@ int has_extension = 0;   // assume name has neither extension ext1 nor ext2
 
 UTF8_string filename = get_lib_dir(lib_name.get_libref());
    filename += '/';
-   filename.append_UTF8(lib_name.get_name());
+   filename << lib_name.get_name();
 
    if (has_extension)   return filename;
 
@@ -324,7 +321,7 @@ UTF8_string filename = get_lib_dir(lib_name.get_libref());
         if (ext1)
            {
              UTF8_string filename_ext1 = filename;
-             filename_ext1.append_ASCII(ext1);
+             filename_ext1 << ext1;
              if (!access(filename_ext1.c_str(), F_OK))
                 {
                   maybe_warn_ambiguous(has_extension,
@@ -336,7 +333,7 @@ UTF8_string filename = get_lib_dir(lib_name.get_libref());
         if (ext2)
            {
              UTF8_string filename_ext2 = filename;
-             filename_ext2.append_ASCII(ext2);
+             filename_ext2 << ext2;
              if (!access(filename_ext2.c_str(), F_OK))   return filename_ext2;
            }
 
@@ -350,8 +347,8 @@ UTF8_string filename = get_lib_dir(lib_name.get_libref());
         //
         if (has_extension)   return filename;
 
-        if      (ext1) filename.append_ASCII(ext1);
-        else if (ext2) filename.append_ASCII(ext2);
+        if      (ext1) filename << ext1;
+        else if (ext2) filename << ext2;
         return filename;
       }
 }

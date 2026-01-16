@@ -309,7 +309,7 @@ Quad_SQL::db_id_to_connection(int db_id)
 }
 //----------------------------------------------------------------------------
 Connection *
-Quad_SQL::Quad_SQL::value_to_db_id(const Value & B)
+Quad_SQL::value_to_db_id(const Value & B)
 {
    if (!B.is_scalar())
       {

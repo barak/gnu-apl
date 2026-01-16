@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
 #include "Tokenizer.hh"
+#include "Token_string.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
@@ -116,9 +117,11 @@ Unicode_source src(input);
                    rest_2 = src.rest_len();
                    {
                      Log(LOG_error_throw)
-                     CERR << endl << "throwing "
-                          << Error::error_name(E_NO_TOKEN)
-                          << " in  Tokenizer" << endl;
+                        {
+                          CERR << endl << "throwing "
+                               << Error::error_name(E_NO_TOKEN)
+                               << " in  Tokenizer" << endl;
+                        }
 
                      char cc[20];
                      SPRINTF(cc, "U+%4.4X (", uni);
@@ -133,6 +136,23 @@ Unicode_source src(input);
               case TC_LINE:
               case TC_VALUE:
               case TC_INDEX:
+                   if (uni == UNI_AT_SIGN)   // marker
+                      {
+                        ++src;
+                        int64_t idx = 0;
+                        while (Avec::is_digit(*src))
+                              {
+                                idx = 10 * idx + src.get() - '0';
+                              }
+                        if (src.get() != UNI_AT_SIGN)
+                           {
+                             MORE_ERROR() << "No second '@' in marker.";
+                             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+                           }
+                        tos.push_back(Token(TOK_MARKER, idx));
+                      }
+                   break;
+
                    CERR << "Offending token: " << tok.get_tag()
                         << " (" << tok << ")" << endl;
                    if (tok.get_tag() == TOK_CHARACTER)
@@ -504,11 +524,11 @@ Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos) const
 UCS_string ucs(UNI_Quad_Quad);
    Assert(ucs[0]);
 
-   if (src.rest_len() > 0)   ucs.append(src[0]);
-   if (src.rest_len() > 1)   ucs.append(src[1]);
-   if (src.rest_len() > 2)   ucs.append(src[2]);
-   if (src.rest_len() > 3)   ucs.append(src[3]);
-   if (src.rest_len() > 4)   ucs.append(src[4]);
+   if (src.rest_len() > 0)   ucs << src[0];
+   if (src.rest_len() > 1)   ucs << src[1];
+   if (src.rest_len() > 2)   ucs << src[2];
+   if (src.rest_len() > 3)   ucs << src[3];
+   if (src.rest_len() > 4)   ucs << src[4];
 
 int len = 0;
 const Token t = Workspace::get_quad(ucs, len);
@@ -547,7 +567,7 @@ bool got_end = false;
                    break;
                  }
 
-              string_value.append(UNI_SINGLE_QUOTE);
+              string_value << UNI_SINGLE_QUOTE;
               ++src;      // skip the second '
             }
          else if (uni == UNI_CR)
@@ -561,7 +581,7 @@ bool got_end = false;
             }
          else
             {
-              string_value.append(uni);
+              string_value << uni;
             }
        }
 
@@ -603,11 +623,10 @@ Unicode last = Invalid_Unicode;   // no last
       }
    else if (first == UNI_RIGHT_DAQ)
       {
-        if (src.rest_len() >= 2        &&
+        if (src.rest_len() >= 2     &&
             src[0] == UNI_RIGHT_DAQ &&
             src[1] == UNI_RIGHT_DAQ)   // special case: «««
            {
-BACKTRACE
              ++src;   ++src;   // discard second and third »
              return;
            }
@@ -647,24 +666,23 @@ bool got_end = false;
               const Unicode uni1 = src.get();
               switch(uni1)
                  {
-                   case '0':  string_value.append(UNI_NUL);         break;
-                   case 'a':  string_value.append(UNI_BEL);         break;
-                   case 'b':  string_value.append(UNI_BS);          break;
-                   case 't':  string_value.append(UNI_HT);          break;
-                   case 'n':  string_value.append(UNI_LF);          break;
-                   case 'v':  string_value.append(UNI_VT);          break;
-                   case 'f':  string_value.append(UNI_FF);          break;
-                   case 'r':  string_value.append(UNI_CR);          break;
-                   case '[':  string_value.append(UNI_ESC);         break;
-                   case '"':  string_value.append(UNI_DOUBLE_QUOTE);break;
-                   case '\\': string_value.append(UNI_BACKSLASH);   break;
-                   default:   string_value.append(uni);
-                              string_value.append(uni1);
+                   case '0':  string_value << UNI_NUL;            break;
+                   case 'a':  string_value << UNI_BEL;            break;
+                   case 'b':  string_value << UNI_BS;             break;
+                   case 't':  string_value << UNI_HT;             break;
+                   case 'n':  string_value << UNI_LF;             break;
+                   case 'v':  string_value << UNI_VT;             break;
+                   case 'f':  string_value << UNI_FF;             break;
+                   case 'r':  string_value << UNI_CR;             break;
+                   case '[':  string_value << UNI_ESC;            break;
+                   case '"':  string_value << UNI_DOUBLE_QUOTE;   break;
+                   case '\\': string_value << UNI_BACKSLASH;      break;
+                   default:   string_value << uni << uni1;
                  }
             }
          else
             {
-              string_value.append(uni);
+              string_value << uni;
             }
        }
 
@@ -1089,16 +1107,16 @@ Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos) const
 UCS_string symbol;
    if (macro)
       {
-        symbol.append(UNI_MUE);
-        symbol.append(UNI_MINUS);
+        symbol << UNI_MUE;
+        symbol << UNI_MINUS;
       }
-   symbol.append(src.get());
+   symbol << src.get();
 
    while (src.has_more())
        {
          const Unicode uni = *src;
          if (!Avec::is_symbol_char(uni))   break;
-         symbol.append(uni);
+         symbol << uni;
          ++src;
        }
 
@@ -1108,7 +1126,7 @@ UCS_string symbol;
         // S∆ or T∆
 
         while (src.has_more() && *src <= UNI_SPACE)   src.get();   // spaces
-        UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
+        UCS_string symbol1(symbol, 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         cFunction_P ST = 0;
         if (symbol[0] == UNI_S) ST = &Quad_STOP::fun;

@@ -201,40 +201,40 @@ Value_P val = get_pointer_value();
 
         if (val->is_char_vector())
            {
-             ucs.append(UNI_SINGLE_QUOTE);
+             ucs << UNI_SINGLE_QUOTE;
              loop(e, ec)
                 {
                   const Unicode uni = val->get_cravel(e).get_char_value();
-                  ucs.append(uni);
-                  if (uni == UNI_SINGLE_QUOTE)   ucs.append(uni);   // ' -> ''
+                  ucs << uni;
+                  if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' -> ''
                 }
-             ucs.append(UNI_SINGLE_QUOTE);
+             ucs << UNI_SINGLE_QUOTE;
            }
         else if (ec == 0)   // empty
            {
              if (val->get_rank() > 1)   TODO;
              if (val->get_cfirst().is_character_cell())
                 {
-                  ucs.append_ASCII("''");
+                  ucs << UNI_SINGLE_QUOTE << UNI_SINGLE_QUOTE;
                 }
              else if (val->get_cfirst().is_integer_cell())
                 {
-                  ucs.append(UNI_ZILDE);
+                  ucs << UNI_ZILDE;
                 }
              else TODO;
            }
         else
            {
-             ucs.append(UNI_L_PARENT);
+             ucs << UNI_L_PARENT;
              loop(e, ec)
                 {
                   PrintBuffer pb = val->get_cravel(e).
                         character_representation(pctx);
-                  ucs.append(UCS_string(pb, 0, Workspace::get_PW()));
+                  ucs << UCS_string(pb, 0, Workspace::get_PW());
 
-                  if (e < ec - 1)   ucs.append(UNI_SPACE);
+                  if (e < ec - 1)   ucs << UNI_SPACE;
                 }
-             ucs.append(UNI_R_PARENT);
+             ucs << UNI_R_PARENT;
            }
 
         ColInfo ci;

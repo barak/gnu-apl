@@ -1741,7 +1741,7 @@ UCS_string saving_SVN;   // from the XML file
 UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
    {
      const UTF8 * saving = find_optional_attr("saving_SVN");
-     while (saving && *saving != '"')   saving_SVN.append(Unicode(*saving++));
+     while (saving && *saving != '"')   saving_SVN << Unicode(*saving++);
    }
 
    if (saving_SVN.size() == 0)   // saved with very old version
@@ -2026,7 +2026,7 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
 
           if (char_mode && uni != '\n' && uni != UNI_PAD_U0)
              {
-               ucs.append(uni);
+               ucs << uni;
                continue;
              }
 
@@ -2041,7 +2041,7 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
               char_mode = false;
               char * end = 0;
               const int hex = strtoll(charP(utf), &end, 16);
-              ucs.append(Unicode(hex));
+              ucs << Unicode(hex);
               utf = utf8P(end);
               continue;
             }
@@ -2299,8 +2299,7 @@ UCS_string text;
         int error = 0;
         UTF8_string filename_utf(filename);
         UCS_string creator_UCS(filename_utf);
-        creator_UCS.append(UNI_COLON);
-        creator_UCS.append_number(line_no);
+        creator_UCS << UNI_COLON << line_no;
         UTF8_string creator(creator_UCS);
 
         UserFunction * ufun = 0;
@@ -2699,7 +2698,7 @@ UCS_string text;
    next_tag(LOC);
    expect_tag("/Statements", LOC);
 
-StatementList * exec = StatementList::fix(text, LOC);
+StatementList * exec = StatementList::fix(text, Value_P(), LOC);
    Assert(exec);
    return exec;
 }

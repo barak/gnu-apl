@@ -152,14 +152,14 @@ StateIndicator::function_name() const
         case PM_STATEMENT_LIST:
              {
                UCS_string ret;
-               ret.append(UNI_DIAMOND);
+               ret << UNI_DIAMOND;
                return ret;
              }
 
         case PM_EXECUTE:
              {
                UCS_string ret;
-               ret.append(UNI_EXECUTE);
+               ret << UNI_EXECUTE;
                return ret;
              }
       }

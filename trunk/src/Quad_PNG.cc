@@ -184,7 +184,7 @@ FILE * in = fopen(filename1.c_str(), "rb");
       {
          errno1 = errno;              // remember why filename1 has failed
          UTF8_string filename2(filename1);
-         filename2.append_ASCII(".png");
+         filename2 << ".png";
          in = fopen(filename2.c_str(), "r");
       }
 

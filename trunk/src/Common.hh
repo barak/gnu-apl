@@ -487,6 +487,8 @@ inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
+//---------------------------------------------------------------------------
+inline const char * yes_no(bool yes)   { return yes ? "yes" : "no"; }
 //============================================================================
 inline Function_PC
 operator +(Function_PC pc, int offset)

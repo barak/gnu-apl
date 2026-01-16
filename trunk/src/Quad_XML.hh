@@ -104,7 +104,7 @@ public:
       }
 
    /// append \b garbage to this garbage can (for later deletion)
-   void append(XML_node * garbage)
+   void append_garbage(XML_node * garbage)
       {
         // check that garbage was properly unlinked.
         Assert(garbage->next == garbage);

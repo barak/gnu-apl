@@ -134,7 +134,7 @@ const Function * function = 0;
                  }
             }
       }
-   else   // maybe user defined function
+   else   // maybe defined function
       {
         const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
         if (obj && obj->is_user_defined())
@@ -403,8 +403,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                if (ufun.is_lambda())
                   {
                     UCS_string res = symbol->get_name();
-                    res.append(UNI_LEFT_ARROW);
-                    res.append(UNI_L_CURLY);
+                    res << UNI_LEFT_ARROW << UNI_L_CURLY;
                     int t = 0;
                     while (t < text.ssize())   // skip λ header
                        {
@@ -417,10 +416,9 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                         {
                           const Unicode uni = text[t++];
                           if (uni == UNI_LF)   break;
-                           res.append(uni);
+                           res << uni;
                         }
-                    res.append(UNI_R_CURLY);
-
+                    res << (UNI_R_CURLY);
                     result.push_back(res);
                   }
                else
@@ -435,16 +433,15 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                                res.clear();
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
-                                   u < (text.ssize() - 1))
-                                  res.append(UNI_SPACE);
+                                   u < (text.ssize() - 1))   res << UNI_SPACE;
                              }
                          else
                              {
-                               res.append(text[u]);
+                               res << text[u];
                              }
                        }
-                    res.append(ufun.get_exec_properties()[0]
-                               ? UNI_DEL_TILDE : UNI_NABLA);
+                    res << (ufun.get_exec_properties()[0]
+                         ? UNI_DEL_TILDE : UNI_NABLA);
                     result.push_back(res);
                   }
                return;
@@ -735,8 +732,7 @@ UCS_string text;
       }
    if (cell.is_complex_cell())
       {
-        text.append_complex(cell.get_real_value(), cell.get_imag_value());
-        return text;
+        return text << cell.get_real_value() << UNI_J << cell.get_imag_value();
       }
    FIXME;
 }
@@ -749,8 +745,8 @@ Quad_CR::do_CR10_shape(const Shape & shape)
 UCS_string result;
    loop(r, shape.get_rank())
        {
-         if (r)   result.push_back(UNI_SPACE);
-         result.append_number(shape.get_shape_item(r));
+         if (r)   result << UNI_SPACE;
+         result << shape.get_shape_item(r);
        }
    return result;
 }
@@ -775,15 +771,14 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result,
 
          const UCS_string member_ucs(*member_name);
          UCS_string member_path = var_name;
-         member_path.push_back(UNI_FULLSTOP);
-         member_path.append(member_ucs);
+         member_path << UNI_FULLSTOP << member_ucs;
 
          const Cell & data_cell = value->get_cravel(2*r + 1);
          if (data_cell.is_simple_cell())
             {
-              member_path.push_back(UNI_LEFT_ARROW);
+              member_path << UNI_LEFT_ARROW;
               const UCS_string data_value = do_CR10_simple_cell(data_cell);
-              member_path.append(data_value);
+              member_path << data_value;
               result.push_back(member_path);
             }
          else
@@ -1330,8 +1325,8 @@ int ascii_len = 0;
 void
 Quad_CR::close_mode(UCS_string & rhs, V_mode mode)
 {
-   if      (mode == Vm_QUOT)   rhs.append_UTF8("'");
-   else if (mode == Vm_UCS)    rhs.append_UTF8(")");
+   if      (mode == Vm_QUOT)   rhs << UNI_SINGLE_QUOTE;
+   else if (mode == Vm_UCS)    rhs << UNI_R_PARENT;
 }
 //----------------------------------------------------------------------------
 void
@@ -1339,16 +1334,16 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
 {
    if (from_mode == to_mode)   // separator in same mode (if any)
       {
-        if      (to_mode == Vm_UCS)    line.append_UTF8(" ");
-        else if (to_mode == Vm_NUM)    line.append_UTF8(" ");
+        if      (to_mode == Vm_UCS)    line << UNI_SPACE;
+        else if (to_mode == Vm_NUM)    line << UNI_SPACE;
       }
    else                // close old mode and open new one
       {
         close_mode(line, from_mode);
-        if (from_mode != Vm_NONE)   line.append_UTF8(",");
+        if (from_mode != Vm_NONE)   line << UNI_COMMA;
 
-        if      (to_mode == Vm_UCS)    line.append_UTF8("(,⎕UCS ");
-        else if (to_mode == Vm_QUOT)   line.append_UTF8("'");
+        if      (to_mode == Vm_UCS)    line << "(,⎕UCS ";
+        else if (to_mode == Vm_QUOT)   line << UNI_SINGLE_QUOTE;
       }
 }
 //----------------------------------------------------------------------------
@@ -1457,7 +1452,7 @@ UCS_string line;
             }
          else
             {
-              line.append(uni);
+              line << uni;
             }
        }
 
@@ -1491,8 +1486,7 @@ UCS_string UZ;
        {
          const Value & Bb = *B->get_cravel(b).get_pointer_value().get();
          UCS_string Ub(Bb);
-         UZ.append(Ub);
-         UZ.append(UNI_LF);
+         UZ << Ub << UNI_LF;
        }
 
 Value_P Z(UZ, LOC);
@@ -1820,12 +1814,8 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
         const UCS_ASCII_string tag_name(tag);
         const UCS_ASCII_string class_name(cls);
         const UCS_ASCII_string type_name(typ);
-        result.append(tag_name);
-        result.append_ASCII("(");
-        result.append(class_name);
-        result.append_ASCII(", ");
-        result.append(type_name);
-        result.append_ASCII(")");
+        result << tag_name << UNI_L_PARENT << class_name << UNI_COMMA
+               << UNI_SPACE << type_name << UNI_R_PARENT;
       }
    else if (cB.is_pointer_cell())    // token ←→ (tag, value)
       {
@@ -1841,59 +1831,55 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
         const TokenValueType typ = TokenValueType(tag & TV_MASK);
 
         const UCS_ASCII_string tag_name(tag);
-        result.append(tag_name);
-        result.append_ASCII("( ");
+        result << (tag_name) << UNI_L_PARENT << UNI_SPACE;
 
         switch(typ)
             {
                case TV_NONE:  switch(cls)
                                  {
-                                   case TC_ASSIGN: result.append_ASCII("←");
+                                   case TC_ASSIGN: result << UNI_LEFT_ARROW;
                                                    break;
-                                   default:        result.append_ASCII("-");
+                                   default:        result << UNI_MINUS;
                                  }
                               break;
 
-               case TV_CHAR:  result.push_back(cVal.get_char_value());
+               case TV_CHAR:  result << cVal.get_char_value();
                               break;
 
-               case TV_INT:   result.append_number(cVal.get_int_value());
+               case TV_INT:   result << cVal.get_int_value();
                               break;
 
-               case TV_FLT:   result.append_double(cVal.get_real_value());
+               case TV_FLT:   result << cVal.get_real_value();
                               break;
 
-               case TV_CPX:   result.append_double(cVal.get_real_value());
-                              result.push_back(UNI_J);
-                              result.append_double(cVal.get_imag_value());
+               case TV_CPX:   result << cVal.get_real_value() << UNI_J
+                                     << cVal.get_imag_value();
                               break;
 
                case TV_FUN:   
                case TV_SYM:   if (!cVal.is_pointer_cell())   DOMAIN_ERROR;
                               {
                                 Value_P symbol = cVal.get_pointer_value();
-                                const UCS_string sym_name(*symbol);
-                                result.append(sym_name);
+                                result << UCS_string(*symbol);
                               }
                               break;
 
-               case TV_LIN:   result.append_ASCII("[");
-                              result.append_number(cVal.get_int_value());
-                              result.append_ASCII("]");
+               case TV_LIN:   result << UNI_L_BRACK << cVal.get_int_value()
+                                     << UNI_R_BRACK;
                               break;
 
                case TV_VAL:   // optional shape
                               value_CR44(result, *cVal.get_pointer_value());
                               break;
 
-               case TV_INDEX: result.append_ASCII("[index]");
+               case TV_INDEX: result << "[index]";
                               break;
 
 
                default:       DOMAIN_ERROR;
             }
 
-        result.append_ASCII(" )");
+        result << UNI_SPACE << UNI_R_PARENT;
       }
    else
       {
@@ -1914,9 +1900,7 @@ const ShapeItem ec = value.element_count();
       {
         loop(r, rank)
            {
-             result.append_number(value.get_shape_item(r));
-             result.push_back(UNI_SPACE);
-             
+             result << value.get_shape_item(r) << UNI_SPACE;
            }
          result.back() = UNI_RHO;
       }
@@ -1925,45 +1909,43 @@ const ShapeItem ec = value.element_count();
        {
          if (result.size() > 60)   // long
             {
-              result.append_ASCII(" ...");
+              result << " ...";
               break;
             }
 
           const  Cell & cell = value.get_cravel(e);
           if (cell.is_character_cell())   // string or char
              {
-               result.push_back(UNI_SINGLE_QUOTE);
-               result.push_back(cell.get_char_value());
-               result.push_back(UNI_SINGLE_QUOTE);
+               result << UNI_SINGLE_QUOTE << cell.get_char_value()
+                      << UNI_SINGLE_QUOTE;
              }
           else if (cell.is_integer_cell())
              {
-               result.append_number(cell.get_int_value());
+               result << cell.get_int_value();
              }
           else if (cell.is_float_cell())
              {
-               result.append_double(cell.get_real_value());
+               result << cell.get_real_value();
              }
           else if (cell.is_complex_cell())
              {
-               result.append_double(cell.get_real_value());
-               result.push_back(UNI_J);
-               result.append_double(cell.get_imag_value());
+               result << cell.get_real_value() << UNI_J
+                      << cell.get_imag_value();
              }
           else if (cell.is_pointer_cell())
              {
-               result.append_ASCII("(...)");
+               result << "(...)";
              }
           else if (cell.is_lval_cell())
              {
-               result.append_ASCII("(...)←");
+               result << "(...)←";
              }
           else
              {
                FIXME;
              }
 
-         result.push_back(UNI_SPACE);
+         result << UNI_SPACE;
        }
 
    result.pop_back();   // trailing blanf

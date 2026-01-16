@@ -39,15 +39,16 @@ def input_filter(str):
 
 #----------------------------------------------------------------------------
 def output_filter_1(str):
+    print(f"Input: '{str}'")
     ret = ""
     while len(str):
         if str[0:2] == "**":
             str = str[2:]   # skip **
             if str[0] == "-":   ret += "⁻" ; str = str[1:]
-            while "123456789".find(str[0]) != -1:
+            while len(str) and "123456789".find(str[0]) != -1:
                 (cc, str) = (str[0], str[1:])
                 ret += imap_upper(cc)
-                continue
+            continue
 
         ret += str[0]
         str = str[1:]

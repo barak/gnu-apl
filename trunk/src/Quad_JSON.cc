@@ -152,7 +152,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
       {
         char cc[40];
         SPRINTF(cc, "%lld", long_long(cell.get_int_value()));
-        result.append_UTF8(cc);
+        result << cc;
         return;
       }
 
@@ -160,7 +160,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
       {
         char cc[40];
         SPRINTF(cc, "%lg", cell.get_real_value());
-        result.append_UTF8(cc);
+        result << cc;
         return;
       }
 
@@ -168,7 +168,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
       {
         char cc[50];
         SPRINTF(cc, "%lgJ%lg", cell.get_real_value(), cell.get_imag_value());
-        result.append_UTF8(cc);
+        result << cc;
         return;
       }
 
@@ -199,7 +199,7 @@ const UCS_string lit_ucs(*Z);
        lit_ucs.compare(UCS_ASCII_string("true"))  == COMP_EQ ||
        lit_ucs.compare(UCS_ASCII_string("false")) == COMP_EQ)
       {
-        result.append(lit_ucs);
+        result << lit_ucs;
         return;
       }
 
@@ -221,31 +221,31 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
    if (B.is_char_vector())
       {
         const UCS_string ucs_string(B);
-        result.push_back(UNI_DOUBLE_QUOTE);
+        result << UNI_DOUBLE_QUOTE;
         loop(u, ucs_string.size())
             {
               switch(const Unicode uni = ucs_string[u])
                  {
-                   case UNI_BS:           result.append_UTF8("\\b");   break;
-                   case UNI_HT:           result.append_UTF8("\\t");   break;
-                   case UNI_LF:           result.append_UTF8("\\n");   break;
-                   case UNI_FF:           result.append_UTF8("\\f");   break;
-                   case UNI_CR:           result.append_UTF8("\\r");   break;
-                   case UNI_DOUBLE_QUOTE: result.append_UTF8("\\\"");   break;
+                   case UNI_BS:           result << "\\b";   break;
+                   case UNI_HT:           result << "\\t";   break;
+                   case UNI_LF:           result << "\\n";   break;
+                   case UNI_FF:           result << "\\f";   break;
+                   case UNI_CR:           result << "\\r";   break;
+                   case UNI_DOUBLE_QUOTE: result << "\\\"";   break;
 
                    default: if (uni < UNI_SPACE)
                                {
                                  char cc[10];
                                  SPRINTF(cc, "\\u%4.4X", int(uni));
-                                 result.append_UTF8(cc);
+                                 result << cc;
                                }
                             else
                                {
-                                 result.push_back(uni);
+                                 result << uni;
                                }
                  }
             }
-        result.push_back(UNI_DOUBLE_QUOTE);
+        result << UNI_DOUBLE_QUOTE;
         return;
       }
 
@@ -255,11 +255,11 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
         const ShapeItem ec = B.element_count();
         loop(e, ec)
             {
-              if (e)   array.append_ASCII(", ");
+              if (e)   array << ", ";
               if (array.size() > 60)
                  {
                    array.back() = UNI_LF;
-                   result.append(array);
+                   result << array;
                    array = UCS_string(2*level + 2, UNI_SPACE);
                  }
 
@@ -270,8 +270,8 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    return;
                  }
             }
-        array.append_UTF8(" ]");
-        result.append(array);
+        array << UNI_SPACE << UNI_R_BRACK;
+        result << array;
         return;
       }
 
@@ -285,26 +285,24 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
              const Cell & member_name = B.get_cravel(2*member_indices[m]);
              const Cell & member_data = B.get_cravel(2*member_indices[m] + 1);
 
-             result.append(UCS_string(2*level, UNI_SPACE));   // level indent
-             if (m)   result.append_UTF8("  \"");
-             else     result.append_UTF8("{ \"");
+             result << UCS_string(2*level, UNI_SPACE);   // level indent
+             if (m)   result << "  \"";
+             else     result << "{ \"";
              UCS_string member(*member_name.get_pointer_value());
-             result.append(member_name);
-             result.append_UTF8("\": ");
+             result << member_name << "\": ";
              APL_to_JSON_string(result, member_data, level + 1, sorted);
              if (result.size() == 0)   return;   // error converting member_data
              if (size_t(m) < (member_indices.size() - 1))
                 {
-                  result.push_back(UNI_COMMA);
-                  result.push_back(UNI_LF);
+                  result << UNI_COMMA << UNI_LF;
                 }
              else
                 {
-                  result.push_back(UNI_SPACE);
+                  result << UNI_SPACE;
                 }
            }
 
-        result.append_UTF8("}");
+        result << UNI_R_CURLY;
         return;
       }
 
@@ -411,8 +409,8 @@ const ShapeItem len_B = B.element_count();
 
 UCS_string ucs_B;
    ucs_B.reserve(len_B + 1);
-   loop(b, len_B)   ucs_B.push_back(B.get_cravel(b).get_char_value());
-   ucs_B.push_back(Unicode_0);   // 0-terminate ucs_B to avoid too many length checks
+   loop(b, len_B)   ucs_B << B.get_cravel(b).get_char_value();
+   ucs_B << Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
 
    // tokenize ucs_B
    //
@@ -926,11 +924,11 @@ bool expect_colon = true;
          switch(uni)
                {
                  case UNI_L_BRACK:            // [
-                      stack.push_back(UNI_R_BRACK);   // push ]
+                      stack << UNI_R_BRACK;   // push ]
                       continue;
 
                  case UNI_L_CURLY:            //      {
-                      stack.push_back(UNI_R_CURLY);   // push }
+                      stack << UNI_R_CURLY;   // push }
                       continue;
 
                  case UNI_COMMA:

@@ -215,7 +215,7 @@ const int function = B->get_cfirst().get_int_value();
                         }
                      else
                         {
-                          arg.append(HWF[j]);
+                          arg << HWF[j];
                         }
                    }
                args.push_back(arg);
@@ -348,8 +348,8 @@ UCS_string ucs_A;
                     DOMAIN_ERROR;
                  }
               Value_P command = cell.get_pointer_value();
-              ucs_A.append(UCS_string(*command));
-              ucs_A.append(UNI_LF);
+              ucs_A << UCS_string(*command);
+              ucs_A << UNI_LF;
             }
       }
    else

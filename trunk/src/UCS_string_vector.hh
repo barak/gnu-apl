@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include "PrintOperator.hh"
 #include "UCS_string.hh"
 
 #ifndef __UCS_STRING_VECTOR_HH_DEFINED__
@@ -73,6 +74,14 @@ public:
    /// return the length of the longest UCS_string in \b this vector,
    /// starting at \b col
    ShapeItem max_width(size_t col, size_t column_count) const;
+
+   /// dump this string vector (debug function)
+   ostream & dump(ostream & out, const char * loc) const
+      {
+        out << "────────  " << loc << "  ──────── " << endl;
+        loop(c, size())   out << "[" << c << "]  '" << at(c) << "'" << endl;
+        return out << "═══════════════════════════════" << endl;
+      }
 
 private:
    /// prevent the inadvertent use of iterator nonsense

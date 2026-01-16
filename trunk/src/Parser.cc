@@ -39,11 +39,125 @@
 #include "Symbol.hh"
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
-#include "Value.hh"
+#include "Token.hh"
+#include "Token_string.hh"
 #include "Tokenizer.hh"
+#include "Tokenizer.hh"
+#include "Value.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//============================================================================
+Multi_line_SM::~Multi_line_SM()
+{
+   if (in_string)       CERR << "*** Multiline string not closed." << endl;
+   if (literal_depth)   CERR << "*** Multiline literal not closed (depth"
+                             << literal_depth << ")." << endl;
+}
+//---------------------------------------------------------------------------
+void
+Multi_line_SM::next(Unicode triple)
+{
+   Log(LOG_Multi_line)
+      {
+        CERR << "See " << triple << triple << triple
+             << ". State (before): string: " << yes_no(in_string)
+             << ", literal: " << literal_depth << endl;
+      }
+                            
+   // multiline strings are flat; the only valid triple is the end of string
+   // triple.
+   //
+   if (in_string)
+      {
+        if (triple == string_end)
+           {
+             in_string = false;
+             string_end = Unicode_0;
+             return;   // OK
+           }
+
+        // unexpected triple in string. Issue a warning (but do not return
+        // an error
+        //
+        CERR << endl << "*** WARNING: unexpected triplet "
+             << triple << triple << triple << " in mult-iline string." << endl
+             << "    Expected triplet: " << string_end << string_end
+             << string_end << " (literal depth: " << literal_depth
+             << ")." << endl
+             << "    The triplet was added to the multi-line string."
+             << endl << endl;
+        return;   // OK
+      }
+
+   // multiline literals are recursive, therefore they may copntain multiline
+   // strings or literals.
+   //
+   if (literal_depth)
+      {
+        if (triple == UNI_GREATER)   // end of literal
+           {
+             --literal_depth;
+             return;   // OK.
+           }
+
+        if (triple == UNI_LESS)   // start of a new literal
+           {
+            
+             ++literal_depth;
+             return;   // OK.
+           }
+
+        if (triple == UNI_DOUBLE_QUOTE)   // start of a """ ... """ string
+           {
+              in_string = true;
+              string_end = UNI_DOUBLE_QUOTE;
+             return;   // OK.
+           }
+
+        if (triple == UNI_LEFT_DAQ)   // start of a ««« ... »»» string
+           {
+              in_string = true;
+              string_end = UNI_RIGHT_DAQ;
+             return;   // OK.
+           }
+      }
+
+   // at this point no string and no literal is ongoing. The only valid
+   // triples are start of string and sstart of literal.
+   //
+   if (triple == UNI_GREATER)
+      {
+        CERR << endl << "*** ERROR: unexpected triplet >>> outside "
+                        "multiline literal." << endl << endl;
+        return;   // OK.
+      }
+
+   if (triple == UNI_LESS)   // start of a new literal
+      {
+       
+        ++literal_depth;
+        return;   // OK.
+      }
+
+   if (triple == UNI_DOUBLE_QUOTE)   // start of a """ ... """ string
+      {
+         in_string = true;
+         string_end = UNI_DOUBLE_QUOTE;
+        return;   // OK.
+      }
+
+   if (triple == UNI_LEFT_DAQ)   // start of a ««« ... »»» string
+      {
+         in_string = true;
+         string_end = UNI_RIGHT_DAQ;
+        return;   // OK.
+      }
+
+   CERR << endl << "*** ERROR: unexpected " << triple << triple << triple
+                << " outside multiline string or literal." << endl;
+   return;   // error
+}
+//============================================================================
 ErrorCode
 Parser::parse(const UCS_string & input, Token_string & tos,
               bool optimize) const
@@ -134,7 +248,7 @@ std::vector<Token_string *> statements;
         loop(t, stat->size())
            {
              tos.push_back(Token());
-             tos[tos.ssize() - 1].move((*stat)[t], LOC);
+             tos[tos.ssize() - 1].move_from((*stat)[t], LOC);
            }
         delete stat;
       }
@@ -165,13 +279,13 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    //
    if (remove_nongrouping_parantheses(tos))
       {
-        remove_TOK_VOID(tos);
+        tos.remove_TOK_VOID();
         parse_log(4, tos);
       }
 
    if (map_function_groups(tos))
       {
-        remove_TOK_VOID(tos);
+        tos.remove_TOK_VOID();
         parse_log(5, tos);
       }
 
@@ -184,7 +298,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         progress = collect_value_groups(tos);
         if (progress)
            {
-             remove_TOK_VOID(tos);
+             tos.remove_TOK_VOID();
              parse_log(6, tos);
            }
       }
@@ -193,7 +307,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    //
    if (collect_constants(tos))
       {
-        remove_TOK_VOID(tos);
+        tos.remove_TOK_VOID();
         parse_log(7, tos);
       }
 
@@ -210,10 +324,10 @@ Parser::parse_statement(Token_string & tos, bool optimize)
    if (optimize)
       {
         if (DO_FT_LITERAL_AXIS && optimize_literal_axes(tos))
-           remove_TOK_VOID(tos);
+           tos.remove_TOK_VOID();
 
         while (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
-           remove_TOK_VOID(tos);
+           tos.remove_TOK_VOID();
       }
    parse_log(8, tos);
 
@@ -249,27 +363,6 @@ Parser::parse_statement(Token_string & tos, bool optimize)
        }
 
    return E_NO_ERROR;
-}
-//----------------------------------------------------------------------------
-void
-Parser::insert_1(Token_string & tos, int pos)
-{
-   tos.push_back(Token(TOK_VOID));
-   for (int from = tos.size() - 2; from > pos; --from)
-       {
-         tos[from + 1].move(tos[from], LOC);   // shift towards end
-       }
-}
-//----------------------------------------------------------------------------
-void
-Parser::insert_2(Token_string & tos, int pos)
-{
-   tos.push_back(Token(TOK_VOID));
-   tos.push_back(Token(TOK_VOID));
-   for (int from = tos.size() - 3; from > pos; --from)
-       {
-         tos[from + 2].move(tos[from], LOC);   // shift towards end
-       }
 }
 //----------------------------------------------------------------------------
 int
@@ -341,7 +434,7 @@ bool progress = false;
          //
          if (tos[t + 1].get_tag() == TOK_L_PARENT)   // f ⍣ ( RO )
             {
-              t = find_closing_parent(tos, t + 1);   // skip (...)
+              t = tos.find_closing_parent(t + 1);   // skip (...)
               continue;                              // next ⍣ (if any)
            }
 
@@ -365,21 +458,21 @@ bool progress = false;
            int pos_LO = pos_POWER - 1;
            if (tos[pos_LO].get_Class() == TC_R_PARENT)   // ( LO )
               {
-                pos_LO = find_opening_parent(tos, pos_LO);
+                pos_LO = tos.find_opening_parent(pos_LO);
               }
            else if (tos[pos_LO].get_Class() == TC_R_CURLY)   // ( LO )
               {
-                pos_LO = find_opening_curly(tos, pos_LO);
+                pos_LO = tos.find_opening_curly(pos_LO);
               }
 
-           insert_1(tos, pos_LO - 1);   // - 1 means insert before
+           tos.insert_1(pos_LO - 1);   // - 1 means insert before
            new (&tos[pos_LO])   Token(TOK_L_PARENT, int64_t(0));
            ++pos_B;
          }
 
          // insert a right parenthesis
          {
-           insert_1(tos, pos_B - 1);   // - 1 means insert before
+           tos.insert_1(pos_B - 1);   // - 1 means insert before
            new (&tos[pos_B])   Token(TOK_R_PARENT, int64_t(0));
          }
 
@@ -434,7 +527,7 @@ bool progress = false;
          //
          if (tos[t + 1].get_tag() == TOK_L_PARENT)   // f ⍤ ( RO )
             {
-              t = find_closing_parent(tos, t + 1);   // skip (...)
+              t = tos.find_closing_parent(t + 1);   // skip (...)
               continue;                              // next ⍤ (if any)
            }
 
@@ -444,7 +537,7 @@ bool progress = false;
          int pos_RO = pos_RANK + 1;
          if (tos[pos_RO].get_tag() == TOK_L_BRACK)
             {
-              pos_RO = find_closing_bracket(tos, pos_RO) + 1;   // skip [...]
+              pos_RO = tos.find_closing_bracket(pos_RO) + 1;   // skip [...]
             }
 
          const int len_y = j_length(tos, pos_RO);
@@ -472,21 +565,21 @@ bool progress = false;
            int pos_LO = pos_RANK - 1;
            if (tos[pos_LO].get_Class() == TC_R_PARENT)   // ( LO )
               {
-                pos_LO = find_opening_parent(tos, pos_LO);
+                pos_LO = tos.find_opening_parent(pos_LO);
               }
            else if (tos[pos_LO].get_Class() == TC_R_CURLY)   // ( LO )
               {
-                pos_LO = find_opening_curly(tos, pos_LO);
+                pos_LO = tos.find_opening_curly(pos_LO);
               }
 
-           insert_1(tos, pos_LO - 1);   // - 1 means insert before
+           tos.insert_1(pos_LO - 1);   // - 1 means insert before
            new (&tos[pos_LO])   Token(TOK_L_PARENT, int64_t(0));
            ++pos_B;
          }
 
          // insert a right parenthesis
          {
-           insert_1(tos, pos_B - 1);   // - 1 means insert before
+           tos.insert_1(pos_B - 1);   // - 1 means insert before
            new (&tos[pos_B])   Token(TOK_R_PARENT, int64_t(0));
          }
 
@@ -633,126 +726,6 @@ int opening = -1;
    return false;
 }
 //----------------------------------------------------------------------------
-int
-Parser::find_closing_bracket(const Token_string & tos, int pos)
-{
-   Assert(tos[pos].get_tag() == TOK_L_BRACK);
-
-int others = 0;
-
-   for (ShapeItem p = pos + 1; p < tos.ssize(); ++p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_closing_bracket() sees " << tos[p] << endl;
-
-         if (tos[p].get_tag() == TOK_R_BRACK)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (tos[p].get_tag() == TOK_R_BRACK)   ++others;
-       }
-
-   MORE_ERROR() << "No closing ] for opening ]";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Parser::find_opening_bracket(const Token_string & tos, int pos)
-{
-   Assert(tos[pos].get_tag() == TOK_R_BRACK);
-
-int others = 0;
-
-   for (int p = pos - 1; p >= 0; --p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << tos[p] << endl;
-
-         if (tos[p].get_tag() == TOK_L_BRACK)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (tos[p].get_tag() == TOK_R_BRACK)   ++others;
-       }
-
-   MORE_ERROR() << "No opening [ for closing ]";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Parser::find_closing_parent(const Token_string & tos, int pos)
-{
-   Assert1(tos[pos].get_Class() == TC_L_PARENT);
-
-int others = 0;
-
-   for (ShapeItem p = pos + 1; p < tos.ssize(); ++p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_closing_bracket() sees " << tos[p] << endl;
-
-         if (tos[p].get_Class() == TC_R_PARENT)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (tos[p].get_Class() == TC_R_PARENT)   ++others;
-       }
-
-   MORE_ERROR() << "No closing ) for opening (";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Parser::find_opening_parent(const Token_string & tos, int pos)
-{
-   Assert(tos[pos].get_Class() == TC_R_PARENT);
-
-int others = 0;
-
-   for (int p = pos - 1; p >= 0; --p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << tos[p] << endl;
-
-         if (tos[p].get_Class() == TC_L_PARENT)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (tos[p].get_Class() == TC_R_PARENT)   ++others;
-       }
-
-   MORE_ERROR() << "No opening ( for closing )";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Parser::find_opening_curly(const Token_string & tos, int pos)
-{
-   Assert(tos[pos].get_Class() == TC_R_CURLY);
-
-int others = 0;
-
-   for (int p = pos - 1; p >= 0; --p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << tos[p] << endl;
-
-         if (tos[p].get_Class() == TC_L_CURLY)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (tos[p].get_Class() == TC_R_CURLY)   ++others;
-       }
-
-   MORE_ERROR() << "No opening { for closing }";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
 bool
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
@@ -768,7 +741,7 @@ bool progress = false;   // per iteration progress
              {
                if (tos[t].get_Class() != TC_L_PARENT)   continue;
 
-               const int closing = find_closing_parent(tos, t);
+               const int closing = tos.find_closing_parent(t);
 
                // check for case 1.
                //
@@ -776,7 +749,7 @@ bool progress = false;   // per iteration progress
                   {
                     // tos[t] is (( ...
                     //
-                    const int closing_1 = find_closing_parent(tos, t + 1);
+                    const int closing_1 = tos.find_closing_parent(t + 1);
                     if (closing == (closing_1 + 1))
                        {
                          // tos[closing_1] is )) ...
@@ -802,7 +775,7 @@ bool progress = false;   // per iteration progress
                // If X is non-scalar, enclose it
                //
                ret = progress = true;
-               tos[t + 2].move(tos[t + 1], LOC);
+               tos[t + 2].move_from(tos[t + 1], LOC);
 
                // we "remember" the nongrouping parantheses to disambiguate
                // e,g, SYM/xxx from (SYM)/xxx
@@ -890,7 +863,7 @@ bool progress = false;
                         tos[t + 0] = SQL_query ? Quad_SQL_3::fun.get_token()
                                                : Quad_SQL_3::fun.get_token();
                         tos[t + 1] = Token(TOK_L_BRACK, int64_t(0));    // T1
-                        tos[t + 2].move(tos[t + 3], LOC);               // T2
+                        tos[t + 2].move_from(tos[t + 3], LOC);          // T2
                         tos[t + 3] = Token(TOK_R_BRACK, int64_t(0));    // T3
                         t += 3;
                       }
@@ -927,7 +900,7 @@ bool TOK_VOID_inserted = false;
                  {
                    Value_P function_axis = IntScalar(axis, LOC);
                    Token tok_axis(TOK_AXIS, function_axis);
-                   tos[t++].move(tok_axis, LOC);      // replace . with [X]
+                   tos[t++].move_from(tok_axis, LOC);      // replace . with [X]
                    tos[t++].clear(LOC);               // invalidate g
                    TOK_VOID_inserted = true;
                  }
@@ -978,7 +951,7 @@ bool TOK_VOID_inserted = false;
             }
        }
 
-   if (TOK_VOID_inserted)   remove_TOK_VOID(tos);
+   if (TOK_VOID_inserted)   tos.remove_TOK_VOID();
 }
 //----------------------------------------------------------------------------
 bool
@@ -1002,7 +975,7 @@ Parser::check_if_value(const Token_string & tos, int pos)
 
         case TC_R_BRACK:    // e.g. +[1]/2 or 2/[1]2
              {
-               const int pos1 = find_opening_bracket(tos, pos);
+               const int pos1 = tos.find_opening_bracket(pos);
                if (pos1 == 0)   return true;   // this is a syntax error
                return check_if_value(tos, pos1 - 1);
              }
@@ -1102,7 +1075,7 @@ bool progress = false;
 
                    Token tok_axis(TOK_FAXIS, function_axis);
                    new (&tos[src++]) Token(TOK_VOID);   // invalidate [
-                   tos[src++].move(tok_axis, LOC);
+                   tos[src++].move_from(tok_axis, LOC);
                    new (&tos[src])   Token(TOK_VOID);   // invalidate ]
                    OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
                    progress = true;
@@ -1282,28 +1255,12 @@ vector<ShapeItem> ends;
                    progress = true;
                  }
             }
+
          // otherwise the arity can not be determined statically (and will be
          // decided at runtime in Prefix.cc)
        }
 
    return progress;
-}
-//----------------------------------------------------------------------------
-VoidCount
-Parser::remove_TOK_VOID(Token_string & tos)
-{
-ShapeItem dst = 0;
-
-   loop(src, tos.ssize())
-       {
-         if (tos[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
-         if (src != dst)   tos[dst].move(tos[src], LOC);
-         ++dst;
-       }
-
-const VoidCount ret = VoidCount(tos.ssize() - dst);
-   tos.resize(dst);
-   return ret;
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -1317,10 +1274,12 @@ std::vector<ShapeItem> stack;
          TokenClass tc_peer;
          switch(tos[t].get_Class())
            {
-             // for [, (, or {, push the position onto stack.
+             // for [, (, or {, push the position onto stack. Note that
+             // TOK_SEMICOL also has class TC_L_BRACK, but we don't want it
+             // here.
              //
              case TC_L_BRACK:   // NOTE: also includes TOK_SEMICOL, so we check
-                  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
+                  if (tos[t].get_tag() != TOK_L_BRACK)   continue;   // SEMICOL
                   /* fall through */
              case TC_L_PARENT:
              case TC_L_CURLY:
@@ -1375,6 +1334,547 @@ std::vector<ShapeItem> stack;
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
+Value_P
+Parser::parse_multi_literal(UCS_string_vector & text, Lit_DB & literals,
+                            bool fun_header)
+{
+   // 0. replace multi-line strings in text and insert them into literals
+   //
+   replace_multi_line_strings(text, literals, fun_header);
+
+   // 1. compute the shape
+   //
+int rank = 0;
+int counters[MAX_RANK];
+int max_counters[MAX_RANK];
+   loop(c, MAX_RANK)
+       {
+         counters[c] = 0;
+         max_counters[c] = 0;
+       }
+
+int counter_index = 0;
+int min_value_length = 1000;
+int max_value_length = 0;
+UCS_string min_line;
+UCS_string max_line;
+vector<Value_P>value_rows;   value_rows.reserve(100);
+
+   loop(l, text.size())
+       {
+         UCS_string line = text[l];
+         line.remove_leading_and_trailing_whitespaces();
+
+         if (line.size())   // data line
+            {
+              counter_index = 0;
+            }
+         else               // separator line
+            {
+              // increment the counter(s)
+              //
+              counters[counter_index] = 0;
+              ++counter_index;
+              rank = max(rank, counter_index);
+              ++counters[counter_index];
+              continue;   // loop(l, text.size())
+            }
+
+         Log(LOG_create_value)
+            {
+              for (int j = MAX_RANK - 1; j >= 0; --j)
+                  {
+                    CERR << "." << counters[j];
+                  }
+              CERR << "  '" << line << "'" << endl;
+            }
+
+         Parser parser(PM_EXECUTE, LOC, /* macro */ false);
+         Token_string tos;   // parsed line
+         if (const ErrorCode ec = parser.parse(line, tos, /* optimize */ true))
+            {
+              MORE_ERROR() << "Error parsing multi-line literal:\n"
+                              "    '" << line << "'";
+              SYNTAX_ERROR;
+            }
+
+         ShapeItem len_Z = 0;
+         loop(t, tos.size())
+             {
+               if (tos[t].get_tag() == TOK_MARKER)
+                  {
+                    ++len_Z;
+                  }
+               else if (tos[t].get_Class() == TC_VALUE)
+                  {
+                    Value_P ZZ = tos[t].get_apl_val();
+                    if (ZZ->get_rank() > 1)   RANK_ERROR;
+                    len_Z += ZZ->element_count();
+                  }
+               else FIXME;
+             }
+
+         Value_P Z(len_Z, LOC);
+         loop(t, tos.size())
+             {
+               if (tos[t].get_tag() == TOK_MARKER)
+                  {
+                    const ShapeItem idx = tos[t].get_int_val();
+                    Value_P ZZ = literals.pull(idx);
+                    Assert(+ZZ);
+                    Z->next_ravel_Value(ZZ.get());
+                  }
+               else if (tos[t].get_Class() == TC_VALUE)
+                  {
+                    Value_P ZZ = tos[t].get_apl_val();
+                    loop(z, ZZ->element_count())
+                        {
+                          Z->next_ravel_Cell(ZZ->get_cravel(z));
+                        }
+                  }
+               else FIXME;
+             }
+         Z->check_value(LOC);
+         Token tok_Z(TOK_APL_VALUE1, Z);
+         tos.clear();
+         tos.push_back(tok_Z);
+         
+
+         const Token & token = tos[0];
+         if (token.get_Class() != TC_VALUE)
+            {
+              MORE_ERROR() << "Error parsing multi-line literal "
+                              "(not a value):\n    '" << line << "'";
+              DOMAIN_ERROR;
+            }
+
+         Value_P value = token.get_apl_val();
+         if (value->get_rank() > 1)   // not a strand
+            {
+
+              MORE_ERROR() << "Error parsing multi-line literal "
+                              "(not a vector):\n" "    '" << line << "'";
+              RANK_ERROR;
+            }
+
+         const ShapeItem value_len = value->element_count();
+         if (min_value_length > value_len)
+            {
+              min_line = line;
+              min_value_length = value_len;
+            }
+         if (max_value_length < value_len)
+            {
+              max_line = line;
+              max_value_length = value_len;
+            }
+
+         value_rows.push_back(value);
+
+         // update cuonter maxima
+         loop(r, MAX_RANK)
+             {
+               max_counters[r] = max(max_counters[r], counters[r]);
+             }
+
+         counter_index = 0;
+         ++counters[0];
+       }   // loop(l, text.size())
+
+   ++counters[counter_index];
+
+   if (min_value_length != max_value_length)
+      {
+        MORE_ERROR() <<
+             "Error parsing multi-line literal (vector length mismatch):\n"
+             "    shortest row (" << min_value_length
+          << "): '" << min_line << "'\n"
+             "    longest row: (" << max_value_length
+          << "):'" << max_line << "'";
+        LENGTH_ERROR;
+      }
+
+   ++rank;   // since counter_index counts from 0
+
+Shape shape_Z;
+   loop(r, rank)
+       {
+         shape_Z.add_shape_item(max_counters[rank - r - 1] + 1);
+       }
+   shape_Z.add_shape_item(max_value_length);
+
+Value_P Z(shape_Z, LOC);
+   loop(r, value_rows.size())
+       {
+         const Value & row = *value_rows[r];
+         loop(c, max_value_length)
+             {
+               Z->next_ravel_Cell(row.get_cravel(c));
+             }
+       }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Parser::get_multiline_status(vector<Multiline_status> & status,
+                             const UCS_string_vector & text,
+                             bool fun_header, bool strings)
+{
+   status.reserve(text.size());
+
+UCS_string scope;
+   if (strings)   scope << UNI_DOUBLE_QUOTE << UNI_LEFT_DAQ << UNI_RIGHT_DAQ;
+   else           scope << UNI_LESS << UNI_GREATER;
+
+size_t start = 0;
+   if (fun_header)   // define function header
+      {
+        status.push_back(MLS_Function_header);
+        ++start;
+      }
+
+Multiline_status current = MLS_APL_text;
+
+   for (size_t l = start; l < text.size(); ++l)
+       {
+         const UCS_string & line = text[l];
+         const int pos = line.multi_pos();
+         if (pos == -1 || !scope.contains(line[pos]))   // same status
+            {
+              status.push_back(current);
+              continue;
+            }
+
+         // status change. Ideally line[pos] tells the status.
+         //
+         switch(line[pos])
+            {
+              case UNI_LESS:
+              case UNI_LEFT_DAQ:  current = MLS_Start_of_multi;
+                   status.push_back(MLS_Start_of_multi);
+                   current = MLS_Inside_multi;
+                   continue;
+
+              case UNI_GREATER:
+              case UNI_RIGHT_DAQ:
+                   status.push_back(MLS_End_of_multi);
+                   current = MLS_APL_text;
+                   continue;
+
+              default:   // ' or ""
+                   if (current <= MLS_APL_text)   // start of multi-line string
+                      {
+                        status.push_back(MLS_Start_of_multi);
+                        current = MLS_Inside_multi;
+                      }
+                   else                           // end of multi-line string
+                      {
+                        status.push_back(MLS_End_of_multi);
+                        current = MLS_APL_text;
+                      }
+                   continue;
+            }
+       }
+
+   // all lines processed. Check final status
+   //
+   if (current == MLS_Start_of_multi || current == MLS_Inside_multi)
+      {
+         // multi-line string started but not ended.
+         //
+         MORE_ERROR() << "No end of multi-line "
+                      << (strings ? "string" : "literal") << " found.";
+         return fun_header ? E_DEFN_ERROR : E_SYNTAX_ERROR;;
+      }
+
+   Log(LOG_Multi_line)
+      {
+        CERR << "At " << LOC << ": scope: " << scope << endl;
+        loop(t, text.size())
+            {
+              CERR << "[" << t << "]: S=" << status[t]
+                   << " '" << text[t] << "'" << endl;
+            }
+      }
+
+   return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Parser::replace_multi_line_literals(UCS_string_vector & text,
+                                    Lit_DB & literals, bool fun_header)
+{
+  /* multi-line literals. Convert dequences of lines like
+
+     [k+1] PREFIX <<<
+     [k+2] L2 ...
+     [k+N] >>>
+
+    into:
+
+    [k+1] PREFIX @N@
+    [...] (empty)
+    [k+N] (empty)
+
+      and add the value for the marker @N@ to this->literals
+   */
+const int start = fun_header ? 1 : 0;
+
+   for (;;)
+       {
+         vector<Multiline_status> status;
+         if (get_multiline_status(status, text, fun_header, false))
+            {
+              return fun_header ? E_DEFN_ERROR : E_SYNTAX_ERROR;
+            }
+
+         // 1. modify lines...
+         //
+
+         // find the first closing >>> and remember its opening <<<
+         //
+         int literal_start = -1;
+         int literal_end   = -1;
+         for (size_t l = start; l < text.size(); ++l)
+             {
+               if (status[l] == MLS_Start_of_multi)
+                  {
+                    literal_start = l;
+                  }
+               else if (status[l] == MLS_End_of_multi)
+                  {
+                    literal_end = l;
+                    break;
+                  }
+             }
+
+         if (literal_end == -1)
+            {
+              // no more literls found
+              //
+              return E_NO_ERROR;
+            }
+
+// loop(j, text.size())
+//     CERR << "[" << j << "] " << status[j]  << "   " << text[j] << endl;
+
+
+         // a (leaf-) multi-line literal starts at literal_start li...
+         //
+         Assert1(literal_start != -1);
+         Assert1(status[literal_start] == MLS_Start_of_multi);
+         UCS_string & prefix = text[literal_start];
+         prefix.resize(prefix.multi_pos());
+         prefix << " @" << literals.get_next_key() << "@ ";
+
+         // copy the literal content (lines between <<< and >>> to content
+         // and clear them in the function text
+         //
+         UCS_string_vector content;
+         int li = literal_start + 1;
+         while(status[li] == MLS_Inside_multi)
+               {
+                 content.push_back(text[li]);
+                 text.erase(li);
+                 status.erase(status.begin() + li);
+               }
+         Assert(status[li] == MLS_End_of_multi);
+         const UCS_string & suffix = text[li];
+         prefix << UCS_string(suffix, suffix.multi_pos() + 3);
+         text.erase(li);
+         status.erase(status.begin() + li);
+
+         // create value Z for content. content may contain "false" trailing
+         // empty lines, which shall be removed (otherwise
+         // parse_multi_literal() would be confused.
+         //
+         while (content.size() && content.back().size() == 0)
+               {
+                 content.pop_back();
+               }
+
+         Value_P Z = parse_multi_literal(content, literals, fun_header);
+         literals.push(Z);
+       }
+
+   return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Parser::replace_multi_line_strings(UCS_string_vector & text,
+                                   Lit_DB & literals, bool fun_header)
+{
+  /* new-style multi-line strings. Convert dequences of lines like
+
+     [k+1] PREFIX """
+     [k+2] L2 ...
+     [k+N] """
+
+    into:
+
+    [k+1] PREFIX "L2" ... "LN"
+    [...] (empty)
+    [k+N] (empty)
+
+     In contrast to transform_old_multi_line_strings(), line k+N may only
+     consist of spaces and the terminating """.
+   */
+
+const ShapeItem start = fun_header ? 1 : 0;
+
+vector<Multiline_status> status;
+   if (get_multiline_status(status, text, fun_header, true))
+      {
+        return fun_header ? E_DEFN_ERROR : E_SYNTAX_ERROR;
+      }
+
+   // modify lines...
+   //
+   for (size_t li = start; li < text.size(); )
+       {
+
+         if (status[li] == MLS_APL_text)
+            {
+              ++li;
+              continue;
+            }
+
+         // a multi-line string starts at line li...
+         //
+         const ShapeItem ml_start = li++;
+         Assert1(status[ml_start] == MLS_Start_of_multi);
+         UCS_string & prefix = text[ml_start];
+         prefix.resize(prefix.multi_pos());   // remove the trailing """
+         prefix << " @" << literals.get_next_key() << "@ ";
+
+         UCS_string_vector content;
+         while (status[li] == MLS_Inside_multi)
+               {
+                 content.push_back(text[li].do_escape(true));
+                 text.erase(li);
+                 status.erase(status.begin() + li);
+               }
+
+         Assert(status[li] == MLS_End_of_multi);
+         const UCS_string suffix(text[li], text[li].multi_pos() + 3);
+         prefix << " " << suffix;
+         text.erase(li);
+         status.erase(status.begin() + li);
+         ++li;
+
+         // create value Z for content
+         //
+         Value_P Z(content.size(), LOC);
+         if (content.size() == 0)        // nothing
+            {
+             Value_P Zproto = Str0(LOC);
+             new (&Z->get_wproto())   PointerCell(Zproto.get(), *Z);
+            }
+         loop(z, content.size())
+             {
+               Value_P Zz(content[z], LOC);
+               Z->next_ravel_Pointer(Zz.get());
+            }
+         Z->check_value(LOC);
+         literals.push(Z);
+       }
+
+   // remove trailing empty lines...
+   //
+   while (text.size() && text.back().size() == 0)   text.pop_back();
+
+// CERR << endl;
+// loop(l, text.size())   CERR << "[" << l << "]  " << text[l] << endl;
+
+   return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Parser::transform_old_multi_line_strings(UCS_string_vector & text)
+{
+  /* old-style multi-line strings. convert sets of lines like
+
+     [k+1] PREFIX "L1
+     [k+2] L2 ...
+     [k+N] Ln" SUFFIX
+
+    into:
+
+    [k+1] PREFIX "L1" "L2" ... "LN" SUFFIX
+    [...] (empty)
+    [k+N] (empty)
+
+    The result is nested.
+   */
+
+
+char * status = ALLOCA(char, text.size());
+   status[0] = MLS_Function_header;
+Multiline_status current = MLS_APL_text;
+
+   // 1. determine the line status of each line...
+   //
+   for (size_t l = 1; l < text.size(); ++l)
+       {
+         const int count = text[l].double_quote_count(false);
+         if (count & 1)   // start or end of string
+            {
+              if (current == MLS_APL_text)   // start of multi-line string
+                 {
+                    status[l] = MLS_Start_of_multi;
+                    current = MLS_Inside_multi;
+                 }
+              else                       // end of multi-line string
+                 {
+                    status[l] = MLS_End_of_multi;
+                    current = MLS_APL_text;
+                 }
+            }
+         else              // no status change
+            {
+              status[l] = current;
+            }
+       }
+
+   if (current == MLS_Start_of_multi || current == MLS_Inside_multi)
+      {
+         // old multi-line string started but not ended.
+         //
+         return E_DEFN_ERROR;
+      }
+
+   // 2. modify lines...
+   //
+   for (size_t line_number = 1; line_number < text.size();)
+       {
+         if (status[line_number] == MLS_APL_text)   { ++line_number;   continue; }
+         const int start_line_number = line_number;
+         Assert1(status[line_number] == MLS_Start_of_multi);
+         UCS_string accu = text[line_number++];
+         accu << "\" ";
+         while (status[line_number] == MLS_Inside_multi)
+               {
+                 accu << " \"" << text[line_number].do_escape(true) << "\"";
+                 text[line_number++].clear();
+               }
+         Assert(status[line_number] == MLS_End_of_multi);
+         accu << "\"" << text[line_number];
+         text[start_line_number] = accu;
+         text[line_number++].clear();
+       }
+
+   // remove trailing empty lines...
+   //
+   while (text.size() && text.back().size() == 0)   text.pop_back();
+
+// CERR << endl;
+// loop(l, text.size())   CERR << "[" << l << "]  " << text[l] << endl;
+
+   return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
 void
 Parser::create_value(Token_string & tos, int pos, int count)
 {
@@ -1382,7 +1882,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
       {
         CERR << "create_value(" << __LINE__ << ") tos[" << tos.ssize()
              <<  "]  pos " << pos << " count " << count << " in:";
-        tos.print(CERR, true);
+        tos.print(CERR, 1);
       }
 
    if (count == 1)   create_scalar_value(tos[pos]);
@@ -1392,7 +1892,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
       {
         CERR << "create_value(" << __LINE__ << ") tos[" << tos.ssize()
              <<  "]  pos " << pos << " count " << count << " out:";
-        tos.print(CERR, true);
+        tos.print(CERR, 1);
       }
 }
 //----------------------------------------------------------------------------
@@ -1408,14 +1908,14 @@ Parser::create_scalar_value(Token & output)
                scalar->next_ravel_Char(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               output.move(tok, LOC);
+               output.move_from(tok, LOC);
              }
              return;
 
         case TOK_INTEGER:
              {
                Token tok(TOK_APL_VALUE3, IntScalar(output.get_int_val(), LOC));
-               output.move(tok, LOC);
+               output.move_from(tok, LOC);
              }
              return;
 
@@ -1423,7 +1923,7 @@ Parser::create_scalar_value(Token & output)
              {
                Token tok(TOK_APL_VALUE3,
                          FloatScalar(output.get_flt_val(), LOC));
-               output.move(tok, LOC);
+               output.move_from(tok, LOC);
              }
              return;
 
@@ -1432,7 +1932,7 @@ Parser::create_scalar_value(Token & output)
                Token tok(TOK_APL_VALUE3,
                          ComplexScalar(output.get_cpx_real(),
                                        output.get_cpx_imag(), LOC));
-               output.move(tok, LOC);
+               output.move_from(tok, LOC);
              }
              return;
 
@@ -1493,12 +1993,12 @@ Value_P Z(count, LOC);
    Z->check_value(LOC);
 Token tok(TOK_APL_VALUE3, Z);
 
-   tos[pos].move(tok, LOC);
+   tos[pos].move_from(tok, LOC);
 
    Log(LOG_create_value)
       {
         CERR << "create_value [" << tos.ssize() << " token] out: ";
-        tos.print(CERR, true);
+        tos.print(CERR, 1);
       }
 }
 //----------------------------------------------------------------------------

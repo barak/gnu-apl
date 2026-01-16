@@ -831,15 +831,15 @@ FloatCell::character_representation(const PrintContext & pctx) const
              APL_Integer numer = get_numerator();
              if (numer < 0)
                 {
-                  ucs.append(UNI_OVERBAR);
+                  ucs << UNI_OVERBAR;
                   numer = -numer;
                 }
-             ucs.append(UCS_string::from_uint(numer));
+             ucs << UCS_string::from_uint(numer);
              info.int_len = ucs.size();
 
-             ucs.append(UNI_DIVIDE);
+             ucs << UNI_DIVIDE;
 
-             ucs.append(UCS_string::from_uint(denom));
+             ucs << UCS_string::from_uint(denom);
              info.denom_len = ucs.size() - info.int_len;
              info.real_len = ucs.size();
              return PrintBuffer(ucs, info);

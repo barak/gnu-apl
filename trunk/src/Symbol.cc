@@ -385,8 +385,8 @@ ValueStackItem & vs = value_stack.back();
              {
                const UserFunction * ufun = lambda->get_func_ufun();
                Assert(ufun);
-               UTF8_string creator = ufun->get_name();
-               creator.append("←λ");
+               UTF8_string creator;
+               creator << ufun->get_name() << "←λ";
                
  
                vs.set_function(lambda);
@@ -725,7 +725,7 @@ const ValueStackItem & vs = value_stack.back();
              else
                 {
                   Token tok_fun = vs.get_function()->get_token();
-                  tok.move(tok_fun, LOC);
+                  tok.move_from(tok_fun, LOC);
                   return;
                 }
 
@@ -758,7 +758,7 @@ const ValueStackItem & vs = value_stack.back();
              {
                Value_P value = IntScalar(vs.get_label(), LOC);
                Token t(TOK_APL_VALUE1, value);
-               tok.move(t, LOC);
+               tok.move_from(t, LOC);
              }
              return;
 
@@ -766,7 +766,7 @@ const ValueStackItem & vs = value_stack.back();
              // if we resolve a variable. the value is considered grouped.
              {
                Token tok_val(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
-               tok.move(tok_val, LOC);
+               tok.move_from(tok_val, LOC);
              }
              return;
 
@@ -774,7 +774,7 @@ const ValueStackItem & vs = value_stack.back();
         case NC_OPERATOR:
              {
                Token tok_function(vs.get_function()->get_token());
-               tok.move(tok_function, LOC);
+               tok.move_from(tok_function, LOC);
              }
              return;
 
@@ -1010,11 +1010,11 @@ UCS_string data;
       {
         case NC_VARIABLE:
              {
-               data.append(UNI_A);
+               data << UNI_A;
                Token tok = Quad_TF::tf2_var(get_name(),
                                             *value_stack[0].get_val_cptr());
                const UCS_string ucs(*tok.get_apl_val());
-               data.append(ucs);
+               data << ucs;
              }
              break;
 
@@ -1041,9 +1041,7 @@ UCS_string data;
 
                // write function record(s)
                //
-               data.append(UNI_F);
-               data.append(get_name());
-               data.append(UNI_SPACE);
+               data << UNI_F << (get_name()) << UNI_SPACE;
                Quad_TF::tf2_fun_ucs(data, get_name(), *fun);
              }
              break;

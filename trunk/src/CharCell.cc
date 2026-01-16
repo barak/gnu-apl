@@ -125,31 +125,19 @@ Unicode uni = get_char_value();
 
    if (style == PR_APL_FUN)
       {
-        if (uni == UNI_SINGLE_QUOTE)
-           {
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(uni);
-             ucs.append(uni);
-             ucs.append(UNI_SINGLE_QUOTE);
-           }
-        else
-           {
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(uni);
-             ucs.append(UNI_SINGLE_QUOTE);
-           }
+        ucs << UNI_SINGLE_QUOTE << uni;
+        if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' → ''
+        ucs << UNI_SINGLE_QUOTE;
       }
    else
       {
        if (style & PST_QUOTE_CHARS)
           {
-            ucs.append(UNI_SINGLE_QUOTE);
-            ucs.append(uni);
-            ucs.append(UNI_SINGLE_QUOTE);
+            ucs << UNI_SINGLE_QUOTE << uni << UNI_SINGLE_QUOTE;
           }
         else
           {
-            ucs.append(uni);
+            ucs << uni;
           }
       }
 

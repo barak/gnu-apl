@@ -914,8 +914,8 @@ UCS_string ucs;
        {
          const char q = cc[c];
          if (q == 0)   break;
-         if (q == '-')   ucs.append(UNI_OVERBAR);
-         else            ucs.append(Unicode(q));
+         if (q == '-')   ucs << UNI_OVERBAR;
+         else            ucs << Unicode(q);
        }
 
 ColInfo info;

@@ -205,9 +205,8 @@ UCS_string_vector names;
         UCS_string name = list[l]->get_name();
         if (which == LIST_NAMES)   // append .NC
            {
-             name.append(UNI_FULLSTOP);
-             name.append_number(list[l]->value_stack.back()
-                                        .get_NC() & NC_case_mask);
+             const int nc = list[l]->value_stack.back().get_NC() & NC_case_mask;
+             name << UNI_FULLSTOP << nc;
            }
         names.push_back(name);
       }

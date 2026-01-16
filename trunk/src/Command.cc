@@ -62,8 +62,8 @@
 #include "Workspace.icc"
 
 bool Command::auto_MORE = false;
-bool Command::inside_multiline = false;
-int  Command::multiline_start = 0;
+Multiline_status Command::multiline_status = MLS_APL_text;
+int  Command::multiline_start = -1;   // read in IO_Files.cc
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
@@ -72,74 +72,124 @@ UCS_string_vector Command::copy_once_table;
 
 //----------------------------------------------------------------------------
 void
-Command::process_line()
+Command::process_lines()
 {
-UCS_string prefix;   // for new-style multiline strings
-UCS_string accu;     // for new-style multiline strings
-UCS_string prompt = Workspace::get_prompt();
-int count = 0;
-   for (;;)
+UCS_string line;
+Multi_line_SM sm;
+ShapeItem multi_pos;
+UCS_string_vector content;   // for new-style multiline strings
+
+   {
+     bool eof = false;
+     InputMux::get_line(LIM_ImmediateExecution, Workspace::get_prompt(),
+                              line, eof, LineInput::get_history());
+     // InputMux::get_line() has removed the trailing \n.
+
+     if (eof)   CERR << "EOF at " << LOC << endl;
+
+     multi_pos = line.multi_pos();
+     if (multi_pos == -1)   // OUTSIDE
+        {
+          process_line(line, 0);
+          return;
+        }
+     content.push_back(UCS_string(line, 0, multi_pos));
+     sm.next(line[multi_pos]);
+   }
+
+   multiline_status = MLS_Start_of_multi;
+
+const bool multi_literal = sm.in_literal();
+
+const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
+
+   for (bool subsequent = false; ; subsequent = true)
        {
-         UCS_string line;
-         bool eof = false;
-         InputMux::get_line(LIM_ImmediateExecution, prompt,
-                            line, eof, LineInput::get_history());
-
-         if (eof) CERR << "EOF at " << LOC << endl;
-
-         const ShapeItem multi = line.multi_pos(inside_multiline);
-         if (multi != -1)   /// line is START or END of multi-line string
+         if (subsequent)   // otherwise we use the line received above
             {
-              inside_multiline = ! inside_multiline;
-              if (inside_multiline)    // START of multi-line string
-                  {
-                    multiline_start = InputFile::current_line_no();
-                    count = 0;
-                    prefix = line;
-                    prefix.resize(multi);   // discard trailing """ ff.
+              line.clear();
 
-                    prompt.prepend(UNI_RIGHT_ARROW);
-                    accu.append(UNI_SPACE);
-                  }
-              else              // END of multi-line string
-                  {
-                    multiline_start = -1;
-                    accu.pop_back();   // trailing " "
-                    if (accu.size() == 1)   accu.append_ASCII(" \"\"");
+              bool eof = false;
+              InputMux::get_line(LIM_ImmediateExecution, prompt,
+                                 line, eof, LineInput::get_history());
+                // InputMux::get_line() has removed the trailing \n.
+          
+              if (eof) CERR << "EOF at " << LOC << endl;
 
-                    if (count == 0)        // no string
-                       {
-                         const UTF8_string empty("0⍴⊂\"\"");   // 0⍴⊂""
-                         prefix << UCS_string(empty);
-                         process_line(prefix, 0);
-                       }
-                    else if (count == 1)   // a single "string" would not nest
-                       {
-                         const UTF8_string encl("(,⊂");  // enclose accu...
-                         prefix << UCS_string(encl) << accu << ")";
-                         process_line(prefix, 0);
-                       }
-                    else                   // true multi-string
-                       {
-                         prefix << accu;
-                         process_line(prefix, 0);
-                       }
-                    return;
-                  }
+              multi_pos = line.multi_pos();
+              if (multi_pos != -1)   // some triple
+                 {
+                    sm.next(line[multi_pos]);
+                 }
+              content.push_back(line.do_escape(true));
             }
-         else if (inside_multiline)   // inside multi-line
-            {
-              ++count;
-              accu.append_ASCII("\"");
-              accu.append(line.do_escape(true));
-              accu.append_ASCII("\" ");
-            }
-         else                   // normal input line
-            {
-              process_line(line, 0);
-              return;
-            }
+
+         if (!sm.inside_multi())   break;
        }
+
+   multiline_status = MLS_APL_text;
+
+const UCS_string suffix(line, multi_pos + 3);
+
+    multiline_start = 0;   // inform IO_Files.cc
+
+   if (multi_literal)   // literal (not string)
+      {
+        // top-level multiline literals are recursive and therefore more
+        // complicated tnan multiline strings
+        //
+        content[0] << "<<<";
+
+        Lit_DB literals;
+
+        Parser::replace_multi_line_strings(content, literals, false);
+        Parser::replace_multi_line_literals(content, literals, false);
+
+        // remove trailing empty lines (which would mess up the shape
+        // computation)
+        while (content.size() && !content.back().size())   content.pop_back();
+
+        if (literals.size() != 1)
+           {
+             MORE_ERROR() << "Multiline literal has more than one ("
+                          << literals.size() << "items";
+             SYNTAX_ERROR;
+           }
+
+        content[0] << " " << suffix;
+        Value_P literal = literals.pull_last();
+        do_APL_expression(content[0], literal);
+      }
+   else                 // string (not literal)
+      {
+        // top-level multiline strings are flat and therefore much simpler
+        // tnan multiline literals, In particular there is no need for
+        // Parser::replace_multi_line_strings().
+        //
+        if (content.size() == 2)        // special case:  ««« »»»
+           {
+             const UTF8_string empty(" (0⍴⊂\"\")");   // 0⍴⊂""
+             content[0] << UCS_string(empty);
+           }
+        else if (content.size() == 3)   // special case: ««« string »»»
+          {
+            const UTF8_string encl("(,⊂\"");  // enclose content...
+            content[0] << UCS_string(encl) << content[1] << "\")";
+          }
+        else                            // general case: ««« string ... »»»
+          {
+            content[0] << "(";
+            for (size_t a = 1; a < content.size() - 1; ++a)
+                {
+                  if (a > 1)   content[0] << " ";
+                  content[0] << "\"" << content[a] << "\"";
+                }
+            content[0] << ")";
+          }
+
+        content[0] << " " << suffix;
+        process_line(content[0], 0);
+      }
 }
 //----------------------------------------------------------------------------
 void
@@ -184,8 +234,7 @@ Command::process_line(UCS_string & line, ostream * out)
         default: break;
       }
 
-   ++APL_expression_count;
-   do_APL_expression(line);
+   do_APL_expression(line, Value_P());
 }
 //----------------------------------------------------------------------------
 bool
@@ -213,7 +262,7 @@ const UCS_string orig_line(line);   // the original line
 UCS_string cmd;   // the command without arguments
 const size_t len = line.copy_black(cmd, 0);   // line w/o leading/trailing ws
 
-UCS_string arg(line, len, line.size() - len);
+UCS_string arg(line, len);
 UCS_string_vector args = split_arg(arg);
    line.clear();
 
@@ -325,15 +374,17 @@ UCS_string args_ucs(args_utf);
 }
 //----------------------------------------------------------------------------
 void
-Command::do_APL_expression(UCS_string & line)
+Command::do_APL_expression(UCS_string & line, Value_P literal)
 {
+   ++APL_expression_count;
+
    COUT << left << dec << nouppercase << setfill(' ');
    Workspace::more_error().clear();
 
 Executable * statements = 0;
    try
       {
-        statements = StatementList::fix(line, LOC);
+        statements = StatementList::fix(line, literal, LOC);
       }
    catch (Error err)
       {
@@ -493,8 +544,7 @@ check_EOC:
               //  the called (just poped) SI.
               //
               {
-                Prefix & prefix =
-                         Workspace::SI_top()->get_prefix();
+                Prefix & prefix = Workspace::SI_top()->get_prefix();
                 Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
 
                 new (&prefix.tos().get_token()) Token(token);
@@ -925,10 +975,10 @@ LibRef libref = LIB_NONE;   // default library reference number to copy from
             {
               const UCS_string & src = copy_once_table[row];
               UCS_string ws(UNI_SPACE);
-              ws.push_back(src.front());      // wsname
-              ws.push_back(UNI_SPACE);
-              ws.append(UCS_string(src, 2, src.size() - 2));
-              ws.push_back(UNI_SPACE);
+              ws << src.front();      // wsname
+              ws << UNI_SPACE;
+              ws << UCS_string(src, 2, src.size() - 2);
+              ws << UNI_SPACE;
               usv.push_back(ws);
             }
         usv.print_table(out, 1);
@@ -955,8 +1005,8 @@ const UCS_string wsname(args.front());
    // lib_wsname is the name in the copy_once_table
    //
 UCS_string lib_wsname(Unicode(libref + UNI_0));
-   lib_wsname.push_back(UNI_UNDERSCORE);
-   lib_wsname.append(wsname);
+   lib_wsname << UNI_UNDERSCORE;
+   lib_wsname << wsname;
 
    // silently return if wsname is already contained in the copy_once_table
    //
@@ -1085,20 +1135,13 @@ Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
 void
 Command::cmd_KEYB(ostream & out)
 {
+const UTF8_string filename = UserPreferences::uprefs.keyboard_layout_file;
+
    // maybe print user-supplied keyboard layout file
    //
    if (UserPreferences::uprefs.keyboard_layout_file.size())
       {
-        FILE * layout =
-               fopen(UserPreferences::uprefs.keyboard_layout_file.c_str(), "r");
-        if (layout == 0)
-           {
-             out << "Could not open "
-                 << UserPreferences::uprefs.keyboard_layout_file
-                 << ": " << strerror(errno) << endl
-                 << "Showing default layout instead" << endl;
-           }
-        else
+        if (FILE * layout = fopen(filename.c_str(), "r"))
            {
              out << "User-defined Keyboard Layout:\n";
              for (;;)
@@ -1110,10 +1153,19 @@ Command::cmd_KEYB(ostream & out)
              out << endl;
              return;
            }
+
+           {
+             out << "Could not open "
+                 << UserPreferences::uprefs.keyboard_layout_file
+                 << ": " << strerror(errno) << endl
+                 << "Showing default layout instead" << endl;
+           }
       }
 
-   out << "US Keyboard Layout:\n"
-                              "\n"
+   out << "US Keyboard Layout\n"
+                             "\n";
+
+UTF8_string_vector utf(
 "╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗\n"
 "║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║\n"
 "║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║\n"
@@ -1126,8 +1178,10 @@ Command::cmd_KEYB(ostream & out)
 "╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣\n"
 "║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?  ║          ║\n"
 "║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║\n"
-"╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝\n"
-   << endl;
+"╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝");
+
+   loop(u, utf.size())   out << utf[u] << endl << flush;
+   out << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -1253,7 +1307,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & _arg)
    // map alternate APL characters to standard ones
    //
 UCS_string arg;
-   loop(a, _arg.size())   arg.push_back(Avec::make_standard(_arg[a]));
+   loop(a, _arg.size())   arg << Avec::make_standard(_arg[a]);
 
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg.front()))
       {
@@ -1734,7 +1788,7 @@ UCS_string arg(UNI_0);
           else                   // relative path
             {
               path += '/';
-              path.append_UTF8(UTF8_string(buffer));
+              path << UTF8_string(buffer);
             }
        }
 
@@ -1760,7 +1814,7 @@ Command::is_directory(const dirent * entry, const UTF8_string & path)
 UTF8_string filename = path;
 UTF8_string entry_name(entry->d_name);
    filename += '/';
-   filename.append_UTF8(entry_name);
+   filename <<entry_name;
 
 DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
@@ -1871,7 +1925,7 @@ UCS_string_vector directories;
 
          if (is_directory(entry, path))
             {
-              filename.append(UNI_SLASH);
+              filename << UNI_SLASH;
               directories.push_back(filename);
               continue;
             }
@@ -2048,7 +2102,7 @@ Command::sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
 UTF8_string wsid_utf8(wsid);
 UTF8_string name(lib_path);   // e.g. /home/workspaces
    name += '/';               //      /home/workspaces/
-   name.append(wsid_utf8);    //      /home/workspaces/wsid
+   name << wsid_utf8;         //      /home/workspaces/wsid
 
    if (access(name.c_str(), R_OK) == 0)   // file is readable
       {
@@ -2559,7 +2613,7 @@ int mode = 0;
          // lambdas could contain spaces, collect all arguments in one string
          for (ShapeItem i = 1; i < args.ssize(); ++i)
             {
-               result.append(args[i]);
+               result << args[i];
             }
          // check if lamda-function closed properly
          if (result.back() == '}')
@@ -2754,18 +2808,17 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
   if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
      {
         // construct the left argument of the (dyadic) 'apl_function'
-        apl_cmd.append_quoted(cmd);
-        apl_cmd.append(UNI_SPACE);
+        apl_cmd.append_single_quoted(cmd);
+        apl_cmd << UNI_SPACE;
         loop(a, args.size())
            {
-             apl_cmd.append_quoted(args[a]);
-             apl_cmd.append(UNI_SPACE);
+             apl_cmd.append_single_quoted(args[a]);
+             apl_cmd << UNI_SPACE;
            }
      }
 
-   apl_cmd.append(Workspace::get_user_commands()[uidx].apl_function);
-   apl_cmd.append(UNI_SPACE);
-   apl_cmd.append_quoted(line);
+   apl_cmd << Workspace::get_user_commands()[uidx].apl_function << UNI_SPACE;
+   apl_cmd.append_single_quoted(line);
 }
 //----------------------------------------------------------------------------
 #ifdef cfg_DYNAMIC_LOG_WANTED
@@ -2915,8 +2968,7 @@ int idx = 1;
 
    // data + 1 is: NAME RK SHAPE RAVEL...
    //
-   while (idx < data.ssize() && data[idx] != UNI_SPACE)
-         name.append(data[idx++]);
+   while (idx < data.ssize() && data[idx] != UNI_SPACE)   name << data[idx++];
    ++idx;   // skip space after the name
 
 int rank = 0;
@@ -2978,7 +3030,7 @@ Symbol * sym = 0;
 
 Token_string tos;
    {
-     UCS_string data1(data, idx, data.size() - idx);
+     UCS_string data1(data, idx);
      Tokenizer tokenizer(PM_EXECUTE, LOC, false);
      if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
    }
@@ -3065,7 +3117,7 @@ Command::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
    // an Array in 2 ⎕TF format
    //
-UCS_string data1(&data[1], data.size() - 1);
+UCS_string data1(data, 1);
 UCS_string var_or_fun;
 
    // data1 is: VARNAME←data...
@@ -3077,7 +3129,7 @@ UCS_string var_or_fun;
            {
              const Unicode uni = data1[d];
              if (uni == UNI_LEFT_ARROW)   break;
-             var_name.append(uni);
+             var_name << uni;
            }
 
         if (!objects.contains(var_name))   return;
@@ -3099,14 +3151,14 @@ UCS_string fun_name;
 
    /// chars 1...' ' are the function name
    while ((idx < data.ssize()) && (data[idx] != UNI_SPACE))
-        fun_name.append(data[idx++]);
+        fun_name << data[idx++];
    ++idx;
 
    if (objects.size() && !objects.contains(fun_name))   return;
 
 UCS_string statement;
-   while (idx < data.ssize())   statement.append(data[idx++]);
-   statement.append(UNI_LF);
+   while (idx < data.ssize())   statement << data[idx++];
+   statement << UNI_LF;
 
 UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
    if (fun_name1.size() == 0)   // tf2_inverse() failed
@@ -3153,10 +3205,10 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
         const UTF8 utf = str[l];
         switch(utf)
            {
-             case '^': data.append(UNI_AND);              break;   // ~ → ∼
-             case '*': data.append(UNI_STAR_OPERATOR);    break;   // * → ⋆
-             case '~': data.append(UNI_TILDE_OPERATOR);   break;   // ~ → ∼
-             default:  data.append(Unicode(cp_to_uni_map[utf]));
+             case '^': data << UNI_AND;              break;   // ~ → ∼
+             case '*': data << UNI_STAR_OPERATOR;    break;   // * → ⋆
+             case '~': data << UNI_TILDE_OPERATOR;   break;   // ~ → ∼
+             default:  data << Unicode(cp_to_uni_map[utf]);
            }
       }
 }
@@ -3189,7 +3241,7 @@ bool got_minus = false;
    //
    while (s < user_arg.ssize()  &&
               user_arg[s] > ' ' &&
-              user_arg[s] != '-')  from.append(user_arg[s++]);
+              user_arg[s] != '-')  from << user_arg[s++];
 
    // skip spaces after from
    //
@@ -3207,7 +3259,7 @@ bool got_minus = false;
 
    // copy right of '-' to from
    //
-   while (s < user_arg.ssize() && user_arg[s] > ' ')  to.append(user_arg[s++]);
+   while (s < user_arg.ssize() && user_arg[s] > ' ')  to << user_arg[s++];
 
    // skip spaces after to
    //

@@ -74,18 +74,18 @@ Workspace::Workspace()
      top_SI(0)
 {
 /// Read-Only System Variable
-#define ro_sv_def(x, str, _txt)                                   \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define ro_sv_def(x, str, _txt)                         \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 /// Read/Write System Variable
-#define rw_sv_def(x, str, _txt)                                   \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define rw_sv_def(x, str, _txt)                         \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 /// System Function
-#define sf_def(x, str, _txt)                                      \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define sf_def(x, str, _txt)                            \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_function(q, ID_ ## x, &x::fun); }
 
 #include "SystemVariable.def"
@@ -265,7 +265,7 @@ Workspace::immediate_execution(bool exit_on_error)
        {
          try
            {
-              Command::process_line();
+              Command::process_lines();
            }
          catch (Error & err)
             {
@@ -379,7 +379,7 @@ SystemName * longest = 0;
         if (!Avec::is_symbol_char(uni))   break;
 
         if (uni >= 'a' && uni <= 'z')   uni = Unicode(uni - 0x20);
-        name.append(uni);
+        name << uni;
         SystemName * dn =
                the_workspace.distinguished_names.lookup_existing_symbol(name);
 
@@ -723,7 +723,7 @@ Workspace::backup_existing_file(const char * filename)
    if (access(filename, F_OK) != 0)   return false;   // OK
 
 UTF8_string backup_filename = filename;
-   backup_filename.append_ASCII(".bak");
+   backup_filename << ".bak";
 
    // 2. if backup file exists then remove it...
    //

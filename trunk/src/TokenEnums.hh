@@ -73,7 +73,7 @@ enum TokenClass
    TC_MAX_PHRASE_4 = TC_MAX_PHRASE*TC_MAX_PHRASE_3,   // TC_MAX_PHRASE ^ 4
 
    TC_OFF           = 0x12,
-   TC_SI_LEAVE      = 0x13,
+   TC_SI_CHANGE     = 0x13,
    TC_LINE          = 0x14,
    TC_DIAMOND       = 0x15,   // ◊
    TC_NUMERIC       = 0x16,   // 0-9, ¯

@@ -29,16 +29,92 @@
 #define __APL_ENUMS_HH_DEFINED__
 
 //----------------------------------------------------------------------------
+/// supposedly the longest possible filename
+enum
+{
+  APL_PATH_MAX = 4096
+};
+//----------------------------------------------------------------------------
 enum
 {
    MAX_RANK = cfg_MAX_RANK_WANTED
 };
 //----------------------------------------------------------------------------
-// whether ⎕LX shall be executed at the end of the file
-enum LX_mode
+/// Auxiliary processor numbers
+enum AP_num
 {
-   no_LX = 0,     ///< no
-   do_LX = 1      ///< yes
+  NO_AP          = -1,     ///< invalid AP
+  AP_NULL        = 0,      ///< invalid AP for structs using memset(0)
+  AP_GENERAL     = 0,      ///< AP for generic offers
+  AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
+  AP_FIRST_USER  = 1001,   ///< the first AP for APL users
+};
+//----------------------------------------------------------------------------
+/// the state of an assignment
+enum Assign_state
+{
+   ASS_none       = 0,   ///< no assignment (right of ←)
+   ASS_arrow_seen = 1,   ///< ← seen but no variable yet
+   ASS_var_seen   = 2,   ///< var and ← seen
+   ASS_unknown    = 3,   ///< not known (too much effort to figure it)
+};
+//----------------------------------------------------------------------------
+/// The bits in an uint32_t
+enum Bitmask
+{
+   BIT_0  = 1 <<  0,   ///<< dito.
+   BIT_1  = 1 <<  1,   ///<< dito.
+   BIT_2  = 1 <<  2,   ///<< dito.
+   BIT_3  = 1 <<  3,   ///<< dito.
+   BIT_4  = 1 <<  4,   ///<< dito.
+   BIT_5  = 1 <<  5,   ///<< dito.
+   BIT_6  = 1 <<  6,   ///<< dito.
+   BIT_7  = 1 <<  7,   ///<< dito.
+   BIT_8  = 1 <<  8,   ///<< dito.
+   BIT_9  = 1 <<  9,   ///<< dito.
+   BIT_10 = 1 << 10,   ///<< dito.
+   BIT_11 = 1 << 11,   ///<< dito.
+   BIT_12 = 1 << 12,   ///<< dito.
+   BIT_13 = 1 << 13,   ///<< dito.
+   BIT_14 = 1 << 14,   ///<< dito.
+   BIT_15 = 1 << 15,   ///<< dito.
+   BIT_16 = 1 << 16,   ///<< dito.
+   BIT_17 = 1 << 17,   ///<< dito.
+   BIT_18 = 1 << 18,   ///<< dito.
+   BIT_19 = 1 << 19,   ///<< dito.
+   BIT_20 = 1 << 20,   ///<< dito.
+   BIT_21 = 1 << 21,   ///<< dito.
+   BIT_22 = 1 << 22,   ///<< dito.
+   BIT_23 = 1 << 23,   ///<< dito.
+   BIT_24 = 1 << 24,   ///<< dito.
+   BIT_25 = 1 << 25,   ///<< dito.
+   BIT_26 = 1 << 26,   ///<< dito.
+   BIT_27 = 1 << 27,   ///<< dito.
+   BIT_28 = 1 << 28,   ///<< dito.
+   BIT_29 = 1 << 29,   ///<< dito.
+   BIT_30 = 1 << 30,   ///<< dito.
+   BIT_31 = 1 << 31    ///<< dito.
+};
+//----------------------------------------------------------------------------
+/// the cause for something
+enum Cause
+{
+   NO_CAUSE       = 0,
+   CAUSE_SHUTDOWN = 1,
+   CAUSE_ERASED   = 2,
+};
+//----------------------------------------------------------------------------
+/// the CDR data types
+enum CDR_type
+{
+   CDR_BOOL1   = 0,   ///< 1 bit boolean
+   CDR_INT32   = 1,   ///< 32 bit integer
+   CDR_FLT64   = 2,   ///< 64 bit double
+   CDR_CPLX128 = 3,   ///< 2*64 bit complex
+   CDR_CHAR8   = 4,   ///< 8 bit char
+   CDR_CHAR32  = 5,   ///< 32 bit char
+   CDR_PROG64  = 6,   ///< 2*32 bit progression vector
+   CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
 //----------------------------------------------------------------------------
 /// The possible cell types (in the ravel of an APL value)
@@ -81,99 +157,41 @@ enum Col_flags
    real_has_E    = 0x0200,   // real part scaled (exponential format)
    imag_has_E    = 0x0400,   // imag part scaled (exponential format)
 };
-
-///  What to list, used by )SYMBOLS, )VARS, and )FUNS.
-enum ListCategory
+//----------------------------------------------------------------------------
+/// the result of a comparison cell_1.compare(cell_2)
+enum Comp_result
 {
-  LIST_NONE    = 0,           ///< list nothing
-  LIST_VARS    = 0x01,        ///< list variables for )VARS
-  LIST_FUNS    = 0x02,        ///< list functions for )FNS
-  LIST_OPERS   = 0x04,        ///< list operators for )OPS
-  LIST_LABELS  = 0x08,        ///< list labels
-  LIST_ERASED  = 0x10,        ///< list erased symbols
-  LIST_INVALID = 0x20,        ///< list invalid symbols
-  LIST_UNUSED  = 0x40,        ///< list unused symbols
-  LIST_NAMES   = LIST_VARS    ///< list names for )NMS
-               | LIST_FUNS
-               | LIST_OPERS,
-  LIST_ALL     = 0xFFFFFFFF   ///< list everything
+  COMP_LT = -1,   ///< less than:     cell_1 < cell_2
+  COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
+  COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
 //----------------------------------------------------------------------------
-/// possible properties of a Value.
-enum ValueFlags
+/// the number of cores/tasks to be used
+enum CoreCount
 {
-  VF_NONE     = 0x0000,   ///< no flags
-  VF_complete = 0x0400,   ///< CHECK called
-  VF_marked   = 0x0800,   ///< marked to detect stale
-  VF_temp     = 0x1000,   ///< computed value
-  VF_member   = 0x2000,   ///< used for member access
-  VF_packed   = 0x4000,   ///< packed homogenious ravel
-};
-
-extern ostream & print_flags(ostream & out, ValueFlags flags);
-
-//----------------------------------------------------------------------------
-/// events for APL values
-enum VH_event
-{
-  VHE_None =  0,   ///< no event
-  VHE_Create,      ///< value created (shape is complete, ravel is not)
-  VHE_Unroll,      ///< rollback creation
-  VHE_Check,       ///< check function called (if enabled)
-  VHE_SetFlag,     ///< set a value flag
-  VHE_ClearFlag,   ///< clear a value flag
-  VHE_Erase,       ///< erase the value
-  VHE_Destruct,    ///< destruct the value
-  VHE_Error,       ///< some APL error has occurred
-  VHE_PtrNew,      ///< new Value_P created
-  VHE_PtrNew0,     ///< new Value_P with 0-pointer created
-  VHE_PtrCopy,     ///< Value_P copied with constructor(Value_P)
-  VHE_PtrCopy3,    ///< Value_P copied with operator =()
-  VHE_PtrClr,      ///< Value_P cleared
-  VHE_PtrDel,      ///< Value_P deleted
-  VHE_PtrDel0,     ///< Value_P deleted (with 0 pointer)
-  VHE_TokCopy,     ///< token with Value_P copied
-  VHE_TokMove,     ///< token with Value_P moved
-  VHE_Completed,   ///< incomplete ravel set to 42424242
-  VHE_Stale,       ///< stale value erased
-  VHE_Visit,       ///< test point
+  CCNT_UNKNOWN = -1,   ///< unknown core count
+  CCNT_0       = 0,    ///<< no core
+  CCNT_1       = 1,    ///< one core ...
 };
 //----------------------------------------------------------------------------
-/// The bits in an uint32_t
-enum Bitmask
+/// the cores/tasks to be used
+enum CoreNumber
 {
-   BIT_0  = 1 <<  0,   ///<< dito.
-   BIT_1  = 1 <<  1,   ///<< dito.
-   BIT_2  = 1 <<  2,   ///<< dito.
-   BIT_3  = 1 <<  3,   ///<< dito.
-   BIT_4  = 1 <<  4,   ///<< dito.
-   BIT_5  = 1 <<  5,   ///<< dito.
-   BIT_6  = 1 <<  6,   ///<< dito.
-   BIT_7  = 1 <<  7,   ///<< dito.
-   BIT_8  = 1 <<  8,   ///<< dito.
-   BIT_9  = 1 <<  9,   ///<< dito.
-   BIT_10 = 1 << 10,   ///<< dito.
-   BIT_11 = 1 << 11,   ///<< dito.
-   BIT_12 = 1 << 12,   ///<< dito.
-   BIT_13 = 1 << 13,   ///<< dito.
-   BIT_14 = 1 << 14,   ///<< dito.
-   BIT_15 = 1 << 15,   ///<< dito.
-   BIT_16 = 1 << 16,   ///<< dito.
-   BIT_17 = 1 << 17,   ///<< dito.
-   BIT_18 = 1 << 18,   ///<< dito.
-   BIT_19 = 1 << 19,   ///<< dito.
-   BIT_20 = 1 << 20,   ///<< dito.
-   BIT_21 = 1 << 21,   ///<< dito.
-   BIT_22 = 1 << 22,   ///<< dito.
-   BIT_23 = 1 << 23,   ///<< dito.
-   BIT_24 = 1 << 24,   ///<< dito.
-   BIT_25 = 1 << 25,   ///<< dito.
-   BIT_26 = 1 << 26,   ///<< dito.
-   BIT_27 = 1 << 27,   ///<< dito.
-   BIT_28 = 1 << 28,   ///<< dito.
-   BIT_29 = 1 << 29,   ///<< dito.
-   BIT_30 = 1 << 30,   ///<< dito.
-   BIT_31 = 1 << 31    ///<< dito.
+  CNUM_INVALID = -1,  ///< invalid core
+  CNUM_MASTER  = 0,   ///< the interpreter core
+  CNUM_WORKER1 = 1,   ///< the first worker core ...
+};
+//----------------------------------------------------------------------------
+/// the CPUs reported by the OS
+enum CPU_Number
+{
+   CPU_0 = 0   ///< the first (only) CPU
+};
+//----------------------------------------------------------------------------
+/// the number of CPUs available
+enum CPU_count
+{
+   CPU_CNT_1 = 1   ///< one CPU
 };
 //----------------------------------------------------------------------------
 /// the line number of an APL function line (0 being the line to
@@ -202,7 +220,122 @@ const Function_Line before_increment = fl;
    fl = Function_Line(fl + 1);
    return before_increment;
 }
+//----------------------------------------------------------------------------
+/// an offset into the body of a user-defined function. If we consider the APL
+/// interpreter as a high-level machine that executes token in user defined
+/// functions then this offset is the "program counter" of the high-level
+/// machine.
+enum Function_PC
+{
+   Function_PC_0       =  0,   ///< the first token in a function
+   Function_PC_done    = -1,   ///< goto 0 (leave function)
+   Function_PC_invalid = -1    ///< dito
+};
+//----------------------------------------------------------------------------
+/// signature of a defined function
+enum Fun_signature
+{
+   // signature atoms
+   //
+   SIG_NONE            = 0,      ///< 
+   SIG_Z               = 0x01,   ///< function has a result
+   SIG_A               = 0x02,   ///< function has a left argument
+   SIG_LO              = 0x04,   ///< operator left operand
+   SIG_FUN             = 0x08,   ///< function (always set)
+   SIG_RO              = 0x10,   ///< operator right operand
+   SIG_X               = 0x20,   ///< RO has an axis
+   SIG_B               = 0x40,   ///< function has a right argument
 
+   // operator variants
+   //
+   SIG_FUN_X           = SIG_FUN | SIG_X,     ///< function with axis
+   SIG_OP1             = SIG_LO  | SIG_FUN,   ///< monadic operator
+   SIG_OP1_X           = SIG_OP1 | SIG_X,     ///< monadic operator with axis
+   SIG_OP2             = SIG_OP1 | SIG_RO,    ///< dyadic operator
+   SIG_LORO            = SIG_LO  | SIG_RO,    ///< monadic or dyadic operator
+
+   // argument variants
+   //
+   SIG_NIL             = SIG_NONE,            ///< niladic function
+   SIG_MON             = SIG_B,               ///< monadic function or operator
+   SIG_DYA             = SIG_A | SIG_B,       ///< dyadic function or operator
+
+   // allowed combinations of operator variants and argument variants...
+
+   // niladic
+   //
+   SIG_F0              = SIG_FUN | SIG_NIL,             ///< dito
+
+   SIG_Z_F0            = SIG_Z   | SIG_F0,              ///< dito
+
+   // monadic
+   //
+   SIG_F1_B            = SIG_MON | SIG_FUN,             ///< dito
+   SIG_F1_X_B          = SIG_MON | SIG_FUN_X,           ///< dito
+   SIG_LO_OP1_B        = SIG_MON | SIG_OP1,             ///< dito
+   SIG_LO_OP1_X_B      = SIG_MON | SIG_OP1_X,           ///< dito
+   SIG_LO_OP2_RO_B     = SIG_MON | SIG_OP2,             ///< dito
+
+   SIG_Z_F1_B          = SIG_Z   | SIG_F1_B,            ///< dito
+   SIG_Z_F1_X_B        = SIG_Z   | SIG_F1_X_B,          ///< dito
+   SIG_Z_LO_OP1_B      = SIG_Z   | SIG_LO_OP1_B,        ///< dito
+   SIG_Z_LO_OP1_X_B    = SIG_Z   | SIG_LO_OP1_X_B,      ///< dito
+   SIG_Z_LO_OP2_RO_B   = SIG_Z   | SIG_LO_OP2_RO_B,     ///< dito
+
+   // dyadic
+   //
+   SIG_A_F2_B          = SIG_DYA | SIG_FUN,             ///< dito
+   SIG_A_F2_X_B        = SIG_DYA | SIG_FUN_X,           ///< dito
+   SIG_A_LO_OP1_B      = SIG_DYA | SIG_OP1,             ///< dito
+   SIG_A_LO_OP1_X_B    = SIG_DYA | SIG_OP1_X,           ///< dito
+   SIG_A_LO_OP2_RO_B   = SIG_DYA | SIG_OP2,             ///< dito
+
+   SIG_Z_A_F2_B        = SIG_Z   | SIG_A_F2_B,          ///< dito
+   SIG_Z_A_F2_X_B      = SIG_Z   | SIG_A_F2_X_B,        ///< dito
+   SIG_Z_A_LO_OP1_B    = SIG_Z   | SIG_A_LO_OP1_B,      ///< dito
+   SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
+   SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
+};
+//----------------------------------------------------------------------------
+/// (unnamed) lambda number
+enum Lambda_number
+{
+   LAMBDA_NUM_0 = 0   // first (or named) lambda
+};
+//----------------------------------------------------------------------------
+///  What to list, used by )SYMBOLS, )VARS, and )FUNS.
+enum ListCategory
+{
+  LIST_NONE    = 0,           ///< list nothing
+  LIST_VARS    = 0x01,        ///< list variables for )VARS
+  LIST_FUNS    = 0x02,        ///< list functions for )FNS
+  LIST_OPERS   = 0x04,        ///< list operators for )OPS
+  LIST_LABELS  = 0x08,        ///< list labels
+  LIST_ERASED  = 0x10,        ///< list erased symbols
+  LIST_INVALID = 0x20,        ///< list invalid symbols
+  LIST_UNUSED  = 0x40,        ///< list unused symbols
+  LIST_NAMES   = LIST_VARS    ///< list names for )NMS
+               | LIST_FUNS
+               | LIST_OPERS,
+  LIST_ALL     = 0xFFFFFFFF   ///< list everything
+};
+//----------------------------------------------------------------------------
+// whether ⎕LX shall be executed at the end of the file
+enum LX_mode
+{
+   no_LX = 0,     ///< no
+   do_LX = 1      ///< yes
+};
+//----------------------------------------------------------------------------
+/// the status of a function line
+enum Multiline_status
+{
+   MLS_Function_header = 0,   ///< function header
+   MLS_APL_text        = 1,   ///< normal APL text
+   MLS_Start_of_multi  = 2,   ///< start of a nulti-line string or literal
+   MLS_Inside_multi    = 3,   ///< start of a nulti-line string or literal
+   MLS_End_of_multi    = 4   ///< end of a nulti-line string or literal 
+};
 //----------------------------------------------------------------------------
 ///  What is being parsed (defined function, immediate execution statements,
 /// or ⍎expr)
@@ -323,88 +456,6 @@ enum PrintStyle
                      | PST_NARS,
 };
 //----------------------------------------------------------------------------
-/// an offset into the body of a user-defined function. If we consider the APL
-/// interpreter as a high-level machine that executes token in user defined
-/// functions then this offset is the "program counter" of the high-level
-/// machine.
-enum Function_PC
-{
-   Function_PC_0       =  0,   ///< the first token in a function
-   Function_PC_done    = -1,   ///< goto 0 (leave function)
-   Function_PC_invalid = -1    ///< dito
-};
-//----------------------------------------------------------------------------
-/// signature of a defined function
-enum Fun_signature
-{
-   // signature atoms
-   //
-   SIG_NONE            = 0,      ///< 
-   SIG_Z               = 0x01,   ///< function has a result
-   SIG_A               = 0x02,   ///< function has a left argument
-   SIG_LO              = 0x04,   ///< operator left operand
-   SIG_FUN             = 0x08,   ///< function (always set)
-   SIG_RO              = 0x10,   ///< operator right operand
-   SIG_X               = 0x20,   ///< RO has an axis
-   SIG_B               = 0x40,   ///< function has a right argument
-
-   // operator variants
-   //
-   SIG_FUN_X           = SIG_FUN | SIG_X,     ///< function with axis
-   SIG_OP1             = SIG_LO  | SIG_FUN,   ///< monadic operator
-   SIG_OP1_X           = SIG_OP1 | SIG_X,     ///< monadic operator with axis
-   SIG_OP2             = SIG_OP1 | SIG_RO,    ///< dyadic operator
-   SIG_LORO            = SIG_LO  | SIG_RO,    ///< monadic or dyadic operator
-
-   // argument variants
-   //
-   SIG_NIL             = SIG_NONE,            ///< niladic function
-   SIG_MON             = SIG_B,               ///< monadic function or operator
-   SIG_DYA             = SIG_A | SIG_B,       ///< dyadic function or operator
-
-   // allowed combinations of operator variants and argument variants...
-
-   // niladic
-   //
-   SIG_F0              = SIG_FUN | SIG_NIL,             ///< dito
-
-   SIG_Z_F0            = SIG_Z   | SIG_F0,              ///< dito
-
-   // monadic
-   //
-   SIG_F1_B            = SIG_MON | SIG_FUN,             ///< dito
-   SIG_F1_X_B          = SIG_MON | SIG_FUN_X,           ///< dito
-   SIG_LO_OP1_B        = SIG_MON | SIG_OP1,             ///< dito
-   SIG_LO_OP1_X_B      = SIG_MON | SIG_OP1_X,           ///< dito
-   SIG_LO_OP2_RO_B     = SIG_MON | SIG_OP2,             ///< dito
-
-   SIG_Z_F1_B          = SIG_Z   | SIG_F1_B,            ///< dito
-   SIG_Z_F1_X_B        = SIG_Z   | SIG_F1_X_B,          ///< dito
-   SIG_Z_LO_OP1_B      = SIG_Z   | SIG_LO_OP1_B,        ///< dito
-   SIG_Z_LO_OP1_X_B    = SIG_Z   | SIG_LO_OP1_X_B,      ///< dito
-   SIG_Z_LO_OP2_RO_B   = SIG_Z   | SIG_LO_OP2_RO_B,     ///< dito
-
-   // dyadic
-   //
-   SIG_A_F2_B          = SIG_DYA | SIG_FUN,             ///< dito
-   SIG_A_F2_X_B        = SIG_DYA | SIG_FUN_X,           ///< dito
-   SIG_A_LO_OP1_B      = SIG_DYA | SIG_OP1,             ///< dito
-   SIG_A_LO_OP1_X_B    = SIG_DYA | SIG_OP1_X,           ///< dito
-   SIG_A_LO_OP2_RO_B   = SIG_DYA | SIG_OP2,             ///< dito
-
-   SIG_Z_A_F2_B        = SIG_Z   | SIG_A_F2_B,          ///< dito
-   SIG_Z_A_F2_X_B      = SIG_Z   | SIG_A_F2_X_B,        ///< dito
-   SIG_Z_A_LO_OP1_B    = SIG_Z   | SIG_A_LO_OP1_B,      ///< dito
-   SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
-   SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
-};
-//----------------------------------------------------------------------------
-/// (unnamed) lambda number
-enum Lambda_number
-{
-   LAMBDA_NUM_0 = 0   // first (or named) lambda
-};
-//----------------------------------------------------------------------------
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {
@@ -417,72 +468,6 @@ enum SI_mode
    SIM_SINL       = SIM_name_list,
    SIM_SI_dbg     = SIM_debug,
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
-};
-//----------------------------------------------------------------------------
-/// the number of cores/tasks to be used
-enum CoreCount
-{
-  CCNT_UNKNOWN = -1,   ///< unknown core count
-  CCNT_0       = 0,    ///<< no core
-  CCNT_1       = 1,    ///< one core ...
-};
-//----------------------------------------------------------------------------
-/// the cores/tasks to be used
-enum CoreNumber
-{
-  CNUM_INVALID = -1,  ///< invalid core
-  CNUM_MASTER  = 0,   ///< the interpreter core
-  CNUM_WORKER1 = 1,   ///< the first worker core ...
-};
-//----------------------------------------------------------------------------
-/// the CPUs reported by the OS
-enum CPU_Number
-{
-   CPU_0 = 0   ///< the first (only) CPU
-};
-//----------------------------------------------------------------------------
-/// the number of CPUs available
-enum CPU_count
-{
-   CPU_CNT_1 = 1   ///< one CPU
-};
-//----------------------------------------------------------------------------
-/// the state of an assignment
-enum Assign_state
-{
-   ASS_none       = 0,   ///< no assignment (right of ←)
-   ASS_arrow_seen = 1,   ///< ← seen but no variable yet
-   ASS_var_seen   = 2,   ///< var and ← seen
-   ASS_unknown    = 3,   ///< not known (too much effort to figure it)
-};
-//----------------------------------------------------------------------------
-/// the cause for something
-enum Cause
-{
-   NO_CAUSE       = 0,
-   CAUSE_SHUTDOWN = 1,
-   CAUSE_ERASED   = 2,
-};
-//----------------------------------------------------------------------------
-/// the CDR data types
-enum CDR_type
-{
-   CDR_BOOL1   = 0,   ///< 1 bit boolean
-   CDR_INT32   = 1,   ///< 32 bit integer
-   CDR_FLT64   = 2,   ///< 64 bit double
-   CDR_CPLX128 = 3,   ///< 2*64 bit complex
-   CDR_CHAR8   = 4,   ///< 8 bit char
-   CDR_CHAR32  = 5,   ///< 32 bit char
-   CDR_PROG64  = 6,   ///< 2*32 bit progression vector
-   CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
-};
-//----------------------------------------------------------------------------
-/// the result of a comparison cell_1.compare(cell_2)
-enum Comp_result
-{
-  COMP_LT = -1,   ///< less than:     cell_1 < cell_2
-  COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
-  COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
 //----------------------------------------------------------------------------
 /// the order of a comparison
@@ -502,22 +487,6 @@ enum Symbol_Event
    SEV_ERASED   = 5,
 };
 //----------------------------------------------------------------------------
-/// Auxiliary processor numbers
-enum AP_num
-{
-  NO_AP          = -1,     ///< invalid AP
-  AP_NULL        = 0,      ///< invalid AP for structs using memset(0)
-  AP_GENERAL     = 0,      ///< AP for generic offers
-  AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
-  AP_FIRST_USER  = 1001,   ///< the first AP for APL users
-};
-//----------------------------------------------------------------------------
-/// supposedly the longest possible filename
-enum
-{
-  APL_PATH_MAX = 4096
-};
-//----------------------------------------------------------------------------
 enum TimeScale
 {
   SECONDS_PER_MINUTE  =     60 * 1,                      ///<         60
@@ -527,6 +496,46 @@ enum TimeScale
   SECONDS_PER_MONTH   =     30 * SECONDS_PER_DAY,        ///<  2,592,000
   SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
   SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
+};
+//----------------------------------------------------------------------------
+/// possible properties of a Value.
+enum ValueFlags
+{
+  VF_NONE     = 0x0000,   ///< no flags
+  VF_complete = 0x0400,   ///< CHECK called
+  VF_marked   = 0x0800,   ///< marked to detect stale
+  VF_temp     = 0x1000,   ///< computed value
+  VF_member   = 0x2000,   ///< used for member access
+  VF_packed   = 0x4000,   ///< packed homogenious ravel
+};
+
+extern ostream & print_flags(ostream & out, ValueFlags flags);
+
+//----------------------------------------------------------------------------
+/// events for APL values
+enum VH_event
+{
+  VHE_None =  0,   ///< no event
+  VHE_Create,      ///< value created (shape is complete, ravel is not)
+  VHE_Unroll,      ///< rollback creation
+  VHE_Check,       ///< check function called (if enabled)
+  VHE_SetFlag,     ///< set a value flag
+  VHE_ClearFlag,   ///< clear a value flag
+  VHE_Erase,       ///< erase the value
+  VHE_Destruct,    ///< destruct the value
+  VHE_Error,       ///< some APL error has occurred
+  VHE_PtrNew,      ///< new Value_P created
+  VHE_PtrNew0,     ///< new Value_P with 0-pointer created
+  VHE_PtrCopy,     ///< Value_P copied with constructor(Value_P)
+  VHE_PtrCopy3,    ///< Value_P copied with operator =()
+  VHE_PtrClr,      ///< Value_P cleared
+  VHE_PtrDel,      ///< Value_P deleted
+  VHE_PtrDel0,     ///< Value_P deleted (with 0 pointer)
+  VHE_TokCopy,     ///< token with Value_P copied
+  VHE_TokMove,     ///< token with Value_P moved
+  VHE_Completed,   ///< incomplete ravel set to 42424242
+  VHE_Stale,       ///< stale value erased
+  VHE_Visit,       ///< test point
 };
 //----------------------------------------------------------------------------
 /// the number of TOK_VOID removed from the body of an \b Executable

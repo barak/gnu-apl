@@ -257,7 +257,7 @@ UCS_string var_name;
       {
         const Unicode uni = Unicode(*var_name_ucs++);
         if (!Avec::is_symbol_char(uni))   return 0;
-        var_name.append(uni);
+        var_name << uni;
       }
 
 Symbol * symbol = Workspace::lookup_symbol(var_name);
@@ -384,7 +384,7 @@ apl_exec_ucs(const unsigned int * line_ucs)
 { 
 UCS_string line;
    line.reserve(200);
-   while (*line_ucs)   line.append(Unicode(*line_ucs++));
+   while (*line_ucs)   line << Unicode(*line_ucs++);
 
 const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line, 0);
@@ -485,7 +485,7 @@ apl_command_ucs(const unsigned int * command)
 {
 UCS_string command_ucs;
    command_ucs.reserve(200);
-   while (*command)   command_ucs.append(Unicode(*command++));
+   while (*command)   command_ucs << Unicode(*command++);
 
 ostringstream out;
   Command::do_APL_command(out, command_ucs);
@@ -535,8 +535,7 @@ UTF8_string text;
    text.reserve(len);
    for (const char ** f = function_lines_utf8; *f; ++f)
       {
-        text.append_ASCII(*f);
-        text += UNI_LF;
+        text << *f << UNI_LF;
       }
 
    return fix_function_NL(text.c_str());
@@ -553,7 +552,7 @@ get_function_ucs(const unsigned int * name, APL_function * L, APL_function * R)
 {
 UCS_string function_ucs;
    function_ucs.reserve(40);
-   while (*name)   function_ucs.append(Unicode(*name++));
+   while (*name)   function_ucs << Unicode(*name++);
 
    if (function_ucs.size() == 0)   return 0;   // empty name
 
@@ -638,7 +637,7 @@ print_ucs(FILE * out, const unsigned int * string_ucs)
 {
 UCS_string ucs;
    ucs.reserve(200);
-   while (*string_ucs)   ucs.append(Unicode(*string_ucs++));
+   while (*string_ucs)   ucs << Unicode(*string_ucs++);
 
 UTF8_string utf8(ucs);
    fprintf(out, "%s", utf8.c_str());

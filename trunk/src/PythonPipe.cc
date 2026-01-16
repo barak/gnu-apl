@@ -44,8 +44,8 @@ UTF8_string argv1_utf;
      const char * bin_dir = LibPaths::get_APL_bin_path();
      UTF8_string path1("./");      // current directory
      UTF8_string path2(bin_dir);   // where apl shll be installed
-     path1.append_ASCII(script);
-     path2.append_ASCII(script);
+     path1 << script;
+     path2 << script;
      if      (access(path1.c_str(), R_OK) == 0)   argv1_utf = path1;
      else if (access(path2.c_str(), R_OK) == 0)   argv1_utf = path2;
      else
@@ -121,7 +121,7 @@ UTF8_string ret;
 
    if (fd == -1)
       {
-         ret.append_ASCII("<!END-OF-FILE!>.");
+         ret << "<!END-OF-FILE!>.";
          return UCS_string(ret);   // connection was closed
       }
 

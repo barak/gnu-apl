@@ -32,6 +32,7 @@
 #include "Quad_TF.hh"
 #include "Symbol.hh"
 #include "Tokenizer.hh"
+#include "Token_string.hh"
 #include "Workspace.hh"
 
 Quad_TF   Quad_TF::fun;
@@ -131,21 +132,18 @@ Quad_TF::tf1(const UCS_string & var_name, Value_P val)
 const bool is_char_array = val->get_cfirst().is_character_cell();
 UCS_string ucs(is_char_array ? UNI_C : UNI_N);
 
-   ucs.append(var_name);
-   ucs.append(UNI_SPACE);
-   ucs.append_number(val->get_rank());   // rank
+   ucs << var_name << UNI_SPACE << val->get_rank();               // rank
 
    loop(r, val->get_rank())
       {
-        ucs.append(UNI_SPACE);
-        ucs.append_number(val->get_shape_item(r));   // shape
+        ucs << UNI_SPACE << val->get_shape_item(r);   // shape
       }
 
 const ShapeItem ec = val->element_count();
 
    if (is_char_array)
       {
-        ucs.append(UNI_SPACE);
+        ucs << UNI_SPACE;
 
         loop(e, ec)
            {
@@ -155,40 +153,40 @@ const ShapeItem ec = val->element_count();
                   return  Str0(LOC);
                 }
 
-             ucs.append(cell.get_char_value());
+             ucs << cell.get_char_value();
            }
       }
    else   // number
       {
         loop(e, ec)
            {
-             ucs.append(UNI_SPACE);
+             ucs << UNI_SPACE;
 
              const Cell & cell = val->get_cravel(e);
              if (cell.is_integer_cell())
                 {
-                  const int sign = ucs.size();
-                  ucs.append_number(cell.get_int_value());
-                  if (ucs[sign] == '-')   ucs[sign] = UNI_OVERBAR;
+                  const int sign_pos = ucs.size();
+                  ucs << cell.get_int_value();
+                  if (ucs[sign_pos] == '-')   ucs[sign_pos] = UNI_OVERBAR;
                 }
              else if (cell.is_near_real())
                 {
                   PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
                   bool scaled = true;
                   UCS_string ucs1(cell.get_real_value(), scaled, pctx);
-                  ucs.append(ucs1);
+                  ucs << ucs1;
                 }
              else if (cell.is_numeric())
                 {
                   PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
                   bool scaled = true;
                   UCS_string ucs1(cell.get_real_value(), scaled, pctx);
-                  ucs.append(ucs1);
+                  ucs << ucs1;
 
-                  ucs.append(UNI_J);
+                  ucs << UNI_J;
 
                   ucs1 = UCS_string(cell.get_imag_value(), scaled, pctx);
-                  ucs.append(ucs1);
+                  ucs << ucs1;
                 }
              else
                 {
@@ -209,20 +207,16 @@ UCS_string_vector lines;
 const size_t max_len = text.to_vector(lines);
 
 UCS_string ucs;
-   ucs.append(UNI_F);
-   ucs.append(fun_name);
-   ucs.append(UNI_SPACE);
-   ucs.append_number(2);   // rank
-   ucs.append(UNI_SPACE);
-   ucs.append_number(lines.size());   // rows
-   ucs.append(UNI_SPACE);
-   ucs.append_number(max_len);        // cols
-   ucs.append(UNI_SPACE);
+   ucs << UNI_F << fun_name
+       << UNI_SPACE << 2               // rank
+       << UNI_SPACE << lines.size()    // rows
+       << UNI_SPACE << max_len         // cols
+       << UNI_SPACE;
 
    loop(l, lines.size())
       {
-       ucs.append(lines[l]);
-       loop(c, max_len - lines[l].size())   ucs.append(UNI_SPACE);
+       ucs << lines[l];
+       loop(c, max_len - lines[l].size())   ucs << UNI_SPACE;
       }
 
    return Value_P(ucs, LOC);
@@ -256,7 +250,7 @@ UCS_string name(ravel[1]);
 
 ShapeItem idx = 2;
    while (idx < len && Avec::is_symbol_char(ravel[idx]))
-         name.append(ravel[idx++]);
+         name << ravel[idx++];
 
    if (Avec::is_quad(name[0]) && name.size() == 1)
       {
@@ -503,11 +497,11 @@ UCS_string ucs_value; /// the right hand side of VAR←VALUE
    Assert(ucs_value[ucs_value.size() - 1] == UNI_R_PARENT);
 
 UCS_string ucs(var_name);
-   ucs.append(UNI_LEFT_ARROW);
+   ucs << UNI_LEFT_ARROW;
 
    // copy ucs_value except the outer parrentheses
    for (ShapeItem v = 1; v < (ucs_value.ssize() - 1); ++v)
-       ucs.append(ucs_value[v]);
+       ucs << ucs_value[v];
 
    Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
 Value_P Z(ucs, LOC);
@@ -653,8 +647,8 @@ const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
 void
 Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
 {
-   ucs.append(UNI_L_PARENT);
-   loop(n, nesting)   ucs.append(UNI_SUBSET);   // ⊂...
+   ucs << UNI_L_PARENT;
+   loop(n, nesting)   ucs << UNI_SUBSET;   // ⊂...
 
    // scalars are ''⍴SCALAR but ''⍴ has no effect and can be omitted
 
@@ -662,11 +656,11 @@ Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
       {
         loop(r, shape.get_rank())
             {
-              if (r)   ucs.append(UNI_SPACE);
-              ucs.append_number(shape.get_shape_item(r));
+              if (r)   ucs << UNI_SPACE;
+              ucs << shape.get_shape_item(r);
             }
 
-        ucs.append(UNI_RHO);
+        ucs << UNI_RHO;
       }
 }
 //----------------------------------------------------------------------------
@@ -690,10 +684,8 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
         const Cell & cell = value.get_cfirst();
         if (cell.is_character_cell())
            {
-             ucs.append(UNI_L_PARENT);
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(UNI_R_PARENT);
+             ucs << UNI_L_PARENT << UNI_SINGLE_QUOTE
+                 << UNI_SINGLE_QUOTE << UNI_R_PARENT;
              return;
            }
       }
@@ -705,7 +697,7 @@ const ShapeItem ec = value.nz_element_count();
    tf2_shape(ucs, value.get_shape(), nesting);
    if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_cfirst());
    else                   tf2_all_char_ravel(level, ucs, value);
-   ucs.append(UNI_R_PARENT);   // close corresponding '(' from tf2_shape()
+   ucs << UNI_R_PARENT;   // close corresponding '(' from tf2_shape()
 
    Log(LOG_Quad_TF)
       {
@@ -723,7 +715,7 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
 
    loop(e, len)
        {
-         if (e)   ucs.append(UNI_SPACE);
+         if (e)   ucs << UNI_SPACE;
          const Cell & cell = *cells++;
 
          if (cell.is_pointer_cell())
@@ -749,23 +741,20 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
              bool scaled = true;
              UCS_string ucs1(cell.get_real_value(), scaled, pctx);
              UCS_string ucs2(cell.get_imag_value(), scaled, pctx);
-             ucs.append(ucs1);
-             ucs.append(UNI_J);
-             ucs.append(ucs2);
+             ucs << ucs1 << UNI_J << ucs2;
            }
         else if (cell.is_float_cell())
            {
              PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
              bool scaled = true;
              UCS_string ucs1(cell.get_real_value(), scaled, pctx);
-             ucs.append(ucs1);
+             ucs << ucs1;
            }
         else
            {
              PrintContext pctx(PR_APL_FUN);
              const PrintBuffer pb = cell.character_representation(pctx);
-
-             ucs.append(pb.l1());
+             ucs << pb.l1();
            }
         }
 }
@@ -791,24 +780,22 @@ const ShapeItem ec = value.nz_element_count();
 
    if (use_UCS)
       {
-        ucs.append_UTF8("⎕UCS");
+        ucs << "⎕UCS";
         loop(e, ec)
             {
-              ucs.append(UNI_SPACE);
-              const Unicode uni = value.get_cravel(e).get_char_value();
-              ucs.append_number(uni);
+              ucs << UNI_SPACE << int(value.get_cravel(e).get_char_value());
             }
       }
    else
       {
-        ucs.append(UNI_SINGLE_QUOTE);
+        ucs << UNI_SINGLE_QUOTE;
         loop(e, ec)
             {
               const Unicode uni = value.get_cravel(e).get_char_value();
-              ucs.append(uni);
-              if (uni == UNI_SINGLE_QUOTE)   ucs.append(UNI_SINGLE_QUOTE);
+              ucs << uni;
+              if (uni == UNI_SINGLE_QUOTE)   ucs << UNI_SINGLE_QUOTE;
             }
-        ucs.append(UNI_SINGLE_QUOTE);
+        ucs << UNI_SINGLE_QUOTE;
       }
 }
 //----------------------------------------------------------------------------
@@ -848,11 +835,11 @@ ShapeItem skipped = 0;
                     tos[s].get_Class() == TC_VALUE; ++s)
                 {
                   tf2_toggle_UCS(*tos[s].get_apl_val().get());
-                  tos[s - skipped].move(tos[s], LOC);
+                  tos[s - skipped].move_from(tos[s], LOC);
                 }
            }
 
-        if (skipped)   tos[s - skipped].move(tos[s], LOC);
+        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
 
       }
 
@@ -915,7 +902,7 @@ ShapeItem skipped = 0;
            {
              // no match: copy the token (but never to itself)
              //
-             if (skipped)   tos[s - skipped].move(tos[s], LOC);
+             if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
@@ -930,14 +917,14 @@ ShapeItem skipped = 0;
         Value_P bval = tos[s].get_apl_val();
         if (sh.get_volume() == bval->element_count())   // same volume
            {
-             tos[s - skipped].move(tos[s], LOC);
+             tos[s - skipped].move_from(tos[s], LOC);
              tos[s - skipped].ChangeTag(TOK_APL_VALUE1);
              bval->set_shape(sh);
            }
         else
            {
              Token t = Bif_F12_RHO::do_reshape(sh, *bval);
-             tos[s - skipped].move(t, LOC);
+             tos[s - skipped].move_from(t, LOC);
            }
       }
 
@@ -976,7 +963,7 @@ ShapeItem skipped = 0;
            !tos[s + 5].get_apl_val()->is_int_scalar())      // K not integer
            {
              if (skipped)   // dont copy to itself
-                tos[s - skipped].move(tos[s], LOC);
+                tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
@@ -991,7 +978,7 @@ ShapeItem skipped = 0;
         loop(k, K)   sequence->next_ravel_Int(N + k);
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
-        tos[s - skipped].move(tok, LOC);
+        tos[s - skipped].move_from(tok, LOC);
         s += 5;   skipped += 5;
       }
 
@@ -1033,7 +1020,7 @@ ShapeItem skipped = 0;
            !tos[s + 7].get_apl_val()->is_int_scalar())      // K not integer
            {
              if (skipped)   // dont copy to itself
-                tos[s - skipped].move(tos[s], LOC);
+                tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
@@ -1050,7 +1037,7 @@ ShapeItem skipped = 0;
         loop(k, K)   sequence->next_ravel_Int(M * (N + k));
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
-        tos[s - skipped].move(tok, LOC);
+        tos[s - skipped].move_from(tok, LOC);
         s += 7;   skipped += 7;
       }
 
@@ -1080,14 +1067,14 @@ ShapeItem skipped = 0;
             tos[s + 2].get_tag()   == TOK_F12_RHO)           // followed by ⍴
            {
              if (skipped)   // dont copy to itself
-                tos[s - skipped].move(tos[s], LOC);
+                tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
         Value_P B = tos[s + 1].get_apl_val();
         if (B->is_simple_scalar())
            {
-             tos[s - skipped].move(tos[s + 1], LOC);
+             tos[s - skipped].move_from(tos[s + 1], LOC);
            }
         else
            {
@@ -1095,7 +1082,7 @@ ShapeItem skipped = 0;
              enc_B->next_ravel_Pointer(B.get());
              enc_B->check_value(LOC);
              Token tok(TOK_APL_VALUE1, enc_B);
-             tos[s - skipped].move(tok, LOC);
+             tos[s - skipped].move_from(tok, LOC);
              tos[s + 1].clear(LOC);   // B
            }
         s += 1;   skipped += 1;
@@ -1131,7 +1118,7 @@ ShapeItem skipped = 0;
                 {
                   // TOK_R_PARENT will become a value: just copy it for now
                   //
-                  if (skipped)   tos[s - skipped].move(tos[s], LOC);
+                  if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
                   continue;
                 }
 
@@ -1149,9 +1136,9 @@ ShapeItem skipped = 0;
 
                   tos[s + 1].clear(LOC);
                   Token tok_AB(TOK_APL_VALUE1, Z);
-                  tos[d_1].move(tok_AB, LOC);
+                  tos[d_1].move_from(tok_AB, LOC);
                   s += 1;   skipped += 2;   // skip , (of A , B) but not B
-                  continue;   // don't move() below
+                  continue;   // don't move_from() below
                 }
 
              // monadic , B
@@ -1162,11 +1149,11 @@ ShapeItem skipped = 0;
              bval->set_shape(sh);
 
              tos[s].ChangeTag(TOK_APL_VALUE1);
-             tos[s - skipped].move(tos[s], LOC);
+             tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
-        if (skipped)   tos[s - skipped].move(tos[s], LOC);
+        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
       }
 
    if (skipped)
@@ -1196,7 +1183,7 @@ ShapeItem skipped = 0;
             skipped)            // remove at most one ⊂ (may enable ⍴)
            {
              if (skipped)   // dont copy to itself
-                tos[s - skipped].move(tos[s], LOC);
+                tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
@@ -1229,24 +1216,24 @@ ShapeItem skipped = 0;
             tos[s + 2].get_Class() != TC_VALUE)              // not B 
            {
              if (skipped)   // dont copy to itself
-                tos[s - skipped].move(tos[s], LOC);
+                tos[s - skipped].move_from(tos[s], LOC);
              continue;
            }
 
         if (skipped)   // dont copy to itself
-           tos[s - skipped].move(tos[s], LOC);   // move ⍴
+           tos[s - skipped].move_from(tos[s], LOC);   // move ⍴
 
         Value_P B = tos[s + 2].get_apl_val();
         if (B->is_scalar())
            {
-             tos[s - skipped + 1].move(tos[s + 2], LOC);
+             tos[s - skipped + 1].move_from(tos[s + 2], LOC);
            }
         else
            {
              Value_P enc_B(LOC);
              enc_B->next_ravel_Pointer(B.get());
              Token tok(TOK_APL_VALUE1, enc_B);
-             tos[s - skipped + 1].move(tok, LOC);
+             tos[s - skipped + 1].move_from(tok, LOC);
              tos[s + 2].clear(LOC);   // B
            }
         s += 2;   ++skipped;
@@ -1279,7 +1266,7 @@ ShapeItem skipped = 0;
             tos[s + 2].get_tag()   == TOK_R_PARENT)   // ( B )
            {
              Token & dest = tos[s - skipped];   // '(' of: '(' B ')'
-             dest.move(tos[s + 1], LOC);      // move B to '('
+             dest.move_from(tos[s + 1], LOC);      // move B to '('
              if (dest.get_tag() == TOK_APL_VALUE3)
                 {
                   // final result of strand expression: enclose it
@@ -1299,7 +1286,7 @@ ShapeItem skipped = 0;
            }
 
         if (skipped)   // dont copy to itself
-           tos[s - skipped].move(tos[s], LOC);
+           tos[s - skipped].move_from(tos[s], LOC);
       }
 
    if (skipped)
@@ -1323,7 +1310,7 @@ ShapeItem skipped = 0;
         // the first value (if any) survives
         //
         if (skipped)   // dont copy to itself
-           tos[s - skipped].move(tos[s], LOC);
+           tos[s - skipped].move_from(tos[s], LOC);
 
         if (tos[s - skipped].get_Class() != TC_VALUE)   continue;
 
@@ -1334,7 +1321,7 @@ ShapeItem skipped = 0;
                 tos[s + 1].get_Class() == TC_VALUE)
             {
                Token tmp;
-               tmp.move(tos[s - skipped], LOC);
+               tmp.move_from(tos[s - skipped], LOC);
                Value_P Z = Value::glue(tmp, tos[s + 1], LOC);
                // Value::glue(tos[s - skipped], t, tos[s + 1], LOC);
                new (&tos[s - skipped]) Token(TOK_APL_VALUE3, Z);
@@ -1375,22 +1362,19 @@ const UCS_string text = fun.canonical(false);
              << "   .atf output file incompatible with other APL interpreters."
              << endl;
 
-        ucs.append_UTF8("'");
-        ucs.append(fun_name);
-        ucs.append_UTF8("' ⎕FX '");
-        ucs.append(text);
-        ucs.append_UTF8("'");
+        ucs << UNI_SINGLE_QUOTE << fun_name << "' ⎕FX '" << text
+            << UNI_SINGLE_QUOTE;;
         return;
       }
 
 UCS_string_vector lines;
    text.to_vector(lines);
 
-   ucs.append_UTF8("⎕FX");
+   ucs << "⎕FX";
 
    loop(l, lines.size())
       {
-        ucs.append(UNI_SPACE);
+        ucs << UNI_SPACE;
         tf2_char_vec(ucs, lines[l]);
       }
 }
@@ -1401,7 +1385,7 @@ Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
    if (vec.size() == 0)   return;
 
 bool in_UCS = false;
-   ucs.append_UTF8("'");
+   ucs << UNI_SINGLE_QUOTE;
 
    loop(v, vec.size())
        {
@@ -1409,25 +1393,24 @@ bool in_UCS = false;
          const bool need_UCS = Avec::need_UCS(uni);
          if (in_UCS != need_UCS)   // mode changed
             {
-              if (in_UCS)   ucs.append_UTF8("),'");      // UCS() → 'xxx'
-              else          ucs.append_UTF8("',(⎕UCS");   // 'xxx' → UCS()
+              if (in_UCS)   ucs << "),'";       // UCS() → 'xxx'
+              else          ucs << "',(⎕UCS";   // 'xxx' → UCS()
               in_UCS = need_UCS;
             }
 
          if (in_UCS)
             {
-              ucs.append_UTF8(" ");
-              ucs.append_number(uni);
+              ucs << UNI_SPACE << int(uni);
             }
          else
             {
-              ucs.append(uni);
-              if (uni == UNI_SINGLE_QUOTE)   ucs.append(uni);
+              ucs << uni;
+              if (uni == UNI_SINGLE_QUOTE)   ucs << uni;
             }
        }
 
-   if (in_UCS)   ucs.append_UTF8("),''");
-   else          ucs.append_UTF8("'");
+   if (in_UCS)   ucs << "),''";
+   else          ucs << UNI_SINGLE_QUOTE;
 }
 //----------------------------------------------------------------------------
 UCS_string
@@ -1457,10 +1440,10 @@ UCS_string ret;
                   while (u < ucs.ssize() && ucs[u] >= '0' && ucs[u] <= '9')
                      { num *= 10;   num += ucs[u++] - '0'; }
 
-                  ret.append(Unicode(num));
+                  ret << Unicode(num);
                  }
            }
-        else ret.append(ucs[u]);
+        else ret << ucs[u];
       }
 
    return ret;

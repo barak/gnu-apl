@@ -338,47 +338,8 @@ const TokenClass tc = tok.get_Class();
         else                              out << "VALUE?(";
 
         Value_P value = tok.get_apl_val();
-        if (+value)
-           {
-             const Shape & shape = value->get_shape();
-             out << "⍴";
-             loop(r, shape.get_rank())
-                 {
-                   r && out << ";";
-                   out << shape.get_shape_item(r);
-                 }
-             out << "≡" << int(value->compute_depth()) << " ";
-             int count = value->element_count();
-             const bool more = count > 3;
-             if (more)   count = 3;
-             if (count == 0)   out << "⊖";   // empty
-             loop(c, count)
-                 {
-                   c && out << " ";
-                   const Cell & cell = value->get_cravel(c);
-                   if (cell.is_integer_cell())
-                      {
-                        out << cell.get_int_value();
-                      }
-                   else if (cell.is_float_cell())
-                      {
-                        out << "FLT";
-                      }
-                   else if (cell.is_complex_cell())
-                      {
-                        out << "CPLX";
-                      }
-                   else if (cell.is_pointer_cell())
-                      {
-                        out << "⊂";
-                      }
-                 }
-             more && out << "....";
-           }
-        else
-           {
-             out << "0";
-           }
+        if (+value)   value->print_brief(out);
+        else          out << "0";
         return out << ")";
       }
    else
@@ -421,24 +382,24 @@ const bool reverse  = which & 4;   // print ahead in APL order
                const Token & tok = at(s).get_token();
                switch(const TokenClass tc = tok.get_Class())
                   {
-                    case TC_ASSIGN:   out << "←";          break;
-                    case TC_R_ARROW:  out << "→";          break;
-                    case TC_L_BRACK:  out << "[";          break;
-                    case TC_R_BRACK:  out << "]";          break;
-                    case TC_END:      out << "END";        break;
-                    case TC_FUN0:     out << "N";          break;
-                    case TC_FUN12:    out << *F++;         break;
-                    case TC_INDEX:    out << "C";          break;
-                    case TC_OPER1:    out << "M";          break;
-                    case TC_OPER2:    out << "D";          break;
-                    case TC_L_PARENT: out << "(";          break;
-                    case TC_R_PARENT: out << ")";          break;
-                    case TC_RETURN:   out << "RET";        break;
-                    case TC_SYMBOL:   out << "SYM";        break;
-                    case TC_VALUE:    out << *V++;         break;
-                    case TC_VOID:     out << "VOID";       break;
-                    case TC_SI_LEAVE: out << "SI_LEAVE";   break;
-                    default:          out << "-TC_" << int(tc);
+                    case TC_ASSIGN:    out << "←";          break;
+                    case TC_R_ARROW:   out << "→";          break;
+                    case TC_L_BRACK:   out << "[";          break;
+                    case TC_R_BRACK:   out << "]";          break;
+                    case TC_END:       out << "END";        break;
+                    case TC_FUN0:      out << "N";          break;
+                    case TC_FUN12:     out << *F++;         break;
+                    case TC_INDEX:     out << "C";          break;
+                    case TC_OPER1:     out << "M";          break;
+                    case TC_OPER2:     out << "D";          break;
+                    case TC_L_PARENT:  out << "(";          break;
+                    case TC_R_PARENT:  out << ")";          break;
+                    case TC_RETURN:    out << "RET";        break;
+                    case TC_SYMBOL:    out << "SYM";        break;
+                    case TC_VALUE:     out << *V++;         break;
+                    case TC_VOID:      out << "VOID";       break;
+                    case TC_SI_CHANGE: out << "SI_CHANGE";  break;
+                    default:           out << "-TC_" << int(tc);
                   }
              }
         out << "»";
@@ -645,7 +606,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
         if (+value)
            {
              Token tok(TOK_APL_VALUE1, value);
-             tl.get_token().move(tok, LOC);
+             tl.get_token().move_from(tok, LOC);
            }
        else
           {
@@ -728,8 +689,7 @@ UCS_string & more = MORE_ERROR();
          else
             {
               const UCS_string name = at(j).get_token().tag_name();
-              if (name.starts_with("TOK_"))
-                 more << UCS_string(name, 4, name.size() - 4);
+              if (name.starts_with("TOK_"))   more << UCS_string(name, 4);
               else
                  more << name;
               if (rightmost && MAX_j < ssize())   more << "...";
@@ -1409,7 +1369,7 @@ Prefix::set_action(const Token & result)
              set_action(RA_RETURN);
              return;
 
-        case TC_SI_LEAVE:
+        case TC_SI_CHANGE:
              //
              // result was TOK_SI_PUSHED or TOK_ERROR
              if (result.get_tag() == TOK_ERROR)   set_action(RA_RETURN);
@@ -1471,8 +1431,8 @@ Prefix::reduce_LPAR_F_C_RPAR()
    // before: ( F C )
    // after:  F C
    //
-   at3().move(at2(), LOC);   // move C left
-   at2().move(at1(), LOC);   // move F left
+   at3().move_from(at2(), LOC);   // move C left
+   at2().move_from(at1(), LOC);   // move F left
    pop_and_discard();          // discard old C
    pop_and_discard();          // discard old RPAR
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1497,7 +1457,12 @@ Prefix::reduce_MISC_F_B_()
 
    if (saved_MISC.get_Class() == TC_INDEX)
       {
-        if (value_expected())
+        // resolve a potential SHIFT/REDUCE conflict. If [] belongs to
+        // an indexed left value A[...] then we must not reduce with
+        // monadic F, but shift [] for the dyadyc F to reduce A[] F B
+        // later on..
+        //
+        if (value_expected())   // then SHIFT
            {
              // push [...] and read one more token
              //
@@ -1506,135 +1471,170 @@ Prefix::reduce_MISC_F_B_()
              set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
+
+        // fall through (REDUCE)
       }
 
 const Token result = at0().get_function()->eval_B(at1().get_apl_val());
-   if (result.get_Class() == TC_SI_LEAVE)
+   if (result.get_Class() != TC_SI_CHANGE)   // the normal case
       {
-        if (result.get_tag() == TOK_SI_PUSHED)   goto done;
+        pop_args_push_result(result);
+        set_action(result);
+        return;
+      }
+   
+    /* the executing of monadic at0().get_function() resulted in a
+       change of the current )SI entry. This change could have been in
+       in two directions:
 
-        /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
-                 and TOK_QUAD_ES_ERR below can only occur if:
+       1. a new )SI entry was pushed. This is the most common case
+          after a defined function was called. In this case the current
+          parser is abandoned until the new )SI entry returns.
 
-            1. ⎕EA resp. ⎕EB is called; each is implemented as macro
-               Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
+       2. ⎕ES (Event Simulate) has simulated an event (with one of
+              the ⎕EC results like:
+       2a.    0 - Error,
+       2b.    1 - non-committed value,
+       2c.    2 - committed value,
+       2d.    3 - missing value (function w/o a result),
+       2e.    4 - branch to function line, or
+       2f.    5 - escape from function.
 
-            2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
-
-            Token result is the return token of Quad_ES::eval_AB() or
-            Quad_ES::eval_B() and contains the right argument B (as set in
-            the macro).
-
-            We must check that ⎕ES 100 was not called directly, but only via
-            ⎕EA or ⎕EB.
-         */
-
-        if (result.get_tag() == TOK_QUAD_ES_COM)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
-
-             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-             if (QES_arg2.is_pointer_cell())
-                {
-                  Value_P val = QES_arg2.get_pointer_value();
-                  new (&si_pushed)  Token(TOK_APL_VALUE2, val);
-                }
-             else
-                {
-                  Value_P scalar(LOC);
-                  scalar->next_ravel_Cell(QES_arg2);
-                  scalar->check_value(LOC);
-                  new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
-                }
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_ESC)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-             new (&si_pushed)  Token(TOK_ESCAPE);
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_BRA)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-
-             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
-             const APL_Integer line = QES_arg2.get_int_value();
-
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-
-             Value_P v_line = IntScalar(line, LOC);
-             Workspace::SI_top()->jump(v_line.get());
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_ERR)
-           {
-             // this case can only occur with ⎕EA, but not with ⎕EB.
-
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-             StateIndicator * top = Workspace::SI_top();
-
-             Token & si_pushed = top->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-
-             const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
-             UCS_string statement_A(  *QES_arg[2].get_pointer_value());
-             const APL_Integer major = QES_arg[3].get_int_value();
-             const APL_Integer minor = QES_arg[4].get_int_value();
-             const ErrorCode ec      = ErrorCode(major << 16 | minor);
-
-             Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
-             if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
-                {
-                  Workspace::SI_top()->get_prefix().at0().move(result_A, LOC);
-                  return;
-                }
-             new (&StateIndicator::get_error(top)) Error(ec, LOC);
-             return;
-           }
-
-        // at this point a normal monadic function (i.e. other than ⎕EA/⎕EB)
-        // has returned an error
-        //
-        if (push_error(result))   return;
-
-        // not reached
-        Q1(result.get_tag())
-        FIXME;
+          Normally ⎕ES has pop'ed the )SI stack, so this parser does
+          not exist anymore (and we must not use its member.
+          in particular si
+     */
+   if (result.get_tag() == TOK_SI_PUSHED)   // case 1.
+      {
+        pop_args_push_result(result);
+        set_action(result);
+        return;
       }
 
-done:
-   pop_args_push_result(result);
-   set_action(result);
+   /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
+            and TOK_QUAD_ES_ERR below can only occur if:
+
+       1. ⎕EA resp. ⎕EB is called; each is implemented as macro
+          Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
+
+       2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
+
+       Token result is the return token of Quad_ES::eval_AB() or
+       Quad_ES::eval_B() and contains the right argument B (as set in
+       the macro).
+
+       We must check that ⎕ES 100 was not called directly, but only via
+       ⎕EA or ⎕EB.
+    */
+
+   switch(result.get_tag())
+       {
+         default: break;
+         case TOK_QUAD_ES_COM:   handle_QUAD_ES_COM(result);   return;
+         case TOK_QUAD_ES_ESC:   handle_QUAD_ES_ESC();         return;
+         case TOK_QUAD_ES_BRA:   handle_QUAD_ES_BRA(result);   return;
+         case TOK_QUAD_ES_ERR:   handle_QUAD_ES_ERR(result);   return;
+      }
+
+   // at this point a normal monadic function (i.e. other than ⎕EA/⎕EB)
+   // has returned an error
+   //
+   if (push_error(result))   return;
+
+   // not reached
+   //
+   Q1(result.get_tag())
+   FIXME;
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_COM(const Token & result)
+{
+   // make sure that ⎕ES was called from a macro (which implies
+   // that it has a parent).
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
+
+const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+   if (QES_arg2.is_pointer_cell())
+      {
+        Value_P val = QES_arg2.get_pointer_value();
+        new (&si_pushed)  Token(TOK_APL_VALUE2, val);
+      }
+   else
+      {
+        Value_P scalar(LOC);
+        scalar->next_ravel_Cell(QES_arg2);
+        scalar->check_value(LOC);
+        new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
+      }
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_ESC()
+{
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+   new (&si_pushed)  Token(TOK_ESCAPE);
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_BRA(const Token & result)
+{
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
+const APL_Integer line = QES_arg2.get_int_value();
+
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+
+Value_P v_line = IntScalar(line, LOC);
+   Workspace::SI_top()->jump(v_line.get());
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_ERR(const Token & result)
+{
+   // this case can only occur with ⎕EA, but not with ⎕EB.
+
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+StateIndicator * top = Workspace::SI_top();
+
+Token & si_pushed = top->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+
+const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
+UCS_string statement_A(  *QES_arg[2].get_pointer_value());
+const APL_Integer major = QES_arg[3].get_int_value();
+const APL_Integer minor = QES_arg[4].get_int_value();
+const ErrorCode ec      = ErrorCode(major << 16 | minor);
+
+Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
+   if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
+      {
+        Workspace::SI_top()->get_prefix().at0().move_from(result_A, LOC);
+        return;
+      }
+   new (&StateIndicator::get_error(top)) Error(ec, LOC);
 }
 //----------------------------------------------------------------------------
 void
@@ -2388,7 +2388,7 @@ Prefix::reduce_V_C__()
 {
 Symbol * V = at0().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);   // not Token & !
-   at0().move(tok, LOC);
+   at0().move_from(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2456,7 +2456,7 @@ Prefix::reduce_F_V__()
    //
 Symbol * V = at1().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);   // not Token & !
-   at1().move(tok, LOC);
+   at1().move_from(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2576,12 +2576,12 @@ Token result = at1();
         if (idx.is_axis())
            {
              Token tok_axis(TOK_AXIS, idx.values[0]);
-             result.move(tok_axis, LOC);
+             result.move_from(tok_axis, LOC);
            }
         else
            {
                Token tok_index(TOK_INDEX, idx);
-               result.move(tok_index, LOC);
+               result.move_from(tok_index, LOC);
            }
       }
    else
@@ -2615,7 +2615,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
              Value_P X = idx.extract_axis();
              Assert1(+X);   // not [ ]
              Token tok_axis(TOK_AXIS, X);
-             I.move(tok_axis, LOC);
+             I.move_from(tok_axis, LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;
@@ -2623,7 +2623,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
         else
            {
              Token tok_index(TOK_INDEX, idx);
-             I.move(tok_index, LOC);
+             I.move_from(tok_index, LOC);
            }
       }
    else
@@ -2767,7 +2767,7 @@ vector<Symbol *> symbols;
         Assert1(V);
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
-        at0().move(result, LOC);
+        at0().move_from(result, LOC);
 
         // at this point variable name V was resolved to the (left-) value
         // of V. Repeat matching with the updated phrase.

@@ -886,7 +886,7 @@ fill_14(const std::string & name)
 {
 UTF8_string name_utf(name.c_str());
 UCS_string ret(name_utf);
-   while (ret.size() < 14)   ret.push_back(UNI_SPACE);
+   while (ret.size() < 14)   ret << UNI_SPACE;
    return ret;
 }
 

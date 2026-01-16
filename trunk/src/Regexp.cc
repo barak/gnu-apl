@@ -111,7 +111,7 @@ PCRE2_SIZE error_offset = -1;
 "    The regular expression A was: '" << pattern << "'\n"
 "    The error was detected at " << error_offset << "↓A.\n"
 "    the offending rest (" << error_offset << "↓A) of A was: '"
-   << UCS_string(pattern, error_offset, pattern.size() - error_offset) << "'";
+   << UCS_string(pattern, error_offset) << "'";
 
    DOMAIN_ERROR;
 }
@@ -148,7 +148,6 @@ const int len = pcre2_get_error_message_32(ec, buffer.pbuff, 256);
    if (len > 0)   return UCS_string(buffer.ubuff, len);
 
 UCS_string ret(UTF8_string("Unknown libpcre error "));
-   ret.append_number(ec);
-   return ret;
+   return ret << ec;
 }
 //----------------------------------------------------------------------------

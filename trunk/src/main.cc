@@ -597,7 +597,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
          const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
          const UTF8_string utf(cmd);
          UCS_string load_cmd(utf);
-         load_cmd.append(init_ws);
+         load_cmd << init_ws;
          Command::process_line(load_cmd, 0);
       }
 

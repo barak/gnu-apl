@@ -25,7 +25,7 @@ Copyright @copyright{} 2013 Free Software Foundation, Inc.
 @c ============================================================================
 
 @titlepage
-@title APL Manual
+@title GNU APL Reference Manual
 
 @c The following two commands start the copyright page.
 @page
@@ -807,8 +807,9 @@ There are a few hopefully useful features in GNU APL:
 * Subsection 2.1.4::  Helpful Features for Scripting
 * Subsection 2.1.5::  Double-quoted Strings
 * Subsection 2.1.6::  Multi-Line Strings
-* Subsection 2.1.7::  Automatic )MORE
-* Subsection 2.1.8::  Script Example
+* Subsection 2.1.7::  Multi-Line Literals
+* Subsection 2.1.8::  Automatic )MORE
+* Subsection 2.1.9::  Script Example
 @end menu
 
 As already mentioned, it is possible to write APL scripts. Similar to other
@@ -1374,6 +1375,198 @@ set matchpairs+=«:»
 
 @c ............................................................................
 @node Subsection 2.1.7
+@subsection Multi-Line Literals
+
+A limitation from the early days of APL is that literals like @b{1 2 3}
+or @b{'abc'} can not stretch over several lines. As a consequnce the rank
+of a literal can not be more than 1, and values with higher ranks require
+the used of APL literals (most likely dyadic @b{⍴}). A single line of input
+can produce multiple lines of output, but these multiple lines of output can
+not be fed back into the interpreter as literals.
+
+This limitation is natural when APL is used interactively (and screen oriented
+editors like @b{vi} or @b{emacs|} were not very common at the time when APL
+was invented.
+
+However, for scripting the situation is quite different. An APL script is
+typically created with a screen oriented editor, and screen oriented
+editors like @b{vi} are available everywhere while its line oriented
+predecessor (named @b{ex}) has died out in the meantime (more precisely, @b{ex}
+has become a sub-mode of @b{vi}).
+
+GNU APL extends the idea of multi-line strings to @i{multi-line literals}.
+The syntax for these multi-line literals adopts the formatting rules of
+the APL primitive @b{⍕} (aka. @b{format}) for nested and/or higher rank APL
+values. That is, the output produced when an APL value is printed can,
+more or less unchanged, be fed back into APL to produce that value. The rules
+for creating such multi-line literals are the rules for signle line literals,
+augmented with for rules of @b{⍕} fore values of higher ranks. That is:
+
+@itemize
+@item one line of a multi-line literals corresponds to one scalar or vector 
+      of the value,
+@item the rules concerning every line of a multi-line literal are those
+      for normal (single line) literals. I.e.
+    @itemize
+    @item a single quoted character is a character scalar,
+    @item several quoted characters are a character vector (aka. string),
+    @item nested items are two or more items enclosed in parentheses, and
+    @item vertically adjacent scalars above are separated by blanks to create
+          vectors; this is called @i{vector notation} in Kenneth Iverson's 
+          APL book and in IBM APL2 documents and @b{strand notation} in other
+          places,
+    @end itemize
+@item two-dimensional values (i.e. matrices) are vertically adjacent vectors.
+@item three-dimensional values are vertically adjacent matrices separated by
+      one blank line,
+@item four-dimensional values are vertically adjacent three-dimensional values
+      separated by two blank lines,
+@item ...
+@item N-dimensional values are vertically adjacent N-1-dimensional values
+      separated by N-2 blank lines,
+@end itemize
+
+Similar to multi-line strings, a multi-line literal starts with the marker
+@b{<<<} at the end of one line and ends with  the marker @b{>>>} on a
+subsequent line. The value of the multi line literal is contained in the lines
+between these two markers (excluding the lines with the markers). In contrast
+to multi-line strings, can multi line literals be used recursively. That is,
+one multi line literal can contain other multi line literals (as well as
+multi-line strings) to created nested sub-values of ranks > 1.
+
+Some examples may be worthwhile to explain the concept:
+
+@example
+      ⍝ two-dimensional multi-line literal
+      ⍝
+      ⎕ ← <<<
+          1 2 3
+          4 5 6
+          7 8 9
+          >>>
+1 2 3
+4 5 6
+7 8 9
+@end example
+
+One blank line separates the matric of a three dimansional value:
+
+@example
+      ⍝ three-dimensional multi-line literal
+      ⍝
+      ⎕ ← <<<
+          1 2 3
+          4 5 6
+          7 8 9
+
+          11 12 13
+          14 15 16
+          17 18 19
+          >>>
+ 1  2  3
+ 4  5  6
+ 7  8  9
+
+11 12 13
+14 15 16
+17 18 19
+@end example
+
+The start line of a literal may contain a comment; the comment does not
+become part of the literal value:
+
+@example
+      ⍝ two-dimensional multi-line literal with comment
+      ⍝
+      ⎕ ← <<<   ⍝ same as 3 3⍴⍳9
+          1 2 3
+          4 5 6
+          7 8 9
+          >>>
+1 2 3
+4 5 6
+7 8 9
+@end example
+
+The items of a multi-line literal can be nested:
+
+@example
+      8 ⎕CR <<<   ⍝ two-dimansional with nested 'abc'
+            1 2     3
+            4 'abc' 6
+            7 8     9
+            >>>
+┌→────────┐
+↓1     2 3│
+│4 ┌→──┐ 6│
+│  │abc│  │
+│  └───┘  │
+│7     8 9│
+└ϵ────────┘
+
+      8 ⎕CR <<<   ⍝ two-dimansional with nested 10 11 12
+            1 2          3
+            4 (10 11 12) 6
+            7 8          9
+            >>>
+┌→─────────────┐
+↓1          2 3│
+│4 ┌→───────┐ 6│
+│  │10 11 12│  │
+│  └────────┘  │
+│7          8 9│
+└ϵ─────────────┘
+@end example
+
+Multi-line literal can contain other Multi-line literals or strings:
+
+@example
+      8 ⎕CR <<<   ⍝ two-dimansional with sub-literal:
+            1 2     3
+            4 <<< ⍝ sub-literal
+              10 11 12
+              13 14 15
+              16 17 18
+              >>>   6
+            7 8     9
+            >>>
+┌→─────────────┐
+↓1          2 3│
+│              │
+│4 ┌→───────┐ 6│
+│  ↓10 11 12│  │
+│  │13 14 15│  │
+│  │16 17 18│  │
+│  └────────┘  │
+│              │
+│7          8 9│
+└ϵ─────────────┘
+
+      8 ⎕CR <<<   ⍝ two-dimansional with sub-string:
+            1 2     3
+            4 «««
+              Hello,
+              World
+              »»»   6
+            7 8     9
+            >>>
+┌→─────────────────────────────────────────────┐
+↓1                                          2 3│
+│4 ┌→───────────────────────────────────────┐ 6│
+│  │┌→─────────────────┐ ┌→────────────────┐│  │
+│  ││            Hello,│ │            World││  │
+│  │└──────────────────┘ └─────────────────┘│  │
+│  └ϵ───────────────────────────────────────┘  │
+│7                                          8 9│
+└ϵϵ────────────────────────────────────────────┘
+@end example
+
+Nested multiline literals can quickly become unreadable. It is therefore
+recommended tu use a clear indentation policy for the different nesting
+levels.
+
+@c ............................................................................
+@node Subsection 2.1.8
 @subsection Automatic )MORE
 
 The GNU APL command )MORE provides, in some cases, additional information
@@ -1426,7 +1619,7 @@ If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
 )MORE information is displayed before the standard 3-line APL error message.
 
 @c ............................................................................
-@node Subsection 2.1.8
+@node Subsection 2.1.9
 @subsection Script Example
 
 Note that the two different ways of running an APL script have an impact on
@@ -3777,9 +3970,9 @@ purpose.
 @subsection  monadic ⎕CC B: Return character class
 
 @b{⎕CC B} returns all characters of character class(es) @b{B}. If @b{B} is an
-scalar then the result is a character vector, If @b{B} is an integer vector
-then the result is a nested vector of integer vectors, with one item per
-character class.
+integer scalar then the result is a character vector, If @b{B} is an integer
+vector then the result is a nested vector of integer vectors, with one item
+per character class.
 
 @example
       ⍝ character class 1: digits (old ⎕D)

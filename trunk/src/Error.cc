@@ -194,13 +194,13 @@ Error::get_error_line_3() const
    if (left_caret < 0)   return UCS_string();             // no ^ position
 
 UCS_string ret;
-   if (left_caret > 0)   ret.append(UCS_string(left_caret, UNI_SPACE));
-   ret.append(UNI_CIRCUMFLEX);
+   if (left_caret > 0)   ret << UCS_string(left_caret, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
 
 const int diff = right_caret - left_caret;
    if (diff <= 0)   return ret;
-   if (diff > 1)   ret.append(UCS_string(diff - 1, UNI_SPACE));
-   ret.append(UNI_CIRCUMFLEX);
+   if (diff > 1)   ret << UCS_string(diff - 1, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
 
    return ret;
 }
@@ -270,7 +270,7 @@ Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
    Log(LOG_verbose_error)   BACKTRACE
 
    // set )MORE error (unless the caller has done so)
-   if (!Workspace::more_error().size())   // not yet done
+   if (Workspace::more_error().size() == 0)   // no )MORE info yet
       {
         MORE_ERROR() << Error::error_name(code);
       }
@@ -391,9 +391,8 @@ Error::update_error_info(StateIndicator * si)
            }
 
         UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
-        ucs.append(UNI_SPACE);
-        ucs.append(UNI_SPACE);
-        UTF8_string utf(ucs);
+        ucs << UNI_SPACE << UNI_SPACE;
+        const UTF8_string utf(ucs);
         set_error_line_2(utf.c_str());
         set_left_caret(ucs.size());
       }

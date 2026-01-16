@@ -94,6 +94,9 @@ public:
    void skip(int count)
       { idx += count;   if (idx > end)   idx = end; }
 
+   /// return the underlying UCS_string
+   const UCS_string & data() const
+      { return str; }
 protected:
    /// the source string
    const UCS_string & str;

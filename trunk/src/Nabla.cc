@@ -61,7 +61,7 @@ void
 Nabla::throw_edit_error(const char * why)
 {
 UCS_string command = first_command;
-   if (trailing_nabla)   command.push_back(UNI_NABLA);
+   if (trailing_nabla)   command << UNI_NABLA;
 
    COUT << "DEFN ERROR+" << endl
         << "      " << command << endl
@@ -144,8 +144,7 @@ try_again:
 UCS_string fun_text;
    loop(l, lines.size())
       {
-        fun_text.append(lines[l].text);
-        fun_text.append(UNI_LF);
+        fun_text << lines[l].text << UNI_LF;
       }
 
    // maybe copy function into the history
@@ -161,26 +160,25 @@ UCS_string fun_text;
         //
         {
           UCS_string line_0(UTF8_string("    "));
-          line_0.append(UNI_NABLA);
-          line_0.append(lines[0].text);
+          line_0 << UNI_NABLA << lines[0].text;
           line_0.remove_trailing_whitespaces();
           LineInput::replace_history_line(line_0);
         }
 
         for (size_t l = 1; l < lines.size(); ++l)
             {
-              UCS_string line_l(UTF8_string("["));
-              line_l.append_number(l);
-              line_l.append_UTF8("]  ");
-              while (line_l.size() < 6)   line_l.append(UNI_SPACE);
-              line_l.append(lines[l].text);
+              UCS_string line_l;
+              line_l << UNI_L_BRACK << l << UNI_R_BRACK
+                     << UNI_SPACE << UNI_SPACE;
+              while (line_l.size() < 6)   line_l << UNI_SPACE;
+              line_l << lines[l].text;
               line_l.remove_trailing_whitespaces();
 
               LineInput::add_history_line(line_l);
            }
 
         UCS_string line_N(UTF8_string("   "));
-        line_N.append(UNI_NABLA);
+        line_N << UNI_NABLA;
         LineInput::add_history_line(line_N);
       }
 
@@ -225,7 +223,7 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line,
                   << error_line << "] ..., or \n"
                      "    delete the faulty line with:    [∆"
                   << error_line << "], or\n"
-                     "    cancel editing entirely with:   [→]∇.";
+                     "    cancel editing entirely with:   [→]∇.\n";
            }
         do_close = false;
         goto try_again;
@@ -303,7 +301,7 @@ UCS_string::iterator c(first_command);
    // function header... Copy anything, but stop at '[' (if present).
    //
    while (c.has_more() && c.lookup() != UNI_L_BRACK)
-         fun_header.push_back(c.next());
+         fun_header << c.next();
    c.skip_white();
 
    /* at this point there could be an axis specification [X] or
@@ -342,7 +340,7 @@ UCS_string::iterator c(first_command);
            the entire first_command, but with its leading and
            trailing ∇s (and whitespaces) removed.
          */
-        while (c.has_more())   fun_header.append(c.next());
+        while (c.has_more())   fun_header << c.next();
         if (InputFile::running_script())   // case 1a.
            {
              if (const char * loc = open_new_function())   return loc;
@@ -387,7 +385,7 @@ bool hdr_has_vars;
         do
           {
             if (!c.has_more())   return "no ] in ∇-command";
-            oper.append(cc = c.next());
+            oper << (cc = c.next());
           } while (cc != UNI_R_BRACK);
 
         if (const char * loc = parse_oper(oper, true))   return loc;   // error
@@ -455,7 +453,7 @@ bool hdr_has_vars;
            optionally followed by a closing ∇. We copy c.rest() into
            current_text and then 
          */
-         while (c.has_more())   current_text.push_back(c.next());
+         while (c.has_more())   current_text << c.next();
          execute_oper();
          return 0;   // OK
       }
@@ -538,7 +536,7 @@ UCS_string text = oper;
         ecmd = ECMD_EDIT;
         edit_from = current_line;
         current_text = text;
-//      for (; c.has_more(); cc = c.next())   current_text.append(cc);
+//      for (; c.has_more(); cc = c.next())   current_text <<cc;
         return 0;
       }
 
@@ -639,34 +637,34 @@ again:
                   return 0;
 
              case UNI_DOUBLE_QUOTE:  // "
-                  current_text.append(cc);
+                  current_text << cc;
                   for (;;)
                       {
                         if (!c.has_more())   // premature end of input
                            {
-                             current_text.append(UNI_DOUBLE_QUOTE);
+                             current_text << UNI_DOUBLE_QUOTE;
                              return 0;
                            }
                         cc = c.next();
 
-                        current_text.append(cc);
+                        current_text << cc;
                         if (cc == UNI_DOUBLE_QUOTE)   break; // string end
                         if (cc == UNI_BACKSLASH)      // \x
                            {
                              if (!c.has_more())   // premature end of input
                                 {
-                                  current_text.append(UNI_BACKSLASH);
-                                  current_text.append(UNI_DOUBLE_QUOTE);
+                                  current_text << UNI_BACKSLASH
+                                               << UNI_DOUBLE_QUOTE;
                                   return 0;
                                 }
                              cc = c.next();
-                             current_text.append(cc);
+                             current_text << cc;
                            }
                       }
                   break;
 
              case UNI_SINGLE_QUOTE:    // '
-                  current_text.append(cc);
+                  current_text << cc;
                   for (;;)
                       {
                         // no need to care for ''. Since we only copy, we can
@@ -675,17 +673,17 @@ again:
                         //
                         if (!c.has_more())   // premature end of input
                            {
-                             current_text.append(UNI_SINGLE_QUOTE);
+                             current_text << UNI_SINGLE_QUOTE;
                              return 0;
                            }
                         cc = c.next();
-                        current_text.append(cc);
+                        current_text << cc;
                         if (cc == UNI_SINGLE_QUOTE)      break;   // string end
                       }
                   break;
 
              default:
-                current_text.append(cc);
+                current_text << cc;
            }
       }
 
@@ -707,7 +705,7 @@ LineLabel ret(0);
       {
         c.next();   // eat the .
         while (c.has_more() && Avec::is_digit(c.lookup()))
-              ret.ln_minor.append(c.next());
+              ret.ln_minor << c.next();
       }
 
    return ret;
@@ -990,29 +988,32 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
    if (UserPreferences::uprefs.new_multi_line_strings)
       {
         // figure the multi-line status from all lines before current_line
-        bool multi = false;
+        Multiline_status multi = MLS_APL_text;
         loop(i, lines.size())
             {
               if (current_line == lines[i].label)   break;   // line replace
               if (current_line <  lines[i].label)   break;   // after current
-              if (-1 == lines[i].text.multi_pos(multi))   continue;
-              multi = ! multi;
+              if (-1 != lines[i].text.multi_pos())
+                 {
+                   if (multi <= MLS_APL_text)   multi = MLS_Inside_multi;
+                   else                         multi = MLS_APL_text;
+                 }
             }
 
-        if (multi)   // line belongs to a multi-line string (incl. """ or »»»)
+        if (multi >= MLS_Start_of_multi)   // line belongs to a multi-line
            {
              parse_text.clear();
            }
        else          // APL code outside multi-line strings (or start of one)
            {
-             const int pos = parse_text.multi_pos(multi);
+             const int pos = parse_text.multi_pos();
              if (pos != -1)   // start of multi-line string (""" or «««)
                 {
                   // for the sole purpose of parsing: replace the start of the
                   // multi-line string (""" or »»») with the empty string ''.
                   //
                   parse_text.resize(pos);
-                  parse_text.append_ASCII("''");
+                  parse_text << UNI_SINGLE_QUOTE << UNI_SINGLE_QUOTE;
                 }
            }
       }
@@ -1135,33 +1136,29 @@ Nabla::FunLine::print(ostream & out) const
 void
 LineLabel::print(ostream & out) const
 {
-UCS_string ucs(UTF8_string("["));
-   ucs.append_number(ln_major);
-   if (ln_minor.size())
-      {
-        ucs.append_UTF8(".");
-        ucs.append(ln_minor);
-      }
-   ucs.append_UTF8("]");
+UCS_string ucs;
+   ucs << UNI_L_BRACK << ln_major;
+   if (ln_minor.size())   ucs << UNI_FULLSTOP << ln_minor;
+   ucs << UNI_R_BRACK; 
 
-   while (ucs.size() < 5)   ucs.append_UTF8(" ");
+   while (ucs.size() < 5)   ucs << UNI_SPACE;
    out << ucs;
 }
 //----------------------------------------------------------------------------
 UCS_string
 LineLabel::print_prompt(int min_size) const
 {
-UCS_string ret(UTF8_string("["));
-   ret.append_number(ln_major);
+UCS_string ret;
+   ret << UNI_L_BRACK << ln_major;
 
    if (ln_minor.size())
       {
-        ret.append(Unicode('.'));
-        loop(s, ln_minor.size())   ret.append(Unicode(char(ln_minor[s])));
+        ret << UNI_FULLSTOP;
+        loop(s, ln_minor.size())   ret << Unicode(char(ln_minor[s]));
       }
 
-   ret.append_UTF8("] ");
-   while (ret.ssize() < min_size)   ret.append(UNI_SPACE);
+   ret << UNI_R_BRACK << UNI_SPACE;
+   while (ret.ssize() < min_size)   ret << UNI_SPACE;
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1178,13 +1175,13 @@ LineLabel::next()
    //
 const Unicode cc = ln_minor[ln_minor.size() - 1];
    if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
-   else                     ln_minor.append(UNI_1);
+   else                     ln_minor << UNI_1;
 }
 //----------------------------------------------------------------------------
 void
 LineLabel::insert()
 {
-   ln_minor.append(UNI_1);
+   ln_minor << UNI_1;
 }
 //----------------------------------------------------------------------------
 bool
@@ -1211,9 +1208,7 @@ UCS_string
 Nabla::FunLine::get_label_and_text() const
 {
 UCS_string ret = label.print_prompt(6);
-   ret.append(text);
-
-   return ret;
+   return ret << text;
 }
 //----------------------------------------------------------------------------
 UCS_string

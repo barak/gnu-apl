@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ CollatingCache::CollatingCache(const Value & A,
 const ShapeItem ec_A = A.element_count();
 UCS_string UA;
    UA.reserve(ec_A);
-   loop(a, ec_A)   UA.append(A.get_cravel(a).get_char_value());
+   loop(a, ec_A)   UA << A.get_cravel(a).get_char_value();
 
 UCS_string UA1 = UA.unique();
 

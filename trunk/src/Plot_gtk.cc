@@ -1658,7 +1658,7 @@ UTF8_string fname(w_props.get_output_filename().c_str());
 
    // append .png unless already there
    //
-   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
+   if (!fname.ends_with(".png"))   fname << ".png";
 
    // save the plot window without its borders
    errno = 0;
@@ -1697,7 +1697,7 @@ UTF8_string fname(w_props.get_output_filename().c_str());
 
    // append .png unless already there
    //
-   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
+   if (!fname.ends_with(".png"))   fname << ".png";
 
 GdkWindow * gdk_win = gtk_widget_get_window(window);
 GdkWindow * parent = gdk_window_get_parent(gdk_win);

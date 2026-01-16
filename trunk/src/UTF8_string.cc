@@ -425,6 +425,29 @@ operator <<(ostream & os, const UTF8_literal & utf)
    return os << utf();
 }
 //============================================================================
+UTF8_string_vector::UTF8_string_vector(const char * lines)
+{
+UTF8_string current;
+   current.reserve(80);
+   while (*lines)
+      {
+        const char cc = *lines++;
+        if (cc == '\r')   continue;   // ignore \r
+        if (cc == '\n')
+           {
+             push_back(current);
+             current.clear();
+           }
+        else
+           {
+             current += cc;
+           }
+      }
+
+   if (current.size())   push_back(current);
+
+}
+//============================================================================
 int
 UTF8_filebuf::overflow(int c)
 {

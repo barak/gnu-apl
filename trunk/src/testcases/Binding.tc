@@ -111,7 +111,7 @@ Dyadic
        SHOW_NC 'B'
       ∇
 
-      ⊣««« NOTE: IBM APL2 gives:
+      ⊣««« ⍝ NOTE: IBM APL2 gives:
 
       ⍝ binding of bracket index
       ⍝

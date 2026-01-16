@@ -43,7 +43,15 @@ class Command
 {
 public:
    /// process a single line entered by the user (in immediate execution mode)
-   static void process_line();
+   static void process_lines();
+
+   /// return \b true if the input os inside a multiline string or literal
+   static bool inside_multi()
+      { return multiline_status >= MLS_Start_of_multi; }
+
+   /// return the line number where a multiline string or literal began
+   static int get_multiline_start()
+      { return multiline_start; }
 
    /// process \b line which contains a command or statements
    static void process_line(UCS_string & line, ostream * out);
@@ -54,7 +62,7 @@ public:
    static bool do_APL_command(ostream & out, UCS_string & line);
 
    /// process \b line which contains APL statements
-   static void do_APL_expression(UCS_string & line);
+   static void do_APL_expression(UCS_string & line, Value_P suffix);
 
    /// finish the current SI->top() and pop it when done
    static void finish_context();
@@ -124,11 +132,13 @@ public:
    /// automatically display )MORE info after errors
    static bool auto_MORE;
 
-   /// true if inside a multi-line string
-   static bool inside_multiline;
-   static int multiline_start;
+   /// multi-line status
+   static Multiline_status multiline_status;
 
 protected:
+   /// line number of miltiline start
+   static int multiline_start;
+
    /// sort order
    enum SORT_ORDER
       {

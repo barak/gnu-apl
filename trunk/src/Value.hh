@@ -428,6 +428,10 @@ public:
    /// print \b this value (line break at Workspace::get_PW())
    ostream & print(ostream & out) const;
 
+   /// print some information to help identifying \b this value (shape, depth,
+   /// and the first few ravel items)
+   ostream & print_brief(ostream & out) const;
+
    /// print \b this member value
    ostream & print_member(ostream & out, UCS_string member) const;
 

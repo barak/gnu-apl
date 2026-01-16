@@ -157,7 +157,7 @@ const UCS_string & match = matches[0];
         // the user input is a prefix of the matched command. Expand it.
         //
         user_input = match;
-        if (ehint != EH_NO_PARAM)   user_input.append(UNI_SPACE);
+        if (ehint != EH_NO_PARAM)   user_input << UNI_SPACE;
         return ER_REPLACE;
       }
 
@@ -172,7 +172,7 @@ const UCS_string & match = matches[0];
         // Otherwiese fall throught to expand_command_arg();
         //
         user_input = match;
-        user_input.append(UNI_SPACE);
+        user_input << UNI_SPACE;
         return ER_REPLACE;
       }
 
@@ -218,7 +218,7 @@ TabExpansion::expand_help_topics(UCS_string & user_input)
       return expand_help_topics();   // initial display
 
 const UCS_string help(user_input, 0, 6);
-UCS_string prefix(user_input, 5, user_input.size() - 5);   // the name prefix
+UCS_string prefix(user_input, 5);   // the name prefix
    prefix.remove_leading_whitespaces();
 
 std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
@@ -383,7 +383,7 @@ int qpos = -1;   // the position of ⎕ in user_input
 
    if (qpos != -1)   // ⎕xxx at end
       {
-        UCS_string qxx(user_input, qpos, user_input.size() - qpos);
+        UCS_string qxx(user_input, qpos);
         UCS_string_vector matches;
 
 #define ro_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
@@ -429,8 +429,8 @@ int qpos = -1;   // the position of ⎕ in user_input
 
         // unique match
         //
-        user_input = UCS_string(UNI_Quad_Quad);
-        user_input.append(matches[0]);
+        user_input.clear();
+        user_input << UNI_Quad_Quad << matches[0];
         return ER_REPLACE;
       }
 
@@ -475,7 +475,7 @@ UCS_string prefix = user_input.drop(prefix_len);
             {
                const UTF8_string capa_utf(CAPABILITIES[c]);
                UCS_string capa_ucs(capa_utf);
-               capa_ucs.append_ASCII("            ");
+               capa_ucs << "            ";
                if ((c % 3) == 0)   COUT << endl;
                COUT << "have-" << UCS_string(capa_ucs, 0, 9)
                     << "no-"   << UCS_string(capa_ucs, 0, 9);
@@ -507,8 +507,8 @@ UCS_string prefix = user_input.drop(prefix_len);
 vector<const char *> matches;
    if (prefix.size() >= 5 && prefix.starts_iwith("HAVE-"))
       {
-        stem.append_ASCII(" HAVE-");
-        const UCS_string suffix(prefix, 5, prefix.size() - 5);   // skip HAVE-
+        stem << " HAVE-";
+        const UCS_string suffix(prefix, 5);   // skip HAVE-
         loop(c, capabilities_count)
             {
               const UTF8_string cap_utf8(CAPABILITIES[c]);
@@ -519,7 +519,7 @@ vector<const char *> matches;
       }
    else if (prefix.size() >= 3 && prefix.starts_iwith("NO-"))
       {
-        stem.append_ASCII(" NO-");
+        stem << " NO-";
         const UCS_string suffix(prefix, 3, prefix.size() - 3);   // skip NO-
         loop(c, capabilities_count)
             {
@@ -568,8 +568,7 @@ TabExpansion::expand_filename(UCS_string & user_input,
                     if (!LibPaths::is_present(LibRef(lib)))
                        continue;
 
-                    libs_present.append(UNI_SPACE);
-                    libs_present.append(Unicode(UNI_0 + lib));
+                    libs_present << UNI_SPACE << Unicode(UNI_0 + lib);
                  }
              if (libs_present.size() == 0)   goto nothing;
 
@@ -593,9 +592,7 @@ TabExpansion::expand_filename(UCS_string & user_input,
         if (arg.size() == 1 && !have_trailing_blank)   // no space yet
            {
              user_input = cmd;
-             user_input.append(UNI_SPACE);
-             user_input.append(Unicode(arg[0]));
-             user_input.append(UNI_SPACE);
+             user_input << UNI_SPACE << arg[0] << UNI_SPACE;
              return ER_REPLACE;
            }
 
@@ -622,21 +619,18 @@ TabExpansion::expand_filename(UCS_string & user_input,
           const char * pwd = getenv("PWD");
           if (pwd == 0)   goto nothing;
           const UTF8_string dir_utf(pwd);
-          dir_ucs = UCS_string(dir_utf);
-          dir_ucs.append(arg.drop(1));
+          dir_ucs = UCS_string(dir_utf) + arg.drop(1);
         }
      else if (tilde_at_0 && slash_at_1)                 // user's home ~/
         {
           const char * home = getenv("HOME");
           if (home == 0)   goto nothing;
           const UTF8_string home_utf(home);
-          dir_ucs = UCS_string(home_utf);
-          dir_ucs.append(arg.drop(1));
+          dir_ucs = UCS_string(home_utf) + arg.drop(1);
         }
      else if (tilde_at_0)                               // somebody's home
         {
-          dir_ucs = UCS_ASCII_string("/home/");
-          dir_ucs.append(arg.drop(1));
+          dir_ucs = UCS_ASCII_string("/home/") + arg.drop(1);
         }
      else goto nothing;
 
@@ -668,17 +662,14 @@ TabExpansion::expand_filename(UCS_string & user_input,
         {
           UCS_string prefix(base_utf);
           user_input = cmd;                     // e.g. )LOAD
-          user_input.append(UNI_SPACE);
-          user_input.append(dir_ucs);           // e.g. )LOAD /usr/apl/
+          user_input << UNI_SPACE << dir_ucs;   // e.g. )LOAD /usr/apl/
           return show_alternatives(user_input, prefix.size(), matches);
         }
 
      // unique match
      //
      user_input = cmd;
-     user_input.append(UNI_SPACE);
-     user_input.append(dir_ucs);
-     user_input.append(matches[0]);
+     user_input << UNI_SPACE << dir_ucs << matches[0];
      return ER_REPLACE;
    }
 
@@ -715,7 +706,7 @@ DIR * dir = opendir(path.c_str());
 << "  library reference number and the workspace name." << endl;
 
         user_input = cmd;
-        user_input.append(UNI_SPACE);
+        user_input << UNI_SPACE;
         return ER_REPLACE;
       }
 
@@ -728,19 +719,14 @@ UTF8_string arg_utf(filename);
    if (matches.size() > 1)
       {
         user_input = cmd;
-        user_input.append(UNI_SPACE);
-        user_input.append_number(lib);
-        user_input.append(UNI_SPACE);
+        user_input << UNI_SPACE << lib << UNI_SPACE;
         return show_alternatives(user_input, filename.size(), matches);
       }
 
    // unique match
    //
    user_input = cmd;
-   user_input.append(UNI_SPACE);
-   user_input.append_UTF8(path.c_str());
-   user_input.append(UNI_SLASH);
-   user_input.append(matches[0]);
+   user_input << UNI_SPACE << path << UNI_SLASH << matches[0];
    return ER_REPLACE;
 
 nothing:
@@ -788,7 +774,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
           UCS_string name(UTF8_string(dent->d_name));
 
           const bool is_dir = Command::is_directory(dent, dirname);
-          if (is_dir)   name.append(UNI_SLASH);
+          if (is_dir)   name << UNI_SLASH;
           else if (only_workspaces)
              {
                const UTF8_string filename(dent->d_name);
@@ -827,7 +813,7 @@ const int common_len = compute_common_length(prefix_len, matches);
         // expand to common part.
         //
         const int usize = user_input.size();
-        user_input.append(matches[0]);
+        user_input << matches[0];
         user_input.resize(usize + common_len);
         return ER_REPLACE;
       }

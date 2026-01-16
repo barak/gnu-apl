@@ -1097,14 +1097,14 @@ int term = 0;
              //
              if (power == 0)   continue;   // hide factor X⁰ (== 1) completely
 
-             poly.append(vars[p]);   // name of the indeterminant
+             poly << vars[p];   // name of the indeterminant
              if (power == 1)
                 {
                   // hide exponent 1 (since X¹ == X).
                 }
              else if (power < 10)   // single digit exponent
                 {
-                  poly.append(expo_digits[power]);
+                  poly << expo_digits[power];
                 }
              else              // multi digit power
                 {
@@ -1114,17 +1114,17 @@ int term = 0;
                   //
                   for (size_t p = power; p; p /= 10)
                       {
-                        pow.append(expo_digits[p % 10]);
+                        pow << expo_digits[p % 10];
                       }
 
-                  loop(p, pow.size())   poly.append(pow[pow.size() - p - 1]);
+                  loop(p, pow.size())   poly << pow[pow.size() - p - 1];
                 }
            }
       }
 
    // if poly is empty then set c₀ = 0;
    //
-   if (poly.size() == 0)   poly.append(UNI_0);
+   if (poly.size() == 0)   poly << UNI_0;
    return poly;
 }
 //----------------------------------------------------------------------------
@@ -1605,14 +1605,14 @@ Bif_F12_DOMINO::run_script(const UTF8_string & script,
    // exist then we use ./script (so we can develop it without running
    // make install after every change of the script..
    //
-const char * bin_path = LibPaths::get_APL_bin_path();
-UTF8_string script_path("/.");
-   script_path.append(script);
+UTF8_string script_path("./");
+   script_path << script;
    if (access(script_path.c_str(), R_OK))   // no ./script
       {
+          const char * bin_path = LibPaths::get_APL_bin_path();
           script_path = UTF8_string(bin_path);
           script_path += '/';
-          script_path.append(script);
+          script_path << script;
           if (access(script_path.c_str(), R_OK))   // no bin_path/script
              {
                MORE_ERROR() << "Installation problem: No readable file '"
@@ -1629,10 +1629,7 @@ FILE * fp_python = 0;
    loop(p, sizeof(pythons) / sizeof(*pythons))
        {
          UTF8_string cmd(pythons[p]);
-         cmd += ' ';
-         cmd.append_UTF8(script_path);
-         cmd += ' ';
-         cmd.append_UTF8(args);
+         cmd << UNI_SPACE << script_path << UNI_SPACE << args;
          fp_python = popen(cmd.c_str(), "r");
          if (fp_python)   break;
       }

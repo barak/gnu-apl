@@ -100,7 +100,7 @@ public:
 
    /// move the mutable (!) \b src into \b this token. If \b src is an APL
    /// value, then it is properly cleared. and an event is added.
-   void move(Token & src, const char * loc)
+   void move_from(Token & src, const char * loc)
       {
          clear(loc);   // clear our Value_P
          copy_N(src);
@@ -418,40 +418,6 @@ Token::copy_N(const Token & src)
         default:       Q1(src.get_ValueType());   FIXME;
       }
 }
-//----------------------------------------------------------------------------
-/// A sequence of Token
-class Token_string : public  std::vector<Token>
-{
-public:
-   /// construct an empty string
-   Token_string()   {}
-
-   /// make size() signed
-   ShapeItem ssize() const
-      { return ShapeItem(vector<Token>::size()); }
-
-   /// construct a string of \b len Token, starting at \b data.
-   Token_string(const Token * data, ShapeItem len)
-      { loop(l, len)   push_back(data[l]); }
-
-   /// construct a string of \b len Token from another token string
-   Token_string(const Token_string & other, uint32_t pos, uint32_t len)
-      { loop(l, len)   push_back(other[pos++]); }
-
-   /// reverse the token order from \b from to \b to (including)
-   void reverse_from_to(ShapeItem from, ShapeItem to);
-
-   /// replace the segment starting a \b pos with \b src. Return the new pos.
-   //
-   ShapeItem replace_segment(const Token_string & src, ShapeItem pos);
-
-   /// print this token string
-   void print(ostream & out, int details) const;
-
-private:
-   /// prevent accidental copying
-   Token_string & operator =(const Token_string & other);
-};
 //----------------------------------------------------------------------------
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location

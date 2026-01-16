@@ -1,0 +1,152 @@
+⍝ MultiLineLiterals.tc
+⍝ ════════════════════
+
+)CLEAR
+CLEAR WS
+
+⍝ NOTE: immediate execution: Command::process_line()
+⍝       ⎕FX:                 UserFunction::transform_old_multi_line_strings()
+⍝                            UserFunction::transform_new_multi_line_strings()
+⍝                            UserFunction::transform_multi_line_literals()
+
+
+⍝ ────── LITERAL in Function ──────
+
+∇FOO
+ "Line 1"
+ Q←<<<
+ 211 212 213 214
+ 221 'a' 223 224
+ 231 232 233 234
+   >>>
+Q
+ "Line N"
+∇
+
+      FOO
+Line 1
+211 212 213 214
+221   a 223 224
+231 232 233 234
+Line N
+
+      ⍝ two literals in one function
+      ⍝
+      )ERASE FOO
+
+∇FOO;Q1;Q2
+ "Line 1"
+ Q1←<<<
+ 211 212 213 214
+ 221 'a' 223 224
+ 231 232 233 234
+   >>>
+ "Line 7"
+
+ Q2←<<<
+ 1211 1212 1213 1214
+ 1221 'aa' 1223 1224
+ 1231 1232 1233 1234
+   >>>
+
+Q1⍪Q2
+ "Line N"
+∇
+
+      FOO
+Line 1
+Line 7
+  211  212  213  214 
+  221    a  223  224 
+  231  232  233  234 
+ 1211 1212 1213 1214 
+ 1221   aa 1223 1224 
+ 1231 1232 1233 1234 
+Line N
+
+      )ERASE FOO
+
+⍝ nested literal in function
+
+∇Z←FOO
+ "Line 1"
+ Z ← <<<
+     1 2 3 4
+     5 6 7 8
+     9 <<<
+       50 51 52
+       53 54 55
+       >>> 11 12
+     >>>
+ "Line 9"
+∇
+      Q← FOO
+Line 1
+Line 9
+
+      ⍴Q
+3 4
+
+      ≡Q
+2
+
+      8 ⎕CR Q
+┌→─────────────────┐
+↓1          2  3  4│
+│5          6  7  8│
+│                  │
+│9 ┌→───────┐ 11 12│
+│  ↓50 51 52│      │
+│  │53 54 55│      │
+│  └────────┘      │
+└ϵ─────────────────┘
+
+
+⍝ ────── LITERAL in Immediate Execution ───
+
+      ⍝ simple
+      ⊃<<<
+211 212 213 214
+'a' 'b' 'c' 224
+231 232 233 234
+       >>>
+211 212 213 214
+  a   b   c 224
+231 232 233 234
+
+      ⍝ simple assigned
+      Q←⊃<<<
+211 212 213 214
+'a' 'b' 'c' 224
+231 232 233 234
+       >>>
+      Q
+211 212 213 214
+  a   b   c 224
+231 232 233 234
+
+      ⍝ nested, assigned
+      Q←<<<
+211 212 213 214
+'a' 'b' 'cde' 224
+231 232 233 234
+       >>>
+
+      Q
+ 211 212 213 214 
+   a   b cde 224 
+ 231 232 233 234 
+
+      8 ⎕CR <<<
+211 212 213 214
+'a' 'b' 'cde' 224
+231 232 233 234
+            >>>
+┌→────────────────┐
+↓211 212   213 214│
+│  a   b ┌→──┐ 224│
+│        │cde│    │
+│        └───┘    │
+│231 232   233 234│
+└ϵ────────────────┘
+

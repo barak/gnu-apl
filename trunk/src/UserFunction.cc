@@ -89,11 +89,17 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
 
    if (UserPreferences::uprefs.discard_indentation)   // really ?
       {
+        Multi_line_SM sm;
         loop(l, get_text_size())
             {
               UCS_string line = get_text(l);
-              line.remove_leading_and_trailing_whitespaces();
-              set_text(l, line);
+              const ShapeItem multi_pos = line.multi_pos();
+              if (multi_pos != -1)   sm.next(line[multi_pos]);
+              if (sm.inside_multi())
+                 {
+                   line.remove_leading_and_trailing_whitespaces();
+                   set_text(l, line);
+                 }
             }
       }
 
@@ -536,27 +542,24 @@ UCS_string message_2(error.get_error_line_2());
            {
              PrintContext pctx(PR_BOXED_GRAPHIC);
              PrintBuffer pb(*val_A, pctx, 0);
-             message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
-             message_2.append(UNI_SPACE);
+             message_2 << UCS_string(pb, 1, DEFAULT_Quad_PW) << UNI_SPACE;
            }
 #endif
       }
 
-   message_2.append(header.get_name());
+   message_2 << header.get_name();
 
    if (header.B())
       {
 #if SHORT
-        message_2.append(UNI_SPACE);
-        message_2.append(header.B()->get_name());
+        message_2 << UNI_SPACE << header.B()->get_name();
 #else
         Value_P val_B = header.B()->get_apl_value();
         if (+val_B)
            {
-             message_2.append(UNI_SPACE);
              PrintContext pctx(PR_APL_FUN);
              PrintBuffer pb(*val_B, pctx, 0);
-             message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
+             message_2 << UNI_SPACE << UCS_string(pb, 1, DEFAULT_Quad_PW);
            }
 #endif
       }
@@ -608,228 +611,6 @@ std::vector<bool> ts_lines;
    parse_body(LOC, false, false);
 }
 //----------------------------------------------------------------------------
-ErrorCode
-UserFunction::transform_old_multi_lines()
-{
-  /* old-style multi-line strings. convert sets of lines like
-
-     [k+1] PREFIX "L1
-     [k+2] L2 ...
-     [k+N] Ln" SUFFIX
-
-    into:
-
-    [k+1] PREFIX "L1" "L2" ... "LN" SUFFIX
-    [...] (empty)
-    [k+N] (empty)
-
-    The result is nested.
-   */
-
-enum Line_status
-   {
-     Function_header = 0,
-     APL_text        = 1,
-     Start_of_string = 2,
-     Inside_string   = 3,
-     End_of_string   = 4
-   };
-
-char * status = ALLOCA(char, get_text_size());
-   status[0] = Function_header;
-Line_status current = APL_text;
-
-   // 1. determine the line status of each line...
-   //
-   for (int l = 1; l < get_text_size(); ++l)
-       {
-         const int count = get_text(l).double_quote_count(false);
-         if (count & 1)   // start or end of string
-            {
-              if (current == APL_text)   // start of multi-line string
-                 {
-                    status[l] = Start_of_string;
-                    current = Inside_string;
-                 }
-              else                       // end of multi-line string
-                 {
-                    status[l] = End_of_string;
-                    current = APL_text;
-                 }
-            }
-         else              // no status change
-            {
-              status[l] = current;
-            }
-       }
-
-   if (current == Start_of_string || current == Inside_string)
-      {
-         // multi-line string started but not ended.
-         //
-         return E_DEFN_ERROR;
-      }
-
-   // 2. modify lines...
-   //
-   for (int line_number = 1; line_number < get_text_size();)
-       {
-         if (status[line_number] == APL_text)   { ++line_number;   continue; }
-         const int start_line_number = line_number;
-         Assert1(status[line_number] == Start_of_string);
-         UCS_string accu = get_text(line_number++);
-         accu << "\" ";
-         while (status[line_number] == Inside_string)
-               {
-                 accu << " \"" << get_text(line_number).do_escape(true) << "\"";
-                 clear_text(line_number++);
-               }
-         Assert(status[line_number] == End_of_string);
-         accu << "\"" << get_text(line_number);
-         set_text(start_line_number, accu);
-         clear_text(line_number++);
-       }
-
-   // remove trailing empty lines...
-   //
-   while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
-         text.pop_back();
-
-// CERR << endl;
-// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
-
-   return E_NO_ERROR;
-}
-//----------------------------------------------------------------------------
-ErrorCode
-UserFunction::transform_new_multi_lines()
-{
-  /* new-style multi-line strings. convert sets of lines like
-
-     [k+1] PREFIX """
-     [k+2] L2 ...
-     [k+N] """
-
-    into:
-
-    [k+1] PREFIX "L2" ... "LN"
-    [...] (empty)
-    [k+N] (empty)
-
-     In contrast to transform_multi_line_strings(), line k+N may only
-     consist of spaces and the terminating """.
-   */
-
-enum Line_status
-   {
-     Function_header = 0,
-     APL_text        = 1,
-     Start_of_string = 2,
-     Inside_string   = 3,
-     End_of_string   = 4
-   };
-
-char * status = ALLOCA(char, get_text_size());
-   status[0] = Function_header;
-Line_status current = APL_text;
-
-   // determine line status of each line...
-   //
-   for (ShapeItem l = 1; l < get_text_size(); ++l)
-       {
-         const UCS_string & line = get_text(l);
-         const ShapeItem len = line.size();
-         if (-1 != line.multi_pos(current == Inside_string))
-            {
-              if (current == APL_text)   // start of multi-line string
-                 {
-                    status[l] = Start_of_string;
-                    current = Inside_string;
-                 }
-              else                       // end of multi-line string
-                 {
-                   bool blanks_only = true;
-                   for (ShapeItem c = 0; c < (len - 3); ++c)
-                       {
-                          if (line[c] != UNI_SPACE &&
-                              line[c] != UNI_HT)   blanks_only = false;
-                       }
-
-                    if (blanks_only)
-                       {
-                         status[l] = End_of_string;
-                         current = APL_text;
-                       }
-                 }
-            }
-         else                            // no status change
-            {
-              status[l] = current;
-            }
-       }
-
-   if (current == Start_of_string || current == Inside_string)
-      {
-         // multi-line string started but not ended.
-         //
-         MORE_ERROR() << "No end of multi-line string found.";
-         return E_DEFN_ERROR;
-      }
-
-   // modify lines...
-   //
-   for (int li = 1; li < get_text_size(); )
-       {
-         if (status[li] == APL_text)   { ++li;   continue; }
-
-         // a multi-line string starts at line li...
-         //
-         const int start = li;
-         Assert1(status[li] == Start_of_string);
-         UCS_string prefix = get_text(li++);
-         prefix.resize(int(prefix.size() - 3));   // remove the trailing """
-         UCS_string accu;
-         int count = 0;
-         while (status[li] == Inside_string)
-               {
-                 ++count;
-                 accu << " \"" << get_text(li).do_escape(true) << "\"";
-                 clear_text(li++);
-               }
-
-         Assert(status[li] == End_of_string);
-
-         if (count == 0)        // nothing
-            {
-              const UTF8_string utf("0⍴⊂\"\"");   // 0⍴⊂""
-              prefix << UCS_string(utf);
-              set_text(start, prefix);
-            }
-         else if (count == 1)   // a single "string" would not nest
-            {
-              const UTF8_string utf("(,⊂");   // enclose the accu...)
-              UCS_string ucs(utf);
-              prefix << UCS_string(utf) << accu << ")";
-              set_text(start, prefix);
-            }
-         else
-            {
-              set_text(start, prefix + accu);
-            }
-         clear_text(li++);
-       }
-
-   // remove trailing empty lines...
-   //
-   while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
-         text.pop_back();
-
-// CERR << endl;
-// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
-
-   return E_NO_ERROR;
-}
-//----------------------------------------------------------------------------
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
@@ -838,31 +619,63 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
    line_starts.push_back(Function_PC_0);   // will be set later.
 
 UCS_string_vector original_text;
-   //
-   // The function text is modified for parsing but restored afterwards
+
+   // The function text is modified for parsing it, but restored afterwards
    // so that e.g. ∇FUN[⎕]∇ shows the text entered by the user.
    //
    // original_text is only set if text was modified.
    //
    clear_body();
 
+Lit_DB literals;
    if (UserPreferences::uprefs.new_multi_line_strings)
       {
+        bool inside = false;
         for (int li = 1; li < get_text_size(); ++li)
             {
               const UCS_string & line = get_text(li);
-              const ShapeItem multi = line.multi_pos(false);
-              if (multi == -1)   continue;   // line contains no """
+              const ShapeItem multi = line.multi_pos();
+              if (multi == -1)          continue;   // no """, «««, or <<<
+              inside = ! inside;
+              if (line[multi] == '<')   continue;   // literal <<<
 
+              // the first (!) multi-line literal starts at line li
+              //
               original_text = text;   // precaution for errors
-              if (/* const ErrorCode ec = */ transform_new_multi_lines())
+              if (Parser::replace_multi_line_strings(text, literals, true))
                  {
                    text = original_text;   // restore function text
                    error_line = li;
                    return;
                  }
 
-              break;   // transform_new_multi_lines() does all
+              break;   // transform_new_multi_line_strings() has done all (!)
+            }
+      }
+
+   if (UserPreferences::uprefs.multi_line_literals)
+      {
+        bool inside = false;
+        for (int li = 1; li < get_text_size(); ++li)
+            {
+              const UCS_string & line = get_text(li);
+              const ShapeItem multi =
+                    line.multi_pos();
+              if (multi == -1)           continue;   // no """, «««, or <<<
+              inside = ! inside;
+              if (line[multi] != '<')   continue;   // literal <<<
+
+              // the first (!) multi-line literal starts at li
+              //
+              original_text = text;   // precaution for errors
+              if (Parser::replace_multi_line_literals(text, literals, true))
+                 {
+                   text = original_text;   // restore function text
+                   error_line = li;
+                   return;
+                 }
+
+              break;   // transform_new_multi_line_strings() has done all (!)
             }
       }
 
@@ -874,14 +687,14 @@ UCS_string_vector original_text;
               if (!(line.double_quote_count(false) & 1))   continue;
 
               original_text = text;   // precaution for errors.
-              if (/* const ErrorCode ec = */ transform_old_multi_lines())
+              if (Parser::transform_old_multi_line_strings(text))
                  {
                    text = original_text;   // restore function text
                    error_line = li;
                    return;
                  }
 
-              break;   // transform_old_multi_lines() does all
+              break;   // transform_old_multi_line_strings() does all (!)
             }
       }
 
@@ -926,7 +739,7 @@ UCS_string_vector original_text;
               if (tolerant && ec != E_NO_ERROR)
                  {
                    UCS_string new_line(UTF8_string("## "));
-                   new_line.append(line);
+                   new_line << line;
                    text[l] = new_line;
                    CERR << "WARNING: SYNTAX ERROR in function "
                         << header.get_name() << endl;
@@ -958,6 +771,28 @@ UCS_string_vector original_text;
 
    // recompute the →→ ←→ ←← jump PCs
    compute_if_else_targets();
+
+   // replace marker tokens with their corresponding literal
+   //
+   if (literals.size())   // if there were any literals defined
+      {
+        loop(b, body.size())
+            {
+              Token & token = body[b];
+              if (token.get_tag() == TOK_MARKER)   // from @N@
+                 {
+                   const ShapeItem key = token.get_int_val();
+                   Value_P value = literals.pull(key);
+                   Assert(+value);
+                   new (&body[b]) Token(TOK_APL_VALUE1, value);
+                 }
+            }
+      }
+
+
+   // literals was only a temporary storage between
+   //
+   Assert(literals.size() == 0);
 }
 //----------------------------------------------------------------------------
 UserFunction *
@@ -1393,17 +1228,17 @@ int signature = SIG_FUN | SIG_Z;
 
               case UNI_LF:   // end of header
                    dest = 0;
-                   for (++t; t < text.ssize();)   body_text.append(text[t++]);
+                   for (++t; t < text.ssize();)   body_text << text[t++];
                    break;                          // header line done
               default:                                        break;
             }
            
-         if (dest)   dest->append(uni);
+         if (dest)   *dest << uni;
        }
 
    lvars_text.remove_trailing_whitespaces();
    body_text.remove_trailing_whitespaces();
-   body_text.append(comment);
+   body_text << comment;
 
 Token_string body;
    {
@@ -1417,7 +1252,7 @@ Token_string body;
    // append lvars_text to body (as in e.g. { ... ;C;D }. This will also
    // parse the lvars_text needed below.
    //
-   body_text.append(lvars_text);
+   body_text << lvars_text;
 
 const Parser parser(PM_FUNCTION, LOC, false);
 
@@ -1482,7 +1317,7 @@ UserFunction::help(ostream & out) const
 
    if (is_lambda())
       {
-         UCS_string body(get_text(1), 2, get_text(1).size() - 2);
+         UCS_string body(get_text(1), 2);
          CERR << "Lambda: { " << body << " ";
          loop(v, local_var_count())
             {
@@ -1588,7 +1423,7 @@ UCS_string ret = header.get_name();
         UCS_string name = Workspace::find_lambda_name(this);
         if (name.size())   ret = name;
       }
-   ret.append(UNI_L_BRACK);
+   ret << UNI_L_BRACK;
 
    // pc may point to the next token already. If that is the case then
    // we go back one token.
@@ -1596,9 +1431,7 @@ UCS_string ret = header.get_name();
    if (pc > 0 && body[pc - 1].get_Class() == TC_END)   pc = Function_PC(pc - 1);
 
 const Function_Line line = get_line(pc);
-   ret.append_number(line);
-   ret.append(UNI_R_BRACK);
-   return ret;
+   return ret << line << UNI_R_BRACK;
 }
 //----------------------------------------------------------------------------
 Function_Line
@@ -1623,9 +1456,8 @@ UserFunction::canonical(bool with_lines) const
 UCS_string ucs;
    loop(t, text.size())
       {
-        if (with_lines)   ucs.append(line_prefix(Function_Line(t)));
-        ucs.append(text[t]);
-        ucs.append(UNI_LF);
+        if (with_lines)   ucs << line_prefix(Function_Line(t));
+        ucs << text[t] << UNI_LF;
       }
 
    return ucs;
@@ -1672,7 +1504,7 @@ UserFunction::remove_TOK_VOID()
    //
    if (line_starts.size() == 0)
       {
-        Parser::remove_TOK_VOID(body);
+        body.remove_TOK_VOID();
         return NO_VOID_TOKEN_REMOVED;
       }
 
@@ -1699,7 +1531,7 @@ Function_PC dst_PC = Function_PC_0;
 
         if (body[src_PC].get_tag() != TOK_VOID)
            {
-             if (src_PC != dst_PC)   body[dst_PC].move(body[src_PC], LOC);
+             if (src_PC != dst_PC)   body[dst_PC].move_from(body[src_PC], LOC);
              ++dst_PC;
            }
         else   // TOK_VOID

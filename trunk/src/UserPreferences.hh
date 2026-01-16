@@ -116,12 +116,14 @@ public:
    /// argument of --mem (if any: 0 if not given, "" if given but empty)
    const char * mem_arg;
 
-   /// true if old-style multi-line strings are allowed (in ∇-defined
-   /// functions)
+   /// \b true if old-style multi-line strings are allowed (in defined functions)
    bool old_multi_line_strings;
 
-   /// true if new-style multi-line strings are allowed
+   /// \b true if new-style multi-line strings are allowed
    bool new_multi_line_strings;
+
+   /// \b true if multi-line literals are allowed
+   bool multi_line_literals;
 
    /// when function body shall go into the history
    int nabla_to_history;

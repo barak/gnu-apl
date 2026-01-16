@@ -1221,7 +1221,7 @@ XImage * image = XGetImage(display, XRootWindow(display, screen),
    // write .bmp file...
    //
 UTF8_string outfile_utf8(outfile);
-   if (!outfile_utf8.ends_with(".bmp"))   outfile_utf8.append_ASCII(".bmp");
+   if (!outfile_utf8.ends_with(".bmp"))   outfile_utf8 << ".bmp";
 
    // writing the file takes a while, so let the user know.
    //

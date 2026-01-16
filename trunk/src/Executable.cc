@@ -53,10 +53,9 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
              const Unicode uni = ucs[t];
              switch (uni)
                 {
-                  case UNI_CR:                         break;
-                  case UNI_LF: text.push_back(line);
-                                     line.clear();           break;
-                  default:           line.append(uni);
+                  case UNI_CR:                                         break;
+                  case UNI_LF: text.push_back(line);   line.clear();   break;
+                  default:     line << uni;
                }
            }
 
@@ -92,7 +91,7 @@ ShapeItem last_semi = -1;
    if (last_semi != -1)
       {
         for (ShapeItem t = last_semi; t < lambda_text.ssize(); ++t)
-            header.append(lambda_text[t]);
+            header << lambda_text[t];
         text.push_back(header);
 
         UCS_string new_text(lambda_text);
@@ -551,7 +550,7 @@ UCS_string ret;
    while (tidx < line_txt.ssize())
       {
         if (Avec::is_diamond(line_txt[tidx]))    break;
-        ret.append(line_txt[tidx++]);
+        ret << line_txt[tidx++];
       }
 
    // skip trailing spaces
@@ -564,7 +563,7 @@ UCS_string ret;
 VoidCount
 Executable::remove_TOK_VOID()
 {
-   return Parser::remove_TOK_VOID(body);
+   return body.remove_TOK_VOID();
 }
 //----------------------------------------------------------------------------
 void
@@ -874,7 +873,7 @@ UCS_string failed_statement;
            if (failed_line[f] == UNI_DIAMOND)   { ++l;   continue; }
            if (l > statement)   break;      // subsequent line
            if (l < statement)   continue;   // previous line
-           failed_statement.push_back(failed_line[f]);
+           failed_statement << failed_line[f];
          }
    }
 
@@ -1096,7 +1095,7 @@ UserFunction * ufun = new UserFunction(signature, lambda_num,
    // A←UFUN      UFUN being a user-defined function with body { ... }
    //
 Token tok_ufun = ufun->get_token();
-   body[bend].move(tok_ufun, LOC);
+   body[bend].move_from(tok_ufun, LOC);
 
    return bend;
 }
@@ -1108,21 +1107,25 @@ Executable::compute_lambda_body(Token_string & lambda_body,
 int signature = SIG_FUN;
 int level = 0;
 
-   /* find the insertion point for λ←. for single statement lambda the
+   /* find the insertion point for λ←. For a single statement lambda the
       insertion point is the first body token lambda_body[b].
       For a multi-statement lambda it is the last ◊ before lambda_body[bend].
     */
-
 ShapeItem insertion_point = b;
    for (ShapeItem j = b; j < bend; ++j)
        {
-         if (body[j].get_tag() == TOK_END)   insertion_point = j + 1;
+         if (body[j].get_tag() == TOK_END)
+            {
+              // TOK_END indicates a multi-statement lambda. Move the
+              // insertion_point to the (beginning of) the next statement.
+              insertion_point = j + 1;
+            }
        }
 
    for (; b < bend; ++b)
        {
          Token t;
-         t.move(body[b], LOC);
+         t.move_from(body[b], LOC);
          body[b].clear(LOC);   // invalidate in main body
 
          // figure the signature by looking for ⍺, ⍶, ⍵, ⍹, and χ
@@ -1207,17 +1210,21 @@ ShapeItem insertion_point = b;
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
-   // this->text is the text of this Executable. Extract the text of
-   // the skip'th lambda in this->text (and return it).
+   // Skip over 'skip' top -level lambdas and return the next one. 
+
+   // this->text is the entire text of this Executable. Extract the text of
+   // the skip'th top-level lambda in this->text (and return it).
    //
 UCS_string lambda_text;
 
-int level = 0;   // {/} nesting level
+// level is used to skip over nested lambdas (= lambdas in a lambda body)
+int level = 0;   // { } nesting level
+
+// copying is false for the first 'skip' lambdas, and true after that.
 bool copying = false;
+
 ShapeItem tidx = 0;    // the current line in text[]
 ShapeItem tcol = 0;    // the current column in text[tidx];
-bool in_single_quotes = false;
-bool in_double_quotes = false;
 
    // skip over the first skip lambdas and copy the next one to lambda_text
    //
@@ -1225,6 +1232,7 @@ bool in_double_quotes = false;
        {
          if (tidx >= text.ssize())
             {
+              // this should never happens since we have 'skip' lambdas.
               Q1(copying)   Q1(tidx)   Q1(skip)   FIXME;
             }
 
@@ -1234,25 +1242,27 @@ bool in_double_quotes = false;
             {
               ++tidx;     // next line
               tcol = 0;   // first column
-              in_single_quotes = false;
-              in_double_quotes = false;
               continue;
             }
 
          const Unicode uni = line[tcol++];
-         if (in_single_quotes)
+         if (uni == UNI_SINGLE_QUOTE ||   // APL string: skip or copy it
+             uni == UNI_DOUBLE_QUOTE)     // GNU APL string: dito.
             {
-              if (uni == UNI_SINGLE_QUOTE)   in_single_quotes = false;
-              if (copying)   lambda_text.append(uni);
-              continue;
-            }
+              const ShapeItem end = line.string_end_pos(tcol - 1, false);
+              if (end == -1)
+                 {
+                   MORE_ERROR() << "No (APL-) string end in function line "
+                                << tidx;
+                   DOMAIN_ERROR;
+                 }
 
-         if (in_double_quotes)
-            {
-              if (uni == UNI_DOUBLE_QUOTE     // either \" or string end
-                 && !(tcol >= 2 && line[tcol - 2] == UNI_BACKSLASH))
-                 in_double_quotes = false;
-              if (copying)   lambda_text.append(uni);
+              if (copying)
+                 {
+                   lambda_text << uni;
+                   while (tcol < end + 1)   lambda_text << line[tcol++];
+                 }
+              tcol = end + 1;
               continue;
             }
 
@@ -1262,67 +1272,58 @@ bool in_double_quotes = false;
             {
               ++tidx;
               tcol = 0;
-              in_single_quotes = false;
-              in_double_quotes = false;
               continue;
             }
 
-         if (copying)   lambda_text.append(uni);
+         if (copying)   lambda_text << uni;
 
          switch(uni)
             {
-              case UNI_SINGLE_QUOTE:             // start of a new '...' string
-                   in_single_quotes = true;
-                   continue;
-
-              case UNI_DOUBLE_QUOTE:       // start of a new "..." string
-                   in_double_quotes = true;
-                   continue;
-
               case UNI_L_CURLY:            // start of a new { ... }
                    if (level++ == 0 && skip == 0)   copying = true;
                    continue;
 
               case UNI_R_CURLY:            // end of { ... }
-                   if (--level)   continue;      // but not top-level }
-                   --skip;                       // next {...} at top-level
+                   if (--level)   continue;      // but not of a top-level }
+                   --skip;                       // one less to skip
                    if (!copying)  continue;
 
-                   lambda_text.pop_back();       // the last }
-                   goto out;
+                   // this } is the 
+                   lambda_text.pop_back();       // the top-level }
+                   goto out;                     // copying done.
 
               default: continue;
             }
        }
 
 out:
-   
-   if (signature & SIG_Z)  // insert λ ←
+
+   // if thew lambda has no results, then we are done.
+   //
+   if (!(signature & SIG_Z))   return lambda_text;
+
+   // Otherwise: insert λ ←. The λ ← shall be inserted before the last
+   // statement (= after the last ◊), or at the beginning if there is only
+   // one statement
+   //
+ShapeItem sols = 0;   // start-of-last-statement; assume no ◊.
+   rev_loop(j, lambda_text.size())
       {
-        ShapeItem insertion_point = 0;
-        rev_loop(j, lambda_text.size())
+        if (lambda_text[j] == UNI_DIAMOND)
            {
-             if (lambda_text[j] == UNI_DIAMOND)
-                {
-                  insertion_point = j + 1;
-                  while (lambda_text[insertion_point] <= UNI_SPACE)
-                         ++insertion_point;
-                  break;
-                }
+             sols = j + 1;
+             while (lambda_text[sols] <= UNI_SPACE)   ++sols;
+             break;
            }
-        UCS_string ret;
-        loop(j, lambda_text.size())
-            {
-              if (j == insertion_point)
-                 {
-                   ret.push_back(UNI_LAMBDA);       // insert λ
-                   ret.push_back(UNI_LEFT_ARROW);   // insert ←
-                 }
-              ret.push_back(lambda_text[j]);
-            }
-        return ret;
       }
-    return lambda_text;
+
+UCS_string ret;
+   loop(j, lambda_text.size())
+       {
+         if (j == sols)   ret << UNI_LAMBDA << UNI_LEFT_ARROW;   // insert λ←
+         ret << lambda_text[j];
+       }
+   return ret;
 }
 //----------------------------------------------------------------------------
 void
@@ -1468,7 +1469,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
 }
 //============================================================================
 StatementList *
-StatementList::fix(const UCS_string & data, const char * loc)
+StatementList::fix(const UCS_string & data, Value_P literal, const char * loc)
 {
 StatementList * fun = new StatementList(data, loc);
 
@@ -1527,6 +1528,21 @@ StatementList * fun = new StatementList(data, loc);
       {
         CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
+
+   if (+literal)
+      {
+        bool found_marker = false;
+        loop(b, fun->body.size())
+            {
+              if (fun->body[b].get_tag() == TOK_MARKER)
+                 {
+                   found_marker = true;
+                   new (&fun->body[b])   Token(TOK_APL_VALUE1, literal);
+                   break;
+                 }
+            }
+         Assert(found_marker);
+       }
 
    fun->body.push_back(Token(TOK_RETURN_STATS));
    if (fun->compute_if_else_targets())

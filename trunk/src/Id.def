@@ -147,6 +147,7 @@ sf( F12_MINUS          , "-"          ,          )
 st( MACRO              , "MACRO"      ,          )
 qf( MAP                , "⎕MAP"       ,          )
 qf( MX                 , "⎕MX"        ,          )
+pp( MARKER             , "@n@"        ,          )   // string marker
                                     
 qf( NA                 , "⎕NA"        , = 0x4E01 )
 sf( F2_NAND            , "⍲"          ,          )

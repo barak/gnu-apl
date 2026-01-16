@@ -72,15 +72,15 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         read_file_line(line, eof);
         if (eof)   // end of file reached: do some global checks
            {
-             if (Command::inside_multiline)
-                {
+             if (Command::inside_multi())
+             {
                   CERR << "\n*** WARNING: Multiline string not closed "
                           "at the end of a file.\n";
                   if (InputFile::current_file())
                      {
                        CERR << "*** File: "
                             << InputFile::current_file()->filename;
-                       if (const int start = Command::multiline_start + 1)
+                       if (const int start = Command::get_multiline_start() + 1)
                           {
                             CERR << " (the string starts near line "
                                  << start << ")";
@@ -410,7 +410,7 @@ IO_Files::open_next_file()
                    {
                      summary_path = UTF8_string(utf8P(log_file_name),
                                                 slash + 1 - log_file_name);
-                     summary_path.append_ASCII("summary.log");
+                     summary_path << "summary.log";
                    }
 
                 CERR << "  #######################################"

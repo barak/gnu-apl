@@ -2445,6 +2445,40 @@ PrintBuffer pb(*this, pctx, &out);   // constructor prints it
 }
 //----------------------------------------------------------------------------
 ostream &
+Value::print_brief(ostream & out) const
+{
+   // shape
+   //
+   out << "⍴";
+   loop(r, shape.get_rank())
+       {
+         r && out << ";";
+         out << shape.get_shape_item(r);
+       }
+
+   // depth
+   //
+   out << "≡" << compute_depth() << " ";
+
+   // ravel
+   //
+const int count = max(3, int(element_count()));
+   if (count == 0)   out << "⌽";   // empty
+   loop(c, count)
+      {
+        if (c)    out << " ";
+        const Cell & cell = get_cravel(c);
+        if (cell.is_integer_cell())        out << cell.get_int_value();
+        else if (cell.is_float_cell())     out << "FLT";
+        else if (cell.is_complex_cell())   out << "CPLX";
+        else if (cell.is_pointer_cell())   out << "⊂";
+        if (element_count() > count)       out << "...";
+      }
+
+   return out;
+}
+//----------------------------------------------------------------------------
+ostream &
 Value::print_member(ostream & out, UCS_string member_prefix) const
 {
 const ShapeItem rows = get_rows();
@@ -2478,8 +2512,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
          const UCS_string member_name = cell_sub->get_UCS_ravel();
          const size_t pad = longest_name - member_name.size();
          UCS_string member = member_prefix;   // ancestor.ancestor ...
-         member.push_back(UNI_FULLSTOP);
-         member.append(member_name);
+         member << UNI_FULLSTOP << member_name;
          out << member << ": ";
          out << UCS_string(pad, UNI_SPACE);
 
@@ -2623,7 +2656,7 @@ Value::get_UCS_ravel() const
 UCS_string ucs;
 
 const ShapeItem ec = element_count();
-   loop(e, ec)   ucs.append(get_cravel(e).get_char_value());
+   loop(e, ec)   ucs << get_cravel(e).get_char_value();
 
    return ucs;
 }

@@ -40,12 +40,19 @@ class UCS_string;
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
 
- 1. from a (user0defined) name,       e.g.  ID_APL_VALUE or ID_CHARACTER
+ 1. from a (user-defined) name,       e.g.  ID_APL_VALUE or ID_CHARACTER
  2. from a distinguished var name,    e.g.  ID_Quad_AI or ID_Quad_AV
  3. from a distinguished fun name,    e.g.  ID_Quad_AT or ID_Quad_EM
  4. from a special token (apl symbol) e.g.  ID_L_PARENT1 or ID_ASSIGN
 
-  This is controlled by 5 corresponding macros: pp() qv() qf() resp. st()
+  This is controlled by 5 corresponding macros: pp() qv() qf() resp. st() which are
+  abbreviations of their purpose:
+
+  pp (pretty print) : generic.                           e.g. FUN VAR
+  qf                : Quad function,                     e.g. ⎕AF, ⎕AT
+  qv                : Quad variable                      e.g. ⎕AI, ⎕ARG
+  sf                  system function (aka. primitive)   e.g. F2_AND, F2_AND_B
+  st                  system token                       e.g. BRANCH, COLON
  */
 /// Identifier of an internal object of the APL interpreter
 class ID

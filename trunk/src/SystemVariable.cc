@@ -755,7 +755,7 @@ UCS_string line;
    line.remove_leading_and_trailing_whitespaces();
 
 Token tok_exec(Bif_F1_EXECUTE::execute_statement(line));
-   token.move(tok_exec, LOC);
+   token.move_from(tok_exec, LOC);
 }
 //============================================================================
 Quad_QUOTE::Quad_QUOTE()
@@ -810,7 +810,7 @@ PrintBuffer pb(*B, pctx, /* print directly to COUT*/ 0);
    else if (pb.get_row_count() > 0)   // one line output
       {
         COUT << pb.l1().no_pad() << flush;
-        buffer.append(pb.l1());
+        buffer << pb.l1();
       }
    else                               // empty output
       {

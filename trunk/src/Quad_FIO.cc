@@ -92,20 +92,17 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
 
    // init stdin, stdout, stderr, and maybe fd 3 
    //
-file_entry f0(stdin, STDIN_FILENO);
-   f0.path.append_ASCII("stdin");
+file_entry f0(stdin,  STDIN_FILENO);    f0.path << "stdin";
+file_entry f1(stdout, STDOUT_FILENO);   f1.path << "stdout";
+file_entry f2(stderr, STDERR_FILENO);   f2.path << "stderr";
    open_files.push_back(f0);
-file_entry f1(stdout, STDOUT_FILENO);
-   f1.path.append_ASCII("stdout");
    open_files.push_back(f1);
-file_entry f2(stderr, STDERR_FILENO);
-   f1.path.append_ASCII("stderr");
    open_files.push_back(f2);
 
    if (-1 != fcntl(3, F_GETFD))   // this process was forked from another APL
       {
         file_entry f3(0, 3);
-        f3.path.append_ASCII("pipe-to_client");
+        f3.path << "pipe-to_client";
         open_files.push_back(f3);
       }
 }
@@ -247,7 +244,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
          const Unicode uni = A_format[fA++];
          if (uni != UNI_PERCENT)   // not %
             {
-              UZ.append(uni);
+              UZ << uni;
               continue;
             }
 
@@ -272,7 +269,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                     //
                     UTF8_string utf(fmt);
                     UCS_string ufmt(utf);
-                    UZ.append(ufmt);
+                    UZ << ufmt;
                     return;
                   }
 
@@ -285,7 +282,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                     //
                     UTF8_string utf(fmt);
                     UCS_string ufmt(utf);
-                    UZ.append(ufmt);
+                    UZ << ufmt;
                     goto field_done;
                   }
 
@@ -337,7 +334,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
                             SPRINTF(numbuf, fmt, int_val);
                             if (thousands)  group_thousands(UZ, numbuf, false);
-                            else            UZ.append_UTF8(numbuf);
+                            else            UZ << numbuf;
                           }
                           goto field_done;
 
@@ -356,13 +353,12 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                             else if (char * const dot = strchr(numbuf, '.'))
                                {
                                  *dot = 0;
-                                 UZ.append_ASCII(numbuf);
-                                 UZ.append(Workspace::get_FC(0));
-                                 UZ.append_ASCII(dot + 1);
+                                 UZ << numbuf;
+                                 UZ << Workspace::get_FC(0) << (dot + 1);
                                }
                             else
                                {
-                                 UZ.append_UTF8(numbuf);
+                                 UZ << numbuf;
                                }
                           }
                           goto field_done;
@@ -371,33 +367,32 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                           COUNT_ARG;
                           if (B->get_cravel(off_B).is_character_cell())
                              {
-                               UZ.append(B->get_cravel(off_B++)
-                                           .get_char_value());
+                               UZ << B->get_cravel(off_B++) .get_char_value();
                                goto field_done;
                              }
                           {
                             Value_P str =
                                     B->get_cravel(off_B++).get_pointer_value();
                             UCS_string ucs(*str.get());
-                            UZ.append(ucs);
+                            UZ << ucs;
                           }
                           goto field_done;
 
                      case 'c':   // single char
                           COUNT_ARG;
-                          UZ.append(B->get_cravel(off_B++).get_char_value());
+                          UZ << B->get_cravel(off_B++).get_char_value();
                           goto field_done;
 
                      case 'm':
                           COUNT_ARG;
                           SPRINTF(numbuf, "%s", strerror(errno));
-                          UZ.append_UTF8(numbuf);
+                          UZ << numbuf;
                           goto field_done;
 
                      case '%':
                           if (fm == 0)   // %% is %
                              {
-                               UZ.append(UNI_PERCENT);
+                               UZ << UNI_PERCENT;
                                goto field_done;
                              }
                           /* no break */
@@ -444,8 +439,7 @@ Quad_FIO::group_thousands(UCS_string & dest, char * buffer, bool flt)
            {
              *dot = 0;
              group_thousands(dest, buffer, false);
-             dest.append(Workspace::get_FC(0));
-             dest.append_ASCII(dot + 1);
+             dest << Workspace::get_FC(0) << (dot + 1);
              return;
            }
       }
@@ -459,11 +453,11 @@ int digit_count = 0;
    for (const char * b = buffer; *b;)
        {
          const char cc = *b++;
-         dest.append(Unicode(cc));
+         dest << Unicode(cc);
          if (cc >= '0' && cc <= '9')   // digit
             {
               if (--digit_count && !(digit_count % 3))
-                 dest.append(Workspace::get_FC(1));
+                 dest << Workspace::get_FC(1);
             }
          }
 }
@@ -836,7 +830,7 @@ Unicode lookahead = input.get_next();
                   UCS_string ucs;
                   loop(c, conv_len)
                      {
-                       ucs.append(lookahead);
+                       ucs << lookahead;
                        lookahead = input.get_next();
                        if (lookahead == UNI_EOF)   break;
                      }
@@ -853,7 +847,7 @@ Unicode lookahead = input.get_next();
              UCS_string ucs;
              while (lookahead > UNI_SPACE)
                  {
-                   ucs.append(lookahead);
+                   ucs << lookahead;
                    if (conv_len && ucs.ssize() >= conv_len)   break;
                    lookahead = input.get_next();
                    if (lookahead == UNI_EOF)   break;
@@ -891,7 +885,7 @@ Unicode lookahead = input.get_next();
              // if the next char is ] then it shall belong to the range,
              // otherwise it terminates the range than ending it.
              if (f == format.ssize())   LENGTH_ERROR;
-             if (format[f] == UNI_R_BRACK)   range.push_back(format[f++]);
+             if (format[f] == UNI_R_BRACK)   range << format[f++];
 
             // the characters of the range, terminated by ]
             //
@@ -934,11 +928,11 @@ Unicode lookahead = input.get_next();
                        // the characters into range...
                        //
                        for (int u = from + 1; u <= to;)
-                           range.push_back(Unicode(u++));
+                           range << Unicode(u++);
                      }
                   if (funi == UNI_R_BRACK)   break;   // end of range
                   ++f;
-                  range.push_back(funi);
+                  range << funi;
                 }
 
              // 2. create the APL result
@@ -955,7 +949,7 @@ Unicode lookahead = input.get_next();
                         // lookahead is the first character after the range
                         break;
                       }
-                   ucs.append(lookahead);
+                   ucs << lookahead;
 
                    lookahead = input.get_next();
                  }

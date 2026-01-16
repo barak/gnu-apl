@@ -379,6 +379,18 @@ protected:
 #define P_(_name, _suffix, _idx, _prio, _misc, _len)
 #include "Prefix.def"
 
+   /// ⎕ES result helper
+   static void handle_QUAD_ES_COM(const Token & result);
+
+   /// ⎕ES result helper
+   static void handle_QUAD_ES_ESC();
+
+   /// ⎕ES result helper
+   static void handle_QUAD_ES_BRA(const Token & result);
+
+   /// ⎕ES result helper
+   static void handle_QUAD_ES_ERR(const Token & result);
+
    /// the StateIndicator that contains this parser
    StateIndicator & si;
 

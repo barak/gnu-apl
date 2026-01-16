@@ -943,11 +943,11 @@ int int_fract = ucs.size();
 
    if (!is_near_real())
       {
-        ucs.append(UNI_J);
+        ucs << UNI_J;
         bool scaled_imag = pctx.get_scaled();  // may be changed by UCS_string()
         const UCS_string ucs_i(value.cval[1], scaled_imag, pctx);
 
-        ucs.append(ucs_i);
+        ucs << ucs_i;
 
         info.imag_len = ucs.size() - info.real_len;
         if (scaled_imag)   info.flags |= imag_has_E;

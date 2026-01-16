@@ -49,7 +49,7 @@ const ShapeItem name_len = val.get_cols();
                 {
                   if ( Avec::is_quad(uni))   // leading ⎕
                      {
-                       name.append(uni);
+                       name << uni;
                        continue;
                      }
                   else if (uni == UNI_ALPHA  || uni == UNI_ALPHA_UNDERBAR ||
@@ -57,7 +57,7 @@ const ShapeItem name_len = val.get_cols();
                            uni == UNI_LAMBDA || uni == UNI_CHI            ||
                            uni == UNI_QUOTE_Quad)
                      {
-                       name.append(uni);
+                       name << uni;
                        continue;
                      }
                 }
@@ -65,7 +65,7 @@ const ShapeItem name_len = val.get_cols();
              if (Avec::is_symbol_char(uni)      // valid symbol char
                 || uni == UNI_FULLSTOP)   // .member dot
                 {
-                  name.append(uni);
+                  name << uni;
                   continue;
                 }
 
@@ -110,7 +110,7 @@ const ShapeItem name_len = val.get_cols();
                   const Unicode uni = val.get_cravel(start++).get_char_value();
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
-                       name.append(uni);
+                       name << uni;
                      }
                   else if (uni == UNI_SPACE)
                      {

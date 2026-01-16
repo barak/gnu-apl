@@ -127,12 +127,12 @@ flags_name(ValueFlags flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)     ret.append(UNI_M);
-  if (flags & VF_complete)   ret.append(UNI_C);
-  if (flags & VF_packed)     ret.append(UNI_P);
-  if (flags & VF_member)     ret.append(UNI_m);
+  if (flags & VF_marked)     ret << UNI_M;
+  if (flags & VF_complete)   ret << UNI_C;
+  if (flags & VF_packed)     ret << UNI_P;
+  if (flags & VF_member)     ret << UNI_m;
 
-   while (ret.size() < 4)   ret.append(UNI_SPACE);
+   while (ret.size() < 4)   ret << UNI_SPACE;
    return ret;
 }
 //----------------------------------------------------------------------------

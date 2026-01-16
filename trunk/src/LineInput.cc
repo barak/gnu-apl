@@ -250,25 +250,12 @@ LineHistory::add_line(const UCS_string & line)
    if (max_lines == 0)      return;   // no history
    if (!line.has_black())   return;   // almost empty
 
-   // remove leading blanks
-   //
-int blanks = 0;
-   while (blanks < line.ssize() && line[blanks] <= UNI_SPACE)   ++blanks;
-
    // a repeated cut-and-paste of entire lines increases the indentation every
    // time due to the APL input prompt). We therefore limit this effect
    // to 6 blanks.
    //
-UCS_string line1;
-   if (blanks)
-      {
-        line1 = UCS_string(line, blanks, line.size() - blanks);
-      }
-   else
-      {
-        line1 = line;
-      }
-   while (line1.back() <= UNI_SPACE)   line1.pop_back();
+UCS_string line1 = line;
+   line1.remove_leading_and_trailing_whitespaces();
 
    if (int(hist_lines.size()) < max_lines)   // append
       {
@@ -504,7 +491,7 @@ LineEditContext::insert_char(Unicode uni)
 {
    if (uidx >= user_line.ssize())   // append char
       {
-        user_line.append(uni);
+        user_line << uni;
         adjust_allocated_height();
         refresh_wrapped_cursor();
         CIN << uni;
@@ -532,7 +519,7 @@ LineEditContext::cut_to_EOL()
 {
    if (uidx >= user_line.ssize())   return;   // nothing to cut
 
-   cut_buffer = UCS_string(user_line, uidx, user_line.size() - uidx);
+   cut_buffer = UCS_string(user_line, uidx);
    user_line.resize(uidx);
    refresh_from_cursor();
 }
@@ -544,14 +531,13 @@ LineEditContext::paste()
 
    if (uidx >= user_line.ssize())   // append cut buffer
       {
-        user_line.append(cut_buffer);
+        user_line << cut_buffer;
       }
    else                            // insert cut buffer
       {
-        const UCS_string rest(user_line, uidx, user_line.size() - uidx);
+        const UCS_string rest(user_line, uidx);
         user_line.resize(uidx);
-        user_line.append(cut_buffer);
-        user_line.append(rest);
+        user_line << cut_buffer << rest;
       }
 
    refresh_from_cursor();
@@ -598,7 +584,7 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
 
         case ER_REPLACE:
              user_line.clear();
-             user_line.append(line);
+             user_line << line;
              uidx = 0;
              refresh_from_cursor();
              move_idx(user_line.size());
@@ -823,7 +809,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
                                file_line.erase(0);
                                line.pop_back();
                              }
-                       line.append_UTF8(file_line.c_str());
+                       line << file_line;
                        break;
 
                   case LIM_Nabla:

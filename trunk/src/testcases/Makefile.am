@@ -90,6 +90,7 @@ dist_noinst_DATA =                              \
         Minimum.tc                              \
         Multiply.tc                             \
         MultiLineStrings.tc                     \
+        MultiLineLiterals.tc                    \
         Nabla.tc                                \
         NativeFunctions.tc                      \
         NaturalLogarithm.tc                     \

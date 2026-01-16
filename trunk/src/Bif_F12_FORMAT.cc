@@ -242,7 +242,7 @@ UCS_string_vector col_formats;
         const UCS_string col0 = col_formats[0];   // keep it out of loop!
         loop(c, cols - 1)
            {
-             all_formats.append(f);
+             all_formats << f;
              col_formats.push_back(col0);
            }
       }
@@ -299,7 +299,7 @@ Value_P Z(shape_Z, LOC);
 
                   const UCS_string item = col_items[c].format_example(value);
                   Log(LOG_Bif_F12_FORMAT)   Q1(item)
-                  row.append(item);
+                  row << item;
                 }
 
              Log(LOG_Bif_F12_FORMAT)   { Q1(row) Q1(all_formats) }
@@ -335,7 +335,7 @@ UCS_string current_format;
    loop(f, all_formats.size())
        {
          const Unicode cc = all_formats[f];
-         current_format.append(cc);
+         current_format << cc;
 
          if (Avec::is_digit(cc))   digit_seen = true;
 
@@ -349,7 +349,7 @@ UCS_string current_format;
             {
               ++f;   // next char is right decorator (and end of field)
               if (f < all_formats.ssize())
-                 current_format.append(all_formats[f]);
+                 current_format << all_formats[f];
 
               col_formats.push_back(current_format);
               current_format.clear();    // start a new field;
@@ -360,7 +360,7 @@ UCS_string current_format;
 
    if (col_formats.size() && !digit_seen)
       {
-        col_formats.back().append(current_format);
+        col_formats.back() << current_format;
       }
    else
       {
@@ -413,22 +413,18 @@ const UCS_string pad(int_part.size() - data.size(), pad_char);
 UCS_string ucs;
    if (int_part.no_float())                 // floating disabled.
       {
-        ucs.append(left_deco.format);
-        ucs.append(pad);
+        ucs << left_deco.format << pad;
       }
    else if (int_part.do_float(negative))   // floating enabled, deco shown
       {
-        ucs.append(pad);
-        ucs.append(left_deco.format);
+        ucs << pad << left_deco.format;
       }
    else                                     // floating enabled, deco hidden
       {
-        ucs.append(pad);
-        ucs.append(UCS_string(left_deco.size(), UNI_SPACE));
+        ucs << pad << UCS_string(left_deco.size(), UNI_SPACE);
       }
 
-   ucs.append(data);
-   return ucs;
+   return ucs << data;
 }
 //----------------------------------------------------------------------------
 UCS_string
@@ -447,8 +443,8 @@ UCS_string ucs;
 
         // print nothing instead of .
         if (data.size() == 0)   ++pad_count;
-        else                    ucs.append(Workspace::get_FC(0));
-        ucs.append(data);
+        else                    ucs << Workspace::get_FC(0);
+        ucs << data;
       }
 
    if (exponent.size())
@@ -458,22 +454,20 @@ UCS_string ucs;
         const Unicode pad_char = exponent.pad_char(Workspace::get_FC(2));
         if (exponent.no_float())              // floating disabled.
            {
-             data.append(expo_deco.format);
-             data.append(data_expo);
+             data << expo_deco.format << data_expo;
            }
         else if (exponent.do_float(expo_negative))   // floating, deco shown
            {
-             data.append(expo_deco.format);
-             data.append(data_expo);
+             data << expo_deco.format << data_expo;
            }
         else                                 // floating enabled and deco hidden
            {
-             data.append(UCS_string(expo_deco.format.ssize(), pad_char));
-             data.append(data_expo);
+             data << UCS_string(expo_deco.format.ssize(), pad_char)
+                  << data_expo;
            }
 
         pad_count += expo_deco.out_len + exponent.out_len - data.size();
-        ucs.append(data);
+        ucs << data;
       }
 
    // now do the right side padding.
@@ -483,18 +477,15 @@ UCS_string ucs;
 
      if (fract_part.no_float())                // floating disabled.
         {
-          ucs.append(right_deco.format);
-          ucs.append(pad);
+          ucs << right_deco.format << pad;
         }
      else if (fract_part.do_float(negative))  // floating, deco shown
         {
-          ucs.append(pad);
-          ucs.append(right_deco.format);
+          ucs << pad << right_deco.format;
         }
      else                                      // floating, deco hidden
         {
-          ucs.append(pad);
-          ucs.append(UCS_string(right_deco.size(), pad_char));
+          ucs << pad << UCS_string(right_deco.size(), pad_char);
         }
    }
 
@@ -515,7 +506,7 @@ bool have_decimal_point = false;
    while (f < format.ssize())
       {
         if (is_control_char(format[f]))   goto integral_part;
-        else                              left_deco.format.append(format[f++]);
+        else                              left_deco.format << format[f++];
       }
    goto fields_done;
 
@@ -532,7 +523,7 @@ integral_part:
         if (cc == UNI_E)          goto exponent_part;
         if (is_control_char(cc))
            {
-             int_part.format.append(cc);
+             int_part.format << cc;
              if (cc == UNI_6)          goto right_decorator;
            }
         else
@@ -551,8 +542,8 @@ fractional_part:
 
         if (is_control_char(cc))
            {
-             fract_part.format.append(cc);
-             if (cc == UNI_6)          goto right_decorator;
+             fract_part.format << cc;
+             if (cc == UNI_6)     goto right_decorator;
            }
         else
            {
@@ -571,7 +562,7 @@ exponent_decorator:
 
         if (!is_control_char(cc))
            {
-             expo_deco.format.append(cc);
+             expo_deco.format << cc;
            }
         else
            {
@@ -587,7 +578,7 @@ exponent_part:
 
         if (is_control_char(cc))
            {
-             exponent.format.append(cc);
+             exponent.format << cc;
              if (cc == UNI_6)          goto right_decorator;
            }
         else
@@ -609,11 +600,11 @@ right_decorator:   /// the right decorator
         //
         // we put a trailing decimat point into the right decorator.
         //
-        right_deco.format.append(UNI_FULLSTOP);
+        right_deco.format << UNI_FULLSTOP;
       }
 
    while (f < format.ssize())
-      right_deco.format.append(format[f++]);
+      right_deco.format << format[f++];
 
 fields_done:
    left_deco.out_len = left_deco .format.ssize();
@@ -728,10 +719,10 @@ char * fract_end = 0;
 
         // insert leading zeros until we have at least min_len digits.
         //
-        for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_0);
+        for (; elen < exponent.min_len; ++elen)   data_expo << UNI_0;
 
         const UTF8_string ep_utf(ep);
-        data_expo.append((UCS_string(ep_utf)));
+        data_expo << UCS_string(ep_utf);
       }
    else   // no exponent in format string.
       {
@@ -777,7 +768,7 @@ char * int_end = strchr(data_buf, '.');
         while (fract_digits[flen - 1] == '0' && flen > fract_part.min_len)
                fract_digits[--flen] = 0;
 
-        loop(f, flen)   data_fract.append(Unicode(fract_digits[f]));
+        loop(f, flen)   data_fract << Unicode(fract_digits[f]);
       }
 
 const int ilen = int_end - &data_buf[0];
@@ -785,9 +776,9 @@ const int ilen = int_end - &data_buf[0];
    // insert leading zeros so that we will have at least min_len digits
    // after appending the integer data.
    //
-   loop(d, int_part.min_len - ilen)   data_int.append(UNI_0);
+   loop(d, int_part.min_len - ilen)   data_int << UNI_0;
 
-   loop(i, ilen)   data_int.append(Unicode(data_buf[i]));
+   loop(i, ilen)   data_int << Unicode(data_buf[i]);
 
    // convert 0.xxx to .xxx
    //
@@ -855,14 +846,14 @@ size_t d = data.size();
             {
               // Workspace::get_FC(1) is ⎕FC[2] when ⎕IO is 1
               //
-              if (d)                    ucs.append(Workspace::get_FC(1));
-              else if (f >= fill_pos)   ucs.append(fill_char);
+              if (d)                    ucs << Workspace::get_FC(1);
+              else if (f >= fill_pos)   ucs << fill_char;
               else                      break;
             }
          else if (Avec::is_digit(format_char))
             {
-              if (d)                    ucs.append(data[--d]);
-              else if (f >= fill_pos)   ucs.append(fill_char);
+              if (d)                    ucs << data[--d];
+              else if (f >= fill_pos)   ucs << fill_char;
               else                      break;
             }
          else
@@ -896,11 +887,11 @@ int d = 0;
         const Unicode format_char = format[f];
          if (format_char == UNI_COMMA)
             {
-              ucs.append(Workspace::get_FC(1));
+              ucs << Workspace::get_FC(1);
             }
          else if (Avec::is_digit(format_char))
             {
-              if (d < data.ssize())   ucs.append(data[d++]);
+              if (d < data.ssize())   ucs << data[d++];
               else                    break;
             }
          else
@@ -1080,8 +1071,7 @@ bool has_complex = false;
                imag.remove_leading_whitespaces();
                if (imag.size())
                   {
-                    real_imag.push_back(UNI_J);
-                    real_imag.append(imag);
+                    real_imag << UNI_J << imag;
                   }
                pb_real_imag.append_ucs(real_imag);
              }
@@ -1183,7 +1173,7 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
       {
         const int d = ret.get_column_count() - data.ssize();
         if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
-        else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
+        else if (d > 0)   data << UCS_string(d, UNI_SPACE);
         ret.append_ucs(data);
       }
    else                 // chars and numbers: align right

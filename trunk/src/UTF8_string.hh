@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "Common.hh"
 
@@ -112,7 +113,7 @@ utf8P(ASCII * cp)
 {
   return reinterpret_cast<UTF8 *>(cp);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 /// an UTF8 encoded Unicode (RFC 3629) string
 class UTF8_string : public std::string
 {
@@ -158,13 +159,13 @@ public:
    void pop_back()
       { Assert(size());   resize(size() - 1); }
 
-   /// append a 0-terminated C string
-   void append_ASCII(const char * ascii)
-      { while (*ascii)   *this += *ascii++; }
+   /// append a (0-terminated) C string
+   UTF8_string & operator <<(const char * ascii)
+      { while (*ascii)   *this += *ascii++;   return *this; }
 
    /// append the UTF8_string \b suffix
-   void append_UTF8(const UTF8_string & suffix)
-      { loop(s, suffix.size())   *this += suffix[s]; }
+   UTF8_string & operator <<(const UTF8_string & suffix)
+      { loop(s, suffix.size())   *this += suffix[s];   return *this; }
 
    /// display bytes in this UTF string
    ostream & dump_hex(ostream & out, int max_bytes) const;
@@ -197,6 +198,14 @@ public:
 
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
+};
+//============================================================================
+class UTF8_string_vector : public std::vector<UTF8_string>
+{
+public:
+   /// constructor: from string with lines separated by \n. The lines
+   /// will be the items of the vector (with any \r or \n removed).
+   UTF8_string_vector(const char * lines);
 };
 //============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream

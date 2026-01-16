@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>January 3, 2026.
+<p>January 16, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -129,8 +129,9 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
         <li><a id="toc-New_002dstyle-Multi_002dLine-Strings" href="#New_002dstyle-Multi_002dLine-Strings">2.1.6.2 New-style Multi-Line Strings</a></li>
         <li><a id="toc-_00ab-_00bb-Strings" href="#g_t_00ab-_00bb-Strings">2.1.6.3 « » Strings</a></li>
       </ul></li>
-      <li><a id="toc-Automatic-_0029MORE" href="#Subsection-2_002e1_002e7">2.1.7 Automatic )MORE</a></li>
-      <li><a id="toc-Script-Example" href="#Subsection-2_002e1_002e8">2.1.8 Script Example</a></li>
+      <li><a id="toc-Multi_002dLine-Literals" href="#Subsection-2_002e1_002e7">2.1.7 Multi-Line Literals</a></li>
+      <li><a id="toc-Automatic-_0029MORE" href="#Subsection-2_002e1_002e8">2.1.8 Automatic )MORE</a></li>
+      <li><a id="toc-Script-Example" href="#Subsection-2_002e1_002e9">2.1.9 Script Example</a></li>
     </ul></li>
     <li><a id="toc-Axis-argument-in-defined-functions" href="#Section-2_002e2">2.2 Axis argument in defined functions</a></li>
     <li><a id="toc-Function-Groups" href="#Section-2_002e3">2.3 Function Groups</a>
@@ -1120,8 +1121,9 @@ apl).
 <li><a href="#Subsection-2_002e1_002e4" accesskey="4">Helpful Features for Scripting</a></li>
 <li><a href="#Subsection-2_002e1_002e5" accesskey="5">Double-quoted Strings</a></li>
 <li><a href="#Subsection-2_002e1_002e6" accesskey="6">Multi-Line Strings</a></li>
-<li><a href="#Subsection-2_002e1_002e7" accesskey="7">Automatic )MORE</a></li>
-<li><a href="#Subsection-2_002e1_002e8" accesskey="8">Script Example</a></li>
+<li><a href="#Subsection-2_002e1_002e7" accesskey="7">Multi-Line Literals</a></li>
+<li><a href="#Subsection-2_002e1_002e8" accesskey="8">Automatic )MORE</a></li>
+<li><a href="#Subsection-2_002e1_002e9" accesskey="9">Script Example</a></li>
 </ul>
 <hr>
 <div class="subsection" id="Subsection-2_002e1_002e1">
@@ -1500,7 +1502,7 @@ etc.
 <div class="subsection" id="Subsection-2_002e1_002e6">
 <div class="header">
 <p>
-Next: <a href="#Subsection-2_002e1_002e7" accesskey="n" rel="next">Automatic )MORE</a>, Previous: <a href="#Subsection-2_002e1_002e5" accesskey="p" rel="prev">Double-quoted Strings</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Subsection-2_002e1_002e7" accesskey="n" rel="next">Multi-Line Literals</a>, Previous: <a href="#Subsection-2_002e1_002e5" accesskey="p" rel="prev">Double-quoted Strings</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Multi_002dLine-Strings"></span><h4 class="subsection">2.1.6 Multi-Line Strings</h4>
 
@@ -1723,9 +1725,206 @@ For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
 <div class="subsection" id="Subsection-2_002e1_002e7">
 <div class="header">
 <p>
-Next: <a href="#Subsection-2_002e1_002e8" accesskey="n" rel="next">Script Example</a>, Previous: <a href="#Subsection-2_002e1_002e6" accesskey="p" rel="prev">Multi-Line Strings</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Subsection-2_002e1_002e8" accesskey="n" rel="next">Automatic )MORE</a>, Previous: <a href="#Subsection-2_002e1_002e6" accesskey="p" rel="prev">Multi-Line Strings</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Automatic-_0029MORE"></span><h4 class="subsection">2.1.7 Automatic )MORE</h4>
+<span id="Multi_002dLine-Literals"></span><h4 class="subsection">2.1.7 Multi-Line Literals</h4>
+
+<p>A limitation from the early days of APL is that literals like <b>1 2 3</b>
+or <b>&rsquo;abc&rsquo;</b> can not stretch over several lines. As a consequnce the rank
+of a literal can not be more than 1, and values with higher ranks require
+the used of APL literals (most likely dyadic <b>⍴</b>). A single line of input
+can produce multiple lines of output, but these multiple lines of output can
+not be fed back into the interpreter as literals.
+</p>
+<p>This limitation is natural when APL is used interactively (and screen oriented
+editors like <b>vi</b> or <b>emacs|</b> were not very common at the time when APL
+was invented.
+</p>
+<p>However, for scripting the situation is quite different. An APL script is
+typically created with a screen oriented editor, and screen oriented
+editors like <b>vi</b> are available everywhere while its line oriented
+predecessor (named <b>ex</b>) has died out in the meantime (more precisely, <b>ex</b>
+has become a sub-mode of <b>vi</b>).
+</p>
+<p>GNU APL extends the idea of multi-line strings to <i>multi-line literals</i>.
+The syntax for these multi-line literals adopts the formatting rules of
+the APL primitive <b>⍕</b> (aka. <b>format</b>) for nested and/or higher rank APL
+values. That is, the output produced when an APL value is printed can,
+more or less unchanged, be fed back into APL to produce that value. The rules
+for creating such multi-line literals are the rules for signle line literals,
+augmented with for rules of <b>⍕</b> fore values of higher ranks. That is:
+</p>
+<ul>
+<li> one line of a multi-line literals corresponds to one scalar or vector 
+      of the value,
+</li><li> the rules concerning every line of a multi-line literal are those
+      for normal (single line) literals. I.e.
+    <ul>
+<li> a single quoted character is a character scalar,
+    </li><li> several quoted characters are a character vector (aka. string),
+    </li><li> nested items are two or more items enclosed in parentheses, and
+    </li><li> vertically adjacent scalars above are separated by blanks to create
+          vectors; this is called <i>vector notation</i> in Kenneth Iverson&rsquo;s 
+          APL book and in IBM APL2 documents and <b>strand notation</b> in other
+          places,
+    </li></ul>
+</li><li> two-dimensional values (i.e. matrices) are vertically adjacent vectors.
+</li><li> three-dimensional values are vertically adjacent matrices separated by
+      one blank line,
+</li><li> four-dimensional values are vertically adjacent three-dimensional values
+      separated by two blank lines,
+</li><li> ...
+</li><li> N-dimensional values are vertically adjacent N-1-dimensional values
+      separated by N-2 blank lines,
+</li></ul>
+
+<p>Similar to multi-line strings, a multi-line literal starts with the marker
+<b>&lt;&lt;&lt;</b> at the end of one line and ends with  the marker <b>&gt;&gt;&gt;</b> on a
+subsequent line. The value of the multi line literal is contained in the lines
+between these two markers (excluding the lines with the markers). In contrast
+to multi-line strings, can multi line literals be used recursively. That is,
+one multi line literal can contain other multi line literals (as well as
+multi-line strings) to created nested sub-values of ranks &gt; 1.
+</p>
+<p>Some examples may be worthwhile to explain the concept:
+</p>
+<div class="example">
+<pre class="example">      ⍝ two-dimensional multi-line literal
+      ⍝
+      ⎕ ← &lt;&lt;&lt;
+          1 2 3
+          4 5 6
+          7 8 9
+          &gt;&gt;&gt;
+1 2 3
+4 5 6
+7 8 9
+</pre></div>
+
+<p>One blank line separates the matric of a three dimansional value:
+</p>
+<div class="example">
+<pre class="example">      ⍝ three-dimensional multi-line literal
+      ⍝
+      ⎕ ← &lt;&lt;&lt;
+          1 2 3
+          4 5 6
+          7 8 9
+
+          11 12 13
+          14 15 16
+          17 18 19
+          &gt;&gt;&gt;
+ 1  2  3
+ 4  5  6
+ 7  8  9
+
+11 12 13
+14 15 16
+17 18 19
+</pre></div>
+
+<p>The start line of a literal may contain a comment; the comment does not
+become part of the literal value:
+</p>
+<div class="example">
+<pre class="example">      ⍝ two-dimensional multi-line literal with comment
+      ⍝
+      ⎕ ← &lt;&lt;&lt;   ⍝ same as 3 3⍴⍳9
+          1 2 3
+          4 5 6
+          7 8 9
+          &gt;&gt;&gt;
+1 2 3
+4 5 6
+7 8 9
+</pre></div>
+
+<p>The items of a multi-line literal can be nested:
+</p>
+<div class="example">
+<pre class="example">      8 ⎕CR &lt;&lt;&lt;   ⍝ two-dimansional with nested 'abc'
+            1 2     3
+            4 'abc' 6
+            7 8     9
+            &gt;&gt;&gt;
+┌→────────┐
+↓1     2 3│
+│4 ┌→──┐ 6│
+│  │abc│  │
+│  └───┘  │
+│7     8 9│
+└ϵ────────┘
+
+      8 ⎕CR &lt;&lt;&lt;   ⍝ two-dimansional with nested 10 11 12
+            1 2          3
+            4 (10 11 12) 6
+            7 8          9
+            &gt;&gt;&gt;
+┌→─────────────┐
+↓1          2 3│
+│4 ┌→───────┐ 6│
+│  │10 11 12│  │
+│  └────────┘  │
+│7          8 9│
+└ϵ─────────────┘
+</pre></div>
+
+<p>Multi-line literal can contain other Multi-line literals or strings:
+</p>
+<div class="example">
+<pre class="example">      8 ⎕CR &lt;&lt;&lt;   ⍝ two-dimansional with sub-literal:
+            1 2     3
+            4 &lt;&lt;&lt; ⍝ sub-literal
+              10 11 12
+              13 14 15
+              16 17 18
+              &gt;&gt;&gt;   6
+            7 8     9
+            &gt;&gt;&gt;
+┌→─────────────┐
+↓1          2 3│
+│              │
+│4 ┌→───────┐ 6│
+│  ↓10 11 12│  │
+│  │13 14 15│  │
+│  │16 17 18│  │
+│  └────────┘  │
+│              │
+│7          8 9│
+└ϵ─────────────┘
+
+      8 ⎕CR &lt;&lt;&lt;   ⍝ two-dimansional with sub-string:
+            1 2     3
+            4 «««
+              Hello,
+              World
+              »»»   6
+            7 8     9
+            &gt;&gt;&gt;
+┌→─────────────────────────────────────────────┐
+↓1                                          2 3│
+│4 ┌→───────────────────────────────────────┐ 6│
+│  │┌→─────────────────┐ ┌→────────────────┐│  │
+│  ││            Hello,│ │            World││  │
+│  │└──────────────────┘ └─────────────────┘│  │
+│  └ϵ───────────────────────────────────────┘  │
+│7                                          8 9│
+└ϵϵ────────────────────────────────────────────┘
+</pre></div>
+
+<p>Nested multiline literals can quickly become unreadable. It is therefore
+recommended tu use a clear indentation policy for the different nesting
+levels.
+</p>
+<hr>
+</div>
+<div class="subsection" id="Subsection-2_002e1_002e8">
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e9" accesskey="n" rel="next">Script Example</a>, Previous: <a href="#Subsection-2_002e1_002e7" accesskey="p" rel="prev">Multi-Line Literals</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Automatic-_0029MORE"></span><h4 class="subsection">2.1.8 Automatic )MORE</h4>
 
 <p>The GNU APL command )MORE provides, in some cases, additional information
 about a prior APL error. The availability of such additional information
@@ -1778,12 +1977,12 @@ INDEX ERROR+
 </p>
 <hr>
 </div>
-<div class="subsection" id="Subsection-2_002e1_002e8">
+<div class="subsection" id="Subsection-2_002e1_002e9">
 <div class="header">
 <p>
-Previous: <a href="#Subsection-2_002e1_002e7" accesskey="p" rel="prev">Automatic )MORE</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Subsection-2_002e1_002e8" accesskey="p" rel="prev">Automatic )MORE</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Script-Example"></span><h4 class="subsection">2.1.8 Script Example</h4>
+<span id="Script-Example"></span><h4 class="subsection">2.1.9 Script Example</h4>
 
 <p>Note that the two different ways of running an APL script have an impact on
 how ⎕ARG looks like. If stdin is redirected then there is only one (possibly
@@ -4332,9 +4531,9 @@ purpose.
 <h4 class="subsection">2.23.1 monadic ⎕CC B: Return character class</h4>
 
 <p><b>⎕CC B</b> returns all characters of character class(es) <b>B</b>. If <b>B</b> is an
-scalar then the result is a character vector, If <b>B</b> is an integer vector
-then the result is a nested vector of integer vectors, with one item per
-character class.
+integer scalar then the result is a character vector, If <b>B</b> is an integer
+vector then the result is a nested vector of integer vectors, with one item
+per character class.
 </p>
 <div class="example">
 <pre class="example">      ⍝ character class 1: digits (old ⎕D)

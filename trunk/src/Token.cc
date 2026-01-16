@@ -116,7 +116,7 @@ operator << (ostream & out, TokenClass tc)
         tcc(TC_COLON)
         tcc(TC_QUOTE)
         tcc(TC_OFF)
-        tcc(TC_SI_LEAVE)
+        tcc(TC_SI_CHANGE)
 
         default: break;
       }
@@ -531,10 +531,7 @@ Token::show_trace(ostream & out, const UCS_string & fun_name,
                   Function_Line line) const
 {
 UCS_string fn = fun_name;
-   fn.append_UTF8("[");
-   fn.append_number(line);
-   fn.append_UTF8("] ");
-
+   fn << UNI_L_BRACK << line << UNI_R_BRACK << UNI_SPACE;
    out << fn;
 
    switch(get_tag())
@@ -613,34 +610,32 @@ UCS_string ucs;
    switch(get_Class())
       {
         case TC_ASSIGN:
-             ucs.append(UNI_LEFT_ARROW);
+             ucs << UNI_LEFT_ARROW;
              break;
 
         case TC_R_ARROW:
-             ucs.append(UNI_RIGHT_ARROW);
+             ucs << UNI_RIGHT_ARROW;
              break;
 
         case TC_L_BRACK:
-             if (get_tag() == TOK_L_BRACK)
-                ucs.append(UNI_L_BRACK);
-             else if (get_tag() == TOK_SEMICOL)
-                ucs.append(UNI_SEMICOLON);
+             if (get_tag() == TOK_L_BRACK)        ucs << UNI_L_BRACK;
+             else if (get_tag() == TOK_SEMICOL)   ucs << UNI_SEMICOLON;
              else
                 FIXME;
              break;
 
         case TC_R_BRACK:
-             ucs.append(UNI_R_BRACK);
+             ucs << UNI_R_BRACK;
              break;
 
         case TC_END:
         case TC_DIAMOND:
-             ucs.append(UNI_DIAMOND);
+             ucs << UNI_DIAMOND;
              break;
 
         case TC_RETURN:                                                  break;
         case TC_LINE:
-             ucs.append(UNI_LF);
+             ucs << UNI_LF;
              break;
 
         case TC_VALUE:
@@ -652,7 +647,7 @@ UCS_string ucs;
              }
 
         case TC_SYMBOL:
-             ucs.append(get_sym_ptr()->get_name());
+             ucs << get_sym_ptr()->get_name();
              break;
 
         case TC_R_PARENT:
@@ -690,6 +685,13 @@ UCS_string ucs;
                   UCS_string ret;
                   return ret << "[" << get_int_val() << "]";
                 }
+
+             if (get_tag() == TOK_MARKER)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "@" << get_int_val() << "@";
+                }
+
              FIXME;
 
         case TC_VOID:
@@ -739,9 +741,9 @@ const Unicode c2 = canon.size() ? canon[0] : Invalid_Unicode;
    //
 bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
 
-   if (need_space)   ucs.append(UNI_SPACE);
+   if (need_space)   ucs << UNI_SPACE;
 
-   ucs.append(canon);
+   ucs << canon;
    return need_space ? -canon.size() : canon.size();
 }
 //----------------------------------------------------------------------------
@@ -770,7 +772,7 @@ Token::short_class_name(TokenClass cls)
         case TC_VOID:      return "VOID";
 
         case TC_OFF:       return "OFF";
-        case TC_SI_LEAVE:  return "LEAVE";
+        case TC_SI_CHANGE: return "CHANGE";
         case TC_LINE:      return "LINE";
         case TC_DIAMOND:   return "◊";
         case TC_NUMERIC:   return "NUMB";
@@ -786,16 +788,6 @@ Token::short_class_name(TokenClass cls)
       }
 
    return "???";
-}
-//----------------------------------------------------------------------------
-ostream &
-operator << (ostream & out, const Token_string & tos)
-{
-   out << "[" << tos.size() << " token]: ";
-   loop(t, tos.size())   CERR << "⏩" << tos[t] << "  ";
-   out << endl;
-   out << endl;
-   return out;
 }
 //----------------------------------------------------------------------------
 const char *
@@ -825,7 +817,7 @@ Token::class_name(TokenClass tc)
         tcn(TC_VOID)
 
         tcn(TC_OFF)
-        tcn(TC_SI_LEAVE)
+        tcn(TC_SI_CHANGE)
         tcn(TC_LINE)
         tcn(TC_DIAMOND)
         tcn(TC_NUMERIC)
@@ -843,53 +835,4 @@ Token::class_name(TokenClass tc)
    return "*** Obscure token class ***";
 }
 //----------------------------------------------------------------------------
-void
-Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
-{
-Token * t1 = &at(from);
-Token * t2 = &at(to);
-   Assert(0 <= from);
-   Assert(from <= to);
-   Assert(to <= ShapeItem(size()));
-
-   while (t1 < t2)   t1++->swap_token(*t2--);
-}
-//----------------------------------------------------------------------------
-ShapeItem
-Token_string::replace_segment(const Token_string & src, ShapeItem pos)
-{
-   loop(s, src.size())
-       {
-         at(pos).clear(LOC);
-         new (&at(pos++)) Token(src[s], LOC);
-       }
-   return pos;
-}
-//----------------------------------------------------------------------------
-void
-Token_string::print(ostream & out, int details) const
-{
-const bool PC  = details & 1;
-const bool VAL = details & 2;
-
-   loop(pc, size())
-       {
-         const Token & tok = at(pc);
-         if (PC)   out << "    [PC=" << setw(2) << pc << "] ";
-         out << "⏩" << tok;
-         if (VAL)
-            {
-              switch(tok.get_ValueType())
-                 {
-                   case TV_INT: out << ":" << tok.get_int_val();   break;
-                   case TV_FLT: out << ":" << tok.get_flt_val();   break;
-                   default:                                        break;
-                 }
-            }
-         if (PC)   out << endl;
-         else      out << "  ";
-       }
-
-   out << endl;
-}
-//----------------------------------------------------------------------------
+// EOF
