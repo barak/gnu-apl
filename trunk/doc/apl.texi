@@ -1352,78 +1352,168 @@ Hello world
 └ϵ──────────────────┘
 
       ⍝ provoke an error...
+      ⍝
       8 ⎕CR «««
 →      Line 1
-→        Line 2
-→      «««
-*** WARNING: see (second) ««« when expecting the closing »»»
-┌→──────────────────┐
-│┌→─────┐ ┌→───────┐│
-││Line 1│ │  Line 2││
-│└──────┘ └────────┘│
-└ϵ──────────────────┘
+→         Line 2
+→            «««
+
+*** WARNING: unexpected triplet ««« in mult-iline string.
+    Expected triplet: »»» (literal depth: 0).
+    The triplet was added to the multi-line string.
+
+→            »»»
+┌→───────────────────────────────┐
+│┌→─────┐ ┌→────────┐ ┌→────────┐│
+││Line 1│ │   Line 2│ │      «««││
+│└──────┘ └─────────┘ └─────────┘│
+└ϵ───────────────────────────────┘
 @end example
 
-Another advantage of ««« ... »»» over """ ... """ is that a decent text
-editor (read: vi/vim) may jump back and forth between the corresponding
-opening « and closing » with a single key stroke (character % in vi/vim).
-For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
+Another advantage of @b{«««} ... @b{»»»} over @b{"""} ... @b{"""} is that
+a decent text editor (read: @b{vi/vim}) may jump back and forth between
+the opening @b{«} and the corresponding closing @b{»} with a single key
+stroke (character @b{%} in vi/vim).  For this to work, add the following
+line to  @b{/etc/vim/vimrc} (or to @b{~/.vimrc}):
 
 @example
 set matchpairs+=«:»
 @end example
+
+@subsubsection Multi-Line Comments
+
+One of the badly missing features of standard APL is comments tnat span
+multiple lines. However, in GNU APL one can use multi-line strings in
+combination with monadic primitive @b{⊣} for that purpose:
+
+@example
+      ⊣««« ⍝⍝⍝
+       Multi-line
+       Comment
+       ...
+       »»» ⍝⍝⍝
+@end example
+
+The triplet @b{⍝⍝⍝} in the example above is optional and has no effect (since
+it is part of the multi-line string, but is then suppressed by ⊣), but is
+nevertheless recommended as an indication that the text between the @b{⍝⍝⍝}
+is a comment.
+
+GNU APL is aware of this construct and optimizes it away entirely. Therefore
+even long multi-line comments inside loops have, like normal APL comments,
+no performance penalty at runtime.
 
 @c ............................................................................
 @node Subsection 2.1.7
 @subsection Multi-Line Literals
 
 A limitation from the early days of APL is that literals like @b{1 2 3}
-or @b{'abc'} can not stretch over several lines. As a consequnce the rank
+or @b{'abc'} can not stretch over several lines. As a consequnce, the rank
 of a literal can not be more than 1, and values with higher ranks require
-the used of APL literals (most likely dyadic @b{⍴}). A single line of input
+the use of APL primitive (most likely dyadic @b{⍴}). A single line of input
 can produce multiple lines of output, but these multiple lines of output can
 not be fed back into the interpreter as literals.
 
-This limitation is natural when APL is used interactively (and screen oriented
-editors like @b{vi} or @b{emacs|} were not very common at the time when APL
-was invented.
+This limitation is rather natural when APL is used interactively (and screen
+oriented editors like @b{vi} or @b{emacs}) were not very common at the time
+when APL was invented. At that time, nobody (and in particular not APL
+programmers who had the reputation of being lazy) would have entered, say, a
+numeric 10 by 10 matrix interactively.
 
 However, for scripting the situation is quite different. An APL script is
-typically created with a screen oriented editor, and screen oriented
-editors like @b{vi} are available everywhere while its line oriented
-predecessor (named @b{ex}) has died out in the meantime (more precisely, @b{ex}
-has become a sub-mode of @b{vi}).
+typically created beforehand with a screen oriented editor, and screen
+oriented editors like @b{vi} are available everywhere while its line oriented
+predecessor (named @b{ex}) has died out in the meantime (more precisely,
+@b{ex} has become a sub-mode of @b{vi}).
 
 GNU APL extends the idea of multi-line strings to @i{multi-line literals}.
-The syntax for these multi-line literals adopts the formatting rules of
-the APL primitive @b{⍕} (aka. @b{format}) for nested and/or higher rank APL
-values. That is, the output produced when an APL value is printed can,
-more or less unchanged, be fed back into APL to produce that value. The rules
-for creating such multi-line literals are the rules for signle line literals,
-augmented with for rules of @b{⍕} fore values of higher ranks. That is:
+The syntax that governs the output of APL values (i.e. in the APL → terminal
+direction) is simply applied to the input of APL literals (i.e. in the
+terminal → APL direction) as well:
+
+@verbatim
+                                         ┌─────────┐          
+                       ┌─────────┐       │  MULTI  │    (text,
+      (text,           │ LITERAL │       │  -LINE  │     multi line)
+       single line)    └────┬────┘       │ LITERAL │
+                            │            └────┬────┘
+                            │                 │
+                            │     input       │
+                            ↓     rules       ↓
+                            │                 │
+                         ╔══╧══╗         ╔════╧════╗
+      (vectors,          ║ APL ║         ║ GNU APL ║
+       values)           ╚══╤══╝         ╚════╤════╝
+                            │                 │
+                            │     output      │
+                            ↓     rules       ↓
+                            │                 │
+                         ┌──┴──┐           ┌──┴──┐
+      (text,             │     │           │     │    (text,
+       multi-line)       │ OUT │           │ OUT │     milti-line)
+                         │     │           │     │
+                         └─────┘           └─────┘
+@end verbatim
+
+The relevant formatting rules for APL output are:
 
 @itemize
-@item one line of a multi-line literals corresponds to one scalar or vector 
-      of the value,
-@item the rules concerning every line of a multi-line literal are those
-      for normal (single line) literals. I.e.
+@item one line of a APL output corresponds to one or more scalar items 
+      of the APL value,
+@item the items in the @b{same} output line are the scalars along the
+      @b{last axis} of the APL value, where
     @itemize
     @item a single quoted character is a character scalar,
-    @item several quoted characters are a character vector (aka. string),
+    @item several characters inside a single pair of quotes are a character
+          vector (aka. string),
+    @item unquoted characters are numeric scalars,
     @item nested items are two or more items enclosed in parentheses, and
+    @item the APL scalars of an APL vector are separated by one or more blanks
+    @end itemize
+@item the items in @b{different} output lines are the scalars along
+      @b{all except the last axis} of the APL value, where
+    @itemize
+    @item two-dimensional values (i.e. matrices) are vertically adjacent
+          vectors.  @item three-dimensional values are vertically adjacent
+          matrices, separated by one blank line,
+    @item four-dimensional values are vertically adjacent three-dimensional
+          values, separated by two blank lines,
+    @item ...
+    @item N-dimensional values are vertically adjacent N-1-dimensional values
+          separated by N-2 blank lines,
+    @end itemize
+@end itemize
+
+Now, the existing formatting rules for (single line) literals are:
+
+@itemize
+@item one literal corresponds to one APL scalar or APL vector, where:
+    @itemize
+    @item a single quoted character is one APL character scalar,
+    @item several quoted characters are an APL character vector (aka. string),
+    @item nested items are two or more items enclosed in blanks, and
     @item vertically adjacent scalars above are separated by blanks to create
           vectors; this is called @i{vector notation} in Kenneth Iverson's 
-          APL book and in IBM APL2 documents and @b{strand notation} in other
+          APL book and in IBM APL2 documents and @i{strand notation} in other
           places,
     @end itemize
-@item two-dimensional values (i.e. matrices) are vertically adjacent vectors.
-@item three-dimensional values are vertically adjacent matrices separated by
-      one blank line,
-@item four-dimensional values are vertically adjacent three-dimensional values
-      separated by two blank lines,
+@end itemize
+
+From these rules for single line literals, one can easily derive the rules
+for multi line literals in a completely consistent fashion:
+
+@itemize
+@item consistency: the rules for every line of a multi-line literal shall be
+      the same as for single line literals,
+@item matrix: (directly) vertically adjacent literals become
+      two-dimensional APL values,
+@item vertically adjacent two-dimensional literals, separated by one blank
+      line, become three-dimensional APL values,
+@item vertically adjacent three-dimensional literals, separated by two blank
+      line, become four-dimensional APL values,
 @item ...
-@item N-dimensional values are vertically adjacent N-1-dimensional values
-      separated by N-2 blank lines,
+@item vertically adjacent @b{N-1}-dimensional literals separated by @b{N-2}
+      blank line become @b{N}-dimensional APL values,
 @end itemize
 
 Similar to multi-line strings, a multi-line literal starts with the marker

@@ -1103,6 +1103,16 @@ Parser::optimize_short_primitives(Token_string & tos)
 {
    if (DONT_FT_SHORT_PRIMITIVE)   return false;
 
+   // multi-line comment, i.e. ⊣ ««« ... »»»
+   if (tos.size() == 2                 &&
+       tos[0].get_tag() == TOK_F2_LEFT &&   // ⊣
+       tos[1].get_Class() == TC_VALUE)      // multi-line string
+      {
+         tos[0].clear(LOC);
+         tos[1].clear(LOC);
+         return true;
+      }
+
    // replace APL primitives with short literal results and arguments,
    // such as 4⍴0 with their result. The scope of tos is one statement.
    //
@@ -1125,7 +1135,7 @@ vector<ShapeItem> ends;
    //
    rev_loop(pc, tos.ssize())
        {
-         if (pc <= 4)   break;   // to few tokens remaining in tos
+         if (pc <= 4)   break;   // too few tokens remaining in tos
 
          // at this point we have at least:
          //

@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 16, 2026.  This manual briefly documents GNU APL, an interpreter
+January 17, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -1263,24 +1263,52 @@ strings like, for example:
      └ϵ──────────────────┘
 
            ⍝ provoke an error...
+           ⍝
            8 ⎕CR «««
      →      Line 1
-     →        Line 2
-     →      «««
-     *** WARNING: see (second) ««« when expecting the closing »»»
-     ┌→──────────────────┐
-     │┌→─────┐ ┌→───────┐│
-     ││Line 1│ │  Line 2││
-     │└──────┘ └────────┘│
-     └ϵ──────────────────┘
+     →         Line 2
+     →            «««
+
+     *** WARNING: unexpected triplet ««« in mult-iline string.
+         Expected triplet: »»» (literal depth: 0).
+         The triplet was added to the multi-line string.
+
+     →            »»»
+     ┌→───────────────────────────────┐
+     │┌→─────┐ ┌→────────┐ ┌→────────┐│
+     ││Line 1│ │   Line 2│ │      «««││
+     │└──────┘ └─────────┘ └─────────┘│
+     └ϵ───────────────────────────────┘
 
    Another advantage of ««« ...  »»» over """ ...  """  is that a decent
-text editor (read: vi/vim) may jump back and forth between the
-corresponding opening « and closing » with a single key stroke
-(character % in vi/vim).  For this to work, add the following line to
-/etc/vim/vimrc (or ~/.vimrc):
+text editor (read: vi/vim) may jump back and forth between the opening «
+and the corresponding closing » with a single key stroke (character % in
+vi/vim).  For this to work, add the following line to /etc/vim/vimrc (or
+to ~/.vimrc):
 
      set matchpairs+=«:»
+
+2.1.6.4 Multi-Line Comments
+...........................
+
+One of the badly missing features of standard APL is comments tnat span
+multiple lines.  However, in GNU APL one can use multi-line strings in
+combination with monadic primitive ⊣ for that purpose:
+
+           ⊣««« ⍝⍝⍝
+            Multi-line
+            Comment
+            ...
+            »»» ⍝⍝⍝
+
+   The triplet ⍝⍝⍝ in the example above is optional and has no effect
+(since it is part of the multi-line string, but is then suppressed by
+⊣), but is nevertheless recommended as an indication that the text
+between the ⍝⍝⍝ is a comment.
+
+   GNU APL is aware of this construct and optimizes it away entirely.
+Therefore even long multi-line comments inside loops have, like normal
+APL comments, no performance penalty at runtime.
 
 
 File: apl.info,  Node: Subsection 2.1.7,  Next: Subsection 2.1.8,  Prev: Subsection 2.1.6,  Up: Section 2.1
@@ -1289,53 +1317,103 @@ File: apl.info,  Node: Subsection 2.1.7,  Next: Subsection 2.1.8,  Prev: Subsect
 -------------------------
 
 A limitation from the early days of APL is that literals like 1 2 3 or
-’abc’ can not stretch over several lines.  As a consequnce the rank of a
-literal can not be more than 1, and values with higher ranks require the
-used of APL literals (most likely dyadic ⍴).  A single line of input can
-produce multiple lines of output, but these multiple lines of output can
-not be fed back into the interpreter as literals.
+’abc’ can not stretch over several lines.  As a consequnce, the rank of
+a literal can not be more than 1, and values with higher ranks require
+the use of APL primitive (most likely dyadic ⍴).  A single line of input
+can produce multiple lines of output, but these multiple lines of output
+can not be fed back into the interpreter as literals.
 
-   This limitation is natural when APL is used interactively (and screen
-oriented editors like vi or emacs| were not very common at the time when
-APL was invented.
+   This limitation is rather natural when APL is used interactively (and
+screen oriented editors like vi or emacs) were not very common at the
+time when APL was invented.  At that time, nobody (and in particular not
+APL programmers who had the reputation of being lazy) would have
+entered, say, a numeric 10 by 10 matrix interactively.
 
    However, for scripting the situation is quite different.  An APL
-script is typically created with a screen oriented editor, and screen
-oriented editors like vi are available everywhere while its line
-oriented predecessor (named ex) has died out in the meantime (more
+script is typically created beforehand with a screen oriented editor,
+and screen oriented editors like vi are available everywhere while its
+line oriented predecessor (named ex) has died out in the meantime (more
 precisely, ex has become a sub-mode of vi).
 
    GNU APL extends the idea of multi-line strings to multi-line
-literals.  The syntax for these multi-line literals adopts the
-formatting rules of the APL primitive ⍕ (aka.  format) for nested and/or
-higher rank APL values.  That is, the output produced when an APL value
-is printed can, more or less unchanged, be fed back into APL to produce
-that value.  The rules for creating such multi-line literals are the
-rules for signle line literals, augmented with for rules of ⍕ fore
-values of higher ranks.  That is:
+literals.  The syntax that governs the output of APL values (i.e.  in
+the APL → terminal direction) is simply applied to the input of APL
+literals (i.e.  in the terminal → APL direction) as well:
 
-   • one line of a multi-line literals corresponds to one scalar or
-     vector of the value,
-   • the rules concerning every line of a multi-line literal are those
-     for normal (single line) literals.  I.e.
+                                         ┌─────────┐          
+                       ┌─────────┐       │  MULTI  │    (text,
+      (text,           │ LITERAL │       │  -LINE  │     multi line)
+       single line)    └────┬────┘       │ LITERAL │
+                            │            └────┬────┘
+                            │                 │
+                            │     input       │
+                            ↓     rules       ↓
+                            │                 │
+                         ╔══╧══╗         ╔════╧════╗
+      (vectors,          ║ APL ║         ║ GNU APL ║
+       values)           ╚══╤══╝         ╚════╤════╝
+                            │                 │
+                            │     output      │
+                            ↓     rules       ↓
+                            │                 │
+                         ┌──┴──┐           ┌──┴──┐
+      (text,             │     │           │     │    (text,
+       multi-line)       │ OUT │           │ OUT │     milti-line)
+                         │     │           │     │
+                         └─────┘           └─────┘
+
+   The relevant formatting rules for APL output are:
+
+   • one line of a APL output corresponds to one or more scalar items of
+     the APL value,
+   • the items in the same output line are the scalars along the last
+     axis of the APL value, where
         • a single quoted character is a character scalar,
-        • several quoted characters are a character vector (aka.
-          string),
+        • several characters inside a single pair of quotes are a
+          character vector (aka.  string),
+        • unquoted characters are numeric scalars,
         • nested items are two or more items enclosed in parentheses,
           and
+        • the APL scalars of an APL vector are separated by one or more
+          blanks
+   • the items in different output lines are the scalars along all
+     except the last axis of the APL value, where
+        • two-dimensional values (i.e.  matrices) are vertically
+          adjacent vectors.
+        • three-dimensional values are vertically adjacent matrices,
+          separated by one blank line,
+        • four-dimensional values are vertically adjacent
+          three-dimensional values, separated by two blank lines,
+        • ...
+        • N-dimensional values are vertically adjacent N-1-dimensional
+          values separated by N-2 blank lines,
+
+   Now, the existing formatting rules for (single line) literals are:
+
+   • one literal corresponds to one APL scalar or APL vector, where:
+        • a single quoted character is one APL character scalar,
+        • several quoted characters are an APL character vector (aka.
+          string),
+        • nested items are two or more items enclosed in blanks, and
         • vertically adjacent scalars above are separated by blanks to
           create vectors; this is called vector notation in Kenneth
           Iverson’s APL book and in IBM APL2 documents and strand
           notation in other places,
-   • two-dimensional values (i.e.  matrices) are vertically adjacent
-     vectors.
-   • three-dimensional values are vertically adjacent matrices separated
-     by one blank line,
-   • four-dimensional values are vertically adjacent three-dimensional
-     values separated by two blank lines,
+
+   From these rules for single line literals, one can easily derive the
+rules for multi line literals in a completely consistent fashion:
+
+   • consistency: the rules for every line of a multi-line literal shall
+     be the same as for single line literals,
+   • matrix: (directly) vertically adjacent literals become
+     two-dimensional APL values,
+   • vertically adjacent two-dimensional literals, separated by one
+     blank line, become three-dimensional APL values,
+   • vertically adjacent three-dimensional literals, separated by two
+     blank line, become four-dimensional APL values,
    • ...
-   • N-dimensional values are vertically adjacent N-1-dimensional values
-     separated by N-2 blank lines,
+   • vertically adjacent N-1-dimensional literals separated by N-2 blank
+     line become N-dimensional APL values,
 
    Similar to multi-line strings, a multi-line literal starts with the
 marker <<< at the end of one line and ends with the marker >>> on a
@@ -10267,86 +10345,86 @@ Node: Subsection 2.1.329243
 Node: Subsection 2.1.435157
 Node: Subsection 2.1.539045
 Node: Subsection 2.1.639906
-Node: Subsection 2.1.748371
-Node: Subsection 2.1.855693
-Node: Subsection 2.1.957499
-Node: Section 2.260908
-Node: Section 2.361700
-Node: Section 2.467648
-Node: Section 2.568930
-Node: Section 2.673427
-Node: Section 2.773600
-Node: Section 2.874230
-Node: Section 2.979710
-Node: Section 2.1082081
-Node: Section 2.1184170
-Node: Section 2.1285743
-Node: Section 2.1387524
-Node: Section 2.1489453
-Node: Section 2.1590394
-Node: Section 2.1690665
-Node: Section 2.1792076
-Node: Section 2.18102979
-Node: Section 2.19105526
-Node: Section 2.20112471
-Node: Section 2.21116907
-Node: Section 2.22118410
-Node: Subsection 2.22.1142826
-Node: Subsection 2.22.2144726
-Node: Section 2.23147473
-Node: Section 2.24149392
-Node: Section 2.25156068
-Node: Section 2.26159440
-Node: Section 2.27159731
-Node: Section 2.28170584
-Node: Section 2.29170856
-Node: Section 2.30177909
-Node: Section 2.31180363
-Node: Section 2.32181032
-Node: Section 2.33182683
-Node: Section 2.34186607
-Node: Section 2.35201036
-Node: Subsection 2.34.1202262
-Node: Subsection 2.34.2204874
-Node: Subsection 2.34.3218403
-Node: Subsection 2.34.4219726
-Node: GUI driver220945
-Node: Section 2.36224499
-Node: Section 2.37233934
-Node: Section 2.38234953
-Node: Section 2.39250188
-Node: Section 2.40261230
-Node: Section 2.41263414
-Node: Section 2.42289519
-Node: Section 2.43294059
-Node: Section 2.44315158
-Node: Section 2.45329171
-Node: Section 2.46332441
-Node: Chapter 3332956
-Node: Chapter 4335464
-Node: Chapter 5336605
-Node: Section 5.1337266
-Node: Section 5.2337998
-Node: Section 5.3338493
-Node: Section 5.4340631
-Node: Section 5.5346278
-Node: Section 5.6349286
-Node: Section 5.7358025
-Node: Chapter 6363990
-Node: Section 6.1365560
-Node: Section 6.2366880
-Node: Section 6.3367240
-Node: Section 6.4367482
-Node: Section 6.5368144
-Node: Section 6.6368622
-Node: Section 6.7369395
-Node: Section 6.8369821
-Node: Chapter 7370223
-Node: Section 7.1370642
-Node: Section 7.2371329
-Node: Chapter 8372160
-Node: Section 8.1372663
-Node: Section 8.2397976
+Node: Subsection 2.1.749527
+Node: Subsection 2.1.859684
+Node: Subsection 2.1.961490
+Node: Section 2.264899
+Node: Section 2.365691
+Node: Section 2.471639
+Node: Section 2.572921
+Node: Section 2.677418
+Node: Section 2.777591
+Node: Section 2.878221
+Node: Section 2.983701
+Node: Section 2.1086072
+Node: Section 2.1188161
+Node: Section 2.1289734
+Node: Section 2.1391515
+Node: Section 2.1493444
+Node: Section 2.1594385
+Node: Section 2.1694656
+Node: Section 2.1796067
+Node: Section 2.18106970
+Node: Section 2.19109517
+Node: Section 2.20116462
+Node: Section 2.21120898
+Node: Section 2.22122401
+Node: Subsection 2.22.1146817
+Node: Subsection 2.22.2148717
+Node: Section 2.23151464
+Node: Section 2.24153383
+Node: Section 2.25160059
+Node: Section 2.26163431
+Node: Section 2.27163722
+Node: Section 2.28174575
+Node: Section 2.29174847
+Node: Section 2.30181900
+Node: Section 2.31184354
+Node: Section 2.32185023
+Node: Section 2.33186674
+Node: Section 2.34190598
+Node: Section 2.35205027
+Node: Subsection 2.34.1206253
+Node: Subsection 2.34.2208865
+Node: Subsection 2.34.3222394
+Node: Subsection 2.34.4223717
+Node: GUI driver224936
+Node: Section 2.36228490
+Node: Section 2.37237925
+Node: Section 2.38238944
+Node: Section 2.39254179
+Node: Section 2.40265221
+Node: Section 2.41267405
+Node: Section 2.42293510
+Node: Section 2.43298050
+Node: Section 2.44319149
+Node: Section 2.45333162
+Node: Section 2.46336432
+Node: Chapter 3336947
+Node: Chapter 4339455
+Node: Chapter 5340596
+Node: Section 5.1341257
+Node: Section 5.2341989
+Node: Section 5.3342484
+Node: Section 5.4344622
+Node: Section 5.5350269
+Node: Section 5.6353277
+Node: Section 5.7362016
+Node: Chapter 6367981
+Node: Section 6.1369551
+Node: Section 6.2370871
+Node: Section 6.3371231
+Node: Section 6.4371473
+Node: Section 6.5372135
+Node: Section 6.6372613
+Node: Section 6.7373386
+Node: Section 6.8373812
+Node: Chapter 7374214
+Node: Section 7.1374633
+Node: Section 7.2375320
+Node: Chapter 8376151
+Node: Section 8.1376654
+Node: Section 8.2401967
 
 End Tag Table
 
