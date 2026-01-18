@@ -188,7 +188,7 @@ public:
    /// if the exponent shall be increased (because 1.0 -> 0.1)
    bool round_0_1();
 
-   /// convert the first char in UTF8-encoded string to Unicode,
+   /// convert the first char(s) in UTF8-encoded string to Unicode,
    /// setting len to the number of bytes in the UTF8 encoding of the char
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
