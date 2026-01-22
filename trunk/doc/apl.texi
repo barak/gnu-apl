@@ -40,9 +40,9 @@ Copyright @copyright{} 2013 Free Software Foundation, Inc.
 @c ====== Part 4: ‘Top’ Node and Master Menu ==================================
 @c ============================================================================
 
-@ifnottex
 @node Top
-@top GNU APL
+@top GNU APL Reference Manual
+@ifnottex
 
 @today{}.
 This manual briefly documents GNU APL, an interpreter for APL as described
@@ -1044,7 +1044,7 @@ useful for scripting:
 @item ⎕INP: Here-Document-alike function for creating large text variables
 @end itemize
 
-@node Section 2.1.4.1
+@node Subsubsection 2.1.4.1
 @subsubsection ⎕ARG
 
 The system variable ⎕ARG contains all command line arguments passed to the
@@ -1055,7 +1055,7 @@ vector:
     /usr/local/bin/apl --id 1010
 @end example
 
-@node Section 2.1.4.2
+@node Subsubsection 2.1.4.2
 @subsubsection ⎕ENV
 
 There are usually at least two ways of passing parameters to a script:
@@ -1096,7 +1096,7 @@ are set with command @b{set} in bash). For a shell variable to occur
 in ⎕ENV it must be @b{export}ed into the environment of the process
 before the GNU APL interpreter is started.
 
-@node Section 2.1.4.3
+@node Subsubsection 2.1.4.3
 @subsubsection ⎕INP
 
 If you need to create a longer static text, like the body of a web page,
@@ -1187,7 +1187,7 @@ Multi-Line strings have become more and more advanced (and elegant) over time.
 For this reason they currently come in different flavors (of which the older
 ones will eventually disappear).
 
-@node Section 2.1.6.1
+@node Subsubsection 2.1.6.1
 @subsubsection Old-style Multi-Line Strings
 
 Old-style multi-line strings were the first attempt to provide long strings
@@ -1270,7 +1270,7 @@ ABC
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end example
 
-@node Section 2.1.6.2
+@node Subsubsection 2.1.6.2
 @subsubsection New-style Multi-Line Strings
 
 The combination of @b{⎕INP} for immediate execution mode and multi-line
@@ -1326,7 +1326,7 @@ indicate that a Multi-Line String is being entered.
 ⎕INP and old-style strings will coexist for a while, but may eventually
 disappear at some point in time.
 
-@node Section 2.1.6.3
+@node Subsubsection 2.1.6.3
 @subsubsection « » Strings
 
 When new-style multi-line strings are used in scripts the related error
@@ -1391,7 +1391,7 @@ line to  @b{/etc/vim/vimrc} (or to @b{~/.vimrc}):
 set matchpairs+=«:»
 @end example
 
-@node Section 2.1.6.4
+@node Subsubsection 2.1.6.4
 @subsubsection Multi-Line Comments
 
 One of the badly missing features of standard APL is comments tnat span
@@ -1913,7 +1913,7 @@ The syntax for function groups has evolved in 3 phases as elucidated in the
 following.
 
 @c ............................................................................
-@node Section 2.3.1
+@node Subsection 2.3.1
 @subsection Phase 1: Numerical Axis Argument
 
 In the first phase, the number of functions per function group (at that time
@@ -1942,7 +1942,7 @@ For example:
 In both cases was the subfunction selector an integer scalar.
 
 @c ............................................................................
-@node Section 2.3.2
+@node Subsection 2.3.2
 @subsection Phase 2: String Axis Argument
 
 Shortly after introducing the syntax of phase 1, GNU APL users began to develop
@@ -1982,7 +1982,7 @@ The phase 1 example above would now become the slightly better readable:
 @end example
 
 @c ............................................................................
-@node Section 2.3.3
+@node Subsection 2.3.3
 @subsection Phase 3: Member Notation
 
 The third phase aims at further improving the readability. It replaces the
@@ -1997,7 +1997,7 @@ now become:
       A ⎕FIO.fopen B          ⍝ fopen file B with mode A
 @end example
 
-@node Section 2.3.4
+@node Subsection 2.3.4
 @subsection Subfunction Lists
 
 If the number of subfunctions becomes large, then remembering all subfunction
@@ -2206,7 +2206,7 @@ GNU APL supports direct functions (aka. lambdas), but only in a rather
 limited form.
 
 @c ............................................................................
-@node Section 2.8.1
+@node Subsection 2.8.1
 @subsection Named Lambdas
 
 A statement of the form
@@ -2296,7 +2296,7 @@ may change in the future and therefore such use of ⍺, ⍵, χ, ⍶, ⍹, and �
 is certainly a bad idea.
 
 @c ............................................................................
-@node Section 2.8.2
+@node Subsection 2.8.2
 @subsection Unnamed Lambdas
 
 An unnamed lambda is an expression inside @{ @} but without assigning it to a
@@ -2317,7 +2317,7 @@ generated for unnamed lambdas in order to provide a name in places where a
 function name is needed.
 
 @c ............................................................................
-@node Section 2.8.3
+@node Subsection 2.8.3
 @subsection Limitations of GNU APL Lambdas
 
 There are a number of features related to lambdas that are present in other
@@ -2345,6 +2345,54 @@ and for properly defined functions. As one of the consequences, you
 
 @c ----------------------------------------------------------------------------
 @node Section 2.9
+@section Commands )COPY_ONCE, )DUMP, and DUMP-HTML
+
+In standard APL, workspaces are processed with the standard commands )LOAD,
+)COPY, and )SAVE. GNU APL provides additional commands to process workspaces.
+
+@c ............................................................................
+@node Subsection 2.9.1
+@subsection )DUMP Command
+
+GNU APL has a command )DUMP that saves a workspace to disk, similar to the
+)OUT command. The difference between them is the file format being produced.
+While )OUT produces a file in IBM's workspace interchange format (aka. an
+.atf file), )DUMP produces a file in GNU APL's script format (i.e. readable
+APL statements). Files written with )DUMP can be edited with normal text
+editors (vi, Emacs), read back with "apl -f", or made executable (see
+scripting).
+
+@c ............................................................................
+@node Subsection 2.9.2
+@subsection )DUMP-HTML Command
+
+The )DUMP-HTML command is similar to the )DUMP command and the output format
+is similar as well. The difference is that those characters that need
+HTML-escaping (e.g. '<' becomes &lt; and '>' becomes '&gt; etc.) are
+HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
+used by a web browser to display workspace listings (to share the code).
+
+The files written with the )DUMP-HTML command have the extension @b{.html}.
+
+In addition to the APL code, the .html files produced have a short HTML
+<head> section template. The user should replace the fields marked
+with @b{??????} with proper values (for the author, the copyright owner,
+and a short description) before publishing the page.
+
+@c ............................................................................
+@node Subsection 2.9.3
+@subsection )COPY_ONCE Command
+
+Command )COPY_ONCE copies all objects (variables, functions and operators)
+from some other workspace into the current workspace similar to )COPY.
+However, )COPY_ONCE does this only once; a second invocation of
+)COPY_ONCE with the same workspace (and the same library reference number)
+is silently ignored. This speeds up the )COPYing of libraries that occur
+in several )DUMP-ed or )SAVE-ed workspaces.
+
+
+@c ----------------------------------------------------------------------------
+@node Section 2.10
 @section ]DOXY Command
 
 A particularly useful debug command is ]DOXY. It dumps the current workspace
@@ -2408,59 +2456,343 @@ do regular APL comments).
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.10
-@section Commands )COPY_ONCE, )DUMP, and DUMP-HTML
+@node Section 2.11
+@section ]KEYB Command
 
-In standard APL, workspaces are processed with the standard commands )LOAD,
-)COPY, and )SAVE. GNU APL provides additional commands to process workspaces.
+In the early days of APL the user was typically faced with three problems:
+APL keyboards, APL screens, and APL printers.
 
-@c ............................................................................
-@node Section 2.10.1
-@subsection )DUMP Command
+The advent of Unicode has soved the last two probelms rather eleqantly:
+the Uncode characters contain all APL charatcers and screens (i.e CTR tubes
+in the old days and screen windows these days) and printers display them
+properly. What remains is the keyboard problem. The keyboard problem has two
+sub-problems: Keyboard caps that show APL symbols in addition to the normal
+ASCII characters, and generating proer Unicodes when the keys are being
+pressed (typically with the ALT or CTRL keys held down).
 
-GNU APL has a command )DUMP that saves a workspace to disk, similar to the
-)OUT command. The difference between them is the file format being produced.
-While )OUT produces a file in IBM's workspace interchange format (aka. an
-.atf file), )DUMP produces a file in GNU APL's script format (i.e. readable
-APL statements). Files written with )DUMP can be edited with normal text
-editors (vi, Emacs), read back with "apl -f", or made executable (see
-scripting).
+GNU APL provides the debug command @b{]KEYB} to help resolving these issues.
+There are two cases where @b{]KEYB} may be useful:
 
-@c ............................................................................
-@node Section 2.10.2
-@subsection )DUMP-HTML Command
+@itemize
+@item One can buy so called 'APL keyboards' or APL stickers that can be
+glued on the key caps of a regular keyboard. As a matter of fact, APL
+keyboards are simply regular keyboards with differen key caps. The keycodes
+sent by APL keyboards do not differ from the keycodes of regular keyboards.
+One the other hand, many programmers type blindly; for them the keycaps are
+mostly irrelevant, and the substantial surcharge for APL keyboards may be
+unreasonable. A related problem is national keyboards: most APL keyboards
+have an US layout for their keycaps although a user may prefer a national
+layout. Most of this can be helped with a keuboard layout that is printed
+on the screen. A user that types bindly most of the time, but cannot
+remember the position of all APL symbols (in particular of rarely used ones)
+may find it useful to display the keyboard layout on the screen.
 
-The )DUMP-HTML command is similar to the )DUMP command and the output format
-is similar as well. The difference is that those characters that need
-HTML-escaping (e.g. '<' becomes &lt; and '>' becomes '&gt; etc.) are
-HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
-used by a web browser to display workspace listings (to share the code).
-
-The files written with the )DUMP-HTML command have the extension @b{.html}.
-
-In addition to the APL code, the .html files produced have a short HTML
-<head> section template. The user should replace the fields marked
-with @b{??????} with proper values (for the author, the copyright owner,
-and a short description) before publishing the page.
-
-@c ............................................................................
-@node Section 2.10.3
-@subsection )COPY_ONCE Command
-
-Command )COPY_ONCE copies all objects (variables, functions and operators)
-from some other workspace into the current workspace similar to )COPY.
-However, )COPY_ONCE does this only once; a second invocation of
-)COPY_ONCE with the same workspace (and the same library reference number)
-is silently ignored. This speeds up the )COPYing of libraries that occur
-in several )DUMP-ed or )SAVE-ed workspaces.
-
+@item The second use case for @b{]KEYB} is troubleshooting the transformation
+of keys pressed on the keyboard to Unicodes sent to the APL interpreter. This
+transformation (which is explained in more detail below) is highly
+conficurable. The good news is that these days any keyboard can be configured
+to send any Unicode on any key as preferered by the user. The bad news is
+that this configuration differs a lot between different platforms and can
+be faily cumbersome. The @b{]KEYB} command is intended to helkp figuring
+why pressing a partiicular key does not produce the APL character that it
+should. It maybe wothwhile to note that even an APL keyboard can (and most
+likely will) not produce the characters shown on its keypad if the
+transformation from key presses to Unicdes is misconfigured. In that respect
+APL keyboards are no better than keybiard stickers: Glueing a @b{⍴} sticker
+onto the @b{R} does not make the @b{R} send the Unicode for @b{⍴}. Likewise,
+an APL keyboard with @b{⍴} printed in addition to @b{R} does not make that
+keyboard send the Unicode for @b{⍴}. Both cases only work as expected if
+the transformation from keys to Unicdes is configured properly.
+@end itemize
 
 @c ----------------------------------------------------------------------------
-@node Section 2.11
+@node Subsection 2.11.1
+@subsection The transformation of Keycodes to Unicodes
+
+In a nutshell, on a GNU/Linux (or other X-based) platform,
+a key pressed or realeased is processed as follows:
+
+@enumerate
+@item The user presses or releases a key on the keyboard. This creates a
+      @b{key-event} in the operating system. This key-event contains three
+      items:
+      @itemize
+      @item a @b{keycode} which is a number between 0 and 255 that uniquely
+            identidies the key. The keys in the main keyboard area (i.e.
+            where all the alkphabetic keys are located), have keycodes between
+            8 and 64,
+      @item a @b{state} which tells if the key was pressed or released, and
+      @item a @b{timestanp} which tells when key was pressed or released.
+      @end itemize
+@item The operating system processes the event:
+      @itemize
+      @item It remembers the new state of the key. If the key is a
+            @b{modifier key} such as SHIFT, CTRL, or ALT, the the processing
+            is done.
+      @item Otherwise the key is a normal key and the operating system 
+       computes a @b{keysymbol} from the @b{keycode}. In this computation
+       the modifier keys whose states were remembered in the previous steps
+       are taken into account. For that reason, e.g. pressing @b{R} when 
+       (only) the SHIFT modifier key is pressed produces @b{R} and if SHIFT
+       is released then it produces @b{r}. Every Unicode has a keysymbol (with
+       the same value) but some keysymbols doe not correspond to a Unicode
+       but o an action that the oprating system shall perform (e.g. cursor
+       home in a termina window). A particularly important keysymbol is
+       @b{0x0000} aka. @b{NoSymbol} which indicates that (for a given
+       combination of modifer keys) no Unicode shall be generated.
+      @end itemize
+
+@item The operating system forwards the keysymbol towards the application
+      (in our case GNU APL). On the way from the operating system to the
+      application there may be other mappings applied to the keysymbol. For
+      example, the window manager may bind functions to function the keys
+      of the keyboard and call the function when the keysymbol for the
+      function key was received from the operating system. Every such
+      mapping can be a cause of trouble if keys needed by GNU APL are
+      involved.
+@end enumerate
+
+@node Subsection 2.11.2
+@subsection xmodmap and friends
+
+The installation of an operating system installs a Keycodes to Unicodes
+mapping according to the language choices made by the user during the 
+installation. for example, in the US keycode @b{29} will be mapped to @b{y},
+while in Germany keycode @b{29} will be mapped to @b{z}. At this point all
+mappings for modifier ALT pressed, and most settings for CTRL pressed are
+either set to @b{NoSymbol}. To generate APL characteres instead of nothing,
+the user has to modify the mapping as to produce APL Unicodes. This
+modification is lost after rebooting the computer; therefore the mapping
+is usually performed in a script that is run at login time of the user (i.e.
+in ~/.bashrc).
+
+The modification is made with a program. Unfortunately there exist several
+such programs, e.g. @b{xmodmap}, @b{setxkbmap}, or @b{loadkeys}. See
+@b{README-3-keyboard} for details. Unfortunately more is not always better
+and the different programs for the same purpose have undesirable side effects
+when used in parallel. An important lesson after experimenting with several
+of these programs was: @i{Use one and only one of these programs on your
+platform}.
+
+Each of these programs has its own set of pitfalls. For example with
+@b{xmodmap}, pressing @b{ALT-SHIFT-L} (in that order produces ⌷. Pressing
+@b{SHIFT-ALT-L} produces nothing.
+
+Despite of this, @b{xmodmap} seems to be the simplest and most reliable
+of the modidication programs. It may have less capabilities than the others,
+but has everything needed to run GNU APL. For this reason, GNU APL is
+shipped with a configuration file for US keyboards
+(@b{support-files/Juergen-Mint-21/xmodmap.apl}) and a file to undo the
+mapping (@b{support-files/Juergen-Mint-21/xmodmap.ascii}). The latter is
+redundant since @b{xmodmap} provides a way to save the current mapping
+(see @b{man xmodmap}). There was a short period where @b{xmodmap} did not
+work in Linux Mint several yeras ago, but this has been fixed in the meantime.
+
+It is impossible for the author to explain all available mapping programs
+and therefore this manual focuses on @b{xmodmap}. Suppose we run:
+
+@b{$ xmodmap xmodmap.apl}
+
+and suppose pressing key @b{R} does @i{@b{not}} produce @b{⍴}. This can have
+the following reasons:
+
+@enumerate
+@item incorrect keycode for key @b{R},
+@item correct keycode, but incorrect keysymbol(s), or
+@end enumerate
+
+Both cases can be identified with the @b{]KEYB}  command.
+
+@node Subsection 2.11.3
+@subsection The ]KEYB command
+
+@node Subsubsection 2.11.3.1
+@subsubsection ]KEYB without arguments.
+
+Command ]KEYB without arguments is for the normal day to day use (as
+opposed to troubleshooting). It displays an APL keyboard on the screen,
+which is very useful if the keyboard has no APL stickers or key caps.
+The command uses different methods to figure the actual layout:
+
+@enumerate
+@item First the command tries to run @b{xmodmap -pk} as to get the current
+      keyboard map and displays the result in form of an APL keyboard. This
+      result, if the command succeeds, is closest to reality and is diplayed
+      on success. However, it may also fail for various reasons, e.g. if
+      xmodmap is not installed.
+
+@item if the first step fails, then @b{]KEYBC} looks for a user-defined
+      keyboard layout. Such a layout is user-defined text file which shows
+      the keyboard. The name of the file must be configured beforehand
+      in one of the GNU APL preferences files.
+@item if no user-defined keyboard layout is found, then GNU APL displays
+      a built-in layout (which is farthest away from reality) as a final
+      resort.
+@end enumerate
+
+The first line of the keyboard displayed shows which of the 3 methods above
+was used to generate the output.
+
+@node Subsubsection 2.11.3.2
+@subsubsection ]KEYB SCAN
+
+@b{]KEYB SCAN} runs, under the hood, @b{xmodmap -pk} to read the current
+keycode to keysymbol mapping and displays the result in form of a
+keyboard layout on the screen. For example:
+
+@example
+      ]KEYB SCAN
+US Keyboard Layout.    Source: xmodmap -pk
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+║ ~  ║ !⌶ ║ @@⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
+║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSPC ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ @{⍞ ║ @}⍬ ║ |⊣   ║
+║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║ \⊢   ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
+║ LOCK)   ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m∣ ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║
+╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+@end example
+
+Naturally, this only works, iff:
+
+@itemize
+@item @b{xmodmap} is installed and working,
+@item the current keyboard mapping was installed with @b{xmodmap},
+@item no other keyboard mappings are in effect, and
+@item the keycodes are correct (see below).
+@end itemize
+
+IOW: @b{]KEYB SCAN} troubleshoots the case
+@i{correct keycode, but incorrect keysymbol(s)} above.
+
+@node Subsubsection 2.11.3.3
+@subsubsection ]KEYB SCAN KEYS
+
+@b{]KEYB SCAN KEYS} does not run @b{xmodmap -pk} but rather shows how
+the keys are supposed to be positioned on the keyboard. This shows how
+@b{xmodmap -pk} assumes the keys are positioned. For example:
+
+@example
+      ]KEYB SCAN KEYS
+US Keyboard Layout.    Source: GNU APL builtin" 
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║
+║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
+║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
+╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+@end example
+
+As the @b{Source: GNU APL builtin} in the example above indicates, this is
+the layout assumed by GNU APL, which may differ from the true layout of your
+keybord. For example, say key @b{R} with ALT pressed does not produce @b{⍴}.
+The Unicode for @b{⍴} is :
+
+@example
+      ⎕UCS "⍴"                    ⍝ Unicode for ⍴
+9076
+      ,5 ⎕CR 256 256 ⊤ ⎕UCS "⍴"   ⍝ Unicode for ⍴ in hex
+2374
+@end example
+
+One can check if the keycodes displayed by @b{]KEYB SCAN KEYS}  are
+correct with a programm called @b{xev} (which is normally pre-installed in
+most GNU/Linux distributions. After starting @b{xev} and hitting the @b{R}
+key several times (because it also shows many other unrelated events),
+one can see the corresponding key events:
+
+@example
+      ...
+KeyPress event, serial 38, synthetic NO, window 0x3c00001,
+    root 0x75c, subw 0x0, time 35629183, (-590,275), root:(284,737),
+    state 0x0, keycode 27 (keysym 0x72, r), same_screen YES,
+    XLookupString gives 1 bytes: (72) "r"
+    XmbLookupString gives 1 bytes: (72) "r"
+    XFilterEvent returns: False
+@end example
+
+So we see that the @b{R} key does indeed have the keycode @b{27}.
+Next we look at the line for key keycode @b{27} in the @b{xmodmap.apl}
+file:
+
+@example
+keycode  27 =  r               R               U2374
+@end example
+
+This line tells us that, when the @b{R} is hit, the following
+Unicodes shall be emitted:
+
+@itemize
+@item the Unicode for (lowercase) @b{r} if neither SHIFT nor ALT is held down,
+@item the Unicode for (uppercase) @b{R} if SHIFT is pressed and ALT is not,
+@item the Unicode for @b{⍴} = $2374  if ALT is pressed and SHIFT is not.
+@end itemize
+
+The line could have had a fourth entry (for SHIFT and ALT pressed); if that
+entry is, like above,  missing then the same Unicode is emitted for both
+ALT and SHIFT+ALT. Likewise, if the second entry is missing then the same 
+code is used for SHIFT and no SHIFT. This is, for example, the case for
+keycode 36 with keysym @b{Return} (the key that is sometimes labelled
+@b{Enter} and sometimes @b{Return} and whose keysym is independent of the
+state of the SHIFT and ALT keys. In the xmodmap the keysyms can be specified
+in multiple ways: as ASCII characters (like @b{r} and @b{R} above, as
+Unicodes like @b{U2374} above, or as symbols like @b{NoSymbol} or @b{Return},
+which are defined in files @b{/usr/include/X11/X.h} and
+ @b{/usr/include/X11/keysymdef.h}:
+
+@example
+#define NoSymbol         0L  /* special KeySym */
+#define XK_Return    0xff0d  /* Return, enter */
+@end example
+
+Given the explanations above, the troubleshooting of keyboard mappings
+becomes zimple (though somewhat tedious in the details):
+
+@enumerate
+@item do @b{]KEYB SCAN KEYS} in GNU APL to display the keycodes, then
+@item  run @b{xev} in a different window and verify, for every key on
+       the keyboard, that the keycode shown by @b{xev} is the one shown by
+       @b{]KEYB SCAN KEYS}, then
+@item do @b{]KEYB SCAN} in GNU APL to display the keysyms, then
+      @item edit the @b{xmodmap.apl} file (or whatever other file ws used
+      as the argument for the @b{xmondmap} command) to see if the Unicodes
+      for every keycode line are correct. In that test:
+      @itemize
+      @item the first keysym is used for the lowercase character, i.e. if
+            neither SHIFT nor ALT are pressed,
+      @item the second keysym is used for the uppercase character, i.e. if
+            SHIFT is pressed and ALT is not. If no second keysym is present,
+            then the first keysym is used instead,
+      @item the third keysym is used for the character that shall be emitted
+            when the ALT key is pressed and the SHIFT is not. If no third
+             keysym is present then nothing is emitted, and
+      @item the fourth keysym is used for the character that shall be emitted
+            when both the ALT key and the SHIFT are pressed. If no fourth
+            keysym is present then the behavior is the same as for ALT
+            without SHIFT.
+      @end itemize
+@end enumerate
+
+@c ----------------------------------------------------------------------------
+@node Section 2.12
 @section ]NEXTFILE and ]PUSHFILE Commands
 
 @c ............................................................................
-@node Section 2.11.1
+@node Subsection 2.12.1
 @subsection ]NEXTFILE
 
 The debug command ]NEXTFILE, when used in an APL script file, terminates
@@ -2490,7 +2822,7 @@ This workspace does the following...
 
 
 @c ............................................................................
-@node Section 2.11.2
+@node Subsection 2.12.2
 @subsection ]PUSHFILE
 
 The debug command ]PUSHFILE is similar to ]NEXTFILE in that it terminates
@@ -2502,7 +2834,7 @@ command, the immediate execution context processing proceeds at the next
 line after the ]PUSHFILE command.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.12
+@node Section 2.13
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -2545,7 +2877,7 @@ function or variable name.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.13
+@node Section 2.14
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -2559,7 +2891,7 @@ there is a debug command ]LOG that allows logging facilities to be turned
 ON or OFF.
 
 @c ............................................................................
-@node Section 2.13.1
+@node Subsection 2.14.1
 @subsection Static Logging
 
 By default the logging facilities that shall be turned ON are defined
@@ -2575,7 +2907,7 @@ If you benchmark the APL interpreter, then ./configure Static Logging by
 NOT setting DYNAMIC_LOG_WANTED=yes.
 
 @c ............................................................................
-@node Section 2.13.2
+@node Subsection 2.14.2
 @subsection Dynamic Logging
 
 Dynamic Logging is intended for trouble-shooters of GNU APL, but also for
@@ -2598,7 +2930,7 @@ toggles the state of logging facility N from OFF to ON and back.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.14
+@node Section 2.15
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
@@ -2619,7 +2951,7 @@ be enabled via ./configure (see README-2-configure).
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.15
+@node Section 2.16
 @section Hex Numbers
 
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
@@ -2635,7 +2967,7 @@ lowercase:
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.16
+@node Section 2.17
 @section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
@@ -2671,7 +3003,7 @@ be deleted like this:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Section 2.17
+@node Section 2.18
 @section Structured Variables and Associative Arrays
 
 GNU APL has implemented two features that are closely related because, under
@@ -2679,7 +3011,7 @@ the hood, they share the same implementation: @b{structured variables} and
 @b{associative arrays}.
 
 @c ............................................................................
-@node Section 2.17.1
+@node Subsection 2.18.1
 @subsection Structured Variables
 
 A structured variable is an APL variable that contains several related but
@@ -2829,7 +3161,7 @@ The file @b{src/testcases/Structured_variable.tc} contains the examples
 above (and more) 
 
 @c ............................................................................
-@node Section 2.17.2
+@node Subsection 2.18.2
 @subsection Associative Arrays
 
 APL arrays are primarily indexed with numbers (or arrays of numbers), which
@@ -2962,7 +3294,7 @@ is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.18
+@node Section 2.19
 @section Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 
 Monadic ⊢ is the identity function. It returns its (committed or non-committed)
@@ -3025,7 +3357,7 @@ a*c
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.19
+@node Section 2.20
 @section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
@@ -3081,7 +3413,7 @@ ABBADEAD
 @end example
 
 @c ............................................................................
-@node Section 2.19.1
+@node Subsection 2.20.1
 @subsection Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
 
 The dyadic forms of @b{⊤∧}, @b{⊤∨}, @b{⊤⍲}, and @b{⊤⍱} are simply the bit-wise
@@ -3097,7 +3429,7 @@ variants of their Boolean counterparts:
 @end example
 
 @c ............................................................................
-@node Section 2.19.2
+@node Subsection 2.20.2
 @subsection Monadic ⊤∨ and ⊤⍱
 
 @b{⊤=}, @b{⊤≠}, and @b{⊤⍲} do not have a monadic form, but @b{⊤∧}, @b{⊤∨},
@@ -3150,7 +3482,7 @@ but the effect is not visible with 26 ⎕CR since Gaussian and non-Gaussian
 complex numbers have the same cell type in GNU APL.
 
 @c ............................................................................
-@node Section 2.19.3
+@node Subsection 2.20.3
 @subsection Monadic ⊤∧
 
 The ISO standard defines two different concepts to decide if a real number R
@@ -3186,7 +3518,7 @@ to nearby integers. In addition ⊤∧ gives the user (via ⎕CT) more control o
 the permitted tolerance for real numbers in the neighborhood of integers.
 
 @c ............................................................................
-@node Section 2.19.4
+@node Subsection 2.20.4
 @subsection Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧, ⊤∨, ==, and ≠≠
 
 Some of the bit-wise operations are allowed to have characters as their right
@@ -3210,7 +3542,7 @@ BE
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.20
+@node Section 2.21
 @section ⊤ (Encode) with Axis
 
 The dyadic primitive function @b{A ⊥ B} (Decode) computes the @b{values}
@@ -3328,11 +3660,11 @@ Examples:
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.21
+@node Section 2.22
 @section Generalized ⍳
 
 @c ............................................................................
-@node Section 2.21.1
+@node Subsection 2.22.1
 @subsection Generalized monadic ⍳
 
 The standard function @b{Interval} (Z←⍳B) requires its argument B to be a
@@ -3346,7 +3678,7 @@ of Z are nested integer vectors consecutive along each axis of B as opposed
 to integer scalars in the standard case.
 
 @c ............................................................................
-@node Section 2.21.2
+@node Subsection 2.22.2
 @subsection Generalized dyadic ⍳
 
 The standard function @b{Index Of} (Z←A⍳B) requires its left argument A to be
@@ -3363,11 +3695,11 @@ if the item was not found).
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.22
+@node Section 2.23
 @section ⌹[X] - Miscellaneous Matrix and Vector Operations
 
 @c ............................................................................
-@node Section 2.22.1
+@node Subsection 2.23.1
 @subsection ⌹[1] and ⌹[2] - QR Factorizations
 
 @b{Z←⌹[1] B} and @b{Z←⌹[2] B} compute a QR factorization of the real or
@@ -3479,13 +3811,13 @@ Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 
 @c ............................................................................
-@node Section 2.22.2
+@node Subsection 2.23.2
 @subsection The Impact of ⎕CT for ⌹
 
 Due to the lack of a better place we describe here how @b{⎕CT} is used
 in the various @b{⌹} functions.
 
-@node Subsection 2.22.2.1
+@node Subsubsection 2.23.2.1
 @subsubsection A⌹B and ⌹B
 
 The first step in the computation of @b{A⌹B} or @b{⌹B} is the estimation
@@ -3527,7 +3859,7 @@ matrix @b{B} then there are two possibilities:
       significant rounding errors in the result.
 @end enumerate
 
-@node Section 2.22.2.2
+@node Subsubsection 2.23.2.2
 @subsubsection ⌹[X] B: Various Factorizations of B
 
 The numeric scalar @b{X} chooses one of several algorithms that computes a 
@@ -3591,7 +3923,7 @@ factorization @b{⌹[6]} returns a nested vector @b{(P U L)} where:
   @item @b{B[P;] = L∘U}.
 @end itemize
 
-@node Section 2.22.2.3
+@node Subsubsection 2.23.2.3
 @subsubsection Matrix Inverse
 
 The matrix @b{Ti} returned by @b{⌹[1]} or @b{⌹[2]} provides an alternative
@@ -3618,7 +3950,7 @@ computation of @b{⌹B} if @b{B} is large.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.22.2.4
+@node Subsubsection 2.23.2.4
 @subsubsection ⌹[7] B: Print Polynomial B
 
 Let @b{B ← b₀ b₁ b₂ ... bₙ}. The standard interpretation of this vector
@@ -3698,7 +4030,7 @@ x² + 2x + 3
 @end example
  
 @c ----------------------------------------------------------------------------
-@node Section 2.22.2.5
+@node Subsubsection 2.23.2.5
 @subsubsection A ⌹[8] B: Multiply Polynomials A and B
 
 The scalar APL primitives @b{+} and @b{-} can be used for vectors
@@ -3734,7 +4066,7 @@ the product of two polynomials. For example:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Section 2.22.2.6
+@node Subsubsection 2.23.2.6
 @subsubsection A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)
 
 The scalar APL primitives @b{+} and @b{-} can be used for vectors
@@ -3753,7 +4085,7 @@ of polynomial @b{B}. That is, @b{⍴Remainder = ¯1+⍴B}.
 @b{NOTE:} @b{A ⌹[9] B} is limited to polynomials with 1 indeterminant.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.22.2.7
+@node Subsubsection 2.23.2.7
 @subsubsection A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
 
 The limitiation of @b{A ⌹[10] B} to handle only polynomials with one 
@@ -3836,7 +4168,7 @@ annihilated (by subtracting a multiple of the divisor from it).
 
 Now, a commonly used order in the division of polynomials, and also the order
 used by @b{A ⌹[10] B}, is the @i{lexicographic order} of the polynomials.
-@xref{Subsection 2.22.1}.
+@xref{Subsubsection 2.23.2.9}.
 
 For example: @b{x < x²}, @b{xy < xyz}, @b{y < x⁸}, and @b{y⁸ < x} in the
 lexicographic order.
@@ -3887,7 +4219,7 @@ dividing it by @b{LT(gᵢ)} if that is possible) or else to @b{r}
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node Section 2.22.2.8
+@node Subsubsection 2.23.2.8
 @subsubsection A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)
 
 As explained above, different monomial orders of a polynomial can lead
@@ -3969,7 +4301,7 @@ Putting the pieces together:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Subsection 2.22.1
+@node Subsubsection 2.23.2.9
 @subsubsection ⌹[11] B: Scan Polynomial B
 
 @b{⌹[11] B} aka. @b{⌹.poly_scan B} is the inverse function of @b{⌹[7] B}.
@@ -4025,7 +4357,7 @@ but in this context all vectors compared have the same length (number of
 indeterminants).
 
 @c ----------------------------------------------------------------------------
-@node Subsection 2.22.2
+@node Subsubsection 2.23.2.10
 @subsubsection A ⌹[20] B: Integral B
 
 Function @b{A ⌹[20] B} aka. @b{A ⌹.integral B} computes the integral of
@@ -4093,7 +4425,7 @@ is defined which defines the format of the result:
 @b{Dot} is a program for printing directed graphs.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.23
+@node Section 2.24
 @section  ⎕CC - Character Classes
 
 Some older APL interpreters (e.g. APL68000) had system variables for
@@ -4101,7 +4433,7 @@ character classes, such as @b{⎕D} for digits 0..9 or @b{⎕A} for letters
 A..Z. GNU APL provides a single system function @b{⎕CC} for that
 purpose.
 
-@node Section 2.23.1
+@node Subsection 2.24.1
 @subsection  monadic ⎕CC B: Return character class
 
 @b{⎕CC B} returns all characters of character class(es) @b{B}. If @b{B} is an
@@ -4175,7 +4507,7 @@ In many cases is the character class number easy to remember because:
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node Section 2.23.2
+@node Subsection 2.24.2
 @subsection  dyadic A ⎕CC B: Test character class
 
 The dyadic @b{A ⎕CC B} returns, for every item in A, integer @b{1} if the item
@@ -4198,7 +4530,7 @@ For most classes this lookup is an optimized constant time operation (for
 every item of @b{A} and faster than e.g. @b{(⎕CC n) ⍳ A}.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.24
+@node Section 2.25
 @section Dyadic ⎕CR
 
 The @b{⎕CR} function has now an optional left argument that selects one of
@@ -4376,7 +4708,7 @@ a name. For example: monadic @b{⎕CR.hex_to_bytes} is the same as monadic
 @b{⎕CR[13]} or dyadic @b{13 ⎕CR}.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.25
+@node Section 2.26
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -4453,14 +4785,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.26
+@node Section 2.27
 @section ⎕ARG - Interpreter command line arguments
 
 @b{⎕ARG} contains the command line arguments with which GNU APL was invoked.
 @xref{Section 2.1}.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.27
+@node Section 2.28
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -4704,14 +5036,14 @@ sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.28
+@node Section 2.29
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 2.1}.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.29
+@node Section 2.30
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -4855,7 +5187,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.30
+@node Section 2.31
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -4912,7 +5244,7 @@ few hours, though, so that creating it will not pay off for most mortals.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.31
+@node Section 2.32
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp ToolKit) is a rather powerful library for creating graphical user
@@ -4926,7 +5258,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.32
+@node Section 2.33
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -4943,7 +5275,7 @@ A (valid) JSON string is mapped to an APL value as follows:
 @end itemize
 
 @c ............................................................................
-@node Section 2.32.1
+@node Subsection 2.33.1
 @subsection Monadic ⎕JSON
 
 Z←⎕JSON B converts the string B into an APL value according to the mapping
@@ -4951,7 +5283,7 @@ above. If that fails then command )MORE provides information about the error
 and where in B the error was detected.
 
 @c ............................................................................
-@node Section 2.32.2
+@node Subsection 2.33.2
 @subsection Dyadic ⎕JSON
 
 Z←A ⎕JSON B performs one of the following conversions:
@@ -4974,7 +5306,7 @@ is large.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.33
+@node Section 2.34
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
@@ -5078,7 +5410,7 @@ shown in the examples below.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.34
+@node Section 2.35
 @section ⎕MX - Matrix/Statistics
 
 ⎕MX was kindly contributed by Henrik Moller
@@ -5111,7 +5443,7 @@ while (@b{A}) indicates an optional left argument. The right argument @b{B}
 of @b{⎕MX[X]} is always mandatory.
 
 @c ............................................................................
-@node Subsection 2.34.1
+@node Subsection 2.35.1
 @subsection Determinant
 
 The determinant operation, ⎕MX[1], is monadic and is valid only for
@@ -5124,7 +5456,7 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
 @end example
 
 @c ............................................................................
-@node Subsection 2.34.2
+@node Subsection 2.35.2
 @subsection Cross Product
 
 The cross product operation, ⎕MX[2], is nomadic. In monadic form, it
@@ -5159,7 +5491,7 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
 @end example
 
 @c ............................................................................
-@node Section 2.34.3
+@node Subsection 2.35.3
 @subsection Vector Angle
 
 The vector angle operation ⎕MX[3] is dyadic and returns the angle between
@@ -5171,7 +5503,7 @@ two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A 
 @end example
 
 @c ............................................................................
-@node Section 2.34.4
+@node Subsection 2.35.4
 @subsection Eigenvector
 
 The eigenvector operation, ⎕MX[4], is monadic and returns the complex
@@ -5207,7 +5539,7 @@ is sorted according to the descending magnitude of the corresponding
 eigenvalues.
 
 @c ............................................................................
-@node Section 2.34.5
+@node Subsection 2.35.5
 @subsection Eigenvalue
 
 The eigenvalue operation, ⎕MX[5], is also monadic with an argument of
@@ -5253,7 +5585,7 @@ Accordingly:
 @end example
 
 @c ............................................................................
-@node Section 2.34.6
+@node Subsection 2.35.6
 @subsection Ident
 
 The monadic ident operation, ⎕MX[6], takes a scalar real integer argument
@@ -5268,7 +5600,7 @@ and returns a square identity matrix of that size:
 @end example
 
 @c ............................................................................
-@node Section 2.34.7
+@node Subsection 2.35.7
 @subsection Rotation
 
 The rotation operation, ⎕MX[7], is monadic and takes a real or complex
@@ -5281,7 +5613,7 @@ scalar angle and returns a 2-space rotation matrix:
 @end example
 
 @c ............................................................................
-@node Section 2.34.8
+@node Subsection 2.35.8
 @subsection Homogeneous transform
 
 The homogeneous operation ⎕MX[8] is dyadic and takes as its left argument
@@ -5298,7 +5630,7 @@ respectively) and returns the corresponding homogeneous matrix:
 @end example
 
 @c ............................................................................
-@node Section 2.34.9
+@node Subsection 2.35.9
 @subsection Norm
 
 The monadic norm operation, ⎕MX[9], takes a real or complex non-scalar
@@ -5331,7 +5663,7 @@ result with the same shape as the argument.
 
 
 @c ............................................................................
-@node Section 2.34.10
+@node Subsection 2.35.10
 @subsection Randoms
 
 The nomadic randoms operation, @b{⎕MX[10]} or @b{⎕MX[10 x]} where @b{x}
@@ -5394,7 +5726,7 @@ where <seed> is a single integer. This allows repeatable random sequences:
 @end example
 
 @c ............................................................................
-@node Section 2.34.11
+@node Subsection 2.35.11
 @subsection Covariance
 
 The covariance operation, ⎕MX[11], is nomadic. In monadic form, it
@@ -5434,7 +5766,7 @@ left and right:
 @end example
 
 @c ............................................................................
-@node Section 2.34.12
+@node Subsection 2.35.12
 @subsection Histograms
 
 The histogram operation, ⎕MX[12], is dyadic and requires a single integer
@@ -5460,7 +5792,7 @@ I.e. a 200-bucket histogram of a 200 thousand-member vector of
 normally distributed samples with a standard deviation of 1.
 
 @c ............................................................................
-@node Section 2.34.13
+@node Subsection 2.35.13
 @subsection Print
 
 The print operation, ⎕MX[13], is dyadic and provides an easy way to
@@ -5546,7 +5878,7 @@ Print: 10+⍳10
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Section 2.35
+@node Section 2.36
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -5569,7 +5901,7 @@ The general syntax of ⎕PLOT is:
 @end example
 
 @c ............................................................................
-@node Subsection 2.35.1
+@node Subsection 2.36.1
 @subsection The Plot Data B
 
 The plot data @b{B} can be a vector (for a single plot line to be drawn)
@@ -5581,7 +5913,7 @@ connecting them are green (for the first plot line). However, all colors
 used, all diameters of points, and all thicknesses of the lines can be
 fine-tuned by overriding the default values (see dyadic A ⎕PLOT B below).
 
-@node Subsubsection 2.35.1.1
+@node Subsubsection 2.36.1.1
 @subsubsection Complex Plot Data B
 
 If a data item B[N] or B[row;N] is @b{complex}, say B[N] = x + iy. then it is
@@ -5609,7 +5941,7 @@ in text mode see file @b{doc/PLOT_circle.png}):
 @image{PLOT_circle}
 
 @c ............................................................................
-@node Subsubsection 2.35.1.2
+@node Subsubsection 2.36.1.2
 @subsubsection Real Plot Data B
 
 On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
@@ -5640,7 +5972,7 @@ makes little sense. If at least one item of the plot data B is complex, then
 all real items in B are taken as complex with imaginary part 0.
 
 @c ............................................................................
-@node Subsection 2.35.2
+@node Subsection 2.36.2
 @subsection The Plot Attributes A
 
 There are a number of attributes like colors, point sizes, line widths,
@@ -5930,7 +6262,7 @@ reason there is no @b{gridY_variable} or @b{gridZ_variable}.
 
 
 @c ............................................................................
-@node Subsection 2.35.3
+@node Subsection 2.36.3
 @subsection Plot Window Handling
 
 Each call of ⎕PLOT with some plot data @b{B} opens a separate window in the X
@@ -5957,7 +6289,7 @@ mouse or the keyboard (as opposed to programmatically with @b{⎕PLOT ¯3} or
 corresponds to the typical method(s) for closing windows on most systems.
 
 @c ............................................................................
-@node Subsection 2.35.4
+@node Subsection 2.36.4
 @subsection Output File Format
 
 Early versions of ⎕PLOT were using @b{libxcb} to display the results of
@@ -5983,7 +6315,7 @@ the @b{libgtk-3} option.
 
 
 @c ............................................................................
-@node Subsection 2.35.5
+@node Subsection 2.36.5
 @subsection GUI driver
 
 @b{⎕PLOT} provides 3 different ways to generate its output, called
@@ -6072,7 +6404,7 @@ be supported for a while, but new features will only be added to the
 @b{GTK} driver.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.36
+@node Section 2.37
 @section ⎕PNG - Portable Network Graphics
 
 Portable Network Graphics is a file format for images, defined in
@@ -6082,7 +6414,7 @@ Portable Network Graphics is a file format for images, defined in
 well-compressed, well-specified standard for lossless bitmapped image files.}
 
 @c ............................................................................
-@node Section 2.36.1
+@node Subsection 2.37.1
 @subsection The GNU APL Color Model
 
 An image is a rectangular matrix of @strong{Pixels} which makes APL the
@@ -6191,7 +6523,7 @@ reason 16-bit color components are quite an overkill and the 8-bit default
 therefore should be more than sufficient for most purposes.
 
 @c ............................................................................
-@node Section 2.36.2
+@node Subsection 2.37.2
 @subsection Monadic ⎕PNG
 
 Monadic ⎕PNG, i.e. ⎕PNG B is used for 3 purposes:
@@ -6237,7 +6569,7 @@ behaviour:
 @end enumerate
 
 @c ............................................................................
-@node Section 2.36.3
+@node Subsection 2.37.3
 @subsection Dyadic ⎕PNG
 
 Dyadic @strong{A ⎕PNG B} has only one purpose: to store an APL array in
@@ -6256,7 +6588,7 @@ the GNU APL color model into a PNG file.
 @end itemize
 
 @c ............................................................................
-@node Section 2.36.4
+@node Subsection 2.37.4
 @subsection APL Examples
 
 @example
@@ -6289,7 +6621,7 @@ the GNU APL color model into a PNG file.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.37
+@node Section 2.38
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -6316,7 +6648,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.38
+@node Section 2.39
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -6325,7 +6657,7 @@ compatible regular expressions". libpcre2 is Copyright (c) 1997-2017
 University of Cambridge, England.
 
 @c ............................................................................
-@node Section 2.38.1
+@node Subsection 2.39.1
 @subsection Preconditions
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the GNU APL
@@ -6336,7 +6668,7 @@ If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX ERROR when
 ⎕RE is used in an APL program.
 
 @c ............................................................................
-@node Section 2.38.2
+@node Subsection 2.39.2
 @subsection Syntax
 
 ⎕RE has two forms. The short form (without an axis argument) is intended to
@@ -6358,7 +6690,7 @@ It therefore suffices to explain the long form. The long form has 3 different
 arguments A, B, and X.
 
 @c ............................................................................
-@node Section 2.38.3
+@node Subsection 2.39.3
 @subsection The Regular Expression A
 
 A is a simple character vector which is expected to be a regular expression
@@ -6371,7 +6703,7 @@ comes with libpcre2.
 See in particular: @b{man pcre2pattern}
 
 @c ............................................................................
-@node Section 2.38.4
+@node Subsection 2.39.4
 @subsection The String(s) B Being Matched
 
 B is either:
@@ -6406,7 +6738,7 @@ Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
 @c ............................................................................
-@node Section 2.38.5
+@node Subsection 2.39.5
 @subsection The Flags X
 
 By default, i.e. without an axis argument X or - equivalently - with an empty
@@ -6421,7 +6753,7 @@ The X argument of @b{A⎕RE[X] B} is a character vector where each character
 is a flag. Each flag is either understood by (and then passed unmodified to)
 libpcre2 or else understood by ⎕RE itself (and then not passed to libpcre2).
 
-@node Section 2.38.5.1
+@node Subsubsection 2.39.5.1
 @subsubsection The libpcre2 flags: i, m, s, and x
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x. They correspond to the
@@ -6437,7 +6769,7 @@ following libpcre2 flags:
 Please consult the libpcre2 documentation for a more detailed description
 of these flags.
 
-@node Section 2.38.5.2
+@node Subsubsection 2.39.5.2
 @subsubsection The ⎕RE (APL output format) flags ↓, ⊂, and /
 
 ⎕RE provides different output formats, some of which are tailored to different
@@ -6490,7 +6822,7 @@ The following examples may better explain the nature of the output flags:
 In the absence of a 'g' flag (see below) the results of output formats
 ⊂ and / are identical; if 'g' is present, however, then they may differ.
 
-@node Section 2.38.5.3
+@node Subsubsection 2.39.5.3
 @subsubsection the ⎕RE global flag g
 
 The default behavior of ⎕RE is to return only the first match of A in B.
@@ -6561,7 +6893,7 @@ The output formats ⊂ and / are related like this:
 @end example
 
 
-@node Section 2.38.5.4
+@node Subsubsection 2.39.5.4
 @subsubsection the ⎕RE error flag E
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -6592,7 +6924,7 @@ it is natural to check the length of the result:
 @end example
 
 @c ............................................................................
-@node Section 2.38.6
+@node Subsection 2.39.6
 @subsection Complex Matches
 
 The regular expressions considered so far were simple, which means that they
@@ -6665,7 +6997,7 @@ The same for the pos+len output format:
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.39
+@node Section 2.40
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -6686,7 +7018,7 @@ Such values can be produced with system function ⎕RVAL. The main use case for
 useful for other purposes as well.
 
 @c ............................................................................
-@node Section 2.39.1
+@node Subsection 2.40.1
 @subsection General
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z,
@@ -6711,7 +7043,7 @@ With these default properties, every call of monadic ⎕RVAL B returns an
 integer scalar.
 
 @c ............................................................................
-@node Section 2.39.2
+@node Subsection 2.40.2
 @subsection Dyadic ⎕RVAL
 
 The left argument A of A ⎕RVAL B determines which aspect of the
@@ -6736,7 +7068,7 @@ A=4 controls a maximum depth of the subsequent random APL values.
 
 @end itemize
 
-@node Section 2.39.2.1
+@node Subsubsection 2.40.2.1
 @subsubsection Control of the underlying random number generator: 0 ⎕RVAL B
 
 Every random number generator has a state (similar to @b{⎕RL} for @b{'?'}).
@@ -6767,7 +7099,7 @@ be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
 change the state of the other.
 
-@node Section 2.39.2.2
+@node Subsubsection 2.40.2.2
 @subsubsection Control of the ranks: 1 ⎕RVAL B
 
 The rank of subsequently generated random values can be controlled with
@@ -6813,7 +7145,7 @@ with probability 30%, and matrices with probability 20%. The numbers
 need not add up to 100, but will be scaled accordingly.
 @end itemize
 
-@node Section 2.39.2.3
+@node Subsubsection 2.40.2.3
 @subsubsection Control of the shapes: 2 ⎕RVAL B
 
 The shapes of subsequently generated random values can be controlled with
@@ -6845,7 +7177,7 @@ Example:
 This will produce scalars, vectors with a fixed length of 3 and matrices
 with 3 rows and between 0 and 10 columns.
 
-@node Section 2.39.2.4
+@node Subsubsection 2.40.2.4
 @subsubsection Control of the data types: 3 ⎕RVAL B
 
 The types (i.e. CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of subsequently
@@ -6894,7 +7226,7 @@ Example:
 7677327503669503253 2152001972871424768
 @end example
 
-@node Section 2.39.2.5
+@node Subsubsection 2.40.2.5
 @subsubsection Control of a maximum depth: 4 ⎕RVAL B
 
 If the probability of generating a nested value is > 0 then the depth of
@@ -6908,7 +7240,7 @@ the probability of the deepest allowed depth to 0.
 An empty B, e.g. 4 ⎕RVAL ⍬, will not change anything and can be used to
 query the current setting for 4 ⎕RVAL.
 
-@node Section 2.39.2.6
+@node Subsubsection 2.40.2.6
 @subsubsection monadic ⎕RVAL B
 
 Calling ⎕RVAL monadically either produces one new random APL value or displays
@@ -6973,7 +7305,7 @@ Examples:
 ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
 @end example
 
-@node Section 2.39.2.7
+@node Subsubsection 2.40.2.7
 @subsubsection Syntax Alternatives
 
 For an improved readability, ⎕RVAL also accepts string arguments for its left
@@ -6988,7 +7320,7 @@ argument A and also the subfunction notation:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Section 2.40
+@node Section 2.41
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -7066,7 +7398,7 @@ the caller, and so on.
 
 
 @c ----------------------------------------------------------------------------
-@node Section 2.41
+@node Section 2.42
 @section ⎕SQL - SQL Database Interface
 
 ⎕SQL was kindly contributed by Elias Mårtenson.
@@ -7076,7 +7408,7 @@ system function ⎕SQL, described below. ⎕SQL has an axis argument that
 selects a subfunction of ⎕SQL.
 
 @c ............................................................................
-@node Section 2.41.1
+@node Subsection 2.42.1
 @subsection ⎕SQL[0] ⍬ : display subfunction numbers
 
 The system function ⎕SQL is divided into a number of subfunctions. The
@@ -7111,7 +7443,7 @@ desired subfunction of ⎕SQL is selected by means of a numeric axis argument:
 
 The axis argument [0] is optional; one can also use @b{⎕SQL ⍬}.
 
-@node Section 2.41.2
+@node Subsection 2.42.2
 @subsection ⎕SQL[0] @code{''} : display subfunction names
 
 As of @b{SVN version 1901}, ⎕SQL has been promoted to be a function group.
@@ -7158,7 +7490,7 @@ Like for @b{⎕SQL[0] ⍬} above is the axis argument [0] optional; one can
 therefore also use @b{⎕SQL ''} instead of @b{⎕SQL[0] ''}.
 
 @c ............................................................................
-@node Section 2.41.3
+@node Subsection 2.42.3
 @subsection ref ← A ⎕SQL[1] B : open database
 
 @example
@@ -7186,7 +7518,7 @@ handle. It is, however, guaranteed that the handle is a scalar
 value.
 
 @c ............................................................................
-@node Section 2.41.4
+@node Subsection 2.42.4
 @subsection ⎕SQL[2] B : close database
 
 @example
@@ -7201,7 +7533,7 @@ on this handle. Future calls to ⎕SQL[1] may reuse previously
 disconnected handles.
 
 @c ............................................................................
-@node Section 2.41.5
+@node Subsection 2.42.5
 @subsection Z ← A ⎕SQL[3, ref] B : database query (with result)
 
 @example
@@ -7224,7 +7556,7 @@ select statement. Null values are returned as ⍬ and empty strings
 are returned as ''.
 
 @c ............................................................................
-@node Section 2.41.6
+@node Subsection 2.42.6
 @subsection Z ← A ⎕SQL[4, ref] B : database query (w/o result)
 
 @example
@@ -7237,7 +7569,7 @@ This function is identical to SQL∆Select with the exception that it
 is used on statements which do not return a result table.
 
 @c ............................................................................
-@node Section 2.41.7
+@node Subsection 2.42.7
 @subsection ⎕SQL[5] B : start transaction
 
 @example
@@ -7247,7 +7579,7 @@ is used on statements which do not return a result table.
 Begin a transaction.
 
 @c ............................................................................
-@node Section 2.41.8
+@node Subsection 2.42.8
 @subsection ⎕SQL[6] B : commit transaction
 
 @example
@@ -7257,7 +7589,7 @@ Begin a transaction.
 Commit a transaction.
 
 @c ............................................................................
-@node Section 2.41.9
+@node Subsection 2.42.9
 @subsection ⎕SQL[7] B : rollback transaction
 
 @example
@@ -7267,7 +7599,7 @@ Commit a transaction.
 Rolls back the current transaction.
 
 @c ............................................................................
-@node Section 2.41.10
+@node Subsection 2.42.10
 @subsection Z←⎕SQL[8] B : table names
 
 @example
@@ -7277,7 +7609,7 @@ Rolls back the current transaction.
 Return an array containing the name of all tables.
 
 @c ............................................................................
-@node Section 2.41.11
+@node Subsection 2.42.11
 @subsection Z←⎕SQL[9] B : column names
 
 @example
@@ -7295,7 +7627,7 @@ release.
 
 
 @c ............................................................................
-@node Section 2.41.12
+@node Subsection 2.42.12
 @subsection Z ← ⎕SQL[10] B : library version number
 
 Return the version number (integer scalar) of the library that was used
@@ -7305,7 +7637,7 @@ kind of SQL database type (the database type is sometimes refered to as
 "SQL provider).
 
 @c ............................................................................
-@node Section 2.41.13
+@node Subsection 2.42.13
 @subsection Z ← ⎕SQL[11] B : library version string
 
 Return the version string of the library that was used to implement the
@@ -7315,7 +7647,7 @@ kind of SQL database type (the database type is sometimes refered to as
 "SQL provider).
 
 @c ----------------------------------------------------------------------------
-@node Section 2.41.14
+@node Subsection 2.42.14
 @subsection SQLite Quickstart
 
 @b{SQL} is a powerful query language with many functions for manipulating
@@ -7355,7 +7687,7 @@ explained in this Quickstart are:
 @item deleting rows from a database table.
 @end itemize
 
-@node Section 2.41.14.1
+@node Subsubsection 2.42.14.1
 @subsubsection Deleting a Database
 
 In order to have a well-defined starting point we delete any
@@ -7392,7 +7724,7 @@ program shipped with the database might be required. For example, postgreSQL
 comes with a program named @b{dropdb} that deletes a database. Such programs
 can be called from APL with the @b{)HOST} command or with @b{⎕FIO.fork_daemon}. 
 
-@node Section 2.41.14.2
+@node Subsubsection 2.42.14.2
 @subsubsection Creating a new Database
 
 To read from or write into a database we need a database handle (sometimes
@@ -7429,7 +7761,7 @@ data written to the same database via different connections).
 database administration tasks. These programs can be called from APL with
 the @b{)HOST} command or with @b{⎕FIO.fork_daemon}.
 
-@node Section 2.41.14.3
+@node Subsubsection 2.42.14.3
 @subsubsection Creating a Database Table
 
 An SQL database is a set of tables. The next step after a new database was
@@ -7505,7 +7837,7 @@ therefore common practice (though not required) that the first column of a
 table is a unique integer ID that identifies the row and can later be used
 to quickly locate the row in a large database.
 
-@node Section 2.41.14.4
+@node Subsubsection 2.42.14.4
 @subsubsection Excursus: Dynamic Query Strings
 
 The SQL query strings @b{(Qs)} used so far were @b{static}, which means that
@@ -7576,7 +7908,7 @@ For rank 2 parameters shall the number of placeholders be equal to the
 number of colums of the APL matrix. If a query string contains no placeholders
 then the parameters shall be ⍬ (aka. ⍳0).
 
-@node Section 2.41.14.5
+@node Subsubsection 2.42.14.5
 @subsubsection Writing an APL matrix into a Database Table
 
 Now suppose that we have an APL matrix with the same columns as our
@@ -7631,7 +7963,7 @@ CLEAR WS
       ⎕SQL.close DB                     ⍝ and close DB
 @end example
 
-@node Section 2.41.14.6
+@node Subsubsection 2.42.14.6
 @subsubsection Reading a Database Table into an APL Matrix
 
 Reading a matrix back from a database table uses a @b{SELECT} query. @b{SELECT}
@@ -7675,7 +8007,7 @@ One can also retrieve a only subset of columns by using a comma separated list
 of column names instead of @b{*} (similar to indexed reference in APL).
 
 
-@node Section 2.41.14.7
+@node Subsubsection 2.42.14.7
 @subsubsection Updating a Database Table
 
 The ⎕SQL subfunction introduced so far suffice, at least in principle. The
@@ -7744,7 +8076,7 @@ match the number of selected rows and columns.
 
 @c ----------------------------------------------------------------------------
 
-@node Section 2.41.15
+@node Subsection 2.42.15
 @subsection Deleting Rows From a Database Table
 
 Like @b{UPDATE} queries are efficient for changing large tables of a database,
@@ -7762,7 +8094,7 @@ As usual, the number of rows must match the number of placeholders in the
 query parameter @b{B} (an APL vector).
 
 @c ----------------------------------------------------------------------------
-@node Section 2.42
+@node Section 2.43
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -7803,7 +8135,7 @@ INDEX ERROR unless the limit is writable. Some read-only limits can
 be changed at compile-time via ./configure
 
 @c ............................................................................
-@node Section 2.42.1
+@node Subsection 2.43.1
 @subsection ⎕SYL[1 2 3 4 5 6;]
 
 The first three limits are writable; their purpose is to stop execution
@@ -7839,7 +8171,7 @@ An attempt to set a too small limit, for example one that is close to the
 current value, is rejected with a DOMAIN ERROR.
 
 @c ............................................................................
-@node Section 2.42.2
+@node Subsection 2.43.2
 @subsection ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 
 These system limits are read-only. Some of them can be changed at
@@ -7847,14 +8179,14 @@ compile time via ./configure. Most others can be changed in the source code
 of GNU APL, but doing so is not recommended.
 
 @c ............................................................................
-@node Section 2.42.3
+@node Subsection 2.43.3
 @subsection ⎕SYL[24 25 26;]
 
 These system limits have been added in preparation for multi-core GNU APL.
 They are currently not used.
 
 @c ............................................................................
-@node Section 2.42.4
+@node Subsection 2.43.4
 @subsection ⎕SYL[27;]
 
 This is not a limit that raises a limit error. Instead it limits the
@@ -7870,11 +8202,11 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end example
 
 @c ----------------------------------------------------------------------------
-@node Section 2.43
+@node Section 2.44
 @section ⎕XML  - XML Parsing
 
 @c ............................................................................
-@node Section 2.43.1
+@node Subsection 2.44.1
 @subsection Purpose
 
 GNU APL provides ⎕XML as a means of performing @b{elementary}
@@ -7909,7 +8241,7 @@ The scope (functionality) of ⎕XML is then:
 @end itemize
 
 @c ............................................................................
-@node Section 2.43.2
+@node Subsection 2.44.2
 @subsection Some XML Terminology
 
 An XML document is a character string with a standardized format.
@@ -7995,7 +8327,7 @@ consequence, entity declarations have no effect and only the predefined XML
 entities (i.e. &, <, >, ', and ") are recognized (and translated) by ⎕XML.
 
 @c ............................................................................
-@node Section 2.43.3
+@node Subsection 2.44.3
 @subsection How ⎕XML maps XML documents to APL Values
 
 The principal mapping between XML strings and APL values is:
@@ -8127,7 +8459,7 @@ Examples of APL member names (assuming ⎕IO←1):
 @end example
 
 @c ............................................................................
-@node Section 2.43.4
+@node Subsection 2.44.4
 @subsection Monadic ⎕XML
 
 @b{Z ← ⎕XML B} converts APL string B that contains a valid XML document
@@ -8146,7 +8478,7 @@ This effect can be suppressed in 2 ways:
 @end enumerate
 
 @c ............................................................................
-@node Section 2.43.5
+@node Subsection 2.44.5
 @subsection Dyadic ⎕XML
 
 @b{Z ← A ⎕XML B} provides a number of convenience functions. Its left
@@ -8384,7 +8716,7 @@ _3C
 @end itemize
 
 @c ............................................................................
-@node Section 2.43.6
+@node Subsection 2.44.6
 @subsection XML Queries
 
 The different functions in dyadic ⎕XML are intended to construct XML queries.
@@ -8402,7 +8734,7 @@ follow these top-level steps:
 @end enumerate
 
 @c ----------------------------------------------------------------------------
-@node Section 2.44
+@node Section 2.45
 @section Conditionals
 
 @b{WARNING}: GNU APL conditionals are experimental. Use them with care and
@@ -8410,7 +8742,7 @@ avoid them, wherever possible, in favour of portability. Neither the ISO
 APL standard, nor IBM APL2 provide conditionals.
 
 @c ............................................................................
-@node Section 2.44.1
+@node Subsection 2.45.1
 @subsection Design considerations.
 
 The author of GNU APL has, for a long time, hesitated to implement
@@ -8590,7 +8922,7 @@ the advantage in 2. (shorter code) looks much smaller than the advantages
 of 1. (e.g. insertion of debug printouts into a clause).
 
 @c ............................................................................
-@node Section 2.44.2
+@node Subsection 2.45.2
 @subsection Syntax
 
 With the above considerations in mind, GNU APL decided for the following
@@ -8706,7 +9038,7 @@ The recommended usage of corresponding →→, ←→, and ←← token is to:
 Like shown in the examples above.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.44.3
+@node Subsection 2.45.3
 @subsection Possible Pitfalls
 
 In APL, as well as in C/C++ (and most other languages), an expression is also
@@ -8777,7 +9109,7 @@ that if not syntactically required. Some people even use double parentheses to
 emphasize the condition of a conditional statement or expression.
 
 @c ----------------------------------------------------------------------------
-@node Section 2.45
+@node Section 2.46
 @section Matrix Product
 
 In standard APL, the inner product Z of two matrices A and B as known from
@@ -8868,7 +9200,7 @@ of @b{A} and @b{B}. Naturally, the multiplications of these 0-columns or
 @end itemize
 
 @c ----------------------------------------------------------------------------
-@node Section 2.46
+@node Section 2.47
 @section Monadic ≠ (Nub Sieve)
 
 The nub sieve @b{Z←≠B} of a value @b{B} is a Boolean vector @b{Z} with the
@@ -9082,7 +9414,7 @@ Before explaining the details of vector notation in GNU APL we would like
 to share the results of some tests performed with IBM APL2 (again the demo
 version for PCs).
 
-@node Section 5.4.1
+@node Subsection 5.4.1
 @subsection Test 1: Binding strength of []
 
 @example
@@ -9116,7 +9448,7 @@ b
 @b{Test 1c}: no surprise for the binding strength. This test confirms
 the second quote on page 14 of the lrm.
 
-@node Section 5.4.2
+@node Subsection 5.4.2
 @subsection Test 2: Binding strength of the left operand
 
 For this test we create a monadic defined function @b{SHOW_NC}, a monadic

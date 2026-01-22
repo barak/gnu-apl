@@ -114,23 +114,23 @@ UCS_string arg;                // argument
 UCS_string_vector matches;
    if (have_trailing_blank || arg.size())   // cmd is a complete command
       {
-#define cmd_def(cmd_str, code, arg, hint)     \
-   { UCS_string ustr(UTF8_string(cmd_str));   \
-     if (cmd.size() == strlen(cmd_str) &&     \
-         ustr.starts_iwith(cmd))              \
-        { matches.push_back(ustr);            \
-          ehint = EH_ ## hint;                \
+#define cmd_def(cmd_str, code, arg, hint) \
+   { UCS_string ustr(UTF8_string(cmd_str));     \
+     if (cmd.size() == strlen(cmd_str) &&       \
+         ustr.starts_iwith(cmd))                \
+        { matches.push_back(ustr);              \
+          ehint = EH_ ## hint;                  \
           shint = arg; } }
 #include "Command.def"
 
       }
    else                       // command prefix
       {
-#define cmd_def(cmd_str, code, arg, hint)     \
-   { UCS_string ustr(UTF8_string(cmd_str));   \
-     if (ustr.starts_iwith(cmd))              \
-        { matches.push_back(ustr);            \
-          ehint = EH_ ## hint;                \
+#define cmd_def(cmd_str, code, arg, hint) \
+   { UCS_string ustr(UTF8_string(cmd_str));     \
+     if (ustr.starts_iwith(cmd))                \
+        { matches.push_back(ustr);              \
+          ehint = EH_ ## hint;                  \
           shint = arg; } }
 #include "Command.def"
       }
@@ -773,7 +773,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
 
           UCS_string name(UTF8_string(dent->d_name));
 
-          const bool is_dir = Command::is_directory(dent, dirname);
+          const bool is_dir = Cmd_LIB::is_directory(dent, dirname);
           if (is_dir)   name << UNI_SLASH;
           else if (only_workspaces)
              {

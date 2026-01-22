@@ -196,14 +196,15 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
-	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -291,9 +292,11 @@ am__objects_8 = $(am__objects_3) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Bif_OPER2_RANK.lo \
 	lib_gnu_apl_la-Bif_OPER1_REDUCE.lo \
 	lib_gnu_apl_la-Bif_OPER1_SCAN.lo lib_gnu_apl_la-CDR.lo \
-	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Doxy.lo \
-	lib_gnu_apl_la-CharCell.lo lib_gnu_apl_la-Command.lo \
-	lib_gnu_apl_la-Common.lo lib_gnu_apl_la-ComplexCell.lo \
+	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Cmd_KEYB.lo \
+	lib_gnu_apl_la-Cmd_LIB.lo lib_gnu_apl_la-Cmd_IN.lo \
+	lib_gnu_apl_la-Doxy.lo lib_gnu_apl_la-CharCell.lo \
+	lib_gnu_apl_la-Command.lo lib_gnu_apl_la-Common.lo \
+	lib_gnu_apl_la-ComplexCell.lo \
 	lib_gnu_apl_la-DerivedFunction.lo lib_gnu_apl_la-DiffOut.lo \
 	lib_gnu_apl_la-DynamicObject.lo lib_gnu_apl_la-Error.lo \
 	lib_gnu_apl_la-Executable.lo lib_gnu_apl_la-FloatCell.lo \
@@ -376,14 +379,15 @@ am__libapl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
-	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -466,6 +470,7 @@ am__objects_16 = $(am__objects_11) libapl_la-Archive.lo \
 	libapl_la-Bif_OPER2_INNER.lo libapl_la-Bif_OPER2_OUTER.lo \
 	libapl_la-Bif_OPER2_RANK.lo libapl_la-Bif_OPER1_REDUCE.lo \
 	libapl_la-Bif_OPER1_SCAN.lo libapl_la-CDR.lo libapl_la-Cell.lo \
+	libapl_la-Cmd_KEYB.lo libapl_la-Cmd_LIB.lo libapl_la-Cmd_IN.lo \
 	libapl_la-Doxy.lo libapl_la-CharCell.lo libapl_la-Command.lo \
 	libapl_la-Common.lo libapl_la-ComplexCell.lo \
 	libapl_la-DerivedFunction.lo libapl_la-DiffOut.lo \
@@ -534,14 +539,15 @@ am__apl_SOURCES_DIST = main.cc Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
-	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
@@ -623,7 +629,8 @@ am__objects_24 = $(am__objects_19) apl-Archive.$(OBJEXT) \
 	apl-Bif_OPER2_POWER.$(OBJEXT) apl-Bif_OPER2_INNER.$(OBJEXT) \
 	apl-Bif_OPER2_OUTER.$(OBJEXT) apl-Bif_OPER2_RANK.$(OBJEXT) \
 	apl-Bif_OPER1_REDUCE.$(OBJEXT) apl-Bif_OPER1_SCAN.$(OBJEXT) \
-	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) \
+	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Cmd_KEYB.$(OBJEXT) \
+	apl-Cmd_LIB.$(OBJEXT) apl-Cmd_IN.$(OBJEXT) apl-Doxy.$(OBJEXT) \
 	apl-CharCell.$(OBJEXT) apl-Command.$(OBJEXT) \
 	apl-Common.$(OBJEXT) apl-ComplexCell.$(OBJEXT) \
 	apl-DerivedFunction.$(OBJEXT) apl-DiffOut.$(OBJEXT) \
@@ -716,8 +723,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-Bif_OPER2_POWER.Po \
 	./$(DEPDIR)/apl-Bif_OPER2_RANK.Po ./$(DEPDIR)/apl-CDR.Po \
 	./$(DEPDIR)/apl-Cell.Po ./$(DEPDIR)/apl-CharCell.Po \
-	./$(DEPDIR)/apl-Command.Po ./$(DEPDIR)/apl-Common.Po \
-	./$(DEPDIR)/apl-ComplexCell.Po \
+	./$(DEPDIR)/apl-Cmd_IN.Po ./$(DEPDIR)/apl-Cmd_KEYB.Po \
+	./$(DEPDIR)/apl-Cmd_LIB.Po ./$(DEPDIR)/apl-Command.Po \
+	./$(DEPDIR)/apl-Common.Po ./$(DEPDIR)/apl-ComplexCell.Po \
 	./$(DEPDIR)/apl-DerivedFunction.Po ./$(DEPDIR)/apl-DiffOut.Po \
 	./$(DEPDIR)/apl-Doxy.Po ./$(DEPDIR)/apl-DynamicObject.Po \
 	./$(DEPDIR)/apl-Error.Po ./$(DEPDIR)/apl-Executable.Po \
@@ -795,6 +803,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Command.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Common.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo \
@@ -913,6 +924,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Bif_OPER2_RANK.Plo \
 	./$(DEPDIR)/libapl_la-CDR.Plo ./$(DEPDIR)/libapl_la-Cell.Plo \
 	./$(DEPDIR)/libapl_la-CharCell.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_IN.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_LIB.Plo \
 	./$(DEPDIR)/libapl_la-Command.Plo \
 	./$(DEPDIR)/libapl_la-Common.Plo \
 	./$(DEPDIR)/libapl_la-ComplexCell.Plo \
@@ -1336,26 +1350,27 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
 	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
 	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FileBuffers.hh FloatCell.cc FloatCell.hh Focus.icc Function.cc \
-	Function.hh Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
-	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
-	LibPaths.hh LineInput.cc LineInput.hh Logging.cc Logging.def \
-	Logging.hh LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
-	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
-	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
+	Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc Cmd_IN.cc Doxy.cc \
+	Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	ConstCell_P.hh DerivedFunction.cc DerivedFunction.hh \
+	DiffOut.cc DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FileBuffers.hh FloatCell.cc FloatCell.hh \
+	Focus.icc Function.cc Function.hh Help.def Heapsort.hh Id.cc \
+	Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LAdebug.icc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
@@ -1672,6 +1687,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-CDR.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cell.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-CharCell.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_IN.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_KEYB.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_LIB.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Command.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Common.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ComplexCell.Po@am__quote@ # am--include-marker
@@ -1791,6 +1809,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Command.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Common.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo@am__quote@ # am--include-marker
@@ -1910,6 +1931,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-CDR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cell.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-CharCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_IN.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_LIB.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Command.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Common.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ComplexCell.Plo@am__quote@ # am--include-marker
@@ -2235,6 +2259,27 @@ lib_gnu_apl_la-Cell.lo: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='lib_gnu_apl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+lib_gnu_apl_la-Cmd_KEYB.lo: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_KEYB.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Tpo -c -o lib_gnu_apl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='lib_gnu_apl_la-Cmd_KEYB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+lib_gnu_apl_la-Cmd_LIB.lo: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_LIB.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Tpo -c -o lib_gnu_apl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='lib_gnu_apl_la-Cmd_LIB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+lib_gnu_apl_la-Cmd_IN.lo: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_IN.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Tpo -c -o lib_gnu_apl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='lib_gnu_apl_la-Cmd_IN.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
 
 lib_gnu_apl_la-Doxy.lo: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Doxy.Tpo -c -o lib_gnu_apl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -3124,6 +3169,27 @@ libapl_la-Cell.lo: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='libapl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+libapl_la-Cmd_KEYB.lo: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_KEYB.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_KEYB.Tpo -c -o libapl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_KEYB.Tpo $(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='libapl_la-Cmd_KEYB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+libapl_la-Cmd_LIB.lo: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_LIB.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_LIB.Tpo -c -o libapl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_LIB.Tpo $(DEPDIR)/libapl_la-Cmd_LIB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='libapl_la-Cmd_LIB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+libapl_la-Cmd_IN.lo: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_IN.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_IN.Tpo -c -o libapl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_IN.Tpo $(DEPDIR)/libapl_la-Cmd_IN.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='libapl_la-Cmd_IN.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
 
 libapl_la-Doxy.lo: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/libapl_la-Doxy.Tpo -c -o libapl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -4202,6 +4268,48 @@ apl-Cell.obj: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='apl-Cell.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cell.obj `if test -f 'Cell.cc'; then $(CYGPATH_W) 'Cell.cc'; else $(CYGPATH_W) '$(srcdir)/Cell.cc'; fi`
+
+apl-Cmd_KEYB.o: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_KEYB.o -MD -MP -MF $(DEPDIR)/apl-Cmd_KEYB.Tpo -c -o apl-Cmd_KEYB.o `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_KEYB.Tpo $(DEPDIR)/apl-Cmd_KEYB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='apl-Cmd_KEYB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_KEYB.o `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+apl-Cmd_KEYB.obj: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_KEYB.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_KEYB.Tpo -c -o apl-Cmd_KEYB.obj `if test -f 'Cmd_KEYB.cc'; then $(CYGPATH_W) 'Cmd_KEYB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_KEYB.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_KEYB.Tpo $(DEPDIR)/apl-Cmd_KEYB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='apl-Cmd_KEYB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_KEYB.obj `if test -f 'Cmd_KEYB.cc'; then $(CYGPATH_W) 'Cmd_KEYB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_KEYB.cc'; fi`
+
+apl-Cmd_LIB.o: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_LIB.o -MD -MP -MF $(DEPDIR)/apl-Cmd_LIB.Tpo -c -o apl-Cmd_LIB.o `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_LIB.Tpo $(DEPDIR)/apl-Cmd_LIB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='apl-Cmd_LIB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_LIB.o `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+apl-Cmd_LIB.obj: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_LIB.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_LIB.Tpo -c -o apl-Cmd_LIB.obj `if test -f 'Cmd_LIB.cc'; then $(CYGPATH_W) 'Cmd_LIB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_LIB.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_LIB.Tpo $(DEPDIR)/apl-Cmd_LIB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='apl-Cmd_LIB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_LIB.obj `if test -f 'Cmd_LIB.cc'; then $(CYGPATH_W) 'Cmd_LIB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_LIB.cc'; fi`
+
+apl-Cmd_IN.o: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_IN.o -MD -MP -MF $(DEPDIR)/apl-Cmd_IN.Tpo -c -o apl-Cmd_IN.o `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_IN.Tpo $(DEPDIR)/apl-Cmd_IN.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='apl-Cmd_IN.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_IN.o `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+
+apl-Cmd_IN.obj: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_IN.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_IN.Tpo -c -o apl-Cmd_IN.obj `if test -f 'Cmd_IN.cc'; then $(CYGPATH_W) 'Cmd_IN.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_IN.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_IN.Tpo $(DEPDIR)/apl-Cmd_IN.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='apl-Cmd_IN.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_IN.obj `if test -f 'Cmd_IN.cc'; then $(CYGPATH_W) 'Cmd_IN.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_IN.cc'; fi`
 
 apl-Doxy.o: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Doxy.o -MD -MP -MF $(DEPDIR)/apl-Doxy.Tpo -c -o apl-Doxy.o `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -5871,6 +5979,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-CDR.Po
 	-rm -f ./$(DEPDIR)/apl-Cell.Po
 	-rm -f ./$(DEPDIR)/apl-CharCell.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_IN.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_KEYB.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_LIB.Po
 	-rm -f ./$(DEPDIR)/apl-Command.Po
 	-rm -f ./$(DEPDIR)/apl-Common.Po
 	-rm -f ./$(DEPDIR)/apl-ComplexCell.Po
@@ -5990,6 +6101,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo
@@ -6109,6 +6223,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ComplexCell.Plo
@@ -6297,6 +6414,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-CDR.Po
 	-rm -f ./$(DEPDIR)/apl-Cell.Po
 	-rm -f ./$(DEPDIR)/apl-CharCell.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_IN.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_KEYB.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_LIB.Po
 	-rm -f ./$(DEPDIR)/apl-Command.Po
 	-rm -f ./$(DEPDIR)/apl-Common.Po
 	-rm -f ./$(DEPDIR)/apl-ComplexCell.Po
@@ -6416,6 +6536,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo
@@ -6535,6 +6658,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ComplexCell.Plo

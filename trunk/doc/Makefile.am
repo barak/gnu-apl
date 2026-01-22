@@ -29,12 +29,12 @@ uninstall-info-am:
 # apl.texi in HTML format
 #
 apl.html:   apl.texi apl-info.css
-	$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
+	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
 
 # apl.texi in info format
 #
 apl.info:   apl.texi
-	$(MAKEINFO) $< -o $@ --no-split || touch $@
+	@$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 # libapl.texi in HTML format
 #

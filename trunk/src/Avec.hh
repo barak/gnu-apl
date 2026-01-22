@@ -104,7 +104,9 @@ public:
 
    /// return \b true iff \b av is a number char (digit, .)
    static bool is_number(Unicode uni)
-      { return is_digit(uni) || (uni == UNI_OVERBAR); }
+      { return is_digit(uni)       ||
+               (uni == UNI_OVERBAR ||
+               (uni == UNI_FULLSTOP)); }
 
    /// map possibly non-standard APL character to its standard character
    static Unicode make_standard(Unicode uni);

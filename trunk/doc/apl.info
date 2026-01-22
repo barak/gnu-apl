@@ -13,10 +13,10 @@ END-INFO-DIR-ENTRY
 
 File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 
-GNU APL
-*******
+GNU APL Reference Manual
+************************
 
-January 18, 2026.  This manual briefly documents GNU APL, an interpreter
+January 22, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -989,12 +989,12 @@ particularly useful for scripting:
 
 * Menu:
 
-* Section 2.1.4.1::
-* Section 2.1.4.2::
-* Section 2.1.4.3::
+* Subsubsection 2.1.4.1::
+* Subsubsection 2.1.4.2::
+* Subsubsection 2.1.4.3::
 
 
-File: apl.info,  Node: Section 2.1.4.1,  Next: Section 2.1.4.2,  Up: Subsection 2.1.4
+File: apl.info,  Node: Subsubsection 2.1.4.1,  Next: Subsubsection 2.1.4.2,  Up: Subsection 2.1.4
 
 2.1.4.1 ⎕ARG
 ............
@@ -1006,7 +1006,7 @@ the interpreter.  In the initial example above this would be a nested
          /usr/local/bin/apl --id 1010
 
 
-File: apl.info,  Node: Section 2.1.4.2,  Next: Section 2.1.4.3,  Prev: Section 2.1.4.1,  Up: Subsection 2.1.4
+File: apl.info,  Node: Subsubsection 2.1.4.2,  Next: Subsubsection 2.1.4.3,  Prev: Subsubsection 2.1.4.1,  Up: Subsection 2.1.4
 
 2.1.4.2 ⎕ENV
 ............
@@ -1048,7 +1048,7 @@ shell variable to occur in ⎕ENV it must be exported into the environment
 of the process before the GNU APL interpreter is started.
 
 
-File: apl.info,  Node: Section 2.1.4.3,  Prev: Section 2.1.4.2,  Up: Subsection 2.1.4
+File: apl.info,  Node: Subsubsection 2.1.4.3,  Prev: Subsubsection 2.1.4.2,  Up: Subsection 2.1.4
 
 2.1.4.3 ⎕INP
 ............
@@ -1137,13 +1137,13 @@ flavors (of which the older ones will eventually disappear).
 
 * Menu:
 
-* Section 2.1.6.1::
-* Section 2.1.6.2::
-* Section 2.1.6.3::
-* Section 2.1.6.4::
+* Subsubsection 2.1.6.1::
+* Subsubsection 2.1.6.2::
+* Subsubsection 2.1.6.3::
+* Subsubsection 2.1.6.4::
 
 
-File: apl.info,  Node: Section 2.1.6.1,  Next: Section 2.1.6.2,  Up: Subsection 2.1.6
+File: apl.info,  Node: Subsubsection 2.1.6.1,  Next: Subsubsection 2.1.6.2,  Up: Subsection 2.1.6
 
 2.1.6.1 Old-style Multi-Line Strings
 ....................................
@@ -1220,7 +1220,7 @@ ignored:
      ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.1.6.2,  Next: Section 2.1.6.3,  Prev: Section 2.1.6.1,  Up: Subsection 2.1.6
+File: apl.info,  Node: Subsubsection 2.1.6.2,  Next: Subsubsection 2.1.6.3,  Prev: Subsubsection 2.1.6.1,  Up: Subsection 2.1.6
 
 2.1.6.2 New-style Multi-Line Strings
 ....................................
@@ -1278,7 +1278,7 @@ their old-style companions:
 eventually disappear at some point in time.
 
 
-File: apl.info,  Node: Section 2.1.6.3,  Next: Section 2.1.6.4,  Prev: Section 2.1.6.2,  Up: Subsection 2.1.6
+File: apl.info,  Node: Subsubsection 2.1.6.3,  Next: Subsubsection 2.1.6.4,  Prev: Subsubsection 2.1.6.2,  Up: Subsection 2.1.6
 
 2.1.6.3 « » Strings
 ...................
@@ -1343,7 +1343,7 @@ to ~/.vimrc):
      set matchpairs+=«:»
 
 
-File: apl.info,  Node: Section 2.1.6.4,  Prev: Section 2.1.6.3,  Up: Subsection 2.1.6
+File: apl.info,  Node: Subsubsection 2.1.6.4,  Prev: Subsubsection 2.1.6.3,  Up: Subsection 2.1.6
 
 2.1.6.4 Multi-Line Comments
 ...........................
@@ -1831,13 +1831,13 @@ in the following.
 
 * Menu:
 
-* Section 2.3.1::
-* Section 2.3.2::
-* Section 2.3.3::
-* Section 2.3.4::
+* Subsection 2.3.1::
+* Subsection 2.3.2::
+* Subsection 2.3.3::
+* Subsection 2.3.4::
 
 
-File: apl.info,  Node: Section 2.3.1,  Next: Section 2.3.2,  Up: Section 2.3
+File: apl.info,  Node: Subsection 2.3.1,  Next: Subsection 2.3.2,  Up: Section 2.3
 
 2.3.1 Phase 1: Numerical Axis Argument
 --------------------------------------
@@ -1864,7 +1864,7 @@ group was selected as follows:
    In both cases was the subfunction selector an integer scalar.
 
 
-File: apl.info,  Node: Section 2.3.2,  Next: Section 2.3.3,  Prev: Section 2.3.1,  Up: Section 2.3
+File: apl.info,  Node: Subsection 2.3.2,  Next: Subsection 2.3.3,  Prev: Subsection 2.3.1,  Up: Section 2.3
 
 2.3.2 Phase 2: String Axis Argument
 -----------------------------------
@@ -1903,7 +1903,7 @@ readable:
            A ⎕FIO['fopen'] B          ⍝ fopen file B with mode A
 
 
-File: apl.info,  Node: Section 2.3.3,  Next: Section 2.3.4,  Prev: Section 2.3.2,  Up: Section 2.3
+File: apl.info,  Node: Subsection 2.3.3,  Next: Subsection 2.3.4,  Prev: Subsection 2.3.2,  Up: Section 2.3
 
 2.3.3 Phase 3: Member Notation
 ------------------------------
@@ -1919,7 +1919,7 @@ above would now become:
            A ⎕FIO.fopen B          ⍝ fopen file B with mode A
 
 
-File: apl.info,  Node: Section 2.3.4,  Prev: Section 2.3.3,  Up: Section 2.3
+File: apl.info,  Node: Subsection 2.3.4,  Prev: Subsection 2.3.3,  Up: Section 2.3
 
 2.3.4 Subfunction Lists
 -----------------------
@@ -2115,12 +2115,12 @@ limited form.
 
 * Menu:
 
-* Section 2.8.1::
-* Section 2.8.2::
-* Section 2.8.3::
+* Subsection 2.8.1::
+* Subsection 2.8.2::
+* Subsection 2.8.3::
 
 
-File: apl.info,  Node: Section 2.8.1,  Next: Section 2.8.2,  Up: Section 2.8
+File: apl.info,  Node: Subsection 2.8.1,  Next: Subsection 2.8.2,  Up: Section 2.8
 
 2.8.1 Named Lambdas
 -------------------
@@ -2205,7 +2205,7 @@ unnamed lambdas.  However, that may change in the future and therefore
 such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside is certainly a bad idea.
 
 
-File: apl.info,  Node: Section 2.8.2,  Next: Section 2.8.3,  Prev: Section 2.8.1,  Up: Section 2.8
+File: apl.info,  Node: Subsection 2.8.2,  Next: Subsection 2.8.3,  Prev: Subsection 2.8.1,  Up: Section 2.8
 
 2.8.2 Unnamed Lambdas
 ---------------------
@@ -2226,7 +2226,7 @@ These names are automatically generated for unnamed lambdas in order to
 provide a name in places where a function name is needed.
 
 
-File: apl.info,  Node: Section 2.8.3,  Prev: Section 2.8.2,  Up: Section 2.8
+File: apl.info,  Node: Subsection 2.8.3,  Prev: Subsection 2.8.2,  Up: Section 2.8
 
 2.8.3 Limitations of GNU APL Lambdas
 ------------------------------------
@@ -2259,8 +2259,72 @@ trouble).
 
 File: apl.info,  Node: Section 2.9,  Next: Section 2.10,  Prev: Section 2.8,  Up: Chapter 2
 
-2.9 ]DOXY Command
-=================
+2.9 Commands )COPY_ONCE, )DUMP, and DUMP-HTML
+=============================================
+
+In standard APL, workspaces are processed with the standard commands
+)LOAD, )COPY, and )SAVE. GNU APL provides additional commands to process
+workspaces.
+
+* Menu:
+
+* Subsection 2.9.1::
+* Subsection 2.9.2::
+* Subsection 2.9.3::
+
+
+File: apl.info,  Node: Subsection 2.9.1,  Next: Subsection 2.9.2,  Up: Section 2.9
+
+2.9.1 )DUMP Command
+-------------------
+
+GNU APL has a command )DUMP that saves a workspace to disk, similar to
+the )OUT command.  The difference between them is the file format being
+produced.  While )OUT produces a file in IBM’s workspace interchange
+format (aka.  an .atf file), )DUMP produces a file in GNU APL’s script
+format (i.e.  readable APL statements).  Files written with )DUMP can be
+edited with normal text editors (vi, Emacs), read back with "apl -f", or
+made executable (see scripting).
+
+
+File: apl.info,  Node: Subsection 2.9.2,  Next: Subsection 2.9.3,  Prev: Subsection 2.9.1,  Up: Section 2.9
+
+2.9.2 )DUMP-HTML Command
+------------------------
+
+The )DUMP-HTML command is similar to the )DUMP command and the output
+format is similar as well.  The difference is that those characters that
+need HTML-escaping (e.g.  ’<’ becomes &lt; and ’>’ becomes ’&gt; etc.)
+are HTML-escaped.  The output of the )DUMP-HTML command can therefore be
+directly used by a web browser to display workspace listings (to share
+the code).
+
+   The files written with the )DUMP-HTML command have the extension
+.html.
+
+   In addition to the APL code, the .html files produced have a short
+HTML <head> section template.  The user should replace the fields marked
+with ??????  with proper values (for the author, the copyright owner,
+and a short description) before publishing the page.
+
+
+File: apl.info,  Node: Subsection 2.9.3,  Prev: Subsection 2.9.2,  Up: Section 2.9
+
+2.9.3 )COPY_ONCE Command
+------------------------
+
+Command )COPY_ONCE copies all objects (variables, functions and
+operators) from some other workspace into the current workspace similar
+to )COPY. However, )COPY_ONCE does this only once; a second invocation
+of )COPY_ONCE with the same workspace (and the same library reference
+number) is silently ignored.  This speeds up the )COPYing of libraries
+that occur in several )DUMP-ed or )SAVE-ed workspaces.
+
+
+File: apl.info,  Node: Section 2.10,  Next: Section 2.11,  Prev: Section 2.9,  Up: Chapter 2
+
+2.10 ]DOXY Command
+==================
 
 A particularly useful debug command is ]DOXY. It dumps the current
 workspace in brows-able HTML format with listings of defined functions
@@ -2315,84 +2379,357 @@ therefore the use of many doxygen comments causes no performance problem
 (and neither do regular APL comments).
 
 
-File: apl.info,  Node: Section 2.10,  Next: Section 2.11,  Prev: Section 2.9,  Up: Chapter 2
+File: apl.info,  Node: Section 2.11,  Next: Section 2.12,  Prev: Section 2.10,  Up: Chapter 2
 
-2.10 Commands )COPY_ONCE, )DUMP, and DUMP-HTML
-==============================================
+2.11 ]KEYB Command
+==================
 
-In standard APL, workspaces are processed with the standard commands
-)LOAD, )COPY, and )SAVE. GNU APL provides additional commands to process
-workspaces.
+In the early days of APL the user was typically faced with three
+problems: APL keyboards, APL screens, and APL printers.
+
+   The advent of Unicode has soved the last two probelms rather
+eleqantly: the Uncode characters contain all APL charatcers and screens
+(i.e CTR tubes in the old days and screen windows these days) and
+printers display them properly.  What remains is the keyboard problem.
+The keyboard problem has two sub-problems: Keyboard caps that show APL
+symbols in addition to the normal ASCII characters, and generating proer
+Unicodes when the keys are being pressed (typically with the ALT or CTRL
+keys held down).
+
+   GNU APL provides the debug command ]KEYB to help resolving these
+issues.  There are two cases where ]KEYB may be useful:
+
+   • One can buy so called ’APL keyboards’ or APL stickers that can be
+     glued on the key caps of a regular keyboard.  As a matter of fact,
+     APL keyboards are simply regular keyboards with differen key caps.
+     The keycodes sent by APL keyboards do not differ from the keycodes
+     of regular keyboards.  One the other hand, many programmers type
+     blindly; for them the keycaps are mostly irrelevant, and the
+     substantial surcharge for APL keyboards may be unreasonable.  A
+     related problem is national keyboards: most APL keyboards have an
+     US layout for their keycaps although a user may prefer a national
+     layout.  Most of this can be helped with a keuboard layout that is
+     printed on the screen.  A user that types bindly most of the time,
+     but cannot remember the position of all APL symbols (in particular
+     of rarely used ones) may find it useful to display the keyboard
+     layout on the screen.
+
+   • The second use case for ]KEYB is troubleshooting the transformation
+     of keys pressed on the keyboard to Unicodes sent to the APL
+     interpreter.  This transformation (which is explained in more
+     detail below) is highly conficurable.  The good news is that these
+     days any keyboard can be configured to send any Unicode on any key
+     as preferered by the user.  The bad news is that this configuration
+     differs a lot between different platforms and can be faily
+     cumbersome.  The ]KEYB command is intended to helkp figuring why
+     pressing a partiicular key does not produce the APL character that
+     it should.  It maybe wothwhile to note that even an APL keyboard
+     can (and most likely will) not produce the characters shown on its
+     keypad if the transformation from key presses to Unicdes is
+     misconfigured.  In that respect APL keyboards are no better than
+     keybiard stickers: Glueing a ⍴ sticker onto the R does not make the
+     R send the Unicode for ⍴.  Likewise, an APL keyboard with ⍴ printed
+     in addition to R does not make that keyboard send the Unicode for
+     ⍴.  Both cases only work as expected if the transformation from
+     keys to Unicdes is configured properly.
 
 * Menu:
 
-* Section 2.10.1::
-* Section 2.10.2::
-* Section 2.10.3::
+* Subsection 2.11.1::
+* Subsection 2.11.2::
+* Subsection 2.11.3::
 
 
-File: apl.info,  Node: Section 2.10.1,  Next: Section 2.10.2,  Up: Section 2.10
+File: apl.info,  Node: Subsection 2.11.1,  Next: Subsection 2.11.2,  Up: Section 2.11
 
-2.10.1 )DUMP Command
---------------------
+2.11.1 The transformation of Keycodes to Unicodes
+-------------------------------------------------
 
-GNU APL has a command )DUMP that saves a workspace to disk, similar to
-the )OUT command.  The difference between them is the file format being
-produced.  While )OUT produces a file in IBM’s workspace interchange
-format (aka.  an .atf file), )DUMP produces a file in GNU APL’s script
-format (i.e.  readable APL statements).  Files written with )DUMP can be
-edited with normal text editors (vi, Emacs), read back with "apl -f", or
-made executable (see scripting).
+In a nutshell, on a GNU/Linux (or other X-based) platform, a key pressed
+or realeased is processed as follows:
 
-
-File: apl.info,  Node: Section 2.10.2,  Next: Section 2.10.3,  Prev: Section 2.10.1,  Up: Section 2.10
+  1. The user presses or releases a key on the keyboard.  This creates a
+     key-event in the operating system.  This key-event contains three
+     items:
+        • a keycode which is a number between 0 and 255 that uniquely
+          identidies the key.  The keys in the main keyboard area (i.e.
+          where all the alkphabetic keys are located), have keycodes
+          between 8 and 64,
+        • a state which tells if the key was pressed or released, and
+        • a timestanp which tells when key was pressed or released.
+  2. The operating system processes the event:
+        • It remembers the new state of the key.  If the key is a
+          modifier key such as SHIFT, CTRL, or ALT, the the processing
+          is done.
+        • Otherwise the key is a normal key and the operating system
+          computes a keysymbol from the keycode.  In this computation
+          the modifier keys whose states were remembered in the previous
+          steps are taken into account.  For that reason, e.g.  pressing
+          R when (only) the SHIFT modifier key is pressed produces R and
+          if SHIFT is released then it produces r.  Every Unicode has a
+          keysymbol (with the same value) but some keysymbols doe not
+          correspond to a Unicode but o an action that the oprating
+          system shall perform (e.g.  cursor home in a termina window).
+          A particularly important keysymbol is 0x0000 aka.  NoSymbol
+          which indicates that (for a given combination of modifer keys)
+          no Unicode shall be generated.
 
-2.10.2 )DUMP-HTML Command
--------------------------
-
-The )DUMP-HTML command is similar to the )DUMP command and the output
-format is similar as well.  The difference is that those characters that
-need HTML-escaping (e.g.  ’<’ becomes &lt; and ’>’ becomes ’&gt; etc.)
-are HTML-escaped.  The output of the )DUMP-HTML command can therefore be
-directly used by a web browser to display workspace listings (to share
-the code).
-
-   The files written with the )DUMP-HTML command have the extension
-.html.
-
-   In addition to the APL code, the .html files produced have a short
-HTML <head> section template.  The user should replace the fields marked
-with ??????  with proper values (for the author, the copyright owner,
-and a short description) before publishing the page.
-
-
-File: apl.info,  Node: Section 2.10.3,  Prev: Section 2.10.2,  Up: Section 2.10
-
-2.10.3 )COPY_ONCE Command
--------------------------
-
-Command )COPY_ONCE copies all objects (variables, functions and
-operators) from some other workspace into the current workspace similar
-to )COPY. However, )COPY_ONCE does this only once; a second invocation
-of )COPY_ONCE with the same workspace (and the same library reference
-number) is silently ignored.  This speeds up the )COPYing of libraries
-that occur in several )DUMP-ed or )SAVE-ed workspaces.
+  3. The operating system forwards the keysymbol towards the application
+     (in our case GNU APL). On the way from the operating system to the
+     application there may be other mappings applied to the keysymbol.
+     For example, the window manager may bind functions to function the
+     keys of the keyboard and call the function when the keysymbol for
+     the function key was received from the operating system.  Every
+     such mapping can be a cause of trouble if keys needed by GNU APL
+     are involved.
 
 
-File: apl.info,  Node: Section 2.11,  Next: Section 2.12,  Prev: Section 2.10,  Up: Chapter 2
+File: apl.info,  Node: Subsection 2.11.2,  Next: Subsection 2.11.3,  Prev: Subsection 2.11.1,  Up: Section 2.11
 
-2.11 ]NEXTFILE and ]PUSHFILE Commands
+2.11.2 xmodmap and friends
+--------------------------
+
+The installation of an operating system installs a Keycodes to Unicodes
+mapping according to the language choices made by the user during the
+installation.  for example, in the US keycode 29 will be mapped to y,
+while in Germany keycode 29 will be mapped to z.  At this point all
+mappings for modifier ALT pressed, and most settings for CTRL pressed
+are either set to NoSymbol.  To generate APL characteres instead of
+nothing, the user has to modify the mapping as to produce APL Unicodes.
+This modification is lost after rebooting the computer; therefore the
+mapping is usually performed in a script that is run at login time of
+the user (i.e.  in ~/.bashrc).
+
+   The modification is made with a program.  Unfortunately there exist
+several such programs, e.g.  xmodmap, setxkbmap, or loadkeys.  See
+README-3-keyboard for details.  Unfortunately more is not always better
+and the different programs for the same purpose have undesirable side
+effects when used in parallel.  An important lesson after experimenting
+with several of these programs was: Use one and only one of these
+programs on your platform.
+
+   Each of these programs has its own set of pitfalls.  For example with
+xmodmap, pressing ALT-SHIFT-L (in that order produces ⌷.  Pressing
+SHIFT-ALT-L produces nothing.
+
+   Despite of this, xmodmap seems to be the simplest and most reliable
+of the modidication programs.  It may have less capabilities than the
+others, but has everything needed to run GNU APL. For this reason, GNU
+APL is shipped with a configuration file for US keyboards
+(support-files/Juergen-Mint-21/xmodmap.apl) and a file to undo the
+mapping (support-files/Juergen-Mint-21/xmodmap.ascii).  The latter is
+redundant since xmodmap provides a way to save the current mapping (see
+man xmodmap).  There was a short period where xmodmap did not work in
+Linux Mint several yeras ago, but this has been fixed in the meantime.
+
+   It is impossible for the author to explain all available mapping
+programs and therefore this manual focuses on xmodmap.  Suppose we run:
+
+   $ xmodmap xmodmap.apl
+
+   and suppose pressing key R does not produce ⍴.  This can have the
+following reasons:
+
+  1. incorrect keycode for key R,
+  2. correct keycode, but incorrect keysymbol(s), or
+
+   Both cases can be identified with the ]KEYB command.
+
+
+File: apl.info,  Node: Subsection 2.11.3,  Prev: Subsection 2.11.2,  Up: Section 2.11
+
+2.11.3 The ]KEYB command
+------------------------
+
+* Menu:
+
+* Subsubsection 2.11.3.1::
+* Subsubsection 2.11.3.2::
+* Subsubsection 2.11.3.3::
+
+
+File: apl.info,  Node: Subsubsection 2.11.3.1,  Next: Subsubsection 2.11.3.2,  Up: Subsection 2.11.3
+
+2.11.3.1 ]KEYB without arguments.
+.................................
+
+Command ]KEYB without arguments is for the normal day to day use (as
+opposed to troubleshooting).  It displays an APL keyboard on the screen,
+which is very useful if the keyboard has no APL stickers or key caps.
+The command uses different methods to figure the actual layout:
+
+  1. First the command tries to run xmodmap -pk as to get the current
+     keyboard map and displays the result in form of an APL keyboard.
+     This result, if the command succeeds, is closest to reality and is
+     diplayed on success.  However, it may also fail for various
+     reasons, e.g.  if xmodmap is not installed.
+
+  2. if the first step fails, then ]KEYBC looks for a user-defined
+     keyboard layout.  Such a layout is user-defined text file which
+     shows the keyboard.  The name of the file must be configured
+     beforehand in one of the GNU APL preferences files.
+  3. if no user-defined keyboard layout is found, then GNU APL displays
+     a built-in layout (which is farthest away from reality) as a final
+     resort.
+
+   The first line of the keyboard displayed shows which of the 3 methods
+above was used to generate the output.
+
+
+File: apl.info,  Node: Subsubsection 2.11.3.2,  Next: Subsubsection 2.11.3.3,  Prev: Subsubsection 2.11.3.1,  Up: Subsection 2.11.3
+
+2.11.3.2 ]KEYB SCAN
+...................
+
+]KEYB SCAN runs, under the hood, xmodmap -pk to read the current keycode
+to keysymbol mapping and displays the result in form of a keyboard
+layout on the screen.  For example:
+
+           ]KEYB SCAN
+     US Keyboard Layout.    Source: xmodmap -pk
+
+     ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+     ║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
+     ║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSPC ║
+     ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+     ║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║ |⊣   ║
+     ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║ \⊢   ║
+     ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+     ║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
+     ║ LOCK)   ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
+     ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+     ║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+     ║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m∣ ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║
+     ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+
+   Naturally, this only works, iff:
+
+   • xmodmap is installed and working,
+   • the current keyboard mapping was installed with xmodmap,
+   • no other keyboard mappings are in effect, and
+   • the keycodes are correct (see below).
+
+   IOW: ]KEYB SCAN troubleshoots the case correct keycode, but incorrect
+keysymbol(s) above.
+
+
+File: apl.info,  Node: Subsubsection 2.11.3.3,  Prev: Subsubsection 2.11.3.2,  Up: Subsection 2.11.3
+
+2.11.3.3 ]KEYB SCAN KEYS
+........................
+
+]KEYB SCAN KEYS does not run xmodmap -pk but rather shows how the keys
+are supposed to be positioned on the keyboard.  This shows how xmodmap
+-pk assumes the keys are positioned.  For example:
+
+           ]KEYB SCAN KEYS
+     US Keyboard Layout.    Source: GNU APL builtin"
+
+     ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+     ║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║
+     ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+     ║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║
+     ║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║
+     ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+     ║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+     ║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
+     ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+     ║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
+     ║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
+     ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+
+   As the Source: GNU APL builtin in the example above indicates, this
+is the layout assumed by GNU APL, which may differ from the true layout
+of your keybord.  For example, say key R with ALT pressed does not
+produce ⍴.  The Unicode for ⍴ is :
+
+           ⎕UCS "⍴"                    ⍝ Unicode for ⍴
+     9076
+           ,5 ⎕CR 256 256 ⊤ ⎕UCS "⍴"   ⍝ Unicode for ⍴ in hex
+     2374
+
+   One can check if the keycodes displayed by ]KEYB SCAN KEYS are
+correct with a programm called xev (which is normally pre-installed in
+most GNU/Linux distributions.  After starting xev and hitting the R key
+several times (because it also shows many other unrelated events), one
+can see the corresponding key events:
+
+           ...
+     KeyPress event, serial 38, synthetic NO, window 0x3c00001,
+         root 0x75c, subw 0x0, time 35629183, (-590,275), root:(284,737),
+         state 0x0, keycode 27 (keysym 0x72, r), same_screen YES,
+         XLookupString gives 1 bytes: (72) "r"
+         XmbLookupString gives 1 bytes: (72) "r"
+         XFilterEvent returns: False
+
+   So we see that the R key does indeed have the keycode 27.  Next we
+look at the line for key keycode 27 in the xmodmap.apl file:
+
+     keycode  27 =  r               R               U2374
+
+   This line tells us that, when the R is hit, the following Unicodes
+shall be emitted:
+
+   • the Unicode for (lowercase) r if neither SHIFT nor ALT is held
+     down,
+   • the Unicode for (uppercase) R if SHIFT is pressed and ALT is not,
+   • the Unicode for ⍴ = $2374 if ALT is pressed and SHIFT is not.
+
+   The line could have had a fourth entry (for SHIFT and ALT pressed);
+if that entry is, like above, missing then the same Unicode is emitted
+for both ALT and SHIFT+ALT. Likewise, if the second entry is missing
+then the same code is used for SHIFT and no SHIFT. This is, for example,
+the case for keycode 36 with keysym Return (the key that is sometimes
+labelled Enter and sometimes Return and whose keysym is independent of
+the state of the SHIFT and ALT keys.  In the xmodmap the keysyms can be
+specified in multiple ways: as ASCII characters (like r and R above, as
+Unicodes like U2374 above, or as symbols like NoSymbol or Return, which
+are defined in files /usr/include/X11/X.h and
+/usr/include/X11/keysymdef.h:
+
+     #define NoSymbol         0L  /* special KeySym */
+     #define XK_Return    0xff0d  /* Return, enter */
+
+   Given the explanations above, the troubleshooting of keyboard
+mappings becomes zimple (though somewhat tedious in the details):
+
+  1. do ]KEYB SCAN KEYS in GNU APL to display the keycodes, then
+  2. run xev in a different window and verify, for every key on the
+     keyboard, that the keycode shown by xev is the one shown by ]KEYB
+     SCAN KEYS, then
+  3. do ]KEYB SCAN in GNU APL to display the keysyms, then
+  4. edit the xmodmap.apl file (or whatever other file ws used as the
+     argument for the xmondmap command) to see if the Unicodes for every
+     keycode line are correct.  In that test:
+        • the first keysym is used for the lowercase character, i.e.  if
+          neither SHIFT nor ALT are pressed,
+        • the second keysym is used for the uppercase character, i.e.
+          if SHIFT is pressed and ALT is not.  If no second keysym is
+          present, then the first keysym is used instead,
+        • the third keysym is used for the character that shall be
+          emitted when the ALT key is pressed and the SHIFT is not.  If
+          no third keysym is present then nothing is emitted, and
+        • the fourth keysym is used for the character that shall be
+          emitted when both the ALT key and the SHIFT are pressed.  If
+          no fourth keysym is present then the behavior is the same as
+          for ALT without SHIFT.
+
+
+File: apl.info,  Node: Section 2.12,  Next: Section 2.13,  Prev: Section 2.11,  Up: Chapter 2
+
+2.12 ]NEXTFILE and ]PUSHFILE Commands
 =====================================
 
 * Menu:
 
-* Section 2.11.1::
-* Section 2.11.2::
+* Subsection 2.12.1::
+* Subsection 2.12.2::
 
 
-File: apl.info,  Node: Section 2.11.1,  Next: Section 2.11.2,  Up: Section 2.11
+File: apl.info,  Node: Subsection 2.12.1,  Next: Subsection 2.12.2,  Up: Section 2.12
 
-2.11.1 ]NEXTFILE
+2.12.1 ]NEXTFILE
 ----------------
 
 The debug command ]NEXTFILE, when used in an APL script file, terminates
@@ -2421,9 +2758,9 @@ how it is used, etc.)  without the need to prepend every line with ⍝ or
      This workspace does the following...
 
 
-File: apl.info,  Node: Section 2.11.2,  Prev: Section 2.11.1,  Up: Section 2.11
+File: apl.info,  Node: Subsection 2.12.2,  Prev: Subsection 2.12.1,  Up: Section 2.12
 
-2.11.2 ]PUSHFILE
+2.12.2 ]PUSHFILE
 ----------------
 
 The debug command ]PUSHFILE is similar to ]NEXTFILE in that it
@@ -2436,9 +2773,9 @@ context processing proceeds at the next line after the ]PUSHFILE
 command.
 
 
-File: apl.info,  Node: Section 2.12,  Next: Section 2.13,  Prev: Section 2.11,  Up: Chapter 2
+File: apl.info,  Node: Section 2.13,  Next: Section 2.14,  Prev: Section 2.12,  Up: Chapter 2
 
-2.12 History and TAB completion
+2.13 History and TAB completion
 ===============================
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive
@@ -2482,9 +2819,9 @@ a system variable name.
 defined function or variable name.
 
 
-File: apl.info,  Node: Section 2.13,  Next: Section 2.14,  Prev: Section 2.12,  Up: Chapter 2
+File: apl.info,  Node: Section 2.14,  Next: Section 2.15,  Prev: Section 2.13,  Up: Chapter 2
 
-2.13 Logging Facilities
+2.14 Logging Facilities
 =======================
 
 The APL interpreter has over 30 logging facilities.  Each logging
@@ -2499,13 +2836,13 @@ to be turned ON or OFF.
 
 * Menu:
 
-* Section 2.13.1::
-* Section 2.13.2::
+* Subsection 2.14.1::
+* Subsection 2.14.2::
 
 
-File: apl.info,  Node: Section 2.13.1,  Next: Section 2.13.2,  Up: Section 2.13
+File: apl.info,  Node: Subsection 2.14.1,  Next: Subsection 2.14.2,  Up: Section 2.14
 
-2.13.1 Static Logging
+2.14.1 Static Logging
 ---------------------
 
 By default the logging facilities that shall be turned ON are defined
@@ -2522,9 +2859,9 @@ run-time.
 by NOT setting DYNAMIC_LOG_WANTED=yes.
 
 
-File: apl.info,  Node: Section 2.13.2,  Prev: Section 2.13.1,  Up: Section 2.13
+File: apl.info,  Node: Subsection 2.14.2,  Prev: Subsection 2.14.1,  Up: Section 2.14
 
-2.13.2 Dynamic Logging
+2.14.2 Dynamic Logging
 ----------------------
 
 Dynamic Logging is intended for trouble-shooters of GNU APL, but also
@@ -2547,9 +2884,9 @@ current state.  The command
    toggles the state of logging facility N from OFF to ON and back.
 
 
-File: apl.info,  Node: Section 2.14,  Next: Section 2.15,  Prev: Section 2.13,  Up: Chapter 2
+File: apl.info,  Node: Section 2.15,  Next: Section 2.16,  Prev: Section 2.14,  Up: Chapter 2
 
-2.14 Rational Numbers
+2.15 Rational Numbers
 =====================
 
 GNU APL has limited support for rational numbers.  Instead of dividing
@@ -2570,9 +2907,9 @@ than with doubles, but in most cases it is slower.
 and must be enabled via ./configure (see README-2-configure).
 
 
-File: apl.info,  Node: Section 2.15,  Next: Section 2.16,  Prev: Section 2.14,  Up: Chapter 2
+File: apl.info,  Node: Section 2.16,  Next: Section 2.17,  Prev: Section 2.15,  Up: Chapter 2
 
-2.15 Hex Numbers
+2.16 Hex Numbers
 ================
 
 GNU APL supports sedecimal numbers.  They start with $ and can be
@@ -2585,9 +2922,9 @@ uppercase or lowercase:
      42
 
 
-File: apl.info,  Node: Section 2.16,  Next: Section 2.17,  Prev: Section 2.15,  Up: Chapter 2
+File: apl.info,  Node: Section 2.17,  Next: Section 2.18,  Prev: Section 2.16,  Up: Chapter 2
 
-2.16 User-defined Commands
+2.17 User-defined Commands
 ==========================
 
 There is a simple mechanism to define additional APL commands.  This
@@ -2620,9 +2957,9 @@ be deleted like this:
            ]USERCMD REMOVE-ALL
 
 
-File: apl.info,  Node: Section 2.17,  Next: Section 2.18,  Prev: Section 2.16,  Up: Chapter 2
+File: apl.info,  Node: Section 2.18,  Next: Section 2.19,  Prev: Section 2.17,  Up: Chapter 2
 
-2.17 Structured Variables and Associative Arrays
+2.18 Structured Variables and Associative Arrays
 ================================================
 
 GNU APL has implemented two features that are closely related because,
@@ -2631,13 +2968,13 @@ and associative arrays.
 
 * Menu:
 
-* Section 2.17.1::
-* Section 2.17.2::
+* Subsection 2.18.1::
+* Subsection 2.18.2::
 
 
-File: apl.info,  Node: Section 2.17.1,  Next: Section 2.17.2,  Up: Section 2.17
+File: apl.info,  Node: Subsection 2.18.1,  Next: Subsection 2.18.2,  Up: Section 2.18
 
-2.17.1 Structured Variables
+2.18.1 Structured Variables
 ---------------------------
 
 A structured variable is an APL variable that contains several related
@@ -2769,9 +3106,9 @@ another structured variable is valid and concatenates the members:
 above (and more)
 
 
-File: apl.info,  Node: Section 2.17.2,  Prev: Section 2.17.1,  Up: Section 2.17
+File: apl.info,  Node: Subsection 2.18.2,  Prev: Subsection 2.18.1,  Up: Section 2.18
 
-2.17.2 Associative Arrays
+2.18.2 Associative Arrays
 -------------------------
 
 APL arrays are primarily indexed with numbers (or arrays of numbers),
@@ -2899,9 +3236,9 @@ the number of members is ⍴ASSOC_ARRAY[;1] and the capacity is
 ↑⍴ASSOC_ARRAY.
 
 
-File: apl.info,  Node: Section 2.18,  Next: Section 2.19,  Prev: Section 2.17,  Up: Chapter 2
+File: apl.info,  Node: Section 2.19,  Next: Section 2.20,  Prev: Section 2.18,  Up: Chapter 2
 
-2.18 Monadic ⊢ and ⊣, dyadic ⊢ with Axis
+2.19 Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 ========================================
 
 Monadic ⊢ is the identity function.  It returns its (committed or
@@ -2964,9 +3301,9 @@ O(1).  Also, ⊢B is marginally faster than ⎕←B.
      4 * 6
 
 
-File: apl.info,  Node: Section 2.19,  Next: Section 2.20,  Prev: Section 2.18,  Up: Chapter 2
+File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  Up: Chapter 2
 
-2.19 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=
+2.20 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=
 ==========================================================
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate
@@ -3018,15 +3355,15 @@ fashion and far more efficiently:
 
 * Menu:
 
-* Section 2.19.1::
-* Section 2.19.2::
-* Section 2.19.3::
-* Section 2.19.4::
+* Subsection 2.20.1::
+* Subsection 2.20.2::
+* Subsection 2.20.3::
+* Subsection 2.20.4::
 
 
-File: apl.info,  Node: Section 2.19.1,  Next: Section 2.19.2,  Up: Section 2.19
+File: apl.info,  Node: Subsection 2.20.1,  Next: Subsection 2.20.2,  Up: Section 2.20
 
-2.19.1 Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
+2.20.1 Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
 ----------------------------------------
 
 The dyadic forms of ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ are simply the bit-wise variants
@@ -3040,9 +3377,9 @@ of their Boolean counterparts:
            A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ aka. NXOR or XNOR
 
 
-File: apl.info,  Node: Section 2.19.2,  Next: Section 2.19.3,  Prev: Section 2.19.1,  Up: Section 2.19
+File: apl.info,  Node: Subsection 2.20.2,  Next: Subsection 2.20.3,  Prev: Subsection 2.20.1,  Up: Section 2.20
 
-2.19.2 Monadic ⊤∨ and ⊤⍱
+2.20.2 Monadic ⊤∨ and ⊤⍱
 ------------------------
 
 ⊤=, ⊤≠, and ⊤⍲ do not have a monadic form, but ⊤∧, ⊤∨, and ⊤⍱ do.
@@ -3087,9 +3424,9 @@ but the effect is not visible with 26 ⎕CR since Gaussian and
 non-Gaussian complex numbers have the same cell type in GNU APL.
 
 
-File: apl.info,  Node: Section 2.19.3,  Next: Section 2.19.4,  Prev: Section 2.19.2,  Up: Section 2.19
+File: apl.info,  Node: Subsection 2.20.3,  Next: Subsection 2.20.4,  Prev: Subsection 2.20.2,  Up: Section 2.20
 
-2.19.3 Monadic ⊤∧
+2.20.3 Monadic ⊤∧
 -----------------
 
 The ISO standard defines two different concepts to decide if a real
@@ -3124,9 +3461,9 @@ user (via ⎕CT) more control over the permitted tolerance for real
 numbers in the neighborhood of integers.
 
 
-File: apl.info,  Node: Section 2.19.4,  Prev: Section 2.19.3,  Up: Section 2.19
+File: apl.info,  Node: Subsection 2.20.4,  Prev: Subsection 2.20.3,  Up: Section 2.20
 
-2.19.4 Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧, ⊤∨, ==, and ≠≠
+2.20.4 Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧, ⊤∨, ==, and ≠≠
 -----------------------------------------------------------------------
 
 Some of the bit-wise operations are allowed to have characters as their
@@ -3147,9 +3484,9 @@ extracting the lower 7 bits of 8-bit bytes containing ASCII characters.
      255 255 255 190
 
 
-File: apl.info,  Node: Section 2.20,  Next: Section 2.21,  Prev: Section 2.19,  Up: Chapter 2
+File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
 
-2.20 ⊤ (Encode) with Axis
+2.21 ⊤ (Encode) with Axis
 =========================
 
 The dyadic primitive function A ⊥ B (Decode) computes the values of B in
@@ -3255,20 +3592,20 @@ for the axis argument:
 
 
 
-File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
+File: apl.info,  Node: Section 2.22,  Next: Section 2.23,  Prev: Section 2.21,  Up: Chapter 2
 
-2.21 Generalized ⍳
+2.22 Generalized ⍳
 ==================
 
 * Menu:
 
-* Section 2.21.1::
-* Section 2.21.2::
+* Subsection 2.22.1::
+* Subsection 2.22.2::
 
 
-File: apl.info,  Node: Section 2.21.1,  Next: Section 2.21.2,  Up: Section 2.21
+File: apl.info,  Node: Subsection 2.22.1,  Next: Subsection 2.22.2,  Up: Section 2.22
 
-2.21.1 Generalized monadic ⍳
+2.22.1 Generalized monadic ⍳
 ----------------------------
 
 The standard function Interval (Z←⍳B) requires its argument B to be a
@@ -3282,9 +3619,9 @@ than 1.  The items of Z are nested integer vectors consecutive along
 each axis of B as opposed to integer scalars in the standard case.
 
 
-File: apl.info,  Node: Section 2.21.2,  Prev: Section 2.21.1,  Up: Section 2.21
+File: apl.info,  Node: Subsection 2.22.2,  Prev: Subsection 2.22.1,  Up: Section 2.22
 
-2.21.2 Generalized dyadic ⍳
+2.22.2 Generalized dyadic ⍳
 ---------------------------
 
 The standard function Index Of (Z←A⍳B) requires its left argument A to
@@ -3300,20 +3637,20 @@ vector (if the item was found) or - different from the standard case (!)
 - the empty vector ⍬ if the item was not found).
 
 
-File: apl.info,  Node: Section 2.22,  Next: Section 2.23,  Prev: Section 2.21,  Up: Chapter 2
+File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
 
-2.22 ⌹[X] - Miscellaneous Matrix and Vector Operations
+2.23 ⌹[X] - Miscellaneous Matrix and Vector Operations
 ======================================================
 
 * Menu:
 
-* Section 2.22.1::
-* Section 2.22.2::
+* Subsection 2.23.1::
+* Subsection 2.23.2::
 
 
-File: apl.info,  Node: Section 2.22.1,  Next: Section 2.22.2,  Up: Section 2.22
+File: apl.info,  Node: Subsection 2.23.1,  Next: Subsection 2.23.2,  Up: Section 2.23
 
-2.22.1 ⌹[1] and ⌹[2] - QR Factorizations
+2.23.1 ⌹[1] and ⌹[2] - QR Factorizations
 ----------------------------------------
 
 Z←⌹[1] B and Z←⌹[2] B compute a QR factorization of the real or complex
@@ -3421,9 +3758,9 @@ I_{N}.
 So please double-check its results before using it in production code.
 
 
-File: apl.info,  Node: Section 2.22.2,  Prev: Section 2.22.1,  Up: Section 2.22
+File: apl.info,  Node: Subsection 2.23.2,  Prev: Subsection 2.23.1,  Up: Section 2.23
 
-2.22.2 The Impact of ⎕CT for ⌹
+2.23.2 The Impact of ⎕CT for ⌹
 ------------------------------
 
 Due to the lack of a better place we describe here how ⎕CT is used in
@@ -3431,21 +3768,21 @@ the various ⌹ functions.
 
 * Menu:
 
-* Subsection 2.22.2.1::
-* Section 2.22.2.2::
-* Section 2.22.2.3::
-* Section 2.22.2.4::
-* Section 2.22.2.5::
-* Section 2.22.2.6::
-* Section 2.22.2.7::
-* Section 2.22.2.8::
-* Subsection 2.22.1::
-* Subsection 2.22.2::
+* Subsubsection 2.23.2.1::
+* Subsubsection 2.23.2.2::
+* Subsubsection 2.23.2.3::
+* Subsubsection 2.23.2.4::
+* Subsubsection 2.23.2.5::
+* Subsubsection 2.23.2.6::
+* Subsubsection 2.23.2.7::
+* Subsubsection 2.23.2.8::
+* Subsubsection 2.23.2.9::
+* Subsubsection 2.23.2.10::
 
 
-File: apl.info,  Node: Subsection 2.22.2.1,  Next: Section 2.22.2.2,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.1,  Next: Subsubsection 2.23.2.2,  Up: Subsection 2.23.2
 
-2.22.2.1 A⌹B and ⌹B
+2.23.2.1 A⌹B and ⌹B
 ...................
 
 The first step in the computation of A⌹B or ⌹B is the estimation of the
@@ -3485,9 +3822,9 @@ columns of some matrix B then there are two possibilities:
      significant rounding errors in the result.
 
 
-File: apl.info,  Node: Section 2.22.2.2,  Next: Section 2.22.2.3,  Prev: Subsection 2.22.2.1,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.2,  Next: Subsubsection 2.23.2.3,  Prev: Subsubsection 2.23.2.1,  Up: Subsection 2.23.2
 
-2.22.2.2 ⌹[X] B: Various Factorizations of B
+2.23.2.2 ⌹[X] B: Various Factorizations of B
 ............................................
 
 The numeric scalar X chooses one of several algorithms that computes a
@@ -3544,9 +3881,9 @@ and Ti is T^{-1}.
    • B[P;] = L∘U.
 
 
-File: apl.info,  Node: Section 2.22.2.3,  Next: Section 2.22.2.4,  Prev: Section 2.22.2.2,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.3,  Next: Subsubsection 2.23.2.4,  Prev: Subsubsection 2.23.2.2,  Up: Subsection 2.23.2
 
-2.22.2.3 Matrix Inverse
+2.23.2.3 Matrix Inverse
 .......................
 
 The matrix Ti returned by ⌹[1] or ⌹[2] provides an alternative to ⌹B for
@@ -3570,9 +3907,9 @@ QR-factorization of B was already computed.
 computation of ⌹B if B is large.
 
 
-File: apl.info,  Node: Section 2.22.2.4,  Next: Section 2.22.2.5,  Prev: Section 2.22.2.3,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.4,  Next: Subsubsection 2.23.2.5,  Prev: Subsubsection 2.23.2.3,  Up: Subsection 2.23.2
 
-2.22.2.4 ⌹[7] B: Print Polynomial B
+2.23.2.4 ⌹[7] B: Print Polynomial B
 ...................................
 
 Let B ← b₀ b₁ b₂ ...  bₙ.  The standard interpretation of this vector B
@@ -3647,9 +3984,9 @@ different indeterminant names.  For example:
 
 
 
-File: apl.info,  Node: Section 2.22.2.5,  Next: Section 2.22.2.6,  Prev: Section 2.22.2.4,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.5,  Next: Subsubsection 2.23.2.6,  Prev: Subsubsection 2.23.2.4,  Up: Subsection 2.23.2
 
-2.22.2.5 A ⌹[8] B: Multiply Polynomials A and B
+2.23.2.5 A ⌹[8] B: Multiply Polynomials A and B
 ...............................................
 
 The scalar APL primitives + and - can be used for vectors and for
@@ -3683,9 +4020,9 @@ the product of two polynomials.  For example:
       PROD: x² - y²
 
 
-File: apl.info,  Node: Section 2.22.2.6,  Next: Section 2.22.2.7,  Prev: Section 2.22.2.5,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.6,  Next: Subsubsection 2.23.2.7,  Prev: Subsubsection 2.23.2.5,  Up: Subsection 2.23.2
 
-2.22.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)
+2.23.2.6 A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)
 ...................................................................
 
 The scalar APL primitives + and - can be used for vectors and for
@@ -3704,9 +4041,9 @@ polynomial B. That is, ⍴Remainder = ¯1+⍴B.
    NOTE: A ⌹[9] B is limited to polynomials with 1 indeterminant.
 
 
-File: apl.info,  Node: Section 2.22.2.7,  Next: Section 2.22.2.8,  Prev: Section 2.22.2.6,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.7,  Next: Subsubsection 2.23.2.8,  Prev: Subsubsection 2.23.2.6,  Up: Subsection 2.23.2
 
-2.22.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
+2.23.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)
 ......................................................................
 
 The limitiation of A ⌹[10] B to handle only polynomials with one
@@ -3780,7 +4117,7 @@ annihilated (by subtracting a multiple of the divisor from it).
 
    Now, a commonly used order in the division of polynomials, and also
 the order used by A ⌹[10] B, is the lexicographic order of the
-polynomials.  *Note Subsection 2.22.1::.
+polynomials.  *Note Subsubsection 2.23.2.9::.
 
    For example: x < x², xy < xyz, y < x⁸, and y⁸ < x in the
 lexicographic order.
@@ -3826,9 +4163,9 @@ that is possible) or else to r (if not).  Obviously:
      momomials.
 
 
-File: apl.info,  Node: Section 2.22.2.8,  Next: Subsection 2.22.1,  Prev: Section 2.22.2.7,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.8,  Next: Subsubsection 2.23.2.9,  Prev: Subsubsection 2.23.2.7,  Up: Subsection 2.23.2
 
-2.22.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)
+2.23.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)
 ....................................................................
 
 As explained above, different monomial orders of a polynomial can lead
@@ -3902,9 +4239,9 @@ appended to create an argument for A ⌹.poly_divideNO B:
      1
 
 
-File: apl.info,  Node: Subsection 2.22.1,  Next: Subsection 2.22.2,  Prev: Section 2.22.2.8,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.9,  Next: Subsubsection 2.23.2.10,  Prev: Subsubsection 2.23.2.8,  Up: Subsection 2.23.2
 
-2.22.2.9 ⌹[11] B: Scan Polynomial B
+2.23.2.9 ⌹[11] B: Scan Polynomial B
 ...................................
 
 ⌹[11] B aka.  ⌹.poly_scan B is the inverse function of ⌹[7] B. It
@@ -3955,9 +4292,9 @@ lengths, but in this context all vectors compared have the same length
 (number of indeterminants).
 
 
-File: apl.info,  Node: Subsection 2.22.2,  Prev: Subsection 2.22.1,  Up: Section 2.22.2
+File: apl.info,  Node: Subsubsection 2.23.2.10,  Prev: Subsubsection 2.23.2.9,  Up: Subsection 2.23.2
 
-2.22.2.10 A ⌹[20] B: Integral B
+2.23.2.10 A ⌹[20] B: Integral B
 ...............................
 
 Function A ⌹[20] B aka.  A ⌹.integral B computes the integral of
@@ -4021,9 +4358,9 @@ expressions.
    Dot is a program for printing directed graphs.
 
 
-File: apl.info,  Node: Section 2.23,  Next: Section 2.24,  Prev: Section 2.22,  Up: Chapter 2
+File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  Up: Chapter 2
 
-2.23 ⎕CC - Character Classes
+2.24 ⎕CC - Character Classes
 ============================
 
 Some older APL interpreters (e.g.  APL68000) had system variables for
@@ -4032,13 +4369,13 @@ GNU APL provides a single system function ⎕CC for that purpose.
 
 * Menu:
 
-* Section 2.23.1::
-* Section 2.23.2::
+* Subsection 2.24.1::
+* Subsection 2.24.2::
 
 
-File: apl.info,  Node: Section 2.23.1,  Next: Section 2.23.2,  Up: Section 2.23
+File: apl.info,  Node: Subsection 2.24.1,  Next: Subsection 2.24.2,  Up: Section 2.24
 
-2.23.1 monadic ⎕CC B: Return character class
+2.24.1 monadic ⎕CC B: Return character class
 --------------------------------------------
 
 ⎕CC B returns all characters of character class(es) B. If B is an
@@ -4106,9 +4443,9 @@ classes for ⎕CC:
    • 2*class is the mixed case of the uppercase class.
 
 
-File: apl.info,  Node: Section 2.23.2,  Prev: Section 2.23.1,  Up: Section 2.23
+File: apl.info,  Node: Subsection 2.24.2,  Prev: Subsection 2.24.1,  Up: Section 2.24
 
-2.23.2 dyadic A ⎕CC B: Test character class
+2.24.2 dyadic A ⎕CC B: Test character class
 -------------------------------------------
 
 The dyadic A ⎕CC B returns, for every item in A, integer 1 if the item
@@ -4129,9 +4466,9 @@ is contained in one of the character classes B and 0 if not.
 (for every item of A and faster than e.g.  (⎕CC n) ⍳ A.
 
 
-File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  Up: Chapter 2
+File: apl.info,  Node: Section 2.25,  Next: Section 2.26,  Prev: Section 2.24,  Up: Chapter 2
 
-2.24 Dyadic ⎕CR
+2.25 Dyadic ⎕CR
 ===============
 
 The ⎕CR function has now an optional left argument that selects one of
@@ -4295,9 +4632,9 @@ with a name.  For example: monadic ⎕CR.hex_to_bytes is the same as
 monadic ⎕CR[13] or dyadic 13 ⎕CR.
 
 
-File: apl.info,  Node: Section 2.25,  Next: Section 2.26,  Prev: Section 2.24,  Up: Chapter 2
+File: apl.info,  Node: Section 2.26,  Next: Section 2.27,  Prev: Section 2.25,  Up: Chapter 2
 
-2.25 Dyadic ⎕FX (Native Functions)
+2.26 Dyadic ⎕FX (Native Functions)
 ==================================
 
 A Native Function is a function that can be called in APL like a normal
@@ -4371,18 +4708,18 @@ into the system function ⎕FIO. The syntax of ⎕FIO is the same as for
 FILE_IO. The )CLEAR workspace command will close all open files.
 
 
-File: apl.info,  Node: Section 2.26,  Next: Section 2.27,  Prev: Section 2.25,  Up: Chapter 2
+File: apl.info,  Node: Section 2.27,  Next: Section 2.28,  Prev: Section 2.26,  Up: Chapter 2
 
-2.26 ⎕ARG - Interpreter command line arguments
+2.27 ⎕ARG - Interpreter command line arguments
 ==============================================
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 *Note Section 2.1::.
 
 
-File: apl.info,  Node: Section 2.27,  Next: Section 2.28,  Prev: Section 2.26,  Up: Chapter 2
+File: apl.info,  Node: Section 2.28,  Next: Section 2.29,  Prev: Section 2.27,  Up: Chapter 2
 
-2.27 ⎕DLX - Knuth’s Dancing Links Algorithm
+2.28 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
@@ -4620,18 +4957,18 @@ without using ⎕DLX) and sudoku_DLX.apl (which solves sudokus using
 ⎕DLX).
 
 
-File: apl.info,  Node: Section 2.28,  Next: Section 2.29,  Prev: Section 2.27,  Up: Chapter 2
+File: apl.info,  Node: Section 2.29,  Next: Section 2.30,  Prev: Section 2.28,  Up: Chapter 2
 
-2.28 ⎕ENV - Environment Variables
+2.29 ⎕ENV - Environment Variables
 =================================
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. *Note Section 2.1::.
 
 
-File: apl.info,  Node: Section 2.29,  Next: Section 2.30,  Prev: Section 2.28,  Up: Chapter 2
+File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  Up: Chapter 2
 
-2.29 ⎕FIO - File I/O Functions
+2.30 ⎕FIO - File I/O Functions
 ==============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -4767,9 +5104,9 @@ and stored in Z. In other words,
      Z F¨Z←⎕FIO[49] 'filename'
 
 
-File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  Up: Chapter 2
+File: apl.info,  Node: Section 2.31,  Next: Section 2.32,  Prev: Section 2.30,  Up: Chapter 2
 
-2.30 ⎕FFT - Fast Fourier Transform
+2.31 ⎕FFT - Fast Fourier Transform
 ==================================
 
 For those interested in signal processing and the like, GNU APL provides
@@ -4824,9 +5161,9 @@ will take a few hours, though, so that creating it will not pay off for
 most mortals.
 
 
-File: apl.info,  Node: Section 2.31,  Next: Section 2.32,  Prev: Section 2.30,  Up: Chapter 2
+File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
 
-2.31 ⎕GTK - GTK Interface
+2.32 ⎕GTK - GTK Interface
 =========================
 
 GTK (Gimp ToolKit) is a rather powerful library for creating graphical
@@ -4840,9 +5177,9 @@ manual and has therefore been put into a separate document.  See:
 HOWTOs/Quad-GTK.html.
 
 
-File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
+File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
 
-2.32 ⎕JSON - JSON Parsing
+2.33 ⎕JSON - JSON Parsing
 =========================
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -4858,13 +5195,13 @@ A (valid) JSON string is mapped to an APL value as follows:
 
 * Menu:
 
-* Section 2.32.1::
-* Section 2.32.2::
+* Subsection 2.33.1::
+* Subsection 2.33.2::
 
 
-File: apl.info,  Node: Section 2.32.1,  Next: Section 2.32.2,  Up: Section 2.32
+File: apl.info,  Node: Subsection 2.33.1,  Next: Subsection 2.33.2,  Up: Section 2.33
 
-2.32.1 Monadic ⎕JSON
+2.33.1 Monadic ⎕JSON
 --------------------
 
 Z←⎕JSON B converts the string B into an APL value according to the
@@ -4872,9 +5209,9 @@ mapping above.  If that fails then command )MORE provides information
 about the error and where in B the error was detected.
 
 
-File: apl.info,  Node: Section 2.32.2,  Prev: Section 2.32.1,  Up: Section 2.32
+File: apl.info,  Node: Subsection 2.33.2,  Prev: Subsection 2.33.1,  Up: Section 2.33
 
-2.32.2 Dyadic ⎕JSON
+2.33.2 Dyadic ⎕JSON
 -------------------
 
 Z←A ⎕JSON B performs one of the following conversions:
@@ -4895,9 +5232,9 @@ Z←A ⎕JSON B performs one of the following conversions:
      the number of keys in Z is large.
 
 
-File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
+File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
 
-2.33 ⎕MAP - Map Value
+2.34 ⎕MAP - Map Value
 =====================
 
 ⎕MAP changes the ravel items of its right argument according to a
@@ -4990,9 +5327,9 @@ these cases, A ⎕MAP B also accepts a vector instead of a N×2 matrix:
      ┗∊━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
+File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
 
-2.34 ⎕MX - Matrix/Statistics
+2.35 ⎕MX - Matrix/Statistics
 ============================
 
 ⎕MX was kindly contributed by Henrik Moller
@@ -5025,24 +5362,24 @@ argument B of ⎕MX[X] is always mandatory.
 
 * Menu:
 
-* Subsection 2.34.1::
-* Subsection 2.34.2::
-* Section 2.34.3::
-* Section 2.34.4::
-* Section 2.34.5::
-* Section 2.34.6::
-* Section 2.34.7::
-* Section 2.34.8::
-* Section 2.34.9::
-* Section 2.34.10::
-* Section 2.34.11::
-* Section 2.34.12::
-* Section 2.34.13::
+* Subsection 2.35.1::
+* Subsection 2.35.2::
+* Subsection 2.35.3::
+* Subsection 2.35.4::
+* Subsection 2.35.5::
+* Subsection 2.35.6::
+* Subsection 2.35.7::
+* Subsection 2.35.8::
+* Subsection 2.35.9::
+* Subsection 2.35.10::
+* Subsection 2.35.11::
+* Subsection 2.35.12::
+* Subsection 2.35.13::
 
 
-File: apl.info,  Node: Subsection 2.34.1,  Next: Subsection 2.34.2,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.1,  Next: Subsection 2.35.2,  Up: Section 2.35
 
-2.34.1 Determinant
+2.35.1 Determinant
 ------------------
 
 The determinant operation, ⎕MX[1], is monadic and is valid only for
@@ -5053,9 +5390,9 @@ numeric arguments (real or complex) where ⍴⍴B = 2 and (1↑⍴B) = (¯1↑�
      ¯164J76
 
 
-File: apl.info,  Node: Subsection 2.34.2,  Next: Section 2.34.3,  Prev: Subsection 2.34.1,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.2,  Next: Subsection 2.35.3,  Prev: Subsection 2.35.1,  Up: Section 2.35
 
-2.34.2 Cross Product
+2.35.2 Cross Product
 --------------------
 
 The cross product operation, ⎕MX[2], is nomadic.  In monadic form, it
@@ -5086,9 +5423,9 @@ arguments to be numeric and ⍴⍴A = 1, ⍴⍴B = 1, ⍴A = 3, and ⍴B = 3:
      ¯3J¯30 6J24 ¯3
 
 
-File: apl.info,  Node: Section 2.34.3,  Next: Section 2.34.4,  Prev: Subsection 2.34.2,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.3,  Next: Subsection 2.35.4,  Prev: Subsection 2.35.2,  Up: Section 2.35
 
-2.34.3 Vector Angle
+2.35.3 Vector Angle
 -------------------
 
 The vector angle operation ⎕MX[3] is dyadic and returns the angle
@@ -5099,9 +5436,9 @@ and ⍴A = ⍴B:
      0.2515670406J0.09930859532
 
 
-File: apl.info,  Node: Section 2.34.4,  Next: Section 2.34.5,  Prev: Section 2.34.3,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.4,  Next: Subsection 2.35.5,  Prev: Subsection 2.35.3,  Up: Section 2.35
 
-2.34.4 Eigenvector
+2.35.4 Eigenvector
 ------------------
 
 The eigenvector operation, ⎕MX[4], is monadic and returns the complex
@@ -5133,9 +5470,9 @@ is sorted according to the descending magnitude of the corresponding
 eigenvalues.
 
 
-File: apl.info,  Node: Section 2.34.5,  Next: Section 2.34.6,  Prev: Section 2.34.4,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.5,  Next: Subsection 2.35.6,  Prev: Subsection 2.35.4,  Up: Section 2.35
 
-2.34.5 Eigenvalue
+2.35.5 Eigenvalue
 -----------------
 
 The eigenvalue operation, ⎕MX[5], is also monadic with an argument of
@@ -5173,9 +5510,9 @@ successive eigenvector successively less significant.)
         Values            Vectors
 
 
-File: apl.info,  Node: Section 2.34.6,  Next: Section 2.34.7,  Prev: Section 2.34.5,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.6,  Next: Subsection 2.35.7,  Prev: Subsection 2.35.5,  Up: Section 2.35
 
-2.34.6 Ident
+2.35.6 Ident
 ------------
 
 The monadic ident operation, ⎕MX[6], takes a scalar real integer
@@ -5188,9 +5525,9 @@ argument and returns a square identity matrix of that size:
      0 0 0 1
 
 
-File: apl.info,  Node: Section 2.34.7,  Next: Section 2.34.8,  Prev: Section 2.34.6,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.7,  Next: Subsection 2.35.8,  Prev: Subsection 2.35.6,  Up: Section 2.35
 
-2.34.7 Rotation
+2.35.7 Rotation
 ---------------
 
 The rotation operation, ⎕MX[7], is monadic and takes a real or complex
@@ -5201,9 +5538,9 @@ scalar angle and returns a 2-space rotation matrix:
      0.5    0.866
 
 
-File: apl.info,  Node: Section 2.34.8,  Next: Section 2.34.9,  Prev: Section 2.34.7,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.8,  Next: Subsection 2.35.9,  Prev: Subsection 2.35.7,  Up: Section 2.35
 
-2.34.8 Homogeneous transform
+2.35.8 Homogeneous transform
 ----------------------------
 
 The homogeneous operation ⎕MX[8] is dyadic and takes as its left
@@ -5219,9 +5556,9 @@ matrix:
       1      2       3      1
 
 
-File: apl.info,  Node: Section 2.34.9,  Next: Section 2.34.10,  Prev: Section 2.34.8,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.9,  Next: Subsection 2.35.10,  Prev: Subsection 2.35.8,  Up: Section 2.35
 
-2.34.9 Norm
+2.35.9 Norm
 -----------
 
 The monadic norm operation, ⎕MX[9], takes a real or complex non-scalar
@@ -5251,9 +5588,9 @@ sum of the squares of the elements equals 1:
 all-zero result with the same shape as the argument.
 
 
-File: apl.info,  Node: Section 2.34.10,  Next: Section 2.34.11,  Prev: Section 2.34.9,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.10,  Next: Subsection 2.35.11,  Prev: Subsection 2.35.9,  Up: Section 2.35
 
-2.34.10 Randoms
+2.35.10 Randoms
 ---------------
 
 The nomadic randoms operation, ⎕MX[10] or ⎕MX[10 x] where x is an
@@ -5310,9 +5647,9 @@ sequences:
      ¯1.358348261 ¯1.75175064 ¯2.009430519 ¯0.5167968281
 
 
-File: apl.info,  Node: Section 2.34.11,  Next: Section 2.34.12,  Prev: Section 2.34.10,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.11,  Next: Subsection 2.35.12,  Prev: Subsection 2.35.10,  Up: Section 2.35
 
-2.34.11 Covariance
+2.35.11 Covariance
 ------------------
 
 The covariance operation, ⎕MX[11], is nomadic.  In monadic form, it
@@ -5345,9 +5682,9 @@ left and right:
      36.67777778
 
 
-File: apl.info,  Node: Section 2.34.12,  Next: Section 2.34.13,  Prev: Section 2.34.11,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.12,  Next: Subsection 2.35.13,  Prev: Subsection 2.35.11,  Up: Section 2.35
 
-2.34.12 Histograms
+2.35.12 Histograms
 ------------------
 
 The histogram operation, ⎕MX[12], is dyadic and requires a single
@@ -5369,9 +5706,9 @@ samples are complex, the imaginary components are ignored.  As examples:
 normally distributed samples with a standard deviation of 1.
 
 
-File: apl.info,  Node: Section 2.34.13,  Prev: Section 2.34.12,  Up: Section 2.34
+File: apl.info,  Node: Subsection 2.35.13,  Prev: Subsection 2.35.12,  Up: Section 2.35
 
-2.34.13 Print
+2.35.13 Print
 -------------
 
 The print operation, ⎕MX[13], is dyadic and provides an easy way to dump
@@ -5444,9 +5781,9 @@ allows e.g.  for texts before and/or after the value(s) printed by
      11 12 13 14 15 16 17 18 19 20
 
 
-File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
+File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
 
-2.35 ⎕PLOT - Plot Data
+2.36 ⎕PLOT - Plot Data
 ======================
 
 ⎕PLOT is a function for visualizing numerical APL values.  The values to
@@ -5468,16 +5805,16 @@ window size, colors for plot lines, points, and grids, etc.
 
 * Menu:
 
-* Subsection 2.35.1::
-* Subsection 2.35.2::
-* Subsection 2.35.3::
-* Subsection 2.35.4::
-* Subsection 2.35.5::
+* Subsection 2.36.1::
+* Subsection 2.36.2::
+* Subsection 2.36.3::
+* Subsection 2.36.4::
+* Subsection 2.36.5::
 
 
-File: apl.info,  Node: Subsection 2.35.1,  Next: Subsection 2.35.2,  Up: Section 2.35
+File: apl.info,  Node: Subsection 2.36.1,  Next: Subsection 2.36.2,  Up: Section 2.36
 
-2.35.1 The Plot Data B
+2.36.1 The Plot Data B
 ----------------------
 
 The plot data B can be a vector (for a single plot line to be drawn) or
@@ -5492,13 +5829,13 @@ lines can be fine-tuned by overriding the default values (see dyadic A
 
 * Menu:
 
-* Subsubsection 2.35.1.1::
-* Subsubsection 2.35.1.2::
+* Subsubsection 2.36.1.1::
+* Subsubsection 2.36.1.2::
 
 
-File: apl.info,  Node: Subsubsection 2.35.1.1,  Next: Subsubsection 2.35.1.2,  Up: Subsection 2.35.1
+File: apl.info,  Node: Subsubsection 2.36.1.1,  Next: Subsubsection 2.36.1.2,  Up: Subsection 2.36.1
 
-2.35.1.1 Complex Plot Data B
+2.36.1.1 Complex Plot Data B
 ............................
 
 If a data item B[N] or B[row;N] is complex, say B[N] = x + iy.  then it
@@ -5523,9 +5860,9 @@ document; in text mode see file doc/PLOT_circle.png):
 
 
 
-File: apl.info,  Node: Subsubsection 2.35.1.2,  Prev: Subsubsection 2.35.1.1,  Up: Subsection 2.35.1
+File: apl.info,  Node: Subsubsection 2.36.1.2,  Prev: Subsubsection 2.36.1.1,  Up: Subsection 2.36.1
 
-2.35.1.2 Real Plot Data B
+2.36.1.2 Real Plot Data B
 .........................
 
 On the other hand, if a data item B[N] or B[row;N] is real, then it is
@@ -5554,9 +5891,9 @@ complex, then all real items in B are taken as complex with imaginary
 part 0.
 
 
-File: apl.info,  Node: Subsection 2.35.2,  Next: Subsection 2.35.3,  Prev: Subsection 2.35.1,  Up: Section 2.35
+File: apl.info,  Node: Subsection 2.36.2,  Next: Subsection 2.36.3,  Prev: Subsection 2.36.1,  Up: Section 2.36
 
-2.35.2 The Plot Attributes A
+2.36.2 The Plot Attributes A
 ----------------------------
 
 There are a number of attributes like colors, point sizes, line widths,
@@ -5765,7 +6102,7 @@ or _N suffix.
    As of GNU APL 1.9, ⎕PLOT legends may be dragged to other locations
 within a plot window using the usual click and drag GUI technique.
 
-2.35.2.1 Tick formatting (GTK only)
+2.36.2.1 Tick formatting (GTK only)
 ...................................
 
 By default, the ticks on the X, Y, and Z axes show the naked value of
@@ -5828,9 +6165,9 @@ Z-coordinates are not.  For this reason there is no gridY_variable or
 gridZ_variable.
 
 
-File: apl.info,  Node: Subsection 2.35.3,  Next: Subsection 2.35.4,  Prev: Subsection 2.35.2,  Up: Section 2.35
+File: apl.info,  Node: Subsection 2.36.3,  Next: Subsection 2.36.4,  Prev: Subsection 2.36.2,  Up: Section 2.36
 
-2.35.3 Plot Window Handling
+2.36.3 Plot Window Handling
 ---------------------------
 
 Each call of ⎕PLOT with some plot data B opens a separate window in the
@@ -5857,9 +6194,9 @@ The above corresponds to the typical method(s) for closing windows on
 most systems.
 
 
-File: apl.info,  Node: Subsection 2.35.4,  Next: Subsection 2.35.5,  Prev: Subsection 2.35.3,  Up: Section 2.35
+File: apl.info,  Node: Subsection 2.36.4,  Next: Subsection 2.36.5,  Prev: Subsection 2.36.3,  Up: Section 2.36
 
-2.35.4 Output File Format
+2.36.4 Output File Format
 -------------------------
 
 Early versions of ⎕PLOT were using libxcb to display the results of
@@ -5884,9 +6221,9 @@ to exist for some time, but bug fixes and new features will only be made
 for the libgtk-3 option.
 
 
-File: apl.info,  Node: Subsection 2.35.5,  Prev: Subsection 2.35.4,  Up: Section 2.35
+File: apl.info,  Node: Subsection 2.36.5,  Prev: Subsection 2.36.4,  Up: Section 2.36
 
-2.35.5 GUI driver
+2.36.5 GUI driver
 -----------------
 
 ⎕PLOT provides 3 different ways to generate its output, called GUI
@@ -5964,9 +6301,9 @@ be supported for a while, but new features will only be added to the GTK
 driver.
 
 
-File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
+File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
 
-2.36 ⎕PNG - Portable Network Graphics
+2.37 ⎕PNG - Portable Network Graphics
 =====================================
 
 Portable Network Graphics is a file format for images, defined in *RFC
@@ -5978,15 +6315,15 @@ files.’
 
 * Menu:
 
-* Section 2.36.1::
-* Section 2.36.2::
-* Section 2.36.3::
-* Section 2.36.4::
+* Subsection 2.37.1::
+* Subsection 2.37.2::
+* Subsection 2.37.3::
+* Subsection 2.37.4::
 
 
-File: apl.info,  Node: Section 2.36.1,  Next: Section 2.36.2,  Up: Section 2.36
+File: apl.info,  Node: Subsection 2.37.1,  Next: Subsection 2.37.2,  Up: Section 2.37
 
-2.36.1 The GNU APL Color Model
+2.37.1 The GNU APL Color Model
 ------------------------------
 
 An image is a rectangular matrix of *Pixels* which makes APL the perfect
@@ -6092,9 +6429,9 @@ overkill and the 8-bit default therefore should be more than sufficient
 for most purposes.
 
 
-File: apl.info,  Node: Section 2.36.2,  Next: Section 2.36.3,  Prev: Section 2.36.1,  Up: Section 2.36
+File: apl.info,  Node: Subsection 2.37.2,  Next: Subsection 2.37.3,  Prev: Subsection 2.37.1,  Up: Section 2.37
 
-2.36.2 Monadic ⎕PNG
+2.37.2 Monadic ⎕PNG
 -------------------
 
 Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
@@ -6138,9 +6475,9 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
         • ⎕PNG ¯6 returns a vector of all open ⎕PNG window handles.
 
 
-File: apl.info,  Node: Section 2.36.3,  Next: Section 2.36.4,  Prev: Section 2.36.2,  Up: Section 2.36
+File: apl.info,  Node: Subsection 2.37.3,  Next: Subsection 2.37.4,  Prev: Subsection 2.37.2,  Up: Section 2.37
 
-2.36.3 Dyadic ⎕PNG
+2.37.3 Dyadic ⎕PNG
 ------------------
 
 Dyadic *A ⎕PNG B* has only one purpose: to store an APL array in the GNU
@@ -6156,9 +6493,9 @@ APL color model into a PNG file.
      and resolution *A2* must be a valid one in the PNG standard.
 
 
-File: apl.info,  Node: Section 2.36.4,  Prev: Section 2.36.3,  Up: Section 2.36
+File: apl.info,  Node: Subsection 2.37.4,  Prev: Subsection 2.37.3,  Up: Section 2.37
 
-2.36.4 APL Examples
+2.37.4 APL Examples
 -------------------
 
            ⍝ load PNG file image.png
@@ -6188,9 +6525,9 @@ File: apl.info,  Node: Section 2.36.4,  Prev: Section 2.36.3,  Up: Section 2.36
            RGB_Blue ← 0 0 1 ⍀ Mono
 
 
-File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
+File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  Up: Chapter 2
 
-2.37 ⎕PS - Print Style
+2.38 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -6217,9 +6554,9 @@ uses the same values.
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  Up: Chapter 2
+File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
 
-2.38 ⎕RE - Regular Expressions
+2.39 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -6229,17 +6566,17 @@ for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 
 * Menu:
 
-* Section 2.38.1::
-* Section 2.38.2::
-* Section 2.38.3::
-* Section 2.38.4::
-* Section 2.38.5::
-* Section 2.38.6::
+* Subsection 2.39.1::
+* Subsection 2.39.2::
+* Subsection 2.39.3::
+* Subsection 2.39.4::
+* Subsection 2.39.5::
+* Subsection 2.39.6::
 
 
-File: apl.info,  Node: Section 2.38.1,  Next: Section 2.38.2,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.1,  Next: Subsection 2.39.2,  Up: Section 2.39
 
-2.38.1 Preconditions
+2.39.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -6251,9 +6588,9 @@ are found.
 ERROR when ⎕RE is used in an APL program.
 
 
-File: apl.info,  Node: Section 2.38.2,  Next: Section 2.38.3,  Prev: Section 2.38.1,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.2,  Next: Subsection 2.39.3,  Prev: Subsection 2.39.1,  Up: Section 2.39
 
-2.38.2 Syntax
+2.39.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -6271,9 +6608,9 @@ gives more control over the format of the result produced by ⎕RE:
 different arguments A, B, and X.
 
 
-File: apl.info,  Node: Section 2.38.3,  Next: Section 2.38.4,  Prev: Section 2.38.2,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.3,  Next: Subsection 2.39.4,  Prev: Subsection 2.39.2,  Up: Section 2.39
 
-2.38.3 The Regular Expression A
+2.39.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -6286,9 +6623,9 @@ user of ⎕RE is referred to the description that comes with libpcre2.
    See in particular: man pcre2pattern
 
 
-File: apl.info,  Node: Section 2.38.4,  Next: Section 2.38.5,  Prev: Section 2.38.3,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.4,  Next: Subsection 2.39.5,  Prev: Subsection 2.39.3,  Up: Section 2.39
 
-2.38.4 The String(s) B Being Matched
+2.39.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either:
@@ -6321,9 +6658,9 @@ character vector.
 libpcre2 documentation.
 
 
-File: apl.info,  Node: Section 2.38.5,  Next: Section 2.38.6,  Prev: Section 2.38.4,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.5,  Next: Subsection 2.39.6,  Prev: Subsection 2.39.4,  Up: Section 2.39
 
-2.38.5 The Flags X
+2.39.5 The Flags X
 ------------------
 
 By default, i.e.  without an axis argument X or - equivalently - with an
@@ -6341,15 +6678,15 @@ passed to libpcre2).
 
 * Menu:
 
-* Section 2.38.5.1::
-* Section 2.38.5.2::
-* Section 2.38.5.3::
-* Section 2.38.5.4::
+* Subsubsection 2.39.5.1::
+* Subsubsection 2.39.5.2::
+* Subsubsection 2.39.5.3::
+* Subsubsection 2.39.5.4::
 
 
-File: apl.info,  Node: Section 2.38.5.1,  Next: Section 2.38.5.2,  Up: Section 2.38.5
+File: apl.info,  Node: Subsubsection 2.39.5.1,  Next: Subsubsection 2.39.5.2,  Up: Subsection 2.39.5
 
-2.38.5.1 The libpcre2 flags: i, m, s, and x
+2.39.5.1 The libpcre2 flags: i, m, s, and x
 ...........................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -6364,9 +6701,9 @@ to the following libpcre2 flags:
 description of these flags.
 
 
-File: apl.info,  Node: Section 2.38.5.2,  Next: Section 2.38.5.3,  Prev: Section 2.38.5.1,  Up: Section 2.38.5
+File: apl.info,  Node: Subsubsection 2.39.5.2,  Next: Subsubsection 2.39.5.3,  Prev: Subsubsection 2.39.5.1,  Up: Subsection 2.39.5
 
-2.38.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
+2.39.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
 ......................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -6420,9 +6757,9 @@ formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
 
-File: apl.info,  Node: Section 2.38.5.3,  Next: Section 2.38.5.4,  Prev: Section 2.38.5.2,  Up: Section 2.38.5
+File: apl.info,  Node: Subsubsection 2.39.5.3,  Next: Subsubsection 2.39.5.4,  Prev: Subsubsection 2.39.5.2,  Up: Subsection 2.39.5
 
-2.38.5.3 the ⎕RE global flag g
+2.39.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match of A in B.
@@ -6489,9 +6826,9 @@ of output formats ’partition’ and ’compress’.
            A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
 
 
-File: apl.info,  Node: Section 2.38.5.4,  Prev: Section 2.38.5.3,  Up: Section 2.38.5
+File: apl.info,  Node: Subsubsection 2.39.5.4,  Prev: Subsubsection 2.39.5.3,  Up: Subsection 2.39.5
 
-2.38.5.4 the ⎕RE error flag E
+2.39.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -6519,9 +6856,9 @@ that case it is natural to check the length of the result:
      ┗━┛
 
 
-File: apl.info,  Node: Section 2.38.6,  Prev: Section 2.38.5,  Up: Section 2.38
+File: apl.info,  Node: Subsection 2.39.6,  Prev: Subsection 2.39.5,  Up: Section 2.39
 
-2.38.6 Complex Matches
+2.39.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -6589,9 +6926,9 @@ two 1-character sub-matches:
      ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
+File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  Up: Chapter 2
 
-2.39 ⎕RVAL - Random APL value
+2.40 ⎕RVAL - Random APL value
 =============================
 
 The standard way to produce random numbers is the primitive function ?
@@ -6612,13 +6949,13 @@ case for ⎕RVAL is the production of test data for the interpreter, but
 
 * Menu:
 
-* Section 2.39.1::
-* Section 2.39.2::
+* Subsection 2.40.1::
+* Subsection 2.40.2::
 
 
-File: apl.info,  Node: Section 2.39.1,  Next: Section 2.39.2,  Up: Section 2.39
+File: apl.info,  Node: Subsection 2.40.1,  Next: Subsection 2.40.2,  Up: Section 2.40
 
-2.39.1 General
+2.40.1 General
 --------------
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z, while
@@ -6641,9 +6978,9 @@ overridden by dyadic A ⎕RVAL B, are:
 an integer scalar.
 
 
-File: apl.info,  Node: Section 2.39.2,  Prev: Section 2.39.1,  Up: Section 2.39
+File: apl.info,  Node: Subsection 2.40.2,  Prev: Subsection 2.40.1,  Up: Section 2.40
 
-2.39.2 Dyadic ⎕RVAL
+2.40.2 Dyadic ⎕RVAL
 -------------------
 
 The left argument A of A ⎕RVAL B determines which aspect of the
@@ -6663,18 +7000,18 @@ scalar:
 
 * Menu:
 
-* Section 2.39.2.1::
-* Section 2.39.2.2::
-* Section 2.39.2.3::
-* Section 2.39.2.4::
-* Section 2.39.2.5::
-* Section 2.39.2.6::
-* Section 2.39.2.7::
+* Subsubsection 2.40.2.1::
+* Subsubsection 2.40.2.2::
+* Subsubsection 2.40.2.3::
+* Subsubsection 2.40.2.4::
+* Subsubsection 2.40.2.5::
+* Subsubsection 2.40.2.6::
+* Subsubsection 2.40.2.7::
 
 
-File: apl.info,  Node: Section 2.39.2.1,  Next: Section 2.39.2.2,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.1,  Next: Subsubsection 2.40.2.2,  Up: Subsection 2.40.2
 
-2.39.2.1 Control of the underlying random number generator: 0 ⎕RVAL B
+2.40.2.1 Control of the underlying random number generator: 0 ⎕RVAL B
 .....................................................................
 
 Every random number generator has a state (similar to ⎕RL for ’?’).
@@ -6702,9 +7039,9 @@ are independent; generating a random number or random value with one
 does not change the state of the other.
 
 
-File: apl.info,  Node: Section 2.39.2.2,  Next: Section 2.39.2.3,  Prev: Section 2.39.2.1,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.2,  Next: Subsubsection 2.40.2.3,  Prev: Subsubsection 2.40.2.1,  Up: Subsection 2.40.2
 
-2.39.2.2 Control of the ranks: 1 ⎕RVAL B
+2.40.2.2 Control of the ranks: 1 ⎕RVAL B
 ........................................
 
 The rank of subsequently generated random values can be controlled with
@@ -6740,9 +7077,9 @@ to query the current setting for 1 ⎕RVAL.
      numbers need not add up to 100, but will be scaled accordingly.
 
 
-File: apl.info,  Node: Section 2.39.2.3,  Next: Section 2.39.2.4,  Prev: Section 2.39.2.2,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.3,  Next: Subsubsection 2.40.2.4,  Prev: Subsubsection 2.40.2.2,  Up: Subsection 2.40.2
 
-2.39.2.3 Control of the shapes: 2 ⎕RVAL B
+2.40.2.3 Control of the shapes: 2 ⎕RVAL B
 .........................................
 
 The shapes of subsequently generated random values can be controlled
@@ -6774,9 +7111,9 @@ used to query the current setting for 2 ⎕RVAL.
 matrices with 3 rows and between 0 and 10 columns.
 
 
-File: apl.info,  Node: Section 2.39.2.4,  Next: Section 2.39.2.5,  Prev: Section 2.39.2.3,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.4,  Next: Subsubsection 2.40.2.5,  Prev: Subsubsection 2.40.2.3,  Up: Subsection 2.40.2
 
-2.39.2.4 Control of the data types: 3 ⎕RVAL B
+2.40.2.4 Control of the data types: 3 ⎕RVAL B
 .............................................
 
 The types (i.e.  CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of
@@ -6820,9 +7157,9 @@ to query the current setting for 3 ⎕RVAL.
      7677327503669503253 2152001972871424768
 
 
-File: apl.info,  Node: Section 2.39.2.5,  Next: Section 2.39.2.6,  Prev: Section 2.39.2.4,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.5,  Next: Subsubsection 2.40.2.6,  Prev: Subsubsection 2.40.2.4,  Up: Subsection 2.40.2
 
-2.39.2.5 Control of a maximum depth: 4 ⎕RVAL B
+2.40.2.5 Control of a maximum depth: 4 ⎕RVAL B
 ..............................................
 
 If the probability of generating a nested value is > 0 then the depth of
@@ -6838,9 +7175,9 @@ depth;
 to query the current setting for 4 ⎕RVAL.
 
 
-File: apl.info,  Node: Section 2.39.2.6,  Next: Section 2.39.2.7,  Prev: Section 2.39.2.5,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.6,  Next: Subsubsection 2.40.2.7,  Prev: Subsubsection 2.40.2.5,  Up: Subsection 2.40.2
 
-2.39.2.6 monadic ⎕RVAL B
+2.40.2.6 monadic ⎕RVAL B
 ........................
 
 Calling ⎕RVAL monadically either produces one new random APL value or
@@ -6900,9 +7237,9 @@ non-empty B.
      ⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
 
 
-File: apl.info,  Node: Section 2.39.2.7,  Prev: Section 2.39.2.6,  Up: Section 2.39.2
+File: apl.info,  Node: Subsubsection 2.40.2.7,  Prev: Subsubsection 2.40.2.6,  Up: Subsection 2.40.2
 
-2.39.2.7 Syntax Alternatives
+2.40.2.7 Syntax Alternatives
 ............................
 
 For an improved readability, ⎕RVAL also accepts string arguments for its
@@ -6915,9 +7252,9 @@ left argument A and also the subfunction notation:
            4 ⎕RVAL B  ←→  'depth' ⎕RVAL B  ←→  ⎕RVAL.depth B
 
 
-File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  Up: Chapter 2
+File: apl.info,  Node: Section 2.41,  Next: Section 2.42,  Prev: Section 2.40,  Up: Chapter 2
 
-2.40 ⎕SI - State Indicator
+2.41 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -6981,9 +7318,9 @@ the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 2.41,  Next: Section 2.42,  Prev: Section 2.40,  Up: Chapter 2
+File: apl.info,  Node: Section 2.42,  Next: Section 2.43,  Prev: Section 2.41,  Up: Chapter 2
 
-2.41 ⎕SQL - SQL Database Interface
+2.42 ⎕SQL - SQL Database Interface
 ==================================
 
 ⎕SQL was kindly contributed by Elias Mårtenson.
@@ -6994,26 +7331,26 @@ selects a subfunction of ⎕SQL.
 
 * Menu:
 
-* Section 2.41.1::
-* Section 2.41.2::
-* Section 2.41.3::
-* Section 2.41.4::
-* Section 2.41.5::
-* Section 2.41.6::
-* Section 2.41.7::
-* Section 2.41.8::
-* Section 2.41.9::
-* Section 2.41.10::
-* Section 2.41.11::
-* Section 2.41.12::
-* Section 2.41.13::
-* Section 2.41.14::
-* Section 2.41.15::
+* Subsection 2.42.1::
+* Subsection 2.42.2::
+* Subsection 2.42.3::
+* Subsection 2.42.4::
+* Subsection 2.42.5::
+* Subsection 2.42.6::
+* Subsection 2.42.7::
+* Subsection 2.42.8::
+* Subsection 2.42.9::
+* Subsection 2.42.10::
+* Subsection 2.42.11::
+* Subsection 2.42.12::
+* Subsection 2.42.13::
+* Subsection 2.42.14::
+* Subsection 2.42.15::
 
 
-File: apl.info,  Node: Section 2.41.1,  Next: Section 2.41.2,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.1,  Next: Subsection 2.42.2,  Up: Section 2.42
 
-2.41.1 ⎕SQL[0] ⍬ : display subfunction numbers
+2.42.1 ⎕SQL[0] ⍬ : display subfunction numbers
 ----------------------------------------------
 
 The system function ⎕SQL is divided into a number of subfunctions.  The
@@ -7048,9 +7385,9 @@ argument:
    The axis argument [0] is optional; one can also use ⎕SQL ⍬.
 
 
-File: apl.info,  Node: Section 2.41.2,  Next: Section 2.41.3,  Prev: Section 2.41.1,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.2,  Next: Subsection 2.42.3,  Prev: Subsection 2.42.1,  Up: Section 2.42
 
-2.41.2 ⎕SQL[0] ‘''’ : display subfunction names
+2.42.2 ⎕SQL[0] ‘''’ : display subfunction names
 -----------------------------------------------
 
 As of SVN version 1901, ⎕SQL has been promoted to be a function group.
@@ -7095,9 +7432,9 @@ symtax.
 therefore also use ⎕SQL ” instead of ⎕SQL[0] ”.
 
 
-File: apl.info,  Node: Section 2.41.3,  Next: Section 2.41.4,  Prev: Section 2.41.2,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.3,  Next: Subsection 2.42.4,  Prev: Subsection 2.42.2,  Up: Section 2.42
 
-2.41.3 ref ← A ⎕SQL[1] B : open database
+2.42.3 ref ← A ⎕SQL[1] B : open database
 ----------------------------------------
 
            type  ⎕SQL[1] file
@@ -7121,9 +7458,9 @@ using other SQL functions.  This value should be seen as an opaque
 handle.  It is, however, guaranteed that the handle is a scalar value.
 
 
-File: apl.info,  Node: Section 2.41.4,  Next: Section 2.41.5,  Prev: Section 2.41.3,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.4,  Next: Subsection 2.42.5,  Prev: Subsection 2.42.3,  Up: Section 2.42
 
-2.41.4 ⎕SQL[2] B : close database
+2.42.4 ⎕SQL[2] B : close database
 ---------------------------------
 
            ⎕SQL[2] ref
@@ -7136,9 +7473,9 @@ this handle.  Future calls to ⎕SQL[1] may reuse previously disconnected
 handles.
 
 
-File: apl.info,  Node: Section 2.41.5,  Next: Section 2.41.6,  Prev: Section 2.41.4,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.5,  Next: Subsection 2.42.6,  Prev: Subsection 2.42.4,  Up: Section 2.42
 
-2.41.5 Z ← A ⎕SQL[3, ref] B : database query (with result)
+2.42.5 Z ← A ⎕SQL[3, ref] B : database query (with result)
 ----------------------------------------------------------
 
            query ⎕SQL[3, ref] params
@@ -7159,9 +7496,9 @@ select statement.  Null values are returned as ⍬ and empty strings are
 returned as ”.
 
 
-File: apl.info,  Node: Section 2.41.6,  Next: Section 2.41.7,  Prev: Section 2.41.5,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.6,  Next: Subsection 2.42.7,  Prev: Subsection 2.42.5,  Up: Section 2.42
 
-2.41.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
+2.42.6 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
 ---------------------------------------------------------
 
            query ⎕SQL[4, ref] params
@@ -7172,9 +7509,9 @@ File: apl.info,  Node: Section 2.41.6,  Next: Section 2.41.7,  Prev: Section 2.4
 is used on statements which do not return a result table.
 
 
-File: apl.info,  Node: Section 2.41.7,  Next: Section 2.41.8,  Prev: Section 2.41.6,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.7,  Next: Subsection 2.42.8,  Prev: Subsection 2.42.6,  Up: Section 2.42
 
-2.41.7 ⎕SQL[5] B : start transaction
+2.42.7 ⎕SQL[5] B : start transaction
 ------------------------------------
 
            ⎕SQL[5] ref
@@ -7182,9 +7519,9 @@ File: apl.info,  Node: Section 2.41.7,  Next: Section 2.41.8,  Prev: Section 2.4
    Begin a transaction.
 
 
-File: apl.info,  Node: Section 2.41.8,  Next: Section 2.41.9,  Prev: Section 2.41.7,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.8,  Next: Subsection 2.42.9,  Prev: Subsection 2.42.7,  Up: Section 2.42
 
-2.41.8 ⎕SQL[6] B : commit transaction
+2.42.8 ⎕SQL[6] B : commit transaction
 -------------------------------------
 
            ⎕SQL[6] ref
@@ -7192,9 +7529,9 @@ File: apl.info,  Node: Section 2.41.8,  Next: Section 2.41.9,  Prev: Section 2.4
    Commit a transaction.
 
 
-File: apl.info,  Node: Section 2.41.9,  Next: Section 2.41.10,  Prev: Section 2.41.8,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.9,  Next: Subsection 2.42.10,  Prev: Subsection 2.42.8,  Up: Section 2.42
 
-2.41.9 ⎕SQL[7] B : rollback transaction
+2.42.9 ⎕SQL[7] B : rollback transaction
 ---------------------------------------
 
            ⎕SQL[7] ref
@@ -7202,9 +7539,9 @@ File: apl.info,  Node: Section 2.41.9,  Next: Section 2.41.10,  Prev: Section 2.
    Rolls back the current transaction.
 
 
-File: apl.info,  Node: Section 2.41.10,  Next: Section 2.41.11,  Prev: Section 2.41.9,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.10,  Next: Subsection 2.42.11,  Prev: Subsection 2.42.9,  Up: Section 2.42
 
-2.41.10 Z←⎕SQL[8] B : table names
+2.42.10 Z←⎕SQL[8] B : table names
 ---------------------------------
 
            ⎕SQL[8] ref
@@ -7212,9 +7549,9 @@ File: apl.info,  Node: Section 2.41.10,  Next: Section 2.41.11,  Prev: Section 2
    Return an array containing the name of all tables.
 
 
-File: apl.info,  Node: Section 2.41.11,  Next: Section 2.41.12,  Prev: Section 2.41.10,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.11,  Next: Subsection 2.42.12,  Prev: Subsection 2.42.10,  Up: Section 2.42
 
-2.41.11 Z←⎕SQL[9] B : column names
+2.42.11 Z←⎕SQL[9] B : column names
 ----------------------------------
 
            ref  ⎕SQL[9] table
@@ -7228,9 +7565,9 @@ table.  Currently, the column layout is as follows:
 future release.
 
 
-File: apl.info,  Node: Section 2.41.12,  Next: Section 2.41.13,  Prev: Section 2.41.11,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.12,  Next: Subsection 2.42.13,  Prev: Subsection 2.42.11,  Up: Section 2.42
 
-2.41.12 Z ← ⎕SQL[10] B : library version number
+2.42.12 Z ← ⎕SQL[10] B : library version number
 -----------------------------------------------
 
 Return the version number (integer scalar) of the library that was used
@@ -7240,9 +7577,9 @@ of SQL database type (the database type is sometimes refered to as "SQL
 provider).
 
 
-File: apl.info,  Node: Section 2.41.13,  Next: Section 2.41.14,  Prev: Section 2.41.12,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.13,  Next: Subsection 2.42.14,  Prev: Subsection 2.42.12,  Up: Section 2.42
 
-2.41.13 Z ← ⎕SQL[11] B : library version string
+2.42.13 Z ← ⎕SQL[11] B : library version string
 -----------------------------------------------
 
 Return the version string of the library that was used to implement the
@@ -7251,9 +7588,9 @@ database type B. Depending on the SQL libraries detected by ./configure,
 (the database type is sometimes refered to as "SQL provider).
 
 
-File: apl.info,  Node: Section 2.41.14,  Next: Section 2.41.15,  Prev: Section 2.41.13,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.14,  Next: Subsection 2.42.15,  Prev: Subsection 2.42.13,  Up: Section 2.42
 
-2.41.14 SQLite Quickstart
+2.42.14 SQLite Quickstart
 -------------------------
 
 SQL is a powerful query language with many functions for manipulating
@@ -7290,18 +7627,18 @@ operations explained in this Quickstart are:
 
 * Menu:
 
-* Section 2.41.14.1::
-* Section 2.41.14.2::
-* Section 2.41.14.3::
-* Section 2.41.14.4::
-* Section 2.41.14.5::
-* Section 2.41.14.6::
-* Section 2.41.14.7::
+* Subsubsection 2.42.14.1::
+* Subsubsection 2.42.14.2::
+* Subsubsection 2.42.14.3::
+* Subsubsection 2.42.14.4::
+* Subsubsection 2.42.14.5::
+* Subsubsection 2.42.14.6::
+* Subsubsection 2.42.14.7::
 
 
-File: apl.info,  Node: Section 2.41.14.1,  Next: Section 2.41.14.2,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.1,  Next: Subsubsection 2.42.14.2,  Up: Subsection 2.42.14
 
-2.41.14.1 Deleting a Database
+2.42.14.1 Deleting a Database
 .............................
 
 In order to have a well-defined starting point we delete any already
@@ -7338,9 +7675,9 @@ database.  Such programs can be called from APL with the )HOST command
 or with ⎕FIO.fork_daemon.
 
 
-File: apl.info,  Node: Section 2.41.14.2,  Next: Section 2.41.14.3,  Prev: Section 2.41.14.1,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.2,  Next: Subsubsection 2.42.14.3,  Prev: Subsubsection 2.42.14.1,  Up: Subsection 2.42.14
 
-2.41.14.2 Creating a new Database
+2.42.14.2 Creating a new Database
 .................................
 
 To read from or write into a database we need a database handle
@@ -7377,9 +7714,9 @@ database administration tasks.  These programs can be called from APL
 with the )HOST command or with ⎕FIO.fork_daemon.
 
 
-File: apl.info,  Node: Section 2.41.14.3,  Next: Section 2.41.14.4,  Prev: Section 2.41.14.2,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.3,  Next: Subsubsection 2.42.14.4,  Prev: Subsubsection 2.42.14.2,  Up: Subsection 2.42.14
 
-2.41.14.3 Creating a Database Table
+2.42.14.3 Creating a Database Table
 ...................................
 
 An SQL database is a set of tables.  The next step after a new database
@@ -7457,9 +7794,9 @@ of a table is a unique integer ID that identifies the row and can later
 be used to quickly locate the row in a large database.
 
 
-File: apl.info,  Node: Section 2.41.14.4,  Next: Section 2.41.14.5,  Prev: Section 2.41.14.3,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.4,  Next: Subsubsection 2.42.14.5,  Prev: Subsubsection 2.42.14.3,  Up: Subsection 2.42.14
 
-2.41.14.4 Excursus: Dynamic Query Strings
+2.42.14.4 Excursus: Dynamic Query Strings
 .........................................
 
 The SQL query strings (Qs) used so far were static, which means that
@@ -7525,9 +7862,9 @@ the number of colums of the APL matrix.  If a query string contains no
 placeholders then the parameters shall be ⍬ (aka.  ⍳0).
 
 
-File: apl.info,  Node: Section 2.41.14.5,  Next: Section 2.41.14.6,  Prev: Section 2.41.14.4,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.5,  Next: Subsubsection 2.42.14.6,  Prev: Subsubsection 2.42.14.4,  Up: Subsection 2.42.14
 
-2.41.14.5 Writing an APL matrix into a Database Table
+2.42.14.5 Writing an APL matrix into a Database Table
 .....................................................
 
 Now suppose that we have an APL matrix with the same columns as our SQL
@@ -7579,9 +7916,9 @@ database table EMPLOYEES like this:
            ⎕SQL.close DB                     ⍝ and close DB
 
 
-File: apl.info,  Node: Section 2.41.14.6,  Next: Section 2.41.14.7,  Prev: Section 2.41.14.5,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.6,  Next: Subsubsection 2.42.14.7,  Prev: Subsubsection 2.42.14.5,  Up: Subsection 2.42.14
 
-2.41.14.6 Reading a Database Table into an APL Matrix
+2.42.14.6 Reading a Database Table into an APL Matrix
 .....................................................
 
 Reading a matrix back from a database table uses a SELECT query.  SELECT
@@ -7624,9 +7961,9 @@ can also retrieve a only subset of columns by using a comma separated
 list of column names instead of * (similar to indexed reference in APL).
 
 
-File: apl.info,  Node: Section 2.41.14.7,  Prev: Section 2.41.14.6,  Up: Section 2.41.14
+File: apl.info,  Node: Subsubsection 2.42.14.7,  Prev: Subsubsection 2.42.14.6,  Up: Subsection 2.42.14
 
-2.41.14.7 Updating a Database Table
+2.42.14.7 Updating a Database Table
 ...................................
 
 The ⎕SQL subfunction introduced so far suffice, at least in principle.
@@ -7691,9 +8028,9 @@ example:
 match the number of selected rows and columns.
 
 
-File: apl.info,  Node: Section 2.41.15,  Prev: Section 2.41.14,  Up: Section 2.41
+File: apl.info,  Node: Subsection 2.42.15,  Prev: Subsection 2.42.14,  Up: Section 2.42
 
-2.41.15 Deleting Rows From a Database Table
+2.42.15 Deleting Rows From a Database Table
 -------------------------------------------
 
 Like UPDATE queries are efficient for changing large tables of a
@@ -7710,9 +8047,9 @@ database:
 the query parameter B (an APL vector).
 
 
-File: apl.info,  Node: Section 2.42,  Next: Section 2.43,  Prev: Section 2.41,  Up: Chapter 2
+File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
 
-2.42 ⎕SYL - System limits
+2.43 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -7752,15 +8089,15 @@ changed at compile-time via ./configure
 
 * Menu:
 
-* Section 2.42.1::
-* Section 2.42.2::
-* Section 2.42.3::
-* Section 2.42.4::
+* Subsection 2.43.1::
+* Subsection 2.43.2::
+* Subsection 2.43.3::
+* Subsection 2.43.4::
 
 
-File: apl.info,  Node: Section 2.42.1,  Next: Section 2.42.2,  Up: Section 2.42
+File: apl.info,  Node: Subsection 2.43.1,  Next: Subsection 2.43.2,  Up: Section 2.43
 
-2.42.1 ⎕SYL[1 2 3 4 5 6;]
+2.43.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -7793,9 +8130,9 @@ bytes limit together.
 the current value, is rejected with a DOMAIN ERROR.
 
 
-File: apl.info,  Node: Section 2.42.2,  Next: Section 2.42.3,  Prev: Section 2.42.1,  Up: Section 2.42
+File: apl.info,  Node: Subsection 2.43.2,  Next: Subsection 2.43.3,  Prev: Subsection 2.43.1,  Up: Section 2.43
 
-2.42.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+2.43.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
@@ -7803,18 +8140,18 @@ compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
 
-File: apl.info,  Node: Section 2.42.3,  Next: Section 2.42.4,  Prev: Section 2.42.2,  Up: Section 2.42
+File: apl.info,  Node: Subsection 2.43.3,  Next: Subsection 2.43.4,  Prev: Subsection 2.43.2,  Up: Section 2.43
 
-2.42.3 ⎕SYL[24 25 26;]
+2.43.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation for multi-core GNU
 APL. They are currently not used.
 
 
-File: apl.info,  Node: Section 2.42.4,  Prev: Section 2.42.3,  Up: Section 2.42
+File: apl.info,  Node: Subsection 2.43.4,  Prev: Subsection 2.43.3,  Up: Section 2.43
 
-2.42.4 ⎕SYL[27;]
+2.43.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -7829,24 +8166,24 @@ this:
            while (ravel-length(SH) ≥ ⎕SYL[27;2]) { divide longest axis in SH by 2 }
 
 
-File: apl.info,  Node: Section 2.43,  Next: Section 2.44,  Prev: Section 2.42,  Up: Chapter 2
+File: apl.info,  Node: Section 2.44,  Next: Section 2.45,  Prev: Section 2.43,  Up: Chapter 2
 
-2.43 ⎕XML - XML Parsing
+2.44 ⎕XML - XML Parsing
 =======================
 
 * Menu:
 
-* Section 2.43.1::
-* Section 2.43.2::
-* Section 2.43.3::
-* Section 2.43.4::
-* Section 2.43.5::
-* Section 2.43.6::
+* Subsection 2.44.1::
+* Subsection 2.44.2::
+* Subsection 2.44.3::
+* Subsection 2.44.4::
+* Subsection 2.44.5::
+* Subsection 2.44.6::
 
 
-File: apl.info,  Node: Section 2.43.1,  Next: Section 2.43.2,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.1,  Next: Subsection 2.44.2,  Up: Section 2.44
 
-2.43.1 Purpose
+2.44.1 Purpose
 --------------
 
 GNU APL provides ⎕XML as a means of performing elementary manipulations
@@ -7879,9 +8216,9 @@ like:
      APL without much overhead.
 
 
-File: apl.info,  Node: Section 2.43.2,  Next: Section 2.43.3,  Prev: Section 2.43.1,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.2,  Next: Subsection 2.44.3,  Prev: Subsection 2.44.1,  Up: Section 2.44
 
-2.43.2 Some XML Terminology
+2.44.2 Some XML Terminology
 ---------------------------
 
 An XML document is a character string with a standardized format.  The
@@ -7957,9 +8294,9 @@ and only the predefined XML entities (i.e.  &, <, >, ’, and ") are
 recognized (and translated) by ⎕XML.
 
 
-File: apl.info,  Node: Section 2.43.3,  Next: Section 2.43.4,  Prev: Section 2.43.2,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.3,  Next: Subsection 2.44.4,  Prev: Subsection 2.44.2,  Up: Section 2.44
 
-2.43.3 How ⎕XML maps XML documents to APL Values
+2.44.3 How ⎕XML maps XML documents to APL Values
 ------------------------------------------------
 
 The principal mapping between XML strings and APL values is:
@@ -8086,9 +8423,9 @@ declarations, etc.  will be contained in a single associative array.
            ⍙2year          ⍝ second attribute year
 
 
-File: apl.info,  Node: Section 2.43.4,  Next: Section 2.43.5,  Prev: Section 2.43.3,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.4,  Next: Subsection 2.44.5,  Prev: Subsection 2.44.3,  Up: Section 2.44
 
-2.43.4 Monadic ⎕XML
+2.44.4 Monadic ⎕XML
 -------------------
 
 Z ← ⎕XML B converts APL string B that contains a valid XML document to
@@ -8105,9 +8442,9 @@ somewhat garbled.  This effect can be suppressed in 2 ways:
   2. prefix the string with ⊃35⎕CR as in the examples below.
 
 
-File: apl.info,  Node: Section 2.43.5,  Next: Section 2.43.6,  Prev: Section 2.43.4,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.5,  Next: Subsection 2.44.6,  Prev: Subsection 2.44.4,  Up: Section 2.44
 
-2.43.5 Dyadic ⎕XML
+2.44.5 Dyadic ⎕XML
 ------------------
 
 Z ← A ⎕XML B provides a number of convenience functions.  Its left
@@ -8318,9 +8655,9 @@ of the function number ↑A.
                 (14 "_3C") ⎕XML APL._1ROOT   ⍝ last member: will be empty
 
 
-File: apl.info,  Node: Section 2.43.6,  Prev: Section 2.43.5,  Up: Section 2.43
+File: apl.info,  Node: Subsection 2.44.6,  Prev: Subsection 2.44.5,  Up: Section 2.44
 
-2.43.6 XML Queries
+2.44.6 XML Queries
 ------------------
 
 The different functions in dyadic ⎕XML are intended to construct XML
@@ -8339,9 +8676,9 @@ their details, but usually follow these top-level steps:
      APL)
 
 
-File: apl.info,  Node: Section 2.44,  Next: Section 2.45,  Prev: Section 2.43,  Up: Chapter 2
+File: apl.info,  Node: Section 2.45,  Next: Section 2.46,  Prev: Section 2.44,  Up: Chapter 2
 
-2.44 Conditionals
+2.45 Conditionals
 =================
 
 WARNING: GNU APL conditionals are experimental.  Use them with care and
@@ -8350,14 +8687,14 @@ ISO APL standard, nor IBM APL2 provide conditionals.
 
 * Menu:
 
-* Section 2.44.1::
-* Section 2.44.2::
-* Section 2.44.3::
+* Subsection 2.45.1::
+* Subsection 2.45.2::
+* Subsection 2.45.3::
 
 
-File: apl.info,  Node: Section 2.44.1,  Next: Section 2.44.2,  Up: Section 2.44
+File: apl.info,  Node: Subsection 2.45.1,  Next: Subsection 2.45.2,  Up: Section 2.45
 
-2.44.1 Design considerations.
+2.45.1 Design considerations.
 -----------------------------
 
 The author of GNU APL has, for a long time, hesitated to implement
@@ -8517,9 +8854,9 @@ because the advantage in 2.  (shorter code) looks much smaller than the
 advantages of 1.  (e.g.  insertion of debug printouts into a clause).
 
 
-File: apl.info,  Node: Section 2.44.2,  Next: Section 2.44.3,  Prev: Section 2.44.1,  Up: Section 2.44
+File: apl.info,  Node: Subsection 2.45.2,  Next: Subsection 2.45.3,  Prev: Subsection 2.45.1,  Up: Section 2.45
 
-2.44.2 Syntax
+2.45.2 Syntax
 -------------
 
 With the above considerations in mind, GNU APL decided for the following
@@ -8621,9 +8958,9 @@ syntax:
    Like shown in the examples above.
 
 
-File: apl.info,  Node: Section 2.44.3,  Prev: Section 2.44.2,  Up: Section 2.44
+File: apl.info,  Node: Subsection 2.45.3,  Prev: Subsection 2.45.2,  Up: Section 2.45
 
-2.44.3 Possible Pitfalls
+2.45.3 Possible Pitfalls
 ------------------------
 
 In APL, as well as in C/C++ (and most other languages), an expression is
@@ -8688,9 +9025,9 @@ people even use double parentheses to emphasize the condition of a
 conditional statement or expression.
 
 
-File: apl.info,  Node: Section 2.45,  Next: Section 2.46,  Prev: Section 2.44,  Up: Chapter 2
+File: apl.info,  Node: Section 2.46,  Next: Section 2.47,  Prev: Section 2.45,  Up: Chapter 2
 
-2.45 Matrix Product
+2.46 Matrix Product
 ===================
 
 In standard APL, the inner product Z of two matrices A and B as known
@@ -8772,9 +9109,9 @@ the operator +.×:
      is not in fact performed, but optimized away.
 
 
-File: apl.info,  Node: Section 2.46,  Prev: Section 2.45,  Up: Chapter 2
+File: apl.info,  Node: Section 2.47,  Prev: Section 2.46,  Up: Chapter 2
 
-2.46 Monadic ≠ (Nub Sieve)
+2.47 Monadic ≠ (Nub Sieve)
 ==========================
 
 The nub sieve Z←≠B of a value B is a Boolean vector Z with the same
@@ -9001,11 +9338,11 @@ the demo version for PCs).
 
 * Menu:
 
-* Section 5.4.1::
-* Section 5.4.2::
+* Subsection 5.4.1::
+* Subsection 5.4.2::
 
 
-File: apl.info,  Node: Section 5.4.1,  Next: Section 5.4.2,  Up: Section 5.4
+File: apl.info,  Node: Subsection 5.4.1,  Next: Subsection 5.4.2,  Up: Section 5.4
 
 5.4.1 Test 1: Binding strength of []
 ------------------------------------
@@ -9040,7 +9377,7 @@ ERROR when indexing the scalar 3.
 the second quote on page 14 of the lrm.
 
 
-File: apl.info,  Node: Section 5.4.2,  Prev: Section 5.4.1,  Up: Section 5.4
+File: apl.info,  Node: Subsection 5.4.2,  Prev: Subsection 5.4.1,  Up: Section 5.4
 
 5.4.2 Test 2: Binding strength of the left operand
 --------------------------------------------------
@@ -10960,220 +11297,227 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11616
-Node: Section 1.11851
-Node: Section 1.22601
-Node: Section 1.34650
-Node: Section 1.418480
-Node: Section 1.519693
-Node: Chapter 224798
-Node: Section 2.126995
-Node: Subsection 2.1.128271
-Node: Subsection 2.1.228940
-Node: Subsection 2.1.329764
-Node: Subsection 2.1.435678
-Node: Section 2.1.4.136300
-Node: Section 2.1.4.236619
-Node: Section 2.1.4.338402
-Node: Subsection 2.1.539927
-Node: Subsection 2.1.640788
-Node: Section 2.1.6.141581
-Node: Section 2.1.6.244384
-Node: Section 2.1.6.347103
-Node: Section 2.1.6.449993
-Node: Subsection 2.1.750903
-Node: Subsection 2.1.861060
-Node: Subsection 2.1.962866
-Node: Section 2.266275
-Node: Section 2.367067
-Node: Section 2.3.169695
-Node: Section 2.3.270752
-Node: Section 2.3.372292
-Node: Section 2.3.472899
-Node: Section 2.473461
-Node: Section 2.574743
-Node: Section 2.679240
-Node: Section 2.779413
-Node: Section 2.880043
-Node: Section 2.8.180351
-Node: Section 2.8.283463
-Node: Section 2.8.384313
-Node: Section 2.985849
-Node: Section 2.1088220
-Node: Section 2.10.188633
-Node: Section 2.10.289226
-Node: Section 2.10.390108
-Node: Section 2.1190648
-Node: Section 2.11.190870
-Node: Section 2.11.291834
-Node: Section 2.1292435
-Node: Section 2.1394216
-Node: Section 2.13.194935
-Node: Section 2.13.295672
-Node: Section 2.1496359
-Node: Section 2.1597300
-Node: Section 2.1697571
-Node: Section 2.1798982
-Node: Section 2.17.199395
-Node: Section 2.17.2104869
-Node: Section 2.18110099
-Node: Section 2.19112646
-Node: Section 2.19.1114751
-Node: Section 2.19.2115605
-Node: Section 2.19.3117339
-Node: Section 2.19.4119168
-Node: Section 2.20120055
-Node: Section 2.21124491
-Node: Section 2.21.1124677
-Node: Section 2.21.2125394
-Node: Section 2.22126208
-Node: Section 2.22.1126466
-Node: Section 2.22.2131673
-Node: Subsection 2.22.2.1132148
-Node: Section 2.22.2.2134349
-Node: Section 2.22.2.3137102
-Node: Section 2.22.2.4137829
-Node: Section 2.22.2.5140968
-Node: Section 2.22.2.6142196
-Node: Section 2.22.2.7143255
-Node: Section 2.22.2.8149255
-Node: Subsection 2.22.1151957
-Node: Subsection 2.22.2153903
-Node: Section 2.23156671
-Node: Section 2.23.1157088
-Node: Section 2.23.2159883
-Node: Section 2.24160573
-Node: Section 2.25167249
-Node: Section 2.26170621
-Node: Section 2.27170912
-Node: Section 2.28181765
-Node: Section 2.29182037
-Node: Section 2.30189090
-Node: Section 2.31191544
-Node: Section 2.32192213
-Node: Section 2.32.1192908
-Node: Section 2.32.2193233
-Node: Section 2.33194078
-Node: Section 2.34198002
-Node: Subsection 2.34.1199799
-Node: Subsection 2.34.2200181
-Node: Section 2.34.3201476
-Node: Section 2.34.4201860
-Node: Section 2.34.5203016
-Node: Section 2.34.6205517
-Node: Section 2.34.7205853
-Node: Section 2.34.8206185
-Node: Section 2.34.9206803
-Node: Section 2.34.10207738
-Node: Section 2.34.11209609
-Node: Section 2.34.12210691
-Node: Section 2.34.13211618
-Node: Section 2.35214056
-Node: Subsection 2.35.1215289
-Node: Subsubsection 2.35.1.1216078
-Node: Subsubsection 2.35.1.2217085
-Node: Subsection 2.35.2218173
-Node: Subsection 2.35.3231701
-Node: Subsection 2.35.4233024
-Node: Subsection 2.35.5234250
-Node: Section 2.36237811
-Node: Section 2.36.1238316
-Node: Section 2.36.2243798
-Node: Section 2.36.3245985
-Node: Section 2.36.4246793
-Node: Section 2.37247710
-Node: Section 2.38248729
-Node: Section 2.38.1249275
-Node: Section 2.38.2249746
-Node: Section 2.38.3250412
-Node: Section 2.38.4251041
-Node: Section 2.38.5252406
-Node: Section 2.38.5.1253296
-Node: Section 2.38.5.2253918
-Node: Section 2.38.5.3256345
-Node: Section 2.38.5.4259807
-Node: Section 2.38.6260701
-Node: Section 2.39265178
-Node: Section 2.39.1266113
-Node: Section 2.39.2267051
-Node: Section 2.39.2.1267857
-Node: Section 2.39.2.2269158
-Node: Section 2.39.2.3270777
-Node: Section 2.39.2.4272217
-Node: Section 2.39.2.5273985
-Node: Section 2.39.2.6274753
-Node: Section 2.39.2.7276688
-Node: Section 2.40277339
-Node: Section 2.41279523
-Node: Section 2.41.1280226
-Node: Section 2.41.2282057
-Node: Section 2.41.3284736
-Node: Section 2.41.4285713
-Node: Section 2.41.5286174
-Node: Section 2.41.6287045
-Node: Section 2.41.7287504
-Node: Section 2.41.8287738
-Node: Section 2.41.9287975
-Node: Section 2.41.10288231
-Node: Section 2.41.11288493
-Node: Section 2.41.12288935
-Node: Section 2.41.13289441
-Node: Section 2.41.14289930
-Node: Section 2.41.14.1291713
-Node: Section 2.41.14.2293113
-Node: Section 2.41.14.3294844
-Node: Section 2.41.14.4298170
-Node: Section 2.41.14.5301062
-Node: Section 2.41.14.6303395
-Node: Section 2.41.14.7305104
-Node: Section 2.41.15307697
-Node: Section 2.42308428
-Node: Section 2.42.1310739
-Node: Section 2.42.2312076
-Node: Section 2.42.3312499
-Node: Section 2.42.4312759
-Node: Section 2.43313432
-Node: Section 2.43.1313704
-Node: Section 2.43.2315273
-Node: Section 2.43.3318687
-Node: Section 2.43.4325313
-Node: Section 2.43.5326090
-Node: Section 2.43.6334379
-Node: Section 2.44335245
-Node: Section 2.44.1335642
-Node: Section 2.44.2342854
-Node: Section 2.44.3346820
-Node: Section 2.45349597
-Node: Section 2.46352867
-Node: Chapter 3353382
-Node: Section 3.1353756
-Node: Section 3.2355028
-Node: Chapter 4356080
-Node: Chapter 5357221
-Node: Section 5.1357882
-Node: Section 5.2358614
-Node: Section 5.3359109
-Node: Section 5.4361247
-Node: Section 5.4.1361596
-Node: Section 5.4.2362376
-Node: Section 5.5367100
-Node: Section 5.6370108
-Node: Section 5.7378847
-Node: Chapter 6384812
-Node: Section 6.1386382
-Node: Section 6.2387702
-Node: Section 6.3388062
-Node: Section 6.4388304
-Node: Section 6.5388966
-Node: Section 6.6389444
-Node: Section 6.7390217
-Node: Section 6.8390643
-Node: Chapter 7391045
-Node: Section 7.1391464
-Node: Section 7.2392151
-Node: Chapter 8392982
-Node: Section 8.1393485
-Node: Section 8.2418798
+Node: Chapter 11650
+Node: Section 1.11885
+Node: Section 1.22635
+Node: Section 1.34684
+Node: Section 1.418514
+Node: Section 1.519727
+Node: Chapter 224832
+Node: Section 2.127029
+Node: Subsection 2.1.128305
+Node: Subsection 2.1.228974
+Node: Subsection 2.1.329798
+Node: Subsection 2.1.435712
+Node: Subsubsection 2.1.4.136352
+Node: Subsubsection 2.1.4.236683
+Node: Subsubsection 2.1.4.338484
+Node: Subsection 2.1.540021
+Node: Subsection 2.1.640882
+Node: Subsubsection 2.1.6.141699
+Node: Subsubsection 2.1.6.244514
+Node: Subsubsection 2.1.6.347251
+Node: Subsubsection 2.1.6.450159
+Node: Subsection 2.1.751081
+Node: Subsection 2.1.861238
+Node: Subsection 2.1.963044
+Node: Section 2.266453
+Node: Section 2.367245
+Node: Subsection 2.3.169885
+Node: Subsection 2.3.270948
+Node: Subsection 2.3.372497
+Node: Subsection 2.3.473113
+Node: Section 2.473681
+Node: Section 2.574963
+Node: Section 2.679460
+Node: Section 2.779633
+Node: Section 2.880263
+Node: Subsection 2.8.180580
+Node: Subsection 2.8.283698
+Node: Subsection 2.8.384557
+Node: Section 2.986099
+Node: Subsection 2.9.186515
+Node: Subsection 2.9.287109
+Node: Subsection 2.9.387994
+Node: Section 2.1088535
+Node: Section 2.1190909
+Node: Subsection 2.11.194076
+Node: Subsection 2.11.296467
+Node: Subsection 2.11.398942
+Node: Subsubsection 2.11.3.199173
+Node: Subsubsection 2.11.3.2100480
+Node: Subsubsection 2.11.3.3103436
+Node: Section 2.12109713
+Node: Subsection 2.12.1109941
+Node: Subsection 2.12.2110911
+Node: Section 2.13111518
+Node: Section 2.14113299
+Node: Subsection 2.14.1114024
+Node: Subsection 2.14.2114767
+Node: Section 2.15115460
+Node: Section 2.16116401
+Node: Section 2.17116672
+Node: Section 2.18118083
+Node: Subsection 2.18.1118502
+Node: Subsection 2.18.2123982
+Node: Section 2.19129218
+Node: Section 2.20131765
+Node: Subsection 2.20.1133882
+Node: Subsection 2.20.2134742
+Node: Subsection 2.20.3136485
+Node: Subsection 2.20.4138323
+Node: Section 2.21139216
+Node: Section 2.22143652
+Node: Subsection 2.22.1143844
+Node: Subsection 2.22.2144567
+Node: Section 2.23145387
+Node: Subsection 2.23.1145651
+Node: Subsection 2.23.2150864
+Node: Subsubsection 2.23.2.1151401
+Node: Subsubsection 2.23.2.2153614
+Node: Subsubsection 2.23.2.3156385
+Node: Subsubsection 2.23.2.4157133
+Node: Subsubsection 2.23.2.5160293
+Node: Subsubsection 2.23.2.6161542
+Node: Subsubsection 2.23.2.7162622
+Node: Subsubsection 2.23.2.8168648
+Node: Subsubsection 2.23.2.9171370
+Node: Subsubsection 2.23.2.10173336
+Node: Section 2.24176118
+Node: Subsection 2.24.1176541
+Node: Subsection 2.24.2179342
+Node: Section 2.25180038
+Node: Section 2.26186714
+Node: Section 2.27190086
+Node: Section 2.28190377
+Node: Section 2.29201230
+Node: Section 2.30201502
+Node: Section 2.31208555
+Node: Section 2.32211009
+Node: Section 2.33211678
+Node: Subsection 2.33.1212379
+Node: Subsection 2.33.2212710
+Node: Section 2.34213561
+Node: Section 2.35217485
+Node: Subsection 2.35.1219315
+Node: Subsection 2.35.2219697
+Node: Subsection 2.35.3220995
+Node: Subsection 2.35.4221385
+Node: Subsection 2.35.5222550
+Node: Subsection 2.35.6225060
+Node: Subsection 2.35.7225405
+Node: Subsection 2.35.8225746
+Node: Subsection 2.35.9226373
+Node: Subsection 2.35.10227317
+Node: Subsection 2.35.11229197
+Node: Subsection 2.35.12230288
+Node: Subsection 2.35.13231224
+Node: Section 2.36233668
+Node: Subsection 2.36.1234901
+Node: Subsubsection 2.36.1.1235690
+Node: Subsubsection 2.36.1.2236697
+Node: Subsection 2.36.2237785
+Node: Subsection 2.36.3251313
+Node: Subsection 2.36.4252636
+Node: Subsection 2.36.5253862
+Node: Section 2.37257423
+Node: Subsection 2.37.1257940
+Node: Subsection 2.37.2263428
+Node: Subsection 2.37.3265624
+Node: Subsection 2.37.4266441
+Node: Section 2.38267364
+Node: Section 2.39268383
+Node: Subsection 2.39.1268947
+Node: Subsection 2.39.2269424
+Node: Subsection 2.39.3270099
+Node: Subsection 2.39.4270737
+Node: Subsection 2.39.5272111
+Node: Subsubsection 2.39.5.1273034
+Node: Subsubsection 2.39.5.2273671
+Node: Subsubsection 2.39.5.3276119
+Node: Subsubsection 2.39.5.4279602
+Node: Subsection 2.39.6280511
+Node: Section 2.40284994
+Node: Subsection 2.40.1285935
+Node: Subsection 2.40.2286879
+Node: Subsubsection 2.40.2.1287733
+Node: Subsubsection 2.40.2.2289049
+Node: Subsubsection 2.40.2.3290689
+Node: Subsubsection 2.40.2.4292150
+Node: Subsubsection 2.40.2.5293939
+Node: Subsubsection 2.40.2.6294728
+Node: Subsubsection 2.40.2.7296684
+Node: Section 2.41297350
+Node: Section 2.42299534
+Node: Subsection 2.42.1300282
+Node: Subsection 2.42.2302119
+Node: Subsection 2.42.3304807
+Node: Subsection 2.42.4305793
+Node: Subsection 2.42.5306263
+Node: Subsection 2.42.6307143
+Node: Subsection 2.42.7307611
+Node: Subsection 2.42.8307854
+Node: Subsection 2.42.9308100
+Node: Subsection 2.42.10308365
+Node: Subsection 2.42.11308636
+Node: Subsection 2.42.12309087
+Node: Subsection 2.42.13309602
+Node: Subsection 2.42.14310100
+Node: Subsubsection 2.42.14.1311934
+Node: Subsubsection 2.42.14.2313349
+Node: Subsubsection 2.42.14.3315101
+Node: Subsubsection 2.42.14.4318448
+Node: Subsubsection 2.42.14.5321361
+Node: Subsubsection 2.42.14.6323715
+Node: Subsubsection 2.42.14.7325445
+Node: Subsection 2.42.15328053
+Node: Section 2.43328790
+Node: Subsection 2.43.1331113
+Node: Subsection 2.43.2332456
+Node: Subsection 2.43.3332888
+Node: Subsection 2.43.4333157
+Node: Section 2.44333836
+Node: Subsection 2.44.1334126
+Node: Subsection 2.44.2335701
+Node: Subsection 2.44.3339124
+Node: Subsection 2.44.4345759
+Node: Subsection 2.44.5346545
+Node: Subsection 2.44.6354843
+Node: Section 2.45355715
+Node: Subsection 2.45.1356121
+Node: Subsection 2.45.2363339
+Node: Subsection 2.45.3367314
+Node: Section 2.46370097
+Node: Section 2.47373367
+Node: Chapter 3373882
+Node: Section 3.1374256
+Node: Section 3.2375528
+Node: Chapter 4376580
+Node: Chapter 5377721
+Node: Section 5.1378382
+Node: Section 5.2379114
+Node: Section 5.3379609
+Node: Section 5.4381747
+Node: Subsection 5.4.1382102
+Node: Subsection 5.4.2382888
+Node: Section 5.5387618
+Node: Section 5.6390626
+Node: Section 5.7399365
+Node: Chapter 6405330
+Node: Section 6.1406900
+Node: Section 6.2408220
+Node: Section 6.3408580
+Node: Section 6.4408822
+Node: Section 6.5409484
+Node: Section 6.6409962
+Node: Section 6.7410735
+Node: Section 6.8411161
+Node: Chapter 7411563
+Node: Section 7.1411982
+Node: Section 7.2412669
+Node: Chapter 8413500
+Node: Section 8.1414003
+Node: Section 8.2439316
 
 End Tag Table
 

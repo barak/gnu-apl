@@ -718,9 +718,11 @@ const Int_or_Double real_val = tokenize_real(src);
    if (src.skip_if(UNI_J) || src.skip_if(UNI_j))   // e.g. 3J4
       {
         // a complex number in real + imag format
+        //
         if (!(src.has_more() && Avec::is_number(*src)))
            {
-             MORE_ERROR() << "Missing imaginary part I in complex number RjI.";
+             MORE_ERROR() << "Missing imaginary part I"
+                             " in complex number RjI.";
              Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
            }
 
@@ -754,6 +756,7 @@ const Int_or_Double real_val = tokenize_real(src);
    else if (src.skip_if(UNI_D) || src.skip_if(UNI_d))   // e.g. 1D90 → 0J1
       {
         // a complex number in magnitude + degrees format
+        //
         if (!(src.has_more() && Avec::is_number(*src)))
            {
              MORE_ERROR() << "Missing angle D in complex number MdD.";
@@ -795,6 +798,7 @@ const Int_or_Double real_val = tokenize_real(src);
    else if (src.skip_if(UNI_R) || src.skip_if(UNI_r))   // 1r3.141592654 → ¯1J0
       {
         // a complex number in magnitude + radians format
+        //
         if (!(src.has_more() && Avec::is_number(*src)))
            {
              MORE_ERROR() << "Missing angle R in complex number MrR.";

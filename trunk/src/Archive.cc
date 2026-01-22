@@ -321,7 +321,8 @@ char cc[80];
 
         case CT_COMPLEX:   // uses UNI_PAD_U5
              space -= leave_char_mode();
-             SPRINTF(cc, "%17gJ%17g", double(cell.get_real_value()),                                                  double(cell.get_imag_value()));
+             SPRINTF(cc, "%.17gJ%.17g", double(cell.get_real_value()),
+                                        double(cell.get_imag_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
              break;
 

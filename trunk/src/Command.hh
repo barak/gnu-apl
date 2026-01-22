@@ -114,9 +114,6 @@ public:
         static int compare_val_val1(const void * key, const void * B);
       };
 
-   /// return true if entry is a directory
-   static bool is_directory(const dirent * entry, const UTF8_string & path);
-
    /// clear the copy_once_table.
    static void clear_copy_once_table();
 
@@ -138,14 +135,6 @@ public:
 protected:
    /// line number of miltiline start
    static int multiline_start;
-
-   /// sort order
-   enum SORT_ORDER
-      {
-        SORT_NONE = 0,      ///< do not sort
-        SORT_SIZE = 1,      ///< sort by size
-        SORT_TIME = 2,      ///< sort by time
-      };
 
    /// On, Off, or Toggle
    enum OOT
@@ -213,18 +202,6 @@ protected:
    /// )HOST: execute OS command
    static void cmd_HOST(ostream & out, const UCS_string & arg);
 
-   /// )IN: import a workspace file
-   static void cmd_IN(ostream & out, UCS_string_vector & args, bool protect);
-
-   /// show US keyboard layout
-   static void cmd_KEYB(ostream & out);
-
-   /// list content of workspace and wslib directories: ]LIB [N]
-   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
-
-   /// list paths of workspace and wslib directories
-   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
-
    /// )LOAD: load a workspace file
    static void cmd_LOAD(ostream & out, UCS_string_vector & args, 
                         UCS_string & quad_lx, bool silent);
@@ -242,7 +219,7 @@ protected:
    static void cmd_NMS(ostream & out, const UCS_string & arg);
 
    /// do nothing helper for ]USERCMD
-#define cmd__NO_OP_
+#define _NO_OP_
 
    /// )FNS: show list of operators
    static void cmd_OPS(ostream & out, const UCS_string & arg);
@@ -307,31 +284,6 @@ protected:
                               const char * prim, const char * name,
                               const char * title, const char * descr);
 
-   /// open directory arg and follow symlinks
-   static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
-                            const UCS_string_vector & args);
-
-   /// list library: common helper. variant tells apart )LIB and ]LIB.
-   static void LIB_common(ostream & out, const UCS_string_vector & args,
-                          bool dbg);
-
-   /// print the workspace names in the LIB directory w/o sorting
-   static void LIB_print_flat(ostream & out, const UTF8_string lib_path,
-                           const UCS_string_vector & directories,
-                           const UCS_string_vector & files);
-
-   /// print the workspace names in the LIB directory with sorting
-   static void LIB_print_sorted(ostream & out, const UTF8_string lib_path,
-                           const UCS_string_vector & directories,
-                           const UCS_string_vector & files, SORT_ORDER sort);
-
-   /// return the property by which file names shall be sorted
-   static size_t sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
-                               const UCS_string & filename);
-                               
-   /// list content of workspace and wslib directories: )LIB [N]
-   static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
-
    /// split whitespace separated arguments into individual arguments
    static UCS_string_vector split_arg(const UCS_string & arg);
 
@@ -352,6 +304,26 @@ protected:
    static bool check_params(ostream & out, const char * command, int argc,
                             const char * args);
 
+   /// parse the argument of the ]LOG command and set logging accordingly
+   static void log_control(const UCS_string & args);
+
+   /// the number of APL expressions entered in immediate execution mode
+   static ShapeItem APL_expression_count;
+
+   /// workspaces that shall not be copied twice
+   static UCS_string_vector copy_once_table;
+
+   /// return true iff, according to config.h, capability \b capa is available
+   static bool have_capability(const UCS_string & capa);
+};
+//----------------------------------------------------------------------------
+class Cmd_IN
+{
+public:
+   /// )IN: import an .atf workspace file
+   static void cmd_IN(ostream & out, UCS_string_vector & args, bool protect);
+
+protected:
    /// a helper struct for the )IN command
    struct transfer_context
       {
@@ -406,18 +378,81 @@ protected:
         /// accumulator for data of different records
         UCS_string data;
       };
+};
+//----------------------------------------------------------------------------
+class Cmd_KEYB
+{
+public:
+   /// show keyboard layout
+   static void cmd_KEYB(ostream & out, const UCS_string_vector & args);
 
-   /// parse the argument of the ]LOG command and set logging accordingly
-   static void log_control(const UCS_string & args);
+   /// execute xmodmap -pk and parse its output.
+  static bool parse_xmodmap();
 
-   /// the number of APL expressions entered in immediate execution mode
-   static ShapeItem APL_expression_count;
+   /// print the keyboard layout according to xmodmap -pk to \b out.
+   static ostream & print_xmodmap(ostream & out, bool keys);
 
-   /// workspaces that shall not be copied twice
-   static UCS_string_vector copy_once_table;
+protected:
+   /// parse one putput line of xmodmap -pk.
+   static bool parse_xmodmap_line(const char * buffer, int line);
 
-   /// return true iff, according to config.h, capability \b capa is available
-   static bool have_capability(const UCS_string & capa);
+   static struct map_item
+      {
+        map_item()
+        : keycode(-1)
+          { unicodes[0] = unicodes[1] = unicodes[2] = unicodes[3] = Unicode_0; }
+
+        int keycode;
+        Unicode unicodes[4];
+      } key_map[256];
+
+   static const char * layout_template[];
+};
+//----------------------------------------------------------------------------
+class Cmd_LIB
+{
+public:
+   /// list paths of workspace and wslib directories
+   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
+
+   /// list content of workspace and wslib directories: )LIB [N]
+   static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
+
+   /// list content of workspace and wslib directories: ]LIB [N]
+   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
+
+   /// return true if entry is a directory
+   static bool is_directory(const dirent * entry, const UTF8_string & path);
+protected:
+   /// sort order
+   enum SORT_ORDER
+      {
+        SORT_NONE = 0,      ///< do not sort
+        SORT_SIZE = 1,      ///< sort by size
+        SORT_TIME = 2,      ///< sort by time
+      };
+
+   /// open directory arg and follow symlinks
+   static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
+                            const UCS_string_vector & args);
+
+   /// list library: common helper. variant tells apart )LIB and ]LIB.
+   static void LIB_common(ostream & out, const UCS_string_vector & args,
+                          bool dbg);
+
+   /// print the workspace names in the LIB directory w/o sorting
+   static void LIB_print_flat(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files);
+
+   /// print the workspace names in the LIB directory with sorting
+   static void LIB_print_sorted(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files, SORT_ORDER sort);
+
+   /// return the property by which file names shall be sorted
+   static size_t sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
+                               const UCS_string & filename);
 };
 //----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
