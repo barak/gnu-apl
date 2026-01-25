@@ -80,8 +80,6 @@ public:
    /// default constructor (for functions that are NOT function groups)
    FunctionGroup()
    : group_name(0),
-     sorted_by_name(0),
-     sorted_by_axis(0),
      subfun_count(0),
      max_function_name_length(0)
    {}
@@ -139,14 +137,30 @@ protected:
    virtual void print_map_syntax(ostream & out, const function_info &) const
       { out << "*** missing FunctionGroup::print_map_syntax()" << endl; }
 
-   /// compare names (helper for bsearch())
-   static int compare_function_name(const void * info1, const void * info2);
+   /// compare names. Return \b > 0 if info1 > info2
+   static int compare_function_name(const char * const & name,
+                                     const function_info * const & info,
+                                     const void *);
 
-   /// compare axes (helper for bsearch())
-   static int compare_function_axis(const void * info1, const void * info2);
+   /// compare axes. Return \b > 0 if info1 > info2
+   static int compare_function_axis(const uAxis & key,
+                                    const function_info * const & info,
+                                    const void *);
+
+   /// compare names. Return \b true if info1 > info2
+   static bool greater_function_name(const function_info * const & info1,
+                                     const function_info * const & info2,
+                                     const void *)
+      { return compare_function_name(info1->function_name, info2, 0) > 0; }
+
+   /// compare axes. Return \b true if info1 > info2
+   static bool greater_function_axis(const function_info * const & info1,
+                                     const function_info * const & info2,
+                                     const void *)
+      { return compare_function_axis(info1->axis, info2, 0) > 0; }
  
    /// return the function_info for function name \b name
-   const function_info * get_info_by_name(const UTF8_literal name) const;
+   const function_info * get_info_by_name(const char * name) const;
 
    /// return the function_info for function axis \b axis
    const function_info * get_info_by_axis(uAxis axis) const;
@@ -159,10 +173,10 @@ protected:
    const char * group_name;
 
    /// the table, sorted by function name
-   const function_info ** sorted_by_name;
+   vector<const function_info *> sorted_by_name;
 
    /// the table, sorted by function number (= axis)
-   const function_info ** sorted_by_axis = 0;
+   vector<const function_info *> sorted_by_axis;
 
    /// the number of subfunctions
    int subfun_count;

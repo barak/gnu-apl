@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 
 #include "Error.hh"
 #include "Function.hh"
+#include "Heapsort.hh"
 #include "IntCell.hh"
 #include "Output.hh"
 #include "Parser.hh"
@@ -242,51 +243,23 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
    Assert(unsorted);
 
    group_name = grp_name;
-  subfun_count = count;
+   subfun_count = count;
 
-  sorted_by_name = new const function_info *[subfun_count];   // never deleted
-  sorted_by_axis = new const function_info *[subfun_count];   // never deleted
+   {
    loop(c, count)
       {
-        sorted_by_name[c] = unsorted + c;   // not yet sorted
-        sorted_by_axis[c] = unsorted + c;   // not yet sorted
+        const FunctionGroup::function_info * info = unsorted + c;
+        sorted_by_name.push_back(info);
+        sorted_by_axis.push_back(info);
         max_function_name_length = max(max_function_name_length,
-                                       strlen(unsorted[c].function_name));
+                                       strlen(info->function_name));
       }
 
-   // subfun_count is relatively small, and this function is called
-   // only once (per function group). We can therefore iafford to use a
-   // simple O(n²) exchange sort.
-   //
-
-   // sort sort_by_name and sorted_by_axis
-   //
-   loop(c, subfun_count)
-   for (int j = c + 1; j < subfun_count; ++j)
-       {
-         // sort names
-         //
-         {
-           if (UTF8_literal(sorted_by_name[j]->function_name) <
-               UTF8_literal(sorted_by_name[c]->function_name))
-              {
-                const function_info * tmp = sorted_by_name[c];
-                sorted_by_name[c] = sorted_by_name[j];
-                sorted_by_name[j] = tmp;
-              }
-         }
-
-         // sort axis
-         //
-         {
-           if (sorted_by_axis[j]->axis < sorted_by_axis[c]->axis)
-              {
-                const function_info * tmp = sorted_by_axis[c];
-                sorted_by_axis[c] = sorted_by_axis[j];
-                sorted_by_axis[j] = tmp;
-              }
-         }
-       }
+   Heapsort<const FunctionGroup::function_info *>::
+            sort(sorted_by_name, 0, greater_function_name);
+   Heapsort<const FunctionGroup::function_info *>::
+            sort(sorted_by_axis, 0, greater_function_axis);
+   }
 
    // check that sorted_by_name is sorted ascendingly
    //
@@ -318,7 +291,7 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
          const function_info & info = unsorted[sub];
 
          {
-           const UTF8_literal key = info.function_name;
+           const char * key = info.function_name;
            const function_info * found = get_info_by_name(key);
            Assert_fatal(found);
            Assert_fatal(UTF8_literal(found->function_name) == key);
@@ -334,47 +307,38 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
 }
 //----------------------------------------------------------------------------
 int
-FunctionGroup::compare_function_name(const void * vp_key, const void * vp_info)
+FunctionGroup::compare_function_name(const char * const & name,
+                                     const function_info * const & info,
+                                     const void *)
 {
-const UTF8_literal & key =
-      *reinterpret_cast<const UTF8_literal *>(vp_key);
-const FunctionGroup::function_info * info =
-      *reinterpret_cast<const FunctionGroup::function_info * const*>(vp_info);
-
-   return key.compare(info->function_name);
+   return strcmp(name, info->function_name);
 }
 //----------------------------------------------------------------------------
 int
-FunctionGroup::compare_function_axis(const void * vp_key, const void * vp_info)
+FunctionGroup::compare_function_axis(const uAxis & key,
+                                     const function_info * const & info,
+                                     const void *)
 {
-const sAxis & key = *reinterpret_cast<const sAxis *>(vp_key);
-const FunctionGroup::function_info * info =
-      *reinterpret_cast<const FunctionGroup::function_info * const*>(vp_info);
-const sAxis axis = info->axis;
-   return key - axis;
+   return key - info->axis;
 }
 //----------------------------------------------------------------------------
 const FunctionGroup::function_info *
-FunctionGroup::get_info_by_name(const UTF8_literal name) const
+FunctionGroup::get_info_by_name(const char * name) const
 {
-const void * ret = bsearch(&name,                            // key
-                           sorted_by_name,                   // base
-                           subfun_count,                     // nmemb
-                           sizeof(const function_info *),    // size
-                           compare_function_name);           // compar
+const FunctionGroup::function_info* const * ret =
+      Heapsort<const FunctionGroup::function_info *>
+      ::search<const char *>(name, sorted_by_name, compare_function_name, 0);
 
    if (ret == 0)   return reinterpret_cast<const function_info *>(0);
-   return *reinterpret_cast<const function_info * const *>(ret);
+   return *ret;
 }
 //----------------------------------------------------------------------------
 const FunctionGroup::function_info *
 FunctionGroup::get_info_by_axis(uAxis axis) const
 {
-const void * ret = bsearch(&axis,                           // key
-                           sorted_by_axis,                  // base
-                           subfun_count,                    // nmemb
-                           sizeof(const function_info *),   // size
-                           compare_function_axis);          // compar
+const FunctionGroup::function_info* const * ret =
+      Heapsort<const FunctionGroup::function_info *>
+      ::search<const uAxis>(axis, sorted_by_axis, compare_function_axis, 0);
                      
    if (ret == 0)   return reinterpret_cast<const function_info *>(0);
    return *reinterpret_cast<const function_info * const *>(ret);
@@ -387,7 +351,7 @@ FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
       {
         const UTF8_string name_utf(subfun_name);
         const UTF8_literal name_literal(name_utf.c_str());
-        if (const function_info * info = get_info_by_name(name_literal))
+        if (const function_info * info = get_info_by_name(name_utf.c_str()))
            {
              return info->axis;   // found
            }

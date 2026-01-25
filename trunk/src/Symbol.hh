@@ -410,11 +410,6 @@ protected:
    /// the value stack of \b this \b Symbol
    std::vector<ValueStackItem> value_stack;
 };
-
-inline void
-Hswap(const Symbol * & u1, const Symbol * & u2)
-{ const Symbol * tmp = u1;   u1 = u2;   u2 = tmp; }
-
 //----------------------------------------------------------------------------
 /// lambda result λ
 class LAMBDA : public Symbol

@@ -100,18 +100,19 @@ public:
    /// a helper for finding sub-values with two parents
    struct val_val
       {
-        /// the parent (0 unless \b this is a sub-value
+        /// the parent (0 unless \b this is a sub-value)
         const Value * parent;
 
         /// the value (always valid)
         const Value * child;
 
         /// compare function for Heapsort::sort()
-        static bool compare_val_val(const val_val & A, const val_val & B,
-                                    const void * /* not used */);
+        static bool greater(const val_val & A, const val_val & B, const void *)
+           { return A.child > B.child; }
 
-        /// compare function for bsearch()
-        static int compare_val_val1(const void * key, const void * B);
+        /// compare function for Heapsort<val_val>::search<const Value *>()
+        static int compare(const Value * key, const val_val * B, const void *)
+           { return key - B->child; }
       };
 
    /// clear the copy_once_table.
@@ -390,7 +391,7 @@ public:
   static bool parse_xmodmap();
 
    /// print the keyboard layout according to xmodmap -pk to \b out.
-   static ostream & print_xmodmap(ostream & out, bool keys);
+   static ostream & print_xmodmap(ostream & out, bool keys, int area);
 
 protected:
    /// parse one putput line of xmodmap -pk.
@@ -406,7 +407,14 @@ protected:
         Unicode unicodes[4];
       } key_map[256];
 
+   /// a keyboard layout (function key area)
+   static const char * funkey_template[];
+
+   /// a keyboard layout (main area)
    static const char * layout_template[];
+
+   /// a keyboard layout (keypad area)
+   static const char * keypad_template[];
 };
 //----------------------------------------------------------------------------
 class Cmd_LIB
@@ -454,10 +462,5 @@ protected:
    static size_t sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
                                const UCS_string & filename);
 };
-//----------------------------------------------------------------------------
-inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
-{
-const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
-}
 //----------------------------------------------------------------------------
 #endif // __COMMAND_HH_DEFINED__

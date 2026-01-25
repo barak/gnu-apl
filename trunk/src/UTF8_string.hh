@@ -88,7 +88,7 @@ public:
    bool operator < (const UTF8_literal & other) const
       { return compare(other) < 0; } 
 
-   /// compare function for bsearch()
+   /// compare function for Heapsort<T>::search<KEY>()
    int compare(const UTF8_literal other) const
       { return strcmp(charP(this->bytes), charP(other.bytes)); }
 

@@ -156,8 +156,8 @@ public:
    /// when apl was started
    timeval session_start;
 
-   /// true if no banner/Goodbye is wanted.
-   bool silent;
+   /// banner silence
+   Silence silence;
 
    /// true if shared variables are enabled by the system. This is initially
    /// the same as user_do_svars, but can become false if something goes wrong

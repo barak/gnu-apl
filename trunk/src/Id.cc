@@ -64,74 +64,37 @@
 #include "UCS_string.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
-/// an Id and how it looks like in APL
-struct Id_name
-{
-  /// compare \b key with \b item (for bsearch())
-  static int compare(const void * key, const void * item)
-     {
-       return *reinterpret_cast<const Id *>(key)
-            - reinterpret_cast<const Id_name *>(item)->id;
-     }
-
-  /// the ID
-  Id id;
-
-   /// how \b id is being printed
-  const UTF8 * utf_name;
-};
-
-static Id_name id2ucs[] =
-{
-#define pp(i, _u, _v) { ID_      ## i, 0}, 
-#define qf(i,  _u, _v) {ID_Quad_ ## i, 0}, 
-#define qv(i,  _u, _v) {ID_Quad_ ## i, 0}, 
-#define sf(i,  _u, _v) {ID_      ## i, 0}, 
-#define st(i,  _u, _v) {ID_      ## i, 0},
-
-#include "Id.def"
-};
+vector<ID> ID::all_IDs;
 
 //----------------------------------------------------------------------------
 UCS_string
 ID::get_name_UCS(Id id)
 {
-UTF8_string utf(reinterpret_cast<const char *>(get_name(id)));
+const UTF8 * name = get_name(id)();
+const UTF8_string utf(charP(name));
    return UCS_string(utf);
 }
 //----------------------------------------------------------------------------
-void
-ID::cleanup()
-{
-}
-//----------------------------------------------------------------------------
-const UTF8 *
+const UTF8_literal
 ID::get_name(Id id)
 {
-void * result =
-    bsearch(&id, id2ucs, sizeof(id2ucs) / sizeof(Id_name),
-            sizeof(Id_name), Id_name::compare);
-
-   Assert(result);
-const Id_name * idn = reinterpret_cast<Id_name *>(result);
-   if (const UTF8 * utf = idn->utf_name)   return utf; 
-
-   // the name was not yet constructed. Do it now
-   //
-const char * name = "unknown ID";
-   switch(id)
-       {
-#define pp(i, _u, _v) case ID_      ## i:   name = #i;   break;
-#define qf(i,  u, _v) case ID_Quad_ ## i:   name = u;   break;
-#define qv(i,  u, _v) case ID_Quad_ ## i:   name = u;   break;
-#define sf(i,  u, _v) case ID_      ## i:   name = u;   break;
-#define st(i,  u, _v) case ID_      ## i:   name = u;   break;
-
+   if (all_IDs.size() == 0)
+      {
+#define pp(i, _u, _v)  all_IDs.push_back(ID(ID_     ## i, #i));
+#define qf(i,  u, _v) all_IDs.push_back(ID(ID_Quad_ ## i,  u));
+#define qv(i,  u, _v) all_IDs.push_back(ID(ID_Quad_ ## i,  u));
+#define sf(i,  u, _v) all_IDs.push_back(ID(ID_      ## i,  u));
+#define st(i,  u, _v) all_IDs.push_back(ID(ID_      ## i,  u));
 #include "Id.def"
-       }
 
-   return reinterpret_cast<const UTF8 *>(name);
+        Heapsort<ID>::sort(all_IDs, 0, ID::greater_id);
+      }
+
+   if (const ID * found = Heapsort<ID>
+                          ::search<Id>(id, all_IDs, ID::compare_id, 0))
+      { return found->name_utf; }
+
+   return "unknown ID";
 }
 //----------------------------------------------------------------------------
 ostream &

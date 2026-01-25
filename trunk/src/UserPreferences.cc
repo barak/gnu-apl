@@ -83,7 +83,7 @@ UserPreferences::UserPreferences()
      requested_par(0),
      safe_mode(false),
      script_argc(0),
-     silent(false),
+     silence(FULL_BANNER),
      system_do_svars(true),
      tcp_port(0),
      tcp_websocket(false),
@@ -438,7 +438,7 @@ UserPreferences::parse_args_2(bool logit)
             do_CONT = false;               // --noCONT
             do_not_echo = true;            // -noCIN
             do_Color = false;              // --noColor
-            silent = true;                 // --silent
+            silence = NO_BANNER;           // --silent
          }
    }
 
@@ -554,7 +554,7 @@ UserPreferences::parse_args_2(bool logit)
                    exit(a);
                  }
               eval_exprs.push_back(val);
-              uprefs.silent   = true;
+              uprefs.silence  = NO_BANNER;
               uprefs.do_Color = false;
               continue;
             }
@@ -763,7 +763,7 @@ UserPreferences::parse_args_2(bool logit)
               do_CONT = false;               // --noCONT
               do_not_echo = true;            // -noCIN
               do_Color = false;              // --noColor
-              silent = true;                 // --silent
+              silence = NO_BANNER;           // --silent
               continue;
             }
 
@@ -809,7 +809,7 @@ UserPreferences::parse_args_2(bool logit)
 
          if (!strcmp(opt, "--silent") || !strcmp(opt, "-q"))
             {
-              silent = true;
+              silence = NO_BANNER;
               continue;
             }
 
@@ -1428,9 +1428,11 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               // obsolete
             }
-         else if (yes_no && !strcasecmp(opt, "WELCOME"))
+         else if (!strcasecmp(opt, "WELCOME"))
             {
-              silent = no;
+              if (yes)                              silence = FULL_BANNER;
+              else if (no)                          silence = NO_BANNER;
+              else if (!strcasecmp(arg, "BRIEF"))   silence = BRIEF_BANNER;
             }
          else if (yes_no && !strcasecmp(opt, "SHAREDVARS"))
             {

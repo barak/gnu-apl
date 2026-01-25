@@ -321,9 +321,9 @@ const ShapeItem rows = value.get_shape_item(0);
 
 const ravel_comp_len ctx = { &value.get_cfirst(), comp_len};
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(indices.data(), rows, &ctx, &Cell::greater_cp);
+      Heapsort<ShapeItem>::sort(indices, &ctx, &Cell::greater_cp);
    else
-      Heapsort<ShapeItem>::sort(indices.data(), rows, &ctx, &Cell::smaller_cp);
+      Heapsort<ShapeItem>::sort(indices, &ctx, &Cell::smaller_cp);
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------

@@ -176,8 +176,8 @@ protected:
    /// a Unicode and its position in the ⎕AV of IBM APL2
    struct Unicode_to_IBM_codepoint
       {
-         uint32_t uni;   ///< the Unicode
-         uint32_t cp;    ///< the IBM char for uni
+         uint32_t    uni;   ///< the Unicode
+         int quad_av_pos;   ///< the IBM char for uni
       };
 
    /// Various character attributes.
@@ -201,8 +201,11 @@ protected:
    /// (through char_def() or char_uni() macros)
    static void check_file(const char * filename);
 
-   /// compare the unicodes of two entries ua and u2 in \b inverse_IBM_quad_AV
-   static int compare_uni(const void * u1, const void * u2);
+   /// compare Unicpde \b key with the Unicode in \b map.
+   static int compare_uni(const uint32_t & key,
+                          const Unicode_to_IBM_codepoint & map,
+                          const void *)
+      { return key - map.uni; }
 };
 
 #endif // __AVEC_HH_DEFINED__

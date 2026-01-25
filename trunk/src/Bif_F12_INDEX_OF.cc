@@ -195,8 +195,9 @@ Bif_F12_INDEX_OF::find_B_in_sorted_A(const Value & A,
 {
 const Cell * ravel_A = &A.get_cfirst();
 const ShapeItem len_A = A.element_count();
+   Assert(size_t(len_A) == Idx_A.size());
 const ShapeItem * const posp =
-      Heapsort<ShapeItem>::search<const Cell &>(cell_B, Idx_A.data(), len_A,
+      Heapsort<ShapeItem>::search<const Cell &>(cell_B, Idx_A,
                                                 &bs_cmp, ravel_A);
    if (!posp)   return len_A;   // cell_B was not found in ravel A
 

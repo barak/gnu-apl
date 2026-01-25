@@ -1109,12 +1109,26 @@ UCS_string::operator <<(double num)
 {
 char cc[40];
    if (Cell::is_near_int(num))   { SPRINTF(cc, "%.2g", num); }
-   else                          { SPRINTF(cc, "%g", num);   }
+   else                          { SPRINTF(cc, "%.17g", num);   }
+
    loop(c, sizeof(cc))
       {
         if (char digit = cc[c])   push_back(Unicode(digit));
         else                      break;
       }
+
+   // the last digit is probably wrong due to rounding errors. 
+   // discard it and any trailing zeroes.
+   //
+   if (size() > 3             &&
+       Avec::is_digit(back()) &&
+       at(size() - 2) == '0'  &&
+       at(size() - 3) == '0')
+      {
+        pop_back();
+        while (size() && back() == '0')   pop_back();
+      }
+
    return *this;
 }
 //----------------------------------------------------------------------------
@@ -1721,7 +1735,7 @@ UCS_string
 UCS_string::sort() const
 {
 UCS_string ret(*this);
-   Heapsort<Unicode>::sort(&ret.front(), ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, 0, greater_uni);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1740,7 +1754,7 @@ UCS_string ret;
          if (sorted[j] != ret.back())   ret << sorted[j];
        }
 
-   Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, 0, greater_uni);
    return ret;
 }
 //----------------------------------------------------------------------------

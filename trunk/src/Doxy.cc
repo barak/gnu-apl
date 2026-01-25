@@ -161,12 +161,10 @@ std::vector<const Symbol *> variables;
       }
 
    if (all_functions.size() > 1)
-      Heapsort<const Symbol *>::
-              sort(&all_functions[0], all_functions.size(), 0, symcomp);
+      Heapsort<const Symbol *>::sort(all_functions, 0, symcomp);
 
    if (variables.size() > 1)
-      Heapsort<const Symbol *>::
-              sort(&variables[0], variables.size(), 0, symcomp);
+      Heapsort<const Symbol *>::sort(variables, 0, symcomp);
 
 UTF8_string index_filename(root_dir);
    index_filename << "/index.html";

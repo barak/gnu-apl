@@ -97,8 +97,6 @@ XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
                                        const char * filename)
   : XML_Archive(of, ef),
      indent(0),
-     val_pars(0),
-     value_count(0),
      char_mode(false)
 {
    outf.open(filename, ofstream::out);
@@ -153,12 +151,13 @@ const int spaces = indent * INDENT_LEN;
 }
 //----------------------------------------------------------------------------
 XML_Saving_Archive::Vid
-XML_Saving_Archive::find_vid(const Value * val)
+XML_Saving_Archive::find_vid(const Value * value)
 {
-const void * item = bsearch(val, val_pars, value_count, sizeof(_val_par),
-                      _val_par::compare_val_par1);
-   if (item == 0)   return INVALID_VID;
-   return Vid(reinterpret_cast<const _val_par *>(item) - val_pars);
+const void * item = Heapsort<_val_par>
+                    ::search<const Value *>
+                    (value, val_pars, _val_par::compare, 0);
+   Assert(item);
+   return Vid(reinterpret_cast<const _val_par *>(item) - val_pars.data());
 }
 //----------------------------------------------------------------------------
 void
@@ -834,20 +833,6 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
       }
 }
 //----------------------------------------------------------------------------
-bool
-XML_Saving_Archive::_val_par::compare_val_par(const _val_par & A,
-                                              const _val_par & B, const void *)
-{
-   return A._val > B._val;
-}
-//----------------------------------------------------------------------------
-int
-XML_Saving_Archive::_val_par::compare_val_par1(const void * key, const void * B)
-{
-const void * Bv = (reinterpret_cast<const _val_par *>(B))->_val;
-   return charP(key) - charP(Bv);
-}
-//----------------------------------------------------------------------------
 void
 XML_Saving_Archive::write_XML_header()
 {
@@ -1032,6 +1017,7 @@ XML_Saving_Archive::save()
    Log(LOG_archive)   err << "save() unmarks values..." << endl;
    Workspace::unmark_all_values();
 
+   ShapeItem value_count = 0;
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();
         dob != DynamicObject::get_all_values(); dob = dob->get_next())
        {
@@ -1048,7 +1034,7 @@ XML_Saving_Archive::save()
 
    try
       {
-        val_pars = new _val_par[value_count];
+        val_pars.reserve(value_count);
       }
    catch(...)
       {
@@ -1063,8 +1049,6 @@ XML_Saving_Archive::save()
       }
    Log(LOG_archive)   err << "save() done allocating values[]..." << endl;
 
-ShapeItem idx = 0;
-
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();
         dob != DynamicObject::get_all_values(); dob = dob->get_next())
        {
@@ -1074,17 +1058,15 @@ ShapeItem idx = 0;
          if (val->is_marked())    continue;   // stale
 
          val->unmark();
-         new (val_pars + idx++) _val_par(val, INVALID_VID);
+         const _val_par vp(val, INVALID_VID);   // a value with no parent
+         val_pars.push_back(vp);
        }
-
-   Assert(idx == value_count);
 
    // some people use an excessive number of values. We therefore sort them
    // by the address of the value as to speed up finding them later on
    //
-   Heapsort<_val_par>::sort(val_pars, value_count, 0,
-                            &_val_par::compare_val_par);
-   loop(v, (value_count - 1))
+   Heapsort<_val_par>::sort(val_pars, 0, &_val_par::greater);
+   loop(v, (val_pars.size() - 1))
        {
          Assert(&val_pars[v]._val < &val_pars[v + 1]._val);
        }

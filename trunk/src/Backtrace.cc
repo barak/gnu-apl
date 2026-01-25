@@ -147,11 +147,10 @@ Backtrace::find_src(int64_t pc)
       {
         typedef Heapsort<Backtrace::PC_src> HS;
         if (const PC_src * posp = HS::search<const int64_t &>
-                                            (pc,                // key
-                                             pc_2_src.data(),   // array
-                                             pc_2_src.size(),   // array size
-                                             &pc_cmp,           // compare fun
-                                             0))                // compare arg
+                                            (pc,         // key
+                                             pc_2_src,   // array
+                                             &pc_cmp,    // compare fun
+                                             0))         // compare arg
         return posp->src_loc;   // found
       }
 

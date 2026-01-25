@@ -1541,12 +1541,11 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-ShapeItem
-Bif_F12_UNION::append_zone(const Cell ** cells_Z, const Cell ** cells_B,
-               Zone_list & B_from_to, double qct)
+void
+Bif_F12_UNION::append_zone(vector<const Cell *> & cells_Z,
+                           const vector<const Cell *> &  cells_B,
+                           Zone_list & B_from_to, double qct)
 {
-const Cell ** Z0 = cells_Z;
-
    while (B_from_to.size())
       {
         const Zone zone = B_from_to.back();
@@ -1580,16 +1579,16 @@ const Cell ** Z0 = cells_Z;
         //
         if (zone_count == 1)
            {
-             *cells_Z++ = cells_B[B_from];
+             cells_Z.push_back(cells_B[B_from]);
              continue;   // zone done
            }
 
         if (zone_count == 2)
            {
              if (cells_B[B_from] < cells_B[B_from + 1])
-                *cells_Z++ = cells_B[B_from];
+                cells_Z.push_back(cells_B[B_from]);
              else
-                *cells_Z++ = cells_B[B_from + 1];
+                cells_Z.push_back(cells_B[B_from + 1]);
              continue;   // zone done
            }
 
@@ -1607,7 +1606,7 @@ const Cell ** Z0 = cells_Z;
              // The unique of the zone is then the smallest pointer (i.e.first,
              // not the smallest Cell) in the zone.
              //
-             *cells_Z++ = cells_B[smallest];
+             cells_Z.push_back(cells_B[smallest]);
              continue;   // zone done
            }
 
@@ -1623,7 +1622,7 @@ const Cell ** Z0 = cells_Z;
         // ⎕CT) to smallest.
         //
         const Cell * first_B = cells_B[smallest];
-        *cells_Z++ = first_B;
+        cells_Z.push_back(first_B);
         ShapeItem from1 = smallest;      // initial start of zone b.
         ShapeItem to1   = smallest;      // initial end of zone b.
 
@@ -1647,8 +1646,6 @@ const Cell ** Z0 = cells_Z;
              continue;   // zone done
            }
       }
-
-   return cells_Z - Z0;
 }
 //----------------------------------------------------------------------------
 Token
@@ -1664,18 +1661,11 @@ const double qct = Workspace::get_CT();
    // 1. construct a vector of Cell pointers and sort it so that the
    //    cells being pointed to are sorted ascendingly.
    //
-   // For efficiency we allocate both the Cell pointers for argument B and
-   // for the result Z. Sorting is first done with ⎕CT←0; ⎕CT will be
-   // considered later on.
-   //
-const Cell ** cells_B = new const Cell *[2*len_B];
-   if (cells_B == 0)   WS_FULL;
+vector<const Cell *> cells_B;
+   try { cells_B.reserve(len_B); }   catch(...)   { WS_FULL; }
 
-const Cell ** cells_Z = cells_B + len_B;
-ShapeItem len_Z = 0;
-
-   for (ConstRavel_P b(B, true); +b; ++b)   cells_B[b()] = &*b;
-   Heapsort<const Cell*>::sort(cells_B, len_B, 0, Cell::A_greater_B);
+   loop(b, B->element_count())   cells_B.push_back(&B->get_cravel(b));
+   Heapsort<const Cell*>::sort(cells_B, 0, Cell::A_greater_B);
 
    // 2. divide the cells into zones. A zone is a sequence of cells
    //    B[from] (including)  ... B[to] (excluding) so that the difference
@@ -1683,8 +1673,11 @@ ShapeItem len_Z = 0;
    //
    //    Then append the unique element(s) of each zone to cells_Z.
    //
-ShapeItem from = 0;
-Zone_list from_to;
+vector<const Cell *> cells_Z;
+   try { cells_Z.reserve(len_B); }   catch(...)   { WS_FULL; }
+
+size_t from = 0;
+Zone_list from_to_B;
    for (ShapeItem b = 1; b < len_B; ++b)
        {
          if (cells_B[b]->equal(*cells_B[b-1], qct))
@@ -1695,32 +1688,31 @@ Zone_list from_to;
             }
 
          const Zone ft0(from, b);
-         from_to.push_back(ft0);
-         len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
-         Assert(from_to.size() == 0);
+         from_to_B.push_back(ft0);
+         append_zone(cells_Z, cells_B, from_to_B, qct);
+         Assert(from_to_B.size() == 0);
          from = b;
          continue;   // next b (in the next zone)
        }
 
-   if (from < len_B)   // the rest
+   if (from < cells_B.size())   // the rest
       {
-        const Zone ft0(from, len_B);
-        from_to.push_back(ft0);
-        len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
-        Assert(from_to.size() == 0);
+        const Zone ft0(from, cells_B.size());
+        from_to_B.push_back(ft0);
+        append_zone(cells_Z, cells_B, from_to_B, qct);
+        Assert(from_to_B.size() == 0);
       }
 
    // 3. cells_Z now contains only the unique cells in cells_B, but sorted by
-   //    cell contnt. Sort cells_Z by address (= position in B)  so that the
+   //    cell content. Sort cells_Z by address (= position in B)  so that the
    //    original order in B is reconstructed
    //
-   Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+   Heapsort<const Cell *>::sort(cells_Z, 0, Cell::compare_ptr);
 
    // 4. construct the result.
    //
-Value_P Z(len_Z, LOC);
-   loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
-   delete[] cells_B;   // also deletes cells_Z
+Value_P Z(cells_Z.size(), LOC);
+   loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1740,17 +1732,21 @@ const double qct = Workspace::get_CT();
       {
         // large A or B: sort A and B to speed up searches
         //
-        const Cell ** cells_A = new const Cell *[2*len_A + len_B];
-        const Cell ** cells_Z = cells_A + len_A;
-        const Cell ** cells_B = cells_A + 2*len_A;
+        vector<const Cell *> cells_A;
+        vector<const Cell *> cells_B;
+        vector<const Cell *> cells_Z;
+        try {
+              cells_A.reserve(len_A);
+              cells_B.reserve(len_B);
+              cells_Z.reserve(len_A + len_B);   // worst case
+            } catch (...) { WS_FULL; }
 
-        loop(a, len_A)   cells_A[a] = &A->get_cravel(a);
-        loop(b, len_B)   cells_B[b] = &B->get_cravel(b);
+        loop(a, len_A)   cells_A.push_back(&A->get_cravel(a));
+        loop(b, len_B)   cells_B.push_back(&B->get_cravel(b));
 
-        Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
-        Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+        Heapsort<const Cell *>::sort(cells_A, 0, Cell::compare_stable);
+        Heapsort<const Cell *>::sort(cells_B, 0, Cell::compare_stable);
 
-        ShapeItem len_Z = 0;
         ShapeItem idx_B = 0;
         loop(idx_A, len_A)
             {
@@ -1759,7 +1755,7 @@ const double qct = Workspace::get_CT();
                   {
                     if (ref->equal(*cells_B[idx_B], qct))
                        {
-                         cells_Z[len_Z++] = ref;   // A is in B
+                         cells_Z.push_back(ref);   // A is in B
                          break;   // for idx_B → next idx_A
                        }
 
@@ -1773,38 +1769,36 @@ const double qct = Workspace::get_CT();
         // sort cells_Z by position so that the original order in A is
         //  reconstructed
         //
-        Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
-        Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
+        Heapsort<const Cell *>::sort(cells_Z, 0, Cell::compare_ptr);
+        Value_P Z(cells_Z.size(), LOC);
+        loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete[] cells_A;
         return Token(TOK_APL_VALUE1, Z);
       }
     else
       {
         // small A and B: use quadratic time algorithm.
         //
-        const Cell ** cells_Z = new const Cell *[len_A];
-        ShapeItem len_Z = 0;
+        vector<const Cell *> cells_Z;
+        cells_Z.reserve(len_A);
 
         for (ConstRavel_P a(A, true); +a; ++a)
         for (ConstRavel_P b(B, true); +b; ++b)
             {
               if (a->equal(*b, qct))
                  {
-                   cells_Z[len_Z++] = &*a;
+                   cells_Z.push_back(&*a);
                    break;   // loop(b)
                  }
             }
 
-        Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
+        Value_P Z(cells_Z.size(), LOC);
+        loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete[] cells_Z;
         return Token(TOK_APL_VALUE1, Z);
       }
 }

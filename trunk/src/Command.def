@@ -73,7 +73,7 @@ cmd_def("]COLOR"    , Command::cmd_XTERM(out, arg)              ,"[ON|OFF]"     
 cmd_def("]DOXY"     , Command::cmd_DOXY(out, args)              ,"[path]"                  ,oPATH      )
 cmd_def("]EXPECT"   , Command::cmd_EXPECT(out, arg)             ,"error_count"             ,COUNT      )
 cmd_def("]HELP"     , Command::cmd_HELP(out, arg)               ,"[primitive]"             ,NO_PARAM   )
-cmd_def("]KEYB"     , Cmd_KEYB::cmd_KEYB(out, args)             ,"[SCAN] [KEYS]"           ,oKEYB      )
+cmd_def("]KEYB"     , Cmd_KEYB::cmd_KEYB(out, args)             ,"[SCAN] [KEYS] [KPAD] [FUNK]" ,oKEYB  )
 cmd_def("]LIB"      , Cmd_LIB::cmd_LIB2(out, args)              ,"[lib|path] [from-to]"    ,DIR_OR_LIB )
 cmd_def("]LOG"      , Command::cmd_LOG(out, arg)                ,"[facility|ON|OFF] ..."   ,LOG_NUM    )
 cmd_def("]NEXTFILE" , Command::cmd_NEXTFILE(out, args)          ,"[cond ...]"              ,CONFIG     )

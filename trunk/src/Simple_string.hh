@@ -252,7 +252,6 @@ protected:
 
    /// the items
    T * items;
-   friend void Hswap(UCS_string &, UCS_string &);
 
    /// return the idx'th character
    const T & at(ShapeItem idx) const

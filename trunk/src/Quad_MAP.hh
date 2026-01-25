@@ -47,7 +47,7 @@ protected:
                            const void * cells);
 
    /// compute ⎕MAP with (indices of) sorted A
-   static Value_P do_map(const Value & A, const ShapeItem * ordered_indices_A,
+   static Value_P do_map(const Value & A, const vector<ShapeItem> ordered_indices_A,
                          const Value * B, bool recursive);
 };
 //----------------------------------------------------------------------------

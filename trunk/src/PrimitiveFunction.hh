@@ -505,11 +505,11 @@ protected:
    /// a list of zones
    typedef std::vector<Zone> Zone_list;
 
-   /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and appendi
-   /// it/them to cells_Z. Return the number of uniquest appended.
-   /// 
-   static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
-                                Zone_list & B_from_to, double qct);
+   /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and append
+   /// it/them to cells_Z.
+   static void append_zone(vector<const Cell *>  & cells_Z,
+                           const vector<const Cell *> & cells_B,
+                           Zone_list & B_from_to, double qct);
 };
 //----------------------------------------------------------------------------
 /** System function ∩ (intersection) */

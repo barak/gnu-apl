@@ -73,7 +73,7 @@ protected:
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible change)
         ASX_MINOR = 11,  ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 1,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_OTHER = 2,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 
    /// where to send information messages (such as "SAVED...")
@@ -91,7 +91,7 @@ public:
    XML_Saving_Archive(ostream & of, ostream & ef, const char * filename);
 
    /// destructor
-   ~XML_Saving_Archive()   { outf.close();  delete [] val_pars; }
+   ~XML_Saving_Archive()   { outf.close(); }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
@@ -173,11 +173,16 @@ public:
             { new (this) _val_par(other._val, other._par); }
 
          /// compare function for Heapsort::sort()
-         static bool compare_val_par(const _val_par & A, const _val_par & B,
-                                     const void *);
+         static bool greater(const _val_par & A, const _val_par & B,
+                             const void *)
+            { return A._val > B._val; }
 
          /// compare function for bsearch()
-         static int compare_val_par1(const void * key, const void * B);
+         static int compare(const Value * const & key,
+                            const _val_par & B, const void *)
+            {
+               return int64_t(key) - int64_t(B._val);
+            }
       };
 
 protected:
@@ -227,10 +232,7 @@ protected:
    ///sub-value of a nested parent). The top-level of an APL value has
    /// has no parents (i.e. INVALID_VID).
    /// all values in the workspace
-   _val_par * val_pars;
-
-   /// the number of (non-stale) values
-   ShapeItem value_count;
+   vector<_val_par> val_pars;
 
    /// true iff ² is pending
    bool char_mode;
@@ -241,14 +243,6 @@ protected:
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
 };
-//----------------------------------------------------------------------------
-inline void
-Hswap(XML_Saving_Archive::_val_par & vp1, XML_Saving_Archive::_val_par & vp2)
-{
-const XML_Saving_Archive::_val_par tmp = vp1;
-   vp1 = vp2;
-   vp2 = tmp;
-}
 //----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
 class XML_Loading_Archive: public XML_Archive

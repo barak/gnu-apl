@@ -58,8 +58,22 @@ class UCS_string;
 class ID
 {
 public:
+   /// constructor
+   ID(Id _id, const char * name)
+   : id(_id),
+     name_utf(name)
+     {}
+
+   /// sort helper: compare IDs. Return \b true if id1 > id2
+   static bool greater_id(const ID & id1, const ID & id2, const void *)
+      { return id1.id > id2.id; }
+
+   /// search helper: compare \b id1 with id2
+   static int compare_id(const Id & key, const ID & id, const void *)
+      { return key - id.id; }
+
    /// return the printable name for id as UTF8 *
-   static const UTF8 * get_name(Id id);
+   static const UTF8_literal get_name(Id id);
 
    /// return the printable name for id as UCS_string
    static UCS_string get_name_UCS(Id id);
@@ -80,8 +94,15 @@ public:
    /// return the TokenTag for \b id
    static TokenTag get_token_tag(Id id);
 
-   /// release UCS_strings with ID names
-   static void cleanup();
+protected:
+   /// the ID (defined in IdEnums.hh)
+   Id id;
+     
+   /// how \b id is being printed
+   UTF8_literal name_utf;
+
+   /// a sorted vector of all IDs. Created on demand
+   static vector<ID> all_IDs;
 };
 //----------------------------------------------------------------------------
 

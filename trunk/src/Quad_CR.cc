@@ -705,36 +705,16 @@ UCS_string text;
         // be careful with non-printable characters and quotes
         //
         const Unicode uni = cell.get_char_value();
-        if (uni < ' ' || uni == 127)
-           {
-             text << "(⎕UCS " << int(uni) << ")";
-           }
-        else if (uni == UNI_SINGLE_QUOTE)
-           {
-             text << "''''";
-           }
-        else
-           {
-             text << "'" << uni << "'";
-           }
-        return text;
+        if (uni < ' ' || uni == 127)   return text << "(⎕UCS " << int(uni) << ")";
+        if (uni == UNI_SINGLE_QUOTE)   return text << "''''";
+        return text << "'" << uni << "'";
       }
 
-   if (cell.is_integer_cell())
-      {
-        return text << cell.get_int_value();
-      }
-   if (cell.is_real_cell())
-      {
-        PrintContext pctx(PR_APL);
-        PrintBuffer pbuf = cell.character_representation(pctx) ;
-        return text << pbuf.l1();
-      }
-   if (cell.is_complex_cell())
-      {
-        return text << cell.get_real_value() << UNI_J << cell.get_imag_value();
-      }
-   FIXME;
+   if (cell.is_integer_cell())   return text << cell.get_int_value();
+   if (cell.is_real_cell())      return text << cell.get_real_value();
+   if (cell.is_complex_cell()) return text << cell.get_real_value() << UNI_J
+                                           << cell.get_imag_value();
+   FIXME;   // cell is not simple
 }
 //----------------------------------------------------------------------------
 UCS_string

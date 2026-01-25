@@ -470,6 +470,13 @@ enum SI_mode
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
 };
 //----------------------------------------------------------------------------
+enum Silence
+{
+  FULL_BANNER  = 0,
+  BRIEF_BANNER = 1,
+  NO_BANNER    = 2,
+};
+//----------------------------------------------------------------------------
 /// the order of a comparison
 enum Sort_order
 {

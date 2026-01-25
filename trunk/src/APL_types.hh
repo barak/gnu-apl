@@ -83,10 +83,6 @@ typedef const Function * cFunction_P;
 typedef const Function * cMonOP;
 typedef const Function * cDyaOP;
 
-inline void
-Hswap(APL_Integer & i1, APL_Integer & i2)
-{ const APL_Integer tmp = i1;   i1 = i2;   i2 = tmp; }
-
 /// One (real) APL floating point value.
 #if APL_Float_is_class // APL_Float is a class
 

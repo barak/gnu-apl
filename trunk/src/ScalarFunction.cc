@@ -1219,29 +1219,26 @@ Bif_F12_WITHOUT::large_eval_AB(const Value & A, const Value & B)
 const ShapeItem len_A = A.element_count();
 const ShapeItem len_B = B.element_count();
 
-   /* pack pointers to the cells of the arguments A and B and of the
-      result Z into one big array:
+vector<const Cell *> cells_A;
+vector<const Cell *> cells_Z;
+vector<const Cell *> cells_B;
+   try {
+         cells_A.reserve(len_A);
+         cells_B.reserve(len_B);
+         cells_Z.reserve(len_A);
 
-        len_A    len_Z      len_B
-     ┌─────────┬─────────┬─────────┐
-     │ cells_A │ cells_Z │ cells_B │
-     └─────────┴─────────┴─────────┘
-    */
-const Cell ** cells_A = new const Cell *[2*len_A + len_B];
-const Cell ** cells_Z = cells_A + len_A;
-const Cell ** cells_B = cells_A + 2*len_A;
+       }   catch (...) { WS_FULL; }
 
-   loop(a, len_A)   cells_A[a] = &A.get_cravel(a);
-   loop(b, len_B)   cells_B[b] = &B.get_cravel(b);
+   loop(a, len_A)   cells_A.push_back(&A.get_cravel(a));
+   loop(b, len_B)   cells_B.push_back(&B.get_cravel(b));
 
    // sort the A-cells and the B-cells ascendingly
    //
-   Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
-   Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+   Heapsort<const Cell *>::sort(cells_A, 0, Cell::compare_stable);
+   Heapsort<const Cell *>::sort(cells_B, 0, Cell::compare_stable);
 
    // store those cells_A pointers that are not in cells_B into cells_Z. Use
    // the fact that cells_A and cells_B are sorted.
-ShapeItem len_Z = 0;
    {
      ShapeItem idx_A = 0;
      ShapeItem idx_B = 0;
@@ -1253,23 +1250,21 @@ ShapeItem len_Z = 0;
              const Cell & ref_B = *cells_B[idx_B];
              if (ref_A.equal(ref_B, qct))     ++idx_A;   // A is in B → not in Z
              else if (ref_A.greater(ref_B))   ++idx_B;
-            else cells_Z[len_Z++] = cells_A[idx_A++];    // A is in Z
+            else cells_Z.push_back(cells_A[idx_A++]);    // A is in Z
            }
 
      // the rest of A is in Z
      //
-     while (idx_A < len_A)   cells_Z[len_Z++] = cells_A[idx_A++];
+     while (idx_A < len_A)   cells_Z.push_back(cells_A[idx_A++]);
    }
 
    // sort cells_Z by position so that the original order in A is reconstructed
    //
-   Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+   Heapsort<const Cell *>::sort(cells_Z, 0, Cell::compare_ptr);
 
-Value_P Z(len_Z, LOC);
+Value_P Z(cells_Z.size(), LOC);
 
-   loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
-
-   delete[] cells_A;   // incl. cells_Z and cells_B
+   loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
    Z->check_value(LOC);
    return Z;

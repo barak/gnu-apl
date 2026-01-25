@@ -101,11 +101,6 @@ extern int nibble(Unicode uni);
 extern int sixbit(Unicode uni);
 
 //----------------------------------------------------------------------------
-/// swap Unicodes u1 and u2 (used by UCS_string::sort())
-inline void
-Hswap(Unicode & u1, Unicode & u2)
-{ const Unicode tmp = u1;   u1 = u2;   u2 = tmp; }
-//----------------------------------------------------------------------------
 /// return true iff \b uni is a padding character (used internally).
 inline bool is_iPAD_char(Unicode uni)
 {

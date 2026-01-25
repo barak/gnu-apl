@@ -32,9 +32,10 @@
 #
 # Print (or don't) a welcome message on start-up
 #
-# The corresponding command line options is --silent
+# The corresponding command line option is --silent
 #
-  Welcome       Yes	(default)
+  Welcome       Yes (default)
+# Welcome       Brief (1-line)
 # Welcome       No
 #
 

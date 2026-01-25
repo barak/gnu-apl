@@ -589,7 +589,7 @@ Avec::print_inverse_IBM_quad_AV()
    loop(c, 256)
       {
         inverse_ibm_av[c].uni = -1;
-        inverse_ibm_av[c].cp  = -1;
+        inverse_ibm_av[c].quad_av_pos = -1;
       }
 
 int current_max = -1;
@@ -607,7 +607,7 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
              else if (uni < ibm_av[next_idx])   next_idx = n;
            }
         current_max = map->uni = ibm_av[next_idx];
-        map->cp  = next_idx;
+        map->quad_av_pos  = next_idx;
         ++map;
       }
 
@@ -627,19 +627,11 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
            {
              const int pos = col + 4*row;
              CERR << " { " << HEX4(inverse_ibm_av[pos].uni) << ", "
-                  << setw(3) << inverse_ibm_av[pos].cp << " }";
+                  << setw(3) << inverse_ibm_av[pos].quad_av_pos << " }";
              if (pos < 255)   CERR << ",";
            }
         CERR << endl;
       }
-}
-//----------------------------------------------------------------------------
-/// compare the unicodes of two chars in the IBM ⎕AV
-int
-Avec::compare_uni(const void * key, const void * entry)
-{
-   return *reinterpret_cast<const Unicode *>(key) -
-           reinterpret_cast<const Unicode_to_IBM_codepoint *>(entry)->uni;
 }
 //----------------------------------------------------------------------------
 unsigned char
@@ -652,8 +644,13 @@ Avec::unicode_to_cp(Unicode uni)
 
    // search in uni_to_cp_map table
    //
-const void * where = bsearch(&uni, inverse_ibm_av, 256,
-                             sizeof(Unicode_to_IBM_codepoint), compare_uni);
+static vector<Unicode_to_IBM_codepoint> inverse;
+   if (inverse.size() == 0)
+      {
+        loop(j, 256)   inverse.push_back(inverse_ibm_av[j]);
+      }
+const void * where = Heapsort<Unicode_to_IBM_codepoint>
+                     ::search<uint32_t>(uni, inverse, compare_uni, 0);
 
    if (where == 0)
       {
@@ -663,8 +660,7 @@ const void * where = bsearch(&uni, inverse_ibm_av, 256,
         return 0xB0;
       }
 
-   Assert(where);
-   return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->cp;
+   return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->quad_av_pos;
 }
 //----------------------------------------------------------------------------
 

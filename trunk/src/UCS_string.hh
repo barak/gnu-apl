@@ -527,20 +527,6 @@ public:
    UCS_ASCII_string(TokenValueType tvt);
 };
 //----------------------------------------------------------------------------
-inline void
-Hswap(const UCS_string * & usp1, const UCS_string * & usp2)
-{
-const UCS_string * tmp = usp1;
-   usp1 = usp2;
-   usp2 = tmp;
-}
-//----------------------------------------------------------------------------
-inline void
-Hswap(UCS_string & u1, UCS_string & u2)
-{
-   swap(u1, u2);
-}
-//----------------------------------------------------------------------------
 
 #endif // __UCS_STRING_HH_DEFINED__
 

@@ -745,20 +745,6 @@ int format = arg.atoi();
       "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
 //----------------------------------------------------------------------------
-bool
-Command::val_val::compare_val_val(const val_val & A,
-                                  const val_val & B, const void *)
-{
-   return A.child > B.child;
-}
-//----------------------------------------------------------------------------
-int
-Command::val_val::compare_val_val1(const void * key, const void * B)
-{
-const void * Bv = reinterpret_cast<const val_val *>(B)->child;
-   return charP(key) - charP(Bv);
-}
-//----------------------------------------------------------------------------
 void
 Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
@@ -837,10 +823,10 @@ bool show_OK = true;   // assume more verbose output
            val_vals.push_back(vv);
          }
 
-     // 4b. sort vector<val_val> val_vals by address so we can bsearch it.
+     // 4b. sort vector<val_val> val_vals by address so that we can search it.
      //
      Heapsort<val_val>::sort(&val_vals.front(), val_vals.size(), 0,
-                             &val_val::compare_val_val);
+                             &val_val::greater);
      loop(v, (val_vals.size() - 1))
          Assert(&val_vals[v].child < &val_vals[v + 1].child);
 
@@ -859,8 +845,8 @@ bool show_OK = true;   // assume more verbose output
                   Assert1(sub);
 
                   val_val * vvp = reinterpret_cast<val_val *>
-                       (bsearch(sub, &val_vals.front(), val_vals.size(),
-                                sizeof(val_val), val_val::compare_val_val1));
+                       Heapsort<val_val>::
+                        search(sub, val_vals, val_val::compare, 0);
                   Assert(vvp);
                   if (vvp->parent == 0)   // child has no parent (OK)
                      {
@@ -1626,7 +1612,7 @@ void
 Command::cmd_OFF(int exit_val)
 {
    COUT << endl;
-   if (!UserPreferences::uprefs.silent)
+   if (UserPreferences::uprefs.silence < NO_BANNER)
       {
         timeval end;
         gettimeofday(&end, 0);

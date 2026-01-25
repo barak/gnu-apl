@@ -220,8 +220,16 @@ signal_HUP_handler(int)
 //----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
-show_welcome(ostream & out, const char * argv0)
+show_welcome(ostream & out, const char * argv0, Silence silence)
 {
+   if (silence == NO_BANNER)   return;
+   if (silence == BRIEF_BANNER)
+      {
+        out << "GNU APL version " << build_tag[1] << endl;
+        return;
+      }
+
+
 char c1[200];
 char c2[200];
    SPRINTF(c1, "Welcome to GNU APL version %s", build_tag[1]);
@@ -530,7 +538,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    init_modules2(log_startup);
 
-   if (!uprefs.silent)   show_welcome(cout, args[0]);
+   show_welcome(cout, args[0], uprefs.silence);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
 
@@ -594,7 +602,8 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
          // the user has provided a workspace name via -L
          //
          UCS_string init_ws(uprefs.initial_workspace);
-         const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
+         const char * cmd = uprefs.silence == NO_BANNER
+                          ? ")QLOAD " : ")LOAD ";
          const UTF8_string utf(cmd);
          UCS_string load_cmd(utf);
          load_cmd << init_ws;

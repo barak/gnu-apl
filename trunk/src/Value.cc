@@ -2462,7 +2462,7 @@ Value::print_brief(ostream & out) const
 
    // ravel
    //
-const int count = max(3, int(element_count()));
+const int count = min(3, int(element_count()));
    if (count == 0)   out << "⌽";   // empty
    loop(c, count)
       {

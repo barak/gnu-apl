@@ -24,6 +24,36 @@
 #include "Command.hh"
 #include "UserPreferences.hh"
 
+// See: /usr/share/X11/xkb/keycodes/xfree86
+
+const char * Cmd_KEYB::funkey_template[] = {
+"╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
+"║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║    ║ Kc ║ Kc ║",
+"║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║",
+"╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
+"",
+"",
+};
+
+const char * Cmd_KEYB::keypad_template[] = {
+"╔════╦════╦════╦════╗",
+"║ Kc ║    ║ Kc ║ Kc ║",
+"║ 77 ║    ║ 82 ║ 82 ║",
+"╠════╬════╬════╬════╣",
+"║ Kc ║ Kc ║ Kc ║    ║",
+"║ 79 ║ 80 ║ 81 ║ Kc ║",
+"╠════╬════╬════╣ 86 ║",
+"║ Kc ║ Kc ║ Kc ║    ║",
+"║ 83 ║ 84 ║ 85 ║    ║",
+"╠════╬════╬════╬════╣",
+"║ Kc ║ Kc ║ Kc ║    ║",
+"║ 87 ║ 88 ║ 89 ║ Kc ║",
+"╠════╩════╬════╣108 ║",
+"║ Kc      ║    ║    ║",
+"║ 90      ║    ║    ║",
+"╚═════════╩════╩════╝",
+};
+
 const char * Cmd_KEYB::layout_template[] = {
 "╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗",
 "║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
@@ -33,11 +63,14 @@ const char * Cmd_KEYB::layout_template[] = {
 "║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║",
 "╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣",
 "║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
-"║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║",
+"║ 66      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║",
 "╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣",
 "║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║",
 "║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║",
-"╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝",
+"╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣",
+"║ Kc ║ Kc  ║ Kc  ║              Kc                  ║ Kc  ║ Kc  ║ Kc  ║ Kc ║",
+"║ 37 ║115  ║ 64  ║              65                  ║113  ║116  ║ 109 ║105 ║",
+"╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝",
                         };
 
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
@@ -48,10 +81,13 @@ Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
 bool scan = false;
 bool keys = false;
+int area = 0;   // main keys
    loop(a, args.size())
       {
-        if (args[a].starts_iwith("SCAN"))        scan = true;
+        if      (args[a].starts_iwith("SCAN"))   scan = true;
         else if (args[a].starts_iwith("KEYS"))   keys = true;
+        else if (args[a].starts_iwith("KPAD"))   area |= 1;
+        else if (args[a].starts_iwith("FUNK"))   area |= 2;
         else
            {
              MORE_ERROR() << "Command ]KEYB: invalid argument '"
@@ -63,7 +99,7 @@ bool keys = false;
 const bool parse_error = parse_xmodmap();
    if (scan)
       {
-        if (!parse_error)   print_xmodmap(out, keys);
+        if (!parse_error)   print_xmodmap(out, keys, area);
         return;
       }
 
@@ -238,24 +274,44 @@ char keyname[42];   // ignored
 }
 //----------------------------------------------------------------------------
 ostream &
-Cmd_KEYB::print_xmodmap(ostream & out, bool keys)
+Cmd_KEYB::print_xmodmap(ostream & out, bool keys, int area)
 {
    out << "US Keyboard Layout.    ";
    if (keys)   out << "Source: GNU APL builtin" << endl << endl;
    else        out << "Source: xmodmap -pk" << endl << endl;
 
-const int rows = sizeof(layout_template) / sizeof(*layout_template);
+const int main_rows = sizeof(layout_template) / sizeof(*layout_template);
+int fun_rows = 0;
 UCS_string_vector lines;
-   for (int y = 0; y < rows; ++y)
+
+   if (keys && (area & 2))   // including function keys
+      {
+        fun_rows = sizeof(funkey_template) / sizeof(*funkey_template);
+        for (int y = 0; y < fun_rows; ++y)
+            {
+              const UTF8_string utf(funkey_template[y]);
+              const UCS_string ucs(utf);
+              lines.push_back(ucs);
+            }
+      }
+
+   for (int y = 0; y < main_rows; ++y)
        {
          const UTF8_string utf(layout_template[y]);
-         const UTF8_string ucs(utf);
-          lines.push_back(ucs);
+         const UCS_string ucs(utf);
+         lines.push_back(ucs);
+         if (area & 1)
+            {
+              const UTF8_string utf(keypad_template[y]);
+              UCS_string ucs(utf);
+              lines.back() <<  "    " << ucs;
+            }
        }
 
+const int rows = lines.size();
    if (keys)
       {
-        for (int y = 0; y < (rows); ++y)   out << lines[y] << endl;
+        for (int y = 0; y < rows; ++y)   out << lines[y] << endl;
         out << endl;
          return out;
       }
@@ -284,10 +340,13 @@ UCS_string_vector lines;
                     //
                     switch(keycode)
                        {
+                         case  9:   // ESC
+                              l[x] = UNI_E;   l[x+1] = UNI_S; l[x+2] = UNI_C;
+                              continue;
+
                          case 22:   // BACKSPACE
                               l[x] = UNI_B;   l[x+1] = UNI_A; l[x+2] = UNI_C;
                               l[x+3] = UNI_K; l[x+4] = UNI_S; l[x+5] = UNI_P;
-                              l[x+6] = UNI_C;
                               continue;
 
                          case 23:   // TAB
@@ -298,16 +357,33 @@ UCS_string_vector lines;
                               l[x] = UNI_R;   l[x+1] = UNI_E; l[x+2] = UNI_T;
                               l[x+3] = UNI_U; l[x+4] = UNI_R; l[x+5] = UNI_N;
                               continue;
-                         case 37:   // CAPS LOCK
+
+                         case 37:
+                         case 105:   // CTRL
+                              l[x-1] = UNI_C;   l[x] = UNI_T; l[x+1] = UNI_R;
+                              l[x+2] = UNI_L;
+                              continue;
+
+                         case 50:
+                         case 62:   // SHIFT
+                              l[x] = UNI_S;   l[x+1] = UNI_H; l[x+2] = UNI_I;
+                              l[x+3] = UNI_F; l[x+4] = UNI_T;
+                              continue;
+
+                         case 66:   // CAPS LOCK
                               u[x] = UNI_L_PARENT; u[x+1] = UNI_C;
                               u[x+2] = UNI_A; u[x+3] = UNI_P; u[x+4] = UNI_S;
                               l[x] = UNI_L;   l[x+1] = UNI_O; l[x+2] = UNI_C;
                               l[x+3] = UNI_K; l[x+4] = UNI_R_PARENT;
                               continue;
 
-                         case 50: case 62:   // SHIFT
-                              l[x] = UNI_S;   l[x+1] = UNI_H; l[x+2] = UNI_I;
-                              l[x+3] = UNI_F; l[x+4] = UNI_T;
+                         case  64:
+                         case 113:
+                              l[x] = UNI_A;   l[x+1] = UNI_L; l[x+2] = UNI_T;
+                              continue;
+                         case 115:
+                         case 116:
+                              l[x] = UNI_W;   l[x+1] = UNI_i; l[x+2] = UNI_n;
                               continue;
                        }
 

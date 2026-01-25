@@ -157,8 +157,6 @@ cleanup(bool soft)
 
         Thread_context::cleanup();
 
-        ID::cleanup();
-
         Quad_GTK::close_all_windows();
 
         Quad_FIO::clear();

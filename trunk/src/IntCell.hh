@@ -275,11 +275,5 @@ protected:
    virtual int CDR_size() const;
 };
 //----------------------------------------------------------------------------
-inline void
-Hswap(IntCell & c1, IntCell & c2)
-{
-   c1.swap_ivals(c2);
-}
-//----------------------------------------------------------------------------
 
 #endif // __INTCELL_HH_DEFINED__

@@ -143,7 +143,7 @@ CollatingCache::get_significance(Unicode uni) const
 const CollatingCacheEntry * entries = &at(0);
 const CollatingCacheEntry * entry =
 
-   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, entries, size(),
+   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, *this,
                                          CollatingCacheEntry::compare_chars, 0);
 
    if (entry)   return entry - entries;
@@ -212,11 +212,10 @@ vector<ShapeItem> vZ;
    loop(z, len_BZ)   vZ.push_back(z);
 
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
-                                &CollatingCache::greater_vec);
+      Heapsort<ShapeItem>::sort(vZ, &cache, &CollatingCache::greater_vec);
    else
-      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
-                                &CollatingCache::smaller_vec);
+      Heapsort<ShapeItem>::sort(vZ, &cache, &CollatingCache::smaller_vec);
+
 Value_P Z(len_BZ, LOC);
    loop(z, len_BZ)   Z->next_ravel_Int(vZ[z] + qio);
    Z->check_value(LOC);

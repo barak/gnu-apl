@@ -875,7 +875,7 @@ const APL_time_us from = now();
 #if PARALLEL_ENABLED
                    Thread_context::kill_pool();
 #endif // PARALLEL_ENABLED
-                   UserPreferences::uprefs.silent = true;   // exit silently
+                   UserPreferences::uprefs.silence = NO_BANNER;   // exit silently
                    Command::cmd_OFF(4);    // exit()s
                    return;  // not reached
                  }
