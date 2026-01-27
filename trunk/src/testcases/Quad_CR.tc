@@ -103,8 +103,9 @@ A ┌→─┐ 1 ┌→──┐ ┌→────────┐
 ╚══════════════════════════╝
 
       ⍝ 10 ⎕CR has its own testcase file Quad_CR10.tc
+      ⍝ and is therefore not tested here.
 
-      ⍝ 10 ⎕CR is binary, so we hex-dump it
+      ⍝ 11 ⎕CR is binary, so we hex-dump it
       ⍝
       6 ⎕CR 11 ⎕CR B
 000020200000013000000005070100000000000530000000500000007000000090000000b0000000
@@ -542,14 +543,15 @@ Z←2 2⍴5 6.6 7J8
 
 
    ⍪44 ⎕CR TOKs
- TOK_SYMBOL( Z )                
- TOK_ASSIGN( ← )                
- TOK_INTEGER( 2 )               
- TOK_INTEGER( 2 )               
- TOK_F12_RHO( ⍴ )               
- TOK_INTEGER( 5 )               
- TOK_REAL( 6.5999999999999996 ) 
- TOK_COMPLEX( 7J8 )             
+ TOK_SYMBOL( Z )    
+ TOK_ASSIGN( ← )    
+ TOK_INTEGER( 2 )   
+ TOK_INTEGER( 2 )   
+ TOK_F12_RHO( ⍴ )   
+ TOK_INTEGER( 5 )   
+ TOK_REAL( 6.6 )    
+ TOK_COMPLEX( 7J8 ) 
+
 
       ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
 Z←2 2⍴5 6.6 7J8
@@ -564,9 +566,9 @@ Z←2 2⍴5 6.6 7J8
 
 
      ⍪44 ⎕CR TOKs
- TOK_LSYMB( Z )                                   
- TOK_ASSIGN( ← )                                  
- TOK_APL_VALUE4( 2 2⍴5 6.5999999999999996 7J8 5 ) 
+ TOK_LSYMB( Z )                    
+ TOK_ASSIGN( ← )                   
+ TOK_APL_VALUE4( 2 2⍴5 6.6 7J8 5 ) 
 
       ⊢TAGs←↑¨TOKs                 ⍝ the token tags (decimal)
 66830 1091043329 1091503887

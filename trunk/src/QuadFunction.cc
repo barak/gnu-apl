@@ -590,7 +590,7 @@ const ErrorCode ec = get_error_code(B);
              // and B is not empty, the event action is generated as though
              // the function were primitive.
              //
-             UCS_string ufun_name(UTF8_string("      "));
+             UCS_string ufun_name(U"      ");
              ufun_name << ufun->get_name();
              error.set_error_line_2(ufun_name, 6, -1);
              Workspace::pop_SI(LOC);

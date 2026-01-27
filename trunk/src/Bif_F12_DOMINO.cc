@@ -415,9 +415,8 @@ void
 Bif_F12_DOMINO::print_map_syntax(ostream & out,
                                  const function_info & info) const
 {
-const UTF8_literal name = info.function_name;
-const UCS_string blanks(max_function_name_length - name.get_char_count(),
-                        UNI_SPACE);
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
    out << "    ⌹[" << setw(2) << info.axis << "]  ←→  ⌹['" << name << "']"
        << blanks << "  ←→  ⌹." << name << endl;
 }

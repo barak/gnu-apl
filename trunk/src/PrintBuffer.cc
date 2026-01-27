@@ -537,7 +537,7 @@ PrintBuffer::pb_empty(const Value & value, PrintContext pctx,
            {
              if (value.get_cfirst().is_character_cell())   // ''
                 {
-                  UCS_string ucs(UTF8_string("''"));
+                  UCS_string ucs(U"''");
                   ColInfo ci;
                   *this = PrintBuffer(ucs, ci);
                   add_outer_frame(outer_style);

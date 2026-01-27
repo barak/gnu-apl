@@ -61,7 +61,7 @@ public:
    /// constructor
    ID(Id _id, const char * name)
    : id(_id),
-     name_utf(name)
+     name_utf(utf8P(name))
      {}
 
    /// sort helper: compare IDs. Return \b true if id1 > id2
@@ -73,7 +73,7 @@ public:
       { return key - id.id; }
 
    /// return the printable name for id as UTF8 *
-   static const UTF8_literal get_name(Id id);
+   static const UTF8 * get_name(Id id);
 
    /// return the printable name for id as UCS_string
    static UCS_string get_name_UCS(Id id);
@@ -99,7 +99,7 @@ protected:
    Id id;
      
    /// how \b id is being printed
-   UTF8_literal name_utf;
+   const UTF8 * name_utf;
 
    /// a sorted vector of all IDs. Created on demand
    static vector<ID> all_IDs;

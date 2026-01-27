@@ -251,7 +251,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 
    if (B.get_rank() == 1)   // JSON array
       {
-        UCS_string array(UTF8_string("[ "));
+        UCS_string array(U"[ ");
         const ShapeItem ec = B.element_count();
         loop(e, ec)
             {

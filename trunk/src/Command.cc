@@ -753,7 +753,7 @@ bool show_OK = true;   // assume more verbose output
       {
         UCS_string arg0(arg);
         arg0.remove_leading_and_trailing_whitespaces();
-        const UCS_string brief(UTF8_string("BRIEF"));
+        const UCS_string brief(U"BRIEF");
         show_OK = arg0.compare(brief) != COMP_EQ;   // not BRIEF
         if (show_OK)   // still show_OK
            {
@@ -899,7 +899,7 @@ Command::cmd_CLEAR(ostream & out)
 void
 Command::cmd_CONTINUE(ostream & out)
 {
-const UCS_string wsname(UTF8_string("CONTINUE"));
+const UCS_string wsname(U"CONTINUE");
    Workspace::wsid(out, wsname, LIB_NONE, false);     // )WSID CONTINUE
 const LibRef_name lib_name(wsname, false);
    Workspace::save_WS(out, lib_name, true);           // )SAVE

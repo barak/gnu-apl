@@ -1437,7 +1437,7 @@ Quad_XML::tree(const Value & B, int flags)
         DOMAIN_ERROR;
       }
 
-UCS_string z(UTF8_string("XML\n"));
+UCS_string z(U"XML\n");
 UCS_string prefix;
 const UCS_string name_prefix;
    tree(B, z, prefix, name_prefix, flags);

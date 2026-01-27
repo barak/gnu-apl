@@ -256,9 +256,9 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
       }
 
    Heapsort<const FunctionGroup::function_info *>::
-            sort(sorted_by_name, 0, greater_function_name);
+            sort(sorted_by_name, greater_function_name, 0);
    Heapsort<const FunctionGroup::function_info *>::
-            sort(sorted_by_axis, 0, greater_function_axis);
+            sort(sorted_by_axis, greater_function_axis, 0);
    }
 
    // check that sorted_by_name is sorted ascendingly
@@ -269,8 +269,7 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
          const function_info * info_1 = sorted_by_name[c + 1];
 
          // CERR << "NAME " << c << ": " << info_0->function_name << endl;
-         Assert(UTF8_literal(info_0->function_name) <
-                UTF8_literal(info_1->function_name));
+         Assert(strcmp(info_0->function_name, info_1->function_name) < 0);
        }
 
    // check that sorted_by_axis is sorted ascendingly
@@ -294,7 +293,7 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
            const char * key = info.function_name;
            const function_info * found = get_info_by_name(key);
            Assert_fatal(found);
-           Assert_fatal(UTF8_literal(found->function_name) == key);
+           Assert_fatal(!strcmp(key, found->function_name));
          }
 
          {
@@ -350,7 +349,6 @@ FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
    if (subfun_count)
       {
         const UTF8_string name_utf(subfun_name);
-        const UTF8_literal name_literal(name_utf.c_str());
         if (const function_info * info = get_info_by_name(name_utf.c_str()))
            {
              return info->axis;   // found

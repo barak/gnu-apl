@@ -235,7 +235,7 @@ const ShapeItem column_count1 = column_count - 1;
 ShapeItem * column_widths = ALLOCA(ShapeItem, column_count);
    loop(col, column_count)   column_widths[col] = max_width(col, column_count);
 
-const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
+const UCS_string frame(U"╔╤╗╚╧╝═║│");
 
    // top row
    //

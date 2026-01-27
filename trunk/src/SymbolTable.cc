@@ -145,13 +145,13 @@ UCS_string to;
           return;
       }
 
-   // put those symbols into 'list' that satisfy 'which'
+   // collect those symbols in 'list' that satisfy 'which' and 'from_to'
    //
-std::vector<Symbol *> list;
-int symbol_count = 0;   // for )SYMBOLS
+vector<const Symbol *> list;
+int symbol_count = 0;   // tital count for )SYMBOLS
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
-         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
+         for (const Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
                const UCS_string symbol_name = sym->get_name();
                if (symbol_name[0] == UNI_MUE)   continue;   // hide macros

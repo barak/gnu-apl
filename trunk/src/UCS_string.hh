@@ -77,7 +77,12 @@ public:
    UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
    /// constructor: UCS_string from UTF8_string
-   UCS_string(const UTF8_string & utf);
+   UCS_string(const UTF8_string & utf)
+      { create(LOC);   decode(utf8P(utf.c_str()), utf.size()); }
+
+   /// constructor: UCS_string from (0-terminated) U"..." literal
+   UCS_string(const char32_t * literal)
+      { create(LOC);   while (*literal)   push_back(Unicode(*literal++)); }
 
    /// constructor: UCS_string from print buffer
    UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW);
@@ -86,7 +91,7 @@ public:
    /// (eg. 3.33 has 3 digits), In standard APL format.
    UCS_string(APL_Float value, bool & scaled, const PrintContext & pctx);
 
-   /// constructor: read one line from UTF8-encoded file.
+   /// constructor: read one line from UTF8-encoded file \b in.
    UCS_string(istream & in);
 
    /// constructor: UCS_string from simple character vector value.
@@ -329,6 +334,7 @@ public:
         return *this << utf;
       }
 
+   /// append Unicode \b uni
    /// append integer \b num
    UCS_string & operator <<(int num)
       { append_int(num);   return *this; }
@@ -472,6 +478,9 @@ public:
    static UCS_string power(size_t n);
 
 protected:
+   /// decode UTF8 decoded \b utf into \b this string
+   void decode(const UTF8 * utf, int size);
+
    // prevernt push_back() outside of this class. Use << instead.
    void push_back(Unicode uni)
       { std::vector<Unicode>::push_back(uni); }
@@ -504,8 +513,10 @@ private:
 
    /// constructor: UCS_string from 0-terminated C string.
    /// Made private because it was far too often used incorrectly.
-
    UCS_string(const char * cstring);
+
+   /// constructor: UCS_string from 0-terminated C string.
+   UCS_string(const UTF8 * cstring);
 };
 //----------------------------------------------------------------------------
 /// an UCS_string that contains only ASCII characters,

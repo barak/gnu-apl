@@ -548,7 +548,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
         return 8;
       }
 
-   if (uprefs.do_Color)   Output::toggle_color(UTF8_string("ON"));
+   if (uprefs.do_Color)   Output::toggle_color(U"ON");
 
    if (uprefs.latent_expression.size())
       {
@@ -568,7 +568,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
    //
    if (uprefs.do_CONT && !uprefs.initial_workspace.size())
       {
-         UCS_string cont(UTF8_string("CONTINUE"));
+         UCS_string cont(U"CONTINUE");
          LibRef_name lib_name(LIB0, cont);
          UTF8_string filename =
             LibPaths::get_filename(lib_name, true, ".xml", ".apl");
@@ -577,7 +577,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
             {
               // CONTINUE workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(UTF8_string(")LOAD CONTINUE"));
+              UCS_string load_cmd(U")LOAD CONTINUE");
               Command::process_line(load_cmd, 0);
               return 0;
             }
@@ -591,7 +591,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
             {
               // SETUP workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(UTF8_string(")LOAD SETUP"));
+              UCS_string load_cmd(U")LOAD SETUP");
               Command::process_line(load_cmd, 0);
               return 0;
             }

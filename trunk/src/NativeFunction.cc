@@ -438,7 +438,7 @@ NativeFunction::print(std::ostream & out) const
 UCS_string
 NativeFunction::load_emacs_library(const char * emacs_arg)
 {
-UCS_string so_path(UTF8_string("libemacs"));
+UCS_string so_path(U"libemacs");
 UCS_string t4;
 
 void * handle = open_so_file(t4, so_path);

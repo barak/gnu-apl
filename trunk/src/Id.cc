@@ -70,12 +70,12 @@ vector<ID> ID::all_IDs;
 UCS_string
 ID::get_name_UCS(Id id)
 {
-const UTF8 * name = get_name(id)();
+const UTF8 * name = get_name(id);
 const UTF8_string utf(charP(name));
    return UCS_string(utf);
 }
 //----------------------------------------------------------------------------
-const UTF8_literal
+const UTF8 *
 ID::get_name(Id id)
 {
    if (all_IDs.size() == 0)
@@ -87,14 +87,14 @@ ID::get_name(Id id)
 #define st(i,  u, _v) all_IDs.push_back(ID(ID_      ## i,  u));
 #include "Id.def"
 
-        Heapsort<ID>::sort(all_IDs, 0, ID::greater_id);
+        Heapsort<ID>::sort(all_IDs, ID::greater_id, 0);
       }
 
    if (const ID * found = Heapsort<ID>
                           ::search<Id>(id, all_IDs, ID::compare_id, 0))
       { return found->name_utf; }
 
-   return "unknown ID";
+   return reinterpret_cast<const UTF8 *>("unknown ID");
 }
 //----------------------------------------------------------------------------
 ostream &

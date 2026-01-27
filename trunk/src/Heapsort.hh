@@ -34,12 +34,14 @@ class Heapsort
 public:
    /// a function to compare two items of array a. The function shall return
    /// true if \b item_a is larger than \b item_b.
-   /// \b comp_arg is some additional argument guiding the comparison
+   /// \b comp_arg is some additional argument guiding the comparison.
+   /// The function is only used for sorting, but not for searching.
+   //
    typedef bool (*greater_fun)(const T & item_a, const T & item_b,
                  const void * comp_arg);
 
    /// sort array \b a according to greater_fun \b gf
-   static void sort(vector<T> & array, const void * comp_arg, greater_fun gf)
+   static void sort(vector<T> & array, greater_fun gf, const void * comp_arg)
       {
         /* Turn array into a heap. An array a is a if for every odd element
            a[i+i+1] in a[] the heap property "Hodd" and for every even element
@@ -140,7 +142,7 @@ public:
    /// to the comparison function \b gf.
    static void sorted_pointers(vector<const T *> & sorted,
                                const vector<T> & array,
-                               greater_fun gf, const void * comp_arg = 0)
+                               greater_fun gf, const void * comp_arg)
       {
         Assert(sorted.size() == 0);   // fresh vector
         sorted.reserve(array.size());
@@ -154,7 +156,7 @@ public:
    static void sorted_pointers(vector<T *> & sorted,
                                       vector<T> & array,
                                       greater_fun gf,
-                                      const void * comp_arg = 0)
+                                      const void * comp_arg)
       {
         Assert(sorted.size() == 0);   // fresh vector
         sorted.reserve(array.size());
@@ -167,7 +169,7 @@ public:
    /// to the comparison function \b gf.
    static void sorted_indices(vector<ShapeItem> & sorted,
                               const vector<T> & array,
-                              greater_fun gf, const void * comp_arg = 0)
+                              greater_fun gf, const void * comp_arg)
       {
         Assert(sorted.size() == 0);   // fresh vector
         sorted.reserve(array.size());
@@ -213,13 +215,13 @@ protected:
            }
       }
 
-   /// echange \b a and \b b
+   /// exchange \b a and \b b
    //
    static void swap(T & a, T & b)
       {
         const T t = a;   a = b;   b = t;
       }
-};
+};   // class Heapsort
 //===========================================================================
 
 #endif // __HEAPSORT_HH_DEFINED__

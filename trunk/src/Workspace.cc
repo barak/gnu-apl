@@ -68,9 +68,9 @@ Workspace::SI_entry_count()
 }
 //----------------------------------------------------------------------------
 Workspace::Workspace()
-   : WS_id(UTF8_string("CLEAR WS"), true),
-//   prompt(UTF8_string("-----> ")),
-     prompt(UTF8_string("      ")),
+   : WS_id(U"CLEAR WS", true),
+//   prompt(U"-----> "),
+     prompt(U"      "),
      top_SI(0)
 {
 /// Read-Only System Variable

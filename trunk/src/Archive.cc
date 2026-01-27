@@ -314,13 +314,13 @@ char cc[80];
                   }
              }
 #endif
-             SPRINTF(cc, "%.17g", double(cell.get_real_value()));
+             SPRINTF(cc, "%.16g", double(cell.get_real_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
              break;
 
         case CT_COMPLEX:   // uses UNI_PAD_U5
              space -= leave_char_mode();
-             SPRINTF(cc, "%.17gJ%.17g", double(cell.get_real_value()),
+             SPRINTF(cc, "%.16gJ%.16g", double(cell.get_real_value()),
                                         double(cell.get_imag_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
              break;
@@ -1065,7 +1065,7 @@ XML_Saving_Archive::save()
    // some people use an excessive number of values. We therefore sort them
    // by the address of the value as to speed up finding them later on
    //
-   Heapsort<_val_par>::sort(val_pars, 0, &_val_par::greater);
+   Heapsort<_val_par>::sort(val_pars, &_val_par::greater, 0);
    loop(v, (val_pars.size() - 1))
        {
          Assert(&val_pars[v]._val < &val_pars[v + 1]._val);
@@ -2377,8 +2377,9 @@ XML_Loading_Archive::read_Symbol()
 const UTF8 * name = find_mandatory_attr("name");
 const UTF8 * name_end = name;
    while (*name_end != '"')   ++name_end;
+const int name_len = name_end - name;
 
-UTF8_string name_UTF(name, name_end - name);
+UTF8_string name_UTF(name, name_len);
 UCS_string  name_UCS(name_UTF);
    if (name_UCS.size() == 0)
       {
@@ -2394,7 +2395,8 @@ UCS_string  name_UCS(name_UTF);
    // ⎕PW and ⎕TZ are session variables that must not )LOADed (but might be
    // )COPYd)
    //
-   if (name_UTF == UTF8_string("⎕NLT") || name_UTF == UTF8_string("⎕PT"))
+   if (!strncmp(charP(name), "⎕NLT", name_len) ||
+       !strncmp(charP(name), "⎕PT", name_len))
       {
         Log(LOG_archive)   err << "        skipped at " << LOC << endl;
         skip_to_tag("/Symbol");

@@ -90,9 +90,9 @@ Quad_CR::print_map_syntax(ostream & out,
                           const function_info & info) const
 {
 char NN[10];   SPRINTF(NN, "%2d", int(info.axis));
-const UTF8_literal name = info.function_name;
+const char * name = info.function_name;
    out << "      " << NN << " ⎕CR  ←→"
-       << UCS_string(24 - name.get_char_count(), UNI_SPACE)
+       << UCS_string(24 - strlen(name), UNI_SPACE)
        << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
 }
 //----------------------------------------------------------------------------
@@ -423,7 +423,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                   }
                else
                   {
-                    UCS_string res(UTF8_string("∇"));
+                    UCS_string res(UNI_NABLA);
 
                     loop(u, text.ssize())
                        {
@@ -705,7 +705,10 @@ UCS_string text;
         // be careful with non-printable characters and quotes
         //
         const Unicode uni = cell.get_char_value();
-        if (uni < ' ' || uni == 127)   return text << "(⎕UCS " << int(uni) << ")";
+        if (uni < ' ' || uni == 127)
+           {
+             return text << "(⎕UCS " << int(uni) << UNI_R_PARENT;
+           }
         if (uni == UNI_SINGLE_QUOTE)   return text << "''''";
         return text << "'" << uni << "'";
       }

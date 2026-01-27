@@ -73,7 +73,7 @@ protected:
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible change)
         ASX_MINOR = 11,  ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 2,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_OTHER = 3,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 
    /// where to send information messages (such as "SAVED...")

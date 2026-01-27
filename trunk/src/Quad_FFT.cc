@@ -84,11 +84,11 @@ Quad_FFT::print_map_syntax(ostream & out,
                            const function_info & info) const
 {
 char NN[10];   SPRINTF(NN, "%3d", int(info.axis));
-const UTF8_literal name = info.function_name;
-const int blanks = max_function_name_length - name.get_char_count();
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
    out << "    " << NN << " ⎕FFT  ←→  ⎕FFT['" << name << "']"
-       << UCS_string(blanks, UNI_SPACE) << "  ←→  ⎕FFT." << name << endl;
+       << blanks << "  ←→  ⎕FFT." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token

@@ -53,7 +53,7 @@ public:
    void sort()
       {
         if (size() < 2)   return;
-        Heapsort<UCS_string>::sort(*this, 0, UCS_string::compare_names);
+        Heapsort<UCS_string>::sort(*this, UCS_string::compare_names, 0);
       }
 
    /// compute columns width so that items align nicely (for )VARS, )FNS, etc.)

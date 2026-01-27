@@ -476,40 +476,8 @@ public:
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
-   /// pointer to _fun
-
    /// Built-in function
    static Bif_F12_UNION  fun;
-
-protected:
-   /// a range of indices (including \b from, excluding \b to)
-   struct Zone
-      {
-        /// constructor
-        Zone(ShapeItem f, ShapeItem t)
-        : from(f),
-          to(t)
-        {}
-
-        /// return the number of elements (indices) in \b this zone
-        ShapeItem count() const
-           { return to - from; }
-
-        /// the first index in the zone (including)
-        ShapeItem from;
-
-        /// the last index in the zone (excluding)
-        ShapeItem to;
-      };
-
-   /// a list of zones
-   typedef std::vector<Zone> Zone_list;
-
-   /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and append
-   /// it/them to cells_Z.
-   static void append_zone(vector<const Cell *>  & cells_Z,
-                           const vector<const Cell *> & cells_B,
-                           Zone_list & B_from_to, double qct);
 };
 //----------------------------------------------------------------------------
 /** System function ∩ (intersection) */

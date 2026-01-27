@@ -161,10 +161,10 @@ std::vector<const Symbol *> variables;
       }
 
    if (all_functions.size() > 1)
-      Heapsort<const Symbol *>::sort(all_functions, 0, symcomp);
+      Heapsort<const Symbol *>::sort(all_functions, symcomp, 0);
 
    if (variables.size() > 1)
-      Heapsort<const Symbol *>::sort(variables, 0, symcomp);
+      Heapsort<const Symbol *>::sort(variables, symcomp, 0);
 
 UTF8_string index_filename(root_dir);
    index_filename << "/index.html";
@@ -192,7 +192,7 @@ ofstream page(index_filename.c_str());
    SI_table(page);
 
    set_call_graph_root(0);
-const UCS_string alias = UTF8_string("all_functions");
+const UCS_string alias(U"all_functions");
    if (write_call_graph(0, alias, false) == 0)
       {
         page <<
@@ -548,7 +548,7 @@ Doxy::native_page(cFunction_P fun, const UCS_string & alias)
    Assert(fun->is_native());
 
 const NativeFunction * nat = reinterpret_cast<const NativeFunction *>(fun);
-UCS_string Z(UTF8_string("    <TR><TD class=center>"));
+UCS_string Z(U"    <TR><TD class=center>");
    if (nat->has_result())   Z << UNI_Z << UNI_LEFT_ARROW;
 
 UTF8_string fun_filename(root_dir);
@@ -854,7 +854,7 @@ void
 Doxy::set_call_graph_root(cFunction_P fun)
 {
 const int MAX = 2 * call_graph.size();   // MAX means unreachable
-UCS_string root_name(UTF8_string("all"));
+UCS_string root_name(U"all");
    if (fun)   root_name = fun->get_name();
 
    if (call_graph.size() == 0)
@@ -1110,7 +1110,7 @@ char buffer[1000];
 UCS_string
 Doxy::fun_anchor(const UCS_string & name)
 {
-UCS_string anchor = UTF8_string("<A href=f_");
+UCS_string anchor(U"<A href=f_");
    return anchor << name << ".html>" << name << "</A>";
 }
 

@@ -305,25 +305,23 @@ Cell::sorted_indices(vector<ShapeItem> & indices, const Value & value,
    Assert(indices.size() == 0);   // initially empty, filled by this function
 
 const ShapeItem rows = value.get_shape_item(0);
-   indices.reserve(rows);
 
    // initialize indices with 0, 1, ... length-1
    //
-   try
-     {
-       loop(r, rows)   indices.push_back(r);
-     }
-   catch (...)
-     {
-       return E_WS_FULL;
-     }
-     
+   try           { indices.reserve(rows); }
+   catch (...)   { return E_WS_FULL; }
+   loop(r, rows)   indices.push_back(r);
 
+   // the cpmparison context ctx for the sorting is the cells of the APL
+   // values and the number of consecutive cells to be compared. The APL
+   // value can be a vector (and then comp_len = 1) or a matrix with
+   // comp_len columns.
+   //
 const ravel_comp_len ctx = { &value.get_cfirst(), comp_len};
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(indices, &ctx, &Cell::greater_cp);
+      Heapsort<ShapeItem>::sort(indices, &Cell::greater_cp, &ctx);
    else
-      Heapsort<ShapeItem>::sort(indices, &ctx, &Cell::smaller_cp);
+      Heapsort<ShapeItem>::sort(indices, &Cell::smaller_cp, &ctx);
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------

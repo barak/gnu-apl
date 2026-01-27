@@ -159,7 +159,7 @@ UCS_string fun_text;
         // the last history line (which contained some ∇foo ...)
         //
         {
-          UCS_string line_0(UTF8_string("    "));
+          UCS_string line_0(U"    ");
           line_0 << UNI_NABLA << lines[0].text;
           line_0.remove_trailing_whitespaces();
           LineInput::replace_history_line(line_0);
@@ -177,7 +177,7 @@ UCS_string fun_text;
               LineInput::add_history_line(line_l);
            }
 
-        UCS_string line_N(UTF8_string("   "));
+        UCS_string line_N(U"   ");
         line_N << UNI_NABLA;
         LineInput::add_history_line(line_N);
       }

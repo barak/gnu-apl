@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -134,18 +134,35 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
 //----------------------------------------------------------------------------
-ostream &
-UTF8_string::dump_hex(ostream & out, int max_bytes) const
+void
+UTF8_string::dump_hex(ostream & out, const UTF8 * utf, int size, int max_bytes)
 {
-   loop(b, size())
+   if (size < 3*max_bytes)   // small string
       {
-        if (b)   out << " ";
-        if (b >= max_bytes)   return out << "...";
-
-         out << HEX2(at(b));
+        loop(b, size)
+           {
+              if (utf[b] == 0)   break;
+             if (b)   out << " ";
+             out << HEX2(utf[b]);
+           }
       }
-
-   return out;
+   else                        // large string
+      {
+        const int max1 = 2*max_bytes/3 - 2;
+        const int max2 = 1*max_bytes/3 - 2;
+        loop(b, max1)
+           {
+             if (utf[b] == 0)   break;
+             if (b)   out << " ";
+             out << HEX2(utf[b]);
+           }
+        out << "  ... ";
+        for (int b = size - max2; b < size; ++b)
+           {
+             if (utf[b] == 0)   break;
+             out << " "; out << HEX2(utf[b]);
+           }
+      }
 }
 //----------------------------------------------------------------------------
 Unicode
@@ -414,15 +431,14 @@ UTF8_string::round_0_1()
 ostream &
 operator <<(ostream & os, const UTF8_string & utf)
 {
-   loop(c, utf.size())   os << utf[c];
-   return os;
+   return os << utf.c_str();
 }
 //----------------------------------------------------------------------------
 /// declared in PrintOperator.hh
 ostream &
-operator <<(ostream & os, const UTF8_literal & utf)
+operator <<(ostream & os, const UTF8 * utf)
 {
-   return os << utf();
+   return os << charP(utf);
 }
 //============================================================================
 UTF8_string_vector::UTF8_string_vector(const char * lines)

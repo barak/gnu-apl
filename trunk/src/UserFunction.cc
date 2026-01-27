@@ -738,7 +738,7 @@ Lit_DB literals;
 
               if (tolerant && ec != E_NO_ERROR)
                  {
-                   UCS_string new_line(UTF8_string("## "));
+                   UCS_string new_line(U"## ");
                    new_line << line;
                    text[l] = new_line;
                    CERR << "WARNING: SYNTAX ERROR in function "
@@ -1330,7 +1330,7 @@ UserFunction::help(ostream & out) const
 
 bool got_lamps = false;
 bool toronto = false;
-const UCS_string two_lamps(UTF8_string("⍝⍝"));
+const UCS_string two_lamps(U"⍝⍝");
    for (int l = 1; l < get_text_size(); ++l)
        {
          UCS_string line(get_text(l));

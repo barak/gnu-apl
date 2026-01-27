@@ -1108,11 +1108,11 @@ void
 Quad_MX::print_map_syntax(ostream & out,
                           const FunctionGroup::function_info & info) const
 {
-const UTF8_literal name = info.function_name;
-const int blanks = max_function_name_length - name.get_char_count();
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
    out << "    ⎕MX[" << setw(3) << info.axis << "]  ←→  ⎕MX['" << name << "']"
-       << UCS_string(blanks, UNI_SPACE) << "  ←→  ⎕MX." << name << endl;
+       << blanks << "  ←→  ⎕MX." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token

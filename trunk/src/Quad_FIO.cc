@@ -1112,11 +1112,11 @@ Quad_FIO::list_functions(ostream & out) const
 void
 Quad_FIO::print_map_syntax(ostream & out, const function_info & info) const
 {
-const UTF8_literal name = info.function_name;
-const int blanks = max_function_name_length - name.get_char_count();
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
    out << "    ⎕FIO[" << info.axis << "]  ←→  ⎕FIO['" << name << "']"
-       << UCS_string(blanks, UNI_SPACE) << "←→  ⎕FIO." << name << endl;
+       << blanks << "←→  ⎕FIO." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token

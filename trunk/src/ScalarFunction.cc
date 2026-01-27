@@ -1234,8 +1234,8 @@ vector<const Cell *> cells_B;
 
    // sort the A-cells and the B-cells ascendingly
    //
-   Heapsort<const Cell *>::sort(cells_A, 0, Cell::compare_stable);
-   Heapsort<const Cell *>::sort(cells_B, 0, Cell::compare_stable);
+   Heapsort<const Cell *>::sort(cells_A, Cell::compare_stable, 0);
+   Heapsort<const Cell *>::sort(cells_B, Cell::compare_stable, 0);
 
    // store those cells_A pointers that are not in cells_B into cells_Z. Use
    // the fact that cells_A and cells_B are sorted.
@@ -1260,7 +1260,7 @@ vector<const Cell *> cells_B;
 
    // sort cells_Z by position so that the original order in A is reconstructed
    //
-   Heapsort<const Cell *>::sort(cells_Z, 0, Cell::compare_ptr);
+   Heapsort<const Cell *>::sort(cells_Z, Cell::compare_ptr, 0);
 
 Value_P Z(cells_Z.size(), LOC);
 

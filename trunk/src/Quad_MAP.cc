@@ -79,7 +79,7 @@ vector<ShapeItem> indices;
    loop(m, map_len)   indices.push_back(m);
 
 const ravel_comp_len ctx = { &A->get_cfirst(), 1};
-   Heapsort<ShapeItem>::sort(indices, &ctx, &Quad_MAP::greater_map);
+   Heapsort<ShapeItem>::sort(indices, &Quad_MAP::greater_map, &ctx);
 
    // complain about duplicated keys
    //

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,105 +87,6 @@ UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
    reserve(2*len);
    loop(l, len)   push_back(ucs[pos + l]);
    create(LOC);
-}
-//----------------------------------------------------------------------------
-UCS_string::UCS_string(const UTF8_string & utf)
-{
-   create(LOC);
-
-   Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
-
-size_t from = 0;
-
-   for (size_t i = 0; i < utf.size();)
-      {
-start_of_sequence:
-
-        const uint32_t b0 = utf[i++];
-        uint32_t bx = b0;
-        uint32_t more;
-        if      ((b0 & 0x80) == 0x00)   { more = 0;             }
-        else if ((b0 & 0xE0) == 0xC0)   { more = 1; bx &= 0x1F; }
-        else if ((b0 & 0xF0) == 0xE0)   { more = 2; bx &= 0x0F; }
-        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
-        else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
-        else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
-        else   // invalid UTF start byte
-           {
-             Log(LOG_char_conversion)
-                {
-                 utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                   << " at " << LOC <<  endl;
-                 BACKTRACE
-                }
-
-             // map this string to the "supplementary private use area B" so
-             // that its hex code becomes (sort of) visible
-             //
-             *this << Unicode(utf[from] | 0x100000);
-             i = ++from;   // retry, starting at next char
-             goto start_of_sequence;
-           }
-
-        uint32_t uni = 0;
-        for (; more; --more)
-            {
-              if (i >= utf.size())
-                 {
-                   Log(LOG_char_conversion)
-                      {
-                        utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
-                                          << " len " << utf.size()
-                                          << " at " << LOC << endl;
-                        if (utf.size() >= 40)
-                           {
-                             const UTF8_string end(utf8P(&utf[utf.size() - 10]),
-                                                                           10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
-                           }
-                      }
-
-                   *this << Unicode(utf[from] | 0x100000);
-                   i = ++from;   // retry, starting at next char
-                   goto start_of_sequence;
-                 }
-
-              const UTF8 subc = utf[i++];
-              if ((subc & 0xC0) != 0x80)   // invalid UTF continuation byte
-                 {
-                   Log(LOG_char_conversion)
-                      {
-                        utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                          << " len " << utf.size()
-                                          << " at " << LOC <<  endl;
-                        if (utf.size() >= 40)
-                           {
-                             const UTF8_string end(utf8P(&utf[utf.size() - 10]),
-                                                                           10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
-                           }
-                        BACKTRACE
-                      }
-
-                   *this << Unicode(utf[from] | 0x100000);
-                   i = ++from;   // retry, starting at next char
-                   goto start_of_sequence;
-                 }
-
-              bx  <<= 6;
-              uni <<= 6;
-              uni |= subc & 0x3F;
-            }
-
-         *this << Unicode(bx | uni);
-         from = i;
-      }
-
-   Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
@@ -481,6 +382,92 @@ UCS_string::UCS_string(istream & in)
         if (uni == UNI_LF)      return;
         *this << uni;
       }
+}
+//----------------------------------------------------------------------------
+void
+UCS_string::decode(const UTF8 * utf, int size)
+{
+
+   Log(LOG_char_conversion)
+      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
+
+int from = 0;
+
+   for (int i = 0; i < size;)
+      {
+start_of_sequence:
+
+        const uint32_t b0 = utf[i++];
+        uint32_t bx = b0;
+        uint32_t more;
+        if      ((b0 & 0x80) == 0x00)   { more = 0;             }
+        else if ((b0 & 0xE0) == 0xC0)   { more = 1; bx &= 0x1F; }
+        else if ((b0 & 0xF0) == 0xE0)   { more = 2; bx &= 0x0F; }
+        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
+        else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
+        else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
+        else   // invalid UTF start byte
+           {
+             Log(LOG_char_conversion)
+                {
+                 CERR << "Bad UTF8 string: ";
+                 UTF8_string::dump_hex(CERR, utf, size, 40);
+                 CERR << " at " << LOC <<  endl;
+                 BACKTRACE
+                }
+
+             // map this string to the "supplementary private use area B" so
+             // that its hex code becomes (sort of) visible
+             //
+             *this << Unicode(utf[from] | 0x100000);
+             i = ++from;   // retry, starting at next char
+             goto start_of_sequence;
+           }
+
+        uint32_t uni = 0;
+        for (; more; --more)
+            {
+              if (i >= size)
+                 {
+                   Log(LOG_char_conversion)
+                      {
+                        CERR << "Truncated UTF8 string: ";
+                        UTF8_string::dump_hex(CERR, utf, size, 40);
+                        CERR << " len " << size << " at " << LOC << endl;
+                      }
+
+                   *this << Unicode(utf[from] | 0x100000);
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
+                 }
+
+              const UTF8 subc = utf[i++];
+              if ((subc & 0xC0) != 0x80)   // invalid UTF continuation byte
+                 {
+                   Log(LOG_char_conversion)
+                      {
+                        CERR << "Bad UTF8 string: ";
+                        UTF8_string::dump_hex(CERR, utf, size, 40);
+                        CERR << " len " << size << " at " << LOC <<  endl;
+                        BACKTRACE
+                      }
+
+                   *this << Unicode(utf[from] | 0x100000);
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
+                 }
+
+              bx  <<= 6;
+              uni <<= 6;
+              uni |= subc & 0x3F;
+            }
+
+         *this << Unicode(bx | uni);
+         from = i;
+      }
+
+   Log(LOG_char_conversion)
+      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
 //----------------------------------------------------------------------------
 int
@@ -1109,24 +1096,12 @@ UCS_string::operator <<(double num)
 {
 char cc[40];
    if (Cell::is_near_int(num))   { SPRINTF(cc, "%.2g", num); }
-   else                          { SPRINTF(cc, "%.17g", num);   }
+   else                          { SPRINTF(cc, "%.16g", num);   }
 
    loop(c, sizeof(cc))
       {
-        if (char digit = cc[c])   push_back(Unicode(digit));
-        else                      break;
-      }
-
-   // the last digit is probably wrong due to rounding errors. 
-   // discard it and any trailing zeroes.
-   //
-   if (size() > 3             &&
-       Avec::is_digit(back()) &&
-       at(size() - 2) == '0'  &&
-       at(size() - 3) == '0')
-      {
-        pop_back();
-        while (size() && back() == '0')   pop_back();
+        if (const char digit = cc[c])   push_back(Unicode(digit));
+        else                            break;
       }
 
    return *this;
@@ -1399,13 +1374,31 @@ operator <<(ostream & os, Unicode uni)
 ostream &
 operator <<(ostream & os, const UCS_string & ucs)
 {
+   /*
+      os.width() is the minimum output width that may have been set
+      before <<, for example:
+
+      out << setw(10) << "abcde"
+
+       os.fill() is the character to be used for filling the output as tp
+       reach the minimum output width.
+    */
 const int fill_len = os.width() - ucs.size();
 
-   if (fill_len > 0)
+   if (fill_len > 0)   // unlikely
       {
         os.width(0);
-        loop(u, ucs.size())   os << ucs[u];
-        loop(f, fill_len)     os << os.fill();
+        const char fill = os.fill();
+        if (os.flags() & ios::right)   // right fill
+           {
+             loop(f, fill_len)     os << fill;
+             loop(u, ucs.size())   os << ucs[u];
+           }
+        else                           // left fill
+           {
+             loop(u, ucs.size())   os << ucs[u];
+             loop(f, fill_len)     os << fill;
+           }
       }
    else
       {
@@ -1635,12 +1628,12 @@ UCS_string ret;
    // append one more fractional digit than needed (the last one will be
    // rounded
    loop(f, fract_digits + 1)
-      {
-        v = v * 10.0;
-        const int vv = v;
-        ret << Unicode(UNI_0 + vv);
-        v -= vv;
-      }
+       {
+         v = v * 10.0;
+         const int vv = v;
+         ret << Unicode(UNI_0 + vv);
+         v -= vv;
+       }
 
    // round to last digit may increase the length
 const int ret_len = ret.size();
@@ -1735,7 +1728,7 @@ UCS_string
 UCS_string::sort() const
 {
 UCS_string ret(*this);
-   Heapsort<Unicode>::sort(ret, 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, greater_uni, 0);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1754,7 +1747,7 @@ UCS_string ret;
          if (sorted[j] != ret.back())   ret << sorted[j];
        }
 
-   Heapsort<Unicode>::sort(ret, 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, greater_uni, 0);
    return ret;
 }
 //----------------------------------------------------------------------------

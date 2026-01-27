@@ -70,7 +70,7 @@ ostream & operator << (ostream &,       TokenClass);        // Token.cc
 ostream & operator << (ostream &, const UCS_string &);      //  UCS_string.cc
 ostream & operator << (ostream &,       Unicode);           // UCS_string.cc
 ostream & operator << (ostream &, const UTF8_string &);     // UTF8_string.cc
-ostream & operator << (ostream &, const UTF8_literal &);    // UTF8_string.cc
+ostream & operator << (ostream &, const UTF8 * );           // UTF8_string.cc
 ostream & operator << (ostream &, const Value &);           // Value.cc
 
 #endif // __PRINTOPERATOR_HH_DEFINED

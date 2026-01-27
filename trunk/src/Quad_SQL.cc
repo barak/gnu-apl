@@ -204,7 +204,7 @@ void
 Quad_SQL::print_map_syntax(ostream & out, const function_info & info) const
 {
 const sAxis axis = info.axis;
-const UTF8_literal name = info.function_name;
+const char * name = info.function_name;
 
    // print axis number syntax
    //

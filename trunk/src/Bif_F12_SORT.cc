@@ -212,9 +212,9 @@ vector<ShapeItem> vZ;
    loop(z, len_BZ)   vZ.push_back(z);
 
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(vZ, &cache, &CollatingCache::greater_vec);
+      Heapsort<ShapeItem>::sort(vZ, &CollatingCache::greater_vec, &cache);
    else
-      Heapsort<ShapeItem>::sort(vZ, &cache, &CollatingCache::smaller_vec);
+      Heapsort<ShapeItem>::sort(vZ, &CollatingCache::smaller_vec, &cache);
 
 Value_P Z(len_BZ, LOC);
    loop(z, len_BZ)   Z->next_ravel_Int(vZ[z] + qio);

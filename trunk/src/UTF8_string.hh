@@ -40,9 +40,6 @@ class Value;
 /// one byte (= 7-bit character !) of an ASCII string
 typedef char ASCII;
 
-/// one byte (not character !( of a UTF8 encoded Unicode (RFC 3629) string
-typedef uint8_t UTF8;
-
 //============================================================================
 /// frequently used cast to const UTF8 *
 inline const UTF8 *
@@ -50,62 +47,6 @@ utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//============================================================================
-/// a light-weigth UTF8-encoded string
-class UTF8_literal
-{
-public:
-   /// constuctor. Its argument \b utf must have infinite lifetime,
-   /// such as C/C++ literals. Otherwise use new char[] or strdup().
-   //
-   UTF8_literal(const char * utf)
-   : bytes(utf8P(utf)),
-     byte_count(0),
-     char_count(0)
-   { if (utf)
-        {
-          while (const char u = *utf++)
-             {
-               ++byte_count;
-               if ((u & 0xC0) != 0x80)   ++char_count;
-              }
-        }
-   }
-
-   /// return the (UTF8 encoding of) the  characters of \b this string.
-   const UTF8 * operator()() const
-      { return bytes; }
-
-   /// return the number of characters (not bytes (!)) of \b this string.
-   int get_char_count() const
-      { return char_count; }
-
-   /// return the number of bytes (not characters (!)) of \b this string.
-   int get_byte_count() const
-      { return byte_count; }
-
-   /// compare \b this UTF8_literal with another UTF8_literal
-   bool operator < (const UTF8_literal & other) const
-      { return compare(other) < 0; } 
-
-   /// compare function for Heapsort<T>::search<KEY>()
-   int compare(const UTF8_literal other) const
-      { return strcmp(charP(this->bytes), charP(other.bytes)); }
-
-   /// compare \b this UTF8_literal with another UTF8_literal
-   bool operator ==(const UTF8_literal & other) const
-      { return compare(other) == 0; } 
-
-protected:
-   /// the bytes of the string
-   const UTF8 * bytes;
-
-   /// the number of bytes (not characters (!)) of this literal
-   int byte_count;
-
-   /// the number of characters (not bytes (!)) of this literal
-   int char_count;
-};
 //============================================================================
 /// frequently used cast to UTF8 *
 inline UTF8 *
@@ -139,14 +80,6 @@ public:
    /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
 
-   /// return true iff \b this is equal to \b other
-   bool operator ==(const UTF8_string & other) const
-      {
-        if (size() != other.size())   return false;
-        loop(c, size())   if (at(c) != other.at(c))   return false;
-        return true;
-      }
-
    /// erase one item at \b pos
    void erase(size_t pos)
       { std::string::erase(begin() + pos); }
@@ -167,9 +100,6 @@ public:
    UTF8_string & operator <<(const UTF8_string & suffix)
       { loop(s, suffix.size())   *this += suffix[s];   return *this; }
 
-   /// display bytes in this UTF string
-   ostream & dump_hex(ostream & out, int max_bytes) const;
-
    /// return true iff string ends with ext (usually a file name extension)
    bool ends_with(const char * ext) const;
 
@@ -178,7 +108,6 @@ public:
 
    /// skip over < ... > and expand &lt; and friends
    int un_HTML(int in_HTML);
-
 
    /// essentially strtol(this, 0, 10)
    uint64_t long_value() const;
@@ -198,6 +127,11 @@ public:
 
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
+
+   /// display bytes in \b utf
+   static void dump_hex(ostream & out, const UTF8 * utf, int size,
+                        int max_bytes);
+
 };
 //============================================================================
 class UTF8_string_vector : public std::vector<UTF8_string>
