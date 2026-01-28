@@ -21,8 +21,14 @@
 /** @file
 */
 
+#include "Common.hh"
 #include "Command.hh"
 #include "UserPreferences.hh"
+#include "Workspace.hh"
+
+#if HAVE_LIBX11
+# include <X11/Xlib.h>
+#endif
 
 // See: /usr/share/X11/xkb/keycodes/xfree86
 
@@ -92,16 +98,47 @@ int area = 0;   // main keys
            {
              MORE_ERROR() << "Command ]KEYB: invalid argument '"
                           << args[a] << "'";
+             if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
              return;
            }
       }
 
-const bool parse_error = parse_xmodmap();
+   // NOTES:
+   //
+   //  scan merely enforces the use of xmodmap (and in that case it is an
+   //  error if xmodmap fails). If scan is not given, than xmodmap is kind of
+   //  expected to fail for various reasons and we ignore the failure.
+
+   // reset SIGCHLD to its default so that pclose() works as expected
+   //
+   signal(SIGCHLD, SIG_DFL);
+const bool xmodmap_error = parse_xmodmap();
+   signal(SIGCHLD, SIG_IGN);
    if (scan)
       {
-        if (!parse_error)   print_xmodmap(out, keys, area);
+        if (xmodmap_error)
+           {
+             MORE_ERROR() << "running xmodmap failed.";
+             if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+           }
+        else
+           {
+             Workspace::more_error().clear();
+             print_xmodmap(out, keys, area);
+           }
         return;
       }
+
+   if (!xmodmap_error)   // xmodmap succeeded
+      {
+        print_xmodmap(out, keys, area);
+        return;
+      }
+
+   // parse_xmodmap() has provided )MORE infos, but it is no longer of
+   // interest at this point.
+   //
+   Workspace::more_error().clear();
 
    // xmodmap failed, try user-defined layout
    //
@@ -155,12 +192,35 @@ UTF8_string_vector utf(
 bool
 Cmd_KEYB::parse_xmodmap()
 {
+   if (UserPreferences::uprefs.disable_Quad_FIO__exec)   return true;   // error
+
+   /* xmodmap prints an annoying
+ 
+       xmodmap:  unable to open display ''
+
+       message that we do not want to see (and it seems to be difficult
+       to get rid of that message. We therefore test beforehand if
+       XOpenDisplay() is likely to succeed.
+    */
+#if HAVE_LIBX11
+   if (Display * display = XOpenDisplay(0))   XCloseDisplay(display);
+   else                                       return true;   // error
+#else
+   return true;   // error
+#endif
+
+   if (access("/usr/bin/xmodmap", X_OK))
+      {
+        return true;
+      }
+
    errno = 0;
 FILE * xm = popen("xmodmap -pk", "r");
    if (xm == 0)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error starting xmodmap: "
                      << strerror(errno);
+        if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;   // error
       }
 
@@ -179,6 +239,21 @@ int bad_lines  = 0;
          else                                    ++good_lines;
        }
 
+   if (good_lines == 0)
+      {
+        // xmodmap was started, but then something went wrong.
+        //
+        return true;
+      }
+
+   if (pclose(xm) && (errno != ECHILD))
+      {
+        MORE_ERROR() << "Command ]KEYB SCAN: Error running xmodmap: "
+                     << strerror(errno);
+        if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+        return true;   // error
+      }
+
    /* a typical xmodmap has:
 
       5  bad lines (header lines at the start of the output), and
@@ -189,6 +264,7 @@ int bad_lines  = 0;
       {
         MORE_ERROR() << "Command ]KEYB SCAN: too few (" << good_lines
                      << ") good lines in the output of: xmodmap -pk";
+        if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
       }
 
@@ -196,14 +272,8 @@ int bad_lines  = 0;
       {
         MORE_ERROR() << "Command ]KEYB SCAN: too many (" << bad_lines
                      << ") bad lines in the output of: xmodmap -pk";
+        if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
-      }
-
-   if (pclose(xm) && (errno != ECHILD))
-      {
-        MORE_ERROR() << "Command ]KEYB SCAN: Error running xmodmap: "
-                     << strerror(errno);
-        return true;   // error
       }
 
    return false;   // OK
