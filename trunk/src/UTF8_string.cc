@@ -61,72 +61,22 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(ucs = " << ucs << ")" << endl;
 
-   loop(i, ucs.size())
+   loop(u, ucs.size())
       {
-        int uni = ucs[i];
+        uint32_t uni = ucs[u];
         if (uni < 0x80)            // 1-byte unicode (ASCII)
            {
              *this += uni;
            }
-        else if (uni < 0x800)      // 2-byte unicode
+        else                       // N-byte unicode
            {
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xC0;
-             *this += b1  | 0x80;
-           }
-        else if (uni < 0x10000)    // 3-byte unicode
-           {
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xE0;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-           }
-        else if (uni < 0x200000)   // 4-byte unicode
-           {
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xF0;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-           }
-        else if (uni < 0x4000000)   // 5-byte unicode
-           {
-             const uint8_t b4 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xF8;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-             *this += b4  | 0x80;
-           }
-        else if (size_t(uni) < 0x80000000)   // 6-byte unicode
-           {
-             const uint8_t b5 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b4 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xFC;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-             *this += b4  | 0x80;
-             *this += b5  | 0x80;
-           }
-        else
-           {
-             CERR << "Bad Unicode: " << UNI(uni) << endl
-                  << "The offending ucs string is:";
-             loop(ii, ucs.size()) CERR << " " << HEX(ucs[ii]);
-             CERR << endl;
-
-             BACKTRACE
-             Assert(0 && "Error in UTF8_string::UTF8_string(ucs)");
+             char sixbits[5];
+             char * s = sixbits;
+             while (uni >= 0x40U >> (s - sixbits))  
+                   { *s++ = 0x80 | (uni & 0x3F);   uni >>= 6; }
+         
+             *this += char(uni | 0xFE << (6 + (sixbits - s)));
+             while (s > sixbits)   *this += *--s;
            }
       }
 

@@ -513,7 +513,7 @@ UCS_string::remove_comment()
            {
              resize(j);
              remove_trailing_whitespaces();
-             break;
+             return;
            }
       }
 }

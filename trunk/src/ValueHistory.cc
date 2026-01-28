@@ -165,7 +165,7 @@ const ValueFlags flags_before = ValueFlags(flags);
 
         case VHE_Check:
              flags |= VF_complete;
-             out << "  VHE_Check   " << flags_before << " ";
+             out << "  VHE_Check    " << flags_before << " ";
              if (flags_before != flags)   out << ValueFlags(flags)
                                               << " ";
              else                         out << "            ";
@@ -211,7 +211,7 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_PtrCopy:
-             out << "  VHE_PtrCopy " << setw(26) << iarg;
+             out << "  VHE_PtrCopy  " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy3:
@@ -231,11 +231,11 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_TokCopy:
-             out << "  VHE_TokCopy " << setw(26) << iarg;
+             out << "  VHE_TokCopy  " << setw(26) << iarg;
              break;
 
         case VHE_TokMove:
-             out << "  VHE_TokMove " << setw(26) << iarg;
+             out << "  VHE_TokMove  " << setw(26) << iarg;
              break;
 
         case VHE_Completed:
