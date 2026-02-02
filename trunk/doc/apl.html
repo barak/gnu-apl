@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>January 22, 2026.
+<p>February 2, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -165,9 +165,12 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <li><a id="toc-xmodmap-and-friends" href="#Subsection-2_002e11_002e2">2.11.2 xmodmap and friends</a></li>
       <li><a id="toc-The-_005dKEYB-command" href="#Subsection-2_002e11_002e3">2.11.3 The ]KEYB command</a>
       <ul class="no-bullet">
-        <li><a id="toc-_005dKEYB-without-arguments_002e" href="#Subsubsection-2_002e11_002e3_002e1">2.11.3.1 ]KEYB without arguments.</a></li>
-        <li><a id="toc-_005dKEYB-SCAN" href="#Subsubsection-2_002e11_002e3_002e2">2.11.3.2 ]KEYB SCAN</a></li>
-        <li><a id="toc-_005dKEYB-SCAN-KEYS" href="#Subsubsection-2_002e11_002e3_002e3">2.11.3.3 ]KEYB SCAN KEYS</a></li>
+        <li><a id="toc-_005dKEYB-Syntax" href="#Subsubsection-2_002e11_002e3_002e1">2.11.3.1 ]KEYB Syntax</a></li>
+        <li><a id="toc-_005dKEYB-without-a-mode" href="#Subsubsection-2_002e11_002e3_002e2">2.11.3.2 ]KEYB without a mode</a></li>
+        <li><a id="toc-_005dKEYB-SCAN" href="#Subsubsection-2_002e11_002e3_002e3">2.11.3.3 ]KEYB SCAN</a></li>
+        <li><a id="toc-_005dKEYB-USER" href="#Subsubsection-2_002e11_002e3_002e4">2.11.3.4 ]KEYB USER</a></li>
+        <li><a id="toc-_005dKEYB-GUESS" href="#Subsubsection-2_002e11_002e3_002e5">2.11.3.5 ]KEYB GUESS</a></li>
+        <li><a id="toc-Optional-_005dKEYB-arguments" href="#Subsubsection-2_002e11_002e3_002e6">2.11.3.6 Optional ]KEYB arguments</a></li>
       </ul></li>
     </ul></li>
     <li><a id="toc-_005dNEXTFILE-and-_005dPUSHFILE-Commands" href="#Section-2_002e12">2.12 ]NEXTFILE and ]PUSHFILE Commands</a>
@@ -2992,12 +2995,12 @@ Next: <a href="#Section-2_002e12" accesskey="n" rel="next">]NEXTFILE and ]PUSHFI
 <p>In the early days of APL the user was typically faced with three problems:
 APL keyboards, APL screens, and APL printers.
 </p>
-<p>The advent of Unicode has soved the last two probelms rather eleqantly:
-the Uncode characters contain all APL charatcers and screens (i.e CTR tubes
+<p>The advent of Unicode has soved the last two problems rather eleqantly:
+the Uncode character set contains all APL characters, and screens (i.e CRT tubes
 in the old days and screen windows these days) and printers display them
 properly. What remains is the keyboard problem. The keyboard problem has two
 sub-problems: Keyboard caps that show APL symbols in addition to the normal
-ASCII characters, and generating proer Unicodes when the keys are being
+ASCII characters, and generating proiper Unicodes when the keys are being
 pressed (typically with the ALT or CTRL keys held down).
 </p>
 <p>GNU APL provides the debug command <b>]KEYB</b> to help resolving these issues.
@@ -3011,19 +3014,19 @@ sent by APL keyboards do not differ from the keycodes of regular keyboards.
 One the other hand, many programmers type blindly; for them the keycaps are
 mostly irrelevant, and the substantial surcharge for APL keyboards may be
 unreasonable. A related problem is national keyboards: most APL keyboards
-have an US layout for their keycaps although a user may prefer a national
+have a US layout for their keycaps although a user may prefer a national
 layout. Most of this can be helped with a keuboard layout that is printed
 on the screen. A user that types bindly most of the time, but cannot
 remember the position of all APL symbols (in particular of rarely used ones)
 may find it useful to display the keyboard layout on the screen.
 
-</li><li> The second use case for <b>]KEYB</b> is troubleshooting the transformation
+</li><li> The other use case for <b>]KEYB</b> is troubleshooting the transformation
 of keys pressed on the keyboard to Unicodes sent to the APL interpreter. This
 transformation (which is explained in more detail below) is highly
 conficurable. The good news is that these days any keyboard can be configured
 to send any Unicode on any key as preferered by the user. The bad news is
 that this configuration differs a lot between different platforms and can
-be faily cumbersome. The <b>]KEYB</b> command is intended to helkp figuring
+be faily cumbersome. The <b>]KEYB</b> command is intended to help figuring
 why pressing a partiicular key does not produce the APL character that it
 should. It maybe wothwhile to note that even an APL keyboard can (and most
 likely will) not produce the characters shown on its keypad if the
@@ -3158,50 +3161,77 @@ Previous: <a href="#Subsection-2_002e11_002e2" accesskey="p" rel="prev">xmodmap 
 <span id="The-_005dKEYB-command"></span><h4 class="subsection">2.11.3 The ]KEYB command</h4>
 
 <ul class="section-toc">
-<li><a href="#Subsubsection-2_002e11_002e3_002e1" accesskey="1">]KEYB without arguments.</a></li>
-<li><a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="2">]KEYB SCAN</a></li>
-<li><a href="#Subsubsection-2_002e11_002e3_002e3" accesskey="3">]KEYB SCAN KEYS</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e1" accesskey="1">]KEYB Syntax</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="2">]KEYB without a mode</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e3" accesskey="3">]KEYB SCAN</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e4" accesskey="4">]KEYB USER</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e5" accesskey="5">]KEYB GUESS</a></li>
+<li><a href="#Subsubsection-2_002e11_002e3_002e6" accesskey="6">Optional ]KEYB arguments</a></li>
 </ul>
 <hr>
 <div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e1">
 <div class="header">
 <p>
-Next: <a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="n" rel="next">]KEYB SCAN</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="n" rel="next">]KEYB without a mode</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005dKEYB-without-arguments_002e"></span><h4 class="subsubsection">2.11.3.1 ]KEYB without arguments.</h4>
+<span id="g_t_005dKEYB-Syntax"></span><h4 class="subsubsection">2.11.3.1 ]KEYB Syntax</h4>
 
-<p>Command ]KEYB without arguments is for the normal day to day use (as
-opposed to troubleshooting). It displays an APL keyboard on the screen,
-which is very useful if the keyboard has no APL stickers or key caps.
-The command uses different methods to figure the actual layout:
+<p>The syntax of the <b>]KEYB</b> command is:
 </p>
-<ol>
-<li> First the command tries to run <b>xmodmap -pk</b> as to get the current
-      keyboard map and displays the result in form of an APL keyboard. This
-      result, if the command succeeds, is closest to reality and is diplayed
-      on success. However, it may also fail for various reasons, e.g. if
-      xmodmap is not installed.
+<div class="example">
+<pre class="example">      <b>]KEYB [mode] [arguments]</b>
+</pre></div>
 
-</li><li> if the first step fails, then <b>]KEYBC</b> looks for a user-defined
-      keyboard layout. Such a layout is user-defined text file which shows
-      the keyboard. The name of the file must be configured beforehand
-      in one of the GNU APL preferences files.
-</li><li> if no user-defined keyboard layout is found, then GNU APL displays
-      a built-in layout (which is farthest away from reality) as a final
-      resort.
-</li></ol>
-
-<p>The first line of the keyboard displayed shows which of the 3 methods above
-was used to generate the output.
+<p>where the optional <b>mode</b> determines how the output shall be generated and
+the optional arguments specify additional details for the output. There are
+3 different modes:
 </p>
+<ul>
+<li> Mode <b>SCAN</b> uses the program <b>xmodmap</b> to figure the keyboard layout.
+      This mode, if it works, produces an output that is closest to reality.
+</li><li> Mode <b>USER</b> display a keyboard layout provided by the user. The output
+      of this mode is as correct as its input.
+</li><li> mode <b>GUESS</b> displays a typical APL keyboard layout (which may differ
+      considerably from thr true keyboard layout).
+</li></ul>
+
+
 <hr>
 </div>
 <div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e2">
 <div class="header">
 <p>
-Next: <a href="#Subsubsection-2_002e11_002e3_002e3" accesskey="n" rel="next">]KEYB SCAN KEYS</a>, Previous: <a href="#Subsubsection-2_002e11_002e3_002e1" accesskey="p" rel="prev">]KEYB without arguments.</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Subsubsection-2_002e11_002e3_002e3" accesskey="n" rel="next">]KEYB SCAN</a>, Previous: <a href="#Subsubsection-2_002e11_002e3_002e1" accesskey="p" rel="prev">]KEYB Syntax</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005dKEYB-SCAN"></span><h4 class="subsubsection">2.11.3.2 ]KEYB SCAN</h4>
+<span id="g_t_005dKEYB-without-a-mode"></span><h4 class="subsubsection">2.11.3.2 ]KEYB without a mode</h4>
+
+<p>Command i<b>]KEYB</b> without a mode is for the normal day to day use (as
+opposed to troubleshooting). It displays an APL keyboard on the screen,
+which is very useful if the keyboard has no APL stickers or key caps.
+</p>
+<p><b>]KEYB</b> without a mode tries (in that order):
+</p>
+<ol>
+<li> <b>]KEYB SCAN</b>
+</li><li> <b>]KEYB USER</b>
+</li><li> <b>]KEYB GUESS</b>
+</li></ol>
+
+<p>The command stops after the first mode that was successful. Mode <b>GUESS</b>
+always succeeds, therefore <b>]KEYB</b> will always produce an output. If that
+output is correct is a different question, though.
+</p>
+<p>The first line of the keyboard displayed shows which of the 3 methods above
+was used to generate the output.
+</p>
+<hr>
+</div>
+<div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e3">
+<div class="header">
+<p>
+Next: <a href="#Subsubsection-2_002e11_002e3_002e4" accesskey="n" rel="next">]KEYB USER</a>, Previous: <a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="p" rel="prev">]KEYB without a mode</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="g_t_005dKEYB-SCAN"></span><h4 class="subsubsection">2.11.3.3 ]KEYB SCAN</h4>
 
 <p><b>]KEYB SCAN</b> runs, under the hood, <b>xmodmap -pk</b> to read the current
 keycode to keysymbol mapping and displays the result in form of a
@@ -3240,12 +3270,44 @@ US Keyboard Layout.    Source: xmodmap -pk
 </p>
 <hr>
 </div>
-<div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e3">
+<div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e4">
 <div class="header">
 <p>
-Previous: <a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="p" rel="prev">]KEYB SCAN</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Subsubsection-2_002e11_002e3_002e5" accesskey="n" rel="next">]KEYB GUESS</a>, Previous: <a href="#Subsubsection-2_002e11_002e3_002e3" accesskey="p" rel="prev">]KEYB SCAN</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005dKEYB-SCAN-KEYS"></span><h4 class="subsubsection">2.11.3.3 ]KEYB SCAN KEYS</h4>
+<span id="g_t_005dKEYB-USER"></span><h4 class="subsubsection">2.11.3.4 ]KEYB USER</h4>
+
+<p><b>]KEYB USER</b> does not try to figure the current keyboard mapping but rather
+displays a static file provided by the user. This mode is a fallback for the 
+case where the other modes are not able to produce a correct keyboard layout.
+The user can take the output of <b>]KEYB GUESS</b> as a starting point and correct
+the deviations from the actual keyboard layout.
+</p>
+<p>The name of file shown with <b>]KEYB USER</b> can be configured in one of the
+<b>preferences</b> files.
+</p>
+<hr>
+</div>
+<div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e5">
+<div class="header">
+<p>
+Next: <a href="#Subsubsection-2_002e11_002e3_002e6" accesskey="n" rel="next">Optional ]KEYB arguments</a>, Previous: <a href="#Subsubsection-2_002e11_002e3_002e4" accesskey="p" rel="prev">]KEYB USER</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="g_t_005dKEYB-GUESS"></span><h4 class="subsubsection">2.11.3.5 ]KEYB GUESS</h4>
+
+<p><b>]KEYB GUESS</b> does not try to figure the current keyboard mapping but rather
+displays the layout that the various keyboard configuration files that are
+shipped with GNU APL are likely to produce. The layout is a standard US APL
+keyboard.
+</p>
+<hr>
+</div>
+<div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e6">
+<div class="header">
+<p>
+Previous: <a href="#Subsubsection-2_002e11_002e3_002e5" accesskey="p" rel="prev">]KEYB GUESS</a>, Up: <a href="#Subsection-2_002e11_002e3" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Optional-_005dKEYB-arguments"></span><h4 class="subsubsection">2.11.3.6 Optional ]KEYB arguments</h4>
 
 <p><b>]KEYB SCAN KEYS</b> does not run <b>xmodmap -pk</b> but rather shows how
 the keys are supposed to be positioned on the keyboard. This shows how
@@ -3268,6 +3330,43 @@ US Keyboard Layout.    Source: GNU APL builtin&quot;
 ║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
 ║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
 ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+</pre></div>
+
+<p>Argument <b>KPAD</b> also shows the keypad of the keyboard. The keypad is normally
+hidden so that the output fits into a 80-column terminal mindow. With <b>KPAD</b>
+the terminal should have at least 101 columns. The standard GNU APL layout puts
+line graphics characters onto the keypad, as well as « and » and some
+currency symbols.
+</p>
+<p>Argument <b>FUNK</b> also shows the function key row of the keyboard, but
+only for <b>]KEYB SCAN KEYS</b>:
+</p>
+<div class="example">
+<pre class="example">      ]KEYB SCAN KEYS FUNK KPAD
+US Keyboard Layout.    Source: GNU APL builtin
+
+╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗
+║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║    ║ Kc ║ Kc ║
+║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║
+╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗    ╔════╦════╦════╦════╗
+║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║    ║ Kc ║    ║ Kc ║ Kc ║
+║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║    ║ 77 ║    ║ 82 ║ 82 ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣    ╠════╬════╬════╬════╣
+║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║    ║ Kc ║ Kc ║ Kc ║    ║
+║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║    ║ 79 ║ 80 ║ 81 ║ Kc ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣    ╠════╬════╬════╣ 86 ║
+║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║    ║ Kc ║ Kc ║ Kc ║    ║
+║ 66      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║    ║ 83 ║ 84 ║ 85 ║    ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣    ╠════╬════╬════╬════╣
+║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║    ║ Kc ║ Kc ║ Kc ║    ║
+║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║    ║ 87 ║ 88 ║ 89 ║ Kc ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣    ╠════╩════╬════╣108 ║
+║ Kc ║ Kc  ║ Kc  ║              Kc                  ║ Kc  ║ Kc  ║ Kc  ║ Kc ║    ║ Kc      ║    ║    ║
+║ 37 ║115  ║ 64  ║              65                  ║113  ║116  ║ 109 ║105 ║    ║ 90      ║    ║    ║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝    ╚═════════╩════╩════╝
+
 </pre></div>
 
 <p>As the <b>Source: GNU APL builtin</b> in the example above indicates, this is
@@ -5262,9 +5361,12 @@ abcdefghijklmnopqrstuvwxyz
 
       ⍝ Line drawing characters
       ⎕CC 7
-┌─┬─┐╒═╤═╕╓─╥─╖╔═╦═╗
-├─┼─┤╞═╪═╡╟─╫─╢╠═╬═╣
-└─┴─┘╘═╧═╛╙─╨─╜╚═╩═╝
+┌─┬─┐╒═╤═╕
+├─┼─┤╞═╪═╡
+└─┴─┘╘═╧═╛
+╓─╥─╖╔═╦═╗
+╟─╫─╢╠═╬═╣
+╙─╨─╜╚═╩═╝
 
       ⍝ Some mathematical symbols
       ⎕CC 8
@@ -5295,6 +5397,7 @@ character classes for ⎕CC:
       ⎕CC  26:  UPPERCASE CHARACTERS A-Z
       ⎕CC ¯26:  lowercase characters A-Z
       ⎕CC  33:  base32 encoding (RFC 4648)
+      ⎕CC  48:  greek characters A-Ω α-ω
       ⎕CC  52:  characters A-Z a-z
       ⎕CC  65:  base64 encoding (RFC 4648)
       ⎕CC  95:  printable characters 0x20 ... 0x7E

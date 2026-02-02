@@ -38,7 +38,6 @@ const char * Cmd_KEYB::funkey_template[] = {
 "║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║",
 "╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
 "",
-"",
 };
 
 const char * Cmd_KEYB::keypad_template[] = {
@@ -85,12 +84,24 @@ Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
-bool scan = false;
 bool keys = false;
 int area = 0;   // main keys
+
+   enum
+      {
+        MO_NONE     = 0,
+        MO_XMODMAP  = 1,
+        MO_USERFILE = 2,
+        MO_BUILTIN  = 4,
+        MO_ALL      = MO_XMODMAP | MO_USERFILE | MO_BUILTIN
+      };
+
+int mode = MO_NONE;
    loop(a, args.size())
       {
-        if      (args[a].starts_iwith("SCAN"))   scan = true;
+        if      (args[a].starts_iwith("SCAN"))   mode |= MO_XMODMAP;
+        else if (args[a].starts_iwith("USER"))   mode |= MO_USERFILE;
+        else if (args[a].starts_iwith("GUESS"))  mode |= MO_BUILTIN;
         else if (args[a].starts_iwith("KEYS"))   keys = true;
         else if (args[a].starts_iwith("KPAD"))   area |= 1;
         else if (args[a].starts_iwith("FUNK"))   area |= 2;
@@ -102,37 +113,37 @@ int area = 0;   // main keys
              return;
            }
       }
+   if (mode == MO_NONE)   mode = MO_ALL;   // if no specific mode(s) given
 
-   // NOTES:
-   //
-   //  scan merely enforces the use of xmodmap (and in that case it is an
-   //  error if xmodmap fails). If scan is not given, than xmodmap is kind of
-   //  expected to fail for various reasons and we ignore the failure.
-
-   // reset SIGCHLD to its default so that pclose() works as expected
-   //
-   signal(SIGCHLD, SIG_DFL);
-const bool xmodmap_error = parse_xmodmap();
-   signal(SIGCHLD, SIG_IGN);
-   if (scan)
+   if (mode & MO_XMODMAP)
       {
-        if (xmodmap_error)
+        // reset SIGCHLD to its default so that pclose() works as expected
+        //
+        signal(SIGCHLD, SIG_DFL);
+        const bool xmodmap_error = parse_xmodmap();
+        signal(SIGCHLD, SIG_IGN);
+
+        if (mode != MO_ALL)
            {
-             MORE_ERROR() << "running xmodmap failed.";
-             if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+             if (xmodmap_error)
+                {
+                  MORE_ERROR() << "running xmodmap failed.";
+                  if (Command::auto_MORE)
+                     CERR << Workspace::more_error() << endl;
+                }
+             else
+                {
+                  Workspace::more_error().clear();
+                  print_xmodmap(out, keys, area);
+                }
+             return;
            }
-        else
+
+        if (!xmodmap_error)   // xmodmap succeeded
            {
-             Workspace::more_error().clear();
              print_xmodmap(out, keys, area);
+             return;
            }
-        return;
-      }
-
-   if (!xmodmap_error)   // xmodmap succeeded
-      {
-        print_xmodmap(out, keys, area);
-        return;
       }
 
    // parse_xmodmap() has provided )MORE infos, but it is no longer of
@@ -140,30 +151,37 @@ const bool xmodmap_error = parse_xmodmap();
    //
    Workspace::more_error().clear();
 
-   // xmodmap failed, try user-defined layout
-   //
-const UTF8_string filename = UserPreferences::uprefs.keyboard_layout_file;
-   if (filename.size())
+   if (mode & MO_USERFILE)
       {
-        if (FILE * layout = fopen(filename.c_str(), "r"))
+        const UTF8_string filename =
+              UserPreferences::uprefs.keyboard_layout_file;
+        if (filename.size())
            {
-             out << "User-defined Keyboard Layout.    Source: "
-                 << filename << "\n";
-             for (;;)
-                 {
-                    const int cc = fgetc(layout);
-                    if (cc == EOF)   break;
-                    out << char(cc);
-                 }
-             out << endl;
-             return;
-           }
+             if (FILE * layout = fopen(filename.c_str(), "r"))
+                {
+                  out << "User-defined Keyboard Layout.    Source: "
+                      << filename << "\n";
+                  for (;;)
+                      {
+                         const int cc = fgetc(layout);
+                         if (cc == EOF)   break;
+                         out << char(cc);
+                      }
+                  out << endl;
+                  return;
+                }
 
-        out << "Could not open "
-            << UserPreferences::uprefs.keyboard_layout_file
-            << ": " << strerror(errno) << endl
-            << "Showing default layout instead" << endl;
+             out << "Could not open " << filename
+                 << ": " << strerror(errno) << endl;
+           }
+        else
+           {
+             out << "]KEYB USER: no file name of a user-defined layoutfile "
+                             "specified in preferences." << endl;
+           }
+        if (mode != MO_ALL)   return;
       }
+   Workspace::more_error().clear();
 
    // no user-defined layout file either, show built-in layout
    //

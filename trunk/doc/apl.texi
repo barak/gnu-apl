@@ -2462,12 +2462,12 @@ do regular APL comments).
 In the early days of APL the user was typically faced with three problems:
 APL keyboards, APL screens, and APL printers.
 
-The advent of Unicode has soved the last two probelms rather eleqantly:
-the Uncode characters contain all APL charatcers and screens (i.e CTR tubes
+The advent of Unicode has soved the last two problems rather eleqantly:
+the Uncode character set contains all APL characters, and screens (i.e CRT tubes
 in the old days and screen windows these days) and printers display them
 properly. What remains is the keyboard problem. The keyboard problem has two
 sub-problems: Keyboard caps that show APL symbols in addition to the normal
-ASCII characters, and generating proer Unicodes when the keys are being
+ASCII characters, and generating proiper Unicodes when the keys are being
 pressed (typically with the ALT or CTRL keys held down).
 
 GNU APL provides the debug command @b{]KEYB} to help resolving these issues.
@@ -2481,19 +2481,19 @@ sent by APL keyboards do not differ from the keycodes of regular keyboards.
 One the other hand, many programmers type blindly; for them the keycaps are
 mostly irrelevant, and the substantial surcharge for APL keyboards may be
 unreasonable. A related problem is national keyboards: most APL keyboards
-have an US layout for their keycaps although a user may prefer a national
+have a US layout for their keycaps although a user may prefer a national
 layout. Most of this can be helped with a keuboard layout that is printed
 on the screen. A user that types bindly most of the time, but cannot
 remember the position of all APL symbols (in particular of rarely used ones)
 may find it useful to display the keyboard layout on the screen.
 
-@item The second use case for @b{]KEYB} is troubleshooting the transformation
+@item The other use case for @b{]KEYB} is troubleshooting the transformation
 of keys pressed on the keyboard to Unicodes sent to the APL interpreter. This
 transformation (which is explained in more detail below) is highly
 conficurable. The good news is that these days any keyboard can be configured
 to send any Unicode on any key as preferered by the user. The bad news is
 that this configuration differs a lot between different platforms and can
-be faily cumbersome. The @b{]KEYB} command is intended to helkp figuring
+be faily cumbersome. The @b{]KEYB} command is intended to help figuring
 why pressing a partiicular key does not produce the APL character that it
 should. It maybe wothwhile to note that even an APL keyboard can (and most
 likely will) not produce the characters shown on its keypad if the
@@ -2607,33 +2607,51 @@ Both cases can be identified with the @b{]KEYB}  command.
 @subsection The ]KEYB command
 
 @node Subsubsection 2.11.3.1
-@subsubsection ]KEYB without arguments.
+@subsubsection ]KEYB Syntax
 
-Command ]KEYB without arguments is for the normal day to day use (as
+The syntax of the @b{]KEYB} command is:
+
+@example
+      @b{]KEYB [mode] [arguments]}
+@end example
+
+where the optional @b{mode} determines how the output shall be generated and
+the optional arguments specify additional details for the output. There are
+3 different modes:
+
+@itemize
+@item Mode @b{SCAN} uses the program @b{xmodmap} to figure the keyboard layout.
+      This mode, if it works, produces an output that is closest to reality.
+@item Mode @b{USER} display a keyboard layout provided by the user. The output
+      of this mode is as correct as its input.
+@item mode @b{GUESS} displays a typical APL keyboard layout (which may differ
+      considerably from thr true keyboard layout).
+@end itemize
+
+
+@node Subsubsection 2.11.3.2
+@subsubsection ]KEYB without a mode
+
+Command i@b{]KEYB} without a mode is for the normal day to day use (as
 opposed to troubleshooting). It displays an APL keyboard on the screen,
 which is very useful if the keyboard has no APL stickers or key caps.
-The command uses different methods to figure the actual layout:
+
+@b{]KEYB} without a mode tries (in that order):
 
 @enumerate
-@item First the command tries to run @b{xmodmap -pk} as to get the current
-      keyboard map and displays the result in form of an APL keyboard. This
-      result, if the command succeeds, is closest to reality and is diplayed
-      on success. However, it may also fail for various reasons, e.g. if
-      xmodmap is not installed.
-
-@item if the first step fails, then @b{]KEYBC} looks for a user-defined
-      keyboard layout. Such a layout is user-defined text file which shows
-      the keyboard. The name of the file must be configured beforehand
-      in one of the GNU APL preferences files.
-@item if no user-defined keyboard layout is found, then GNU APL displays
-      a built-in layout (which is farthest away from reality) as a final
-      resort.
+@item @b{]KEYB SCAN}
+@item @b{]KEYB USER}
+@item @b{]KEYB GUESS}
 @end enumerate
+
+The command stops after the first mode that was successful. Mode @b{GUESS}
+always succeeds, therefore @b{]KEYB} will always produce an output. If that
+output is correct is a different question, though.
 
 The first line of the keyboard displayed shows which of the 3 methods above
 was used to generate the output.
 
-@node Subsubsection 2.11.3.2
+@node Subsubsection 2.11.3.3
 @subsubsection ]KEYB SCAN
 
 @b{]KEYB SCAN} runs, under the hood, @b{xmodmap -pk} to read the current
@@ -2671,8 +2689,28 @@ Naturally, this only works, iff:
 IOW: @b{]KEYB SCAN} troubleshoots the case
 @i{correct keycode, but incorrect keysymbol(s)} above.
 
-@node Subsubsection 2.11.3.3
-@subsubsection ]KEYB SCAN KEYS
+@node Subsubsection 2.11.3.4
+@subsubsection ]KEYB USER
+
+@b{]KEYB USER} does not try to figure the current keyboard mapping but rather
+displays a static file provided by the user. This mode is a fallback for the 
+case where the other modes are not able to produce a correct keyboard layout.
+The user can take the output of @b{]KEYB GUESS} as a starting point and correct
+the deviations from the actual keyboard layout.
+
+The name of file shown with @b{]KEYB USER} can be configured in one of the
+@b{preferences} files.
+
+@node Subsubsection 2.11.3.5
+@subsubsection ]KEYB GUESS
+
+@b{]KEYB GUESS} does not try to figure the current keyboard mapping but rather
+displays the layout that the various keyboard configuration files that are
+shipped with GNU APL are likely to produce. The layout is a standard US APL
+keyboard.
+
+@node Subsubsection 2.11.3.6
+@subsubsection Optional ]KEYB arguments
 
 @b{]KEYB SCAN KEYS} does not run @b{xmodmap -pk} but rather shows how
 the keys are supposed to be positioned on the keyboard. This shows how
@@ -2695,6 +2733,43 @@ US Keyboard Layout.    Source: GNU APL builtin"
 ║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
 ║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
 ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+@end example
+
+Argument @b{KPAD} also shows the keypad of the keyboard. The keypad is normally
+hidden so that the output fits into a 80-column terminal mindow. With @b{KPAD}
+the terminal should have at least 101 columns. The standard GNU APL layout puts
+line graphics characters onto the keypad, as well as « and » and some
+currency symbols.
+
+Argument @b{FUNK} also shows the function key row of the keyboard, but
+only for @b{]KEYB SCAN KEYS}:
+
+@example
+      ]KEYB SCAN KEYS FUNK KPAD
+US Keyboard Layout.    Source: GNU APL builtin
+
+╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗
+║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║    ║ Kc ║ Kc ║
+║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║
+╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗    ╔════╦════╦════╦════╗
+║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║    ║ Kc ║    ║ Kc ║ Kc ║
+║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║    ║ 77 ║    ║ 82 ║ 82 ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣    ╠════╬════╬════╬════╣
+║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║    ║ Kc ║ Kc ║ Kc ║    ║
+║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║    ║ 79 ║ 80 ║ 81 ║ Kc ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣    ╠════╬════╬════╣ 86 ║
+║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║    ║ Kc ║ Kc ║ Kc ║    ║
+║ 66      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║    ║ 83 ║ 84 ║ 85 ║    ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣    ╠════╬════╬════╬════╣
+║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║    ║ Kc ║ Kc ║ Kc ║    ║
+║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║    ║ 87 ║ 88 ║ 89 ║ Kc ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣    ╠════╩════╬════╣108 ║
+║ Kc ║ Kc  ║ Kc  ║              Kc                  ║ Kc  ║ Kc  ║ Kc  ║ Kc ║    ║ Kc      ║    ║    ║
+║ 37 ║115  ║ 64  ║              65                  ║113  ║116  ║ 109 ║105 ║    ║ 90      ║    ║    ║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝    ╚═════════╩════╩════╝
+
 @end example
 
 As the @b{Source: GNU APL builtin} in the example above indicates, this is
@@ -4457,9 +4532,12 @@ abcdefghijklmnopqrstuvwxyz
 
       ⍝ Line drawing characters
       ⎕CC 7
-┌─┬─┐╒═╤═╕╓─╥─╖╔═╦═╗
-├─┼─┤╞═╪═╡╟─╫─╢╠═╬═╣
-└─┴─┘╘═╧═╛╙─╨─╜╚═╩═╝
+┌─┬─┐╒═╤═╕
+├─┼─┤╞═╪═╡
+└─┴─┘╘═╧═╛
+╓─╥─╖╔═╦═╗
+╟─╫─╢╠═╬═╣
+╙─╨─╜╚═╩═╝
 
       ⍝ Some mathematical symbols
       ⎕CC 8
@@ -4490,6 +4568,7 @@ character classes for ⎕CC:
       ⎕CC  26:  UPPERCASE CHARACTERS A-Z
       ⎕CC ¯26:  lowercase characters A-Z
       ⎕CC  33:  base32 encoding (RFC 4648)
+      ⎕CC  48:  greek characters A-Ω α-ω
       ⎕CC  52:  characters A-Z a-z
       ⎕CC  65:  base64 encoding (RFC 4648)
       ⎕CC  95:  printable characters 0x20 ... 0x7E

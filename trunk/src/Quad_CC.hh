@@ -53,6 +53,7 @@ public:
           QCC_CHAR_AZ   =  26,   ///< A-Z
           QCC_CHAR_az   = -26,   ///< a-z
           QCC_BASE_32   =  33,   ///< RFC 4648
+          QCC_GREEK     =  48,   ///< Α-Ω α-ω
           QCC_CHAR_Az   =  52,   ///< A-Z a-z
           QCC_BASE_64   =  65,   ///< RFC 4648
           QCC_PRINT     =  95,   ///< printable 0x20 ... 0x7E
@@ -227,6 +228,42 @@ protected:
 };
 //---------------------------------------------------------------------------
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
+class CC_GREEK : public CC_base
+{
+public:
+   /// constructor
+   CC_GREEK() { check(); }
+
+   static const CC_GREEK instance;
+
+protected:
+   virtual Shape get_shape() const          { return Shape(48); }
+   virtual const char * get_ravel() const   { return "ΑΒΓΔΕΖΗΘΙΚΛΜ"
+                                                     "ΝΞΟΠΡΣΤΥΦΧΨΩ"
+                                                     "αβγδεζηθικλμ"
+                                                     "νξοπρστυφχψω"; }
+   virtual bool contains(Unicode uni) const
+      { return (0x0391 <= uni && uni <= 0x03A9 && uni != 0x03A2) ||
+               (0x03B1 <= uni && uni <= 0x03C9 && uni != 0x03C2); }
+};
+//---------------------------------------------------------------------------
+/* character class ANYcase alphabetical chars (A-Z, a-z) */
+class CC_ASCII : public CC_base
+{
+public:
+   /// constructor
+   CC_ASCII() { check(); }
+
+   static const CC_ASCII instance;
+
+protected:
+   virtual Shape get_shape() const          { return Shape(127); }
+   virtual const char * get_ravel() const   { return 0; }
+   virtual bool contains(Unicode uni) const
+      { return (0 <= uni && uni <= 127); }
+};
+//---------------------------------------------------------------------------
+/* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_Alpha : public CC_base
 {
 public:
@@ -247,22 +284,6 @@ protected:
 };
 //---------------------------------------------------------------------------
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
-class CC_ASCII : public CC_base
-{
-public:
-   /// constructor
-   CC_ASCII() { check(); }
-
-   static const CC_ASCII instance;
-
-protected:
-   virtual Shape get_shape() const          { return Shape(127); }
-   virtual const char * get_ravel() const   { return 0; }
-   virtual bool contains(Unicode uni) const
-      { return (0 <= uni && uni <= 127); }
-};
-//---------------------------------------------------------------------------
-/* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_LINE_DRAWING: public CC_base
 {
 public:
@@ -272,10 +293,14 @@ public:
    static const CC_LINE_DRAWING instance;
 
 protected:
-   virtual Shape get_shape() const          { return Shape(3, 20); }
-   virtual const char * get_ravel() const { return "┌─┬─┐╒═╤═╕╓─╥─╖╔═╦═╗"
-                                                   "├─┼─┤╞═╪═╡╟─╫─╢╠═╬═╣"
-                                                   "└─┴─┘╘═╧═╛╙─╨─╜╚═╩═╝"; }
+   virtual Shape get_shape() const          { return Shape(6, 10); }
+   virtual const char * get_ravel() const { return "┌─┬─┐╒═╤═╕"
+                                                   "├─┼─┤╞═╪═╡"
+                                                   "└─┴─┘╘═╧═╛"
+                                                   "╓─╥─╖╔═╦═╗"
+                                                   "╟─╫─╢╠═╬═╣"
+                                                   "╙─╨─╜╚═╩═╝"
+; }
    virtual bool contains(Unicode uni) const;
 };
 //---------------------------------------------------------------------------
