@@ -2615,7 +2615,7 @@ The syntax of the @b{]KEYB} command is:
       @b{]KEYB [mode] [arguments]}
 @end example
 
-where the optional @b{mode} determines how the output shall be generated and
+where the optional @b{mode} determines how the output shall be generated, and
 the optional arguments specify additional details for the output. There are
 3 different modes:
 
@@ -2651,16 +2651,26 @@ output is correct is a different question, though.
 The first line of the keyboard displayed shows which of the 3 methods above
 was used to generate the output.
 
+As may have become clear from the explanations above and/or from reading
+@b{README-3-keyboard} in the top-level GNU APL directory, @b{]KEYB SCAN}
+will fail if either @b{xmodmap} is not used at all, or if @b{xmodmap} is
+combined with other keyboard mapping programs. For these cases, the user can
+disable the automatic use of @b{xmodmap} in one of her preferences files.
+The option to do so is @b{NO-XMODMAP} and ii is effective only of
+]KEYB is calle  without a mode. That is, @b{]KEYB SCAN} will use @b{xmodmap}
+even if @b{xmodmap} was disabled by @b{NO-XMODMAP} in a preferences file.
+
+
 @node Subsubsection 2.11.3.3
 @subsubsection ]KEYB SCAN
 
-@b{]KEYB SCAN} runs, under the hood, @b{xmodmap -pk} to read the current
+@b{]KEYB SCAN} runs, under the hood, @b{xmodmap -pke} to read the current
 keycode to keysymbol mapping and displays the result in form of a
 keyboard layout on the screen. For example:
 
 @example
       ]KEYB SCAN
-US Keyboard Layout.    Source: xmodmap -pk
+US Keyboard Layout.    Source: xmodmap -pke
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
 ║ ~  ║ !⌶ ║ @@⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
@@ -2712,9 +2722,9 @@ keyboard.
 @node Subsubsection 2.11.3.6
 @subsubsection Optional ]KEYB arguments
 
-@b{]KEYB SCAN KEYS} does not run @b{xmodmap -pk} but rather shows how
+@b{]KEYB SCAN KEYS} does not run @b{xmodmap -pke} but rather shows how
 the keys are supposed to be positioned on the keyboard. This shows how
-@b{xmodmap -pk} assumes the keys are positioned. For example:
+@b{xmodmap -pke} assumes the keys are positioned. For example:
 
 @example
       ]KEYB SCAN KEYS
@@ -2736,7 +2746,7 @@ US Keyboard Layout.    Source: GNU APL builtin"
 @end example
 
 Argument @b{KPAD} also shows the keypad of the keyboard. The keypad is normally
-hidden so that the output fits into a 80-column terminal mindow. With @b{KPAD}
+hidden so that the output fits into a 80-column terminal window. With @b{KPAD}
 the terminal should have at least 101 columns. The standard GNU APL layout puts
 line graphics characters onto the keypad, as well as « and » and some
 currency symbols.
@@ -2835,7 +2845,7 @@ which are defined in files @b{/usr/include/X11/X.h} and
 @end example
 
 Given the explanations above, the troubleshooting of keyboard mappings
-becomes zimple (though somewhat tedious in the details):
+becomes simple (though somewhat tedious in the details):
 
 @enumerate
 @item do @b{]KEYB SCAN KEYS} in GNU APL to display the keycodes, then

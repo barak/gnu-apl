@@ -54,8 +54,8 @@ const char * Cmd_KEYB::keypad_template[] = {
 "║ Kc ║ Kc ║ Kc ║    ║",
 "║ 87 ║ 88 ║ 89 ║ Kc ║",
 "╠════╩════╬════╣108 ║",
-"║ Kc      ║    ║    ║",
-"║ 90      ║    ║    ║",
+"║ Kc      ║ Kc ║    ║",
+"║ 90      ║ 91 ║    ║",
 "╚═════════╩════╩════╝",
 };
 
@@ -64,17 +64,17 @@ const char * Cmd_KEYB::layout_template[] = {
 "║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
 "║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║",
 "╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣",
-"║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║",
-"║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║",
+"║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc  ║",
+"║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║",
 "╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣",
-"║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
-"║ 66      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║",
+"║  Kc     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
+"║  66     ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║",
 "╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣",
-"║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║",
-"║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║",
+"║    Kc       ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║   Kc     ║",
+"║    50       ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║   62     ║",
 "╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣",
-"║ Kc ║ Kc  ║ Kc  ║              Kc                  ║ Kc  ║ Kc  ║ Kc  ║ Kc ║",
-"║ 37 ║115  ║ 64  ║              65                  ║113  ║116  ║ 109 ║105 ║",
+"║ Kc ║ Kc  ║ Kc  ║                Kc                ║ Kc  ║ Kc  ║ Kc  ║ Kc ║",
+"║ 37 ║115  ║ 64  ║                65                ║113  ║116  ║ 109 ║105 ║",
 "╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝",
                         };
 
@@ -115,7 +115,11 @@ int mode = MO_NONE;
       }
    if (mode == MO_NONE)   mode = MO_ALL;   // if no specific mode(s) given
 
-   if (mode & MO_XMODMAP)
+const bool do_xmodmap = (mode & MO_XMODMAP) &&
+                         ! (mode == MO_ALL &&
+                            UserPreferences::uprefs.no_xmodmap);
+
+   if (do_xmodmap)
       {
         // reset SIGCHLD to its default so that pclose() works as expected
         //
@@ -125,11 +129,19 @@ int mode = MO_NONE;
 
         if (mode != MO_ALL)
            {
+             // in mode MO_ALL failure of xmodmap is kind of expected. However
+             // mode was not MO_ALL and then we should complain if xmodmap
+             // has failed. Normally parse_xmodmap() sets up the )MORE info,
+             // but if it didn;t then we do it here,
+             //
              if (xmodmap_error)
                 {
-                  MORE_ERROR() << "running xmodmap failed.";
-                  if (Command::auto_MORE)
-                     CERR << Workspace::more_error() << endl;
+                  if (Workspace::more_error().size() == 0)
+                     {
+                       MORE_ERROR() << "running xmodmap failed.";
+                       if (Command::auto_MORE)
+                       CERR << Workspace::more_error() << endl;
+                     }
                 }
              else
                 {
@@ -233,7 +245,7 @@ Cmd_KEYB::parse_xmodmap()
       }
 
    errno = 0;
-FILE * xm = popen("xmodmap -pk", "r");
+FILE * xm = popen("xmodmap -pke", "r");
    if (xm == 0)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error starting xmodmap: "
@@ -261,8 +273,35 @@ int bad_lines  = 0;
       {
         // xmodmap was started, but then something went wrong.
         //
+        pclose(xm);
         return true;
       }
+
+   /* figure the number of Uxxx mappings per key. A typical APL keyboard that
+      uses xmodmap (and no other keymap mechanism) has 66 keys with one or
+      more Uxxx entries,
+     
+      If the counts are substantially smaller, then most likely xmodmap is
+      used tigether with some other keyboard mapping mechanism, or the xmodmap
+      is incomplete. We consider that an error.
+    */
+   {
+     int Ucount = 0;
+     loop(k, 256)
+         {
+           map_item & item = key_map[k];
+           if (item.Ucount > 0)   ++Ucount;
+         }
+
+     if (Ucount <= 33)
+        {
+          MORE_ERROR() <<
+               "Command ]KEYB SCAN: Too few Uxxx mappings in xmodmap -pke:\n"
+               "    " << Ucount << " keys with one or more Uxxx mapping(s),\n";
+          if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+          return true;   // error
+        }
+   }
 
    if (pclose(xm) && (errno != ECHILD))
       {
@@ -272,7 +311,7 @@ int bad_lines  = 0;
         return true;   // error
       }
 
-   /* a typical xmodmap has:
+   /* a typical xmodmap -pke output line has:
 
       5  bad lines (header lines at the start of the output), and
      248 good lines.
@@ -281,7 +320,7 @@ int bad_lines  = 0;
    if (good_lines < 100)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: too few (" << good_lines
-                     << ") good lines in the output of: xmodmap -pk";
+                     << ") good lines in the output of: xmodmap -pke";
         if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
       }
@@ -289,7 +328,7 @@ int bad_lines  = 0;
    if (bad_lines > 20)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: too many (" << bad_lines
-                     << ") bad lines in the output of: xmodmap -pk";
+                     << ") bad lines in the output of: xmodmap -pke";
         if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
         return true;
       }
@@ -312,53 +351,177 @@ const bool debug = false;
 
 int keycode = -1, len;
 const char * p = buffer;
-int rc = sscanf(p, " %d%n", &keycode, &len);
+int rc = sscanf(p, "keycode %d = %n", &keycode, &len);
    if (rc < 1)
       {
-        debug && cout << "line " << line << ": sscanf() failed ("
+        debug && cout << "line " << line << ": sscanf() failed (rc="
                       << rc << ")" << endl;
         return true;   // error
       }
-   p += len;
+   if (keycode <  0 || keycode >= 256)
+      {
+        debug && cout << "line " << line << ": sscanf() failed "
+                         "(invalid keycode " << keycode << ")" << endl;
+        return true;   // error
+      }
 
-unsigned int unicodes[4] = { 0, 0, 0, 0 };
+   p += len;   // skip keycode
+
+uint32_t unicodes[4] = { 0, 0, 0, 0 };
 int j = 0;
 
-char keyname[42];   // ignored
+int Ucount = 0;
    for (j = 0; j < 4; ++j)
        {
-         *keyname = 0;
-         if (debug)
-         debug && cout << "   See: '" << p << "'";
-         rc = sscanf(p, " %x %s%n", &unicodes[j], keyname, &len);
-         debug && cout << "  j=" << j << " rc=" << rc << " len=" << len
-              << "    " << keyname << endl;
-         if (*keyname == 0)   break;
-         p += len;
+         debug && cout << "   See: '" << p << "'" << endl;
+         if (parse_Unicode(Keycode(keycode), p, unicodes[j]))   ++Ucount;
        }
 
    if (debug)
       {
-        cout << "   └──── keycode[" << j << "] " << keycode << ":";
-        for (int jj = 0; jj < j; ++jj)
-            cout << " 0x" << hex << unicodes[jj];
+        cout << "   └──── keycode[" << Ucount << "] " << keycode << ":";
+        loop (jj, j)   cout << " 0x" << hex << unicodes[jj];
         cout << dec << endl;
       }
 
-   if (keycode <  0)     return true;
-   if (keycode >= 256)   return true;
-
-   // there are typically 136 lines with a keycode but without s Unicode.
-   // Thse lines are reserved. That is, j=0 is not an error.
+   // there are typically 136 lines with a keycode but without a Unicode.
+   // These lines are reserved. That is, j=0 is not an error.
 
    map_item & item = key_map[keycode];
    item.keycode = keycode;
-   for (int jj = 0; jj < j; ++jj)
-       {
-         item.unicodes[jj] = Unicode(unicodes[jj]);
-       }
+   item.Ucount = Ucount;
+   loop(jj, j)   item.unicodes[jj] = Unicode(unicodes[jj]);
 
    return false;   // OK
+}
+//----------------------------------------------------------------------------
+bool
+Cmd_KEYB::parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode)
+{
+   /* parse the keysym starting at p. The full line might look like ths:
+ 
+      keycode  19 = 0 parenright U2227 U2372
+                    │ │          │     │
+                    └─┴──────────┴─────┴────── keysyms
+ 
+      As can be seen above there are 3 major cases:
+
+      1. a single ASCII like '0'
+      2. a symbolic name like 'parenright'm or
+      3. a Unicode like 'U2227'
+    */
+   unicode = 0;   // assume error
+
+   while (*p == ' ')   ++p;   // skip leading whitespace
+   if (*p == 0)   return false;
+
+   if (*p && p[1] == ' ')   // case 1: single ASCII
+      {
+        unicode = *p;
+        p += 2;
+        return true;
+      }
+
+   if (*p == 'U')   // case 3: Uxxxx
+      {
+        int len = 0;
+        sscanf(p, "U%x%n", &unicode, &len);
+        if (len == 5)
+           {
+             p += 5;
+             return true;
+           }
+      }
+
+   // case 2: symbolic key. We use a subset of 
+   // /usr/include/xkbcommon/xkbcommon-keysyms.h
+   // to decode the name
+   //
+static const struct symkey
+{
+  const char * name;
+   int         unicode;
+} sym_map[] = {
+{ "NoSymbol",       0x0000 },
+{ "Escape",         0x001B },
+{ "space",          0x0020 },
+{ "exclam",         0x0021 },
+{ "at macron",      0x0022 },
+{ "quotedbl",       0x0022 },
+{ "numbersign",     0x0023 },
+{ "less",           0x003c },
+{ "dollar",         0x0024 },
+{ "percent",        0x0025 },
+{ "ampersand",      0x0026 },
+{ "apostrophe",     0x0027 },
+{ "quoteright",     0x0027 },
+{ "parenleft",      0x0028 },
+{ "parenright",     0x0029 },
+{ "asterisk",       0x002A },
+{ "plus",           0x002B },
+{ "colon",          0x002A },
+{ "semicolon",      0x002B },
+{ "comma",          0x002C },
+{ "minus",          0x002D },
+{ "period",         0x002E },
+{ "slash",          0x002F },
+{ "equal",          0x003D },
+{ "greater",        0x003E },
+{ "question",       0x003F },
+{ "bracketleft",    0x005B },
+{ "backslash",      0x005C },
+{ "bracketright",   0x005D },
+{ "asciicircum",    0x005E },
+{ "underscore",     0x005F },
+{ "grave",          0x0060 },
+{ "braceleft",      0x007B },
+{ "bar",            0x007C },
+{ "braceright",     0x007D },
+{ "asciitilde",     0x007E },
+{ "cent",           0x00A2 },
+{ "sterling",       0x00A3 },
+{ "yen",            0x00A5 },
+{ "brokenbar",      0x00A6 },
+{ "section",        0x00A7 },
+{ "diaeresis",      0x00A8 },
+{ "guillemotleft",  0x00AB },
+{ "macron",         0x00AF },
+{ "guillemotright", 0x00BB },
+{ "Odiaeresis",     0x00D6 },
+{ "multiply",       0x00D7 },
+{ "Udiaeresis",     0x00DC },
+{ "ssharp",         0x00DF },
+{ "adiaeresis",     0x00E4 },
+{ "odiaeresis",     0x00F6 },
+{ "udiaeresis",     0x00FC },
+{ "division",       0x00F7 },
+{ "Adiaeresis",     0x07A5 },
+{ "notidentical",   0x2262 },
+{ "elementof"   ,   0x2208 },
+              };
+
+   loop(s, sizeof(sym_map)/sizeof(*sym_map))
+       {
+         const symkey & sk = sym_map[s];
+         const size_t len = strlen(sk.name);
+         if (!strncmp(sk.name, p, len))   // found
+            {
+              unicode = sk.unicode;
+              p += len;
+              return true;
+            }
+       }
+
+   // uppercase symbol names seem to be functions rather than characters
+   //
+   if (*p >= 'a')
+      {
+        CERR << "Keycode " << keycode
+             << ": missing KEYSYM: '" << p << "'" << endl;
+      }
+
+   while (*p > ' ')   ++p;
+   return false;
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -366,7 +529,7 @@ Cmd_KEYB::print_xmodmap(ostream & out, bool keys, int area)
 {
    out << "US Keyboard Layout.    ";
    if (keys)   out << "Source: GNU APL builtin" << endl << endl;
-   else        out << "Source: xmodmap -pk" << endl << endl;
+   else        out << "Source: xmodmap -pke" << endl << endl;
 
 const int main_rows = sizeof(layout_template) / sizeof(*layout_template);
 int fun_rows = 0;
@@ -426,7 +589,7 @@ const int rows = lines.size();
 
                     // fill in characters
                     //
-                    switch(keycode)
+                    switch(keycode)   // special key names
                        {
                          case  9:   // ESC
                               l[x] = UNI_E;   l[x+1] = UNI_S; l[x+2] = UNI_C;
@@ -456,6 +619,11 @@ const int rows = lines.size();
                          case 62:   // SHIFT
                               l[x] = UNI_S;   l[x+1] = UNI_H; l[x+2] = UNI_I;
                               l[x+3] = UNI_F; l[x+4] = UNI_T;
+                              continue;
+
+                         case 65:   // SPACE
+                              l[x-2] = UNI_S; l[x-1] = UNI_P; l[x] = UNI_A;
+                              l[x+1] = UNI_C; l[x+2] = UNI_E;
                               continue;
 
                          case 66:   // CAPS LOCK

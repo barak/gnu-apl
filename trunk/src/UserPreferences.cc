@@ -69,6 +69,7 @@ UserPreferences::UserPreferences()
      initial_PW(DEFAULT_Quad_PW),
      initial_PW_by_user(false),
      line_history_len(500),
+     no_xmodmap(false),
      line_history_path(".apl.history"),
      mem_arg(0),
      old_multi_line_strings(true),
@@ -1616,6 +1617,10 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               keyboard_layout_file = UTF8_string(arg);
             }
+         else if (!strcasecmp(opt, "NO-XMODMAP"))
+              {
+                no_xmodmap = true;
+              }
          else if (!strcasecmp(opt, "CONTROL-Ds-TO-EXIT"))
             {
               control_Ds_to_exit = atoi(arg);

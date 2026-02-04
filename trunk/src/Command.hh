@@ -394,17 +394,30 @@ public:
    static ostream & print_xmodmap(ostream & out, bool keys, int area);
 
 protected:
-   /// parse one putput line of xmodmap -pk.
+   enum Keycode
+      {
+        keycode_NONE =  -1,
+        keycode_min  =   8,  // including
+        keycode_max  = 255   // including;
+      };
+
+   /// parse one output line of xmodmap -pke.
    static bool parse_xmodmap_line(const char * buffer, int line);
+
+   /// parse one unicode (like Uxxxx); increment \b p, and return \b true
+   /// on success.
+   static bool parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode);
 
    static struct map_item
       {
         map_item()
-        : keycode(-1)
+        : keycode(-1),
+          Ucount(0)
           { unicodes[0] = unicodes[1] = unicodes[2] = unicodes[3] = Unicode_0; }
 
-        int keycode;
-        Unicode unicodes[4];
+        int keycode;           ///< the keycode
+        int Ucount;            ///< the number of Uxxx mappings
+        Unicode unicodes[4];   ///< the unicodes
       } key_map[256];
 
    /// a keyboard layout (function key area)

@@ -73,7 +73,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 2, 2026.
+<p>February 4, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -3182,7 +3182,7 @@ Next: <a href="#Subsubsection-2_002e11_002e3_002e2" accesskey="n" rel="next">]KE
 <pre class="example">      <b>]KEYB [mode] [arguments]</b>
 </pre></div>
 
-<p>where the optional <b>mode</b> determines how the output shall be generated and
+<p>where the optional <b>mode</b> determines how the output shall be generated, and
 the optional arguments specify additional details for the output. There are
 3 different modes:
 </p>
@@ -3224,6 +3224,16 @@ output is correct is a different question, though.
 <p>The first line of the keyboard displayed shows which of the 3 methods above
 was used to generate the output.
 </p>
+<p>As may have become clear from the explanations above and/or from reading
+<b>README-3-keyboard</b> in the top-level GNU APL directory, <b>]KEYB SCAN</b>
+will fail if either <b>xmodmap</b> is not used at all, or if <b>xmodmap</b> is
+combined with other keyboard mapping programs. For these cases, the user can
+disable the automatic use of <b>xmodmap</b> in one of her preferences files.
+The option to do so is <b>NO-XMODMAP</b> and ii is effective only of
+]KEYB is calle  without a mode. That is, <b>]KEYB SCAN</b> will use <b>xmodmap</b>
+even if <b>xmodmap</b> was disabled by <b>NO-XMODMAP</b> in a preferences file.
+</p>
+
 <hr>
 </div>
 <div class="subsubsection" id="Subsubsection-2_002e11_002e3_002e3">
@@ -3233,13 +3243,13 @@ Next: <a href="#Subsubsection-2_002e11_002e3_002e4" accesskey="n" rel="next">]KE
 </div>
 <span id="g_t_005dKEYB-SCAN"></span><h4 class="subsubsection">2.11.3.3 ]KEYB SCAN</h4>
 
-<p><b>]KEYB SCAN</b> runs, under the hood, <b>xmodmap -pk</b> to read the current
+<p><b>]KEYB SCAN</b> runs, under the hood, <b>xmodmap -pke</b> to read the current
 keycode to keysymbol mapping and displays the result in form of a
 keyboard layout on the screen. For example:
 </p>
 <div class="example">
 <pre class="example">      ]KEYB SCAN
-US Keyboard Layout.    Source: xmodmap -pk
+US Keyboard Layout.    Source: xmodmap -pke
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
 ║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &amp;⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
@@ -3309,9 +3319,9 @@ Previous: <a href="#Subsubsection-2_002e11_002e3_002e5" accesskey="p" rel="prev"
 </div>
 <span id="Optional-_005dKEYB-arguments"></span><h4 class="subsubsection">2.11.3.6 Optional ]KEYB arguments</h4>
 
-<p><b>]KEYB SCAN KEYS</b> does not run <b>xmodmap -pk</b> but rather shows how
+<p><b>]KEYB SCAN KEYS</b> does not run <b>xmodmap -pke</b> but rather shows how
 the keys are supposed to be positioned on the keyboard. This shows how
-<b>xmodmap -pk</b> assumes the keys are positioned. For example:
+<b>xmodmap -pke</b> assumes the keys are positioned. For example:
 </p>
 <div class="example">
 <pre class="example">      ]KEYB SCAN KEYS
@@ -3333,7 +3343,7 @@ US Keyboard Layout.    Source: GNU APL builtin&quot;
 </pre></div>
 
 <p>Argument <b>KPAD</b> also shows the keypad of the keyboard. The keypad is normally
-hidden so that the output fits into a 80-column terminal mindow. With <b>KPAD</b>
+hidden so that the output fits into a 80-column terminal window. With <b>KPAD</b>
 the terminal should have at least 101 columns. The standard GNU APL layout puts
 line graphics characters onto the keypad, as well as « and » and some
 currency symbols.
@@ -3432,7 +3442,7 @@ which are defined in files <b>/usr/include/X11/X.h</b> and
 </pre></div>
 
 <p>Given the explanations above, the troubleshooting of keyboard mappings
-becomes zimple (though somewhat tedious in the details):
+becomes simple (though somewhat tedious in the details):
 </p>
 <ol>
 <li> do <b>]KEYB SCAN KEYS</b> in GNU APL to display the keycodes, then

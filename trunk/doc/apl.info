@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-February 2, 2026.  This manual briefly documents GNU APL, an interpreter
+February 4, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -2560,7 +2560,7 @@ The syntax of the ]KEYB command is:
 
            ]KEYB [mode] [arguments]
 
-   where the optional mode determines how the output shall be generated
+   where the optional mode determines how the output shall be generated,
 and the optional arguments specify additional details for the output.
 There are 3 different modes:
 
@@ -2595,18 +2595,27 @@ If that output is correct is a different question, though.
    The first line of the keyboard displayed shows which of the 3 methods
 above was used to generate the output.
 
+   As may have become clear from the explanations above and/or from
+reading README-3-keyboard in the top-level GNU APL directory, ]KEYB SCAN
+will fail if either xmodmap is not used at all, or if xmodmap is
+combined with other keyboard mapping programs.  For these cases, the
+user can disable the automatic use of xmodmap in one of her preferences
+files.  The option to do so is NO-XMODMAP and ii is effective only of
+]KEYB is calle without a mode.  That is, ]KEYB SCAN will use xmodmap
+even if xmodmap was disabled by NO-XMODMAP in a preferences file.
+
 
 File: apl.info,  Node: Subsubsection 2.11.3.3,  Next: Subsubsection 2.11.3.4,  Prev: Subsubsection 2.11.3.2,  Up: Subsection 2.11.3
 
 2.11.3.3 ]KEYB SCAN
 ...................
 
-]KEYB SCAN runs, under the hood, xmodmap -pk to read the current keycode
-to keysymbol mapping and displays the result in form of a keyboard
-layout on the screen.  For example:
+]KEYB SCAN runs, under the hood, xmodmap -pke to read the current
+keycode to keysymbol mapping and displays the result in form of a
+keyboard layout on the screen.  For example:
 
            ]KEYB SCAN
-     US Keyboard Layout.    Source: xmodmap -pk
+     US Keyboard Layout.    Source: xmodmap -pke
 
      ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
      ║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
@@ -2665,9 +2674,9 @@ File: apl.info,  Node: Subsubsection 2.11.3.6,  Prev: Subsubsection 2.11.3.5,  U
 2.11.3.6 Optional ]KEYB arguments
 .................................
 
-]KEYB SCAN KEYS does not run xmodmap -pk but rather shows how the keys
+]KEYB SCAN KEYS does not run xmodmap -pke but rather shows how the keys
 are supposed to be positioned on the keyboard.  This shows how xmodmap
--pk assumes the keys are positioned.  For example:
+-pke assumes the keys are positioned.  For example:
 
            ]KEYB SCAN KEYS
      US Keyboard Layout.    Source: GNU APL builtin"
@@ -2688,7 +2697,7 @@ are supposed to be positioned on the keyboard.  This shows how xmodmap
 
    Argument KPAD also shows the keypad of the keyboard.  The keypad is
 normally hidden so that the output fits into a 80-column terminal
-mindow.  With KPAD the terminal should have at least 101 columns.  The
+window.  With KPAD the terminal should have at least 101 columns.  The
 standard GNU APL layout puts line graphics characters onto the keypad,
 as well as « and » and some currency symbols.
 
@@ -2774,7 +2783,7 @@ are defined in files /usr/include/X11/X.h and
      #define XK_Return    0xff0d  /* Return, enter */
 
    Given the explanations above, the troubleshooting of keyboard
-mappings becomes zimple (though somewhat tedious in the details):
+mappings becomes simple (though somewhat tedious in the details):
 
   1. do ]KEYB SCAN KEYS in GNU APL to display the keycodes, then
   2. run xev in a different window and verify, for every key on the
@@ -11431,182 +11440,182 @@ Node: Subsection 2.11.194081
 Node: Subsection 2.11.296472
 Node: Subsection 2.11.398947
 Node: Subsubsection 2.11.3.199259
-Node: Subsubsection 2.11.3.2100057
-Node: Subsubsection 2.11.3.3100874
-Node: Subsubsection 2.11.3.4103830
-Node: Subsubsection 2.11.3.5104456
-Node: Subsubsection 2.11.3.6104872
-Node: Section 2.12115757
-Node: Subsection 2.12.1115985
-Node: Subsection 2.12.2116955
-Node: Section 2.13117562
-Node: Section 2.14119343
-Node: Subsection 2.14.1120068
-Node: Subsection 2.14.2120811
-Node: Section 2.15121504
-Node: Section 2.16122445
-Node: Section 2.17122716
-Node: Section 2.18124127
-Node: Subsection 2.18.1124546
-Node: Subsection 2.18.2130026
-Node: Section 2.19135262
-Node: Section 2.20137809
-Node: Subsection 2.20.1139926
-Node: Subsection 2.20.2140786
-Node: Subsection 2.20.3142529
-Node: Subsection 2.20.4144367
-Node: Section 2.21145260
-Node: Section 2.22149696
-Node: Subsection 2.22.1149888
-Node: Subsection 2.22.2150611
-Node: Section 2.23151431
-Node: Subsection 2.23.1151695
-Node: Subsection 2.23.2156908
-Node: Subsubsection 2.23.2.1157445
-Node: Subsubsection 2.23.2.2159658
-Node: Subsubsection 2.23.2.3162429
-Node: Subsubsection 2.23.2.4163177
-Node: Subsubsection 2.23.2.5166337
-Node: Subsubsection 2.23.2.6167586
-Node: Subsubsection 2.23.2.7168666
-Node: Subsubsection 2.23.2.8174692
-Node: Subsubsection 2.23.2.9177414
-Node: Subsubsection 2.23.2.10179380
-Node: Section 2.24182162
-Node: Subsection 2.24.1182585
-Node: Subsection 2.24.2185455
-Node: Section 2.25186151
-Node: Section 2.26192827
-Node: Section 2.27196199
-Node: Section 2.28196490
-Node: Section 2.29207343
-Node: Section 2.30207615
-Node: Section 2.31214668
-Node: Section 2.32217122
-Node: Section 2.33217791
-Node: Subsection 2.33.1218492
-Node: Subsection 2.33.2218823
-Node: Section 2.34219674
-Node: Section 2.35223598
-Node: Subsection 2.35.1225428
-Node: Subsection 2.35.2225810
-Node: Subsection 2.35.3227108
-Node: Subsection 2.35.4227498
-Node: Subsection 2.35.5228663
-Node: Subsection 2.35.6231173
-Node: Subsection 2.35.7231518
-Node: Subsection 2.35.8231859
-Node: Subsection 2.35.9232486
-Node: Subsection 2.35.10233430
-Node: Subsection 2.35.11235310
-Node: Subsection 2.35.12236401
-Node: Subsection 2.35.13237337
-Node: Section 2.36239781
-Node: Subsection 2.36.1241014
-Node: Subsubsection 2.36.1.1241803
-Node: Subsubsection 2.36.1.2242810
-Node: Subsection 2.36.2243898
-Node: Subsection 2.36.3257426
-Node: Subsection 2.36.4258749
-Node: Subsection 2.36.5259975
-Node: Section 2.37263536
-Node: Subsection 2.37.1264053
-Node: Subsection 2.37.2269541
-Node: Subsection 2.37.3271737
-Node: Subsection 2.37.4272554
-Node: Section 2.38273477
-Node: Section 2.39274496
-Node: Subsection 2.39.1275060
-Node: Subsection 2.39.2275537
-Node: Subsection 2.39.3276212
-Node: Subsection 2.39.4276850
-Node: Subsection 2.39.5278224
-Node: Subsubsection 2.39.5.1279147
-Node: Subsubsection 2.39.5.2279784
-Node: Subsubsection 2.39.5.3282232
-Node: Subsubsection 2.39.5.4285715
-Node: Subsection 2.39.6286624
-Node: Section 2.40291107
-Node: Subsection 2.40.1292048
-Node: Subsection 2.40.2292992
-Node: Subsubsection 2.40.2.1293846
-Node: Subsubsection 2.40.2.2295162
-Node: Subsubsection 2.40.2.3296802
-Node: Subsubsection 2.40.2.4298263
-Node: Subsubsection 2.40.2.5300052
-Node: Subsubsection 2.40.2.6300841
-Node: Subsubsection 2.40.2.7302797
-Node: Section 2.41303463
-Node: Section 2.42305647
-Node: Subsection 2.42.1306395
-Node: Subsection 2.42.2308232
-Node: Subsection 2.42.3310920
-Node: Subsection 2.42.4311906
-Node: Subsection 2.42.5312376
-Node: Subsection 2.42.6313256
-Node: Subsection 2.42.7313724
-Node: Subsection 2.42.8313967
-Node: Subsection 2.42.9314213
-Node: Subsection 2.42.10314478
-Node: Subsection 2.42.11314749
-Node: Subsection 2.42.12315200
-Node: Subsection 2.42.13315715
-Node: Subsection 2.42.14316213
-Node: Subsubsection 2.42.14.1318047
-Node: Subsubsection 2.42.14.2319462
-Node: Subsubsection 2.42.14.3321214
-Node: Subsubsection 2.42.14.4324561
-Node: Subsubsection 2.42.14.5327474
-Node: Subsubsection 2.42.14.6329828
-Node: Subsubsection 2.42.14.7331558
-Node: Subsection 2.42.15334166
-Node: Section 2.43334903
-Node: Subsection 2.43.1337226
-Node: Subsection 2.43.2338569
-Node: Subsection 2.43.3339001
-Node: Subsection 2.43.4339270
-Node: Section 2.44339949
-Node: Subsection 2.44.1340239
-Node: Subsection 2.44.2341814
-Node: Subsection 2.44.3345237
-Node: Subsection 2.44.4351872
-Node: Subsection 2.44.5352658
-Node: Subsection 2.44.6360956
-Node: Section 2.45361828
-Node: Subsection 2.45.1362234
-Node: Subsection 2.45.2369452
-Node: Subsection 2.45.3373427
-Node: Section 2.46376210
-Node: Section 2.47379480
-Node: Chapter 3379995
-Node: Section 3.1380369
-Node: Section 3.2381641
-Node: Chapter 4382693
-Node: Chapter 5383834
-Node: Section 5.1384495
-Node: Section 5.2385227
-Node: Section 5.3385722
-Node: Section 5.4387860
-Node: Subsection 5.4.1388215
-Node: Subsection 5.4.2389001
-Node: Section 5.5393731
-Node: Section 5.6396739
-Node: Section 5.7405478
-Node: Chapter 6411443
-Node: Section 6.1413013
-Node: Section 6.2414333
-Node: Section 6.3414693
-Node: Section 6.4414935
-Node: Section 6.5415597
-Node: Section 6.6416075
-Node: Section 6.7416848
-Node: Section 6.8417274
-Node: Chapter 7417676
-Node: Section 7.1418095
-Node: Section 7.2418782
-Node: Chapter 8419613
-Node: Section 8.1420116
-Node: Section 8.2445429
+Node: Subsubsection 2.11.3.2100058
+Node: Subsubsection 2.11.3.3101428
+Node: Subsubsection 2.11.3.4104386
+Node: Subsubsection 2.11.3.5105012
+Node: Subsubsection 2.11.3.6105428
+Node: Section 2.12116315
+Node: Subsection 2.12.1116543
+Node: Subsection 2.12.2117513
+Node: Section 2.13118120
+Node: Section 2.14119901
+Node: Subsection 2.14.1120626
+Node: Subsection 2.14.2121369
+Node: Section 2.15122062
+Node: Section 2.16123003
+Node: Section 2.17123274
+Node: Section 2.18124685
+Node: Subsection 2.18.1125104
+Node: Subsection 2.18.2130584
+Node: Section 2.19135820
+Node: Section 2.20138367
+Node: Subsection 2.20.1140484
+Node: Subsection 2.20.2141344
+Node: Subsection 2.20.3143087
+Node: Subsection 2.20.4144925
+Node: Section 2.21145818
+Node: Section 2.22150254
+Node: Subsection 2.22.1150446
+Node: Subsection 2.22.2151169
+Node: Section 2.23151989
+Node: Subsection 2.23.1152253
+Node: Subsection 2.23.2157466
+Node: Subsubsection 2.23.2.1158003
+Node: Subsubsection 2.23.2.2160216
+Node: Subsubsection 2.23.2.3162987
+Node: Subsubsection 2.23.2.4163735
+Node: Subsubsection 2.23.2.5166895
+Node: Subsubsection 2.23.2.6168144
+Node: Subsubsection 2.23.2.7169224
+Node: Subsubsection 2.23.2.8175250
+Node: Subsubsection 2.23.2.9177972
+Node: Subsubsection 2.23.2.10179938
+Node: Section 2.24182720
+Node: Subsection 2.24.1183143
+Node: Subsection 2.24.2186013
+Node: Section 2.25186709
+Node: Section 2.26193385
+Node: Section 2.27196757
+Node: Section 2.28197048
+Node: Section 2.29207901
+Node: Section 2.30208173
+Node: Section 2.31215226
+Node: Section 2.32217680
+Node: Section 2.33218349
+Node: Subsection 2.33.1219050
+Node: Subsection 2.33.2219381
+Node: Section 2.34220232
+Node: Section 2.35224156
+Node: Subsection 2.35.1225986
+Node: Subsection 2.35.2226368
+Node: Subsection 2.35.3227666
+Node: Subsection 2.35.4228056
+Node: Subsection 2.35.5229221
+Node: Subsection 2.35.6231731
+Node: Subsection 2.35.7232076
+Node: Subsection 2.35.8232417
+Node: Subsection 2.35.9233044
+Node: Subsection 2.35.10233988
+Node: Subsection 2.35.11235868
+Node: Subsection 2.35.12236959
+Node: Subsection 2.35.13237895
+Node: Section 2.36240339
+Node: Subsection 2.36.1241572
+Node: Subsubsection 2.36.1.1242361
+Node: Subsubsection 2.36.1.2243368
+Node: Subsection 2.36.2244456
+Node: Subsection 2.36.3257984
+Node: Subsection 2.36.4259307
+Node: Subsection 2.36.5260533
+Node: Section 2.37264094
+Node: Subsection 2.37.1264611
+Node: Subsection 2.37.2270099
+Node: Subsection 2.37.3272295
+Node: Subsection 2.37.4273112
+Node: Section 2.38274035
+Node: Section 2.39275054
+Node: Subsection 2.39.1275618
+Node: Subsection 2.39.2276095
+Node: Subsection 2.39.3276770
+Node: Subsection 2.39.4277408
+Node: Subsection 2.39.5278782
+Node: Subsubsection 2.39.5.1279705
+Node: Subsubsection 2.39.5.2280342
+Node: Subsubsection 2.39.5.3282790
+Node: Subsubsection 2.39.5.4286273
+Node: Subsection 2.39.6287182
+Node: Section 2.40291665
+Node: Subsection 2.40.1292606
+Node: Subsection 2.40.2293550
+Node: Subsubsection 2.40.2.1294404
+Node: Subsubsection 2.40.2.2295720
+Node: Subsubsection 2.40.2.3297360
+Node: Subsubsection 2.40.2.4298821
+Node: Subsubsection 2.40.2.5300610
+Node: Subsubsection 2.40.2.6301399
+Node: Subsubsection 2.40.2.7303355
+Node: Section 2.41304021
+Node: Section 2.42306205
+Node: Subsection 2.42.1306953
+Node: Subsection 2.42.2308790
+Node: Subsection 2.42.3311478
+Node: Subsection 2.42.4312464
+Node: Subsection 2.42.5312934
+Node: Subsection 2.42.6313814
+Node: Subsection 2.42.7314282
+Node: Subsection 2.42.8314525
+Node: Subsection 2.42.9314771
+Node: Subsection 2.42.10315036
+Node: Subsection 2.42.11315307
+Node: Subsection 2.42.12315758
+Node: Subsection 2.42.13316273
+Node: Subsection 2.42.14316771
+Node: Subsubsection 2.42.14.1318605
+Node: Subsubsection 2.42.14.2320020
+Node: Subsubsection 2.42.14.3321772
+Node: Subsubsection 2.42.14.4325119
+Node: Subsubsection 2.42.14.5328032
+Node: Subsubsection 2.42.14.6330386
+Node: Subsubsection 2.42.14.7332116
+Node: Subsection 2.42.15334724
+Node: Section 2.43335461
+Node: Subsection 2.43.1337784
+Node: Subsection 2.43.2339127
+Node: Subsection 2.43.3339559
+Node: Subsection 2.43.4339828
+Node: Section 2.44340507
+Node: Subsection 2.44.1340797
+Node: Subsection 2.44.2342372
+Node: Subsection 2.44.3345795
+Node: Subsection 2.44.4352430
+Node: Subsection 2.44.5353216
+Node: Subsection 2.44.6361514
+Node: Section 2.45362386
+Node: Subsection 2.45.1362792
+Node: Subsection 2.45.2370010
+Node: Subsection 2.45.3373985
+Node: Section 2.46376768
+Node: Section 2.47380038
+Node: Chapter 3380553
+Node: Section 3.1380927
+Node: Section 3.2382199
+Node: Chapter 4383251
+Node: Chapter 5384392
+Node: Section 5.1385053
+Node: Section 5.2385785
+Node: Section 5.3386280
+Node: Section 5.4388418
+Node: Subsection 5.4.1388773
+Node: Subsection 5.4.2389559
+Node: Section 5.5394289
+Node: Section 5.6397297
+Node: Section 5.7406036
+Node: Chapter 6412001
+Node: Section 6.1413571
+Node: Section 6.2414891
+Node: Section 6.3415251
+Node: Section 6.4415493
+Node: Section 6.5416155
+Node: Section 6.6416633
+Node: Section 6.7417406
+Node: Section 6.8417832
+Node: Chapter 7418234
+Node: Section 7.1418653
+Node: Section 7.2419340
+Node: Chapter 8420171
+Node: Section 8.1420674
+Node: Section 8.2445987
 
 End Tag Table
 

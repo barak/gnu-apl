@@ -337,7 +337,16 @@ BACKUP_BEFORE_SAVE  yes
 #
 # GNU APL assumes a particular layout of your keyboard (and assumes that you
 # do your best to obtain that layout). That assumed layout is shown when you
-# give the ]KEYB command.
+# give the ]KEYB USER command.
+#
+# Before showing a user define layout, the ]KEYB command may (depending on its
+# arguments) try to figure the current keyboard layout with the help of the
+# xmodmap -pke command. That ususally works if the keyboard layout is entirely
+# controlled by xmodmap, but fails if other keyboard layout programs are
+# involved. In these cases one can disable the use of xmodmap -pke by
+# uncommentint the line below.
+#
+# NO-XMODMAP
 #
 # If your keyboard layout differs from the assumed keyboard for some reason,
 # then the ]KEYB command will show the wrong layout. You can fix this by

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ const char * lines[] =
   ""                                                                      ,
   c1                                                                      ,
   ""                                                                      ,
-  "Copyright © 2008-2025  Dr. Jürgen Sauermann"                         ,
+  "Copyright © 2008-2026  Dr. Jürgen Sauermann"                         ,
   "Banner by FIGlet: www.figlet.org"                                      ,
   ""                                                                      ,
   "This program comes with ABSOLUTELY NO WARRANTY;"                       ,
@@ -255,24 +255,23 @@ const char * lines[] =
   "This program is free software, and you are welcome to redistribute it" ,
   "according to the GNU Public License (GPL) version 3 or later."         ,
   ""                                                                      ,
-  0
 };
 
    // compute max. length
    //
 int len = 0;
-   for (const char ** l = lines; *l; ++l)
+   loop(l, sizeof(lines)/sizeof(*lines))
        {
-         const char * cl = *l;
+         const char * cl = lines[l];
          const int clen = strlen(cl);
          if (len < clen)   len = clen;
        }
  
 const int left_pad = (80 - len)/2;
 
-   for (const char ** l = lines; *l; ++l)
+   loop(l, sizeof(lines)/sizeof(*lines))
        {
-         const char * cl = *l;
+         const char * cl = lines[l];
          if (const int clen = strlen(cl))   // unless empty line
             {
               const int pad = left_pad + (len - clen)/2;

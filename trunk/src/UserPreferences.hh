@@ -110,6 +110,9 @@ public:
    /// name of a user-provided keyboard layout file
    UTF8_string keyboard_layout_file;
 
+   /// true do disable xmodmap usage in ]KEYB command
+   bool no_xmodmap;
+
    /// location of the input line history
    UTF8_string line_history_path;
 
