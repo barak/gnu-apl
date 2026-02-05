@@ -136,25 +136,6 @@ const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_XCB;
 const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
 #endif
 
-# include "ComplexCell.hh"
-# include "FloatCell.hh"
-# include "Security.hh"
-# include "Workspace.hh"
-
-// UTF8 support for XCB windows needs additional libraries that may
-// not be present. You can disable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
-// or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
-//
-# ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
-#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
-# endif
-
-# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
-#  include <X11/Xutil.h>
-#  include <X11/Xlib.h>
-#  include <X11/Xlib-xcb.h>
-# endif
-
 # include <stdio.h>
 # include <math.h>
 # include <stdlib.h>
@@ -165,9 +146,13 @@ const Quad_PLOT::Plot_driver default_plot_driver = Quad_PLOT::PltDrv_ASCII;
 
 using namespace std;
 
+# include "ComplexCell.hh"
+# include "FloatCell.hh"
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
+# include "Security.hh"
+# include "Workspace.hh"
 
 //============================================================================
 
@@ -789,7 +774,7 @@ const string driver_attr = w_props->get_gui_driver();
 
    if (driver == PltDrv_GTK)
       {
-#if apl_GTK3
+#if apl_GTK3 && apl_X11
         // plot_main_GTK() pushes a new GTK_context into variable
         // Quad_PLOT::all_PLOT_windows and  posts expose_sema after
         // its plot window was exposed.
@@ -805,7 +790,7 @@ const string driver_attr = w_props->get_gui_driver();
                    "but GTK was not completely installed.\n"
                    "Missing: " MISSING_X11 MISSING_GTK;
    DOMAIN_ERROR;
-#endif   // (not) apl_GTK3
+#endif   // (not) apl_GTK3 && apl_X11
       }
 
    if (driver == PltDrv_XCB)

@@ -27,9 +27,15 @@
 # include <locale.h>
 #endif
 
-#if apl_GTK3 && apl_X11
+#if apl_GTK3
 
-# include <X11/Xlib.h>
+# if apl_X11
+#  include <X11/Xlib.h>   // for XInitThreads
+# define MAYBE_XInitThreads() XInitThreads()
+# else
+# define MAYBE_XInitThreads()
+# endif
+
 # include <gtk/gtk.h>
 
 # include "Plot_data.hh"
@@ -1545,7 +1551,7 @@ Event_handler(Motion_notify_event, GtkWidget * widget, GdkEventMotion * ev)
 
    if (!pctx->legend_drag)   return TRUE;
 
-   // the legend is being dragged. Compute how much since the first
+   // the legend is being dragged. Compute by how much since the first
    // (start_legend_drag) or previous (move_legend_drag) event.
    //
 const int x = ev->x;
@@ -1788,7 +1794,7 @@ Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
    verbosity = w_props.get_verbosity();
 
-   XInitThreads();
+   MAYBE_XInitThreads();
 
    if (!gtk_init_done)
       {
@@ -1872,4 +1878,4 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }
 //----------------------------------------------------------------------------
-#endif // apl_GTK3 && apl_X11
+#endif // apl_GTK3

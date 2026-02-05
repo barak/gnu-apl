@@ -930,94 +930,82 @@ Previous: <a href="#Section-1_002e4" accesskey="p" rel="prev">Configuration File
 </div>
 <span id="File-Names-and-Paths"></span><h3 class="section">1.5 File Names and Paths</h3>
 
-<p>The GNU APL interpreter is a binary file named &rsquo;apl&rsquo;. It is usually
-installed in directory /usr/bin/ or in /usr/local/bin/. The location
-where &rsquo;apl&rsquo; is installed can be changed via ./configure options
-(see file INSTALL).
+<p>The GNU APL interpreter is a binary file named <b>apl</b>. It is usually
+installed in directory <b>/usr/bin/</b> or in <b>/usr/local/bin/</b>. The location
+where <b>apl</b> is installed can be changed via <b>./configure</b> options
+(see file <b>INSTALL</b>).
 </p>
 <p>GNU APL understands 4 file types:
 </p>
 <ol>
-<li> APL workspaces that can be manipulated with the )LOAD, )SAVE,
- )COPY, and )DROP commands. APL workspaces are XML files and must have a
- file extension of .xml to be accepted by GNU APL. APL workspaces can only
- be exchanged between machines that all run GNU APL.
+<li> <i>APL workspaces</i> that can be manipulated with the <b>)LOAD</b>, <b>)SAVE</b>,
+      <b>)COPY</b>, and <b>)DROP</b> commands. APL workspaces are XML files and shall
+      have a file extension of <b>.xml</b> to be accepted by GNU APL. APL
+      workspaces can only be exchanged between machines that all run GNU APL.
 
-</li><li> APL exchange files can be manipulated with the )IN and )OUT
- commands. APL exchange files are text files in ⎕TF format defined by IBM
- (basically APL expressions that create variables or functions)
- and must have a file extension of .atf to be accepted by GNU APL.
- APL exchange files can be exchanged between machines running APL
- interpreters from different vendors. The ⎕TF format can be easily emulated
- on machines not providing compatible )IN and )OUT commands.
+</li><li> <i>APL exchange files</i> can be manipulated with the <b>)IN</b> and <b>)OUT</b>
+      commands. APL exchange files are text files in <b>⎕TF</b> format defined
+      by IBM (basically APL expressions that create variables or functions)
+      and shall have a file extension of <b>.atf</b> to be accepted by GNU APL.
+      APL exchange files can be exchanged between machines running APL
+      interpreters from different vendors. The <b>⎕TF</b> format can be easily
+      emulated on machines that do not not provide compatible <b>)IN</b> and
+      <b>)OUT</b> commands.
 
-</li><li> APL scripts consist of APL commands and APL expressions (including
- function definition via ∇) like they would be entered by the user.
- APL scripts should have a file extension of .apl but other extensions
- are also accepted by GNU APL. APL scripts are, for example, the files
- expected for the -f command line option. A workspace can be written in this
- format with the )DUMP command and can become an active workspace using the
- )LOAD command.
+</li><li> <i>APL scripts</i> consist of APL commands and APL expressions (including
+      function definition via <b>∇</b>) like they would be entered by the user.
+      APL scripts should have a file extension of <b>.apl</b> but other extensions
+      are also accepted by GNU APL. APL scripts are, for example, the files
+      expected for the -f command line option. A workspace can be written in this
+      format with the i<b>)DUMP</b> command and can become an active workspace
+      using the <b>)LOAD</b> command.
 
-</li><li> APL testcase files are similar to APL scripts, but in addition to
- the APL commands and expressions they also contain the expected output
- from the commands.
- APL testcase files normally have a file extension of .tc for normal
- (functional) testcases and .pt for performance testcases.
- APL testcase files are, for example, the files expected for the
- -T command line option.
-
+</li><li> <i>APL testcase files</i> are similar to APL scripts, but in addition to
+      the APL commands and expressions they also contain the expected output
+      from the commands.
+      APL testcase files normally have a file extension of <b>.tc</b> for normal
+      (functional) testcases and <b>.pt</b> for performance testcases.
+      APL testcase files are, for example, the files expected for the
+      <b>-T</b> command line option.
 </li></ol>
 
 <p>The following APL commands are related to file names:
 </p>
-<p>)LOAD [lib] name[.xml|.apl]
-</p>
-<p>)SAVE [lib] [name[.xml]]
-</p>
-<p>)COPY [lib] [name[.xml|.apl]]
-</p>
-<p>)PCOPY [lib] [name[.xml|.apl]]
-</p>
-<p>)DROP [lib] [name[.xml|.apl]]
-</p>
-<p>)IN   [lib] name[.atf]
-</p>
-<p>)PIN   [lib] name[.atf]
-</p>
-<p>)OUT  [lib] name[.atf]
-</p>
-<p>)DUMP [lib] [name[.apl]]
-</p>
-<p>)LIB  [lib]
-</p>
-<p>)LIBS [new-lib-root]
-</p>
-<p>)WSID       [name]
-</p>
+<ul>
+<li> )LOAD [lib] name[.xml|.apl]
+</li><li> )SAVE [lib] [name[.xml]]
+</li><li> )COPY [lib] [name[.xml|.apl]]
+</li><li> )PCOPY [lib] [name[.xml|.apl]]
+</li><li> )DROP [lib] [name[.xml|.apl]]
+</li><li> )IN   [lib] name[.atf]
+</li><li> )PIN   [lib] name[.atf]
+</li><li> )OUT  [lib] name[.atf]
+</li><li> )DUMP [lib] [name[.apl]]
+</li><li> )LIB  [lib]
+</li><li> )LIBS [new-lib-root]
+</li><li> )WSID       [name]
+</li></ul>
+
 <p>The rules for how file names are constructed from the argument(s) of an APL
-command are:
+command above are:
 </p>
 <ol>
 <li> command arguments shown in brackets are optional.
-
-</li><li> lib is a number from 0 to 9. If lib is not present then 0 is taken
-as default.
-
-</li><li> if the name is optional and missing then the workspace ID (the name
-set with the )WSID command) is used.
-
-</li><li> if the file extension (i.e. .xml or .atf) is missing then it is
-appended automatically to name.
+</li><li> <b>lib</b> is a number from 0 to 9. If lib is not present then 0 is taken
+      as default.
+</li><li> if the <b>name</b> is optional and missing then the workspace ID (the name
+      set with the <b>)WSID</b> command) is used.
+</li><li> if the file extension (i.e. <b>.apl</b>, <b>.xml</b> or <b>.atf</b>) is missing
+      then it is appended automatically to name.
 </li></ol>
 
-<p>If the name starts with &rsquo;/&rsquo; then it is taken as an absolute path to
+<p>If the <b>name</b> starts with &rsquo;/&rsquo; then it is taken as an absolute path to
 the file (an absolute file name) and no further computation is done
 with the name.
 </p>
-<p>Otherwise name is a relative path which is relative to some directory
+<p>Otherwise <b>name</b> is a relative path which is relative to some directory
 library-root and a sub-directory of library-root that is determined by
-the lib number. The library numbers 0-9 correspond to the following
+the <b>lib</b> number. The library numbers 0-9 correspond to the following
 directories:
 </p>
 <p>0: library-root/workspaces/
@@ -1030,18 +1018,19 @@ directories:
 </p>
 <p>9: library-root/wslib9/
 </p>
-<p>The command )LIBS without arguments shows the mapping between library
+<p>The command <b>)LIBS</b> without arguments shows the mapping between library
 numbers and paths. The command )LIBS with an argument sets a new lib-root.
 </p>
 <p>The command )LIB [lib] shows the files in library (i.e. directory) lib.
 </p>
 <p>The directory library-root is computed as follows when the interpreter starts:
 </p>
-<p>If an environment variable APL_LIB_ROOT is defined, then its value is used
-as library-root. Otherwise the path from the current directory (&quot;.&quot;) up to
+<p>If environment variable <b>APL_LIB_ROOT</b> is defined, then its value is used
+as the library-root. Otherwise the path from the current directory (&quot;.&quot;) up to
 the root directory (&quot;/&quot;) is searched until a directory containing two
-files &rsquo;workspaces&rsquo; and &rsquo;wslib1&rsquo; is found. Normally &rsquo;workspaces&rsquo; and &rsquo;wslib1&rsquo;
-are directories, but for the computation of library-root files suffice.
+sub-directories <b>workspaces</b> and <b>wslib1</b> is found. Normally <b>workspaces</b>
+and <b>wslib1</b> are directories, but for the computation of library-root files
+suffice.
 </p>
 <p>If such a directory is found, then it is used as library-root; otherwise the
 current directory (i.e. &quot;.&quot;) is used and converted to an absolute path.
@@ -1062,10 +1051,11 @@ is often not adequate for multi-user environments where some directories
 are not writable by users and different users have different home directories.
 </p>
 <p>For that reason the above library root scheme can be overridden by the
-GNU APL configuration files (preferences). In these files you can un-comment
-any of the LIBREF-0 to LIBREF-9 settings (which correspond to library
-numbers 0 to 9) and provide your own paths. The library numbers NOT overridden
-in a &rsquo;preferences&rsquo; file still follow the library root scheme.
+GNU APL configuration files (named <b>preferences</b>). In these files you can
+un-comment any of the <b>LIBREF-0</b> to <b>LIBREF-9</b> settings (which correspond
+to library numbers 0 to 9) and provide your own paths. The library numbers
+that are <b>NOT</b> overridden in a <b>preferences</b> file still follow the
+library root scheme.
 </p>
 <hr>
 </div>

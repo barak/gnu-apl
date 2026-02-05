@@ -608,94 +608,82 @@ Command line options in turn override settings in 'preferences' files.
 @node Section 1.5
 @section File Names and Paths
 
-The GNU APL interpreter is a binary file named 'apl'. It is usually
-installed in directory /usr/bin/ or in /usr/local/bin/. The location
-where 'apl' is installed can be changed via ./configure options
-(see file INSTALL).
+The GNU APL interpreter is a binary file named @b{apl}. It is usually
+installed in directory @b{/usr/bin/} or in @b{/usr/local/bin/}. The location
+where @b{apl} is installed can be changed via @b{./configure} options
+(see file @b{INSTALL}).
 
 GNU APL understands 4 file types:
 
 @enumerate
-@item APL workspaces that can be manipulated with the )LOAD, )SAVE,
- )COPY, and )DROP commands. APL workspaces are XML files and must have a
- file extension of .xml to be accepted by GNU APL. APL workspaces can only
- be exchanged between machines that all run GNU APL.
+@item @i{APL workspaces} that can be manipulated with the @b{)LOAD}, @b{)SAVE},
+      @b{)COPY}, and @b{)DROP} commands. APL workspaces are XML files and shall
+      have a file extension of @b{.xml} to be accepted by GNU APL. APL
+      workspaces can only be exchanged between machines that all run GNU APL.
 
-@item APL exchange files can be manipulated with the )IN and )OUT
- commands. APL exchange files are text files in ⎕TF format defined by IBM
- (basically APL expressions that create variables or functions)
- and must have a file extension of .atf to be accepted by GNU APL.
- APL exchange files can be exchanged between machines running APL
- interpreters from different vendors. The ⎕TF format can be easily emulated
- on machines not providing compatible )IN and )OUT commands.
+@item @i{APL exchange files} can be manipulated with the @b{)IN} and @b{)OUT}
+      commands. APL exchange files are text files in @b{⎕TF} format defined
+      by IBM (basically APL expressions that create variables or functions)
+      and shall have a file extension of @b{.atf} to be accepted by GNU APL.
+      APL exchange files can be exchanged between machines running APL
+      interpreters from different vendors. The @b{⎕TF} format can be easily
+      emulated on machines that do not not provide compatible @b{)IN} and
+      @b{)OUT} commands.
 
-@item APL scripts consist of APL commands and APL expressions (including
- function definition via ∇) like they would be entered by the user.
- APL scripts should have a file extension of .apl but other extensions
- are also accepted by GNU APL. APL scripts are, for example, the files
- expected for the -f command line option. A workspace can be written in this
- format with the )DUMP command and can become an active workspace using the
- )LOAD command.
+@item @i{APL scripts} consist of APL commands and APL expressions (including
+      function definition via @b{∇}) like they would be entered by the user.
+      APL scripts should have a file extension of @b{.apl} but other extensions
+      are also accepted by GNU APL. APL scripts are, for example, the files
+      expected for the -f command line option. A workspace can be written in this
+      format with the i@b{)DUMP} command and can become an active workspace
+      using the @b{)LOAD} command.
 
-@item APL testcase files are similar to APL scripts, but in addition to
- the APL commands and expressions they also contain the expected output
- from the commands.
- APL testcase files normally have a file extension of .tc for normal
- (functional) testcases and .pt for performance testcases.
- APL testcase files are, for example, the files expected for the
- -T command line option.
-
+@item @i{APL testcase files} are similar to APL scripts, but in addition to
+      the APL commands and expressions they also contain the expected output
+      from the commands.
+      APL testcase files normally have a file extension of @b{.tc} for normal
+      (functional) testcases and @b{.pt} for performance testcases.
+      APL testcase files are, for example, the files expected for the
+      @b{-T} command line option.
 @end enumerate
 
 The following APL commands are related to file names:
 
-)LOAD [lib] name[.xml|.apl]
-
-)SAVE [lib] [name[.xml]]
-
-)COPY [lib] [name[.xml|.apl]]
-
-)PCOPY [lib] [name[.xml|.apl]]
-
-)DROP [lib] [name[.xml|.apl]]
-
-)IN   [lib] name[.atf]
-
-)PIN   [lib] name[.atf]
-
-)OUT  [lib] name[.atf]
-
-)DUMP [lib] [name[.apl]]
-
-)LIB  [lib]
-
-)LIBS [new-lib-root]
-
-)WSID       [name]
+@itemize
+@item )LOAD [lib] name[.xml|.apl]
+@item )SAVE [lib] [name[.xml]]
+@item )COPY [lib] [name[.xml|.apl]]
+@item )PCOPY [lib] [name[.xml|.apl]]
+@item )DROP [lib] [name[.xml|.apl]]
+@item )IN   [lib] name[.atf]
+@item )PIN   [lib] name[.atf]
+@item )OUT  [lib] name[.atf]
+@item )DUMP [lib] [name[.apl]]
+@item )LIB  [lib]
+@item )LIBS [new-lib-root]
+@item )WSID       [name]
+@end itemize
 
 The rules for how file names are constructed from the argument(s) of an APL
-command are:
+command above are:
 
 @enumerate
 @item command arguments shown in brackets are optional.
-
-@item lib is a number from 0 to 9. If lib is not present then 0 is taken
-as default.
-
-@item if the name is optional and missing then the workspace ID (the name
-set with the )WSID command) is used.
-
-@item if the file extension (i.e. .xml or .atf) is missing then it is
-appended automatically to name.
+@item @b{lib} is a number from 0 to 9. If lib is not present then 0 is taken
+      as default.
+@item if the @b{name} is optional and missing then the workspace ID (the name
+      set with the @b{)WSID} command) is used.
+@item if the file extension (i.e. @b{.apl}, @b{.xml} or @b{.atf}) is missing
+      then it is appended automatically to name.
 @end enumerate
 
-If the name starts with '/' then it is taken as an absolute path to
+If the @b{name} starts with '/' then it is taken as an absolute path to
 the file (an absolute file name) and no further computation is done
 with the name.
 
-Otherwise name is a relative path which is relative to some directory
+Otherwise @b{name} is a relative path which is relative to some directory
 library-root and a sub-directory of library-root that is determined by
-the lib number. The library numbers 0-9 correspond to the following
+the @b{lib} number. The library numbers 0-9 correspond to the following
 directories:
 
     0: library-root/workspaces/
@@ -708,18 +696,19 @@ directories:
 
     9: library-root/wslib9/
 
-The command )LIBS without arguments shows the mapping between library
+The command @b{)LIBS} without arguments shows the mapping between library
 numbers and paths. The command )LIBS with an argument sets a new lib-root.
 
 The command )LIB [lib] shows the files in library (i.e. directory) lib.
 
 The directory library-root is computed as follows when the interpreter starts:
 
-If an environment variable APL_LIB_ROOT is defined, then its value is used
-as library-root. Otherwise the path from the current directory (".") up to
+If environment variable @b{APL_LIB_ROOT} is defined, then its value is used
+as the library-root. Otherwise the path from the current directory (".") up to
 the root directory ("/") is searched until a directory containing two
-files 'workspaces' and 'wslib1' is found. Normally 'workspaces' and 'wslib1'
-are directories, but for the computation of library-root files suffice.
+sub-directories @b{workspaces} and @b{wslib1} is found. Normally @b{workspaces}
+and @b{wslib1} are directories, but for the computation of library-root files
+suffice.
 
 If such a directory is found, then it is used as library-root; otherwise the
 current directory (i.e. ".") is used and converted to an absolute path.
@@ -740,10 +729,11 @@ is often not adequate for multi-user environments where some directories
 are not writable by users and different users have different home directories.
 
 For that reason the above library root scheme can be overridden by the
-GNU APL configuration files (preferences). In these files you can un-comment
-any of the LIBREF-0 to LIBREF-9 settings (which correspond to library
-numbers 0 to 9) and provide your own paths. The library numbers NOT overridden
-in a 'preferences' file still follow the library root scheme.
+GNU APL configuration files (named @b{preferences}). In these files you can
+un-comment any of the @b{LIBREF-0} to @b{LIBREF-9} settings (which correspond
+to library numbers 0 to 9) and provide your own paths. The library numbers
+that are @b{NOT} overridden in a @b{preferences} file still follow the
+library root scheme.
 
 @c ============================================================================
 @node Chapter 2

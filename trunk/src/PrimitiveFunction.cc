@@ -1540,6 +1540,35 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
+//============================================================================
+Token
+Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
+{
+   /*
+      NOTE: Neither IBM APL2 nor ISO define dyadic A ∪ B. Dyalog defines it as:
+
+            A ∪ B ←→ A , (B ∼ A)
+    */
+   if (A->get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
+
+   // A ∪ B ←→ ∪ A , B
+   //
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
+
+   // Z←A, B
+Value_P Z(len_A + len_B, LOC);
+
+   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
+   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   Z->set_default(*B, LOC);
+   Z->check_value(LOC);
+
+   // return ∪Z
+   //
+   return eval_B(Z);
+}
 //----------------------------------------------------------------------------
 Token
 Bif_F12_UNION::eval_B(Value_P B) const
@@ -1585,7 +1614,7 @@ Value_P Z(len_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 Token
 Bif_F2_INTER::eval_AB(Value_P A, Value_P B) const
 {
@@ -1670,27 +1699,6 @@ const double qct = Workspace::get_CT();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
-}
-//----------------------------------------------------------------------------
-Token
-Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
-{
-   if (A->get_rank() > 1)   RANK_ERROR;
-   if (B->get_rank() > 1)   RANK_ERROR;
-
-   // A ∪ B ←→ A,B∼A
-   //
-Token BwoA = Bif_F12_WITHOUT::fun.eval_AB(B, A);
-
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = BwoA.get_apl_val()->element_count();
-Value_P Z(len_A + len_B, LOC);
-
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
-   Z->set_default(*B, LOC);
-   Z->check_value(LOC);
-   return Bif_F12_COMMA::fun.eval_AB(A, BwoA.get_apl_val());
 }
 //============================================================================
 Token

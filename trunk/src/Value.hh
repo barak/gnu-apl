@@ -235,13 +235,13 @@ public:
    /** reshape this value in place. This is generally dangerous and only
        permitted if:
 
-       1. this value has been initialized completely, and
-       2. the new shape has not more items than this value.
+       1. \b this value has been initialized completely, and
+       2. the new shape has not more items than \b this value.
 
-       If this value is empty, then (due to its prototype) reshaping
+       If \b this value is empty, then (due to its prototype) reshaping
        it to volume 1 is permitted.
 
-       The caller is responsible for ensuring that this value does not have
+       The caller is responsible for ensuring that \b this value does not have
        multiple owners.
    **/
    void set_shape(const Shape & new_shape)
@@ -284,9 +284,29 @@ public:
       { return (get_rank() == 1) && is_int_array(); }
 
    /// return true, if this value has complex cells, false iff it has only
-   /// real cells. Throw domain error for other cells (char, nested etc.)
+   /// real cells. Throw domain error for other cells (char, nested, etc.)
    /// if check_numeric is \b true.
    bool is_complex(bool check_numeric) const;
+
+   /// true if Value flag \b member is set
+   bool is_member() const
+      { return (flags & VF_member) != 0; }
+
+   /// true if Value flag \b packed is set
+   bool is_packed() const
+      { return (flags & VF_packed) != 0; }
+
+   /// true if Value flag \b marked is set
+   bool is_marked() const
+      { return (flags & VF_marked) != 0; }
+
+   /// true if Value flag \b complete is set
+   bool is_complete() const
+      { return (flags & VF_complete) != 0; }
+
+   /// return true if this variable is is_member() and a N×2 matrix
+   /// with proper keys
+   bool is_structured() const;
 
    /// return true if this value can be compared. This is the case when all
    /// cells (including nested ones) are not complex
@@ -386,6 +406,48 @@ public:
    Cell & get_wproto()
       { return get_wravel(0); }
 
+   /// return the number of Value_P pointing to \b this value
+   int get_owner_count() const
+      { return owner_count; }
+
+   /// return true iff more ravel items (as per shape) need to be initialized.
+   /// (the prototype of empty values may still be missing)
+   bool more() const
+      { return valid_ravel_items < element_count(); }
+
+   /// return the number of (so far) initialized items
+   ShapeItem get_valid_item_count()
+      { return valid_ravel_items; }
+
+   /// return the current ravel cell to be initialized (excluding prototype)
+   Cell * current_ravel()
+      { return more() ? ravel + valid_ravel_items : 0; }
+
+   /// return \b true iff \b this value has the same rank as \b other.
+   bool same_rank(const Value & other) const
+      { return get_rank() == other.get_rank(); }
+
+   /// return \b true iff \b this value has the same shape as \b other.
+   bool same_shape(const Value & other) const
+      { if (get_rank() != other.get_rank())   return false;
+        loop (r, get_rank())
+            if (get_shape_item(r) != other.get_shape_item(r))   return false;
+        return true;
+      }
+
+   /// return \b true iff \b this value has the same shape as \b other or one
+   /// of the values is a scalar
+   bool scalar_matching_shape(const Value & other) const
+      { return is_scalar_extensible()
+            || other.is_scalar_extensible()
+            || same_shape(other);
+      }
+
+   /// return \b true if shapes of this and other differ only by axes of
+   /// length 1
+   bool conforms_to(const Value & other) const
+      { return get_shape().conforms_to(other.get_shape()); }
+
    /// set the prototype (according to B) if this value is empty.
    inline void set_default(const Value & B, const char * loc);
 
@@ -463,6 +525,7 @@ public:
    /// convert the ravel of Value \b val to a shape (normalized to ⎕IO←0)
    /// An elided index, for example B[], throws an INDEX_ERROR.
    static Shape to_shape(const Value * val);
+
    /// return the offset'th ravel cell (of an unpack'ed ravel)
    static const Cell & cell_fetcher(ShapeItem offset, const Cell * ravel)
       { return ravel[offset]; }
@@ -478,25 +541,9 @@ public:
    static Value_P glue(const Token & token_A, const Token & token_B,
                        const char * loc);
 
-   /// return the number of Value_P pointing to \b this value
-   int get_owner_count() const
-      { return owner_count; }
-
    /// return \b true iff this value is an lval (selective assignment)
    /// i.e. return true if at least one leaf value is an lval.
    Value * get_lval_cellowner() const;
-
-   /// return true iff more ravel items (as per shape) need to be initialized.
-   /// (the prototype of empty values may still be missing)
-   bool more() const
-      { return valid_ravel_items < element_count(); }
-
-   /// return the number of (so far) initialized items
-   ShapeItem get_valid_item_count()
-      { return valid_ravel_items; }
-   /// return the current ravel cell to be initialized (excluding prototype)
-   Cell * current_ravel()
-      { return more() ? ravel + valid_ravel_items : 0; }
 
    /// initialize the next ravel cell with a character value
    inline void next_ravel_Char(Unicode u);
@@ -597,31 +644,7 @@ public:
    /// see also lrm p. 138.
    bool NOTCHAR() const;
 
-   /// return \b true iff \b this value has the same rank as \b other.
-   bool same_rank(const Value & other) const
-      { return get_rank() == other.get_rank(); }
-
-   /// return \b true iff \b this value has the same shape as \b other.
-   bool same_shape(const Value & other) const
-      { if (get_rank() != other.get_rank())   return false;
-        loop (r, get_rank())
-            if (get_shape_item(r) != other.get_shape_item(r))   return false;
-        return true;
-      }
-
-   /// return \b true iff \b this value has the same shape as \b other or one
-   /// of the values is a scalar
-   bool scalar_matching_shape(const Value & other) const
-      { return is_scalar_extensible()
-            || other.is_scalar_extensible()
-            || same_shape(other);
-      }
-
-   /// return true if shapes of this and other differ only by axes of length 1
-   bool conforms_to(const Value & other) const
-      { return get_shape().conforms_to(other.get_shape()); }
-
-   /// returen true if \b sub == \b val or sub is contained in \b val
+   /// returen \b true if \b sub == \b val or sub is contained in \b val
    static bool is_or_contains(const Value * val, const Value * sub);
 
    /// print debug info about setting or clearing of flags to CERR
@@ -654,9 +677,6 @@ public:
       { FLAG_TRACE(member, true)   flags |=  VF_member;
         ADD_EVENT(this, VHE_SetFlag, VF_member, _loc); }
 
-   /// true if Value flag \b member is set
-   bool is_member() const      { return (flags & VF_member) != 0; }
-
 # define set_member() SET_member(_LOC)
 
    /// set the Value flag \b packed
@@ -669,10 +689,6 @@ public:
       { FLAG_TRACE(packed, false)   flags &=  ~VF_packed;
         ADD_EVENT(this, VHE_ClearFlag, VF_packed, _loc); }
 
-   /// true if Value flag \b packed is set
-   bool is_packed() const
-      { return (flags & VF_packed) != 0; }
-
 # define set_packed()   SET_packed(_LOC)
 # define clear_packed() CLEAR_packed(_LOC)
 
@@ -680,9 +696,6 @@ public:
    void SET_complete(_loc_type _loc) const
       { FLAG_TRACE(complete, true)   flags |=  VF_complete;
         ADD_EVENT(this, VHE_SetFlag, VF_complete, _loc); }
-
-   /// true if Value flag \b complete is set
-   bool is_complete() const      { return (flags & VF_complete) != 0; }
 
 # define set_complete() SET_complete(_LOC)
 
@@ -696,16 +709,8 @@ public:
       { FLAG_TRACE(marked, false)   flags &=  ~VF_marked;
         ADD_EVENT(this, VHE_ClearFlag, VF_marked, _loc); }
 
-   /// true if Value flag \b marked is set
-   bool is_marked() const
-      { return (flags & VF_marked) != 0; }
-
 # define set_marked()   SET_marked(_LOC)
 # define clear_marked() CLEAR_marked(_LOC)
-
-   /// return true if this variable is is_member() and a N×2 matrix
-   /// with proper keys
-   bool is_structured() const;
 
    /// add a member to a structured variable
    void add_member(const UCS_string & member_name, Value * member_value);
@@ -939,9 +944,9 @@ protected:
    uint8_t * next_ravel_byte()
       {
         Assert(is_packed());
-        if (!more())   return 0;   // no more valid items
-        return reinterpret_cast<uint8_t *>
-                               (ravel) + (valid_ravel_items++ >> 3);
+        if (more())   return reinterpret_cast<uint8_t *>
+                             (ravel) + (valid_ravel_items++ >> 3);
+        return 0;   // no more valid items
       }
 
    /// init the ravel of an APL value, return the ravel length
