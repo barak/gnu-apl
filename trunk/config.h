@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 2750"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 2787", "2026-02-08 12:45:17 CET", "Linux 5.15.0-164-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 2792", "2026-02-08 17:03:25 CET", "Linux 5.15.0-164-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -323,6 +323,9 @@
 
 /* Define to 1 if `vfork' works. */
 #define HAVE_WORKING_VFORK 1
+
+/* Define to 1 if you have the <X11/XKBlib.h> header file. */
+#define HAVE_X11_XKBLIB_H 1
 
 /* Define to 1 if you have the <X11/Xlib.h> header file. */
 #define HAVE_X11_XLIB_H 1

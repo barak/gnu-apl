@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-February 6, 2026.  This manual briefly documents GNU APL, an interpreter
+February 8, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -2479,21 +2479,22 @@ File: apl.info,  Node: xmodmap and friends,  Next: The ]KEYB command,  Prev: The
 The installation of an operating system installs a Keycodes to Unicodes
 mapping according to the language choices made by the user during the
 installation.  for example, in the US keycode 29 will be mapped to y,
-while in Germany keycode 29 will be mapped to z.  At this point all
+while in Germany keycode 29 will be mapped to z.  At this point most
 mappings for modifier ALT pressed, and most settings for CTRL pressed
-are either set to NoSymbol.  To generate APL characteres instead of
-nothing, the user has to modify the mapping as to produce APL Unicodes.
-This modification is lost after rebooting the computer; therefore the
-mapping is usually performed in a script that is run at login time of
-the user (i.e.  in ~/.bashrc).
+are set to NoSymbol so that pressing these keys together with CTRL or
+ALT have no effect.  To generate APL characteres instead of nothing, the
+user has to modify the mapping as to produce APL Unicodes.  This
+modification is lost after rebooting the computer; therefore the mapping
+is usually performed in a script that is run at login time of the user
+(i.e.  in ~/.bashrc).
 
    The modification is made with a program.  Unfortunately there exist
 several such programs, e.g.  xmodmap, setxkbmap, or loadkeys.  See
-README-3-keyboard for details.  Unfortunately more is not always better
-and the different programs for the same purpose have undesirable side
-effects when used in parallel.  An important lesson after experimenting
-with several of these programs was: Use one and only one of these
-programs on your platform.
+README-3-keyboard for details.  More is not always better and the
+different programs for the same purpose have undesirable side effects
+when used in parallel.  An important lesson after experimenting with
+several of these programs was: Use one and only one of these programs on
+your platform.
 
    Each of these programs has its own set of pitfalls.  For example with
 xmodmap, pressing ALT-SHIFT-L (in that order produces ⌷.  Pressing
@@ -2510,7 +2511,11 @@ man xmodmap).  There was a short period where xmodmap did not work in
 Linux Mint several yeras ago, but this has been fixed in the meantime.
 
    It is impossible for the author to explain all available mapping
-programs and therefore this manual focuses on xmodmap.  Suppose we run:
+programs and therefore this manual focuses on xmodmap and, as an
+alternative, setxkbmap/xkbcomp.  xmodmap is considerably simpler to
+configure than setxkbmap/xkbcomp but not available on all platforms.
+
+   Suppose we run:
 
    $ xmodmap xmodmap.apl
 
@@ -2532,7 +2537,7 @@ File: apl.info,  Node: The ]KEYB command,  Prev: xmodmap and friends,  Up: ]KEYB
 
 * ]KEYB Syntax::
 * ]KEYB without a mode::
-* ]KEYB SCAN::
+* ]KEYB XMOD::
 * ]KEYB USER::
 * ]KEYB GUESS::
 * Optional ]KEYB arguments::
@@ -2551,16 +2556,28 @@ The syntax of the ]KEYB command is:
 and the optional arguments specify additional details for the output.
 There are 3 different modes:
 
-   • Mode SCAN uses the program xmodmap to figure the keyboard layout.
+   • Mode XMOD uses the program xmodmap to figure the keyboard layout.
      This mode, if it works, produces an output that is closest to
+     reality.
+   • Mode XKBD uses the X extension Xkbd which is typically configured
+     with the programs setxkbmap and xkbcomp.  GNU APL reads the result
+     of that configuration back with function XkbKeycodeToKeysym.  This
+     mode, if it works, produces an output that is also closest to
      reality.
    • Mode USER display a keyboard layout provided by the user.  The
      output of this mode is as correct as its input.
    • mode GUESS displays a typical APL keyboard layout (which may differ
-     considerably from thr true keyboard layout).
+     considerably from the true keyboard layout).
+
+   WARNING: In theory one could map some keys with xmodmap and others
+with xkbcomp.  Even though one might be able to achieve a desired
+mapping in this way (and maybe quicker than with either of the methods
+alone), ]KEYB will not be able to display it properly.  This is because
+the xmodmap -pke does not see the xkbcomp mapping and the X function
+XkbKeycodeToKeysym() does not see the xmodmap mapping.
 
 
-File: apl.info,  Node: ]KEYB without a mode,  Next: ]KEYB SCAN,  Prev: ]KEYB Syntax,  Up: The ]KEYB command
+File: apl.info,  Node: ]KEYB without a mode,  Next: ]KEYB XMOD,  Prev: ]KEYB Syntax,  Up: The ]KEYB command
 
 2.11.3.2 ]KEYB without a mode
 .............................
@@ -2571,7 +2588,7 @@ which is very useful if the keyboard has no APL stickers or key caps.
 
    ]KEYB without a mode tries (in that order):
 
-  1. ]KEYB SCAN
+  1. ]KEYB XMOD
   2. ]KEYB USER
   3. ]KEYB GUESS
 
@@ -2583,25 +2600,25 @@ If that output is correct is a different question, though.
 above was used to generate the output.
 
    As may have become clear from the explanations above and/or from
-reading README-3-keyboard in the top-level GNU APL directory, ]KEYB SCAN
+reading README-3-keyboard in the top-level GNU APL directory, ]KEYB XMOD
 will fail if either xmodmap is not used at all, or if xmodmap is
 combined with other keyboard mapping programs.  For these cases, the
 user can disable the automatic use of xmodmap in one of her preferences
 files.  The option to do so is NO-XMODMAP and ii is effective only of
-]KEYB is calle without a mode.  That is, ]KEYB SCAN will use xmodmap
+]KEYB is calle without a mode.  That is, ]KEYB XMOD will use xmodmap
 even if xmodmap was disabled by NO-XMODMAP in a preferences file.
 
 
-File: apl.info,  Node: ]KEYB SCAN,  Next: ]KEYB USER,  Prev: ]KEYB without a mode,  Up: The ]KEYB command
+File: apl.info,  Node: ]KEYB XMOD,  Next: ]KEYB USER,  Prev: ]KEYB without a mode,  Up: The ]KEYB command
 
-2.11.3.3 ]KEYB SCAN
+2.11.3.3 ]KEYB XMOD
 ...................
 
-]KEYB SCAN runs, under the hood, xmodmap -pke to read the current
+]KEYB XMOD runs, under the hood, xmodmap -pke to read the current
 keycode to keysymbol mapping and displays the result in form of a
 keyboard layout on the screen.  For example:
 
-           ]KEYB SCAN
+           ]KEYB XMOD
      US Keyboard Layout.    Source: xmodmap -pke
 
      ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
@@ -2625,11 +2642,11 @@ keyboard layout on the screen.  For example:
    • no other keyboard mappings are in effect, and
    • the keycodes are correct (see below).
 
-   IOW: ]KEYB SCAN troubleshoots the case correct keycode, but incorrect
+   IOW: ]KEYB XMOD troubleshoots the case correct keycode, but incorrect
 keysymbol(s) above.
 
 
-File: apl.info,  Node: ]KEYB USER,  Next: ]KEYB GUESS,  Prev: ]KEYB SCAN,  Up: The ]KEYB command
+File: apl.info,  Node: ]KEYB USER,  Next: ]KEYB GUESS,  Prev: ]KEYB XMOD,  Up: The ]KEYB command
 
 2.11.3.4 ]KEYB USER
 ...................
@@ -2661,26 +2678,49 @@ File: apl.info,  Node: Optional ]KEYB arguments,  Prev: ]KEYB GUESS,  Up: The ]K
 2.11.3.6 Optional ]KEYB arguments
 .................................
 
-]KEYB SCAN KEYS does not run xmodmap -pke but rather shows how the keys
-are supposed to be positioned on the keyboard.  This shows how xmodmap
--pke assumes the keys are positioned.  For example:
+]KEYB XMOD KEYS runs xmodmap -pke, but first shows the assumed physical
+layout of the keyboard.  By comparing the first half of the output with
+the second half, one can see how xmodmap mapes keycodes to Unicode
+characters.  For example:
 
-           ]KEYB SCAN KEYS
-     US Keyboard Layout.    Source: GNU APL builtin"
+           ]KEYB XMOD KEYS
+     Physical Keyboard:      Source: GNU APL builtin
 
      ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
      ║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║
      ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
-     ║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║
-     ║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║
+     ║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc  ║
+     ║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║
      ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
-     ║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
-     ║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
+     ║  Kc     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+     ║  66     ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
      ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
-     ║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
-     ║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
-     ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+     ║    Kc       ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║   Kc     ║
+     ║    50       ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║   62     ║
+     ╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+     ║ Kc ║ Kc  ║ Kc  ║                Kc                ║ Kc  ║ Kc  ║ Kc  ║ Kc ║
+     ║ 37 ║115  ║ 64  ║                65                ║113  ║116  ║ 109 ║105 ║
+     ╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
+
+     Keyboard Layout.    Source: xmodmap -pke
+
+     ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+     ║ ~  ║ !⌶ ║ "  ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
+     ║ `◊ ║ 1¨ ║ 2⍫ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║
+     ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+     ║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║
+     ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \⊢  ║
+     ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+     ║  (CAPS  ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ *≡ ║ "≢ ║         ║
+     ║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ +⍎ ║ '⍕ ║ RETURN  ║
+     ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+     ║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+     ║    SHIFT    ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m∣ ║ ,⍝ ║ .⍀ ║ /⌿ ║   SHIFT  ║
+     ╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+     ║    ║     ║     ║                                  ║     ║     ║ !⌶  ║    ║
+     ║CTRL║ Win ║ ALT ║              SPACE               ║ ALT ║ Win ║ 1¨9 ║CTRL║
+     ╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
 
    Argument KPAD also shows the keypad of the keyboard.  The keypad is
 normally hidden so that the output fits into a 80-column terminal
@@ -2689,9 +2729,9 @@ standard GNU APL layout puts line graphics characters onto the keypad,
 as well as « and » and some currency symbols.
 
    Argument FUNK also shows the function key row of the keyboard, but
-only for ]KEYB SCAN KEYS:
+only for ]KEYB XMOD KEYS:
 
-           ]KEYB SCAN KEYS FUNK KPAD
+           ]KEYB XMOD KEYS FUNK KPAD
      US Keyboard Layout.    Source: GNU APL builtin
 
      ╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗
@@ -2727,7 +2767,7 @@ produce ⍴.  The Unicode for ⍴ is :
            ,5 ⎕CR 256 256 ⊤ ⎕UCS "⍴"   ⍝ Unicode for ⍴ in hex
      2374
 
-   One can check if the keycodes displayed by ]KEYB SCAN KEYS are
+   One can check if the keycodes displayed by ]KEYB XMOD KEYS are
 correct with a programm called xev (which is normally pre-installed in
 most GNU/Linux distributions.  After starting xev and hitting the R key
 several times (because it also shows many other unrelated events), one
@@ -2772,11 +2812,11 @@ are defined in files /usr/include/X11/X.h and
    Given the explanations above, the troubleshooting of keyboard
 mappings becomes simple (though somewhat tedious in the details):
 
-  1. do ]KEYB SCAN KEYS in GNU APL to display the keycodes, then
+  1. do ]KEYB XMOD KEYS in GNU APL to display the keycodes, then
   2. run xev in a different window and verify, for every key on the
      keyboard, that the keycode shown by xev is the one shown by ]KEYB
-     SCAN KEYS, then
-  3. do ]KEYB SCAN in GNU APL to display the keysyms, then
+     XMOD KEYS, then
+  3. do ]KEYB XMOD in GNU APL to display the keysyms, then
   4. edit the xmodmap.apl file (or whatever other file ws used as the
      argument for the xmondmap command) to see if the Unicodes for every
      keycode line are correct.  In that test:
@@ -11425,184 +11465,184 @@ Node: ]DOXY Command89063
 Node: ]KEYB Command91487
 Node: The transformation of Keycodes to Unicodes94728
 Node: xmodmap and friends97147
-Node: The ]KEYB command99650
-Node: ]KEYB Syntax99920
-Node: ]KEYB without a mode100707
-Node: ]KEYB SCAN102053
-Node: ]KEYB USER104985
-Node: ]KEYB GUESS105576
-Node: Optional ]KEYB arguments105971
-Node: ]NEXTFILE and ]PUSHFILE Commands116849
-Node: ]NEXTFILE117116
-Node: ]PUSHFILE118090
-Node: History and TAB completion118701
-Node: Logging Facilities120542
-Node: Static Logging121306
-Node: Dynamic Logging122050
-Node: Rational Numbers122744
-Node: Hex Numbers123714
-Node: User-defined Commands124017
-Node: Structured Variables and Associative Arrays125487
-Node: Structured Variables125999
-Node: Associative Arrays131514
-Node: Monadic ⊢ and ⊣; dyadic ⊢ with Axis136785
-Node: Bit-wise Logical Functions: ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤≠ and ⊤=139471
-Node: Dyadic ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= and ⊤≠141804
-Node: Monadic ⊤∨ and ⊤⍱142764
-Node: Monadic ⊤∧144604
-Node: Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧ ⊤∨ == and ≠≠146566
-Node: ⊤ (Encode) with Axis147575
-Node: Generalized ⍳152103
-Node: Generalized monadic ⍳152378
-Node: Generalized dyadic ⍳153115
-Node: ⌹[X] - Miscellaneous Matrix and Vector Operations153949
-Node: ⌹[1] and ⌹[2] - QR Factorizations154318
-Node: The Impact of ⎕CT for ⌹159600
-Node: A⌹B and ⌹B160352
-Node: ⌹[X] B: Various Factorizations of B162582
-Node: Matrix Inverse165362
-Node: ⌹[7] B: Print Polynomial B166133
-Node: A ⌹[8] B: Multiply Polynomials A and B169319
-Node: A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)170640
-Node: A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)171827
-Node: A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)177986
-Node: ⌹[11] B Scan Polynomial B180803
-Node: A ⌹[20] B: Integral B182823
-Node: ⎕CC - Character Classes185620
-Node: monadic ⎕CC B: Return character class186158
-Node: dyadic A ⎕CC B: Test character class189084
-Node: Dyadic ⎕CR189836
-Node: Dyadic ⎕FX (Native Functions)196564
-Node: ⎕ARG - Interpreter command line arguments200006
-Node: ⎕DLX - Knuth's Dancing Links Algorithm200397
-Node: ⎕ENV - Environment Variables211347
-Node: ⎕FIO - File I/O Functions211702
-Node: ⎕FFT - Fast Fourier Transform218827
-Node: ⎕GTK - GTK Interface221345
-Node: ⎕JSON - JSON Parsing222073
-Node: Monadic ⎕JSON222815
-Node: Dyadic ⎕JSON223151
-Node: ⎕MAP - Map Value224007
-Node: ⎕MX - Matrix/Statistics227980
-Node: Determinant229758
-Node: Cross Product230143
-Node: Vector Angle231439
-Node: Eigenvector231827
-Node: Eigenvalue232987
-Node: Ident235485
-Node: Rotation235815
-Node: Homogeneous transform236152
-Node: Norm236774
-Node: Randoms237711
-Node: Covariance239572
-Node: Histograms240649
-Node: Print241569
-Node: ⎕PLOT - Plot Data244005
-Node: The Plot Data B245299
-Node: Complex Plot Data B246088
-Node: Real Plot Data B247084
-Node: The Plot Attributes A248161
-Node: Plot Window Handling261695
-Node: Output File Format263033
-Node: GUI driver264263
-Node: ⎕PNG - Portable Network Graphics267825
-Node: The GNU APL Color Model268392
-Node: Monadic ⎕PNG273905
-Node: Dyadic ⎕PNG276122
-Node: APL Examples276949
-Node: ⎕PS - Print Style277885
-Node: ⎕RE - Regular Expressions278968
-Node: Preconditions279590
-Node: ⎕RE Syntax280073
-Node: The Regular Expression A280771
-Node: The String(s) B Being Matched281438
-Node: The Flags X282840
-Node: The libpcre2 flags: i m s and x283819
-Node: The ⎕RE (APL output format) flags ↓ ⊂ and /284486
-Node: the ⎕RE global flag g286965
-Node: the ⎕RE error flag E290470
-Node: Complex Matches291374
-Node: ⎕RVAL - Random APL value295864
-Node: General296852
-Node: Dyadic ⎕RVAL297797
-Node: Control of the underlying random number generator: 0 ⎕RVAL B298740
-Node: Control of the ranks: 1 ⎕RVAL B300104
-Node: Control of the shapes: 2 ⎕RVAL B301804
-Node: Control of the data types: 3 ⎕RVAL B303301
-Node: Control of a maximum depth: 4 ⎕RVAL B305132
-Node: monadic ⎕RVAL B305946
-Node: Syntax Alternatives307912
-Node: ⎕SI - State Indicator308567
-Node: ⎕SQL - SQL Database Interface310815
-Node: ⎕SQL[0] ⍬ : display subfunction numbers311911
-Node: ⎕SQL[0] '' : display subfunction names313816
-Node: ref ← A ⎕SQL[1] B : open database316592
-Node: ⎕SQL[2] B : close database317651
-Node: Z ← A ⎕SQL[3 ref] B : database query (with result)318208
-Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)319191
-Node: ⎕SQL[5] B : start transaction319765
-Node: ⎕SQL[6] B : commit transaction320092
-Node: ⎕SQL[7] B : rollback transaction320403
-Node: Z←⎕SQL[8] B : table names320730
-Node: Z←⎕SQL[9] B : column names321060
-Node: Z ← ⎕SQL[10] B : library version number321578
-Node: Z ← ⎕SQL[11] B : library version string322174
-Node: SQLite Quickstart322740
-Node: Deleting a Database324682
-Node: Creating a new Database326092
-Node: Creating a Database Table327841
-Node: Excursus: Dynamic Query Strings331197
-Node: Writing an APL matrix into a Database Table334139
-Node: Reading a Database Table into an APL Matrix336540
-Node: Updating a Database Table338311
-Node: Deleting Rows From a Database Table340940
-Node: ⎕SYL - System limits341712
-Node: ⎕SYL[1 2 3 4 5 6;]344128
-Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]345523
-Node: ⎕SYL[24 25 26;]346007
-Node: ⎕SYL[27;]346319
-Node: ⎕XML - XML Parsing347002
-Node: Purpose347336
-Node: Some XML Terminology348912
-Node: How ⎕XML maps XML documents to APL Values352362
-Node: Monadic ⎕XML359031
-Node: Dyadic ⎕XML359844
-Node: XML Queries368137
-Node: Conditionals369007
-Node: Design considerations.369437
-Node: Syntax376649
-Node: Possible Pitfalls380618
-Node: Matrix Product383390
-Node: Monadic ≠ (Nub Sieve)386693
-Node: Limitations and Missing Features387241
-Node: System Limits387676
-Node: Shared Variables388978
-Node: Internationalization390060
-Node: Vector Notation391241
-Node: History391837
-Node: Standardization392575
-Node: Quotes from the lrm393084
-Node: Some APL2 Tests395244
-Node: Test 1: Binding strength of []395659
-Node: Test 2: Binding strength of the left operand396491
-Node: Definitions401267
-Node: Unexpected Stranding404294
-Node: GNU APL Vector Notation413060
-Node: GNU APL Project Structure419054
-Node: The subdirectory src420573
-Node: The subdirectory support-files421937
-Node: The subdirectory doc422350
-Node: The subdirectory HOWTOs422648
-Node: The subdirectories workspaces and wslib2 ... wslib5423387
-Node: The subdirectory m4423941
-Node: The subdirectories debian and debian_tmp424807
-Node: The subdirectory tools425297
-Node: Libraries Contributed by GNU APL Users425755
-Node: The GNU APL Community Webpage426232
-Node: Core Libraries426969
-Node: Licenses for this GNU APL Manual and for GNU APL427850
-Node: The GNU Free Documentation License428395
-Node: The GNU GENERAL PUBLIC LICENSE453789
+Node: The ]KEYB command99850
+Node: ]KEYB Syntax100120
+Node: ]KEYB without a mode101609
+Node: ]KEYB XMOD102955
+Node: ]KEYB USER105887
+Node: ]KEYB GUESS106478
+Node: Optional ]KEYB arguments106873
+Node: ]NEXTFILE and ]PUSHFILE Commands120907
+Node: ]NEXTFILE121174
+Node: ]PUSHFILE122148
+Node: History and TAB completion122759
+Node: Logging Facilities124600
+Node: Static Logging125364
+Node: Dynamic Logging126108
+Node: Rational Numbers126802
+Node: Hex Numbers127772
+Node: User-defined Commands128075
+Node: Structured Variables and Associative Arrays129545
+Node: Structured Variables130057
+Node: Associative Arrays135572
+Node: Monadic ⊢ and ⊣; dyadic ⊢ with Axis140843
+Node: Bit-wise Logical Functions: ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤≠ and ⊤=143529
+Node: Dyadic ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= and ⊤≠145862
+Node: Monadic ⊤∨ and ⊤⍱146822
+Node: Monadic ⊤∧148662
+Node: Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧ ⊤∨ == and ≠≠150624
+Node: ⊤ (Encode) with Axis151633
+Node: Generalized ⍳156161
+Node: Generalized monadic ⍳156436
+Node: Generalized dyadic ⍳157173
+Node: ⌹[X] - Miscellaneous Matrix and Vector Operations158007
+Node: ⌹[1] and ⌹[2] - QR Factorizations158376
+Node: The Impact of ⎕CT for ⌹163658
+Node: A⌹B and ⌹B164410
+Node: ⌹[X] B: Various Factorizations of B166640
+Node: Matrix Inverse169420
+Node: ⌹[7] B: Print Polynomial B170191
+Node: A ⌹[8] B: Multiply Polynomials A and B173377
+Node: A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)174698
+Node: A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)175885
+Node: A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)182044
+Node: ⌹[11] B Scan Polynomial B184861
+Node: A ⌹[20] B: Integral B186881
+Node: ⎕CC - Character Classes189678
+Node: monadic ⎕CC B: Return character class190216
+Node: dyadic A ⎕CC B: Test character class193142
+Node: Dyadic ⎕CR193894
+Node: Dyadic ⎕FX (Native Functions)200622
+Node: ⎕ARG - Interpreter command line arguments204064
+Node: ⎕DLX - Knuth's Dancing Links Algorithm204455
+Node: ⎕ENV - Environment Variables215405
+Node: ⎕FIO - File I/O Functions215760
+Node: ⎕FFT - Fast Fourier Transform222885
+Node: ⎕GTK - GTK Interface225403
+Node: ⎕JSON - JSON Parsing226131
+Node: Monadic ⎕JSON226873
+Node: Dyadic ⎕JSON227209
+Node: ⎕MAP - Map Value228065
+Node: ⎕MX - Matrix/Statistics232038
+Node: Determinant233816
+Node: Cross Product234201
+Node: Vector Angle235497
+Node: Eigenvector235885
+Node: Eigenvalue237045
+Node: Ident239543
+Node: Rotation239873
+Node: Homogeneous transform240210
+Node: Norm240832
+Node: Randoms241769
+Node: Covariance243630
+Node: Histograms244707
+Node: Print245627
+Node: ⎕PLOT - Plot Data248063
+Node: The Plot Data B249357
+Node: Complex Plot Data B250146
+Node: Real Plot Data B251142
+Node: The Plot Attributes A252219
+Node: Plot Window Handling265753
+Node: Output File Format267091
+Node: GUI driver268321
+Node: ⎕PNG - Portable Network Graphics271883
+Node: The GNU APL Color Model272450
+Node: Monadic ⎕PNG277963
+Node: Dyadic ⎕PNG280180
+Node: APL Examples281007
+Node: ⎕PS - Print Style281943
+Node: ⎕RE - Regular Expressions283026
+Node: Preconditions283648
+Node: ⎕RE Syntax284131
+Node: The Regular Expression A284829
+Node: The String(s) B Being Matched285496
+Node: The Flags X286898
+Node: The libpcre2 flags: i m s and x287877
+Node: The ⎕RE (APL output format) flags ↓ ⊂ and /288544
+Node: the ⎕RE global flag g291023
+Node: the ⎕RE error flag E294528
+Node: Complex Matches295432
+Node: ⎕RVAL - Random APL value299922
+Node: General300910
+Node: Dyadic ⎕RVAL301855
+Node: Control of the underlying random number generator: 0 ⎕RVAL B302798
+Node: Control of the ranks: 1 ⎕RVAL B304162
+Node: Control of the shapes: 2 ⎕RVAL B305862
+Node: Control of the data types: 3 ⎕RVAL B307359
+Node: Control of a maximum depth: 4 ⎕RVAL B309190
+Node: monadic ⎕RVAL B310004
+Node: Syntax Alternatives311970
+Node: ⎕SI - State Indicator312625
+Node: ⎕SQL - SQL Database Interface314873
+Node: ⎕SQL[0] ⍬ : display subfunction numbers315969
+Node: ⎕SQL[0] '' : display subfunction names317874
+Node: ref ← A ⎕SQL[1] B : open database320650
+Node: ⎕SQL[2] B : close database321709
+Node: Z ← A ⎕SQL[3 ref] B : database query (with result)322266
+Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)323249
+Node: ⎕SQL[5] B : start transaction323823
+Node: ⎕SQL[6] B : commit transaction324150
+Node: ⎕SQL[7] B : rollback transaction324461
+Node: Z←⎕SQL[8] B : table names324788
+Node: Z←⎕SQL[9] B : column names325118
+Node: Z ← ⎕SQL[10] B : library version number325636
+Node: Z ← ⎕SQL[11] B : library version string326232
+Node: SQLite Quickstart326798
+Node: Deleting a Database328740
+Node: Creating a new Database330150
+Node: Creating a Database Table331899
+Node: Excursus: Dynamic Query Strings335255
+Node: Writing an APL matrix into a Database Table338197
+Node: Reading a Database Table into an APL Matrix340598
+Node: Updating a Database Table342369
+Node: Deleting Rows From a Database Table344998
+Node: ⎕SYL - System limits345770
+Node: ⎕SYL[1 2 3 4 5 6;]348186
+Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]349581
+Node: ⎕SYL[24 25 26;]350065
+Node: ⎕SYL[27;]350377
+Node: ⎕XML - XML Parsing351060
+Node: Purpose351394
+Node: Some XML Terminology352970
+Node: How ⎕XML maps XML documents to APL Values356420
+Node: Monadic ⎕XML363089
+Node: Dyadic ⎕XML363902
+Node: XML Queries372195
+Node: Conditionals373065
+Node: Design considerations.373495
+Node: Syntax380707
+Node: Possible Pitfalls384676
+Node: Matrix Product387448
+Node: Monadic ≠ (Nub Sieve)390751
+Node: Limitations and Missing Features391299
+Node: System Limits391734
+Node: Shared Variables393036
+Node: Internationalization394118
+Node: Vector Notation395299
+Node: History395895
+Node: Standardization396633
+Node: Quotes from the lrm397142
+Node: Some APL2 Tests399302
+Node: Test 1: Binding strength of []399717
+Node: Test 2: Binding strength of the left operand400549
+Node: Definitions405325
+Node: Unexpected Stranding408352
+Node: GNU APL Vector Notation417118
+Node: GNU APL Project Structure423112
+Node: The subdirectory src424631
+Node: The subdirectory support-files425995
+Node: The subdirectory doc426408
+Node: The subdirectory HOWTOs426706
+Node: The subdirectories workspaces and wslib2 ... wslib5427445
+Node: The subdirectory m4427999
+Node: The subdirectories debian and debian_tmp428865
+Node: The subdirectory tools429355
+Node: Libraries Contributed by GNU APL Users429813
+Node: The GNU APL Community Webpage430290
+Node: Core Libraries431027
+Node: Licenses for this GNU APL Manual and for GNU APL431908
+Node: The GNU Free Documentation License432453
+Node: The GNU GENERAL PUBLIC LICENSE457847
 
 End Tag Table
 

@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 6, 2026.
+<p>February 8, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -167,7 +167,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
       <ul class="no-bullet">
         <li><a id="toc-_005dKEYB-Syntax-1" href="#g_t_005dKEYB-Syntax">2.11.3.1 ]KEYB Syntax</a></li>
         <li><a id="toc-_005dKEYB-without-a-mode-1" href="#g_t_005dKEYB-without-a-mode">2.11.3.2 ]KEYB without a mode</a></li>
-        <li><a id="toc-_005dKEYB-SCAN-1" href="#g_t_005dKEYB-SCAN">2.11.3.3 ]KEYB SCAN</a></li>
+        <li><a id="toc-_005dKEYB-XMOD-1" href="#g_t_005dKEYB-XMOD">2.11.3.3 ]KEYB XMOD</a></li>
         <li><a id="toc-_005dKEYB-USER-1" href="#g_t_005dKEYB-USER">2.11.3.4 ]KEYB USER</a></li>
         <li><a id="toc-_005dKEYB-GUESS-1" href="#g_t_005dKEYB-GUESS">2.11.3.5 ]KEYB GUESS</a></li>
         <li><a id="toc-Optional-_005dKEYB-arguments-1" href="#Optional-_005dKEYB-arguments">2.11.3.6 Optional ]KEYB arguments</a></li>
@@ -3093,9 +3093,10 @@ Next: <a href="#The-_005dKEYB-command" accesskey="n" rel="next">The ]KEYB comman
 <p>The installation of an operating system installs a Keycodes to Unicodes
 mapping according to the language choices made by the user during the 
 installation. for example, in the US keycode <b>29</b> will be mapped to <b>y</b>,
-while in Germany keycode <b>29</b> will be mapped to <b>z</b>. At this point all
+while in Germany keycode <b>29</b> will be mapped to <b>z</b>. At this point most
 mappings for modifier ALT pressed, and most settings for CTRL pressed are
-either set to <b>NoSymbol</b>. To generate APL characteres instead of nothing,
+set to <b>NoSymbol</b> so that pressing these keys together with CTRL or ALT 
+have no effect. To generate APL characteres instead of nothing,
 the user has to modify the mapping as to produce APL Unicodes. This
 modification is lost after rebooting the computer; therefore the mapping
 is usually performed in a script that is run at login time of the user (i.e.
@@ -3103,7 +3104,7 @@ in ~/.bashrc).
 </p>
 <p>The modification is made with a program. Unfortunately there exist several
 such programs, e.g. <b>xmodmap</b>, <b>setxkbmap</b>, or <b>loadkeys</b>. See
-<b>README-3-keyboard</b> for details. Unfortunately more is not always better
+<b>README-3-keyboard</b> for details. More is not always better
 and the different programs for the same purpose have undesirable side effects
 when used in parallel. An important lesson after experimenting with several
 of these programs was: <i>Use one and only one of these programs on your
@@ -3124,7 +3125,11 @@ redundant since <b>xmodmap</b> provides a way to save the current mapping
 work in Linux Mint several yeras ago, but this has been fixed in the meantime.
 </p>
 <p>It is impossible for the author to explain all available mapping programs
-and therefore this manual focuses on <b>xmodmap</b>. Suppose we run:
+and therefore this manual focuses on <b>xmodmap</b> and, as an alternative,
+<b>setxkbmap/xkbcomp</b>. <b>xmodmap</b> is considerably simpler to configure
+than <b>setxkbmap/xkbcomp</b> but not available on all platforms.
+</p>
+<p>Suppose we run:
 </p>
 <p><b>$ xmodmap xmodmap.apl</b>
 </p>
@@ -3150,7 +3155,7 @@ Previous: <a href="#xmodmap-and-friends" accesskey="p" rel="prev">xmodmap and fr
 <ul class="section-toc">
 <li><a href="#g_t_005dKEYB-Syntax" accesskey="1">]KEYB Syntax</a></li>
 <li><a href="#g_t_005dKEYB-without-a-mode" accesskey="2">]KEYB without a mode</a></li>
-<li><a href="#g_t_005dKEYB-SCAN" accesskey="3">]KEYB SCAN</a></li>
+<li><a href="#g_t_005dKEYB-XMOD" accesskey="3">]KEYB XMOD</a></li>
 <li><a href="#g_t_005dKEYB-USER" accesskey="4">]KEYB USER</a></li>
 <li><a href="#g_t_005dKEYB-GUESS" accesskey="5">]KEYB GUESS</a></li>
 <li><a href="#Optional-_005dKEYB-arguments" accesskey="6">Optional ]KEYB arguments</a></li>
@@ -3174,21 +3179,31 @@ the optional arguments specify additional details for the output. There are
 3 different modes:
 </p>
 <ul>
-<li> Mode <b>SCAN</b> uses the program <b>xmodmap</b> to figure the keyboard layout.
+<li> Mode <b>XMOD</b> uses the program <b>xmodmap</b> to figure the keyboard layout.
       This mode, if it works, produces an output that is closest to reality.
+</li><li> Mode <b>XKBD</b> uses the X extension <b>Xkbd</b> which is typically configured
+      with the programs <b>setxkbmap</b> and <b>xkbcomp</b>. GNU APL reads the result
+      of that configuration back with function <b>XkbKeycodeToKeysym</b>. This
+      mode, if it works, produces an output that is also closest to reality.
 </li><li> Mode <b>USER</b> display a keyboard layout provided by the user. The output
       of this mode is as correct as its input.
 </li><li> mode <b>GUESS</b> displays a typical APL keyboard layout (which may differ
-      considerably from thr true keyboard layout).
+      considerably from the true keyboard layout).
 </li></ul>
 
-
+<p><b>WARNING</b>: In theory one could map some keys with <b>xmodmap</b> and others
+with <b>xkbcomp</b>. Even though one might be able to achieve a desired mapping
+in this way (and maybe quicker than with either of the methods alone),
+<b>]KEYB</b> will not be able to display it properly. This is because the
+<b>xmodmap -pke </b> does not see the <b>xkbcomp</b> mapping and the <b>X</b> function
+<b>XkbKeycodeToKeysym()</b> does not see the <b>xmodmap</b> mapping. 
+</p>
 <hr>
 </div>
 <div class="subsubsection" id="g_t_005dKEYB-without-a-mode">
 <div class="header">
 <p>
-Next: <a href="#g_t_005dKEYB-SCAN" accesskey="n" rel="next">]KEYB SCAN</a>, Previous: <a href="#g_t_005dKEYB-Syntax" accesskey="p" rel="prev">]KEYB Syntax</a>, Up: <a href="#The-_005dKEYB-command" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#g_t_005dKEYB-XMOD" accesskey="n" rel="next">]KEYB XMOD</a>, Previous: <a href="#g_t_005dKEYB-Syntax" accesskey="p" rel="prev">]KEYB Syntax</a>, Up: <a href="#The-_005dKEYB-command" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005dKEYB-without-a-mode-1"></span><h4 class="subsubsection">2.11.3.2 ]KEYB without a mode</h4>
 
@@ -3199,7 +3214,7 @@ which is very useful if the keyboard has no APL stickers or key caps.
 <p><b>]KEYB</b> without a mode tries (in that order):
 </p>
 <ol>
-<li> <b>]KEYB SCAN</b>
+<li> <b>]KEYB XMOD</b>
 </li><li> <b>]KEYB USER</b>
 </li><li> <b>]KEYB GUESS</b>
 </li></ol>
@@ -3212,30 +3227,30 @@ output is correct is a different question, though.
 was used to generate the output.
 </p>
 <p>As may have become clear from the explanations above and/or from reading
-<b>README-3-keyboard</b> in the top-level GNU APL directory, <b>]KEYB SCAN</b>
+<b>README-3-keyboard</b> in the top-level GNU APL directory, <b>]KEYB XMOD</b>
 will fail if either <b>xmodmap</b> is not used at all, or if <b>xmodmap</b> is
 combined with other keyboard mapping programs. For these cases, the user can
 disable the automatic use of <b>xmodmap</b> in one of her preferences files.
 The option to do so is <b>NO-XMODMAP</b> and ii is effective only of
-]KEYB is calle  without a mode. That is, <b>]KEYB SCAN</b> will use <b>xmodmap</b>
+]KEYB is calle  without a mode. That is, <b>]KEYB XMOD</b> will use <b>xmodmap</b>
 even if <b>xmodmap</b> was disabled by <b>NO-XMODMAP</b> in a preferences file.
 </p>
 
 <hr>
 </div>
-<div class="subsubsection" id="g_t_005dKEYB-SCAN">
+<div class="subsubsection" id="g_t_005dKEYB-XMOD">
 <div class="header">
 <p>
 Next: <a href="#g_t_005dKEYB-USER" accesskey="n" rel="next">]KEYB USER</a>, Previous: <a href="#g_t_005dKEYB-without-a-mode" accesskey="p" rel="prev">]KEYB without a mode</a>, Up: <a href="#The-_005dKEYB-command" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005dKEYB-SCAN-1"></span><h4 class="subsubsection">2.11.3.3 ]KEYB SCAN</h4>
+<span id="g_t_005dKEYB-XMOD-1"></span><h4 class="subsubsection">2.11.3.3 ]KEYB XMOD</h4>
 
-<p><b>]KEYB SCAN</b> runs, under the hood, <b>xmodmap -pke</b> to read the current
+<p><b>]KEYB XMOD</b> runs, under the hood, <b>xmodmap -pke</b> to read the current
 keycode to keysymbol mapping and displays the result in form of a
 keyboard layout on the screen. For example:
 </p>
 <div class="example">
-<pre class="example">      ]KEYB SCAN
+<pre class="example">      ]KEYB XMOD
 US Keyboard Layout.    Source: xmodmap -pke
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
@@ -3262,7 +3277,7 @@ US Keyboard Layout.    Source: xmodmap -pke
 </li><li> the keycodes are correct (see below).
 </li></ul>
 
-<p>IOW: <b>]KEYB SCAN</b> troubleshoots the case
+<p>IOW: <b>]KEYB XMOD</b> troubleshoots the case
 <i>correct keycode, but incorrect keysymbol(s)</i> above.
 </p>
 <hr>
@@ -3270,7 +3285,7 @@ US Keyboard Layout.    Source: xmodmap -pke
 <div class="subsubsection" id="g_t_005dKEYB-USER">
 <div class="header">
 <p>
-Next: <a href="#g_t_005dKEYB-GUESS" accesskey="n" rel="next">]KEYB GUESS</a>, Previous: <a href="#g_t_005dKEYB-SCAN" accesskey="p" rel="prev">]KEYB SCAN</a>, Up: <a href="#The-_005dKEYB-command" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#g_t_005dKEYB-GUESS" accesskey="n" rel="next">]KEYB GUESS</a>, Previous: <a href="#g_t_005dKEYB-XMOD" accesskey="p" rel="prev">]KEYB XMOD</a>, Up: <a href="#The-_005dKEYB-command" accesskey="u" rel="up">The ]KEYB command</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005dKEYB-USER-1"></span><h4 class="subsubsection">2.11.3.4 ]KEYB USER</h4>
 
@@ -3306,27 +3321,50 @@ Previous: <a href="#g_t_005dKEYB-GUESS" accesskey="p" rel="prev">]KEYB GUESS</a>
 </div>
 <span id="Optional-_005dKEYB-arguments-1"></span><h4 class="subsubsection">2.11.3.6 Optional ]KEYB arguments</h4>
 
-<p><b>]KEYB SCAN KEYS</b> does not run <b>xmodmap -pke</b> but rather shows how
-the keys are supposed to be positioned on the keyboard. This shows how
-<b>xmodmap -pke</b> assumes the keys are positioned. For example:
+<p><b>]KEYB XMOD KEYS</b> runs <b>xmodmap -pke</b>, but first shows the assumed
+physical layout of the keyboard. By comparing the first half of the output
+with the second half, one can see how <b>xmodmap</b> mapes keycodes to
+Unicode characters. For example:
 </p>
 <div class="example">
-<pre class="example">      ]KEYB SCAN KEYS
-US Keyboard Layout.    Source: GNU APL builtin&quot; 
+<pre class="example">      ]KEYB XMOD KEYS
+Physical Keyboard:      Source: GNU APL builtin
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
 ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
 ║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║
 ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
-║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║
-║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║
+║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc  ║
+║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║
 ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
-║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
-║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
+║  Kc     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+║  66     ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
 ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
-║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
-║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
-╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+║    Kc       ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║   Kc     ║
+║    50       ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║   62     ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+║ Kc ║ Kc  ║ Kc  ║                Kc                ║ Kc  ║ Kc  ║ Kc  ║ Kc ║
+║ 37 ║115  ║ 64  ║                65                ║113  ║116  ║ 109 ║105 ║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
+
+Keyboard Layout.    Source: xmodmap -pke
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+║ ~  ║ !⌶ ║ &quot;  ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &amp;⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
+║ `◊ ║ 1¨ ║ 2⍫ ║ 3&lt; ║ 4≤ ║ 5= ║ 6≥ ║ 7&gt; ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║
+║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \⊢  ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+║  (CAPS  ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ *≡ ║ &quot;≢ ║         ║
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ +⍎ ║ '⍕ ║ RETURN  ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ &lt;⍪ ║ &gt;⍙ ║ ?⍠ ║          ║
+║    SHIFT    ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m∣ ║ ,⍝ ║ .⍀ ║ /⌿ ║   SHIFT  ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+║    ║     ║     ║                                  ║     ║     ║ !⌶  ║    ║
+║CTRL║ Win ║ ALT ║              SPACE               ║ ALT ║ Win ║ 1¨9 ║CTRL║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
 </pre></div>
 
 <p>Argument <b>KPAD</b> also shows the keypad of the keyboard. The keypad is normally
@@ -3336,10 +3374,10 @@ line graphics characters onto the keypad, as well as « and » and some
 currency symbols.
 </p>
 <p>Argument <b>FUNK</b> also shows the function key row of the keyboard, but
-only for <b>]KEYB SCAN KEYS</b>:
+only for <b>]KEYB XMOD KEYS</b>:
 </p>
 <div class="example">
-<pre class="example">      ]KEYB SCAN KEYS FUNK KPAD
+<pre class="example">      ]KEYB XMOD KEYS FUNK KPAD
 US Keyboard Layout.    Source: GNU APL builtin
 
 ╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗
@@ -3378,7 +3416,7 @@ The Unicode for <b>⍴</b> is :
 2374
 </pre></div>
 
-<p>One can check if the keycodes displayed by <b>]KEYB SCAN KEYS</b>  are
+<p>One can check if the keycodes displayed by <b>]KEYB XMOD KEYS</b>  are
 correct with a programm called <b>xev</b> (which is normally pre-installed in
 most GNU/Linux distributions. After starting <b>xev</b> and hitting the <b>R</b>
 key several times (because it also shows many other unrelated events),
@@ -3432,11 +3470,11 @@ which are defined in files <b>/usr/include/X11/X.h</b> and
 becomes simple (though somewhat tedious in the details):
 </p>
 <ol>
-<li> do <b>]KEYB SCAN KEYS</b> in GNU APL to display the keycodes, then
+<li> do <b>]KEYB XMOD KEYS</b> in GNU APL to display the keycodes, then
 </li><li> run <b>xev</b> in a different window and verify, for every key on
        the keyboard, that the keycode shown by <b>xev</b> is the one shown by
-       <b>]KEYB SCAN KEYS</b>, then
-</li><li> do <b>]KEYB SCAN</b> in GNU APL to display the keysyms, then
+       <b>]KEYB XMOD KEYS</b>, then
+</li><li> do <b>]KEYB XMOD</b> in GNU APL to display the keysyms, then
       </li><li> edit the <b>xmodmap.apl</b> file (or whatever other file ws used
       as the argument for the <b>xmondmap</b> command) to see if the Unicodes
       for every keycode line are correct. In that test:

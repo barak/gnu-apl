@@ -30,9 +30,15 @@
 # include <X11/Xlib.h>
 #endif
 
+#if HAVE_X11_XKBLIB_H
+# include <X11/XKBlib.h>
+#endif
+
+bool Cmd_KEYB::keymap_from_xkbd = false;
+
 // See: /usr/share/X11/xkb/keycodes/xfree86
 
-const char * Cmd_KEYB::funkey_template[] = {
+const char * funkey_template[] = {
 "╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
 "║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║    ║ Kc ║ Kc ║",
 "║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║",
@@ -40,7 +46,7 @@ const char * Cmd_KEYB::funkey_template[] = {
 "",
 };
 
-const char * Cmd_KEYB::keypad_template[] = {
+const char * keypad_template[] = {
 "╔════╦════╦════╦════╗",
 "║ Kc ║    ║ Kc ║ Kc ║",
 "║ 77 ║    ║ 82 ║ 82 ║",
@@ -59,7 +65,7 @@ const char * Cmd_KEYB::keypad_template[] = {
 "╚═════════╩════╩════╝",
 };
 
-const char * Cmd_KEYB::layout_template[] = {
+const char * main_template[] = {
 "╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗",
 "║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
 "║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║",
@@ -78,47 +84,85 @@ const char * Cmd_KEYB::layout_template[] = {
 "╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝",
                         };
 
+enum {
+   FUNKEY_rows = sizeof(funkey_template) / sizeof(char *),
+   MAIN_rows = sizeof(main_template)     / sizeof(char *),
+   KEYPAD_rows = sizeof(keypad_template) / sizeof(char *),
+     };
+
+static_assert(MAIN_rows == KEYPAD_rows);
+
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 
 //----------------------------------------------------------------------------
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
-bool keys = false;
 int area = 0;   // main keys
 
    enum
       {
-        MO_NONE     = 0,
-        MO_XMODMAP  = 1,
-        MO_USERFILE = 2,
-        MO_BUILTIN  = 4,
+        MO_NONE     =  0,
+        MO_KEYS     =  1,
+        MO_XMODMAP  =  2,
+        MO_XKBD     =  4,
+        MO_USERFILE =  8,
+        MO_BUILTIN  = 16,
         MO_ALL      = MO_XMODMAP | MO_USERFILE | MO_BUILTIN
       };
 
 int mode = MO_NONE;
    loop(a, args.size())
       {
-        if      (args[a].starts_iwith("SCAN"))   mode |= MO_XMODMAP;
+        if      (args[a].starts_iwith("XMOD"))   mode |= MO_XMODMAP;
+        else if (args[a].starts_iwith("XKBD"))   mode |= MO_XKBD;
         else if (args[a].starts_iwith("USER"))   mode |= MO_USERFILE;
         else if (args[a].starts_iwith("GUESS"))  mode |= MO_BUILTIN;
-        else if (args[a].starts_iwith("KEYS"))   keys = true;
+        else if (args[a].starts_iwith("KEYS"))   mode |= MO_KEYS;
         else if (args[a].starts_iwith("KPAD"))   area |= 1;
         else if (args[a].starts_iwith("FUNK"))   area |= 2;
         else
            {
+             CERR << "Bad Command+" << endl;
              MORE_ERROR() << "Command ]KEYB: invalid argument '"
                           << args[a] << "'";
              if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
              return;
            }
       }
-   if (mode == MO_NONE)   mode = MO_ALL;   // if no specific mode(s) given
+
+   if ((mode & MO_XMODMAP) && (mode & MO_XKBD))
+      {
+        CERR << "Bad Command+" << endl;
+        MORE_ERROR() << "]KEYB: Invalid combination of XMOD and XKBD";
+        if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+        return;
+      }
+
+const bool no_mode = mode == MO_NONE;
+   if (no_mode)   // if no specific mode(s) given
+      {
+        mode = MO_XMODMAP | MO_USERFILE | MO_BUILTIN;
+      }
+
+   // if neither xmodmap nor xkdb is specified then use xmodmap
+   //
+   if (!(mode & (MO_XMODMAP | MO_XKBD)))   mode |= MO_XMODMAP;
+
+   if (mode & MO_KEYS)
+      {
+        print_keycodes(out, area);
+      }
+
+   if (mode & MO_XKBD)
+      {
+        const bool got_map = ! read_xkbd_map();
+        if (got_map)   print_keymap(out, area);
+        return;
+      }
 
 const bool do_xmodmap = (mode & MO_XMODMAP) &&
-                         ! (mode == MO_ALL &&
-                            UserPreferences::uprefs.no_xmodmap);
-
+                         ! (no_mode && UserPreferences::uprefs.no_xmodmap);
    if (do_xmodmap)
       {
         // reset SIGCHLD to its default so that pclose() works as expected
@@ -146,14 +190,14 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
              else
                 {
                   Workspace::more_error().clear();
-                  print_xmodmap(out, keys, area);
+                  print_keymap(out, area);
                 }
              return;
            }
 
         if (!xmodmap_error)   // xmodmap succeeded
            {
-             print_xmodmap(out, keys, area);
+             print_keymap(out, area);
              return;
            }
       }
@@ -339,6 +383,8 @@ int bad_lines  = 0;
 bool
 Cmd_KEYB::parse_xmodmap_line(const char * buffer, int line)
 {
+   keymap_from_xkbd = false;
+
 const bool debug = false;
 
    // the first few lines, say 12, are header lines that can not be 
@@ -394,6 +440,78 @@ int Ucount = 0;
 
    return false;   // OK
 }
+//----------------------------------------------------------------------------
+#if HAVE_X11_XKBLIB_H
+
+bool
+Cmd_KEYB::read_xkbd_map()
+{
+   keymap_from_xkbd = true;
+
+   // 1. figure the keycodes in the templates
+   //
+   read_xkbd_template(main_template,   MAIN_rows);
+   read_xkbd_template(funkey_template, FUNKEY_rows);
+   read_xkbd_template(keypad_template, KEYPAD_rows);
+
+   return false;   // OK
+}
+//---------------------------------------------------------------------------
+Unicode
+Cmd_KEYB::read_ksym(_XDisplay * display, int keycode, int level)
+{
+const KeySym symbol = XkbKeycodeToKeysym(display,keycode, 0, level);
+
+   if (symbol < 0x80)    return Unicode(symbol);
+   if (symbol < 0x100)   return Unicode(symbol);
+   if ((symbol & 0xFFFF0000) == 0x01000000)   return Unicode(symbol & 0xFFFF);
+   return Unicode_0;
+}
+//---------------------------------------------------------------------------
+void
+Cmd_KEYB::read_xkbd_template(const char ** lines, int line_count)
+{
+Display * display = XOpenDisplay(0);
+
+   loop(y, line_count - 1)
+       {
+         const char * line  = lines[y];
+         const char * line1 = lines[y + 1];
+         const size_t len = strlen(line);
+         for (size_t x = 1; x < len - 1; ++x)
+             {
+               if (line[x] == 'K' && line[x + 1] == 'c')
+                  {
+                    // fix UTF8 offsets
+                    const char * p = line1 + x - 1;
+                    while (*p & 0x80)   ++p;
+
+                    const int keycode = strtol(p, 0, 10) & 0xFF;
+                    map_item & item = key_map[keycode];
+                    item.keycode = keycode;
+                    item.unicodes[0] = read_ksym(display, keycode, 0);
+                    item.unicodes[1] = read_ksym(display, keycode, 1);
+                    item.unicodes[2] = read_ksym(display, keycode, 2);
+                    item.unicodes[3] = read_ksym(display, keycode, 3);
+                  }
+             }
+       }
+
+   XCloseDisplay(display);
+}
+
+#else // do not HAVE_X11_XKBLIB_H
+
+bool
+Cmd_KEYB::read_xkbd_map()
+{
+   MORE_ERROR() << "]KEYB XKBD failed: missing header file X11/XKBlib.h";
+   if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+
+   return true;   // error
+}
+#endif   // do/don't HAVE_X11_XKBLIB_H
+
 //----------------------------------------------------------------------------
 bool
 Cmd_KEYB::parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode)
@@ -525,20 +643,18 @@ static const struct symkey
 }
 //----------------------------------------------------------------------------
 ostream &
-Cmd_KEYB::print_xmodmap(ostream & out, bool keys, int area)
+Cmd_KEYB::print_keycodes(ostream & out, int area)
 {
-   out << "US Keyboard Layout.    ";
-   if (keys)   out << "Source: GNU APL builtin" << endl << endl;
-   else        out << "Source: xmodmap -pke" << endl << endl;
+   out << "Physical Keyboard:      Source: GNU APL builtin"
+       << endl << endl;
 
-const int main_rows = sizeof(layout_template) / sizeof(*layout_template);
 int fun_rows = 0;
 UCS_string_vector lines;
 
-   if (keys && (area & 2))   // including function keys
+   if (area & 2)   // including function keys
       {
-        fun_rows = sizeof(funkey_template) / sizeof(*funkey_template);
-        for (int y = 0; y < fun_rows; ++y)
+        fun_rows = FUNKEY_rows;
+        loop(y, fun_rows)
             {
               const UTF8_string utf(funkey_template[y]);
               const UCS_string ucs(utf);
@@ -546,9 +662,9 @@ UCS_string_vector lines;
             }
       }
 
-   for (int y = 0; y < main_rows; ++y)
+   loop (y, MAIN_rows)
        {
-         const UTF8_string utf(layout_template[y]);
+         const UTF8_string utf(main_template[y]);
          const UCS_string ucs(utf);
          lines.push_back(ucs);
          if (area & 1)
@@ -560,14 +676,37 @@ UCS_string_vector lines;
        }
 
 const int rows = lines.size();
-   if (keys)
-      {
-        for (int y = 0; y < rows; ++y)   out << lines[y] << endl;
-        out << endl;
-         return out;
-      }
+   loop(y, rows)   out << lines[y] << endl;
+   out << endl;
+   return out;
+}
+//----------------------------------------------------------------------------
+ostream &
+Cmd_KEYB::print_keymap(ostream & out, int area)
+{
+   out << "Keyboard Layout.    ";
+   if (keymap_from_xkbd)   out << "Source: XkbKeycodeToKeysym()";
+   else                    out << "Source: xmodmap -pke";
+   out << endl << endl;
 
-   for (int y = 0; y < (rows - 2); ++y)
+UCS_string_vector lines;
+
+   loop (y, MAIN_rows)
+       {
+         const UTF8_string utf(main_template[y]);
+         const UCS_string ucs(utf);
+         lines.push_back(ucs);
+         if (area & 1)
+            {
+              const UTF8_string utf(keypad_template[y]);
+              UCS_string ucs(utf);
+              lines.back() <<  "    " << ucs;
+            }
+       }
+
+const int rows = lines.size();
+
+   loop(y, rows - 2)
        {
          UCS_string & u = lines[y];
          UCS_string & l = lines[y + 1];

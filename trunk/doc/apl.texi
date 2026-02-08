@@ -2476,9 +2476,10 @@ a key pressed or realeased is processed as follows:
 The installation of an operating system installs a Keycodes to Unicodes
 mapping according to the language choices made by the user during the 
 installation. for example, in the US keycode @b{29} will be mapped to @b{y},
-while in Germany keycode @b{29} will be mapped to @b{z}. At this point all
+while in Germany keycode @b{29} will be mapped to @b{z}. At this point most
 mappings for modifier ALT pressed, and most settings for CTRL pressed are
-either set to @b{NoSymbol}. To generate APL characteres instead of nothing,
+set to @b{NoSymbol} so that pressing these keys together with CTRL or ALT 
+have no effect. To generate APL characteres instead of nothing,
 the user has to modify the mapping as to produce APL Unicodes. This
 modification is lost after rebooting the computer; therefore the mapping
 is usually performed in a script that is run at login time of the user (i.e.
@@ -2486,7 +2487,7 @@ in ~/.bashrc).
 
 The modification is made with a program. Unfortunately there exist several
 such programs, e.g. @b{xmodmap}, @b{setxkbmap}, or @b{loadkeys}. See
-@b{README-3-keyboard} for details. Unfortunately more is not always better
+@b{README-3-keyboard} for details. More is not always better
 and the different programs for the same purpose have undesirable side effects
 when used in parallel. An important lesson after experimenting with several
 of these programs was: @i{Use one and only one of these programs on your
@@ -2507,7 +2508,11 @@ redundant since @b{xmodmap} provides a way to save the current mapping
 work in Linux Mint several yeras ago, but this has been fixed in the meantime.
 
 It is impossible for the author to explain all available mapping programs
-and therefore this manual focuses on @b{xmodmap}. Suppose we run:
+and therefore this manual focuses on @b{xmodmap} and, as an alternative,
+@b{setxkbmap/xkbcomp}. @b{xmodmap} is considerably simpler to configure
+than @b{setxkbmap/xkbcomp} but not available on all platforms.
+
+Suppose we run:
 
 @b{$ xmodmap xmodmap.apl}
 
@@ -2538,14 +2543,24 @@ the optional arguments specify additional details for the output. There are
 3 different modes:
 
 @itemize
-@item Mode @b{SCAN} uses the program @b{xmodmap} to figure the keyboard layout.
+@item Mode @b{XMOD} uses the program @b{xmodmap} to figure the keyboard layout.
       This mode, if it works, produces an output that is closest to reality.
+@item Mode @b{XKBD} uses the X extension @b{Xkbd} which is typically configured
+      with the programs @b{setxkbmap} and @b{xkbcomp}. GNU APL reads the result
+      of that configuration back with function @b{XkbKeycodeToKeysym}. This
+      mode, if it works, produces an output that is also closest to reality.
 @item Mode @b{USER} display a keyboard layout provided by the user. The output
       of this mode is as correct as its input.
 @item mode @b{GUESS} displays a typical APL keyboard layout (which may differ
-      considerably from thr true keyboard layout).
+      considerably from the true keyboard layout).
 @end itemize
 
+@b{WARNING}: In theory one could map some keys with @b{xmodmap} and others
+with @b{xkbcomp}. Even though one might be able to achieve a desired mapping
+in this way (and maybe quicker than with either of the methods alone),
+@b{]KEYB} will not be able to display it properly. This is because the
+@b{xmodmap -pke } does not see the @b{xkbcomp} mapping and the @b{X} function
+@b{XkbKeycodeToKeysym()} does not see the @b{xmodmap} mapping. 
 
 @node ]KEYB without a mode
 @subsubsection ]KEYB without a mode
@@ -2557,7 +2572,7 @@ which is very useful if the keyboard has no APL stickers or key caps.
 @b{]KEYB} without a mode tries (in that order):
 
 @enumerate
-@item @b{]KEYB SCAN}
+@item @b{]KEYB XMOD}
 @item @b{]KEYB USER}
 @item @b{]KEYB GUESS}
 @end enumerate
@@ -2570,24 +2585,24 @@ The first line of the keyboard displayed shows which of the 3 methods above
 was used to generate the output.
 
 As may have become clear from the explanations above and/or from reading
-@b{README-3-keyboard} in the top-level GNU APL directory, @b{]KEYB SCAN}
+@b{README-3-keyboard} in the top-level GNU APL directory, @b{]KEYB XMOD}
 will fail if either @b{xmodmap} is not used at all, or if @b{xmodmap} is
 combined with other keyboard mapping programs. For these cases, the user can
 disable the automatic use of @b{xmodmap} in one of her preferences files.
 The option to do so is @b{NO-XMODMAP} and ii is effective only of
-]KEYB is calle  without a mode. That is, @b{]KEYB SCAN} will use @b{xmodmap}
+]KEYB is calle  without a mode. That is, @b{]KEYB XMOD} will use @b{xmodmap}
 even if @b{xmodmap} was disabled by @b{NO-XMODMAP} in a preferences file.
 
 
-@node ]KEYB SCAN
-@subsubsection ]KEYB SCAN
+@node ]KEYB XMOD
+@subsubsection ]KEYB XMOD
 
-@b{]KEYB SCAN} runs, under the hood, @b{xmodmap -pke} to read the current
+@b{]KEYB XMOD} runs, under the hood, @b{xmodmap -pke} to read the current
 keycode to keysymbol mapping and displays the result in form of a
 keyboard layout on the screen. For example:
 
 @example
-      ]KEYB SCAN
+      ]KEYB XMOD
 US Keyboard Layout.    Source: xmodmap -pke
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
@@ -2614,7 +2629,7 @@ Naturally, this only works, iff:
 @item the keycodes are correct (see below).
 @end itemize
 
-IOW: @b{]KEYB SCAN} troubleshoots the case
+IOW: @b{]KEYB XMOD} troubleshoots the case
 @i{correct keycode, but incorrect keysymbol(s)} above.
 
 @node ]KEYB USER
@@ -2640,27 +2655,50 @@ keyboard.
 @node Optional ]KEYB arguments
 @subsubsection Optional ]KEYB arguments
 
-@b{]KEYB SCAN KEYS} does not run @b{xmodmap -pke} but rather shows how
-the keys are supposed to be positioned on the keyboard. This shows how
-@b{xmodmap -pke} assumes the keys are positioned. For example:
+@b{]KEYB XMOD KEYS} runs @b{xmodmap -pke}, but first shows the assumed
+physical layout of the keyboard. By comparing the first half of the output
+with the second half, one can see how @b{xmodmap} mapes keycodes to
+Unicode characters. For example:
 
 @example
-      ]KEYB SCAN KEYS
-US Keyboard Layout.    Source: GNU APL builtin" 
+      ]KEYB XMOD KEYS
+Physical Keyboard:      Source: GNU APL builtin
 
 ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
 ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
 ║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║
 ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
-║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc   ║
-║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║ 51   ║
+║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc  ║
+║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║
 ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
-║ Kc      ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
-║ 37      ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
+║  Kc     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║
+║  66     ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║
 ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
-║  Kc         ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc      ║
-║  50         ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║  62      ║
-╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
+║    Kc       ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║   Kc     ║
+║    50       ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║   62     ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+║ Kc ║ Kc  ║ Kc  ║                Kc                ║ Kc  ║ Kc  ║ Kc  ║ Kc ║
+║ 37 ║115  ║ 64  ║                65                ║113  ║116  ║ 109 ║105 ║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
+
+Keyboard Layout.    Source: xmodmap -pke
+
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗
+║ ~  ║ !⌶ ║ "  ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║
+║ `◊ ║ 1¨ ║ 2⍫ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣
+║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ @{⍞ ║ @}⍬ ║  |⊣  ║
+║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \⊢  ║
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
+║  (CAPS  ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ *≡ ║ "≢ ║         ║
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ +⍎ ║ '⍕ ║ RETURN  ║
+╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
+║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+║    SHIFT    ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m∣ ║ ,⍝ ║ .⍀ ║ /⌿ ║   SHIFT  ║
+╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣
+║    ║     ║     ║                                  ║     ║     ║ !⌶  ║    ║
+║CTRL║ Win ║ ALT ║              SPACE               ║ ALT ║ Win ║ 1¨9 ║CTRL║
+╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝
 @end example
 
 Argument @b{KPAD} also shows the keypad of the keyboard. The keypad is normally
@@ -2670,10 +2708,10 @@ line graphics characters onto the keypad, as well as « and » and some
 currency symbols.
 
 Argument @b{FUNK} also shows the function key row of the keyboard, but
-only for @b{]KEYB SCAN KEYS}:
+only for @b{]KEYB XMOD KEYS}:
 
 @example
-      ]KEYB SCAN KEYS FUNK KPAD
+      ]KEYB XMOD KEYS FUNK KPAD
 US Keyboard Layout.    Source: GNU APL builtin
 
 ╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗
@@ -2712,7 +2750,7 @@ The Unicode for @b{⍴} is :
 2374
 @end example
 
-One can check if the keycodes displayed by @b{]KEYB SCAN KEYS}  are
+One can check if the keycodes displayed by @b{]KEYB XMOD KEYS}  are
 correct with a programm called @b{xev} (which is normally pre-installed in
 most GNU/Linux distributions. After starting @b{xev} and hitting the @b{R}
 key several times (because it also shows many other unrelated events),
@@ -2766,11 +2804,11 @@ Given the explanations above, the troubleshooting of keyboard mappings
 becomes simple (though somewhat tedious in the details):
 
 @enumerate
-@item do @b{]KEYB SCAN KEYS} in GNU APL to display the keycodes, then
+@item do @b{]KEYB XMOD KEYS} in GNU APL to display the keycodes, then
 @item  run @b{xev} in a different window and verify, for every key on
        the keyboard, that the keycode shown by @b{xev} is the one shown by
-       @b{]KEYB SCAN KEYS}, then
-@item do @b{]KEYB SCAN} in GNU APL to display the keysyms, then
+       @b{]KEYB XMOD KEYS}, then
+@item do @b{]KEYB XMOD} in GNU APL to display the keysyms, then
       @item edit the @b{xmodmap.apl} file (or whatever other file ws used
       as the argument for the @b{xmondmap} command) to see if the Unicodes
       for every keycode line are correct. In that test:

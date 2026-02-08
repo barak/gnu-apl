@@ -32,6 +32,7 @@
 
 class Workspace;
 struct dirent;
+struct _XDisplay;
 
 //----------------------------------------------------------------------------
 /*!
@@ -390,9 +391,23 @@ public:
    /// execute xmodmap -pk and parse its output.
   static bool parse_xmodmap();
 
-   /// print the keyboard layout according to xmodmap -pk to \b out.
-   static ostream & print_xmodmap(ostream & out, bool keys, int area);
+   /// read the mappings for all templates
+   static bool read_xkbd_map();
 
+   /// read the mappings for one template
+   static void read_xkbd_template(const char ** lines, int line_count);
+
+   /// print the keycodes
+   static ostream & print_keycodes(ostream & out, int area);
+
+   /// print the keyboard layout according to xmodmap -pk to \b out.
+   static ostream & print_keymap(ostream & out, int area);
+
+   /// read a key symbol and translate it to a Unicode
+    static Unicode read_ksym(_XDisplay * display, int keycode, int level);
+
+   /// true for XkbKeycodeToKeysym(), false for xmodmap -pke
+   static bool keymap_from_xkbd;
 protected:
    enum Keycode
       {
@@ -419,15 +434,6 @@ protected:
         int Ucount;            ///< the number of Uxxx mappings
         Unicode unicodes[4];   ///< the unicodes
       } key_map[256];
-
-   /// a keyboard layout (function key area)
-   static const char * funkey_template[];
-
-   /// a keyboard layout (main area)
-   static const char * layout_template[];
-
-   /// a keyboard layout (keypad area)
-   static const char * keypad_template[];
 };
 //----------------------------------------------------------------------------
 class Cmd_LIB

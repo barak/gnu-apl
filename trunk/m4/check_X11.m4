@@ -22,19 +22,20 @@ local x_includes x_libraries   # also set by AC_PATH_X(), normally empty
 AC_CHECK_HEADERS([ xcb/xcb.h
                    X11/Xlib.h
                    X11/Xlib-xcb.h
-                   X11/Xutil.h], , return)
+                   X11/Xutil.h
+                   X11/XKBlib.h], , return)
 
 # xcb/xproto.h #include's xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [return], [#include <xcb/xcb.h>])
 
-apl_OPT_LIB([X11], [XOpenDisplay], [])  # sets apl_have_opt_lib
+apl_OPT_LIB([X11], [XOpenDisplay], [])      # sets apl_have_opt_lib
 apl_NO($apl_have_opt_lib) && return
 
-apl_OPT_LIB([xcb], [xcb_connect], [])   # sets apl_have_opt_lib
+apl_OPT_LIB([xcb], [xcb_connect], [])       # sets apl_have_opt_lib
 apl_NO($apl_have_opt_lib) && return
 
 apl_OPT_LIB([X11-xcb], [XGetXCBConnection], [])
-apl_NO($apl_have_opt_lib) && return # sets apl_have_opt_lib
+apl_NO($apl_have_opt_lib) && return         # sets apl_have_opt_lib
 
 # at this point all libraries needed for XCB are installed
 apl_X11=yes

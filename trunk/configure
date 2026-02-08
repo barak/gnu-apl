@@ -20690,7 +20690,7 @@ fi
  } ; test "x$have_x" != "xyes" && return
 
 # check for header files (#include'd in Plot_xcb.cc)
-       for ac_header in xcb/xcb.h X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h
+       for ac_header in xcb/xcb.h X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h X11/XKBlib.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -20761,7 +20761,7 @@ then :
 else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
-  # sets apl_have_opt_lib
+      # sets apl_have_opt_lib
 test "x$apl_have_opt_lib" = "xno" && return
 
  apl_have_opt_lib=yes
@@ -20808,7 +20808,7 @@ then :
 else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
-   # sets apl_have_opt_lib
+       # sets apl_have_opt_lib
 test "x$apl_have_opt_lib" = "xno" && return
 
  apl_have_opt_lib=yes
@@ -20856,7 +20856,7 @@ else $as_nop
   test -n "" && printf "%s\n" "   └────  "; apl_have_opt_lib=no
 fi
 
-test "x$apl_have_opt_lib" = "xno" && return # sets apl_have_opt_lib
+test "x$apl_have_opt_lib" = "xno" && return         # sets apl_have_opt_lib
 
 # at this point all libraries needed for XCB are installed
 apl_X11=yes
