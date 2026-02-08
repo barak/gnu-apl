@@ -1545,28 +1545,35 @@ Token
 Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
 {
    /*
-      NOTE: Neither IBM APL2 nor ISO define dyadic A ∪ B. Dyalog defines it as:
+      NOTE: Neither IBM APL2 nor ISO define dyadic A ∪ B.
+            Dyalog APL defines it as:
 
             A ∪ B ←→ A , (B ∼ A)
+
+            However, that definition suffers from asymmetry: duplicated items
+            in A remain duplicated while duplicated items in B are removed.
+
+            We therefore define dyadic A ∪ B as:
+
+            A ∪ B ←→ ∪ (A , B)
+
+            which is simpler, symmetrical, and closer to the mathematical
+            definition of a set.
     */
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   // A ∪ B ←→ ∪ A , B
-   //
 const ShapeItem len_A = A->element_count();
 const ShapeItem len_B = B->element_count();
 
    // Z←A, B
+   //
 Value_P Z(len_A + len_B, LOC);
 
    loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
    loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
    Z->set_default(*B, LOC);
    Z->check_value(LOC);
-
-   // return ∪Z
-   //
    return eval_B(Z);
 }
 //----------------------------------------------------------------------------
@@ -1580,37 +1587,33 @@ Bif_F12_UNION::eval_B(Value_P B) const
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
-   // 1. create a vector with all cells of B.
+   // 1. create a vector with all cells of B and sort it.
    //
 vector<const Cell *> cells_B;
-cells_B.reserve(len_B);
+   cells_B.reserve(len_B);
 
    loop(b, len_B)   cells_B.push_back(&B->get_cravel(b));
+   Heapsort<const Cell *>::sort(cells_B, Cell::compare_stable, 0);
 
    // 2. remove duplicates
    //
 const double qct = Workspace::get_CT();
-ShapeItem len_Z = len_B;
-   loop(b, len_B)
+vector<const Cell *> unique;
+   unique.reserve(len_B);
+   for (ShapeItem b = 0; b < len_B; )
        {
-         if (cells_B[b] == 0)   continue;
-         for (ShapeItem bb = b + 1; bb < len_B; ++bb)
-             {
-               if (cells_B[bb] == 0)   continue;
-               if (cells_B[b]->equal(*cells_B[bb], qct))
-                  {
-                    cells_B[bb] = 0;
-                    --len_Z;
-                  }
-             }
+         const Cell * u = cells_B[b++];
+         unique.push_back(u);
+         while (b < len_B && u->equal(*cells_B[b], qct))   ++b;   // duplicate
        }
 
+   // 3. restore original order and create the result
+   //
+   Heapsort<const Cell *>::sort(unique, Cell::compare_ptr, 0);
+
+const ShapeItem len_Z = unique.size();
 Value_P Z(len_Z, LOC);
-   loop(b, len_B)
-       {
-         if (cells_B[b])   Z->next_ravel_Cell(*cells_B[b]);
-       }
-
+   loop(u, len_Z)   Z->next_ravel_Cell(*unique[u]);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

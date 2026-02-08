@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2024  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,9 +63,9 @@ class GTK_context : public Quad_PLOT::PLOT_context
 {
 public:
    /// constructor
-   GTK_context(Plot_window_properties & pwp, Quad_PLOT::Handle handle)
+   GTK_context(Plot_window_properties & props, Quad_PLOT::Handle handle)
    : PLOT_context(handle),
-     w_props(pwp),
+     w_props(props),
      window(0),
      drawing_area(0),
      surface(0),
@@ -149,10 +149,14 @@ public:
    void set_legend_Y1(Pixel_Y y1, const char * loc)   { legend_Y1 = y1; }
 
 protected:
-   /// the left and right edges of the legend rectangle
+   /// the left and right edges of the legend rectangle (during a drag & drop
+   /// operation). The final result (when the legend is dropped) will be
+   /// stored in w_props.
    Pixel_X legend_X0, legend_X1;
 
-   /// the top and bottom edges of the legend rectangle
+   /// the top and bottom edges of the legend rectangle (during a drag & drop
+   /// operation). The final result (when the legend is dropped) will be
+   /// stored in w_props.
    Pixel_Y legend_Y0, legend_Y1;
 };
 //----------------------------------------------------------------------------

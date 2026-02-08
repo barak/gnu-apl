@@ -1086,7 +1086,11 @@ char cc[40];
    SPRINTF(cc, "%lld", long_long(num));
    loop(c, sizeof(cc))
       {
-        if (char digit = cc[c])   *this << Unicode(digit);
+        if (const char digit = cc[c])
+           {
+             if (digit == '-')   push_back(UNI_OVERBAR);
+             else                push_back(Unicode(digit));
+           }
         else                      break;
       }
 }
@@ -1100,7 +1104,12 @@ char cc[40];
 
    loop(c, sizeof(cc))
       {
-        if (const char digit = cc[c])   push_back(Unicode(digit));
+        if (const char digit = cc[c])
+           {
+             if (digit == 'e')        push_back(UNI_E);
+             else if (digit == '-')   push_back(UNI_OVERBAR);
+             else                     push_back(Unicode(digit));
+           }
         else                            break;
       }
 
