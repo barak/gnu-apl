@@ -384,6 +384,14 @@ protected:
 //----------------------------------------------------------------------------
 class Cmd_KEYB
 {
+   enum KB_Area
+      {
+        KB_AREA_FUNKEY = 1,
+        KB_AREA_MAIN   = 2,
+        KB_AREA_CURSOR = 4,
+        KB_AREA_KEYPAD = 8,
+      };
+
 public:
    /// show keyboard layout
    static void cmd_KEYB(ostream & out, const UCS_string_vector & args);
@@ -398,16 +406,20 @@ public:
    static void read_xkbd_template(const char ** lines, int line_count);
 
    /// print the keycodes
-   static ostream & print_keycodes(ostream & out, int area);
+   static ostream & print_keycodes(ostream & out, KB_Area area);
 
    /// print the keyboard layout according to xmodmap -pk to \b out.
-   static ostream & print_keymap(ostream & out, int area);
+   static ostream & print_keymap(ostream & out, KB_Area area);
+
+   /// copy text into UCS_string
+   static void copy_text(Unicode & start, const char * text);
 
    /// read a key symbol and translate it to a Unicode
-    static Unicode read_ksym(_XDisplay * display, int keycode, int level);
+    static Unicode read_xkbd_Ksym(_XDisplay * display, int keycode, int level);
 
    /// true for XkbKeycodeToKeysym(), false for xmodmap -pke
    static bool keymap_from_xkbd;
+
 protected:
    enum Keycode
       {
@@ -421,7 +433,11 @@ protected:
 
    /// parse one unicode (like Uxxxx); increment \b p, and return \b true
    /// on success.
-   static bool parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode);
+   static bool parse_xmodmap_Unicode(Keycode keycode, const char * & p,
+                                     uint32_t & unicode);
+
+   /// fill \b result with a keyboard templace according to bitmap \b area
+   static void get_template(UCS_string_vector & result, KB_Area area);
 
    static struct map_item
       {

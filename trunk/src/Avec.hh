@@ -98,6 +98,10 @@ public:
             || (uni <= UNI_F && uni >= UNI_A)
             || (uni <= UNI_f && uni >= UNI_a); }
 
+   /// return \b true if \b uni is (uppercase) alphabetic
+   static bool is_A_to_Z(Unicode uni)
+      { return uni >= UNI_A && uni <= UNI_Z; }
+
    /// Return \b true iff \b av is a digit or a space
    static bool is_digit_or_space(Unicode uni)
       { return is_digit(uni) || is_white(uni); }

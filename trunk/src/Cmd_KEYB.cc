@@ -38,59 +38,80 @@ bool Cmd_KEYB::keymap_from_xkbd = false;
 
 // See: /usr/share/X11/xkb/keycodes/xfree86
 
-const char * funkey_template[] = {
+const char * FUNKEY_template[] = {
 "╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
-"║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║ Kc ║ Kc ║ Kc ║ Kc ║    ║    ║ Kc ║ Kc ║",
+"║ESC ║    ║FK01║FK02║FK03║FK04║    ║FK05║FK06║FK07║FK08║    ║FK09║FK10║FK11║FK12║    ║    ║SCLK║NMLK║",
 "║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║",
 "╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
 "",
 };
 
-const char * keypad_template[] = {
+const char * CURSOR_template[] = {
+"╔════╦════╦════╗",
+"║INS ║HOME║PGUP║",
+"║118 ║110 ║112 ║",
+"╠════╬════╬════╣",
+"║DELE║END ║PGDN║",
+"║119 ║115 ║117 ║",
+"╚════╩════╩════╝",
+"                ",
+"                ",
+"     ╔════╗     ",
+"     ║ UP ║     ",
+"     ║111 ║     ",
+"╔════╬════╬════╗",
+"║LEFT║DOWN║RGHT║",
+"║113 ║116 ║114 ║",
+"╚════╩════╩════╝",
+};
+
+const char * KEYPAD_template[] = {
 "╔════╦════╦════╦════╗",
-"║ Kc ║    ║ Kc ║ Kc ║",
-"║ 77 ║    ║ 82 ║ 82 ║",
+"║NMLK║    ║    ║KPSU║",
+"║ 77 ║    ║    ║ 82 ║",
 "╠════╬════╬════╬════╣",
-"║ Kc ║ Kc ║ Kc ║    ║",
-"║ 79 ║ 80 ║ 81 ║ Kc ║",
+"║KP7 ║KP8 ║KP9 ║    ║",
+"║ 79 ║ 80 ║ 81 ║KPAD║",
 "╠════╬════╬════╣ 86 ║",
-"║ Kc ║ Kc ║ Kc ║    ║",
+"║KP4 ║KP5 ║KP6 ║    ║",
 "║ 83 ║ 84 ║ 85 ║    ║",
 "╠════╬════╬════╬════╣",
-"║ Kc ║ Kc ║ Kc ║    ║",
-"║ 87 ║ 88 ║ 89 ║ Kc ║",
-"╠════╩════╬════╣108 ║",
-"║ Kc      ║ Kc ║    ║",
-"║ 90      ║ 91 ║    ║",
+"║KP1 ║KP2 ║KP3 ║    ║",
+"║ 87 ║ 88 ║ 89 ║KPEN║",
+"╠════╩════╬════╣104 ║",
+"║   KP0   ║KPDL║    ║",
+"║   90    ║ 91 ║    ║",
 "╚═════════╩════╩════╝",
 };
 
-const char * main_template[] = {
+const char * MAIN_template[] = {
 "╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗",
-"║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
-"║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║ 22      ║",
+"║TLDE║AE01║AE02║AE03║AE04║AE05║AE06║AE07║AE08║AE09║AE10║AE11║AE12║  BKSP   ║",
+"║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║   22    ║",
 "╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣",
-"║  Kc   ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║  Kc  ║",
+"║  TAB  ║AD01║AD02║AD03║AD04║AD05║AD06║AD07║AD08║AD09║AD00║AD10║AD11║ BKSL ║",
 "║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║",
 "╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣",
-"║  Kc     ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc      ║",
-"║  66     ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║ 36      ║",
+"║  CAPS   ║AC01║AC02║AC03║AC04║AC05║AC06║AC07║AC08║AC09║AC10║AC11║  RTRN   ║",
+"║   66    ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║   36    ║",
 "╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣",
-"║    Kc       ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║ Kc ║   Kc     ║",
-"║    50       ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║   62     ║",
+"║    LFSH     ║AB01║AB02║AB03║AB04║AB05║AB06║AB07║AB08║AB09║AB10║   RTSH   ║",
+"║     50      ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║    62    ║",
 "╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣",
-"║ Kc ║ Kc  ║ Kc  ║                Kc                ║ Kc  ║ Kc  ║ Kc  ║ Kc ║",
-"║ 37 ║115  ║ 64  ║                65                ║113  ║116  ║ 109 ║105 ║",
+"║LCTL║ LWIN║     ║               SPCE               ║     ║ RWIN║COMP ║RCTL║",
+"║ 37 ║ 133 ║ ALT ║                65                ║ ALT ║ 134 ║ 135 ║105 ║",
 "╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝",
                         };
 
 enum {
-   FUNKEY_rows = sizeof(funkey_template) / sizeof(char *),
-   MAIN_rows = sizeof(main_template)     / sizeof(char *),
-   KEYPAD_rows = sizeof(keypad_template) / sizeof(char *),
+   FUNKEY_rows = sizeof(FUNKEY_template) / sizeof(char *),
+   MAIN_rows   = sizeof(MAIN_template)   / sizeof(char *),
+   CURSOR_rows = sizeof(CURSOR_template) / sizeof(char *),
+   KEYPAD_rows = sizeof(KEYPAD_template) / sizeof(char *),
      };
 
 static_assert(MAIN_rows == KEYPAD_rows);
+static_assert(MAIN_rows == CURSOR_rows);
 
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 
@@ -98,7 +119,9 @@ Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
-int area = 0;   // main keys
+   // clear the key_map from the previous invocation
+   //
+  loop(k, 256)   key_map[k].keycode = 0;
 
    enum
       {
@@ -112,6 +135,7 @@ int area = 0;   // main keys
       };
 
 int mode = MO_NONE;
+int area = KB_AREA_MAIN;   // main keys
    loop(a, args.size())
       {
         if      (args[a].starts_iwith("XMOD"))   mode |= MO_XMODMAP;
@@ -119,8 +143,9 @@ int mode = MO_NONE;
         else if (args[a].starts_iwith("USER"))   mode |= MO_USERFILE;
         else if (args[a].starts_iwith("GUESS"))  mode |= MO_BUILTIN;
         else if (args[a].starts_iwith("KEYS"))   mode |= MO_KEYS;
-        else if (args[a].starts_iwith("KPAD"))   area |= 1;
-        else if (args[a].starts_iwith("FUNK"))   area |= 2;
+        else if (args[a].starts_iwith("KPAD"))   area |= KB_AREA_KEYPAD;
+        else if (args[a].starts_iwith("FUNK"))   area |= KB_AREA_FUNKEY;
+        else if (args[a].starts_iwith("CURS"))   area |= KB_AREA_CURSOR;
         else
            {
              CERR << "Bad Command+" << endl;
@@ -151,13 +176,13 @@ const bool no_mode = mode == MO_NONE;
 
    if (mode & MO_KEYS)
       {
-        print_keycodes(out, area);
+        print_keycodes(out, KB_Area(area));
       }
 
    if (mode & MO_XKBD)
       {
         const bool got_map = ! read_xkbd_map();
-        if (got_map)   print_keymap(out, area);
+        if (got_map)   print_keymap(out, KB_Area(area));
         return;
       }
 
@@ -190,14 +215,14 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
              else
                 {
                   Workspace::more_error().clear();
-                  print_keymap(out, area);
+                  print_keymap(out, KB_Area(area));
                 }
              return;
            }
 
         if (!xmodmap_error)   // xmodmap succeeded
            {
-             print_keymap(out, area);
+             print_keymap(out, KB_Area(area));
              return;
            }
       }
@@ -420,7 +445,8 @@ int Ucount = 0;
    for (j = 0; j < 4; ++j)
        {
          debug && cout << "   See: '" << p << "'" << endl;
-         if (parse_Unicode(Keycode(keycode), p, unicodes[j]))   ++Ucount;
+         uint32_t & uni = unicodes[j];
+         if (parse_xmodmap_Unicode(Keycode(keycode), p, uni))   ++Ucount;
        }
 
    if (debug)
@@ -450,17 +476,22 @@ Cmd_KEYB::read_xkbd_map()
 
    // 1. figure the keycodes in the templates
    //
-   read_xkbd_template(main_template,   MAIN_rows);
-   read_xkbd_template(funkey_template, FUNKEY_rows);
-   read_xkbd_template(keypad_template, KEYPAD_rows);
+   read_xkbd_template(FUNKEY_template, FUNKEY_rows);
+   read_xkbd_template(MAIN_template,   MAIN_rows);
+   read_xkbd_template(CURSOR_template, CURSOR_rows);
+   read_xkbd_template(KEYPAD_template, KEYPAD_rows);
 
    return false;   // OK
 }
 //---------------------------------------------------------------------------
 Unicode
-Cmd_KEYB::read_ksym(_XDisplay * display, int keycode, int level)
+Cmd_KEYB::read_xkbd_Ksym(_XDisplay * display, int keycode, int level)
 {
-const KeySym symbol = XkbKeycodeToKeysym(display,keycode, 0, level);
+KeySym symbol = XkbKeycodeToKeysym(display, keycode, 0, level);
+   if (symbol == 0)
+      {
+        symbol = XkbKeycodeToKeysym(display, keycode, 1, level & 1);
+      }
 
    if (symbol < 0x80)    return Unicode(symbol);
    if (symbol < 0x100)   return Unicode(symbol);
@@ -473,26 +504,60 @@ Cmd_KEYB::read_xkbd_template(const char ** lines, int line_count)
 {
 Display * display = XOpenDisplay(0);
 
-   loop(y, line_count - 1)
+bool data_coming = false;
+   loop(y, line_count - 2)
        {
-         const char * line  = lines[y];
-         const char * line1 = lines[y + 1];
-         const size_t len = strlen(line);
-         for (size_t x = 1; x < len - 1; ++x)
-             {
-               if (line[x] == 'K' && line[x + 1] == 'c')
-                  {
-                    // fix UTF8 offsets
-                    const char * p = line1 + x - 1;
-                    while (*p & 0x80)   ++p;
+         const UTF8_string u_utf(lines[y]);
+         const UCS_string u(u_utf);
 
-                    const int keycode = strtol(p, 0, 10) & 0xFF;
+         if (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
+             u[0] == UNI_LINE2_VERT_RIGHT)     // ╠
+            {
+              data_coming = true;
+              continue;
+            }
+
+         if (!data_coming)   continue;
+         data_coming = false;
+
+         const UTF8_string l_utf(lines[y + 1]);
+         const UCS_string l(l_utf);
+         for (size_t x = 1; x < u.size() - 1; ++x)
+             {
+               int ss = x;   while (u[ss] == UNI_SPACE)   ++ss;
+               if (Avec::is_A_to_Z(u[ss]))   // keycode marker
+                  {
+                    // extract the keycode
+                    //
+                    int keycode = 0;
+                    for (int xx = x; ; ++xx)
+                        {
+                           const Unicode cc = l[xx];
+                           if (cc == UNI_LINE2_VERT)   break;   // empty field
+                           if (cc == UNI_SPACE)   // leding or trailing space
+                              {
+                                if (keycode)   break;      // trailing: done
+                                else           continue;   // leading:  skip
+                              }
+
+                          Assert(cc >= UNI_0 && cc <= UNI_9);
+                          keycode = 10*keycode + (cc - UNI_0);
+                        }
+                    if (keycode == 0)   continue;
+
                     map_item & item = key_map[keycode];
                     item.keycode = keycode;
-                    item.unicodes[0] = read_ksym(display, keycode, 0);
-                    item.unicodes[1] = read_ksym(display, keycode, 1);
-                    item.unicodes[2] = read_ksym(display, keycode, 2);
-                    item.unicodes[3] = read_ksym(display, keycode, 3);
+                    item.unicodes[0] = read_xkbd_Ksym(display, keycode, 0);
+                    item.unicodes[1] = read_xkbd_Ksym(display, keycode, 1);
+                    item.unicodes[2] = read_xkbd_Ksym(display, keycode, 2);
+                    item.unicodes[3] = read_xkbd_Ksym(display, keycode, 3);
+
+                    // show only base if shifted is the same
+                    //
+                    if (item.unicodes[0] == item.unicodes[1])
+                        item.unicodes[1] = UNI_SPACE;
+                    if (item.unicodes[2] == item.unicodes[3])
+                        item.unicodes[3] = UNI_SPACE;
                   }
              }
        }
@@ -514,7 +579,8 @@ Cmd_KEYB::read_xkbd_map()
 
 //----------------------------------------------------------------------------
 bool
-Cmd_KEYB::parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode)
+Cmd_KEYB::parse_xmodmap_Unicode(Keycode keycode, const char * & p,
+                                uint32_t & unicode)
 {
    /* parse the keysym starting at p. The full line might look like ths:
  
@@ -528,7 +594,7 @@ Cmd_KEYB::parse_Unicode(Keycode keycode, const char * & p, uint32_t & unicode)
       2. a symbolic name like 'parenright'm or
       3. a Unicode like 'U2227'
     */
-   unicode = 0;   // assume error
+   unicode = Unicode_0;   // assume error
 
    while (*p == ' ')   ++p;   // skip leading whitespace
    if (*p == 0)   return false;
@@ -642,47 +708,59 @@ static const struct symkey
    return false;
 }
 //----------------------------------------------------------------------------
-ostream &
-Cmd_KEYB::print_keycodes(ostream & out, int area)
+void
+Cmd_KEYB::get_template(UCS_string_vector & result, KB_Area area)
 {
-   out << "Physical Keyboard:      Source: GNU APL builtin"
-       << endl << endl;
+   Assert(result.size() == 0);
 
-int fun_rows = 0;
-UCS_string_vector lines;
-
-   if (area & 2)   // including function keys
+   if (area & KB_AREA_FUNKEY)   // including function keys
       {
-        fun_rows = FUNKEY_rows;
-        loop(y, fun_rows)
+        loop(y, FUNKEY_rows)
             {
-              const UTF8_string utf(funkey_template[y]);
+              const UTF8_string utf(FUNKEY_template[y]);
               const UCS_string ucs(utf);
-              lines.push_back(ucs);
+              result.push_back(ucs);
             }
       }
 
    loop (y, MAIN_rows)
-       {
-         const UTF8_string utf(main_template[y]);
-         const UCS_string ucs(utf);
-         lines.push_back(ucs);
-         if (area & 1)
-            {
-              const UTF8_string utf(keypad_template[y]);
-              UCS_string ucs(utf);
-              lines.back() <<  "    " << ucs;
-            }
-       }
+        {
+          const UTF8_string utf(MAIN_template[y]);
+          const UCS_string ucs(utf);
+          result.push_back(ucs);
 
-const int rows = lines.size();
-   loop(y, rows)   out << lines[y] << endl;
+          if (area & KB_AREA_CURSOR)
+             {
+               const UTF8_string utf(CURSOR_template[y]);
+               const UCS_string ucs(utf);
+               result.back() <<  "    " << ucs;
+             }
+
+          if (area & KB_AREA_KEYPAD)
+             {
+               const UTF8_string utf(KEYPAD_template[y]);
+               const UCS_string ucs(utf);
+               result.back() <<  "    " << ucs;
+             }
+        }
+}
+//----------------------------------------------------------------------------
+ostream &
+Cmd_KEYB::print_keycodes(ostream & out, KB_Area area)
+{
+   out << "Physical Keyboard:      Source: GNU APL builtin"
+       << endl << endl;
+
+UCS_string_vector lines;
+   get_template(lines, area);
+
+   loop(y, lines.size())   out << lines[y] << endl;
    out << endl;
    return out;
 }
 //----------------------------------------------------------------------------
 ostream &
-Cmd_KEYB::print_keymap(ostream & out, int area)
+Cmd_KEYB::print_keymap(ostream & out, KB_Area area)
 {
    out << "Keyboard Layout.    ";
    if (keymap_from_xkbd)   out << "Source: XkbKeycodeToKeysym()";
@@ -690,120 +768,108 @@ Cmd_KEYB::print_keymap(ostream & out, int area)
    out << endl << endl;
 
 UCS_string_vector lines;
-
-   loop (y, MAIN_rows)
-       {
-         const UTF8_string utf(main_template[y]);
-         const UCS_string ucs(utf);
-         lines.push_back(ucs);
-         if (area & 1)
-            {
-              const UTF8_string utf(keypad_template[y]);
-              UCS_string ucs(utf);
-              lines.back() <<  "    " << ucs;
-            }
-       }
+   get_template(lines, area);
 
 const int rows = lines.size();
 
+bool data_coming = false;
    loop(y, rows - 2)
        {
          UCS_string & u = lines[y];
+         if (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
+             u[0] == UNI_LINE2_VERT_RIGHT)     // ╠
+         {
+              data_coming = true;
+              continue;
+            }
+         if (!data_coming)   continue;
+         data_coming = false;
+
          UCS_string & l = lines[y + 1];
          for (size_t x = 1; x < u.size(); ++x)
              {
-               if (u[x] == UNI_K && u[x+1] == UNI_c)   // Kc marker
+               int ss = x;   while (u[ss] == UNI_SPACE)   ++ss;
+               if (Avec::is_A_to_Z(u[ss]))   // keycode marker
                   {
-                    // get keycode
-                    const int h = l[x - 1] == UNI_SPACE   // hundreds
-                                            ? 0 : l[x - 1] - UNI_0;
-                    const int t = l[x] - UNI_0;                    // tens
-                    const int o = l[x + 1] - UNI_0;                // tens
-                    const int keycode = 100*h + 10*t + o;
+                    // extract the keycode
+                    //
+                    int keycode = 0;
+                    int k0 = 0;   // first keycode digit
+                    for (int xx = x; ; ++xx)
+                        {
+                           const Unicode cc = l[xx];
+                           if (cc == UNI_SPACE)   // leding or trailing space
+                              {
+                                if (keycode)   break;      // trailing: done
+                                else           continue;   // leading:  skip
+                              }
+
+                          if (k0 == 0)   k0 = xx;
+                          Assert(cc >= UNI_0 && cc <= UNI_9);
+                          keycode = 10*keycode + (cc - UNI_0);
+                        }
                     const map_item & item = key_map[keycode];
 
-                   // clear key field
-                   //
-                    u[x] = u[x+1] = l[x-1] = l[x] = l[x+1] = UNI_SPACE;
+                    // clear the field
+                    //
+                    int xx = x;
+                    while (u[xx - 1] != UNI_LINE2_VERT)   --xx;
+                    for (; u[xx] != UNI_LINE2_VERT; ++xx)
+                        { u[xx] = l[xx] = UNI_SPACE; }
 
                     // fill in characters
                     //
                     switch(keycode)   // special key names
                        {
-                         case  9:   // ESC
-                              l[x] = UNI_E;   l[x+1] = UNI_S; l[x+2] = UNI_C;
-                              continue;
-
-                         case 22:   // BACKSPACE
-                              l[x] = UNI_B;   l[x+1] = UNI_A; l[x+2] = UNI_C;
-                              l[x+3] = UNI_K; l[x+4] = UNI_S; l[x+5] = UNI_P;
-                              continue;
-
-                         case 23:   // TAB
-                              l[x] = UNI_T;   l[x+1] = UNI_A; l[x+2] = UNI_B;
-                              continue;   // BACKSPACE
-
-                         case 36:   // RETURN
-                              l[x] = UNI_R;   l[x+1] = UNI_E; l[x+2] = UNI_T;
-                              l[x+3] = UNI_U; l[x+4] = UNI_R; l[x+5] = UNI_N;
-                              continue;
-
-                         case 37:
-                         case 105:   // CTRL
-                              l[x-1] = UNI_C;   l[x] = UNI_T; l[x+1] = UNI_R;
-                              l[x+2] = UNI_L;
-                              continue;
-
-                         case 50:
-                         case 62:   // SHIFT
-                              l[x] = UNI_S;   l[x+1] = UNI_H; l[x+2] = UNI_I;
-                              l[x+3] = UNI_F; l[x+4] = UNI_T;
-                              continue;
-
-                         case 65:   // SPACE
-                              l[x-2] = UNI_S; l[x-1] = UNI_P; l[x] = UNI_A;
-                              l[x+1] = UNI_C; l[x+2] = UNI_E;
-                              continue;
-
-                         case 66:   // CAPS LOCK
-                              u[x] = UNI_L_PARENT; u[x+1] = UNI_C;
-                              u[x+2] = UNI_A; u[x+3] = UNI_P; u[x+4] = UNI_S;
-                              l[x] = UNI_L;   l[x+1] = UNI_O; l[x+2] = UNI_C;
-                              l[x+3] = UNI_K; l[x+4] = UNI_R_PARENT;
-                              continue;
-
-                         case  64:
-                         case 113:
-                              l[x] = UNI_A;   l[x+1] = UNI_L; l[x+2] = UNI_T;
-                              continue;
-                         case 115:
-                         case 116:
-                              l[x] = UNI_W;   l[x+1] = UNI_i; l[x+2] = UNI_n;
-                              continue;
+                         case 22:  copy_text(l[x+1],  "BACKSP");   goto next;
+                         case 23:  copy_text(l[x+2],  "TAB");      goto next;
+                         case 36:  copy_text(l[x+1],  "RETURN");   goto next;
+                         case 37:  copy_text(l[x],    "CTRL");     goto next;
+                         case 50:  copy_text(l[x+4],  "SHIFT");    goto next;
+                         case 62:  copy_text(l[x+2],  "SHIFT");    goto next;
+                         case 65:  copy_text(l[x+14], "SPACE");    goto next;
+                         case 66:  copy_text(u[x+1],  "(CAPS");  
+                                   copy_text(l[x+2],  "LOCK)");    goto next;
+                         case 105: copy_text(l[x],    "CTRL");     goto next;
+                         case 133: 
+                         case 134: copy_text(l[x+1],  "Win");      goto next;
                        }
 
-                    if (const Unicode uni = item.unicodes[0])   // lowercase
+                    if (item.keycode)
                        {
-                         l[x] = Unicode(uni & 0xFFFF);
-                       }
-                    if (const Unicode uni = item.unicodes[1])   // SHIFT
-                       {
-                         u[x] = Unicode(uni & 0xFFFF);
-                       }
-                    if (const Unicode uni = item.unicodes[2])   // ALT
-                       {
-                         l[x+1] = Unicode(uni & 0xFFFF);
-                       }
-                    if (const Unicode uni = item.unicodes[3])   // ALT
-                       {
-                         u[x+1] = Unicode(uni & 0xFFFF);
+                         if (const Unicode uni = item.unicodes[0])   // lowercase
+                            {
+                              l[k0] = Unicode(uni & 0xFFFF);
+                            }
+                         if (const Unicode uni = item.unicodes[1])   // SHIFT
+                            {
+                              u[k0] = Unicode(uni & 0xFFFF);
+                            }
+                         if (const Unicode uni = item.unicodes[2])   // ALT
+                            {
+                              l[k0+1] = Unicode(uni & 0xFFFF);
+                            }
+                         if (const Unicode uni = item.unicodes[3])   // ALT
+                            {
+                              u[k0+1] = Unicode(uni & 0xFFFF);
+                            }
                        }
                   }
+
+               next:
+               while (x < u.size() && u[x] != UNI_LINE2_VERT)   ++x;
              }
        }
 
    for (int y = 0; y < rows; ++y)   out << lines[y] << endl;
    return out;
+}
+//----------------------------------------------------------------------------
+void
+Cmd_KEYB::copy_text(Unicode & start, const char * text)
+{
+Unicode * p = &start;
+   while (*text)   *p++ = Unicode(*text++);
 }
 //----------------------------------------------------------------------------
 // EOF
