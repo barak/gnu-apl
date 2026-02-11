@@ -155,7 +155,6 @@ const UCS_string suffix(line, multi_pos + 3);
              SYNTAX_ERROR;
            }
 
-        content[0] << " " << suffix;
         Value_P literal = literals.pull_last();
         do_APL_expression(content[0], literal);
       }

@@ -837,19 +837,19 @@ bool data_coming = false;
 
                     if (item.keycode)
                        {
-                         if (const Unicode uni = item.unicodes[0])   // lowercase
+                         if (uint32_t uni = item.unicodes[0])   // lowercase
                             {
                               l[k0] = Unicode(uni & 0xFFFF);
                             }
-                         if (const Unicode uni = item.unicodes[1])   // SHIFT
+                         if (uint32_t uni = item.unicodes[1])   // SHIFT
                             {
                               u[k0] = Unicode(uni & 0xFFFF);
                             }
-                         if (const Unicode uni = item.unicodes[2])   // ALT
+                         if (uint32_t uni = item.unicodes[2])   // ALT
                             {
                               l[k0+1] = Unicode(uni & 0xFFFF);
                             }
-                         if (const Unicode uni = item.unicodes[3])   // ALT
+                         if (uint32_t uni = item.unicodes[3])   // ALT SHIFT
                             {
                               u[k0+1] = Unicode(uni & 0xFFFF);
                             }

@@ -9471,7 +9471,7 @@ RANK ERROR
 
       ⍝ Test 1c.
       ⍝
-      'abc'
+      'abc'[b][2]
 b
 @end example
 
