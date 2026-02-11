@@ -375,7 +375,7 @@ Unicode_source src(input);
                    ++src;
                    break;
 
-              case TC_QUOTE:
+              case TC_QUOTE:   // ' or " or « or »
                    if (tok.get_tag() == TOK_QUOTE1)
                       tokenize_string1(src, tos, rest_2);
                    else
@@ -546,6 +546,7 @@ Tokenizer::tokenize_string1(Unicode_source & src, Token_string & tos,
 {
    Log(LOG_tokenize)   CERR << "tokenize_string1(" << src << ")" << endl;
 
+const int start_pos = src.get_pos();
 const Unicode uni = src.get();
    Assert(Avec::is_single_quote(uni));
 
@@ -585,7 +586,17 @@ bool got_end = false;
             }
        }
 
-   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+   // at this point, got_end could be false if (the start of )an old-style
+   // multiline string was tokenized. Such strings are, however, only allowed
+   // in function definition mode (aka. PM_FUNCTION).
+   //
+   if (pmode != PM_FUNCTION && !got_end)
+      {
+        const int pos = start_pos + Workspace::get_IO();
+        MORE_ERROR() << "Standard APL string (i.e. '...'): start at "
+                        "column (prompt+" << pos << "), but no end.";
+        Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+      }
 
    if (string_value.size() == 1)   // scalar
       {
@@ -598,8 +609,8 @@ bool got_end = false;
 }
 //----------------------------------------------------------------------------
 /** tokenize a double quoted string, i.e.  "..." or «...».
- ** If the string is a single character, then we
- **  return a TOK_CHARACTER, otherwise TOK_APL_VALUE1.
+ ** Unlike '...' strings (which may be character scalars or character vectors,
+    are "..." and «...» strings always character vectors.
  **
  ** for special cases ««« and »»» do nothing.
  **/
@@ -609,8 +620,10 @@ Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos,
 {
    Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << endl;
 
-   // remember the leading ", «. or »
+const int start_pos = src.get_pos();
 
+   // remember the leading ", «. or »
+   //
 const Unicode first = src.get();
 Unicode last = Invalid_Unicode;   // no last
    if (first == UNI_DOUBLE_QUOTE)
@@ -625,7 +638,7 @@ Unicode last = Invalid_Unicode;   // no last
       {
         if (src.rest_len() >= 2     &&
             src[0] == UNI_RIGHT_DAQ &&
-            src[1] == UNI_RIGHT_DAQ)   // special case: «««
+            src[1] == UNI_RIGHT_DAQ)   // special case: »»»
            {
              ++src;   ++src;   // discard second and third »
              return;
@@ -651,9 +664,10 @@ bool got_end = false;
 
          if (uni == UNI_CR)          // ignore CR
             {
-              continue;
+              continue;   // while (src.has_more())
             }
-         else if (uni == UNI_LF)          // end of line before "
+
+         if (uni == UNI_LF)          // end of line before " or »
             {
               rest_2 = src.rest_len();
               if (UserPreferences::uprefs.old_multi_line_strings)
@@ -666,25 +680,58 @@ bool got_end = false;
               const Unicode uni1 = src.get();
               switch(uni1)
                  {
-                   case '0':  string_value << UNI_NUL;            break;
-                   case 'a':  string_value << UNI_BEL;            break;
-                   case 'b':  string_value << UNI_BS;             break;
-                   case 't':  string_value << UNI_HT;             break;
-                   case 'n':  string_value << UNI_LF;             break;
-                   case 'v':  string_value << UNI_VT;             break;
-                   case 'f':  string_value << UNI_FF;             break;
-                   case 'r':  string_value << UNI_CR;             break;
-                   case '[':  string_value << UNI_ESC;            break;
-                   case '"':  string_value << UNI_DOUBLE_QUOTE;   break;
-                   case '\\': string_value << UNI_BACKSLASH;      break;
+                   case UNI_0:
+                   case UNI_L_BRACK:
+                   case UNI_DOUBLE_QUOTE:
+                   case UNI_LEFT_DAQ:
+                   case UNI_RIGHT_DAQ:
+                   case UNI_BACKSLASH: string_value << uni1;      break;
+
+                   case UNI_a:  string_value << UNI_BEL;            break;
+                   case UNI_b:  string_value << UNI_BS;             break;
+                   case UNI_t:  string_value << UNI_HT;             break;
+                   case UNI_n:  string_value << UNI_LF;             break;
+                   case UNI_v:  string_value << UNI_VT;             break;
+                   case UNI_f:  string_value << UNI_FF;             break;
+                   case UNI_r:  string_value << UNI_CR;             break;
                    default:   string_value << uni << uni1;
                  }
+            }
+         else if (uni == UNI_LEFT_DAQ)   // « another
+            {
+              MORE_ERROR() << "Invalid start of « string inside a « string";
+              Error::throw_parse_error(E_NESTED_DAQ_STRING, LOC, loc);
             }
          else
             {
               string_value << uni;
             }
        }
+
+   // at this point, got_end could be false if (the start of )an old-style
+   // multiline string was tokenized. Such strings are, however, only allowed
+   // in function definition mode (aka. PM_FUNCTION).
+   //
+   if (pmode != PM_FUNCTION && !got_end)
+      {
+        const int pos = start_pos + Workspace::get_IO();
+        if (first == UNI_DOUBLE_QUOTE)
+           {
+             MORE_ERROR() << "Double quoted string (i.e. \"...\"): start at "
+                             "column (prompt+" << pos << "), but no end.";
+             Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+           }
+        if (first == UNI_LEFT_DAQ)
+           {
+             MORE_ERROR() << "DAQ string (i.e. «...»): start « at column "
+                             "(prompt+" << pos << "), but no ending ».";
+             Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+           }
+
+        MORE_ERROR() << "DAQ string (i.e. «...»): end » at column (prompt+"
+                     << pos << "), but no starting «.";
+        Error::throw_parse_error(E_NO_STRING_START, LOC, loc);
+      }
 
    if (got_end || UserPreferences::uprefs.old_multi_line_strings)
       {

@@ -295,7 +295,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-dist_noinst_DATA = xmodmap.apl xmodmap.ascii
+
+# config files for xkbcomp and xmodmap
+#
+dist_noinst_DATA = apl.xkb          \
+                   ascii.xkb        \
+                   xmodmap.apl      \
+                   xmodmap.ascii 
+
 all: all-am
 
 .SUFFIXES:

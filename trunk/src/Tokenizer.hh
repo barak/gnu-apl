@@ -97,6 +97,11 @@ public:
    /// return the underlying UCS_string
    const UCS_string & data() const
       { return str; }
+
+   /// return the current position
+   int get_pos() const
+      { return idx; }
+
 protected:
    /// the source string
    const UCS_string & str;

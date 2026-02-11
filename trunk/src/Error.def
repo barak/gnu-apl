@@ -74,6 +74,8 @@ err_def(UNBALANCED_R_BRACKET,"Unbalanced right square bracket" ,   2, 0x1B02 )
 err_def(UNBALANCED_R_CURLY,  "Unbalanced right curly bracket"  ,   2, 0x1C02 )
 err_def(ILLEGAL_COLON_EXEC,  "Illegal : in ⍎"                  ,   2, 0x0D02 )
 err_def(ILLEGAL_DIAMOND,     "Illegal ◊ in { ... }"            ,   2, 0x0E02 )
+err_def(NESTED_DAQ_STRING,   "Nested «...» string"             ,   2, 0x0F02 )
+err_def(NO_STRING_START,     "No string start found"           ,   2, 0x1002 )
 err_def(LEFT_SYNTAX_ERROR,   "SYNTAX ERROR"                    ,   2,      4 )
 
 err_def(VALUE_ERROR,         "VALUE ERROR"                     ,   3,      1 )
