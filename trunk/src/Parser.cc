@@ -80,7 +80,7 @@ Multi_line_SM::next(Unicode triple)
         // an error
         //
         CERR << endl << "*** WARNING: unexpected triplet "
-             << triple << triple << triple << " in mult-iline string." << endl
+             << triple << triple << triple << " in mult-line string." << endl
              << "    Expected triplet: " << string_end << string_end
              << string_end << " (literal depth: " << literal_depth
              << ")." << endl
@@ -1421,7 +1421,14 @@ vector<Value_P>value_rows;   value_rows.reserve(100);
                     if (ZZ->get_rank() > 1)   RANK_ERROR;
                     len_Z += ZZ->element_count();
                   }
-               else FIXME;
+               else
+                  {
+                    MORE_ERROR() << "Invalid token '"
+                                 << tos[t].canonical(PR_APL_FUN)
+                                 << "' in multi-line literal.\nOnly "
+                                    "constant (!) APL values are permitted.";
+                    SYNTAX_ERROR;
+                  }
              }
 
          Value_P Z(len_Z, LOC);

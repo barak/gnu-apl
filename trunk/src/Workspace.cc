@@ -264,9 +264,9 @@ Workspace::immediate_execution(bool exit_on_error)
    for (;;)
        {
          try
-           {
+            {
               Command::process_lines();
-           }
+            }
          catch (Error & err)
             {
               if (!err.get_print_loc())
@@ -274,10 +274,14 @@ Workspace::immediate_execution(bool exit_on_error)
                    if (err.get_error_code() != E_DEFN_ERROR)
                       {
                         err.print_em(UERR, LOC);
-                        CERR << __FUNCTION__ << "() caught APL error "
-                             << HEX(err.get_error_code()) << " ("
-                             << err.error_name(err.get_error_code()) << ")"
-                             << endl;
+                        if (err.get_error_code() == E_SYNTAX_ERROR)   {}
+                        else
+                           {
+                             CERR << __FUNCTION__ << "() caught APL error "
+                                  << HEX(err.get_error_code()) << " ("
+                                  << err.error_name(err.get_error_code()) << ")"
+                                  << endl;
+                           }
 
                         IO_Files::apl_error(LOC);
                       }
