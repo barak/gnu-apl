@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 11, 2026.
+<p>February 12, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -10481,31 +10481,34 @@ syntax:
 <p>For this syntax to work, the following rules must be followed:
 </p>
 <ul>
-<li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> markers must be single tokens (2 adjacent Unicode
-  characters) That is, no whitespace (and in particular no line feed) is
-  permitted between the first and the second arrow. A single <b>→</b> is a valid
-  APL statement (named Escape). A linefeed between two <b>→</b> turns the single
-  token <b>→→</b> into two valid (though most of the time useless) Escape statements.
+<li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> markers must be single tokens (2
+        adjacent Unicode characters) That is, no whitespace (and in particular
+        no line feed) is permitted between the first and the second arrow. A
+        single <b>→</b> is a valid APL statement (named Escape). A linefeed
+        between two <b>→</b> turns the single token <b>→→</b> into two valid (though
+        most of the time useless) Escape statements.
 
-</li><li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> tokens are <b>end-of statement</b> markers (as opposed
-  to <b>beginning-of statement</b> markers). Each marker binds to the non-empty
-  statement left of it. APL is parsed line by line, so there can never be a
-  valid non-empty APL statement left of the first token of a line. As a
-  consequence, a <b>→→</b> token, a <b>←→</b> token, or a <b>←←</b> token at the beginning of
-  a line is a <b>SYNTAX ERROR</b>.
+</li><li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> tokens are <b>end-of-statement</b> markers
+        (as opposed to <b>beginning-of-statement</b> markers). Each marker
+        terminates the non-empty (!) statement(s) left of it. That is, 
+        <b>→→</b>, terminates the <b>COND</b> statement, <b>←→</b> terminates
+        the <b>THEN</b> statement(s), and <b>←←</b> terminates the <b>ELSE</b>
+        statement(s). As a consequence, a <b>→→</b> token, a <b>←→</b> token,
+        or a <b>←←</b> token at the beginning of a line is a <b>SYNTAX ERROR</b>.
 
-</li><li> The <b>COND</b>, <b>THEN</b>, and <b>ELSE</b> clauses shall be <b>non-empty (!)</b>
-  sequences of valid APL statements. In particular:
+</li><li> The <b>COND</b>, <b>THEN</b>, and <b>ELSE</b> clauses shall be
+        <b>non-empty (!)</b> sequences of valid APL statements.
+        In particular:
   <ul>
 <li> The condition <b>COND</b> shall be a <i>single statement</i> that evaluates
-  to a 1-item Boolean array (of any rank). The statement result of <b>COND</b>
-  is a committed value (and therefore not displayed).
+        to a 1-item Boolean array (of any rank). The statement result of
+        <b>COND</b> is a committed value (and is therefore not displayed).
 
 </li><li> The <b>THEN</b> clause shall be <i>one or more valid statements</i>,
-  possibly separated by <b>◊</b> for more than one statement.
+        possibly separated by <b>◊</b> for more than one statement.
 
-</li><li> The <b>ELSE</b> clause (if present) shall be <i>one or more valid statements</i>,
-  separated by <b>◊</b> for more than one statement.
+</li><li> The <b>ELSE</b> clause (if present) shall be <i>one or more valid
+        statements</i>, separated by <b>◊</b> for more than one statement.
   </li></ul>
 </li></ul>
 

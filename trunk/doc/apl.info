@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-February 11, 2026.  This manual briefly documents GNU APL, an
+February 12, 2026.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -8999,19 +8999,19 @@ syntax:
      between two → turns the single token →→ into two valid (though most
      of the time useless) Escape statements.
 
-   • The →→, ←→, and ←← tokens are end-of statement markers (as opposed
-     to beginning-of statement markers).  Each marker binds to the
-     non-empty statement left of it.  APL is parsed line by line, so
-     there can never be a valid non-empty APL statement left of the
-     first token of a line.  As a consequence, a →→ token, a ←→ token,
-     or a ←← token at the beginning of a line is a SYNTAX ERROR.
+   • The →→, ←→, and ←← tokens are end-of-statement markers (as opposed
+     to beginning-of-statement markers).  Each marker terminates the
+     non-empty (!)  statement(s) left of it.  That is, →→, terminates
+     the COND statement, ←→ terminates the THEN statement(s), and ←←
+     terminates the ELSE statement(s).  As a consequence, a →→ token, a
+     ←→ token, or a ←← token at the beginning of a line is a SYNTAX
+     ERROR.
 
    • The COND, THEN, and ELSE clauses shall be non-empty (!)  sequences
      of valid APL statements.  In particular:
-
         • The condition COND shall be a single statement that evaluates
           to a 1-item Boolean array (of any rank).  The statement result
-          of COND is a committed value (and therefore not displayed).
+          of COND is a committed value (and is therefore not displayed).
 
         • The THEN clause shall be one or more valid statements,
           possibly separated by ◊ for more than one statement.
@@ -11611,38 +11611,38 @@ Node: XML Queries372194
 Node: Conditionals373064
 Node: Design considerations.373494
 Node: Syntax380706
-Node: Possible Pitfalls384675
-Node: Matrix Product387447
-Node: Monadic ≠ (Nub Sieve)390750
-Node: Limitations and Missing Features391298
-Node: System Limits391733
-Node: Shared Variables393035
-Node: Internationalization394117
-Node: Vector Notation395298
-Node: History395894
-Node: Standardization396632
-Node: Quotes from the lrm397141
-Node: Some APL2 Tests399301
-Node: Test 1: Binding strength of []399716
-Node: Test 2: Binding strength of the left operand400554
-Node: Definitions405330
-Node: Unexpected Stranding408357
-Node: GNU APL Vector Notation417123
-Node: GNU APL Project Structure423117
-Node: The subdirectory src424636
-Node: The subdirectory support-files426000
-Node: The subdirectory doc426413
-Node: The subdirectory HOWTOs426711
-Node: The subdirectories workspaces and wslib2 ... wslib5427450
-Node: The subdirectory m4428004
-Node: The subdirectories debian and debian_tmp428870
-Node: The subdirectory tools429360
-Node: Libraries Contributed by GNU APL Users429818
-Node: The GNU APL Community Webpage430295
-Node: Core Libraries431032
-Node: Licenses for this GNU APL Manual and for GNU APL431913
-Node: The GNU Free Documentation License432458
-Node: The GNU GENERAL PUBLIC LICENSE457852
+Node: Possible Pitfalls384709
+Node: Matrix Product387481
+Node: Monadic ≠ (Nub Sieve)390784
+Node: Limitations and Missing Features391332
+Node: System Limits391767
+Node: Shared Variables393069
+Node: Internationalization394151
+Node: Vector Notation395332
+Node: History395928
+Node: Standardization396666
+Node: Quotes from the lrm397175
+Node: Some APL2 Tests399335
+Node: Test 1: Binding strength of []399750
+Node: Test 2: Binding strength of the left operand400588
+Node: Definitions405364
+Node: Unexpected Stranding408391
+Node: GNU APL Vector Notation417157
+Node: GNU APL Project Structure423151
+Node: The subdirectory src424670
+Node: The subdirectory support-files426034
+Node: The subdirectory doc426447
+Node: The subdirectory HOWTOs426745
+Node: The subdirectories workspaces and wslib2 ... wslib5427484
+Node: The subdirectory m4428038
+Node: The subdirectories debian and debian_tmp428904
+Node: The subdirectory tools429394
+Node: Libraries Contributed by GNU APL Users429852
+Node: The GNU APL Community Webpage430329
+Node: Core Libraries431066
+Node: Licenses for this GNU APL Manual and for GNU APL431947
+Node: The GNU Free Documentation License432492
+Node: The GNU GENERAL PUBLIC LICENSE457886
 
 End Tag Table
 

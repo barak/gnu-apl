@@ -172,9 +172,9 @@ const ShapeItem end = input.size();
 
    // handle label (if any)
    //
-   if (get_parse_mode() == PM_FUNCTION &&   // defined function, and
-       end > 1                         &&   // at least 2 token, and
-       input[1].get_tag() == TOK_COLON &&   // second token is :, and
+   if (get_parse_mode() == PM_FUNCTION &&   // defined function
+       end > 1                         &&   // at least 2 tokens
+       input[1].get_tag() == TOK_COLON &&   // second token is :
        input[0].get_tag() == TOK_SYMBOL)    // first token is (label-) name
       {
         Token tok_sym = input[0];   // get the label symbol
@@ -185,7 +185,7 @@ const ShapeItem end = input.size();
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
 
-   // each →→ ←→ and →→ bind to the statement left of it,
+   // each →→, ←→, or →→ binds to the statement left of it,
    // which must therefore not be empty.
    //
    if (idx < end && input[idx].is_COND())
@@ -343,13 +343,21 @@ vector<conditional> conditionals;
                      const conditional cond = { pc, Function_PC(-2) };
                      conditionals.push_back(cond);
                    }
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                     CERR << "\n*** WARNING: TC_END before TOK_IF_THEN" << endl;
+                   Log(LOG_IfElse)
+                      {
+                        if (pc && body[pc-1].get_Class() == TC_END)
+                           {
+                             CERR << "\n*** WARNING: TC_END before TOK_IF_THEN"
+                                  << endl;
+                           }
+                      }
                    continue;
           
               case TOK_IF_ELSE:   // ←→
                    Log(LOG_IfElse)
-                      CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+                      {
+                        CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+                      }
           
                    if (conditionals.size() == 0)
                       {
@@ -358,6 +366,7 @@ vector<conditional> conditionals;
                         cause_PC.low = pc;
                         goto error;
                       }
+
                    if (conditionals.back().if_ELSE >= 0)
                       {
                         cause = "duplicate ←→ (aka. duplicate ELSE)";
@@ -366,14 +375,23 @@ vector<conditional> conditionals;
                         cause_PC.high = pc;
                         goto error;
                       }
+
                    conditionals.back().if_ELSE = pc;
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                     CERR << "\n*** WARNING: TC_END before TOK_IF_ELSE" << endl;
+                   Log(LOG_IfElse)
+                      {
+                         if ( pc && body[pc-1].get_Class() == TC_END)
+                            {
+                              CERR << "\n*** WARNING: TC_END before TOK_IF_ELSE"
+                                   << endl;
+                            }
+                      }
                    continue;
           
               case TOK_IF_END:    // ←←
                    Log(LOG_IfElse)
-                      CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+                      {
+                        CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+                      }
           
                    if (conditionals.size() == 0)
                       {
@@ -396,9 +414,9 @@ vector<conditional> conditionals;
                      if (cond.if_ELSE  == (cond.if_THEN + 1))   // empty THEN
                         {
                           cause = "empty →→ ... ←→ (aka. empty THEN)";
-                        cause_line = get_line(pc);
-                        cause_PC.low = pc - 1;
-                        cause_PC.high = pc;
+                          cause_line = get_line(pc);
+                          cause_PC.low = pc - 1;
+                          cause_PC.high = pc;
                           goto error;
                         }
           
@@ -423,9 +441,15 @@ vector<conditional> conditionals;
                         }
                      conditionals.pop_back();
                    }
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                    CERR << "\n*** WARNING: TC_END before TOK_IF_END" << endl;
-          
+
+                   Log(LOG_IfElse)
+                      {
+                         if (pc && body[pc-1].get_Class() == TC_END)
+                            {
+                              CERR << "\n*** WARNING: TC_END before TOK_IF_END"
+                                   << endl;
+                            }
+                       }
                    continue;
           
               default:
@@ -450,8 +474,7 @@ vector<conditional> conditionals;
 
 error:
    MORE_ERROR() << cause;
-   CERR <<  cause << ". First observed on line ["
-        << cause_line << "]";
+   CERR <<  cause << ". First observed on line [" << cause_line << "]";
    if (cause_PC.low  != Function_PC_invalid)   CERR << ", PC=" << cause_PC.low;
    if (cause_PC.high != Function_PC_invalid)   CERR << "-" << cause_PC.high;
 

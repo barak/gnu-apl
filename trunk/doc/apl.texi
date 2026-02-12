@@ -8989,32 +8989,34 @@ syntax:
 For this syntax to work, the following rules must be followed:
 
 @itemize
-  @item The @b{→→}, @b{←→}, and @b{←←} markers must be single tokens (2 adjacent Unicode
-  characters) That is, no whitespace (and in particular no line feed) is
-  permitted between the first and the second arrow. A single @b{→} is a valid
-  APL statement (named Escape). A linefeed between two @b{→} turns the single
-  token @b{→→} into two valid (though most of the time useless) Escape statements.
+  @item The @b{→→}, @b{←→}, and @b{←←} markers must be single tokens (2
+        adjacent Unicode characters) That is, no whitespace (and in particular
+        no line feed) is permitted between the first and the second arrow. A
+        single @b{→} is a valid APL statement (named Escape). A linefeed
+        between two @b{→} turns the single token @b{→→} into two valid (though
+        most of the time useless) Escape statements.
 
-  @item The @b{→→}, @b{←→}, and @b{←←} tokens are @b{end-of statement} markers (as opposed
-  to @b{beginning-of statement} markers). Each marker binds to the non-empty
-  statement left of it. APL is parsed line by line, so there can never be a
-  valid non-empty APL statement left of the first token of a line. As a
-  consequence, a @b{→→} token, a @b{←→} token, or a @b{←←} token at the beginning of
-  a line is a @b{SYNTAX ERROR}.
+  @item The @b{→→}, @b{←→}, and @b{←←} tokens are @b{end-of-statement} markers
+        (as opposed to @b{beginning-of-statement} markers). Each marker
+        terminates the non-empty (!) statement(s) left of it. That is, 
+        @b{→→}, terminates the @b{COND} statement, @b{←→} terminates
+        the @b{THEN} statement(s), and @b{←←} terminates the @b{ELSE}
+        statement(s). As a consequence, a @b{→→} token, a @b{←→} token,
+        or a @b{←←} token at the beginning of a line is a @b{SYNTAX ERROR}.
 
-  @item The @b{COND}, @b{THEN}, and @b{ELSE} clauses shall be @b{non-empty (!)}
-  sequences of valid APL statements. In particular:
+  @item The @b{COND}, @b{THEN}, and @b{ELSE} clauses shall be
+        @b{non-empty (!)} sequences of valid APL statements.
+        In particular:
   @itemize
-
   @item The condition @b{COND} shall be a @i{single statement} that evaluates
-  to a 1-item Boolean array (of any rank). The statement result of @b{COND}
-  is a committed value (and therefore not displayed).
+        to a 1-item Boolean array (of any rank). The statement result of
+        @b{COND} is a committed value (and is therefore not displayed).
 
   @item The @b{THEN} clause shall be @i{one or more valid statements},
-  possibly separated by @b{◊} for more than one statement.
+        possibly separated by @b{◊} for more than one statement.
 
-  @item The @b{ELSE} clause (if present) shall be @i{one or more valid statements},
-  separated by @b{◊} for more than one statement.
+  @item The @b{ELSE} clause (if present) shall be @i{one or more valid
+        statements}, separated by @b{◊} for more than one statement.
   @end itemize
 @end itemize
 
