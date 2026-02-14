@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-February 12, 2026.  This manual briefly documents GNU APL, an
+February 14, 2026.  This manual briefly documents GNU APL, an
 interpreter for APL as described in ISO standard 13751, aka.
 "Programming Language APL, Extended".
 
@@ -8993,8 +8993,8 @@ syntax:
    For this syntax to work, the following rules must be followed:
 
    • The →→, ←→, and ←← markers must be single tokens (2 adjacent
-     Unicode characters) That is, no whitespace (and in particular no
-     line feed) is permitted between the first and the second arrow.  A
+     Unicode characters).  No whitespace (and in particular no line
+     feed) is permitted between the first and the second arrow.  A
      single → is a valid APL statement (named Escape).  A linefeed
      between two → turns the single token →→ into two valid (though most
      of the time useless) Escape statements.
@@ -9002,22 +9002,23 @@ syntax:
    • The →→, ←→, and ←← tokens are end-of-statement markers (as opposed
      to beginning-of-statement markers).  Each marker terminates the
      non-empty (!)  statement(s) left of it.  That is, →→, terminates
-     the COND statement, ←→ terminates the THEN statement(s), and ←←
-     terminates the ELSE statement(s).  As a consequence, a →→ token, a
-     ←→ token, or a ←← token at the beginning of a line is a SYNTAX
-     ERROR.
+     the single COND statement, ←→ terminates the THEN statement(s), and
+     ←← terminates the ELSE statement(s).
 
    • The COND, THEN, and ELSE clauses shall be non-empty (!)  sequences
      of valid APL statements.  In particular:
         • The condition COND shall be a single statement that evaluates
           to a 1-item Boolean array (of any rank).  The statement result
-          of COND is a committed value (and is therefore not displayed).
+          of COND is a committed value (and is therefore not being
+          displayed).
 
         • The THEN clause shall be one or more valid statements,
           possibly separated by ◊ for more than one statement.
 
         • The ELSE clause (if present) shall be one or more valid
           statements, separated by ◊ for more than one statement.
+   • A →→, ←→, or ←← token at the beginning of a line would terminate an
+     empty statement, which is a SYNTAX ERROR.
 
    Examples:
            ⍝ short format. Valid in immediate execution and in defined functions
@@ -9050,9 +9051,9 @@ syntax:
                 → X 'is negative' ←←
            ∇
            FOO 5
-     SYNTAX ERROR
+     SYNTAX ERROR+
      FOO[1]  X 'is positive'←
-
+             *              *
 
            ⍝ invalid split into several lines: ←→ is first token in line).
            ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
@@ -11611,38 +11612,38 @@ Node: XML Queries372194
 Node: Conditionals373064
 Node: Design considerations.373494
 Node: Syntax380706
-Node: Possible Pitfalls384709
-Node: Matrix Product387481
-Node: Monadic ≠ (Nub Sieve)390784
-Node: Limitations and Missing Features391332
-Node: System Limits391767
-Node: Shared Variables393069
-Node: Internationalization394151
-Node: Vector Notation395332
-Node: History395928
-Node: Standardization396666
-Node: Quotes from the lrm397175
-Node: Some APL2 Tests399335
-Node: Test 1: Binding strength of []399750
-Node: Test 2: Binding strength of the left operand400588
-Node: Definitions405364
-Node: Unexpected Stranding408391
-Node: GNU APL Vector Notation417157
-Node: GNU APL Project Structure423151
-Node: The subdirectory src424670
-Node: The subdirectory support-files426034
-Node: The subdirectory doc426447
-Node: The subdirectory HOWTOs426745
-Node: The subdirectories workspaces and wslib2 ... wslib5427484
-Node: The subdirectory m4428038
-Node: The subdirectories debian and debian_tmp428904
-Node: The subdirectory tools429394
-Node: Libraries Contributed by GNU APL Users429852
-Node: The GNU APL Community Webpage430329
-Node: Core Libraries431066
-Node: Licenses for this GNU APL Manual and for GNU APL431947
-Node: The GNU Free Documentation License432492
-Node: The GNU GENERAL PUBLIC LICENSE457886
+Node: Possible Pitfalls384764
+Node: Matrix Product387536
+Node: Monadic ≠ (Nub Sieve)390839
+Node: Limitations and Missing Features391387
+Node: System Limits391822
+Node: Shared Variables393124
+Node: Internationalization394206
+Node: Vector Notation395387
+Node: History395983
+Node: Standardization396721
+Node: Quotes from the lrm397230
+Node: Some APL2 Tests399390
+Node: Test 1: Binding strength of []399805
+Node: Test 2: Binding strength of the left operand400643
+Node: Definitions405419
+Node: Unexpected Stranding408446
+Node: GNU APL Vector Notation417212
+Node: GNU APL Project Structure423206
+Node: The subdirectory src424725
+Node: The subdirectory support-files426089
+Node: The subdirectory doc426502
+Node: The subdirectory HOWTOs426800
+Node: The subdirectories workspaces and wslib2 ... wslib5427539
+Node: The subdirectory m4428093
+Node: The subdirectories debian and debian_tmp428959
+Node: The subdirectory tools429449
+Node: Libraries Contributed by GNU APL Users429907
+Node: The GNU APL Community Webpage430384
+Node: Core Libraries431121
+Node: Licenses for this GNU APL Manual and for GNU APL432002
+Node: The GNU Free Documentation License432547
+Node: The GNU GENERAL PUBLIC LICENSE457941
 
 End Tag Table
 
