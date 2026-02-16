@@ -173,7 +173,7 @@ const ShapeItem end = input.size();
    // handle label (if any)
    //
    if (get_parse_mode() == PM_FUNCTION &&   // defined function
-       end > 1                         &&   // at least 2 tokens
+       end >= 2                        &&   // at least 2 tokens
        input[1].get_tag() == TOK_COLON &&   // second token is :
        input[0].get_tag() == TOK_SYMBOL)    // first token is (label-) name
       {
@@ -185,8 +185,10 @@ const ShapeItem end = input.size();
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
 
-   // each →→, ←→, or →→ binds to the statement left of it,
-   // which must therefore not be empty.
+   // each →→, ←→, or →→ binds to the statement left of it, which must not
+   // be empty. The left of the start of the line is empty, and a conditionalt
+   // at the start of the line would would bind to an empty statelement, which
+   // is a SYNTAX ERROR.
    //
    if (idx < end && input[idx].is_COND())
       {
@@ -220,13 +222,14 @@ Token_string output;   // in reverse order
    while (idx < end)   // loop over one line
       {
         // 1. determine the number of token (excluding ◊) in the statement
-        //    that starts at idx
+        //    that starts at idx. The END token may be missing and in that case
+        //    TOK_END is appended.
         //
         ShapeItem stat_len = 0;   // statement length, not counting ◊
         int diamond_len    = 0;   // ◊ length (if any)
         TokenTag tag_end   = TOK_END;
         int64_t tr         = trace ? 1 : 0;
-        loop(t, end - idx)   // loop over one statement
+        loop(t, end - idx)   // loop over one statement, starting at input[idx]
             {
               const Token & tok = input[idx + t];
               const TokenTag tag = tok.get_tag();
@@ -319,6 +322,23 @@ Token_string output;   // in reverse order
 bool
 Executable::compute_if_else_targets()
 {
+   /*
+      This function recursively matches corresponding TOK_IF_XXX token and
+      sets their int values to the pc of their companion. In a single sided
+      IF (i.e. without ELSE):
+
+      the intval of the TOK_IF_THEN token is the PC after the TOK_IF_END.
+
+      In a double sider IF/ELSE:
+
+      the intval of the TOK_IF_THEN token is the PC after the TOK_IF_ELSE.
+      the intval of the TOK_IF_ELSE token is the PC after the TOK_IF_END.
+
+      In Prefix::reduce_END_B__() these intvals are used to quickly jump over
+      the then resp. else clauses. All TOK_IF_XXX (as well as ◊ and \n)
+      belong to token class TC_END and are essentially ◊ tokens with this
+      additional jump information.
+    */
    Log(LOG_IfElse)
       {
          CERR << "initial body at " << LOC ":" << endl;
@@ -331,8 +351,9 @@ Function_PC2 cause_PC(Function_PC_invalid, Function_PC_invalid);
 
 vector<conditional> conditionals;
 
-   for (Function_PC pc = Function_PC_0; pc < body.ssize(); ++pc)
+   loop(b, body.size())
        {
+         const Function_PC pc = Function_PC(b);
          switch(body[pc].get_tag())
             {
               case TOK_IF_THEN:   // →→ (always allowed).
@@ -340,7 +361,7 @@ vector<conditional> conditionals;
                       CERR << "SEE →→ (then)  at [" << pc << "]" << endl;
           
                    {
-                     const conditional cond = { pc, Function_PC(-2) };
+                     const conditional cond(pc);
                      conditionals.push_back(cond);
                    }
                    Log(LOG_IfElse)
@@ -351,7 +372,7 @@ vector<conditional> conditionals;
                                   << endl;
                            }
                       }
-                   continue;
+                   continue;   // loop(b, body.size())
           
               case TOK_IF_ELSE:   // ←→
                    Log(LOG_IfElse)
@@ -385,7 +406,7 @@ vector<conditional> conditionals;
                                    << endl;
                             }
                       }
-                   continue;
+                   continue;   // loop(b, body.size())
           
               case TOK_IF_END:    // ←←
                    Log(LOG_IfElse)
@@ -411,7 +432,7 @@ vector<conditional> conditionals;
                             << "\n └── endif: " << pc
                             << endl;
           
-                     if (cond.if_ELSE  == (cond.if_THEN + 1))   // empty THEN
+                     if (cond.if_ELSE == (cond.if_THEN + 1))   // empty THEN
                         {
                           cause = "empty →→ ... ←→ (aka. empty THEN)";
                           cause_line = get_line(pc);
@@ -450,13 +471,16 @@ vector<conditional> conditionals;
                                    << endl;
                             }
                        }
-                   continue;
+                   continue;   // loop(b, body.size())
           
               default:
-                   continue;
+                   continue;   // loop(b, body.size())
             }
        }
 
+   // at this point, all conditionals shoud have been processed.
+   // If not, complain.
+   //
    if (conditionals.size())
       {
         cause = "→→ without ←← (aka. IF without ENDIF)";

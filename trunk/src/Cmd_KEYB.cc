@@ -38,15 +38,17 @@ bool Cmd_KEYB::keymap_from_xkbd = false;
 
 // See: /usr/share/X11/xkb/keycodes/xfree86
 
-const char * FUNKEY_template[] = {
-"╔════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
-"║ESC ║    ║FK01║FK02║FK03║FK04║    ║FK05║FK06║FK07║FK08║    ║FK09║FK10║FK11║FK12║    ║    ║SCLK║NMLK║",
-"║ 09 ║    ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║    ║ 78 ║ 77 ║",
-"╚════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
+const char * FUNKEY_template[] =
+{
+"╔═════╗   ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
+"║ ESC ║   ║FK01║FK02║FK03║FK04║    ║FK05║FK06║FK07║FK08║    ║FK09║FK10║FK11║FK12║    ║PRSC║SCLK║NMLK║",
+"║  8  ║   ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║107 ║ 78 ║ 77 ║",
+"╚═════╝   ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
 "",
 };
 
-const char * CURSOR_template[] = {
+const char * CURSOR_template[] =
+{
 "╔════╦════╦════╗",
 "║INS ║HOME║PGUP║",
 "║118 ║110 ║112 ║",
@@ -65,7 +67,8 @@ const char * CURSOR_template[] = {
 "╚════╩════╩════╝",
 };
 
-const char * KEYPAD_template[] = {
+const char * KEYPAD_template[] =
+{
 "╔════╦════╦════╦════╗",
 "║NMLK║    ║    ║KPSU║",
 "║ 77 ║    ║    ║ 82 ║",
@@ -84,7 +87,8 @@ const char * KEYPAD_template[] = {
 "╚═════════╩════╩════╝",
 };
 
-const char * MAIN_template[] = {
+const char * MAIN_template[] =
+{
 "╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗",
 "║TLDE║AE01║AE02║AE03║AE04║AE05║AE06║AE07║AE08║AE09║AE10║AE11║AE12║  BKSP   ║",
 "║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║   22    ║",
@@ -776,8 +780,8 @@ bool data_coming = false;
    loop(y, rows - 2)
        {
          UCS_string & u = lines[y];
-         if (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
-             u[0] == UNI_LINE2_VERT_RIGHT)     // ╠
+         if (u.size() && (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
+                          u[0] == UNI_LINE2_VERT_RIGHT))    // ╠
          {
               data_coming = true;
               continue;
@@ -821,6 +825,7 @@ bool data_coming = false;
                     //
                     switch(keycode)   // special key names
                        {
+                         case  8:  copy_text(l[x+1],  "ESC");      goto next;
                          case 22:  copy_text(l[x+1],  "BACKSP");   goto next;
                          case 23:  copy_text(l[x+2],  "TAB");      goto next;
                          case 36:  copy_text(l[x+1],  "RETURN");   goto next;

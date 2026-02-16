@@ -180,9 +180,14 @@ public:
    bool compute_if_else_targets();
 
 protected:
-   /// the body positions of the ←← and ←→ tokens of a congitional
+   /// the body positions of the ←← and ←→ tokens of a conditional
    struct conditional
       {
+        conditional(Function_PC pc)
+        : if_THEN(pc),
+          if_ELSE(Function_PC(-2))   // -2 means no ELSE clause
+        {}
+
         Function_PC if_THEN;   ///< position of the ←← token (end of condition)
         Function_PC if_ELSE;   ///< position of the ←→ token (before else)
       };

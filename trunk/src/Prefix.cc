@@ -342,11 +342,18 @@ const TokenClass tc = tok.get_Class();
         else          out << "0";
         return out << ")";
       }
-   else
+
+   if (tc == TC_END)
       {
-        out << (Token::class_name(tc) + 3);
+        const TokenTag tag = tok.get_tag();
+        if (tag == TOK_END)       return out << "◊";
+        if (tag == TOK_ENDL)      return out << "EOL";
+        if (tag == TOK_IF_THEN)   return out << "→→";
+        if (tag == TOK_IF_ELSE)   return out << "←→";
+        if (tag == TOK_IF_END)    return out << "←←";
       }
-   return out;
+
+   return out << (Token::class_name(tc) + 3);
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -715,12 +722,6 @@ Prefix::push_next_token()
       }
 
 again:
-
-   // TC_END is the end of the statement (i.e. the leftmost token in APL).
-   // The caller wants one more Token, but we may not have any. In that
-   /// case: prepare the )MORE info and throw a SYNTAX_ERROR.
-   //
-   if (ssize() && at0().get_Class() == TC_END)   push_END_error();
 
 const Function_PC old_PC = PC++;
 const Token & tok = body[old_PC];
@@ -2794,6 +2795,36 @@ const Token result(TOK_APL_VALUE2, at3().get_apl_val());
 }
 //----------------------------------------------------------------------------
 void
+Prefix::reduce_END___()
+{
+   /*
+      this phrase occurs only if none of the other reduce_END_XXX phrases
+      has matched. This happens rarely if either:
+
+      1. the entire statement was empty (and then ssize() == 1).
+         However, empty statements are normaly optimized away (in
+         Executable::parse_body_line() around line 277) so that this does
+         not happen under normal conditions, but conditionals may become
+         an exception in the future. Currently empty conditional clauses
+         are rejected at parse time in Executable::parse_body_line() around
+         line 193, but this may change.
+
+         or otherwise:
+
+      2. an invalid phrase. In this case there are tokens other than B,
+         VOID, or GOTO phrases on the stack and the end of statment is
+         reacehd. This is a SYNTAX ERROR and we can throw it here rather
+         than shifting the END token and failing then.
+
+         will trigger a SYNTAX ERROR because END X will not match.
+    */
+
+   if (ssize() > 1)   push_END_error();   // case 2
+
+   // case 1 (empty statement)
+}
+//----------------------------------------------------------------------------
+void
 Prefix::reduce_END_VOID__()
 {
    Assert1(prefix_len == 2);
@@ -2803,8 +2834,7 @@ Prefix::reduce_END_VOID__()
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
 const bool trace = end_of_line && (at0().get_int_val() & 1);
 
-   pop_and_discard();   // pop END
-   pop_and_discard();   // pop VOID
+   put = 0;             // pop END and VOID
 
 Token Void(TOK_VOID);
    si.statement_result(Void, trace);
