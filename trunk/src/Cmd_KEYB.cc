@@ -40,71 +40,71 @@ bool Cmd_KEYB::keymap_from_xkbd = false;
 
 const char * FUNKEY_template[] =
 {
-"╔═════╗   ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╦════╗    ╔════╦════╦════╗",
-"║ ESC ║   ║FK01║FK02║FK03║FK04║    ║FK05║FK06║FK07║FK08║    ║FK09║FK10║FK11║FK12║    ║PRSC║SCLK║NMLK║",
-"║  8  ║   ║ 67 ║ 68 ║ 69 ║ 70 ║    ║ 71 ║ 72 ║ 73 ║ 74 ║    ║ 75 ║ 76 ║ 95 ║ 96 ║    ║107 ║ 78 ║ 77 ║",
-"╚═════╝   ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╩════╝    ╚════╩════╩════╝",
+"┌─────┐   ┌────┬────┬────┬────┐  ┌────┬────┬────┬────┐  ┌────┬────┬────┬────┐   ┌────┬────┬────┐",
+"│ ESC │   │FK01│FK02│FK03│FK04│  │FK05│FK06│FK07│FK08│  │FK09│FK10│FK11│FK12│   │PRSC│SCLK│NMLK│",
+"│  8  │   │ 67 │ 68 │ 69 │ 70 │  │ 71 │ 72 │ 73 │ 74 │  │ 75 │ 76 │ 95 │ 96 │   │107 │ 78 │ 77 │",
+"└─────┘   └────┴────┴────┴────┘  └────┴────┴────┴────┘  └────┴────┴────┴────┘   └────┴────┴────┘",
 "",
 };
 
 const char * CURSOR_template[] =
 {
-"╔════╦════╦════╗",
-"║INS ║HOME║PGUP║",
-"║118 ║110 ║112 ║",
-"╠════╬════╬════╣",
-"║DELE║END ║PGDN║",
-"║119 ║115 ║117 ║",
-"╚════╩════╩════╝",
+"┌────┬────┬────┐",
+"│INS │HOME│PGUP│",
+"│118 │110 │112 │",
+"├────┼────┼────┤",
+"│DELE│END │PGDN│",
+"│119 │115 │117 │",
+"└────┴────┴────┘",
 "                ",
 "                ",
-"     ╔════╗     ",
-"     ║ UP ║     ",
-"     ║111 ║     ",
-"╔════╬════╬════╗",
-"║LEFT║DOWN║RGHT║",
-"║113 ║116 ║114 ║",
-"╚════╩════╩════╝",
+"     ┌────┐     ",
+"     │ UP │     ",
+"     │111 │     ",
+"┌────┼────┼────┐",
+"│LEFT│DOWN│RGHT│",
+"│113 │116 │114 │",
+"└────┴────┴────┘",
 };
 
 const char * KEYPAD_template[] =
 {
-"╔════╦════╦════╦════╗",
-"║NMLK║    ║    ║KPSU║",
-"║ 77 ║    ║    ║ 82 ║",
-"╠════╬════╬════╬════╣",
-"║KP7 ║KP8 ║KP9 ║    ║",
-"║ 79 ║ 80 ║ 81 ║KPAD║",
-"╠════╬════╬════╣ 86 ║",
-"║KP4 ║KP5 ║KP6 ║    ║",
-"║ 83 ║ 84 ║ 85 ║    ║",
-"╠════╬════╬════╬════╣",
-"║KP1 ║KP2 ║KP3 ║    ║",
-"║ 87 ║ 88 ║ 89 ║KPEN║",
-"╠════╩════╬════╣104 ║",
-"║   KP0   ║KPDL║    ║",
-"║   90    ║ 91 ║    ║",
-"╚═════════╩════╩════╝",
+"┌────┬────┬────┬────┐",
+"│NMLK│    │    │KPSU│",
+"│ 77 │    │    │ 82 │",
+"├────┼────┼────┼────┤",
+"│KP7 │KP8 │KP9 │    │",
+"│ 79 │ 80 │ 81 │KPAD│",
+"├────┼────┼────┼ 86 │",
+"│KP4 │KP5 │KP6 │    │",
+"│ 83 │ 84 │ 85 │    │",
+"├────┼────┼────┼────┤",
+"│KP1 │KP2 │KP3 │    │",
+"│ 87 │ 88 │ 89 │KPEN│",
+"├────┼────┼────┤104 │",
+"│   KP0   │KPDL│    │",
+"│   90    │ 91 │    │",
+"└─────────┴────┴────┘",
 };
 
 const char * MAIN_template[] =
 {
-"╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═════════╗",
-"║TLDE║AE01║AE02║AE03║AE04║AE05║AE06║AE07║AE08║AE09║AE10║AE11║AE12║  BKSP   ║",
-"║ 49 ║ 10 ║ 11 ║ 12 ║ 13 ║ 14 ║ 15 ║ 16 ║ 17 ║ 18 ║ 19 ║ 20 ║ 21 ║   22    ║",
-"╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣",
-"║  TAB  ║AD01║AD02║AD03║AD04║AD05║AD06║AD07║AD08║AD09║AD00║AD10║AD11║ BKSL ║",
-"║  23   ║ 24 ║ 25 ║ 26 ║ 27 ║ 28 ║ 29 ║ 30 ║ 31 ║ 32 ║ 33 ║ 34 ║ 35 ║  51  ║",
-"╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣",
-"║  CAPS   ║AC01║AC02║AC03║AC04║AC05║AC06║AC07║AC08║AC09║AC10║AC11║  RTRN   ║",
-"║   66    ║ 38 ║ 39 ║ 40 ║ 41 ║ 42 ║ 43 ║ 44 ║ 45 ║ 46 ║ 47 ║ 48 ║   36    ║",
-"╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣",
-"║    LFSH     ║AB01║AB02║AB03║AB04║AB05║AB06║AB07║AB08║AB09║AB10║   RTSH   ║",
-"║     50      ║ 52 ║ 53 ║ 54 ║ 55 ║ 56 ║ 57 ║ 58 ║ 59 ║ 60 ║ 61 ║    62    ║",
-"╠════╦═════╦══╩══╦═╩════╩════╩════╩════╩════╩════╩══╦═╩═══╦╩════╬═════╦════╣",
-"║LCTL║ LWIN║     ║               SPCE               ║     ║ RWIN║COMP ║RCTL║",
-"║ 37 ║ 133 ║ ALT ║                65                ║ ALT ║ 134 ║ 135 ║105 ║",
-"╚════╩═════╩═════╩══════════════════════════════════╩═════╩═════╩═════╩════╝",
+"┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┳━━━━━━━━━┓",
+"│TLDE│AE01│AE02│AE03│AE04│AE05│AE06│AE07│AE08│AE09│AE10│AE11│AE12┃  BKSP   ┃",
+"│ 49 │ 10 │ 11 │ 12 │ 13 │ 14 │ 15 │ 16 │ 17 │ 18 │ 19 │ 20 │ 21 ┃   22    ┃",
+"┢━━━━┷━━┱─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┺━━┯━━━━━━┩",
+"┃  TAB  ┃AD01│AD02│AD03│AD04│AD05│AD06│AD07│AD08│AD09│AD00│AD10│AD11│ BKSL │",
+"┃  23   ┃ 24 │ 25 │ 26 │ 27 │ 28 │ 29 │ 30 │ 31 │ 32 │ 33 │ 34 │ 35 │  51  │",
+"┣━━━━━━━┻━┱──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┬──┴─┲━━┷━━━━━━┪",
+"┃  CAPS   ┃AC01│AC02│AC03│AC04│AC05│AC06│AC07│AC08│AC09│AC10│AC11┃  RTRN   ┃",
+"┃   66    ┃ 38 │ 39 │ 40 │ 41 │ 42 │ 43 │ 44 │ 45 │ 46 │ 47 │ 48 ┃   36    ┃",
+"┣━━━━━━━━━┻━━━┱┴───┬┴───┬┴───┬┴───┬┴───┬┴───┬┴───┬┴───┬┴───┬┴───┲┻━━━━━━━━━┫",
+"┃    LFSH     ┃AB01│AB02│AB03│AB04│AB05│AB06│AB07│AB08│AB09│AB10┃   RTSH   ┃",
+"┃     50      ┃ 52 │ 53 │ 54 │ 55 │ 56 │ 57 │ 58 │ 59 │ 60 │ 61 ┃    62    ┃",
+"┣━━━━┳━━━━━┳━━┻━━┱─┴────┴────┴────┴────┴────┴────┴──┲━┷━━━┳┷━━━━╋━━━━━┳━━━━┫",
+"┃LCTL┃ LWIN┃     ┃               SPCE               ┃     ┃ RWIN┃COMP ┃RCTL┃",
+"┃ 37 ┃ 133 ┃ ALT ┃                65                ┃ ALT ┃ 134 ┃ 135 ┃105 ┃",
+"┗━━━━┻━━━━━┻━━━━━┹──────────────────────────────────┺━━━━━┻━━━━━┻━━━━━┻━━━━┛",
                         };
 
 enum {
@@ -148,7 +148,8 @@ int area = KB_AREA_MAIN;   // main keys
         else if (args[a].starts_iwith("GUESS"))  mode |= MO_BUILTIN;
         else if (args[a].starts_iwith("KEYS"))   mode |= MO_KEYS;
         else if (args[a].starts_iwith("KPAD"))   area |= KB_AREA_KEYPAD;
-        else if (args[a].starts_iwith("FUNK"))   area |= KB_AREA_FUNKEY;
+        else if (args[a].starts_iwith("FUNK"))   area |= (KB_AREA_FUNKEY |
+                                                          KB_AREA_CURSOR);
         else if (args[a].starts_iwith("CURS"))   area |= KB_AREA_CURSOR;
         else
            {
@@ -174,9 +175,13 @@ const bool no_mode = mode == MO_NONE;
         mode = MO_XMODMAP | MO_USERFILE | MO_BUILTIN;
       }
 
-   // if neither xmodmap nor xkdb is specified then use xmodmap
+   // if neither xmodmap nor xkdb is specified then check user preferences
    //
-   if (!(mode & (MO_XMODMAP | MO_XKBD)))   mode |= MO_XMODMAP;
+   if (!(mode & (MO_XMODMAP | MO_XKBD)))
+      {
+        if (UserPreferences::uprefs.no_xmodmap)   mode |= MO_XKBD;
+        else                                      mode |= MO_XMODMAP;
+      }
 
    if (mode & MO_KEYS)
       {
@@ -514,8 +519,9 @@ bool data_coming = false;
          const UTF8_string u_utf(lines[y]);
          const UCS_string u(u_utf);
 
-         if (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
-             u[0] == UNI_LINE2_VERT_RIGHT)     // ╠
+         if (u.size() && (u[0] == 0x250C ||   // ┌
+                          u[0] == 0x2522 ||   // ┢
+                          u[0] == 0x2523))    // ┣
             {
               data_coming = true;
               continue;
@@ -537,7 +543,8 @@ bool data_coming = false;
                     for (int xx = x; ; ++xx)
                         {
                            const Unicode cc = l[xx];
-                           if (cc == UNI_LINE2_VERT)   break;   // empty field
+                           if (cc == U'│')   break;   // empty field
+                           if (cc == U'┃')   break;   // empty field
                            if (cc == UNI_SPACE)   // leding or trailing space
                               {
                                 if (keycode)   break;      // trailing: done
@@ -780,8 +787,9 @@ bool data_coming = false;
    loop(y, rows - 2)
        {
          UCS_string & u = lines[y];
-         if (u.size() && (u[0] == UNI_LINE2_DOWN_RIGHT ||   // ╔ 
-                          u[0] == UNI_LINE2_VERT_RIGHT))    // ╠
+         if (u.size() && (u[0] == 0x250C ||   // ┌
+                          u[0] == 0x2522 ||   // ┢
+                          u[0] == 0x2523))    // ┣
          {
               data_coming = true;
               continue;
@@ -816,17 +824,19 @@ bool data_coming = false;
 
                     // clear the field
                     //
-                    int xx = x;
-                    while (u[xx - 1] != UNI_LINE2_VERT)   --xx;
-                    for (; u[xx] != UNI_LINE2_VERT; ++xx)
-                        { u[xx] = l[xx] = UNI_SPACE; }
+                    {
+                      int xx = x;
+                      while (u[xx - 1] != U'│' && u[xx - 1] != U'┃')   --xx;
+                      for (; u[xx] != U'│' && u[xx] != U'┃'; ++xx)
+                          { u[xx] = l[xx] = UNI_SPACE; }
+                    }
 
                     // fill in characters
                     //
                     switch(keycode)   // special key names
                        {
                          case  8:  copy_text(l[x+1],  "ESC");      goto next;
-                         case 22:  copy_text(l[x+1],  "BACKSP");   goto next;
+                         case 22:  copy_text(l[x+1],  "BACKSPC");  goto next;
                          case 23:  copy_text(l[x+2],  "TAB");      goto next;
                          case 36:  copy_text(l[x+1],  "RETURN");   goto next;
                          case 37:  copy_text(l[x],    "CTRL");     goto next;
@@ -862,7 +872,7 @@ bool data_coming = false;
                   }
 
                next:
-               while (x < u.size() && u[x] != UNI_LINE2_VERT)   ++x;
+               while (x < u.size() && u[x] != U'│' && u[x] != U'┃')   ++x;
              }
        }
 

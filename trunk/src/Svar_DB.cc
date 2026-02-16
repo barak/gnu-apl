@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -684,28 +684,21 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 void
 Svar_DB::print(ostream & out)
 {
-Q1(LOC)
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
-Q1(tcp)
    if (tcp == NO_TCP_SOCKET)   return;
 
-Q1(LOC)
 PRINT_SVAR_DB_c request(tcp);
-Q1(LOC)
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 4000];
 const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
 
-   if (response)
+   if (Signal_base * response =
+       Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc))
       {
-Q1(LOC)
         out << response->get__SVAR_DB_PRINTED__printout();
         delete response;
       }
-Q1(LOC)
 }
 //----------------------------------------------------------------------------
 
