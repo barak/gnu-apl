@@ -2822,6 +2822,8 @@ Prefix::reduce_END___()
    if (ssize() > 1)   push_END_error();   // case 2
 
    // case 1 (empty statement)
+   put = 0;
+   set_action(RA_PUSH_NEXT);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void

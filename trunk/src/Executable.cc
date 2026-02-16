@@ -192,14 +192,23 @@ const ShapeItem end = input.size();
    //
    if (idx < end && input[idx].is_COND())
       {
-        CERR << "NOTE: Invalid ";
+        CERR << "NOTE: Invalid conditional ";
         if      (input[idx].get_tag() == TOK_IF_THEN)   CERR << "→→";
         else if (input[idx].get_tag() == TOK_IF_ELSE)   CERR << "←→";
         else if (input[idx].get_tag() == TOK_IF_END)    CERR << "←←";
 
-        CERR << " at start of line " << line << endl;
+        UserFunction * ufun = get_exec_ufun();
+        Assert(ufun);
+        CERR << " at the start of defined function line "
+             << ufun->get_name() << "[" << line << "]." << endl
+             << "      Conditional token terminate non-empty statements "
+               "and are therefore" << endl
+            << "      invalid at the start of a line." << endl
+            << "      Move the token to the end of the previous line."
+            << endl << endl;
+             
         if (tolerant)   return E_SYNTAX_ERROR;
-        else            SYNTAX_ERROR;
+        SYNTAX_ERROR;
       }
 
    /*
