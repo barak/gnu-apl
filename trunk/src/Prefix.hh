@@ -294,10 +294,13 @@ protected:
    DerivedFunction * get_fun_oper_slot(const char * loc) const;
 
    /// set the prefix parser action
-   void set_action(R_action ra)
+   inline void set_action(R_action ra)
       {
         action = ra;
       }
+
+   /// if end is \b TOK_IF_ELSe then jump over the ELSE clause
+   inline void handle_ELSE(const Token & maybe_else, int num);
 
    /// set the prefix parser action according to (result-) Token type.
    // Called (typically after some eval_XXX()) if the return class can not

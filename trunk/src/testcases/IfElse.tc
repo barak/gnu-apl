@@ -12,7 +12,7 @@ DOMAIN ERROR+
       2
       ^
       )MORE
-In B ←← ... →→ : condition B is not Boolean
+array is not Boolean (expecting 0 or 1).
       )SIC
       )CHECK BRIEF
 
@@ -22,7 +22,8 @@ DOMAIN ERROR+
       1+1
       ^
       )MORE
-In B ←← ... →→ : condition B is not Boolean
+array is not Boolean (expecting 0 or 1).
+
       )SIC
       )CHECK BRIEF
 
@@ -32,7 +33,7 @@ LENGTH ERROR+
       1 1
       ^
       )MORE
-In B ←← ... →→ : condition B is too long
+Boolean array has length 2 (expecting length 1).
       )SIC
       )CHECK BRIEF
 
@@ -42,7 +43,7 @@ LENGTH ERROR+
       ''
       ^
       )MORE
-In B ←← ... →→ : condition B is empty
+Boolean array is empty (expecting length 1).
       )SIC
       )CHECK BRIEF
 

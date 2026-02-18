@@ -347,7 +347,7 @@ const TokenClass tc = tok.get_Class();
       {
         const TokenTag tag = tok.get_tag();
         if (tag == TOK_END)       return out << "◊";
-        if (tag == TOK_ENDL)      return out << "EOL";
+        if (tag == TOK_ENDL)      return out << "ENDL";
         if (tag == TOK_IF_THEN)   return out << "→→";
         if (tag == TOK_IF_ELSE)   return out << "←→";
         if (tag == TOK_IF_END)    return out << "←←";
@@ -2795,6 +2795,24 @@ const Token result(TOK_APL_VALUE2, at3().get_apl_val());
 }
 //----------------------------------------------------------------------------
 void
+Prefix::handle_ELSE(const Token & maybe_else, int num)
+{
+   // the int value of TOK_IF_ELSE is the PC of the end of the ELSE clause.
+   //
+   if (maybe_else.get_tag() != TOK_IF_ELSE)   return;   // not ←→
+
+const Function_PC PC_from = PC = Function_PC(maybe_else.get_int_val());
+   while (body[PC].get_tag() == TOK_IF_END)   ++PC;   // nested else
+   if (body[PC].get_tag() == TOK_IF_ELSE)   // another ELSE clause
+      PC = Function_PC(body[PC].get_int_val());
+   Log(LOG_IfElse)
+      {
+        CERR << "END of THEN (" << num << ") reached, PC is now: " << PC
+             << "(" << PC_from << ")" << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
 Prefix::reduce_END___()
 {
    /*
@@ -2821,6 +2839,8 @@ Prefix::reduce_END___()
 
    if (ssize() > 1)   push_END_error();   // case 2
 
+   handle_ELSE(at0(), 1);
+
    // case 1 (empty statement)
    put = 0;
    set_action(RA_PUSH_NEXT);   // match again (w/o SHIFT)
@@ -2835,6 +2855,8 @@ Prefix::reduce_END_VOID__()
 
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
 const bool trace = end_of_line && (at0().get_int_val() & 1);
+
+   handle_ELSE(at0(), 3);
 
    put = 0;             // pop END and VOID
 
@@ -2879,33 +2901,17 @@ Token B = pop().get_token();   // pop B
         // B is the Boolean condition of an if/else conditional.
         // END is the token after the condition (PC of the IF clause).
         //
-        // If COND is 1 then continue, wlse jump to the else clause
-        Value_P COND(B.get_apl_val());
-        if (COND->element_count() != 1)
+        // If COND is 1 then continue, else jump to the else clause
+        const bool cond = B.get_apl_val()->get_sole_bool();
+        if (!cond)   PC = Function_PC(END.get_int_val());   // else clause
+
+        Log(LOG_IfElse)
            {
-             if (COND->element_count())
-                MORE_ERROR() << "In B ←← ... →→ : condition B is too long";
-             else
-                MORE_ERROR() << "In B ←← ... →→ : condition B is empty";
-             LENGTH_ERROR;
+             if (cond)   CERR << "IF(1) : Proceeding with THEN clause";
+             else        CERR << "IF(0) : Jump to ELSE/ENDIF clause";
+             CERR << " PC is now: " << PC << endl;
            }
-        const Cell & c0 = COND->get_cfirst();
-         if (c0.is_near_one())         // continue with the THEN clause
-            {
-              Log(LOG_IfElse)   CERR << 
-                  "IF(1) : Proceeding with THEN clause, PC now: " << PC << endl;
-            }
-         else if (c0.is_near_zero())   // continue with the ELSE clause
-            {
-              PC = Function_PC(END.get_int_val());
-              Log(LOG_IfElse)     CERR <<
-                  "IF(0) : Jump to ELSE/ENDIF clause, PC now: " << PC << endl;
-            }
-         else
-            {
-             MORE_ERROR() << "In B ←← ... →→ : condition B is not Boolean";
-             DOMAIN_ERROR;
-            }
+
          set_action(RA_PUSH_NEXT);
          return;
       }
@@ -2916,7 +2922,7 @@ Token B = pop().get_token();   // pop B
    // TOK_IF_END:  the end of (or no) ELSE clause:   no op
    // TOK_END(L):  normal end of statement or line:  no op
    //
-   if (END.get_tag() == TOK_IF_END)
+   if (END.get_tag() == TOK_IF_END)   // ←←
       {
         Log(LOG_IfElse)   CERR << 
             "ENDIF reached, PC is now: " << PC << endl;
@@ -2926,16 +2932,9 @@ Token B = pop().get_token();   // pop B
         Log(LOG_IfElse)   CERR << 
             "ENDIF reached, fixed PC is now: " << PC << endl;
       }
-   else if (END.get_tag() == TOK_IF_ELSE)
+   else
       {
-        PC = Function_PC(END.get_int_val()); 
-        Log(LOG_IfElse)   CERR << 
-            "END of THEN reached, PC is now: " << PC << endl;
-        while (body[PC].get_tag() == TOK_IF_END)   ++PC;   // nested else
-        if (body[PC].get_tag() == TOK_IF_ELSE)
-           PC = Function_PC(body[PC].get_int_val());
-        Log(LOG_IfElse)   CERR << 
-            "END of THEN reached, fixed PC is now: " << PC << endl;
+        handle_ELSE(END, 2);   // maybe ←→
       }
 
    si.fun_oper_cache.reset();
@@ -3073,6 +3072,7 @@ const Token result = si.jump(line);   // may change the PC
 
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
+        handle_ELSE(at0(), 4);
         reset(LOC);
         set_action(RA_PUSH_NEXT);   // again with modified stack
         return;
@@ -3167,6 +3167,7 @@ const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
            {
               // the function ignores attention (aka. weak interrupt)
               //
+              handle_ELSE(at0(), 5);
               pop_and_discard();   // pop END
               pop_and_discard();   // pop GOTO
               set_action(RA_CONTINUE);   // match again (w/o SHIFT)

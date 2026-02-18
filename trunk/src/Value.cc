@@ -1658,6 +1658,27 @@ Value::equal_string(const UCS_string & ucs) const
 }
 //----------------------------------------------------------------------------
 bool
+Value::get_sole_bool() const
+{
+   if (element_count() != 1)
+      {
+        if (element_count())
+           MORE_ERROR() << "Boolean array has length " << element_count()
+                        << " (expecting length 1).";
+        else
+           MORE_ERROR() << "Boolean array is empty (expecting length 1).";
+        LENGTH_ERROR;
+      }
+
+const Cell & c0 = get_cfirst();
+   if (c0.is_near_one())    return true;
+   if (c0.is_near_zero())   return false;
+
+   MORE_ERROR() << "array is not Boolean (expecting 0 or 1).";
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+bool
 Value::is_simple() const
 {
    if (flags & VF_packed)   return true;

@@ -185,32 +185,6 @@ const ShapeItem end = input.size();
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
 
-   // each →→, ←→, or →→ binds to the statement left of it, which must not
-   // be empty. The left of the start of the line is empty, and a conditionalt
-   // at the start of the line would would bind to an empty statelement, which
-   // is a SYNTAX ERROR.
-   //
-   if (idx < end && input[idx].is_COND())
-      {
-        CERR << "NOTE: Invalid conditional ";
-        if      (input[idx].get_tag() == TOK_IF_THEN)   CERR << "→→";
-        else if (input[idx].get_tag() == TOK_IF_ELSE)   CERR << "←→";
-        else if (input[idx].get_tag() == TOK_IF_END)    CERR << "←←";
-
-        UserFunction * ufun = get_exec_ufun();
-        Assert(ufun);
-        CERR << " at the start of defined function line "
-             << ufun->get_name() << "[" << line << "]." << endl
-             << "      Conditional token terminate non-empty statements "
-               "and are therefore" << endl
-            << "      invalid at the start of a line." << endl
-            << "      Move the token to the end of the previous line."
-            << endl << endl;
-             
-        if (tolerant)   return E_SYNTAX_ERROR;
-        SYNTAX_ERROR;
-      }
-
    /*
        Convert (APL order) :
 
@@ -338,7 +312,7 @@ Executable::compute_if_else_targets()
 
       the intval of the TOK_IF_THEN token is the PC after the TOK_IF_END.
 
-      In a double sider IF/ELSE:
+      In a double sided IF/ELSE:
 
       the intval of the TOK_IF_THEN token is the PC after the TOK_IF_ELSE.
       the intval of the TOK_IF_ELSE token is the PC after the TOK_IF_END.
@@ -469,6 +443,12 @@ vector<conditional> conditionals;
                           body[cond.if_THEN].set_int_val(cond.if_ELSE + 1);
                           body[cond.if_ELSE].set_int_val(pc + 1);
                         }
+
+                     Log(LOG_IfElse)
+                        {
+                          conditionals.back().print(CERR, conditionals.size(),
+                                                    body);
+                        }
                      conditionals.pop_back();
                    }
 
@@ -519,6 +499,28 @@ error:
         print_token(CERR, 3);
       }
    return true;
+}
+//----------------------------------------------------------------------------
+void
+Executable::conditional::print(ostream & out, int level,
+                               const Token_string & body) const
+{
+int endif_PC;
+   out << "COND[" << level << "] IF ... THEN@PC=" << if_THEN;
+   Assert1(body[if_THEN].get_tag() == TOK_IF_THEN);
+   if (if_ELSE < 0)   // single sided if/endif
+      {
+        endif_PC = body[if_THEN].get_int_val() - 1;
+      }
+   else               // double sided if/else/endif
+      {
+        out << " ELSE@PC=" << if_ELSE;
+        Assert1(body[if_ELSE].get_tag() == TOK_IF_ELSE);
+        endif_PC = body[if_ELSE].get_int_val() - 1;
+      }
+
+   Assert1(body[endif_PC].get_tag() == TOK_IF_END);
+   out << " ENDIF@PC=" << endif_PC << endl;
 }
 //----------------------------------------------------------------------------
 Token

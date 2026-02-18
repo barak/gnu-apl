@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 14, 2026.
+<p>February 18, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -358,7 +358,7 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
     <ul class="no-bullet">
       <li><a id="toc-Design-considerations_002e-1" href="#Design-considerations_002e">2.45.1 Design considerations.</a></li>
       <li><a id="toc-Syntax-1" href="#Syntax">2.45.2 Syntax</a></li>
-      <li><a id="toc-Possible-Pitfalls-1" href="#Possible-Pitfalls">2.45.3 Possible Pitfalls</a></li>
+      <li><a id="toc-A-Possible-Pitfall-1" href="#A-Possible-Pitfall">2.45.3 A Possible Pitfall</a></li>
     </ul></li>
     <li><a id="toc-Matrix-Product-1" href="#Matrix-Product">2.46 Matrix Product</a></li>
     <li><a id="toc-Monadic-_005b_003f_005d-_0028Nub-Sieve_0029" href="#Monadic-_2260-_0028Nub-Sieve_0029">2.47 Monadic ≠ (Nub Sieve)</a></li>
@@ -10267,7 +10267,7 @@ APL standard, nor IBM APL2 provide conditionals.
 <ul class="section-toc">
 <li><a href="#Design-considerations_002e" accesskey="1">Design considerations.</a></li>
 <li><a href="#Syntax" accesskey="2">Syntax</a></li>
-<li><a href="#Possible-Pitfalls" accesskey="3">Possible Pitfalls</a></li>
+<li><a href="#A-Possible-Pitfall" accesskey="3">A Possible Pitfall</a></li>
 </ul>
 <hr>
 <div class="subsection" id="Design-considerations_002e">
@@ -10291,12 +10291,13 @@ conditionals in GNU APL. Primarily for the following reasons:
 <p>The C language has six keywords for flow control: <b>if</b> <b>else</b>, <b>for</b>,
 <b>while</b>, <b>do</b>, <b>switch</b> and <b>goto</b>. Two of them (<b>do</b> and <b>while</b>)
 are redundant and rarely used, leaving only 4 base cases. A quick <b>grep -c</b>
-over the 100,000 top-level C++ source code lines of GNU APL reveals the
+over the 130,000 top-level C++ source code lines of GNU APL reveals the
 following statistics:
 </p>
 <ul>
-<li> 7000 <b>if</b> statements, 1600 of them two-sided if-then-else-endif,
-  the others one-sided if-then-endif,
+<li> 7000 <b>if</b> statements, 5400 of them <i>one-sided</i> (i.e.
+  if-then-endif), and the other 1600 of them <i>two-sided</i> (i.e.
+   if-then-else-endif,
   </li><li> 2000 <b>for</b> statements, 1200 of them trivial iterations over some
   array (aka. <i>for (int i = 0; i &lt; size; ++i) ... </i>,
   </li><li> 200 <b>switch</b> statements with an averge of 8 case clauses per switch,
@@ -10322,8 +10323,9 @@ serious problems. To name a few:
   APL statements in immediate execution mode and only transfer them into
   the body of defined functions when they work properly. However, the keywords 
   above seem to work only in the bodies of defined functions but <b>not</b> in
-  immediate execution mode. The reason seems to be that their implementation
-  depends on labels which are not available in immediate execution.
+  immediate execution mode. The reason for this limitation might be that
+  their implementation depends, under the hood, on APL labels (which are not
+   available in immediate execution mode).
 
 </li><li> Another rather common design practice is to limit the length of
   lines to less than 80 characters (e.g. in the GNU coding conventions,
@@ -10354,16 +10356,17 @@ were these:
 </p>
 <ol>
 <li> the syntax shall be easy to understand and consistent,
-  </li><li> the syntax shall work in immediate execution mode (as long as
-  the entire conditional is provided on a single input line),
-  </li><li> to support 2., lengthy keywords shall be avoided in favour of the
-  original APL style, and
+  </li><li> the syntax shall not only work in defined functions, but also in
+       immediate execution mode (provided, of course, that the entire
+       conditional fits into a single input line),
+  </li><li> in order to support 2., lengthy keywords shall be avoided in
+        favour of the original APL style, and
   </li><li> the syntax needs to only support those cases where the standard APL
-  flow control (i.e. →N) becomes cumbersome. There is no obvious benefit in
-  introducing a new (and redundant) syntax when the standard APL mechanism
-  is already completely adequate. IOW: Why would <b><i>:Goto Label</i></b> be any
-  better than <b><i>:→Label</i></b>?
-
+        flow control (i.e. <b>→N</b>) becomes cumbersome. There is no obvious
+        benefit in introducing a new (and redundant) syntax when the
+        standard APL syntax is already completely adequate. IOW: in which
+        universe would <b><i>:Goto Label</i></b> be any better than the good old
+        <b><i>→Label</i></b>?
 </li></ol>
 
 <p>As to the last point, almost every flow control case (in a standards compliant
@@ -10378,8 +10381,8 @@ while COND)
 </li><li> <b>switch/case</b>: switch ARG case CASE1 case CASE2 case ... CASEn endswitch
 </li></ol>
 
-<p>where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are a sequence of one or more
-statements, while COND or ARG control which of these sequences (if any)
+<p>where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are sequences of one or more
+statements, while COND or ARG determine which of these sequences (if any)
 shall be executed.
 </p>
 <p>Interestingly, the complexity of the above cases, when coded in APL,
@@ -10430,8 +10433,8 @@ a new syntax like :Select / :Case for switches or :For / :Endfor for loops
 would therefore only make matters different and incompatible, but not better.
 </p>
 <p>In case 3. (one-sided if) there is also not much to gain. However, case 3. 
-can be seen as a special case of case 4. (with an empty ELSE clause). As
-a matter of consistency, a new syntax for case 4. should also cover case 3.
+can be seen as a special case of case 4. (with an empty ELSE clause). For
+the sake of consistency, a new syntax for case 4. should also cover case 3.
 </p>
 <p>The only cases where a new syntax could improve matters are therefore
 cases 3. and  4.
@@ -10443,8 +10446,8 @@ end of the conditional:
 </p>
 <ol>
 <li> allow multiple statements in the THEN and ELSE clauses and mark the end
-  of the <b>ELSE</b> clause (or, in the one-sided case 3 of the <b>THEN</b> clause
-  with some <b>ENDIF</b> marker, or
+  of the <b>ELSE</b> clause (or, in the one-sided case 3. of the <b>THEN</b> clause
+  above) with some kind of <b>ENDIF</b> marker, or
 </li><li> allow only single statement clauses (which implies the <b>ENDIF</b> and
  makes it obsolete.
 </li></ol>
@@ -10458,12 +10461,12 @@ of 1. (e.g. insertion of debug printouts into a clause).
 <div class="subsection" id="Syntax">
 <div class="header">
 <p>
-Next: <a href="#Possible-Pitfalls" accesskey="n" rel="next">Possible Pitfalls</a>, Previous: <a href="#Design-considerations_002e" accesskey="p" rel="prev">Design considerations.</a>, Up: <a href="#Conditionals" accesskey="u" rel="up">Conditionals</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#A-Possible-Pitfall" accesskey="n" rel="next">A Possible Pitfall</a>, Previous: <a href="#Design-considerations_002e" accesskey="p" rel="prev">Design considerations.</a>, Up: <a href="#Conditionals" accesskey="u" rel="up">Conditionals</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Syntax-1"></span><h4 class="subsection">2.45.2 Syntax</h4>
 
-<p>With the above considerations in mind, GNU APL decided for the following
-syntax:
+<p>With the above considerations in mind, GNU APL decided in favour of the
+following syntax for APL condionals:
 </p>
 <ul>
 <li> <b>one-sided if/else</b>:
@@ -10478,7 +10481,7 @@ syntax:
 
 </li></ul>
 
-<p>For this syntax to work, the following rules must be followed:
+<p>The following rules govern this syntax:
 </p>
 <ul>
 <li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> markers must be single tokens (2
@@ -10488,30 +10491,21 @@ syntax:
         between two <b>→</b> turns the single token <b>→→</b> into two valid (though
         most of the time useless) Escape statements.
 
-</li><li> The <b>→→</b>, <b>←→</b>, and <b>←←</b> tokens are <b>end-of-statement</b> markers
-        (as opposed to <b>beginning-of-statement</b> markers). Each marker
-        terminates the non-empty (!) statement(s) left of it. That is, 
-        <b>→→</b>, terminates the single <b>COND</b> statement, <b>←→</b> terminates
-        the <b>THEN</b> statement(s), and <b>←←</b> terminates the <b>ELSE</b>
-        statement(s).
-
-</li><li> The <b>COND</b>, <b>THEN</b>, and <b>ELSE</b> clauses shall be
-        <b>non-empty (!)</b> sequences of valid APL statements.
-        In particular:
+</li><li> The <b>COND</b>, <b>THEN</b>, and <b>ELSE</b> clauses shall be sequences
+         of valid APL statements. In particular:
         <ul>
 <li> The condition <b>COND</b> shall be a <i>single statement</i> that
               evaluates to a 1-item Boolean array (of any rank).
-              The statement result of <b>COND</b> is a committed value (and is
-              therefore not being displayed).
+              The statement result of <b>COND</b> is a committed value and is
+              therefore not being displayed.
        
 </li><li> The <b>THEN</b> clause shall be <i>one or more valid statements</i>,
               possibly separated by <b>◊</b> for more than one statement.
        
-</li><li> The <b>ELSE</b> clause (if present) shall be <i>one or more valid
-              statements</i>, separated by <b>◊</b> for more than one statement.
+</li><li> Likewise, the <b>ELSE</b> clause (if present) shall be
+              <i>one or more valid statements</i>, separated by <b>◊</b> for
+              more than one statement.
         </li></ul>
-</li><li> A <b>→→</b>, <b>←→</b>, or <b>←←</b> token at the beginning of a line would
-        terminate an empty statement, which is a <b>SYNTAX ERROR</b>.
 </li></ul>
 
 <p>Examples:
@@ -10549,63 +10543,53 @@ syntax:
 SYNTAX ERROR+
 FOO[1]  X 'is positive'←
         *              *
-
-      ⍝ invalid split into several lines: ←→ is first token in line).
-      ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
-      ⍝
-      ∇FOO X
-       X≥0 →→ X 'is positive'
-           ←→ X 'is negative' ←←
-      ∇
-NOTE: Invalid ←→ at start of line 2
-Error in function body in function line [2] of:
-[0] FOO X
-[1]        X≥0 →→ X 'is positive'
-[2]            ←→ X 'is negative' ←←
-Fatal error in defined function line [2]. You may now:
-    change the faulty line  with:  [2] ..., or 
-    delete the faulty line  with:  [∆2], or
-    cancel editing with:  [→]∇.
 </pre></div>
 
-<p>The recommended usage of corresponding →→, ←→, and ←← token is to:
+<p>The recommended usage of the corresponding <b>→→</b>, <b>←→</b>, and <b>←←</b>
+token of the same conditional is to:
 </p>
 <ul>
-<li> either put them on the same line (short format), or else
-  </li><li> align all of them on the same column (long form), but
+<li> either put all of them on the same line (short format), or
+  </li><li> else align all of them on the same column (long form), but
   </li><li> never mix the short and long forms
 </li></ul>
 
-<p>Like shown in the examples above.
+<p>In theory one could place (and align) the token <i>before</i> or <i>after</i>
+their statement(s). However, placing them <i>after</i> their statement(s),
+like shown in the examples above, makes them arguably more visible and
+is therefore the recommended way. In particular when conditionals are
+being nested.
 </p>
 <hr>
 </div>
-<div class="subsection" id="Possible-Pitfalls">
+<div class="subsection" id="A-Possible-Pitfall">
 <div class="header">
 <p>
 Previous: <a href="#Syntax" accesskey="p" rel="prev">Syntax</a>, Up: <a href="#Conditionals" accesskey="u" rel="up">Conditionals</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Possible-Pitfalls-1"></span><h4 class="subsection">2.45.3 Possible Pitfalls</h4>
+<span id="A-Possible-Pitfall-1"></span><h4 class="subsection">2.45.3 A Possible Pitfall</h4>
 
 <p>In APL, as well as in C/C++ (and most other languages), an expression is also
 a statement, but not vice versa. Expressions yield a value, while statements
 may not.
 </p>
-<p>In <b>C/C++</b> there are <i>conditional statements</i> and
+<p>The <b>C/C++</b> language knows <i>conditional statements</i> and
 <i>conditional expressions</i>:
 </p>
 <div class="example">
-<pre class="example">   if (COND) { IF-statements } else { ELSE-statements }   // conditional statement
+<pre class="example">   if (COND) { IF-statements }       // conditional C/C++ statement
+   else      { ELSE-statements }
 
-   (COND) ? IF-value : ELSE-value                         // conditional expression
+   (COND) ? IF-value : ELSE-value    // conditional C/C++ expression
 </pre></div>
 
-<p>GNU APL also has <i>conditional statements</i> and <i>conditional expressions</i>:
+<p>Likewise, GNU APL also has <i>conditional statements</i> and
+<i>conditional expressions</i>:
 </p>
 <div class="example">
-<pre class="example">      COND →→ IF-statements ←→ ELSE-statements ←←    ⍝ conditional statement
+<pre class="example">      COND →→ IF-statements ←→ ELSE-statements ←←    ⍝ conditional APL statement
 
-      IF-value ⊢[COND] ELSE-value                    ⍝ conditional statement
+      IF-value ⊢[COND] ELSE-value                    ⍝ conditional APL expression
 </pre></div>
 
 <p>If a value is needed, e.g. for assigning it to a variable, but the expression
@@ -10613,44 +10597,65 @@ becomes too long to fit in a single line, then one can replicate the
 assigment in both of the <b>IF</b> and the <b>ELSE</b> clauses:
 </p>
 <div class="example">
-<pre class="example">   // C/C++
-   x = -5;
-   Result = (x &lt; 0) ? &quot;negative&quot; : &quot;positive&quot;;                         // OK
-   Result = if (x &lt; 0) { &quot;negative&quot;; } else { &quot;positive&quot;; }            // syntax error
-   if (x &lt; 0) { Result = &quot;negative&quot;; } else { Result = &quot;positive&quot;; }   // OK
+<pre class="example">      // C/C++
+      x = -5;
+      Result = (x &lt; 0) ? &quot;negative&quot; : &quot;positive&quot;;                          // OK
+      Result = if (x &lt; 0) { &quot;negative&quot;; } else { &quot;positive&quot;; }         // syntax error
+      if (x &lt; 0) { Result = &quot;negative&quot;; } else { Result = &quot;positive&quot;; }   // OK
 
-   ⍝ GNU APL
-   X←¯5
-   Result ← &quot;positive&quot; ⊢[X &lt; 0] &quot;negative&quot;                     ⍝ OK
-   Result ← (X &lt; 0) →→ ⊣&quot;negative&quot; ←→ ⊣&quot;positive&quot; ←←           ⍝ ???
-   Result
+      ⍝ GNU APL conditional expression, aka. ⊢[]
+      X←¯5
+      Result ← &quot;positive&quot; ⊢[X &lt; 0] &quot;negative&quot;                     ⍝ OK
+      Result ← (X &lt; 0) →→ ⊣&quot;negative&quot; ←→ ⊣&quot;positive&quot; ←←           ⍝ ???
+      Result
 1
 
-   (X &lt; 0) →→ Result ← &quot;negative&quot; ←→ Result ← &quot;positive&quot; ←←    ⍝ OK
-   Result
+      (X &lt; 0) →→ Result ← &quot;negative&quot; ←→ Result ← &quot;positive&quot; ←←    ⍝ OK
+      Result
 negative
 </pre></div>
 
-<p>The possibly unexpected result of the APL condional in the line with
-comment <b>⍝ ???</b> above has worked as follows:
+<p>The correct, although possibly unexpected, result <b>1</b> of the APL condional
+in the line with comment <b>⍝ ???</b> above was evaluated as follows:
 </p>
 <ol>
-<li> <code>Result ← (X &lt; 0)</code> therefore <code>result ← 1</code> (and not
-      <code>&quot;negative&quot;</code> !), and then
-</li><li> <code>&quot;negative&quot;</code> committed value <code>⊣&quot;negative&quot;</code> (discarded).
+<li> APL computes different statements from right to left.
+</li><li> The conditional tokens <b>→→</b>, <b>←→</b>, and <b>←←</b> are statement
+      separators like <b>◊</b>, but with the additional capability to jump
+      over their <b>THEN</b> and/or <b>ELSE</b> clauses according to the value
+      of their <b>COND</b> clause.
+</li><li> The first statement in the example above is <code>Result ← (X &lt; 0)</code>
+      i.e. <code>Result←1</code>.
+</li><li> The statement result of <b>COND</b> is always a committed value, regardless
+      of whether it is assigned to a variable (like in the example above)
+      or not. Therefore the <b>COND</b> clause does not produce any output.
+</li><li> The next statement that is being executed it either <code>⊣&quot;negative&quot;</code>
+      or else <code>⊣&quot;positive&quot;</code>, depending on the value of variable <b>X</b>.
+      Normally it would be displayed, but due to <b>⊣</b> the dispay is
+      suppressed. The entire conditional does therefore produce no output.
+</li><li> As a consequence, <code>Result ← 1</code> (and not, for example,
+      <code>&quot;negative&quot;</code> !). 
+</li><li> The <code>⊣&quot;negative&quot;</code> and <code>⊣&quot;positive&quot;</code> are separate statements
+      which do not assign anything to <b>Result</b> in the previous <b>COND</b>
+      clause. The pitfall in the example is that the conditional looks like
+      it would assign either <b>&quot;negative&quot;</b> or <b>&quot;positive&quot;</b> to <b>Result</b>,
+      but in fact assigns <b>1</b>.
 </li></ol>
 
-<p>Needless to say that, as in the example above, an assignment of a conditional
-statement to a variable is, although possible, a dubious programming style
-that should be avoided for the sake of readability.
+<p>Needless to say that, as in the example above, the assignment of a APL
+conditional statement to a variable is, although possible, a dubious
+programming style that should be avoided for the sake of readability. The
+key takeway here is that <i>the clauses of a GNU APL conditional are (two or
+three) different statements, and that an assignment of the conditional
+to a variable assignes only the first of these statements to the variable</i>.
 </p>
-<p>In C/C++, the condition of a conditional statement MUST bew put in parentheses,
+<p>In C/C++, the condition of a conditional statement MUST be put in parentheses,
 while the condition of a conditional expression MAY be put in parentheses.
 </p>
 <p>In GNU APL the condition of a conditional statement MAY be put in parentheses,
 while the condition of conditional expression MUST be put in brackets (since it
-is the axis argument <b>X</b> of <b>A ⊢[X] B.</b>. It is a good programming practice
-in C/C++ and in GNU APL to always put the condition into parentheses even if
+is the axis argument <b>X</b> of <b>A ⊢[X] B.</b>. A good programming practice
+in C/C++ and in GNU APL is to always put the condition into parentheses even if
 that if not syntactically required. Some people even use double parentheses to
 emphasize the condition of a conditional statement or expression.
 </p>

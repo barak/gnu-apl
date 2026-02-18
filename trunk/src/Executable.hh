@@ -188,6 +188,9 @@ protected:
           if_ELSE(Function_PC(-2))   // -2 means no ELSE clause
         {}
 
+        /// print \b this conditional
+        void print(ostream & out, int level, const Token_string & body) const;
+
         Function_PC if_THEN;   ///< position of the ←← token (end of condition)
         Function_PC if_ELSE;   ///< position of the ←→ token (before else)
       };

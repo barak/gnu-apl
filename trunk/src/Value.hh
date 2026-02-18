@@ -269,6 +269,10 @@ public:
         Log(LOG_execute_goto)   CERR << "goto line " << line << endl;
         return Function_Line(line); }
 
+   /// return the boolean value of a value that is supposed to have
+   /// (exactly) one
+   bool get_sole_bool() const;
+
    /// return \b true iff \b this value is simple (i.e. not nested).
    bool is_simple() const;
 

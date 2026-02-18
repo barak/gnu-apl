@@ -8804,12 +8804,13 @@ conditionals in GNU APL. Primarily for the following reasons:
 The C language has six keywords for flow control: @b{if} @b{else}, @b{for},
 @b{while}, @b{do}, @b{switch} and @b{goto}. Two of them (@b{do} and @b{while})
 are redundant and rarely used, leaving only 4 base cases. A quick @b{grep -c}
-over the 100,000 top-level C++ source code lines of GNU APL reveals the
+over the 130,000 top-level C++ source code lines of GNU APL reveals the
 following statistics:
 
 @itemize
-  @item 7000 @b{if} statements, 1600 of them two-sided if-then-else-endif,
-  the others one-sided if-then-endif,
+  @item 7000 @b{if} statements, 5400 of them @i{one-sided} (i.e.
+  if-then-endif), and the other 1600 of them @i{two-sided} (i.e.
+   if-then-else-endif,
   @item 2000 @b{for} statements, 1200 of them trivial iterations over some
   array (aka. @i{for (int i = 0; i < size; ++i) ... },
   @item 200 @b{switch} statements with an averge of 8 case clauses per switch,
@@ -8835,8 +8836,9 @@ serious problems. To name a few:
   APL statements in immediate execution mode and only transfer them into
   the body of defined functions when they work properly. However, the keywords 
   above seem to work only in the bodies of defined functions but @b{not} in
-  immediate execution mode. The reason seems to be that their implementation
-  depends on labels which are not available in immediate execution.
+  immediate execution mode. The reason for this limitation might be that
+  their implementation depends, under the hood, on APL labels (which are not
+   available in immediate execution mode).
 
   @item Another rather common design practice is to limit the length of
   lines to less than 80 characters (e.g. in the GNU coding conventions,
@@ -8867,16 +8869,17 @@ were these:
 
 @enumerate
   @item the syntax shall be easy to understand and consistent,
-  @item the syntax shall work in immediate execution mode (as long as
-  the entire conditional is provided on a single input line),
-  @item to support 2., lengthy keywords shall be avoided in favour of the
-  original APL style, and
+  @item the syntax shall not only work in defined functions, but also in
+       immediate execution mode (provided, of course, that the entire
+       conditional fits into a single input line),
+  @item in order to support 2., lengthy keywords shall be avoided in
+        favour of the original APL style, and
   @item the syntax needs to only support those cases where the standard APL
-  flow control (i.e. →N) becomes cumbersome. There is no obvious benefit in
-  introducing a new (and redundant) syntax when the standard APL mechanism
-  is already completely adequate. IOW: Why would @b{@i{:Goto Label}} be any
-  better than @b{@i{:→Label}}?
-
+        flow control (i.e. @b{→N}) becomes cumbersome. There is no obvious
+        benefit in introducing a new (and redundant) syntax when the
+        standard APL syntax is already completely adequate. IOW: in which
+        universe would @b{@i{:Goto Label}} be any better than the good old
+        @b{@i{→Label}}?
 @end enumerate
 
 As to the last point, almost every flow control case (in a standards compliant
@@ -8891,8 +8894,8 @@ while COND)
 @item @b{switch/case}: switch ARG case CASE1 case CASE2 case ... CASEn endswitch
 @end enumerate
 
-where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are a sequence of one or more
-statements, while COND or ARG control which of these sequences (if any)
+where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are sequences of one or more
+statements, while COND or ARG determine which of these sequences (if any)
 shall be executed.
 
 Interestingly, the complexity of the above cases, when coded in APL,
@@ -8943,8 +8946,8 @@ a new syntax like :Select / :Case for switches or :For / :Endfor for loops
 would therefore only make matters different and incompatible, but not better.
 
 In case 3. (one-sided if) there is also not much to gain. However, case 3. 
-can be seen as a special case of case 4. (with an empty ELSE clause). As
-a matter of consistency, a new syntax for case 4. should also cover case 3.
+can be seen as a special case of case 4. (with an empty ELSE clause). For
+the sake of consistency, a new syntax for case 4. should also cover case 3.
 
 The only cases where a new syntax could improve matters are therefore
 cases 3. and  4.
@@ -8956,8 +8959,8 @@ end of the conditional:
 
 @enumerate
 @item allow multiple statements in the THEN and ELSE clauses and mark the end
-  of the @b{ELSE} clause (or, in the one-sided case 3 of the @b{THEN} clause
-  with some @b{ENDIF} marker, or
+  of the @b{ELSE} clause (or, in the one-sided case 3. of the @b{THEN} clause
+  above) with some kind of @b{ENDIF} marker, or
 @item allow only single statement clauses (which implies the @b{ENDIF} and
  makes it obsolete.
 @end enumerate
@@ -8970,8 +8973,8 @@ of 1. (e.g. insertion of debug printouts into a clause).
 @node Syntax
 @subsection Syntax
 
-With the above considerations in mind, GNU APL decided for the following
-syntax:
+With the above considerations in mind, GNU APL decided in favour of the
+following syntax for APL condionals:
 
 @itemize
 @item @b{one-sided if/else}:
@@ -8986,7 +8989,7 @@ syntax:
 
 @end itemize
 
-For this syntax to work, the following rules must be followed:
+The following rules govern this syntax:
 
 @itemize
   @item The @b{→→}, @b{←→}, and @b{←←} markers must be single tokens (2
@@ -8996,30 +8999,21 @@ For this syntax to work, the following rules must be followed:
         between two @b{→} turns the single token @b{→→} into two valid (though
         most of the time useless) Escape statements.
 
-  @item The @b{→→}, @b{←→}, and @b{←←} tokens are @b{end-of-statement} markers
-        (as opposed to @b{beginning-of-statement} markers). Each marker
-        terminates the non-empty (!) statement(s) left of it. That is, 
-        @b{→→}, terminates the single @b{COND} statement, @b{←→} terminates
-        the @b{THEN} statement(s), and @b{←←} terminates the @b{ELSE}
-        statement(s).
-
-  @item The @b{COND}, @b{THEN}, and @b{ELSE} clauses shall be
-        @b{non-empty (!)} sequences of valid APL statements.
-        In particular:
+  @item The @b{COND}, @b{THEN}, and @b{ELSE} clauses shall be sequences
+         of valid APL statements. In particular:
         @itemize
         @item The condition @b{COND} shall be a @i{single statement} that
               evaluates to a 1-item Boolean array (of any rank).
-              The statement result of @b{COND} is a committed value (and is
-              therefore not being displayed).
+              The statement result of @b{COND} is a committed value and is
+              therefore not being displayed.
        
         @item The @b{THEN} clause shall be @i{one or more valid statements},
               possibly separated by @b{◊} for more than one statement.
        
-        @item The @b{ELSE} clause (if present) shall be @i{one or more valid
-              statements}, separated by @b{◊} for more than one statement.
+        @item Likewise, the @b{ELSE} clause (if present) shall be
+              @i{one or more valid statements}, separated by @b{◊} for
+              more than one statement.
         @end itemize
-  @item A @b{→→}, @b{←→}, or @b{←←} token at the beginning of a line would
-        terminate an empty statement, which is a @b{SYNTAX ERROR}.
 @end itemize
 
 Examples:
@@ -9057,58 +9051,48 @@ Examples:
 SYNTAX ERROR+
 FOO[1]  X 'is positive'←
         *              *
-
-      ⍝ invalid split into several lines: ←→ is first token in line).
-      ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
-      ⍝
-      ∇FOO X
-       X≥0 →→ X 'is positive'
-           ←→ X 'is negative' ←←
-      ∇
-NOTE: Invalid ←→ at start of line 2
-Error in function body in function line [2] of:
-[0] FOO X
-[1]        X≥0 →→ X 'is positive'
-[2]            ←→ X 'is negative' ←←
-Fatal error in defined function line [2]. You may now:
-    change the faulty line  with:  [2] ..., or 
-    delete the faulty line  with:  [∆2], or
-    cancel editing with:  [→]∇.
 @end example
 
-The recommended usage of corresponding →→, ←→, and ←← token is to:
+The recommended usage of the corresponding @b{→→}, @b{←→}, and @b{←←}
+token of the same conditional is to:
 
 @itemize
-  @item either put them on the same line (short format), or else
-  @item align all of them on the same column (long form), but
+  @item either put all of them on the same line (short format), or
+  @item else align all of them on the same column (long form), but
   @item never mix the short and long forms
 @end itemize
 
-Like shown in the examples above.
+In theory one could place (and align) the token @i{before} or @i{after}
+their statement(s). However, placing them @i{after} their statement(s),
+like shown in the examples above, makes them arguably more visible and
+is therefore the recommended way. In particular when conditionals are
+being nested.
 
 @c ----------------------------------------------------------------------------
-@node Possible Pitfalls
-@subsection Possible Pitfalls
+@node A Possible Pitfall
+@subsection A Possible Pitfall
 
 In APL, as well as in C/C++ (and most other languages), an expression is also
 a statement, but not vice versa. Expressions yield a value, while statements
 may not.
 
-In @b{C/C++} there are @i{conditional statements} and
+The @b{C/C++} language knows @i{conditional statements} and
 @i{conditional expressions}:
 
 @example
-   if (COND) @{ IF-statements @} else @{ ELSE-statements @}   // conditional statement
+   if (COND) @{ IF-statements @}       // conditional C/C++ statement
+   else      @{ ELSE-statements @}
 
-   (COND) ? IF-value : ELSE-value                         // conditional expression
+   (COND) ? IF-value : ELSE-value    // conditional C/C++ expression
 @end example
 
-GNU APL also has @i{conditional statements} and @i{conditional expressions}:
+Likewise, GNU APL also has @i{conditional statements} and
+@i{conditional expressions}:
 
 @example
-      COND →→ IF-statements ←→ ELSE-statements ←←    ⍝ conditional statement
+      COND →→ IF-statements ←→ ELSE-statements ←←    ⍝ conditional APL statement
 
-      IF-value ⊢[COND] ELSE-value                    ⍝ conditional statement
+      IF-value ⊢[COND] ELSE-value                    ⍝ conditional APL expression
 @end example
 
 If a value is needed, e.g. for assigning it to a variable, but the expression
@@ -9116,44 +9100,65 @@ becomes too long to fit in a single line, then one can replicate the
 assigment in both of the @b{IF} and the @b{ELSE} clauses:
 
 @example
-   // C/C++
-   x = -5;
-   Result = (x < 0) ? "negative" : "positive";                         // OK
-   Result = if (x < 0) @{ "negative"; @} else @{ "positive"; @}            // syntax error
-   if (x < 0) @{ Result = "negative"; @} else @{ Result = "positive"; @}   // OK
+      // C/C++
+      x = -5;
+      Result = (x < 0) ? "negative" : "positive";                          // OK
+      Result = if (x < 0) @{ "negative"; @} else @{ "positive"; @}         // syntax error
+      if (x < 0) @{ Result = "negative"; @} else @{ Result = "positive"; @}   // OK
 
-   ⍝ GNU APL
-   X←¯5
-   Result ← "positive" ⊢[X < 0] "negative"                     ⍝ OK
-   Result ← (X < 0) →→ ⊣"negative" ←→ ⊣"positive" ←←           ⍝ ???
-   Result
+      ⍝ GNU APL conditional expression, aka. ⊢[]
+      X←¯5
+      Result ← "positive" ⊢[X < 0] "negative"                     ⍝ OK
+      Result ← (X < 0) →→ ⊣"negative" ←→ ⊣"positive" ←←           ⍝ ???
+      Result
 1
 
-   (X < 0) →→ Result ← "negative" ←→ Result ← "positive" ←←    ⍝ OK
-   Result
+      (X < 0) →→ Result ← "negative" ←→ Result ← "positive" ←←    ⍝ OK
+      Result
 negative
 @end example
 
-The possibly unexpected result of the APL condional in the line with
-comment @b{⍝ ???} above has worked as follows:
+The correct, although possibly unexpected, result @b{1} of the APL condional
+in the line with comment @b{⍝ ???} above was evaluated as follows:
 
 @enumerate 1
-@item @code{Result ← (X < 0)} therefore @code{result ← 1} (and not
-      @code{"negative"} !), and then
-@item @code{"negative"} committed value @code{⊣"negative"} (discarded).
+@item APL computes different statements from right to left.
+@item The conditional tokens @b{→→}, @b{←→}, and @b{←←} are statement
+      separators like @b{◊}, but with the additional capability to jump
+      over their @b{THEN} and/or @b{ELSE} clauses according to the value
+      of their @b{COND} clause.
+@item The first statement in the example above is @code{Result ← (X < 0)}
+      i.e. @code{Result←1}.
+@item The statement result of @b{COND} is always a committed value, regardless
+      of whether it is assigned to a variable (like in the example above)
+      or not. Therefore the @b{COND} clause does not produce any output.
+@item The next statement that is being executed it either @code{⊣"negative"}
+      or else @code{⊣"positive"}, depending on the value of variable @b{X}.
+      Normally it would be displayed, but due to @b{⊣} the dispay is
+      suppressed. The entire conditional does therefore produce no output.
+@item As a consequence, @code{Result ← 1} (and not, for example,
+      @code{"negative"} !). 
+@item The @code{⊣"negative"} and @code{⊣"positive"} are separate statements
+      which do not assign anything to @b{Result} in the previous @b{COND}
+      clause. The pitfall in the example is that the conditional looks like
+      it would assign either @b{"negative"} or @b{"positive"} to @b{Result},
+      but in fact assigns @b{1}.
 @end enumerate
 
-Needless to say that, as in the example above, an assignment of a conditional
-statement to a variable is, although possible, a dubious programming style
-that should be avoided for the sake of readability.
+Needless to say that, as in the example above, the assignment of a APL
+conditional statement to a variable is, although possible, a dubious
+programming style that should be avoided for the sake of readability. The
+key takeway here is that @i{the clauses of a GNU APL conditional are (two or
+three) different statements, and that an assignment of the conditional
+to a variable assignes only the first of these statements to the variable}.
 
-In C/C++, the condition of a conditional statement MUST bew put in parentheses,
+In C/C++, the condition of a conditional statement MUST be put in parentheses,
 while the condition of a conditional expression MAY be put in parentheses.
 
 In GNU APL the condition of a conditional statement MAY be put in parentheses,
 while the condition of conditional expression MUST be put in brackets (since it
-is the axis argument @b{X} of @b{A ⊢[X] B.}. It is a good programming practice
-in C/C++ and in GNU APL to always put the condition into parentheses even if
+is the axis argument @b{X} of @b{A ⊢[X] B.}. A good programming practice
+in C/C++ and in GNU APL is to always put the condition into parentheses even if
 that if not syntactically required. Some people even use double parentheses to
 emphasize the condition of a conditional statement or expression.
 
