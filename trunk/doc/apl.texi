@@ -2133,21 +2133,53 @@ A statement of the form
       FUN ← @{ body_statement @} 
 @end example
 
-creates a named lambda. A body_statement can contain variable names ⍺ and ⍵
-as well as function names ⍶ and ⍹ which are replaced by the actual arguments
-of the lambda. If both ⍺ and ⍵ are present in body_statement then the lambda
-is dyadic. If only ⍵ is present then it is monadic, and if neither ⍺ nor ⍵ is
-present then the lambda is niladic.
+creates a @i{named lambda}. The single @i{body_statement} may contain the
+special variable names @b{⍺} and @b{⍵} as well as the special function
+names @b{⍶} and @b{⍹} which are replaced by the actual arguments of the
+lambda when the  lambda is executed. The valence of the lambda is determined
+as follows:
 
-Likewise, if ⍶ and ⍹ are present then the lambda is a dyadic operator. If only
-⍶ is present then it is a monadic operator, and if neither ⍶ nor ⍹ is present
-then the lambda is a normal function.
+@itemize
+@item If @b{⍶} and @b{⍹} are present then the lambda is a @i{dyadic operator}.
+@item If only @b{⍶} is present then the lambda is a @i{monadic operator}.
+@item If neither @b{⍶} nor @b{⍹} is present then the lambda is a normal
+      defined function.
+@item If both @b{⍺} and @b{⍵} are present in the body_statement then the
+      operator or defined function is dyadic.
+@item If only @b{⍵} is present then the operator or defined is monadic.
+@item If neither @b{⍺} nor @b{⍵} is present then the lambda is niladic.
+@item Lambdas with the left value argument @b{⍺} but without the right
+      value argument @b{⍵} are invalid (SYNTAX ERROR).
+@end itemize
 
-GNU APL supports an axis argument in normal user defined functions and
-operators. In lambda expressions the Greek letter χ (Chi) is the variable
-name for an axis argument.
+There is a noteworthy pitfall related to niladic named lambdas. Recalling
+to the fundamental APL evaluation rule:
 
-The way a named lambda is implemented in GNU APL is that the expression
+@i{All functions execute according to their position in an expression.
+The rightmost function whose arguments are available is evaluated
+first}
+
+implies that a niladic function is evaluated first (because it has no
+arguments and consequently no arguments that are not available). Therefore
+in an expression such as:
+
+@example
+NAME ← @{ statement @}
+@end example
+
+will the niladic lambda @b{@{ statement @}} be evaluated before the
+assignment, The name @b{NAME} is therefore the result of the niladic lambda
+and not the niladic lambda itself. IOW: the example above @i{does not}
+create a niladic named lambda, but rather a normal variable @b{NAME} whose
+value is the result of evaluating @b{statement}. Creating niladic named
+lambdas is impossible.
+
+GNU APL supports an axis argument in normal defined functions and
+operators. In lambda expressions the Greek letter @b{χ} (Chi) is the
+variable name for an axis argument.
+
+The way a named lambda is implemented in GNU APL is that the assignment of
+the form:
 
 @example
       FUN ← @{ body_expression @}
@@ -2161,18 +2193,30 @@ For example:
       )FNS
 
       SUM ← @{ ⍺ + ⍵ @}
+@end example
+
+is translated to a two-line function ⎕FX 'lambda_header' 'body_expression'.
+
+For example:
+
+@example
+      )FNS
+
+      SUM ← @{ ⍺ + ⍵ @}
       )FNS
 SUM
+
       ∇SUM[⎕]∇
 DEFN ERROR+
       ∇SUM[⎕]∇
              ^
-      )more
+      )MORE
 function is a lambda
 @end example
 
-Even though named lambdas are included in function lists along with other
-user defined functions, they must be listed using ⎕CR 'name':
+Named lambdas are included in function lists like @b{)FNS} along with other
+defined functions. They can not be edited with the ∇-edidor, but can be
+displayed using @b{⎕CR 'name'}:
 
 @example
       ⎕CR 'SUM'
@@ -2201,9 +2245,9 @@ variables C and D like this:
 λ← ⍺ + ⍵     
 @end example
 
-If a named lambda is created inside a function, then the name of the lambda
-(i.e. the name left of ← @{ ... @}) can be made a local variable of the
-function in which the named lambda is created. This creates a lambda with
+If a named lambda is created inside a defined function, then the name of the
+lambda (i.e. the name left of ← @{ ... @}) can be made a local variable of
+the function in which the named lambda is created. This creates a lambda with
 local scope.
 
 Please note that the above only describes the current implementation of named
@@ -2213,12 +2257,18 @@ particular, they can be used outside named or unnamed lambdas. However, that
 may change in the future and therefore such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside
 is certainly a bad idea.
 
+As of this writing, GNU APL lambdas allow multiple statements, separated
+by @b{◊}. This feature is experimental, not portable, and should be avoided
+where possible. In GNU APL, the value of a multi-statement lambda is the
+value of the last statement and this differs from the semantics of
+multi-statements in other APL interpreters!
+
 @c ............................................................................
 @node Unnamed Lambdas
 @subsection Unnamed Lambdas
 
-An unnamed lambda is an expression inside @{ @} but without assigning it to a
-name. This is often used together with the EACH operator.
+An unnamed lambda is an expression inside @{ and @} but without assigning
+it to a name. This is often used together with the EACH operator.
 For example:
 
 @example

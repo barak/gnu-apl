@@ -170,6 +170,12 @@ Executable::parse_body_line(Function_Line line, const Token_string & input,
 ShapeItem idx = 0;
 const ShapeItem end = input.size();
 
+   Log(LOG_UserFunction__set_line)
+      {
+        CERR << "[input line " << line << "]: ";
+        input.print(CERR, false);
+      }
+
    // handle label (if any)
    //
    if (get_parse_mode() == PM_FUNCTION &&   // defined function
@@ -294,7 +300,7 @@ Token_string output;   // in reverse order
 
    Log(LOG_UserFunction__set_line)
       {
-        CERR << "[final line " << line << "] ";
+        CERR << "[final line " << line << "]: ";
         output.print(CERR, false);
       }
 

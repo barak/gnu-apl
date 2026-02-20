@@ -46,7 +46,7 @@ TD(TOK_SYMBOL        , TC_SYMBOL    , TV_SYM  , ID_No_ID        )
 TD(TOK_ASSIGN        , TC_ASSIGN    , TV_NONE , ID_ASSIGN       )
 TD(TOK_ASSIGN1       , TC_ASSIGN    , TV_NONE , ID_ASSIGN1      )
 TD(TOK_COLON         , TC_COLON     , TV_NONE , ID_COLON        )
-TD(TOK_DIAMOND       , TC_DIAMOND   , TV_NONE , ID_DIAMOND      )
+TD(TOK_DIAMOND       , TC_END       , TV_NONE , ID_DIAMOND      )
 TD(TOK_ESCAPE        , TC_R_ARROW   , TV_NONE , ID_ESCAPE       )
 TD(TOK_FIRST_TIME    , TC_VOID      , TV_NONE , ID_FIRST_TIME   )
 TD(TOK_GOTO_PC       , TC_R_ARROW   , TV_INT  , ID_GOTO_PC      ) // →literal N

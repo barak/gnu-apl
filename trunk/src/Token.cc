@@ -109,7 +109,6 @@ operator << (ostream & out, TokenClass tc)
         tcc(TC_ASSIGN)
         tcc(TC_LINE)
         tcc(TC_VOID)
-        tcc(TC_DIAMOND)
         tcc(TC_NUMERIC)
         tcc(TC_SPACE)
         tcc(TC_NEWLINE)
@@ -192,6 +191,13 @@ operator << (ostream & out, const Token & token)
         return out << "INTEGER (" << token.get_int_val() << ") ";
       }
 
+   if (token.get_tag() == TOK_RETURN_SYMBOL)
+      {
+        const Symbol * symbol = token.get_sym_ptr();
+        Assert1(symbol);
+        return out << "RETURN_SYMBOL(" << symbol->get_name() << ")";
+      }
+
    if (token.get_Id() > ID_No_ID2)   return out << token.get_Id();
 
    switch(token.get_Class())
@@ -202,12 +208,16 @@ operator << (ostream & out, const Token & token)
         case TC_RETURN:
              if (token.get_tag() == TOK_RETURN_EXEC)
                 return out << "RETURN ⍎";
+
              if (token.get_tag() == TOK_RETURN_STATS)
                 return out << "RETURN ◊";
+
              if (token.get_tag() == TOK_RETURN_VOID)
                 return out << "RETURN ∇FUN";
+
              if (token.get_tag() == TOK_RETURN_SYMBOL)
                 return out << "RETURN Z←FUN";
+
              return out << "RETURN ???";
 
         case TC_VALUE:    return token.print_value(out);
@@ -629,7 +639,6 @@ UCS_string ucs;
              break;
 
         case TC_END:
-        case TC_DIAMOND:
              ucs << UNI_DIAMOND;
              break;
 
@@ -748,15 +757,23 @@ bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
 }
 //----------------------------------------------------------------------------
 const char * 
-Token::short_class_name(TokenClass cls)
+Token::short_class_name(TokenTag tag)
 {
-   switch(cls)
+const TokenClass tc = TokenClass(tag & TC_MASK);
+   switch(tc)
       {
         case TC_ASSIGN:    return "←";
         case TC_R_ARROW:   return "→";
         case TC_L_BRACK:   return "[";
         case TC_R_BRACK:   return "]";
-        case TC_END:       return "END";
+        case TC_END:
+             if (tag == TOK_DIAMOND)   return "◊";
+             if (tag == TOK_ENDL)      return "ENDL";
+             if (tag == TOK_IF_THEN)   return "→→";
+             if (tag == TOK_IF_ELSE)   return "←→";
+             if (tag == TOK_IF_END)    return "←←";
+             return "END";
+
         case TC_FUN0:      return "F0";
         case TC_FUN12:     return "F12";
         case TC_INDEX:     return "IDX";
@@ -774,7 +791,6 @@ Token::short_class_name(TokenClass cls)
         case TC_OFF:       return "OFF";
         case TC_SI_CHANGE: return "CHANGE";
         case TC_LINE:      return "LINE";
-        case TC_DIAMOND:   return "◊";
         case TC_NUMERIC:   return "NUMB";
         case TC_SPACE:     return "SPACE";
         case TC_NEWLINE:   return "LF";
@@ -791,10 +807,11 @@ Token::short_class_name(TokenClass cls)
 }
 //----------------------------------------------------------------------------
 const char *
-Token::class_name(TokenClass tc)
+Token::class_name(TokenTag tag)
 {
 #define tcn(x) case x: return #x;
 
+const TokenClass tc = TokenClass(tag & TC_MASK);
    switch(tc)
       {
         tcn(TC_ASSIGN)
@@ -819,7 +836,6 @@ Token::class_name(TokenClass tc)
         tcn(TC_OFF)
         tcn(TC_SI_CHANGE)
         tcn(TC_LINE)
-        tcn(TC_DIAMOND)
         tcn(TC_NUMERIC)
         tcn(TC_SPACE)
         tcn(TC_NEWLINE)

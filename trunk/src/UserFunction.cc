@@ -623,7 +623,8 @@ UCS_string_vector original_text;
    // The function text is modified for parsing it, but restored afterwards
    // so that e.g. ∇FUN[⎕]∇ shows the text entered by the user.
    //
-   // original_text is only set if text was modified.
+   // original_text is only set if text was modified in one of the
+   // multi-line transformations below.
    //
    clear_body();
 
@@ -760,7 +761,9 @@ Lit_DB literals;
              << "line_starts.size() is " << line_starts.size() <<endl; 
       }
 
-   // let [0] be the end of the function.
+   // set line_starts[0] be the end of the function, so that →0 returns
+   // from the function
+   //
    line_starts[0] = Function_PC(body.ssize());
 
    if (header.Z())   body.push_back(Token(TOK_RETURN_SYMBOL, header.Z()));
@@ -1240,22 +1243,13 @@ int signature = SIG_FUN | SIG_Z;
    body_text.remove_trailing_whitespaces();
    body_text << comment;
 
-Token_string body;
-   {
-     Token ret_lambda(TOK_RETURN_SYMBOL, &Workspace::get_v_LAMBDA());
-     body.push_back(ret_lambda);
-     const int64_t trace = 0;
-     Token tok_endl(TOK_ENDL, trace);
-     body.push_back(tok_endl);
-   }
-
    // append lvars_text to body (as in e.g. { ... ;C;D }. This will also
    // parse the lvars_text needed below.
    //
    body_text << lvars_text;
 
 const Parser parser(PM_FUNCTION, LOC, false);
-
+Token_string body;
    // if parsing fails at this point, then something is wrong in )SAVE
    //
    if (const ErrorCode ec = parser.parse(body_text, body, true))
@@ -1263,6 +1257,25 @@ const Parser parser(PM_FUNCTION, LOC, false);
         CERR << "Parsing '" << body_text << "' failed (" << ec << ")." << endl;
         return 0;
       }
+
+Function_PC last_statement = Function_PC(-1);
+   for (int b = body.size() - 1; b; --b)
+       {
+         if (body[b].get_tag() == TOK_DIAMOND)
+            {
+              last_statement = Function_PC(b);
+              break;
+            }
+       }
+
+   {
+     body.insert_2(last_statement);
+     Token ret_lambda(TOK_RETURN_SYMBOL, &Workspace::get_v_LAMBDA());
+     const int64_t trace = 0;
+     Token tok_endl(TOK_ENDL, trace);
+     body[last_statement + 1].move_from(ret_lambda, LOC);
+     body[last_statement + 2].move_from(tok_endl, LOC);
+   }
 
 vector<Symbol *> local_vars;
    while (body.size() >= 2)
@@ -1277,10 +1290,8 @@ vector<Symbol *> local_vars;
         else break;
       }
 
-UserFunction * ufun = new UserFunction(Fun_signature(signature),
-                                       LAMBDA_NUM_0,
-                                       body_text, body, local_vars);
-   return ufun;
+   return new UserFunction(Fun_signature(signature), LAMBDA_NUM_0,
+                                         body_text, body, local_vars);
 }
 //----------------------------------------------------------------------------
 void

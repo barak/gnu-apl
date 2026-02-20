@@ -1844,7 +1844,6 @@ UCS_ASCII_string::UCS_ASCII_string(TokenClass tc)
         case TC_OFF:       *this << "TC_OFF";        return;
         case TC_SI_CHANGE: *this << "TC_SI_CHANGE"; return;
         case TC_LINE:      *this << "TC_LINE";       return;
-        case TC_DIAMOND:   *this << "TC_DIAMOND";    return;
         case TC_NUMERIC:   *this << "TC_NUMERIC";    return;
         case TC_SPACE:     *this << "TC_SPACE";      return;
         case TC_NEWLINE:   *this << "TC_NEWLINE";    return;

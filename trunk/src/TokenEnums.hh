@@ -75,7 +75,7 @@ enum TokenClass
    TC_OFF           = 0x12,
    TC_SI_CHANGE     = 0x13,
    TC_LINE          = 0x14,
-   TC_DIAMOND       = 0x15,   // ◊
+// TC_DIAMOND       = 0x15,   // ◊
    TC_NUMERIC       = 0x16,   // 0-9, ¯
    TC_SPACE         = 0x17,   // space, tab, CR (but not LF)
    TC_NEWLINE       = 0x18,   // LF

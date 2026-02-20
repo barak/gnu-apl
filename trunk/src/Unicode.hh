@@ -51,7 +51,9 @@ enum Unicode
    UNI_CursorHome  = -7,
    UNI_InsertMode  = -8,
 
-   /// internal pad characters - will be removed or replaced before printout
+   /// internal pad characters - will be removed or replaced before
+   /// the value is printed.
+   //
 #ifdef cfg_VISIBLE_MARKERS_WANTED
    UNI_iPAD_U0       = UNI_PAD_U0,   // not (yet) a pad char
    UNI_PAD_r_NOTCHAR = UNI_PAD_U1,   // after NOTCHAR column
@@ -92,6 +94,17 @@ enum Unicode
    UNI_PAD_l_STRING  = 0xEEFD,
    UNI_iPAD_L9       = 0xEEFE,
 #endif
+
+   // aliases for Diffout.cc (used in testcase files)
+   //
+   UNI_DIFF_DIGITS   = UNI_PAD_U0,   ///< ⁰: digits (integer)
+   UNI_DIFF_SPACES   = UNI_PAD_U1,   ///< ¹: blanks
+   UNI_DIFF_REAL     = UNI_PAD_U2,   ///< ²: real number
+   UNI_DIFF_ANY      = UNI_PAD_U3,   ///< ³: anything
+   UNI_DIFF_OVERBAR  = UNI_PAD_U4,   ///< ⁴: optional ¯
+   UNI_DIFF_SIGN     = UNI_PAD_U5,   ///< ⁵: ASCII sign (+ or -)
+   UNI_DIFF_CR28_29  = UNI_PAD_U6,   ///< ⁶: obsolete
+   UNI_DIFF_MULT     = UNI_PAD_Un,   ///< ⁿ: unit multiplier (m, n, u, μ)
 };
 
 /// value 0-15 of hex digit, or -1 if uni not in "023456789ABCDEFabcdef"

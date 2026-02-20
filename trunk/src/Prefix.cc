@@ -287,8 +287,8 @@ const int si_depth = si.get_level();
 
    loop(s, ssize())
       {
-        const TokenClass tc = at(s).get_Class();
-        out << " " << Token::class_name(tc);
+        const TokenTag tag = at(s).get_tag();
+        out << " " << Token::class_name(tag);
       }
 
    out << "  at " << loc << endl;
@@ -353,7 +353,7 @@ const TokenClass tc = tok.get_Class();
         if (tag == TOK_IF_END)    return out << "←←";
       }
 
-   return out << (Token::class_name(tc) + 3);
+   return out << (Token::class_name(tok.get_tag()) + 3);
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -432,8 +432,8 @@ const bool reverse  = which & 4;   // print ahead in APL order
              for (int pc = end_of_statement - 1; pc >= PC; --pc)
                  {
                    if (sepa++)   out << " ";
-                   const TokenClass tc = body[pc].get_Class();
-                   out << Token::short_class_name(tc);
+                   const TokenTag tag = body[pc].get_tag();
+                   out << Token::short_class_name(tag);
                  }
 
              if (end_of_statement != body.size() - 1)
@@ -447,9 +447,9 @@ const bool reverse  = which & 4;   // print ahead in APL order
              for (size_t pc = PC; pc < body.size(); ++pc)
                  {
                    if (sepa++)   out << " ";
-                   const TokenClass tc = body[pc].get_Class();
-                   out << Token::short_class_name(tc);
-                   if (tc == TC_END)   break;   // end of statement
+                   const TokenTag tag = body[pc].get_tag();
+                   out << Token::short_class_name(tag);
+                   if ((tag & TC_MASK) == TC_END)   break;   // end of statement
                  }
            }
       }
@@ -731,7 +731,7 @@ const TokenClass tcl = tok.get_Class();
         CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
              << "] Read token[" << ssize()
              << "] (←" << get_assign_state() << "←) " << tok << " "
-             << Token::class_name(tcl) << endl;
+             << Token::class_name(tok.get_tag()) << endl;
       }
 
    saved_MISC.set_PC(old_PC);   // expand the PC range of the stack
@@ -925,7 +925,7 @@ grow:    // aka. SHIFT
    Log(LOG_Shift_XXX)
       {
         loop(s, si.get_depth() + 1)   CERR << "    ";   // indent
-        CERR << "Shift[" << ssize() << "]: ";
+        CERR << "PC=" << PC << " Shift[" << ssize() << "]: ";
         print_token_value(CERR, body[PC]) << " into ";
         print_patterns(CERR, 1);
       }
@@ -2884,8 +2884,8 @@ Prefix::reduce_END_B__()
         more << "non-empty stack at end of statement:";
         loop(s, ssize())
            {
-             const TokenClass tc = at(s).get_Class();
-             more << " " << Token::class_name(tc);
+             const TokenTag tag = at(s).get_tag();
+             more << " " << Token::class_name(tag);
            }
         syntax_error(LOC);
       }

@@ -362,7 +362,7 @@ public:
    inline void copy_N(const Token & src);
 
    /// return a brief token class name for debugging purposes
-   static const char * short_class_name(TokenClass cls);
+   static const char * short_class_name(TokenTag tag);
 
    /// the optional value of the token.
    union sval
@@ -383,7 +383,7 @@ public:
       };
 
    /// the name of \b tc
-   static const char * class_name(TokenClass tc);
+   static const char * class_name(TokenTag tag);
 
 protected:
    /// The tag indicating the type of \b this token

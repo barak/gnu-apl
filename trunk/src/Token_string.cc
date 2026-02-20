@@ -209,8 +209,7 @@ operator << (ostream & out, const Token_string & tos)
    out << "[" << tos.size() << " token]: ";
    loop(t, tos.size())   CERR << "⏩" << tos[t] << "  ";
    out << endl;
-   out << endl;
-   return out;
+   return out << endl;
 }
 //----------------------------------------------------------------------------
 void

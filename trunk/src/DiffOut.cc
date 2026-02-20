@@ -112,22 +112,22 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 
          if (a == r)   // same char
             {
-              if (a == 0)   return false;   // not different
+              if (a == 0)   return false;   // end of string: not different
               continue;
             }
 
          // different chars: try special matches (⁰, ¹, ², ³, ⁴, ⁵, ⁶, or ⁿ)...
 
-         if (r == UNI_PAD_U0)   // ⁰: match one or more digits
+         if (r == UNI_DIFF_DIGITS)   // ⁰: match one or more digits
             {
-              if (!Avec::is_digit(a))   return true;   // different
+              if (!Avec::is_digit(a))   return true;   // no match
 
-              // skip trailing digits
+              // match: skip trailing digits
               while (Avec::is_digit(Unicode(*apl)))   ++apl;
               continue;
             }
 
-         if (r == UNI_PAD_U1)   // ¹: match zero or more spaces
+         if (r == UNI_DIFF_SPACES)   // ¹: match zero or more spaces
             {
               if (a != UNI_SPACE)   return true;   // different
 
@@ -136,7 +136,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
               continue;
             }
 
-         if (r == UNI_PAD_U2)   // ²: match floating point number
+         if (r == UNI_DIFF_REAL)   // ²: match floating point number
             {
               if (!Avec::is_digit(a) &&
                   a != UNI_OVERBAR   &&
@@ -167,22 +167,24 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
               continue;
             }
 
-         if (r == UNI_PAD_U3)   // ³: match anything
-            return false;   // not different
+         if (r == UNI_DIFF_ANY)   // ³: match anything
+            {
+              return false;   // not different
+            }
 
-         if (r == UNI_PAD_U4)   // ⁴: match optional ¯
+         if (r == UNI_DIFF_OVERBAR)   // ⁴: match optional ¯
             {
               if (a != UNI_OVERBAR)   apl -= len_apl;   // restore apl
               continue;
             }
 
-         if (r == UNI_PAD_U5)   // ⁵: match + or -
+         if (r == UNI_DIFF_SIGN)   // ⁵: match + or -
             {
               if (a != '+' && a != '-')   return true;   // different
               continue;
             }
 
-         if (r == UNI_PAD_U6)   // ⁶: match 28 ⎕CR 42
+         if (r == UNI_DIFF_CR28_29)   // ⁶: match 28 ⎕CR 42
             {
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
               if (a != '1')   return true;   // different
@@ -191,7 +193,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 #endif
               continue;
             }
-         if (r == UNI_PAD_Un)   // ⁿ: optional unit multiplier
+         if (r == UNI_DIFF_MULT)   // ⁿ: optional unit multiplier
             {
               // ⁿ shall match an optional unit (milli, micro, or nano)
               // multiplier i.e. m, n, u, or μ
@@ -206,7 +208,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
               continue;
             }
 
-         return true;   // different
+         return true;   // different (r does not match a)
        }
 
    // not reached

@@ -114,6 +114,13 @@ Unicode_source src(input);
         switch(tok.get_Class())
             {
               case TC_END:   // chars without APL meaning
+                   if (tok.get_tag() == TOK_DIAMOND)
+                       {
+                         ++src;
+                         tos.push_back(tok);
+                         break;
+                       }
+
                    rest_2 = src.rest_len();
                    {
                      Log(LOG_error_throw)
@@ -341,11 +348,6 @@ Unicode_source src(input);
               case TC_R_BRACK:
               case TC_L_CURLY:
               case TC_R_CURLY:
-                   ++src;
-                   tos.push_back(tok);
-                   break;
-
-              case TC_DIAMOND:
                    ++src;
                    tos.push_back(tok);
                    break;
