@@ -1187,7 +1187,6 @@ UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
    // NOTE: only called from Archive::read_Function(). extract the local
    //       vars the first line of text,
    //
-
    /* Example: consider;
 
       ⎕FX 'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'

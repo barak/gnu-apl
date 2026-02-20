@@ -934,7 +934,9 @@ UCS_string failed_statement;
 
      loop(f, failed_line.size())
          {
-           if (failed_line[f] == UNI_DIAMOND)   { ++l;   continue; }
+           if (Avec::make_standard(failed_line[f]) == UNI_DIAMOND)
+              { ++l;   continue; }
+
            if (l > statement)   break;      // subsequent line
            if (l < statement)   continue;   // previous line
            failed_statement << failed_line[f];
@@ -1203,11 +1205,11 @@ ShapeItem insertion_point = b;
               case TOK_ALPHA_U: if (!level)   signature |= SIG_LO;        break;
 
               case TOK_DIAMOND:
-                   MORE_ERROR() << "◊ is not allowed in λ expressionx ";
+                   MORE_ERROR() << "◊ is not allowed in λ expression ";
                    DEFN_ERROR;
 
               case TOK_BRANCH:
-                   MORE_ERROR() << "→ is not allowed in λ expressionx ";
+                   MORE_ERROR() << "→ is not allowed in λ expression ";
                    DEFN_ERROR;
 
               case TOK_ESCAPE:
@@ -1373,7 +1375,7 @@ out:
 ShapeItem sols = 0;   // start-of-last-statement; assume no ◊.
    rev_loop(j, lambda_text.size())
       {
-        if (lambda_text[j] == UNI_DIAMOND)
+        if (Avec::make_standard(lambda_text[j]) == UNI_DIAMOND)
            {
              sols = j + 1;
              while (lambda_text[sols] <= UNI_SPACE)   ++sols;

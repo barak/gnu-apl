@@ -127,75 +127,78 @@ operator << (ostream & out, TokenClass tc)
 ostream &
 operator << (ostream & out, const Token & token)
 {
-   if (token.get_tag() == TOK_CHARACTER)
+const TokenTag tag = token.get_tag();
+   switch(tag)
       {
-        out << "CHAR«" << token.get_char_val() << "»";
-        return out;
-      }
+        case TOK_CHARACTER: return out << "CHAR«" << token.get_char_val()
+                                       << "»";
 
-   if (token.get_tag() == TOK_APL_VALUE1 ||
-       token.get_tag() == TOK_APL_VALUE2 ||
-       token.get_tag() == TOK_APL_VALUE3)
-      {
-        if      (token.get_tag() == TOK_APL_VALUE1)   out << "VALUE1";
-        else if (token.get_tag() == TOK_APL_VALUE2)   out << "VALUE2";
-        else if (token.get_tag() == TOK_APL_VALUE3)   out << "VALUE3";
-        else                                          out << "VALUE???";
-        Value_P value = token.get_apl_val();
-        Assert(+value);
-        const APL_types::Depth depth = value->compute_depth();
-        out << "«";
-        for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
+        case TOK_APL_VALUE1:
+        case TOK_APL_VALUE2:
+        case TOK_APL_VALUE3:
+             if      (tag == TOK_APL_VALUE1)   out << "VALUE1";
+             else if (tag == TOK_APL_VALUE2)   out << "VALUE2";
+             else if (tag == TOK_APL_VALUE3)   out << "VALUE3";
+             else                              out << "VALUE???";
+             {
+               Value_P value = token.get_apl_val();
+               Assert(+value);
+               const APL_types::Depth depth = value->compute_depth();
+               out << "«";
+               for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
 
-        if (value->get_rank())   out << value->get_shape();
+               if (value->get_rank())   out << value->get_shape();
 
-        const PrintContext pctx(PR_APL);
-        PrintBuffer pb(*value, pctx, 0);
-        bool more = pb.get_row_count() > 1;
-        if (pb.get_row_count() > 0)
-           {
-             UCS_string ucs = pb.get_line(0).no_pad();
-             if (ucs.size() > 20)
-                {
-                  ucs.resize(20);
-                  more = true;
-                }
-             out << ucs;
-           }
-        if (more)   out << "...";
-        return out << "»";
-      }
+               const PrintContext pctx(PR_APL);
+               PrintBuffer pb(*value, pctx, 0);
+               bool more = pb.get_row_count() > 1;
+               if (pb.get_row_count() > 0)
+                  {
+                    UCS_string ucs = pb.get_line(0).no_pad();
+                    if (ucs.size() > 20)
+                       {
+                         ucs.resize(20);
+                         more = true;
+                       }
+                    out << ucs;
+                  }
+               if (more)   out << "...";
+               return out << "»";
+             }
 
-   if (token.get_tag() == TOK_ERROR)
-      {
-        return out << Error::error_name(ErrorCode(token.get_int_val()));
-      }
+        case TOK_ERROR:
+             return out << Error::error_name( ErrorCode(token.get_int_val()));
 
-   if (token.get_tag() == TOK_BRANCH)
-      {
-        return out << token.get_Id() << token.get_int_val();
-      }
+        case TOK_BRANCH:
+             return out << token.get_Id() << token.get_int_val();
 
-   if (token.get_tag() == TOK_GOTO_PC)
-      {
-        return out << "→PC=" << token.get_int_val();
-      }
+        case  TOK_GOTO_PC:
+              return out << "→PC=" << token.get_int_val();
 
-   if (token.get_tag() == TOK_NOBRANCH)
-      {
-        return out << token.get_Id() << token.get_int_val();
-      }
+        case TOK_NOBRANCH:
+             return out << token.get_Id() << token.get_int_val();
 
-   if (token.get_tag() == TOK_INTEGER)
-      {
-        return out << "INTEGER (" << token.get_int_val() << ") ";
-      }
+        case TOK_INTEGER:
+             return out << "INTEGER (" << token.get_int_val() << ") ";
 
-   if (token.get_tag() == TOK_RETURN_SYMBOL)
-      {
-        const Symbol * symbol = token.get_sym_ptr();
-        Assert1(symbol);
-        return out << "RETURN_SYMBOL(" << symbol->get_name() << ")";
+        case TOK_RETURN_SYMBOL:
+             {
+               const Symbol * symbol = token.get_sym_ptr();
+               Assert1(symbol);
+               return out << "RETURN_SYMBOL(" << symbol->get_name() << ")";
+             }
+
+        case TOK_DIAMOND:      return out << "◊";
+        case TOK_ENDL:         return out << "ENDL";
+        case TOK_IF_THEN:      return out << "→→";
+        case TOK_IF_ELSE:      return out << "←→";
+        case TOK_IF_END:       return out << "←←";
+
+        case TOK_RETURN_EXEC:  return out << "RETURN ⍎";
+        case TOK_RETURN_STATS: return out << "RETURN ◊";
+        case TOK_RETURN_VOID:  return out << "RETURN ∇FUN";
+
+         default: break;
       }
 
    if (token.get_Id() > ID_No_ID2)   return out << token.get_Id();
@@ -206,46 +209,33 @@ operator << (ostream & out, const Token & token)
              return out << "END";
 
         case TC_RETURN:
-             if (token.get_tag() == TOK_RETURN_EXEC)
-                return out << "RETURN ⍎";
-
-             if (token.get_tag() == TOK_RETURN_STATS)
-                return out << "RETURN ◊";
-
-             if (token.get_tag() == TOK_RETURN_VOID)
-                return out << "RETURN ∇FUN";
-
-             if (token.get_tag() == TOK_RETURN_SYMBOL)
-                return out << "RETURN Z←FUN";
-
              return out << "RETURN ???";
 
         case TC_VALUE:    return token.print_value(out);
 
         case TC_INDEX:
         case TC_PINDEX:
-             if (token.get_tag() == TOK_INDEX)
-                return out << token.get_index_val();
-             if (token.get_tag() == TOK_AXIS)
+             if (tag == TOK_INDEX)   return out << token.get_index_val();
+             if (tag == TOK_AXIS)
                 {
                   out << "[";
                   if (const Value * val = token.get_axes().get())
                      out << *val;
                   return out << "]";
                 }
-             if (token.get_tag() == TOK_FAXIS)
+             if (tag == TOK_FAXIS)
                 {
                   return out << "[" << token.get_int_val() << "]";
                 }
              FIXME;
 
         case TC_SYMBOL:
-             if (token.get_tag() == TOK_LSYMB)
+             if (tag == TOK_LSYMB)
                 {
                   token.get_sym_ptr()->print(out);
                   out << UNI_LEFT_ARROW;
                 }
-             else if (token.get_tag() == TOK_LSYMB2)
+             else if (tag == TOK_LSYMB2)
                 {
                   token.get_sym_ptr()->print(out << "'(... ");
                   out << ")←";
@@ -267,7 +257,7 @@ operator << (ostream & out, const Token & token)
         default: break;
       }
 
-   return out <<  "{-unknown Token " << token.get_tag() << "-}";
+   return out <<  "{-unknown Token " << tag << "-}";
 }
 //----------------------------------------------------------------------------
 void
