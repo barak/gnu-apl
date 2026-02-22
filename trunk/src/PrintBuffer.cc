@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -832,63 +832,75 @@ UCS_string hori(get_column_count(), HORI);
 
    // maybe draw frame decorators
    //
-    if (!(style & PST_PLAIN))
+    if (style & PST_PLAIN)   // no decorators
        {
-         if (shape.get_rank() > 0)               // → on top frame line
-            {
-              if (style & PST_NARS)   // digit(s) indicating axis lengths
-                 {
-                   UCS_string ucs;
-                   ucs << shape.get_last_shape_item();
-                   if (ucs.ssize() < (get_column_count() - 2))
-                      {
-                        loop(u, ucs.ssize())   set_char(u + 1, 0, ucs[u]);
-                      }
-                 }
-              else   // IBM DISPLAY workspace style
-                 {
-                   set_char(1, 0, UNI_RIGHT_ARROW);
-                 }
-            }
-       
-         if (shape.get_rank() > 1)               // ↓ on left frame line
-            {
-              if (style & PST_NARS)
-                 {
-                   UCS_string ucs;
-                   loop(r, shape.get_rank() - 1)
-                      {
-                        if (r)   ucs << VERT;
-                        ucs << shape.get_shape_item(r);
-                      }
-                   if (ucs.ssize() < get_row_count() - 2)
-                      {
-                        loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
-                      }
-                 }
-              else   // IBM DISPLAY workspace style
-                 {
-                   set_char(0, 1, UNI_DOWN_ARROW);
-                 }
-            }
-       
-         if (depth)                      // ϵ on bottom frame line
-            {
-              loop(d, depth - 1)
-                  if (d + 1 < get_column_count() - 1)
-                     set_char(1 + d, get_row_count() - 1, UNI_ELEMENT);
-            }
-       
-         if (style & PST_EMPTY_LAST)   // last (X-) dimension is empty
-            {
-              set_char(1, 0, UNI_CIRCLE_BAR);   // ⊖
-            }
-       
-         if (style & PST_EMPTY_NLAST)   // a non-last (Y-) dimension is empty
-            {
-              set_char(0, 1, UNI_CIRCLE_STILE);   // ⌽
-            }
+         Assert(is_rectangular());
+         return;
        }
+
+   if (shape.get_rank() > 0)               // → on top frame line
+      {
+        if (style & PST_NARS)   // digit(s) indicating axis lengths
+           {
+             UCS_string ucs;
+             ucs << shape.get_last_shape_item();
+             if (ucs.ssize() < (get_column_count() - 2))
+                {
+                  loop(u, ucs.ssize())   set_char(u + 1, 0, ucs[u]);
+                }
+           }
+        else   // IBM DISPLAY workspace style
+           {
+             set_char(1, 0, UNI_RIGHT_ARROW);
+           }
+      }
+   
+   if (shape.get_rank() > 1)               // ↓ on left frame line
+      {
+        if (style & PST_NARS)
+           {
+             UCS_string ucs;
+             loop(r, shape.get_rank() - 1)
+                {
+                  if (r)   ucs << VERT;
+                  ucs << shape.get_shape_item(r);
+                }
+             if (ucs.ssize() < get_row_count() - 2)
+                {
+                  loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
+                }
+           }
+        else   // IBM DISPLAY workspace style
+           {
+             set_char(0, 1, UNI_DOWN_ARROW);
+           }
+      }
+
+   if (depth > 1)                      // one or more ϵ on bottom frame line
+      {
+        loop(d, depth - 1)
+            if (d + 1 < get_column_count() - 1)
+               set_char(1 + d, get_row_count() - 1, UNI_ELEMENT);
+      }
+   else if (style & PST_SIMPLE_NUMER)   // simple numeric
+     {
+        set_char(1, get_row_count() - 1, UNI_TILDE_OPERATOR);   // ∼
+     }
+   else if (style & PST_SIMPLE_MIXED)   // simple numeric
+     {
+        set_char(1, get_row_count() - 1, UNI_PLUS);   // +
+     }
+   
+   if (style & PST_EMPTY_LAST)   // last (X-) dimension is empty
+      {
+        set_char(1, 0, UNI_CIRCLE_BAR);   // ⊖
+      }
+   
+   if (style & PST_EMPTY_NLAST)   // a non-last (Y-) dimension is empty
+      {
+        set_char(0, 1, UNI_CIRCLE_STILE);   // ⌽
+      }
+   
 
    Assert(is_rectangular());
 }

@@ -934,7 +934,7 @@ UCS_string failed_statement;
 
      loop(f, failed_line.size())
          {
-           if (Avec::make_standard(failed_line[f]) == UNI_DIAMOND)
+           if (Avec::is_DIAMOND(failed_line[f]))
               { ++l;   continue; }
 
            if (l > statement)   break;      // subsequent line
@@ -1375,7 +1375,7 @@ out:
 ShapeItem sols = 0;   // start-of-last-statement; assume no ◊.
    rev_loop(j, lambda_text.size())
       {
-        if (Avec::make_standard(lambda_text[j]) == UNI_DIAMOND)
+        if (Avec::is_DIAMOND(lambda_text[j]))
            {
              sols = j + 1;
              while (lambda_text[sols] <= UNI_SPACE)   ++sols;

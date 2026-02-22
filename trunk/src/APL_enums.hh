@@ -370,6 +370,8 @@ enum PrintStyle
    PST_NO_FRACT_0    = 0x00000400,       ///< remove trailing fractional 0s
    PST_EMPTY_LAST    = 0x00000800,       ///< last axis is empty
    PST_EMPTY_NLAST   = 0x00001000,       ///< some non-last axis is empty
+   PST_SIMPLE_NUMER  = 0x00002000,       ///< simple numeric
+   PST_SIMPLE_MIXED  = 0x00004000,       ///< simple mixed
 
    PST_MATRIX        = 0x00010000,       ///< multi line output
    PST_INPUT         = 0x00020000,       ///< use '' for chars and () for nested

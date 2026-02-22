@@ -1175,31 +1175,36 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
 {
    if (strcmp(arg, prim))   return;
 
+   if (arity == -6)
+      {
+        out << "   " << name << ":   " << brief << endl
+            << "    " << descr << endl;
+        return;
+      }
+
+   out << "   " << name << " is a ";
    switch(arity)
       {
-        case -6: out << "   " << name << ":   " << brief << endl
-                     << "    " << descr << endl;            return;
-
-        case -5: out << "   quasi-dyadic operator:"
+        case -5: out << "quasi-dyadic operator:\n"
                         "   Z ← A (∘ . G) B";               break;
-        case -4: out << "   dyadic primitive operator:"
+        case -4: out << "dyadic primitive operator:\n"
                         "   Z ← A (F . G) B";               break;
-        case -3: out << "   dyadic primitive operator:"
+        case -3: out << "dyadic primitive operator:\n"
                         "   Z ← (F " << prim << " G) B";    break;
-        case -2: out << "   monadic primitive operator:"
-                        "  Z ← A (F " << prim << ") B";     break;
-        case -1: out << "   monadic primitive operator:"
-                        "  Z ← (F " << prim << ") B";       break;
-        case  0: out << "   niladic primitive function:"
-                        " Z ← " << prim;                    break;
-        case  1: out << "   monadic primitive function:"
-                        " Z ← " << prim << " B";            break;
-        case  2: out << "   dyadic primitive function:"
-                        "  Z ← A " << prim << " B";         break;
-        case  3: out << "   monadic primitive function (with axis):"
-                        "  Z ← " << prim << "[X] B";      break;
-        case  4: out << "   dyadic primitive function (with axis):"
-                        "  Z ← A " << prim << "[X] B";      break;
+        case -2: out << "monadic primitive operator:\n"
+                        "   Z ← A (F " << prim << ") B";     break;
+        case -1: out << "monadic primitive operator:\n"
+                        "   Z ← (F " << prim << ") B";       break;
+        case  0: out << "niladic primitive function:\n"
+                        "   Z ← " << prim;                    break;
+        case  1: out << "monadic primitive function:\n"
+                        "   Z ← " << prim << " B";            break;
+        case  2: out << "dyadic primitive function:\n"
+                        "   Z ← A " << prim << " B";         break;
+        case  3: out << "monadic primitive function (with axis):\n"
+                        "   Z ← " << prim << "[X] B";      break;
+        case  4: out << "dyadic primitive function (with axis):\n"
+                        "   Z ← A " << prim << "[X] B";      break;
 
         default: FIXME;   // error in Help.def
       }

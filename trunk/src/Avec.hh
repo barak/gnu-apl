@@ -102,9 +102,16 @@ public:
    static bool is_A_to_Z(Unicode uni)
       { return uni >= UNI_A && uni <= UNI_Z; }
 
-   /// Return \b true iff \b av is a digit or a space
+   /// Return \b true iff \b uni is a digit or a space
    static bool is_digit_or_space(Unicode uni)
       { return is_digit(uni) || is_white(uni); }
+
+   /// Return \b true iff \b uni is one of the various DIAMOND characters
+   static bool is_DIAMOND(Unicode uni)
+      { return uni == UNI_DIAMOND ||   // ◊ = 0x25CA
+               uni == 0x2B25      ||   // ⬥
+               uni == 0x2B26      ||   // ⬦
+               uni == 0x2B27; }
 
    /// return \b true iff \b av is a number char (digit, .)
    static bool is_number(Unicode uni)

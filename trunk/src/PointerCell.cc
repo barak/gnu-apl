@@ -258,8 +258,8 @@ PrintBuffer ret(*val, pctx, 0);
                 {
                   if (val->get_shape_item(r) == 0)   // an empty axis
                      {
-                       if (r == val->get_rank() - 1)   style |= PST_EMPTY_LAST;
-                       else                            style |= PST_EMPTY_NLAST;
+                       if (r == val->get_rank()-1)   style |= PST_EMPTY_LAST;
+                       else                          style |= PST_EMPTY_NLAST;
                      }
                 }
 
@@ -289,10 +289,30 @@ PrintBuffer ret(*val, pctx, 0);
            }
        else
            {
+             int style = pctx.get_style();
+             bool is_simple   = true;
+             bool has_chars   = false;
+             bool has_numbers = false;
+             loop(e, ec)
+                 {
+                   const Cell & cell = val->get_cravel(e);
+                   if      (cell.is_pointer_cell())     is_simple = false;
+                   else if (cell.is_character_cell())   has_chars = true;
+                   else if (cell.is_numeric())          has_numbers = true;
+                 }
+              if (has_chars && has_numbers)
+                 {
+                   style |= PST_SIMPLE_MIXED;
+                 }
+              else if (is_simple && has_numbers)
+                 {
+                   style |= PST_SIMPLE_NUMER;
+                 }
+
              if (!(pctx.get_style() & PST_QUOTE_CHARS && val->is_char_array()))
                 {
-                  ret.add_frame(pctx.get_style(), val->get_shape(),
-                                val->compute_depth());
+                  ret.add_frame(PrintStyle(style),
+                                val->get_shape(), val->compute_depth());
                 }
            }
       }
