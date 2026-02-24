@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 20, 2026.
+<p>February 24, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -7583,8 +7583,18 @@ like a true graphical driver like <b>GTK</b> or <b>XCB</b>. But at least the col
 attributes are honored by rounding 3×8-bit RGB values to their nearest 4-bit
 <b>VT100</b> color.
 </p>
+<p>Some terminal emulators have issues when characters are printed on the last
+column of the terminal. This is addressed by a user preference named
+<b>plot-ASCII-columns</b>, which should be set to one less the number of columns
+of the terminal (so that the last columns in not written).
+</p>
+<p>Another preferencefor the ASCII driver that might be of interest is
+<b>plot-ASCII-background</b>. It sets the background color for the terminal
+if the Plot attribute canvas-color is not provided (e.g. in monadic ⎕PLOT
+which has no plot attributes).
+</p>
 <p>The <b>XCB</b> driver was the first driver for <b>⎕PLOT</b> but has since become
-somewhat obsolete. It has limitation when it comes to the dusplay of texts
+somewhat obsolete. It has limitation when it comes to the display of texts
 (in particular for APL characters). The long-term GNU APL design strategy
 is therefore <b>GTK</b> in favour of the good old <b>XCB</b>. <b>XCB</b> will still
 be supported for a while, but new features will only be added to the

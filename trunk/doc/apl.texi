@@ -6491,8 +6491,18 @@ like a true graphical driver like @b{GTK} or @b{XCB}. But at least the color
 attributes are honored by rounding 3×8-bit RGB values to their nearest 4-bit
 @b{VT100} color.
 
+Some terminal emulators have issues when characters are printed on the last
+column of the terminal. This is addressed by a user preference named
+@b{plot-ASCII-columns}, which should be set to one less the number of columns
+of the terminal (so that the last columns in not written).
+
+Another preferencefor the ASCII driver that might be of interest is
+@b{plot-ASCII-background}. It sets the background color for the terminal
+if the Plot attribute canvas-color is not provided (e.g. in monadic ⎕PLOT
+which has no plot attributes).
+
 The @b{XCB} driver was the first driver for @b{⎕PLOT} but has since become
-somewhat obsolete. It has limitation when it comes to the dusplay of texts
+somewhat obsolete. It has limitation when it comes to the display of texts
 (in particular for APL characters). The long-term GNU APL design strategy
 is therefore @b{GTK} in favour of the good old @b{XCB}. @b{XCB} will still
 be supported for a while, but new features will only be added to the
