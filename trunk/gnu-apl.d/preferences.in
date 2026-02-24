@@ -4,10 +4,10 @@
 #
 # It should be placed into
 #
-# (1) in sub-directory gnu-apl.d of the system configuration directory, and/or
-# (2) in folder .config/gnu-apl/ in the user's home directory.
+# (1) sub-directory gnu-apl.d of the system configuration directory, and/or
+# (2) sub-directory .config/gnu-apl/ in the user's home directory.
 #
-# In both cases the file name must be 'preferences'.
+# In both cases the file name shall be be 'preferences'.
 #
 # The system configuration directory is usually /etc or /usr/local/etc
 # It can be overridden by  ./configure --sysconfdir=something-else
@@ -333,6 +333,17 @@ READLINE_HISTORY_PATH .apl.history
 BACKUP_BEFORE_SAVE  yes
 
 
+###############################################################################
+#
+# ASCII PLOT default values
+#
+# The ASCII driver for ⎕PLOT uses default values for plot attributes that
+# were not specified (e.g. for monadic ⎕PLOT B). Some of these default values
+# can be changed by uncommenting the lines below.
+#
+# plot-ASCII-rows    24
+# plot-ASCII-columns 80
+#
 ###############################################################################
 #
 # GNU APL assumes a particular layout of your keyboard (and assumes that you

@@ -54,6 +54,8 @@ UserPreferences::UserPreferences()
      append_summary(false),
      auto_OFF(false),
      backup_before_save(false),
+     plot_ASCII_rows(24),
+     plot_ASCII_columns(80),
      control_Ds_to_exit(0),
      CPU_limit_secs(0),
      daemon(false),
@@ -1612,6 +1614,14 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (yes_no && !strcasecmp(opt, "BACKUP_BEFORE_SAVE"))
             {
               backup_before_save = yes;
+            }
+         else if (!strcasecmp(opt, "plot-ASCII-rows"))
+            {
+              plot_ASCII_rows = atoi(arg);
+            }
+         else if (!strcasecmp(opt, "plot-ASCII-columns"))
+            {
+              plot_ASCII_columns = atoi(arg);
             }
          else if (!strcasecmp(opt, "KEYBOARD_LAYOUT_FILE"))
             {

@@ -158,19 +158,18 @@ Unicode u1;
    switch(w_props.get_gridX_style())
       {
         case 0:   return;   // no grid
-        case 1:  u1 = Unicode(0x2500);   break;   // │
-        case 2:  u1 = Unicode(0x2504);   break;   // 
-        default: u1 = Unicode(0x2500);   break;   // │
+        case 1:  u1 = Unicode(U'─');   break;
+        case 2:  u1 = Unicode(U'┄');   break;
+        default: u1 = Unicode(U'─');   break;
       }
 
 const int W1 = W - 1;
 const int H1 = H - 1;
    for (int y = 3; y < H1; y += 4)
        {
-         set_point( 0, y, Unicode(0x255F), color);   // ╟
-         set_point(W1, y, Unicode(0x2562), color);   // ╢
-         for (int x = 1; x < W1; ++x)
-             set_point(x, y, u1, color);
+         set_point( 0, y, Unicode(U'╟'), color);
+         set_point(W1, y, Unicode(U'╢'), color);
+         for (int x = 1; x < W1; ++x)   set_point(x, y, u1, color);
        }
 }
 //----------------------------------------------------------------------------
@@ -185,17 +184,17 @@ Unicode u1, u2;
    switch(w_props.get_gridX_style())
       {
         case 0:   return;   // no grid
-        case 1:  u1 = Unicode(0x2502);   u2 = Unicode(0x253C);   break;   // │ ┼
-        case 2:  u1 = Unicode(0x2506);   u2 = Unicode(0x253C);   break;   // ┆ ┼
-        default: u1 = Unicode(0x2502);   u2 = Unicode(0x253C);   break;   // │ ┼
+        case 1:  u1 = Unicode(0x2502);   u2 = Unicode(U'┼');   break;
+        case 2:  u1 = Unicode(0x2506);   u2 = Unicode(U'┼');   break;
+        default: u1 = Unicode(0x2502);   u2 = Unicode(U'┼');   break;
       }
 
 const int W1 = W - 1;
 const int H1 = H - 1;
    for (int x = 9; x < W1; x += 10)
        {
-         set_point(x,  0, Unicode(0x2564), VT100_dark_black);   // ╤ 
-         set_point(x, H1, Unicode(0x2567), VT100_dark_black);   // ╧
+         set_point(x,  0, Unicode(U'╤'), VT100_dark_black);
+         set_point(x, H1, Unicode(U'╧'), VT100_dark_black);
          for (int y = 1; y < H1; ++y)
              {
                if (get_point(x, y).uni == UNI_SPACE)
@@ -214,20 +213,20 @@ const VT100_color color = VT100_dark_black;
    //
    loop(x, W)
        {
-         set_point(x,  0,  Unicode(0x2550), color);   // ═
-         set_point(x, H-1, Unicode(0x2550), color);   // ═
+         set_point(x,  0,  Unicode(U'═'), color);   // ═
+         set_point(x, H-1, Unicode(U'═'), color);   // ═
        }
 
    loop(y, H)
        {
-         set_point( 0,  y, Unicode(0x2551), color);   // ║
-         set_point(W-1, y, Unicode(0x2551), color);   // ║
+         set_point( 0,  y, Unicode(U'║'), color);   // ║
+         set_point(W-1, y, Unicode(U'║'), color);   // ║
        }
 
-   set_point( 0,   0,  Unicode(0x2554), color);   // ╔
-   set_point( 0,  H-1, Unicode(0x255A), color);   // ╚
-   set_point(W-1,  0,  Unicode(0x2557), color);   // ╗
-   set_point(W-1, H-1, Unicode(0x255D), color);   // ╝
+   set_point( 0,   0,  Unicode(U'╔'), color);
+   set_point( 0,  H-1, Unicode(U'╚'), color);
+   set_point(W-1,  0,  Unicode(U'╗'), color);
+   set_point(W-1, H-1, Unicode(U'╝'), color);
 
    draw_horizontal_grid(w_props);
    draw_vertical_grid(w_props);
@@ -253,16 +252,16 @@ const int W1 = W - 1;   // bottom frame column
 const int H2 = H - 2;   // space inside the frame
 const int W2 = W - 2;   // space inside the frame
 
-Unicode POINT = Unicode(0x25CF);   // ●
+Unicode POINT = Unicode(U'●');
    switch(lp.get_point_style())
       {
-        case 1:  POINT = Unicode(0x25CF);   break;   // ●
-        case 2:  POINT = Unicode(0x25B2);   break;   // ▲
-        case 3:  POINT = Unicode(0x25BC);   break;   // ▼
-        case 4:  POINT = Unicode(0x25C6);   break;   // ◆
-        case 5:  POINT = Unicode(0x25A0);   break;   // ■
-        case 6:  POINT = Unicode(0x2B);     break;   // +
-        case 7:  POINT = Unicode(0xD7);     break;   // ×
+        case 1:  POINT = Unicode(U'●');   break;
+        case 2:  POINT = Unicode(U'▲');   break;
+        case 3:  POINT = Unicode(U'▼');   break;
+        case 4:  POINT = Unicode(U'◆');   break;
+        case 5:  POINT = Unicode(U'■');   break;
+        case 6:  POINT = Unicode(U'+');   break;
+        case 7:  POINT = Unicode(U'×');   break;
       }
 
    // scale ranges to screen size. Actually a litte less to avoud rounding

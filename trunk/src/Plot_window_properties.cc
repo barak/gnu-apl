@@ -34,7 +34,8 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
      plot_data(*data),
-# define gdef(_ty,  na,  val, _descr) na(val),
+# define gdef(_ty,  na,  val, _descr) \
+     na(val), na ## _provided(false),
 # include "Quad_PLOT.def"
      user_pw_pos(false),
      user_caption(false),
@@ -58,6 +59,13 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      rangeZ_type(NO_RANGE),
      show_legend(legend_lX != 0)
 {
+   // adjust some defaults that can be changed by UserPreferences
+   //
+   if (const int value = UserPreferences::uprefs.plot_ASCII_rows)
+      terminal_rows = value;
+   if (const int value = UserPreferences::uprefs.plot_ASCII_columns)
+      terminal_cols = value;
+
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl
            << setw(20) << "max_X: " << max_X << endl
@@ -400,6 +408,7 @@ int line_number = -1;
          if (!strncmp(#na, att_and_val, colon - att_and_val))         \
             { const char * error = 0;                                 \
               set_ ## na(Plot_data::ty ## _from_str(value, error));   \
+              na ## _provided = true;                                 \
               return error;                                           \
             }
 # include "Quad_PLOT.def"
@@ -463,7 +472,6 @@ const char * attname_cp = attname_utf.c_str();
       {
         return "Bad attribute value type";
       }
-
 }
 //----------------------------------------------------------------------------
 double

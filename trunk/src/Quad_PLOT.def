@@ -23,7 +23,7 @@ gdef(uint32_t, gridX_style,          1, "X grid style = ────────
 "                   (3)             (             = ─╴─╴─╴─╴ ")
 gdef(uint32_t, axisX_arrow,          0, "X-axis arrow")
 gdef(String,   axisX_label,        "X", "X-axis label")
-gdef(uint32_t, axisY_arrow,          0, "Yaxis arrow")
+gdef(uint32_t, axisY_arrow,          0, "Y-axis arrow")
 gdef(String,   axisY_label,        "Y", "Y-axis label")
 gdef(uint32_t, axisZ_arrow,          0, "Z-axis arrow")
 gdef(String,   axisZ_label,        "Z", "Z-axis label")
