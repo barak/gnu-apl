@@ -54,8 +54,9 @@ UserPreferences::UserPreferences()
      append_summary(false),
      auto_OFF(false),
      backup_before_save(false),
-     plot_ASCII_rows(24),
-     plot_ASCII_columns(80),
+     plot_ASCII_rows(0),         // 0: optional, not provided
+     plot_ASCII_columns(0),      // 0: optional, not provided
+     plot_ASCII_background(0),   // 0: optional, not provided
      control_Ds_to_exit(0),
      CPU_limit_secs(0),
      daemon(false),
@@ -1622,6 +1623,10 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "plot-ASCII-columns"))
             {
               plot_ASCII_columns = atoi(arg);
+            }
+         else if (!strcasecmp(opt, "plot-ASCII-background"))
+            {
+              plot_ASCII_background = strtol(arg, 0, 0);
             }
          else if (!strcasecmp(opt, "KEYBOARD_LAYOUT_FILE"))
             {

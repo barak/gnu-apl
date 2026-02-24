@@ -58,6 +58,9 @@ public:
    /// screen columns for ⎕PLOT ASCII driver
    int plot_ASCII_columns;
 
+   /// background color for ⎕PLOT ASCII driver
+   int plot_ASCII_background;
+
    /// number of control-Ds to exit (0 = never)
    int control_Ds_to_exit;
 

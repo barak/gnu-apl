@@ -51,7 +51,7 @@ const struct
   { VT100_dark_blue     ,    0,   0, 255 },
   { VT100_dark_magenta  ,  255,   0, 255 },
   { VT100_dark_cyan     ,    0, 255, 255 },
-  { VT100_dark_white    ,  255, 255, 255 },
+  { VT100_dark_white    ,  250, 250, 250 },
                                       
   { VT100_bright_black  ,  128, 128, 128 },
   { VT100_bright_red    ,  255, 128, 128 },
@@ -321,7 +321,7 @@ VT100_color color = VT100_NONE;   // to force an initial color change
          // end of line: switch back to COUT color
          //
          cerr << Output::color_COUT << Output::clear_EOL
-              << "\n" "\x1B[0;" << (40 + bg_color) << 'm';
+              << "\n" "\x1B[" << (40 + bg_color) << 'm';
        }
 
    cerr << Output::color_CIN << Output::clear_EOL << "\n";

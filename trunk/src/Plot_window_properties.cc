@@ -59,12 +59,16 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      rangeZ_type(NO_RANGE),
      show_legend(legend_lX != 0)
 {
-   // adjust some defaults that can be changed by UserPreferences
+   // adjust some defaults that can be changed by UserPreferences. The default
+   // for these preferences is 0 (= not provided) and the preference will only
+   // be used if ≠0.
    //
    if (const int value = UserPreferences::uprefs.plot_ASCII_rows)
       terminal_rows = value;
    if (const int value = UserPreferences::uprefs.plot_ASCII_columns)
       terminal_cols = value;
+   if (const int value = UserPreferences::uprefs.plot_ASCII_background)
+      canvas_color = value;
 
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl

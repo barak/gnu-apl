@@ -341,8 +341,9 @@ BACKUP_BEFORE_SAVE  yes
 # were not specified (e.g. for monadic ⎕PLOT B). Some of these default values
 # can be changed by uncommenting the lines below.
 #
-# plot-ASCII-rows    24
-# plot-ASCII-columns 80
+# plot-ASCII-rows       24
+# plot-ASCII-columns    80
+# plot-ASCII-background 0xFFFFFF
 #
 ###############################################################################
 #
