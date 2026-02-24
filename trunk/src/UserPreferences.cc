@@ -54,9 +54,9 @@ UserPreferences::UserPreferences()
      append_summary(false),
      auto_OFF(false),
      backup_before_save(false),
-     plot_ASCII_rows(0),         // 0: optional, not provided
-     plot_ASCII_columns(0),      // 0: optional, not provided
-     plot_ASCII_background(0),   // 0: optional, not provided
+     plot_ASCII_rows(0),          //  0: preference was not provided
+     plot_ASCII_columns(0),       //  0: preference was not provided
+     plot_ASCII_background(-1),   // -1: preference was not provided
      control_Ds_to_exit(0),
      CPU_limit_secs(0),
      daemon(false),

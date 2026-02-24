@@ -67,8 +67,10 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
       terminal_rows = value;
    if (const int value = UserPreferences::uprefs.plot_ASCII_columns)
       terminal_cols = value;
-   if (const int value = UserPreferences::uprefs.plot_ASCII_background)
-      canvas_color = value;
+   {
+     const int value = UserPreferences::uprefs.plot_ASCII_background;
+     if (value != -1)   canvas_color = value;
+   }
 
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl
