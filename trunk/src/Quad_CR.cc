@@ -99,9 +99,21 @@ const char * name = info.function_name;
 Token
 Quad_CR::eval_B(Value_P B) const
 {
-   if (B->element_count())                    return do_eval_B(B.get(), true);
-   if (B->get_cfirst().is_character_cell())   return list_functions(CERR);
-   if (B->get_cfirst().is_integer_cell())     return list_mappings(CERR);
+   if (B->element_count())                    // the normal case
+      {
+        const bool discard = UserPreferences::uprefs.discard_indentation;
+        return do_eval_B(B.get(), discard);
+      }
+
+   if (B->get_cfirst().is_character_cell())   // ⎕CR ''
+      {
+        return list_functions(CERR);
+      }
+
+   if (B->get_cfirst().is_integer_cell())     // ⎕CR ⍬
+      {
+        return list_mappings(CERR);
+      }
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
