@@ -566,6 +566,13 @@ if apl_EQ($MAX_RANK_WANTED,); then MAX_RANK_WANTED=8; fi   # set default to 8
 AC_DEFINE_UNQUOTED(cfg_MAX_RANK_WANTED, $MAX_RANK_WANTED,
           [max. rank of APL values])
 
+# APL: alt map desired ?
+AC_ARG_VAR(ALT_MAP_WANTED,
+   [ Alt-key map profile (see README-2-configure) default: 0 (none)) ])
+if apl_EQ($ALT_MAP_WANTED,); then ALT_MAP_WANTED=0; fi   # set default to 0
+AC_DEFINE_UNQUOTED(cfg_ALT_MAP_WANTED, $ALT_MAP_WANTED,
+          [Alt key map profile])
+
 
 # APL: Value::check_value() desired ?
 AC_MSG_CHECKING([whether internal value checks shall be enabled])
@@ -1054,6 +1061,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
+    ALT_MAP_WANTED:              $ALT_MAP_WANTED
     DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED
     PERFORMANCE_COUNTERS_WANTED: $PERFORMANCE_COUNTERS_WANTED
     VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED

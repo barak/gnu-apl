@@ -354,6 +354,9 @@ public:
    static LineHistory & get_history()
       { return the_line_input->history; }
 
+   // old-fashioned ^N (shift out) / ^O (shift in) replacement for the ALT keys
+   static void map_alt(int alt_map_profile, UCS_string & line);
+
 protected:
    /// constructor
    LineInput(bool do_read_history);

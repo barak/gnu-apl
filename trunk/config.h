@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 2750"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 2857", "2026-02-27 18:47:05 CET", "Linux 5.15.0-164-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 2860", "2026-03-05 15:53:36 CET", "Linux 5.15.0-164-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -551,6 +551,9 @@
 
 /* XCB is available ? */
 #define apl_XCB 1
+
+/* Alt key map profile */
+#define cfg_ALT_MAP_WANTED 0
 
 /* APserver listen port name */
 #define cfg_APSERVER_PATH "/tmp/GNU-APL/APserver"

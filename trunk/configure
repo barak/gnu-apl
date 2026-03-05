@@ -683,6 +683,7 @@ GPROF_WANTED
 VALUE_HISTORY_WANTED
 PERFORMANCE_COUNTERS_WANTED
 VALUE_CHECK_WANTED
+ALT_MAP_WANTED
 MAX_RANK_WANTED
 apl_DEVELOP_FALSE
 apl_DEVELOP_TRUE
@@ -897,6 +898,7 @@ XMKMF
 CXX_WERROR
 DEVELOP_WANTED
 MAX_RANK_WANTED
+ALT_MAP_WANTED
 VALUE_CHECK_WANTED
 PERFORMANCE_COUNTERS_WANTED
 VALUE_HISTORY_WANTED
@@ -1606,6 +1608,8 @@ Some influential environment variables:
               set development options (see README-2-configure) default: no
   MAX_RANK_WANTED
               the max. Rank of APL values (see README-2-configure) default: 8)
+  ALT_MAP_WANTED
+              Alt-key map profile (see README-2-configure) default: 0 (none))
   VALUE_CHECK_WANTED
               enable Value::check_value() (see README-2-configure) default: no
   PERFORMANCE_COUNTERS_WANTED
@@ -22793,6 +22797,13 @@ if test "x$MAX_RANK_WANTED" = "x"; then MAX_RANK_WANTED=8; fi   # set default to
 printf "%s\n" "#define cfg_MAX_RANK_WANTED $MAX_RANK_WANTED" >>confdefs.h
 
 
+# APL: alt map desired ?
+
+if test "x$ALT_MAP_WANTED" = "x"; then ALT_MAP_WANTED=0; fi   # set default to 0
+
+printf "%s\n" "#define cfg_ALT_MAP_WANTED $ALT_MAP_WANTED" >>confdefs.h
+
+
 
 # APL: Value::check_value() desired ?
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether internal value checks shall be enabled" >&5
@@ -26046,6 +26057,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
+    ALT_MAP_WANTED:              $ALT_MAP_WANTED
     DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED
     PERFORMANCE_COUNTERS_WANTED: $PERFORMANCE_COUNTERS_WANTED
     VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED

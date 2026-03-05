@@ -1106,10 +1106,22 @@ bool add_hist = false;
 int
 LineInput::safe_fgetc()
 {
+static bool shift_next = false;
+static bool shift_in   = false;
+
+int ret;
    for (;;)
        {
-          const int ret = fgetc(stdin);
-          if (ret != EOF)       return ret;
+          ret = fgetc(stdin);
+#if cfg_ALT_MAP_WANTED
+          switch(ret)
+             {
+               default:                             break;
+               case UNI_SOH: shift_next = true;     continue;   // ^A
+               case UNI_SO: shift_in = !shift_in;   continue;   // ^N
+             }
+#endif
+          if (ret != EOF)       break;
           if (errno == EINTR)   continue;
 
           if (got_WINCH)
@@ -1117,9 +1129,75 @@ LineInput::safe_fgetc()
                got_WINCH = false;
                continue;
              }
-
-         return EOF;
+         break;   // EOF
        }
+
+   // got a valid character of EOF
+   //
+#if cfg_ALT_MAP_WANTED
+   if (shift_next || shift_in)
+      {
+# define keymap(ascii_u, apl_u, ascii_s, apl_s) \
+   case ascii_u: return apl_u;                 \
+   case ascii_s: return apl_s;
+
+        shift_next = false;
+        switch(ret)
+           {
+             keymap( '1'  , U'¨' , '!' , U'⌶' )
+             keymap( '2'  , U'¯' , '@' , U'⍫' )
+             keymap( '3'  , U'<' , '#' , U'⍒' )
+             keymap( '4'  , U'≤' , '$' , U'⍋' )
+             keymap( '5'  , U'=' , '%' , U'⌽' )
+             keymap( '6'  , U'≥' , '^' , U'⍉' )
+             keymap( '7'  , U'>' , '&' , U'⊖' )
+             keymap( '8'  , U'≠' , '*' , U'⍟' )
+             keymap( '9'  , U'∨' , '(' , U'⍱' )
+             keymap( '0'  , U'∧' , ')' , U'⍲' )
+             keymap( '-'  , U'×' , '_' , U'!' )
+             keymap( '='  , U'÷' , '+' , U'⌹' )
+
+             keymap( 'q'  , U'?' , 'Q' , U'?' )
+             keymap( 'w'  , U'⍵' , 'W' , U'⍹' )
+             keymap( 'e'  , U'∈' , 'E' , U'⋸' )
+             keymap( 'r'  , U'⍴' , 'R' , U'⍴' )
+             keymap( 't'  , U'∼' , 'T' , U'⍨' )
+             keymap( 'y'  , U'↑' , 'Y' , U'¥' )
+             keymap( 'u'  , U'↓' , 'U' , U'↓' )
+             keymap( 'i'  , U'⍳' , 'I' , U'⍸' )
+             keymap( 'o'  , U'○' , 'O' , U'⍥' )
+             keymap( 'p'  , U'⋆' , 'P' , U'⍣' )
+             keymap( '['  , U'←' , '{' , U'⍞' )
+             keymap( ']'  , U'→' , '}' , U'⍬' )
+             keymap( '\\' , U'⊢' , '|' , U'⊣' )
+
+             keymap( 'a'  , U'⍺' , 'A' , U'⍶' )
+             keymap( 's'  , U'⌈' , 'S' , U'⌈' )
+             keymap( 'd'  , U'⌊' , 'D' , U'⌊' )
+             keymap( 'f'  , U'_' , 'F' , U'∇' )
+             keymap( 'g'  , U'∇' , 'G' , U'∇' )
+             keymap( 'h'  , U'∆' , 'H' , U'⍙' )
+             keymap( 'j'  , U'∘' , 'J' , U'⍤' )
+             keymap( 'k'  , U'λ' , 'K' , U'λ' )
+             keymap( 'l'  , U'⎕' , 'L' , U'⌷' )
+             keymap( ';'  , U'⍎' , ':' , U'≡' )
+             keymap( '\'' , U'⍕' , '"' , U'≢' )
+
+             keymap( 'z'  , U'⊂' , 'Z' , U'⊂' )
+             keymap( 'x'  , U'⊃' , 'X' , U'χ' )
+             keymap( 'c'  , U'∩' , 'C' , U'¢' )
+             keymap( 'v'  , U'∪' , 'V' , U'∪' )
+             keymap( 'b'  , U'⊥' , 'B' , U'⊥' )
+             keymap( 'n'  , U'⊤' , 'N' , U'⊤' )
+             keymap( 'm'  , U'∣' , 'M' , U'μ' )
+             keymap( ','  , U'⍝' , '<' , U'⍪' )
+             keymap( '.'  , U'⍀' , '>' , U'⍙' )
+             keymap( '/'  , U'⌿' , '?' , U'⍠' )
+           }
+      }
+# undef keymap
+#endif // cfg_ALT_MAP_WANTED
+   return ret;
 }
 //----------------------------------------------------------------------------
 Unicode

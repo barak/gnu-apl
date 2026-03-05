@@ -551,6 +551,9 @@
 /* XCB is available ? */
 #undef apl_XCB
 
+/* Alt key map profile */
+#undef cfg_ALT_MAP_WANTED
+
 /* APserver listen port name */
 #undef cfg_APSERVER_PATH
 
