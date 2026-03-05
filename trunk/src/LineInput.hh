@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -388,6 +388,12 @@ protected:
 
    /// single LineInput instance that restores stdin termios on destruction
    static LineInput * the_line_input;
+
+   /// map the next ASCII char to APL
+  static bool map_next;
+
+   /// map all subsequent ASCII chars to APL
+  static bool map_all;
 };
 //----------------------------------------------------------------------------
 /** A mapping from ESC sequences to (internal) pseudo-Unicodes such as

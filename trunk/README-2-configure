@@ -218,6 +218,11 @@ ALT_MAP_WANTED=n
                          entered again). Like CAPS LOCK for mapping lowercase
                          characters to uppercase.
 
+    Example:
+
+    ./configure ALT_MAP_WANTED=1
+
+
 PRINT_SEMA_WANTED=yes
    This option is now obsolete.
 

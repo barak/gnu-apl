@@ -50,6 +50,9 @@ void (*end_input)() = 0;
 
 LineInput * LineInput::the_line_input = 0;
 
+bool LineInput::map_next = false;
+bool LineInput::map_all  = false;
+
 LineHistory LineHistory::quote_quad_history(10);
 LineHistory LineHistory::quad_quad_history(10);
 LineHistory LineHistory::quad_INP_history(2);
@@ -1106,9 +1109,6 @@ bool add_hist = false;
 int
 LineInput::safe_fgetc()
 {
-static bool shift_next = false;
-static bool shift_in   = false;
-
 int ret;
    for (;;)
        {
@@ -1116,12 +1116,12 @@ int ret;
 #if cfg_ALT_MAP_WANTED
           switch(ret)
              {
-               default:                             break;
-               case UNI_SOH: shift_next = true;     continue;   // ^A
-               case UNI_SO: shift_in = !shift_in;   continue;   // ^N
+               default:                            break;
+               case UNI_SOH: map_next = true;      continue;   // ^A
+               case UNI_SO: map_all = ! map_all;   continue;   // ^N
              }
 #endif
-          if (ret != EOF)       break;
+          if (ret != EOF)       return ret;
           if (errno == EINTR)   continue;
 
           if (got_WINCH)
@@ -1129,20 +1129,63 @@ int ret;
                got_WINCH = false;
                continue;
              }
-         break;   // EOF
+         return EOF;   // EOF
        }
+}
+//----------------------------------------------------------------------------
+Unicode
+LineInput::get_uni()
+{
+again:
 
-   // got a valid character of EOF
+const int b0 = safe_fgetc();
+   if (b0 == EOF)   return UNI_EOF;
+
+   if (b0 & 0x80)   // non-ASCII unicode
+      {
+        int len;
+        uint32_t bx = b0;   // the "significant" bits in b0
+        if ((b0 & 0xE0) == 0xC0)        { len = 2;   bx &= 0x1F; }
+        else if ((b0 & 0xF0) == 0xE0)   { len = 3;   bx &= 0x0F; }
+        else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x0E; }
+        else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x0E; }
+        else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x0E; }
+        else
+           {
+             CERR << "Bad UTF8 sequence start at " << LOC << endl;
+             return Invalid_Unicode;
+           }
+
+        uint32_t uni = 0;
+        loop(l, len - 1)
+            {
+              const UTF8 subc = safe_fgetc();
+              if ((subc & 0xC0) != 0x80)
+                 {
+                   CERR << "Bad UTF8 sequence: " << HEX(b0)
+                        << "... at " LOC << endl;
+                   return Invalid_Unicode;
+                 }
+
+              bx  <<= 6;
+              uni <<= 6;
+              uni |= subc & 0x3F;
+            }
+
+        return Unicode(bx | uni);
+      }
+
+   // at this point b0 is an ASCII character
    //
 #if cfg_ALT_MAP_WANTED
-   if (shift_next || shift_in)
-      {
 # define keymap(ascii_u, apl_u, ascii_s, apl_s) \
-   case ascii_u: return apl_u;                 \
-   case ascii_s: return apl_s;
+   case ascii_u: return Unicode(apl_u);         \
+   case ascii_s: return Unicode(apl_s);
 
-        shift_next = false;
-        switch(ret)
+   if (map_next || map_all)
+      {
+        map_next = false;
+        switch(b0)
            {
              keymap( '1'  , U'¨' , '!' , U'⌶' )
              keymap( '2'  , U'¯' , '@' , U'⍫' )
@@ -1195,52 +1238,9 @@ int ret;
              keymap( '/'  , U'⌿' , '?' , U'⍠' )
            }
       }
+
 # undef keymap
-#endif // cfg_ALT_MAP_WANTED
-   return ret;
-}
-//----------------------------------------------------------------------------
-Unicode
-LineInput::get_uni()
-{
-again:
-
-const int b0 = safe_fgetc();
-   if (b0 == EOF)   return UNI_EOF;
-
-   if (b0 & 0x80)   // non-ASCII unicode
-      {
-        int len;
-        uint32_t bx = b0;   // the "significant" bits in b0
-        if ((b0 & 0xE0) == 0xC0)        { len = 2;   bx &= 0x1F; }
-        else if ((b0 & 0xF0) == 0xE0)   { len = 3;   bx &= 0x0F; }
-        else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x0E; }
-        else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x0E; }
-        else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x0E; }
-        else
-           {
-             CERR << "Bad UTF8 sequence start at " << LOC << endl;
-             return Invalid_Unicode;
-           }
-
-        uint32_t uni = 0;
-        loop(l, len - 1)
-            {
-              const UTF8 subc = safe_fgetc();
-              if ((subc & 0xC0) != 0x80)
-                 {
-                   CERR << "Bad UTF8 sequence: " << HEX(b0)
-                        << "... at " LOC << endl;
-                   return Invalid_Unicode;
-                 }
-
-              bx  <<= 6;
-              uni <<= 6;
-              uni |= subc & 0x3F;
-            }
-
-        return Unicode(bx | uni);
-      }
+#endif
 
    if (b0 == UNI_ESC)
       {
