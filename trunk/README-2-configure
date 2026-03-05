@@ -206,6 +206,17 @@ MAX_RANK_WANTED=n
 
     ./configure MAX_RANK_WANTED=10
 
+ALT_MAP_WANTED=n
+    Enable an APL input mechanism that allows the input of APL characters
+    without installing a keyboard mapping. This is primarily for Windows
+    machines where no reliable mechanism for entering APL characters exists.
+    The parameter n specifies a profile as sollows:
+
+    n=0 : disable the mecxhanism
+    n=1 : ^A (ASCII SOH) maps the next ASCII character to an APL character
+          ^N (ASCII SO)  maps all subsequenct ASCII characters (until ^N is
+                         entered again). Like CAPS LOCK for mapping lowercase
+                         characters to uppercase.
 
 PRINT_SEMA_WANTED=yes
    This option is now obsolete.
