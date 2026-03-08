@@ -1109,20 +1109,27 @@ bool add_hist = false;
 int
 LineInput::safe_fgetc()
 {
-int ret;
    for (;;)
        {
-          ret = fgetc(stdin);
+          errno = 0;
+          const int ret = fgetc(stdin);
+          if (errno == EINTR)   continue;
+
 #if cfg_ALT_MAP_WANTED
-          switch(ret)
+
+          // maybe change the current ASCII to APL mapping
+          //
+          enum { PROFILE = cfg_ALT_MAP_WANTED };
+          if (PROFILE == 1)   switch(ret)
              {
-               default:                            break;
-               case UNI_SOH: map_next = true;      continue;   // ^A
-               case UNI_SO: map_all = ! map_all;   continue;   // ^N
+               default:                             break;
+               case UNI_SOH: map_next = true;                   // ^A
+                             map_all  = false;      continue;
+               case UNI_SO:  map_all = ! map_all;   continue;   // ^N
              }
 #endif
+
           if (ret != EOF)       return ret;
-          if (errno == EINTR)   continue;
 
           if (got_WINCH)
              {
@@ -1139,7 +1146,12 @@ LineInput::get_uni()
 again:
 
 const int b0 = safe_fgetc();
-   if (b0 == EOF)   return UNI_EOF;
+   if (b0 == EOF)
+      {
+        map_next = false;
+        map_all  = false;
+        return UNI_EOF;
+      }
 
    if (b0 & 0x80)   // non-ASCII unicode
       {
@@ -1185,7 +1197,9 @@ const int b0 = safe_fgetc();
    if (map_next || map_all)
       {
         map_next = false;
-        switch(b0)
+
+        enum { PROFILE = cfg_ALT_MAP_WANTED };
+        if (PROFILE == 1)   switch(b0)
            {
              keymap( '1'  , U'¨' , '!' , U'⌶' )
              keymap( '2'  , U'¯' , '@' , U'⍫' )

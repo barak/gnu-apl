@@ -4,7 +4,7 @@ About APL
 In addition to ASCII characters found on most keyboards,
 APL needs additional "APL characters". This README file
 explains how GNU APL works and how to enable APL characters
-on a number of different machines.
+on a number of platforms.
 
 1. How GNU APL works
 ====================
@@ -260,7 +260,71 @@ be downloaded from:
     http://unifoundry.com
 
 
-6. Editing APL files
+6. The GNU APL ASCII keyboard driver
+====================================
+
+On some platforms (read: Microdoft Windows) it has become more and more
+difficult to produce APL characters with the keyboard. In early windows
+versions versions one could modify the windows registry to support APL, but
+in recent versions this no longer works.
+
+Micorsoft offers a royalty-free product called PowerTools for download which
+contans a component called Keyboard Manager. This Keyboard Manager allows
+you, at least in principle, to map arbitrary input key-sequences to arbitrary
+output characters or even string. So you could, in theory, map the key
+combination ALT + R to the APL character ⍴. However:
+
+1. There is no configuration file by means of which you could enter an entire
+   keyboard mapping (or to transfer a mapping from one machine to another).
+   Instead you have to interactively enter the mapping key by key. Entering
+   the mapping n the Keyboard Manager is somewhat tedious, but once you get
+   used to it you may be able to enter an entire mapping in less than one hour.
+
+2. Unfortunately after having spent an hour with entering a keyboard mapping
+   you will notice that not all windows programs will consider that mapping.
+   For example, the gvim editor will produced APL characters (as long as the
+   Keyboard Maanager is active) while the cmd.exe program (under which GNU
+   APL normally runs) does not. Bad luck.
+
+Since Windows 10 or so Microsoft also offers a thing called IME (Input Method
+Editor). The IME can, for example, be used to enter Chineses characters.
+Unfortunately the IME is, like Windows itself, non-free softeare and, as a
+consequence, does not allow you to specify your own keyboard mapping.
+Fortunately the APL vendor Dyalog offers an IME with a keyboard layout
+that matches its own (US-) APL keyboard (als also the keyboard layout
+assumed by GNU APL). Unfortunately, however, the author was not able to
+make the Dyalog IME work togeteher with GNU APL on Windows 10 or 11. The
+reason for this is unknown (possibly the same as for the Keyboard Manager).
+
+To avoid all these problems under Windows, GNU APL comes with a built-in
+keyboardd driver that does not map keys to APL characters but ASCII
+characters to APL characters. As some of the readers may remember, APL
+terminals in the 1970 had SHIFT resp. SHIFT-LOCK keys to temporarily resp.
+permanently map lowercase ASCII characters to uppercase ASCII characters.
+On these terminals you coud send ASCI control characters SI (aka. ^O) and
+SO (aka. ^N) to toggle between an ASCII mode and an APL mode of the keyboard.
+
+GNU APL has adopted this old method in its built-in ASCII Keyboard driver.
+Tho enable this driver GNU APL has to be ./configured like so:
+
+./configure ALT_MAP_WANTED=1   <other configure options...>
+
+If GNU APL was configure like that, then:
+
+^A (ASCII SOH) maps the next character entered from ASCII to APL, and
+^N (ASCII SI)  toggles between mapping and not mapping subsequent ASCII 
+               characters to APL. That is, ^N pretty much works like
+               the SHIFT LOCK key for mapping lowercase to uppercase
+               ASCII characters.
+
+The parameter 1 of the ALT_MAP_WANTED option is a profile number which defines
+the two ASCII characters(^A and ^N) that switch between ASCII and APL as well
+as the details of the mapping (which ASCII character is mapped to which APL
+character). Currently only one profile exists. The user may change these
+details in file src/LineInput.cc (search for cfg_ALT_MAP_WANTED in that file).
+
+
+7. Editing APL files
 ====================
 
 Instead of using APL interactively, you may, like the author, find it more
@@ -277,7 +341,7 @@ To further improve on that, there is a syntax file support-files/apl.vim
 that supports syntax coloring of vim.
 
 
-7. Emacs Mode
+8. Emacs Mode
 =============
 
 Unlike vim, which runs out-of-the-box with APL characters, emacs needs
@@ -289,7 +353,7 @@ emacs user:
     https://github.com/lokedhs/gnu-apl-mode
 
 
-8. Vim Plugins
+9. Vim Plugins
 ==============
 
 If your favorite editor is vim, then you will like the following plugin
@@ -303,7 +367,7 @@ pick APL characters from a menu inside vim. It is here:
     http://apl-adventures.tumblr.com/post/76528148239/an-apl-character-picker-for-vim
 
 
-9. The APL Keyboard Translator (akt)
+10. The APL Keyboard Translator (akt)
 =====================================
 
 David Lamkins has written a keyboard translator called akt. You can
@@ -328,7 +392,7 @@ Certain older terminal emulators may offer an "Alt sets MSB" option. This
 is incompatible with `akt`.
 
 
-10. Keyboard Wrapper
+11. Keyboard Wrapper
 ====================
 
 If the methods described above cannot be used for whatever reason then
@@ -340,7 +404,7 @@ This technique is demonstrated by 3 programs called APL_keyboard_show,
 APL_keyboard_learn, and APL_keyboard, which are all located in the 'tools'
 subdirectory.
 
-10.1 Introduction to Defining your own layout.
+11.1 Introduction to Defining your own layout.
 =============================================
 When you wish to use APL with your own keyboard and/or keyboard arrangement.
 
@@ -356,7 +420,7 @@ o  make                 to transform output from learn to program
 
 Details follow in sections 10.2 through 10.4 below.
 
-10.2 APL_keyboard_show
+11.2 APL_keyboard_show
 ----------------------
 
 APL_keyboard_show is a simple program that displays the byte sequences
@@ -402,7 +466,7 @@ key_seq_3(0xE2, 0x86, 0x91))
 The alert reader will have noticed that in both cases UTF8 encoded characters
 were sent; they were different and just wrong for APL before running xmodmap.
 
-10.3 APL_keyboard_learn
+11.3 APL_keyboard_learn
 -----------------------
 
 The next program is APL_keyboard_learn which is derived from APL_keyboard_show.
@@ -439,7 +503,7 @@ After running APL_keyboard_learn, you should do 'make' in the tools directory,
 in order incorporate the newly created APL_keyboard.def into the program
 APL_keyboard.
 
-10.4 APL_keyboard
+11.4 APL_keyboard
 -----------------
 
 The keyboard wrapper itself is APL_keyboard. The file APL_keyboard.def is
@@ -451,7 +515,7 @@ Once APL_keyboard is made, you can start GNU APL like this:
 $ APL_keyboard | apl
 
 
-11. aplwrap
+122 aplwrap
 ===========
 
 There is a cool GTK-based keyboard wrapper written by Chris Moller.
@@ -462,7 +526,7 @@ You can reach it via the GNU APL Community web page:
 When invoked, it opens the apl interpretor in a window. The left alt key
 is used to provide the apl characters. 
 
-12. Remote Login
+13. Remote Login
 ================
 
 Suppose GNU APL is started on machine A and you connect to it by means 
@@ -482,7 +546,7 @@ or else output coloring of GNU APL may send incorrect ESC sequences for
 switching between colors (or use apl -noColor).
 
 
-13. Pitfalls and Troubleshooting
+14. Pitfalls and Troubleshooting
 ================================
 
 There are other pieces of software that may intercept the byte stream on its
@@ -516,7 +580,7 @@ If you need to troubleshoot APL characters, proceed as follows:
    the problem.
 
 
-14. APL Keyboards
+15. APL Keyboards
 =================
 
 If you are new to APL or infrequently use it, then you may have
