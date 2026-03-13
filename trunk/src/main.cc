@@ -544,6 +544,8 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
    if (ProcessorID::init(log_startup))
       {
         // error message printed in ProcessorID::init()
+        //
+        cleanup(true);
         return 8;
       }
 

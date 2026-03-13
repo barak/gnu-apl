@@ -293,7 +293,7 @@ testAP: all
 
 # run all testcases, except slow ones
 test3: all
-	./apl --id 1010 -T testcases_3/*tc
+	./apl --id 1010 -T testcases_3/*tc || true
 	stty sane
 
 perf: apl

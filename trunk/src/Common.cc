@@ -145,7 +145,8 @@ cleanup(bool soft)
 {
    if (soft)   // proper clean-up
       {
-        ProcessorID::disconnect();
+        Svar_DB::disconnect();
+        // ProcessorID::disconnect();
 
         NativeFunction::cleanup();
 
@@ -165,9 +166,13 @@ cleanup(bool soft)
       }
    else        // minimal clean-up
       {
+        // ProcessorID::disconnect();
+        Svar_DB::disconnect();
         LineInput::close(true);
         Output::reset_colors();
       }
+
+   LineInput::restore_termios();
 }
 //----------------------------------------------------------------------------
 void

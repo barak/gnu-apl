@@ -238,6 +238,7 @@ enum Signal_id
    sid_RETRACT_OFFER,
 /// APserver request: ⎕SVR
    sid_RETRACT_VAR,
+   sid_DISCONNECT,
 
 /// APserver request: set state of shared var \b key
    sid_SET_STATE,
@@ -385,6 +386,10 @@ public:
    /// access functions for signal RETRACT_VAR...
    virtual uint64_t get__RETRACT_VAR__key() const   ///< dito
       { bad_get("RETRACT_VAR", "key"); return 0; }
+
+   /// access functions for signal DISCONNECT...
+   virtual uint64_t get__DISCONNECT__key() const   ///< dito
+      { bad_get("DISCONNECT", "key"); return 0; }
 
 
 /// APserver request: set state of shared var \b key
@@ -815,6 +820,53 @@ public:
 
   /// return item key of this signal 
    virtual uint64_t get__RETRACT_VAR__key() const { return key.get_value(); }
+
+
+protected:
+   Sig_item_x64 key;   ///< key
+};
+//----------------------------------------------------------------------------
+/// The class for signal DISCONNECT
+class DISCONNECT_c : public Signal_base
+{
+public:
+
+   /// contructor that creates the signal and sends it on TCP socket s
+   DISCONNECT_c(int s,
+                Sig_item_x64 _key)
+   : key(_key)
+   { send_TCP(s); }
+
+   /// construct (deserialize) this item from a (received) buffer
+   /// id has already been load()ed.
+   DISCONNECT_c(const uint8_t * & buffer)
+   : key(buffer)
+   {}
+
+   /// store (aka. serialize) this signal into a buffer
+   virtual void store(string & buffer) const
+       {
+         const Sig_item_u16 signal_id(sid_DISCONNECT);
+         signal_id.store(buffer);
+        key.store(buffer);
+       }
+
+   /// print this signal on out.
+   virtual ostream & print(ostream & out) const
+      {
+        out << "DISCONNECT(";
+        key.print(out);
+        return out << ")" << endl;
+      }
+
+   /// a unique number for this signal
+   virtual Signal_id get_sigID() const   { return sid_DISCONNECT; }
+
+   /// the name of this signal
+   virtual const char * get_sigName() const   { return "DISCONNECT"; }
+
+  /// return item key of this signal 
+   virtual uint64_t get__DISCONNECT__key() const { return key.get_value(); }
 
 
 protected:
@@ -2723,6 +2775,7 @@ struct _all_signal_classes_
         char u_RETRACT_OFFER[sizeof(RETRACT_OFFER_c)];
 /// APserver request: ⎕SVR
         char u_RETRACT_VAR[sizeof(RETRACT_VAR_c)];
+        char u_DISCONNECT[sizeof(DISCONNECT_c)];
 
 /// APserver request: set state of shared var \b key
         char u_SET_STATE[sizeof(SET_STATE_c)];
@@ -2950,6 +3003,7 @@ Signal_base * ret = 0;
         case sid_RETRACT_OFFER: ret = new RETRACT_OFFER_c(b);   break;
 /// APserver request: ⎕SVR
         case sid_RETRACT_VAR: ret = new RETRACT_VAR_c(b);   break;
+        case sid_DISCONNECT: ret = new DISCONNECT_c(b);   break;
 
 /// APserver request: set state of shared var \b key
         case sid_SET_STATE: ret = new SET_STATE_c(b);   break;

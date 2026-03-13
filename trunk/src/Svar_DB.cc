@@ -49,6 +49,7 @@ extern ostream & get_CERR();
 uint16_t Svar_DB::APserver_port = cfg_APSERVER_PORT;
 
 TCP_socket Svar_DB::DB_tcp = NO_TCP_SOCKET;
+bool Svar_DB::do_log = false;
 
 Svar_record Svar_record_P::cache;
 
@@ -344,6 +345,7 @@ void
 Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
               bool logit, bool do_svars)
 {
+   do_log = logit;
    if (!do_svars)   // shared variables disabled
       {
         if (logit)
@@ -357,6 +359,19 @@ Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
       {
         if (logit)   get_CERR() << "using Svar_DB on APserver!" << endl;
       }
+}
+//----------------------------------------------------------------------------
+void
+Svar_DB::disconnect()
+{
+  if (DB_tcp != NO_TCP_SOCKET)
+     {
+        close_connection();
+        close(DB_tcp);
+        DB_tcp = NO_TCP_SOCKET;
+     }
+
+  do_log && get_CERR() << "APserver disconnected" << endl;
 }
 //----------------------------------------------------------------------------
 SV_key
@@ -642,6 +657,15 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
      }
 
    return false;
+}
+//----------------------------------------------------------------------------
+void
+Svar_DB::close_connection()
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+DISCONNECT_c request(tcp, 0);   // no response
 }
 //----------------------------------------------------------------------------
 TCP_socket

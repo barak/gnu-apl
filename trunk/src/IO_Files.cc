@@ -120,7 +120,8 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         if ((test_mode == TM_EXIT_AFTER_LAST_FILE) ||
             (test_mode == TM_EXIT_AFTER_LAST_FILE_IF_OK && !error_count()))
           {
-            CERR << "Exiting (test_mode " << test_mode << ")" << endl;
+            CERR << "Exiting (test_mode " << test_mode << ") : "
+                 << total_errors << " errors" << endl;
             cleanup(true);
             if (total_errors)   Command::cmd_OFF(1);
             else                Command::cmd_OFF(0);
@@ -287,6 +288,7 @@ IO_Files::end_of_current_file()
 
         // print seconds if nonzero, else blanks
         //
+        summary << "  ";
         if (duration >= 1000000)     // ≥ 1 second
            {
              // sss.mmm
@@ -299,7 +301,8 @@ IO_Files::end_of_current_file()
              // mmm.uuu
              //
              summary << setw(3) << duration_msec << "."
-                     << setfill('0') << setw(3) << duration_usec << " ms ";
+                     << setfill('0') << setw(3) << duration_usec
+                     << setfill(' ') << " ms ";
            }
         else
            {
@@ -307,7 +310,7 @@ IO_Files::end_of_current_file()
              //
              summary << "    " << setw(3) << duration_usec << " μs ";
            }
-        summary << setfill(' ');   // restore fill
+        summary << setfill(' ') << " ";
 
         if (error_count())
            {

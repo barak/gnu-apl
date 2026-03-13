@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -741,6 +741,10 @@ AP3_fd * ap_fd = 0;
              }
              return;
 
+        case sid_DISCONNECT:     // APL closes the connection
+             close_fd(fd);
+             return;
+
         case sid_ASSIGN_VALUE:     // Svar←X for APs
              {
                const SV_key key = request->get__ASSIGN_VALUE__key();
@@ -1142,25 +1146,25 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
 #ifdef USE_POLL // use poll()
 
-        pollfd fds[2*connected_procs.size() + 1];
+        pollfd fds[2*connected_procs.size() + 1];   // more than needed
         fds[0].fd = listen_sock;
         fds[0].events = POLLIN | POLLPRI;
         int fd_idx = 1;
         for (size_t j = 0; j < connected_procs.size(); ++j)
             {
-              TCP_socket fd = connected_procs[j].fd;
+              const TCP_socket fd = connected_procs[j].fd;
               if (fd != NO_TCP_SOCKET)
                  {
                    fds[fd_idx].fd = fd;
-                   fds[fd_idx].events = POLLIN | POLLPRI;
+                   fds[fd_idx].events = POLLIN | POLLPRI | POLLRDHUP;
                    ++fd_idx;
                  }
 
-              fd = connected_procs[j].fd2;
-              if (fd != NO_TCP_SOCKET)
+              const TCP_socket fd2 = connected_procs[j].fd2;
+              if (fd2 != NO_TCP_SOCKET)
                  {
-                   fds[fd_idx].fd = fd;
-                   fds[fd_idx].events = POLLIN | POLLPRI;
+                   fds[fd_idx].fd = fd2;
+                   fds[fd_idx].events = POLLIN | POLLPRI | POLLRDHUP;
                    ++fd_idx;
                  }
             }
@@ -1180,7 +1184,9 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
          for (int i = 0; i < fd_idx; ++i)
              {
                if (fds[i].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP))
-                  FD_SET(fds[i].fd, &read_fds);
+                  {
+                    FD_SET(fds[i].fd, &read_fds);
+                  }
              }
 
 #else // use select()

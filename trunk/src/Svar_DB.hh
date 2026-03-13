@@ -88,9 +88,13 @@ public:
    /// return true if \b id is registered in APserver
    static bool is_registered_id(const AP_num3 & id);
 
+   /// close the connection to the APserver
+   static void close_connection();
+
    /// get TCP socket to APserver, complain if not connected
    static TCP_socket get_Svar_DB_tcp(const char * calling_function);
 
+   
    /// retract an offer, return previous coupling
    static void retract_var(SV_key key);
 
@@ -171,11 +175,7 @@ public:
                                          bool logit);
 
    /// close TCP connection to APserver
-   static void disconnect()
-      {
-        if (DB_tcp != NO_TCP_SOCKET)
-           { close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
-      }
+   static void disconnect();
 
    /// return true if the connection to APserver is up
    static bool APserver_available()
@@ -199,6 +199,8 @@ protected:
    /// The TCP port of APserver
    static uint16_t APserver_port;
 
+   /// log some details
+   static bool do_log;
 private:
    /// don't create...
   Svar_DB();

@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>February 24, 2026.
+<p>March 13, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -113,26 +113,28 @@ therefore it must be expanded with e.g. <b>gunzip</b> before it can be read.
   <ul class="no-bullet">
     <li><a id="toc-APL-Scripting-1" href="#APL-Scripting">2.1 APL Scripting</a>
     <ul class="no-bullet">
-      <li><a id="toc-Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter-1" href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter">2.1.1 Redirect the script file to the stdin of the GNU APL interpreter</a></li>
-      <li><a id="toc-Make-the-script-file-executable-1" href="#Make-the-script-file-executable">2.1.2 Make the script file executable</a></li>
-      <li><a id="toc-How-command-line-arguments-are-handled-1" href="#How-command-line-arguments-are-handled">2.1.3 How command line arguments are handled</a></li>
-      <li><a id="toc-Helpful-Features-for-Scripting-1" href="#Helpful-Features-for-Scripting">2.1.4 Helpful Features for Scripting</a>
+      <li><a id="toc-Introduction-and-Terminology-1" href="#Introduction-and-Terminology">2.1.1 Introduction and Terminology</a></li>
+      <li><a id="toc-Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter-1" href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter">2.1.2 Redirect the script file to the stdin of the GNU APL interpreter</a></li>
+      <li><a id="toc-Make-the-script-file-executable-1" href="#Make-the-script-file-executable">2.1.3 Make the script file executable</a></li>
+      <li><a id="toc-Starting-GNU-APL-Scripts_003a-a-Conclusion-1" href="#Starting-GNU-APL-Scripts_003a-a-Conclusion">2.1.4 Starting GNU APL Scripts: a Conclusion</a></li>
+      <li><a id="toc-How-command-line-arguments-are-handled-1" href="#How-command-line-arguments-are-handled">2.1.5 How command line arguments are handled</a></li>
+      <li><a id="toc-Helpful-Features-for-Scripting-1" href="#Helpful-Features-for-Scripting">2.1.6 Helpful Features for Scripting</a>
       <ul class="no-bullet">
-        <li><a id="toc-_005b_003f_005dARG" href="#g_t_2395ARG">2.1.4.1 ⎕ARG</a></li>
-        <li><a id="toc-_005b_003f_005dENV" href="#g_t_2395ENV">2.1.4.2 ⎕ENV</a></li>
-        <li><a id="toc-_005b_003f_005dINP" href="#g_t_2395INP">2.1.4.3 ⎕INP</a></li>
+        <li><a id="toc-_005b_003f_005dARG" href="#g_t_2395ARG">2.1.6.1 ⎕ARG</a></li>
+        <li><a id="toc-_005b_003f_005dENV" href="#g_t_2395ENV">2.1.6.2 ⎕ENV</a></li>
+        <li><a id="toc-_005b_003f_005dINP" href="#g_t_2395INP">2.1.6.3 ⎕INP</a></li>
       </ul></li>
-      <li><a id="toc-Double_002dquoted-Strings-1" href="#Double_002dquoted-Strings">2.1.5 Double-quoted Strings</a></li>
-      <li><a id="toc-Multi_002dLine-Strings-1" href="#Multi_002dLine-Strings">2.1.6 Multi-Line Strings</a>
+      <li><a id="toc-Double_002dquoted-Strings-1" href="#Double_002dquoted-Strings">2.1.7 Double-quoted Strings</a></li>
+      <li><a id="toc-Multi_002dLine-Strings-1" href="#Multi_002dLine-Strings">2.1.8 Multi-Line Strings</a>
       <ul class="no-bullet">
-        <li><a id="toc-Old_002dstyle-Multi_002dLine-Strings-1" href="#Old_002dstyle-Multi_002dLine-Strings">2.1.6.1 Old-style Multi-Line Strings</a></li>
-        <li><a id="toc-New_002dstyle-Multi_002dLine-Strings-1" href="#New_002dstyle-Multi_002dLine-Strings">2.1.6.2 New-style Multi-Line Strings</a></li>
-        <li><a id="toc-_00ab-_00bb-Strings-1" href="#g_t_00ab-_00bb-Strings">2.1.6.3 « » Strings</a></li>
-        <li><a id="toc-Multi_002dLine-Comments-1" href="#Multi_002dLine-Comments">2.1.6.4 Multi-Line Comments</a></li>
+        <li><a id="toc-Old_002dstyle-Multi_002dLine-Strings-1" href="#Old_002dstyle-Multi_002dLine-Strings">2.1.8.1 Old-style Multi-Line Strings</a></li>
+        <li><a id="toc-New_002dstyle-Multi_002dLine-Strings-1" href="#New_002dstyle-Multi_002dLine-Strings">2.1.8.2 New-style Multi-Line Strings</a></li>
+        <li><a id="toc-_00ab-_00bb-Strings-1" href="#g_t_00ab-_00bb-Strings">2.1.8.3 « » Strings</a></li>
+        <li><a id="toc-Multi_002dLine-Comments-1" href="#Multi_002dLine-Comments">2.1.8.4 Multi-Line Comments</a></li>
       </ul></li>
-      <li><a id="toc-Multi_002dLine-Literals-1" href="#Multi_002dLine-Literals">2.1.7 Multi-Line Literals</a></li>
-      <li><a id="toc-Automatic-_0029MORE-1" href="#Automatic-_0029MORE">2.1.8 Automatic )MORE</a></li>
-      <li><a id="toc-Script-Example-1" href="#Script-Example">2.1.9 Script Example</a></li>
+      <li><a id="toc-Multi_002dLine-Literals-1" href="#Multi_002dLine-Literals">2.1.9 Multi-Line Literals</a></li>
+      <li><a id="toc-Automatic-_0029MORE-1" href="#Automatic-_0029MORE">2.1.10 Automatic )MORE</a></li>
+      <li><a id="toc-Script-Example-1" href="#Script-Example">2.1.11 Script Example</a></li>
     </ul></li>
     <li><a id="toc-Axis-argument-in-defined-functions-1" href="#Axis-argument-in-defined-functions">2.2 Axis argument in defined functions</a></li>
     <li><a id="toc-Function-Groups-1" href="#Function-Groups">2.3 Function Groups</a>
@@ -521,7 +523,7 @@ relative, or absolute (second example). The exact details of how the first
 line of a GNU APL script shall look vary slightly among operating systems.
 Please consult the info (or man) pages for &rsquo;path_resolution&rsquo; and/or &rsquo;execve&rsquo;
 on your operating system. After the name of the binary, optional GNU APL
-command line options, usually &ndash;script, can be provided.
+command line options, usually <b>&ndash;script</b>, can be provided.
 </p>
 <p>The text file must, of course, have execute permission, and should be ASCII
 or, more likely, UTF-8 encoded. The APL characters in the script shall be
@@ -1126,46 +1128,164 @@ Next: <a href="#Axis-argument-in-defined-functions" accesskey="n" rel="next">Axi
 </div>
 <span id="APL-Scripting-1"></span><h3 class="section">2.1 APL Scripting</h3>
 
-<p>As already mentioned, it is possible to write APL scripts. Similar to other
-nscript languages, an APL script is a text file whose first line is a so-called
-&quot;shebang line&quot;, i.e. a line starting with <code>#!</code>, followed by the
-absolute path to the interpreter (in our case the GNU APL binary), followed
-by command line arguments that are passed on to the interpreter. In our case
-the shebang line could be, for example:
-</p>
-<div class="example">
-<pre class="example">#! /usr/local/bin/apl --id 1010
-</pre></div>
-
-<p>There are essentially two ways to run an APL script: redirecting the script
-file to stdin of the interpreter or making the script executable and indicate
-apl as the script interpreter (followed by some command line arguments for
-apl).
-</p>
 <ul class="section-toc">
-<li><a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" accesskey="1">Redirect the script file to the stdin of the GNU APL interpreter</a></li>
-<li><a href="#Make-the-script-file-executable" accesskey="2">Make the script file executable</a></li>
-<li><a href="#How-command-line-arguments-are-handled" accesskey="3">How command line arguments are handled</a></li>
-<li><a href="#Helpful-Features-for-Scripting" accesskey="4">Helpful Features for Scripting</a></li>
-<li><a href="#Double_002dquoted-Strings" accesskey="5">Double-quoted Strings</a></li>
-<li><a href="#Multi_002dLine-Strings" accesskey="6">Multi-Line Strings</a></li>
-<li><a href="#Multi_002dLine-Literals" accesskey="7">Multi-Line Literals</a></li>
-<li><a href="#Automatic-_0029MORE" accesskey="8">Automatic )MORE</a></li>
-<li><a href="#Script-Example" accesskey="9">Script Example</a></li>
+<li><a href="#Introduction-and-Terminology" accesskey="1">Introduction and Terminology</a></li>
+<li><a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" accesskey="2">Redirect the script file to the stdin of the GNU APL interpreter</a></li>
+<li><a href="#Make-the-script-file-executable" accesskey="3">Make the script file executable</a></li>
+<li><a href="#Starting-GNU-APL-Scripts_003a-a-Conclusion" accesskey="4">Starting GNU APL Scripts: a Conclusion</a></li>
+<li><a href="#How-command-line-arguments-are-handled" accesskey="5">How command line arguments are handled</a></li>
+<li><a href="#Helpful-Features-for-Scripting" accesskey="6">Helpful Features for Scripting</a></li>
+<li><a href="#Double_002dquoted-Strings" accesskey="7">Double-quoted Strings</a></li>
+<li><a href="#Multi_002dLine-Strings" accesskey="8">Multi-Line Strings</a></li>
+<li><a href="#Multi_002dLine-Literals" accesskey="9">Multi-Line Literals</a></li>
+<li><a href="#Automatic-_0029MORE">Automatic )MORE</a></li>
+<li><a href="#Script-Example">Script Example</a></li>
 </ul>
 <hr>
+<div class="subsection" id="Introduction-and-Terminology">
+<div class="header">
+<p>
+Next: <a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" accesskey="n" rel="next">Redirect the script file to the stdin of the GNU APL interpreter</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Introduction-and-Terminology-1"></span><h4 class="subsection">2.1.1 Introduction and Terminology</h4>
+
+<p>A <i>script</i> is a text file that contains the source code of an interpreted
+programming languae. An <i>APL script</i> is a text file that contains <i>APL
+commands</i> (like <b>)LOAD</b> or <b>)OFF</b>) and <i>APL expressions</i> like
+<b>1 2 3+ 4 5 6</b>. In GNU APL a script can also contains instructions for
+the well-known ∇-editor in order to create defines functions.
+</p>
+<p>On most platforms are the lines of a script separated by the single ASCII
+character linefeed (<b>LF</b>, ASCII code 10); on Microsoft operating systems
+the lines are separated by two characters carriage return (<b>CR</b>, ASCII
+code 13) and (<b>LF</b>. ASCII code 10). GNU APL ignores <b>CR</b> in most contexts
+so that the same APL script can be executed on both kinds of platforms.
+</p>
+<p>The first line of a script is called the <i>shebang line</i>. The shebang line
+determines how and with which arguments the script shall be executed. When
+the operating system (or, more precisely: a shell of the operating system)
+executes a script then it parses the shebang line and calls a function
+<b>execve</b> whose arguments are the result of that parsing. Much of how
+GNU APL handles APL scripts can be learned by consulting the 
+<b>man</b> page for function <b>execve</b>. To quote that <b>man</b> page:
+</p>
+<div class="example -">
+<pre class="example">    ...
+
+Interpreter scripts
+       An  interpreter script is a text file that has execute permission enabled and whose
+       first line is of the form:
+
+           #!interpreter [optional-arg]
+
+       The interpreter must be a valid pathname for an executable file.
+
+       If the pathname argument of execve() specifies an interpreter script,
+       then interpreter will be invoked with the following arguments:
+
+           interpreter [optional-arg] pathname arg...
+
+       where pathname is the absolute pathname of the file specified as the
+       first argument of execve(), and arg... is the series of words pointed
+       to by the argv argument of execve(), starting at argv[1]. Note that
+       there is no way to get the argv[0] that was passed to the execve()
+       call.
+
+    ...
+</pre></div>
+
+<p>It is important to note the <i>singular</i> in <b>[optional-arg]</b> above.
+Traditionally the interpreter would have been <b>/usr/local/bin/apl</b>
+(if GNU APL was installed in directory <b>/usr/local/bin/</b> or else
+<b>/usr/bin/apl</b> (if GNU APL was installed in directory <b>/usr/bin/</b>).
+These days, however, it has become common practice not to call the
+interpreter directly, but to call the program <b>/usr/bin/env</b> as the
+interpreter and passing the real interpreter (i.e. /usr/local/bin/apl or
+ apl) to <b>/bin/env</b>. For example:
+</p>
+<div class="example">
+<pre class="example">Traditional shebang line (full path to the interpreter):
+
+    #!/usr/local/bin/apl --script
+
+Traditional shebang line (interpreter name only):
+
+    #!apl --script
+
+Contemporary shebang line:
+
+    #!/bin/env -S apl --script
+</pre></div>
+
+<p>For a single argument the shebang lines above have essentially the same
+effect. The long form (full path to the interpreter) is needed only if the
+interpreter interpreter can not be found in one of the directories listed
+in the environment variable <b>$PATH</b>, for example if a user installs GNU APL
+in a non-standard directory (i.e. other than in <b>/bin</b>, <b>/usr/bin</b>, or
+<b>/usr/local/bin</b>).
+</p>
+<p>A minor disadvantage of using <b>env</b> as the interpreter is that
+<b>execve()</b> is called twice: first by the shell to run <b>env</b> and then
+by <b>env</b> to run <b>apl</b>.
+</p>
+<p>A potential advantage of using <b>/bin/env</b> as the interpreter is the <b>-S</b>
+option of <b>/bin/env</b> which works around the single argument limitation
+of <b>execve</b>. However, this advantage only to programs other than
+GNU APL because GNU APL comes with a built-in capability that is
+essentially doing the same as the <b>-S</b> option of <b>/bin/env</b>. Another,
+more important, aspect is portability. On a GNU/Linux system the standard
+shells (<b>bash</b>, <b>dash</b>) seem to pass multiple arguments in the shebang
+line to the interpreter in a way that GNU APL understands. Whether all
+systems behave in the same way is, however, not known. Therefore using
+<b>/bin/env</b> (with multiple arguments quoted) might be a more portable
+approach than starting GNU APL directly.
+</p>
+<p>For multiple arguments the situation is more tricky and the
+two methods differ slightly. The <b>/bin/env</b>
+method requires that multiple arguments are being quoted in the shebang
+line (so that they beconme a single argument which <b>env -S</b> splits into
+several arguments passed to <b>execve</b>). the direct <b>apl</b> method does
+the same,  but without the need to quote multiple arguments in the
+shebang line. For example:
+</p>
+<div class="example">
+<pre class="example">    #!apl --script --id 1010
+
+    #!/bin/env -S apl &quot;--script --id 1010&quot;
+</pre></div>
+
+<p>A nasty pitfall of <b>/bin/env</b> is not to quote multiple arguments:
+</p>
+<div class="example">
+<pre class="example">$ cat SCRIPT2.apl
+#!/usr/bin/env -S apl --id 1010
+
+$ ./SCRIPT2.apl
+unknown option './SCRIPT2.apl'
+...
+
+$ cat SCRIPT3.apl
+#!/usr/bin/env apl --id 1010
+
+$ b./SCRIPT2.apl
+/usr/bin/env: ‘apl --id 1010’: No such file or directory
+/usr/bin/env: use -[v]S to pass options in shebang lines
+</pre></div>
+
+<hr>
+</div>
 <div class="subsection" id="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter">
 <div class="header">
 <p>
-Next: <a href="#Make-the-script-file-executable" accesskey="n" rel="next">Make the script file executable</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Make-the-script-file-executable" accesskey="n" rel="next">Make the script file executable</a>, Previous: <a href="#Introduction-and-Terminology" accesskey="p" rel="prev">Introduction and Terminology</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter-1"></span><h4 class="subsection">2.1.1 Redirect the script file to the stdin of the GNU APL interpreter</h4>
+<span id="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter-1"></span><h4 class="subsection">2.1.2 Redirect the script file to the stdin of the GNU APL interpreter</h4>
 
-<p>A file, say <b>SCRIPT.apl</b>, can be redirected to apl by redirection of
-the shell:
+<p>Another method to execute an APL script file, say <b>SCRIPT.apl</b>, is to
+use the input redirection of the shall:
 </p>
 <div class="example">
-<pre class="example">$ apl &lt; SCRIPT.apl
+<pre class="example">$ apl &lt; SCRIPT.apl   # input redirection of SCRIPT.apl to stdin of apl
 </pre></div>
 
 <p>Alternatively, the GNU APL command line option <b>-f</b> or <b>-s</b> can be used:
@@ -1184,16 +1304,16 @@ the redirecting of the file was performed by apl itself.
 <div class="subsection" id="Make-the-script-file-executable">
 <div class="header">
 <p>
-Next: <a href="#How-command-line-arguments-are-handled" accesskey="n" rel="next">How command line arguments are handled</a>, Previous: <a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" accesskey="p" rel="prev">Redirect the script file to the stdin of the GNU APL interpreter</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Starting-GNU-APL-Scripts_003a-a-Conclusion" accesskey="n" rel="next">Starting GNU APL Scripts: a Conclusion</a>, Previous: <a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" accesskey="p" rel="prev">Redirect the script file to the stdin of the GNU APL interpreter</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Make-the-script-file-executable-1"></span><h4 class="subsection">2.1.2 Make the script file executable</h4>
+<span id="Make-the-script-file-executable-1"></span><h4 class="subsection">2.1.3 Make the script file executable</h4>
 
 <p>Alternatively the script can be made executable, specifying apl as its
 interpreter (see also <code>'man 2 execve'</code>). For this to work, the
 first line of the script must have a special format:
 </p>
 <div class="example">
-<pre class="example">    #! /usr/local/bin/apl --script
+<pre class="example">    #!/usr/bin/env apl --script
 </pre></div>
 
 <p><code>--script</code> prevents: printing of a welcome banner, 
@@ -1206,17 +1326,47 @@ it must be in <b>$PATH</b> of the shell that runs the script.
 </p>
 <hr>
 </div>
+<div class="subsection" id="Starting-GNU-APL-Scripts_003a-a-Conclusion">
+<div class="header">
+<p>
+Next: <a href="#How-command-line-arguments-are-handled" accesskey="n" rel="next">How command line arguments are handled</a>, Previous: <a href="#Make-the-script-file-executable" accesskey="p" rel="prev">Make the script file executable</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Starting-GNU-APL-Scripts_003a-a-Conclusion-1"></span><h4 class="subsection">2.1.4 Starting GNU APL Scripts: a Conclusion</h4>
+
+<p>The different methods for starting a GNU APL described above have emerged
+over time. They can be seen as different front-ends to the GNU APL
+interpreter that slightly differ in how command line options are being passed
+from the shell to GNU APL. However, sooner or later each of the methods wiil
+call <b>execve(pathname, argv, envp)</b> where:
+</p>
+<ul>
+<li> <b>pathname</b> is the name or absolute path to the GNU APL interpreter,
+</li><li> <b>argv</b> is the command line arguments for the GNU APL interpreter, and
+</li><li> <b>envp</b> is the environment variables for the GNU APL interpreter.
+</li></ul>
+
+<p>The different front-ends differ slightly as to how <b>argv</b> and <b>envp</b> are
+being constructed; <b>/bin/env</b> allows the user to modify the environment 
+before the GNU APL interpreter is called, input redirection allows the user
+to modifu the apl script file before the GNU APL interpreter is called, and
+<b>-f</b> allows the user to select the script file to be executed. One method
+may be simpler to use in one situation and another method may be simpler to 
+use in another situation and the final verdict as to which method is the
+best is left to the user.
+</p>
+<hr>
+</div>
 <div class="subsection" id="How-command-line-arguments-are-handled">
 <div class="header">
 <p>
-Next: <a href="#Helpful-Features-for-Scripting" accesskey="n" rel="next">Helpful Features for Scripting</a>, Previous: <a href="#Make-the-script-file-executable" accesskey="p" rel="prev">Make the script file executable</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Helpful-Features-for-Scripting" accesskey="n" rel="next">Helpful Features for Scripting</a>, Previous: <a href="#Starting-GNU-APL-Scripts_003a-a-Conclusion" accesskey="p" rel="prev">Starting GNU APL Scripts: a Conclusion</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="How-command-line-arguments-are-handled-1"></span><h4 class="subsection">2.1.3 How command line arguments are handled</h4>
+<span id="How-command-line-arguments-are-handled-1"></span><h4 class="subsection">2.1.5 How command line arguments are handled</h4>
 
 <p>As we have seen, GNU APL can be started directly (by entering the name
-of the GNU APL binary on the command line of a shell, or indirectly by
+of the GNU APL binary in the command line of a shell, or indirectly by
 entering the name of a script that provides the name of the GNU APL binary
-on the first line of the script. In the latter case, the shell uses function
+in the first line of the script. In the latter case, the shell uses function
 execve() to start APL, and one can provide additional arguments that are
 passed on to APL. We briefly discuss both cases:
 </p>
@@ -1269,18 +1419,18 @@ there are two sets of command line options:
 </p>
 <ul>
 <li> those passed to the script as command line arguments, and
-</li><li> those on the shebang line of the script
+</li><li> those in the shebang line of the script
 </li></ul>
 
 <p>When the APL script is started, possibly with command line arguments, the
 command line arguments entered by the user are combined with the arguments
-on the shebang line of the script in a way that is described in &rsquo;man 2 execve&rsquo;.
+in the shebang line of the script in a way that is described in &rsquo;man 2 execve&rsquo;.
 </p>
 <p>Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
 </p>
 <div class="example">
-<pre class="example">#! /usr/local/bin/apl --id 1010 --script
+<pre class="example"># !/usr/bin/env -S apl &quot;--script --id 1010&quot;
 
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
@@ -1289,33 +1439,48 @@ with GNU APL):
 <p>Assume further that the script is started like this:
 </p>
 <div class="example">
-<pre class="example">$ ./SCRIPT.apl sarg1 sarg2
+<pre class="example">$ ./SCRIPT.apl -- sarg1 sarg2
 </pre></div>
 
 <p>Then the following output, which shows the order of command line options
 as seen by ⎕ARG, is produced:
 </p>
 <div class="example">
-<pre class="example">   ⊃⎕ARG
-/usr/local/bin/apl
---script          
-./SCRIPT.apl      
-sarg1             
-sarg2 
+<pre class="example">--script    
+--id        
+1010        
+./SCRIPT.apl
+--          
+sarg1       
+sarg2       
 </pre></div>
 
-<p>This suggests that the options and option arguments are constructed by execve()
-(the function that is eventually responsible for processing scripts in shells
-and other executables) in the following order:
+<p>In the example above please note the following:
 </p>
-<p>1. Interpreter name (the first name in the shebang, here: /usr/local/bin/apl)
+<ul>
+<li> <b>&ndash;</b> separates the arguments passed to the interpreter (left of <b>&ndash;</b>)
+      from the arguments passed to the APL application,
+</li><li> The first line of the text file <b>SCIPT.apl</b> is commonly referred to
+      as the <i>shebang line</i>. If the shebang contains more than one argument
+      (like <b>&ndash;script</b>, <b>&ndash;id</b>, and <b>1010</b> above), then the arguments
+      need to be quoted, and
+         then the arguments must be quoted, and
+</li><li> in contrast, multiple arguments in the command line (like <b>sarg1</b> and
+      <b>sarg2</b> above) must not be quoted (or else they will appear as a single
+      argument).
+</li></ul>
+
+<p>⎕ARG shows the arguments in the shebang line and in the command line in
+the following order:
 </p>
-<p>2. Optional Interpreter arguments (here: &ndash;script)
-</p>
-<p>3. Script filename (here: ./SCRIPT.apl)
-</p>
-<p>4. Script arguments (here: sarg1 sarg2)
-</p>
+<ol>
+<li> Interpreter name (the first name in the shebang, here: <b>apl</b>)
+</li><li> Optional Interpreter argument(s) (here: <b>&ndash;script</b>, <b>&ndash;id</b>, and
+      <b>1010</b>)
+</li><li> Script filename (here: <b>./SCRIPT.apl</b>)
+</li><li> Optional Script argument(s) (here: <b>&ndash;</b>, <b>sarg1</b>, and <b>sarg2</b>)
+</li></ol>
+
 <p>CAUTION: as discussed in &rsquo;man 2 execve&rsquo; the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
 For that reason the optional interpreter argument should not be omitted (you
@@ -1324,29 +1489,30 @@ argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 </p>
 <div class="example">
-<pre class="example">$ /usr/local/bin/apl
-$ /usr/local/bin/apl --
-$ /usr/local/bin/apl -s
-$ /usr/local/bin/apl --script
-$ /usr/local/bin/apl -s --
-$ /usr/local/bin/apl --script --
+<pre class="example">#!/usr/bin/env -S apl &quot;--script --id 1010&quot;
+#! /usr/local/bin/apl
+#! /usr/local/bin/apl --
+#! /usr/local/bin/apl -s
+#! /usr/local/bin/apl --script
+#! /usr/local/bin/apl -s --
+#! /usr/local/bin/apl --script --
 </pre></div>
 
 <p>The recommended form is: <code>|/usr/local/bin/apl --script|</code>.
 </p>
-<p>Note that <code>-</code> and any options that follow it on the shebang line
+<p>Note that <code>-</code> and any options that follow it in the shebang line
 MAY OR MAY NOT be included in ⎕ARG (this depends on the platform used).
-In contrast, options that follow <code>-</code> on the script command line
+In contrast, options that follow <code>-</code> in the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
-There is normally no point in passing any application options on the shebang
+There is normally no point in passing any application options in the shebang
 line to APL because such parameters can more easily be provided directly
 further down in the script. However, in cases where the script has only
 application options it may be convenient to make <b><tt>--</tt></b> the last
 option of the shebang so that the user of the script need not specify it
 manually.
 </p>
-<p>Using <code>0-</code> on the shebang line of the script file usually prevents
-subsequent options on the shebang line from being interpreted as APL command
+<p>Using <code>0-</code> in the shebang line of the script file usually prevents
+subsequent options in the shebang line from being interpreted as APL command
 line options (and, more importantly, from causing <b>unknown option</b> errors
 when GNU APL starts). At least under GNU/Linux with <b>bash</b> the subsequent
 options will be passed to the APL application via ⎕ARG.
@@ -1371,7 +1537,7 @@ which contain no whitespace:
 <p>
 Next: <a href="#Double_002dquoted-Strings" accesskey="n" rel="next">Double-quoted Strings</a>, Previous: <a href="#How-command-line-arguments-are-handled" accesskey="p" rel="prev">How command line arguments are handled</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Helpful-Features-for-Scripting-1"></span><h4 class="subsection">2.1.4 Helpful Features for Scripting</h4>
+<span id="Helpful-Features-for-Scripting-1"></span><h4 class="subsection">2.1.6 Helpful Features for Scripting</h4>
 
 <p>GNU APL provides three system variables and functions that are particularly
 useful for scripting:
@@ -1394,7 +1560,7 @@ useful for scripting:
 <p>
 Next: <a href="#g_t_2395ENV" accesskey="n" rel="next">⎕ENV</a>, Up: <a href="#Helpful-Features-for-Scripting" accesskey="u" rel="up">Helpful Features for Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dARG"></span><h4 class="subsubsection">2.1.4.1 ⎕ARG</h4>
+<span id="g_t_005b_003f_005dARG"></span><h4 class="subsubsection">2.1.6.1 ⎕ARG</h4>
 
 <p>The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
@@ -1411,7 +1577,7 @@ vector:
 <p>
 Next: <a href="#g_t_2395INP" accesskey="n" rel="next">⎕INP</a>, Previous: <a href="#g_t_2395ARG" accesskey="p" rel="prev">⎕ARG</a>, Up: <a href="#Helpful-Features-for-Scripting" accesskey="u" rel="up">Helpful Features for Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dENV"></span><h4 class="subsubsection">2.1.4.2 ⎕ENV</h4>
+<span id="g_t_005b_003f_005dENV"></span><h4 class="subsubsection">2.1.6.2 ⎕ENV</h4>
 
 <p>There are usually at least two ways of passing parameters to a script:
 </p>
@@ -1458,7 +1624,7 @@ before the GNU APL interpreter is started.
 <p>
 Previous: <a href="#g_t_2395ENV" accesskey="p" rel="prev">⎕ENV</a>, Up: <a href="#Helpful-Features-for-Scripting" accesskey="u" rel="up">Helpful Features for Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_005b_003f_005dINP"></span><h4 class="subsubsection">2.1.4.3 ⎕INP</h4>
+<span id="g_t_005b_003f_005dINP"></span><h4 class="subsubsection">2.1.6.3 ⎕INP</h4>
 
 <p>If you need to create a longer static text, like the body of a web page,
 then you would normally construct it in APL like this:
@@ -1522,7 +1688,7 @@ same purpose. The monadic ⎕INP has therefore become obsolete.
 <p>
 Next: <a href="#Multi_002dLine-Strings" accesskey="n" rel="next">Multi-Line Strings</a>, Previous: <a href="#Helpful-Features-for-Scripting" accesskey="p" rel="prev">Helpful Features for Scripting</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Double_002dquoted-Strings-1"></span><h4 class="subsection">2.1.5 Double-quoted Strings</h4>
+<span id="Double_002dquoted-Strings-1"></span><h4 class="subsection">2.1.7 Double-quoted Strings</h4>
 
 <p>Standard APL literals (aka. strings) such as &rsquo;Hello&rsquo; are single quoted. As a
 matter of convenience, GNU APL also provides double-quoted strings which
@@ -1547,7 +1713,7 @@ etc.
 <p>
 Next: <a href="#Multi_002dLine-Literals" accesskey="n" rel="next">Multi-Line Literals</a>, Previous: <a href="#Double_002dquoted-Strings" accesskey="p" rel="prev">Double-quoted Strings</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Multi_002dLine-Strings-1"></span><h4 class="subsection">2.1.6 Multi-Line Strings</h4>
+<span id="Multi_002dLine-Strings-1"></span><h4 class="subsection">2.1.8 Multi-Line Strings</h4>
 
 <p>A substantial disadvantage of <b>⎕INP</b> is that it only works in immediate
 execution mode (and consequently also in .apl scripts), but not the bodies of
@@ -1570,7 +1736,7 @@ ones will eventually disappear).
 <p>
 Next: <a href="#New_002dstyle-Multi_002dLine-Strings" accesskey="n" rel="next">New-style Multi-Line Strings</a>, Up: <a href="#Multi_002dLine-Strings" accesskey="u" rel="up">Multi-Line Strings</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Old_002dstyle-Multi_002dLine-Strings-1"></span><h4 class="subsubsection">2.1.6.1 Old-style Multi-Line Strings</h4>
+<span id="Old_002dstyle-Multi_002dLine-Strings-1"></span><h4 class="subsubsection">2.1.8.1 Old-style Multi-Line Strings</h4>
 
 <p>Old-style multi-line strings were the first attempt to provide long strings
 for defined functions. The idea for the old-style multi-line strings was
@@ -1659,7 +1825,7 @@ ABC
 <p>
 Next: <a href="#g_t_00ab-_00bb-Strings" accesskey="n" rel="next">« » Strings</a>, Previous: <a href="#Old_002dstyle-Multi_002dLine-Strings" accesskey="p" rel="prev">Old-style Multi-Line Strings</a>, Up: <a href="#Multi_002dLine-Strings" accesskey="u" rel="up">Multi-Line Strings</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="New_002dstyle-Multi_002dLine-Strings-1"></span><h4 class="subsubsection">2.1.6.2 New-style Multi-Line Strings</h4>
+<span id="New_002dstyle-Multi_002dLine-Strings-1"></span><h4 class="subsubsection">2.1.8.2 New-style Multi-Line Strings</h4>
 
 <p>The combination of <b>⎕INP</b> for immediate execution mode and multi-line
 strings for defined functions achieved, at least in principle, the goal of
@@ -1678,7 +1844,7 @@ little different and syntactically stricter than their old-style companions:
 </p>
 <ul>
 <li> the starting &quot;&quot;&quot; must be placed at the end of an APL code line, i.e.
-there is no more mixing of APL code and string content on the same line.
+there is no more mixing of APL code and string content in the same line.
 An old-style string starts with APL code and ends with the first line of
 the string, while a new-style string starts with an APL code line and
 the string itself begins at the following line.
@@ -1721,7 +1887,7 @@ disappear at some point in time.
 <p>
 Next: <a href="#Multi_002dLine-Comments" accesskey="n" rel="next">Multi-Line Comments</a>, Previous: <a href="#New_002dstyle-Multi_002dLine-Strings" accesskey="p" rel="prev">New-style Multi-Line Strings</a>, Up: <a href="#Multi_002dLine-Strings" accesskey="u" rel="up">Multi-Line Strings</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_00ab-_00bb-Strings-1"></span><h4 class="subsubsection">2.1.6.3 « » Strings</h4>
+<span id="g_t_00ab-_00bb-Strings-1"></span><h4 class="subsubsection">2.1.8.3 « » Strings</h4>
 
 <p>When new-style multi-line strings are used in scripts the related error
 reporting (if the syntax is used incorrectly) can become cumbersome. For
@@ -1792,7 +1958,7 @@ line to  <b>/etc/vim/vimrc</b> (or to <b>~/.vimrc</b>):
 <p>
 Previous: <a href="#g_t_00ab-_00bb-Strings" accesskey="p" rel="prev">« » Strings</a>, Up: <a href="#Multi_002dLine-Strings" accesskey="u" rel="up">Multi-Line Strings</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Multi_002dLine-Comments-1"></span><h4 class="subsubsection">2.1.6.4 Multi-Line Comments</h4>
+<span id="Multi_002dLine-Comments-1"></span><h4 class="subsubsection">2.1.8.4 Multi-Line Comments</h4>
 
 <p>One of the badly missing features of standard APL is comments tnat span
 multiple lines. However, in GNU APL one can use multi-line strings in
@@ -1823,7 +1989,7 @@ no performance penalty at runtime.
 <p>
 Next: <a href="#Automatic-_0029MORE" accesskey="n" rel="next">Automatic )MORE</a>, Previous: <a href="#Multi_002dLine-Strings" accesskey="p" rel="prev">Multi-Line Strings</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Multi_002dLine-Literals-1"></span><h4 class="subsection">2.1.7 Multi-Line Literals</h4>
+<span id="Multi_002dLine-Literals-1"></span><h4 class="subsection">2.1.9 Multi-Line Literals</h4>
 
 <p>A limitation from the early days of APL is that literals like <b>1 2 3</b>
 or <b>&rsquo;abc&rsquo;</b> can not stretch over several lines. As a consequnce, the rank
@@ -2078,7 +2244,7 @@ levels.
 <p>
 Next: <a href="#Script-Example" accesskey="n" rel="next">Script Example</a>, Previous: <a href="#Multi_002dLine-Literals" accesskey="p" rel="prev">Multi-Line Literals</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Automatic-_0029MORE-1"></span><h4 class="subsection">2.1.8 Automatic )MORE</h4>
+<span id="Automatic-_0029MORE-1"></span><h4 class="subsection">2.1.10 Automatic )MORE</h4>
 
 <p>The GNU APL command )MORE provides, in some cases, additional information
 about a prior APL error. The availability of such additional information
@@ -2136,7 +2302,7 @@ INDEX ERROR+
 <p>
 Previous: <a href="#Automatic-_0029MORE" accesskey="p" rel="prev">Automatic )MORE</a>, Up: <a href="#APL-Scripting" accesskey="u" rel="up">APL Scripting</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Script-Example-1"></span><h4 class="subsection">2.1.9 Script Example</h4>
+<span id="Script-Example-1"></span><h4 class="subsection">2.1.11 Script Example</h4>
 
 <p>Note that the two different ways of running an APL script have an impact on
 how ⎕ARG looks like. If stdin is redirected then there is only one (possibly

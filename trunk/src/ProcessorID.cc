@@ -103,7 +103,6 @@ ProcessorID::init(bool log_startup)
              << id.proc << ":" << id.parent << ":" << id.grand << endl
              << "system_do_svars is: "
              << UserPreferences::uprefs.system_do_svars << endl;
-
       }
 
    // if we have an APserver then let it know our IDs

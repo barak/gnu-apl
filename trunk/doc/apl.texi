@@ -156,7 +156,7 @@ relative, or absolute (second example). The exact details of how the first
 line of a GNU APL script shall look vary slightly among operating systems.
 Please consult the info (or man) pages for 'path_resolution' and/or 'execve'
 on your operating system. After the name of the binary, optional GNU APL
-command line options, usually --script, can be provided.
+command line options, usually @b{--script}, can be provided.
 
 The text file must, of course, have execute permission, and should be ASCII
 or, more likely, UTF-8 encoded. The APL characters in the script shall be
@@ -735,31 +735,141 @@ There are a few hopefully useful features in GNU APL:
 @node APL Scripting
 @section APL Scripting
 
-As already mentioned, it is possible to write APL scripts. Similar to other
-nscript languages, an APL script is a text file whose first line is a so-called
-"shebang line", i.e. a line starting with @code{#!}, followed by the
-absolute path to the interpreter (in our case the GNU APL binary), followed
-by command line arguments that are passed on to the interpreter. In our case
-the shebang line could be, for example:
+@node Introduction and Terminology
+@subsection Introduction and Terminology
 
-@example
-#! /usr/local/bin/apl --id 1010
+A @i{script} is a text file that contains the source code of an interpreted
+programming languae. An @i{APL script} is a text file that contains @i{APL
+commands} (like @b{)LOAD} or @b{)OFF}) and @i{APL expressions} like
+@b{1 2 3+ 4 5 6}. In GNU APL a script can also contains instructions for
+the well-known ∇-editor in order to create defines functions.
+
+On most platforms are the lines of a script separated by the single ASCII
+character linefeed (@b{LF}, ASCII code 10); on Microsoft operating systems
+the lines are separated by two characters carriage return (@b{CR}, ASCII
+code 13) and (@b{LF}. ASCII code 10). GNU APL ignores @b{CR} in most contexts
+so that the same APL script can be executed on both kinds of platforms.
+
+The first line of a script is called the @i{shebang line}. The shebang line
+determines how and with which arguments the script shall be executed. When
+the operating system (or, more precisely: a shell of the operating system)
+executes a script then it parses the shebang line and calls a function
+@b{execve} whose arguments are the result of that parsing. Much of how
+GNU APL handles APL scripts can be learned by consulting the 
+@b{man} page for function @b{execve}. To quote that @b{man} page:
+
+@example@
+    ...
+
+Interpreter scripts
+       An  interpreter script is a text file that has execute permission enabled and whose
+       first line is of the form:
+
+           #!interpreter [optional-arg]
+
+       The interpreter must be a valid pathname for an executable file.
+
+       If the pathname argument of execve() specifies an interpreter script,
+       then interpreter will be invoked with the following arguments:
+
+           interpreter [optional-arg] pathname arg...
+
+       where pathname is the absolute pathname of the file specified as the
+       first argument of execve(), and arg... is the series of words pointed
+       to by the argv argument of execve(), starting at argv[1]. Note that
+       there is no way to get the argv[0] that was passed to the execve()
+       call.
+
+    ...
 @end example
 
-There are essentially two ways to run an APL script: redirecting the script
-file to stdin of the interpreter or making the script executable and indicate
-apl as the script interpreter (followed by some command line arguments for
-apl).
+It is important to note the @i{singular} in @b{[optional-arg]} above.
+Traditionally the interpreter would have been @b{/usr/local/bin/apl}
+(if GNU APL was installed in directory @b{/usr/local/bin/} or else
+@b{/usr/bin/apl} (if GNU APL was installed in directory @b{/usr/bin/}).
+These days, however, it has become common practice not to call the
+interpreter directly, but to call the program @b{/usr/bin/env} as the
+interpreter and passing the real interpreter (i.e. /usr/local/bin/apl or
+ apl) to @b{/bin/env}. For example:
+
+@example
+Traditional shebang line (full path to the interpreter):
+
+    #!/usr/local/bin/apl --script
+
+Traditional shebang line (interpreter name only):
+
+    #!apl --script
+
+Contemporary shebang line:
+
+    #!/bin/env -S apl --script
+@end example
+
+For a single argument the shebang lines above have essentially the same
+effect. The long form (full path to the interpreter) is needed only if the
+interpreter interpreter can not be found in one of the directories listed
+in the environment variable @b{$PATH}, for example if a user installs GNU APL
+in a non-standard directory (i.e. other than in @b{/bin}, @b{/usr/bin}, or
+@b{/usr/local/bin}).
+
+A minor disadvantage of using @b{env} as the interpreter is that
+@b{execve()} is called twice: first by the shell to run @b{env} and then
+by @b{env} to run @b{apl}.
+
+A potential advantage of using @b{/bin/env} as the interpreter is the @b{-S}
+option of @b{/bin/env} which works around the single argument limitation
+of @b{execve}. However, this advantage only to programs other than
+GNU APL because GNU APL comes with a built-in capability that is
+essentially doing the same as the @b{-S} option of @b{/bin/env}. Another,
+more important, aspect is portability. On a GNU/Linux system the standard
+shells (@b{bash}, @b{dash}) seem to pass multiple arguments in the shebang
+line to the interpreter in a way that GNU APL understands. Whether all
+systems behave in the same way is, however, not known. Therefore using
+@b{/bin/env} (with multiple arguments quoted) might be a more portable
+approach than starting GNU APL directly.
+
+For multiple arguments the situation is more tricky and the
+two methods differ slightly. The @b{/bin/env}
+method requires that multiple arguments are being quoted in the shebang
+line (so that they beconme a single argument which @b{env -S} splits into
+several arguments passed to @b{execve}). the direct @b{apl} method does
+the same,  but without the need to quote multiple arguments in the
+shebang line. For example:
+
+@example
+    #!apl --script --id 1010
+
+    #!/bin/env -S apl "--script --id 1010"
+@end example
+
+A nasty pitfall of @b{/bin/env} is not to quote multiple arguments:
+
+@example
+$ cat SCRIPT2.apl
+#!/usr/bin/env -S apl --id 1010
+
+$ ./SCRIPT2.apl
+unknown option './SCRIPT2.apl'
+...
+
+$ cat SCRIPT3.apl
+#!/usr/bin/env apl --id 1010
+
+$ b./SCRIPT2.apl
+/usr/bin/env: ‘apl --id 1010’: No such file or directory
+/usr/bin/env: use -[v]S to pass options in shebang lines
+@end example
 
 @c ............................................................................
 @node Redirect the script file to the stdin of the GNU APL interpreter
 @subsection Redirect the script file to the stdin of the GNU APL interpreter
 
-A file, say @b{SCRIPT.apl}, can be redirected to apl by redirection of
-the shell:
+Another method to execute an APL script file, say @b{SCRIPT.apl}, is to
+use the input redirection of the shall:
 
 @example
-$ apl < SCRIPT.apl
+$ apl < SCRIPT.apl   # input redirection of SCRIPT.apl to stdin of apl
 @end example
 
 Alternatively, the GNU APL command line option @b{-f} or @b{-s} can be used:
@@ -782,7 +892,7 @@ interpreter (see also @code{'man 2 execve'}). For this to work, the
 first line of the script must have a special format:
 
 @example
-    #! /usr/local/bin/apl --script
+    #!/usr/bin/env apl --script
 @end example
 
 @code{--script} prevents: printing of a welcome banner, 
@@ -794,13 +904,38 @@ do not know in advance where the APL interpreter will be installed) then
 it must be in @b{$PATH} of the shell that runs the script.
 
 @c ............................................................................
+@node Starting GNU APL Scripts: a Conclusion
+@subsection Starting GNU APL Scripts: a Conclusion
+
+The different methods for starting a GNU APL described above have emerged
+over time. They can be seen as different front-ends to the GNU APL
+interpreter that slightly differ in how command line options are being passed
+from the shell to GNU APL. However, sooner or later each of the methods wiil
+call @b{execve(pathname, argv, envp)} where:
+
+@itemize
+@item @b{pathname} is the name or absolute path to the GNU APL interpreter,
+@item @b{argv} is the command line arguments for the GNU APL interpreter, and
+@item @b{envp} is the environment variables for the GNU APL interpreter.
+@end itemize
+
+The different front-ends differ slightly as to how @b{argv} and @b{envp} are
+being constructed; @b{/bin/env} allows the user to modify the environment 
+before the GNU APL interpreter is called, input redirection allows the user
+to modifu the apl script file before the GNU APL interpreter is called, and
+@b{-f} allows the user to select the script file to be executed. One method
+may be simpler to use in one situation and another method may be simpler to 
+use in another situation and the final verdict as to which method is the
+best is left to the user.
+
+@c ............................................................................
 @node How command line arguments are handled
 @subsection How command line arguments are handled
 
 As we have seen, GNU APL can be started directly (by entering the name
-of the GNU APL binary on the command line of a shell, or indirectly by
+of the GNU APL binary in the command line of a shell, or indirectly by
 entering the name of a script that provides the name of the GNU APL binary
-on the first line of the script. In the latter case, the shell uses function
+in the first line of the script. In the latter case, the shell uses function
 execve() to start APL, and one can provide additional arguments that are
 passed on to APL. We briefly discuss both cases:
 
@@ -853,18 +988,18 @@ there are two sets of command line options:
 
 @itemize
 @item those passed to the script as command line arguments, and
-@item those on the shebang line of the script
+@item those in the shebang line of the script
 @end itemize
 
 When the APL script is started, possibly with command line arguments, the
 command line arguments entered by the user are combined with the arguments
-on the shebang line of the script in a way that is described in 'man 2 execve'.
+in the shebang line of the script in a way that is described in 'man 2 execve'.
 
 Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
 
 @example
-#! /usr/local/bin/apl --id 1010 --script
+# !/usr/bin/env -S apl "--script --id 1010"
 
       ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
@@ -873,32 +1008,47 @@ with GNU APL):
 Assume further that the script is started like this:
 
 @example
-$ ./SCRIPT.apl sarg1 sarg2
+$ ./SCRIPT.apl -- sarg1 sarg2
 @end example
 
 Then the following output, which shows the order of command line options
 as seen by ⎕ARG, is produced:
 
 @example
-   ⊃⎕ARG
-/usr/local/bin/apl
---script          
-./SCRIPT.apl      
-sarg1             
-sarg2 
+--script    
+--id        
+1010        
+./SCRIPT.apl
+--          
+sarg1       
+sarg2       
 @end example
 
-This suggests that the options and option arguments are constructed by execve()
-(the function that is eventually responsible for processing scripts in shells
-and other executables) in the following order:
+In the example above please note the following:
 
-1. Interpreter name (the first name in the shebang, here: /usr/local/bin/apl)
+@itemize
+@item @b{--} separates the arguments passed to the interpreter (left of @b{--})
+      from the arguments passed to the APL application,
+@item The first line of the text file @b{SCIPT.apl} is commonly referred to
+      as the @i{shebang line}. If the shebang contains more than one argument
+      (like @b{--script}, @b{--id}, and @b{1010} above), then the arguments
+      need to be quoted, and
+         then the arguments must be quoted, and
+@item in contrast, multiple arguments in the command line (like @b{sarg1} and
+      @b{sarg2} above) must not be quoted (or else they will appear as a single
+      argument).
+@end itemize
 
-2. Optional Interpreter arguments (here: --script)
+⎕ARG shows the arguments in the shebang line and in the command line in
+the following order:
 
-3. Script filename (here: ./SCRIPT.apl)
-
-4. Script arguments (here: sarg1 sarg2)
+@enumerate
+@item Interpreter name (the first name in the shebang, here: @b{apl})
+@item Optional Interpreter argument(s) (here: @b{--script}, @b{--id}, and
+      @b{1010})
+@item Script filename (here: @b{./SCRIPT.apl})
+@item Optional Script argument(s) (here: @b{--}, @b{sarg1}, and @b{sarg2})
+@end enumerate
 
 CAUTION: as discussed in 'man 2 execve' the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
@@ -908,29 +1058,30 @@ argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 
 @example
-$ /usr/local/bin/apl
-$ /usr/local/bin/apl --
-$ /usr/local/bin/apl -s
-$ /usr/local/bin/apl --script
-$ /usr/local/bin/apl -s --
-$ /usr/local/bin/apl --script --
+#!/usr/bin/env -S apl "--script --id 1010"
+#! /usr/local/bin/apl
+#! /usr/local/bin/apl --
+#! /usr/local/bin/apl -s
+#! /usr/local/bin/apl --script
+#! /usr/local/bin/apl -s --
+#! /usr/local/bin/apl --script --
 @end example
 
 The recommended form is: @code{|/usr/local/bin/apl --script|}.
 
-Note that @code{-} and any options that follow it on the shebang line
+Note that @code{-} and any options that follow it in the shebang line
 MAY OR MAY NOT be included in ⎕ARG (this depends on the platform used).
-In contrast, options that follow @code{-} on the script command line
+In contrast, options that follow @code{-} in the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
-There is normally no point in passing any application options on the shebang
+There is normally no point in passing any application options in the shebang
 line to APL because such parameters can more easily be provided directly
 further down in the script. However, in cases where the script has only
 application options it may be convenient to make @b{@verb{|--|}} the last
 option of the shebang so that the user of the script need not specify it
 manually.
 
-Using @code{0-} on the shebang line of the script file usually prevents
-subsequent options on the shebang line from being interpreted as APL command
+Using @code{0-} in the shebang line of the script file usually prevents
+subsequent options in the shebang line from being interpreted as APL command
 line options (and, more importantly, from causing @b{unknown option} errors
 when GNU APL starts). At least under GNU/Linux with @b{bash} the subsequent
 options will be passed to the APL application via ⎕ARG.
@@ -1208,7 +1359,7 @@ little different and syntactically stricter than their old-style companions:
 
 @itemize
 @item the starting """ must be placed at the end of an APL code line, i.e.
-there is no more mixing of APL code and string content on the same line.
+there is no more mixing of APL code and string content in the same line.
 An old-style string starts with APL code and ends with the first line of
 the string, while a new-style string starts with an APL code line and
 the string itself begins at the following line.
