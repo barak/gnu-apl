@@ -1,7 +1,7 @@
 This is apl.info, produced by makeinfo version 6.8 from apl.texi.
 
-This is the manual for GNU APL, an implementation of ISO standard 13751
-"Programming Language APL, Extended"
+This is the reference manual for GNU APL, an implementation of ISO
+standard 13751 "Programming Language APL, Extended".
 
    Copyright © 2013 Free Software Foundation, Inc.
 INFO-DIR-SECTION GNU programming tools
@@ -79,12 +79,14 @@ APL is built and installed like this:
    For the experienced, but impatient reader: it is the well-known
 sequence
 
-     $ ./configure
+     $ ./configure [configure-option]...
      $ make
      $ sudo make install
 
-   On success, an executable file named ’apl’ will have been produced in
-the sub-directory ’src’.
+   On success, make produces an executable filee named apl in
+sub-directory src while make install installs that file (in
+/usr/local/bin) as well as some other files in other locations (that can
+be controlled via configure-options).
 
    File README contains further instructions about the installation GNU
 APL.
@@ -134,9 +136,9 @@ in /mypath/apl):
 example), relative, or absolute (second example).  The exact details of
 how the first line of a GNU APL script shall look vary slightly among
 operating systems.  Please consult the info (or man) pages for
-’path_resolution’ and/or ’execve’ on your operating system.  After the
-name of the binary, optional GNU APL command line options, usually
-–script, can be provided.
+path_resolution and/or execve on your operating system.  After the name
+of the binary, optional GNU APL command line options, usually –script,
+can be provided.
 
    The text file must, of course, have execute permission, and should be
 ASCII or, more likely, UTF-8 encoded.  The APL characters in the script
@@ -153,7 +155,7 @@ GNU APL understands the following command line options:
 
    • -C new_root
 
-     perform chroot("new_root") followed by chdir("/").  This restricts
+     Perform chroot("new_root") followed by chdir("/").  This restricts
      the access of the process running GNU APL to files in or below
      directory new_root, and it also changes the current directory
      (which could have resided above new_root before the chroot() was
@@ -193,34 +195,34 @@ GNU APL understands the following command line options:
 
    • ‘--cfg’
 
-     show ./configure options that were used to configure GNU APL, and
+     Show ./configure options that were used to configure GNU APL, and
      exit.
 
    • –[no]Color
 
-     start with ]COLOR ON [OFF].
+     Start with ]COLOR ON [OFF].
 
    • –CPU_limit_secs sec
 
-     set CPU time limit to sec seconds.
+     Set CPU time limit to sec seconds.
 
    • ‘-d’
 
-     run the APL interpreter (or APL script) in the background (i.e.  as
+     Run the APL interpreter (or APL script) in the background (i.e.  as
      a daemon).  For this to work you need to provide some input to the
      background process, e.g.  via the -f option.
 
    • ‘--emacs’
 
-     run in (old) Emacs mode.
+     Run in (old) Emacs mode.
 
    • ‘--emacs_arg arg’
 
-     run in (new) Emacs mode with argument arg.
+     Run in (new) Emacs mode with argument arg.
 
    • ‘--eval line’
 
-     evaluate one APL line and exit (-s without -f is implied).  This
+     Evaluate one APL line and exit (-s without -f is implied).  This
      option can be given several times; in that case several lines will
      be executed in command line order before GNU apl exits.  Keep in
      mind that command line options are normally processed by the shell
@@ -230,14 +232,14 @@ GNU APL understands the following command line options:
 
    • ‘-f file’
 
-     read input from file rather than from the keyboard.  When the end
+     Read input from file rather than from the keyboard.  When the end
      of the file is reached, input is switched back to the keyboard.  If
      you want to terminate the APL interpreter after executing the file,
      then use )OFF as last line in the file or include the –OFF option.
 
    • ‘--gpl’
 
-     show GNU APL license (GPL) and exit.
+     Show GNU APL license (GPL) and exit.
 
    • ‘-L wsname’
 
@@ -245,33 +247,33 @@ GNU APL understands the following command line options:
 
    • ‘--LX expr’
 
-     execute expr first.  The workspace behaves as if ⎕LX (latent
+     Execute expr first.  The workspace behaves as if ⎕LX (latent
      expression) were set to expr in the workspace.  This can be used,
      for example, to start the same workspace with different start-up
      values.
 
    • ‘-h’, ‘--help’
 
-     print all command line options with a brief hint about what they
+     Print all command line options with a brief hint about what they
      do.
 
    • ‘--id proc’
 
-     use processor ID proc for this interpreter.  If no ID is provided,
+     Use processor ID proc for this interpreter.  If no ID is provided,
      then the first unused ID > 1000 is taken by this interpreter and
      the ID becomes used as long as the interpreter runs.  Processor IDs
      are used by shared variables to identify share partners.
 
    • ‘-l num’
 
-     turn logging facility num ON (provided that dynamic logging was
+     Turn logging facility num ON (provided that dynamic logging was
      ./configure’d).  The logging facility 37 (start-up messages) is of
      particular importance for troubleshooting and it works even if
      dynamic logging was not ./configure’d.
 
    • ‘--mem [memory-limit]’
 
-     tell the interpreter not to use more than memory-limit bytes of
+     Tell the interpreter not to use more than memory-limit bytes of
      RAM. By using this option, the user is fully responsible for
      ensuring that the specified amount of memory will always be
      available.  The following rules should be observed.
@@ -313,12 +315,14 @@ GNU APL understands the following command line options:
      without any chance to )SAVE the workspace) when the available
      memory is exhausted.
 
-   • ‘--echoCIN’ copy the input line (after editing) to stdout.  For
-     creating session logs.
+   • ‘--echoCIN’
+
+     Copy the input line (after editing) to stdout.  For creating
+     session logs.
 
    • ‘--noCIN’
 
-     do not echo stdin to stdout.  Almost a must for scripting (unless
+     Do not echo stdin to stdout.  Almost a must for scripting (unless
      you intend to troubleshoot a script).
 
    • ‘--to_COUT’
@@ -334,7 +338,7 @@ GNU APL understands the following command line options:
 
    • ‘--tcp_port PORT’
 
-     this option starts GNU APL as a server that listens on TCP port
+     This option starts GNU APL as a server that listens on TCP port
      PORT. Every TCP connection accepted by the server forks a new GNU
      APL instance which has its stdin, stdout, and stderr redirected to
      the TCP connection.
@@ -344,7 +348,7 @@ GNU APL understands the following command line options:
 
    • ‘--noCONT’
 
-     do not load a SETUP or CONTINUE workspace on start-up.
+     Do not load a SETUP or CONTINUE workspace on start-up.
 
    • ‘--OFF’
 
@@ -370,23 +374,23 @@ GNU APL understands the following command line options:
 
    • ‘--par pproc’
 
-     use processor parent ID pproc (default: no parent ID).
+     Use processor parent ID pproc (default: no parent ID).
 
    • ‘--rawCIN’
 
-     do not emit ESC sequences.  Normally ESC sequences are emitted for
+     Do not emit ESC sequences.  Normally ESC sequences are emitted for
      colored output and during line editing.  In scripts, however, ESC
      sequences usually are not wanted and can be turned off with this
      option.
 
    • ‘-s’, ‘--script’
 
-     this option is an abbreviation for: ‘--silent’ ‘--noCIN’ ‘--noCONT’
+     This option is an abbreviation for: ‘--silent’ ‘--noCIN’ ‘--noCONT’
      ‘-f -’ (which is a typical combination of options for APL scripts).
 
    • ‘-q’, ‘--silent’
 
-     suppress printing of the GNU APL welcome message.  Useful for
+     Suppress printing of the GNU APL welcome message.  Useful for
      scripts.
 
    • ‘--safe’
@@ -395,23 +399,23 @@ GNU APL understands the following command line options:
 
    • ‘--show_bin_dir’
 
-     display the binary directory where, according to ./configure, the
+     Display the binary directory where, according to ./configure, the
      programs apl, APserver, AP100, and AP210 are installed.  Then exit.
 
    • ‘--show_doc_dir’
 
-     display the directory where, according to ./configure,
+     Display the directory where, according to ./configure,
      documentation files for GNU APL are installed.  Then exit.
 
    • ‘--show_etc_dir’
 
-     display the system configuration directory where, according to
+     Display the system configuration directory where, according to
      ./configure, the preferences file for GNU APL is installed.  Then
      exit.
 
    • ‘--show_lib_dir’
 
-     display the library directory where, according to ./configure,
+     Display the library directory where, according to ./configure,
      shared library files and the workspaces shipped with GNU APL are
      installed.  Then exit.
 
@@ -425,7 +429,7 @@ GNU APL understands the following command line options:
 
    • ‘--show_all_dirs’
 
-     display all the directories above.  Then exit.
+     Display all the directories above.  Then exit.
 
    • ‘-T testcases ...’ run testcases.  Testcases are text files that
      contain both input to the APL interpreter and the expected response
@@ -436,7 +440,7 @@ GNU APL understands the following command line options:
 
    • ‘--TM mode’
 
-     test mode.  This option specifies how the interpreter shall behave
+     Test mode.  This option specifies how the interpreter shall behave
      when running a number of testcases (as specified with the ‘-T’
      option).
 
@@ -462,7 +466,7 @@ GNU APL understands the following command line options:
 
    • ‘--TR’
 
-     executes test case files in random order.
+     Executes test case files in random order.
 
    • ‘--TS’
 
@@ -473,11 +477,11 @@ GNU APL understands the following command line options:
 
    • ‘-v’, ‘--version’,
 
-     show version information and exit.
+     Show version information and exit.
 
    • ‘-u UID’
 
-     run as user with UID 0.  This option can only be used by the root
+     Run as user with UID 0.  This option can only be used by the root
      user (who then wants to run as a different user).
 
    • ‘-w milli’
@@ -503,7 +507,7 @@ GNU APL understands the following command line options:
 
    • ‘-’
 
-     end of command line options for the interpreter.  GNU APL provides
+     End of command line options for the interpreter.  GNU APL provides
      the system variable ⎕ARG that returns all command line options with
      which the GNU APL interpreter was invoked (similar to variable argv
      in main(int argc, char * argv[]) in C/C++).  Option ‘-’ can be used
@@ -767,7 +771,7 @@ File: apl.info,  Node: Introduction and Terminology,  Next: Redirect the script 
 ----------------------------------
 
 A script is a text file that contains the source code of an interpreted
-programming languae.  An APL script is a text file that contains APL
+programming language.  An APL script is a text file that contains APL
 commands (like )LOAD or )OFF) and APL expressions like 1 2 3+ 4 5 6.  In
 GNU APL a script can also contains instructions for the well-known
 ∇-editor in order to create defines functions.
@@ -1039,7 +1043,7 @@ options as seen by ⎕ARG, is produced:
 
    • – separates the arguments passed to the interpreter (left of –)
      from the arguments passed to the APL application,
-   • The first line of the text file SCIPT.apl is commonly referred to
+   • The first line of the text file SCRIPT.apl is commonly referred to
      as the shebang line.  If the shebang contains more than one
      argument (like –script, –id, and 1010 above), then the arguments
      need to be quoted, and then the arguments must be quoted, and
@@ -1477,7 +1481,7 @@ File: apl.info,  Node: Multi-Line Comments,  Prev: « » Strings,  Up: Multi-Lin
 2.1.8.4 Multi-Line Comments
 ...........................
 
-One of the badly missing features of standard APL is comments tnat span
+One of the badly missing features of standard APL are comments that span
 multiple lines.  However, in GNU APL one can use multi-line strings in
 combination with monadic primitive ⊣ for that purpose:
 
@@ -1503,7 +1507,7 @@ File: apl.info,  Node: Multi-Line Literals,  Next: Automatic )MORE,  Prev: Multi
 -------------------------
 
 A limitation from the early days of APL is that literals like 1 2 3 or
-’abc’ can not stretch over several lines.  As a consequnce, the rank of
+’abc’ can not stretch over several lines.  As a consequence, the rank of
 a literal can not be more than 1, and values with higher ranks require
 the use of APL primitive (most likely dyadic ⍴).  A single line of input
 can produce multiple lines of output, but these multiple lines of output
@@ -1623,7 +1627,7 @@ sub-values of ranks > 1.
      4 5 6
      7 8 9
 
-   One blank line separates the matric of a three dimansional value:
+   One blank line separates the matrix of a three dimensional value:
 
            ⍝ three-dimensional multi-line literal
            ⍝
@@ -1660,7 +1664,7 @@ not become part of the literal value:
 
    The items of a multi-line literal can be nested:
 
-           8 ⎕CR <<<   ⍝ two-dimansional with nested 'abc'
+           8 ⎕CR <<<   ⍝ two-dimensional with nested 'abc'
                  1 2     3
                  4 'abc' 6
                  7 8     9
@@ -1673,7 +1677,7 @@ not become part of the literal value:
      │7     8 9│
      └ϵ────────┘
 
-           8 ⎕CR <<<   ⍝ two-dimansional with nested 10 11 12
+           8 ⎕CR <<<   ⍝ two-dimensional with nested 10 11 12
                  1 2          3
                  4 (10 11 12) 6
                  7 8          9
@@ -1688,7 +1692,7 @@ not become part of the literal value:
 
    Multi-line literal can contain other Multi-line literals or strings:
 
-           8 ⎕CR <<<   ⍝ two-dimansional with sub-literal:
+           8 ⎕CR <<<   ⍝ two-dimensional with sub-literal:
                  1 2     3
                  4 <<< ⍝ sub-literal
                    10 11 12
@@ -1709,7 +1713,7 @@ not become part of the literal value:
      │7          8 9│
      └ϵ─────────────┘
 
-           8 ⎕CR <<<   ⍝ two-dimansional with sub-string:
+           8 ⎕CR <<<   ⍝ two-dimensional with sub-string:
                  1 2     3
                  4 «««
                    Hello,
@@ -1727,8 +1731,8 @@ not become part of the literal value:
      │7                                          8 9│
      └ϵϵ────────────────────────────────────────────┘
 
-   Nested multiline literals can quickly become unreadable.  It is
-therefore recommended tu use a clear indentation policy for the
+   Nested multi-line literals can quickly become unreadable.  It is
+therefore recommended to use a clear indentation policy for the
 different nesting levels.
 
 
@@ -1911,7 +1915,7 @@ File: apl.info,  Node: Function Groups,  Next: Colored Output,  Prev: Axis argum
 
 In the old APL1 every function of the interpreter was represented by a
 single APL character.  More precisely, the character represented 1, 2,
-or 3 subfunctions and the subfunction was selected by the number of
+or 3 sub-functions and the sub-function was selected by the number of
 arguments provided:
 
    • 1 for monadic functions,
@@ -1938,12 +1942,12 @@ non-standard functions for various purposes.  For such a large number
 the ⎕-function approach is no longer scalable (try to remember 100
 abbreviations and think about the readability of the code using them!).
 Rather than adding a new ⎕-function for every new function, GNU APL
-tries to keep the number of ⎕-functions as small as resonable and by
-grouping several interpreter functions into subfunction of a single
+tries to keep the number of ⎕-functions as small as reasonable and by
+grouping several interpreter functions into sub-function of a single
 top-level ⎕-function.
 
    We call such a top-level ⎕-function a function group.  The
-subfunction functions of a function group are somehow related by their
+sub-function functions of a function group are somehow related by their
 purpose.  The function groups of GNU APL are:
 
    • ⌹: a collection of matrix factorizations (aka.  decompositions)
@@ -1972,15 +1976,15 @@ File: apl.info,  Node: Phase 1: Numerical Axis Argument,  Next: Phase 2: String 
 --------------------------------------
 
 In the first phase, the number of functions per function group (at that
-time ⎕CR and ⎕FIO) was fairly small.  A subfunction of the function
+time ⎕CR and ⎕FIO) was fairly small.  A sub-function of the function
 group was selected as follows:
 
    • If all functions in the function group were monadic (as is the case
-     in ⎕CR), then the subfunction was selected by the left argument of
+     in ⎕CR), then the sub-function was selected by the left argument of
      the function group.
-   • Otherwise (as is the case in ⎕FIO) the individual subfunction could
-     be monadic, dyadic, or nomadic and the subfunction was selected by
-     an axis argument of the function group.
+   • Otherwise (as is the case in ⎕FIO) the individual sub-function
+     could be monadic, dyadic, or nomadic and the sub-function was
+     selected by an axis argument of the function group.
 
    For example:
 
@@ -1990,7 +1994,7 @@ group was selected as follows:
            ⎕FIO[3] B        ⍝ fopen file B for reading
            A ⎕FIO[3] B      ⍝ fopen file B with mode A
 
-   In both cases was the subfunction selector an integer scalar.
+   In both cases was the sub-function selector an integer scalar.
 
 
 File: apl.info,  Node: Phase 2: String Axis Argument,  Next: Phase 3: Member Notation,  Prev: Phase 1: Numerical Axis Argument,  Up: Function Groups
@@ -2000,7 +2004,7 @@ File: apl.info,  Node: Phase 2: String Axis Argument,  Next: Phase 3: Member Not
 
 Shortly after introducing the syntax of phase 1, GNU APL users began to
 develop an APL workspace named FILE_IO. This workspace contains one APL
-wrapper function for each numerical ⎕FIO subfunction selector.  These
+wrapper function for each numerical ⎕FIO sub-function selector.  These
 wrappers were trivial one-liners like these:
 
            ∇Zh ← As FIO∆fopen Bs
@@ -2016,10 +2020,10 @@ wrappers were trivial one-liners like these:
    APL programs would )COPY this workspace and then use its normal
 defined functions instead of ⎕FIO with an axis argument or ⎕CR with a
 left argument.  The development of the FILE_IO suggested that APL users
-have a preference of names over numbers to select a subfunction.
+have a preference of names over numbers to select a sub-function.
 
-   GNU APL accomodeted this preference by allowing subfunction names
-(APL strings) as subfunction selectors.  These names were usually the
+   GNU APL accommodated this preference by allowing sub-function names
+(APL strings) as sub-function selectors.  These names were usually the
 same as the C library function that implemented them.
 
    The phase 1 example above would now become the slightly better
@@ -2053,14 +2057,14 @@ File: apl.info,  Node: Subfunction Lists,  Prev: Phase 3: Member Notation,  Up: 
 2.3.4 Subfunction Lists
 -----------------------
 
-If the number of subfunctions becomes large, then remembering all
-subfunction names of a function group is still a problem.  To avoid the
+If the number of sub-functions becomes large, then remembering all
+sub-function names of a function group is still a problem.  To avoid the
 need to consult other documentation while programming, all function
-groups provide lists that show their subfunctions and their syntax.
+groups provide lists that show their sub-functions and their syntax.
 
    Let FOO be a function group.  Then:
 
-   • FOO "" shows a list of subfunctions, and
+   • FOO "" shows a list of sub-functions, and
    • FOO ⍬ shows the syntaces (as per phase 1, 2, or 3) of them.
 
 
@@ -4792,7 +4796,7 @@ results of ⎕FIO functions.
 
    Let Z←A ⎕CR B.
 
-   Then the left argument A of ⎕CR selects one of several subfunctions
+   Then the left argument A of ⎕CR selects one of several sub-functions
 of ⎕CR:
 
    • A∈0 1 2 3 4 7 8 9 29: various formatting styles (boxed, APL
@@ -4932,7 +4936,7 @@ to a signed positive char in C/C++).  Real, Complex, or rational numbers
 are never proper byte values even if their value is close to an integer.
 Nor are nested APL values or values being assigned.
 
-   ⎕CR is a function group, therefore its subfunctions can be selected
+   ⎕CR is a function group, therefore its sub-functions can be selected
 with a name.  For example: monadic ⎕CR.hex_to_bytes is the same as
 monadic ⎕CR[13] or dyadic 13 ⎕CR.
 
@@ -4957,7 +4961,7 @@ files (fopen(), fclose(), ...), For example:
            'lib_file_io.so' ⎕FX 'FILE_IO'
      FILE_IO
 
-           ⍝ show overview of subfunctions in FILE_IO
+           ⍝ show overview of sub-functions in FILE_IO
            ⍝
            FILE_IO ''
         Functions provided by this library.
@@ -6611,7 +6615,7 @@ which has no plot attributes).
    The XCB driver was the first driver for ⎕PLOT but has since become
 somewhat obsolete.  It has limitation when it comes to the display of
 texts (in particular for APL characters).  The long-term GNU APL design
-strategy is therefore GTK in favour of the good old XCB. XCB will still
+strategy is therefore GTK in favor of the good old XCB. XCB will still
 be supported for a while, but new features will only be added to the GTK
 driver.
 
@@ -7558,7 +7562,7 @@ File: apl.info,  Node: Syntax Alternatives,  Prev: monadic ⎕RVAL B,  Up: Dyadi
 ............................
 
 For an improved readability, ⎕RVAL also accepts string arguments for its
-left argument A and also the subfunction notation:
+left argument A and also the sub-function notation:
 
            0 ⎕RVAL B  ←→  'state' ⎕RVAL B  ←→  ⎕RVAL.state B
            1 ⎕RVAL B  ←→   'rank' ⎕RVAL B  ←→  ⎕RVAL.rank  B
@@ -7642,12 +7646,12 @@ File: apl.info,  Node: ⎕SQL - SQL Database Interface,  Next: ⎕SYL - System l
 
    As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.  ⎕SQL has an axis argument that
-selects a subfunction of ⎕SQL.
+selects a sub-function of ⎕SQL.
 
 * Menu:
 
-* ⎕SQL[0] ⍬ : display subfunction numbers::
-* ⎕SQL[0] '' : display subfunction names::
+* ⎕SQL[0] ⍬ : display sub-function numbers::
+* ⎕SQL[0] '' : display sub-function names::
 * ref ← A ⎕SQL[1] B : open database::
 * ⎕SQL[2] B : close database::
 * Z ← A ⎕SQL[3 ref] B : database query (with result)::
@@ -7663,13 +7667,13 @@ selects a subfunction of ⎕SQL.
 * Deleting Rows From a Database Table::
 
 
-File: apl.info,  Node: ⎕SQL[0] ⍬ : display subfunction numbers,  Next: ⎕SQL[0] '' : display subfunction names,  Up: ⎕SQL - SQL Database Interface
+File: apl.info,  Node: ⎕SQL[0] ⍬ : display sub-function numbers,  Next: ⎕SQL[0] '' : display sub-function names,  Up: ⎕SQL - SQL Database Interface
 
-2.42.1 ⎕SQL[0] ⍬ : display subfunction numbers
-----------------------------------------------
+2.42.1 ⎕SQL[0] ⍬ : display sub-function numbers
+-----------------------------------------------
 
-The system function ⎕SQL is divided into a number of subfunctions.  The
-desired subfunction of ⎕SQL is selected by means of a numeric axis
+The system function ⎕SQL is divided into a number of sub-functions.  The
+desired sub-function of ⎕SQL is selected by means of a numeric axis
 argument:
 
          Valid (sub-)function numbers for ⎕SQL:
@@ -7700,17 +7704,17 @@ argument:
    The axis argument [0] is optional; one can also use ⎕SQL ⍬.
 
 
-File: apl.info,  Node: ⎕SQL[0] '' : display subfunction names,  Next: ref ← A ⎕SQL[1] B : open database,  Prev: ⎕SQL[0] ⍬ : display subfunction numbers,  Up: ⎕SQL - SQL Database Interface
+File: apl.info,  Node: ⎕SQL[0] '' : display sub-function names,  Next: ref ← A ⎕SQL[1] B : open database,  Prev: ⎕SQL[0] ⍬ : display sub-function numbers,  Up: ⎕SQL - SQL Database Interface
 
-2.42.2 ⎕SQL[0] ‘''’ : display subfunction names
------------------------------------------------
+2.42.2 ⎕SQL[0] ‘''’ : display sub-function names
+------------------------------------------------
 
 As of SVN version 1901, ⎕SQL has been promoted to be a function group.
 Instead of the function nunbers above, one can therefore also use
 function names with the following syntax:
 
          With a small performance penalty, ⎕SQL also accepts the following
-         subfunction names instead of subfunction numbers as axis argument:
+         sub-function names instead of sub-function numbers as axis argument:
 
          Legend: Fs - database file name (path)
                  Ty - database type ('sqlite' or 'postgres')
@@ -7747,7 +7751,7 @@ symtax.
 therefore also use ⎕SQL ” instead of ⎕SQL[0] ”.
 
 
-File: apl.info,  Node: ref ← A ⎕SQL[1] B : open database,  Next: ⎕SQL[2] B : close database,  Prev: ⎕SQL[0] '' : display subfunction names,  Up: ⎕SQL - SQL Database Interface
+File: apl.info,  Node: ref ← A ⎕SQL[1] B : open database,  Next: ⎕SQL[2] B : close database,  Prev: ⎕SQL[0] '' : display sub-function names,  Up: ⎕SQL - SQL Database Interface
 
 2.42.3 ref ← A ⎕SQL[1] B : open database
 ----------------------------------------
@@ -8162,15 +8166,15 @@ parameter matrix before the result of each replacement is sent as a
 (static) query to the database machinery.  This feature makes it rather
 simple to write an APL matrix (= query parameter) to the database.
 
-   Dynamic query strings are allowed in two ⎕SQL subfunctions: in
+   Dynamic query strings are allowed in two ⎕SQL sub-functions: in
 function 3 (⎕SQL.query) and in function 4 (⎕SQL.update).  The syntax
 differs slightly beween ⎕SQL function numbers and ⎕SQL function names:
 
-           Qs ⎕SQL.query DB PARAMS       ⍝ ⎕SQL subfunction name
-           Qs ⎕SQL[3, DB] PARAMS         ⍝ ⎕SQL subfunction number
+           Qs ⎕SQL.query DB PARAMS       ⍝ ⎕SQL sub-function name
+           Qs ⎕SQL[3, DB] PARAMS         ⍝ ⎕SQL sub-function number
 
-           Qs ⎕SQL.update DB PARAMS      ⍝ ⎕SQL subfunction name
-           Qs ⎕SQL[4, DB] PARAMS         ⍝ ⎕SQL subfunction number
+           Qs ⎕SQL.update DB PARAMS      ⍝ ⎕SQL sub-function name
+           Qs ⎕SQL[4, DB] PARAMS         ⍝ ⎕SQL sub-function number
 
    For rank 2 parameters shall the number of placeholders be equal to
 the number of colums of the APL matrix.  If a query string contains no
@@ -8281,15 +8285,15 @@ File: apl.info,  Node: Updating a Database Table,  Prev: Reading a Database Tabl
 2.42.14.7 Updating a Database Table
 ...................................
 
-The ⎕SQL subfunction introduced so far suffice, at least in principle.
+The ⎕SQL sub-function introduced so far suffice, at least in principle.
 The APL programmer can read a table from the database into APL, analyse
-and/or modify it in APL, and optionally writeit back into the database.
+and/or modify it in APL, and optionally write it back into the database.
 
    There is, however, one case where this approach becomes arbitrarily
 inefficient: a large database with only a small change.  In that case it
 is far more efficient to make a change directly in the database, i.e.
 without transferring the entire database back and forth between APL and
-SQL. This is achieved with an SQL UPDATE query, and ⎕SQL.uopdate does
+SQL. This is achieved with an SQL UPDATE query, and ⎕SQL.update does
 exactly that.
 
    Suppose we want to increase Teddy’s salary from 20000 to 22000.
@@ -8332,7 +8336,7 @@ SALARY in a single row ID in the database table COMPANY. The placeholder
 where ID=?  was set to Terry’s row with ID. Like in APL one can,
 however, also change multiple rows and/or multiple columns in a database
 table.  To change multiple columns one can set a comma separated list of
-column namesi in the SET clause (or * for all columns).  For multiple
+column names in the SET clause (or * for all columns).  For multiple
 rows one can set multiple rows in the WHERE clause.  Omitting the WHERE
 clause updates all rows (similar to * for columns) in the database.  For
 example:
@@ -8602,11 +8606,11 @@ needs to be preserved.
 
    Processing instructions and declarations are typically located at the
 beginning of the XML document and at the same level as the root of the
-tree.  defined by the document.  Document type declarations are
-preserved (so that they can be processed in APL), but are currently
-ignored by ⎕XML. As a consequence, entity declarations have no effect
-and only the predefined XML entities (i.e.  &, <, >, ’, and ") are
-recognized (and translated) by ⎕XML.
+tree defined by the document.  Document type declarations are preserved
+(so that they can be processed in APL), but are currently ignored by
+⎕XML. As a consequence, entity declarations have no effect and only the
+predefined XML entities (i.e.  &, <, >, ’, and ") are recognized (and
+translated) by ⎕XML.
 
 
 File: apl.info,  Node: How ⎕XML maps XML documents to APL Values,  Next: Monadic ⎕XML,  Prev: Some XML Terminology,  Up: ⎕XML - XML Parsing
@@ -8713,8 +8717,7 @@ synthesized names are produced by ⎕XML:
    • ∆NNdeclaration for XML declarations, i.e.  <?  ...  ?> in XML,
    • ∆NNdoctype for document type declarations, i.e.  <!DOCTYPE ...  >
      in XML
-   • ∆NNtext for unstructured (and hence untagged) text segements in
-     XML.
+   • ∆NNtext for unstructured (and hence untagged) text segments in XML.
 
    Every XML name (of a tag or attribute) is also a valid APL name, but
 valid APL names may also contain the characters _, ∆, and ⍙ which are
@@ -8997,8 +9000,8 @@ File: apl.info,  Node: Conditionals,  Next: Matrix Product,  Prev: ⎕XML - XML 
 =================
 
 WARNING: GNU APL conditionals are experimental.  Use them with care and
-avoid them, wherever possible, in favour of portability.  Neither the
-ISO APL standard, nor IBM APL2 provide conditionals.
+avoid them, wherever possible, in favor of portability.  Neither the ISO
+APL standard, nor IBM APL2 provide conditionals.
 
 * Menu:
 
@@ -9088,7 +9091,7 @@ condionals were these:
   2. the syntax shall not only work in defined functions, but also in
      immediate execution mode (provided, of course, that the entire
      conditional fits into a single input line),
-  3. in order to support 2., lengthy keywords shall be avoided in favour
+  3. in order to support 2., lengthy keywords shall be avoided in favor
      of the original APL style, and
   4. the syntax needs to only support those cases where the standard APL
      flow control (i.e.  →N) becomes cumbersome.  There is no obvious
@@ -9176,8 +9179,8 @@ File: apl.info,  Node: Syntax,  Next: A Possible Pitfall,  Prev: Design consider
 2.45.2 Syntax
 -------------
 
-With the above considerations in mind, GNU APL decided in favour of the
-following syntax for APL condionals:
+With the above considerations in mind, GNU APL decided in favor of the
+following syntax for APL conditionals:
 
    • one-sided if/else:
                 COND →→ THEN-statement(s) ←←
@@ -9282,7 +9285,7 @@ expressions:
 
    If a value is needed, e.g.  for assigning it to a variable, but the
 expression becomes too long to fit in a single line, then one can
-replicate the assigment in both of the IF and the ELSE clauses:
+replicate the assignment in both of the IF and the ELSE clauses:
 
            // C/C++
            x = -5;
@@ -9302,7 +9305,7 @@ replicate the assigment in both of the IF and the ELSE clauses:
      negative
 
    The correct, although possibly unexpected, result 1 of the APL
-condional in the line with comment ⍝ ???  above was evaluated as
+conditional in the line with comment ⍝ ???  above was evaluated as
 follows:
 
   1. APL computes different statements from right to left.
@@ -9317,7 +9320,7 @@ follows:
      any output.
   5. The next statement that is being executed it either ‘⊣"negative"’
      or else ‘⊣"positive"’, depending on the value of variable X.
-     Normally it would be displayed, but due to ⊣ the dispay is
+     Normally it would be displayed, but due to ⊣ the display is
      suppressed.  The entire conditional does therefore produce no
      output.
   6. As a consequence, ‘Result ← 1’ (and not, for example, ‘"negative"’
@@ -9331,9 +9334,9 @@ follows:
    Needless to say that, as in the example above, the assignment of a
 APL conditional statement to a variable is, although possible, a dubious
 programming style that should be avoided for the sake of readability.
-The key takeway here is that the clauses of a GNU APL conditional are
+The key takeaway here is that the clauses of a GNU APL conditional are
 (two or three) different statements, and that an assignment of the
-conditional to a variable assignes only the first of these statements to
+conditional to a variable assigns only the first of these statements to
 the variable.
 
    In C/C++, the condition of a conditional statement MUST be put in
@@ -9562,8 +9565,8 @@ File: apl.info,  Node: Vector Notation,  Next: GNU APL Project Structure,  Prev:
 
 This chapter describes details of the GNU APL vector notation.
 Unfortunately there exists misleading information concerning the GNU APL
-vector nontation on the public internet and the attempts of the author
-of this manual to have the misleading information corrected were not
+vector notation on the public internet and the attempts of the author of
+this manual to have the misleading information corrected were not
 successful.
 
 * Menu:
@@ -9596,7 +9599,7 @@ notation.
      17.1
 
    The terms vector notation (used by IBM APL and by GNU APL) was
-apparently coined by Kenneth Iverson (A Programming Lagnuage, p.  163)
+apparently coined by Kenneth Iverson (A Programming Language, p.  163)
 and the equivalent term strand notation is used by other APL vendors.
 
 
@@ -9610,8 +9613,8 @@ extended, in the following abbreviated as iso, does not formally define
 vector notation, but uses it all over the place in its examples.
 
    The IBM APL2 Language Reference Manual, in the following abbreviated
-as lrm, was the blueprint for GNU APL. The lrm describes vector
-notatation briefly.
+as lrm, was the blueprint for GNU APL. The lrm describes vector notation
+briefly.
 
 
 File: apl.info,  Node: Quotes from the lrm,  Next: Some APL2 Tests,  Prev: Standardization,  Up: Vector Notation
@@ -9619,7 +9622,7 @@ File: apl.info,  Node: Quotes from the lrm,  Next: Some APL2 Tests,  Prev: Stand
 5.3 Quotes from the lrm
 =======================
 
-Different aspects of vector nortation are distributed over the lrm.  To
+Different aspects of vector notation are distributed over the lrm.  To
 get a compressed view of the matter we quote the relevant pieces:
 
   1. lrm page 14: The juxtaposition of two or more arrays in an
@@ -9831,10 +9834,10 @@ iso suggests.
         • The ISO standard for APL,
         • IBM APL2, and
         • APL implementation of other vendors (including GNU APL).
-   • It is therefore impossible to accomodate both the ISO standard and
+   • It is therefore impossible to accommodate both the ISO standard and
      IBM APL2 to 100% at the same time, but
    • GNU APL tries to be as close as possible to one of them,
-   • The issues highlited above can be easily avoided by always using
+   • The issues highlighted above can be easily avoided by always using
      parentheses around operators and their operands (even though they
      may appear to be redundant).  These parentheses are the (only) key
      to portable APL programs.
@@ -9862,13 +9865,13 @@ added to it when the statement is executed.
 
    Note: Strands are, in general, subject to what is known as unexpected
 stranding, which occurs when an operator accept values as operands.
-This is the case for the power operatror ⍣ and for the rank operator ⍤;
+This is the case for the power operator ⍣ and for the rank operator ⍤;
 both can have values as right operands.  The clean way of avoiding
-unexpected stranding is to put the operatorr and its operands into
+unexpected stranding is to put the operator and its operands into
 parentheses, but the iso does not do that and in order to make the
 examples in iso work, GNU APL has dedicated code for the rank and power
 operators that prevents unexpected stranding for their right operand and
-their right function value.  For defined operators this is not possuble
+their right function value.  For defined operators this is not possible
 because at tokenization time a defined operator is only a symbol whose
 name class at execution time is unknown at tokenization time of its
 caller.  For the same reason.  the binding strengths defined above can
@@ -9953,12 +9956,12 @@ sequences:
          FUNCTION                   VALUE_A VALUE_B          ⍝  ├── expected
          DYADIC_OPERATOR            VALUE_A VALUE_B          ⍝  └── unexpected
 
-   The fact that VALUE_A and VALUE_B are adjacent constitues what is
-known as a shift/reduce confict in compiler terminology.  Let’s add some
-parentheses to see how these shift/reduce conficts are, by means of the
-APL2 binding strength, supposed to be resolved:
+   The fact that VALUE_A and VALUE_B are adjacent constitutes what is
+known as a shift/reduce conflict in compiler terminology.  Let’s add
+some parentheses to see how these shift/reduce conflicts are, by means
+of the APL2 binding strength, supposed to be resolved:
 
-                                                             ⍝ at tokenizatio time...
+                                                             ⍝ at tokenization time...
          PRIMITIVE_FUNCTION       ( VALUE_A   VALUE_B )      ⍝  ├── expected
        ( PRIMITIVE_DYADIC_OPERATOR  VALUE_A ) VALUE_B        ⍝  ├── unexpected
          VALUE                    ( VALUE_A   VALUE_B )      ⍝  ├── expected
@@ -9978,7 +9981,7 @@ not.  In the fourth case the parser cannot decide whether SYMBOL refers
 to a defined function (including functions derived from monadic
 operators), to a variable, or to a dyadic defined operator.  Therefore
 the parser can resolve the first three cases at tokenization time, i.e.
-bind VALUE_A to PRIMITIVE_DYADIC_OPERATOR or ito VALUE if so, and to
+bind VALUE_A to PRIMITIVE_DYADIC_OPERATOR or to VALUE if so, and to
 VALUE_B otherwise.  Only the binding of SYMBOL is left over and will be
 decided at execution time.
 
@@ -9988,7 +9991,7 @@ VALUE (for variables), or to FUNCTION (for defined functions), or to
 OPERATOR for defined operators.  At the time when the parser sees the
 pattern VALUE_A VALUE_B it can, with a lookahead of 1 token decide if
 the token VALUE_A shall be bound to it PRIMITIVE_DYADIC_OPERATOR, or
-stranded to its adjacxent value VALUE_B. To do this a so-called LALR-1
+stranded to its adjacent value VALUE_B. To do this a so-called LALR-1
 parser suffices.  In simple terms: if the parser sees a
 PRIMITIVE_DYADIC_OPERATOR left of VALUE_A VALUE_B then it shifts VALUE_A
 (which will later on become the right operand of that operator) and
@@ -10008,18 +10011,18 @@ that would be illegal in IBM APL2 (rank operator, page 126):
      CAB
 
    In IBM APL2, the rightmost 0 would bind to ⍤ and not to the rightmost
-1, like in (parentheses added according to the APL bindig strength:
+1, like in (parentheses added according to the APL binding strength:
 
            (0 1 2) (⌽ ⍤ 0) (1 'ABC')
      LENGTH ERROR
            0 1 2(⌽⍤0 0 0)1 'ABC'
            ^            ^
 
-   What saves IBM here is only the fact that the the two primitive
-operators that accept values as right operands (the rank operator ⍤ and
-the power operator ⍣) are not implemented in IBM APL2.  In contrast GNU
-APL has implemented both operators and the iso examples work as shown in
-the standard.
+   What saves IBM here is only the fact that the two primitive operators
+that accept values as right operands (the rank operator ⍤ and the power
+operator ⍣) are not implemented in IBM APL2.  In contrast GNU APL has
+implemented both operators and the iso examples work as shown in the
+standard.
 
    The same iso example in Dyalog APL (who seem to be the inventor of
 these operators) does not work either (at least not without parentheses:
@@ -10050,7 +10053,7 @@ converting (number-) strings and quoted strings to APL values and
 postpone the resolution of shift/reduce conflicts to the execution
 phase.  To understand why it is important to perform as much of the
 strand building at tokenization time, have a look at the following,
-somwhat crude, APL code (which is not too uncommon in real life):
+somewhat crude, APL code (which is not too uncommon in real life):
 
            ∇Z←FOO N
             Z←100⍴0 ◊ J←1
@@ -10064,7 +10067,7 @@ been more efficient than e.g.  storing that term in an APL variable.
 That strand would have been a single APL value.
 
    The tokenization of the LOOP line is pretty fast; the tokenizer runs
-once over the line and produces a strand as it goes.  MOst of the
+once over the line and produces a strand as it goes.  Most of the
 tokenization, such as converting number strings to integers is the same
 in both cases compared below.
 
@@ -10102,7 +10105,7 @@ File: apl.info,  Node: GNU APL Vector Notation,  Prev: Unexpected Stranding,  Up
 With the definitions from the previous section we can explain how GNU
 APL has implemented vector notation:
 
-   1.  GNU APL distinguishes between literal and mixed strands.  literal
+   1.  GNU APL distinguishes between literal and mixed strands.  Literal
 strands are combined into a single APL value at tokenization time.  This
 is a very effective optimization (which can be disabled at ./configure
 time).  In contrast, mixed strands are created at phrase matching time,
@@ -10130,7 +10133,7 @@ step-by-step according to the following rules:
      strand items).  Each of the two scalars A or B can be simple (like
      numbers or single characters) or nested (like strings or closed
      strands).
-   • An APL scalar A adjacent to an open strand B preprends A to B. That
+   • An APL scalar A adjacent to an open strand B prepends A to B. That
      is, B←A, B.
    • An open strand A adjacent to an an APL scalar B appends B to A.
      That is, A←A, B.
@@ -10151,7 +10154,7 @@ step-by-step according to the following rules:
      functions are called to obtain their result.
    • Likewise, any literal strands that were created at tokenization
      time are considered closed (which cause them to be enclosed when
-     preprended or appended to an open mixed strand).
+     prepended or appended to an open mixed strand).
    • If a strand is open then any other token (functions, operators,
      brackets, end-of-statement, etc.)  closes it.  The result is a
      single value for the strand.
@@ -10172,15 +10175,15 @@ Consider the following APL statement:
 
    When function FOO is created its single function line is being
 tokenized.  The tokenization of the function line sees the string "Time
-is now: " which is a literal token wth 13 literal items (= single
+is now: " which is a literal token with 13 literal items (= single
 characters).  The result of the tokenization is therefore 2 tokens: the
 string and the system function ⎕TS. Naturally ⎕TS is the time stamp when
-function FOO is called and not the the time when function FOO is
-created.  Therefore the strand building stops at this point and leaves
-the string as an (incomplete) strand because the strand building can not
-predict when FOO will be called.  At this point the incomplete strand
-and the system function ⎕TS will become adjacent tokens in the function
-body of FOO.
+function FOO is called and not the time when function FOO is created.
+Therefore the strand building stops at this point and leaves the string
+as an (incomplete) strand because the strand building can not predict
+when FOO will be called.  At this point the incomplete strand and the
+system function ⎕TS will become adjacent tokens in the function body of
+FOO.
 
    Later on (or maybe never) FOO will be called.  The execution of FOO
 (which goes from right to left) first sees the niladic token ⎕TS, and
@@ -10199,7 +10202,7 @@ printed.
 iso is somewhat incomplete.  In particular the pattern A B above (which
 performs the strand building in the execution phase) is not present in
 iso.  Also, iso defines END tokens as used above, but no pattern in
-ehich they appear.  All this has the unfortunate consequence that vector
+which they appear.  All this has the unfortunate consequence that vector
 notation is provided by every APL interpreter, but the details of it
 differ considerably.  For example, 1 2 3[2] could be 2 in one
 interpreter, but raise a RANK ERROR in another.  Even for different
@@ -10246,32 +10249,32 @@ projects.  The top-level itself contains the files needed by
 autoconf/automake and a handful of README-XXX files that might be of
 interest when building GNU APL.
 
-   The subdirectories are (in order of decreasing relevance):
+   The sub-directories are (in order of decreasing relevance):
 
 * Menu:
 
-* The subdirectory src::
-* The subdirectory support-files::
-* The subdirectory doc::
-* The subdirectory HOWTOs::
-* The subdirectories workspaces and wslib2 ... wslib5::
-* The subdirectory m4::
-* The subdirectories debian and debian_tmp::
-* The subdirectory tools::
+* The sub-directory src::
+* The sub-directory support-files::
+* The sub-directory doc::
+* The sub-directory HOWTOs::
+* The sub-directories workspaces and wslib2 ... wslib5::
+* The sub-directory m4::
+* The sub-directories debian and debian_tmp::
+* The sub-directory tools::
 
 
-File: apl.info,  Node: The subdirectory src,  Next: The subdirectory support-files,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory src,  Next: The sub-directory support-files,  Up: GNU APL Project Structure
 
-6.1 The subdirectory src
-========================
+6.1 The sub-directory src
+=========================
 
-The subdirectory src contains all C++ source files that are needed to
+The sub-directory src contains all C++ source files that are needed to
 build either the GNU APL interpreter itself, or libapl (a library that
 contains the essential part of GNU APL, but without the interactive REPL
 loop of the interpreter).  During the build, the object files produced
 by the compiler are also placed in this directory.
 
-   The subdirectory src contains further subdirectories for components
+   The sub-directory src contains further sub-directories for components
 of GNU APL that are optional and typically require the installation of
 additional libraries on the build machine.  The ./configure script in
 the top-level directory determines, which optional components shall be
@@ -10287,34 +10290,34 @@ included in the build.
              ├── testcases               dito
 
    GNU APL comes with an automated test suite, the testcases are
-contained in subdirectory src/testcases
+contained in sub-directory src/testcases
 
 
-File: apl.info,  Node: The subdirectory support-files,  Next: The subdirectory doc,  Prev: The subdirectory src,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory support-files,  Next: The sub-directory doc,  Prev: The sub-directory src,  Up: GNU APL Project Structure
 
-6.2 The subdirectory support-files
-==================================
+6.2 The sub-directory support-files
+===================================
 
-The subdirectory support-file contains a number of configuration files
+The sub-directory support-file contains a number of configuration files
 that aim at making a standard keyboard produce APL characters.  Details
 are explained in top-level file README-3-keyboard.
 
 
-File: apl.info,  Node: The subdirectory doc,  Next: The subdirectory HOWTOs,  Prev: The subdirectory support-files,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory doc,  Next: The sub-directory HOWTOs,  Prev: The sub-directory support-files,  Up: GNU APL Project Structure
 
-6.3 The subdirectory doc
-========================
+6.3 The sub-directory doc
+=========================
 
-The subdirectory doc is used to create this info file in different file
+The sub-directory doc is used to create this info file in different file
 formats (.info, .html).
 
 
-File: apl.info,  Node: The subdirectory HOWTOs,  Next: The subdirectories workspaces and wslib2 ... wslib5,  Prev: The subdirectory doc,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory HOWTOs,  Next: The sub-directories workspaces and wslib2 ... wslib5,  Prev: The sub-directory doc,  Up: GNU APL Project Structure
 
-6.4 The subdirectory HOWTOs
-===========================
+6.4 The sub-directory HOWTOs
+============================
 
-The subdirectory HOWTOs contains some documents that try to explain how
+The sub-directory HOWTOs contains some documents that try to explain how
 some of the non-standard features of GNU APL are intended to be used.
 These documents were written for two different audiences: APL
 programmers and GNU APL hackers.  The documents for APL programmers are,
@@ -10324,23 +10327,23 @@ or trouble-shooters) are not installed by make install, but rather
 remain in the source tree.
 
 
-File: apl.info,  Node: The subdirectories workspaces and wslib2 ... wslib5,  Next: The subdirectory m4,  Prev: The subdirectory HOWTOs,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directories workspaces and wslib2 ... wslib5,  Next: The sub-directory m4,  Prev: The sub-directory HOWTOs,  Up: GNU APL Project Structure
 
-6.5 The subdirectories workspaces and wslib2 ... wslib5
-=======================================================
+6.5 The sub-directories workspaces and wslib2 ... wslib5
+========================================================
 
 These directories (and their content) are, by default, copied to
-/usr/local/lib/apl by make install.  Some subdirectories are empty while
-others contain small workspaces or libraries for various purposes
+/usr/local/lib/apl by make install.  Some sub-directories are empty
+while others contain small workspaces or libraries for various purposes
 (mostly demonstrating the use of some non-standard APL features).
 
 
-File: apl.info,  Node: The subdirectory m4,  Next: The subdirectories debian and debian_tmp,  Prev: The subdirectories workspaces and wslib2 ... wslib5,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory m4,  Next: The sub-directories debian and debian_tmp,  Prev: The sub-directories workspaces and wslib2 ... wslib5,  Up: GNU APL Project Structure
 
-6.6 The subdirectory m4
-=======================
+6.6 The sub-directory m4
+========================
 
-The subdirectory m4 contains macros used by autoconf and automake.  In
+The sub-directory m4 contains macros used by autoconf and automake.  In
 most cases the top-level ./configure script can be used as is.  If a
 platform on which GNU APL shall be built differs too much from the
 platform on which the GNU APL project tar file (e.g.  apl-1.9.tar.gz)
@@ -10356,23 +10359,23 @@ script on the platform.
    • running autoreconf
 
 
-File: apl.info,  Node: The subdirectories debian and debian_tmp,  Next: The subdirectory tools,  Prev: The subdirectory m4,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directories debian and debian_tmp,  Next: The sub-directory tools,  Prev: The sub-directory m4,  Up: GNU APL Project Structure
 
-6.7 The subdirectories debian and debian_tmp
-============================================
+6.7 The sub-directories debian and debian_tmp
+=============================================
 
-These subdirectories are templates for building Debian packages that
-contain GNU APL. Subdirectory debian_tmp is initially empty and acts as
+These sub-directories are templates for building Debian packages that
+contain GNU APL. Sub-directory debian_tmp is initially empty and acts as
 a scratch directory inside which the interpreter is being compiled when
 a Debian package is built.
 
 
-File: apl.info,  Node: The subdirectory tools,  Prev: The subdirectories debian and debian_tmp,  Up: GNU APL Project Structure
+File: apl.info,  Node: The sub-directory tools,  Prev: The sub-directories debian and debian_tmp,  Up: GNU APL Project Structure
 
-6.8 The subdirectory tools
-==========================
+6.8 The sub-directory tools
+===========================
 
-GNU APL uses generated C++ code.  The subdirectory tools contains the
+GNU APL uses generated C++ code.  The sub-directory tools contains the
 source code for the code generator (phrase_gen) and also some other
 small tools for various purposes.  These tools are typically used by GNU
 APL hackers and are therefore not installed by make install.
@@ -11620,233 +11623,233 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 
 Tag Table:
-Node: Top383
-Node: Installing and Starting GNU APL1574
-Node: Installing APL1892
-Node: Starting APL2668
-Node: Command Line Options4752
-Node: Configuration File for GNU APL18633
-Node: File Names and Paths19905
-Node: Non-standard GNU APL Features25103
-Node: APL Scripting26790
-Node: Introduction and Terminology27327
-Node: Redirect the script file to the stdin of the GNU APL interpreter32507
-Node: Make the script file executable33360
-Node: Starting GNU APL Scripts: a Conclusion34268
-Node: How command line arguments are handled35631
-Node: Helpful Features for Scripting42183
-Node: ⎕ARG42821
-Node: ⎕ENV43136
-Node: ⎕INP44906
-Node: Double-quoted Strings46427
-Node: Multi-Line Strings47311
-Node: Old-style Multi-Line Strings48144
-Node: New-style Multi-Line Strings50975
-Node: « » Strings53720
-Node: Multi-Line Comments56626
-Node: Multi-Line Literals57540
-Node: Automatic )MORE67703
-Node: Script Example69513
-Node: Axis argument in defined functions72923
-Node: Function Groups73764
-Node: Phase 1: Numerical Axis Argument76492
-Node: Phase 2: String Axis Argument77588
-Node: Phase 3: Member Notation79178
-Node: Subfunction Lists79820
-Node: Colored Output80401
-Node: Comparison Rules81715
-Node: Complex Numbers86244
-Node: Debug Commands86449
-Node: Direct Functions (Lambdas)87121
-Node: Named Lambdas87514
-Node: Unnamed Lambdas92356
-Node: Limitations of GNU APL Lambdas93244
-Node: Commands )COPY_ONCE )DUMP and DUMP-HTML94814
-Node: )DUMP Command95295
-Node: )DUMP-HTML Command95916
-Node: )COPY_ONCE Command96830
-Node: ]DOXY Command97403
-Node: ]KEYB Command99827
-Node: The transformation of Keycodes to Unicodes103068
-Node: xmodmap and friends105487
-Node: The ]KEYB command108190
-Node: ]KEYB Syntax108460
-Node: ]KEYB without a mode109949
-Node: ]KEYB XMOD111295
-Node: ]KEYB USER114227
-Node: ]KEYB GUESS114818
-Node: Optional ]KEYB arguments115213
-Node: ]NEXTFILE and ]PUSHFILE Commands129247
-Node: ]NEXTFILE129514
-Node: ]PUSHFILE130488
-Node: History and TAB completion131099
-Node: Logging Facilities132940
-Node: Static Logging133704
-Node: Dynamic Logging134448
-Node: Rational Numbers135142
-Node: Hex Numbers136112
-Node: User-defined Commands136415
-Node: Structured Variables and Associative Arrays137885
-Node: Structured Variables138397
-Node: Associative Arrays143912
-Node: Monadic ⊢ and ⊣; dyadic ⊢ with Axis149183
-Node: Bit-wise Logical Functions: ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤≠ and ⊤=151869
-Node: Dyadic ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= and ⊤≠154202
-Node: Monadic ⊤∨ and ⊤⍱155162
-Node: Monadic ⊤∧157002
-Node: Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧ ⊤∨ == and ≠≠158964
-Node: ⊤ (Encode) with Axis159973
-Node: Generalized ⍳164501
-Node: Generalized monadic ⍳164776
-Node: Generalized dyadic ⍳165513
-Node: ⌹[X] - Miscellaneous Matrix and Vector Operations166347
-Node: ⌹[1] and ⌹[2] - QR Factorizations166716
-Node: The Impact of ⎕CT for ⌹171998
-Node: A⌹B and ⌹B172750
-Node: ⌹[X] B: Various Factorizations of B174980
-Node: Matrix Inverse177760
-Node: ⌹[7] B: Print Polynomial B178531
-Node: A ⌹[8] B: Multiply Polynomials A and B181717
-Node: A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)183038
-Node: A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)184225
-Node: A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)190384
-Node: ⌹[11] B Scan Polynomial B193201
-Node: A ⌹[20] B: Integral B195221
-Node: ⎕CC - Character Classes198018
-Node: monadic ⎕CC B: Return character class198556
-Node: dyadic A ⎕CC B: Test character class201482
-Node: Dyadic ⎕CR202234
-Node: Dyadic ⎕FX (Native Functions)208962
-Node: ⎕ARG - Interpreter command line arguments212404
-Node: ⎕DLX - Knuth's Dancing Links Algorithm212795
-Node: ⎕ENV - Environment Variables223745
-Node: ⎕FIO - File I/O Functions224100
-Node: ⎕FFT - Fast Fourier Transform231225
-Node: ⎕GTK - GTK Interface233743
-Node: ⎕JSON - JSON Parsing234471
-Node: Monadic ⎕JSON235213
-Node: Dyadic ⎕JSON235549
-Node: ⎕MAP - Map Value236405
-Node: ⎕MX - Matrix/Statistics240378
-Node: Determinant242156
-Node: Cross Product242541
-Node: Vector Angle243837
-Node: Eigenvector244225
-Node: Eigenvalue245385
-Node: Ident247883
-Node: Rotation248213
-Node: Homogeneous transform248550
-Node: Norm249172
-Node: Randoms250109
-Node: Covariance251970
-Node: Histograms253047
-Node: Print253967
-Node: ⎕PLOT - Plot Data256403
-Node: The Plot Data B257697
-Node: Complex Plot Data B258486
-Node: Real Plot Data B259482
-Node: The Plot Attributes A260559
-Node: Plot Window Handling274093
-Node: Output File Format275431
-Node: GUI driver276661
-Node: ⎕PNG - Portable Network Graphics280756
-Node: The GNU APL Color Model281323
-Node: Monadic ⎕PNG286836
-Node: Dyadic ⎕PNG289053
-Node: APL Examples289880
-Node: ⎕PS - Print Style290816
-Node: ⎕RE - Regular Expressions291899
-Node: Preconditions292521
-Node: ⎕RE Syntax293004
-Node: The Regular Expression A293702
-Node: The String(s) B Being Matched294369
-Node: The Flags X295771
-Node: The libpcre2 flags: i m s and x296750
-Node: The ⎕RE (APL output format) flags ↓ ⊂ and /297417
-Node: the ⎕RE global flag g299896
-Node: the ⎕RE error flag E303401
-Node: Complex Matches304305
-Node: ⎕RVAL - Random APL value308795
-Node: General309783
-Node: Dyadic ⎕RVAL310728
-Node: Control of the underlying random number generator: 0 ⎕RVAL B311671
-Node: Control of the ranks: 1 ⎕RVAL B313035
-Node: Control of the shapes: 2 ⎕RVAL B314735
-Node: Control of the data types: 3 ⎕RVAL B316232
-Node: Control of a maximum depth: 4 ⎕RVAL B318063
-Node: monadic ⎕RVAL B318877
-Node: Syntax Alternatives320843
-Node: ⎕SI - State Indicator321498
-Node: ⎕SQL - SQL Database Interface323746
-Node: ⎕SQL[0] ⍬ : display subfunction numbers324842
-Node: ⎕SQL[0] '' : display subfunction names326747
-Node: ref ← A ⎕SQL[1] B : open database329523
-Node: ⎕SQL[2] B : close database330582
-Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331139
-Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332122
-Node: ⎕SQL[5] B : start transaction332696
-Node: ⎕SQL[6] B : commit transaction333023
-Node: ⎕SQL[7] B : rollback transaction333334
-Node: Z←⎕SQL[8] B : table names333661
-Node: Z←⎕SQL[9] B : column names333991
-Node: Z ← ⎕SQL[10] B : library version number334509
-Node: Z ← ⎕SQL[11] B : library version string335105
-Node: SQLite Quickstart335671
-Node: Deleting a Database337613
-Node: Creating a new Database339023
-Node: Creating a Database Table340772
-Node: Excursus: Dynamic Query Strings344128
-Node: Writing an APL matrix into a Database Table347070
-Node: Reading a Database Table into an APL Matrix349471
-Node: Updating a Database Table351242
-Node: Deleting Rows From a Database Table353871
-Node: ⎕SYL - System limits354643
-Node: ⎕SYL[1 2 3 4 5 6;]357059
-Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]358454
-Node: ⎕SYL[24 25 26;]358938
-Node: ⎕SYL[27;]359250
-Node: ⎕XML - XML Parsing359933
-Node: Purpose360267
-Node: Some XML Terminology361843
-Node: How ⎕XML maps XML documents to APL Values365293
-Node: Monadic ⎕XML371962
-Node: Dyadic ⎕XML372775
-Node: XML Queries381068
-Node: Conditionals381938
-Node: Design considerations.382369
-Node: Syntax389768
-Node: A Possible Pitfall392920
-Node: Matrix Product397173
-Node: Monadic ≠ (Nub Sieve)400476
-Node: Limitations and Missing Features401024
-Node: System Limits401459
-Node: Shared Variables402761
-Node: Internationalization403843
-Node: Vector Notation405024
-Node: History405620
-Node: Standardization406358
-Node: Quotes from the lrm406867
-Node: Some APL2 Tests409027
-Node: Test 1: Binding strength of []409442
-Node: Test 2: Binding strength of the left operand410280
-Node: Definitions415056
-Node: Unexpected Stranding418083
-Node: GNU APL Vector Notation426849
-Node: GNU APL Project Structure432843
-Node: The subdirectory src434362
-Node: The subdirectory support-files435726
-Node: The subdirectory doc436139
-Node: The subdirectory HOWTOs436437
-Node: The subdirectories workspaces and wslib2 ... wslib5437176
-Node: The subdirectory m4437730
-Node: The subdirectories debian and debian_tmp438596
-Node: The subdirectory tools439086
-Node: Libraries Contributed by GNU APL Users439544
-Node: The GNU APL Community Webpage440021
-Node: Core Libraries440758
-Node: Licenses for this GNU APL Manual and for GNU APL441639
-Node: The GNU Free Documentation License442184
-Node: The GNU GENERAL PUBLIC LICENSE467578
+Node: Top394
+Node: Installing and Starting GNU APL1585
+Node: Installing APL1903
+Node: Starting APL2828
+Node: Command Line Options4900
+Node: Configuration File for GNU APL18787
+Node: File Names and Paths20059
+Node: Non-standard GNU APL Features25257
+Node: APL Scripting26944
+Node: Introduction and Terminology27481
+Node: Redirect the script file to the stdin of the GNU APL interpreter32662
+Node: Make the script file executable33515
+Node: Starting GNU APL Scripts: a Conclusion34423
+Node: How command line arguments are handled35786
+Node: Helpful Features for Scripting42339
+Node: ⎕ARG42977
+Node: ⎕ENV43292
+Node: ⎕INP45062
+Node: Double-quoted Strings46583
+Node: Multi-Line Strings47467
+Node: Old-style Multi-Line Strings48300
+Node: New-style Multi-Line Strings51131
+Node: « » Strings53876
+Node: Multi-Line Comments56782
+Node: Multi-Line Literals57697
+Node: Automatic )MORE67862
+Node: Script Example69672
+Node: Axis argument in defined functions73082
+Node: Function Groups73923
+Node: Phase 1: Numerical Axis Argument76656
+Node: Phase 2: String Axis Argument77757
+Node: Phase 3: Member Notation79352
+Node: Subfunction Lists79994
+Node: Colored Output80579
+Node: Comparison Rules81893
+Node: Complex Numbers86422
+Node: Debug Commands86627
+Node: Direct Functions (Lambdas)87299
+Node: Named Lambdas87692
+Node: Unnamed Lambdas92534
+Node: Limitations of GNU APL Lambdas93422
+Node: Commands )COPY_ONCE )DUMP and DUMP-HTML94992
+Node: )DUMP Command95473
+Node: )DUMP-HTML Command96094
+Node: )COPY_ONCE Command97008
+Node: ]DOXY Command97581
+Node: ]KEYB Command100005
+Node: The transformation of Keycodes to Unicodes103246
+Node: xmodmap and friends105665
+Node: The ]KEYB command108368
+Node: ]KEYB Syntax108638
+Node: ]KEYB without a mode110127
+Node: ]KEYB XMOD111473
+Node: ]KEYB USER114405
+Node: ]KEYB GUESS114996
+Node: Optional ]KEYB arguments115391
+Node: ]NEXTFILE and ]PUSHFILE Commands129425
+Node: ]NEXTFILE129692
+Node: ]PUSHFILE130666
+Node: History and TAB completion131277
+Node: Logging Facilities133118
+Node: Static Logging133882
+Node: Dynamic Logging134626
+Node: Rational Numbers135320
+Node: Hex Numbers136290
+Node: User-defined Commands136593
+Node: Structured Variables and Associative Arrays138063
+Node: Structured Variables138575
+Node: Associative Arrays144090
+Node: Monadic ⊢ and ⊣; dyadic ⊢ with Axis149361
+Node: Bit-wise Logical Functions: ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤≠ and ⊤=152047
+Node: Dyadic ⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= and ⊤≠154380
+Node: Monadic ⊤∨ and ⊤⍱155340
+Node: Monadic ⊤∧157180
+Node: Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧ ⊤∨ == and ≠≠159142
+Node: ⊤ (Encode) with Axis160151
+Node: Generalized ⍳164679
+Node: Generalized monadic ⍳164954
+Node: Generalized dyadic ⍳165691
+Node: ⌹[X] - Miscellaneous Matrix and Vector Operations166525
+Node: ⌹[1] and ⌹[2] - QR Factorizations166894
+Node: The Impact of ⎕CT for ⌹172176
+Node: A⌹B and ⌹B172928
+Node: ⌹[X] B: Various Factorizations of B175158
+Node: Matrix Inverse177938
+Node: ⌹[7] B: Print Polynomial B178709
+Node: A ⌹[8] B: Multiply Polynomials A and B181895
+Node: A ⌹[9] B: Divide Polynomial A by Polynomial B (univariate)183216
+Node: A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)184403
+Node: A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)190562
+Node: ⌹[11] B Scan Polynomial B193379
+Node: A ⌹[20] B: Integral B195399
+Node: ⎕CC - Character Classes198196
+Node: monadic ⎕CC B: Return character class198734
+Node: dyadic A ⎕CC B: Test character class201660
+Node: Dyadic ⎕CR202412
+Node: Dyadic ⎕FX (Native Functions)209142
+Node: ⎕ARG - Interpreter command line arguments212585
+Node: ⎕DLX - Knuth's Dancing Links Algorithm212976
+Node: ⎕ENV - Environment Variables223926
+Node: ⎕FIO - File I/O Functions224281
+Node: ⎕FFT - Fast Fourier Transform231406
+Node: ⎕GTK - GTK Interface233924
+Node: ⎕JSON - JSON Parsing234652
+Node: Monadic ⎕JSON235394
+Node: Dyadic ⎕JSON235730
+Node: ⎕MAP - Map Value236586
+Node: ⎕MX - Matrix/Statistics240559
+Node: Determinant242337
+Node: Cross Product242722
+Node: Vector Angle244018
+Node: Eigenvector244406
+Node: Eigenvalue245566
+Node: Ident248064
+Node: Rotation248394
+Node: Homogeneous transform248731
+Node: Norm249353
+Node: Randoms250290
+Node: Covariance252151
+Node: Histograms253228
+Node: Print254148
+Node: ⎕PLOT - Plot Data256584
+Node: The Plot Data B257878
+Node: Complex Plot Data B258667
+Node: Real Plot Data B259663
+Node: The Plot Attributes A260740
+Node: Plot Window Handling274274
+Node: Output File Format275612
+Node: GUI driver276842
+Node: ⎕PNG - Portable Network Graphics280936
+Node: The GNU APL Color Model281503
+Node: Monadic ⎕PNG287016
+Node: Dyadic ⎕PNG289233
+Node: APL Examples290060
+Node: ⎕PS - Print Style290996
+Node: ⎕RE - Regular Expressions292079
+Node: Preconditions292701
+Node: ⎕RE Syntax293184
+Node: The Regular Expression A293882
+Node: The String(s) B Being Matched294549
+Node: The Flags X295951
+Node: The libpcre2 flags: i m s and x296930
+Node: The ⎕RE (APL output format) flags ↓ ⊂ and /297597
+Node: the ⎕RE global flag g300076
+Node: the ⎕RE error flag E303581
+Node: Complex Matches304485
+Node: ⎕RVAL - Random APL value308975
+Node: General309963
+Node: Dyadic ⎕RVAL310908
+Node: Control of the underlying random number generator: 0 ⎕RVAL B311851
+Node: Control of the ranks: 1 ⎕RVAL B313215
+Node: Control of the shapes: 2 ⎕RVAL B314915
+Node: Control of the data types: 3 ⎕RVAL B316412
+Node: Control of a maximum depth: 4 ⎕RVAL B318243
+Node: monadic ⎕RVAL B319057
+Node: Syntax Alternatives321023
+Node: ⎕SI - State Indicator321679
+Node: ⎕SQL - SQL Database Interface323927
+Node: ⎕SQL[0] ⍬ : display sub-function numbers325026
+Node: ⎕SQL[0] '' : display sub-function names326937
+Node: ref ← A ⎕SQL[1] B : open database329719
+Node: ⎕SQL[2] B : close database330779
+Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331336
+Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332319
+Node: ⎕SQL[5] B : start transaction332893
+Node: ⎕SQL[6] B : commit transaction333220
+Node: ⎕SQL[7] B : rollback transaction333531
+Node: Z←⎕SQL[8] B : table names333858
+Node: Z←⎕SQL[9] B : column names334188
+Node: Z ← ⎕SQL[10] B : library version number334706
+Node: Z ← ⎕SQL[11] B : library version string335302
+Node: SQLite Quickstart335868
+Node: Deleting a Database337810
+Node: Creating a new Database339220
+Node: Creating a Database Table340969
+Node: Excursus: Dynamic Query Strings344325
+Node: Writing an APL matrix into a Database Table347272
+Node: Reading a Database Table into an APL Matrix349673
+Node: Updating a Database Table351444
+Node: Deleting Rows From a Database Table354073
+Node: ⎕SYL - System limits354845
+Node: ⎕SYL[1 2 3 4 5 6;]357261
+Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]358656
+Node: ⎕SYL[24 25 26;]359140
+Node: ⎕SYL[27;]359452
+Node: ⎕XML - XML Parsing360135
+Node: Purpose360469
+Node: Some XML Terminology362045
+Node: How ⎕XML maps XML documents to APL Values365493
+Node: Monadic ⎕XML372156
+Node: Dyadic ⎕XML372969
+Node: XML Queries381262
+Node: Conditionals382132
+Node: Design considerations.382562
+Node: Syntax389960
+Node: A Possible Pitfall393113
+Node: Matrix Product397370
+Node: Monadic ≠ (Nub Sieve)400673
+Node: Limitations and Missing Features401221
+Node: System Limits401656
+Node: Shared Variables402958
+Node: Internationalization404040
+Node: Vector Notation405221
+Node: History405816
+Node: Standardization406554
+Node: Quotes from the lrm407061
+Node: Some APL2 Tests409220
+Node: Test 1: Binding strength of []409635
+Node: Test 2: Binding strength of the left operand410473
+Node: Definitions415252
+Node: Unexpected Stranding418277
+Node: GNU APL Vector Notation427043
+Node: GNU APL Project Structure433031
+Node: The sub-directory src434559
+Node: The sub-directory support-files435931
+Node: The sub-directory doc436350
+Node: The sub-directory HOWTOs436654
+Node: The sub-directories workspaces and wslib2 ... wslib5437399
+Node: The sub-directory m4437959
+Node: The sub-directories debian and debian_tmp438831
+Node: The sub-directory tools439328
+Node: Libraries Contributed by GNU APL Users439791
+Node: The GNU APL Community Webpage440268
+Node: Core Libraries441005
+Node: Licenses for this GNU APL Manual and for GNU APL441886
+Node: The GNU Free Documentation License442431
+Node: The GNU GENERAL PUBLIC LICENSE467825
 
 End Tag Table
 

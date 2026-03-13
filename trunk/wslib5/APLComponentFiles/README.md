@@ -1,7 +1,7 @@
 
 A Component File System for GNU APL
 ===================================
-Blake McBride (blake@arahant.com)
+Blake McBride (blake@mcbridemail.com)
 
 This package provides a component file system for GNU APL that
 conforms to the ISO Standard.  Components are numbered with integers.
@@ -19,12 +19,15 @@ Facilities for this are provided.
 
 This package depends upon the following:
 
-GNU APL by Juergen Sauermann <juergen.sauermann@t-online.de>
-http://www.gnu.org/software/apl/apl.html
-Subversion:  http://svn.savannah.gnu.org/svn/apl/trunk
+GNU APL by Dr. Jürgen Sauermann (<mail@jürgen-sauermann.de>)
+[http://www.gnu.org/software/apl/apl.html](http://www.gnu.org/software/apl/apl.html)
+
+Subversion:  [http://svn.savannah.gnu.org/svn/apl/trunk](http://svn.savannah.gnu.org/svn/apl/trunk)
 
 
-SQL Interface by  Elias M�rtenson <lokedhs@gmail.com>
+SQL Interface by  Elias Mårtenson <lokedhs@gmail.com>
 This library provides an SQL interface to Sqlite & PostgreSQL
 It is now a part of GNU APL so that you do not
 need to load or build this separately.
+
+Source code available at:  [https://github.com/blakemcbride/APLComponentFiles](https://github.com/blakemcbride/APLComponentFiles)
