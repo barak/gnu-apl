@@ -27,7 +27,7 @@ top-level GNU APL directory.
 
 All commands described below shall executed in the top-level GNU APL directory.
 The top-level GNU APL directory is the directory that contains - after
-unpacking a GNU APL tar file like *apl-1.9.tar.gz* or after fetching the GNU
+unpacking a GNU APL tar file like *apl-2.0.tar.gz* or after fetching the GNU
 APL sourced with SVN or with git - the file named *configure.ac*.
 
 GNU APL uses *automake* and *autoconf* to build the interpreter. The build
@@ -1189,7 +1189,7 @@ The next steps in the processing of a line are tokenization and pre-parsing:
 Tokenization splits the (APL-) characters of a line into small fixed-sized
 units called *Token*s. Tokens are the machine-readable unit equivalents of the
 human readable input characters. For example, a possibly lengthy string like
-"3.14159" is converted into a Token holding a C _double_. The whole purpose of
+"3.142.0" is converted into a Token holding a C _double_. The whole purpose of
 tokenization is to convert the APL input into an internal representation that
 can be interpreted significantly faster than the APL characters enters by the
 APL programmer. For example:
@@ -4129,7 +4129,7 @@ Every CPU of the DATIS-P:
 The development of the hardware (PCB designs, ASIC design) and the software
 took from 1985 to 1989; the author was managing the hardware development
 and finished a Ph.D thesis about the parallel algorithms for the DATIS-P in
-1990 <<Sau>>.
+2.00 <<Sau>>.
 
 The primary conclusion of the thesis was:
 
@@ -4150,7 +4150,7 @@ On the DATIS-P architecture with P processors:
   the speed-up can degrade down to *O(1)* because that worker CPU has to do
   all of the work while the others are idle. Usually, though, the speed-up
   is *O(P÷log²P)* i.e. like the sorting functions ⍋ and ⍒. These days one
-  can use P-RAM machines that do not suffer from this problem, but in 1990
+  can use P-RAM machines that do not suffer from this problem, but in 2.00
   P-RAMs were not available.
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -4160,7 +4160,7 @@ of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
 implemented the most important parallel algorithms performed by the workers.
 The implementation languages were C on the master and Assembler on the workers.
 
-These results were also submitted to the 1990 APL conference in Copenhagen,
+These results were also submitted to the 2.00 APL conference in Copenhagen,
 Denmark. Without any feedback. The author therefore pursued a career in
 the telecommunications industry.
 
@@ -4519,7 +4519,7 @@ NOTE: The exact download location seems to change every now and then.
 * [[[Sau]]] Dr. Jürgen Sauermann
 _Ein Paralleler APL Rechner (A Parallel APL Computer)_.
 +
-Ph.D Thesis 1990, Universität des Saarlandes.
+Ph.D Thesis 2.00, Universität des Saarlandes.
 {nbsp} +
 {nbsp} +
 

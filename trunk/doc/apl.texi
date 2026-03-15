@@ -10255,7 +10255,7 @@ are being indexed.
 The top-level directory of the GNU APL project has a structure like this:
 
 @example
-    apl-1.9/
+    apl-2.0/
     ├── build
     ├── debian
     ├── doc
@@ -10277,7 +10277,7 @@ The top-level directory of the GNU APL project has a structure like this:
 @end example
 
 Most of these directories are contained in the project tar file
-(e.g. apl-1.9.tar.gz) and some are created during the build of GNU APL. Only
+(e.g. apl-2.0.tar.gz) and some are created during the build of GNU APL. Only
 the directories in the top-level are shown above.
 
 The GNU APL project follows the standard layout for autoconf/automake projects.
@@ -10301,7 +10301,7 @@ libraries on the build machine. The ./configure script in the top-level
 directory determines, which optional components shall be included in the build.
 
 @example
-    apl-1.9/
+    apl-2.0/
     ├── src
         ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
@@ -10352,7 +10352,7 @@ demonstrating the use of some non-standard APL features).
 The sub-directory m4 contains macros used by autoconf and automake. In most
 cases the top-level ./configure script can be used as is. If a platform on
 which GNU APL shall be built differs too much from the platform on which the
-GNU APL project tar file (e.g. apl-1.9.tar.gz) was created, then it might
+GNU APL project tar file (e.g. apl-2.0.tar.gz) was created, then it might
 be necessary to re-create the ./configure script on the platform.
 
 Re-creating the ./configure script requires:

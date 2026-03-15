@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-March 13, 2026.  This manual briefly documents GNU APL, an interpreter
+March 15, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -10220,7 +10220,7 @@ File: apl.info,  Node: GNU APL Project Structure,  Next: Libraries Contributed b
 The top-level directory of the GNU APL project has a structure like
 this:
 
-         apl-1.9/
+         apl-2.0/
          ├── build
          ├── debian
          ├── doc
@@ -10241,7 +10241,7 @@ this:
          └── wslib5
 
    Most of these directories are contained in the project tar file (e.g.
-apl-1.9.tar.gz) and some are created during the build of GNU APL. Only
+apl-2.0.tar.gz) and some are created during the build of GNU APL. Only
 the directories in the top-level are shown above.
 
    The GNU APL project follows the standard layout for autoconf/automake
@@ -10280,7 +10280,7 @@ additional libraries on the build machine.  The ./configure script in
 the top-level directory determines, which optional components shall be
 included in the build.
 
-         apl-1.9/
+         apl-2.0/
          ├── src
              ├── APs                     APs for ⎕SVO and friends
              ├── emacs_mode              dito
@@ -10346,7 +10346,7 @@ File: apl.info,  Node: The sub-directory m4,  Next: The sub-directories debian a
 The sub-directory m4 contains macros used by autoconf and automake.  In
 most cases the top-level ./configure script can be used as is.  If a
 platform on which GNU APL shall be built differs too much from the
-platform on which the GNU APL project tar file (e.g.  apl-1.9.tar.gz)
+platform on which the GNU APL project tar file (e.g.  apl-2.0.tar.gz)
 was created, then it might be necessary to re-create the ./configure
 script on the platform.
 

@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>March 13, 2026.
+<p>March 15, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -11876,7 +11876,7 @@ Next: <a href="#Libraries-Contributed-by-GNU-APL-Users" accesskey="n" rel="next"
 <p>The top-level directory of the GNU APL project has a structure like this:
 </p>
 <div class="example">
-<pre class="example">    apl-1.9/
+<pre class="example">    apl-2.0/
     ├── build
     ├── debian
     ├── doc
@@ -11898,7 +11898,7 @@ Next: <a href="#Libraries-Contributed-by-GNU-APL-Users" accesskey="n" rel="next"
 </pre></div>
 
 <p>Most of these directories are contained in the project tar file
-(e.g. apl-1.9.tar.gz) and some are created during the build of GNU APL. Only
+(e.g. apl-2.0.tar.gz) and some are created during the build of GNU APL. Only
 the directories in the top-level are shown above.
 </p>
 <p>The GNU APL project follows the standard layout for autoconf/automake projects.
@@ -11937,7 +11937,7 @@ libraries on the build machine. The ./configure script in the top-level
 directory determines, which optional components shall be included in the build.
 </p>
 <div class="example">
-<pre class="example">    apl-1.9/
+<pre class="example">    apl-2.0/
     ├── src
         ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
@@ -12018,7 +12018,7 @@ Next: <a href="#The-sub_002ddirectories-debian-and-debian_005ftmp" accesskey="n"
 <p>The sub-directory m4 contains macros used by autoconf and automake. In most
 cases the top-level ./configure script can be used as is. If a platform on
 which GNU APL shall be built differs too much from the platform on which the
-GNU APL project tar file (e.g. apl-1.9.tar.gz) was created, then it might
+GNU APL project tar file (e.g. apl-2.0.tar.gz) was created, then it might
 be necessary to re-create the ./configure script on the platform.
 </p>
 <p>Re-creating the ./configure script requires:

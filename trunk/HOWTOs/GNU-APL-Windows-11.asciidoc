@@ -141,8 +141,8 @@ After having installed *WSL*, GNU APL can be compiled as usual:
 
 . Open the Windows Command Prompt (*cmd.exe*) and enter *bash*.
   That should enter the *WSL*.
-.. *svn co http://svn.savannah.gnu.org/svn/apl/trunk apl-1.9* # fetch GNU APL
-.. *cd apl-1.9*
+.. *svn co http://svn.savannah.gnu.org/svn/apl/trunk apl-2.0* # fetch GNU APL
+.. *cd apl-2.0*
 .. *./configure ALT_MAP_WANTED=1*
 .. *make*
 .. *make install*

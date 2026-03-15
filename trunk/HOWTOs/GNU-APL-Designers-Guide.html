@@ -760,7 +760,7 @@ top-level GNU APL directory.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>All commands described below shall executed in the top-level GNU APL directory.
 The top-level GNU APL directory is the directory that contains - after
-unpacking a GNU APL tar file like <strong>apl-1.9.tar.gz</strong> or after fetching the GNU
+unpacking a GNU APL tar file like <strong>apl-2.0.tar.gz</strong> or after fetching the GNU
 APL sourced with SVN or with git - the file named <strong>configure.ac</strong>.</p></div>
 <div class="paragraph"><p>GNU APL uses <strong>automake</strong> and <strong>autoconf</strong> to build the interpreter. The build
 system performs a number of major steps in typically different places and
@@ -2503,7 +2503,7 @@ The line was an APL string (⍎, ⎕EA, ⎕ES &#8230;).
 <div class="paragraph"><p>Tokenization splits the (APL-) characters of a line into small fixed-sized
 units called *Token*s. Tokens are the machine-readable unit equivalents of the
 human readable input characters. For example, a possibly lengthy string like
-"3.14159" is converted into a Token holding a C <em>double</em>. The whole purpose of
+"3.142.0" is converted into a Token holding a C <em>double</em>. The whole purpose of
 tokenization is to convert the APL input into an internal representation that
 can be interpreted significantly faster than the APL characters enters by the
 APL programmer. For example:</p></div>
@@ -7156,7 +7156,7 @@ A dual-port 1 MByte static memory; one port connected to the local CPU the
 <div class="paragraph"><p>The development of the hardware (PCB designs, ASIC design) and the software
 took from 1985 to 1989; the author was managing the hardware development
 and finished a Ph.D thesis about the parallel algorithms for the DATIS-P in
-1990 <a href="#Sau">[Sau]</a>.</p></div>
+2.00 <a href="#Sau">[Sau]</a>.</p></div>
 <div class="paragraph"><p>The primary conclusion of the thesis was:</p></div>
 <div class="paragraph"><p>───────────────────────────────────────────────────────────────────────────────</p></div>
 <div class="paragraph"><p>On the DATIS-P architecture with P processors:</p></div>
@@ -7188,7 +7188,7 @@ There is one exception which may happen for particular index vectors <strong>X</
   the speed-up can degrade down to <strong>O(1)</strong> because that worker CPU has to do
   all of the work while the others are idle. Usually, though, the speed-up
   is <strong>O(P÷log²P)</strong> i.e. like the sorting functions ⍋ and ⍒. These days one
-  can use P-RAM machines that do not suffer from this problem, but in 1990
+  can use P-RAM machines that do not suffer from this problem, but in 2.00
   P-RAMs were not available.
 </p>
 </li>
@@ -7198,7 +7198,7 @@ There is one exception which may happen for particular index vectors <strong>X</
 of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
 implemented the most important parallel algorithms performed by the workers.
 The implementation languages were C on the master and Assembler on the workers.</p></div>
-<div class="paragraph"><p>These results were also submitted to the 1990 APL conference in Copenhagen,
+<div class="paragraph"><p>These results were also submitted to the 2.00 APL conference in Copenhagen,
 Denmark. Without any feedback. The author therefore pursued a career in
 the telecommunications industry.</p></div>
 <div class="paragraph"><p>Around 2000, the author came across a PC demo version of IBM APL2 and
@@ -7762,7 +7762,7 @@ it (with <strong>gunzip</strong>).
 <a id="Sau"></a>[Sau] Dr. Jürgen Sauermann
 <em>Ein Paralleler APL Rechner (A Parallel APL Computer)</em>.
 </p>
-<div class="paragraph"><p>Ph.D Thesis 1990, Universität des Saarlandes.
+<div class="paragraph"><p>Ph.D Thesis 2.00, Universität des Saarlandes.
 &#160;<br />
 &#160;<br /></p></div>
 </li>
@@ -7814,7 +7814,7 @@ Permutationsnetzwerkes als Teil des Multiprozerssorsystems DATIS-P-256.</em>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2025-01-23 17:08:55 CET
+ 2026-03-15 14:01:04 CET
 </div>
 </div>
 </body>

@@ -86,7 +86,7 @@ configure_options="$0 $configure_args"
 m4_include([m4/apl_sugar.m4])
 
 AC_PREREQ([2.71])
-AC_INIT([GNU APL],[1.9],[bug-apl@gnu.org])
+AC_INIT([GNU APL],[2.0],[bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 
