@@ -167,30 +167,43 @@ AC_CHECK_HEADER(
 
 # keep headers in roughy alphabetical order as to find them more easily
 #
-apl_missing_headers=0
-AC_CHECK_HEADERS([      \
-   dirent.h             \
-   execinfo.h           \
-   ext/atomicity.h      \
-   fcntl.h fenv.h       \
-   fftw3.h              \
-   inttypes.h           \
-   libpng16/png.h       \
-   limits.h             \
-   locale.h             \
-   malloc.h             \
-   netdb.h              \
-   netinet/in.h         \
-   stdint.h             \
-   stdlib.h             \
-   string.h             \
-   strings.h            \
-   sys/un.h             \
-   termios.h            \
-   unistd.h             \
-   utmpx.h              \
-   vector               \
-   zlib.h               \
+apl_missing_headers=-1 # since either sys/socket,h or winsock2.h will be missing
+AC_CHECK_HEADERS([  \
+   dirent.h         \
+   execinfo.h       \
+   ext/atomicity.h  \
+   fcntl.h fenv.h   \
+   fftw3.h          \
+   inttypes.h       \
+   libpng16/png.h   \
+   limits.h         \
+   locale.h         \
+   malloc.h         \
+   netdb.h          \
+   netinet/in.h     \
+   netinet/tcp.h    \
+   stdint.h         \
+   stdlib.h         \
+   string.h         \
+   strings.h        \
+   sys/fcntl.h      \
+   sys/ioctl.h      \
+   sys/mman.h       \
+   sys/resource.h   \
+   sys/select.h     \
+   sys/socket.h     \
+   sys/stat.h       \
+   sys/time.h       \
+   sys/types.h      \
+   sys/time.h       \
+   sys/un.h         \
+   sys/wait.h       \
+   termios.h        \
+   unistd.h         \
+   utmpx.h          \
+   vector           \
+   zlib.h           \
+   winsock2.h       \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -977,6 +990,15 @@ else
    AC_DEFINE_UNQUOTED(apl_PNG, 0)
 fi
 
+AC_MSG_CHECKING([for MINGW (not yet working!)])
+case $host_os in
+    mingw*)   AC_DEFINE_UNQUOTED(MINGW_SRC, 1, [Compiling for MINGW ??])
+              AM_CONDITIONAL(apl_TARGET_MINGW, 1)
+              AC_MSG_RESULT([yes]);;
+    *)
+              AM_CONDITIONAL(apl_TARGET_MINGW, 0)
+              AC_MSG_RESULT([no]);;
+esac
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 
@@ -1069,6 +1091,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     # B. computed variables (most of them in m4/*.m4
     #
+    host_os:                     $host_os
     apl_BUILD_DATE:              $apl_BUILD_DATE
     apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE

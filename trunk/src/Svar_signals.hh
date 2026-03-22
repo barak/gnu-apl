@@ -70,14 +70,29 @@ and then:
 
 ********/
 
+#include "config.h"   // for HAVE_xxx
+
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/socket.h>
 #include <sys/types.h>
+
+#if HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif // HAVE_SYS_SELECT_H
+
+#if HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
 
 #include <string>
 #include <iostream>

@@ -71,9 +71,9 @@ protected:
     **/
    enum ArchiveSyntax
       {
-        ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible change)
-        ASX_MINOR = 11,  ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 3,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_MAJOR =  1,   ///< ++ if incompatible XML file format change
+        ASX_MINOR = 11,  ///< ++ if backward compatible XML file format change
+        ASX_OTHER =  4,   ///< ++ if no XML file format change (code cleanup)
       };
 
    /// where to send information messages (such as "SAVED...")
@@ -256,7 +256,7 @@ public:
    ~XML_Loading_Archive();
 
    /// return true iff constructor could open the file
-   bool is_open() const   { return fd != -1; }
+   bool is_open() const   { return file_start != 0; }
 
    /// read an entire workspace, throw DOMAIN_ERROR on failure
    void read_Workspace(bool silent);
@@ -423,17 +423,11 @@ protected:
    /// return floating point value of attribute \b att_name
    APL_Float find_float_attr(const char * att_name);
 
-   /// the file descriptor for the mmap()ed workspace.xml file
-   int fd;
+   /// the length of the workspace file
+   ssize_t file_length;
 
-   /// the start of the file (for mmap())
-   void * map_start;
-
-   /// the length of the file (for mmap())
-   size_t map_length;
-
-   /// the start of the file
-   const char * file_start;
+   /// the start of the workspace file
+   const UTF8 * file_start;
 
    /// the start of the current line
    const UTF8 * line_start;
@@ -456,7 +450,7 @@ protected:
    /// the end of attributes
    const UTF8 * end_attr;
 
-   /// the end of the file
+   /// the end of the workspace file
    const UTF8 * file_end;
 
    /// all values in the workspace

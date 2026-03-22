@@ -25,12 +25,25 @@
 #define NETWORK_HH
 
 #include "emacs.hh"
+#include <errno.h>
 
 #include <sys/types.h>
+
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#include <sys/un.h>
-#include <errno.h>
-#include <netdb.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
+
+#if HAVE_SYS_UN_H
+# include <sys/un.h>
+#endif // HAVE_SYS_UN_H
+
+#if HAVE_NETDB_H
+# include <netdb.h>   // gethostbyname() etc.
+#endif
 
 class Listener;
 

@@ -22,7 +22,6 @@
 */
 
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 
 #include "Avec.hh"
@@ -70,6 +69,8 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
 }
 //----------------------------------------------------------------------------
 #ifdef cfg_DEVELOP_WANTED
+
+#include <sys/mman.h>
 
 void
 Avec::check_file(const char * filename)

@@ -24,7 +24,12 @@
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
+#include <config.h>
 #include <signal.h>
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
 
 #include "Error_macros.hh"
 #include "PrimitiveOperator.hh"

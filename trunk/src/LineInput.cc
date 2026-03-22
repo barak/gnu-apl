@@ -700,6 +700,7 @@ LineInput::LineInput(bool do_read_history)
    : history(UserPreferences::uprefs.line_history_len),
      write_history(false)
 {
+#if ! MINGW_SRC
    initial_termios_errno = 0;
 
    if (tcgetattr(STDIN_FILENO, &initial_termios))
@@ -725,16 +726,18 @@ LineInput::LineInput(bool do_read_history)
    current_termios.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
    current_termios.c_lflag |= ISIG;
 
-#ifndef apl_TARGET_LIBAPL
-# ifndef apl_TARGET_PYTHON
-   tcsetattr(STDIN_FILENO, TCSANOW, &current_termios);
-# endif // apl_TARGET_PYTHON
-#endif // apl_TARGET_LIBAPL
+# ifndef apl_TARGET_LIBAPL
+#  ifndef apl_TARGET_PYTHON
+    tcsetattr(STDIN_FILENO, TCSANOW, &current_termios);
+#  endif // apl_TARGET_PYTHON
+# endif // apl_TARGET_LIBAPL
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 void
 LineInput::restore_termios()
 {
+#if ! MINGW_SRC
    if (initial_termios_errno == 0)
       {
 #ifndef apl_TARGET_LIBAPL
@@ -744,6 +747,7 @@ LineInput::restore_termios()
 #endif // not apl_TARGET_LIBAPL
       }
    initial_termios_errno = 1;   // prevent multiple calls
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 LineInput::~LineInput()

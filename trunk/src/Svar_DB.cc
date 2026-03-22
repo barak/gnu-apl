@@ -20,15 +20,19 @@
 
 /** @file
 */
+#include "../config.h"
 
 #include <errno.h>
 #include <fcntl.h>           /* For O_* constants */
 #include <limits.h>
-#include <netinet/tcp.h>
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
+
+#if HAVE_NETINET_TCP_H
+#include <netinet/tcp.h>
+#endif // HAVE_NETINET_TCP_H
 
 #include "Common.hh"   // for HAVE_xxx macros
 

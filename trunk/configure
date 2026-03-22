@@ -665,6 +665,8 @@ ac_func_cxx_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+apl_TARGET_MINGW_FALSE
+apl_TARGET_MINGW_TRUE
 apl_BUILD_OS
 apl_BUILD_DATE
 RATIONAL_NUMBERS_WANTED
@@ -10222,6 +10224,10 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -18736,8 +18742,8 @@ fi
 
 # keep headers in roughy alphabetical order as to find them more easily
 #
-apl_missing_headers=0
-       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h stdint.h stdlib.h string.h strings.h sys/un.h termios.h unistd.h utmpx.h vector zlib.h
+apl_missing_headers=-1 # since either sys/socket,h or winsock2.h will be missing
+       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h netinet/tcp.h stdint.h stdlib.h string.h strings.h sys/fcntl.h sys/ioctl.h sys/mman.h sys/resource.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/time.h sys/un.h sys/wait.h termios.h unistd.h utmpx.h vector zlib.h winsock2.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -23311,6 +23317,34 @@ else
 
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for MINGW (not yet working!)" >&5
+printf %s "checking for MINGW (not yet working!)... " >&6; }
+case $host_os in
+    mingw*)
+printf "%s\n" "#define MINGW_SRC 1" >>confdefs.h
+
+               if 1; then
+  apl_TARGET_MINGW_TRUE=
+  apl_TARGET_MINGW_FALSE='#'
+else
+  apl_TARGET_MINGW_TRUE='#'
+  apl_TARGET_MINGW_FALSE=
+fi
+
+              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; };;
+    *)
+               if 0; then
+  apl_TARGET_MINGW_TRUE=
+  apl_TARGET_MINGW_FALSE='#'
+else
+  apl_TARGET_MINGW_TRUE='#'
+  apl_TARGET_MINGW_FALSE=
+fi
+
+              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; };;
+esac
 
  { printf "%s\n" ; printf "%s\n" "    *** ./configure checks done, producing the Makefiles and config.h... ***"; printf "%s\n" ; }
 
@@ -23509,6 +23543,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_DEVELOP_TRUE}" && test -z "${apl_DEVELOP_FALSE}"; then
   as_fn_error $? "conditional \"apl_DEVELOP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${apl_TARGET_MINGW_TRUE}" && test -z "${apl_TARGET_MINGW_FALSE}"; then
+  as_fn_error $? "conditional \"apl_TARGET_MINGW\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${apl_TARGET_MINGW_TRUE}" && test -z "${apl_TARGET_MINGW_FALSE}"; then
+  as_fn_error $? "conditional \"apl_TARGET_MINGW\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -26061,6 +26103,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     # B. computed variables (most of them in m4/*.m4
     #
+    host_os:                     $host_os
     apl_BUILD_DATE:              $apl_BUILD_DATE
     apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE

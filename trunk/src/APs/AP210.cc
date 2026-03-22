@@ -417,8 +417,12 @@ struct stat st;
 
    // stat failed: create pipe
    //
+#if MINGW_SRC
+   get_CERR() << "TODO: pipe on windows" << endl;
+#else
    if (mknod(filename, S_IFIFO | ALL_RW, 0) == 0)   // mknod successful
       return fopen(filename, mode);
+#endif // MINGW_SRC
 
    return 0;
 }

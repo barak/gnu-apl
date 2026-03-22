@@ -20,21 +20,32 @@
 
 // #define USE_POLL   /* use poll() instead of select() */
 
+#include <config.h>
+
 #include <errno.h>
 #include <limits.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
+#if HAVE_NETINET_TCP_H
+# include <netinet/tcp.h>
+#endif // HAVE_NETINET_TCP_H
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
 #include <unistd.h>
+
+#if MINGW_SRC
+typedef int socklen_t;
+#endif // MINGW_SRC
 
 #ifdef USE_POLL
 # include <poll.h>
 #else
-# include <sys/select.h>
+# if HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+# endif // HAVE_SYS_SELECT_H
 #endif
 
 #include "config.h"   // for HAVE_SYS_UN_H
@@ -224,8 +235,13 @@ AP_num3 peer_id;
    return get_tcp_fd2_for_id(peer_id);
 }
 //-----------------------------------------------------------------------------
+
+#if ! MINGW_SRC
 static struct sigaction old_control_C_action;
 static struct sigaction new_control_C_action;
+static struct sigaction old_control_BSL_action;
+static struct sigaction new_control_BSL_action;
+#endif // ! MINGW_SRC
 
 static void
 control_C(int)
@@ -234,8 +250,6 @@ control_C(int)
    exit(0);
 }
 //-----------------------------------------------------------------------------
-static struct sigaction old_control_BSL_action;
-static struct sigaction new_control_BSL_action;
 
 static void
 control_BSL(int)
@@ -949,7 +963,8 @@ open_TCP_socket(int listen_port)
 const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
    {
      int yes = 1;
-     setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+     setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR,
+                reinterpret_cast<const char *>(&yes), sizeof(int));
    }
 
 sockaddr_in local;
@@ -1089,6 +1104,7 @@ bool auto_start = false;
 
    // enable ^C and ^\ when in debug mode
    //
+#if ! MINGW_SRC
    memset(&new_control_C_action, 0, sizeof(struct sigaction));
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));
 
@@ -1105,6 +1121,7 @@ bool auto_start = false;
 
    sigaction(SIGINT,  &new_control_C_action,   &old_control_C_action);
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
+#endif // ! MINGW_SRC
 
    if (verbosity > 0)
       cerr << "sizeof(Svar_DB_server) is " << sizeof(Svar_DB_server) << endl
@@ -1118,6 +1135,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    fclose(stdout);                 // cause getc() of caller to return EOF !
 
+#if ! MINGW_SRC
    if (auto_start && fork())
       {
         // if we return too quickly (a race condition) then the pclose() of
@@ -1128,12 +1146,13 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
         // around line 132, and while we are waiting, the pclose(fp) in
         // Svar_DB.cc line 137 should succeed without ECHILD.
         //
-        // At leat that is the plan.
+        // At least that is the plan.
         //
         usleep(200000);
 
         return 0;         // parent returns (daemonize)
       }
+#endif // ! MINGW_SRC
 
    memset(reinterpret_cast<void *>(&db), 0, sizeof(db));
 
@@ -1261,14 +1280,26 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
              int jfd = connected_procs[janitor].fd;
              if (jfd != NO_TCP_SOCKET)
                 {
+#if MINGW_SRC
+                  u_long iMode = 1;
+                  ioctlsocket(jfd, FIONBIO, &iMode);
+                  ::recv(jfd, 0, 0, 0);
+#else // ! MINGW_SRC
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
+#endif
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
 
              jfd = connected_procs[janitor].fd2;
              if (jfd != NO_TCP_SOCKET)
                 {
+#if MINGW_SRC
+                  u_long iMode = 1;
+                  ioctlsocket(jfd, FIONBIO, &iMode);
+                  ::recv(jfd, 0, 0, 0);
+#else // ! MINGW_SRC
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
+#endif
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
 
@@ -1288,7 +1319,8 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
              // disable nagle
              {
                const int ndelay = 1;
-               setsockopt(new_fd, 6, TCP_NODELAY, &ndelay, sizeof(int));
+               setsockopt(new_fd, 6, TCP_NODELAY,
+                          reinterpret_cast<const char *>(&ndelay), sizeof(int));
              }
 
              if (new_fd == -1)

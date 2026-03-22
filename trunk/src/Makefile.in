@@ -95,16 +95,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@apl_TARGET_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
-@apl_GTK3_TRUE@am__append_2 = Gtk	# for ⎕GTK
-@apl_GTK3_TRUE@am__append_3 = Plot_gtk.cc
-@apl_GTK3_FALSE@am__append_4 = Plot_gtk.cc
-@apl_XCB_TRUE@am__append_5 = Plot_xcb.cc
-@apl_XCB_FALSE@am__append_6 = Plot_xcb.cc
-@apl_PCRE_TRUE@am__append_7 = Regexp.cc								Regexp.hh
-@apl_SQLITE3_TRUE@am__append_8 = $(SQLITE3_CFLAGS)
-@apl_SQLITE3_TRUE@am__append_9 = $(SQLITE3_LDFLAGS)
-@apl_SQLITE3_TRUE@am__append_10 = sql/SqliteArgListBuilder.cc \
+@apl_TARGET_ANDROID_FALSE@am__append_1 = APs sql workspaces
+@apl_TARGET_ANDROID_FALSE@@apl_TARGET_MINGW_FALSE@am__append_2 = emacs_mode
+@apl_GTK3_TRUE@am__append_3 = Gtk	# for ⎕GTK
+@apl_GTK3_TRUE@am__append_4 = Plot_gtk.cc
+@apl_GTK3_FALSE@am__append_5 = Plot_gtk.cc
+@apl_XCB_TRUE@am__append_6 = Plot_xcb.cc
+@apl_XCB_FALSE@am__append_7 = Plot_xcb.cc
+@apl_PCRE_TRUE@am__append_8 = Regexp.cc								Regexp.hh
+@apl_SQLITE3_TRUE@am__append_9 = $(SQLITE3_CFLAGS)
+@apl_SQLITE3_TRUE@am__append_10 = $(SQLITE3_LDFLAGS)
+@apl_SQLITE3_TRUE@am__append_11 = sql/SqliteArgListBuilder.cc \
 @apl_SQLITE3_TRUE@	sql/SqliteArgListBuilder.hh \
 @apl_SQLITE3_TRUE@	sql/SqliteConnection.cc \
 @apl_SQLITE3_TRUE@	sql/SqliteConnection.hh \
@@ -112,24 +113,26 @@ host_triplet = @host@
 @apl_SQLITE3_TRUE@	sql/SqliteResultValue.hh \
 @apl_SQLITE3_TRUE@	sql/SqliteProvider.cc sql/SqliteProvider.hh \
 @apl_SQLITE3_TRUE@	sql/Connection.cc
-@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__append_11 = sql/Connection.cc
-@apl_POSTGRES_TRUE@am__append_12 = $(POSTGRESQL_CFLAGS)
-@apl_POSTGRES_TRUE@am__append_13 = $(POSTGRESQL_LDFLAGS)
-@apl_POSTGRES_TRUE@am__append_14 = sql/PostgresArgListBuilder.cc \
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__append_12 = sql/Connection.cc
+@apl_POSTGRES_TRUE@am__append_13 = $(POSTGRESQL_CFLAGS)
+@apl_POSTGRES_TRUE@am__append_14 = $(POSTGRESQL_LDFLAGS)
+@apl_POSTGRES_TRUE@am__append_15 = sql/PostgresArgListBuilder.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresArgListBuilder.hh \
 @apl_POSTGRES_TRUE@	sql/PostgresConnection.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresConnection.hh \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.hh
-@apl_TARGET_LIBAPL_TRUE@am__append_15 = libapl.la
-@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_16 = lib_gnu_apl.la
+@apl_TARGET_LIBAPL_TRUE@am__append_16 = libapl.la
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_17 = lib_gnu_apl.la
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
@@ -1319,10 +1322,10 @@ top_srcdir = @top_srcdir@
 dist_noinst_SCRIPTS = integral.py
 dist_SCRIPTS = integral.py
 distdir = ${bindir}
-EXTRA_DIRS = $(am__append_1)
-SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
-EXTRA_apl_SOURCES = $(am__append_4) $(am__append_6)
-plot_SOURCES = Plot_ascii.cc $(am__append_3) $(am__append_5)
+EXTRA_DIRS = $(am__append_1) $(am__append_2)
+SUBDIRS = native $(EXTRA_DIRS) $(am__append_3)
+EXTRA_apl_SOURCES = $(am__append_5) $(am__append_7)
+plot_SOURCES = Plot_ascii.cc $(am__append_4) $(am__append_6)
 @apl_GTK3_TRUE@plot_CXXFLAGS = -Wno-parentheses
 dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
@@ -1331,9 +1334,9 @@ DIST_SUBDIRS = $(SUBDIRS) testcases
 #
 common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) \
 	$(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) $(PYTHON_CFLAGS) \
-	$(am__append_8) $(am__append_12)
-common_LDFLAGS = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS) \
 	$(am__append_9) $(am__append_13)
+common_LDFLAGS = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS) \
+	$(am__append_10) $(am__append_14)
 common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	APL_types.hh APL_enums.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
@@ -1403,9 +1406,9 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
 	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	$(am__append_7) $(am__append_10) $(am__append_11) \
-	$(am__append_14)
-pkglib_LTLIBRARIES = $(am__append_15) $(am__append_16)
+	$(am__append_8) $(am__append_11) $(am__append_12) \
+	$(am__append_15)
+pkglib_LTLIBRARIES = $(am__append_16) $(am__append_17)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @apl_TARGET_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) \

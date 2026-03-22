@@ -21,9 +21,7 @@
 /** @file
 */
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
+#include "config.h"
 
 #include <pthread.h>
 
@@ -32,14 +30,24 @@
 #include <limits.h>
 #include <signal.h>
 #include <string.h>
-#include <termios.h>
-
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
 #include <sys/stat.h>
+
+#if HAVE_TERMIOS_H
+# include <termios.h>
+#endif // HAVE_TERMIOS_H
+
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
 #include <sys/types.h>
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
 
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
@@ -61,6 +69,38 @@
 # include <libelfin/elf/elf++.hh>
 #endif
 
+
+#if MINGW_SRC
+#define SIGHUP 1
+#define SIGCHLD 17
+typedef int socklen_t;
+#define sigaction(x,y,z)
+#define setenv(x,y,z)
+#define fork() pid_t(1);
+struct sigaction
+{
+void (*sa_handler)(int);
+};
+#else  // ! MINGW_SRC
+static struct sigaction old_control_C_action;     // new ^C handler
+static struct sigaction old_SEGV_action;          // new SEGV handler
+static struct sigaction old_HUP_action;           // new HUP  handler
+static struct sigaction old_TERM_action;          // new TERM handler
+static struct sigaction old_USR1_action;          // new USR1 handler
+static struct sigaction old_WINCH_action;         // new WINCH handler
+#endif
+
+static struct sigaction new_SEGV_action;        // new SEGV handler
+static struct sigaction new_control_C_action;   // new ^C handler
+static struct sigaction new_HUP_action;         // new HUP handler
+static struct sigaction new_TERM_action;        // new TERM handler
+static struct sigaction new_USR1_action;        // new USR1 handler
+static struct sigaction new_WINCH_action;       // new WINCH handler
+
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 /** \mainpage GNU APL
 
    GNU APL is a free interpreter for the programming language APL.
@@ -77,20 +117,6 @@
 static const char * build_tag[] = { BUILDTAG, 0 };
 
 //----------------------------------------------------------------------------
-
-/// old sigaction argument for ^C
-static struct sigaction old_control_C_action;
-
-/// new sigaction argument for ^C
-static struct sigaction new_control_C_action;
-
-//----------------------------------------------------------------------------
-/// old sigaction argument for segfaults
-static struct sigaction old_SEGV_action;
-
-/// new sigaction argument for segfaults
-static struct sigaction new_SEGV_action;
-
 /// signal handler for segfaults
 static void
 signal_SEGV_handler(int)
@@ -116,12 +142,6 @@ signal_SEGV_handler(int)
    Command::cmd_OFF(3);
 }
 //----------------------------------------------------------------------------
-/// old sigaction argument for SIGWINCH
-static struct sigaction old_WINCH_action;
-
-/// new sigaction argument for SIGWINCH
-static struct sigaction new_WINCH_action;
-
 /// signal handler for SIGWINCH
 static void
 signal_WINCH_handler(int)
@@ -159,12 +179,6 @@ struct winsize wsize;
    return;
 }
 //----------------------------------------------------------------------------
-/// old sigaction argument for SIGUSR1
-static struct sigaction old_USR1_action;
-
-/// new sigaction argument for SIGUSR1
-static struct sigaction new_USR1_action;
-
 /// signal handler for SIGUSR1
 static void
 signal_USR1_handler(int)
@@ -172,12 +186,6 @@ signal_USR1_handler(int)
    CERR << "Got signal USR1" << endl;
 }
 //----------------------------------------------------------------------------
-/// old sigaction argument for SIGTERM
-static struct sigaction old_TERM_action;
-
-/// new sigaction argument for SIGTERM
-static struct sigaction new_TERM_action;
-
 /// signal handler for SIGTERM
 static void
 signal_TERM_handler(int)
@@ -203,12 +211,6 @@ control_BSL(int sig)
 }
 #endif // PARALLEL_ENABLED
 //----------------------------------------------------------------------------
-/// old sigaction argument for SIGHUP
-static struct sigaction old_HUP_action;
-
-/// new sigaction argument for SIGHUP
-static struct sigaction new_HUP_action;
-
 /// new signal handler for SIGHUP
 static void
 signal_HUP_handler(int)
@@ -306,7 +308,7 @@ sockaddr_in local;
    {
      const int yes = 1;
      if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
-                     &yes, sizeof(yes)) < 0)
+                     reinterpret_cast<const char *>(&yes), sizeof(yes)) < 0)
         {
           perror("setsockopt(SO_REUSEADDR) failed");
         }
@@ -422,11 +424,11 @@ const bool log_startup =
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
 
+const UserPreferences & uprefs = UserPreferences::uprefs;    
 #if HAVE_IOCTL_TIOCGWINSZ
    // Enable the ability to change ⎕PW on window resize only if the
    // platform supports ioctl TIOCGWINSZ
    //
-const UserPreferences & uprefs = UserPreferences::uprefs;    
    if (uprefs.WINCH_sets_pw)
       {
         // IF WINCH_sets_pw preference is enabled, set up a handler for the
@@ -464,10 +466,12 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    if (uprefs.CPU_limit_secs)
       {
+#if ! MINGW_SRC
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
         rl.rlim_cur = UserPreferences::uprefs.CPU_limit_secs;
         setrlimit(RLIMIT_CPU, &rl);
+#endif // ! MINGW_SRC
       }
 
    if (UserPreferences::uprefs.emacs_mode)

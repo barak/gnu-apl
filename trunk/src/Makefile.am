@@ -8,8 +8,13 @@ distdir = ${bindir}
 
 EXTRA_DIRS =
 if ! apl_TARGET_ANDROID
-EXTRA_DIRS += APs emacs_mode sql workspaces
+EXTRA_DIRS += APs sql workspaces
+
+if ! apl_TARGET_MINGW
+# EXTRA_DIRS += emacs_mode
 endif
+endif
+
 SUBDIRS = native $(EXTRA_DIRS)
 
 EXTRA_apl_SOURCES = 
@@ -304,11 +309,6 @@ perf: apl
 patch:
 	mkdir -p patches
 	svn diff > patches/`date +patch_%F-%R.diff`
-
-.PHONY:	git-pull
-git-pull:
-	make -C emacs_mode $@
-#	make -C sql $@   ══ possibly not up-to-dat e══
 
 .PHONY:	help
 help:

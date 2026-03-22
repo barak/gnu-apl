@@ -696,6 +696,12 @@ const UTF8_string filename =
         }
    }
 
+   if (the_workspace.SI_entry_count())
+      {
+        CERR << "WARNING: )SAVEing a workspaces whose )SI stack is not clear."
+             << endl;
+      }
+
    if (UserPreferences::uprefs.backup_before_save &&
        backup_existing_file(filename.c_str()))
       {

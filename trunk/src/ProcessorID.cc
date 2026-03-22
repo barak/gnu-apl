@@ -23,7 +23,16 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <netdb.h>   // gethostbyname() etc.
+
+#include "config.h"   // for HAVE_xxx
+
+#if HAVE_NETDB_H
+# include <netdb.h>   // gethostbyname() etc.
+#endif
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif
 
 #include "Common.hh"
 #include "LibPaths.hh"

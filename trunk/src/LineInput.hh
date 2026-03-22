@@ -24,7 +24,11 @@
 #ifndef __LINEINPUT_HH_DEFINED__
 #define __LINEINPUT_HH_DEFINED__
 
+#if HAVE_TERMIOS_H
 #include <termios.h>
+#else
+struct termios { int x; };
+#endif // HAVE_TERMIOS_H
 
 #include "Output.hh"
 #include "PrintOperator.hh"
@@ -369,7 +373,7 @@ protected:
 
    /// the stdin termios at startup of the interpreter. Will be restored
    /// when the interpreter exits.
-   static struct termios initial_termios;
+   static termios initial_termios;
 
    /// write history when done
    bool write_history;
@@ -381,7 +385,7 @@ protected:
    static int initial_termios_errno;
 
    /// the current stdin termios.
-   struct termios current_termios;
+   termios current_termios;
 
    /// get one character from user
    static Unicode get_uni();

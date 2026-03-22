@@ -540,7 +540,13 @@ Symbol::cant_be_defined() const
 {
 // if (value_stack.size() > 1)         return "symbol was localized";
    if (Workspace::is_called(name))
-      return "function is called (used on the )SI stack). Try )SIC first.";
+      {
+        static char cc[100];
+        const UTF8_string utf(get_name());
+        SPRINTF(cc, "function %s is called (used on the )SI stack). "
+                    "Try )SIC first.", utf.c_str());
+        return cc;
+      }
 
    if (value_stack.back().get_NC() &
         (NC_UNUSED_USER_NAME | NC_FUNCTION | NC_OPERATOR))   return 0;   // OK

@@ -24,7 +24,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -135,6 +134,7 @@ do_Assert(const char * cond, const char * fun, const char * file, int line)
         << file << ":" << line << endl;
 
    assert(0);
+   abort();   // not reached
 }
 //-----------------------------------------------------------------------------
 void
@@ -149,8 +149,10 @@ AP_num3 this_proc = ProcessorID::get_id();
    exit(0);
 }
 
+#if ! MINGW_SRC
 static struct sigaction old_ctl_C_action;
 static struct sigaction new_ctl_C_action;
+#endif // ! MINGW_SRC
 
 //-----------------------------------------------------------------------------
 int usage()
@@ -234,16 +236,19 @@ char * slash = strrchr(bin_path, '/');
 
    // serious attempt to run: run in the background
    //
+#if ! MINGW_SRC
    if (fork())   return 0;            // parent returns (daemonize)
+#endif // ! MINGW_SRC
 
    // child code...
    // register as e.g. AP210-port. We do this BEFORE closing stdout so that
    // caller of our parent waits until we have closed stdout
    //
-
+#if ! MINGW_SRC
    memset(&new_ctl_C_action, 0, sizeof(struct sigaction));
    new_ctl_C_action.sa_handler = &control_C;
    sigaction(SIGTERM, &new_ctl_C_action, &old_ctl_C_action);
+#endif // ! MINGW_SRC
 
 Svar_partner this_proc(ProcessorID::get_id(), NO_TCP_SOCKET);
 

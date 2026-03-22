@@ -24,7 +24,12 @@
 #ifndef __QUAD_WA_HH_DEFINED__
 #define __QUAD_WA_HH_DEFINED__
 
-#include <sys/resource.h>   // for rlim_t
+#include "config.h"   // for HAVE_xxx
+#if HAVE_SYS_RESOURCE_H
+# include <sys/resource.h>   // for rlim_t
+#else  // windows
+typedef uint64_t rlim_t;
+#endif // HAVE_SYS_RESOURCE_H
 
 #include "SystemVariable.hh"
 

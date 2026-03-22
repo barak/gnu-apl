@@ -23,7 +23,11 @@
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
-#include <sys/mman.h>
+
+#if HAVE_SYS_MMAN_H
+# include <sys/mman.h>
+#endif // HAVE_SYS_MMAN_H
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>

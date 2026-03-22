@@ -26,7 +26,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 
 #include "APmain.hh"
 #include "CDR_string.hh"
@@ -125,7 +124,8 @@ const int result = pclose(fp);
    get_CERR() << pref << " finished command with exit code "
               << result << endl;
 
-   set_ACK(var, WEXITSTATUS(result));
+// set_ACK(var, WEXITSTATUS(result));
+      set_ACK(var, result >> 8 & 0xFF);
 }
 //-----------------------------------------------------------------------------
 bool

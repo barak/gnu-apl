@@ -21,11 +21,12 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <fcntl.h>
 #include <errno.h>
 #include <iostream>
 #include <stdio.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -1217,7 +1218,8 @@ ShapeItem done_count = 0;
    do_indent();
 
    // write closing tag and a few 0's so that string functions
-   // can be used on the mmaped file.
+   // can be used if the file should be mmap()ed.
+
    //
    outf << "</Workspace>" << endl
        << char(0) << char(0) << char(0) << char(0) << endl;
@@ -1228,9 +1230,7 @@ ShapeItem done_count = 0;
 XML_Loading_Archive::XML_Loading_Archive(ostream & of, ostream & ef,
                                          const char * _filename, int & dump_fd)
    : XML_Archive(of, ef),
-     fd(-1),
-     map_start(0),
-     map_length(0),
+     file_length(0),
      file_start(0),
      line_start(0),
      line_no(1),
@@ -1244,63 +1244,86 @@ XML_Loading_Archive::XML_Loading_Archive(ostream & of, ostream & ef,
      filename(_filename),
      file_is_complete(false)
 {
-   Log(LOG_archive)   err << "Loading file " << filename << endl;
+   Log(LOG_archive)   err << "Loading workspace file " << filename << endl;
 
-   fd = open(filename, O_RDONLY);
-   if (fd == -1)   return;
+   errno = 0;
 
-struct stat st;
-   if (fstat(fd, &st))
-      {
-        err << "fstat() failed: " << strerror(errno) << endl;
-        close(fd);
-        fd = -1;
-        return;
-      }
-
-   map_length = st.st_size;
-   map_start = mmap(0, map_length, PROT_READ, MAP_SHARED, fd, 0);
-   if (map_start == reinterpret_cast<const void *>(-1))
-      {
-        err << "mmap() failed: " << strerror(errno) << endl;
-        close(fd);
-        fd = -1;
-        return;
-      }
-
-   // success
+   // 1. open the workspace file. At this point, the file could be an .xml
+   //    file (handled by this XML_Loading_Archive) or an .apl file processed
+   //    by the caller after this constructor returns).
    //
-   file_start = charP(map_start);
-   file_end = utf8P(file_start + map_length);
+   // 1a. .xml files are closed by this constructor, while
+   // 1b. .apl files are left open by this constructo and closed by the caller.
+   // 1c. the caller uses this->is_open() to detect errors in this constructor.
+   //
+const int fd = open(filename, O_RDONLY);
+   if (fd == -1)
+      {
+        err << "open(" << filename << ") failed: " << strerror(errno) << endl;
+        return;
+      }
 
+   // 2. determine the workspace file lenght
+   //
+   {
+     struct stat st;
+     if (fstat(fd, &st))
+        {
+          err << "fstat(" << filename << ") failed: "
+              << strerror(errno) << endl;
+          close(fd);
+          return;
+        }
+
+     file_length = st.st_size;
+   }
+
+   // 3. read the workspace file and set file_start on success
+   //
+   {
+     UTF8 * buffer = new UTF8[file_length + 1];
+     if (buffer == 0)   WS_FULL;
+     buffer[file_length] = 0;
+     const ssize_t read_len = read(fd, buffer, file_length);
+     if (read_len != file_length)
+        {
+          err << "read(" << filename << ") failed: " << strerror(errno) << endl;
+          close(fd);
+          return;
+        }
+
+     file_start = buffer;   // success
+   }
+   file_end = file_start + file_length;
+
+   // 4. check for files NOT handled by this XML_Loading_Archive,
+   //
    reset();
 
-   if (!strncmp(file_start, "#!", 2) ||   // )DUMP file
-       !strncmp(file_start, "<!", 2) ||   // )DUMP-HTML file
-       !strncmp(file_start, "⍝!", 4))     // a library
+   if (!strncmp(charP(file_start), "#!", 2) ||   // )DUMP file
+       !strncmp(charP(file_start), "<!", 2) ||   // )DUMP-HTML file
+       !strncmp(charP(file_start), "⍝!", 4))     // a library
       {
         // the file was either written with )DUMP or is a library.
         // Return the open file descriptor (the destructor will unmap())
         //
-        dump_fd = fd;
-        fd = -1;   // caller will closed the file via dump_fd by 
+        lseek(fd, 0, SEEK_SET);
+        dump_fd = fd;   // leave fd open
         return;
       }
 
-   if (strncmp(file_start, "<?xml", 5))   // not an xml file
+   close(fd);
+
+   if (strncmp(charP(file_start), "<?xml", 5))   // not an xml file
       {
         err << "file " << filename << " does not " << endl
              << "have the format of a GNU APL .xml or .apl file" << endl;
-        close(fd);
-        fd = -1;
-        return;
       }
 }
 //----------------------------------------------------------------------------
 XML_Loading_Archive::~XML_Loading_Archive()
 {
-   if (map_start)   munmap(map_start, map_length);
-   if (fd != -1)    close(fd);
+   delete[] file_start;
 }
 //----------------------------------------------------------------------------
 void
