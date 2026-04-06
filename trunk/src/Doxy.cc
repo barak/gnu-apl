@@ -20,6 +20,8 @@
 
 /** @file
 */
+#include "config.h"
+
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -73,7 +75,11 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
       out << "Creating output directory " << root_dir << endl;
 
    errno = 0;
+#if MINGW_SRC
+   if (mkdir(root_dir.c_str()))
+#else // ! MINGW_SRC
    if (mkdir(root_dir.c_str(), 0777))
+#endif // ! MINGW_SRC
       {
         const char * why = strerror(errno);
 

@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>March 15, 2026.
+<p>March 27, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -626,16 +626,6 @@ then use )OFF as last line in the file or include the &ndash;OFF option.
 
 <p>Show GNU APL license (GPL) and exit.
 </p>
-</li><li> <code>-L wsname</code>
-
-<p>)LOAD wsname on start-up.
-</p>
-</li><li> <code>--LX expr</code>
-
-<p>Execute <b>expr</b> first. The workspace behaves as if ⎕LX (latent
-expression) were set to <b>expr</b> in the workspace. This can be used,
-for example, to start the same workspace with different start-up values.
-</p>
 </li><li> <code>-h</code>, <code>--help</code>
 
 <p>Print all command line options with a brief hint about what they do.
@@ -647,15 +637,30 @@ first unused ID &gt; 1000 is taken by this interpreter and the ID becomes used
 as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 </p>
+</li><li> <code>-L wsname</code>
+
+<p>)LOAD wsname on start-up.
+</p>
+</li><li> <code>--LX expr</code>
+
+<p>Execute <b>expr</b> first. The workspace behaves as if ⎕LX (latent
+expression) were set to <b>expr</b> in the workspace. This can be used,
+for example, to start the same workspace with different start-up values.
+</p>
 </li><li> <code>-l num</code>
 
-<p>Turn logging facility <b>num</b> ON (provided that dynamic logging was
-./configure&rsquo;d). The logging facility 37 (start-up messages) is of particular
-importance for troubleshooting and it works even if dynamic logging
-was not ./configure&rsquo;d.
+<p>Turn logging facility <b>num</b> ON. This always works for logging facility
+<b>num = 37</b> (start-up messages) which is of particular importance for
+troubleshooting. All other logging facilities <b>num ≠ 37</b> require that:
+  </p><ul>
+<li> <i>dynamic logging</i> was enabled in <b>./configure</b>, and/or
+  </li><li> or the default value of the logging facility in <b>src/Logging.def</b>
+        was set to 1.
+  </li></ul>
+<p>before GNU APL was compiled.
 </p>
-</li><li> <code>--mem [memory-limit]</code>
-
+<p><code>--mem [memory-limit]</code>
+</p>
 <p>Tell the interpreter not to use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules

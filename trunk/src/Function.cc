@@ -24,7 +24,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 
 #include "Error.hh"
 #include "Function.hh"

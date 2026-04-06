@@ -21,19 +21,39 @@
 /** @file
 */
 
+#include "Sys.hh"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/stat.h>
+
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif // HAVE_SYS_IOCTL_H
+
+#if HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif // HAVE_SYS_SELECT_H
+
+#include <sys/stat.h>
+
+#if HAVE_SYS_UN_H
 #include <sys/un.h>   // for sockaddr_un
+#endif // HAVE_SYS_UN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
@@ -49,6 +69,22 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
+#if MINGW_SRC
+#define NOT_MINGW(x) { MINGW_more(__FUNCTION__, __LINE__); }
+typedef int socklen_t;
+#else
+#define NOT_MINGW(x) x
+#define SOCKET(x) x
+#endif // MINGW_SRC
+
+void
+MINGW_more(const char * fun, int line)
+{
+   MORE_ERROR() <<
+   "Function is not available when GNU is cross-compiled (!) to\n"
+   "Windows. On Windows: consider compiling GNU APL under CYGWIN or WSL.";
+   DOMAIN_ERROR;
+}
 extern uint64_t top_of_memory();
 uint64_t Quad_FIO::benchmark_cycles_from = 0;
 
@@ -66,8 +102,10 @@ union SockAddr
   /// an AF_INET socket address
   sockaddr_in inet;
 
+#if HAVE_SYS_UN_H
   ///  an AF_UNIX socket address
   sockaddr_un uNix;
+#endif // HAVE_SYS_UN_H
 };
 
    // CONVENTION: all functions must have an axis argument (like X
@@ -99,12 +137,14 @@ file_entry f2(stderr, STDERR_FILENO);   f2.path << "stderr";
    open_files.push_back(f1);
    open_files.push_back(f2);
 
+#if ! MINGW_SRC
    if (-1 != fcntl(3, F_GETFD))   // this process was forked from another APL
       {
         file_entry f3(0, 3);
         f3.path << "pipe-to_client";
         open_files.push_back(f3);
       }
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 void
@@ -1139,6 +1179,27 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         // function_numbers < 0 refer to "hacker functions" that should not be
         // used by normal mortals.
         //
+        case -18: // memory test
+                  {
+                    const int64_t blocks = B->get_cravel(1).get_int_value();
+                    const int64_t verbo  = B->get_cravel(2).get_int_value();
+                    uint64_t * p = 0;
+                    try { p = new uint64_t[blocks * 512]; }   catch (...) { }
+                    if (p == 0)
+                       {
+                          const APL_Integer K_bytes = blocks * 4;
+                          const APL_Integer M_bytes = K_bytes / 1024;
+                          CERR << "NOTE: " << blocks << " blocks = " << K_bytes
+                               << " Kbytes = " << M_bytes << " MBytes." << endl;
+                         WS_FULL;
+                       }
+
+                    const APL_Integer errors =
+                          Sys::probe_memory(p, blocks, verbo);
+                    delete[] p;
+                    return Token(TOK_APL_VALUE1, IntScalar(errors, LOC));
+                  }
+
         case -17: // emulate Assert1()
                   Assert1(0 && "Simulated Assert1() (aka. ⎕FIO ¯17)");
                   return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -1177,26 +1238,36 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         case -13: // total number of UCS strings
              return Token(TOK_APL_VALUE1,
                           IntScalar(UCS_string::get_total_count(), LOC));
+
         case -12: // sbrk()
+NOT_MINGW(
              return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
+         )
         case -11: // fnew
              return Token(TOK_APL_VALUE1,
                           IntScalar(Value::fast_new_count, LOC));
         case -10: // slow new
              return Token(TOK_APL_VALUE1,
                           IntScalar(Value::slow_new_count, LOC));
+
         case -9: // screen height
+NOT_MINGW(
              {
                struct winsize ws;
                ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
                return Token(TOK_APL_VALUE1, IntScalar(ws.ws_row, LOC));
              }
+         ) // NOT_MINGW
+
         case -8: // screen width
+NOT_MINGW(
              {
                struct winsize ws;
                ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
                return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
              }
+         ) // NOT_MINGW
+
         case -7: // throw a segfault
              {
                CERR << "NOTE: Triggering a segfault (keeping the current "
@@ -1208,6 +1279,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
              }
 
         case -6: // throw a segfault
+NOT_MINGW(
              {
                CERR << "NOTE: Resetting SIGSEGV handler and triggering "
                        "a segfault..." << endl;
@@ -1222,6 +1294,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                CERR << "NOTE: Throwing a segfault failed." << endl;
                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
              }
+         ) // NOT_MINGW
 
         case -5: // return ⎕AV of IBM APL2
              {
@@ -1645,14 +1718,17 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
               goto out_errno;
 
          case 17:   // fsync(Bh)
+NOT_MINGW(
               {
                 errno = 0;
                 const int fd = get_fd(*B.get());
                 fsync(fd);
               }
               goto out_errno;
+         ) // NOT_MINGW
 
          case 18:   // fstat(Bh)
+NOT_MINGW(
               {
                 errno = 0;
                 const int fd = get_fd(*B.get());
@@ -1677,6 +1753,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
+         ) // NOT_MINGW
 
          case 19:   // unlink(Bc)
               {
@@ -1692,7 +1769,11 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 errno = 0;
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
+#if MINGW_SRC
+                mkdir(path.c_str());
+#else // ! MINGW_SRC
                 mkdir(path.c_str(), 0777);
+#endif // ! MINGW_SRC
                 if (errno == EEXIST)   errno = 0;   // frequent non-error
               }
               goto out_errno;
@@ -1712,7 +1793,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
                 errno = 0;
-                FILE * f = popen(path.c_str(), "r");
+                FILE * f = sys_popen(path.c_str(), "r");
                 if (f == 0)
                    {
                      if (errno)   goto out_errno;   // errno may be set or not
@@ -1722,7 +1803,6 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = true;
                 open_files.push_back(fe);
-                signal(SIGCHLD, SIG_DFL);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
@@ -1733,8 +1813,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 int err = EBADF;   /* Bad file number */
                 if (fe.fe_FILE)
                    {
-                     err = pclose(fe.fe_FILE);
-                     signal(SIGCHLD, SIG_IGN);
+                     err = sys_pclose(fe.fe_FILE);
                    }
 
                 fe = open_files.back();       // move last file to fe
@@ -1745,6 +1824,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
               }
 
          case 26:   // read entire file
+NOT_MINGW(
               {
                 errno = 0;
                 const UCS_string path_ucs(*B.get());
@@ -1767,20 +1847,20 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                    }
 
                 const ShapeItem len = st.st_size;
-                uint8_t * data = reinterpret_cast<uint8_t *>
-                                 (mmap(0, len, PROT_READ, MAP_SHARED, fd, 0));
+                const UTF8 * data = Sys::mmap(fd, len);
                 close(fd);
                 if (data == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
                 Z->set_proto_Spc();
                 loop(z, len)   Z->next_ravel_Char(Unicode(data[z]));
-                munmap(data, len);
+                Sys::munmap(data, len);
 
                 Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
+         ) // NOT_MINGW
 
          case 28:   // read directory Bs
          case 29:   // read file names in directory Bs
@@ -1961,7 +2041,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                             const int fd(vex->get_cravel(l).get_int_value());
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
-                            FD_SET(fd, &exceptfds);
+                            FD_SET(SOCKET(fd), &exceptfds);
                             if (max_fd < fd)   max_fd = fd;
                             ex = &exceptfds;
                           }
@@ -1976,7 +2056,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                                   vwr->get_cravel(l).get_int_value();
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
-                            FD_SET(fd, &writefds);
+                            FD_SET(SOCKET(fd), &writefds);
                             if (max_fd < fd)   max_fd = fd;
                             wr = &writefds;
                           }
@@ -1991,7 +2071,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                                   vrd->get_cravel(l).get_int_value();
                             if (fd < 0)                         DOMAIN_ERROR;
                             if (fd > (8*int(sizeof(fd_set))))   DOMAIN_ERROR;
-                            FD_SET(fd, &readfds);
+                            FD_SET(SOCKET(fd), &readfds);
                             if (max_fd < fd)   max_fd = fd;
                             rd = &readfds;
                           }
@@ -2064,6 +2144,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
               }
 
          case 49:   // read entire file as nested lines
+NOT_MINGW(
               {
                 errno = 0;
                 const UCS_string path_ucs(*B.get());
@@ -2086,8 +2167,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                    }
 
                 const ShapeItem len = st.st_size;
-                UTF8 * data = reinterpret_cast<UTF8 *>
-                              (mmap(0, len, PROT_READ, MAP_SHARED, fd, 0));
+                const UTF8 * data = Sys::mmap(fd, len);
                 close(fd);
                 if (data == 0)   goto out_errno;
 
@@ -2105,12 +2185,12 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                 Value_P Z(line_count, LOC);
                 Z->set_proto_Spc();
 
-                UTF8 * from = data;
+                const UTF8 * from = data;
                 loop(l, len)
                     {
                       if (data[l] != '\n')   continue;
 
-                      uint8_t * end = data + l;
+                      const uint8_t * end = data + l;
                      // discard CR before LF
                       if (end > data && end[-1] == '\r')   --end;
                       UTF8_string utf(from, end - from);
@@ -2122,7 +2202,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
 
                 if (len && data[len - 1] != '\n')   // incomplete final line
                    {
-                      uint8_t * end = data + len;
+                      const uint8_t * end = data + len;
                       if (end[-1] == '\r')   --end;   // discard trailing CR
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
@@ -2130,12 +2210,13 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
                       Z->next_ravel_Pointer(ZZ.get());
                    }
 
-                munmap(data, len);
+                Sys::munmap(data, len);
 
                 Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
+         ) // NOT_MINGW
 
          case 50:   // gettimeofday
               {
@@ -2335,6 +2416,7 @@ out_errno:
 int
 Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
+NOT_MINGW(
 int spair[2];
    if (socketpair(AF_UNIX, SOCK_STREAM, 0, spair))
       {
@@ -2407,6 +2489,7 @@ char * from = filename;
 
    usleep(100000);
    CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
+         ) // NOT_MINGW
    exit(-1);
 }
 //----------------------------------------------------------------------------
@@ -2550,10 +2633,14 @@ const sAxis subfunction = value_to_subfun(*X);
          case 20:   // mkdir(Bc, Ai)
               {
                 errno = 0;
-                const int mask = A->get_cfirst().get_near_int();
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
+#if MINGW_SRC
+                mkdir(path.c_str());
+#else // ! MINGW_SRC
+                const int mask = A->get_cfirst().get_near_int();
                 mkdir(path.c_str(), mask);
+#endif // ! MINGW_SRC
                 if (errno == EEXIST)   errno = 0;   // frequent non-error
               }
               goto out_errno;
@@ -2580,6 +2667,7 @@ const sAxis subfunction = value_to_subfun(*X);
 
          case 24:   // popen(Bs, As) command Bs mode As
               CHECK_SECURITY(disable_Quad_FIO__exec);
+NOT_MINGW(
               {
                 const UCS_string mode_ucs(*A.get());
                 const UCS_string path_ucs(*B.get());
@@ -2595,20 +2683,18 @@ const sAxis subfunction = value_to_subfun(*X);
                 else    DOMAIN_ERROR;
 
                 errno = 0;
-                FILE * f = popen(path.c_str(), m);
-                if (f == 0)
+                if (FILE * f = sys_popen(path.c_str(), m))
                    {
-                     if (errno)   goto out_errno;   // errno may be set or not
-                     return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
+                     file_entry fe(f, fileno(f));
+                     fe.fe_may_read = read;
+                     fe.fe_may_write = write;
+                     open_files.push_back(fe);
+                     return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
                    }
-
-                signal(SIGCHLD, SIG_DFL);
-                file_entry fe(f, fileno(f));
-                fe.fe_may_read = read;
-                fe.fe_may_write = write;
-                open_files.push_back(fe);
-                return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
+                if (errno)   goto out_errno;   // errno may be set or not
+                return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
               }
+         ) // NOT_MINGW
 
          case 27:   // rename(As, Bs)
               {
@@ -2810,7 +2896,9 @@ const sAxis subfunction = value_to_subfun(*X);
                 int optval = 0;
                 socklen_t olen = sizeof(optval);
                 errno = 0;
-                const int ret = getsockopt(fd, level, optname, &optval, &olen);
+                const int ret = getsockopt(fd, level, optname,
+                                           reinterpret_cast<char *>(&optval),
+                                           &olen);
                 if (ret < 0)   goto out_errno;
                 return Token(TOK_APL_VALUE1, IntScalar(optval, LOC));
               }
@@ -2822,7 +2910,7 @@ const sAxis subfunction = value_to_subfun(*X);
                 const int optval =  A->get_cravel(2).get_int_value();
                 const int fd = get_fd(*B.get());
                 errno = 0;
-                setsockopt(fd, level, optname, &optval, sizeof(optval));
+                setsockopt(fd, level, optname, charP(&optval), sizeof(optval));
                 goto out_errno;
               }
 
@@ -2907,11 +2995,12 @@ const sAxis subfunction = value_to_subfun(*X);
               }
 
          case 59:   // fcntl(Bh, Ai...)
+NOT_MINGW(
               {
+                const Cell * cA = &A->get_cfirst();
                 const int fd = get_fd(*B.get());
                 errno = 0;
                 int result = -1;
-                const Cell * cA = &A->get_cfirst();
                 switch(A->element_count())
                    {
                       case 1: result = fcntl(fd, cA[0].get_int_value());
@@ -2927,6 +3016,7 @@ const sAxis subfunction = value_to_subfun(*X);
                 if (result == -1 && errno)   goto out_errno;
                 return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
               }
+         ) // NOT_MINGW
 
          case 60:   // random value(s)
               {

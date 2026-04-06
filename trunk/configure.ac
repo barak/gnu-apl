@@ -203,6 +203,7 @@ AC_CHECK_HEADERS([  \
    utmpx.h          \
    vector           \
    zlib.h           \
+   windows.h        \
    winsock2.h       \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
@@ -993,10 +994,10 @@ fi
 AC_MSG_CHECKING([for MINGW (not yet working!)])
 case $host_os in
     mingw*)   AC_DEFINE_UNQUOTED(MINGW_SRC, 1, [Compiling for MINGW ??])
-              AM_CONDITIONAL(apl_TARGET_MINGW, 1)
+              AM_CONDITIONAL(apl_TARGET_MINGW, true)
               AC_MSG_RESULT([yes]);;
     *)
-              AM_CONDITIONAL(apl_TARGET_MINGW, 0)
+              AM_CONDITIONAL(apl_TARGET_MINGW, false)
               AC_MSG_RESULT([no]);;
 esac
 

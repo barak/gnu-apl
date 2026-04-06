@@ -21,10 +21,27 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/socket.h>
+
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif
+
+#if MINGW_SRC
+# define socketpair(a, b, c, d) 1
+#define fork() 1
+#endif // MINGW_SRC
 
 #include "Error_macros.hh"
 #include "LibPaths.hh"

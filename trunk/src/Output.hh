@@ -196,8 +196,9 @@ public:
    /// default ESC sequence for Delete key with SHIFT and/or CTRL
    static char ESC_Delete_1[MAX_ESC_LEN];
 
-   /// true if xterm/color is on
-   static bool color_enabled();
+   /// true if xterm/color is ON
+   static bool color_enabled()
+      { return colors_enabled; }
 
    /// return the current column (chars since last LF).
    static int get_column()

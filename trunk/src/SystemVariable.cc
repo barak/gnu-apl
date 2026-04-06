@@ -23,7 +23,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/resource.h>   // for ⎕WA
 #include <sys/time.h>
 
 // FreeBSD 8.x lacks utmpx.h

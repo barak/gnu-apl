@@ -44,6 +44,7 @@ LibPaths::LibDir LibPaths::lib_dirs[LIB_MAX];
 
 // realpath() complains if its result is not used, To avoid that warning
 // we assign the result to variable unused below.
+//
 const void * unused = 0;
 
 //----------------------------------------------------------------------------
@@ -114,7 +115,11 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
             }
       }
 
+#if MINGW_SRC
+   strncpy(APL_bin_path, argv0, sizeof(APL_bin_path) - 1);
+#else // ! MINGW_SRC
    unused = realpath(argv0, APL_bin_path);
+#endif // // ! MINGW_SRC
    APL_bin_path[APL_PATH_MAX] = 0;
    {
      char * slash = strrchr(APL_bin_path, '/');
@@ -165,10 +170,9 @@ LibPaths::search_APL_lib_root()
 {
    APL_lib_root[0] = 0;
 
-const char * path = getenv("APL_LIB_ROOT");
-   if (path)
+   if (const char * path = getenv("APL_LIB_ROOT"))
       {
-        unused = realpath(path, APL_lib_root);
+        set_APL_lib_root(path);
         root_from_env = true;
         return;
       }
@@ -177,7 +181,7 @@ const char * path = getenv("APL_LIB_ROOT");
 
    // search from "." to "/" for  a valid lib-root
    //
-   unused = realpath(".", APL_lib_root);
+   set_APL_lib_root(".");
    while (strlen(APL_lib_root))
       {
         if (is_lib_root(APL_lib_root))   return;   // lib-root found
@@ -191,13 +195,17 @@ const char * path = getenv("APL_LIB_ROOT");
            }
       }
 
-   unused = realpath(".", APL_lib_root);
+   set_APL_lib_root(".");
 }
 //----------------------------------------------------------------------------
 void
 LibPaths::set_APL_lib_root(const char * new_root)
 {
+#if MINGW_SRC
+   strncpy(APL_lib_root, ".", sizeof(APL_lib_root) - 1);
+#else // ! MINGW_SRC
    unused = realpath(new_root, APL_lib_root);
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 void

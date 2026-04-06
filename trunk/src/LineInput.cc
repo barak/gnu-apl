@@ -955,10 +955,12 @@ void
 LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
                      UCS_string & user_line, bool & eof, LineHistory & hist)
 {
+#if ! MINGW_SRC
    the_line_input->current_termios.c_lflag &= ~ISIG;   // disable ^C
-#ifndef apl_TARGET_LIBAPL
+# ifndef apl_TARGET_LIBAPL
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
-#endif // apl_TARGET_LIBAPL
+# endif // apl_TARGET_LIBAPL
+#endif // ! MINGW_SRC
 
    user_line.clear();
 
@@ -1072,10 +1074,12 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
          break;
        }
 
+#if ! MINGW_SRC
    the_line_input->current_termios.c_lflag |= ISIG;   // enable ^C
 #ifndef apl_TARGET_LIBAPL
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
 #endif // apl_TARGET_LIBAPL
+#endif // ! MINGW_SRC
 
    user_line = lec.get_user_line();
 

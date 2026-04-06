@@ -21,7 +21,7 @@
 /** @file
 */
 
-#include "config.h"
+#include "Sys.hh"
 
 #include <fcntl.h>
 #include <errno.h>
@@ -1281,18 +1281,12 @@ const int fd = open(filename, O_RDONLY);
    // 3. read the workspace file and set file_start on success
    //
    {
-     UTF8 * buffer = new UTF8[file_length + 1];
-     if (buffer == 0)   WS_FULL;
-     buffer[file_length] = 0;
-     const ssize_t read_len = read(fd, buffer, file_length);
-     if (read_len != file_length)
+     file_start = Sys::mmap(fd, file_length);
+     if (file_start == 0)
         {
-          err << "read(" << filename << ") failed: " << strerror(errno) << endl;
           close(fd);
-          return;
+          WS_FULL;
         }
-
-     file_start = buffer;   // success
    }
    file_end = file_start + file_length;
 
@@ -1323,7 +1317,7 @@ const int fd = open(filename, O_RDONLY);
 //----------------------------------------------------------------------------
 XML_Loading_Archive::~XML_Loading_Archive()
 {
-   delete[] file_start;
+   Sys::munmap(file_start, file_length);
 }
 //----------------------------------------------------------------------------
 void
@@ -1495,7 +1489,7 @@ again:
    if (current_char == '?')   goto again;   // processing instruction
    if (current_char == '!')                 // comment
       {
-        const char * ctag_name = reinterpret_cast<const char *>(tag_name);
+        const char * ctag_name = charP(tag_name);
         const char * comment_end = strstr(ctag_name, "-->");
         Assert(comment_end);
         comment_end += 3;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,17 +21,20 @@
 /** @file
 */
 
+#include "config.h"
+
+#if HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
+#endif // HAVE_SYS_RESOURCE_H
+
 #include "UserPreferences.hh"
 #include "Quad_WA.hh"
 
-extern uint64_t top_of_memory();
-
-rlim_t Quad_WA::initial_rlimit = RLIM_INFINITY;
 uint64_t Quad_WA::total_memory = 0x40000000;   // a little more than 1 Gig
+bool Quad_WA::total_memory_by_user = false;
+
 int64_t  Quad_WA::WA_margin = 0;  // 100000000;
 int      Quad_WA::WA_scale = 90;   // percent
-unsigned long long Quad_WA::initial_sbrk = 0;
 
 Quad_WA::_mem_info Quad_WA::meminfo;
 
@@ -49,7 +52,33 @@ Quad_WA::get_apl_value() const
                     (Value::total_ravel_count * sizeof(Cell)
                     + Value::value_count * sizeof(Value)), LOC);
 }
-//----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+#if MINGW_SRC
+int
+Quad_WA::read_meminfo()
+{
+   return 0;   // error
+}
+//---------------------------------------------------------------------------
+int64_t
+Quad_WA::read_procfile(const char * filename)
+{
+   return -1;   // something went wrong
+}
+//---------------------------------------------------------------------------
+void
+Quad_WA::init(bool log_startup)
+{
+}
+
+#else // ! MINGW_SRC
+
+extern uint64_t top_of_memory();
+
+rlim_t Quad_WA::initial_rlimit = RLIM_INFINITY;
+unsigned long long Quad_WA::initial_sbrk = 0;
+
+//============================================================================
 void
 Quad_WA::init(bool log_startup)
 {
@@ -157,6 +186,7 @@ const struct _tag
 int64_t
 Quad_WA::read_procfile(const char * filename)
 {
+#if !MINGW_SRC
    if (FILE * pm = fopen(filename, "r"))
       {
         long long ret = -1;
@@ -165,6 +195,7 @@ Quad_WA::read_procfile(const char * filename)
         if (count == 1) return ret;
       }
 
+#endif // !MINGW_SRC
    return -1;   // something went wrong
 }
 //----------------------------------------------------------------------------
@@ -184,31 +215,36 @@ uint64_t result = 0xC0000000;   // assume ~3 GB on error
 
    return result;
 }
+#endif // ! MINGW_SRC
 //----------------------------------------------------------------------------
 void
 Quad_WA::parse_mem(bool log_startup)
 {
 const char * mem_arg = UserPreferences::uprefs.mem_arg;
+   Assert(mem_arg);
 
-   if (mem_arg == 0)   // no --mem option given
+   if (log_startup)
       {
-        if (log_startup)
-           CERR << "--mem option not used" << endl;
-        return;
-     }
-
-   if (*mem_arg == 0)   // -mem option without rgument
-      {
-        if (log_startup)
-           CERR << "using --mem with default value: 50%" << endl;
-
-        mem_arg = "50%";
+        CERR << "using --mem with user's value " << mem_arg << endl;
       }
-   else
+
+char mem_unit = mem_arg[strlen(mem_arg) -1];
+   if (mem_unit == 'b' || mem_unit == 'B')   // optional trailing B
+      mem_unit = mem_arg[strlen(mem_arg) -2];
+
+#if MINGW_SRC
+   if (mem_unit == '%')
       {
-        if (log_startup)
-           CERR << "using --mem with user's value " << mem_arg << endl;
+        CERR <<
+"This GNU APL interpreter was cross-compiled to Windows. In this case (which\n"
+"is different from compiling under windows in a CYGWIN or WSL!) there is no\n"
+"/proc/memory file to determine the available free memory available. As a\n"
+"consequence, the total memory available for the interpreter can only be\n"
+"specified ansolutely (i.e. using units like k, M, G, kB, MB, or G) but not\n"
+"as a percentage.";
+        exit(3);
       }
+#endif // MINGW_SRC
 
    if (3 != read_meminfo())
       {
@@ -216,10 +252,6 @@ const char * mem_arg = UserPreferences::uprefs.mem_arg;
                 "no readable /proc/meminfo: " << strerror(errno) << endl;
         exit(3);
       }
-
-char mem_unit = mem_arg[strlen(mem_arg) -1];
-   if (mem_unit == 'b' || mem_unit == 'B')   // optional trailing B
-      mem_unit = mem_arg[strlen(mem_arg) -2];
 
 uint64_t mem_number = strtoll(mem_arg, 0, 0);
 uint64_t mem_val = 0;
@@ -299,7 +331,7 @@ uint64_t mem_val = 0;
    else
       {
         CERR << "*** FATAL ERROR: invalid unit in --mem value '" << mem_arg
-             << "' (not k, M, G, kB, MB, or GB)" << endl;
+             << "' (not %, k, M, G, kB, MB, or GB)" << endl;
         exit(3);
       }
 
@@ -331,6 +363,7 @@ const int64_t overcommit = read_procfile("/proc/sys/vm/overcommit_memory");
                " by the --mem option !!!" << endl;
 
    total_memory = mem_val;
+   total_memory_by_user = true;
 }
 //============================================================================
 

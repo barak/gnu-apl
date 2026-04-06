@@ -74,7 +74,7 @@ UserPreferences::UserPreferences()
      line_history_len(500),
      no_xmodmap(false),
      line_history_path(".apl.history"),
-     mem_arg(0),
+     mem_arg(0),  // no --mem and mo MEMORY preference
      old_multi_line_strings(true),
      new_multi_line_strings(true),
      multi_line_literals(true),
@@ -151,6 +151,7 @@ UserPreferences::show_args(const std::vector<const char *> & args)
 
    // tell if stdin is open or closed
    //
+#if ! MINGW_SRC
    if (fcntl(STDIN_FILENO, F_GETFD))
       CERR << "stdin is: CLOSED" << endl;
    else
@@ -162,6 +163,7 @@ UserPreferences::show_args(const std::vector<const char *> & args)
       CERR << "fd 3 is:  CLOSED" << endl;
    else
       CERR << "fd 3 is:  OPEN" << endl;
+#endif // MINGW_SRC
 }
 //----------------------------------------------------------------------------
 void
@@ -210,7 +212,7 @@ UserPreferences::usage(const char * prog)
 "    --emacs_arg arg      run in emacs mode with argument 'arg'\n"
 "    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
-"    --huge [arg]         memory management\n"
+"    --mem limit          memory limit\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
 "    --OFF                automatically )OFF after last input file\n"
@@ -334,6 +336,10 @@ UserPreferences::parse_args_0(const std::vector<const char *> & args)
    return false;
 }
 //----------------------------------------------------------------------------
+
+#define IFOPT(x)     if (!strcmp(opt, #x))
+#define IFOPT2(x, y) if ((!strcmp(opt, #x)) || (!strcmp(opt, #y)))
+
 bool
 UserPreferences::parse_args_1()
 {
@@ -343,7 +349,7 @@ bool log_startup = false;
          const char * opt = expanded_args[a++];
          const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
-         if (!strcmp(opt, "-l"))
+         IFOPT( -l )
             {
               ++a;
               if (!val)
@@ -356,7 +362,7 @@ bool log_startup = false;
               continue;
             }
 
-         if (!strcmp(opt, "-p"))
+         IFOPT( -p )
             {
               ++a;
               if (!val)
@@ -369,7 +375,7 @@ bool log_startup = false;
               continue;
             }
 
-         if (!strcmp(opt, "-C"))
+         IFOPT( -C )
             {
               ++a;
               if (!val)
@@ -379,12 +385,14 @@ bool log_startup = false;
                  }
 
 #ifndef WINDOWS
+#if ! MINGW_SRC
               if (chroot(val))
                  {
                    CERR << "chroot(" << val << ") failed: "
                         << strerror(errno) << endl;
                    exit(a);
                  }
+#endif // ! MINGW_SRC
 #endif // WINDOWS
 
               if (chdir("/"))
@@ -398,7 +406,7 @@ bool log_startup = false;
             }
 
 #ifndef WINDOWS
-         if (!strcmp(opt, "-u"))
+         IFOPT( -u )
             {
               ++a;
               if (!val)
@@ -406,12 +414,14 @@ bool log_startup = false;
                    CERR << "-u without user ID" << endl;
                    exit(a);
                  }
+#if ! MINGW_SRC
               if (setuid(strtoll(val, 0, 10)))
                  {
                    CERR << "setuid(" << val << ") failed: "
                         << strerror(errno) << endl;
                    exit(a);
                  }
+#endif // ! MINGW_SRC
               continue;
             }
 #endif // WINDOWS
@@ -440,7 +450,7 @@ UserPreferences::parse_args_2(bool logit)
       if (strlen(prog) >= 6 && !strcmp("script", (prog + strlen(prog) - 6)))
          {
             do_CONT = false;               // --noCONT
-            do_not_echo = true;            // -noCIN
+            do_not_echo = true;            // --noCIN
             do_Color = false;              // --noColor
             silence = NO_BANNER;           // --silent
          }
@@ -456,7 +466,7 @@ UserPreferences::parse_args_2(bool logit)
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
          //
-         if (!strcmp(opt, "--"))   // end of options marker
+         IFOPT( -- )   // end of options marker
             {
               break;   // for (size_t a = 1; ...
             }
@@ -472,14 +482,14 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-C"))
+         IFOPT( -C )
             {
               ++a;
               continue;   // -C already handled in parse_args_1()
             }
 
 #if cfg_CORE_COUNT_WANTED == -2
-         if (!strcmp(opt, "--cc"))
+         IFOPT( --cc )
             {
               ++a;
               if (!val)
@@ -491,13 +501,13 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 #endif
-         if (!strcmp(opt, "--cfg"))
+         IFOPT( --cfg )
             {
               show_configure_options();
               exit(0);
             }
 
-         if (!strcmp(opt, "--CPU_limit_secs"))
+         IFOPT( --CPU_limit_secs )
             {
               ++a;
               if (!val)
@@ -509,19 +519,19 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--Color"))
+         IFOPT( --Color )
             {
               do_Color = true;
               continue;
             }
 
-         if (!strcmp(opt, "-d"))
+         IFOPT( -d )
             {
               daemon = true;
               continue;
             }
 
-         if (!strcmp(opt, "--echoCIN"))
+         IFOPT( --echoCIN )
             {
               echo_CIN = true;
               do_not_echo = true;
@@ -529,13 +539,13 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--emacs"))
+         IFOPT( --emacs )
             {
               emacs_mode = true;
               continue;
             }
 
-         if (!strcmp(opt, "--emacs_arg"))
+         IFOPT( --emacs_arg )
             {
               ++a;
               if (!val)
@@ -549,7 +559,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--eval"))
+         IFOPT( --eval )
             {
               ++a;
               if (!val)
@@ -563,7 +573,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-f"))
+         IFOPT( -f )
             {
               ++a;
               if (!val)
@@ -579,21 +589,21 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--gpl"))
+         IFOPT( --gpl )
             {
               show_GPL(cout);
               exit(0);
             }
 
-         if (!strcmp(opt, "-h") || !strcmp(opt, "--help"))
+         IFOPT2( -h , --help )
             {
               usage(expanded_args[0]);
               exit(0);
             }
 
-         if (!strcmp(opt, "--mem"))
+         IFOPT( --mem )
             {
-              mem_arg = "";   // assume no value
+              mem_arg = "50%";   // assume no value
               if (val)   // --huge with user-supplied value
                  {
                    ++a;   // skip val
@@ -604,7 +614,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--id"))
+         IFOPT( --id )
             {
               ++a;
               if (!val)
@@ -617,7 +627,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-L"))
+         IFOPT( -L )
             {
               ++a;
               if (!val)
@@ -630,7 +640,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--LX"))
+         IFOPT( --LX )
             {
               ++a;
               if (!val)
@@ -643,10 +653,11 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-l"))
+         IFOPT( -l )
             {
               ++a;
               if (val && atoi(val) == LID_startup)   logit = true;
+
 #ifdef cfg_DYNAMIC_LOG_WANTED
               if (val)   Log_control(LogId(atoi(val)), true);
               else
@@ -654,59 +665,59 @@ UserPreferences::parse_args_2(bool logit)
                    CERR << "-l without log facility" << endl;
                    exit(a);
                  }
-#else
+#else // ! cfg_DYNAMIC_LOG_WANTED
    if (val && atoi(val) == LID_startup)   ;
    else  CERR << "the -l option was ignored (requires ./configure "
                    "DYNAMIC_LOG_WANTED=yes)" << endl;
-#endif // cfg_DYNAMIC_LOG_WANTED
+#endif // ! cfg_DYNAMIC_LOG_WANTED
 
               continue;
             }
 
-         if (!strcmp(opt, "--noCIN"))
+         IFOPT( --noCIN )
             {
               do_not_echo = true;
               continue;
             }
 
-         if (!strcmp(opt, "--to_COUT"))
+         IFOPT( --to_COUT )
             {
               output_to_cout = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noColor"))
+         IFOPT( --noColor )
             {
               do_Color = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noCONT"))
+         IFOPT( --noCONT )
             {
               do_CONT = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noSV"))
+         IFOPT( --noSV )
             {
               user_do_svars = false;
               system_do_svars = false;
               continue;
             }
 
-         if (!strcmp(opt, "--OFF"))
+         IFOPT( --OFF )
             {
               auto_OFF = true;
               continue;
             }
 
-         if (!strcmp(opt, "-p"))
+         IFOPT( -p )
             {
               ++a;
               continue;   // -p already handled in parse_args_1()
             }
 
-         if (!strcmp(opt, "--par"))
+         IFOPT( --par )
             {
               ++a;
               if (!val)
@@ -718,7 +729,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--PW"))
+         IFOPT( --PW )
             {
               ++a;
               if (!val)
@@ -742,66 +753,67 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--rawCIN"))
+         IFOPT( --rawCIN )
             {
               raw_cin = true;
               continue;
             }
 
-         if (!strcmp(opt, "--SV"))
+         IFOPT( --SV )
             {
               user_do_svars = true;
               system_do_svars = true;
               continue;
             }
 
-         if (!strcmp(opt, "--safe"))
+         IFOPT( --safe )
             {
               safe_mode = true;
               user_do_svars = false;
               system_do_svars = false;
               continue;
             }
-         if (!strcmp(opt, "-s") || !strcmp(opt, "--script"))
+
+         IFOPT2( -s , --script )
             {
               do_CONT = false;               // --noCONT
-              do_not_echo = true;            // -noCIN
+              do_not_echo = true;            // --noCIN
               do_Color = false;              // --noColor
               silence = NO_BANNER;           // --silent
               continue;
             }
 
-         if (!strcmp(opt, "--show_bin_dir"))
+         IFOPT( --show_bin_dir )
             {
               COUT << apl_DIR__bin << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_doc_dir"))
+         IFOPT( --show_doc_dir )
             {
               COUT << apl_DIR__doc << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_etc_dir"))
+         IFOPT( --show_etc_dir )
             {
               COUT << apl_DIR__sysconf << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_lib_dir"))
+         IFOPT( --show_lib_dir )
             {
               COUT << apl_DIR__pkglib << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_src_dir"))
+         IFOPT( --show_src_dir )
             {
               COUT << apl_DIR__src << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_all_dirs"))
+         IFOPT( --show_all_dirs )
             {
               COUT << "bindir: " << apl_DIR__bin     << endl
                    << "docdir: " << apl_DIR__doc     << endl
@@ -811,13 +823,13 @@ UserPreferences::parse_args_2(bool logit)
               exit(0);
             }
 
-         if (!strcmp(opt, "--silent") || !strcmp(opt, "-q"))
+         IFOPT2( --silent , -q )
             {
               silence = NO_BANNER;
               continue;
             }
 
-         if (!strcmp(opt, "-T"))
+         IFOPT( -T )
             {
               do_CONT = false;
 
@@ -852,7 +864,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--TM"))
+         IFOPT( --TM )
             {
               ++a;
               if (!val)
@@ -865,19 +877,19 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--TR"))
+         IFOPT( --TR )
             {
               randomize_testfiles = true;
               continue;
             }
 
-         if (!strcmp(opt, "--TS"))
+         IFOPT( --TS )
             {
               append_summary = true;
               continue;
             }
 
-         if (!strcmp(opt, "--tcp_port"))
+         IFOPT( --tcp_port )
             {
               ++a;
               if (!val)
@@ -892,24 +904,24 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--tcp_websocket"))
+         IFOPT( --tcp_websocket )
             {
               tcp_websocket = true;
               continue;
             }
 
-         if (!strcmp(opt, "-v") || !strcmp(opt, "--version"))
+         IFOPT2( -v , --version )
             {
               show_version(cout);
               exit(0);
             }
-         if (!strcmp(opt, "-u"))
+         IFOPT( -u )
             {
               ++a;
               continue;   // -u already handled in parse_args_1()
             }
 
-         if (!strcmp(opt, "-w"))
+         IFOPT( -w )
             {
               ++a;
               if (!val)
@@ -925,6 +937,8 @@ UserPreferences::parse_args_2(bool logit)
          usage(expanded_args[0]);
          exit(a);
        }
+#undef IFOPT
+#undef IFOPT2
 
    if (logit)
       {
@@ -1097,7 +1111,9 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
          if (arg_end)   // more arguments
             {
               const int arg_len = arg_end - apl_args;
-              const char * arg = strndup(apl_args, arg_len);
+              char * arg = new char[arg_len + 1];
+              memcpy(arg, apl_args, arg_len);
+              arg[arg_len] = 0;
               expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               apl_args += arg_len;
@@ -1602,6 +1618,7 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "MEMORY"))
             {
               mem_arg = strdup(arg);
+              Quad_WA::parse_mem(false);
             }
          else if (!strcasecmp(opt, "NABLA-TO-HISTORY"))
             {

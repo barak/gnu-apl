@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Sys.hh"
+
 /** @file
 */
 
@@ -25,7 +27,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <errno.h>
 
 #include "Bif_F12_TAKE_DROP.hh"
@@ -1014,8 +1015,8 @@ char filename[FILENAME_MAX + 1];
         throw_apl_error(E_SYS_LIMIT_FILENAME, LOC);
       }
 
-int in = open(filename, O_RDONLY);
-   if (in == -1)
+int fd = open(filename, O_RDONLY);
+   if (fd == -1)
       {
         CERR << "Can't open() workspace file '" 
              << filename << "': " << strerror(errno) << endl;
@@ -1023,22 +1024,21 @@ int in = open(filename, O_RDONLY);
       }
 
 struct stat st;
-   if (fstat(in, &st) == -1)
+   if (fstat(fd, &st) == -1)
       {
         CERR << "Can't fstat() workspace file '" 
              << filename << "': " << strerror(errno) << endl;
-        close(in);
+        close(fd);
         throw_apl_error(E_WS_FSTAT, LOC);
       }
 
 off_t len = st.st_size;
-void * start = mmap(0, len, PROT_READ, MAP_SHARED, in, 0);
-
-   if (start == reinterpret_cast<const void *>(-1))
+const UTF8 * start = Sys::mmap(fd, len);
+   if (start == 0)
       {
         CERR << "Can't mmap() workspace file '" 
              << filename << "': " << strerror(errno) << endl;
-        close(in);
+        close(fd);
         throw_apl_error(E_WS_MMAP, LOC);
       }
 
@@ -1049,8 +1049,8 @@ UTF8_string utf(utf8P(start), len);
    while (utf.size() &&
           (utf.back() == '\r' || utf.back() == '\n'))   utf.pop_back();
 
-   munmap(start, st.st_size);
-   close(in);
+   Sys::munmap(start, st.st_size);
+   close(fd);
 
 UCS_string ucs(utf);
 int error_line = -1;

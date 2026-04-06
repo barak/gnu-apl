@@ -21,6 +21,8 @@
 /** @file
 */
 
+#include "config.h"
+
 // this file provides a wrapper around sbrk() that allows sbrk(0) to be called
 // without #including unistd.h. The reason is to avoid a weird warning on
 // Apple machines telling that 'sbrk' is deprecated
@@ -31,6 +33,7 @@
 extern "C" void * sbrk(int increment);
 extern uint64_t top_of_memory();
 
+#if !MINGW_SRC
 /// our sbrk() so that it compiles under Apple OS X
 uint64_t
 top_of_memory()
@@ -40,4 +43,5 @@ top_of_memory()
    else
       return uint64_t(sbrk(0));
 }
+#endif // ! MINGW_SRC
 

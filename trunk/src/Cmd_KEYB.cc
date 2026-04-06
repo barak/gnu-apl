@@ -21,8 +21,11 @@
 /** @file
 */
 
+#include "config.h"
+
 #include "Common.hh"
 #include "Command.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -199,11 +202,7 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
                          ! (no_mode && UserPreferences::uprefs.no_xmodmap);
    if (do_xmodmap)
       {
-        // reset SIGCHLD to its default so that pclose() works as expected
-        //
-        signal(SIGCHLD, SIG_DFL);
         const bool xmodmap_error = parse_xmodmap();
-        signal(SIGCHLD, SIG_IGN);
 
         if (mode != MO_ALL)
            {
@@ -323,7 +322,7 @@ Cmd_KEYB::parse_xmodmap()
       }
 
    errno = 0;
-FILE * xm = popen("xmodmap -pke", "r");
+FILE * xm = sys_popen("xmodmap -pke", "r");
    if (xm == 0)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error starting xmodmap: "
@@ -351,7 +350,7 @@ int bad_lines  = 0;
       {
         // xmodmap was started, but then something went wrong.
         //
-        pclose(xm);
+        sys_pclose(xm);
         return true;
       }
 
@@ -381,7 +380,7 @@ int bad_lines  = 0;
         }
    }
 
-   if (pclose(xm) && (errno != ECHILD))
+   if (sys_pclose(xm))
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error running xmodmap: "
                      << strerror(errno);

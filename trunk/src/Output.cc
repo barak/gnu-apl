@@ -21,6 +21,11 @@
 /** @file
 */
 
+#include "config.h"
+#if HAVE_WINDOWS_H
+#include <windows.h>
+#endif // HAVE_WINDOWS_H
+
 #include "Common.hh"
 #include "Command.hh"
 #include "InputFile.hh"
@@ -167,9 +172,25 @@ Output::init(bool logit)
                 "configured in your preferences file(s))" << endl;
 
 
-        CERR << "using ANSI terminal input ESC sequences(or those "
+        CERR << "using ANSI terminal input ESC sequences (or those "
                 "configured in your preferences file(s))" << endl;
       }
+
+#if MINGW_SRC
+   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),
+                  ENABLE_VIRTUAL_TERMINAL_INPUT);
+   SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),
+                  ENABLE_PROCESSED_OUTPUT);
+   SetConsoleMode(GetStdHandle(STD_ERROR_HANDLE),
+                  ENABLE_PROCESSED_OUTPUT);
+
+   if (logit)
+      {
+        CERR << "WINDOWS: set ENABLE_PROCESSED_OUTPUT "
+                "for stdout and stderr." << endl;
+      }
+
+#endif // MINGW_SRC
 }
 //----------------------------------------------------------------------------
 void
@@ -181,10 +202,11 @@ Output::reset_dout()
 void
 Output::reset_colors()
 {
-   if (!colors_changed)   return;
-
-   cout << color_RESET << clear_EOL;
-   cerr << color_RESET << clear_EOL;
+   if (colors_changed)
+      {
+        cout << color_RESET << clear_EOL;
+        cerr << color_RESET << clear_EOL;
+      }
 }
 //----------------------------------------------------------------------------
 void
@@ -215,12 +237,6 @@ Output::toggle_color(const UCS_string & arg)
    else if (arg.starts_iwith("OFF"))   colors_enabled = false;
    else                                colors_enabled = !colors_enabled;
 }
-//----------------------------------------------------------------------------
-bool
-Output::color_enabled()
-{
-   return Output::colors_enabled;
-}
 //============================================================================
 void
 CIN_ostream::set_cursor(int y, int x)
@@ -242,4 +258,4 @@ CIN_ostream::set_cursor(int y, int x)
         *this << CSI << (1 + y) << ";" << (1 + x) << 'H' << std::flush;
       }
 }
-//----------------------------------------------------------------------------
+//============================================================================

@@ -334,7 +334,6 @@ public:
         return *this << utf;
       }
 
-   /// append Unicode \b uni
    /// append integer \b num
    UCS_string & operator <<(int num)
       { append_int(num);   return *this; }

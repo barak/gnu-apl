@@ -465,8 +465,8 @@ size_t token0 = 0;
    if (token0 != tokens_B.size())
       {
         MORE_ERROR() <<
-        "⎕JSON B: there were extra tokens in B (tokenized: " << tokens_B.size()
-        << ", but processed: " << token0 <<
+        "⎕JSON B: there were extra tokens in B (tokenized: "
+        << int(tokens_B.size()) << ", but processed: " << int(token0) <<
         ").\n    The JSON string must be one serialized value.";
         LENGTH_ERROR;
       }
@@ -573,7 +573,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
                  {
                    MORE_ERROR() << "⎕JSON B: Got '" << uni
                                 << "' when expecting ',' or ']' at "
-                                <<  token_from << "↓B";
+                                <<  int(token_from) << "↓B";
                    DOMAIN_ERROR;
                  }
             }
@@ -638,7 +638,7 @@ const size_t B_start =  tokens_B[token_from];
       {
         MORE_ERROR() << "⎕JSON B: Got '" << ucs_B[B_start] <<
         "' when expecting (double-quoted) object member name at " <<
-        B_start << "↓B";
+        int(B_start) << "↓B";
         DOMAIN_ERROR;
       }
    ++token_from;   // skip "
@@ -655,7 +655,7 @@ UCS_string member_name;
           MORE_ERROR() <<
           "⎕JSON B: Got '" << ucs_B[ucs_B_colon] <<
           "' when expecting ':' after object member name at " <<
-          B_start << "↓B";
+          int(B_start) << "↓B";
           DOMAIN_ERROR;
         }
      ++token_from;   // skip :
@@ -681,7 +681,7 @@ UCS_string member_name;
         // member name exists already
         //
         MORE_ERROR() << "⎕JSON: duplicate member name '" << member_name
-                     << "' at " << B_start << "↓B";
+                     << "' at " << int(B_start) << "↓B";
         DOMAIN_ERROR;
       }
 
@@ -703,7 +703,7 @@ UCS_string member_name;
         {
           MORE_ERROR() << "⎕JSON B: Got '" << sepa <<
                "' when expecting ',' or '}' after \"" << member_name
-               << "\" : at " << B_start << "↓B";
+               << "\" : at " << int(B_start) << "↓B";
           DOMAIN_ERROR;
         }
    }

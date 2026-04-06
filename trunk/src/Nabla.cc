@@ -168,7 +168,7 @@ UCS_string fun_text;
         for (size_t l = 1; l < lines.size(); ++l)
             {
               UCS_string line_l;
-              line_l << UNI_L_BRACK << l << UNI_R_BRACK
+              line_l << UNI_L_BRACK << int(l) << UNI_R_BRACK
                      << UNI_SPACE << UNI_SPACE;
               while (line_l.size() < 6)   line_l << UNI_SPACE;
               line_l << lines[l].text;

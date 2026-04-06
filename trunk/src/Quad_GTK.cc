@@ -23,8 +23,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <poll.h>
-#include <sys/ioctl.h>
 
 #include "Common.hh"
 #include "LibPaths.hh"
@@ -40,7 +38,11 @@ UCS_string_vector Quad_GTK::event_queue;
 
 bool Quad_GTK::focus_on_map = false;   // focus for new windows
 
-#if apl_GTK3 && apl_X11
+#if apl_GTK3 && apl_X11 && ! MINGW_SRC
+
+#include <poll.h>
+#include <sys/ioctl.h>
+
 //----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const

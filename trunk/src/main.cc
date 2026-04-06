@@ -32,6 +32,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#ifndef SIGHUP   // MINGW
+# define SIGHUP 1
+#endif
+
 #if HAVE_TERMIOS_H
 # include <termios.h>
 #endif // HAVE_TERMIOS_H
@@ -48,6 +52,7 @@
 #if HAVE_WINSOCK2_H
 # include <winsock2.h>
 #endif // HAVE_WINSOCK2_H
+
 
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
@@ -69,10 +74,7 @@
 # include <libelfin/elf/elf++.hh>
 #endif
 
-
 #if MINGW_SRC
-#define SIGHUP 1
-#define SIGCHLD 17
 typedef int socklen_t;
 #define sigaction(x,y,z)
 #define setenv(x,y,z)
@@ -422,7 +424,10 @@ const bool log_startup =
    sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
+
+#if ! MINGW_SRC
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
+#endif // ! MINGW_SRC
 
 const UserPreferences & uprefs = UserPreferences::uprefs;    
 #if HAVE_IOCTL_TIOCGWINSZ

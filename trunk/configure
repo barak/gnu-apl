@@ -18743,7 +18743,7 @@ fi
 # keep headers in roughy alphabetical order as to find them more easily
 #
 apl_missing_headers=-1 # since either sys/socket,h or winsock2.h will be missing
-       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h netinet/tcp.h stdint.h stdlib.h string.h strings.h sys/fcntl.h sys/ioctl.h sys/mman.h sys/resource.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/time.h sys/un.h sys/wait.h termios.h unistd.h utmpx.h vector zlib.h winsock2.h
+       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h netinet/tcp.h stdint.h stdlib.h string.h strings.h sys/fcntl.h sys/ioctl.h sys/mman.h sys/resource.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/time.h sys/un.h sys/wait.h termios.h unistd.h utmpx.h vector zlib.h windows.h winsock2.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -23323,7 +23323,7 @@ case $host_os in
     mingw*)
 printf "%s\n" "#define MINGW_SRC 1" >>confdefs.h
 
-               if 1; then
+               if true; then
   apl_TARGET_MINGW_TRUE=
   apl_TARGET_MINGW_FALSE='#'
 else
@@ -23334,7 +23334,7 @@ fi
               { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; };;
     *)
-               if 0; then
+               if false; then
   apl_TARGET_MINGW_TRUE=
   apl_TARGET_MINGW_FALSE='#'
 else

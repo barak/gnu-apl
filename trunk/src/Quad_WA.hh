@@ -80,6 +80,9 @@ protected:
         uint64_t MemFree;     ///< kilobytes free
       } meminfo;              ///< values read from /proc/meminfo
 
+   /// \b true iff total_memory was provided by the user
+   static bool total_memory_by_user;
+
    /// read /proc/meminfo, return the number of items found
    static int read_meminfo();
 
@@ -90,7 +93,6 @@ protected:
    virtual Value_P get_apl_value() const;
    /// estimate (!) the amount of free memory
    static uint64_t get_free_memory();
-
 };
 //----------------------------------------------------------------------------
 

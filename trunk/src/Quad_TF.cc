@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -208,9 +208,9 @@ const size_t max_len = text.to_vector(lines);
 
 UCS_string ucs;
    ucs << UNI_F << fun_name
-       << UNI_SPACE << 2               // rank
-       << UNI_SPACE << lines.size()    // rows
-       << UNI_SPACE << max_len         // cols
+       << UNI_SPACE << 2                    // rank
+       << UNI_SPACE << int(lines.size())    // rows
+       << UNI_SPACE << int(max_len)         // cols
        << UNI_SPACE;
 
    loop(l, lines.size())

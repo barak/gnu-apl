@@ -23,6 +23,8 @@
 
 #include <sys/stat.h>
 
+#include "config.h"
+
 #include "Common.hh"
 #include "Command.hh"
 
@@ -164,6 +166,7 @@ UCS_string arg(UNI_0);
    // follow symbolic links, but not too often (because symbolic links are
    // subject to creating an endless loop)...
    //
+#if ! MINGW_SRC
    loop(depth, 20)
        {
          char buffer[FILENAME_MAX + 1];
@@ -181,6 +184,7 @@ UCS_string arg(UNI_0);
               path << UTF8_string(buffer);
             }
        }
+#endif // ! MINGW_SRC
 
    if (DIR * dir = opendir(path.c_str()))   return dir;   // OK
 

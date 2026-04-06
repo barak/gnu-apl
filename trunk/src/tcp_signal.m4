@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2026  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,12 +74,29 @@ and then:
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 
-#include <string>
+#if HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif // HAVE_SYS_SELECT_H
+
+#if HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#include <sys/types.h>
+
+#if HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
+
+#if ! MINGW_SRC
+#define SOCKET(x) x
+#endif // ! MINGW_SRC
+
 #include <iostream>
 #include <iomanip>
 
@@ -414,7 +431,7 @@ ssize_t siglen = 0;
        {
          fd_set readfds;
          FD_ZERO(&readfds);
-         FD_SET(tcp_sock, &readfds);
+         FD_SET(SOCKET(tcp_sock), &readfds);
 
          errno = 0;
          const int select__result = select(tcp_sock + 1, &readfds, 0, 0, 0);
@@ -426,7 +443,7 @@ ssize_t siglen = 0;
               return 0;   // most likely: connection was closed by the peer
             }
 
-         if (!FD_ISSET(tcp_sock, &readfds))
+         if (!FD_ISSET(SOCKET(tcp_sock), &readfds))
             {
               *loc = LOC;
               return 0;   // never happens

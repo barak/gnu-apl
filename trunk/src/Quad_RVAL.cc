@@ -60,7 +60,9 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
    N = 8;
    desired_maxdepth = 4;
    memset(state, 0, sizeof(state));
+#if ! MINGW_SRC
    initstate(1, state, N);
+#endif // ! MINGW_SRC
 
    while (desired_shape.get_rank() < MAX_RANK)
          desired_shape.add_shape_item(1);
@@ -291,7 +293,9 @@ Value_P Z(N, LOC);
             {
                state[b] = B.get_cravel(b).get_int_value();
             }
+#if ! MINGW_SRC
          setstate(state);
+#endif // ! MINGW_SRC
       }
 
    return Z;
@@ -643,11 +647,15 @@ Value_P Zsub;
 uint64_t
 Quad_RVAL::rand17()
 {
+#if ! MINGW_SRC
 const int32_t rnd = random();
 
    // the lower bits are less random, so we xor the upper 16 bits into
    // the lower 16 bits and return them.
    return (rnd ^ (rnd >> 16)) & 0x1FFFF;
+#else
+   return 0;
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 // EOF

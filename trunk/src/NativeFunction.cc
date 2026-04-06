@@ -21,8 +21,15 @@
 /** @file
 */
 
+#include "config.h"
 
-#include <dlfcn.h>
+#if MINGW_SRC
+# define dlsym(x, y) 0
+# define dlclose(x)
+#else
+# include <dlfcn.h>
+#endif // ! MINGW_SRC
+
 #include <errno.h>
 #include <string.h>
 
@@ -171,6 +178,10 @@ NativeFunction::~NativeFunction()
 void *
 NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
+#if MINGW_SRC
+   MORE_ERROR() << "Native functions work only on GNU/Linux.";
+   DOMAIN_ERROR;
+#else
 const int t4_len = t4.size();
    t4 << "    file " << filename;
 
@@ -181,17 +192,15 @@ const int t4_len = t4.size();
         return 0;
       }
 
-void * handle = dlopen(filename, RTLD_LAZY);
-   if (handle == 0)
-      {
-        const char * err = dlerror();
-        if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
+   if (void * handle = dlopen(filename, RTLD_LAZY))   return handle;
 
-        while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
-        t4 << " (" << err << " )\n";
-      }
+const char * err = dlerror();
+   if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
 
-   return handle;
+   while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
+   t4 << " (" << err << " )\n";
+   return 0;
+#endif
 }
 //----------------------------------------------------------------------------
 void *
@@ -313,7 +322,12 @@ NativeFunction::cleanup()
              const bool do_dlclose = (*fun->close_fun)(CAUSE_SHUTDOWN, fun);
              if (do_dlclose)
                 {
+#if MINGW_SRC
+                  MORE_ERROR() << "Native functions work only on GNU/Linux.";
+                  DOMAIN_ERROR;
+#else
                   dlclose(fun->handle);
+#endif
                   fun->handle = 0;
                 }
            }

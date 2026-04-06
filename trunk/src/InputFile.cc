@@ -21,6 +21,8 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
@@ -81,6 +83,7 @@ InputFile::close_current_file()
 void
 InputFile::randomize_files()
 {
+#if ! MINGW_SRC
    {
      timeval now;
      gettimeofday(&now, 0);
@@ -126,6 +129,7 @@ InputFile::randomize_files()
          files_todo[n2] = f1;
          ++done;
        }
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 bool

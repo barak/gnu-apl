@@ -21,13 +21,20 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+
+#if HAVE_SYS_RESOURCE_C
 #include <sys/resource.h>
+#endif // HAVE_SYS_RESOURCE_C
+
 #include <sys/stat.h>
 
 #include "Common.hh"
+#include "Sys.hh"
 
 #include "CharCell.hh"
 #include "ComplexCell.hh"
@@ -1463,16 +1470,13 @@ Command::cmd_HOST(ostream & out, const UCS_string & arg)
       }
 
 UTF8_string host_cmd(arg);
-FILE * pipe = popen(host_cmd.c_str(), "r");
+FILE * pipe = sys_popen(host_cmd.c_str(), "r");
    if (pipe == 0)   // popen() failed
       {
         out << ")HOST command failed: " << strerror(errno) << endl;
         return;
       }
 
-   // reset SIGCHLD to its default so that pclose() works as expected
-   //
-   signal(SIGCHLD, SIG_DFL);
    for (;;)
        {
          const int cc = fgetc(pipe);
@@ -1481,7 +1485,7 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
        }
 
    errno = 0;
-const int result = pclose(pipe);
+const int result = sys_pclose(pipe);
    Log(LOG_verbose_error)
       {
         if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
@@ -1489,7 +1493,6 @@ const int result = pclose(pipe);
       }
 
    out << endl << result << ' ' << endl;
-   signal(SIGCHLD, SIG_IGN);
 }
 //----------------------------------------------------------------------------
 void
@@ -1636,10 +1639,12 @@ Command::cmd_OFF(int exit_val)
 # define RLIMIT_AS RLIMIT_DATA
 #endif
 
+#if ! MINGW_SRC
 rlimit rl;
    getrlimit(RLIMIT_AS, &rl);
    rl.rlim_cur = Quad_WA::initial_rlimit;
    setrlimit(RLIMIT_AS, &rl);
+#endif // ! MINGW_SRC
 
    exit(exit_val);
 }

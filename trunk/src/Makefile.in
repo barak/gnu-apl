@@ -240,22 +240,22 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
-	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Sys.cc Sys.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh Token_string.cc Token_string.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
@@ -337,7 +337,7 @@ am__objects_8 = $(am__objects_3) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Security.lo lib_gnu_apl_la-StateIndicator.lo \
 	lib_gnu_apl_la-Svar_DB.lo lib_gnu_apl_la-Svar_record.lo \
 	lib_gnu_apl_la-Symbol.lo lib_gnu_apl_la-SymbolTable.lo \
-	lib_gnu_apl_la-SystemVariable.lo \
+	lib_gnu_apl_la-Sys.lo lib_gnu_apl_la-SystemVariable.lo \
 	lib_gnu_apl_la-TabExpansion.lo \
 	lib_gnu_apl_la-Thread_context.lo lib_gnu_apl_la-Token.lo \
 	lib_gnu_apl_la-Token_string.lo lib_gnu_apl_la-Tokenizer.lo \
@@ -423,22 +423,22 @@ am__libapl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
-	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Sys.cc Sys.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh Token_string.cc Token_string.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -507,7 +507,7 @@ am__objects_16 = $(am__objects_11) libapl_la-Archive.lo \
 	libapl_la-Shape.lo libapl_la-ScalarFunction.lo \
 	libapl_la-Security.lo libapl_la-StateIndicator.lo \
 	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
-	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
+	libapl_la-Symbol.lo libapl_la-SymbolTable.lo libapl_la-Sys.lo \
 	libapl_la-SystemVariable.lo libapl_la-TabExpansion.lo \
 	libapl_la-Thread_context.lo libapl_la-Token.lo \
 	libapl_la-Token_string.lo libapl_la-Tokenizer.lo \
@@ -583,22 +583,22 @@ am__apl_SOURCES_DIST = main.cc Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
-	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Sys.cc Sys.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh Token_string.cc Token_string.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -669,12 +669,12 @@ am__objects_24 = $(am__objects_19) apl-Archive.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
-	apl-SymbolTable.$(OBJEXT) apl-SystemVariable.$(OBJEXT) \
-	apl-TabExpansion.$(OBJEXT) apl-Thread_context.$(OBJEXT) \
-	apl-Token.$(OBJEXT) apl-Token_string.$(OBJEXT) \
-	apl-Tokenizer.$(OBJEXT) apl-UCS_string.$(OBJEXT) \
-	apl-UCS_string_vector.$(OBJEXT) apl-UserFunction.$(OBJEXT) \
-	apl-UserFunction_header.$(OBJEXT) \
+	apl-SymbolTable.$(OBJEXT) apl-Sys.$(OBJEXT) \
+	apl-SystemVariable.$(OBJEXT) apl-TabExpansion.$(OBJEXT) \
+	apl-Thread_context.$(OBJEXT) apl-Token.$(OBJEXT) \
+	apl-Token_string.$(OBJEXT) apl-Tokenizer.$(OBJEXT) \
+	apl-UCS_string.$(OBJEXT) apl-UCS_string_vector.$(OBJEXT) \
+	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
@@ -768,7 +768,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-Security.Po ./$(DEPDIR)/apl-Shape.Po \
 	./$(DEPDIR)/apl-StateIndicator.Po ./$(DEPDIR)/apl-Svar_DB.Po \
 	./$(DEPDIR)/apl-Svar_record.Po ./$(DEPDIR)/apl-Symbol.Po \
-	./$(DEPDIR)/apl-SymbolTable.Po \
+	./$(DEPDIR)/apl-SymbolTable.Po ./$(DEPDIR)/apl-Sys.Po \
 	./$(DEPDIR)/apl-SystemVariable.Po \
 	./$(DEPDIR)/apl-TabExpansion.Po \
 	./$(DEPDIR)/apl-Thread_context.Po ./$(DEPDIR)/apl-Token.Po \
@@ -885,6 +885,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Symbol.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Sys.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo \
@@ -1006,6 +1007,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Svar_record.Plo \
 	./$(DEPDIR)/libapl_la-Symbol.Plo \
 	./$(DEPDIR)/libapl_la-SymbolTable.Plo \
+	./$(DEPDIR)/libapl_la-Sys.Plo \
 	./$(DEPDIR)/libapl_la-SystemVariable.Plo \
 	./$(DEPDIR)/libapl_la-TabExpansion.Plo \
 	./$(DEPDIR)/libapl_la-Thread_context.Plo \
@@ -1395,19 +1397,19 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
-	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
-	$(am__append_8) $(am__append_11) $(am__append_12) \
-	$(am__append_15)
+	Sys.cc Sys.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh Token_string.cc Token_string.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
+	static_Objects.hh $(am__append_8) $(am__append_11) \
+	$(am__append_12) $(am__append_15)
 pkglib_LTLIBRARIES = $(am__append_16) $(am__append_17)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
@@ -1770,6 +1772,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Svar_record.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-SymbolTable.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Sys.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-SystemVariable.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-TabExpansion.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Thread_context.Po@am__quote@ # am--include-marker
@@ -1892,6 +1895,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Symbol.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Sys.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo@am__quote@ # am--include-marker
@@ -2014,6 +2018,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Svar_record.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Symbol.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-SymbolTable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Sys.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-SystemVariable.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-TabExpansion.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Thread_context.Plo@am__quote@ # am--include-marker
@@ -2814,6 +2819,13 @@ lib_gnu_apl_la-SymbolTable.lo: SymbolTable.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SymbolTable.cc' object='lib_gnu_apl_la-SymbolTable.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-SymbolTable.lo `test -f 'SymbolTable.cc' || echo '$(srcdir)/'`SymbolTable.cc
+
+lib_gnu_apl_la-Sys.lo: Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Sys.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Sys.Tpo -c -o lib_gnu_apl_la-Sys.lo `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Sys.Tpo $(DEPDIR)/lib_gnu_apl_la-Sys.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Sys.cc' object='lib_gnu_apl_la-Sys.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Sys.lo `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
 
 lib_gnu_apl_la-SystemVariable.lo: SystemVariable.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-SystemVariable.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-SystemVariable.Tpo -c -o lib_gnu_apl_la-SystemVariable.lo `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
@@ -3724,6 +3736,13 @@ libapl_la-SymbolTable.lo: SymbolTable.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SymbolTable.cc' object='libapl_la-SymbolTable.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-SymbolTable.lo `test -f 'SymbolTable.cc' || echo '$(srcdir)/'`SymbolTable.cc
+
+libapl_la-Sys.lo: Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Sys.lo -MD -MP -MF $(DEPDIR)/libapl_la-Sys.Tpo -c -o libapl_la-Sys.lo `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Sys.Tpo $(DEPDIR)/libapl_la-Sys.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Sys.cc' object='libapl_la-Sys.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Sys.lo `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
 
 libapl_la-SystemVariable.lo: SystemVariable.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-SystemVariable.lo -MD -MP -MF $(DEPDIR)/libapl_la-SystemVariable.Tpo -c -o libapl_la-SystemVariable.lo `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
@@ -5377,6 +5396,20 @@ apl-SymbolTable.obj: SymbolTable.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-SymbolTable.obj `if test -f 'SymbolTable.cc'; then $(CYGPATH_W) 'SymbolTable.cc'; else $(CYGPATH_W) '$(srcdir)/SymbolTable.cc'; fi`
 
+apl-Sys.o: Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Sys.o -MD -MP -MF $(DEPDIR)/apl-Sys.Tpo -c -o apl-Sys.o `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Sys.Tpo $(DEPDIR)/apl-Sys.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Sys.cc' object='apl-Sys.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Sys.o `test -f 'Sys.cc' || echo '$(srcdir)/'`Sys.cc
+
+apl-Sys.obj: Sys.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Sys.obj -MD -MP -MF $(DEPDIR)/apl-Sys.Tpo -c -o apl-Sys.obj `if test -f 'Sys.cc'; then $(CYGPATH_W) 'Sys.cc'; else $(CYGPATH_W) '$(srcdir)/Sys.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Sys.Tpo $(DEPDIR)/apl-Sys.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Sys.cc' object='apl-Sys.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Sys.obj `if test -f 'Sys.cc'; then $(CYGPATH_W) 'Sys.cc'; else $(CYGPATH_W) '$(srcdir)/Sys.cc'; fi`
+
 apl-SystemVariable.o: SystemVariable.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-SystemVariable.o -MD -MP -MF $(DEPDIR)/apl-SystemVariable.Tpo -c -o apl-SystemVariable.o `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-SystemVariable.Tpo $(DEPDIR)/apl-SystemVariable.Po
@@ -6062,6 +6095,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-Svar_record.Po
 	-rm -f ./$(DEPDIR)/apl-Symbol.Po
 	-rm -f ./$(DEPDIR)/apl-SymbolTable.Po
+	-rm -f ./$(DEPDIR)/apl-Sys.Po
 	-rm -f ./$(DEPDIR)/apl-SystemVariable.Po
 	-rm -f ./$(DEPDIR)/apl-TabExpansion.Po
 	-rm -f ./$(DEPDIR)/apl-Thread_context.Po
@@ -6184,6 +6218,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Symbol.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Sys.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo
@@ -6306,6 +6341,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Svar_record.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Symbol.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-SymbolTable.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Sys.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-SystemVariable.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Thread_context.Plo
@@ -6497,6 +6533,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-Svar_record.Po
 	-rm -f ./$(DEPDIR)/apl-Symbol.Po
 	-rm -f ./$(DEPDIR)/apl-SymbolTable.Po
+	-rm -f ./$(DEPDIR)/apl-Sys.Po
 	-rm -f ./$(DEPDIR)/apl-SystemVariable.Po
 	-rm -f ./$(DEPDIR)/apl-TabExpansion.Po
 	-rm -f ./$(DEPDIR)/apl-Thread_context.Po
@@ -6619,6 +6656,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Symbol.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Sys.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo
@@ -6741,6 +6779,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Svar_record.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Symbol.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-SymbolTable.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Sys.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-SystemVariable.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Thread_context.Plo
@@ -6874,11 +6913,6 @@ perf: apl
 patch:
 	mkdir -p patches
 	svn diff > patches/`date +patch_%F-%R.diff`
-
-.PHONY:	git-pull
-git-pull:
-	make -C emacs_mode $@
-#	make -C sql $@   ══ possibly not up-to-dat e══
 
 .PHONY:	help
 help:

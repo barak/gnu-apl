@@ -272,18 +272,6 @@ then use )OFF as last line in the file or include the --OFF option.
 Show GNU APL license (GPL) and exit.
 
 @item
-@code{-L wsname}
-
-)LOAD wsname on start-up.
-
-@item
-@code{--LX expr}
-
-Execute @b{expr} first. The workspace behaves as if ⎕LX (latent
-expression) were set to @b{expr} in the workspace. This can be used,
-for example, to start the same workspace with different start-up values.
-
-@item
 @code{-h}, @code{--help}
 
 Print all command line options with a brief hint about what they do.
@@ -297,14 +285,30 @@ as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 
 @item
-@code{-l num}
+@code{-L wsname}
 
-Turn logging facility @b{num} ON (provided that dynamic logging was
-./configure'd). The logging facility 37 (start-up messages) is of particular
-importance for troubleshooting and it works even if dynamic logging
-was not ./configure'd.
+)LOAD wsname on start-up.
 
 @item
+@code{--LX expr}
+
+Execute @b{expr} first. The workspace behaves as if ⎕LX (latent
+expression) were set to @b{expr} in the workspace. This can be used,
+for example, to start the same workspace with different start-up values.
+
+@item
+@code{-l num}
+
+Turn logging facility @b{num} ON. This always works for logging facility
+@b{num = 37} (start-up messages) which is of particular importance for
+troubleshooting. All other logging facilities @b{num ≠ 37} require that:
+  @itemize
+  @item @i{dynamic logging} was enabled in @b{./configure}, and/or
+  @item or the default value of the logging facility in @b{src/Logging.def}
+        was set to 1.
+  @end itemize
+  before GNU APL was compiled.
+
 @code{--mem [memory-limit]}
 
 Tell the interpreter not to use more than memory-limit bytes of RAM. By

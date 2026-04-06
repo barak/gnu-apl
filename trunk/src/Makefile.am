@@ -11,7 +11,7 @@ if ! apl_TARGET_ANDROID
 EXTRA_DIRS += APs sql workspaces
 
 if ! apl_TARGET_MINGW
-# EXTRA_DIRS += emacs_mode
+EXTRA_DIRS += emacs_mode
 endif
 endif
 
@@ -170,6 +170,7 @@ common_SOURCES += Symbol.cc					    		Symbol.hh
 common_SOURCES +=          					    		Simple_string.hh
 common_SOURCES += SymbolTable.cc						SymbolTable.hh
 common_SOURCES += 					SystemLimits.def	SystemLimits.hh
+common_SOURCES += Sys.cc 								Sys.hh
 common_SOURCES += SystemVariable.cc	SystemVariable.def	SystemVariable.hh
 common_SOURCES += TabExpansion.cc						TabExpansion.hh
 common_SOURCES += Thread_context.cc						Thread_context.hh

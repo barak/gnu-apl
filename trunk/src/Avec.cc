@@ -21,6 +21,8 @@
 /** @file
 */
 
+#include "Sys.hh"
+
 #include <fcntl.h>
 #include <sys/stat.h>
 
@@ -70,8 +72,6 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
 //----------------------------------------------------------------------------
 #ifdef cfg_DEVELOP_WANTED
 
-#include <sys/mman.h>
-
 void
 Avec::check_file(const char * filename)
 {
@@ -88,10 +88,10 @@ uint32_t datalen;
      datalen = s.st_size;
    }
 
-const void * data = mmap(NULL, datalen, PROT_READ, MAP_PRIVATE, fd, 0);
-   Assert(data != (void *)-1);
+const UTF8 * data = Sys::mmap(fd, datalen);
+   Assert(data);
 
-const UTF8_string utf = UTF8_string((const UTF8 *)data, datalen);
+const UTF8_string utf(data, datalen);
 UCS_string ucs(utf);
 
    loop(i, ucs.size())

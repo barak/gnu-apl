@@ -1738,7 +1738,7 @@ const Value * container = &B;
          if (data_cell == 0)
             {
               MORE_ERROR() << "(14 PATH) ⎕XML: could not find the "
-                           << (path_idx+1) << ". member '" << member
+                           << int(path_idx+1) << ". member '" << member
                            << "' of PATH (= '" << UCS_string(A1) << "')";
               DOMAIN_ERROR;
             }

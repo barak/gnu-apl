@@ -572,11 +572,11 @@ UCS_string ind_var_level = indent;   ind_var_level << var_level;
       }
 
    text << value.nz_element_count()
-        << "⍴0   ⍝ L" << level << " zeroes";                         PUSH_TEXT
+        << "⍴0   ⍝ L" << int(level) << " zeroes";                         PUSH_TEXT
 
-size_t nested_count = 0;
-size_t simple_count = 0;
-size_t zero_count  = 0;
+int nested_count = 0;
+int simple_count = 0;
+int zero_count  = 0;
    loop(v, value.nz_element_count())
        {
          const Cell & cell = value.get_cravel(v);
@@ -601,7 +601,7 @@ size_t zero_count  = 0;
         // as item separator. Otherwise we need commas (which is less
         // efficient)
         //
-        text << indent << "⍝ L" << level << ": ";
+        text << indent << "⍝ L" << int(level) << ": ";
         if (zero_count)   text << zero_count << "+";
         text << simple_count << " simple item(s)...";                PUSH_TEXT
         const ShapeItem ec = value.nz_element_count();
@@ -678,7 +678,7 @@ size_t zero_count  = 0;
 
    if (nested_count)
       {
-        text << indent << "⍝ L" << level << ": " << nested_count
+        text << indent << "⍝ L" << int(level) << ": " << nested_count
              << " nested item(s)...";                                PUSH_TEXT
         loop(v, value.nz_element_count())
             {
@@ -699,11 +699,11 @@ const Shape & shape = value.get_shape();
       {
         text << ind_var_level << "←" <<  do_CR10_shape(shape)
              << "⍴" << var_level
-             << "   ⍝ L" << level << " final reshape";               PUSH_TEXT
+             << "   ⍝ L" << int(level) << " final reshape";          PUSH_TEXT
       }
    else
       {
-        text << indent << "⍝ no (need for) L" << level
+        text << indent << "⍝ no (need for) L" << int(level)
              << " final reshape";                                    PUSH_TEXT
       }
 }
