@@ -139,8 +139,7 @@ Executable::clear_body()
 //----------------------------------------------------------------------------
 ErrorCode
 Executable::parse_body_line(Function_Line line, const UCS_string & ucs_line,
-                            bool trace, bool tolerant, const char * loc,
-                            bool macro)
+                            bool trace, const char * loc, bool macro)
 {
    Log(LOG_UserFunction__set_line)
       CERR << "[" << line << "]" << ucs_line << endl;
@@ -149,8 +148,6 @@ Token_string in;
 const Parser parser(get_parse_mode(), loc, macro);
    if (const ErrorCode ec = parser.parse(ucs_line, in, true))
       {
-        if (tolerant)   return ec;    // the caller will check ec
-
         if (ec == E_NO_TOKEN)
            {
              Error error(ec, LOC);
@@ -160,12 +157,12 @@ const Parser parser(get_parse_mode(), loc, macro);
         if (ec != E_NO_ERROR)   Error::throw_parse_error(ec, LOC, LOC);
       }
 
-   return parse_body_line(line, in, trace, tolerant, loc);
+   return parse_body_line(line, in, trace, loc);
 } 
 //----------------------------------------------------------------------------
 ErrorCode
 Executable::parse_body_line(Function_Line line, const Token_string & input,
-                            bool trace, bool tolerant, const char * loc)
+                            bool trace, const char * loc)
 {
 ShapeItem idx = 0;
 const ShapeItem end = input.size();
@@ -238,14 +235,11 @@ Token_string output;   // in reverse order
                        tag != TOK_L_CURLY             &&   // but allow {
                        tag != TOK_R_CURLY)                 // and allow }
                  {
-                   if (!tolerant)   // then complain
-                      {
-                        CERR << "Line " << line << endl
-                             << "Offending token: (tag > TC_MAX_PERM) "
-                             << tag << " " << tok << "\nStatement: ";
-                        input.print(CERR, /* details */ 0);
-                        CERR << endl;
-                      }
+                   CERR << "Line " << line << endl
+                        << "Offending token: (tag > TC_MAX_PERM) "
+                        << tag << " " << tok << "\nStatement: ";
+                   input.print(CERR, /* details */ 0);
+                   CERR << endl;
 
                    return E_SYNTAX_ERROR;
                  }
@@ -473,7 +467,7 @@ vector<conditional> conditionals;
             }
        }
 
-   // at this point, all conditionals should have been processed.
+   // at this point, all conditionals shoud have been processed.
    // If not, complain.
    //
    if (conditionals.size())
@@ -1505,7 +1499,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
 
    try
       {
-        fun->parse_body_line(Function_Line_0, data, false, false, loc, false);
+        fun->parse_body_line(Function_Line_0, data, false, loc, false);
       }
    catch (Error err)
       {
@@ -1523,6 +1517,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
       }
 
    // for ⍎ we do not append TOK_END, but only TOK_RETURN_EXEC.
+   //
    fun->body.push_back(Token(TOK_RETURN_EXEC));
    if (fun->compute_if_else_targets())
       {
@@ -1550,7 +1545,7 @@ StatementList * fun = new StatementList(data, loc);
 
    try
       {
-        fun->parse_body_line(Function_Line_0, data, false, false, loc, false);
+        fun->parse_body_line(Function_Line_0, data, false, loc, false);
         fun->setup_lambdas();
       }
    catch (Error & e)
@@ -1610,6 +1605,8 @@ StatementList * fun = new StatementList(data, loc);
          Assert(found_marker);
        }
 
+   // for ◊ we do not append TOK_END, but only TOK_RETURN_STATS.
+   //
    fun->body.push_back(Token(TOK_RETURN_STATS));
    if (fun->compute_if_else_targets())
       {

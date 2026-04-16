@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public:
 
    /// do ⎕FX with execution properties \b exec_props
    static Token do_quad_FX(const int * exec_props, const Value * B,
-                           const UTF8_string & creator, bool tolerant);
+                           const UTF8_string & creator);
 
    /// implementation of eval_AB()
    static Token do_eval_AB(const Value * A, const Value * B);
@@ -63,7 +63,7 @@ public:
 protected:
    /// do ⎕FX with execution properties \b exec_props
    static Token do_quad_FX(const int * exec_props, const UCS_string & text,
-                           const UTF8_string & creator, bool tolerant);
+                           const UTF8_string & creator);
 
    /// ⎕FX with native function and optional library reference
    static Value_P do_native_FX(const Value * A, sAxis axis, const Value * B);

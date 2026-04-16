@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -238,12 +238,11 @@ protected:
 
    /// parse the body line number \b line of \b this function
    ErrorCode parse_body_line(Function_Line line, const UCS_string & ucs,
-                             bool trace, bool tolerant, const char * loc,
-                             bool macro);
+                             bool trace, const char * loc, bool macro);
 
    /// parse the body line number \b line of \b this function
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
-                             bool trace, bool tolerant, const char * loc);
+                             bool trace, const char * loc);
 
    /// the mode \b this Executable
    const ParseMode pmode;
@@ -293,7 +292,8 @@ class StatementList : public Executable
 
 public:
    /// compute body token from text \b data
-   static StatementList * fix(const UCS_string & data, Value_P suffix, const char * loc);
+   static StatementList * fix(const UCS_string & data, Value_P suffix,
+                              const char * loc);
 
 protected:
    /// constructor

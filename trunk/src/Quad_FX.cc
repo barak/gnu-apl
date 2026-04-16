@@ -41,7 +41,7 @@ Quad_FX::do_eval_B(const Value * B)
    // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
    //
 static const int default_eprops[] = { 0, 0, 0, 0 };
-   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"), false);
+   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"));
 }
 //----------------------------------------------------------------------------
 Token
@@ -104,7 +104,7 @@ UTF8_string creator("⎕FX");
         default: LENGTH_ERROR;
       }
 
-   return do_quad_FX(eprops, B, creator, false);
+   return do_quad_FX(eprops, B, creator);
 }
 //----------------------------------------------------------------------------
 Token
@@ -122,7 +122,7 @@ const sAxis axis = Value::get_single_axis(X.get(), 10);
 //----------------------------------------------------------------------------
 Token
 Quad_FX::do_quad_FX(const int * exec_props, const Value * B,
-                    const UTF8_string & creator, bool tolerant)
+                    const UTF8_string & creator)
 {
    if (B->get_rank() > 2)   RANK_ERROR;
    if (B->get_rank() < 1)   RANK_ERROR;
@@ -232,16 +232,15 @@ const bool keep_indent = !UserPreferences::uprefs.discard_indentation;
            }
       }
 
-   return do_quad_FX(exec_props, text, creator, tolerant);
+   return do_quad_FX(exec_props, text, creator);
 }
 //----------------------------------------------------------------------------
 Token
 Quad_FX::do_quad_FX(const int * exec_props, const UCS_string & text,
-                    const UTF8_string & creator, bool tolerant)
+                    const UTF8_string & creator)
 {
 int error_line = 0;
-UserFunction * fun = UserFunction::fix(text, error_line, false, LOC,
-                                       creator, tolerant);
+UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator);
 
    if (fun == 0)   // UserFunction::fix() dailed
       {

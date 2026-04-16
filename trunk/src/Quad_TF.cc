@@ -630,7 +630,7 @@ Token_string tos;
 
 static const int eprops[] = { 0, 0, 0, 0 };
 const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
-                                      UTF8_string("2 ⎕TF"), true);
+                                      UTF8_string("2 ⎕TF"));
 
    if (tok.get_Class() != TC_VALUE)
       {

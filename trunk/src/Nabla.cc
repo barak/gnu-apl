@@ -187,12 +187,19 @@ char creator[APL_PATH_MAX+20];
    SPRINTF(creator, "%s:%d", InputFile::current_filename(), defn_line_no)
 const UTF8_string creator_utf8(creator);
 
-UserFunction * ufun = UserFunction::fix(fun_text, error_line,
-                                        /* keep_existing */ false,
-                                        LOC, creator_utf8,
-                                        /* tolerant */  true);
+UserFunction * ufun;
+   try
+      {
+        ufun = UserFunction::fix(fun_text, error_line,
+                                 /* keep_existing */ false,
+                                 LOC, creator_utf8);
+      }
+   catch (...)
+      {
+        ufun = 0;
+      }
 
-   if (ufun == 0)   // UserFunction::fix() failed
+   if (ufun == 0)
       {
         const UCS_string & MORE = Workspace::more_error();
         if (InputFile::running_script())

@@ -181,6 +181,9 @@ public:
    /// Return a pounter to this newly created function (or 0 on error).
    static UserFunction * load(const char * workspace, const char * function);
 
+   /// Load this function into the workspace named \b workspace.
+   static UserFunction * do_load(const char * workspace, const char * function);
+
    /// overloaded Function::destroy()
    virtual void destroy();
 
@@ -190,15 +193,11 @@ public:
    /// print help for this function on out (for the )HELP command)
    void help(ostream & out) const;
 
-   /// Load this function into the workspace named \b workspace.
-   static void load(const char * workspace, const char * function,
-                    UserFunction * & fun);
-
    /// create a user defined function according to \b data of length \b len
    /// in workspace \b w.
    static UserFunction * fix(const UCS_string & text, int & err_line,
                              bool keep_existing, const char * loc,
-                             const UTF8_string &  creator, bool tolerant);
+                             const UTF8_string &  creator);
 
    /// (re-)create a lambda
    static UserFunction * fix_lambda(Symbol & var, const UCS_string & text);
@@ -276,7 +275,7 @@ public:
    void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
 
    /// recompile the body
-   void parse_body(const char * loc, bool tolerant, bool macro);
+   void parse_body(const char * loc, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
    const std::vector<Function_Line> & get_stop_lines() const
@@ -306,7 +305,7 @@ public:
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
    UserFunction(const UCS_string txt, const char * loc,
-                const UTF8_string &  _creator, bool tolerant, bool macro);
+                const UTF8_string &  _creator, bool macro);
 
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }

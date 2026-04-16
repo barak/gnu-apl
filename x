@@ -1,0 +1,1 @@
+UserFunction::load(): return UserFunction*

@@ -43,8 +43,7 @@
 //----------------------------------------------------------------------------
 // constructor for a normal (non-lambda) define function
 UserFunction::UserFunction(const UCS_string txt, const char * loc,
-                           const UTF8_string & _creator, bool tolerant,
-                           bool macro)
+                           const UTF8_string & _creator, bool macro)
   : Function(ID_USER_SYMBOL, TOK_FUN2),
     Executable(txt, true, PM_FUNCTION, loc),
     header(txt, macro),
@@ -81,7 +80,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
    else if (header.B())    tag = TOK_FUN1;
    else                    tag = TOK_FUN0;
 
-   parse_body(loc, tolerant, macro);
+   parse_body(loc, macro);
    if (error_line > 0)
       {
         error_info = "Error in function body";
@@ -144,7 +143,7 @@ UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
    //
    header.reverse_local_vars();
 
-   parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
+   parse_body_line(Function_Line_0, lambda_body, false, LOC);
    setup_lambdas();
    line_starts.push_back(Function_PC(lambda_body.ssize() - 1));
    line_starts.push_back(Function_PC_0);
@@ -609,11 +608,11 @@ std::vector<bool> ts_lines;
            }
       }
 
-   parse_body(LOC, false, false);
+   parse_body(LOC, false);
 }
 //----------------------------------------------------------------------------
 void
-UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
+UserFunction::parse_body(const char * loc, bool macro)
 {
    header.clear_labels();
    line_starts.clear();
@@ -733,19 +732,8 @@ Lit_DB literals;
            }
 
         const UCS_string & line = get_text(l);
-        ErrorCode ec = E_SYNTAX_ERROR;
         try {
-              ec = parse_body_line(Function_Line(l), line, trace_line,
-                                   tolerant, loc, macro);
-
-              if (tolerant && ec != E_NO_ERROR)
-                 {
-                   UCS_string new_line(U"## ");
-                   new_line << line;
-                   text[l] = new_line;
-                   CERR << "WARNING: SYNTAX ERROR in function "
-                        << header.get_name() << endl;
-                 }
+              parse_body_line(Function_Line(l), line, trace_line, loc, macro);
             }
         catch(const Error & err)
             {
@@ -806,7 +794,7 @@ UserFunction * fun = 0;
 
    try
       {
-        load(workspace, function, fun);
+        fun = do_load(workspace, function);
       }
    catch (Error & err)
       {
@@ -1002,9 +990,8 @@ bool VOID_inserted = false;
    return VOID_inserted;
 }
 //----------------------------------------------------------------------------
-void
-UserFunction::load(const char * workspace, const char * function,
-                   UserFunction * & fun)
+UserFunction *
+UserFunction::do_load(const char * workspace, const char * function)
 {
 char filename[FILENAME_MAX + 1];
    SPRINTF(filename, "workspaces/%s/%s.fun", workspace, function);
@@ -1054,7 +1041,7 @@ UTF8_string utf(utf8P(start), len);
 
 UCS_string ucs(utf);
 int error_line = -1;
-   fun = fix(ucs, error_line, false, LOC, filename, false);
+   return fix(ucs, error_line, false, LOC, filename);
 }
 //----------------------------------------------------------------------------
 Function_PC
@@ -1069,7 +1056,7 @@ UserFunction::pc_for_line(Function_Line line) const
 UserFunction *
 UserFunction::fix(const UCS_string & text, int & err_line,
                   bool keep_existing, const char * loc,
-                  const UTF8_string & creator, bool tolerant)
+                  const UTF8_string & creator)
 {
    Log(LOG_UserFunction__fix)
       {
@@ -1078,7 +1065,7 @@ UserFunction::fix(const UCS_string & text, int & err_line,
       }
 
 UserFunction * ufun = new UserFunction(text, loc, creator,
-                                       tolerant, /* macro = */ false);
+                                       /* macro = */ false);
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 
@@ -1113,25 +1100,25 @@ const bool bad_function = info || err_line != -1;
       }
 
 const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
-cFunction_P old_function = symbol->get_function();
-   if (old_function && keep_existing)
-      {
-        Log(LOG_UserFunction__fix)
-           {
-             CERR << "not fixing '" << ufun->header.get_name()
-                  << "' (function already exists, and keep_existing set)"
-                  << endl;
-           }
-        err_line = 0;
-        delete ufun;
-        return 0;
-      }
 
-   // check that the function can be defined (e.g. is not on the )SI stack)
-   // and is not native
-   //
-   if (old_function)
+   if (cFunction_P old_function = symbol->get_function())
       {
+        if (keep_existing)
+           {
+             Log(LOG_UserFunction__fix)
+                {
+                  CERR << "not fixing '" << ufun->header.get_name()
+                       << "' (function already exists, "
+                          "and keep_existing is set)" << endl;
+                }
+             err_line = 0;
+             delete ufun;
+             return 0;
+           }
+
+        // check that the function can be defined (e.g. is not on the )SI stack)
+        // and is not native
+        //
         if (const char * reason = symbol->cant_be_defined())
            {
              Log(LOG_UserFunction__fix)
@@ -1172,10 +1159,9 @@ cFunction_P old_function = symbol->get_function();
    ufun->optimize_label_vectors();
    if (ufun->compute_if_else_targets())
       {
-        // must NOT: delete ufun;
-
-        if (tolerant)   return 0;   // caller checks result
-        DEFN_ERROR;
+        ufun->header.FUN()->set_NC(NC_UNUSED_USER_NAME, 0);
+        delete ufun;
+        return 0;
       }
 
    return ufun;
