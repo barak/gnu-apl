@@ -473,7 +473,7 @@ vector<conditional> conditionals;
             }
        }
 
-   // at this point, all conditionals shoud have been processed.
+   // at this point, all conditionals should have been processed.
    // If not, complain.
    //
    if (conditionals.size())

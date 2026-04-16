@@ -1507,7 +1507,15 @@ Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
 const LibRef_name lib_name(out, args, false);
    if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
 
-   Workspace::load_WS(out, CERR, lib_name, quad_lx, silent);
+   try
+      {
+        Workspace::load_WS(out, CERR, lib_name, quad_lx, silent);
+      }
+   catch (...)
+      {
+        MORE_ERROR() << "Loading workspace '" << lib_name.get_libref()
+                     << " " << lib_name.get_name() << "' failed.";
+      }
 }
 //----------------------------------------------------------------------------
 void
