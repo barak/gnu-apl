@@ -73,7 +73,7 @@ protected:
       {
         ASX_MAJOR =  1,   ///< ++ if incompatible XML file format change
         ASX_MINOR = 11,  ///< ++ if backward compatible XML file format change
-        ASX_OTHER =  4,   ///< ++ if no XML file format change (code cleanup)
+        ASX_OTHER =  5,   ///< ++ if no XML file format change (code cleanup)
       };
 
    /// where to send information messages (such as "SAVED...")
@@ -177,11 +177,16 @@ public:
                              const void *)
             { return A._val > B._val; }
 
-         /// compare function for binary searches
+         /// compare function for binary searches.
          static int compare(const Value * const & key,
                             const _val_par & B, const void *)
             {
-               return int64_t(key) - int64_t(B._val);
+              /* CAUTION: Cannot use int64_t(key) - int64_t(B._val) here
+                 because it would ignore the upper 32_bits of the difference.
+               */
+              if (key < B._val)   return -2;   // key is smaller
+              if (key > B._val)   return +2;   // key is larger
+              return 0;                        // same (key found)
             }
       };
 
