@@ -548,8 +548,7 @@ Symbol::cant_be_defined() const
         return cc;
       }
 
-   if (value_stack.back().get_NC() &
-        (NC_UNUSED_USER_NAME | NC_FUNCTION | NC_OPERATOR))   return 0;   // OK
+   if (value_stack.back().get_NC() & NC_DEFINABLE)   return 0;   // OK
 
    return "bad name class";
 }

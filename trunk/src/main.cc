@@ -634,6 +634,15 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 int
 main(int argc, const char *argv[])
 {
+#if MINGW_SRC
+   // Tell the Windows console to interpret our output bytes as UTF-8.
+   // The source file is saved as UTF-8, therefore e.g. the character literals
+   // "∇" is emitted as the byte sequence E2 88 87 by the compiler;
+   // CP_UTF8 makes cmd.exe render it correctly (given a Unicode-capable font).
+   //
+   SetConsoleOutputCP(CP_UTF8);
+#endif
+
 std::vector<const char *> args(argc);
    loop(a, argc)   args[a] = argv[a];
    if (const int ret = init_apl(args))   return ret;

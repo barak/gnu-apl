@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1647,13 +1647,22 @@ char buffer[BUFSIZE + 1];
            if (s == 0)   break;
            buffer[BUFSIZE] = 0;   // to secure strlen()
            size_t len = strlen(buffer);
-           if (buffer[len - 1] == '\n')   buffer[--len] = 0;   // trailing \n
-           if (buffer[len - 1] == '\r')   buffer[--len] = 0;   // trailing \r
-           if (len == 0)   continue;
+           if (len && buffer[len - 1] == '\n')   // discard trailing \n
+              buffer[--len] = 0;
+
+           if (len && buffer[len - 1] == '\r')   // discard trailing \r
+              buffer[--len] = 0;
+
+           if (len == 0)   continue;   // if nothing left
+
            // COUT << "──── " << buffer << " ────" << endl;
-           const UTF8_string buffer_utf(buffer);
-           const UCS_string buffer_ucs(buffer_utf);
-           result.push_back(buffer_ucs);
+           try   // proposed by Claude Code
+              {
+                const UTF8_string buffer_utf(buffer);
+                const UCS_string buffer_ucs(buffer_utf);
+                result.push_back(buffer_ucs);
+              }
+           catch (...) { }
        }
 
    // pclose() returns ECHILD even if the script runs successfully.

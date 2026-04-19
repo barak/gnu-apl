@@ -7,7 +7,7 @@
 # (1) sub-directory gnu-apl.d of the system configuration directory, and/or
 # (2) sub-directory .config/gnu-apl/ in the user's home directory.
 #
-# In both cases the file name shall be be 'preferences'.
+# In both cases the file name shall be 'preferences'.
 #
 # The system configuration directory is usually /etc or /usr/local/etc
 # It can be overridden by  ./configure --sysconfdir=something-else

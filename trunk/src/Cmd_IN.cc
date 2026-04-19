@@ -48,12 +48,10 @@ const UTF8_string filename = LibPaths::get_filename(lib_name, true, ".atf", 0);
 FILE * in = fopen(filename.c_str(), "r");
    if (in == 0)   // open failed: try filename.atf unless already .atf
       {
-        const UTF8_string fname_utf8(fname);
-        CERR << ")IN " << fname_utf8
-             << " failed: " << strerror(errno) << endl;
+        CERR << ")IN " << fname << " failed: " << strerror(errno) << endl;
 
         MORE_ERROR() << "command )IN: could not open file "
-                     << fname_utf8.c_str() << " for reading: "
+                     << fname << " for reading: "
                      << strerror(errno);
         return;
       }

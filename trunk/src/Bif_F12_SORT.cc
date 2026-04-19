@@ -134,7 +134,7 @@ const sRank rank = cache.get_rank();
          if (const int diff = a.compare_axis(b, r))   return diff < 0;
        }
 
-   return significance_a > significance_b;
+   return significance_a < significance_b;
 }
 //----------------------------------------------------------------------------
 ShapeItem

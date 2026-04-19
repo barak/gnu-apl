@@ -67,7 +67,7 @@ protected:
 };
 //----------------------------------------------------------------------------
 /** The system function ⎕AT (Attributes) */
-/// The class implementing ⎕AI
+/// The class implementing ⎕AT
 class Quad_AT : public QuadFunction
 {
 public:

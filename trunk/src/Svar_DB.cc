@@ -225,17 +225,39 @@ char peer[100];
    loop(retry, retry_max)
        {
 #if HAVE_SYS_UN_H
+
+        /* An absract socket address starts with a 0-byte followed by a name,
+           see man 7 unix. The socket name given to ./configure has no leading
+           0 and we insert it here in case the socket is abstract.
+
+           The memset() below clears the entire address (and in particular
+           the first byte, thus making the socket abstract).
+
+           The strncpy() below truncates too long names (which make little
+           sense here).
+         */
         if (server_sockname)
            {
              SockAddr remote;
+             const int max_path_len = sizeof(remote.uNix.sun_path)
+                                             - ABSTRACT_OFFSET;
+             if (strlen(server_sockname) > max_path_len - 1)
+                {
+                  get_CERR() << "*** WARNING: the ./configure'd APserver "
+                              "socket name:\n    '" << server_sockname
+                             << "' is too long and may be truncated." << endl;
+                }
+
              memset(&remote, 0, sizeof(SockAddr));
              remote.uNix.sun_family = AF_UNIX;
-             strcpy(remote.uNix.sun_path + ABSTRACT_OFFSET, server_sockname);
+             strncpy(remote.uNix.sun_path + ABSTRACT_OFFSET,
+                     server_sockname, max_path_len);
+              remote.uNix.sun_path[sizeof(remote.uNix.sun_path) - 1 ] = 0;
 
              if (::connect(sock, &remote.addr, sizeof(sockaddr_un)) == 0)
                 break;   // success
            }
-        else   // TCP
+        else   // TCP transport
 #endif
            {
              SockAddr remote;

@@ -36,7 +36,8 @@ class Quad_MX : public QuadFunction
   typedef std::complex<double> Dcomplex;
 
 public:
-   /// Constructor. Sorts \b sub_function_infos by name (as needed by bsearch()).
+   /// Constructor. Sorts \b sub_function_infos by name (as needed for binary
+   /// searches).
   Quad_MX();
 
   enum MX_ops

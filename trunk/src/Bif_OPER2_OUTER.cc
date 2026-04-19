@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,15 +52,18 @@ Bif_JOT::eval_AB(Value_P A, Value_P B) const
        {
          if (!A->get_cravel(a).is_numeric())
             {
-              MORE_ERROR() << "A∘B: non-numeric item in matrix A";
+              MORE_ERROR() << "A∘B: non-numeric item in A";
               DOMAIN_ERROR;
             }
        }
 
    loop(b, B->nz_element_count())
        {
-              MORE_ERROR() << "A∘B: non-numeric item in matrix B";
-         if (!B->get_cravel(b).is_numeric())   DOMAIN_ERROR;
+         if (!B->get_cravel(b).is_numeric())
+            {
+              MORE_ERROR() << "A∘B: non-numeric item in B";
+              DOMAIN_ERROR;
+            }
        }
 
 ShapeItem rows_A = A->get_rows();

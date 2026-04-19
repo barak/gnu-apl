@@ -324,6 +324,12 @@ protected:
    const char * get_error_info() const
       { return error_info; }
 
+   void bind_to_symbol() const
+      {
+        if (header.LO())   header.FUN()->set_NC(NC_OPERATOR, this);
+        else               header.FUN()->set_NC(NC_FUNCTION, this);
+      }
+
    /// helper function to print token with Function or Value content
    static ostream & print_val_or_fun(ostream & out, Token & tok);
 

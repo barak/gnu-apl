@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-March 27, 2026.  This manual briefly documents GNU APL, an interpreter
+April 19, 2026.  This manual briefly documents GNU APL, an interpreter
 for APL as described in ISO standard 13751, aka.  "Programming Language
 APL, Extended".
 
@@ -7343,7 +7343,7 @@ While the primitive ?  keeps its state in ⎕RL, i.e.  in the workspace,
 Instead, the user needs to store the state of i⎕RVAL in a workspace
 variable if the workspace shall be stored and continued at a later
 point.  This rarely happens, therefore no effort was spent on
-implementing another system variable.  For the same reasonxi does, the
+implementing another system variable.  For the same reason does the
 state of ⎕RVAL survive )CLEAR.
 
    The current state of ⎕RVAL’s random number generator can be retrieved
@@ -11777,83 +11777,83 @@ Node: ⎕RVAL - Random APL value309141
 Node: General310129
 Node: Dyadic ⎕RVAL311074
 Node: Control of the underlying random number generator: 0 ⎕RVAL B312017
-Node: Control of the ranks: 1 ⎕RVAL B313381
-Node: Control of the shapes: 2 ⎕RVAL B315081
-Node: Control of the data types: 3 ⎕RVAL B316578
-Node: Control of a maximum depth: 4 ⎕RVAL B318409
-Node: monadic ⎕RVAL B319223
-Node: Syntax Alternatives321189
-Node: ⎕SI - State Indicator321845
-Node: ⎕SQL - SQL Database Interface324093
-Node: ⎕SQL[0] ⍬ : display sub-function numbers325192
-Node: ⎕SQL[0] '' : display sub-function names327103
-Node: ref ← A ⎕SQL[1] B : open database329885
-Node: ⎕SQL[2] B : close database330945
-Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331502
-Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332485
-Node: ⎕SQL[5] B : start transaction333059
-Node: ⎕SQL[6] B : commit transaction333386
-Node: ⎕SQL[7] B : rollback transaction333697
-Node: Z←⎕SQL[8] B : table names334024
-Node: Z←⎕SQL[9] B : column names334354
-Node: Z ← ⎕SQL[10] B : library version number334872
-Node: Z ← ⎕SQL[11] B : library version string335468
-Node: SQLite Quickstart336034
-Node: Deleting a Database337976
-Node: Creating a new Database339386
-Node: Creating a Database Table341135
-Node: Excursus: Dynamic Query Strings344491
-Node: Writing an APL matrix into a Database Table347438
-Node: Reading a Database Table into an APL Matrix349839
-Node: Updating a Database Table351610
-Node: Deleting Rows From a Database Table354239
-Node: ⎕SYL - System limits355011
-Node: ⎕SYL[1 2 3 4 5 6;]357427
-Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]358822
-Node: ⎕SYL[24 25 26;]359306
-Node: ⎕SYL[27;]359618
-Node: ⎕XML - XML Parsing360301
-Node: Purpose360635
-Node: Some XML Terminology362211
-Node: How ⎕XML maps XML documents to APL Values365659
-Node: Monadic ⎕XML372322
-Node: Dyadic ⎕XML373135
-Node: XML Queries381428
-Node: Conditionals382298
-Node: Design considerations.382728
-Node: Syntax390126
-Node: A Possible Pitfall393279
-Node: Matrix Product397536
-Node: Monadic ≠ (Nub Sieve)400839
-Node: Limitations and Missing Features401387
-Node: System Limits401822
-Node: Shared Variables403124
-Node: Internationalization404206
-Node: Vector Notation405387
-Node: History405982
-Node: Standardization406720
-Node: Quotes from the lrm407227
-Node: Some APL2 Tests409386
-Node: Test 1: Binding strength of []409801
-Node: Test 2: Binding strength of the left operand410639
-Node: Definitions415418
-Node: Unexpected Stranding418443
-Node: GNU APL Vector Notation427209
-Node: GNU APL Project Structure433197
-Node: The sub-directory src434725
-Node: The sub-directory support-files436097
-Node: The sub-directory doc436516
-Node: The sub-directory HOWTOs436820
-Node: The sub-directories workspaces and wslib2 ... wslib5437565
-Node: The sub-directory m4438125
-Node: The sub-directories debian and debian_tmp438997
-Node: The sub-directory tools439494
-Node: Libraries Contributed by GNU APL Users439957
-Node: The GNU APL Community Webpage440434
-Node: Core Libraries441171
-Node: Licenses for this GNU APL Manual and for GNU APL442052
-Node: The GNU Free Documentation License442597
-Node: The GNU GENERAL PUBLIC LICENSE467991
+Node: Control of the ranks: 1 ⎕RVAL B313378
+Node: Control of the shapes: 2 ⎕RVAL B315078
+Node: Control of the data types: 3 ⎕RVAL B316575
+Node: Control of a maximum depth: 4 ⎕RVAL B318406
+Node: monadic ⎕RVAL B319220
+Node: Syntax Alternatives321186
+Node: ⎕SI - State Indicator321842
+Node: ⎕SQL - SQL Database Interface324090
+Node: ⎕SQL[0] ⍬ : display sub-function numbers325189
+Node: ⎕SQL[0] '' : display sub-function names327100
+Node: ref ← A ⎕SQL[1] B : open database329882
+Node: ⎕SQL[2] B : close database330942
+Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331499
+Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332482
+Node: ⎕SQL[5] B : start transaction333056
+Node: ⎕SQL[6] B : commit transaction333383
+Node: ⎕SQL[7] B : rollback transaction333694
+Node: Z←⎕SQL[8] B : table names334021
+Node: Z←⎕SQL[9] B : column names334351
+Node: Z ← ⎕SQL[10] B : library version number334869
+Node: Z ← ⎕SQL[11] B : library version string335465
+Node: SQLite Quickstart336031
+Node: Deleting a Database337973
+Node: Creating a new Database339383
+Node: Creating a Database Table341132
+Node: Excursus: Dynamic Query Strings344488
+Node: Writing an APL matrix into a Database Table347435
+Node: Reading a Database Table into an APL Matrix349836
+Node: Updating a Database Table351607
+Node: Deleting Rows From a Database Table354236
+Node: ⎕SYL - System limits355008
+Node: ⎕SYL[1 2 3 4 5 6;]357424
+Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]358819
+Node: ⎕SYL[24 25 26;]359303
+Node: ⎕SYL[27;]359615
+Node: ⎕XML - XML Parsing360298
+Node: Purpose360632
+Node: Some XML Terminology362208
+Node: How ⎕XML maps XML documents to APL Values365656
+Node: Monadic ⎕XML372319
+Node: Dyadic ⎕XML373132
+Node: XML Queries381425
+Node: Conditionals382295
+Node: Design considerations.382725
+Node: Syntax390123
+Node: A Possible Pitfall393276
+Node: Matrix Product397533
+Node: Monadic ≠ (Nub Sieve)400836
+Node: Limitations and Missing Features401384
+Node: System Limits401819
+Node: Shared Variables403121
+Node: Internationalization404203
+Node: Vector Notation405384
+Node: History405979
+Node: Standardization406717
+Node: Quotes from the lrm407224
+Node: Some APL2 Tests409383
+Node: Test 1: Binding strength of []409798
+Node: Test 2: Binding strength of the left operand410636
+Node: Definitions415415
+Node: Unexpected Stranding418440
+Node: GNU APL Vector Notation427206
+Node: GNU APL Project Structure433194
+Node: The sub-directory src434722
+Node: The sub-directory support-files436094
+Node: The sub-directory doc436513
+Node: The sub-directory HOWTOs436817
+Node: The sub-directories workspaces and wslib2 ... wslib5437562
+Node: The sub-directory m4438122
+Node: The sub-directories debian and debian_tmp438994
+Node: The sub-directory tools439491
+Node: Libraries Contributed by GNU APL Users439954
+Node: The GNU APL Community Webpage440431
+Node: Core Libraries441168
+Node: Licenses for this GNU APL Manual and for GNU APL442049
+Node: The GNU Free Documentation License442594
+Node: The GNU GENERAL PUBLIC LICENSE467988
 
 End Tag Table
 

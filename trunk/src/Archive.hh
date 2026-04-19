@@ -177,7 +177,7 @@ public:
                              const void *)
             { return A._val > B._val; }
 
-         /// compare function for bsearch()
+         /// compare function for binary searches
          static int compare(const Value * const & key,
                             const _val_par & B, const void *)
             {

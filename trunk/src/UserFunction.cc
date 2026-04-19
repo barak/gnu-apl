@@ -1010,16 +1010,20 @@ int fd = open(filename, O_RDONLY);
         throw_apl_error(E_WS_OPEN, LOC);
       }
 
-struct stat st;
-   if (fstat(fd, &st) == -1)
-      {
-        CERR << "Can't fstat() workspace file '" 
-             << filename << "': " << strerror(errno) << endl;
-        close(fd);
-        throw_apl_error(E_WS_FSTAT, LOC);
-      }
+off_t len = 0;
+   {
+     struct stat st;
+     if (fstat(fd, &st) == -1)
+        {
+          CERR << "Can't fstat() workspace file '" 
+               << filename << "': " << strerror(errno) << endl;
+          close(fd);
+          throw_apl_error(E_WS_FSTAT, LOC);
+        }
+    
+       len = st.st_size;
+   }
 
-off_t len = st.st_size;
 const UTF8 * start = Sys::mmap(fd, len);
    if (start == 0)
       {
@@ -1036,10 +1040,10 @@ UTF8_string utf(utf8P(start), len);
    while (utf.size() &&
           (utf.back() == '\r' || utf.back() == '\n'))   utf.pop_back();
 
-   Sys::munmap(start, st.st_size);
+   Sys::munmap(start, len);
    close(fd);
 
-UCS_string ucs(utf);
+const UCS_string ucs(utf);
 int error_line = -1;
    return fix(ucs, error_line, false, LOC, filename);
 }
@@ -1116,8 +1120,8 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
              return 0;
            }
 
-        // check that the function can be defined (e.g. is not on the )SI stack)
-        // and is not native
+        // check that the function is allowed to be defined,
+        // E.g. it is not on the )SI stack and is not native
         //
         if (const char * reason = symbol->cant_be_defined())
            {
@@ -1126,6 +1130,7 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
                   CERR << "not fixing '" << ufun->header.get_name()
                        << "' (function already exists, and " << reason << endl;
                 }
+
              err_line = 0;
              delete ufun;
              return 0;
@@ -1143,7 +1148,15 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
         delete old_ufun;
       }
 
-   // bind function to symbol
+   ufun->optimize_labels();
+   ufun->optimize_label_vectors();
+   if (ufun->compute_if_else_targets())
+      {
+        delete ufun;
+        return 0;
+      }
+
+   // finally: bind function to symbol
    //
    if (ufun->header.LO())   ufun->header.FUN()->set_NC(NC_OPERATOR, ufun);
    else                     ufun->header.FUN()->set_NC(NC_FUNCTION, ufun);
@@ -1153,15 +1166,6 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
         CERR << " addr " << voidP(ufun) << endl;
         ufun->print(CERR);
         CERR <<  "------------------- UserFunction::fix() OK --" << endl;
-      }
-
-   ufun->optimize_labels();
-   ufun->optimize_label_vectors();
-   if (ufun->compute_if_else_targets())
-      {
-        ufun->header.FUN()->set_NC(NC_UNUSED_USER_NAME, 0);
-        delete ufun;
-        return 0;
       }
 
    return ufun;

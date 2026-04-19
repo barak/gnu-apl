@@ -36,6 +36,8 @@ class Value;
 /// The possible values returned by \b ⎕NC.
 enum NameClass
 {
+  // NC atoms...
+  //
   NC_INVALID          =  0x0100,   ///< invalid name class.
   NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
   NC_LABEL            =  0x0401,   ///< Label.
@@ -47,15 +49,18 @@ enum NameClass
   NC_case_mask        =  0x00FF,   ///< almost ⎕NC
   NC_bool_mask        =  0xFF00,   ///< for fast selection
 
-  /// name of a function or operator
-  NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
+  // NC class bitmaps...
 
-   // NC class bitmaps...
+  /// name of a function or operator
+  NC_FUN_OPER         = NC_bool_mask & (NC_FUNCTION | NC_OPERATOR),
+
+  /// name that can become a defined function
+  NC_DEFINABLE        = NC_bool_mask & (NC_UNUSED_USER_NAME | NC_FUN_OPER),
 
   /// name allowed left of ←
   NC_left             = (NC_VARIABLE         |
-                         NC_UNUSED_USER_NAME |
                          NC_SYSTEM_VAR       |
+                         NC_UNUSED_USER_NAME |
                          NC_INVALID          //  ⎕, ⍞, ⎕xx
                         ) & NC_bool_mask,
 

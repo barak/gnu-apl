@@ -341,7 +341,7 @@ int bad_lines  = 0;
 
          buffer[BUFSIZE] = 0;
          ssize_t len = strlen(buffer);
-         if (buffer[len - 1] == '\n')   buffer[--len] = 0;
+         if (len && buffer[len - 1] == '\n')   buffer[--len] = 0;
          if (parse_xmodmap_line(buffer, line))   ++bad_lines;
          else                                    ++good_lines;
        }

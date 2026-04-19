@@ -7345,7 +7345,7 @@ While the primitive @b{?} keeps its state in @b{⎕RL}, i.e. in the workspace,
 Instead, the user needs to store the state of i@b{⎕RVAL} in a workspace
 variable if the workspace shall be stored and continued at a later point.
 This rarely happens, therefore no effort was spent on implementing another
-system variable. For the same reasonxi does, the state of @b{⎕RVAL}
+system variable. For the same reason does the state of @b{⎕RVAL}
 survive @b{)CLEAR}.
 
 The current state of @b{⎕RVAL}'s random number generator can be retrieved

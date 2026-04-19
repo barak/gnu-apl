@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -742,11 +742,11 @@ public:
        the callee, and
    1c. Values may be cloned without need.
 
-   2. the new scheme (with # define NEW_CLONE) clones Values late, so that
-   2a. Different PointerCells (of the same or even of different
-       Values) may point to the same Sub-Value, and
-   2b. Arguments of defined functions are different in the caller and in
-       the callee are the same as long as they are not modified, and
+   2. the new scheme (with #define NEW_CLONE) clones Values late, so that:
+   2a. Different PointerCells (of the same or even of different Values)
+       may point to the same Sub-Value, and
+   2b. Arguments of defined functions remain the same as long as they are
+       not modified (aka. COW (Copy On Write)), and
    2c. A Value is only cloned before it is being modified and only if it
        has more than one owner.
 

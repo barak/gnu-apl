@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -115,12 +115,12 @@ const APL_Float val_up_i = ceil(val_i);
 
 double z_r;
    if (val_r < (val_dn_r + max_diff_r))        z_r = val_dn_r;
-   else if (val_r < (val_up_r - max_diff_r))   z_r = val_up_r;
+   else if (val_r > (val_up_r - max_diff_r))   z_r = val_up_r;
    else                                        return E_DOMAIN_ERROR;
 
 double z_i;
    if (val_i < (val_dn_i + max_diff_i))        z_i = val_dn_i;
-   else if (val_i < (val_up_i - max_diff_i))   z_i = val_up_i;
+   else if (val_i > (val_up_i - max_diff_i))   z_i = val_up_i;
    else                                        return E_DOMAIN_ERROR;
 
    return ComplexCell::zC(Z, z_r, z_i);

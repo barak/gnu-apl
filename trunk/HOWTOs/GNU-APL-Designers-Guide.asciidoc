@@ -4160,7 +4160,7 @@ of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
 implemented the most important parallel algorithms performed by the workers.
 The implementation languages were C on the master and Assembler on the workers.
 
-These results were also submitted to the 2.00 APL conference in Copenhagen,
+These results were also submitted to the 1990 APL conference in Copenhagen,
 Denmark. Without any feedback. The author therefore pursued a career in
 the telecommunications industry.
 

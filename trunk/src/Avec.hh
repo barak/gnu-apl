@@ -199,7 +199,7 @@ protected:
    /// char_uni()) are in this table.
    static const Character_definition character_table[MAX_AV];
 
-   /// Unicode_to_IBM_codepoint table sorted by Unicode (for bsearch())
+   /// Unicode_to_IBM_codepoint table sorted by Unicode (for inary searches)
    static Unicode_to_IBM_codepoint inverse_ibm_av[];
 
    /// print an error position on cerr, and then Assert(0);

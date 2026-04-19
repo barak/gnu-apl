@@ -134,10 +134,15 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
       {
         logit && CERR << "initializing paths from  $PWD = " << PWD << endl;
         const int PWD_len = strlen(PWD);
-        if (!strncmp(PWD, APL_bin_path, PWD_len) && PWD_len > 1)
+        const int bin_len = strlen(APL_bin_path);
+        const char s0 = APL_bin_path[PWD_len];   // first char of suffix
+        if (!strncmp(PWD, APL_bin_path, PWD_len) && (s0 == '/' || s0 == 0))
            {
-             strcpy(APL_bin_path + 1, APL_bin_path + PWD_len);
-             APL_bin_path[0] = '.';
+             const char * src = APL_bin_path + PWD_len;
+             char * dest = APL_bin_path;
+             *dest++ = '.';
+             memmove(dest, src, bin_len);
+             dest[bin_len] = 0;
            }
       }
    else
