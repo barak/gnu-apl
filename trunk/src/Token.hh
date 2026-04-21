@@ -267,7 +267,7 @@ public:
                id == ID_OPER1_REDUCE1 || id == ID_OPER1_SCAN1;
       }
 
-   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   /// return \b true iff \b this token is ⍴, /, or ⌿
    bool is_RHO_or_SLASH() const
       {
         const Id id = get_Id();   // use Id, not tag (which may change) !!!
