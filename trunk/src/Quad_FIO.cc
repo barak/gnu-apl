@@ -2035,7 +2035,9 @@ NOT_MINGW(
 
                 if (B->element_count() >= 3)
                    {
-                      Value_P vex = B->get_cravel(2).get_pointer_value();
+                      const Cell & b2 = B->get_cravel(2);
+                      if (!b2.is_pointer_cell())   DOMAIN_ERROR;
+                      Value_P vex = b2.get_pointer_value();
                       loop(l, vex->element_count())
                           {
                             const int fd(vex->get_cravel(l).get_int_value());
@@ -2049,7 +2051,9 @@ NOT_MINGW(
 
                 if (B->element_count() >= 2)
                    {
-                      Value_P vwr = B->get_cravel(1).get_pointer_value();
+                      const Cell & b1 = B->get_cravel(1);
+                      if (!b1.is_pointer_cell())   DOMAIN_ERROR;
+                      Value_P vwr = b1.get_pointer_value();
                       loop(l, vwr->element_count())
                           {
                             const APL_Integer fd =
@@ -2064,7 +2068,9 @@ NOT_MINGW(
 
                 if (B->element_count() >= 1)
                    {
-                      Value_P vrd = B->get_cfirst().get_pointer_value();
+                      const Cell & b0 = B->get_cfirst();
+                      if (!b0.is_pointer_cell())   DOMAIN_ERROR;
+                      Value_P vrd = b0.get_pointer_value();
                       loop(l, vrd->element_count())
                           {
                             const APL_Integer fd =

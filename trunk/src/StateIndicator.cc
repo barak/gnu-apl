@@ -108,13 +108,16 @@ StateIndicator::retry(const char * loc)
 bool
 StateIndicator::uses_function(const UserFunction * ufun) const
 {
-const Executable * uexec = ufun;
+const Executable * const uexec = ufun;   // cast ufun to uexec
 
    for (const StateIndicator * si = this; si; si = si->get_parent())
        {
+         const Executable * exec = si->get_executable();
+         Assert1(exec);
+
          // case 1: ufun is the currently executing function
          //
-         if (uexec == si->get_executable())   return true;
+         if (exec == uexec)   return true;
 
          // case 2: ufun is used on the prefix parser stack
          //
@@ -124,16 +127,16 @@ const Executable * uexec = ufun;
          // )SAVE since the symbol is already resolved and points to the old
          // function.
          //
-         uexec = si->get_executable();
-         Assert(uexec);
-         const Token_string & body = uexec->get_body();
+         const Token_string & body = exec->get_body();
          loop(b, body.size())
              {
                const Token & tok = body[b];
                if (tok.get_tag() != TOK_SYMBOL)   continue;
 
-               if (ufun->get_name().compare(tok.get_sym_ptr()->get_name())
-                   == COMP_EQ)   return true;
+               if (ufun->get_name() == tok.get_sym_ptr()->get_name())
+                  {
+                    return true;
+                  }
              }
        }
    return false;
@@ -489,7 +492,8 @@ std::vector<const StateIndicator *> stack;
          if (0 == --from_tos)   return si->get_level();
        }
 
-   FIXME;   // mot reached
+   MORE_ERROR() << "Invalid ⎕STACK index";
+   INDEX_ERROR;
 }
 //----------------------------------------------------------------------------
 Function_Line

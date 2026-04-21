@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -2059,7 +2059,7 @@ const bool member_assign = prefix_len == 4;   // assume member reference
 vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
-   while (PC < body.ssize() - 1)   // at least 2 more token
+   while (PC + 1 < body.ssize())   // at least 2 more token
          {
            if (body[PC].get_Class() == TC_SYMBOL)   // the normal case
               {
@@ -2116,6 +2116,12 @@ Symbol * top_sym = 0;
                  syntax_error(LOC);
               }
          }
+
+   if (top_sym == 0)
+      {
+        MORE_ERROR() << "member access: no top-level variable name";
+        syntax_error(LOC);
+      }
 
 Value_P top_val = top_sym->get_var_value();
    if (!top_val)   // top_sym is not a variable (-name). Maybe create one.
@@ -2574,10 +2580,16 @@ Token result = at1();
       {
         assign_state = idx.get_assign_state();
 
-        if (idx.is_axis())
+        if (idx.is_axis())   // [] or [ axis ]
            {
-             Token tok_axis(TOK_AXIS, idx.values[0]);
-             result.move_from(tok_axis, LOC);
+             Token I = at1();
+             Value_P X = idx.extract_axis();
+             Assert1(+X);   // not [ ]
+             Token tok_axis(TOK_AXIS, X);
+             I.move_from(tok_axis, LOC);
+             Log(LOG_delete)
+                CERR << "delete " << voidP(&idx) << " at " LOC << endl;
+             delete &idx;
            }
         else
            {
@@ -2724,16 +2736,19 @@ vector<Symbol *> symbols;
              // this case is rather rare, so we can afford a little time
              // to verify that we have at least one function in the supposed
              // selective specification
+             //
              bool selective_spec = false;
-             for (int pc = PC + 1;;)
+             for (int pc = PC + 1; pc < body.ssize();)
                  {
-                   const TokenClass tc1 = body[pc++].get_Class();
-                   if ((1 << tc1) & TCG_FUN12_OPER12)
+                   const Token tok = body[pc++];
+                   const TokenClass tc = tok.get_Class();
+                   if ((1 << tc) & TCG_FUN12_OPER12)
                       {
                         selective_spec = true;
                         break;
                       }
-                   else if (tc1 == TC_L_PARENT)   // most likely end of (...)←
+                   else if (tc == TC_L_PARENT ||   // most likely end of (...)←
+                            tc == TC_END)
                       {
                         break;   // so selective_spec remains false
                       }
@@ -3006,7 +3021,6 @@ const APL_Integer jump_offset = A0.get_near_int();
         if (PC >= body.ssize())           // PC at or past end of function
            {
              Assert(body[PC-1].get_tag() == TOK_ENDL);
-             Assert(body[PC].get_Class() == TC_RETURN);
              PC = Function_PC(body.ssize() -1);
            }
       }
@@ -3390,7 +3404,8 @@ const Token result = si.jump(line);   // may change the PC
    Assert(result.get_tag() == TOK_VOID);   // branch taken, i.e. →N in ∇-context
    branch_within_function(end_of_line);    // does set_action(RA_PUSH_NEXT)
 
-   set_action(RA_RETURN);            // return from context;
+   pop_args_push_result(result);   // proposed by Claude Code
+   set_action(RA_RETURN);          // return from context;
 }
 //----------------------------------------------------------------------------
 void

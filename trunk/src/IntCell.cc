@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -364,7 +364,7 @@ ErrorCode
 IntCell::bif_negative(Cell * Z) const
 {
    if (uint64_t(value.ival) == 0x8000000000000000LL)   // integer overflow
-      return IntCell::zI(Z, - value.ival);
+      return FloatCell::zF(Z, - APL_Float(value.ival));
    return  IntCell::zI(Z, - value.ival);
 }
 //----------------------------------------------------------------------------
@@ -508,7 +508,7 @@ IntCell::bif_subtract(Cell * Z, const Cell * A) const
         const APL_Integer z = a - b;
 
         if (diff_overflow(z, a, b))
-           return FloatCell::zF(Z, APL_Float(a) + APL_Float(b));
+           return FloatCell::zF(Z, APL_Float(a) - APL_Float(b));
         else
            return IntCell::zI(Z,z);
       }

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +98,8 @@ XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
                                        const char * filename)
   : XML_Archive(of, ef),
      indent(0),
-     char_mode(false)
+     char_mode(false),
+     save_success(false)
 {
    outf.open(filename, ofstream::out);
    if (!outf.is_open())   // open() failed
@@ -111,6 +112,7 @@ XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
    Log(LOG_archive)   err << "saving XML_Saving_Archive..." << endl;
    save();
    Log(LOG_archive)   err << "done XML_Saving_Archive." << endl;
+   save_success = true;
 }
 //----------------------------------------------------------------------------
 bool
@@ -246,6 +248,7 @@ int space = do_indent();
         }
 
         // print the data of the bytes attribute
+        //
         ++indent;
         outf << uhex << UNI_PAD_U9;   // emit the following bytes in hex
         if (space < byte_count)   outf << endl;
@@ -1006,7 +1009,7 @@ XML_Saving_Archive::save()
 
    ++indent;
 
-   Log(LOG_archive)   err << "save() saves function..." << endl;
+   Log(LOG_archive)   err << "save() saves functions..." << endl;
    save_functions();
 
    // collect all values to be saved. We mark the values to avoid
@@ -1983,7 +1986,7 @@ char **pend = reinterpret_cast<char **>(&end);
 
                    const int converted = end - cc;
                    if (converted == 0)   return input;   // nothing converted
-                   Z.next_ravel_Byte(byte);              // > 0 bytes converted
+                   Z.next_ravel_Byte(byte);         // > 0 bytes converted
                    if (converted == 1)   return input + 1;
                  }
 

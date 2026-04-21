@@ -408,7 +408,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized statement
        1294     Z 
- 1091043329   0   
+ 1091371009   0   
  1224933917   2   
  1224933917   2   
  1376651527     ⍴ 
@@ -418,7 +418,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
       1294
-1091043329
+1091371009
 1224933917
 1224933917
 1376651527
@@ -438,7 +438,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
  00 00 05 0E 
- 41 08 00 01 
+ 41 0D 00 01 
  49 03 02 1D 
  49 03 02 1D 
  52 0E 09 07 
@@ -448,7 +448,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex sigits)
 0000050E
-41080001
+410D0001
 4903021D
 4903021D
 520E0907
@@ -462,7 +462,7 @@ Z←2 2⍴5 6.6 7J8
 ⍝     │ │ │ │   │ │   │ │
       1 1 1 1 0 1 1 0 1 1 \ B32
 0000 05 0E
-4108 00 01
+410D 00 01
 4903 02 1D
 4903 02 1D
 520E 09 07
@@ -476,14 +476,14 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
       66830         Z 
- 1091043329         0 
+ 1091371009         0 
 
  1091503887   5   6.6 
               7J8 5   
 
       ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
      66830
-1091043329
+1091371009
 1091503887
 
       ⊢VALs←⍪0 1↓(⊃TOKs)           ⍝ the token values (if any)
@@ -495,12 +495,12 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
  00 01 05 0E 
- 41 08 00 01 
+ 41 0D 00 01 
  41 0F 07 0F 
 
       ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex digits)
 0001050E
-41080001
+410D0001
 410F070F
 
 ⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
@@ -509,7 +509,7 @@ Z←2 2⍴5 6.6 7J8
 ⍝     │ │ │ │   │ │   │ │
       1 1 1 1 0 1 1 0 1 1 \ B32
 0001 05 0E
-4108 00 01
+410D 00 01
 410F 07 0F
 
 
@@ -518,7 +518,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized statement
        1294     Z 
- 1091043329   0   
+ 1091371009   0   
  1224933917   2   
  1224933917   2   
  1376651527     ⍴ 
@@ -527,13 +527,13 @@ Z←2 2⍴5 6.6 7J8
  1124533277   7J8 
 
       ⊢TAGs←↑¨TOKs                ⍝ the token tags (decimal)
-1294 1091043329 1224933917 1224933917 1376651527 1224933917 1376191261
+1294 1091371009 1224933917 1224933917 1376651527 1224933917 1376191261
       1124533277
 
 
    ⍪44 ⎕CR TAGs
  TOK_SYMBOL(TC_SYMBOL, TV_SYM)    
- TOK_ASSIGN(TC_ASSIGN, TV_NONE)   
+ TOK_ASSIGN1(TC_ASSIGN, TV_NONE)  
  TOK_INTEGER(TC_LIT_ITEM, TV_INT) 
  TOK_INTEGER(TC_LIT_ITEM, TV_INT) 
  TOK_F12_RHO(TC_FUN12, TV_FUN)    
@@ -544,7 +544,7 @@ Z←2 2⍴5 6.6 7J8
 
    ⍪44 ⎕CR TOKs
  TOK_SYMBOL( Z )    
- TOK_ASSIGN( ← )    
+ TOK_ASSIGN1( ← )   
  TOK_INTEGER( 2 )   
  TOK_INTEGER( 2 )   
  TOK_F12_RHO( ⍴ )   
@@ -559,7 +559,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
       66830         Z 
- 1091043329         0 
+ 1091371009         0 
 
  1091503887   5   6.6 
               7J8 5   
@@ -567,15 +567,15 @@ Z←2 2⍴5 6.6 7J8
 
      ⍪44 ⎕CR TOKs
  TOK_LSYMB( Z )                    
- TOK_ASSIGN( ← )                   
+ TOK_ASSIGN1( ← )                  
  TOK_APL_VALUE4( 2 2⍴5 6.6 7J8 5 ) 
 
       ⊢TAGs←↑¨TOKs                 ⍝ the token tags (decimal)
-66830 1091043329 1091503887
+66830 1091371009 1091503887
 
          ⍪44 ⎕CR TAGs
  TOK_LSYMB(TC_SYMBOL, TV_SYM)     
- TOK_ASSIGN(TC_ASSIGN, TV_NONE)   
+ TOK_ASSIGN1(TC_ASSIGN, TV_NONE)  
  TOK_APL_VALUE4(TC_VALUE, TV_VAL) 
 
 

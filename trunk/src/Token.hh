@@ -259,7 +259,7 @@ public:
    bool is_function() const
       { return get_ValueType() == TV_FUN; }
 
-   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   /// return \b true iff \b this token is /, ⌿, \\, or ⍀
    bool is_SLASH_or_BACKSLASH() const
       {
         const Id id = get_Id();   // use Id, not tag (which may change) !!!

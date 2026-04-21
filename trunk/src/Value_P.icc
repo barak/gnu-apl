@@ -205,8 +205,9 @@ Value_P::operator =(const Value_P & other)
 
    if (value_p)   // override existing pointer
       {
+        const int other_count = other.value_p ? other.value_p->owner_count : 0;
         value_p->decrement_owner_count(LOC);   // give up our (co-)ownership
-        ADD_EVENT(value_p, VHE_PtrClr, other.value_p->owner_count, LOC);
+        ADD_EVENT(value_p, VHE_PtrClr, other_count, LOC);
       }
 
    value_p = other.value_p;

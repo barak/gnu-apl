@@ -698,7 +698,7 @@ const UTF8_string filename =
 
    if (the_workspace.SI_entry_count())
       {
-        CERR << "WARNING: )SAVEing a workspaces whose )SI stack is not clear."
+        CERR << "WARNING: )SAVEing a workspace whose )SI stack is not clear."
              << endl;
       }
 
@@ -712,17 +712,30 @@ const UTF8_string filename =
 
    // at this point it is OK to rename and save the workspace...
    //
-   the_workspace.WS_id = LibRef_name(the_workspace.WS_id.get_libref(),
-                                     lib_name.get_name());
-
    Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
 XML_Saving_Archive ar(out, CERR, filename.c_str());
 
    // print time and date to COUT
    //
-   get_v_Quad_TZ().print_timestamp(out, now());
-   if (name_from_WSID)   out << " " << the_workspace.WS_id.get_name();
-   out << endl;
+   if (ar.saved_OK())
+      {
+        the_workspace.WS_id = LibRef_name(the_workspace.WS_id.get_libref(),
+                                          lib_name.get_name());
+
+        get_v_Quad_TZ().print_timestamp(out, now());
+        if (name_from_WSID)   out << " " << the_workspace.WS_id.get_name();
+        out << endl;
+      }
+   else
+      {
+        COUT << "NOT SAVED" << endl;
+        if ((!name_from_WSID) &&
+            (lib_name.get_name() != the_workspace.WS_id.get_name()))
+           {
+             COUT << " ( and WSID not changed)";
+           }
+        COUT << "." << endl;
+      }
 }
 //----------------------------------------------------------------------------
 bool
@@ -799,8 +812,9 @@ FILE * file = fdopen(fd, "r");
       {
         if (filename == InputFile::files_todo[f].filename)   // same filename
            {
-             CERR << "*** )COPY " << filename
-                  << " would cause recursion (NOT COPIED)" << endl;
+             fclose(file);
+             CERR << "*** NOT COPIED. )COPY " << filename
+                  << " would cause an infinite recursion." << endl;
              return;
            }
       }
@@ -1049,9 +1063,9 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
            ++wsid_start;
         const char * wsid_end = filename.c_str() + filename.size();
 
-        // skip the .apl extension (if any)
+        // ignore the .apl extension (if any)
         //
-        if (wsid_end > (wsid_start - 4) &&   // long enough
+        if ((wsid_end  - wsid_start) <= 4 &&   // long enough
            !strcmp(wsid_end - 4, ".apl"))  wsid_end -= 4;
 
         const UTF8_string wsid_utf8(utf8P(wsid_start), wsid_end - wsid_start);

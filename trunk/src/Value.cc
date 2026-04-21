@@ -2913,7 +2913,7 @@ int count = 0;
         goon && (dob != &all_values); dob = dob->get_prev())
        {
          const Value & value = dob->rValue();
-         goon = (dob == dob->get_prev());
+         goon = (dob != dob->get_prev());
 
          if (value.owner_count)   continue;
 
@@ -3063,7 +3063,7 @@ IntCell * new_ravel = 0;
    catch (...)   { WS_FULL }
 
    loop(b, element_count())
-      if (bits[b >> 3] & 1 << (b & 7))   new_ravel[b].set_int_value(1);
+      if (bits[b >> 3] & (1 << (b & 7)))   new_ravel[b].set_int_value(1);
 
    delete [] bits;
    ravel = new_ravel;

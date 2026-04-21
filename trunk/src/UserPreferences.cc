@@ -327,9 +327,9 @@ const size_t len = read(fd, buf, sizeof(buf));
 bool
 UserPreferences::parse_args_0(const std::vector<const char *> & args)
 {
-   for (size_t a = 1; a < (args.size() - 1); ++a)
+   for (size_t a = 1; (a + 1) < args.size(); ++a)
        {
-         if (!strcmp(args[a], "-l") && atoi(args[a+1]) == LID_startup)
+         if (!strcmp(args[a], "-l") && strtol(args[a+1], 0, 10) == LID_startup)
             return true;
        }
 

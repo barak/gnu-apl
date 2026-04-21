@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -207,7 +207,16 @@ std::vector<Token_string *> statements;
 
                case TOK_R_CURLY:
                     if (curly_depth)   --curly_depth;
-                    else               return E_UNBALANCED_R_CURLY;
+                    else
+                       {
+                         delete stat;
+                         while (statements.size())
+                            {
+                              delete statements.back();
+                              statements.pop_back();
+                            }
+                         return E_UNBALANCED_R_CURLY;
+                       }
                     stat->push_back(tok);
                     break;
 
@@ -861,7 +870,7 @@ bool progress = false;
                            }
 
                         tos[t + 0] = SQL_query ? Quad_SQL_3::fun.get_token()
-                                               : Quad_SQL_3::fun.get_token();
+                                               : Quad_SQL_4::fun.get_token();
                         tos[t + 1] = Token(TOK_L_BRACK, int64_t(0));    // T1
                         tos[t + 2].move_from(tos[t + 3], LOC);          // T2
                         tos[t + 3] = Token(TOK_R_BRACK, int64_t(0));    // T3
@@ -1348,7 +1357,7 @@ Value_P
 Parser::parse_multi_literal(UCS_string_vector & text, Lit_DB & literals,
                             bool fun_header)
 {
-   // 0. replace multi-line strings in text and insert them into literals
+   // 0. replace multi-line strings in text and insert them into 'literals'
    //
    replace_multi_line_strings(text, literals, fun_header);
 
@@ -1385,6 +1394,13 @@ vector<Value_P>value_rows;   value_rows.reserve(100);
               //
               counters[counter_index] = 0;
               ++counter_index;
+              if (counter_index >= MAX_RANK)
+                 {
+                   MORE_ERROR() << "too many separator lines (i.e. empty "
+                                   "lines between data lines)\n"
+                                   "in multi-line literal";
+                   RANK_ERROR;
+                 }
               rank = max(rank, counter_index);
               ++counters[counter_index];
               continue;   // loop(l, text.size())

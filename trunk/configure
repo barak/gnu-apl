@@ -22755,7 +22755,7 @@ printf "%s\n" "$apl_TARGET_PYTHON" >&6; }
 ###############################################################################
 
 
-ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/Juergen-Mint-21/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
+ac_config_files="$ac_config_files Makefile build/Makefile Claude/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/Juergen-Mint-21/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
 
 
 # AM_CXXFLAGS: do/dont -Werror ?
@@ -24528,6 +24528,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "build/Makefile") CONFIG_FILES="$CONFIG_FILES build/Makefile" ;;
+    "Claude/Makefile") CONFIG_FILES="$CONFIG_FILES Claude/Makefile" ;;
     "debian/Makefile") CONFIG_FILES="$CONFIG_FILES debian/Makefile" ;;
     "debian/source/Makefile") CONFIG_FILES="$CONFIG_FILES debian/source/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;

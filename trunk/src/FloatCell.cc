@@ -137,7 +137,7 @@ const double val = dfval();
    if (val > LARGE_INT)   return E_DOMAIN_ERROR;
    if (val < SMALL_INT)   return E_DOMAIN_ERROR;
 
-const double max_diff = Workspace::get_CT() * val;   // scale ⎕CT
+const double max_diff = Workspace::get_CT() * fabs(val);   // scale ⎕CT
 
 const APL_Float val_dn = floor(val);
    if (val < (val_dn + max_diff))   return FloatCell::zF(Z, val_dn);

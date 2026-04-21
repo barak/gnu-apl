@@ -215,10 +215,10 @@ ErrorCode
 CharCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zU(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_char_value())));
+     return zU(Z, Unicode(0xFFFFFFFF & ~(value.aval ^ A->get_char_value())));
 
    if (A->is_numeric())
-      return zU(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_int_value())));
+      return zU(Z, Unicode(0xFFFFFFFF & ~(value.aval ^ A->get_int_value())));
    return E_DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------

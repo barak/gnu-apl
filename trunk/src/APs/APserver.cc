@@ -844,8 +844,22 @@ AP3_fd * ap_fd = 0;
                char * del = 0;
                char buffer[2*MAX_SIGNAL_CLASS_SIZE + 40000];
                const char * loc = 0;
-               Signal_base * response = Signal_base::recv_TCP(ap_sock, buffer,
-                                    sizeof(buffer), del, debug, &loc);
+               Signal_base * response =
+                             Signal_base::recv_TCP(ap_sock, buffer,
+                                                   sizeof(buffer), del,
+                                                   debug, &loc);
+               if (response == 0)
+                  {
+                    if (verbosity > 0)
+                       {
+                         cerr << prog << ": connection[" << ap_sock
+                              << "] closed by peer: errno=" << errno
+                              << ", loc=" << loc << endl;
+                       }
+                     close_fd(fd);
+                     return;
+                  }
+
                VALUE_IS_c vis(fd, response->get__VALUE_IS__key(),
                                   response->get__VALUE_IS__error(),
                                   response->get__VALUE_IS__error_loc(),

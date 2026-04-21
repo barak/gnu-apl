@@ -188,7 +188,9 @@ int len;
 
    if      ((b0 & 0xE0) == 0xC0)   { len = 1;   bx &= 0x1F; }
    else if ((b0 & 0xF0) == 0xE0)   { len = 2;   bx &= 0x0F; }
-   else if ((b0 & 0xF8) == 0xF0)   { len = 3;   bx &= 0x0E; }
+   else if ((b0 & 0xF8) == 0xF0)   { len = 3;   bx &= 0x07; }
+   else if ((b0 & 0xFC) == 0xF8)   { len = 4;   bx &= 0x03; }
+   else if ((b0 & 0xFE) == 0xFC)   { len = 5;   bx &= 0x01; }
    else
       {
         CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;

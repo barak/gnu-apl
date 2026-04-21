@@ -147,18 +147,19 @@ Unicode_source src(input);
                       {
                         ++src;
                         int64_t idx = 0;
-                        while (Avec::is_digit(*src))
+                        while (src.has_more() && Avec::is_digit(*src))
                               {
                                 idx = 10 * idx + src.get() - '0';
                               }
-                        if (src.get() != UNI_AT_SIGN)
+                        if (!src.has_more() || src.get() != UNI_AT_SIGN)
                            {
+                             // this may occur if a user types e.g. @123
                              MORE_ERROR() << "No second '@' in marker.";
-                             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+                             Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
                            }
                         tos.push_back(Token(TOK_MARKER, idx));
+                        break;
                       }
-                   break;
 
                    CERR << "Offending token: " << tok.get_tag()
                         << " (" << tok << ")" << endl;
@@ -331,7 +332,7 @@ Unicode_source src(input);
 
                          or else leave it as is (.
                        */
-                      if (sym && ((tos.size() == 2) || dia || col))
+                      if (sym && ((tos.size() == 1) || dia || col))
                          {
                            tos.push_back(TOK_ASSIGN1);
                          }
@@ -858,7 +859,7 @@ const Int_or_Double real_val = tokenize_real(src);
         if (!radian.is_valid)   // not a complex number
            {
              --src;   // undo skip 'R'
-             if (radian.is_double)
+             if (real_val.is_double)
                 {
                   tos.push_back(Token(TOK_REAL, real_val.value.APL_flt));
                   Log(LOG_tokenize)
@@ -1047,7 +1048,8 @@ bool dot_seen = false;      // the decimal . was seen
       }
 
    // second dot (which is a syntax error)?
-   if (src.skip_if(UNI_FULLSTOP) && dot_seen)
+   //
+   if (dot_seen && src.has_more() && *src == UNI_FULLSTOP)
       {
         MORE_ERROR() << "Two . in a number.";
         return Int_or_Double();

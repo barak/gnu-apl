@@ -503,6 +503,7 @@ m4_include([m4/apl_TARGETs.m4])
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile
+                 Claude/Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile

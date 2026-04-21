@@ -104,12 +104,11 @@ UTF8 * buffer = new UTF8[st.st_size];
 const ssize_t bytes_read = read(fd, buffer, st.st_size);
    if (bytes_read != st.st_size)
       {
-        MORE_ERROR() << "1 ⎕JSON B: error in reading " << B
-                     << "): " << strerror(errno);
-        ::close(fd);
-        DOMAIN_ERROR;
         ::close(fd);
         delete [] buffer;
+        MORE_ERROR() << "1 ⎕JSON B: error in reading " << B
+                     << "): " << strerror(errno);
+        DOMAIN_ERROR;
       }
 
 const UTF8_string json_string_utf8(buffer, bytes_read);

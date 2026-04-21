@@ -190,6 +190,11 @@ public:
             }
       };
 
+   /// return \b true iff )SAVE was successful
+   bool saved_OK()
+      { return save_success; }
+
+
 protected:
    /// width of one indentation level
    enum { INDENT_LEN = 2 };
@@ -247,6 +252,9 @@ protected:
 
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
+
+   /// \b true iff )SAVE was successful
+   bool save_success;
 };
 //----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace

@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 APL_DIRS	= workspaces wslib3 wslib4 wslib5
 SUBDIRS		= $(APL_DIRS)
-SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
+SUBDIRS		+= build Claude doc erlang gnu-apl.d HOWTOs
 SUBDIRS		+= src support-files tools websock
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 

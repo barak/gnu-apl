@@ -944,15 +944,6 @@ protected:
    Cell * next_ravel()
       { return more() ? ravel + valid_ravel_items++ : 0; }
 
-   /// return the next (packed) byte position
-   uint8_t * next_ravel_byte()
-      {
-        Assert(is_packed());
-        if (more())   return reinterpret_cast<uint8_t *>
-                             (ravel) + (valid_ravel_items++ >> 3);
-        return 0;   // no more valid items
-      }
-
    /// init the ravel of an APL value, return the ravel length
    inline void init_ravel();
 
