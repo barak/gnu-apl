@@ -72,10 +72,15 @@ public:
                av == UNI_SINGLE_QUOTE1 ||
                av == UNI_SINGLE_QUOTE2; } 
 
-   /// return \b true iff \b av is one of the various diamond characters
-   static bool is_diamond(Unicode av)
-      { return av == UNI_DIAMOND || av == 0x22C4 || av == 0x2662 ||
-               av == 0x2B25      || av == 0x2B26 || av == 0x2B27; }
+   /// Return \b true iff \b uni is one of the various DIAMOND characters
+   static bool is_DIAMOND(Unicode uni)
+      { return uni == UNI_DIAMOND ||   // ◊ = 0x25CA
+               uni == 0x22C4      ||   // ⋄
+               uni == 0x25C7      ||   // ◇
+               uni == 0x2662      ||   // ♢
+               uni == 0x2B25      ||   // ⬥
+               uni == 0x2B26      ||   // ⬦
+               uni == 0x2B27; }
 
    /// return \b true iff \b av is a control char (ASCII 0..32 (excluding))
    static bool is_control(Unicode av)
@@ -105,13 +110,6 @@ public:
    /// Return \b true iff \b uni is a digit or a space
    static bool is_digit_or_space(Unicode uni)
       { return is_digit(uni) || is_white(uni); }
-
-   /// Return \b true iff \b uni is one of the various DIAMOND characters
-   static bool is_DIAMOND(Unicode uni)
-      { return uni == UNI_DIAMOND ||   // ◊ = 0x25CA
-               uni == 0x2B25      ||   // ⬥
-               uni == 0x2B26      ||   // ⬦
-               uni == 0x2B27; }
 
    /// return \b true iff \b av is a number char (digit, .)
    static bool is_number(Unicode uni)

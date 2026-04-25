@@ -596,7 +596,7 @@ int tidx = 0;
    while(tidx < line_txt.ssize())
       {
         if (stats_before == 0)   break;
-        if ( Avec::is_diamond(line_txt[tidx++])   // ◊ xxx
+        if ( Avec::is_DIAMOND(line_txt[tidx++])   // ◊ xxx
            )   --stats_before;
       }
 
@@ -607,7 +607,7 @@ int tidx = 0;
 UCS_string ret;
    while (tidx < line_txt.ssize())
       {
-        if (Avec::is_diamond(line_txt[tidx]))    break;
+        if (Avec::is_DIAMOND(line_txt[tidx]))    break;
         ret << line_txt[tidx++];
       }
 

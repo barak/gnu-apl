@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -307,6 +307,7 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x22F8: return AV_EPSILON_UNDERBAR; //  map ⋸ to ⍷
         case 0x25AF: return AV_Quad_Quad;        //  map ▯ to ⎕
         case 0x25E6: return AV_RING_OPERATOR;    //  map ◦ to ∘
+        case 0x25C7: return AV_DIAMOND;          //  map ◇ to ◊
         case 0x2662: return AV_DIAMOND;          //  map ♢ to ◊
         case 0x26AA: return AV_CIRCLE;           //  map ⚪ to ○
         case 0x2A7D: return AV_LESS_OR_EQUAL;    //  map ⩽ to ≤
