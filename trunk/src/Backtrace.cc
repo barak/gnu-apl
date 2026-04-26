@@ -32,6 +32,8 @@
 #include <sys/stat.h>
 
 #include "Common.hh"   // for HAVE_EXECINFO_H et al.
+#include "Sys.hh"
+
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 # include <cxxabi.h>
@@ -218,11 +220,11 @@ const time_t apl_lines_time = st.st_mtime;
 
    pc_2_src.reserve(100000);
 char buffer[1000];
-FILE * file = fdopen(fd, "r");
+FileReader reader(fd);
 size_t file_lines = 0;
 size_t asm_lines = 0;
 
-   assert(file);
+   Assert(+reader);
 
 const char * src_line = 0;
 bool new_line = false;
@@ -230,7 +232,7 @@ int64_t prev_pc = NO_PC;
 
    for (;;)
        {
-         const char * s = fgets(buffer, sizeof(buffer) - 1, file);
+         const char * s = reader.fgets(buffer, sizeof(buffer) - 1);
          if (s == 0)   break;   // end of file.
          ++file_lines;
 
@@ -315,8 +317,6 @@ main():
               continue;
             }
        }
-
-   fclose(file);   // also closes fd
 
    cerr << "\n      assembler lines in apl.lines: " << asm_lines
         << "\n    + source line numbers found:    " << (file_lines - asm_lines)

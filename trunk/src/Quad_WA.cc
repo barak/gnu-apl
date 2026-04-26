@@ -27,8 +27,9 @@
 #include <sys/resource.h>
 #endif // HAVE_SYS_RESOURCE_H
 
-#include "UserPreferences.hh"
 #include "Quad_WA.hh"
+#include "Sys.hh"
+#include "UserPreferences.hh"
 
 uint64_t Quad_WA::total_memory = 0x40000000;   // a little more than 1 Gig
 bool Quad_WA::total_memory_by_user = false;
@@ -148,8 +149,8 @@ int ret = 0;
    meminfo.Cached    = 0;
    meminfo.MemFree   = 0;
 
-FILE * pm = fopen("/proc/meminfo", "r");
-   if (pm == 0)   return 0;   // error
+FileReader reader("/proc/meminfo");
+   if (!reader)   return 0;   // error
 
 const struct _tag
    {
@@ -163,7 +164,7 @@ const struct _tag
    for (;;)   // read all lines of /proc.meminfo
        {
          char buffer[2000];
-         if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
+         if (reader.fgets(buffer, sizeof(buffer) - 1) == 0)   break;
          buffer[sizeof(buffer) - 1] = 0;   // to allow strncmp()
 
          for (size_t t = 0; t < sizeof(tags) / sizeof(*tags); ++t)
@@ -178,7 +179,6 @@ const struct _tag
                   }
              }
        }
-   fclose(pm);
 
    return ret;   // success
 }
@@ -186,16 +186,16 @@ const struct _tag
 int64_t
 Quad_WA::read_procfile(const char * filename)
 {
-#if !MINGW_SRC
-   if (FILE * pm = fopen(filename, "r"))
+#if !MINGW_SRC   // no /proc in Windows
+FileReader reader(filename);
+   if (+reader)
       {
         long long ret = -1;
-        const int count = fscanf(pm, "%lld", &ret);
-        fclose(pm);
-        if (count == 1) return ret;
+        const int count = fscanf(reader.get_FILE(), "%lld", &ret);
+        if (count == 1)    return ret;
       }
-
 #endif // !MINGW_SRC
+
    return -1;   // something went wrong
 }
 //----------------------------------------------------------------------------

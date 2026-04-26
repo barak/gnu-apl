@@ -44,6 +44,7 @@ doc/apl.texi
 #include "Workspace.hh"
 #include "APL_types.hh"
 #include "Shape.hh"
+#include "Sys.hh"
 #include "Value.hh"
 
 Quad_MX Quad_MX::fun;
@@ -214,16 +215,17 @@ Quad_MX::printit(Value_P filename_A, Value_P B)
 {
 const CellType B_celltype = B->deep_cell_types();
 
-bool close_A = false;
    if (B->is_char_string())
       {
+        FileWriter writer;
+        bool close_A = false;
         FILE * ofile = open_file(*filename_A, close_A);
+        if (close_A)   new (&writer) FileWriter(ofile);
         const UCS_string B_ucs = B->get_UCS_ravel();
         const UTF8_string B_utf(B_ucs);
         const char * B_ccp = B_utf.c_str();
  
         fprintf(ofile, "%s\n", B_ccp);
-        if (close_A)   fclose(ofile);
         return Idx0_0(LOC);
       }
 
@@ -235,7 +237,11 @@ bool close_A = false;
 
 const ShapeItem B_count = B->element_count();
 const uRank     B_rank  = B->get_rank();
+
+bool close_A = false;
 FILE * ofile = open_file(*filename_A, close_A);
+FileWriter writer;
+   if (close_A)   new (&writer) FileWriter(ofile);
 
    if (B_rank <= 1)   // scalar or vector
       {
@@ -335,7 +341,7 @@ Quad_MX::open_file(const Value & filename, bool & close_file)
         return Quad_FIO::get_FILE(filename);
       }
 
-   close_file= true;
+   close_file = true;
 
    // filename is either "file_name" or ">file_name:", where the leading
    // '>' indicates append (as opposed to overwrite) and shall be skipped.

@@ -25,6 +25,7 @@
 #include "Function.hh"
 #include "Quad_TF.hh"
 #include "Symbol.hh"
+#include "Sys.hh"
 #include "Tokenizer.hh"
 #include "Token_string.hh"
 #include "UserPreferences.hh"
@@ -45,8 +46,8 @@ UCS_string fname = args.front();
 const LibRef_name lib_name(LIB0, fname);
 const UTF8_string filename = LibPaths::get_filename(lib_name, true, ".atf", 0);
 
-FILE * in = fopen(filename.c_str(), "r");
-   if (in == 0)   // open failed: try filename.atf unless already .atf
+FileReader in(filename.c_str());
+   if (!in)   // open failed: try filename.atf unless already .atf
       {
         CERR << ")IN " << fname << " failed: " << strerror(errno) << endl;
 
@@ -63,7 +64,7 @@ transfer_context tctx(protection);
 
    for (;;)
       {
-        const int cc = fgetc(in);
+        const int cc = in.fgetc();
         if (cc == EOF)   break;
         if (idx == 0 && cc == 0x0A)   // optional LF
            {
@@ -90,7 +91,6 @@ transfer_context tctx(protection);
         CERR << "BAD record charset (neither ASCII nor EBCDIC)" << endl;
         break;
       }
-   fclose(in);
 }
 //----------------------------------------------------------------------------
 void

@@ -35,6 +35,32 @@
 
 #include "config.h"   // for HAVE_MMAN_H
 
+/// A FILE * that pclose()s itself FILE * when destructed.
+class PipePointer
+{
+public:
+   PipePointer(FILE * fptr) : ptr(fptr) {}
+   ~PipePointer()   { close(); }
+
+   FILE * operator->()
+      { return ptr; }
+
+   int close()
+      {
+        if (ptr)
+           {
+             const int ret = pclose(ptr);
+             ptr = 0;
+             return ret;
+           }
+
+        return 0;
+      }
+
+protected:
+   FILE * ptr;
+};
+
 class Sys
 {
 public:
@@ -95,11 +121,187 @@ const int ret = pclose(stream);
 #if ! MINGW_SRC
    signal(SIGCHLD, SIG_IGN);
 #endif // ! MINGW_SRC
+
    return ret;
 }
-//---------------------------------------------------------------------------
+//===========================================================================
+/// A MAII compliant wrapper for popen()/pclose()
+class PipeReader
+{
+public:
+   /// default constructor for placement new
+   PipeReader() : fp(0) {}
 
 
+   /// constructor
+   PipeReader(const char * command)
+      {
+        fp = sys_popen(command, "r");
+      }
+
+   /// destructor: pclose fp (unless already closed).
+   ~PipeReader()
+      {
+        if (fp)   sys_pclose(fp);
+      }
+
+   /// return \b true if ptr is not open
+   bool operator !() const
+      { return fp == 0; }
+
+   /// return \b true if ptr is (open)
+   bool operator +() const
+      { return fp != 0; }
+
+   char * fgets(char * buffer, int buflen) const
+      {
+        if (fp)   return ::fgets(buffer, buflen, fp);
+        return 0;
+      }
+
+   size_t fread(char * buffer, int buflen) const
+      {
+        if (fp)   return ::fread(buffer, 1, buflen, fp);
+        return 0;
+      }
+
+   int fgetc() const
+      {
+        if (fp)   return ::fgetc(fp);
+        return EOF;
+      }
+   int close()
+      {
+       if (fp)
+          {
+            const int ret = sys_pclose(fp);
+            fp = 0;
+            return ret;
+          }
+        return 0;
+      }
+
+protected:
+   FILE * fp;
+};
+//===========================================================================
+/// A MAII compliant wrapper for fopen()/fclose()
+class FileReader
+{
+public:
+   /// default constructor for placement new
+   FileReader() : fp(0) {}
+
+
+   /// constructor: from alrady open FILE *
+   FileReader(FILE * file)
+      {
+        fp = file;
+      }
+
+   /// constructor: from open fd
+   FileReader(int fd)
+      {
+        fp = fdopen(fd, "r");
+      }
+
+   /// constructor: from filename
+   FileReader(const char * filename)
+      {
+        fp = fopen(filename, "r");
+      }
+
+   /// destructor: pclose fp (unless already closed).
+   ~FileReader()
+      {
+        if (fp)   fclose(fp);
+      }
+
+   FILE * get_FILE() const
+      { return fp; }
+
+   /// return \b true if ptr is not open
+   bool operator !() const
+      { return fp == 0; }
+
+   /// return \b true if ptr is (open)
+   bool operator +() const
+      { return fp != 0; }
+
+   char * fgets(char * buffer, int buflen) const
+      {
+        if (fp)   return ::fgets(buffer, buflen, fp);
+        return 0;
+      }
+
+   size_t fread(char * buffer, int buflen) const
+      {
+        if (fp)   return ::fread(buffer, 1, buflen, fp);
+        return 0;
+      }
+
+   int fgetc() const
+      {
+        if (fp)   return ::fgetc(fp);
+        return EOF;
+      }
+
+protected:
+   FILE * fp;
+};
+//===========================================================================
+/// A MAII compliant wrapper for fopen()/fclose()
+class FileWriter
+{
+public:
+   /// default constructor for placement new
+   FileWriter() : fp(0) {}
+
+
+   /// constructor: from alrady open FILE *
+   FileWriter(FILE * file)
+      {
+        fp = file;
+      }
+
+   /// constructor: from open fd
+   FileWriter(int fd, const char * mode = "w")
+      {
+        fp = fdopen(fd, mode);
+      }
+
+   /// constructor: from filename
+   FileWriter(const char * filename, const char * mode = "w")
+      {
+        fp = fopen(filename, mode);
+      }
+
+   /// destructor: pclose fp (unless already closed).
+   ~FileWriter()
+      {
+        if (fp)   fclose(fp);
+      }
+
+   FILE * get_FILE() const
+      { return fp; }
+
+   /// return \b true if ptr is not open
+   bool operator !() const
+      { return fp == 0; }
+
+   /// return \b true if ptr is (open)
+   bool operator +() const
+      { return fp != 0; }
+
+   size_t fwrite(const void * buffer, size_t bufsize)
+      { if (fp)   return ::fwrite(buffer, 1, bufsize, fp);
+        return 0;
+      }
+
+protected:
+   FILE * fp;
+};
+//===========================================================================
 
 #endif // SYS_HH_DEFINED
 

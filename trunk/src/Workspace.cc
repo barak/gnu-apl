@@ -803,8 +803,6 @@ Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
      Workspace::get_v_Quad_TZ().print_timestamp(out << "DUMPED ", when) << endl;
    }
 
-FILE * file = fdopen(fd, "r");
-
    // make sure that filename is not already open (which would indicate
    // )COPY recursion
    //
@@ -812,12 +810,13 @@ FILE * file = fdopen(fd, "r");
       {
         if (filename == InputFile::files_todo[f].filename)   // same filename
            {
-             fclose(file);
              CERR << "*** NOT COPIED. )COPY " << filename
                   << " would cause an infinite recursion." << endl;
              return;
            }
       }
+
+FILE * file = fdopen(fd, "r");
 
 InputFile fam(filename, file, false, false, true, with_LX);
    if (object_filter)   // therefore )COPY, not )LOAD

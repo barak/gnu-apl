@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "NativeFunction.hh"
 #include "PrintOperator.hh"
 #include "StateIndicator.hh"
+#include "Sys.hh"
 #include "UserFunction.hh"
 #include "UTF8_string.hh"
 #include "Workspace.hh"
@@ -209,23 +210,21 @@ const UCS_string alias(U"all_functions");
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
-           if (FILE * cmap = fopen(cmapx_filename.c_str(), "r"))
-              {
-                char buffer[400];
-                for (;;)
-                    {
-                      const char * s = fgets(buffer, sizeof(buffer), cmap);
-                      if (s == 0)   break;
-                      buffer[sizeof(buffer) - 1] = 0;
-                      page << "    " << buffer;
-                    }
-                fclose(cmap);
-              }
-           else
+           FileReader reader(cmapx_filename.c_str());
+           if (!reader)
               {
                 CERR << "*** Cannot open " << cmapx_filename
                      << ": " << strerror(errno) << endl;
               }
+
+           char buffer[400];
+           for (;;)
+               {
+                      const char * s = reader.fgets(buffer, sizeof(buffer));
+                      if (s == 0)   break;
+                      buffer[sizeof(buffer) - 1] = 0;
+                      page << "    " << buffer;
+               }
 
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
          }
@@ -618,17 +617,16 @@ ofstream page(fun_filename.c_str());
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename << "/gc_" << UTF8_string(alias) << ".cmapx";
-           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-           Assert(cmap);
+           FileReader reader(cmapx_filename.c_str());
+           Assert(+reader);
            char buffer[400];
            for (;;)
                {
-                 const char * s = fgets(buffer, sizeof(buffer), cmap);
+                 const char * s = reader.fgets(buffer, sizeof(buffer));
                  if (s == 0)   break;
                  buffer[sizeof(buffer) - 1] = 0;
                  page << "    " << buffer;
                }
-           fclose(cmap);
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
          }
       }
@@ -696,22 +694,23 @@ ofstream page(fun_filename.c_str());
         {
           UTF8_string cmapx_filename(root_dir);
           cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
-          FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-          if (cmap == 0)
+          FileReader reader(cmapx_filename.c_str());
+          if (!reader)
              {
                CERR << "cannot open " << cmapx_filename << ": "
                     << strerror(errno) << endl;
                return;
              }
+
           char buffer[400];
           for (;;)
               {
-                const char * s = fgets(buffer, sizeof(buffer), cmap);
+                const char * s = reader.fgets(buffer, sizeof(buffer));
                 if (s == 0)   break;
                 buffer[sizeof(buffer) - 1] = 0;
                 page << "    " << buffer;
               }
-          fclose(cmap);
+
           Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
         }
       }
@@ -729,17 +728,17 @@ ofstream page(fun_filename.c_str());
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename << "/gc_" << UTF8_string(alias) << ".cmapx";
-           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-           Assert(cmap);
+           FileReader reader(cmapx_filename.c_str());
+           Assert(+reader);
            char buffer[400];
            for (;;)
                {
-                 const char * s = fgets(buffer, sizeof(buffer), cmap);
+                 const char * s = reader.fgets(buffer, sizeof(buffer));
                  if (s == 0)   break;
                  buffer[sizeof(buffer) - 1] = 0;
                  page << "    " << buffer;
                }
-           fclose(cmap);
+
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
          }
       }
@@ -1079,8 +1078,8 @@ char cmd[200];
    SPRINTF(cmd, "dot -T%s %s -o%s", out_type, gv_filename, out_filename);
 
    errno = 0;
-FILE * dot = popen(cmd, "r");
-   if (dot == 0)
+PipeReader dot(cmd);
+   if (!dot)
       {
         if (errno)
            CERR << "Could not run 'dot': " << strerror(errno) << endl;
@@ -1094,12 +1093,11 @@ FILE * dot = popen(cmd, "r");
 char buffer[1000];
    for (;;)
        {
-         const int len = fread(buffer, 1, sizeof(buffer), dot);
+         const int len = dot.fread(buffer, sizeof(buffer));
          if (len == 0)   break;
          buffer[len] = 0;
          CERR << "dot says: " << buffer;
        }
-   pclose(dot);
 
    // if LOG_command_DOXY then do not remove temporary files
    Log(LOG_command_DOXY)

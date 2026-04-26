@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
 # include "Quad_PLOT.hh"
+# include "Sys.hh"
 # include "Workspace.hh"
 
 // UTF8 support for XCB windows needs additional libraries that may
@@ -1228,8 +1229,8 @@ UTF8_string outfile_utf8(outfile);
    CERR << "writing ⎕PLOT output file " << outfile_utf8 << "..." << endl;
 
    errno = 0;
-FILE * bmp = fopen(outfile_utf8.c_str(), "w");
-   if (bmp == 0)
+FileWriter writer(outfile_utf8.c_str());
+   if (!writer)
       {
         CERR << "open " << outfile << ": " << strerror(errno) << endl;
         MORE_ERROR() << "save_file() failed: cannot open output file "
@@ -1266,7 +1267,7 @@ int file_bytes = 0;
           LE4(0),              // reserved
           LE4(pixel_offset),   // offset
        };
-     file_bytes += fwrite(file_header, 1, sizeof(file_header), bmp);
+     file_bytes += writer.fwrite(file_header, sizeof(file_header));
    };
 
    {
@@ -1284,7 +1285,7 @@ int file_bytes = 0;
           LE4(0),    // colors used
           LE4(0),    // importantcolors
         };
-     file_bytes += fwrite(dib_header, 1, sizeof(dib_header), bmp);
+     file_bytes += writer.fwrite(dib_header, sizeof(dib_header));
    }
 
 const Colormap cmap = XDefaultColormap(display, screen);
@@ -1301,11 +1302,10 @@ const Colormap cmap = XDefaultColormap(display, screen);
                *s++ = uint8_t(c.red  /256);
              }
           while ((s - scanline) & 3)   *s++ = 0;   // scanline padding
-          file_bytes += fwrite(scanline, 1, s - scanline, bmp);
+          file_bytes += writer.fwrite(scanline, s - scanline);
        }
 
    XFree(image);
-   fclose(bmp);
    CERR << "output file " << outfile_utf8 << " written" << endl;
 }
 //----------------------------------------------------------------------------

@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2024  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #endif   // HAVE_LOCALE_H
 
 #include "Quad_PNG.hh"
+#include "Sys.hh"
 #include "Token.hh"
 
 Quad_PNG  Quad_PNG::fun;
@@ -179,16 +180,19 @@ Quad_PNG::read_PNG_file(const UTF8_string & filename1)
    // If opening filename1 fails we try filename2 = filename1.png
    //
 int errno1 = 0;
-FILE * in = fopen(filename1.c_str(), "rb");
-   if (in == 0 && !filename1.ends_with(".png"))
+FileReader reader(filename1.c_str());
+   if (!reader && !filename1.ends_with(".png"))
       {
+         // .png file could not be openend and the filename did not have
+         // the .png extension. Try again with .png appended,
+         // 
          errno1 = errno;              // remember why filename1 has failed
          UTF8_string filename2(filename1);
          filename2 << ".png";
-         in = fopen(filename2.c_str(), "r");
+         new (&reader) FileReader(filename2.c_str());
       }
 
-   if (in == 0)   // neither filename nor filename.png
+   if (!reader)   // neither filename nor filename.png couldbe opened
       {
         MORE_ERROR() << "Cannot open file '" << filename1.c_str()
                      << "' in ⎕PNG B: " << strerror(errno1);
@@ -202,7 +206,7 @@ png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 png_infop info_ptr = png_create_info_struct(png_ptr);
    if (!info_ptr)   WS_FULL;
 
-    png_init_io(png_ptr, in);
+    png_init_io(png_ptr, reader.get_FILE());
 
    // We use the low-level interface for a better control of the input
    // transformations...
@@ -539,8 +543,8 @@ const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
         DOMAIN_ERROR;
       }
 
-FILE * out = fopen(filename, "wb");
-   if (out == 0)
+FileWriter writer(filename);
+   if (!writer)
        {
           MORE_ERROR() << "Cannot open PNG output file " << filename
                        << " in A ⎕PNG B: " << strerror(errno);
@@ -554,7 +558,7 @@ png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)   WS_FULL;
 
-   png_init_io(png_ptr, out);
+   png_init_io(png_ptr, writer.get_FILE());
 
    // add a Software keyword indicating GNU APL's ⎕PNG as image producer
    //
@@ -662,7 +666,6 @@ UTF8 * scanline = RGB;
    delete [] RGB;
 
    png_destroy_write_struct(&png_ptr, &info_ptr);
-   fclose(out);
 
 #endif   // PNG_LIBS
 }

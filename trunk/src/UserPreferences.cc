@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "LibPaths.hh"
 #include "Output.hh"
 #include "ScalarFunction.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -1313,8 +1314,9 @@ UserPreferences::read_config_file(bool sys, bool log_startup)
 {
 char filename[APL_PATH_MAX + 1];
 
-FILE * f = open_user_file("preferences", filename, sys, log_startup);
-   if (f == 0)   return;
+FILE * fp = open_user_file("preferences", filename, sys, log_startup);
+FileReader reader(fp);
+   if (!reader)   return;
 
 int line = 0;
 int file_profile = 0;   // the current profile in the preferences file
@@ -1322,7 +1324,7 @@ int file_profile = 0;   // the current profile in the preferences file
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         const char * s = fgets(buffer, BUFSIZE, f);
+         const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
 
          buffer[BUFSIZE] = 0;
@@ -1719,8 +1721,6 @@ int file_profile = 0;   // the current profile in the preferences file
                    << filename << " (ignored)" << endl;
             }
        }
-
-   fclose(f);
 }
 //----------------------------------------------------------------------------
 int
@@ -1770,15 +1770,16 @@ UserPreferences::read_threshold_file(bool sys, bool log_startup)
 {
 char filename[APL_PATH_MAX + 1];
 
-FILE * f = open_user_file("parallel_thresholds", filename, sys, log_startup);
-   if (f == 0)   return;
+FileReader reader(open_user_file("parallel_thresholds",
+                  filename, sys, log_startup));
+   if (!reader)   return;
 
 int line = 0;
    for (;;)
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         const char * s = fgets(buffer, BUFSIZE, f);
+         const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
 
          buffer[BUFSIZE] = 0;
@@ -1843,7 +1844,6 @@ int line = 0;
             CERR << "Bad macro format in file " << filename
                  << " line " << line << endl;
        }
-   fclose(f);
 }
 //----------------------------------------------------------------------------
 void

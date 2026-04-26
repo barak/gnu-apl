@@ -1470,8 +1470,8 @@ Command::cmd_HOST(ostream & out, const UCS_string & arg)
       }
 
 UTF8_string host_cmd(arg);
-FILE * pipe = sys_popen(host_cmd.c_str(), "r");
-   if (pipe == 0)   // popen() failed
+PipeReader reader(host_cmd.c_str());
+   if (!reader)   // popen() failed
       {
         out << ")HOST command failed: " << strerror(errno) << endl;
         return;
@@ -1479,13 +1479,13 @@ FILE * pipe = sys_popen(host_cmd.c_str(), "r");
 
    for (;;)
        {
-         const int cc = fgetc(pipe);
+         const int cc = reader.fgetc();
          if (cc == EOF)   break;
          out << char(cc);
        }
 
    errno = 0;
-const int result = sys_pclose(pipe);
+const int result = reader.close();
    Log(LOG_verbose_error)
       {
         if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
@@ -1724,8 +1724,8 @@ UCS_string fname = args.front();
 const LibRef_name lib_name(LIB0, fname);
 const UTF8_string filename = LibPaths::get_filename(lib_name, false, ".atf", 0);
 
-FILE * atf = fopen(filename.c_str(), "w");
-   if (atf == 0)
+FileWriter writer(filename.c_str());
+   if (!writer)
       {
         const char * why = strerror(errno);
         out << ")OUT " << fname << " failed: " << why << endl;
@@ -1735,9 +1735,7 @@ FILE * atf = fopen(filename.c_str(), "w");
       }
 
 uint64_t seq = 1;   // sequence number for records written
-   Workspace::write_OUT(atf, seq, args);
-
-   fclose(atf);
+   Workspace::write_OUT(writer.get_FILE(), seq, args);
 }
 //---------------------------------------------------------------------------
 void

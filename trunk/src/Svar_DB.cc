@@ -46,6 +46,7 @@
 #include "Logging.hh"
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 
 extern ostream & get_CERR();
@@ -120,8 +121,8 @@ char popen_args[APL_PATH_MAX + 50];
 
    logit && get_CERR() << "Starting " << popen_args << "..." << endl;
 
-FILE * fp = popen(popen_args, "r");
-   if (fp == 0)
+PipeReader reader(popen_args);
+   if (!reader)
       {
         get_CERR() << "popen(" << popen_args << " failed: " << strerror(errno)
              << endl;
@@ -132,12 +133,12 @@ FILE * fp = popen(popen_args, "r");
    // APserver does not really output anything (and we would see if it would),
    // but the interesting part is the EOF of the parent process in APserfver.
    //
-   for (int cc; (cc = getc(fp)) != EOF;)
+   for (int cc; (cc = reader.fgetc()) != EOF;)
        {
          logit && get_CERR() << char(cc);
        }
 
-const int APserver_result = pclose(fp);
+const int APserver_result = reader.close();
 
    logit && get_CERR() << endl;
 

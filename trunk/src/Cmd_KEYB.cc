@@ -246,13 +246,14 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
               UserPreferences::uprefs.keyboard_layout_file;
         if (filename.size())
            {
-             if (FILE * layout = fopen(filename.c_str(), "r"))
+             FileReader reader(filename.c_str());
+             if (+reader)
                 {
                   out << "User-defined Keyboard Layout.    Source: "
                       << filename << "\n";
                   for (;;)
                       {
-                         const int cc = fgetc(layout);
+                         const int cc = reader.fgetc();
                          if (cc == EOF)   break;
                          out << char(cc);
                       }
@@ -322,8 +323,8 @@ Cmd_KEYB::parse_xmodmap()
       }
 
    errno = 0;
-FILE * xm = sys_popen("xmodmap -pke", "r");
-   if (xm == 0)
+PipeReader reader("xmodmap -pke");
+   if (!reader)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error starting xmodmap: "
                      << strerror(errno);
@@ -337,7 +338,7 @@ int bad_lines  = 0;
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         if (!fgets(buffer, BUFSIZE, xm))   break;
+         if (!reader.fgets(buffer, BUFSIZE))   break;
 
          buffer[BUFSIZE] = 0;
          ssize_t len = strlen(buffer);
@@ -350,7 +351,6 @@ int bad_lines  = 0;
       {
         // xmodmap was started, but then something went wrong.
         //
-        sys_pclose(xm);
         return true;
       }
 
@@ -380,7 +380,7 @@ int bad_lines  = 0;
         }
    }
 
-   if (sys_pclose(xm))
+   if (reader.close())
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error running xmodmap: "
                      << strerror(errno);

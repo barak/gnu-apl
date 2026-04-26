@@ -27,6 +27,7 @@
 #include "LibPaths.hh"
 #include "Polynomial.hh"
 #include "PythonPipe.hh"
+#include "Sys.hh"
 #include "Tokenizer.hh"
 #include "Value.hh"
 #include "Workspace.hh"
@@ -1624,16 +1625,16 @@ UTF8_string script_path("./");
    // construct command
    //
 const char * pythons[] = { "python3", "python" };
-FILE * fp_python = 0;
+PipeReader reader;
    loop(p, sizeof(pythons) / sizeof(*pythons))
        {
          UTF8_string cmd(pythons[p]);
-         cmd << UNI_SPACE << script_path << UNI_SPACE << args;
-         fp_python = popen(cmd.c_str(), "r");
-         if (fp_python)   break;
+         cmd << " " << script_path << " " << args;
+         new (&reader) PipeReader(cmd.c_str());
+         if (+reader)   break;   // success opening cmd
       }
 
-   if (fp_python == 0)
+   if (!reader)
       {
         MORE_ERROR() << "A ⌹.poly_quotient2 B: Could not start python.";
         DOMAIN_ERROR;
@@ -1643,7 +1644,7 @@ enum { BUFSIZE = 80 };
 char buffer[BUFSIZE + 1];
    for (;;)
        {
-           const char * s = fgets(buffer, BUFSIZE, fp_python);
+           const char * s = reader.fgets(buffer, BUFSIZE);
            if (s == 0)   break;
            buffer[BUFSIZE] = 0;   // to secure strlen()
            size_t len = strlen(buffer);
@@ -1664,9 +1665,6 @@ char buffer[BUFSIZE + 1];
               }
            catch (...) { }
        }
-
-   // pclose() returns ECHILD even if the script runs successfully.
-   pclose(fp_python);
 }
 #endif
 //----------------------------------------------------------------------------

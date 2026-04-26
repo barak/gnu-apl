@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "Nabla.hh"
 #include "Parallel.hh"
 #include "SystemVariable.hh"
+#include "Sys.hh"
 #include "TabExpansion.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
@@ -165,8 +166,8 @@ int cl = -1;
 void
 LineHistory::read_history(const char * filename)
 {
-FILE * hist = fopen(filename, "r");
-   if (hist == 0)
+FileReader reader(filename);
+   if (!reader)
       {
         Log(LOG_get_line)
            CERR << "Cannot open history file " << filename
@@ -175,7 +176,7 @@ FILE * hist = fopen(filename, "r");
       }
 
 char buffer[4000];
-   while (fgets(buffer, sizeof(buffer) - 1, hist))
+   while (reader.fgets(buffer, sizeof(buffer) - 1))
        {
          buffer[sizeof(buffer) - 1] = 0;
 

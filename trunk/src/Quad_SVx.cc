@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "Quad_SVx.hh"
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -130,18 +131,16 @@ bool found_executable = false;
         return;
       }
 
-FILE * fp = popen(filename, "r");
-   if (fp == 0)
+PipeReader reader(filename);
+   if (!reader)
       {
         CERR << "popen(" << filename << " failed: " << strerror(errno)
              << endl;
         return;
       }
 
-   for (int cc; (cc = getc(fp)) != EOF;)   CERR << char(cc);
+   for (int cc; (cc = reader.fgetc()) != EOF;)   CERR << char(cc);
    CERR << endl;
-
-   pclose(fp);
 
    usleep(100000);   // give new AP time to register with APserver
 }

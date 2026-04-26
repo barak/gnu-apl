@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include "ProcessorID.hh"
 #include "Quad_SVx.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 
 extern const char * prog_name();
@@ -283,11 +284,11 @@ const char * filename = getenv("APL2SVPPRF");
 int
 ProcessorID::read_network_profile(const char * filename)
 {
-FILE * file = fopen(filename, "r");
+FileReader reader(filename);
 int line = 0;
 const char * loc = 0;
 
-   if (file == 0)
+   if (!reader)
       {
         CERR << "Cannot open network profile '" << filename << "'" << endl;
         return 1;
@@ -297,7 +298,7 @@ const char * loc = 0;
    for (line = 1;; ++line)
        {
          char buffer[200];
-         const char * s = fgets(buffer, sizeof(buffer) - 1, file);
+         const char * s = reader.fgets(buffer, sizeof(buffer) - 1);
 
          if (s == 0)   // end of file
             {
@@ -318,7 +319,7 @@ const char * loc = 0;
               if (1 != sscanf(s, ":svopid,%u", &svopid.svopid))
                  { loc = LOC;   break; }
 
-             loc = read_svopid(file, svopid, line);
+             loc = read_svopid(reader.get_FILE(), svopid, line);
              if (loc)   break;
 
              network_profile.svo_pids.push_back(svopid);
@@ -337,7 +338,7 @@ const char * loc = 0;
 
              procauth.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
 
-             loc = read_procauth(file, procauth, line);
+             loc = read_procauth(reader.get_FILE(), procauth, line);
              if (loc)   break;
 
              network_profile.proc_auths.push_back(procauth);
@@ -347,8 +348,6 @@ const char * loc = 0;
         loc = LOC;
         break;
        }
-
-   fclose(file);
 
    if (loc)
       {
