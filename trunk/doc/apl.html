@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>April 19, 2026.
+<p>April 29, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -2842,8 +2842,13 @@ Next: <a href="#Commands-_0029COPY_005fONCE-_0029DUMP-and-DUMP_002dHTML" accessk
 </div>
 <span id="Direct-Functions-_0028Lambdas_0029-1"></span><h3 class="section">2.8 Direct Functions (Lambdas)</h3>
 
-<p>GNU APL supports direct functions (aka. lambdas), but only in a rather
-limited form.
+<p>GNU APL supports <i>direct functions</i> (aka. <i>lambdas)</i>, but only in a
+rather limited form.
+</p>
+<p>Direct functions must be defined entirely on a single line.
+</p>
+<p><b>Corollary:</b> Multi-line strings and multi-line literals may not be
+used in the definition of a GNU APL lambda.
 </p>
 <ul class="section-toc">
 <li><a href="#Named-Lambdas" accesskey="1">Named Lambdas</a></li>
@@ -2864,7 +2869,7 @@ Next: <a href="#Unnamed-Lambdas" accesskey="n" rel="next">Unnamed Lambdas</a>, U
 <pre class="example">      FUN ← { body_statement } 
 </pre></div>
 
-<p>creates a <i>named lambda</i>. The single <i>body_statement</i> may contain the
+<p>creates a <i>named lambda</i>. The <i>body_statement(s)</i> may contain the
 special variable names <b>⍺</b> and <b>⍵</b> as well as the special function
 names <b>⍶</b> and <b>⍹</b> which are replaced by the actual arguments of the
 lambda when the  lambda is executed. The valence of the lambda is determined
@@ -2875,7 +2880,7 @@ as follows:
 </li><li> If only <b>⍶</b> is present then the lambda is a <i>monadic operator</i>.
 </li><li> If neither <b>⍶</b> nor <b>⍹</b> is present then the lambda is a normal
       defined function.
-</li><li> If both <b>⍺</b> and <b>⍵</b> are present in the body_statement then the
+</li><li> If both <b>⍺</b> and <b>⍵</b> are present in the body_statement(s) then the
       operator or defined function is dyadic.
 </li><li> If only <b>⍵</b> is present then the operator or defined is monadic.
 </li><li> If neither <b>⍺</b> nor <b>⍵</b> is present then the lambda is niladic.
@@ -2895,15 +2900,16 @@ arguments and consequently no arguments that are not available). Therefore
 in an expression such as:
 </p>
 <div class="example">
-<pre class="example">NAME ← { statement }
+<pre class="example">NAME ← { statement(s) }
 </pre></div>
 
-<p>will the niladic lambda <b>{ statement }</b> be evaluated before the
+<p>will the niladic lambda <b>{ statement(s) }</b> be evaluated <i>before</i> the
 assignment, The name <b>NAME</b> is therefore the result of the niladic lambda
-and not the niladic lambda itself. IOW: the example above <i>does not</i>
-create a niladic named lambda, but rather a normal variable <b>NAME</b> whose
-value is the result of evaluating <b>statement</b>. Creating niladic named
-lambdas is impossible.
+and not the definition of a niladic lambda with that name. IOW: the example
+above <i>does not</i> create a niladic named lambda, but rather a normal
+variable <b>NAME</b> whose value is the result of evaluating <b>statement</b>.
+</p>
+<p><b>Corollary:</b> Creating niladic named lambdas is impossible.
 </p>
 <p>GNU APL supports an axis argument in normal defined functions and
 operators. In lambda expressions the Greek letter <b>χ</b> (Chi) is the
@@ -2988,7 +2994,7 @@ particular, they can be used outside named or unnamed lambdas. However, that
 may change in the future and therefore such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside
 is certainly a bad idea.
 </p>
-<p>As of this writing, GNU APL lambdas allow multiple statements, separated
+<p>As of this writing, GNU APL lambdas support multiple statements, separated
 by <b>◊</b>. This feature is experimental, not portable, and should be avoided
 where possible. In GNU APL, the value of a multi-statement lambda is the
 value of the last statement and this differs from the semantics of
@@ -3031,7 +3037,8 @@ Previous: <a href="#Unnamed-Lambdas" accesskey="p" rel="prev">Unnamed Lambdas</a
 
 <p>There are a number of features related to lambdas that are present in other
 APL interpreters but that are <b>NOT</b> implemented in GNU APL. This includes
-multiple statements, guards, lexical scoping, and probably more.
+definitions that span multiple lines, guards, lexical scoping, and probably
+more.
 </p>
 <p>The primary reason for these limitations in not the lazyness of the GNU APL
 author, but the fact that the lambdas in other APL dialects introduce a 

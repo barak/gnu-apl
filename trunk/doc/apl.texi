@@ -2283,8 +2283,13 @@ Type )HELP or ]HELP in the interpreter for a list of all commands available.
 @node Direct Functions (Lambdas)
 @section Direct Functions (Lambdas)
 
-GNU APL supports direct functions (aka. lambdas), but only in a rather
-limited form.
+GNU APL supports @i{direct functions} (aka. @i{lambdas)}, but only in a
+rather limited form.
+
+Direct functions must be defined entirely on a single line.
+
+@b{Corollary:} Multi-line strings and multi-line literals may not be
+used in the definition of a GNU APL lambda.
 
 @c ............................................................................
 @node Named Lambdas
@@ -2296,7 +2301,7 @@ A statement of the form
       FUN ← @{ body_statement @} 
 @end example
 
-creates a @i{named lambda}. The single @i{body_statement} may contain the
+creates a @i{named lambda}. The @i{body_statement(s)} may contain the
 special variable names @b{⍺} and @b{⍵} as well as the special function
 names @b{⍶} and @b{⍹} which are replaced by the actual arguments of the
 lambda when the  lambda is executed. The valence of the lambda is determined
@@ -2307,7 +2312,7 @@ as follows:
 @item If only @b{⍶} is present then the lambda is a @i{monadic operator}.
 @item If neither @b{⍶} nor @b{⍹} is present then the lambda is a normal
       defined function.
-@item If both @b{⍺} and @b{⍵} are present in the body_statement then the
+@item If both @b{⍺} and @b{⍵} are present in the body_statement(s) then the
       operator or defined function is dyadic.
 @item If only @b{⍵} is present then the operator or defined is monadic.
 @item If neither @b{⍺} nor @b{⍵} is present then the lambda is niladic.
@@ -2327,15 +2332,16 @@ arguments and consequently no arguments that are not available). Therefore
 in an expression such as:
 
 @example
-NAME ← @{ statement @}
+NAME ← @{ statement(s) @}
 @end example
 
-will the niladic lambda @b{@{ statement @}} be evaluated before the
+will the niladic lambda @b{@{ statement(s) @}} be evaluated @i{before} the
 assignment, The name @b{NAME} is therefore the result of the niladic lambda
-and not the niladic lambda itself. IOW: the example above @i{does not}
-create a niladic named lambda, but rather a normal variable @b{NAME} whose
-value is the result of evaluating @b{statement}. Creating niladic named
-lambdas is impossible.
+and not the definition of a niladic lambda with that name. IOW: the example
+above @i{does not} create a niladic named lambda, but rather a normal
+variable @b{NAME} whose value is the result of evaluating @b{statement}.
+
+@b{Corollary:} Creating niladic named lambdas is impossible.
 
 GNU APL supports an axis argument in normal defined functions and
 operators. In lambda expressions the Greek letter @b{χ} (Chi) is the
@@ -2420,7 +2426,7 @@ particular, they can be used outside named or unnamed lambdas. However, that
 may change in the future and therefore such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside
 is certainly a bad idea.
 
-As of this writing, GNU APL lambdas allow multiple statements, separated
+As of this writing, GNU APL lambdas support multiple statements, separated
 by @b{◊}. This feature is experimental, not portable, and should be avoided
 where possible. In GNU APL, the value of a multi-statement lambda is the
 value of the last statement and this differs from the semantics of
@@ -2453,7 +2459,8 @@ function name is needed.
 
 There are a number of features related to lambdas that are present in other
 APL interpreters but that are @b{NOT} implemented in GNU APL. This includes
-multiple statements, guards, lexical scoping, and probably more.
+definitions that span multiple lines, guards, lexical scoping, and probably
+more.
 
 The primary reason for these limitations in not the lazyness of the GNU APL
 author, but the fact that the lambdas in other APL dialects introduce a 

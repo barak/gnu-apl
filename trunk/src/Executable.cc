@@ -81,7 +81,7 @@ ShapeItem last_semi = -1;
    rev_loop(t,lambda_text.size())
        {
          const Unicode cc = lambda_text[t];
-         if (cc == UNI_SPACE)      continue;
+         if (cc == UNI_SPACE)            continue;
          if (Avec::is_symbol_char(cc))   continue;
          if (Avec::is_quad(cc))          continue;
          if (cc == UNI_SEMICOLON)   last_semi = t;
@@ -1063,6 +1063,12 @@ Lambda_number lambda_num = LAMBDA_NUM_0;
                               end = b1;
                               b1 = body.size();
                             }
+                         continue;
+
+                    case TOK_MARKER:   // multi-line string or literal
+                         MORE_ERROR() << "Invalid multi-line string or "
+                                         "literal in (single-line) lambda.";
+                         DEFN_ERROR;
                          continue;
 
                     default:
