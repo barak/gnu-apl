@@ -215,7 +215,7 @@ enum TokenValueType
 enum TokenTag
 {
 
-#define TD(tok, tc, tv, id) tok = tc | tv | (id << 16),
+#define TD(tok, tc, tv, id) tok = int(tc) | int(tv) | int(id << 16),
 #include "Token.def"
 
    TOK_FUN1 = TOK_FUN2,
