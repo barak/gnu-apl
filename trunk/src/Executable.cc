@@ -1312,8 +1312,9 @@ ShapeItem tcol = 0;    // the current column in text[tidx];
             }
 
          const Unicode uni = line[tcol++];
-         if (uni == UNI_SINGLE_QUOTE ||   // APL string: skip or copy it
-             uni == UNI_DOUBLE_QUOTE)     // GNU APL string: dito.
+         if (uni == UNI_SINGLE_QUOTE ||   // standard APL 'string'
+             uni == UNI_DOUBLE_QUOTE ||   // GNU APL "string"
+             uni == UNI_LEFT_DAQ)         // GNU APL «string»
             {
               const ShapeItem end = line.string_end_pos(tcol - 1, false);
               if (end == -1)
