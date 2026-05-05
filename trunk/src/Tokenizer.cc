@@ -903,20 +903,39 @@ const Int_or_Double real_val = tokenize_real(src);
       }
 
 done:
-   // ISO 13751 requires a space between two numeric scalar literals (page 42),
-   // but not between a numeric scalar literal and an identifier.
-   //
-   // IBM APL2 requires a space in both cases. For example, 10Q10 is tokenized
-   // as  10Q 10
-   //
-   // We follow ISO. The second numeric literal cannot start with 0-9 because
-   // that would have been eaten by the first literal. Therefor the only cases
-   // remaining to be checked are a numeric scalar literal followed by ¯
-   // or by . (page 42)
-   //
+   /* ISO 13751 does:
+
+      A. require a space between two numeric-scalar-literals (page 42), but
+      B. requires no space between a numeric scalar literal and an identifier:
+
+      Numeric Literal
+
+      →──┬──→numeric-scalar-literal─┬──*─→
+         ↑                          ↓
+         └────────┬──blank──┬───────┘ ␄
+                  │         │
+␆ ␅               └────←────┘
+
+      As a consequence, e.g. 10Q10 should parse as 10 Q10 in ISO.
+
+      IBM APL2 requires a space in both cases.
+      As a consequence, e.g. 10Q10 raises a SYNTAX ERROR inm IBM APL2.
+     
+      We follow ISO (and parse e.g. 10Q10 as 10 Q10).
+
+      This leaves the case of two adjacent numeric literals. In this case
+      the second of (two adjacent) numeric literal can not start with 0-9
+      because that digit would have been eaten by the first 
+      literal. Thereforethe only cases remaining to be checked are a
+      numeric scalar literal followed by ¯ or by . (page 42).
+
+      NOTE: The second case below (e.g. 10.10.10) will not come here since
+            it would have reised an E_BAD_NUMBER  in tokenize_real() above.
+    */
    if (src.has_more())
       {
-        if (*src == UNI_OVERBAR || *src == '.')
+        if (*src == UNI_OVERBAR ||   // e.g 10¯10
+            *src == '.')             // e.g. 10.10.10
            Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 }
