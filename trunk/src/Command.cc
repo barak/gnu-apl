@@ -1734,8 +1734,7 @@ FileWriter writer(filename.c_str());
         return;
       }
 
-uint64_t seq = 1;   // sequence number for records written
-   Workspace::write_OUT(writer.get_FILE(), seq, args);
+   Workspace::write_OUT(writer.get_FILE(), args);
 }
 //---------------------------------------------------------------------------
 void

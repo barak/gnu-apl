@@ -278,8 +278,7 @@ public:
    static bool is_called(const UCS_string & funname);
 
    /// write symbols for )OUT command
-   static void write_OUT(FILE * out, uint64_t & seq,
-                  const UCS_string_vector & objects);
+   static void write_OUT(FILE * out, const UCS_string_vector & objects);
 
    /// clear the marked flag in all values known in this workspace
    static void unmark_all_values();

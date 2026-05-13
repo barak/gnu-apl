@@ -439,9 +439,10 @@ const UserFunction * ufun = fun->get_func_ufun();
 }
 //----------------------------------------------------------------------------
 void
-Workspace::write_OUT(FILE * out, uint64_t & seq,
-                     const UCS_string_vector & objects)
+Workspace::write_OUT(FILE * out, const UCS_string_vector & objects)
 {
+uint64_t seq = 1;   // sequence number for records written
+
    // if objects is empty then write all user defined objects and some system
    // variables
    //

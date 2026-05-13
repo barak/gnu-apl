@@ -527,8 +527,8 @@ int color_type;
    else if (planes == 4)   color_type = PNG_COLOR_TYPE_RGB_ALPHA;
    else
       {
-        MORE_ERROR() << "Bad number of planes (" << planes
-                     << ") in B of A ⎕PNG B";
+        MORE_ERROR() << "A ⎕PNG B: bad number of planes (" << planes
+                     << ") in B.";
         DOMAIN_ERROR;
       }
 
@@ -537,17 +537,17 @@ const bool color_used   = color_type & PNG_COLOR_MASK_COLOR;     // 0x02
 const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
    if (!valid_type_and_bits(color_type, bit_depth))
       {
-        MORE_ERROR() << "Bad/unsupported combination of color type "
+        MORE_ERROR() << "A ⎕PNG B: bad/unsupported combination of color type "
                      << color_type << " and bit depth " << bit_depth
-                     << " in A ⎕PNG B";
+                     << ".";
         DOMAIN_ERROR;
       }
 
 FileWriter writer(filename);
    if (!writer)
        {
-          MORE_ERROR() << "Cannot open PNG output file " << filename
-                       << " in A ⎕PNG B: " << strerror(errno);
+          MORE_ERROR() << "A ⎕PNG B: cannot open PNG output file " << filename
+                       << ": " << strerror(errno);
           DOMAIN_ERROR;
        }
 

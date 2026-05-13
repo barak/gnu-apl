@@ -942,12 +942,22 @@ UCS_string failed_statement;
 const Parser parser(get_parse_mode(), LOC, false);
 Token_string orig;
 const ErrorCode ec = parser.parse(failed_statement, orig, false);
-   Assert(ec == E_NO_ERROR);
-
-   // revert orig, starting after label (if eny)
-   //
-const int end = orig.size() > 1 && orig[1].get_tag() == TOK_COLON ? 2 : 0;
-   for (int j = orig.size() - 1; j >= end; --j)   original.push_back(orig[j]);
+   if (ec == E_NO_ERROR)   // failed_statement could be parsed
+      {
+        // revert orig, starting after label (if eny)
+        //
+        const int end = orig.size() > 1 && orig[1].get_tag() == TOK_COLON ? 2 : 0;
+        for (int j = orig.size() - 1; j >= end; --j)   original.push_back(orig[j]);
+      }
+   else                    // parsing failed_statement failed
+      {
+        /* a common case for arriving here is e.g.
+  
+           A←{⍵ + 1}
+           A←{⍵ + 1}
+         */ 
+        loop(b, body.size())   original.push_back(body[b]);
+      }
 }
 //----------------------------------------------------------------------------
 Function_PC

@@ -1008,7 +1008,21 @@ Symbol::list(ostream & out) const
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
-char buffer[128];   // a little bigger than needed (we need 80 + 2)
+   // )OUT records have a fixed format:
+   // We use buffers that are a little larger than that.
+   //
+enum { LAST_REC_LEN =  1,   //    1 byte last record indicator (' ' or 'X')
+       CONTENT_REST = 71,   // + 71 byte content  
+                            // ────
+       CONTENT_LEN  = 72,   // = 72 byte content
+       SEQ_LEN      =  8,   // +  8 byte sequence nunber
+       CRLF_LEN     =  2,   // +  2 byte CR/LF
+                            // ────
+       RECORD_SIZE  = 82,   // = 82 byte
+       SLACK        =  8,   // +  8 byte slack
+                            // ────
+       BUFSIZE      = 90    // = 90 byte buffer size
+     };
 UCS_string data;
 
    switch(value_stack[0].get_NC())
@@ -1026,23 +1040,26 @@ UCS_string data;
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
-               // write a timestamp record
+               // defined functions and operators are preceeded by
+               // a timestamp record
                //
                cFunction_P fun = value_stack[0].get_function();
                const YMDhmsu ymdhmsu(fun->get_creation_time());
-               SPRINTF(buffer, "*(%d %d %d %d %d %d %d)",
+               char ts_buf[BUFSIZE];
+               char * const seq_pos = ts_buf + CONTENT_LEN;
+               SPRINTF(ts_buf, "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
                        ymdhmsu.hour, ymdhmsu.minute, ymdhmsu.second,
                        ymdhmsu.micro/1000);
 
-               for (char * cp = buffer + strlen(buffer);
-                    cp < (buffer + 72); )   *cp++ = ' ';
-                snprintf(buffer + 72,
-                         sizeof(buffer) - 72,
-                         "%8.8lld\r\n",
-                         long_long(seq++));
-               NULL_TERMINATE(buffer)
-               fwrite(buffer, 1, 82, out);
+               for (char * cp = ts_buf + strlen(ts_buf); cp < seq_pos; )
+                   {
+                     *cp++ = ' ';
+                   }
+                snprintf(ts_buf + CONTENT_LEN, BUFSIZE - CONTENT_LEN,
+                         "%8.8lld\r\n", long_long(seq++));
+               NULL_TERMINATE(ts_buf)
+               fwrite(ts_buf, 1, RECORD_SIZE, out);
 
                // write function record(s)
                //
@@ -1054,22 +1071,23 @@ UCS_string data;
         default: return;
       }
 
+char buffer[BUFSIZE];
    for (ShapeItem u = 0; u < data.ssize() ;)
       {
         const ShapeItem rest = data.size() - u;
-        if (rest <= 71)   buffer[0] = 'X';   // last record
-        else              buffer[0] = ' ';   // more records
-        loop(uu, 71)
+        if (rest <= CONTENT_REST)   buffer[0] = 'X';   // last record
+        else                        buffer[0] = ' ';   // more records
+        loop(uu, CONTENT_REST)
            {
              unsigned char cc = ' ';
              if (u < data.ssize()) cc = Avec::unicode_to_cp(data[u++]);
              buffer[1 + uu] = cc;
            }
 
-        snprintf(buffer + 72, sizeof(buffer) - 72,
+        snprintf(buffer + CONTENT_LEN, BUFSIZE - CONTENT_LEN,
                  "%8.8lld\r\n", long_long(seq++));
         NULL_TERMINATE(buffer)
-        fwrite(buffer, 1, 82, out);
+        fwrite(buffer, 1, RECORD_SIZE, out);
       }
 }
 //----------------------------------------------------------------------------

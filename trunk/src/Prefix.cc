@@ -580,17 +580,29 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
         if (!(nc & NC_left))   // error
            {
              const char * sym_nc = "???";
+             cFunction_P defined_fun = 0;
              switch(nc)
                 {
                    case NC_LABEL:      sym_nc = "label";              break;
-                   case NC_OPERATOR:   sym_nc = "defined operator";   break;
-                   case NC_FUNCTION:   sym_nc = "defined function";   break;
+                   case NC_OPERATOR:   defined_fun = symbol->get_function();
+                                       sym_nc = "defined operator";   break;
+                   case NC_FUNCTION:   defined_fun = symbol->get_function();
+                                       sym_nc = "defined function";   break;
                    case NC_SYSTEM_FUN: sym_nc = "system function";    break;
                    default: FIXME;
                 }
 
-             MORE_ERROR() << "Assignment to symbol " << symbol->get_name()
-                  << " which (currently) is a " << sym_nc;
+             if (defined_fun && defined_fun->is_lambda())
+                {
+                  MORE_ERROR() << "Assignment to symbol " << symbol->get_name()
+                               << " which (currently) is a named lambda.\n"
+                  "    You may want to ⎕EX '" << symbol->get_name() << "' first.";
+                }
+             else
+                {
+                  MORE_ERROR() << "Assignment to symbol " << symbol->get_name()
+                               << " which (currently) is a " << sym_nc;
+                }
              syntax_error(LOC);
            }
 
