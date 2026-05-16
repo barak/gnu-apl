@@ -93,11 +93,18 @@ Value_P Z;
              Z = monadic_format(B);
              B->set_shape(shape_B);
            }
-        catch (...)
+        catch (Error &)
            {
              B->set_shape(shape_B);
              throw;   // rethrow error
            }
+        catch (std::bad_alloc &)
+           {
+             B->set_shape(shape_B);
+             throw;   // rethrow error
+           }
+        catch (...)
+           { FIXME; }
 
         // ¯1↓⍴B ←→ ¯1↓⍴Z i.e. the leading axes of B have the same lengths as
         // the leading axes of Z. monadic ⍕ changes (increases) only the length
@@ -313,9 +320,12 @@ Value_P Z(shape_Z, LOC);
       {
         throw err;   // rethrow
       }
-   catch (...)
+   catch (std::bad_alloc &)
       {
+        WS_FULL;
       }
+   catch (...)
+      { FIXME; }
 
    return Z;
 }

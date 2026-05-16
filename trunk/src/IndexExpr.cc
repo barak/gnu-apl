@@ -123,7 +123,9 @@ int count = 0;
          out << dob->where_allocated();
 
          try           { out << *idx; }
-         catch (...)   { out << " *** corrupt ***"; }
+         catch (Error &)      { out << " *** corrupt ***"; }
+         catch (std::bad_alloc &) { out << " *** corrupt ***"; WS_FULL; }
+         catch (...)          { FIXME; }
 
          out << endl;
 

@@ -296,16 +296,13 @@ Workspace::immediate_execution(bool exit_on_error)
                  CERR << ")SI depth is " << the_workspace.SI_entry_count()
                       <<  "; )SIC is strongly recommended !!!"
                       << endl;
-              try { WS_FULL } catch (...) {}
+              try { WS_FULL } catch (Error &) {}
+                              catch (...) { FIXME; }
               if (exit_on_error)   return Token(TOK_OFF);
             }
+
          catch (...)
-            {
-              CERR << "*** " << __FUNCTION__
-                   << "() caught other exception ***" << endl;
-              IO_Files::apl_error(LOC);
-              if (exit_on_error)   return Token(TOK_OFF);
-            }
+            { FIXME; }
       }
 
    return Token(TOK_ESCAPE);

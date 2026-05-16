@@ -154,12 +154,14 @@ const ShapeItem cols = value.get_last_shape_item();
 
 PrintBuffer * item_matrix = 0;
    try { item_matrix = new PrintBuffer[ec]; }
-   catch (...)
+   catch (std::bad_alloc &)
       {
         MORE_ERROR() << "value too large to print ("
                      << cols << " columns, " << ec << " items)";
         WS_FULL;
       }
+   catch (...)
+      { FIXME; }
 
    if (do_PrintBuffer(value, pctx, out, outer_style, item_matrix))   // ^C hit
       {

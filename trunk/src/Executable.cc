@@ -530,8 +530,9 @@ StateIndicator & si = *Workspace::SI_top();
 
    try                 { return si.run();                               }
    catch (Error err)   { return Token(TOK_ERROR, err.get_error_code()); }
-   catch (Token tok)   { return tok;                                    }
-   catch (...)         { return Token(TOK_ERROR, E_SYSTEM_ERROR);       }
+
+   catch (std::bad_alloc &) { return Token(TOK_ERROR, E_SYSTEM_ERROR);       }
+   catch (...)              { FIXME; }
 
    // not reached
    FIXME;

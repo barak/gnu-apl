@@ -808,7 +808,10 @@ eval__fun(APL_function fun)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -821,7 +824,10 @@ eval__A_fun_B(APL_value vA, APL_function fun, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -835,7 +841,10 @@ eval__A_L_oper_B(APL_value vA, APL_function fL, APL_function fun, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -849,7 +858,10 @@ eval__A_fun_X_B(APL_value vA, APL_function fun, APL_value vX, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -865,7 +877,10 @@ eval__A_L_oper_R_B(APL_value vA, APL_function fL, APL_function fun,
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -881,7 +896,10 @@ eval__A_L_oper_X_B(APL_value vA, APL_function fL, APL_function fun,
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -898,7 +916,10 @@ eval__A_L_oper_R_X_B(APL_value vA, APL_function fL, APL_function fun,
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -910,7 +931,10 @@ eval__fun_B(APL_function fun, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -923,7 +947,10 @@ eval__L_oper_B(APL_function L, APL_function oper, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -936,7 +963,10 @@ eval__fun_X_B(APL_function fun, APL_value vX, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -951,7 +981,10 @@ eval__L_oper_R_B(APL_function fL, APL_function fun, APL_function fR,
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -965,7 +998,10 @@ eval__L_oper_X_B(APL_function fL, APL_function fun, APL_value vX, APL_value vB)
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 APL_value
@@ -981,7 +1017,10 @@ eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
 
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
-       } catch (...)   { return 0; }
+       } catch (Error &)          { return 0; }
+
+         catch (std::bad_alloc &) { return 0; }
+         catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 void

@@ -161,7 +161,7 @@ bool need_restore = false;
                  }
             }
        }
-    catch (...)
+    catch (Error &)
       {
         desired_ranks = old_desired_ranks;
         desired_shape = old_desired_shape;
@@ -169,6 +169,16 @@ bool need_restore = false;
         desired_maxdepth = old_desired_maxdepth;
         throw;
       }
+    catch (std::bad_alloc &)
+      {
+        desired_ranks = old_desired_ranks;
+        desired_shape = old_desired_shape;
+        desired_types = old_desired_types;
+        desired_maxdepth = old_desired_maxdepth;
+        throw;
+      }
+    catch (...)
+      { FIXME; }
 
    Log(LOG_Quad_RVAL)
       {

@@ -2998,7 +2998,9 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
         Z->print(out);
         out << endl;
       }
-   catch (...)   { out << " *** corrupt stale ***"; }
+   catch (Error &)          { out << " *** corrupt stale ***"; }
+   catch (std::bad_alloc &) { out << " *** corrupt stale ***"; WS_FULL; }
+   catch (...)              { FIXME; }
 
    out << endl;
 }
@@ -3060,7 +3062,8 @@ const uint8_t * bits = reinterpret_cast<const uint8_t *>(ravel);
 
 IntCell * new_ravel = 0;
    try           { ravel = new IntCell[element_count()]; }
-   catch (...)   { WS_FULL }
+   catch (std::bad_alloc &) { WS_FULL }
+   catch (...)              { FIXME; }
 
    loop(b, element_count())
       if (bits[b >> 3] & (1 << (b & 7)))   new_ravel[b].set_int_value(1);

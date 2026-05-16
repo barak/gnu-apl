@@ -1640,7 +1640,8 @@ const double qct = Workspace::get_CT();
               cells_A.reserve(len_A);
               cells_B.reserve(len_B);
               cells_Z.reserve(len_A + len_B);   // worst case
-            } catch (...) { WS_FULL; }
+            } catch (std::bad_alloc &) { WS_FULL; }
+              catch (...)              { FIXME; }
 
         loop(a, len_A)   cells_A.push_back(&A->get_cravel(a));
         loop(b, len_B)   cells_B.push_back(&B->get_cravel(b));

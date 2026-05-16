@@ -194,10 +194,17 @@ UserFunction * ufun;
                                  /* keep_existing */ false,
                                  LOC, creator_utf8);
       }
-   catch (...)
+   catch (Error &)
       {
         ufun = 0;
       }
+   catch (std::bad_alloc &)
+      {
+        ufun = 0;
+        WS_FULL;
+      }
+   catch (...)
+      { FIXME; }
 
    if (ufun == 0)
       {

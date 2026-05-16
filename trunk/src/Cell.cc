@@ -309,7 +309,8 @@ const ShapeItem rows = value.get_shape_item(0);
    // initialize indices with 0, 1, ... length-1
    //
    try           { indices.reserve(rows); }
-   catch (...)   { return E_WS_FULL; }
+   catch (std::bad_alloc &) { return E_WS_FULL; }
+   catch (...)              { FIXME; }
    loop(r, rows)   indices.push_back(r);
 
    // the cpmparison context ctx for the sorting is the cells of the APL

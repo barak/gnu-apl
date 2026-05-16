@@ -656,11 +656,18 @@ std::vector<const char *> args(argc);
               UCS_string expr_ucs(expr_utf);
               try
                  { Command::process_line(expr_ucs, 0); }
-              catch (...)
+              catch (Error &)
                  {
                    CERR << "*** --eval '" << expr << "' failed.";
                    Command::cmd_OFF(6);
                  }
+              catch (std::bad_alloc &)
+                 {
+                   CERR << "*** --eval '" << expr << "' failed.";
+                   Command::cmd_OFF(6);
+                 }
+              catch (...)
+                 { FIXME; }
             }
         Command::cmd_OFF(0);
         return 0;

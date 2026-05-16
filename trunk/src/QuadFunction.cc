@@ -280,7 +280,9 @@ ExecuteList * fun = 0;
    try {
          fun = ExecuteList::fix(statement_B, LOC);
        }
-     catch (...) {}
+     catch (Error &)          {}
+     catch (std::bad_alloc &) { WS_FULL; }
+     catch (...)              { FIXME; }
 
    if (fun == 0)
       {

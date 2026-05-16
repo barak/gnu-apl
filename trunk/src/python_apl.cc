@@ -191,11 +191,14 @@ UCS_string line_ucs(line_utf8);
         CERR << "cought ErrorCode" << endl;
         return PyLong_FromLong(error_code);
       }
-   catch (...)
+   catch (std::bad_alloc &)
       {
         CERR << "cought something else" << endl;
         return PyLong_FromLong(-1);
       }
+
+   catch (...)
+      { FIXME; }
 
    if (exec_result == 0)   // error or defined function without return value
       {

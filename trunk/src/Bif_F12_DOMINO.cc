@@ -1663,7 +1663,8 @@ char buffer[BUFSIZE + 1];
                 const UCS_string buffer_ucs(buffer_utf);
                 result.push_back(buffer_ucs);
               }
-           catch (...) { }
+           catch (std::bad_alloc &) { WS_FULL; }
+           catch (...)              { FIXME; }
        }
 }
 #endif

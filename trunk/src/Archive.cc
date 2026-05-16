@@ -1040,7 +1040,7 @@ XML_Saving_Archive::save()
       {
         val_pars.reserve(value_count);
       }
-   catch(...)
+   catch(std::bad_alloc &)
       {
         MORE_ERROR() <<
            "XML_Saving_Archive::save() could not allocate values["
@@ -1051,6 +1051,8 @@ XML_Saving_Archive::save()
            ;
          WS_FULL;
       }
+   catch(...)
+      { FIXME; }
    Log(LOG_archive)   err << "save() done allocating values[]..." << endl;
 
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();
@@ -2181,11 +2183,19 @@ const int vid = find_int_attr("vid", false, 10);
       {
         symbol.assign(values[vid], true, LOC);
       }
-   catch (...)
+   catch (Error &)
       {
         err << "*** Could not assign value " << *values[vid]
              << "    to variable " << symbol.get_name() << " ***" << endl;
       }
+   catch (std::bad_alloc &)
+      {
+        err << "*** Could not assign value " << *values[vid]
+             << "    to variable " << symbol.get_name() << " ***" << endl;
+        WS_FULL;
+      }
+   catch (...)
+      { FIXME; }
 }
 //----------------------------------------------------------------------------
 void
@@ -2616,7 +2626,7 @@ const int levels = find_int_attr("levels", false, 10);
            {
              read_SI_entry(l);
            }
-        catch (...)
+        catch (Error &)
            {
              err <<
 "\n"
@@ -2630,6 +2640,22 @@ const int levels = find_int_attr("levels", false, 10);
              skip_to_tag("/StateIndicator");
              return;
            }
+        catch (std::bad_alloc &)
+           {
+             err <<
+"\n"
+"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
+"    workspace. The )SI stack was reconstructed to the extent possible.\n"
+"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
+"    a different name.\n" << endl;
+
+             // skip rest of <StateIndicator>
+             //
+             skip_to_tag("/StateIndicator");
+             return;
+           }
+        catch (...)
+           { FIXME; }
 
         // the parsers loop eats the terminating /SI-entry
       }

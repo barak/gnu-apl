@@ -523,11 +523,18 @@ Token_string tos;
         const Parser parser(PM_EXECUTE, LOC, false);
         parser.parse(ucs1, tos, true);
       }
-   catch(...)
+   catch(Error &)
       {
         Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
         return UCS_string();
       }
+   catch(std::bad_alloc &)
+      {
+        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
+        return UCS_string();
+      }
+   catch(...)
+      { FIXME; }
 
    // tos is now ( VAR ← ... ) or: ( ⎕FX val ...
    // make it VAR ← ( ... )    or: leave as is

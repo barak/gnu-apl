@@ -802,12 +802,14 @@ UserFunction * fun = 0;
 
         err.print(CERR, LOC);
       }
-   catch (...)
+   catch (std::bad_alloc &)
       {
         delete fun;
         CERR << "Caught unexpected exception at " << LOC << endl;
         return 0;
       }
+   catch (...)
+      { FIXME; }
 
    return fun;
 }

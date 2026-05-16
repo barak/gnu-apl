@@ -74,7 +74,8 @@ ShapeItem map_len = A->get_rows();               // the number of mappings
 
 vector<ShapeItem> indices;
    try         { indices.reserve(map_len); }
-   catch (...) { WS_FULL; }
+   catch (std::bad_alloc &) { WS_FULL; }
+   catch (...)              { FIXME; }
 
    loop(m, map_len)   indices.push_back(m);
 

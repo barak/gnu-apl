@@ -413,13 +413,15 @@ Executable * statements = 0;
         delete statements;
         return;
       }
-   catch (...)
+   catch (std::bad_alloc &)
       {
         CERR << "*** Command::process_line() caught other exception ***"
              << endl;
         delete statements;
         cmd_OFF(0);
       }
+   catch (...)
+      { FIXME; }
 
    if (statements == 0)   // StatementList::fix() failed
       {
@@ -1046,7 +1048,9 @@ UTF8_string root("/tmp");
              << doxy.get_root_dir()
              << "/index.html" << endl;
      }
-   catch (...) {}
+   catch (Error &)          {}
+   catch (std::bad_alloc &) { WS_FULL; }
+   catch (...)              { FIXME; }
 }
 //----------------------------------------------------------------------------
 void
@@ -1511,11 +1515,19 @@ const LibRef_name lib_name(out, args, false);
       {
         Workspace::load_WS(out, CERR, lib_name, quad_lx, silent);
       }
-   catch (...)
+   catch (Error &)
       {
         MORE_ERROR() << "Loading workspace '" << lib_name.get_libref()
                      << " " << lib_name.get_name() << "' failed.";
       }
+   catch (std::bad_alloc &)
+      {
+        MORE_ERROR() << "Loading workspace '" << lib_name.get_libref()
+                     << " " << lib_name.get_name() << "' failed.";
+        WS_FULL;
+      }
+   catch (...)
+      { FIXME; }
 }
 //----------------------------------------------------------------------------
 void

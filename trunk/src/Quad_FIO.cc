@@ -1184,7 +1184,8 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                     const int64_t blocks = B->get_cravel(1).get_int_value();
                     const int64_t verbo  = B->get_cravel(2).get_int_value();
                     uint64_t * p = 0;
-                    try { p = new uint64_t[blocks * 512]; }   catch (...) { }
+                    try { p = new uint64_t[blocks * 512]; }   catch (std::bad_alloc &) { WS_FULL; }
+                    catch (...)              { FIXME; }
                     if (p == 0)
                        {
                           const APL_Integer K_bytes = blocks * 4;
