@@ -1494,8 +1494,7 @@ Bif_F1_EXECUTE::execute_command(UCS_string & command)
         // Command::do_APL_expression() with token.get_tag() == TOK_ERROR
         //
         Workspace::push_Command(command);
-        Error error(E_COMMAND_PUSHED, LOC);
-        throw error;
+        throw_apl_error(E_COMMAND_PUSHED, LOC);
       }
 
 UTF8_ostream out;   // the APL output (like stdout) of the command
