@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>April 29, 2026.
+<p>May 20, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -458,12 +458,12 @@ $ make
 $ sudo make install
 </pre></div>
 
-<p>On success, <b>make</b> produces an executable filee named <b>apl</b> in
+<p>On success, <b>make</b> produces an executable file named <b>apl</b> in
 sub-directory <b>src</b> while <b>make install</b> installs that file (in
 <b>/usr/local/bin</b>) as well as some other files in other locations
 (that can be controlled via <b>configure-options</b>).
 </p>
-<p>File README contains further instructions about the installation GNU APL.
+<p>File README contains further instructions about the installation of GNU APL.
 </p>
 <hr>
 </div>
@@ -654,7 +654,7 @@ for example, to start the same workspace with different start-up values.
 troubleshooting. All other logging facilities <b>num ≠ 37</b> require that:
   </p><ul>
 <li> <i>dynamic logging</i> was enabled in <b>./configure</b>, and/or
-  </li><li> or the default value of the logging facility in <b>src/Logging.def</b>
+  </li><li> the default value of the logging facility in <b>src/Logging.def</b>
         was set to 1.
   </li></ul>
 <p>before GNU APL was compiled.
@@ -856,7 +856,7 @@ existing summary.log instead of overwriting it.
 </p>
 </li><li> <code>-u UID</code>
 
-<p>Run as user with UID 0. This option can only be used by the root user (who
+<p>Run as the user with the given UID. This option can only be used by the root user (who
 then wants to run as a different user).
 </p>
 </li><li> <code>-w milli</code>
@@ -960,7 +960,7 @@ where <b>apl</b> is installed can be changed via <b>./configure</b> options
       and shall have a file extension of <b>.atf</b> to be accepted by GNU APL.
       APL exchange files can be exchanged between machines running APL
       interpreters from different vendors. The <b>⎕TF</b> format can be easily
-      emulated on machines that do not not provide compatible <b>)IN</b> and
+      emulated on machines that do not provide compatible <b>)IN</b> and
       <b>)OUT</b> commands.
 
 </li><li> <i>APL scripts</i> consist of APL commands and APL expressions (including
@@ -968,7 +968,7 @@ where <b>apl</b> is installed can be changed via <b>./configure</b> options
       APL scripts should have a file extension of <b>.apl</b> but other extensions
       are also accepted by GNU APL. APL scripts are, for example, the files
       expected for the -f command line option. A workspace can be written in this
-      format with the i<b>)DUMP</b> command and can become an active workspace
+      format with the <b>)DUMP</b> command and can become an active workspace
       using the <b>)LOAD</b> command.
 
 </li><li> <i>APL testcase files</i> are similar to APL scripts, but in addition to
@@ -1161,13 +1161,13 @@ Next: <a href="#Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter
 <p>A <i>script</i> is a text file that contains the source code of an interpreted
 programming language. An <i>APL script</i> is a text file that contains <i>APL
 commands</i> (like <b>)LOAD</b> or <b>)OFF</b>) and <i>APL expressions</i> like
-<b>1 2 3+ 4 5 6</b>. In GNU APL a script can also contains instructions for
-the well-known ∇-editor in order to create defines functions.
+<b>1 2 3+ 4 5 6</b>. In GNU APL a script can also contain instructions for
+the well-known ∇-editor in order to create defined functions.
 </p>
-<p>On most platforms are the lines of a script separated by the single ASCII
+<p>On most platforms the lines of a script are separated by the single ASCII
 character linefeed (<b>LF</b>, ASCII code 10); on Microsoft operating systems
 the lines are separated by two characters carriage return (<b>CR</b>, ASCII
-code 13) and (<b>LF</b>. ASCII code 10). GNU APL ignores <b>CR</b> in most contexts
+code 13) and <b>LF</b> (ASCII code 10). GNU APL ignores <b>CR</b> in most contexts
 so that the same APL script can be executed on both kinds of platforms.
 </p>
 <p>The first line of a script is called the <i>shebang line</i>. The shebang line
@@ -1228,7 +1228,7 @@ Contemporary shebang line:
 
 <p>For a single argument the shebang lines above have essentially the same
 effect. The long form (full path to the interpreter) is needed only if the
-interpreter interpreter can not be found in one of the directories listed
+interpreter cannot be found in one of the directories listed
 in the environment variable <b>$PATH</b>, for example if a user installs GNU APL
 in a non-standard directory (i.e. other than in <b>/bin</b>, <b>/usr/bin</b>, or
 <b>/usr/local/bin</b>).
@@ -1239,7 +1239,7 @@ by <b>env</b> to run <b>apl</b>.
 </p>
 <p>A potential advantage of using <b>/bin/env</b> as the interpreter is the <b>-S</b>
 option of <b>/bin/env</b> which works around the single argument limitation
-of <b>execve</b>. However, this advantage only to programs other than
+of <b>execve</b>. However, this advantage applies only to programs other than
 GNU APL because GNU APL comes with a built-in capability that is
 essentially doing the same as the <b>-S</b> option of <b>/bin/env</b>. Another,
 more important, aspect is portability. On a GNU/Linux system the standard
@@ -1252,9 +1252,9 @@ approach than starting GNU APL directly.
 <p>For multiple arguments the situation is more tricky and the
 two methods differ slightly. The <b>/bin/env</b>
 method requires that multiple arguments are being quoted in the shebang
-line (so that they beconme a single argument which <b>env -S</b> splits into
-several arguments passed to <b>execve</b>). the direct <b>apl</b> method does
-the same,  but without the need to quote multiple arguments in the
+line (so that they become a single argument which <b>env -S</b> splits into
+several arguments passed to <b>execve</b>). The direct <b>apl</b> method does
+the same, but without the need to quote multiple arguments in the
 shebang line. For example:
 </p>
 <div class="example">
@@ -1276,7 +1276,7 @@ unknown option './SCRIPT2.apl'
 $ cat SCRIPT3.apl
 #!/usr/bin/env apl --id 1010
 
-$ b./SCRIPT2.apl
+$ ./SCRIPT3.apl
 /usr/bin/env: ‘apl --id 1010’: No such file or directory
 /usr/bin/env: use -[v]S to pass options in shebang lines
 </pre></div>
@@ -1291,7 +1291,7 @@ Next: <a href="#Make-the-script-file-executable" accesskey="n" rel="next">Make t
 <span id="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter-1"></span><h4 class="subsection">2.1.2 Redirect the script file to the stdin of the GNU APL interpreter</h4>
 
 <p>Another method to execute an APL script file, say <b>SCRIPT.apl</b>, is to
-use the input redirection of the shall:
+use the input redirection of the shell:
 </p>
 <div class="example">
 <pre class="example">$ apl &lt; SCRIPT.apl   # input redirection of SCRIPT.apl to stdin of apl
@@ -1345,7 +1345,7 @@ Next: <a href="#How-command-line-arguments-are-handled" accesskey="n" rel="next"
 <p>The different methods for starting a GNU APL described above have emerged
 over time. They can be seen as different front-ends to the GNU APL
 interpreter that slightly differ in how command line options are being passed
-from the shell to GNU APL. However, sooner or later each of the methods wiil
+from the shell to GNU APL. However, sooner or later each of the methods will
 call <b>execve(pathname, argv, envp)</b> where:
 </p>
 <ul>
@@ -1357,10 +1357,10 @@ call <b>execve(pathname, argv, envp)</b> where:
 <p>The different front-ends differ slightly as to how <b>argv</b> and <b>envp</b> are
 being constructed; <b>/bin/env</b> allows the user to modify the environment 
 before the GNU APL interpreter is called, input redirection allows the user
-to modifu the apl script file before the GNU APL interpreter is called, and
+to modify the APL script file before the GNU APL interpreter is called, and
 <b>-f</b> allows the user to select the script file to be executed. One method
-may be simpler to use in one situation and another method may be simpler to 
-use in another situation and the final verdict as to which method is the
+may be simpler to use in one situation and another method may be simpler to
+use in a different situation and the final verdict as to which method is the
 best is left to the user.
 </p>
 <hr>
@@ -1473,7 +1473,6 @@ sarg2
       as the <i>shebang line</i>. If the shebang contains more than one argument
       (like <b>&ndash;script</b>, <b>&ndash;id</b>, and <b>1010</b> above), then the arguments
       need to be quoted, and
-         then the arguments must be quoted, and
 </li><li> in contrast, multiple arguments in the command line (like <b>sarg1</b> and
       <b>sarg2</b> above) must not be quoted (or else they will appear as a single
       argument).
@@ -2042,14 +2041,14 @@ terminal → APL direction) as well:
                             │                 │
                          ┌──┴──┐           ┌──┴──┐
       (text,             │     │           │     │    (text,
-       multi-line)       │ OUT │           │ OUT │     milti-line)
+       multi-line)       │ OUT │           │ OUT │     multi-line)
                          │     │           │     │
                          └─────┘           └─────┘
 </pre>
 <p>The relevant formatting rules for APL output are:
 </p>
 <ul>
-<li> one line of a APL output corresponds to one or more scalar items 
+<li> one line of an APL output corresponds to one or more scalar items
       of the APL value,
 </li><li> the items in the <b>same</b> output line are the scalars along the
       <b>last axis</b> of the APL value, where
@@ -2101,19 +2100,19 @@ for multi line literals in a completely consistent fashion:
 </li><li> vertically adjacent two-dimensional literals, separated by one blank
       line, become three-dimensional APL values,
 </li><li> vertically adjacent three-dimensional literals, separated by two blank
-      line, become four-dimensional APL values,
+      lines, become four-dimensional APL values,
 </li><li> ...
 </li><li> vertically adjacent <b>N-1</b>-dimensional literals separated by <b>N-2</b>
-      blank line become <b>N</b>-dimensional APL values,
+      blank lines become <b>N</b>-dimensional APL values,
 </li></ul>
 
 <p>Similar to multi-line strings, a multi-line literal starts with the marker
 <b>&lt;&lt;&lt;</b> at the end of one line and ends with  the marker <b>&gt;&gt;&gt;</b> on a
 subsequent line. The value of the multi line literal is contained in the lines
 between these two markers (excluding the lines with the markers). In contrast
-to multi-line strings, can multi line literals be used recursively. That is,
-one multi line literal can contain other multi line literals (as well as
-multi-line strings) to created nested sub-values of ranks &gt; 1.
+to multi-line strings, multi-line literals can be used recursively. That is,
+one multi-line literal can contain other multi-line literals (as well as
+multi-line strings) to create nested sub-values of ranks &gt; 1.
 </p>
 <p>Some examples may be worthwhile to explain the concept:
 </p>
@@ -2199,7 +2198,7 @@ become part of the literal value:
 └ϵ─────────────┘
 </pre></div>
 
-<p>Multi-line literal can contain other Multi-line literals or strings:
+<p>Multi-line literals can contain other multi-line literals or strings:
 </p>
 <div class="example">
 <pre class="example">      8 ⎕CR &lt;&lt;&lt;   ⍝ two-dimensional with sub-literal:
@@ -2314,7 +2313,7 @@ Previous: <a href="#Automatic-_0029MORE" accesskey="p" rel="prev">Automatic )MOR
 <span id="Script-Example-1"></span><h4 class="subsection">2.1.11 Script Example</h4>
 
 <p>Note that the two different ways of running an APL script have an impact on
-how ⎕ARG looks like. If stdin is redirected then there is only one (possibly
+what ⎕ARG looks like. If stdin is redirected then there is only one (possibly
 empty) set of command line options. Otherwise there are two sets of command
 line options: command line options for the apl interpreter and command line
 options for the script.
@@ -2466,7 +2465,7 @@ provided:
 </p>
 <ul>
 <li> 1 for monadic functions,
-</li><li> 2 or monadic functions with axis,
+</li><li> 2 for monadic functions with axis,
 </li><li> 2 for dyadic functions (w/o axis), or
 </li><li> 3 for dyadic functions with axis.
 </li></ul>
@@ -2479,7 +2478,7 @@ functions did not scale very well. As the number of functions increased,
 a new and, at that time, better scalable concept was introduced: ⎕-functions
 (and variables). The APL standards define only a small number (less than 20)
 of them, but different APL vendors were eagerly adding more system functions
-to represent their proprietary extensions to th APL language. And so did
+to represent their proprietary extensions to the APL language. And so did
 GNU APL. With ⎕-functions the original visual appearance that helped to
 remember the many functions was replaced by abbreviations. That is, for
 example, <b>⎕AV</b> stands for the <b>A</b>tomic <b>V</b>ector, <b>⎕TS</b> for
@@ -2491,7 +2490,7 @@ approach is no longer scalable (try to remember 100 abbreviations and
 think about the readability of the code using them!). Rather than adding a
 new ⎕-function for every new function, GNU APL tries to keep the number
 of ⎕-functions as small as reasonable and by grouping several interpreter
-functions into sub-function of a single top-level ⎕-function.
+functions into sub-functions of a single top-level ⎕-function.
 </p>
 <p>We call such a top-level ⎕-function a <b>function group</b>. The sub-function
 functions of a function group are somehow related by their
@@ -2500,11 +2499,10 @@ purpose. The function groups of GNU APL are:
 <ul>
 <li> <b>⌹</b>: a collection of matrix factorizations (aka. decompositions)
 </li><li> <b>⎕CR</b>: a collection of data conversions (formerly known as monadic
-  <b>C</b>harater <b>R</b>epresentations
+  <b>C</b>haracter <b>R</b>epresentations
 </li><li> <b>⎕FFT</b>: a collection of <b>F</b>ast <b>F</b>ourier <b>T</b>ransformations
 </li><li> <b>⎕FIO</b>: a collection of <b>F</b>ile <b>I</b>/O functions
 </li><li> <b>⎕MX</b>: a collection of <b>M</b>atri<b>x</b> functions
-  functions
 </li><li> <b>⎕RVAL</b>: generation of <b>R</b>andom APL <b>Val</b>ues
 </li><li> <b>SQL</b>:  an interface to <b>SQL databases</b>
 </li></ul>
@@ -2549,7 +2547,7 @@ was selected as follows:
       A ⎕FIO[3] B      ⍝ fopen file B with mode A
 </pre></div>
 
-<p>In both cases was the sub-function selector an integer scalar.
+<p>In both cases the sub-function selector was an integer scalar.
 </p>
 <hr>
 </div>
@@ -2635,7 +2633,7 @@ that show their sub-functions and their syntax.
 </p>
 <ul>
 <li> <b>FOO &quot;&quot;</b> shows a list of sub-functions, and
-</li><li> <b>FOO ⍬</b> shows the syntaces (as per phase 1, 2, or 3) of them.
+</li><li> <b>FOO ⍬</b> shows the syntaxes (as per phase 1, 2, or 3) of them.
 </li></ul>
 
 <hr>
@@ -2882,7 +2880,7 @@ as follows:
       defined function.
 </li><li> If both <b>⍺</b> and <b>⍵</b> are present in the body_statement(s) then the
       operator or defined function is dyadic.
-</li><li> If only <b>⍵</b> is present then the operator or defined is monadic.
+</li><li> If only <b>⍵</b> is present then the operator or defined function is monadic.
 </li><li> If neither <b>⍺</b> nor <b>⍵</b> is present then the lambda is niladic.
 </li><li> Lambdas with the left value argument <b>⍺</b> but without the right
       value argument <b>⍵</b> are invalid (SYNTAX ERROR).
@@ -2930,16 +2928,6 @@ the form:
 <pre class="example">      )FNS
 
       SUM ← { ⍺ + ⍵ }
-</pre></div>
-
-<p>is translated to a two-line function ⎕FX &rsquo;lambda_header&rsquo; &rsquo;body_expression&rsquo;.
-</p>
-<p>For example:
-</p>
-<div class="example">
-<pre class="example">      )FNS
-
-      SUM ← { ⍺ + ⍵ }
       )FNS
 SUM
 
@@ -2952,7 +2940,7 @@ function is a lambda
 </pre></div>
 
 <p>Named lambdas are included in function lists like <b>)FNS</b> along with other
-defined functions. They can not be edited with the ∇-edidor, but can be
+defined functions. They can not be edited with the ∇-editor, but can be
 displayed using <b>⎕CR &rsquo;name&rsquo;</b>:
 </p>
 <div class="example">
@@ -3040,22 +3028,22 @@ APL interpreters but that are <b>NOT</b> implemented in GNU APL. This includes
 definitions that span multiple lines, guards, lexical scoping, and probably
 more.
 </p>
-<p>The primary reason for these limitations in not the lazyness of the GNU APL
+<p>The primary reason for these limitations is not the laziness of the GNU APL
 author, but the fact that the lambdas in other APL dialects introduce a 
 execution semantics that is very different from the execution semantics of
 <i>properly</i> defined functions (i.e. those created with the ∇-editor or
 with <b>⎕FX</b>. For example, a properly defined function returns with <b>→0</b>
 or after its last line was executed, while the lambdas in other dialects
-also returns after the first non-committed value was computed (i.e. in the
+also return after the first non-committed value was computed (i.e. in the
 middle of a multi-line function and without any <b>→0</b> (and without any 
 warnings). The GNU APL author is an old-fashioned programmer from the APL1
-aera who considers it outright dangerous to have two kinds of functions that
+era who considers it outright dangerous to have two kinds of functions that
 very much look the same (the only difference being the argument names <b>⍺</b>
 and <b>⍵</b>), but that behave fundamentally different.
 </p>
 <p>In contrast, GNU APL tries to keep the same execution semantics for lambdas
 and for properly defined functions. As one of the consequences, you
-<i>should not</i> create or modify a lambdas with <b>⎕FX</b> or with the ∇-editor
+<i>should not</i> create or modify a lambda with <b>⎕FX</b> or with the ∇-editor
 (it may be possible for debugging purposes, but then it is asking for trouble).
 </p>
 
@@ -3104,7 +3092,7 @@ Next: <a href="#g_t_0029COPY_005fONCE-Command" accesskey="n" rel="next">)COPY_ON
 
 <p>The )DUMP-HTML command is similar to the )DUMP command and the output format
 is similar as well. The difference is that those characters that need
-HTML-escaping (e.g. &rsquo;&lt;&rsquo; becomes &amp;lt; and &rsquo;&gt;&rsquo; becomes &rsquo;&amp;gt; etc.) are
+HTML-escaping (e.g. &rsquo;&lt;&rsquo; becomes &amp;lt; and &rsquo;&gt;&rsquo; becomes &rsquo;&amp;gt;&rsquo; etc.) are
 HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
 used by a web browser to display workspace listings (to share the code).
 </p>
@@ -3143,7 +3131,7 @@ Next: <a href="#g_t_005dKEYB-Command" accesskey="n" rel="next">]KEYB Command</a>
 <span id="g_t_005dDOXY-Command-1"></span><h3 class="section">2.10 ]DOXY Command</h3>
 
 <p>A particularly useful debug command is ]DOXY. It dumps the current workspace
-in brows-able HTML format with listings of defined functions and hyperlinks
+in browsable HTML format with listings of defined functions and hyperlinks
 between them.
 </p>
 <div class="example">
@@ -3214,12 +3202,12 @@ Next: <a href="#g_t_005dNEXTFILE-and-_005dPUSHFILE-Commands" accesskey="n" rel="
 <p>In the early days of APL the user was typically faced with three problems:
 APL keyboards, APL screens, and APL printers.
 </p>
-<p>The advent of Unicode has soved the last two problems rather eleqantly:
-the Uncode character set contains all APL characters, and screens (i.e CRT tubes
+<p>The advent of Unicode has solved the last two problems rather elegantly:
+the Unicode character set contains all APL characters, and screens (i.e. CRT tubes
 in the old days and screen windows these days) and printers display them
 properly. What remains is the keyboard problem. The keyboard problem has two
 sub-problems: Keyboard caps that show APL symbols in addition to the normal
-ASCII characters, and generating proiper Unicodes when the keys are being
+ASCII characters, and generating proper Unicodes when the keys are being
 pressed (typically with the ALT or CTRL keys held down).
 </p>
 <p>GNU APL provides the debug command <b>]KEYB</b> to help resolving these issues.
@@ -3228,33 +3216,33 @@ There are two cases where <b>]KEYB</b> may be useful:
 <ul>
 <li> One can buy so called &rsquo;APL keyboards&rsquo; or APL stickers that can be
 glued on the key caps of a regular keyboard. As a matter of fact, APL
-keyboards are simply regular keyboards with differen key caps. The keycodes
+keyboards are simply regular keyboards with different key caps. The keycodes
 sent by APL keyboards do not differ from the keycodes of regular keyboards.
-One the other hand, many programmers type blindly; for them the keycaps are
+On the other hand, many programmers type blindly; for them the keycaps are
 mostly irrelevant, and the substantial surcharge for APL keyboards may be
 unreasonable. A related problem is national keyboards: most APL keyboards
 have a US layout for their keycaps although a user may prefer a national
-layout. Most of this can be helped with a keuboard layout that is printed
-on the screen. A user that types bindly most of the time, but cannot
+layout. Most of this can be helped with a keyboard layout that is printed
+on the screen. A user that types blindly most of the time, but cannot
 remember the position of all APL symbols (in particular of rarely used ones)
 may find it useful to display the keyboard layout on the screen.
 
 </li><li> The other use case for <b>]KEYB</b> is troubleshooting the transformation
 of keys pressed on the keyboard to Unicodes sent to the APL interpreter. This
 transformation (which is explained in more detail below) is highly
-conficurable. The good news is that these days any keyboard can be configured
-to send any Unicode on any key as preferered by the user. The bad news is
+configurable. The good news is that these days any keyboard can be configured
+to send any Unicode on any key as preferred by the user. The bad news is
 that this configuration differs a lot between different platforms and can
-be faily cumbersome. The <b>]KEYB</b> command is intended to help figuring
-why pressing a partiicular key does not produce the APL character that it
-should. It maybe wothwhile to note that even an APL keyboard can (and most
+be fairly cumbersome. The <b>]KEYB</b> command is intended to help figuring out
+why pressing a particular key does not produce the APL character that it
+should. It may be worthwhile to note that even an APL keyboard can (and most
 likely will) not produce the characters shown on its keypad if the
-transformation from key presses to Unicdes is misconfigured. In that respect
-APL keyboards are no better than keybiard stickers: Glueing a <b>⍴</b> sticker
+transformation from key presses to Unicodes is misconfigured. In that respect
+APL keyboards are no better than keyboard stickers: Glueing a <b>⍴</b> sticker
 onto the <b>R</b> does not make the <b>R</b> send the Unicode for <b>⍴</b>. Likewise,
 an APL keyboard with <b>⍴</b> printed in addition to <b>R</b> does not make that
 keyboard send the Unicode for <b>⍴</b>. Both cases only work as expected if
-the transformation from keys to Unicdes is configured properly.
+the transformation from keys to Unicodes is configured properly.
 </li></ul>
 
 <ul class="section-toc">
@@ -3271,7 +3259,7 @@ Next: <a href="#xmodmap-and-friends" accesskey="n" rel="next">xmodmap and friend
 <span id="The-transformation-of-Keycodes-to-Unicodes-1"></span><h4 class="subsection">2.11.1 The transformation of Keycodes to Unicodes</h4>
 
 <p>In a nutshell, on a GNU/Linux (or other X-based) platform,
-a key pressed or realeased is processed as follows:
+a key pressed or released is processed as follows:
 </p>
 <ol>
 <li> The user presses or releases a key on the keyboard. This creates a
@@ -3279,16 +3267,16 @@ a key pressed or realeased is processed as follows:
       items:
       <ul>
 <li> a <b>keycode</b> which is a number between 0 and 255 that uniquely
-            identidies the key. The keys in the main keyboard area (i.e.
-            where all the alkphabetic keys are located), have keycodes between
+            identifies the key. The keys in the main keyboard area (i.e.
+            where all the alphabetic keys are located), have keycodes between
             8 and 64,
       </li><li> a <b>state</b> which tells if the key was pressed or released, and
-      </li><li> a <b>timestanp</b> which tells when key was pressed or released.
+      </li><li> a <b>timestamp</b> which tells when key was pressed or released.
       </li></ul>
 </li><li> The operating system processes the event:
       <ul>
 <li> It remembers the new state of the key. If the key is a
-            <b>modifier key</b> such as SHIFT, CTRL, or ALT, the the processing
+            <b>modifier key</b> such as SHIFT, CTRL, or ALT, the processing
             is done.
       </li><li> Otherwise the key is a normal key and the operating system 
        computes a <b>keysymbol</b> from the <b>keycode</b>. In this computation
@@ -3296,11 +3284,11 @@ a key pressed or realeased is processed as follows:
        are taken into account. For that reason, e.g. pressing <b>R</b> when 
        (only) the SHIFT modifier key is pressed produces <b>R</b> and if SHIFT
        is released then it produces <b>r</b>. Every Unicode has a keysymbol (with
-       the same value) but some keysymbols doe not correspond to a Unicode
-       but o an action that the oprating system shall perform (e.g. cursor
-       home in a termina window). A particularly important keysymbol is
+       the same value) but some keysymbols do not correspond to a Unicode
+       but to an action that the operating system shall perform (e.g. cursor
+       home in a terminal window). A particularly important keysymbol is
        <b>0x0000</b> aka. <b>NoSymbol</b> which indicates that (for a given
-       combination of modifer keys) no Unicode shall be generated.
+       combination of modifier keys) no Unicode shall be generated.
       </li></ul>
 
 </li><li> The operating system forwards the keysymbol towards the application
@@ -3328,7 +3316,7 @@ installation. for example, in the US keycode <b>29</b> will be mapped to <b>y</b
 while in Germany keycode <b>29</b> will be mapped to <b>z</b>. At this point most
 mappings for modifier ALT pressed, and most settings for CTRL pressed are
 set to <b>NoSymbol</b> so that pressing these keys together with CTRL or ALT 
-have no effect. To generate APL characteres instead of nothing,
+have no effect. To generate APL characters instead of nothing,
 the user has to modify the mapping as to produce APL Unicodes. This
 modification is lost after rebooting the computer; therefore the mapping
 is usually performed in a script that is run at login time of the user (i.e.
@@ -3354,7 +3342,7 @@ shipped with a configuration file for US keyboards
 mapping (<b>support-files/Juergen-Mint-21/xmodmap.ascii</b>). The latter is
 redundant since <b>xmodmap</b> provides a way to save the current mapping
 (see <b>man xmodmap</b>). There was a short period where <b>xmodmap</b> did not
-work in Linux Mint several yeras ago, but this has been fixed in the meantime.
+work in Linux Mint several years ago, but this has been fixed in the meantime.
 </p>
 <p>It is impossible for the author to explain all available mapping programs
 and therefore this manual focuses on <b>xmodmap</b> and, as an alternative,
@@ -3439,7 +3427,7 @@ Next: <a href="#g_t_005dKEYB-XMOD" accesskey="n" rel="next">]KEYB XMOD</a>, Prev
 </div>
 <span id="g_t_005dKEYB-without-a-mode-1"></span><h4 class="subsubsection">2.11.3.2 ]KEYB without a mode</h4>
 
-<p>Command i<b>]KEYB</b> without a mode is for the normal day to day use (as
+<p>Command <b>]KEYB</b> without a mode is for the normal day to day use (as
 opposed to troubleshooting). It displays an APL keyboard on the screen,
 which is very useful if the keyboard has no APL stickers or key caps.
 </p>
@@ -3463,8 +3451,8 @@ was used to generate the output.
 will fail if either <b>xmodmap</b> is not used at all, or if <b>xmodmap</b> is
 combined with other keyboard mapping programs. For these cases, the user can
 disable the automatic use of <b>xmodmap</b> in one of her preferences files.
-The option to do so is <b>NO-XMODMAP</b> and ii is effective only of
-]KEYB is calle  without a mode. That is, <b>]KEYB XMOD</b> will use <b>xmodmap</b>
+The option to do so is <b>NO-XMODMAP</b> and it is effective only if
+]KEYB is called without a mode. That is, <b>]KEYB XMOD</b> will use <b>xmodmap</b>
 even if <b>xmodmap</b> was disabled by <b>NO-XMODMAP</b> in a preferences file.
 </p>
 
@@ -3555,7 +3543,7 @@ Previous: <a href="#g_t_005dKEYB-GUESS" accesskey="p" rel="prev">]KEYB GUESS</a>
 
 <p><b>]KEYB XMOD KEYS</b> runs <b>xmodmap -pke</b>, but first shows the assumed
 physical layout of the keyboard. By comparing the first half of the output
-with the second half, one can see how <b>xmodmap</b> mapes keycodes to
+with the second half, one can see how <b>xmodmap</b> maps keycodes to
 Unicode characters. For example:
 </p>
 <div class="example">
@@ -3638,7 +3626,7 @@ US Keyboard Layout.    Source: GNU APL builtin
 
 <p>As the <b>Source: GNU APL builtin</b> in the example above indicates, this is
 the layout assumed by GNU APL, which may differ from the true layout of your
-keybord. For example, say key <b>R</b> with ALT pressed does not produce <b>⍴</b>.
+keyboard. For example, say key <b>R</b> with ALT pressed does not produce <b>⍴</b>.
 The Unicode for <b>⍴</b> is :
 </p>
 <div class="example">
@@ -3649,7 +3637,7 @@ The Unicode for <b>⍴</b> is :
 </pre></div>
 
 <p>One can check if the keycodes displayed by <b>]KEYB XMOD KEYS</b>  are
-correct with a programm called <b>xev</b> (which is normally pre-installed in
+correct with a program called <b>xev</b> (which is normally pre-installed in
 most GNU/Linux distributions. After starting <b>xev</b> and hitting the <b>R</b>
 key several times (because it also shows many other unrelated events),
 one can see the corresponding key events:
@@ -3707,8 +3695,8 @@ becomes simple (though somewhat tedious in the details):
        the keyboard, that the keycode shown by <b>xev</b> is the one shown by
        <b>]KEYB XMOD KEYS</b>, then
 </li><li> do <b>]KEYB XMOD</b> in GNU APL to display the keysyms, then
-      </li><li> edit the <b>xmodmap.apl</b> file (or whatever other file ws used
-      as the argument for the <b>xmondmap</b> command) to see if the Unicodes
+      </li><li> edit the <b>xmodmap.apl</b> file (or whatever other file was used
+      as the argument for the <b>xmodmap</b> command) to see if the Unicodes
       for every keycode line are correct. In that test:
       <ul>
 <li> the first keysym is used for the lowercase character, i.e. if
@@ -5115,10 +5103,10 @@ with only powers of <b>X</b>,
 <p>Function <b>⌹[7] B</b>, aka. <b>⌹.poly_print B</b> returns a string with this
 interpretation. In its monadic form <b>⌹[7] B</b> it uses the names
 <b>x</b>, <b>y</b>, <b>z</b>, ... for the indeterminants of the polynomial.
-In its dyadic form <b>A ⌹[7] B</b> does i<b>A</b> specify the names that shall
+In its dyadic form <b>A ⌹[7] B</b> <b>A</b> specifies the names that shall
 be used. Two forms are supported for <b>A</b>: the characters of a plain APL
 string <b>(⍴A == ⍴⍴B)</b> is understood as a list of single character
-indeterminants. iAlternatively A list of nested strings <b>A</b> (again with
+indeterminants. Alternatively, a list of nested strings <b>A</b> (again with
 <b>(⍴A == ⍴⍴B)</b>) is understood as N different indeterminant names. For example:
 </p>
 <div class="example">
@@ -5228,16 +5216,16 @@ Next: <a href="#A-_2339_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_
 </div>
 <span id="A-_005b_003f_005d_005b10_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028multivariate_0029"></span><h4 class="subsubsection">2.23.2.7 A ⌹[10] B: Divide Polynomial A by Polynomial B (multivariate)</h4>
 
-<p>The limitiation of <b>A ⌹[10] B</b> to handle only polynomials with one 
-indeterminan is lifted with <b>A ⌹[10]</b> aka. <b>A ⌹.poly_divideN B</b>.
-The suffix <b>N</b> shall indicate that the number off indefinites is &gt; 1.
+<p>The limitation of <b>A ⌹[10] B</b> to handle only polynomials with one
+indeterminant is lifted with <b>A ⌹[10]</b> aka. <b>A ⌹.poly_divideN B</b>.
+The suffix <b>N</b> shall indicate that the number of indeterminants is &gt; 1.
 However, some caution needs to be exercized when using this function,
 as described in the following.
 </p>
 <p>A <i>polynomial</i> is the sum of zero or more <i>terms</i>. The terms of a
 polynomial are commonly called <i>monomials</i>.
 </p>
-<p><b>Tip</b>: to list, for example, all possible monomials of a polymomial with
+<p><b>Tip</b>: to list, for example, all possible monomials of a polynomial with
 three indeterminants x, y, and z and at most powers of 3:
 </p>
 <div class="example">
@@ -5272,7 +5260,7 @@ the following:
 
 <p>The general problem with multivariate polynomials (i.e. polynomials with more
 than one indeterminant, such as <b>x² + y²</b>) is then that the quotient and 
-remainder of two multivariate polinomials is not unique but depend on
+remainder of two multivariate polynomials is not unique but depends on
 the order defined between its monomials. The division of integers and
 of polynomials with one indeterminant is based on their canonical order,
 which results in a unique quotient and a unique remainder in these cases.
@@ -5337,7 +5325,7 @@ is this:
 <p>The algorithm divides polynomial <b>f</b> by polynomial
 <b>g = g₁ + g₂ + ... + gₙ</b> and yields a quotient <b>q = q₁ + q₂ + ... + qₘ</b>
 and a remainder <b>r = r₁ + r₂ + ... + rₖ</b>. In every iteration the largest
-term in <b>p</b> is annihilated by &quot;moving&quot; it to either i<b>q</b> (after
+term in <b>p</b> is annihilated by &quot;moving&quot; it to either <b>q</b> (after
 dividing it by <b>LT(gᵢ)</b> if that is possible) or else to <b>r</b>
 (if not). Obviously:
 </p>
@@ -5354,8 +5342,8 @@ dividing it by <b>LT(gᵢ)</b> if that is possible) or else to <b>r</b>
       In the integer and polynomial with one indeterminant cases is the length
       of the remainder limited by the degree of the dividend (so the
       remainder of dividing e.g. <b>x³ + ax² + bx + c</b> by anything has always
-      no more than 3 momomials). In contrast a polynomial with a max. power
-      of, say, 3 but 4 indeterminants can have up to 4⁴ = 256 momomials.
+      no more than 3 monomials). In contrast a polynomial with a max. power
+      of, say, 3 but 4 indeterminants can have up to 4⁴ = 256 monomials.
 </li></ul>
 
 <hr>
@@ -5368,12 +5356,12 @@ Next: <a href="#g_t_2339_005b11_005d-B-Scan-Polynomial-B" accesskey="n" rel="nex
 <span id="A-_005b_003f_005d_005b11_005d-B_003a-Divide-Polynomial-A-by-Polynomial-B-_0028with-order_0029"></span><h4 class="subsubsection">2.23.2.8 A ⌹[11] B: Divide Polynomial A by Polynomial B (with order)</h4>
 
 <p>As explained above, different monomial orders of a polynomial can lead
-to different quotients and remainders when dividing them. This iproblem
+to different quotients and remainders when dividing them. This problem
 is addressed by <b>A ⌹[11] B</b> aka. <b>A ⌹.poly_divideNO B</b>.
-The suffix <b>NO</b> shall indicate that the number off indefinites is &gt; 1,
+The suffix <b>NO</b> shall indicate that the number of indeterminants is &gt; 1,
 and that a user defined monomial order shall be used.
 </p>
-<p>Let <b>P</b> be a polynimial. An monomial order <b>O</b> for <b>P</b> is then 
+<p>Let <b>P</b> be a polynomial. A monomial order <b>O</b> for <b>P</b> is then 
 a matrix with the following properties:
 </p>
 <ul>
@@ -5478,11 +5466,11 @@ summed up in different orders, defines the same polynomial. Therefore:
 </p>
 <p>holds only if the terms in <b>P</b> occur in the same order as produced
 by <b>⌹.poly_print</b>.  The order in which <b>⌹.poly_print B</b> prints the terms
-of a polynimial <b>B</b> is what is known as the <b>lexicographic order</b>,
+of a polynomial <b>B</b> is what is known as the <b>lexicographic order</b>,
 which can, in this context, be defined as follows:
 </p>
 <p>A sequence of vectors is in lexicographic order (or: 
-<i>ordered lexicographically</i>), if every smaller item i<b>a</b> in the sequence
+<i>ordered lexicographically</i>), if every smaller item <b>a</b> in the sequence
 comes before every larger item <b>b</b> in the sequence. Where <b>smaller</b>
 resp, <b>larger</b> is defined as follows:
 </p>
@@ -5543,8 +5531,8 @@ depends on the python package <b>sympy</b> which does the actual computation
 of the integral. Normally the GNU APL <b>./configure</b> script determines which
 optional libraries for GNU APL are present and compiles GNU APL accordingly.
 In the python case this is not possible because python and its packages
-can be installed globally (by a privilreged user such as <b>root</b>) or by
-a unprivilreged user (e.g. below her home directory). It could therefore
+can be installed globally (by a privileged user such as <b>root</b>) or by
+an unprivileged user (e.g. below her home directory). It could therefore
 happen that e.g. python is available for the user that installs GNU APL, 
 but not for a user that uses the installed GNU APL. The GNU APL
 <b>./configure</b> has no way to detect such a situation. For this reason
@@ -5553,9 +5541,9 @@ GNU APL checks at runtime (i.e. when <b>⌹.integral</b> is used) if python and
 </p>
 <p>Now to the arguments of <b>⌹.integral</b>. The right argument <b>B</b> is a string
 with the expression for which the integral shall be computed. The syntax
-of <b>B</b> ia pretty much defined by <b>sympy</b>. A maybe noteworthy difference
+of <b>B</b> is pretty much defined by <b>sympy</b>. A maybe noteworthy difference
 between strings understood by <b>⌹.integral</b> and strings understood by
-<b>sympy</b> is that powers in <b>sympy</b> cwhave to be written as e.g. <b>a**n</b>,
+<b>sympy</b> is that powers in <b>sympy</b> have to be written as e.g. <b>a**n</b>,
 while <b>⌹.integral</b> also understands <b>aⁿ</b>.
 </p>
 <p>The left argument <b>A</b> is a vector of options. Currently only one option
@@ -5654,7 +5642,7 @@ character classes for ⎕CC:
       ⎕CC   4:  ASCII characters (same as ⎕CC 127)
       ⎕CC   5:  superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )
       ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )
-      ⎕CC   7:  line drawing chatacters
+      ⎕CC   7:  line drawing characters
       ⎕CC   8:  octal digits 0-7
       ⎕CC   9:  some mathematical symbols
       ⎕CC  10:  decimal digits 0-9
@@ -5745,7 +5733,7 @@ of <b>⎕CR</b>:
       APL input/output, etc.).  Just try them out.
 
 </li><li> <b>A∈5 6</b>: convert byte vector B to a string of uppercase or lowercase
-i     hex digits respectively. Every byte in <b>B</b> becomes 2 characters
+      hex digits respectively. Every byte in <b>B</b> becomes 2 characters
       in <b>Z</b>.
 
 </li><li> <b>A=10</b>: convert variable named in <b>B</b> to an APL expression
@@ -5851,7 +5839,7 @@ GNU APL with <b>⎕FIO[57]</b> (aka. <b>fork()</b> and <b>execve()</b>).
       delimiters) to a nested vector of lines.
 
 </li><li> <b>A=36</b>: the inverse of <b>⎕CR[35]</b>. Convert a nested vector of lines
-      to a string with lines terminated with LF characxters.
+      to a string with lines terminated with LF characters.
 
 </li><li> <b>A=37</b>: Same as <b>⎕CR B</b> but without removing any indentation.
 
@@ -7527,7 +7515,7 @@ See <a href="#Eigenvector">Eigenvector</a> below.
 <pre class="example">      ⊣ ( ⊂ &quot;output_filename: /tmp/bitmap.png&quot; ) ⎕PLOT 1 3 1 4 2
 </pre></div>
 
-<p>writes the plot of a a zigzag curve to file <b>/tmp/bitmap.png</b>.
+<p>writes the plot of a zigzag curve to file <b>/tmp/bitmap.png</b>.
 </p>
 <p><b>Caution</b>: ⎕PLOT with attribute <b>output_filename</b> overwrites existing
 files without any warning). Errors, most likely lack of permissions to write
@@ -7729,9 +7717,9 @@ case where no plot attributes can be specified).
     <ul>
 <li> <b>Z[1;;]</b> is a character matrix with the Unicode characters used
           to draw the plot window,
-    </li><li> <b>Z[2;;]</b> is an integer matrix with the the forground colors
+    </li><li> <b>Z[2;;]</b> is an integer matrix with the foreground colors
           (in terms of <b>VT100</b> terminal colors), and
-    </li><li> <b>Z[3;;]</b> is an integer matrix with the the backround colors
+    </li><li> <b>Z[3;;]</b> is an integer matrix with the background colors
           (again in terms of <b>VT100</b> terminal colors).
     </li></ul>
 </li></ul>
@@ -7760,7 +7748,7 @@ values with the following integer encoding:
 
 <p>The <b>ASCII</b> driver returns its result as a committed value (so that the
 plot window is not drawn twice if the value is not assigned to a variable).
-Naturally the <b>ASCII</b> driver can not support most of the <b>⎕PLOT</b> atrributes
+Naturally the <b>ASCII</b> driver can not support most of the <b>⎕PLOT</b> attributes
 like a true graphical driver like <b>GTK</b> or <b>XCB</b>. But at least the color
 attributes are honored by rounding 3×8-bit RGB values to their nearest 4-bit
 <b>VT100</b> color.
@@ -7770,7 +7758,7 @@ column of the terminal. This is addressed by a user preference named
 <b>plot-ASCII-columns</b>, which should be set to one less the number of columns
 of the terminal (so that the last columns in not written).
 </p>
-<p>Another preferencefor the ASCII driver that might be of interest is
+<p>Another preference for the ASCII driver that might be of interest is
 <b>plot-ASCII-background</b>. It sets the background color for the terminal
 if the Plot attribute canvas-color is not provided (e.g. in monadic ⎕PLOT
 which has no plot attributes).
@@ -8589,8 +8577,8 @@ Next: <a href="#Control-of-the-ranks_003a-1-_2395RVAL-B" accesskey="n" rel="next
 
 <p>Every random number generator has a state (similar to <b>⎕RL</b> for <b>&rsquo;?&rsquo;</b>).
 While the primitive <b>?</b> keeps its state in <b>⎕RL</b>, i.e. in the workspace,
-⎕RVAL has no associated system variable like i<b>⎕RL</b> which keeps its state.
-Instead, the user needs to store the state of i<b>⎕RVAL</b> in a workspace
+⎕RVAL has no associated system variable like <b>⎕RL</b> which keeps its state.
+Instead, the user needs to store the state of <b>⎕RVAL</b> in a workspace
 variable if the workspace shall be stored and continued at a later point.
 This rarely happens, therefore no effort was spent on implementing another
 system variable. For the same reason does the state of <b>⎕RVAL</b>
@@ -8727,7 +8715,7 @@ $7FFFFFFF.
 
 </li><li> for type REAL: a floating point number between 0.0 and 1.0 (exclusive)
 
-</li><li> for type COMPLEX: a complex point number with real and imaginaty part
+</li><li> for type COMPLEX: a complex number with real and imaginary part
 between 0.0 and 1.0 (exclusive), and
 
 </li><li> for type NESTED: a nested APL value with the same properties (rank, shape,
@@ -8784,7 +8772,7 @@ a list of arguments for dyadic <b>⎕RVAL</b>:
 <ul>
 <li> <b>⎕RVAL ⍬</b> shows the valid left arguments of <b>A ⎕RVAL B</b> with a brief
   description,
-</li><li> <b>⎕RVAL &rdquo;</b> shows the valid syntaces of <b>A ⎕RVAL B</b>
+</li><li> <b>⎕RVAL &rdquo;</b> shows the valid syntaxes of <b>A ⎕RVAL B</b>
   (see also See <a href="#Function-Groups">Function Groups</a>.
 </li><li> <b>⎕RVAL 0</b> returns the next random value according to the properties set with dyadic <b>⎕RVAL</b>.
 </li></ul>
@@ -9286,9 +9274,9 @@ Next: <a href="#Deleting-Rows-From-a-Database-Table" accesskey="n" rel="next">De
 <p><b>SQL</b> is a powerful query language with many functions for manipulating
 the data that is stored in the tables of databases. Similarly, APL is
 a powerful language with many functions for manipulating the data stored
-in matrices (the APL conterpart of SQL database tables). The overlap in
+in matrices (the APL counterpart of SQL database tables). The overlap in
 functionality between SQL and APL is considerable. That means that an APL
-programmer always has the follwing options:
+programmer always has the following options:
 </p>
 <ul>
 <li> Manipulate SQL database tables directly. This requires a detailed
