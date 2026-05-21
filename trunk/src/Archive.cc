@@ -2755,7 +2755,7 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(symbol);
    Assert(level >= 0);
    Assert(level < symbol->value_stack_size());
-ValueStackItem & vsi = (*symbol)[level];
+const ValueStackItem & vsi = (*symbol)[level];
    Assert(vsi.get_NC() == NC_FUNCTION || vsi.get_NC() == NC_OPERATOR);
 cFunction_P fun = vsi.get_function();
    Assert(fun);

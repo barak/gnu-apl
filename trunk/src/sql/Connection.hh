@@ -40,7 +40,7 @@ public:
       type( type_in )
     {}
 
-    ColumnDescriptor operator=(ColumnDescriptor &orig)
+    ColumnDescriptor operator=(const ColumnDescriptor &orig)
        { return ColumnDescriptor( orig.name, orig.type); }
 
     const string & get_name()

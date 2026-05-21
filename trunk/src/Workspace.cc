@@ -1005,7 +1005,7 @@ int variable_count = 0;
 void
 Workspace::dump_commands(ostream & out)
 {
-vector<Command::user_command> & cmds = get_user_commands();
+const vector<Command::user_command> & cmds = get_user_commands();
 
    loop(c, cmds.size())
        {

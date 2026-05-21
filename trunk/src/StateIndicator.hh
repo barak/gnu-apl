@@ -103,7 +103,7 @@ public:
    Function_Line get_line() const;
 
    /// Maybe print B (according to tag) and erase B
-   void statement_result(Token & result, bool trace);
+   void statement_result(const Token & result, bool trace);
 
    /// Escape from \b user function (exit from each invocation until
    /// immediate execution is reached)

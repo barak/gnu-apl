@@ -156,7 +156,7 @@ protected:
    /// return the open file descriptor for (APL integer) \b handle
    static int get_fd(const Value & value)
        {
-         file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
+         const file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
          return fe.fe_fd;
        }
 

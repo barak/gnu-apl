@@ -109,7 +109,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
 //----------------------------------------------------------------------------
 // conatructor for a lambda
 UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
-                           const UCS_string & text, Token_string & lambda_body,
+                           const UCS_string & text, const Token_string & lambda_body,
                            const vector<Symbol *> & lvars)
   : Function(ID_USER_SYMBOL, TOK_FUN0),
     Executable(sig, lambda_num, text, LOC),
@@ -573,7 +573,7 @@ UCS_string message_2(error.get_error_line_2());
 }
 //----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(std::vector<Function_Line> & B, bool stop)
+UserFunction::set_trace_stop(const std::vector<Function_Line> & B, bool stop)
 {
    // Sort B, so that stop_lines resp. trace_lines will be sorted.
    //
@@ -1576,7 +1576,7 @@ UserFunction::line_start(Function_Line line) const
 }
 //----------------------------------------------------------------------------
 ostream &
-UserFunction::print_val_or_fun(ostream & out, Token & tok)
+UserFunction::print_val_or_fun(ostream & out, const Token & tok)
 {
    if (tok.is_function())         out << *tok.get_function();
    else if (tok.is_apl_val())     out << tok;

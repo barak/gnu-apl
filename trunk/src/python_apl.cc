@@ -119,7 +119,7 @@ PyObject * ravel = PyList_New(ravel_len);
 static PyObject * exec_result = 0;
 
 bool
-python_result_callback(Token & result)
+python_result_callback(const Token & result)
 {
 const TokenTag tag = result.get_tag();
 bool do_display = false;

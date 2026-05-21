@@ -254,7 +254,7 @@ StateIndicator * si = Workspace::SI_top();   // the current )SI entry
 Error error(code, loc);
    if (si)   error.update_error_info(si);
 
-Error & eref = error;
+const Error & eref = error;
    throw eref;
 }
 //----------------------------------------------------------------------------
@@ -281,7 +281,7 @@ Error error(code, loc);
 // StateIndicator * si = Workspace::SI_top();
 // if (si)   error.update_error_info(si);
 
-Error & eref = error;
+const Error & eref = error;
    throw eref;
 }
 //----------------------------------------------------------------------------
@@ -313,7 +313,7 @@ UTF8_string sym_name_utf(sym_name);
    if (StateIndicator * si = Workspace::SI_top())   // )SI not empty
       err.update_error_info(si);
 
-Error & eref = err;
+const Error & eref = err;
    throw eref;
 }
 //----------------------------------------------------------------------------

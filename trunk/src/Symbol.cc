@@ -918,7 +918,7 @@ ValueStackItem & vs = value_stack.back();
 void
 Symbol::share_var(SV_key key)
 {
-ValueStackItem & vs = value_stack.back();
+const ValueStackItem & vs = value_stack.back();
 
    if (vs.get_NC() == NC_UNUSED_USER_NAME)   // new shared variable
       {

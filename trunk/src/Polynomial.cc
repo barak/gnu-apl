@@ -29,7 +29,7 @@
 //============================================================================
 void
 Monomial::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
-                            bool & got_overbar)
+                            const bool & got_overbar)
 {
 const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
    if (!id.is_valid)   DOMAIN_ERROR;

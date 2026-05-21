@@ -145,7 +145,7 @@ vector<Dcomplex> rc(mtx->cols());
 }
 //----------------------------------------------------------------------------
 Quad_MX::Dcomplex
-Quad_MX::magnitude(vector<Dcomplex> &v)
+Quad_MX::magnitude(const vector<Dcomplex> &v)
 {
 Dcomplex rc(0.0, 0.0);
    loop(i, v.size())   rc += v[i] * v[i];

@@ -316,7 +316,7 @@ LineHistory::clear_search(void)
 }
 //----------------------------------------------------------------------------
 const void
-LineHistory::update_search(UCS_string &cur_line)
+LineHistory::update_search(const UCS_string &cur_line)
 {
     cur_search_substr = cur_line;
 }

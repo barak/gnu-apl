@@ -142,7 +142,7 @@ protected:
   static Dcomplex getDet(GSL_Matrix * mtx);
 
   /// return the magnitude of \b v
-  static Dcomplex magnitude(vector<Dcomplex> & v);
+  static Dcomplex magnitude(const vector<Dcomplex> & v);
 
   /// normalize \b v to length 1
   static void normalise(vector<double> & v);

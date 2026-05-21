@@ -63,7 +63,7 @@ public:
    static bool do_APL_command(ostream & out, UCS_string & line);
 
    /// process \b line which contains APL statements
-   static void do_APL_expression(UCS_string & line, Value_P suffix);
+   static void do_APL_expression(const UCS_string & line, Value_P suffix);
 
    /// finish the current SI->top() and pop it when done
    static void finish_context();
@@ -187,7 +187,7 @@ protected:
                         bool html, bool silent);
 
    /// )ERASE: erase symbols
-   static void cmd_ERASE(ostream & out, UCS_string_vector & args);
+   static void cmd_ERASE(ostream & out, const UCS_string_vector & args);
 
    /// ]EXPECT: set the number of expected errors (in testcase files)
    static void cmd_EXPECT(ostream & out, const UCS_string & arg);
@@ -205,7 +205,7 @@ protected:
    static void cmd_HOST(ostream & out, const UCS_string & arg);
 
    /// )LOAD: load a workspace file
-   static void cmd_LOAD(ostream & out, UCS_string_vector & args, 
+   static void cmd_LOAD(ostream & out, const UCS_string_vector & args,
                         UCS_string & quad_lx, bool silent);
 
    /// control logging facilities

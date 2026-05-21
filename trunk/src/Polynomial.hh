@@ -187,7 +187,7 @@ public:
 
    /// scan the coeffient in \b src.
    void scan_coefficient(Unicode_source & src, char term_sign,
-                         bool & got_j, bool & got_overbar);
+                         bool & got_j, const bool & got_overbar);
 
    /// scan the indeterminants in \b src.
    void scan_indeterminants(const UCS_string_vector & vars,

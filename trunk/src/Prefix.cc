@@ -1613,7 +1613,7 @@ Prefix::handle_QUAD_ES_BRA(const Token & result)
 const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
 const APL_Integer line = QES_arg2.get_int_value();
 
-Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+const Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
    Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
 
 Value_P v_line = IntScalar(line, LOC);
@@ -1632,7 +1632,7 @@ Prefix::handle_QUAD_ES_ERR(const Token & result)
    Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
 StateIndicator * top = Workspace::SI_top();
 
-Token & si_pushed = top->get_prefix().at0();
+const Token & si_pushed = top->get_prefix().at0();
    Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
 
 const Cell * QES_arg = &result.get_apl_val()->get_cfirst();

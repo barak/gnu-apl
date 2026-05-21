@@ -417,21 +417,21 @@ StateIndicator::info(ostream & out, const char * loc) const
 Value_P
 StateIndicator::get_L(UCS_string & function) const
 {
-   if (Value_P * L = current_stack.locate_L(function))   return *L;
+   if (const Value_P * L = current_stack.locate_L(function))   return *L;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
 StateIndicator::get_R(UCS_string & function) const
 {
-   if (Value_P * R = current_stack.locate_R(function))   return *R;
+   if (const Value_P * R = current_stack.locate_R(function))   return *R;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
 StateIndicator::get_X(UCS_string & function) const
 {
-   if (Value_P * X = current_stack.locate_X(function))   return *X;
+   if (const Value_P * X = current_stack.locate_X(function))   return *X;
    return Value_P();
 }
 //----------------------------------------------------------------------------
@@ -511,11 +511,11 @@ result_callback res_callback = 0;
 #endif
 
 #ifdef apl_TARGET_PYTHON
-extern bool python_result_callback(Token & result);
+extern bool python_result_callback(const Token & result);
 #endif
 
 void
-StateIndicator::statement_result(Token & result, bool trace)
+StateIndicator::statement_result(const Token & result, bool trace)
 {
    Log(LOG_IfElse)   usleep(200000);
 

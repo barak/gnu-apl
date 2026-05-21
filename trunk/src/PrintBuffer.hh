@@ -206,13 +206,13 @@ protected:
    void align(ColInfo & col);
 
    /// align this char-only PrintBuffer to col
-   void align_left(ColInfo & col);
+   void align_left(const ColInfo & col);
 
    /// align this real-only PrintBuffer to col
-   void align_dot(ColInfo & col);
+   void align_dot(const ColInfo & col);
 
    /// align this complex PrintBuffer to col
-   void align_j(ColInfo & col);
+   void align_j(const ColInfo & col);
 
    /// pad the fraction part to \b wanted_fract_len with '0'
    void pad_fraction(int wanted_fract_len, bool want_expo);

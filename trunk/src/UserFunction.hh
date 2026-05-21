@@ -40,7 +40,7 @@ class UserFunction : public Function, public Executable
 public:
    /// constructor for a lambda
    UserFunction(Fun_signature sig, Lambda_number lambda_num,
-                const UCS_string & text, Token_string & body,
+                const UCS_string & text, const Token_string & body,
                 const vector<Symbol *> & lvars);
 
    /// Destructor.
@@ -272,7 +272,7 @@ public:
       { return creator; }
 
    /// set trace or stop vector
-   void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
+   void set_trace_stop(const std::vector<Function_Line> & lines, bool stop);
 
    /// recompile the body
    void parse_body(const char * loc, bool macro);
@@ -331,7 +331,7 @@ protected:
       }
 
    /// helper function to print token with Function or Value content
-   static ostream & print_val_or_fun(ostream & out, Token & tok);
+   static ostream & print_val_or_fun(ostream & out, const Token & tok);
 
    /// return the "[nn] " prefix
    UCS_string line_prefix(Function_Line nn) const;

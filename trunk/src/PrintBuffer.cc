@@ -1185,7 +1185,7 @@ PrintBuffer::align(ColInfo & cols)
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::align_dot(ColInfo & COL_INFO)
+PrintBuffer::align_dot(const ColInfo & COL_INFO)
 {
    // align this PrintBuffer (one value) at the decimal dot of COL_INFO.
    //
@@ -1286,7 +1286,7 @@ PrintBuffer::align_dot(ColInfo & COL_INFO)
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::align_j(ColInfo & COL_INFO)
+PrintBuffer::align_j(const ColInfo & COL_INFO)
 {
    // align all items in this PrintBuffer (= one APL output column)
    // at the complex J.
@@ -1392,7 +1392,7 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::align_left(ColInfo & COL_INFO)
+PrintBuffer::align_left(const ColInfo & COL_INFO)
 {
    Log(LOG_printbuf_align)
       {

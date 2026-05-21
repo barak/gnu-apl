@@ -379,7 +379,7 @@ UCS_string args_ucs(args_utf);
 }
 //----------------------------------------------------------------------------
 void
-Command::do_APL_expression(UCS_string & line, Value_P literal)
+Command::do_APL_expression(const UCS_string & line, Value_P literal)
 {
    ++APL_expression_count;
 
@@ -1122,7 +1122,7 @@ LibRef_name wsid  = Workspace::get_WSID();
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
+Command::cmd_ERASE(ostream & out, const UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
@@ -1500,7 +1500,7 @@ const int result = reader.close();
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
+Command::cmd_LOAD(ostream & out, const UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
    // Command is:

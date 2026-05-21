@@ -88,7 +88,7 @@ public:
    const void clear_search(void);
 
    /// update search substring (called when current line is edited)
-   const void update_search(UCS_string &cur_line);
+   const void update_search(const UCS_string &cur_line);
 
    /// find entries like current line in history
    const UCS_string * search(UCS_string &cur_line);

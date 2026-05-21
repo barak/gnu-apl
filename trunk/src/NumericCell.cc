@@ -1223,7 +1223,7 @@ NumericCell::K33_binomial(Cell * Z, APL_Integer N, APL_Integer K, bool negate)
         uint64_t numer[7] = { 0, 0, 0, 0, 0, 0, 0 };   // numerator N! ÷ (N-K)!
         loop(n, K)   numer[n] = N - n;
 
-        size_t denom[] = { 2, 3,  2,2,  5,  2,3, 7 };
+        const size_t denom[] = { 2, 3,  2,2,  5,  2,3, 7 };
         size_t denom_count = K - 1;   // drop factor 1
         if (K >= 4)   ++denom_count;   // 4 is 2×2
         if (K >= 6)   ++denom_count;   // 6 is 2×3
