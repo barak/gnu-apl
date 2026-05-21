@@ -743,7 +743,7 @@ asciidoc.install(4);
 <div class="sect1">
 <h2 id="_abstract">Abstract</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Ths document contains hints for installing GNU APL under Windows 11.</p></div>
+<div class="paragraph"><p>This document contains hints for installing GNU APL under Windows 11.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -752,8 +752,8 @@ asciidoc.install(4);
 <div class="paragraph"><p>GNU APL has to be compiled from the GNU APL source code (in directory <strong>src</strong>).
 Many system functions of GNU APL depend on external libraries that may
 or may not be installed on the user&#8217;s machine. The <strong>./configure</strong> script of
-GNU APL determins which of these libraries are present on the user&#8217;s machine
-and compiles and links GNU APL accordingly. The multitude of avilable or not
+GNU APL determines which of these libraries are present on the user&#8217;s machine
+and compiles and links GNU APL accordingly. The multitude of available or not
 available libraries on a Windows machine makes it unfeasible to generate a
 single binary GNU APL version that accommodates all possible combinations of
 libraries.</p></div>
@@ -768,17 +768,17 @@ limitations that make the installation of GNU APL on Windows more complicated
 than on GNU/Linux. On Windows 11 the user needs to fetch different components
 from different places on the internet. Under GNU/Linux the display of APL
 characters works out-of-the box and the generation of APL characters on the
-keyboard can be dome with typically a single configuration file
+keyboard can be done with typically a single configuration file
 (shipped with GNU APL; see file <strong>README-3-keyboard</strong> and directory
 <strong>support-files</strong>). On Windows the user has to install a suitable APL font to
 display APL characters and a keyboard mapping for the keyboard. While
 installing an APL font is relatively easy, the installation of a keyboard
-mapping has become more and more difficult form one Windows version to the
+mapping has become more and more difficult from one Windows version to the
 next. In older Windows versions one could "hack" the Windows registry to make
 Windows produce APL characters with the keyboard, but this does not work
 anymore under Windows 11. Microsoft provides alternatives like the Keyboard
 Manager in their PowerTools, or the Input Mode Editor (IME), but both seem
-not to work for terminal applications like GNU APL. To adress this issue, GNU
+not to work for terminal applications like GNU APL. To address this issue, GNU
 APL comes with a built-in keyboard mapper that allows the user to toggle the
 keyboard between ASCII and APL.</p></div>
 </div>
@@ -845,8 +845,8 @@ The Microsoft C++ compiler failed completely. The compiler emitted thousands
 <p>
 The <strong>Cygwin</strong> environment works well these days. There was a short period
   when GNU APL had problems being compiled in Cygwin, but these problems seem
-  to no longer exists. Whether the problems were related to the Windows
-  version or to the Cygwin versio is not known.
+  to no longer exist. Whether the problems were related to the Windows
+  version or to the Cygwin version is not known.
 </p>
 </li>
 <li>
@@ -875,14 +875,14 @@ opinion of the author:</p></div>
 <li>
 <p>
 <strong>Cygwin</strong> is fine-grained and lets you choose the version of each package
-  that you install. <strong>WSL</strong> coarse-grained and lets you only choose the
+  that you install. <strong>WSL</strong> is coarse-grained and lets you only choose the
   GNU/Linux distribution that it tries to emulate. After that it is up to
   the package manager of the chosen distribution to handle package versions.
 </p>
 </li>
 <li>
 <p>
-On the other hand seems <strong>Cygwin</strong> to be a little closer to GNU/Linux than
+On the other hand, <strong>Cygwin</strong> seems to be a little closer to GNU/Linux than
   <strong>WSL</strong>. In particular the fonts shipped with <strong>Cygwin</strong> support APL
   out-of-the-box while in <strong>WSL</strong> they need to be installed and enabled in the
   terminal emulator in which GNU APL runs.
@@ -1038,7 +1038,7 @@ On that page click on the <strong>APL385</strong> font (which downloads a file
 </li>
 <li>
 <p>
-In your <strong>Downloads</strong> directory, execute the <strong>setuo-fonts.msi</strong> file. This
+In your <strong>Downloads</strong> directory, execute the <strong>setup-fonts.msi</strong> file. This
   installs a file named <strong>Apl385.ttf</strong>. This is a True-type font.
 </p>
 </li>
@@ -1049,7 +1049,7 @@ Right-click on that <strong>Apl385.ttf</strong> file and press <strong>install</
 </li>
 </ol></div>
 <div class="paragraph"><p>Later on you will run GNU APL in a Windows shell such as <strong>cmd.exe</strong>. The
-installed font must be enabled in that shall to be operational.</p></div>
+installed font must be enabled in that shell to be operational.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_installation_of_a_keyboard_mapping">Installation of a keyboard mapping</h3>
@@ -1075,7 +1075,7 @@ Running APL scripts or workspaces. The <strong>)LOAD</strong>, <strong>)COPY</st
 <li>
 <p>
 Last but not least there is the built-in ASCII-to-APL mapping of GNU APL
-  which is decribed in more detail gurther down.
+  which is described in more detail further down.
 </p>
 </li>
 </ol></div>
@@ -1091,9 +1091,9 @@ has tried the following.</p></div>
 <p>
 The <strong>Keyboard Manager</strong> (which is a component in the <strong>PowerTools</strong>) offered
   by Microsoft free of charge. One can indeed map keys to APL characters
-  with the <strong>Keyboard Manager</strong>. However, the mapping works in some Micorsoft
+  with the <strong>Keyboard Manager</strong>. However, the mapping works in some Microsoft
   applications, but not in others. When the <strong>Keyboard Manager</strong> is running
-  (and if tan APL font is installed and selected) then you can edit APL
+  (and if an APL font is installed and selected) then you can edit APL
   scripts in Microsoft&#8217;s <strong>Notepad</strong>, but if you open Microsoft&#8217;s Windows
   Command Prompt <strong>cmd.exe</strong> in another window then the mapping provided by
   the <strong>Keyboard Manager</strong> does not apply in that window.
@@ -1102,11 +1102,11 @@ The <strong>Keyboard Manager</strong> (which is a component in the <strong>Power
 <li>
 <p>
 Microsoft provides a thing called <strong>Input Method Editor</strong> (<strong>IME</strong>) that should
-  provide arbitrary keyboard mappings. In dact there are hundreds of such
+  provide arbitrary keyboard mappings. In fact there are hundreds of such
   mappings provided by Microsoft, but none of them is suitable for APL.
   The IMEs are not configurable in any way, so if you need Chinese characters
   then you are fine because Microsoft provides a Chinese IME, but for APL
-  you are out of luck. Also there are several defailed instruction how to
+  you are out of luck. Also there are several detailed instructions how to
   add IMEs under Windows 11 on the internet, but all of them fail in the first
   or second step because the Windows 11 of the author was different from the
   Windows 11 in these instructions. The instructions referred to items
@@ -1126,7 +1126,7 @@ Dyalog (a prominent APL vendor) offers an IME for APL. However, the author
 </li>
 <li>
 <p>
-There are a number keyboard mappers offered on the internet, both commercial
+There are a number of keyboard mappers offered on the internet, both commercial
   and free ones. The author has not tried any of those because most looked
   like mere convenience front-ends to Windows 11 components above that did
   not work. If a GNU APL user should find a mapping that works with GNU APL
@@ -1138,30 +1138,30 @@ There are a number keyboard mappers offered on the internet, both commercial
 <div class="sect2">
 <h3 id="_the_gnu_apl_built_in_ascii_to_apl_mapper">The GNU APL Built-in ASCII to APL Mapper</h3>
 <div class="paragraph"><p>As a consequence of all the failed attempts to find a working keyboard
-mapping outside of GNU ASPL (where it belongs) the author vaguely
+mapping outside of GNU APL (where it belongs) the author vaguely
 remembered how APL characters were entered in the 1970s. At that time
 keyboards had no <strong>ALT</strong> keys. Instead, some keyboards could be switched
 between an ASCII mode and an APL mode with the ASCII control characters
 <strong>SI</strong> and <strong>SO</strong> (aka, ^O and \^N). One of them (the author has forgotten
 which in the meantime) would select the ASCII mode (and all subsequently
 typed characters were ASCII characters) and the other would select the
-APL mode (not to be confused with the APL overstrike method of that time)
+APL mode (not to be confused with the APL overstrike method of that time,
 which would operate in parallel when in APL mode). Technically speaking
-these mappings were made in the keyboard driver of the operating systenm
+these mappings were made in the keyboard driver of the operating system
 and not in the keyboards themselves.</p></div>
 <div class="paragraph"><p>The built-in ASCII to APL mapper of GNU APL has adopted this old mechanism
 as follows:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Typing \^A, i.e. holding down the CRTL key and typing A, will map the
+Typing \^A, i.e. holding down the CTRL key and typing A, will map the
   next character typed to APL, and
 </p>
 </li>
 <li>
 <p>
 Typing ^N will map all subsequent characters typed to APL (until
-  \^N is typed again.
+  \^N is typed again).
 </p>
 </li>
 </ol></div>
@@ -1191,7 +1191,7 @@ are defined:</p></div>
 <div class="paragraph"><p>Unlike in Windows 11 (which is closed source and prevents the user from
 defining her own layout), GNU APL is free software that allows the user
 to modify it to suit her needs. To construct your own mapping,
-have a look at file <strong>src/src/LineInput.cc</strong> and search for all occurences of
+have a look at file <strong>src/src/LineInput.cc</strong> and search for all occurrences of
 <strong>cfg_ALT_MAP_WANTED</strong>.</p></div>
 </div>
 </div>
@@ -1201,7 +1201,7 @@ have a look at file <strong>src/src/LineInput.cc</strong> and search for all occ
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-04-19 13:49:58 CEST
+ 2026-05-21 12:50:56 CEST
 </div>
 </div>
 </body>

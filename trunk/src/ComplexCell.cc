@@ -389,10 +389,10 @@ const APL_Complex b = get_complex_value();
    // compliant implementation: B-A×⌊B÷A+A=0
    // The b=0 case may still exist due to ⎕CT
    //
-   //                          	// op       Z before     Z after
+   //                           // op       Z before     Z after
    IntCell::z0(Z);              // Z←0      any          0
    Z->bif_equal(Z, A);          // Z←A=Z    0            A=0
-   Z->bif_add(Z, A);           	// Z←A+Z    A=0          A+A=0
+   Z->bif_add(Z, A);            // Z←A+Z    A=0          A+A=0
    Z->bif_divide(Z, this);      // Z←B÷Z    A+A=0        B÷A+A=0
    Z->bif_floor(Z);             // Z←⌊Z     B÷A+A=0      ⌊B÷A+A=0
    Z->bif_multiply(Z, A);       // Z←A×Z    ⌊B÷A+A=0     A×⌊B÷A+A=0

@@ -62,9 +62,9 @@ private:
    Svar_record_P & operator =(const Svar_record_P & other);
 };
 //----------------------------------------------------------------------------
-# define READ_RECORD(key, open_act, closed_act)		\
-    if (Svar_DB::APserver_available())			\
-         { const Svar_record_P svar(key); open_act }	\
+# define READ_RECORD(key, open_act, closed_act)         \
+    if (Svar_DB::APserver_available())                  \
+         { const Svar_record_P svar(key); open_act }    \
     else { closed_act }
 
 /// Access to the shared variable database in APserver

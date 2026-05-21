@@ -755,7 +755,7 @@ perform poorly.</p></div>
 session is distributed over the different GNU APL source files.</p></div>
 <div class="sect3">
 <h4 id="_preparation">Preparation</h4>
-<div class="paragraph"><p>Profiling with <strong>gprof</strong> requires that the enire GNU APL code is compiled
+<div class="paragraph"><p>Profiling with <strong>gprof</strong> requires that the entire GNU APL code is compiled
 with specific compiler flags. The GNU APL build system sets these flags
 if <strong>gprof</strong> is desired. The simplest way to set these flags is to simply run:</p></div>
 <div class="listingblock">
@@ -829,7 +829,7 @@ L: ⊣A⌹B ◊ →(0 &lt; COUNT←COUNT-1)⍴L
 
 </pre>
 </div></div>
-<div class="paragraph"><p>In step 2. we run the workpace (in directory src):</p></div>
+<div class="paragraph"><p>In step 2. we run the workspace (in directory src):</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -892,7 +892,7 @@ and therefore have to be enabled explicitly. For example with:</p></div>
 <div class="paragraph"><p>The <strong>./configure</strong> option <strong>DEVELOP_WANTED=yes</strong> automatically sets
 <strong>PERFORMANCE_COUNTERS_WANTED=yes</strong>, but also other debug features that may
 have performance impacts.</p></div>
-<div class="paragraph"><p>The counters are mananged from APL via <strong>⎕FIO</strong>. Every counter has a unique
+<div class="paragraph"><p>The counters are managed from APL via <strong>⎕FIO</strong>. Every counter has a unique
 ID and can be cleared (before a measurement is started) and read (after a
 measurement). For example:</p></div>
 <div class="listingblock">
@@ -962,7 +962,7 @@ measurement). For example:</p></div>
 <li>
 <p>
 <strong>Z[5]</strong> the (sum of) the squares of the CPU cycles of all the first APL vector
-  items. (To compute the variance). If <strong>Z[3] ←→ 1</strong> (one vectror measured) then
+  items. (To compute the variance). If <strong>Z[3] ←→ 1</strong> (one vector measured) then
   <strong>Z[4]×Z[4] ←→ Z[5]</strong>,
 </p>
 </li>
@@ -1034,7 +1034,7 @@ took Z[4] ←→ 3087 CPU cycles. The Z[6] ←→ 999 subsequent divisions,
 i.e. <strong>42.1 ÷ 1↓⍳1000 ←→ 42.1 ÷ 2 3 4 &#8230; 1000</strong> took 370713 CPU cycles total,
 or 370713 ÷ 999 ←→ 371 CPU cycles per division. The comparison between the
 first division (3087 CPU cycles) and the average of the subsequent
-divisions (371 CPU cycles) demonstarates the effect of caching, etc. Since
+divisions (371 CPU cycles) demonstrates the effect of caching, etc. Since
 there was only one first vector item, the variance is the square of that item,
 i.e. Z[5] ←→ 9529569 ←→ 3087×3087 ←→ Z[4]×Z[4] (a single item always has a
 variance of 0). If we had run <strong>A ÷ B</strong> in a loop, say N times, then:</p></div>
@@ -1090,7 +1090,7 @@ benchmarking of some scalar APL functions.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2025-01-23 17:08:55 CET
+ 2026-05-21 12:49:27 CEST
 </div>
 </div>
 </body>

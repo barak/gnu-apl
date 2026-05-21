@@ -1005,7 +1005,7 @@ The programmer displays the GUI - either at the start of the APL
    if the GUI is, for example, only popped up to request input from the user
    of the APL application. In the latter case the GUI is a single window
    (a "modal dialog") which is polled from APL until some final action of the
-   user has occurred, while the former case the APL application has to poll
+   user has occurred, while in the former case the APL application has to poll
    the GUI for events at rather short intervals. To poll <strong>⎕GTK</strong> at regular
    intervals:
 </p>
@@ -1660,7 +1660,7 @@ in the <a href="#TAG_appendix">Appendix</a> of this document.</td>
 <div class="paragraph"><p>The handle above (6) can, in theory, also be used with ⎕FIO functions like
 fread() if you know what you are doing. This practice is, however, dangerous
 because it might create inconsistencies between <strong>⎕GTK</strong> and ⎕FIO. For example,
-closing a <strong>⎕GTK</strong> handle with ⎕FIO is technically possible, but usually bad
+closing a <strong>⎕GTK</strong> handle with ⎕FIO is technically possible, but usually a bad
 idea.</p></div>
 <div class="paragraph"><p>Please note that a window can normally be closed from two ends: from APL with
 <strong>Ah *⎕GTK</strong> 0* and from the GUI via <strong>Close</strong> in the top-left window menu.
@@ -2172,9 +2172,9 @@ happen automatically at the proper point in time, What remains is step 6.</p></d
 <h3 id="_6c_polling_the_event_loop_in_apl">6c. Polling the Event Loop in APL</h3>
 <div class="paragraph"><p>The event loop can be polled from APL in two fashions: <strong>blocking</strong> or
 <strong>non-blocking</strong>. <strong>Blocking</strong> means that the APL functions that do the poll
-returns an event to APL immediately if the event has occurred already (e.g.
+return an event to APL immediately if the event has occurred already (e.g.
 the user has clicked <strong>button1</strong> <em>before</em> the event queue was polled), and
-otherwise waits until that event has occurred. <strong>Non-blocking</strong> means that the
+otherwise wait until that event has occurred. <strong>Non-blocking</strong> means that the
 APL functions that do the poll <em>always</em> return immediately, but return a
 special event with number 0 to indicate that the event queue was empty at the
 time when the poll function was called.</p></div>
@@ -2312,7 +2312,7 @@ explains the steps needed to draw a red circle onto a white background.</p></div
 child of type <strong>DrawingArea</strong>. That child is the canvas on which the circle will
 be drawn. In the <strong>Common</strong> tab of the canvas, set the property <strong>Width request</strong>
 to 400 and <strong>Height request</strong> to 300, and store the GUI as file <strong>circle.ui</strong>.
-That defines the size of the canvas, In the <strong>Signals</strong> tab, set the handler for
+That defines the size of the canvas. In the <strong>Signals</strong> tab, set the handler for
 signal <strong>draw</strong> to <strong>do_draw</strong>. The resulting XML file <strong>circle.ui</strong> is then:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2438,7 +2438,7 @@ ellipse     (200 150) (100 75)
 </div>
 <div class="paragraph"><p>A slightly more advanced example that uses the same XML file <strong>circle.ui</strong> but
 different drawing commands to show additional features (lines, text, objects
-with and without borders is:</p></div>
+with and without borders) is:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -2516,7 +2516,7 @@ Opaque colors are specified as a 3-element vector containing the red, green,
 <li>
 <p>
 Transparent colors are specified as a 4-element vector containing the red,
-  green, and blue component of each color (o-255), and an opacity value
+  green, and blue component of each color (0-255), and an opacity value
   between 0 (fully transparent) and 100 (fully opaque).
 </p>
 </li>
@@ -2660,7 +2660,7 @@ before looking into the APL code of that workspace.</p></div>
 normally stores it in some file, say <strong>my-gui.xml</strong>, that can later be
 loaded with <strong>⎕GTK "my-gui.xml"</strong> or with <strong>CSS *⎕GTK</strong> "my-gui.xml"* where
 CSS is a string produced elsewhere (and not of concern here).</p></div>
-<div class="paragraph"><p>Lets start with:</p></div>
+<div class="paragraph"><p>Let&#8217;s start with:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -2680,7 +2680,7 @@ start <strong>glade</strong>,
 <li>
 <p>
 → select the new window and set the (topmost) property <strong>ID</strong>
-     in tab <strong>Genera</strong> to <strong>window1</strong>
+     in tab <strong>General</strong> to <strong>window1</strong>
 </p>
 </li>
 <li>
@@ -2743,7 +2743,7 @@ boring) that can be used in APL via <strong>⎕GTK</strong>:</p></div>
 <img src="glade-7.png" alt="glade-7.png" />
 </div>
 </div>
-<div class="paragraph"><p>Now, lets test the claim above: <em>the filename (APL string) arguments <strong>A</strong>
+<div class="paragraph"><p>Now, let&#8217;s test the claim above: <em>the filename (APL string) arguments <strong>A</strong>
 and <strong>B</strong> of dyadic <strong>A *⎕GTK</strong> B* and monadic <strong>⎕GTK B</strong> can also be the contents
 of the files instead of the file names</em>:</p></div>
 <div class="listingblock">
@@ -2812,7 +2812,7 @@ Every line becomes a nested (string) component of the multi-line string. The
 <p>
 the XML standard treats newlines and blanks alike, therefore the string
   lines could have been separated by blanks (or tabs etc.) as well. However,
-  no corrsponding ⎕CR conversion exists, so <strong>36 ⎕CR</strong> was used and long XML
+  no corresponding ⎕CR conversion exists, so <strong>36 ⎕CR</strong> was used and long XML
   strings using \n are easier to read than those using blanks or TABs.
 </p>
 </li>
@@ -2884,7 +2884,7 @@ helpful to disambiguate core names. For example, to decide (below) if
 corresponding header file. The class for <strong>corename</strong> is either <strong>GtkCoreName</strong> or
 GtkCorename*. In our example the class names are <strong>GtkWidget</strong>, <strong>GtkTextView</strong>,
 and <strong>GtkTreeViewColumn</strong>.</p></div>
-<div class="paragraph"><p>Confusingly, many widget not only declare the class name as described, but
+<div class="paragraph"><p>Confusingly, many widgets not only declare the class name as described, but
 in addition another class with suffix <strong>Class</strong>. For instance both
 <strong>GtkTreeViewColumn</strong> and <strong>GtkTreeViewColumnClass</strong> in <strong>gtktreeviewcolumn.h</strong>.</p></div>
 <div class="paragraph"><p>The name variant with the <strong>Class</strong> suffix is not used by <strong>⎕GTK</strong>.</p></div>
@@ -3243,7 +3243,7 @@ by the following XML snipplet:</p></div>
 <img src="glade-9.png" alt="glade-9.png" />
 </div>
 </div>
-<div class="paragraph"><p>To explain the the above:</p></div>
+<div class="paragraph"><p>To explain the above:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -3456,7 +3456,7 @@ therefore it is better to have fewer selectors and style attributes
 than more by splitting bigger statements into a sequence of smaller ones.
 More details can be found here:</p></div>
 <div class="paragraph"><p><a href="https://docs.gtk.org/gtk3/css-overview.html">https://docs.gtk.org/gtk3/css-overview.html</a></p></div>
-<div class="paragraph"><p>Lets start simple (with variable XML as above):</p></div>
+<div class="paragraph"><p>Let&#8217;s start simple (with variable XML as above):</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -3627,7 +3627,7 @@ the parameters of that event is mere overhead. Also, the APL code is trivial
 
 </pre>
 </div></div>
-<div class="paragraph"><p>and it may, since no APL loop is required, even be use in immediate execution
+<div class="paragraph"><p>and it may, since no APL loop is required, even be used in immediate execution
 mode or in APL scripts.</p></div>
 <div class="paragraph"><p>Sometimes you want to do something else while waiting for a user action, for
 example updating a progress bar. In that case you could use <strong>⎕GTK 2</strong> (the
@@ -4274,7 +4274,7 @@ commands.</p></td>
 <h3 id="TAG_caveats">Caveats</h3>
 <div class="paragraph"><p>With <strong>glade</strong> it is possible to design a single GUI that contains multiple
 top-level windows or no top-level window. However, <strong>⎕GTK</strong> currently supports
-only GUIs with one top-level widget of type "Window (the first widget in the
+only GUIs with one top-level widget of type "Window" (the first widget in the
 top-level group in glade).</p></div>
 </div>
 <div class="sect2">
@@ -4289,7 +4289,7 @@ top-level group in glade).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-14 14:48:59 CET
+ 2026-05-21 12:55:44 CEST
 </div>
 </div>
 </body>

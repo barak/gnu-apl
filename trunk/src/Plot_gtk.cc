@@ -672,7 +672,7 @@ char line[strlen(lines) + 10];
 //----------------------------------------------------------------------------
 double
 longest_legend_string(cairo_t * cr, int line_count, 
-                      Plot_line_properties const * const * l_props)
+                      const Plot_line_properties * const * l_props)
 {
 double ly = FONT_SIZE;
 double longest_len = 0.0;
@@ -693,7 +693,7 @@ draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
 const Plot_window_properties & w_props = pctx.w_props;
    if (!w_props.get_show_legend())   return;   // no legend
 
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
 const int line_count = surface_plot ? 1 : w_props.get_line_count();
 
@@ -1258,7 +1258,7 @@ draw_plot_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
    loop(l, data.get_row_count())
        {
@@ -1304,7 +1304,7 @@ draw_surface_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp0 = *l_props[0];
 
 const Color canvas_color = w_props.get_canvas_color();

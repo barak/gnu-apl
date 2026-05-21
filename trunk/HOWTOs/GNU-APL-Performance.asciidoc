@@ -17,7 +17,7 @@ session is distributed over the different GNU APL source files.
 
 ==== Preparation
 
-Profiling with *gprof* requires that the enire GNU APL code is compiled
+Profiling with *gprof* requires that the entire GNU APL code is compiled
 with specific compiler flags. The GNU APL build system sets these flags
 if *gprof* is desired. The simplest way to set these flags is to simply run:
 
@@ -70,7 +70,7 @@ L: ⊣A⌹B ◊ →(0 < COUNT←COUNT-1)⍴L
       LOOP loop_count   ⍝ run the loop loop_count times
 -----
 
-In step 2. we run the workpace (in directory src):
+In step 2. we run the workspace (in directory src):
 
 ----
 ./apl -f workspaces/GPROF_LOOP.apl # invoke apl with the above script file
@@ -78,7 +78,7 @@ In step 2. we run the workpace (in directory src):
 
 In step 3. we analyze the result *gmon.out* of step 2. The file *gmon.out* is
 a hard to read binary file with the measurement results. Step 3 converts this
-binary file into a human-readable statistics file named *profile*: 
+binary file into a human-readable statistics file named *profile*:
 
 ----
 gprof ./apl gmon.out > profile
@@ -112,7 +112,7 @@ The *./configure* option *DEVELOP_WANTED=yes* automatically sets
 *PERFORMANCE_COUNTERS_WANTED=yes*, but also other debug features that may
 have performance impacts.
 
-The counters are mananged from APL via *⎕FIO*. Every counter has a unique
+The counters are managed from APL via *⎕FIO*. Every counter has a unique
 ID and can be cleared (before a measurement is started) and read (after a
 measurement). For example:
 
@@ -143,7 +143,7 @@ The result *Z* of *Z←⎕FIO[201]* is an 8 item vector:
 * *Z[4]* the (sum of) CPU cycles of the first APL vector item. Therefore
   *Z[4] ÷ Z[3]* is the average number of CPU cycles
 * *Z[5]* the (sum of) the squares of the CPU cycles of all the first APL vector
-  items. (To compute the variance). If *Z[3] ←→ 1* (one vectror measured) then
+  items. (To compute the variance). If *Z[3] ←→ 1* (one vector measured) then
   *Z[4]×Z[4] ←→ Z[5]*,
 * *Z[6]* number of executions of all subsequent APL vector items
 * *Z[7]* the (sum of) CPU cycles of all subsequent APL vector items,
@@ -163,7 +163,7 @@ considerably. To get a better understanding of the varying CPU cycles:
 * *Z[3] ÷ Z[2]* and *Z[6] ÷ Z[5]* are the *average number* of CPU cycles for
   the respective (i.e. first vs. subsequent) measurements, and
 * *(Z[4]⋆0.5) ÷ Z[2]* and *Z[7] ÷ Z[5]* are the statistical *variances* of the
-first and subsequent CPU cycles respectively. 
+first and subsequent CPU cycles respectively.
 
 The output above, i.e.:
 
@@ -183,7 +183,7 @@ took Z[4] ←→ 3087 CPU cycles. The Z[6] ←→ 999 subsequent divisions,
 i.e. *42.1 ÷ 1↓⍳1000 ←→ 42.1 ÷ 2 3 4 ... 1000* took 370713 CPU cycles total,
 or 370713 ÷ 999 ←→ 371 CPU cycles per division. The comparison between the
 first division (3087 CPU cycles) and the average of the subsequent
-divisions (371 CPU cycles) demonstarates the effect of caching, etc. Since
+divisions (371 CPU cycles) demonstrates the effect of caching, etc. Since
 there was only one first vector item, the variance is the square of that item,
 i.e. Z[5] ←→ 9529569 ←→ 3087×3087 ←→ Z[4]×Z[4] (a single item always has a
 variance of 0). If we had run *A ÷ B* in a loop, say N times, then:

@@ -1000,7 +1000,7 @@ for workspace-to-workspace shared variables in the directory
 <div class="paragraph"><p>The GNU APL implementation of shared variables is a separate process running
 the program <strong>APserver</strong> (which comes with GNU APL). APserver currently
 implements only AP100 and AP210, but the source code of APserver is open, so
-that a user can add more APs. Is seems, however, that most of the APs that
+that a user can add more APs. It seems, however, that most of the APs that
 were not implemented have been superseded by more modern interfaces (most
 of which are sub-functions of ⎕FIO) that are easier to use than shared
 variables.</p></div>
@@ -1241,7 +1241,7 @@ line 170 of the test case file).</p></div>
 <h3 id="_native_functions">Native functions</h3>
 <div class="paragraph"><p>If the capabilities provided by sockets are still not enough, then one
 can get complete control by means of GNU APL native functions. A native
-function is a function that can be called from APL (and returns results back
+function is a function that can be called from APL and returns results back
 to APL, but has an implementation in a different language (typically C or
 C++).</p></div>
 <div class="paragraph"><p>Writing native functions is a little more complicated than using communication
@@ -1279,7 +1279,7 @@ the dynamic library, with:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>That makes the 3 signatures implemented <strong>FOO.so</strong> available in APL (for the
+<div class="paragraph"><p>That makes the 3 signatures implemented in <strong>FOO.so</strong> available in APL (for the
 same signatures).</p></div>
 <div class="paragraph"><p><strong>Note:</strong> Native functions were not primarily intended for communication purposes.
 But since they import the full power of C/C++ into GNU APL they are a last
@@ -1352,7 +1352,7 @@ the APL application, and GNU APL provides a few system functions that can
 be used to <strong>frame</strong> (read: encode) an item at the sender side into a sequence
 of bytes, and to <strong>de-frame</strong> (read: decode) the received byte stream back into
 the item that was sent at the receiver side. The <strong>frame</strong> and <strong>de-frame</strong>
-functions cooperate in such a way that;</p></div>
+functions cooperate in such a way that:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1424,7 +1424,7 @@ done with <strong>35 ⎕CR</strong>. The terminating line feeds are removed in t
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2025-04-25 16:47:28 CEST
+ 2026-05-21 12:49:54 CEST
 </div>
 </div>
 </body>

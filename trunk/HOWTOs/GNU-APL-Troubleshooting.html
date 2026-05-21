@@ -790,7 +790,7 @@ root cause of the error.</p></div>
 <div class="sect1">
 <h2 id="_errors_in_user_programs_aka_apl_errors">Errors in User Programs (aka. APL errors),</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Errors in user programs are reported by the APL intepreter when APL code
+<div class="paragraph"><p>Errors in user programs are reported by the APL interpreter when APL code
 is being executed. Before the interpreter starts its internal computation(s)
 it checks the arguments. These checks depend on the computation required
 and usually occur in the following order:</p></div>
@@ -975,7 +975,7 @@ different assertion levels as follows (see also <strong>README-2-configure</stro
 <li>
 <p>
 <strong>ASSERT_LEVEL_WANTED = 1</strong> (the default): this disables the Assert1() macro
-  and enables and the Assert() macro.
+  and enables the Assert() macro.
 </p>
 </li>
 <li>
@@ -1069,7 +1069,7 @@ most functions in the source code of <strong>GNU APL</strong> are) then we can u
 exact source line for each stack entry rather easily using the function name
 displayed. For larger functions, the same function may be called from different
 source code lines in the same function. This can be improved by converting the
-hex addresses on the left into source line numbers as exlained in the
+hex addresses on the left into source line numbers as explained in the
 following.</p></div>
 <div class="paragraph"><p>First of all the C++ compiler must be instructed to not discard line numbers.
 Older g++ versions would always keep line numbers in the object files, but
@@ -1237,7 +1237,7 @@ down, which sequence of APL operations has led to the state of the workspace.
 <strong>GNU APL</strong> has a command <strong>)HISTORY</strong> which displays the last lines entered.</p></div>
 <div class="paragraph"><p>An assertion checks the immediate state of the interpreter and can therefore
 not check the entire lifetime of an APL value or function. For this purpose,
-<strong>GNU APL</strong> povides a different debugging tool called <strong>Value history</strong>.</p></div>
+<strong>GNU APL</strong> provides a different debugging tool called <strong>Value history</strong>.</p></div>
 <div class="paragraph"><p>The Value history tracks the locations in the <strong>GNU APL</strong> source code that have
 manipulated a value from its creation (memory allocation) to its destruction
 (memory deallocation). This tracking, when enabled, has performance impacts
@@ -1308,12 +1308,12 @@ core files. See also <strong>man 5 core</strong>.</p></div>
 <h2 id="_non_reproducible_errors">Non-reproducible Errors</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The most difficult to fix errors are those that occur on one machine (usually
-your&#8217;s) and not on others.</p></div>
-<div class="paragraph"><p>The first thing to locate their root cause it to <strong>./configure</strong> with either no
+yours) and not on others.</p></div>
+<div class="paragraph"><p>The first thing to locate their root cause is to <strong>./configure</strong> with either no
 options or via <strong>make develop</strong> to see if the error is related to specific
 <strong>./configure</strong> options.</p></div>
 <div class="paragraph"><p>Also, look for compiler warnings when <strong>GNU APL</strong> is built. In the default build,
-compiler warnings can be overlooked easiy. <strong>make develop</strong> turns most warnings
+compiler warnings can be overlooked easily. <strong>make develop</strong> turns most warnings
 into errors so you will see at the end if the build was successful.</p></div>
 <div class="sect2">
 <h3 id="_optimization">Optimization</h3>
@@ -1533,11 +1533,11 @@ the current state (i.e. ON or OFF) of all logging facilities:</p></div>
 <h3 id="_logging_facilities_of_interest">Logging Facilities of Interest</h3>
 <div class="paragraph"><p>Many of the currently over 40 logging facilities serve a particular purpose
 for the maintainers or have become obsolete and are therefore not too useful
-for the trouble-shooting performed by the user. The others mentioned below.</p></div>
+for the trouble-shooting performed by the user. The others are mentioned below.</p></div>
 <div class="sect3">
 <h4 id="_log_2_new_and_delete_calls">]Log 2 : new and delete calls</h4>
 <div class="paragraph"><p>For tracking the allocation and de-allocation of memory.
-To find memo leaks.</p></div>
+To find memory leaks.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_log_25_and_26_apl_errors">]Log 25 and 26 : APL Errors</h4>
@@ -1708,7 +1708,7 @@ run-time cost for <strong>GNU APL</strong> is only the loading of the string lit
 such as <strong>std::cerr</strong> (or <strong>stderr</strong> in C). The operator &lt;&lt; is overloaded a lot
 and in such a way that commonly used data types in <strong>GNU APL</strong> are being printed
 nicely. A consequence of the overloading is that <strong>Q()</strong> macro can be used
-with many different data types without the burdon to properly format them
+with many different data types without the burden to properly format them
 for the debug output.</p></div>
 <div class="paragraph"><p><strong>Q(x)</strong> uses the <strong>LOC</strong> macro to get the source file name and line number of its
 invocation and essentially prints <strong>x</strong> in a suitable format and followed by
@@ -1830,7 +1830,7 @@ reduced to a small number of APL lines.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-14 14:48:59 CET
+ 2026-05-21 12:59:23 CEST
 </div>
 </div>
 </body>

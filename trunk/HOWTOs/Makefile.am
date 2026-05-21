@@ -48,7 +48,8 @@ dist_doc_DATA = \
     APL2.png             \
     APL3.png             \
     APL4.png             \
-    APL5.png
+    APL5.png             \
+    GNU-APL-Programming-Style-Guide.md
 
 # asciidoctor has more features that asciidoc, but ASCII line graphics
 # (used a  lot in our documents) look well in asciidoc but pretty bad

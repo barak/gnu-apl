@@ -43,14 +43,14 @@ Quad_PNG  Quad_PNG::fun;
     defined( apl_GTK3      ) && \
     defined( HAVE_LIBGTK_3 ) 
 
-# define PNG_GTK	1
+# define PNG_GTK        1
 #else
-# define PNG_GTK	0
+# define PNG_GTK        0
 #endif
 
 /// PNG_LIBS defines if the PNG related libraries (and their header files)
 /// are present
-#if	defined( HAVE_LIBZ           ) && \
+#if     defined( HAVE_LIBZ           ) && \
     defined( HAVE_ZLIB_H         ) && \
     defined( HAVE_LIBPNG         ) && \
     defined( HAVE_LIBPNG16_PNG_H )

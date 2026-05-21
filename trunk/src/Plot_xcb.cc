@@ -694,7 +694,7 @@ const Color point_color = l_props.get_point_color();
 void
 draw_legend(const XCB_context & pctx, const Plot_window_properties & w_props)
 {
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const int line_count = w_props.get_line_count();
 
    // estimate the box size from the length of the longest legend string
@@ -893,7 +893,7 @@ draw_plot_lines(const XCB_context & pctx,
                 const Plot_window_properties & w_props, const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
    loop(l, data.get_row_count())
        {
@@ -936,7 +936,7 @@ draw_surface_lines(const XCB_context & pctx,
                    const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp0 = *l_props[0];
 
    // 1. setup graphic contexts

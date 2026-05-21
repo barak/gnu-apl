@@ -986,7 +986,7 @@ Notice that every operation above subtracts a multiple of some row from some
 <div class="paragraph"><p>The algorithm above defines the sequence <strong>op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong> above,
 where <strong>n</strong> is the number of columns in <strong>R</strong>. In practice (in LApack and
 consequently also in GNU APL) these operations are not performed on <strong>R</strong> first
-and then on the identity matrix afterwords but rather in parallel:</p></div>
+and then on the identity matrix afterwards but rather in parallel:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -1076,7 +1076,7 @@ make the computation of the transposition <strong>⍉H</strong> essentially a no
 </li>
 <li>
 <p>
-ensures that the composition <strong>H = H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> of several Householder
+ensure that the composition <strong>H = H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> of several Householder
   matrices is also Hermitian (complex case) or orthogonal (real case).
 </p>
 </li>
@@ -1402,7 +1402,7 @@ If the input matrices are very large or very small (in terms of their norm)
 <li>
 <p>
 As we have seen above, for any matrix <strong>B</strong> there are actually two reflectors
-  <strong>H1</strong> and <strong>H2</strong> each of which bring the first column off <strong>B</strong> below the
+  <strong>H1</strong> and <strong>H2</strong> each of which bring the first column of <strong>B</strong> below the
   diagonal to <strong>0). LA_pack then chooses the one that produces the largest
   difference *V1</strong> or <strong>V2</strong> above.
 </p>
@@ -1878,7 +1878,7 @@ usually differ between different algorithms. For example,</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Notice the differences between the Helzer and the LAack algorithm
+<div class="paragraph"><p>Notice the differences between the Helzer and the LApack algorithm
 in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
 </div>
 <div class="sect2">
@@ -2059,7 +2059,7 @@ of the LApack functions.</td>
 <strong>LApack::estimate_rank()</strong> to compute the effective rank of the right
 argument <strong>B</strong>. Matrices with fewer rows than columns are <em>under-determined</em>
 and always yield a RANK ERROR. However a matrix can be under-determined even
-if the number of rows is suffiently large. This is the case if the rows are
+if the number of rows is sufficiently large. This is the case if the rows are
 not linearly independent. Put differently, a large number of rows alone
 does not guarantee a sufficient matrix rank because a linear dependent row
 is as good as no row.</p></div>
@@ -2094,7 +2094,7 @@ the computation and producing an unreliable result.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2025-01-23 17:08:55 CET
+ 2026-05-21 12:53:51 CEST
 </div>
 </div>
 </body>

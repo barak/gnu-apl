@@ -813,7 +813,7 @@ GNU APL tries to allocate memory statically as much as possible. The
   static allocation has already taken place when the interpreter outputs its
   first APL prompt. After that dynamic memory allocation via malloc()/new()
   is performed for objects whose lifetime is potentially infinite (i.e. whose
-  destruction is triggered by APL code. These objects are:
+  destruction is triggered by APL code). These objects are:
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1000,7 +1000,7 @@ value can be allocated in a single new() call while a long value needs two
 new() calls: one for the value header (which contains the shape of the value),
 and one for the ravel cells of the value. Looking at the details of malloc()
 one can see that the allocation or deallocation of smaller memory areas is more
-efficient than the allocation or deallocation of larger areas, Finally, short
+efficient than the allocation or deallocation of larger areas. Finally, short
 APL values occur more frequently in APL programs than long values, and they
 are also more frequently overridden as a whole (which allocates a new value
 and discards the old) as opposed to being updated via indexed assignment
@@ -1093,8 +1093,8 @@ The same size of all elements causes V[n] to take constant time,
 <li>
 <p>
 The indexed assignment of e.g. a single element (of a different type) to a
-   non-mixed array would also take (constant time (in option 1 above the entire
-   array would have needed to be converted from non-mixed to mixed)).
+   non-mixed array would also take constant time (in option 1 above the entire
+   array would have needed to be converted from non-mixed to mixed).
 </p>
 </li>
 <li>
@@ -1317,7 +1317,7 @@ to achieve full protection.</p></div>
 </li>
 <li>
 <p>
-Finally, ⎕SYL[31 32;] define a safety margin that is is explained below.
+Finally, ⎕SYL[31 32;] define a safety margin that is explained below.
 </p>
 </li>
 </ul></div>
@@ -1466,7 +1466,7 @@ the memory of a machine is, say, 8 GB or more, then one can have several
 processes with each process allocating up to 3 GByte as long as the memory
 shown in <strong>/proc/meminfo</strong> is not exceeded.</p></div>
 <div class="paragraph"><p>If GNU APL sees a <strong>total_memory</strong> of more than 3 GB in the analysis of
-<strong>/proc/meminfo</strong>, then it reduces <strong>total_memory</strong> to about 3 GB. if it is
+<strong>/proc/meminfo</strong>, then it reduces <strong>total_memory</strong> to about 3 GB, if it is
 running on a 32-bit kernel. 64-bit machines have a similar limit, but the
 limit is so high that it is not relevant in practice.</p></div>
 <div class="paragraph"><p>The safety margin <strong>(total_memory_1</strong> - <strong>total_memory)</strong> that results from
@@ -1803,7 +1803,7 @@ ulimit to protect processes from each other,
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-14 14:48:59 CET
+ 2026-05-21 12:55:50 CEST
 </div>
 </div>
 </body>

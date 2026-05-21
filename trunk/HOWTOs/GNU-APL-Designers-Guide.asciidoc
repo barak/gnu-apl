@@ -25,7 +25,7 @@ top-level GNU APL directory.
 
 == The GNU APL Build System
 
-All commands described below shall executed in the top-level GNU APL directory.
+All commands described below shall be executed in the top-level GNU APL directory.
 The top-level GNU APL directory is the directory that contains - after
 unpacking a GNU APL tar file like *apl-2.0.tar.gz* or after fetching the GNU
 APL sourced with SVN or with git - the file named *configure.ac*.
@@ -294,7 +294,7 @@ of this check is crucial for the performance of the interpreter.
 ** either a collision-free hash table (the default),
 ** or else a search tree.
 * After a *make gen* the next compiler build will use the hash table, while
-  after *make gen2 it will use a search tree. Performance tests of both
+  after *make gen2* it will use a search tree. Performance tests of both
   alternatives have shown only a marginal performance difference between
   both methods, but the technique as such might be of interest.
 
@@ -421,7 +421,7 @@ Suppose further that we add the new error code to the enum but not to the
 because *ErrorCode* is usually declared in a *.hh* file and
 *get_error_string()* is defined in the corresponding *.cc* file. In that case
 Method 1 will most likely produce a segmentation fault at runtime, which is
-about the worst case that may happen. <Method 2 is a little better because a
+about the worst case that may happen. Method 2 is a little better because a
 smart compiler like g++ will issue a warning in this case. Both methods are,
 however, quite inconvenient for the C/Cpp programmer, in particular if many
 such mappings are needed in a larger program.
@@ -752,7 +752,7 @@ will enable a useful set of debugging facilities. *make develop* re-runs
 
 === Assertions
 
-GNU APL has more 600 Assertions spread throughout the source code. The
+GNU APL has more than 600 Assertions spread throughout the source code. The
 assertions check internal assumptions that the designer has made. If such
 an assumption turns out to be false then a stack dump is produced which
 tells which assumption (and where) was wrong.
@@ -1140,7 +1140,7 @@ file:
 
 Consult source file *Command.def* to find the implementation of a particular
 command. Most commands support TAB-completion: the user hits TAB and the
-possible completions are are displayed. Implemented in *TabExpansion.cc*.
+possible completions are displayed. Implemented in *TabExpansion.cc*.
 
 === APL Expressions
 
@@ -1191,7 +1191,7 @@ units called *Token*s. Tokens are the machine-readable unit equivalents of the
 human readable input characters. For example, a possibly lengthy string like
 "3.142.0" is converted into a Token holding a C _double_. The whole purpose of
 tokenization is to convert the APL input into an internal representation that
-can be interpreted significantly faster than the APL characters enters by the
+can be interpreted significantly faster than the APL characters entered by the
 APL programmer. For example:
 
 ----
@@ -1314,7 +1314,7 @@ By reversing every statement the same processing order now becomes:
 and lines from top to bottom) as the *APL order* and to the order after
 reversing the tokens of every statement (statement tokens from right to left,
 statements from left to right, and lines from top to bottom) as the
-*reversed order*. The reversal is performed in *Executable::parse_body_line().
+*reversed order*. The reversal is performed in *Executable::parse_body_line()*.
 In other words, function *Tokenizer::tokenize()* produces a *Token_string tos*
 in APL order, which is later reversed into the final function body
 *Token_string Executable::body*.
@@ -1397,7 +1397,7 @@ parameter passing) and have their own implementation file *UserFunction.cc*.
 
 To conclude the discussion of pre-parsing we should mention the role of names.
 Ignoring comments and white-space (which are discarded rather early), the
-lines of every APL program consists of 3 types of objects:
+lines of every APL program consist of 3 types of objects:
 
 . literals (constants) like 1 2 3 or 'abc', and
 . names of built-in primitives like + and -, system functions like ⎕UCS, and
@@ -1714,7 +1714,7 @@ phrase table (in *Prefix.def*) becomes:
 
 ----
 Given that *SN_A* and *SN B* are both short names for *TC_VALUE*, and that
-*SN_F* the short name for *TC_FUN12*, after expanding macro PH() in the Cpp
+*SN_F* is the short name for *TC_FUN12*, after expanding macro PH() in the Cpp
 preprocessor this translated to something like:
 
 _If a sequence of token classes TC_VALUE TC_FUN12 TC_VALUE is discovered, then
@@ -1781,7 +1781,7 @@ The somewhat simplified algorithm of the GNU APL prefix parser is:
   that return no result or TOK_VALUE otherwise.
 . If the parser sees a closing parenthesis *)* or bracket *]* then the parser
   creates a sub-parser and execution is continued (with the current PC) in
-  the sub-parser until the corresponding opening parenthesis *(* or bracked
+  the sub-parser until the corresponding opening parenthesis *(* or bracket
   *[* is reached. The result of the sub-parser, typically a token with class
   *TC_VALUE* for parentheses and *TC_INDEX* for brackets is returned to the
   calling parser,
@@ -1805,7 +1805,7 @@ The case 3. above is the most tricky one and deserves a closer look at it.
 
 ==== Ambiguity of APL symbols.
 
-In compiled lanuages like C/Cpp every name defined by the user must be
+In compiled languages like C/Cpp every name defined by the user must be
 _declared_. Any use of a name without a prior declaration is an error detected
 by the compiler. The declaration determines, among other things, whether the
 name refers to a variable, or to a function, and in that latter case the arity
@@ -2379,14 +2379,14 @@ the role of *get_wravel(0)* as the prototype of Z explicit.
 
 APL values are rarely copied but pointers to APL values are passed back and
 forth a lot in the interpreter (in more than 1200 source code locations),
-It is therefore easy to loose a Value, which then causes a memory leak. Early
+It is therefore easy to lose a Value, which then causes a memory leak. Early
 GNU APL versions were plagued by these memory leaks, but are now fixed
 using several counter-measures:
 
 * Cpp overloading of operators ::new() and ::delete(). Every newly allocated
   Value, no matter if long or short, is tracked in a link list called
   *DynamicObject::all_values*, see *DynamicObject.hh*
-* The APL command )CHECK compares the values that are are reachable from APL,
+* The APL command )CHECK compares the values that are reachable from APL,
   e.g. via a token of *class TC_Value*, with the values in
   *DynamicObject::all_values* and reports any mismatches as *stale values*.
 * Every value tracks itself with a *ValueHistory* which is, for performance
@@ -2435,8 +2435,8 @@ most important member functions of Value_P are:
 * *void reset()* : decrement the owner-count and clear the pointer
 * *init_pointer()* reset() without decrementing the owner-count 
 * *void clear()* : reset and add an event to the ValueHistory (if enabled)
-* *bool operator +()* : *true* iff the pointer is valie (non-zero)
-* *bool operator !()* : *true* iff the pointer is invalie (zero)
+* *bool operator +()* : *true* iff the pointer is valid (non-zero)
+* *bool operator !()* : *true* iff the pointer is invalid (zero)
 * *Value * operator->()* : return the Value * (to the Value)
 * *Value & operator *()* : return the Value & reference (of the Value)
 * *void increment_owner_count()* : dito.
@@ -2490,7 +2490,7 @@ Z←1 2 3
 X←FOO ◊ X←4 5 6
 ----
 
-If we do not clone the result of FOO, not cloned before assigning it to
+If the result of FOO is not cloned before assigning it to
 X, then the subsequent assignment to X would modify the body of FOO and the
 next call of FOO would return 4 5 6.
 
@@ -2507,7 +2507,7 @@ X←1 + FOO ◊ X←4 5 6
 is safe because the addition + does not modify the result of FOO but rather
 discards it immediately. GNU APL versions have always cloned values before
 assigning them (to be on the safe side). Current versions check how many
-owners a value has before coning them:
+owners a value has before cloning them:
 
 ----
    Value.hh
@@ -3054,9 +3054,9 @@ this:
 Each of a derived class has a static function *fix()* which creates an
 instance of that class. The *fix()* function acts as a constructor for
 the derived class. Unlike a normal constructor (which either returns a
-valid object of the class or else throws an execption, the *fix()* function
+valid object of the class or else throws an exception), the *fix()* function
 returns 0 if the construction fails (typically due to some SYNTAX ERROR in
-the input line(s) passed to it. The *fix()* functon of class *UserFunction*
+the input line(s) passed to it). The *fix()* function of class *UserFunction*
 is essentially the implementation of *monadic ⎕FX*, and is also called after
 the ∇-editor finalizes a function definition (trailing ∇).
 
@@ -3075,7 +3075,7 @@ The main differences between the 3 classes are:
 ==== Classes ExecuteList and StatementList
 
 The execution of **ExecuteList**s and **StatementList**s is rather simple:
-the tokens of their body are intepreted from the start of the body to its end,
+the tokens of their body are interpreted from the start of the body to its end,
 no arguments can be passed to the body, no change of the execution with
 branches (→N), etc.
 
@@ -3138,7 +3138,7 @@ The typical life-cycle of Userfunction SUM is then:
 .. The *Executable::body* is executed. This computes *Z←45*; *Z* is now
    defined.
 . At some point in time *SUM* returns (either when the end of the body is
-  reached, or the when execution is stopped explitly (e.g. *→0*).
+  reached, or when execution is stopped explicitly (e.g. *→0*).
 .. The current value of *Z* (if any) is set aside (and will later be
    returned to the caller).
 .. The Symbols *Z*, *A*, *B*, *C*, and *D* are popped again (restored).
@@ -3637,7 +3637,7 @@ All other derivates of class *Function* are executed in the same fashion.
 An important difference between *ExecuteList*, *StatementList*, and
 *UserFunction* concerns the last token in their body. This token is not
 produced by the tokenizer (since there is no APL code for it), but by the
-corrsponding *fix()* function of the derived class. The last token
+corresponding *fix()* function of the derived class. The last token
 determines if and how a value is returned to the caller of the executable:
 
 [cols="<,^,^", options="header,autowidth"]
@@ -3650,11 +3650,11 @@ determines if and how a value is returned to the caller of the executable:
 |
 |====
 
-=== Class Nable
+=== Class Nabla
 
-Class *Nable* implements the interactive function editor (for lack of a
+Class *Nabla* implements the interactive function editor (for lack of a
 better name, sometimes referred to as the ∇-editor). The constructor
-*Nable::Nabla(const UCS_string & cmd)* starts the editor with the first
+*Nabla::Nabla(const UCS_string & cmd)* starts the editor with the first
 editor command (which either creates a new function or else modifies an
 existing one). Every serious APL programmer knows the ∇-editor and its
 implementation is straightforward.
@@ -3727,7 +3727,7 @@ protected:
 };
 ----
 
-The idea between this distinction between base class *Workspace_0* and
+The idea behind this distinction between base class *Workspace_0* and
 derived class *Workspace* is twofold:
 
 . It ensures that the two symbol tables *symbol_table* (for user-defined
@@ -3757,7 +3757,7 @@ classes. There are actually 3 classes:
 * Derived class *XML_Saving_Archive* contains the functions for serializing
   a *Workspace* object into a file. Serializing means that the internal
   (binary) representation of a workspace is written into a (human readable)
-  format from which it can later be de-serialized. IOW: class derived
+  format from which it can later be de-serialized. IOW: derived class
   *XML_Saving_Archive* implements the *)SAVE* command.
 * Class *XML_Loading_Archive* contains the functions for de-serializing a
   *Workspace* object from the (human readable) format back to its internal
@@ -3969,7 +3969,7 @@ is not allowed in a tag attribute value in XML).
 
 All the complexity above was motivated by the following design goals:
 
-* **)SAVE**d workspaces should be resonably compact,
+* **)SAVE**d workspaces should be reasonably compact,
 * it should be possible to fix a broken workspace with a simple ASCII text
   editor such as vi or emacs, with only some basic knowledge of the XML
   syntax, and
@@ -4074,7 +4074,7 @@ a mainframe at that time).
 The most challenging part of the DATIS-P was its communication network. Its
 structure was a 3-stage permutation network as invented by *Waksman*. Since
 no suitable technology existed at that time we developed an ASIC (a 1-bit wide
-8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprized of
+8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprised of
 8-bit × 3 stages × 4 width = 96 such ASICs. The 3 stages were pipelined,
 a reconfiguration of the network to an arbitrary permutation of the inputs
 was done in parallel by all CPUs and took only 3 CPU instructions. The
@@ -4119,7 +4119,7 @@ An entire DATIS-P consists of:
 
 Every CPU of the DATIS-P:
 
-* was a Mototola 68020 processor (the cutting edge when the development
+* was a Motorola 68020 processor (the cutting edge when the development
   of DATIS-P started),
 * had up to 8 numerical co-processors MC 68881 to boost the floating point
   performance
@@ -4155,7 +4155,7 @@ On the DATIS-P architecture with P processors:
 
 ───────────────────────────────────────────────────────────────────────────────
 
-The benchmarks perfomed on the DATIS-P essentially confirmed the predictions
+The benchmarks performed on the DATIS-P essentially confirmed the predictions
 of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
 implemented the most important parallel algorithms performed by the workers.
 The implementation languages were C on the master and Assembler on the workers.
@@ -4181,7 +4181,7 @@ rather buggy (primarily suffering from memory leaks).
 In 2014, multi-core support (parallel APL) was added. However, only the
 APL workhorses (i.e. scalar functions and their outer products) were
 parallelized and benchmarked. The results were somewhat disappointing
-and suggested that non-scalar functions will not gain much by parallization.
+and suggested that non-scalar functions will not gain much by parallelization.
 They are memory bound (as opposed to the more compute bound scalar functions)
 The main reason seems to be that the interface between the CPU cores and
 the memory does not scale with the number of cores so that the cores are
@@ -4366,7 +4366,7 @@ This takes care of a number of things:
   **)SAVE**d with older versions, but not vice versa. Incrementing *ASX_MINOR*
   will then issue a warning in older (but not too old) interpreters.
 
-. After these changes you can build and test that the new intepreter compiles
+. After these changes you can build and test that the new interpreter compiles
   and works (if not then the author has missed something above).
 +
 ----

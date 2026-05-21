@@ -282,8 +282,8 @@ enum Signal_id
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
    sid_READ_SVAR_RECORD,
 /// APserver result (record) for: read SVAR database record from APserver
@@ -480,8 +480,8 @@ public:
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
    /// access functions for signal READ_SVAR_RECORD...
    virtual uint64_t get__READ_SVAR_RECORD__key() const   ///< dito
@@ -1382,8 +1382,8 @@ protected:
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
 //----------------------------------------------------------------------------
 /// The class for signal READ_SVAR_RECORD
@@ -2819,8 +2819,8 @@ struct _all_signal_classes_
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
         char u_READ_SVAR_RECORD[sizeof(READ_SVAR_RECORD_c)];
 /// APserver result (record) for: read SVAR database record from APserver
@@ -3047,8 +3047,8 @@ Signal_base * ret = 0;
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
         case sid_READ_SVAR_RECORD: ret = new READ_SVAR_RECORD_c(b);   break;
 /// APserver result (record) for: read SVAR database record from APserver

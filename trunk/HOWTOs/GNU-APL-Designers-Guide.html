@@ -758,7 +758,7 @@ top-level GNU APL directory.</p></div>
 <div class="sect1">
 <h2 id="_the_gnu_apl_build_system">The GNU APL Build System</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>All commands described below shall executed in the top-level GNU APL directory.
+<div class="paragraph"><p>All commands described below shall be executed in the top-level GNU APL directory.
 The top-level GNU APL directory is the directory that contains - after
 unpacking a GNU APL tar file like <strong>apl-2.0.tar.gz</strong> or after fetching the GNU
 APL sourced with SVN or with git - the file named <strong>configure.ac</strong>.</p></div>
@@ -1142,7 +1142,7 @@ or else a search tree.
 <li>
 <p>
 After a <strong>make gen</strong> the next compiler build will use the hash table, while
-  after *make gen2 it will use a search tree. Performance tests of both
+  after <strong>make gen2</strong> it will use a search tree. Performance tests of both
   alternatives have shown only a marginal performance difference between
   both methods, but the technique as such might be of interest.
 </p>
@@ -1337,7 +1337,7 @@ Suppose further that we add the new error code to the enum but not to the
 because <strong>ErrorCode</strong> is usually declared in a <strong>.hh</strong> file and
 <strong>get_error_string()</strong> is defined in the corresponding <strong>.cc</strong> file. In that case
 Method 1 will most likely produce a segmentation fault at runtime, which is
-about the worst case that may happen. &lt;Method 2 is a little better because a
+about the worst case that may happen. Method 2 is a little better because a
 smart compiler like g++ will issue a warning in this case. Both methods are,
 however, quite inconvenient for the C/C++ programmer, in particular if many
 such mappings are needed in a larger program.</p></div>
@@ -1908,7 +1908,7 @@ performance impacts; they need to be enabled. The make target <strong>develop</s
 (otherwise the top-level Makefile would be missing).</p></div>
 <div class="sect2">
 <h3 id="_assertions">Assertions</h3>
-<div class="paragraph"><p>GNU APL has more 600 Assertions spread throughout the source code. The
+<div class="paragraph"><p>GNU APL has more than 600 Assertions spread throughout the source code. The
 assertions check internal assumptions that the designer has made. If such
 an assumption turns out to be false then a stack dump is produced which
 tells which assumption (and where) was wrong.</p></div>
@@ -2435,7 +2435,7 @@ cellspacing="0" cellpadding="4">
 </div>
 <div class="paragraph"><p>Consult source file <strong>Command.def</strong> to find the implementation of a particular
 command. Most commands support TAB-completion: the user hits TAB and the
-possible completions are are displayed. Implemented in <strong>TabExpansion.cc</strong>.</p></div>
+possible completions are displayed. Implemented in <strong>TabExpansion.cc</strong>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_apl_expressions">APL Expressions</h3>
@@ -2505,7 +2505,7 @@ units called *Token*s. Tokens are the machine-readable unit equivalents of the
 human readable input characters. For example, a possibly lengthy string like
 "3.142.0" is converted into a Token holding a C <em>double</em>. The whole purpose of
 tokenization is to convert the APL input into an internal representation that
-can be interpreted significantly faster than the APL characters enters by the
+can be interpreted significantly faster than the APL characters entered by the
 APL programmer. For example:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2677,8 +2677,8 @@ be processed like this:</p></div>
 and lines from top to bottom) as the <strong>APL order</strong> and to the order after
 reversing the tokens of every statement (statement tokens from right to left,
 statements from left to right, and lines from top to bottom) as the
-<strong>reversed order</strong>. The reversal is performed in <strong>Executable::parse_body_line().
-In other words, function *Tokenizer::tokenize()</strong> produces a <strong>Token_string tos</strong>
+<strong>reversed order</strong>. The reversal is performed in <strong>Executable::parse_body_line()</strong>.
+In other words, function <strong>Tokenizer::tokenize()</strong> produces a <strong>Token_string tos</strong>
 in APL order, which is later reversed into the final function body
 <strong>Token_string Executable::body</strong>.</p></div>
 <div class="paragraph"><p>The reversed order can be processed much faster since the order is now linear
@@ -2783,7 +2783,7 @@ parameter passing) and have their own implementation file <strong>UserFunction.c
 <h3 id="_naming_of_apl_objects">Naming of APL objects</h3>
 <div class="paragraph"><p>To conclude the discussion of pre-parsing we should mention the role of names.
 Ignoring comments and white-space (which are discarded rather early), the
-lines of every APL program consists of 3 types of objects:</p></div>
+lines of every APL program consist of 3 types of objects:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -3170,7 +3170,7 @@ phrase table (in <strong>Prefix.def</strong>) becomes:</p></div>
 </pre>
 </div></div>
 <div class="paragraph"><p>Given that <strong>SN_A</strong> and <strong>SN B</strong> are both short names for <strong>TC_VALUE</strong>, and that
-<strong>SN_F</strong> the short name for <strong>TC_FUN12</strong>, after expanding macro PH() in the C++
+<strong>SN_F</strong> is the short name for <strong>TC_FUN12</strong>, after expanding macro PH() in the C++
 preprocessor this translated to something like:</p></div>
 <div class="paragraph"><p><em>If a sequence of token classes TC_VALUE TC_FUN12 TC_VALUE is discovered, then
 call C++ function reduce_A_F_B().</em></p></div>
@@ -3332,7 +3332,7 @@ If a phrase with an APL jump, such as <strong>→N</strong> (i.e. to line <stron
 <p>
 If the parser sees a closing parenthesis <strong>)</strong> or bracket <strong>]</strong> then the parser
   creates a sub-parser and execution is continued (with the current PC) in
-  the sub-parser until the corresponding opening parenthesis <strong>(</strong> or bracked
+  the sub-parser until the corresponding opening parenthesis <strong>(</strong> or bracket
   <strong>[</strong> is reached. The result of the sub-parser, typically a token with class
   <strong>TC_VALUE</strong> for parentheses and <strong>TC_INDEX</strong> for brackets is returned to the
   calling parser,
@@ -3360,7 +3360,7 @@ is needed for proper error reporting.</p></div>
 <div class="paragraph"><p>The case 3. above is the most tricky one and deserves a closer look at it.</p></div>
 <div class="sect3">
 <h4 id="_ambiguity_of_apl_symbols">Ambiguity of APL symbols.</h4>
-<div class="paragraph"><p>In compiled lanuages like C/C++ every name defined by the user must be
+<div class="paragraph"><p>In compiled languages like C/C++ every name defined by the user must be
 <em>declared</em>. Any use of a name without a prior declaration is an error detected
 by the compiler. The declaration determines, among other things, whether the
 name refers to a variable, or to a function, and in that latter case the arity
@@ -4231,7 +4231,7 @@ the role of <strong>get_wravel(0)</strong> as the prototype of Z explicit.</p></
 <h4 id="_class_value_p">class Value_P</h4>
 <div class="paragraph"><p>APL values are rarely copied but pointers to APL values are passed back and
 forth a lot in the interpreter (in more than 1200 source code locations),
-It is therefore easy to loose a Value, which then causes a memory leak. Early
+It is therefore easy to lose a Value, which then causes a memory leak. Early
 GNU APL versions were plagued by these memory leaks, but are now fixed
 using several counter-measures:</p></div>
 <div class="ulist"><ul>
@@ -4244,7 +4244,7 @@ C++ overloading of operators ::new() and ::delete(). Every newly allocated
 </li>
 <li>
 <p>
-The APL command )CHECK compares the values that are are reachable from APL,
+The APL command )CHECK compares the values that are reachable from APL,
   e.g. via a token of <strong>class TC_Value</strong>, with the values in
   <strong>DynamicObject::all_values</strong> and reports any mismatches as <strong>stale values</strong>.
 </p>
@@ -4362,12 +4362,12 @@ most important member functions of Value_P are:</p></div>
 </li>
 <li>
 <p>
-<strong>bool operator +()</strong> : <strong>true</strong> iff the pointer is valie (non-zero)
+<strong>bool operator +()</strong> : <strong>true</strong> iff the pointer is valid (non-zero)
 </p>
 </li>
 <li>
 <p>
-<strong>bool operator !()</strong> : <strong>true</strong> iff the pointer is invalie (zero)
+<strong>bool operator !()</strong> : <strong>true</strong> iff the pointer is invalid (zero)
 </p>
 </li>
 <li>
@@ -4467,7 +4467,7 @@ X←FOO ◊ X←4 5 6</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>If we do not clone the result of FOO, not cloned before assigning it to
+<div class="paragraph"><p>If the result of FOO is not cloned before assigning it to
 X, then the subsequent assignment to X would modify the body of FOO and the
 next call of FOO would return 4 5 6.</p></div>
 <div class="paragraph"><p>On the other hand:</p></div>
@@ -4486,7 +4486,7 @@ X←1 + FOO ◊ X←4 5 6</code>
 <div class="paragraph"><p>is safe because the addition + does not modify the result of FOO but rather
 discards it immediately. GNU APL versions have always cloned values before
 assigning them (to be on the safe side). Current versions check how many
-owners a value has before coning them:</p></div>
+owners a value has before cloning them:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -5445,9 +5445,9 @@ class ExecuteList: ⍎
 <div class="paragraph"><p>Each of a derived class has a static function <strong>fix()</strong> which creates an
 instance of that class. The <strong>fix()</strong> function acts as a constructor for
 the derived class. Unlike a normal constructor (which either returns a
-valid object of the class or else throws an execption, the <strong>fix()</strong> function
+valid object of the class or else throws an exception), the <strong>fix()</strong> function
 returns 0 if the construction fails (typically due to some SYNTAX ERROR in
-the input line(s) passed to it. The <strong>fix()</strong> functon of class <strong>UserFunction</strong>
+the input line(s) passed to it). The <strong>fix()</strong> function of class <strong>UserFunction</strong>
 is essentially the implementation of <strong>monadic ⎕FX</strong>, and is also called after
 the ∇-editor finalizes a function definition (trailing ∇).</p></div>
 <div class="paragraph"><p>The main differences between the 3 classes are:</p></div>
@@ -5511,7 +5511,7 @@ cellspacing="0" cellpadding="4">
 <div class="sect3">
 <h4 id="_classes_executelist_and_statementlist">Classes ExecuteList and StatementList</h4>
 <div class="paragraph"><p>The execution of <strong>ExecuteList</strong>s and <strong>StatementList</strong>s is rather simple:
-the tokens of their body are intepreted from the start of the body to its end,
+the tokens of their body are interpreted from the start of the body to its end,
 no arguments can be passed to the body, no change of the execution with
 branches (→N), etc.</p></div>
 </div>
@@ -5618,7 +5618,7 @@ The <strong>Executable::body</strong> is executed. This computes <strong>Z←45<
 <li>
 <p>
 At some point in time <strong>SUM</strong> returns (either when the end of the body is
-  reached, or the when execution is stopped explitly (e.g. <strong>→0</strong>).
+  reached, or when execution is stopped explicitly (e.g. <strong>→0</strong>).
 </p>
 <div class="olist loweralpha"><ol class="loweralpha">
 <li>
@@ -6333,7 +6333,7 @@ The Prefix parser replaces <strong>A F B</strong> with <strong>Z</strong> which 
 <div class="paragraph"><p>An important difference between <strong>ExecuteList</strong>, <strong>StatementList</strong>, and
 <strong>UserFunction</strong> concerns the last token in their body. This token is not
 produced by the tokenizer (since there is no APL code for it), but by the
-corrsponding <strong>fix()</strong> function of the derived class. The last token
+corresponding <strong>fix()</strong> function of the derived class. The last token
 determines if and how a value is returned to the caller of the executable:</p></div>
 <div class="tableblock">
 <table rules="all"
@@ -6376,10 +6376,10 @@ cellspacing="0" cellpadding="4">
 </div>
 </div>
 <div class="sect2">
-<h3 id="_class_nable">Class Nable</h3>
-<div class="paragraph"><p>Class <strong>Nable</strong> implements the interactive function editor (for lack of a
+<h3 id="_class_nabla">Class Nabla</h3>
+<div class="paragraph"><p>Class <strong>Nabla</strong> implements the interactive function editor (for lack of a
 better name, sometimes referred to as the ∇-editor). The constructor
-<strong>Nable::Nabla(const UCS_string &amp; cmd)</strong> starts the editor with the first
+<strong>Nabla::Nabla(const UCS_string &amp; cmd)</strong> starts the editor with the first
 editor command (which either creates a new function or else modifies an
 existing one). Every serious APL programmer knows the ∇-editor and its
 implementation is straightforward.</p></div>
@@ -6474,7 +6474,7 @@ protected:
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The idea between this distinction between base class <strong>Workspace_0</strong> and
+<div class="paragraph"><p>The idea behind this distinction between base class <strong>Workspace_0</strong> and
 derived class <strong>Workspace</strong> is twofold:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -6518,7 +6518,7 @@ Class <strong>XML_Archive</strong> is the base class. It merely contains an
 Derived class <strong>XML_Saving_Archive</strong> contains the functions for serializing
   a <strong>Workspace</strong> object into a file. Serializing means that the internal
   (binary) representation of a workspace is written into a (human readable)
-  format from which it can later be de-serialized. IOW: class derived
+  format from which it can later be de-serialized. IOW: derived class
   <strong>XML_Saving_Archive</strong> implements the <strong>)SAVE</strong> command.
 </p>
 </li>
@@ -6886,7 +6886,7 @@ is not allowed in a tag attribute value in XML).</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>)SAVE</strong>d workspaces should be resonably compact,
+<strong>)SAVE</strong>d workspaces should be reasonably compact,
 </p>
 </li>
 <li>
@@ -7075,7 +7075,7 @@ a mainframe at that time).</p></div>
 <div class="paragraph"><p>The most challenging part of the DATIS-P was its communication network. Its
 structure was a 3-stage permutation network as invented by <strong>Waksman</strong>. Since
 no suitable technology existed at that time we developed an ASIC (a 1-bit wide
-8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprized of
+8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprised of
 8-bit × 3 stages × 4 width = 96 such ASICs. The 3 stages were pipelined,
 a reconfiguration of the network to an arbitrary permutation of the inputs
 was done in parallel by all CPUs and took only 3 CPU instructions. The
@@ -7136,7 +7136,7 @@ one master CPU. This master CPU does the APL interpretation and delegates
 <div class="ulist"><ul>
 <li>
 <p>
-was a Mototola 68020 processor (the cutting edge when the development
+was a Motorola 68020 processor (the cutting edge when the development
   of DATIS-P started),
 </p>
 </li>
@@ -7194,7 +7194,7 @@ There is one exception which may happen for particular index vectors <strong>X</
 </li>
 </ul></div>
 <div class="paragraph"><p>───────────────────────────────────────────────────────────────────────────────</p></div>
-<div class="paragraph"><p>The benchmarks perfomed on the DATIS-P essentially confirmed the predictions
+<div class="paragraph"><p>The benchmarks performed on the DATIS-P essentially confirmed the predictions
 of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
 implemented the most important parallel algorithms performed by the workers.
 The implementation languages were C on the master and Assembler on the workers.</p></div>
@@ -7215,7 +7215,7 @@ rather buggy (primarily suffering from memory leaks).</p></div>
 <div class="paragraph"><p>In 2014, multi-core support (parallel APL) was added. However, only the
 APL workhorses (i.e. scalar functions and their outer products) were
 parallelized and benchmarked. The results were somewhat disappointing
-and suggested that non-scalar functions will not gain much by parallization.
+and suggested that non-scalar functions will not gain much by parallelization.
 They are memory bound (as opposed to the more compute bound scalar functions)
 The main reason seems to be that the interface between the CPU cores and
 the memory does not scale with the number of cores so that the cores are
@@ -7521,7 +7521,7 @@ And finally: increment <strong>ASX_MINOR</strong> minor in <strong>enum ArchiveS
 </li>
 <li>
 <p>
-After these changes you can build and test that the new intepreter compiles
+After these changes you can build and test that the new interpreter compiles
   and works (if not then the author has missed something above).
 </p>
 <div class="listingblock">
@@ -7814,7 +7814,7 @@ Permutationsnetzwerkes als Teil des Multiprozerssorsystems DATIS-P-256.</em>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-04-19 13:51:08 CEST
+ 2026-05-21 13:06:32 CEST
 </div>
 </div>
 </body>

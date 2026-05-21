@@ -43,7 +43,7 @@ root cause of the error.
 
 == Errors in User Programs (aka. APL errors),
 
-Errors in user programs are reported by the APL intepreter when APL code
+Errors in user programs are reported by the APL interpreter when APL code
 is being executed. Before the interpreter starts its internal computation(s)
 it checks the arguments. These checks depend on the computation required
 and usually occur in the following order:
@@ -144,7 +144,7 @@ different assertion levels as follows (see also *README-2-configure*):
 * *ASSERT_LEVEL_WANTED = 0*: this disables both the Assert1() and the Assert()
   macro so that the interpreter will have the maximal performance.
 * *ASSERT_LEVEL_WANTED = 1* (the default): this disables the Assert1() macro
-  and enables and the Assert() macro.
+  and enables the Assert() macro.
 * *ASSERT_LEVEL_WANTED = 2*: this enables both the Assert1() and the Assert()
   macro.
 
@@ -233,7 +233,7 @@ most functions in the source code of *GNU APL* are) then we can usually find the
 exact source line for each stack entry rather easily using the function name
 displayed. For larger functions, the same function may be called from different
 source code lines in the same function. This can be improved by converting the
-hex addresses on the left into source line numbers as exlained in the
+hex addresses on the left into source line numbers as explained in the
 following.
 
 First of all the Cpp compiler must be instructed to not discard line numbers.
@@ -379,7 +379,7 @@ down, which sequence of APL operations has led to the state of the workspace.
 
 An assertion checks the immediate state of the interpreter and can therefore
 not check the entire lifetime of an APL value or function. For this purpose,
-*GNU APL* povides a different debugging tool called *Value history*.
+*GNU APL* provides a different debugging tool called *Value history*.
 
 The Value history tracks the locations in the *GNU APL* source code that have
 manipulated a value from its creation (memory allocation) to its destruction
@@ -442,14 +442,14 @@ Finally, try to nail down the root cause with logging facilities (see below).
 == Non-reproducible Errors
 
 The most difficult to fix errors are those that occur on one machine (usually
-your's) and not on others.
+yours) and not on others.
 
-The first thing to locate their root cause it to *./configure* with either no
+The first thing to locate their root cause is to *./configure* with either no
 options or via *make develop* to see if the error is related to specific
 *./configure* options.
 
 Also, look for compiler warnings when *GNU APL* is built. In the default build,
-compiler warnings can be overlooked easiy. *make develop* turns most warnings
+compiler warnings can be overlooked easily. *make develop* turns most warnings
 into errors so you will see at the end if the build was successful.
 
 === Optimization
@@ -629,12 +629,12 @@ Otherwise *]LOG N* toggles the state of logging facility N, e.g.:
 
 Many of the currently over 40 logging facilities serve a particular purpose
 for the maintainers or have become obsolete and are therefore not too useful
-for the trouble-shooting performed by the user. The others mentioned below.
+for the trouble-shooting performed by the user. The others are mentioned below.
 
 ==== ]Log 2 : new and delete calls
 
 For tracking the allocation and de-allocation of memory.
-To find memo leaks.
+To find memory leaks.
 
 ==== ]Log 25 and 26 : APL Errors
 
@@ -762,7 +762,7 @@ In this definition *get_CERR()* is a function which returns an output channel
 such as *std::cerr* (or *stderr* in C). The operator << is overloaded a lot
 and in such a way that commonly used data types in *GNU APL* are being printed
 nicely. A consequence of the overloading is that *Q()* macro can be used
-with many different data types without the burdon to properly format them
+with many different data types without the burden to properly format them
 for the debug output.
 
 *Q(x)* uses the *LOC* macro to get the source file name and line number of its
@@ -853,4 +853,3 @@ reduced to a small number of APL lines.
 Last but not least, please have a look here:
 
 https://www.gnu.org/software/libc/manual/html_node/Reporting-Bugs.html
-

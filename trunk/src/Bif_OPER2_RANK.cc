@@ -372,7 +372,7 @@ Bif_OPER2_RANK::y123_to_chunk_B_rank(Value_P y123, sRank rank_B)
    // 2. the number of elements in y determines rank_B:
    //
    //                    -- monadic f⍤ --       -- dyadic f⍤ --
-   //          	        rank_A     rank_B       rank_A   rank_B
+   //                   rank_A     rank_B       rank_A   rank_B
    // ---------------------------------------------------------
    // y        :        N/A        y            y        y
    // yA yB    :        N/A        yB           yA       yB
@@ -437,7 +437,7 @@ const sRank rk_B = rank_B;
    // shall be computed:
    //
    //                    -- monadic f⍤ --       -- dyadic f⍤ --
-   //          	        rank_A     rank_B       rank_A   rank_B
+   //                   rank_A     rank_B       rank_A   rank_B
    // ---------------------------------------------------------
    // y        :        N/A        y            y        y
    // yA yB    :        N/A        yB           yA       yB
@@ -477,10 +477,10 @@ Bif_OPER2_RANK::unstrand_RO_B(Value_P y123_B, Value_P & y123, Value_P & B)
    /* The ISO standard and NARS define the reduction patterns for the RANK
       operator ⍤ as:
      
-      Z ← A f ⍤ y B		    (ISO and NARS)
-      Z ←   f ⍤ y B		    (ISO and NARS)
-      Z ← A f ⍤ [X] y B		(NARS only)
-      Z ←   f ⍤ [X] y B		(NARS only)
+      Z ← A f ⍤ y B             (ISO and NARS)
+      Z ←   f ⍤ y B             (ISO and NARS)
+      Z ← A f ⍤ [X] y B             (NARS only)
+      Z ←   f ⍤ [X] y B             (NARS only)
 
       We say y123 instead of y here to indicate that y has 1, 2, or 3 items.
 

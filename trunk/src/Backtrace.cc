@@ -337,7 +337,7 @@ Backtrace::show_item(int idx, char * s)
 #undef  DISPLAY_ASM_OFFSET
     
 int64_t abs_addr = NO_PC;
-char * fun = nullptr;
+char * fun = 0;
 long long asm_offset = 0;
    (void)asm_offset;   // avoid warning if not used
     
@@ -362,7 +362,7 @@ long long asm_offset = 0;
           if (char * e = strchr(a_a,' ')) {
               *e = '\0';
               fun = e + 1;
-              abs_addr = strtoll(a_a, nullptr, 16);
+              abs_addr = strtoll(a_a, 0, 16);
               abs_addr -= main_offset_0;
           }
       }
@@ -376,7 +376,7 @@ long long asm_offset = 0;
             if (char * a_o = strstr(e,"+ "))
             {
                 a_o += 2;
-                asm_offset = strtoll(a_o,nullptr,10);
+                asm_offset = strtoll(a_o, 0, 10);
             }
         }
     }
@@ -425,7 +425,7 @@ long long asm_offset = 0;
        if (char * plus = strchr(fun, '+'))
           {
             *plus++ = '\0';
-            asm_offset = strtoll(plus, nullptr, 16);
+            asm_offset = strtoll(plus, 0, 16);
           }
       }
 
@@ -1376,7 +1376,7 @@ char ** strings = backtrace_symbols(buffer, size);
         << "-- Stack trace at " << file << ":" << line << endl
         << "----------------------------------------"  << endl;
 
-   if (strings == nullptr)
+   if (strings == 0)
       {
         cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
                 " instead..." << endl << endl;

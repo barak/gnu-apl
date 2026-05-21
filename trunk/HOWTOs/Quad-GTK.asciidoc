@@ -181,7 +181,7 @@ The architecture above leads to the following work-flow.
    if the GUI is, for example, only popped up to request input from the user
    of the APL application. In the latter case the GUI is a single window
    (a "modal dialog") which is polled from APL until some final action of the
-   user has occurred, while the former case the APL application has to poll
+   user has occurred, while in the former case the APL application has to poll
    the GUI for events at rather short intervals. To poll *⎕GTK* at regular
    intervals:
 
@@ -494,7 +494,7 @@ in the <<TAG_appendix, Appendix>> of this document.
 The handle above (6) can, in theory, also be used with ⎕FIO functions like
 fread() if you know what you are doing. This practice is, however, dangerous
 because it might create inconsistencies between *⎕GTK* and ⎕FIO. For example,
-closing a *⎕GTK* handle with ⎕FIO is technically possible, but usually bad
+closing a *⎕GTK* handle with ⎕FIO is technically possible, but usually a bad
 idea.
 
 Please note that a window can normally be closed from two ends: from APL with
@@ -736,9 +736,9 @@ happen automatically at the proper point in time, What remains is step 6.
 
 The event loop can be polled from APL in two fashions: *blocking* or
 *non-blocking*. *Blocking* means that the APL functions that do the poll
-returns an event to APL immediately if the event has occurred already (e.g.
+return an event to APL immediately if the event has occurred already (e.g.
 the user has clicked *button1* _before_ the event queue was polled), and
-otherwise waits until that event has occurred. *Non-blocking* means that the
+otherwise wait until that event has occurred. *Non-blocking* means that the
 APL functions that do the poll _always_ return immediately, but return a
 special event with number 0 to indicate that the event queue was empty at the
 time when the poll function was called.
@@ -850,7 +850,7 @@ In *glade*, design a GUI with a top-level widget of type *Window* that has one
 child of type *DrawingArea*. That child is the canvas on which the circle will
 be drawn. In the *Common* tab of the canvas, set the property *Width request*
 to 400 and *Height request* to 300, and store the GUI as file *circle.ui*.
-That defines the size of the canvas, In the *Signals* tab, set the handler for
+That defines the size of the canvas. In the *Signals* tab, set the handler for
 signal *draw* to *do_draw*. The resulting XML file *circle.ui* is then:
 
 ----
@@ -948,7 +948,7 @@ image::glade-5.png[]
 
 A slightly more advanced example that uses the same XML file *circle.ui* but
 different drawing commands to show additional features (lines, text, objects
-with and without borders is:
+with and without borders) is:
 
 ----
       )CLEAR
@@ -1006,7 +1006,7 @@ The following notes may be helpful when creating custom drawings.
   and blue component of each color. Each color component is an integer value
   between 0 and 255 (inclusive), The background is always opaque.
 * Transparent colors are specified as a 4-element vector containing the red,
-  green, and blue component of each color (o-255), and an opacity value
+  green, and blue component of each color (0-255), and an opacity value
   between 0 (fully transparent) and 100 (fully opaque).
 * Most graphical objects are controlled by two colors:
 ** A line color (called the *pen* color in other places), and
@@ -1065,13 +1065,13 @@ normally stores it in some file, say *my-gui.xml*, that can later be
 loaded with *⎕GTK "my-gui.xml"* or with *CSS *⎕GTK* "my-gui.xml"* where
 CSS is a string produced elsewhere (and not of concern here).
 
-Lets start with:
+Let's start with:
 
 1. start *glade*,
 2. → Create a new project,
 3. → add a new *Toplevel* widget of type *GtkWindow*, and
 4. → select the new window and set the (topmost) property *ID*
-     in tab *Genera* to *window1*
+     in tab *General* to *window1*
    
 5. → *Save as* the project as *my-gui*.
 
@@ -1119,7 +1119,7 @@ This returns GTK handle 6 and opens the following GUI:
 
 image::glade-7.png[]
 
-Now, lets test the claim above: _the filename (APL string) arguments *A*
+Now, let's test the claim above: _the filename (APL string) arguments *A*
 and *B* of dyadic *A *⎕GTK* B* and monadic *⎕GTK B* can also be the contents
 of the files instead of the file names_:
 
@@ -1169,7 +1169,7 @@ To see why, we note the following:
   line separator.
 * the XML standard treats newlines and blanks alike, therefore the string
   lines could have been separated by blanks (or tabs etc.) as well. However,
-  no corrsponding ⎕CR conversion exists, so *36 ⎕CR* was used and long XML
+  no corresponding ⎕CR conversion exists, so *36 ⎕CR* was used and long XML
   strings using \n are easier to read than those using blanks or TABs.
 
 
@@ -1245,7 +1245,7 @@ corresponding header file. The class for *corename* is either *GtkCoreName* or
 GtkCorename*. In our example the class names are *GtkWidget*, *GtkTextView*,
 and *GtkTreeViewColumn*.
 
-Confusingly, many widget not only declare the class name as described, but
+Confusingly, many widgets not only declare the class name as described, but
 in addition another class with suffix *Class*. For instance both
 *GtkTreeViewColumn* and *GtkTreeViewColumnClass* in *gtktreeviewcolumn.h*.
 
@@ -1531,7 +1531,7 @@ and produces:
 
 image::glade-9.png[]
 
-To explain the the above:
+To explain the above:
 
 * the properties *width_request* and *height_request* specify the desired
   sizes of the parent widget *window1* and its (so far) anonymous child
@@ -1694,7 +1694,7 @@ More details can be found here:
 
 https://docs.gtk.org/gtk3/css-overview.html
 
-Lets start simple (with variable XML as above):
+Let's start simple (with variable XML as above):
 
 ----
       CSS ← """
@@ -1850,7 +1850,7 @@ the parameters of that event is mere overhead. Also, the APL code is trivial
       H *⎕GTK* 0   ⍝ close the window with handle H
 ----
 
-and it may, since no APL loop is required, even be use in immediate execution
+and it may, since no APL loop is required, even be used in immediate execution
 mode or in APL scripts.
 
 Sometimes you want to do something else while waiting for a user action, for
@@ -2108,7 +2108,7 @@ commands.
 
 With *glade* it is possible to design a single GUI that contains multiple
 top-level windows or no top-level window. However, *⎕GTK* currently supports
-only GUIs with one top-level widget of type "Window (the first widget in the
+only GUIs with one top-level widget of type "Window" (the first widget in the
 top-level group in glade).
 
 

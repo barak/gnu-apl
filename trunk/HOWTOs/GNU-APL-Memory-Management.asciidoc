@@ -23,7 +23,7 @@ The sizes of the binaries mentioned (at the time of this writing) are:
 [options="header"]
 [width="60%"]
 |===============
-| Binary             | Size (bytes) 
+| Binary             | Size (bytes)
 |GNU APL Interpreter |  44,620,848
 |APserver            |   1,540,944
 |Gtk_server          |     530,376
@@ -41,7 +41,7 @@ The sizes of the binaries mentioned (at the time of this writing) are:
   static allocation has already taken place when the interpreter outputs its
   first APL prompt. After that dynamic memory allocation via malloc()/new()
   is performed for objects whose lifetime is potentially infinite (i.e. whose
-  destruction is triggered by APL code. These objects are:
+  destruction is triggered by APL code). These objects are:
 ** APL variables
 ** APL values
 ** defined functions
@@ -130,7 +130,7 @@ value can be allocated in a single new() call while a long value needs two
 new() calls: one for the value header (which contains the shape of the value),
 and one for the ravel cells of the value. Looking at the details of malloc()
 one can see that the allocation or deallocation of smaller memory areas is more
-efficient than the allocation or deallocation of larger areas, Finally, short
+efficient than the allocation or deallocation of larger areas. Finally, short
 APL values occur more frequently in APL programs than long values, and they
 are also more frequently overridden as a whole (which allocates a new value
 and discards the old) as opposed to being updated via indexed assignment
@@ -180,8 +180,8 @@ possibly combinations of them) to deal with mixed values:
   bytes. On the other hand, there are quite a few advantages:
 ** The same size of all elements causes V[n] to take constant time,
 ** The indexed assignment of e.g. a single element (of a different type) to a
-   non-mixed array would also take (constant time (in option 1 above the entire
-   array would have needed to be converted from non-mixed to mixed)).
+   non-mixed array would also take constant time (in option 1 above the entire
+   array would have needed to be converted from non-mixed to mixed).
 ** The number of different array types would be reduced to 1 instead of being
    increased from 5 to 6 (bit, byte, integer, float, complex, and mixed). This
    in turn makes a huge number of type checks in the dyadic APL primitives
@@ -330,7 +330,7 @@ to achieve full protection.
 * ⎕SYL[3;] limits the number of ravel elements in APL values.
   *⎕SYL[3;2]←1000000* will throw a LIMIT ERROR before more than 20 MByte on
   32-bit systems, or more than 24 MByte on 64-bit systems is requested.
-* Finally, ⎕SYL[31 32;] define a safety margin that is is explained below.
+* Finally, ⎕SYL[31 32;] define a safety margin that is explained below.
 
 In short, ⎕SYL[1;] protects primarily against too deep recursion, which is most
 likely caused by a programming fault. ⎕SYL[2;] protects against too many APL
@@ -396,7 +396,7 @@ Instead, GNU APL uses the following simple algorithm:
 ** otherwise the request is forwarded to malloc() and from there possibly
    to the kernel.
 
-The ⎕WA-margin currently has a default value of 0, but can be changed via 
+The ⎕WA-margin currently has a default value of 0, but can be changed via
 
 === Hints for GNU APL Users
 
@@ -431,7 +431,7 @@ processes with each process allocating up to 3 GByte as long as the memory
 shown in */proc/meminfo* is not exceeded.
 
 If GNU APL sees a *total_memory* of more than 3 GB in the analysis of
-*/proc/meminfo*, then it reduces *total_memory* to about 3 GB. if it is
+*/proc/meminfo*, then it reduces *total_memory* to about 3 GB, if it is
 running on a 32-bit kernel. 64-bit machines have a similar limit, but the
 limit is so high that it is not relevant in practice.
 
@@ -505,21 +505,21 @@ safety margin disabled in order to allow near-memory-starvation.
 ==== Example 1: WS FULL with sufficient free memory left
 
 ----
-      
+
       ⍝ enable relevant logging facilities
       ]log 25
-    Log facility 'more verbose errors                 ' is now ON 
+    Log facility 'more verbose errors                 ' is now ON
       ]log 26
-    Log facility 'details of error throwing           ' is now ON 
+    Log facility 'details of error throwing           ' is now ON
       ]log 45
-    Log facility 'details of Value allocation         ' is now ON 
-      
+    Log facility 'details of Value allocation         ' is now ON
+
       ⍝ disable safety margin
       ⎕SYL[31 32;2]←1000000 200
       ⎕SYL[31 32;]
- ⎕WA safety margin (bytes) 1000000 
- ⎕WA memory scale (%)          200 
-      
+ ⎕WA safety margin (bytes) 1000000
+ ⎕WA memory scale (%)          200
+
       A←⊂'0123456789ABCDEF'   ⍝ 692 bytes
       N←200000000             ⍝ for 200 Mio ravel Cells
       ↑↑ N⍴A                  ⍝ 4 GB top-level + 138.4 GB nested sub-values
@@ -560,18 +560,18 @@ new Value(PrimitiveFunction.cc:230) failed (APL error in ravel allocation)
 ----
       ⍝ enable relevant logging facilities
       ]log 25
-    Log facility 'more verbose errors                 ' is now ON 
+    Log facility 'more verbose errors                 ' is now ON
       ]log 26
-    Log facility 'details of error throwing           ' is now ON 
+    Log facility 'details of error throwing           ' is now ON
       ]log 45
-    Log facility 'details of Value allocation         ' is now ON 
-      
+    Log facility 'details of Value allocation         ' is now ON
+
       ⍝ disable safety margin
       ⎕SYL[31 32;2]←1000000 200
       ⎕SYL[31 32;]
- ⎕WA safety margin (bytes) 1000000 
- ⎕WA memory scale (%)          200 
-      
+ ⎕WA safety margin (bytes) 1000000
+ ⎕WA memory scale (%)          200
+
       A←⊂'0123456789ABCDEF'   ⍝ 692 bytes
       N←20000000              ⍝ for 20 Mio ravel Cells
       ↑↑ N⍴A                  ⍝ 0,4 GB top-level + 13.84 GB nested sub-values
@@ -612,7 +612,7 @@ backtrace_symbols() failed. Using backtrace_symbols_fd() instead...
 WS FULL+
       ↑↑N⍴A
         ^ ^
-      
+
       )MORE
 new Value(const Shape & shape, const char * loc) failed (std::bad_alloc)
       throwing WS FULL at Value_P.icc:227
@@ -673,4 +673,3 @@ on bug-apl please consider the following.
    exception handling.
 
 Thanks for using GNU APL.
-

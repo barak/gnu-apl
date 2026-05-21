@@ -236,7 +236,7 @@ void
 ASCII_canvas::draw_plot_line(const Plot_window_properties & w_props,
                              int row, const Plot_data & data)
 {
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp = *l_props[row];
 
 const double max_X = w_props.get_max_X();
