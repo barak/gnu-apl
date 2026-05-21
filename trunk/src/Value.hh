@@ -742,7 +742,7 @@ public:
        the callee, and
    1c. Values may be cloned without need.
 
-   2. the new scheme (with #define NEW_CLONE) clones Values late, so that:
+   2. the new scheme (with # define NEW_CLONE) clones Values late, so that:
    2a. Different PointerCells (of the same or even of different Values)
        may point to the same Sub-Value, and
    2b. Arguments of defined functions remain the same as long as they are
@@ -751,7 +751,7 @@ public:
        has more than one owner.
 
    !!! NOTE that Scheme2 was reported to fail in certain cases of
-            slective specification.
+            selective specification.
  **/
 #define NEW_CLONE
 

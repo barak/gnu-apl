@@ -138,7 +138,7 @@ class UTF8_string_vector : public std::vector<UTF8_string>
 {
 public:
    /// constructor: from string with lines separated by \n. The lines
-   /// will be the items of the vector (with any \r or \n removed).
+   /// will be the items of the vector (with any CR or LF characters removed).
    UTF8_string_vector(const char * lines);
 };
 //============================================================================
