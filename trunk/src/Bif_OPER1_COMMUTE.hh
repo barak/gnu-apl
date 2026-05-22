@@ -37,15 +37,27 @@ public:
    Bif_OPER1_COMMUTE() : PrimitiveOperator(TOK_OPER1_COMMUTE) {}
 
    /// Overloaded Function::eval_LB().
+   /// @param LO left operand token
+   /// @param B right argument APL value
    virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LXB().
+   /// @param LO left operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALB().
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param B right argument APL value
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB().
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_COMMUTE  fun;      ///< Built-in function.

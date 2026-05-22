@@ -60,6 +60,7 @@ public:
       }
 
    /// copy constructor without location
+   /// @param other token to copy from
    Token(const Token & other)
    : tag(TOK_VOID)
       {
@@ -70,6 +71,8 @@ public:
       }
 
    /// copy constructor with location
+   /// @param other token to copy from
+   /// @param loc caller location for diagnostics
    Token(const Token & other, const char * loc)
    : tag(TOK_VOID)
       {
@@ -80,6 +83,8 @@ public:
       }
 
    /// copy Token \b src into \b this token.
+   /// @param src source token to copy from
+   /// @param loc caller location for diagnostics
    void copy(const Token & src, const char * loc)
       {
          clear(loc);   // clear our Value_P
@@ -100,6 +105,8 @@ public:
 
    /// move the mutable (!) \b src into \b this token. If \b src is an APL
    /// value, then it is properly cleared. and an event is added.
+   /// @param src source token to move from (cleared after move)
+   /// @param loc caller location for diagnostics
    void move_from(Token & src, const char * loc)
       {
          clear(loc);   // clear our Value_P
@@ -119,26 +126,37 @@ public:
       }
 
    /// Construct a token without a value
+   /// @param tg tag identifying the token type
    Token(TokenTag tg)
    : tag(tg) { Assert(get_ValueType() == TV_NONE);   value.int_vals[0] = 0; }
 
    /// Construct a token for a \b Function.
+   /// @param tg tag identifying the token type
+   /// @param fun pointer to the function to store
    Token(TokenTag tg, cFunction_P fun)
    : tag(tg) { Assert(get_ValueType() == TV_FUN);   value.function = fun; }
 
    /// Construct a token for a \b line number
+   /// @param tg tag identifying the token type (must be TOK_LINE)
+   /// @param line function line number to store
    Token(TokenTag tg, Function_Line line)
    : tag(tg) { Assert(tg == TOK_LINE);   value.fun_line = line; }
 
    /// Construct a token for an \b error code
+   /// @param tg tag identifying the token type (must be TOK_ERROR)
+   /// @param ec error code to store
    Token(TokenTag tg, ErrorCode ec)
    : tag(tg) { Assert(tg == TOK_ERROR);   value.int_vals[0] = ec; }
 
    /// Construct a token for a \b function \b axis
+   /// @param tg tag identifying the token type (must be TOK_FAXIS)
+   /// @param fnum function axis (sub-function) number
    Token(TokenTag tg, sAxis fnum)
    : tag(tg) { Assert(tg == TOK_FAXIS);   value.int_vals[0] = fnum; }
 
    /// Construct a token for a \b Symbol
+   /// @param tg tag identifying the token type
+   /// @param sp pointer to the symbol to store
    Token(TokenTag tg, Symbol * sp)
    : tag(tg) { Assert(get_ValueType() == TV_SYM);  value.sym_ptr = sp; }
 
@@ -146,18 +164,27 @@ public:
    /// defined in Avec.def. This token in temporary in the sense that
    /// get_ValueType() can be anything rather than TV_CHAR. The value
    /// for the token (if any) will be added later (after parsing it).
+   /// @param tg tag identifying the token type (from Avec.def)
+   /// @param uni Unicode character value to store
    Token(TokenTag tg, Unicode uni)
    : tag(tg) { value.char_val = uni; }
 
    /// Construct a token for a single integer value.
+   /// @param tg tag identifying the token type
+   /// @param ival integer value to store
    Token(TokenTag tg, int64_t ival)
    : tag(tg) { value.int_vals[0] = ival; }
 
    /// Construct a token for a single floating point value.
+   /// @param tg tag identifying the token type
+   /// @param flt floating-point value to store
    Token(TokenTag tg, APL_Float flt)
    : tag(tg) { value.float_vals[0] = flt; }
 
    /// Construct a token for a single complex value.
+   /// @param tg tag identifying the token type
+   /// @param r real part of the complex value
+   /// @param i imaginary part of the complex value
    Token(TokenTag tg, APL_Float r, APL_Float i)
    : tag(tg)
      {
@@ -166,12 +193,16 @@ public:
      }
 
    /// Construct a token for an APL value.
+   /// @param tg tag identifying the token type
+   /// @param vp APL value to store
    Token(TokenTag tg, Value_P vp)
    : tag(tg)
    { Assert1(get_ValueType() == TV_VAL);
      Assert(+vp);   new (&value.apl_val) Value_P(vp); }
 
    /// Construct a token for an index
+   /// @param tg tag identifying the token type
+   /// @param idx index expression to store
    Token(TokenTag tg, IndexExpr & idx);
 
    /// destructor
@@ -179,6 +210,7 @@ public:
      { release_apl_val("~Token()");  }
 
    /// swap this and \b other
+   /// @param other token to swap with
    inline void swap_token(Token & other)
       { swap(tag, other.tag);
         swap(value.int_vals[0], other.value.int_vals[0]);
@@ -220,10 +252,12 @@ public:
         return ErrorCode(value.int_vals[0]); }
 
    /// set the integer value of this token
+   /// @param val new integer value to store
    void set_int_val(int64_t val)
       { Assert(get_ValueType() == TV_INT);   value.int_vals[0] = val; }
 
    /// set the second integer value of this token
+   /// @param val new second integer value to store
    void set_int_val2(int64_t val)
       { value.int_vals[1] = val; }
 
@@ -293,6 +327,7 @@ public:
       { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
 
    /// clear this token, properly clearing its Value token (if any)
+   /// @param loc caller location for diagnostics
    void clear(const char * loc)
       {
          if (is_apl_val())   value.apl_val.reset();
@@ -304,6 +339,7 @@ public:
       { Assert1(get_tag() == TOK_AXIS);  return value._apl_val(); }
 
    /// set the Value_P value of this token
+   /// @param val APL value to store
    void set_apl_val(Value_P val)
       { Assert(get_ValueType() == TV_VAL);   value._apl_val() = val; }
 
@@ -324,18 +360,22 @@ public:
 
   /// clear the Value_P value (if any) of this token, updating
    /// its refcount as needed. Left-over in libapl?
+   /// @param loc caller location for diagnostics
    void extract_apl_val(const char * loc);
 
-   /// clear the Value_P (if any) without updating its refcount. Return 
+   /// clear the Value_P (if any) without updating its refcount. Return
    /// the old Value * that was overridden. Left-over in libapl?
+   /// @param loc caller location for diagnostics
    Value * extract_and_keep(const char * loc);
 
 
    /// clear the Value_P value (if any) of this token, updating
    /// its refcount as needed
+   /// @param loc caller location for diagnostics
    void release_apl_val(const char * loc);
 
    /// change the tag (within the same TokenValueType)
+   /// @param new_tag replacement tag (must share the same TokenValueType)
    void ChangeTag(TokenTag new_tag);
 
    /// helper function to print a function.
@@ -345,10 +385,14 @@ public:
    ostream & print_value(ostream & out) const;
 
    /// show trace output for this token
+   /// @param out output stream to write trace to
+   /// @param fun_name name of the function being traced
+   /// @param line current function line number
    void show_trace(ostream & out, const UCS_string & fun_name,
                    Function_Line line) const;
 
    /// the Quad_CR representation of the token.
+   /// @param style print style controlling output format
    UCS_string canonical(PrintStyle style) const;
 
    /// the tag in readable form (TOK_...)

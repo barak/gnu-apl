@@ -41,6 +41,11 @@ class ScalarFunction : public PrimitiveFunction
    //
 protected:
    /// Construct a ScalarFunction with \b Id \b id
+   /// @param tag token tag identifying this scalar function
+   /// @param stat_AB dyadic performance statistics collector (may be null)
+   /// @param stat_B monadic performance statistics collector (may be null)
+   /// @param thresh_AB element-count threshold for parallel dyadic evaluation
+   /// @param thresh_B element-count threshold for parallel monadic evaluation
    ScalarFunction(TokenTag tag, CellFunctionStatistics * stat_AB,
                                 CellFunctionStatistics * stat_B,
                                 ShapeItem thresh_AB,
@@ -55,19 +60,27 @@ protected:
    virtual bool is_scalar_function() const   { return true; }
 
    /// Evaluate a scalar function monadically.
+   /// @param B right argument APL value
+   /// @param fun cell-level monadic function to apply
    Token eval_scalar_B(Value_P B, prim_f1 fun) const;
 
    /// Evaluate a scalar function dyadically.
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   /// @param fun cell-level dyadic function to apply
    Token eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const;
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const = 0;
 
    /// overloaded Function::eval_fill_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_fill_AB(Value_P A, Value_P B) const
       { return do_eval_fill_AB(A, B); }
 
    /// overloaded Function::eval_fill_B()
+   /// @param B right argument APL value
    virtual Token eval_fill_B(Value_P B) const
       { return do_eval_fill_B(B); }
 
@@ -78,30 +91,56 @@ protected:
    virtual bool may_parallel() const   { return true; }
 
    /// compute the monadic scalar function \b fun along one ravel
+   /// @param ec receives error code on failure
+   /// @param B right argument APL value
+   /// @param fun cell-level monadic function to apply
    Value_P do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const;
 
    /// compute the dyadic scalar function \b fun along one ravel
+   /// @param ec receives error code on failure
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   /// @param fun cell-level dyadic function to apply
    Value_P do_scalar_AB(ErrorCode & ec, Value_P A,
                                         Value_P B, prim_f2 fun) const;
 
    /// compute cell_A fun cell_B, scalar-extending PointerCells
+   /// @param Z result value to write into
+   /// @param cell_A left ravel cell (scalar-extended if PointerCell)
+   /// @param cell_B right ravel cell (scalar-extended if PointerCell)
+   /// @param fun cell-level dyadic function to apply
    void expand_nested(Value * Z, const Cell * cell_A,
                       const Cell * cell_B, prim_f2 fun) const;
 
    /// Evaluate a scalar function dyadically with axis.
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
+   /// @param fun cell-level dyadic function to apply
    Token eval_scalar_AXB(Value_P A, Value_P X, Value_P B, prim_f2 fun) const;
 
    /// A helper function for eval_scalar_AXB().
+   /// @param A left argument APL value
+   /// @param axes_in_X bitmap of axes along which to apply the function
+   /// @param B right argument APL value
+   /// @param fun cell-level dyadic function to apply
+   /// @param reversed true if the axis order should be reversed
    Value_P eval_scalar_AXB(Value_P A, AxesBitmap axes_in_X,
                            Value_P B, prim_f2 fun, bool reversed) const;
 
    /// A helper function for eval_fill_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    Token do_eval_fill_AB(const Value_P A, const Value_P B) const;
 
    /// A helper function for eval_fill_B().
+   /// @param B right argument APL value
    Token do_eval_fill_B(const Value_P B) const;
 
    /// Evaluate \b the identity function.
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
+   /// @param FI0 fill identity cell value
    static Token eval_scalar_identity_fun(Value_P B, sAxis axis,
                                          const Cell & FI0);
 
@@ -126,6 +165,9 @@ protected:
    /// return the conforming shape of sh_A and sh_A, or set ec and return 0
    /// if shapes cannot be conformed.
    /// RANK ERROR or LENGTH ERROR if the dont.
+   /// @param ec receives the error code if shapes cannot be conformed
+   /// @param sh_A shape of the left argument
+   /// @param sh_B shape of the right argument
    static const Shape * conforming_shape(ErrorCode & ec, const Shape & sh_A,
                                                          const Shape & sh_B);
 };
@@ -160,10 +202,13 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { return eval_scalar_B(B, &Cell::bif_factorial); }
 
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_binomial); }
 
@@ -172,10 +217,15 @@ protected:
       { return &Cell::bif_binomial; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_binomial); }
 };
@@ -195,6 +245,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_less_than); }
 
@@ -203,10 +255,15 @@ protected:
       { return &Cell::bif_less_than; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_less_than); }
 };
@@ -226,6 +283,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_equal); }
 
@@ -234,10 +293,15 @@ protected:
       { return &Cell::bif_equal; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_equal); }
 };
@@ -257,6 +321,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B,
                               &Cell::bif_equal_bitwise); }
@@ -266,10 +332,15 @@ protected:
       { return &Cell::bif_equal_bitwise; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_equal_bitwise); }
 };
@@ -289,6 +360,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_not_equal_bitwise); }
 
@@ -297,10 +370,15 @@ protected:
       { return &Cell::bif_not_equal_bitwise; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_not_equal_bitwise); }
 };
@@ -320,6 +398,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_greater_than); }
 
@@ -328,10 +408,15 @@ protected:
       { return &Cell::bif_greater_than; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_greater_than); }
 };
@@ -351,6 +436,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_and); }
 
@@ -362,10 +449,15 @@ protected:
    virtual assoc_f2 get_assoc() const { return &Cell::bif_and; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_and); }
 };
@@ -385,10 +477,13 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { return eval_scalar_B(B, &Cell::bif_within_quad_CT); }
 
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B,
                               &Cell::bif_and_bitwise); }
@@ -401,10 +496,15 @@ protected:
    virtual assoc_f2 get_assoc() const { return &Cell::bif_and_bitwise; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_and_bitwise); }
 };
@@ -424,6 +524,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_or); }
 
@@ -435,10 +537,15 @@ protected:
    virtual assoc_f2 get_assoc() const { return &Cell::bif_or; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_or); }
 };
@@ -458,10 +565,13 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { return eval_scalar_B(B, &Cell::bif_near_int64_t); }
 
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_or_bitwise); }
 
@@ -473,10 +583,15 @@ protected:
    virtual assoc_f2 get_assoc() const { return &Cell::bif_or_bitwise; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_or_bitwise); }
 };
@@ -496,6 +611,8 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_less_eq); }
 
@@ -504,10 +621,15 @@ protected:
       { return &Cell::bif_less_eq; }
 
    /// overloaded Function::eval_identity_fun();
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_less_eq); }
 };

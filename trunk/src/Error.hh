@@ -48,6 +48,8 @@ class Error
 {
 public:
    /// constructor: error with error code ec
+   /// @param ec error code identifying the APL error
+   /// @param loc caller location for diagnostics
    Error(ErrorCode ec, const char * loc);
 
    /// return true iff error_code is known (as opposed to an arbitrary
@@ -77,10 +79,12 @@ public:
       { return UCS_string(UTF8_string(error_message_2)); }
 
    /// return the major class (⎕ET) of the error
+   /// @param err error code to classify
    static int error_major(ErrorCode err)
       { return err >> 16; }
 
    /// return the category (⎕ET) of the error
+   /// @param err error code to classify
    static int error_minor(ErrorCode err)
       { return err & 0xFFFF; }
 
@@ -105,13 +109,17 @@ public:
       { return show_locked; }
 
    /// print the error and its related information
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
    void print(ostream & out, const char * loc) const;
 
    /// set the first error line
+   /// @param msg_1 error name text for ⎕EM[1;]
    void set_error_line_1(const char * msg_1);
 
    /// add a '+' to error_message_1 unless it hast one already. The caller
-   /// has checked that 
+   /// has checked that
+   /// @param have_more true if there is more context available
    void add_MORE_indicator(bool have_more);
 
    /// compute the caret line. This is the third of the 3 error lines.
@@ -120,12 +128,18 @@ public:
    UCS_string get_error_line_3() const;
 
    /// set the second error line to \b msg_2
+   /// @param msg_2 failed-statement text for ⎕EM[2;]
    void set_error_line_2(const char * msg_2);
 
    /// set error line 2, left caret, and right caret
+   /// @param ucs failed-statement text
+   /// @param lcaret left caret column position
+   /// @param rcaret right caret column position
    void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
 
    /// print the 3 error message lines as per ⎕EM
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
    void print_em(ostream & out, const char * loc);
 
    /// set the error code
@@ -133,38 +147,52 @@ public:
       { error_code = E_NO_ERROR; }
 
    /// set the show_locked flag
+   /// @param on new value for show_locked
    void set_show_locked(bool on)
       { show_locked = on; }
 
    /// set the left caret (^) position in the third error line
+   /// @param col column index for the left caret
    void set_left_caret(int col)
       { left_caret = col; }
 
    /// set the right caret (^) position in the third error line
+   /// @param col column index for the right caret
    void set_right_caret(int col)
       { right_caret = col; }
 
    /// set the source code line where a parse error was thrown
+   /// @param loc caller location for diagnostics
    void set_parser_loc(const char * loc)
       { parser_loc = loc; }
 
    /// update error information in \b this and copy it to si
+   /// @param si state indicator entry to update with error info
    void update_error_info(StateIndicator * si);
 
    /// throw an Error related to \b Symbol \b symbol
+   /// @param symbol name of the offending symbol
+   /// @param loc caller location for diagnostics
    static void throw_symbol_error(const UCS_string & symbol,
                                   const char * loc) GNUC__noreturn;
 
    /// throw a error with a parser location
+   /// @param code error code to throw
+   /// @param par_loc parser source location where the error was detected
+   /// @param loc caller location for diagnostics
    static void throw_parse_error(ErrorCode code, const char * par_loc,
                                  const char * loc) GNUC__noreturn;
 
    /// throw a DEFN ERROR for function \b fun
+   /// @param fun function name that caused the DEFN ERROR
+   /// @param cmd command text associated with the definition attempt
+   /// @param loc caller location for diagnostics
    static void throw_define_error(const UCS_string & fun,
                                   const UCS_string & cmd,
                                   const char * loc) GNUC__noreturn;
 
    /// return a string describing the error
+   /// @param err error code to look up
    static const char * error_name(ErrorCode err);
 
 protected:

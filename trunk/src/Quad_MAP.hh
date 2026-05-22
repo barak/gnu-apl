@@ -40,13 +40,22 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value (the mapping table)
+   /// @param B right argument APL value (the data to map)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Heapsort helper
+   /// @param a first ShapeItem index to compare
+   /// @param b second ShapeItem index to compare
+   /// @param cells comparison context (pointer to ravel_comp_len)
    static bool greater_map(const ShapeItem & a, const ShapeItem & b,
                            const void * cells);
 
    /// compute ⎕MAP with (indices of) sorted A
+   /// @param A the mapping table value
+   /// @param ordered_indices_A sorted indices into A's key column
+   /// @param B the data value to map
+   /// @param recursive true to apply mapping recursively to nested elements
    static Value_P do_map(const Value & A, const vector<ShapeItem> ordered_indices_A,
                          const Value * B, bool recursive);
 };

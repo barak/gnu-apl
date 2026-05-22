@@ -41,6 +41,8 @@ public:
       };
 
    /// constructor
+   /// @param num unique macro identifier
+   /// @param text UTF-8 encoded APL source text of the macro body
    Macro(Macro_num num, const UTF8_string & text);
 
    /// overloaded Function::is_macro()
@@ -54,6 +56,7 @@ public:
    static void unmark_all_macros();
 
    /// return the macro with \b macro_number num
+   /// @param num macro identifier to look up
    static Macro * get_macro(Macro_num num);
 
 #define mac_def(name, _txt) static Macro name;   ///< a macro

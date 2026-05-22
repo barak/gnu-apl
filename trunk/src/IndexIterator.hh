@@ -36,6 +36,8 @@ class IndexIterator
 {
 public:
    /// constructor: IndexIterator with weight w
+   /// @param w   stride weight for this dimension
+   /// @param cnt number of index elements in this dimension
    IndexIterator(ShapeItem w, ShapeItem cnt)
    : weight(w),
      count(cnt),
@@ -55,15 +57,18 @@ public:
    virtual ShapeItem get_ivalue() const = 0;
 
    /// return the current index
+   /// @param p position within the index sequence
    virtual ShapeItem get_pos(ShapeItem p) const = 0;
 
    /// print this iterator (for debugging purposes).
+   /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
    /// return the next higher IndexIterator
    IndexIterator * get_upper() const   { return upper; };
 
    /// set the next higher IndexIterator
+   /// @param up the IndexIterator one dimension higher
    void set_upper(IndexIterator * up)   { Assert(upper == 0);   upper = up; };
 
    /// get the number of indices.
@@ -88,6 +93,8 @@ class ElidedIndexIterator : public IndexIterator
 {
 public:
    /// constructor
+   /// @param w  stride weight for this dimension
+   /// @param sh shape (element count) of this dimension
    ElidedIndexIterator(ShapeItem w, ShapeItem sh)
    : IndexIterator(w, sh)
    {}
@@ -96,6 +103,7 @@ public:
    virtual ShapeItem get_ivalue() const { return pos * weight; }
 
    /// get the index i.
+   /// @param i position within the elided index sequence
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return i; }
 };
@@ -105,6 +113,10 @@ class TrueIndexIterator : public IndexIterator
 {
 public:
    /// constructor
+   /// @param w       stride weight for this dimension
+   /// @param value   APL array supplying the index values
+   /// @param qio     current value of ⎕IO (index origin)
+   /// @param max_idx exclusive upper bound for valid indices
    TrueIndexIterator(ShapeItem w, Value_P value,
                      uint32_t qio, ShapeItem max_idx);
 
@@ -117,6 +129,7 @@ public:
       { Assert(pos < count);   return indices[pos]; }
 
    /// return the i'th index
+   /// @param i position within the index array
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return indices[i]; }
 
@@ -134,6 +147,8 @@ class MultiIndexIterator
 {
 public:
    /// constructor from IndexExpr for value with rank/shape
+   /// @param shape shape of the APL value being indexed
+   /// @param IDX   the index expression specifying the desired elements
    MultiIndexIterator(const Shape & shape, const IndexExpr & IDX);
 
    /// destructor

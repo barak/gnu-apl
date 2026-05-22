@@ -42,12 +42,17 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
+   /// @param A left APL value argument
+   /// @param B right APL value argument
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B().
+   /// @param B right APL value argument
    virtual Token eval_B(Value_P B) const;
 
    /// common part of eval_AB() and eval_B()
+   /// @param result_count maximum number of solutions to return
+   /// @param B constraint matrix value
    static Token do_DLX(ShapeItem result_count, const Value & B);
 };
 //----------------------------------------------------------------------------

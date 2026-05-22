@@ -25,7 +25,7 @@
 #define __APL_TYPES_HH_DEFINED__
 
 #ifndef __COMMON_HH_DEFINED__
-# error This file shall not be #included directly, but by #including Common.hh
+#  error This file shall not be #included directly, but by #including Common.hh
 #endif
 
 #include <complex>
@@ -86,7 +86,7 @@ typedef const Function * cDyaOP;
 /// One (real) APL floating point value.
 #if APL_Float_is_class // APL_Float is a class
 
-#include "APL_Float_as_class.hh"
+#  include "APL_Float_as_class.hh"
 
 inline void release_APL_Float(APL_Float * x)   { x->~APL_Float(); }
 
@@ -95,10 +95,10 @@ inline void release_APL_Float(APL_Float * x)   { x->~APL_Float(); }
 typedef double APL_Float_Base;
 typedef APL_Float_Base APL_Float;
 
-#define complex_exponent(x) exp(x)
-#define complex_power(x, y) pow((x), (y))
-#define complex_sqrt(x)     sqrt(x)
-#define release_APL_Float(x)
+#  define complex_exponent(x) exp(x)
+#  define complex_power(x, y) pow((x), (y))
+#  define complex_sqrt(x)     sqrt(x)
+#  define release_APL_Float(x)
 
 #endif // APL_Float is class vs. POD
 
@@ -127,6 +127,9 @@ class Cell;
 struct AP_num3
 {
    /// constructor: processor, parent, and grand-parent
+   /// @param pro the processor number
+   /// @param par the parent processor number
+   /// @param gra the grand-parent processor number
    AP_num3(AP_num pro = NO_AP, AP_num par = AP_NULL, AP_num gra = AP_NULL)
    : proc(pro),
      parent(par),
@@ -134,6 +137,7 @@ struct AP_num3
    {}
 
    /// copy \b other to \b this
+   /// @param other AP_num3 to copy from
    void operator =(const AP_num3 & other)
       {
         proc   = other.proc;
@@ -142,6 +146,7 @@ struct AP_num3
       }
 
    /// true if \b this AP_num3 is equal to \b other
+   /// @param other AP_num3 to compare against
    bool operator==(const AP_num3 & other) const
       { return proc   == other.proc   &&
                parent == other.parent &&
@@ -163,6 +168,8 @@ struct Function_PC2
    {}
 
    /// a PC range
+   /// @param l low PC value (inclusive)
+   /// @param h high PC value (inclusive)
    Function_PC2(Function_PC l, Function_PC h)
    : low(l),
      high(h)

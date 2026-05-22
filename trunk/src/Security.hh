@@ -27,27 +27,28 @@
 #include "Common.hh"
 #include "UserPreferences.hh"
 
+/// @param what name of the disallowed operation
 extern void not_allowed(const char * what);
 
 #ifndef cfg_SECURITY_LEVEL_WANTED
 
-#error "cfg_SECURITY_LEVEL_WANTED not defined"
+#  error "cfg_SECURITY_LEVEL_WANTED not defined"
 
 #elif cfg_SECURITY_LEVEL_WANTED == 0
 
-#define CHECK_SECURITY(X)
+#  define CHECK_SECURITY(X)
 
 #elif cfg_SECURITY_LEVEL_WANTED == 1
 
-#define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
+#  define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
 
 #elif cfg_SECURITY_LEVEL_WANTED == 2
 
-#define CHECK_SECURITY(X)  not_allowed(#X);
+#  define CHECK_SECURITY(X)  not_allowed(#X);
 
 #else 
 
-#error "Bad SECURITY_LEVEL_WANTED"
+#  error "Bad SECURITY_LEVEL_WANTED"
 
 #endif
 

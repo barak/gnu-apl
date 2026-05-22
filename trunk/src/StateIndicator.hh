@@ -47,32 +47,42 @@ class StateIndicator
 
 public:
    /// constructor
+   /// @param exec executable (function or statements) being entered
+   /// @param _par parent SI entry (caller), or null for the outermost level
    StateIndicator(const Executable * exec, StateIndicator * _par);
 
    /// destructor
    ~StateIndicator();
 
    /// continue this StateIndicator (to line N after →N back into it)
+   /// @param N function line to continue execution at
+   /// @param loc caller location for diagnostics
    void goon(Function_Line N, const char * loc);
 
    /// retry this StateIndicator (after →'')
+   /// @param loc caller location for diagnostics
    void retry(const char * loc);
 
    /// return true iff
    ///  (1) this SI entry is executing \b funname, or
    ///  (2) has resolved \b funname on its prefix parser stack
+   /// @param ufun user function to check for
    bool uses_function(const UserFunction * ufun) const;
 
    /// Return the function name, or "*" for an immediate execution context
    UCS_string function_name() const;
 
    /// list the stack entry (for commands ]SI, )SI, and )SIS)
+   /// @param out destination output stream
+   /// @param mode which fields to include in the listing
    void list(ostream & out, SI_mode mode) const;
 
    /// list the stack entry (for command ]SI)
+   /// @param out destination output stream
    void print(ostream & out) const;
 
    /// print spaces according to level
+   /// @param out destination output stream
    ostream & indent(ostream & out) const;
 
    /// return pointer to the current user function, statements, or execute
@@ -91,9 +101,11 @@ public:
       { return executable->get_parse_mode(); }
 
    /// evaluate a →B statement. Update PC if needed, maybe do nothing (→'')
+   /// @param B right argument giving the target line number or empty vector
    Token jump(const Value * B);
 
    /// do a jump to function line \b line
+   /// @param line target function line number
    Token jump_to_line(Function_Line line);
 
    /// return the nesting level (oldest SI has level 0, next has level 1, ...)
@@ -103,6 +115,8 @@ public:
    Function_Line get_line() const;
 
    /// Maybe print B (according to tag) and erase B
+   /// @param result token holding the statement result value
+   /// @param trace true if tracing is active for this function
    void statement_result(const Token & result, bool trace);
 
    /// Escape from \b user function (exit from each invocation until
@@ -117,6 +131,8 @@ public:
    void unmark_all_values() const;
 
    /// print all owners of \b value
+   /// @param out destination output stream
+   /// @param value APL value whose owners are to be listed
    int show_owners(ostream & out, const Value & value) const;
 
    /// print a short debug info

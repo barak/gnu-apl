@@ -28,6 +28,8 @@
 #include "ErrorCode.hh"
 
 /// throw an Error with \b code only (typically a standard APL error)
+/// @param code APL error code to throw
+/// @param loc caller location for diagnostics
 void throw_apl_error(ErrorCode code, const char * loc)
 #ifdef __GNUC__
     __attribute__ ((noreturn))

@@ -37,6 +37,8 @@ class IndexExpr : public DynamicObject
 {
 public:
    /// constructor: empty (0-dimensional) IndexExpr
+   /// @param ass_state whether this index is part of an indexed assignment
+   /// @param loc caller location for diagnostics
    IndexExpr(Assign_state ass_state, const char * loc);
 
    /// destructor
@@ -49,6 +51,7 @@ public:
    Value_P values[MAX_RANK];
 
    /// append a value.
+   /// @param val APL value to append as the next index dimension
    void add_index(Value_P val)
       {
        if (rank >= MAX_RANK)    RANK_ERROR;
@@ -64,6 +67,7 @@ public:
    bool is_axis() const   { return rank == 1; }
 
    /// Return an axis (from an IndexExpr of rank 1.
+   /// @param max_axis upper bound on the valid axis value (exclusive)
    sAxis get_axis(sRank max_axis) const;
 
    /// return true iff this index is part of indexed assignment ( A[]← )
@@ -75,16 +79,20 @@ public:
 
    /// check that all indices indices of \b this IndexExpr are valid indices
    /// for \b shape, raise INDEX_ERROR if not.
+   /// @param shape the APL array shape that bounds the valid index range
    void check_index_range(const Shape & shape) const;
 
    /// return axis rk (rk in shape order as opposed to index order)
+   /// @param ax axis number in shape order
    const Value * get_axis_value(uAxis ax) const
       { return values[rank - ax - 1].get(); }
 
    /// print stale IndexExprs, and return the number of stale IndexExprs.
+   /// @param out output stream for the diagnostic report
    static int print_stale(ostream & out);
 
    /// erase stale IndexExprs
+   /// @param loc caller location for diagnostics
    static void erase_stale(const char * loc);
 
 protected:

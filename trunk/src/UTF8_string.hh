@@ -42,6 +42,7 @@ typedef char ASCII;
 
 //============================================================================
 /// frequently used cast to const UTF8 *
+/// @param vp pointer to cast
 inline const UTF8 *
 utf8P(const void * vp)
 {
@@ -49,6 +50,7 @@ utf8P(const void * vp)
 }
 //============================================================================
 /// frequently used cast to UTF8 *
+/// @param cp ASCII pointer to cast
 inline UTF8 *
 utf8P(ASCII * cp)
 {
@@ -64,11 +66,14 @@ public:
    {}
 
    /// constructor: UTF8_string from 0-terminated C string.
+   /// @param str null-terminated ASCII source string
    UTF8_string(const ASCII * str)
       { while (const ASCII cc = *str++)   *this += cc; }
 
    /// constructor: copy of C string, at most len bytes, possibly less if
    /// \b str is 0-terminated.
+   /// @param str source UTF-8 byte array
+   /// @param len maximum number of bytes to copy
    UTF8_string(const UTF8 * str, size_t len)
       {
         loop(l, len)
@@ -78,9 +83,11 @@ public:
 
    /// constructor: copy of UCS string. The Unicodes in ucs
    /// will be UTF8-encoded
+   /// @param ucs source Unicode string to encode as UTF-8
    UTF8_string(const UCS_string & ucs);
 
    /// erase one item at \b pos
+   /// @param pos byte position of the element to remove
    void erase(size_t pos)
       { std::string::erase(begin() + pos); }
 
@@ -93,20 +100,25 @@ public:
       { Assert(size());   resize(size() - 1); }
 
    /// append a (0-terminated) C string
+   /// @param ascii null-terminated ASCII string to append
    UTF8_string & operator <<(const char * ascii)
       { while (*ascii)   *this += *ascii++;   return *this; }
 
    /// append the UTF8_string \b suffix
+   /// @param suffix UTF-8 string to append
    UTF8_string & operator <<(const UTF8_string & suffix)
       { loop(s, suffix.size())   *this += suffix[s];   return *this; }
 
    /// return true iff string ends with ext (usually a file name extension)
+   /// @param ext expected file extension (including dot, e.g. ".apl")
    bool ends_with(const char * ext) const;
 
    /// return true iff string starts with path (usually a file path)
+   /// @param path expected path prefix to check for
    bool starts_with(const char * path) const;
 
    /// skip over < ... > and expand &lt; and friends
+   /// @param in_HTML current HTML nesting depth on entry
    int un_HTML(int in_HTML);
 
    /// essentially strtol(this, 0, 10)
@@ -119,16 +131,25 @@ public:
 
    /// convert the first char(s) in UTF8-encoded string to Unicode,
    /// setting len to the number of bytes in the UTF8 encoding of the char
+   /// @param string pointer to the start of a UTF-8 encoded byte sequence
+   /// @param len output: number of bytes consumed by the first character
+   /// @param verbose true to print diagnostics for malformed sequences
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
    /// return the (always positive) difference between the number of bytes
    /// and the number of chars in the (UTF8 encoded) \b string.
+   /// @param string pointer to a null-terminated UTF-8 encoded string
    static int bytes_chars(const void * string);
 
    /// return the next UTF8 encoded char from an input file
+   /// @param in input stream to read from
    static Unicode getc(istream & in);
 
    /// display bytes in \b utf
+   /// @param out output stream to write to
+   /// @param utf pointer to the UTF-8 byte array to display
+   /// @param size total number of bytes in utf
+   /// @param max_bytes maximum number of bytes to display
    static void dump_hex(ostream & out, const UTF8 * utf, int size,
                         int max_bytes);
 
@@ -139,6 +160,7 @@ class UTF8_string_vector : public std::vector<UTF8_string>
 public:
    /// constructor: from string with lines separated by \n. The lines
    /// will be the items of the vector (with any CR or LF characters removed).
+   /// @param lines newline-separated C string to split into individual lines
    UTF8_string_vector(const char * lines);
 };
 //============================================================================
@@ -152,6 +174,7 @@ public:
 
 protected:
    /// insert \b c into this filebuf
+   /// @param c character value to append (EOF signals flush)
    virtual int overflow(int c);
 
    /// the data in this filebuf

@@ -34,6 +34,7 @@ class PrimitiveOperator : public PrimitiveFunction
 {
 public:
    /// Constructor.
+   /// @param tag token tag identifying this operator
    PrimitiveOperator(TokenTag tag) : PrimitiveFunction(tag) {}
 
    /// overloaded Function::is_operator()

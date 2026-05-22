@@ -39,12 +39,19 @@ public:
    VH_entry()   {}
 
    /// Constructor: event for \b val
+   /// @param val  APL value to which this event belongs
+   /// @param ev   event type
+   /// @param ia   integer argument (meaning depends on event type)
+   /// @param loc  caller location for diagnostics
    VH_entry(const Value * val, VH_event ev, int ia, const char * loc);
 
    /// init the event history
    static void init();
 
    /// print the history of \b value
+   /// @param out    output stream
+   /// @param value  APL value whose history is to be printed
+   /// @param loc    caller location for diagnostics
    static void print_history(ostream & out, const Value & value,
                              const char * loc);
 
@@ -56,6 +63,10 @@ public:
 
 protected:
    /// print the event
+   /// @param flags     accumulated display flags (modified in place)
+   /// @param out       output stream
+   /// @param val       APL value this event belongs to
+   /// @param previous  preceding history entry for context, or null
    void print(int & flags, ostream & out, const Value & val,
                const VH_entry * previous) const;
 

@@ -53,6 +53,8 @@ public:
    {}
 
    /// constructor
+   /// @param Z the result APL value (pre-allocated)
+   /// @param B the right APL argument value
    PJob_scalar_B(Value_P Z, Value_P B)
    : value_B(B, LOC),
      value_Z(Z, LOC),
@@ -88,10 +90,12 @@ public:
    prim_f1 fun1;   // not initialized by constructor!
 
    /// return Bbz]
+   /// @param b ravel index into the right argument
    const Cell & B_at(ShapeItem b) const
       { return value_B->get_cravel(b); }
 
    /// return Z[z]
+   /// @param z ravel index into the result
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
@@ -111,6 +115,9 @@ public:
    {}
 
    /// constructor
+   /// @param Z the result APL value (pre-allocated)
+   /// @param A the left APL argument value
+   /// @param B the right APL argument value
    PJob_scalar_AB(Value_P Z, Value_P A, Value_P B)
    : value_A(A, LOC),
      value_B(B, LOC),
@@ -159,14 +166,17 @@ public:
    prim_f2 fun2;   // not initialized by constructor!
 
    /// return A[z]
+   /// @param a ravel index into the left argument
    const Cell & A_at(ShapeItem a) const
       { return value_A->get_cravel(a * inc_A); }
 
    /// return B[z]
+   /// @param b ravel index into the right argument
    const Cell & B_at(ShapeItem b) const
       { return value_B->get_cravel(b * inc_B); }
 
    /// return Z[z]
+   /// @param z ravel index into the result
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
@@ -194,6 +204,8 @@ public:
    {} 
 
    /// start execution of \b jobs
+   /// @param first_job the initial job to seed the list
+   /// @param loc caller location for diagnostics
    void start(const T & first_job, const char * loc)
       {
 #if 0
@@ -244,6 +256,7 @@ public:
       { return jobs.size(); }
 
    /// add \b job to \b jobs
+   /// @param job the job to append to the list
    void add_job(const T & job)
       { jobs.push_back(job); }
 

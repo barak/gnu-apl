@@ -42,6 +42,8 @@ public:
       };
 
    /// constructor
+   /// @param data pointer to the data to be plotted
+   /// @param verbosity verbosity level for diagnostic output
    Plot_window_properties(const Plot_data * data, int verbosity);
 
    /// destructor
@@ -49,9 +51,12 @@ public:
 
    /// update derived properties after changing primary ones, return \b true
    /// on error
+   /// @param verbosity verbosity level for diagnostic output
    bool update(int verbosity);
 
    /// handle window resize event
+   /// @param width new window width in pixels
+   /// @param height new window height in pixels
    void set_window_size(Pixel_X width, Pixel_Y height);
 
    /// return true iff the user has dictated a window position
@@ -61,7 +66,7 @@ public:
    bool get_user_caption() const   { return user_caption; }
 
    // get_XXX() and set_XXX() functions for window properties
-# define gdef(ty,  na,  _val, _descr)                                    \
+#define gdef(ty,  na,  _val, _descr)                                    \
   /** return the value of na **/                                         \
   ty get_ ## na() const   { return na; }                                 \
   bool get_ ## na ## _provided() const   { return na ## _provided; }     \
@@ -82,12 +87,12 @@ public:
           rangeZ_type = Plot_Range_type(rangeZ_type | PLOT_RANGE_MAX);   \
      }
 
-# define ldef(ty,  na, _val, _descr)                              \
+#define ldef(ty,  na, _val, _descr)                              \
    /** set the  value of na in all lines**/                        \
    void set_all_ ## na(ty v, int propnum) { loop(ln, line_count)   \
        if (can_be_set(ln, propnum))   line_properties[ln]->set_ ## na(v); }
 
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    /// return true iff a rangeX_min property was specified
    bool rangeX_min_valid() const
@@ -118,23 +123,30 @@ public:
       { return line_properties; }
 
    /// convert \n val_X to the X coordinate of the pixel in the plot area
+   /// @param val_X data-space X value to convert
    Pixel_X valX2pixel(double val_X) const
       { return pa_border_L + val_X * scale_X; }
 
    /// convert \n val_Y to the Y coordinate of the pixel in the plot area
+   /// @param val_Y data-space Y value to convert
    Pixel_Y valY2pixel(double val_Y) const
       { return pa_border_T + pa_height - val_Y * scale_Y; }
 
    /// convert \n val_Z to the relative Z vector (q. quadrant)
+   /// @param val_Z data-space Z value to convert
    Pixel_Z valZ2pixel(double val_Z) const
       { return  val_Z * scale_Z; }
 
    /// convert values \b val_X,  \b val_Y,  and \b val_Z, to the X and Y
    /// coordinate of the pixel below the Z=0 plane of the plot area
+   /// @param val_X data-space X value
+   /// @param val_Y data-space Y value
+   /// @param val_Z data-space Z value
    Pixel_XY valXYZ2pixelXY(double val_X, double val_Y, double val_Z) const;
 
    /// return the pixel position of the point where the X, Y, and possibly
    /// Z-axis cross.
+   /// @param surface true for 3-D surface plots, false for 2-D plots
    Pixel_XY get_origin(bool surface) const
       {
         if (surface)   return valXYZ2pixelXY(get_min_X(),
@@ -144,14 +156,18 @@ public:
       }
 
    /// print the properties (for debugging purposes)
+   /// @param out output stream to write to
    int print(ostream & out) const;
 
    /// for e.g. att_and_val = "pa_width: 600" set pa_width to 600.
    /// Return error string on error.
+   /// @param att_and_val string of the form "name: value"
    const char * set_attribute(const char * att_and_val);
 
    /// for e.g. A.pa_width ←  600" set pa_width to 600.
    /// Return error string on error.
+   /// @param att attribute name as UCS string
+   /// @param val APL cell holding the new attribute value
    const char * set_attribute(const UCS_string & att, const Cell & val);
 
    /// return the width of the plot window
@@ -209,6 +225,7 @@ public:
    int get_verbosity() const       { return verbosity; }
 
    /// set the verbosity when plotting
+   /// @param verb new verbosity level
    void set_verbosity(int verb)      { verbosity = verb; }
 
    /// return the date to be plotted
@@ -220,6 +237,7 @@ public:
 
    /// for level 0.0 <= alpha <= 1.0: return the color for alpha according
    /// to \b gradient
+   /// @param alpha normalized level in [0.0, 1.0]
    uint32_t get_color(double alpha) const;
 
    /// return the number of plot lines
@@ -230,6 +248,8 @@ public:
       { return show_legend; }
 
    /// move the legend rectangle by dx:dy
+   /// @param dx horizontal displacement in pixels
+   /// @param dy vertical displacement in pixels
    void move_legend(Pixel_X dx, Pixel_Y dy)
       {
         legend_X += dx;
@@ -244,12 +264,12 @@ protected:
    const Plot_data & plot_data;
 
    // attribute declarations...
-# define gdef(ty, na, _val, descr)              \
+#define gdef(ty, na, _val, descr)              \
    /** descr **/                                \
    ty na;                                       \
    /** true if attribute \b na was provided **/ \
    bool na ## _provided;
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    /// whether the window position was dictated by the user
    bool user_pw_pos;
@@ -326,20 +346,26 @@ protected:
    vector<level_color> gradient;
 
    /// round val up to the next higher 1/2/5×10^N
+   /// @param val value to round up
    static double round_up_1_2_5(double val);
 
    /// round val (< 24) up to the next higher divisor of 24
+   /// @param val value to round up (must be < 24)
    static int round_up_24(int val);
 
    /// round val (<= 60) up to the next higher divisor of 60
+   /// @param val value to round up (must be <= 60)
    static int round_up_60(int val);
 
    /// round a time_t up or down to the next minute, hour, day, month, or year.
    /// positive diff round up, negative round down.
+   /// @param val time value in seconds to round
    static double round_up_seconds(double val);
 
    /// return true unless property \b propnum was already set in plot
    /// line \b line
+   /// @param line plot line index
+   /// @param propnum property number to check
    bool can_be_set(uint16_t line, uint16_t propnum);
 
    /// true if the plot window shall have a legend

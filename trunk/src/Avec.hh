@@ -51,28 +51,36 @@ public:
       };
 
    /// Return the UNICODE of char table entry \b av
+   /// @param av index into the character table (CHT_Index)
    static Unicode unicode(CHT_Index av);
 
    /// Return the UNICODE of char table entry \b av
+   /// @param av index into the character table (CHT_Index)
    static uint32_t get_av_pos(CHT_Index av);
 
    /// Return a token containing \b av
+   /// @param av Unicode character to convert to a token
+   /// @param loc caller location for diagnostics
    static Token uni_to_token(Unicode & av, const char * loc);
 
    /// Return \b true iff \b av is a valid char in a user defined symbol
+   /// @param av Unicode character to test
    static bool is_symbol_char(Unicode av);
 
    /// return \b true iff \b av is a whitespace char (ASCII 0..32 (including))
+   /// @param av Unicode character to test
    static bool is_white(Unicode av)
       { return av >= 0 && av <= ' '; }
 
-   /// return \b true iff \b av is one of the single quote characters ' ‘ or ’
+   /// return \b true iff \b av is one of the single quote characters ‘ ‘ or ‘
+   /// @param av Unicode character to test
    static bool is_single_quote(Unicode av)
       { return av == UNI_SINGLE_QUOTE  ||
                av == UNI_SINGLE_QUOTE1 ||
-               av == UNI_SINGLE_QUOTE2; } 
+               av == UNI_SINGLE_QUOTE2; }
 
    /// Return \b true iff \b uni is one of the various DIAMOND characters
+   /// @param uni Unicode character to test
    static bool is_DIAMOND(Unicode uni)
       { return uni == UNI_DIAMOND ||   // ◊ = 0x25CA
                uni == 0x22C4      ||   // ⋄
@@ -83,76 +91,97 @@ public:
                uni == 0x2B27; }
 
    /// return \b true iff \b av is a control char (ASCII 0..32 (excluding))
+   /// @param av Unicode character to test
    static bool is_control(Unicode av)
       { return av >= 0 && av < ' '; }
 
    /// return \b true iff \b av is a comment char (⍝ or #)
+   /// @param av Unicode character to test
    static bool is_comment(Unicode av)
       { return av == UNI_NUMBER_SIGN || av == UNI_COMMENT; }
 
    /// Return \b true iff \b av is a valid char in a user defined symbol
+   /// @param uni Unicode character to test
    static bool is_first_symbol_char(Unicode uni);
 
    /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
+   /// @param uni Unicode character to test
    static bool is_digit(Unicode uni)
       { return (uni <= UNI_9 && uni >= UNI_0); }
 
    /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
+   /// @param uni Unicode character to test
    static bool is_hex_digit(Unicode uni)
       { return is_digit(uni)
             || (uni <= UNI_F && uni >= UNI_A)
             || (uni <= UNI_f && uni >= UNI_a); }
 
    /// return \b true if \b uni is (uppercase) alphabetic
+   /// @param uni Unicode character to test
    static bool is_A_to_Z(Unicode uni)
       { return uni >= UNI_A && uni <= UNI_Z; }
 
    /// Return \b true iff \b uni is a digit or a space
+   /// @param uni Unicode character to test
    static bool is_digit_or_space(Unicode uni)
       { return is_digit(uni) || is_white(uni); }
 
    /// return \b true iff \b av is a number char (digit, .)
+   /// @param uni Unicode character to test
    static bool is_number(Unicode uni)
       { return is_digit(uni)       ||
                (uni == UNI_OVERBAR ||
                (uni == UNI_FULLSTOP)); }
 
    /// map possibly non-standard APL character to its standard character
+   /// @param uni Unicode character to normalize
    static Unicode make_standard(Unicode uni);
 
    /// return true if unicode \b is defined by a char_def() or char_uni() macro
+   /// @param uni Unicode character to look up
    static bool is_known_char(Unicode uni);
 
    /// return true if unicode \b uni is a quad (⎕ or ▯)
+   /// @param uni Unicode character to test
    static bool is_quad(Unicode uni)
       { return uni == UNI_Quad_Quad || uni == UNI_Quad_Quad1; }
 
    /// return the value (0..9 if decimal, or 0..15 if hex) for uni,
    /// or -1 if uni is not a decimal or hex digit.
+   /// @param uni Unicode character to convert
+   /// @param hex true to allow hex digits A-F/a-f in addition to 0-9
    static int digit_value(Unicode uni, bool hex);
 
    /// return true if unicode \b uni needs ⎕UCS in 2 ⎕TF or )OUT
+   /// @param uni Unicode character to test
    static bool need_UCS(Unicode uni);
 
    /// return \b true iff a token printed after \b av never needs a space
+   /// @param uni Unicode character to test
    static bool no_space_after(Unicode uni);
 
    /// return \b true iff a token printed before \b av never needs a space
+   /// @param av Unicode character to test
    static bool no_space_before(Unicode av);
 
    /// return the subscript char for digit i (i = 0..9)
+   /// @param i digit value in range 0..9
    static Unicode subscript(uint32_t i);
 
    /// return the superscript char for digit i (i = 0..9)
+   /// @param i digit value in range 0..9
    static Unicode superscript(uint32_t i);
 
    /// Find \b av in \b character_table. Return AV position if found or MAX_AV
+   /// @param av Unicode character to look up
    static uint32_t find_av_pos(Unicode av);
 
    /// Find \b av in \b character_table. Return position or Invalid_CHT
+   /// @param av Unicode character to look up
    static CHT_Index find_char(Unicode av);
 
    /// Find \b return position of \b alt_av, or Invalid_AV if not found
+   /// @param alt_av alternative Unicode character to map to its standard form
    static CHT_Index map_alternative_char(Unicode alt_av);
 
    /// a pointer to 256 Unicode characters that are exactly the APL2 character
@@ -163,6 +192,7 @@ public:
 
    /// search uni in \b inverse_ibm_av and return its position in
    /// the IBM ⎕AV (= its code in .ATF files). Return 0xB0 if not found.
+   /// @param uni Unicode character to look up in the IBM ⎕AV
    static unsigned char unicode_to_cp(Unicode uni);
 
    /// recompute \b inverse_ibm_av from \b ibm_av and print it
@@ -201,6 +231,10 @@ protected:
    static Unicode_to_IBM_codepoint inverse_ibm_av[];
 
    /// print an error position on cerr, and then Assert(0);
+   /// @param i current index being checked in the character table
+   /// @param line source line number of the check
+   /// @param cond condition that was expected to be true
+   /// @param def_line line number of the character definition macro
    static int show_error_pos(int i, int line, bool cond, int def_line);
 
    /// check that the character table that is used in this class is correct
@@ -208,9 +242,12 @@ protected:
 
    /// check that all characters in the UTF-8 encoded file are known
    /// (through char_def() or char_uni() macros)
+   /// @param filename path to the UTF-8 source file to check
    static void check_file(const char * filename);
 
    /// compare Unicpde \b key with the Unicode in \b map.
+   /// @param key Unicode codepoint to search for
+   /// @param map table entry to compare against
    static int compare_uni(const uint32_t & key,
                           const Unicode_to_IBM_codepoint & map,
                           const void *)

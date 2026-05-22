@@ -64,6 +64,7 @@ public:
    void check() const;
 
    /// return \b true if get_ravel() contains uni
+   /// @param uni Unicode code point to search for
    bool contains(Unicode uni);
 
    /// return the shape of the result
@@ -75,6 +76,7 @@ public:
    /// return \b true if \b uni belongs to this character class
    virtual bool contains(Unicode uni) const = 0;
 
+   /// @param cls character class identifier
    static const CC_base & get_instance(CharClass cls);
 };
 //---------------------------------------------------------------------------
@@ -396,18 +398,25 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value (character class selector)
+   /// @param B right argument APL value (characters to test)
    Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
+   /// @param B right argument APL value (character class selector)
    Token eval_B(Value_P B) const;
 
    /// print the classes that were implementee
+   /// @param out output stream to write to
    static void print_classes(ostream & out);
 
    /// return the characters of class \b cls
+   /// @param num character class identifier
    static Value_P get_character_class(CC_base::CharClass num);
 
    /// retur true if \b is contained in character class \b cls
+   /// @param uni Unicode code point to test
+   /// @param num character class identifier
    static bool contained_in(Unicode uni, CC_base::CharClass num);
 };
 //---------------------------------------------------------------------------

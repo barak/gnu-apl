@@ -21,7 +21,7 @@
 //=============================================================================
 
 #if apl_GSL
-# include <gsl/gsl_linalg.h>
+#  include <gsl/gsl_linalg.h>
 #else
 class gsl_matrix;
 #endif
@@ -32,24 +32,62 @@ class Cell;
 class GSL
 {
 public:
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param B input APL matrix value
    static void RQ_factorize(Value & Z, int M, int N, Value_P B);
+
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param B input APL matrix value
+   /// @param need_complex true if complex arithmetic is required
    static void LQ_factorize(Value & Z, int M, int N, Value_P B,
                             bool need_complex);
 
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param cB pointer to first cell of the input ravel (real matrix)
    static void QR_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param cB pointer to first cell of the input ravel (complex matrix)
    static void QR_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
 
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param cB pointer to first cell of the input ravel (real matrix)
    static void QL_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
 
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param cB pointer to first cell of the input ravel (real matrix)
    static void LU_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB);
+
+   /// @param Z output value receiving the factorization result
+   /// @param M number of rows in the input matrix
+   /// @param N number of columns in the input matrix
+   /// @param cB pointer to first cell of the input ravel (complex matrix)
    static void LU_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB);
 
 protected:
   static void set_GSL_error_handler();
+  /// @param reason human-readable error description from GSL
+  /// @param file source file where the GSL error occurred
+  /// @param line line number where the GSL error occurred
+  /// @param gsl_errno GSL error code
   static void GSL_error_handler(const char * reason, const char * file,
                                 int line, int gsl_errno);
 
   /// invert the M×M matrix Q in place
+  /// @param Q GSL matrix to invert in place
+  /// @param M dimension of the square matrix
   static int invert_matrix(gsl_matrix * Q, size_t M);
 };
 //=============================================================================

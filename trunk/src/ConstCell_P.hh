@@ -45,6 +45,7 @@ public:
    {}
 
    /// copy constructor
+   /// @param other the ConstCell_P to copy from
    ConstCell_P(const ConstCell_P & other)
    : base(other.base),
      end(other.end),
@@ -53,6 +54,8 @@ public:
    {}
 
    /// constructor from the first Cell of a ravel
+   /// @param owner the APL value whose ravel is iterated
+   /// @param _inc  whether operator++() shall advance the offset
    ConstCell_P(const Value & owner, bool _inc)
    : base(&owner.get_cfirst()),
      end(owner.element_count()),
@@ -61,6 +64,8 @@ public:
    { Assert(!owner.is_packed()); }
 
    /// constructor from pointer to the owner of the Cell
+   /// @param owner smart pointer to the APL value whose ravel is iterated
+   /// @param _inc  whether operator++() shall advance the offset
    ConstCell_P(Value_P owner, bool _inc)
    : base(&owner->get_cfirst()),
      end(owner->element_count()),
@@ -69,6 +74,7 @@ public:
    { Assert(!owner->is_packed()); }
 
    /// constructor: from a single Cell (of a scalar)
+   /// @param cell the single Cell to wrap
    ConstCell_P(const Cell & cell)
    : base(&cell),
      end(1),
@@ -86,6 +92,7 @@ public:
       { return offset; }
 
    /// return a reference to the Cell at off
+   /// @param off ravel offset of the desired Cell
    const Cell & operator [](Cell_offset off) const
       { return base[off]; }
 
@@ -125,6 +132,8 @@ class ConstRavel_P
 {
 public:
    /// constructor from the owner of the Cell
+   /// @param _owner the APL value whose ravel is iterated
+   /// @param _inc   whether operator++() shall advance the offset
    ConstRavel_P(const Value & _owner, bool _inc)
    : owner(_owner),
      end(_owner.element_count()),
@@ -133,6 +142,8 @@ public:
    {}
 
    /// constructor from pointer to the owner of the Cell
+   /// @param _owner smart pointer to the APL value whose ravel is iterated
+   /// @param _inc   whether operator++() shall advance the offset
    ConstRavel_P(Value_P _owner, bool _inc)
    : owner(*_owner),
      end(_owner->element_count()),

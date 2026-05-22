@@ -95,6 +95,7 @@ enum Svar_event
 };
 
 /// return the name for event \b ev
+/// @param ev the shared-variable event
 extern const char * event_name(Svar_event ev);
 
 /// SV_key uniquely identifies a shared variable. It is created when the
@@ -122,6 +123,8 @@ struct Svar_partner
    {}
 
    /// constructor: specific share partner
+   /// @param _id processor identification triple
+   /// @param _tcp_fd TCP socket towards this partner
    Svar_partner(const AP_num3 _id, TCP_socket _tcp_fd)
    : id(_id),
      tcp_fd(_tcp_fd),
@@ -131,6 +134,7 @@ struct Svar_partner
    {}
 
    /// copy other to \n this
+   /// @param other partner to copy from
    void operator =(const Svar_partner & other)
       {
         id      = other.id;
@@ -149,6 +153,7 @@ struct Svar_partner
       { return active; }
 
    /// set the control bits of this partner (as seen by the offering partner)
+   /// @param ctl control value to set
    void set_control(Svar_Control ctl)
       { flags = ctl; }
 
@@ -158,6 +163,7 @@ struct Svar_partner
       { return Svar_Control(flags); }
 
    /// print this partner
+   /// @param out output stream
    ostream & print(ostream & out) const;
 
    /// the processor
@@ -216,9 +222,12 @@ struct Svar_record
    bool is_ws_to_ws() const;
 
    /// complain about \b proc
+   /// @param function name of the calling function
+   /// @param ap processor identification that caused the complaint
    void bad_proc(const char * function, const AP_num3 & ap) const;
 
    /// return true if UCS_other matches varname (could be a wildcard match)
+   /// @param UCS_other UCS name to match against varname
    bool match_name(const uint32_t * UCS_other) const;
 
    /// return the coupling of the variable
@@ -232,6 +241,7 @@ struct Svar_record
    Svar_Control get_control() const;
 
    /// set the control bits of this variable
+   /// @param ctl new control value
    void set_control(Svar_Control ctl);
 
    /// return the state of this variable
@@ -242,22 +252,31 @@ struct Svar_record
       { return *varname ? varname : 0; }
 
    /// update the state when using or setting this variable, and clear events
+   /// @param used true if the variable is being used (read), false if set (written)
+   /// @param loc caller location for diagnostics
    void set_state(bool used, const char * loc);
 
    /// return true iff the calling partner may use the current value
+   /// @param attempt retry count for contention handling
    bool may_use(int attempt);
 
    /// return true iff the calling partner may set the current value
+   /// @param attempt retry count for contention handling
    bool may_set(int attempt);
 
    /// print the variable
+   /// @param out output stream
    void print(ostream & out) const;
 
    /// print a name
+   /// @param out output stream
+   /// @param name UCS name to print
+   /// @param len maximum characters to print
    static ostream & print_name(ostream & out, const uint32_t * name,
                                int len = MAX_SVAR_NAMELEN);
 
    /// print the name of this variable
+   /// @param out output stream
    ostream & print_name(ostream & out) const
       { return print_name(out, varname, 0); }
 

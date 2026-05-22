@@ -38,9 +38,12 @@ public:
    {}
 
    /// overloaded Function::eval_B()
+   /// @param B right APL value argument
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB()
+   /// @param A left APL value argument (the array to search in)
+   /// @param B right APL value argument (items to look up)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Bif_F12_INDEX_OF  fun;   ///< Built-in function
@@ -48,6 +51,10 @@ public:
 protected:
    /// find Cell B in the ravel A (of length len_A). Return the position
    /// (< len_A) if found, or len_A if not.
+   /// @param A pointer to the first cell of the ravel to search
+   /// @param len_A number of cells in the ravel
+   /// @param cell_B cell value to search for
+   /// @param qct comparison tolerance (⎕CT)
    static ShapeItem find_B_in_A(const Cell * A, ShapeItem len_A,
                          const Cell & cell_B, double qct)
       {
@@ -57,11 +64,18 @@ protected:
 
    /// find Cell B in value A. Return the position (< len_A) if found,
    /// or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
+   /// @param A APL value whose ravel is searched
+   /// @param Idx_A ascending sort-index of A (grade-up, ⎕IO←0)
+   /// @param cell_B cell value to search for
+   /// @param qct comparison tolerance (⎕CT)
    static ShapeItem find_B_in_sorted_A(const Value & A,
                                        const vector<ShapeItem> & Idx_A,
                                        const Cell & cell_B, double qct);
 
    /// compare function for Heapsort<ShapeItem>::search<const Cell &>
+   /// @param cell cell value used as the search key
+   /// @param A ravel index into the sorted array
+   /// @param ctx opaque context pointer (points to the source Value)
    static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 };
 //----------------------------------------------------------------------------

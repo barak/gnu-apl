@@ -53,10 +53,12 @@ public:
       { return name_class; }
 
    /// set the name class for \b this ValueStackItem
+   /// @param nc  new name class to assign
    void set_NC(NameClass nc)
       { name_class = nc; }
 
    /// set \b this ValueStackItem to APL value new_value
+   /// @param new_value  APL value to store
    void set_apl_value(Value_P new_value)
       {
         name_class = NC_VARIABLE;
@@ -76,6 +78,7 @@ public:
       { return sym_val.function; }
 
    /// set function to \b fun
+   /// @param fun  function pointer to store
    void set_function(cFunction_P fun)
       {
         name_class = fun->is_operator() ? NC_OPERATOR : NC_FUNCTION;
@@ -98,6 +101,7 @@ public:
       { return sym_val.sv_key; }
 
    /// set the shared variable key
+   /// @param key  shared variable key to store
    void set_key(SV_key key)
       { name_class = NC_SYSTEM_VAR;   sym_val.sv_key = key; }
 
@@ -113,10 +117,12 @@ public:
       { return apl_val.get(); }
 
    /// make \b apl_val the sole owner of apl_val.value
+   /// @param loc  caller location for diagnostics
    void isolate(const char * loc)
       { if (+apl_val)   apl_val.isolate(loc); }
 
    /// isolate \b apl_val and its sub-values
+   /// @param loc  caller location for diagnostics
    void isolate_deep(const char * loc)
       { if (+apl_val)   apl_val.isolate_deep(loc); }
 
@@ -127,17 +133,20 @@ protected:
       { memset(&sym_val, 0, sizeof(sym_val)); }
 
    /// constructor: ValueStackItem for a label (function line)
+   /// @param lab  function line number for the label
    ValueStackItem(Function_Line lab)
    : name_class(NC_LABEL)
       { sym_val.label = lab; }
 
    /// constructor: ValueStackItem for a variable
+   /// @param val  APL value to hold
    ValueStackItem(Value_P val)
    : apl_val(val),
      name_class(NC_VARIABLE)
    {}
 
    /// constructor: ValueStackItem for a shared variable
+   /// @param key  shared variable key
    ValueStackItem(SV_key key)
    : name_class(NC_SYSTEM_VAR)
       { sym_val.sv_key = key; }
@@ -176,9 +185,12 @@ class Symbol : public NamedObject
 
 public:
    /// create a system symbol with Id \b id
+   /// @param id  system symbol identifier
    Symbol(Id id);
 
    /// create a symbol with name \b ucs
+   /// @param ucs  Unicode name of the symbol
+   /// @param id   system identifier (or ID_USER_SYMBOL for user names)
    Symbol(const UCS_string & ucs, Id id);
 
    /// destructor
@@ -189,27 +201,36 @@ public:
    ostream & list(ostream & out) const;
 
    /// write \b this symbol in )OUT format to file \b out
+   /// @param out  destination file
+   /// @param seq  running sequence number for )OUT records
    void write_OUT(FILE * out, uint64_t & seq) const;
 
    /// set \b token according to the current NC/sym_val of \b this \b Symbol.
    /// Decrement PC if the name class of \b token is either
    /// NC_UNUSED_USER_NAME or unexpected (supposedly to re-read the
    /// the resolved token).
+   /// @param token  token to be resolved in place
+   /// @param PC     program counter, decremented on re-read
    virtual void resolve_left(Token & token, Function_PC & PC) const;
 
    /// set \b token according to the current NC/sym_val of \b this \b Symbol.
    /// Decrement PC if the name class of \b token is either
    /// NC_UNUSED_USER_NAME or unexpected (supposedly to re-read the
    /// the resolved token).
+   /// @param token  token to be resolved in place
+   /// @param PC     program counter, decremented on re-read
    virtual void resolve_right(Token & token, Function_PC & PC) const;
 
    /// set \b token according to the current NC/sym_val of \b this shared var
+   /// @param token  token to be resolved in place
    void resolve_shared_variable(Token & token) const;
 
    /// resolve a variable name for an assignment (left of ←)
+   /// @param loc  caller location for diagnostics
    virtual Token resolve_lv(const char * loc);
 
    /// return the token class of \b this \b Symbol WITHOUT calling resolve()
+   /// @param left  true if resolving for a left-hand-side context
    TokenClass resolve_class(bool left) const;
 
    /// set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove
@@ -217,12 +238,16 @@ public:
    virtual int expunge();
 
    /// Set current NameClass of this Symbol to \b nc
+   /// @param nc  new name class
    void set_NC(NameClass nc);
 
    /// Set current NameClass of this Symbol to \b nc and function fun
+   /// @param nc   new name class
+   /// @param fun  function pointer to associate with this symbol
    void set_NC(NameClass nc, cFunction_P fun);
 
    /// share variable with \b proc
+   /// @param key  shared variable key identifying the offer
    void share_var(SV_key key);
 
    /// unshare a shared variable
@@ -232,6 +257,7 @@ public:
    void clear_vs();
 
    /// Compare name of \b this value with \b other
+   /// @param other  symbol whose name is compared against this symbol's name
    int compare(const Symbol & other) const
        { return name.compare(other.name); }
 
@@ -240,24 +266,37 @@ public:
    virtual bool is_readonly() const   { return false; }
 
    /// Assign \b value to \b this \b Symbol
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// Assign \b value to \b this \b Symbol (which is a shared variable)
+   /// @param value  APL value to assign
+   /// @param loc    caller location for diagnostics
    void assign_shared_variable(Value_P value, const char * loc);
 
    /// Indexed (multi-dimensional) assign \b value to \b this \b Symbol
+   /// @param index  multi-dimensional index expression
+   /// @param value  APL value to assign at the indexed positions
    virtual void assign_indexed(const IndexExpr & index, Value_P value);
 
    /// Indexed (one-dimensional) assign \b value to \b this \b Symbol
+   /// @param X      one-dimensional index vector
+   /// @param value  APL value to assign at the indexed positions
    virtual void assign_indexed(const Value * X, Value_P value);
 
    /// assign lambda, eg. V←{ ... }
+   /// @param lambda  lambda function to assign
+   /// @param loc     caller location for diagnostics
    virtual bool assign_named_lambda(cFunction_P lambda, const char * loc);
 
    /// Print \b this \b Symbol to \b out
+   /// @param out  output stream
    virtual ostream & print(ostream & out) const;
 
    /// Print \b this \b Symbol and its stack to \b out
+   /// @param out  output stream
    ostream & print_verbose(ostream & out) const;
 
    /// Pop latest entry from the stack of \b this \b Symbol
@@ -267,16 +306,20 @@ public:
    virtual void push();
 
    /// push a label onto the stack of \b this \b Symbol
+   /// @param label  function line number for the label
    virtual void push_label(Function_Line label);
 
    /// push a function onto the stack of \b this \b Symbol
+   /// @param function  function pointer to push
    virtual void push_function(cFunction_P function);
 
    /// Push an APL value onto the stack of \b this \b Symbol
+   /// @param value  APL value to push
    virtual void push_value(Value_P value);
 
    /// return the depth (global == 0) of \b ufun on the stack. Use the largest
    /// depth if ufun is pushed multiple times
+   /// @param ufun  user-defined function to search for on the stack
    int get_exec_ufun_depth(const UserFunction * ufun);
 
    /// return the current APL value (or throw a VALUE_ERROR)
@@ -309,6 +352,7 @@ public:
    virtual const Function * get_function() const;
 
    /// Return the function at SI level si, or 0 if none.
+   /// @param si  state indicator stack level to query
    cFunction_P get_function(unsigned int si) const;
 
    /// The name of \b this \b Symbol
@@ -343,6 +387,8 @@ public:
       { return this; }
 
    /// store the attributes (as per ⎕AT) of symbol in Z...
+   /// @param mode  ⎕AT mode selecting which attributes to retrieve
+   /// @param Z     output value receiving the attributes
    virtual void get_attributes(int mode, Value & Z) const;
 
    /// return the size of the value stack
@@ -358,14 +404,17 @@ public:
       { return value_stack.size() ? &value_stack.back() : 0; }
 
    /// return the idx'th item on stack (higher index = newer item)
+   /// @param idx  stack index (0 = oldest/global entry)
    const ValueStackItem & operator [](int idx) const
       { return value_stack[idx]; }
 
    /// return the idx'th item on stack (higher index = newer item)
+   /// @param idx  stack index (0 = oldest/global entry)
    ValueStackItem & operator [](int idx)
       { return value_stack[idx]; }
 
    /// set a callback function for symbol events
+   /// @param callback  function to call on symbol events
    void set_monitor_callback(void (* callback)(const Symbol &, Symbol_Event))
       { monitor_callback = callback; }
 
@@ -373,28 +422,37 @@ public:
    void unmark_all_values() const;
 
    /// print variables owning value
+   /// @param out    output stream
+   /// @param value  APL value whose owners are to be printed
    int show_owners(ostream & out, const Value & value) const;
 
    /// perform a vector assignment (like (A B C)←1 2 3) for variables in
    /// \b symbols with values \b values
+   /// @param symbols  vector of symbols to receive assigned values
+   /// @param values   APL value whose items are distributed to symbols
    static void vector_assignment(std::vector<Symbol *> & symbols,
                                  Value_P values);
 
    /// dump this symbol to out
+   /// @param out  output stream
    void dump(ostream & out) const;
 
    /// call the monitor callback function (if any) with event \b ev
+   /// @param ev  symbol event to report
    void call_monitor_callback(Symbol_Event ev)
       { if (monitor_callback)   monitor_callback(*this, ev); }
 
    /// Compare the name of \b this \b Symbol with \b ucs
+   /// @param ucs  Unicode string to compare against this symbol's name
    bool equal(const UCS_string & ucs) const
       { return (name.compare(ucs) == COMP_EQ); }
 
    /// return the level of fun on the stack of \b this Symbol) on the SI stack
+   /// @param fun  function to locate on the SI stack
    int get_SI_level(cFunction_P fun) const;
 
    /// return the SI stack level of val on the stack of \b this Symbol)
+   /// @param val  APL value to locate on the SI stack
    int get_SI_level(const Value & val) const;
 
    /// The next Symbol with the same hash value as \b this \b Symbol
@@ -421,6 +479,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 
@@ -438,6 +499,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 
@@ -455,6 +519,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 
@@ -472,6 +539,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 
@@ -489,6 +559,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 
@@ -506,6 +579,9 @@ public:
    {}
 
    /// overloaded Symbol::assign(), suppressing assignment if not localized
+   /// @param value  APL value to assign
+   /// @param clone  if true, clone the value before storing
+   /// @param loc    caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc)
       { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
 

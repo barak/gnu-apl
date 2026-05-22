@@ -32,6 +32,10 @@ class XML_node
 {
 public:
    /// constructor
+   /// @param anchor doubly-linked list anchor to append this node after
+   /// @param src entire XML source string
+   /// @param spos start position of this node in src
+   /// @param slen length of this node in src
    XML_node(XML_node * anchor, const UCS_string & src,
             ShapeItem spos, ShapeItem slen);
 
@@ -104,6 +108,7 @@ public:
       }
 
    /// append \b garbage to this garbage can (for later deletion)
+   /// @param garbage node to append for deferred deletion
    void append_garbage(XML_node * garbage)
       {
         // check that garbage was properly unlinked.
@@ -116,6 +121,7 @@ public:
       }
 
    /// (debug-) print this node
+   /// @param out output stream
    void print(ostream & out) const;
 
    /// parse an XML start or leaf tag, store result in \b this->APL_value
@@ -123,26 +129,42 @@ public:
    bool parse_tag();
 
    /// (debug-) print all nodes·
+   /// @param out output stream
+   /// @param anchor list anchor node
    static void print_all(ostream & out, const XML_node & anchor);
 
    /// return the type of this node as string
    const char * get_node_type_name() const;
 
    /// reduce nodes starting at \b start, return true on error
+   /// @param anchor list anchor for nodes to translate
+   /// @param garbage list anchor for nodes pending deletion
    static bool translate(XML_node & anchor, XML_node & garbage);
 
    /// collect nodes starting at \b anchor, return true on error
+   /// @param anchor list anchor for nodes to collect
+   /// @param garbage list anchor for nodes pending deletion
+   /// @param Z APL value to receive the collected result
    static bool collect(XML_node & anchor, XML_node & garbage, Value * Z);
 
    /// add member \b name with value \b value to structured value Z
+   /// @param Z structured APL value to add to
+   /// @param first first Unicode character of the member name category prefix
+   /// @param name member name (ASCII portion)
+   /// @param number position number for sorting
+   /// @param value APL value for the new member
    static void add_member(Value * Z, Unicode first, const char * name,
                           int number, Value * value);
 
    /// merge the items from start(-tag) to (end(-tag) into start tag
+   /// @param start start-tag node to merge into
+   /// @param end matching end-tag node
+   /// @param garbage_can list anchor for nodes pending deletion
    static bool merge_range(XML_node & start, XML_node & end,
                            XML_node & garbage_can);
 
    /// return true if uni is a validchar
+   /// @param uni Unicode character to test
    static bool is_name_char(Unicode uni);
 
    /// return true if uni is a valid char in an XML tag name

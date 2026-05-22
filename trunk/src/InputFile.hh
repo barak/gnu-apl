@@ -40,6 +40,12 @@ struct InputFile
    InputFile() {}
 
    /// Normal constructor
+   /// @param _filename path of the input file
+   /// @param _file open FILE pointer (or 0 if not yet open)
+   /// @param _test true if this is a testcase (.tc) file
+   /// @param _echo true if input lines should be echoed
+   /// @param _is_script true if the file is an APL script
+   /// @param LX ⎕LX execution mode after the file is processed
    InputFile(const UTF8_string & _filename, FILE * _file,
              bool _test, bool _echo, bool _is_script, LX_mode LX)
    : file     (_file),
@@ -65,14 +71,17 @@ struct InputFile
       { pushed_IE = true; }
 
    /// set the pushed_pending flag
+   /// @param on_off new value of the pushed_pending flag
    void set_pushed_pending(bool on_off)
       { pushed_pending = on_off; }
 
    /// set the current line number
+   /// @param num the new line number
    void set_line_no(int num)
       { line_no = num; }
 
    /// set the current HTML mode
+   /// @param html new HTML mode value (0=none, 1=in-HTML, 2=in-header)
    void set_html(int html)
       { in_html = html; }
 
@@ -140,6 +149,7 @@ struct InputFile
         {}
 
         /// add \b object to \b this object_filter
+        /// @param object APL name to include in the copy filter
         void add_filter_object(UCS_string & object)
            {
              object_filter.push_back(object);
@@ -152,6 +162,7 @@ struct InputFile
 
         /// check the current line and return true if the line is permitted by
         /// the object_filter. Also, update \b in_function and \b in_variable.
+        /// @param line the UTF-8 source line to evaluate against the filter
         bool check_filter(const UTF8_string & line);
 
         // where the current (and subsequent) line(s) are located

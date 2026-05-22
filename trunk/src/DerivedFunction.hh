@@ -43,6 +43,7 @@ public:
    DerivedFunction() : Function(TOK_FUN0)   {}
 
    /// deallocate resources held by this DerivedFunction
+   /// @param loc caller location for diagnostics
    void destroy_derived(const char * loc);
 
    /// overloaded NamedObject::get_name()
@@ -88,6 +89,11 @@ public:
 
 protected:
   /// constructor. Set omitted arguments to 0.
+  /// @param LO token for the left operand (or 0 if absent)
+  /// @param F_or_M_or_D the function, monadic, or dyadic operator
+  /// @param RO token for the right operand (or 0 if absent)
+  /// @param X optional axis value (empty Value_P if absent)
+  /// @param loc caller location for diagnostics
   DerivedFunction(Token * LO, cFunction_P F_or_M_or_D, Token * RO, Value_P X,
                   const char * loc);
 
@@ -106,6 +112,8 @@ protected:
       { return !axis ? 0 : const_cast<Value_P *>(&axis); }
 
    /// debug printout when an eval_XXX() function is called.
+   /// @param class_name name of the derived-function class
+   /// @param fun_name name of the eval function being entered
    void entering(const char * class_name, const char * fun_name) const;
 
    /// the function (to the left of the operator).
@@ -133,6 +141,10 @@ class Derived_LO_D_RO: public DerivedFunction
 {
 public:
    /// constructor
+   /// @param LO token for the left operand function
+   /// @param D the dyadic operator
+   /// @param RO token for the right operand function
+   /// @param loc caller location for diagnostics
    Derived_LO_D_RO(Token & LO, cDyaOP D, Token & RO, const char * loc)
    : DerivedFunction(&LO, D, &RO, Value_P(), loc)
    {
@@ -140,15 +152,23 @@ public:
    }
 
    /// overloaded Function::eval_AB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AXB()
+   /// @param A left APL argument value
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_XB()
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
 //============================================================================
@@ -157,6 +177,11 @@ class Derived_LO_D_X_RO : public DerivedFunction
 {
 public:
    /// constructor
+   /// @param LO token for the left operand function
+   /// @param D the dyadic operator
+   /// @param X axis specification value
+   /// @param RO token for the right operand function
+   /// @param loc caller location for diagnostics
    Derived_LO_D_X_RO(Token & LO, cDyaOP D, Value_P X, Token & RO,
                              const char * loc)
    : DerivedFunction(&LO, D, &RO, X, loc)
@@ -166,9 +191,12 @@ public:
    }
 
    /// overloaded Function::eval_AXB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_XB()
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 };
 //============================================================================
@@ -177,6 +205,9 @@ class Derived_LO_M: public DerivedFunction
 {
 public:
    /// constructor
+   /// @param LO token for the left operand function
+   /// @param M the monadic operator
+   /// @param loc caller location for diagnostics
    Derived_LO_M(Token & LO, cMonOP M, const char * loc)
    : DerivedFunction(&LO, M, 0, Value_P(), loc)
    {
@@ -184,15 +215,23 @@ public:
    }
 
    /// overloaded Function::eval_AB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AB()
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AXB()
+   /// @param A left APL argument value
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_XB()
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
 //============================================================================
@@ -202,21 +241,33 @@ class Derived_LO_M_X: public DerivedFunction
 {
 public:
    /// constructor
+   /// @param LO token for the left operand function
+   /// @param M the monadic operator
+   /// @param X axis specification value
+   /// @param loc caller location for diagnostics
    Derived_LO_M_X(Token & LO, cMonOP M, Value_P X,
                           const char * loc)
    : DerivedFunction(&LO, M, 0, X, loc)
    {}
 
    /// overloaded Function::eval_AB();
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B();
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AXB();
+   /// @param A left APL argument value
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_XB();
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
 
@@ -227,6 +278,9 @@ class Derived_F_X : public DerivedFunction
 {
 public:
    /// constructor
+   /// @param F the function to bind to an axis
+   /// @param X axis specification value
+   /// @param loc caller location for diagnostics
    Derived_F_X(cFunction_P F, Value_P X, const char * loc)
    : DerivedFunction(0, F, 0, X, loc)
    {
@@ -235,9 +289,12 @@ public:
    }
 
    /// overloaded Function::eval_AB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 };
 //============================================================================
@@ -252,6 +309,7 @@ public:
    ~DerivedFunctionCache();
 
    /// return the i'th derived function
+   /// @param i zero-based index into the cache
    const DerivedFunction * at(size_t i) const
       {
         return reinterpret_cast<const DerivedFunction *>
@@ -259,6 +317,7 @@ public:
       }
 
    /// return the i'th derived function
+   /// @param i zero-based index into the cache
    const DerivedFunction & operator [](size_t i) const
       {
         Assert(i < idx);
@@ -278,6 +337,7 @@ public:
 
    /// return the last cache entry and increment \b idx. To be used with
    /// placement new.
+   /// @param loc caller location for diagnostics
    DerivedFunction * get(const char * loc);
 
 protected:

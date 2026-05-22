@@ -207,6 +207,7 @@ enum Function_Line
 };
 
 /// Function_Line ++ (pre increment)
+/// @param fl  the function line to increment
 inline Function_Line operator ++(Function_Line & fl)
 {
    fl = Function_Line(fl + 1);
@@ -214,6 +215,8 @@ inline Function_Line operator ++(Function_Line & fl)
 }
 
 /// Function_Line ++ (post increment)
+/// @param fl  the function line to increment
+/// @param     unused post-increment distinguisher
 inline Function_Line operator ++(Function_Line & fl, int)
 {
 const Function_Line before_increment = fl;
@@ -518,6 +521,8 @@ enum ValueFlags
   VF_packed   = 0x4000,   ///< packed homogenious ravel
 };
 
+/// @param out    output stream to write to
+/// @param flags  value flags bitmask to display
 extern ostream & print_flags(ostream & out, ValueFlags flags);
 
 //----------------------------------------------------------------------------

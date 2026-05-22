@@ -77,6 +77,8 @@ class Prefix
 
 public:
    /// constructor
+   /// @param _si the StateIndicator entry that owns this parser
+   /// @param body the token sequence to be parsed
    Prefix(StateIndicator & _si, const Token_string & body);
 
    /// destructor
@@ -87,21 +89,28 @@ public:
           MAX_CONTENT_1 = MAX_CONTENT - 1 };
 
    /// return true if ufun is on the stack
+   /// @param ufun user-defined function to search for on the parser stack
    bool uses_function(const UserFunction * ufun) const;
 
    /// return true if the content of \b this Prefix has ⎕R (and maybe ⎕L or ⎕X).
    bool has_quad_LRX() const;
 
    /// print the state of this parser
+   /// @param out output stream to print to
+   /// @param indent indentation level for formatting
    void print(ostream & out, int indent) const;
 
    /// throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR
+   /// @param loc caller location for diagnostics
    void syntax_error(const char * loc);
 
    /// clear the mark flag of all values in \b this Prefix
    void unmark_all_values() const;
 
    /// print all owners of \b value
+   /// @param prfx string prefix printed before each owner line
+   /// @param out output stream to print to
+   /// @param value the APL value whose owners are to be listed
    int show_owners(const char * prfx, ostream & out, const Value & value) const;
 
    /// highest PC in current statement
@@ -113,15 +122,19 @@ public:
       { return put ? content[0].get_PC() : get_lookahead_PC(); }
 
    /// print the current range (PC from - PC to) on out
+   /// @param out output stream to print to
    void print_range(ostream & out) const;
 
    /// return the left argument of a failed primitive function (if any)
+   /// @param function output: name of the function whose left arg is returned
    Value_P * locate_L(UCS_string & function) const;
 
    /// return the right argument of a failed primitive function (if any)
+   /// @param function output: name of the function whose right arg is returned
    Value_P * locate_R(UCS_string & function) const;
 
    /// return the axis argument of a failed primitive function (if any)
+   /// @param function output: name of the function whose axis arg is returned
    Value_P * locate_X(UCS_string & function) const;
 
    /// return the current monadic function (if any)
@@ -165,6 +178,7 @@ public:
       { Assert1(put >= 4);   return content[put - 4].get_token(); }
 
    /// return true if the next token binds stronger than the best match
+   /// @param next token class of the upcoming lookahead token
    bool do_shift(TokenClass next) const;
 
    /// return the current assignment state
@@ -172,6 +186,7 @@ public:
       { return assign_state; }
 
    /// set the current assignment state
+   /// @param new_state the new assignment state to set
    void set_assign_state(Assign_state new_state)
       { assign_state = new_state; }
 
@@ -183,10 +198,12 @@ public:
       { return saved_MISC.get_PC(); }
 
    /// set the PC of the lookahead token
+   /// @param pc program counter value to assign to the lookahead token
    void set_lookahead_PC(Function_PC pc)
       { saved_MISC.set_PC(pc); }
 
    /// reset statement to empty state (e.g. after →N)
+   /// @param loc caller location for diagnostics
    void reset(const char * loc)
       { clean_up();   put = 0;   assign_state = ASS_none;
         clear_MISC(loc);
@@ -198,12 +215,18 @@ public:
       { return PC; }
 
    /// print the current stack to \b out
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
    void print_stack(ostream & out, const char * loc) const;
 
    /// print the current stack before or after shift/reduce to \b out
+   /// @param out output stream to print to
+   /// @param which 0 for before shift/reduce, 1 for after
    ostream & print_patterns(ostream & out, int which);
 
    /// print a token and its value in a brief form.
+   /// @param out output stream to print to
+   /// @param tok the token whose tag and value are printed
    ostream & print_token_value(ostream & out, const Token & tok);
 
    /// return the leftmost (top-of-stack) Token_loc (at put position)
@@ -212,6 +235,7 @@ public:
 
    /// store one more token. push(A) in e.g. F B would produce A F B.
    /// IOW, push() works right-to-left of XXX in reduce_XXX().
+   /// @param tl token with location to push onto the parser stack
    void push(const Token_loc & tl)
       {
         if (put >= MAX_CONTENT_1)   LIMIT_ERROR_PREFIX;
@@ -220,6 +244,7 @@ public:
 
    /// if \b tok is an error token (from some eval_XXX() function) then
    /// push its Token_loc and return \b true. Otherwise return \b false.
+   /// @param tok token to inspect; pushed only if it carries TOK_ERROR
    bool push_error(const Token & tok)
       {
         if (tok.get_tag() != TOK_ERROR)   return false;   // no error pushed
@@ -243,6 +268,7 @@ public:
                 └─PC─┐
       After:         Z   prefix_len=1, put→Z, PC(Z_ = PC(A)
     */
+   /// @param result token produced by the reduction that replaces the phrase
    void pop_args_push_result(const Token & result)
         {
           Assert1(put >= prefix_len);
@@ -265,9 +291,11 @@ public:
    /// return TOK_LSYMB2 tokens ahead (excluding the leftmost one
    /// already read into \b content). The result \b symbols is empty
    /// for selective specifications and non-empty for vector specifications.
+   /// @param symbols output: vector filled with collected symbol pointers
    void collect_symbols(vector<Symbol *> & symbols);
 
    /// clear the saved_MISC token
+   /// @param loc caller location for diagnostics
    void clear_MISC(const char * loc)
       {
         saved_MISC.set_PC(Function_PC_invalid);
@@ -279,10 +307,13 @@ public:
    bool value_expected() const;
 
    /// jump to new PC
+   /// @param new_pc program counter value to jump to
    void goto_PC(Function_PC new_pc)
       { reset(LOC);   PC = new_pc; }
 
    /// adjust the right caret after a SYNTAX_ERROR
+   /// @param range program counter range for the failed statement; updated in place
+   /// @param failed_statement the token sequence that caused the syntax error
    static void adjust_right_caret(Function_PC2 & range,
                                   const Token_string & failed_statement);
 
@@ -291,6 +322,7 @@ public:
 
 protected:
    /// return uninitialized memory for a new derived function
+   /// @param loc caller location for diagnostics
    DerivedFunction * get_fun_oper_slot(const char * loc) const;
 
    /// set the prefix parser action
@@ -300,11 +332,14 @@ protected:
       }
 
    /// if end is \b TOK_IF_ELSe then jump over the ELSE clause
+   /// @param maybe_else token that may be a TOK_IF_ELSE marker
+   /// @param num number of tokens to skip if the ELSE branch is taken
    inline void handle_ELSE(const Token & maybe_else, int num);
 
    /// set the prefix parser action according to (result-) Token type.
    // Called (typically after some eval_XXX()) if the return class can not
    // be predicted token classes.
+   /// @param result the token returned by an eval_XXX() function
    void set_action(const Token & result);
 
    /// read and resolve the token class left of [ ... ], PC is at ']'
@@ -315,18 +350,22 @@ protected:
       { return saved_MISC.get_token().get_tag() == TOK_VOID ? 0 : 1; }
 
    /// read and resolve the token class left of )
+   /// @param pc program counter of the closing parenthesis token
    bool is_value_parenthesis(int pc) const;
 
    /// return the idx'th Token_loc (from put position)
+   /// @param idx zero-based index from the left (APL order)
    Token_loc & at(int idx)
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
    /// return the TokenClass of \b at(idx)
+   /// @param idx zero-based index from the left (APL order)
    const TokenClass Class_at(int idx) const
        { Assert1(idx < put);
          return content[put - idx - 1].get_token().get_Class(); }
- 
+
    /// return the idx'th Token_loc (from put position)
+   /// @param idx zero-based index from the left (APL order)
    const Token_loc & at(int idx) const
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
@@ -355,9 +394,11 @@ protected:
    inline bool check_next_binding();
 
    /// check if ^C or attention was raised (and throw if so)
+   /// @param end_of_line true if the parser has reached the end of a statement
    void check_interrupt_or_attention(bool end_of_line);
 
-   /// perform a branch within a function. 
+   /// perform a branch within a function.
+   /// @param end_of_line true if the parser has reached the end of a statement
    void branch_within_function(bool end_of_line)
       {
         check_interrupt_or_attention(end_of_line);
@@ -369,9 +410,11 @@ protected:
    void push_END_error();
 
    /// push a symbol token (of class TC_SYMBOL). Return true iff )SI was pushed.
+   /// @param tl token with location for the symbol to push
    inline bool push_Symbol(Token_loc & tl);
 
    /// return true if the left (back-)slash in M M means F M.
+   /// @param PC program counter of the left slash/backslash token
    inline bool MM_is_FM(Function_PC PC);
 
    /// a unique identifier

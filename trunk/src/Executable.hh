@@ -45,11 +45,19 @@ class Executable
 {
 public:
    /// constructor
+   /// @param ucs source text of the executable
+   /// @param multi_line true if the source spans multiple lines
+   /// @param pm parse mode (execute, statement list, or function)
+   /// @param loc caller location for diagnostics
    Executable(const UCS_string & ucs, bool multi_line,
               ParseMode pm, const char * loc);
 
    /// constructor for lambdas
-   Executable(Fun_signature sig, int lambda_num, 
+   /// @param sig function signature of the lambda
+   /// @param lambda_num sequential number identifying this lambda
+   /// @param lambda_text source text of the lambda body
+   /// @param loc caller location for diagnostics
+   Executable(Fun_signature sig, int lambda_num,
               const UCS_string & lambda_text, const char * loc);
 
    /// destructor: release values held by the body
@@ -79,6 +87,7 @@ public:
       { return 0; }
 
    /// return true if this Executable localizes Symbol \b sym
+   /// @param sym symbol to check for localisation
    virtual bool pushes_sym(const Symbol * sym) const
       { return false; }
 
@@ -87,20 +96,27 @@ public:
    { return 0; }
 
    /// get the line number for pc
+   /// @param pc program counter value to map to a line number
    virtual Function_Line get_line(Function_PC pc) const
       { return Function_Line_0; }
 
    /// print this user defined executable to \b out
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       { print_token(out, false);   return out; }
 
    /// print a body range (in APL order)
+   /// @param out output stream to write to
+   /// @param from_to PC range (start and end) to print
    ostream & print_range(ostream & out, Function_PC2 from_to) const;
 
    /// print this user defined executable to \b out
+   /// @param out output stream to write to
+   /// @param details non-zero to include additional token detail
    void print_token(ostream & out, int details) const;
 
    /// print the text of this user defined executable to \b out
+   /// @param out output stream to write to
    void print_text(ostream & out) const;
 
    /// execute the body of this executable
@@ -115,21 +131,27 @@ public:
       { return text.size(); }
 
    /// return function line n (0 = header line)
+   /// @param l line number (0 = header)
    const UCS_string & get_text(int l) const
       { return text[l]; }
 
    /// clear the text of line n (0 = header line)
+   /// @param l line number to clear (0 = header)
    void clear_text(int l)
       { text[l].clear(); }
 
    /// set the text of line n (0 = header line)
+   /// @param l line number to replace (0 = header)
+   /// @param new_line replacement text for line \b l
    void set_text(int l, const UCS_string & new_line)
       { text[l] = new_line; }
 
    /// return the text of statement at \b pc
+   /// @param pc program counter identifying the statement
    UCS_string statement_text(Function_PC pc) const;
 
    /// return the first PC of the \b line
+   /// @param line function line number whose start PC is requested
    virtual Function_PC line_start(Function_Line line) const
       { return Function_PC_0; }
 
@@ -139,25 +161,37 @@ public:
    virtual VoidCount remove_TOK_VOID();
 
    /// compute error lines 2 and 3 in \b error
+   /// @param error error object to fill with location information
+   /// @param range PC range (start/end) of the failing statement
    void set_error_info(Error & error, Function_PC2 range) const;
 
    /// helper for set_error_info(Error & error, Function_PC2 range).
+   /// @param error error object to fill with location information
+   /// @param failed_statement token string of the failing statement
+   /// @param range PC range (start/end) of the failing statement
    void set_error_info(Error & error, const Token_string & failed_statement,
                        Function_PC2 range) const;
 
    /// restore the original (un-optimized) tokens for a failed statement
+   /// @param original token string to restore into
+   /// @param low_PC first PC of the statement to restore
    void reparse(Token_string & original, Function_PC low_PC) const;
 
    /// return the end of the statement (excluding) to which pc belongs
+   /// @param pc program counter within the statement
    Function_PC get_statement_end(Function_PC pc) const;
 
    /// return the start of the statement to which pc belongs
+   /// @param pc program counter within the statement
    Function_PC get_statement_start(Function_PC pc) const;
 
    /// clear marked flag in all body token
    void unmark_all_values() const;
 
    /// print all owners of \b value
+   /// @param prefix string prepended to each output line
+   /// @param out output stream to write to
+   /// @param value APL value whose owners are to be listed
    int show_owners(const char * prefix, ostream & out,
                    const Value & value) const;
 
@@ -170,9 +204,12 @@ public:
       { return refcount; }
 
    /// increment the reference counter
+   /// @param loc caller location for diagnostics
+   /// @param creator description of the entity acquiring the reference
    void increment_refcount(const char * loc, const char * creator);
 
    /// decrement the reference counter
+   /// @param loc caller location for diagnostics
    void decrement_refcount(const char * loc);
 
    /// compute the targets for if/else aka →→ ←→ and ←←.
@@ -189,6 +226,9 @@ protected:
         {}
 
         /// print \b this conditional
+        /// @param out output stream to write to
+        /// @param level indentation level for nested output
+        /// @param body token string of the enclosing executable
         void print(ostream & out, int level, const Token_string & body) const;
 
         Function_PC if_THEN;   ///< position of the ←← token (end of condition)
@@ -214,33 +254,52 @@ protected:
 
    /// reverse the token order in each statement of tos (statement by
    /// statement reversal). The order pf statements is not changed).
+   /// @param tos token string whose statements are reversed in place
   static void reverse_each_statement(Token_string & tos);
 
    /// reverse the token order of the entire Token_string (i.e. not statement
    /// by statement)
+   /// @param tos token string to reverse in place
   static void reverse_all_token(Token_string & tos);
 
    /// extract one lambda expressions from body and store it in lambdas
    /// body[b] is { and body[bend] is }.
+   /// @param b index of the opening '{' in the body
+   /// @param nend index of the matching '}' in the body
+   /// @param lambda_num sequential number to assign to this lambda
    ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend,
                               Lambda_number lambda_num);
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.
+   /// @param rev_lambda_body token string receiving the reversed lambda body
+   /// @param b index of the opening '{' in the body
+   /// @param bend index of the matching '}' in the body
    Fun_signature compute_lambda_body(Token_string & rev_lambda_body,
                                      ShapeItem b, ShapeItem bend);
 
    /// extract the skip'th { ... } from the function text
+   /// @param signature function signature of the lambda
+   /// @param skip zero-based index of which lambda to extract
    UCS_string extract_lambda_text(Fun_signature signature, int skip) const;
 
    /// where this SI entry was allocated
    const char * alloc_loc;
 
    /// parse the body line number \b line of \b this function
+   /// @param line function line number being parsed
+   /// @param ucs source text of the line
+   /// @param trace true to enable trace output during parsing
+   /// @param loc caller location for diagnostics
+   /// @param macro true if this line originates from a macro expansion
    ErrorCode parse_body_line(Function_Line line, const UCS_string & ucs,
                              bool trace, const char * loc, bool macro);
 
    /// parse the body line number \b line of \b this function
+   /// @param line function line number being parsed
+   /// @param tos pre-tokenised source for the line
+   /// @param trace true to enable trace output during parsing
+   /// @param loc caller location for diagnostics
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              bool trace, const char * loc);
 
@@ -269,9 +328,13 @@ class ExecuteList : public Executable
 
 public:
    /// compute body token from text \b data
+   /// @param data APL source text of the execute expression
+   /// @param loc caller location for diagnostics
    static ExecuteList * fix(const UCS_string & data, const char * loc);
 
    /// constructor
+   /// @param txt source text of the execute expression
+   /// @param loc caller location for diagnostics
    ExecuteList(const UCS_string & txt, const char * loc)
    : Executable(txt, false, PM_EXECUTE, loc)
    {}
@@ -292,11 +355,16 @@ class StatementList : public Executable
 
 public:
    /// compute body token from text \b data
+   /// @param data APL source text of the statement list
+   /// @param suffix optional APL value appended after execution
+   /// @param loc caller location for diagnostics
    static StatementList * fix(const UCS_string & data, Value_P suffix,
                               const char * loc);
 
 protected:
    /// constructor
+   /// @param txt source text of the statement list
+   /// @param loc caller location for diagnostics
    StatementList(const UCS_string txt, const char * loc)
    : Executable(txt, false, PM_STATEMENT_LIST, loc)
    {}

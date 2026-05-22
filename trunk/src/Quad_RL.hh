@@ -49,6 +49,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param value new random seed value to assign
+   /// @param clone true if the value should be cloned before storing
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::pop()

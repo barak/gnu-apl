@@ -107,7 +107,7 @@ public:
 
 #if 1
 
-#include <complex>
+#  include <complex>
   /// a complex number
   class ZZ: public std::complex<APL_Float>
      {
@@ -225,6 +225,10 @@ public:
          /// Unlike e.g. std::vector<T> (which copies \b data), \b vdata must
          /// outlive \b this, and modifying items also modifies \b vdata!
          //
+        /// @param vdata pointer to the underlying element buffer
+        /// @param M number of rows
+        /// @param N number of columns
+        /// @param _dx leading dimension (distance between adjacent columns)
         fMatrix(void * vdata, Crow M, Ccol N, ShapeItem _dx)
           : data(reinterpret_cast<T *>(vdata)),
             rows(M),
@@ -235,6 +239,8 @@ public:
      
         /// constructor: sub-matrix of \b other with \b new_col_count columns
         /// CAUTION: other must outlive \b this!
+        /// @param other source matrix to create sub-matrix from
+        /// @param new_col_count number of columns in the sub-matrix
         fMatrix(const fMatrix & other, ShapeItem new_col_count)
           : data(other.data),
             rows(other.rows),
@@ -244,6 +250,7 @@ public:
         { Assert(new_col_count <= other.cols); }
 
         /// copy from \b other
+        /// @param other source matrix to copy from
         void operator =(const fMatrix & other)
            {
              transpose = other.transpose;
@@ -254,18 +261,22 @@ public:
 
         /// return the sub-matrix starting at row and col.
         /// I.e. \b row col↓this
+        /// @param row starting row index of the sub-matrix
+        /// @param col starting column index of the sub-matrix
         fMatrix sub_matrix(Crow row, Crow col)
            {
              Assert(col <= cols && row <= rows);
              return fMatrix(&at(row, col), rows - row, cols - col, dx);
            }
 
+        /// @param new_rows new row count
         void set_rows(Ccol new_rows)
            {
              const_cast<ShapeItem &>(dx) = dx + new_rows - rows;
              const_cast<Crow &>(rows) = new_rows;
            }
 
+        /// @param new_cols new column count
         void set_columns(Ccol new_cols)
            { const_cast<Ccol &>(cols) = new_cols; }
 
@@ -275,6 +286,8 @@ public:
         /// return the sub-matrix of size new_len_y: new_len_x.
         /// I.e. \b new_rows new_rows↑this
         /// starting at row 0 and column 0
+        /// @param new_rows number of rows to take
+        /// @param new_cols number of columns to take
         fMatrix take(ShapeItem new_rows, ShapeItem new_cols)
            {
              Assert(new_rows <= rows);
@@ -300,36 +313,46 @@ public:
            { return dx; }
      
         /// return const \b this[row, col]
+        /// @param row row index
+        /// @param col column index
         const T & at(Crow row, Ccol col) const
            { Assert(row < rows);
              Assert(col < cols);
              return data[row + col*dx]; }
-     
+
         /// return \b this[row, col]
+        /// @param row row index
+        /// @param col column index
         T & at(Crow row, Ccol col)
            { Assert(row < rows);
              Assert(col < cols);
              return data[row + col*dx]; }
-     
+
         /// return \b this[row, col] or this[col, row]
+        /// @param row row index (or column index when transposed)
+        /// @param col column index (or row index when transposed)
         const T & AT(Crow row, Ccol col) const
            { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
-     
+
         /// return \b this[row, col] or this[col, row]
+        /// @param row row index (or column index when transposed)
+        /// @param col column index (or row index when transposed)
         T & AT(Crow row, Ccol col)
            { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
-     
+
         /// return \b this[i, i]
+        /// @param i diagonal index
         T & diag(ShapeItem i)
            { Assert(i < rows);
              Assert(i < cols);
              return data[i*(1 + dx)]; }
-     
+
         /// return \b this[i, i]
+        /// @param i diagonal index
         const T & diag(ShapeItem i) const
            { Assert(i < rows);
              Assert(i < cols);

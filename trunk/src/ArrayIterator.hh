@@ -44,6 +44,9 @@ public:
    /// constructor for placement new. The weight is the step size in
    /// the associated ravel ehrn the iterator is incremented.
    /// A weight of 0 indicates a scalar
+   /// @param len number of elements along this axis
+   /// @param weight ravel stride when this iterator is incremented
+   /// @param _wrap true if the iterator should wrap around at axis end
    AxisIterator(ShapeItem len, ShapeItem weight, bool _wrap)
    : axis_length(len),
      axis_weight(weight),
@@ -121,6 +124,7 @@ class ArrayIterator
 {
 public:
    /// constructor from Shape
+   /// @param shape the array shape to iterate over
    ArrayIterator(const Shape & shape)
    : rank(shape.get_rank()),
      total_ravel_offset(0)
@@ -144,6 +148,8 @@ public:
       }
 
    /// constructor from Shape and axis permutation
+   /// @param shape the array shape to iterate over
+   /// @param perm axis permutation to apply during iteration
    ArrayIterator(const Shape & shape,  const Shape & perm)
    : rank(shape.get_rank()),
      total_ravel_offset(0)
@@ -198,6 +204,7 @@ public:
       }
 
    /// Get the current offset for axis r
+   /// @param a the axis index to query
    ShapeItem get_shape_offset(sAxis a) const
       { return get_iterator(a).get_shape_offset(); }
 
@@ -216,10 +223,12 @@ public:
 
 protected:
    /// return the iterator for axis a
+   /// @param a the axis index to retrieve
    const AxisIterator & get_iterator(sAxis a) const
       { return axis_iterators[a]; }
 
    /// return the iterator for axis a
+   /// @param a the axis index to retrieve
    AxisIterator & get_iterator(sAxis a)
       { return axis_iterators[a]; }
 

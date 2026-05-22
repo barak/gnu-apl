@@ -57,30 +57,43 @@ public:
    UCS_string();
 
    /// constructor: one-element string
+   /// @param uni  single Unicode character to store
    UCS_string(Unicode uni);
 
    /// constructor: \b len Unicode characters, starting at \b data
+   /// @param data  pointer to array of Unicode characters
+   /// @param len   number of characters to copy
    UCS_string(const Unicode * data, size_t len);
 
    /// constructor: \b len times \b uni
+   /// @param len  number of copies of uni
+   /// @param uni  Unicode character to repeat
    UCS_string(size_t len, Unicode uni);
 
    /// constructor: copy of another UCS_string
+   /// @param ucs  source string to copy
    UCS_string(const UCS_string & ucs);
 
    /// constructor: copy of another UCS_string \b ucs, starting at \b pos
    /// in \b ucs
+   /// @param ucs  source string to copy from
+   /// @param pos  starting position within ucs
    UCS_string(const UCS_string & ucs, size_t pos);
 
    /// constructor: copy of another UCS_string \b ucs, starting at \b pos
    /// in \b ucs and length \b len
+   /// @param ucs  source string to copy from
+   /// @param pos  starting position within ucs
+   /// @param len  number of characters to copy
    UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
    /// constructor: UCS_string from UTF8_string
+   /// @param utf  UTF-8 encoded source string
    UCS_string(const UTF8_string & utf)
       { create(LOC);   decode(utf8P(utf.c_str()), utf.size()); }
 
    /// constructor: UCS_string from (0-terminated) U"..." literal
+   /// @param literal  null-terminated UTF-32 string literal
    UCS_string(const char32_t * literal)
       { create(LOC);   while (*literal)   push_back(Unicode(*literal++)); }
 

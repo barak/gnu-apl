@@ -50,9 +50,11 @@ struct Format_sub
 
    /// set flt_mask according to the digits in member \b format
    /// return the number of digits from '1' to '4' (including)
+   /// @param type sub-field type code (integer, fraction, or exponent)
    int map_field(int type);
 
    /// a debug function for printing \b this Format_sub
+   /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
    /// return true iff format contains a '4' (i.e. counteract the effect of 
@@ -63,7 +65,8 @@ struct Format_sub
           return ! (flt_mask & (BIT_1 | BIT_2 | BIT_3));   // no 1, 2, or 3
         }
 
-   /// return true if the decorator is floating floating 
+   /// return true if the decorator is floating floating
+   /// @param value_is_negative true if the formatted number is negative
    bool do_float(bool value_is_negative) const
       { if (flt_mask & BIT_1)   return  value_is_negative;
         if (flt_mask & BIT_2)   return !value_is_negative;
@@ -71,14 +74,18 @@ struct Format_sub
       }
 
    /// return the pad character (default: space, otherwise controlled by ⎕FC)
+   /// @param qfc current ⎕FC fill character
    Unicode pad_char(Unicode qfc) const
       { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
 
    /// Fill buf at position x,y with data according to fmt
+   /// @param data digit string for the integer part
+   /// @param overflow output flag set if the field is too narrow
    UCS_string insert_int_commas(const UCS_string & data,
                                 bool & overflow) const;
 
    /// Fill buf at position x,y with data according to fmt
+   /// @param data digit string for the fractional part
    UCS_string insert_fract_commas(const UCS_string & data) const;
 };
 //----------------------------------------------------------------------------
@@ -94,11 +101,14 @@ public:
    {}
 
    /// A character array with B formatted by specification
+   /// @param A format specification APL value (numeric width and precision)
+   /// @param B APL value to format
    static Value_P format_by_specification(Value_P A, Value_P B);
 
    static Bif_F12_FORMAT  fun;   ///< Built-in function
 
    /// Return true iff uni is '0' .. '9', comma, or full-stop
+   /// @param uni Unicode character to test
    static bool is_control_char(Unicode uni);
 
    /// An entire format field (LIFER = Left-Int-Fract-Expo-Right
@@ -108,6 +118,7 @@ public:
         Format_LIFER() {}
 
         /// constructor
+        /// @param fmt format string to parse into sub-fields
         Format_LIFER(UCS_string fmt);
 
         /// return the size of the format
@@ -121,19 +132,31 @@ public:
                   + expo_deco.out_len + exponent.out_len + right_deco.out_len; }
 
         /// format \b value by example
+        /// @param value floating-point number to format
         UCS_string format_example(APL_Float value);
 
         /// format the left decorator and integer part (everything left of the
         /// decimal dot)
+        /// @param data_int digit string for the integer part
+        /// @param negative true if the value is negative
+        /// @param overflow output flag set if the field is too narrow
         UCS_string format_left_side(const UCS_string data_int, bool negative,
                                     bool & overflow);
 
         /// format the fract part, exponent, and right decorator (everything
         /// left of the decimal dot)
+        /// @param data_fract digit string for the fractional part
+        /// @param negative true if the value is negative
+        /// @param data_expo digit string for the exponent part
         UCS_string format_right_side(const UCS_string data_fract, bool negative,
                                      const UCS_string data_expo);
 
         /// Print \b value into int, fract, and expo fields
+        /// @param value floating-point number to decompose
+        /// @param data_int output string for the integer digits
+        /// @param data_fract output string for the fractional digits
+        /// @param data_expo output string for the exponent digits
+        /// @param overflow output flag set if the value exceeds field width
         void fill_data_fields(APL_Float value, UCS_string & data_int,
                               UCS_string & data_fract, UCS_string & data_expo,
                               bool & overflow);
@@ -153,32 +176,53 @@ public:
       };
 
    /// A character array with the display of B
+   /// @param B APL value to format
    static Value_P monadic_format(Value_P B);
 
 protected:
    /// Overloaded Function::eval_B()
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_AB()
+   /// @param A left argument APL value (format specification or example)
+   /// @param B right argument APL value to format
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// A character array with B formatted by example
+   /// @param A format example APL value (character string with picture)
+   /// @param B APL value to format
    static Value_P format_by_example(Value_P A, Value_P B);
 
    /// split entire format string string into \b column format strings
+   /// @param format overall format picture string to split
+   /// @param col_formats output vector receiving one format string per column
    static void split_example_into_columns(const UCS_string & format,
                                    UCS_string_vector & col_formats);
 
    /// A character array with one column of B formatted by specification
+   /// @param width total output field width in characters
+   /// @param precision number of digits after the decimal point
+   /// @param cB pointer to the first cell of the column
+   /// @param cols total number of columns in the value
+   /// @param rows total number of rows in the value
    static PrintBuffer format_one_col_by_spec(int width, int precision,
                                              const Cell * cB, ShapeItem cols,
                                              ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
+   /// @param ret PrintBuffer to append the row to
+   /// @param row zero-based index of the row being added
+   /// @param has_char true if any cell in the row is a character cell
+   /// @param has_num true if any cell in the row is a numeric cell
+   /// @param align_char alignment character for mixed char/num columns
+   /// @param data formatted string content for this row
    static void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
 
    /// format value with \b precision mantissa digits (floating format)
+   /// @param value floating-point number to format
+   /// @param precision number of significant mantissa digits
    static UCS_string format_float_by_spec(APL_Float value, int precision);
 };
 //----------------------------------------------------------------------------

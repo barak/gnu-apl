@@ -37,20 +37,25 @@ struct LineLabel
    {}
 
    /// constructor: line mj
+   /// @param mj the integer (major) part of the line number
    LineLabel(int mj)
    : ln_major(mj)
    {}
 
    /// print the line number
+   /// @param out output stream to write the line label to
    void print(ostream & out) const;
 
    /// print a prompt like [1.2] into buffer
+   /// @param min_size minimum character width for the prompt field
    UCS_string print_prompt(int min_size) const;
 
    /// true iff two line numbers are equal
+   /// @param other the line label to compare against
    bool operator ==(const LineLabel & other) const;
 
    /// true iff this line number is smaller than \b other
+   /// @param other the line label to compare against
    bool operator <(const LineLabel & other) const;
 
    /// true if tis line number is valid (i.e. the line exists)
@@ -83,11 +88,14 @@ class Nabla
 {
 public:
    /// edit the function specified in \b cmd (e.g. cmd = "∇FUN")
+   /// @param cmd the ∇-editor command string (e.g. "∇FUN")
    static void edit_function(const UCS_string & cmd);
 
    /// Return the line label (sucah as [1]) and the line text.
    /// Set is_current iff \b line is the current line of the editor.
    /// Return 0 if line > lines.size().
+   /// @param line 0-based index of the function line to retrieve
+   /// @param is_current set to true if this line is the currently edited line
    UCS_string get_label_and_text(int line, bool & is_current) const;
 
    /// return the number of lines
@@ -96,9 +104,11 @@ public:
 
 protected:
    /// constructor
+   /// @param cmd the ∇-editor command string used to open the editor
    Nabla(const UCS_string & cmd);
 
    /// throw a DEFN error with some additional information
+   /// @param loc caller location for diagnostics
    void throw_edit_error(const char * loc);
 
    /// edit this function
@@ -114,6 +124,8 @@ protected:
         {}
 
         /// constructor
+        /// @param lab the line label (e.g. [1.2])
+        /// @param tx the function text for this line
         FunLine(LineLabel lab, const UCS_string & tx)
         : label(lab),
           text(tx),
@@ -122,6 +134,7 @@ protected:
         {}
 
         /// print the line
+        /// @param out output stream to write the line to
         void print(ostream & out) const;
 
         /// return the line label (sucah as [1]) and the line text
@@ -144,6 +157,8 @@ protected:
     const char * start();
 
    /// parse an operation (something like [...], e.g. [⎕3])
+   /// @param oper output string receiving the parsed operation text
+   /// @param initial true if this is the first command parse
    const char * parse_oper(UCS_string & oper, bool initial);
 
    /// execute an edit operation
@@ -172,18 +187,23 @@ protected:
 
    /// open an existing function, or create a new one. Return a non-zero
    // error text on error.
+   /// @param name APL name of the function to open
    const char * open_existing_function(const UCS_string & name);
 
    /// return true if \b ucs starts with an axis
+   /// @param ucs UCS string to test for an axis prefix
    static bool is_axis(const UCS_string & ucs);
 
    /// parse [nn.mm] into a LineLabel;
+   /// @param c iterator positioned at the '['; advanced past the ']' on return
    LineLabel parse_lineno(UCS_string::iterator & c);
 
    /// return index of line with label lab, or -1 if not found.
+   /// @param lab the line label to search for
    int find_line(const LineLabel & lab) const;
 
    /// true if line with label lab exists
+   /// @param lab the line label to check
    bool line_exists(const LineLabel & lab) const
       { return find_line(lab) != -1; }
 

@@ -37,18 +37,22 @@ enum LogId
 
 #ifdef cfg_DYNAMIC_LOG_WANTED
 
-#define log_def(val, item, txt) extern bool LOG_ ## item;
-#include "Logging.def"
+#  define log_def(val, item, txt) extern bool LOG_ ## item;
+#  include "Logging.def"
 
+/// @param lid logging category identifier
+/// @param ON true to enable, false to disable the category
 void Log_control(LogId lid, bool ON);
+/// @param lid logging category identifier
 bool Log_status(LogId lid);
+/// @param lid logging category identifier
 const char * Log_info(LogId lid);
 
 #else   // static logging
 
-#define Log_control(x, y)
-#define log_def(val, item, txt) enum { LOG_ ## item = val };
-#include "Logging.def"
+#  define Log_control(x, y)
+#  define log_def(val, item, txt) enum { LOG_ ## item = val };
+#  include "Logging.def"
 
 #endif
 

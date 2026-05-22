@@ -81,6 +81,7 @@ public:
       { return the_workspace.v_Quad_CT.current(); }
 
    /// return element \b pos of the current ⎕FC (pos should be 0..5)
+   /// @param p index into ⎕FC (0..5)
    static APL_Char get_FC(int p)
       { return the_workspace.v_Quad_FC.current()[p]; }
 
@@ -105,6 +106,7 @@ public:
       { return UCS_string(*the_workspace.v_Quad_LX.get_apl_value()); }
 
    /// return style and the current ⎕PP, and ⎕PW
+   /// @param style the print style to embed in the context
    static PrintContext get_PrintContext(PrintStyle style)
       {
         return PrintContext(style, the_workspace.v_Quad_PP.current(),
@@ -124,6 +126,8 @@ public:
       { return the_workspace.v_Quad_PW.current(); }
 
    /// set the current ⎕PW
+   /// @param PW new print width value
+   /// @param loc caller location for diagnostics
    static void set_PW(int PW, const char * loc)
       { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
 
@@ -140,10 +144,12 @@ public:
 
    /// lookup an existing user defined symbol. If not found, create one
    /// (unless this would be a quad symbol)
+   /// @param symbol_name the name of the symbol to look up or create
    static Symbol * lookup_symbol(const UCS_string & symbol_name)
       { return the_workspace.symbol_table.lookup_symbol(symbol_name);}
 
    /// increase the wait time for user input as reported in ⎕AI
+   /// @param diff additional wait time in microseconds
    static void add_wait(APL_time_us diff)
       { the_workspace.v_Quad_AI.add_wait(diff); }
 
@@ -155,18 +161,26 @@ public:
       { return the_workspace.more_error_info; }
 
    /// erase the symbols in \b symbols from the symbol table
+   /// @param out output stream for messages
+   /// @param symbols list of symbol names to erase
    static void erase_symbols(ostream & out, const UCS_string_vector & symbols)
       { the_workspace.symbol_table.erase_symbols(CERR, symbols); }
 
    /// list all symbols (of category \b which) with names in \b from_to
+   /// @param out output stream for the listing
+   /// @param which category of symbols to list
+   /// @param from_to name range filter
    static void list(ostream & out, ListCategory which, UCS_string from_to)
       { the_workspace.symbol_table.list(out, which, from_to); }
 
    /// list all symbols with names in \b buf
+   /// @param out output stream for the listing
+   /// @param buf symbol name to search for
    static ostream & list_symbol(ostream & out, const UCS_string & buf)
       { return the_workspace.symbol_table.list_symbol(out, buf); }
 
    /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
+   /// @param ufun the user function that was expunged
    static void add_expunged_function(const UserFunction * ufun)
       { the_workspace.expunged_functions.push_back(ufun); }
 
@@ -183,6 +197,7 @@ public:
       { return the_workspace.WS_id; }
 
    /// set the name of the current workspace.
+   /// @param new_id new workspace identifier
    static void set_WSID(const LibRef_name & new_id)
       { the_workspace.WS_id = new_id; }
 
@@ -194,29 +209,40 @@ public:
    static bool is_CLEAR_WS();
 
    /// Create a new SI-entry on the SI stack.
+   /// @param fun the executable (function or statement) being pushed
+   /// @param loc caller location for diagnostics
    static void push_SI(const Executable * fun, const char * loc);
 
    /// Remove the current SI-entry from the SI stack.
+   /// @param loc caller location for diagnostics
    static void pop_SI(const char * loc);
 
    /// return the Quad-RL (to be taken % mod)
+   /// @param mod modulus to apply to the random value
    static uint64_t get_RL(uint64_t mod);
 
    /// clear ⎕EM and ⎕ET related errors (error entries on SI up to (including)
    /// the next user-defined function
+   /// @param loc caller location for diagnostics
    static void clear_error(const char * loc);
 
    /// create and execute one immediate execution context
    // (leave with TOK_ESCAPE)
+   /// @param exit_on_error if true, exit the interpreter on error
    static Token immediate_execution(bool exit_on_error);
 
    /// clear the workspace
+   /// @param out output stream for messages
+   /// @param silent if true, suppress informational output
    static void clear_WS(ostream & out, bool silent);
 
    /// clear the SI
+   /// @param out output stream for messages
    static void clear_SI(ostream & out);
 
    /// print the SI on \b out
+   /// @param out output stream for the listing
+   /// @param mode controls which SI details to display
    static void list_SI(ostream & out, SI_mode mode);
 
    /// the topmost SI with parse mode PM_FUNCTION

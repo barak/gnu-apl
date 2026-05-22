@@ -39,10 +39,11 @@ public:
    /** constructor. Set all property values to the defaults that are
        defined in Quad_PLOT.def, and then override those property that
        have different defaults for different lines.
+       @param lnum  0-based plot line number
    **/
    Plot_line_properties(int lnum) :
-# define ldef(_ty,  na,  val, _descr) na(val),
-# include "Quad_PLOT.def"
+#define ldef(_ty,  na,  val, _descr) na(val),
+#include "Quad_PLOT.def"
    line_number(lnum)
    {
      snprintf(legend_name_buffer, sizeof(legend_name_buffer),
@@ -53,29 +54,32 @@ public:
    // define the get_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
-# define ldef(ty,  na,  _val, _descr)     \
+#define ldef(ty,  na,  _val, _descr)     \
    /** return the value of na **/         \
    ty get_ ## na() const   { return na; }
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    // define the set_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
-# define ldef(ty,  na,  _val, _descr)     \
+#define ldef(ty,  na,  _val, _descr)     \
    /** set the  value of na **/           \
    void set_ ## na(ty val)   { na = val; }
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    /// print the line properties
+   /// @param out  output stream
    int print(std::ostream & out) const;
 
    /// return true if \b  matches \b attribute. For a match attribute is
    /// prefix, followed by optional whitespace, terminated by :, -, or space.
+   /// @param prefix     expected property name prefix
+   /// @param attribute  full attribute string to test
    static bool is_line_property(const char * prefix, const char * attribute);
 
 protected:
-# define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
-# include "Quad_PLOT.def"
+#define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
+#include "Quad_PLOT.def"
 
   /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO

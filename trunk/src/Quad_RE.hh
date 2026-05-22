@@ -50,17 +50,25 @@ protected:
       } result_type;    ///< the type of result
 
    /// overloaded Function::eval_AB().
+   /// @param A left argument APL value (regex pattern)
+   /// @param B right argument APL value (subject string)
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_AXB(A, Str0(LOC), B); }
 
    /// overloaded Function::eval_AXB().
+   /// @param A left argument APL value (regex pattern)
+   /// @param X axis/flags specification
+   /// @param B right argument APL value (subject string)
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_B().
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { VALENCE_ERROR; }
 
    /// overloaded Function::eval_XB().
+   /// @param X axis/flags specification
+   /// @param B right argument APL value
    virtual Token eval_XB(Value_P X, Value_P B) const
       { VALENCE_ERROR; }
 
@@ -71,6 +79,7 @@ protected:
       {
         public:
            /// constructor
+           /// @param flags_in UCS string containing flag characters
            Flags(const UCS_string & flags_in);
 
            /// return the flags
@@ -104,22 +113,36 @@ protected:
       };
 
    /// return a result whose format is given by flags
+   /// @param A compiled regular expression
+   /// @param X match flags controlling result format
+   /// @param B subject string to match against
    static Value_P regex_results(const Regexp & A, const Flags & X,
                                 const UCS_string & B);
 
    /// return a result that can be used directly by ⊂ or /
+   /// @param A compiled regular expression
+   /// @param X match flags controlling result format
+   /// @param B subject string to match against
    static Value_P partition_result(const Regexp & A, const Flags & X,
                                    const UCS_string & B);
 
    /// return a result that contains the matched strings
+   /// @param A        compiled regular expression
+   /// @param X        match flags controlling result format
+   /// @param B        subject string to match against
+   /// @param B_offset current offset into B; updated past last match on return
    static Value_P string_result(const Regexp & A, const Flags & X,
                                  const UCS_string & B, ShapeItem & B_offset);
 
    /// return a result that can be used by [] (position and length)
+   /// @param regex    compiled regular expression
+   /// @param X        match flags controlling result format
+   /// @param B        subject string to match against
+   /// @param B_offset current offset into B; updated past last match on return
    static Value_P index_result(const Regexp & regex, const Flags & X,
                                 const UCS_string & B, ShapeItem & B_offset);
 
-# endif
+#endif
 };
 
 #endif

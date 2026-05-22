@@ -51,6 +51,8 @@ using namespace std;
 class XML_Archive
 {
 protected:
+   /// @param of stream for informational output
+   /// @param ef stream for error output
    XML_Archive(ostream & of, ostream & ef)
    : out(of),
      err(ef)
@@ -88,6 +90,9 @@ class XML_Saving_Archive: public XML_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
+   /// @param of stream for informational output
+   /// @param ef stream for error output
+   /// @param filename path of the XML workspace file to write
    XML_Saving_Archive(ostream & of, ostream & ef, const char * filename);
 
    /// destructor
@@ -97,46 +102,59 @@ public:
    enum Vid { INVALID_VID = -1 };
 
    /// write user-defined function \b fun
+   /// @param fun function to serialise
    void save_Function(const Function & fun);
 
    /// write either the name and SI-level of user-defined function or the
    /// id of a system function. Return number of attribute= items written
+   /// @param fun function whose name/id is written
    int save_Function_name(const Function & fun);
 
    /// write the Prefix parser of \b si (and its derived functions)
+   /// @param si state indicator entry whose parser is written
    void save_Parser(const StateIndicator & si);
 
    /// write derived functions cache
+   /// @param fns cache of derived functions to serialise
    void save_Derived(const DerivedFunctionCache & fns);
 
    /// write Symbol \b sym
+   /// @param sym symbol to serialise
    void save_Symbol(const Symbol & sym);
 
    /// write all function
    void save_functions();
 
    /// write all user defined commands
+   /// @param cmds list of user-defined commands to serialise
    void save_user_commands(const std::vector<Command::user_command> & cmds);
 
    /// write SymbolTable \b symtab
+   /// @param symtab symbol table to serialise
    void save_symtab(const SymbolTable & symtab);
 
    /// write StateIndicator entry \b si
+   /// @param si state indicator entry to serialise
    void save_SI_entry(const StateIndicator & si);
 
    /// write Token_loc \b tloc
+   /// @param tloc token location record to serialise
    void save_token_loc(const Token_loc & tloc);
 
    /// write ValueStackItem \b vsi
+   /// @param vsi value stack item to serialise
    void save_vstack_item(const ValueStackItem & vsi);
 
    /// write UCS_string \b str
+   /// @param str Unicode string to serialise
    void save_UCS(const UCS_string & str);
 
    /// write Value \b v except its ravel
+   /// @param vid index of the value in the values array
    XML_Saving_Archive & save_shape(Vid vid);
 
    /// write ravel of Value \b v
+   /// @param vid index of the value whose ravel is written
    XML_Saving_Archive & save_Ravel(Vid vid);
 
    /// write entire workspace
@@ -153,6 +171,8 @@ public:
          {}
 
          /// constructor
+         /// @param v pointer to the APL value
+         /// @param par value ID of the parent, or INVALID_VID for top-level
          _val_par(const Value * v, Vid par)
          : _val(v),
            _par(par),
@@ -169,15 +189,20 @@ public:
          const APL_types::Depth _depth;
 
          /// assign \b other
+         /// @param other source _val_par to copy from
          void operator=(const _val_par & other)
             { new (this) _val_par(other._val, other._par); }
 
          /// compare function for Heapsort::sort()
+         /// @param A left-hand operand
+         /// @param B right-hand operand
          static bool greater(const _val_par & A, const _val_par & B,
                              const void *)
             { return A._val > B._val; }
 
          /// compare function for binary searches.
+         /// @param key value pointer to search for
+         /// @param B element to compare against
          static int compare(const Value * const & key,
                             const _val_par & B, const void *)
             {
@@ -203,15 +228,21 @@ protected:
    int do_indent();
 
    /// return the index of \b val in values
+   /// @param val pointer to the APL value to look up
    Vid find_vid(const Value * val);
 
    /// emit one unicode character (inside "...")
+   /// @param uni Unicode code point to emit
+   /// @param space remaining character budget on the current line
    void emit_unicode(Unicode uni, int & space);
 
    /// emit one ravel cell \b cell
+   /// @param cell ravel cell to emit
+   /// @param space remaining character budget on the current line
    void emit_cell(const Cell & cell, int & space);
 
    /// emit a token value up to (excluding) the '>' of the end token
+   /// @param tok token whose value is emitted
    void emit_token_val(const Token & tok);
 
    /// enter char mode. maybe print ² and return the number of chars printed
@@ -227,9 +258,12 @@ protected:
    void write_XML_header();
 
    /// decrement \b space by length of \b str and return \b str
+   /// @param space character budget counter to decrement
+   /// @param str string whose length is subtracted from space
    static const char * decr(int & space, const char * str);
 
    /// return true if \b uni prints nicely and is allowed in XML "..." strings
+   /// @param uni Unicode code point to test
    static bool xml_allowed(Unicode uni);
 
    /// current indentation level
@@ -251,6 +285,7 @@ protected:
    vector<const Function *> saved_Functions;
 
    /// return true iff (the definition of) \b fun was already saved.
+   /// @param fun function to check for prior serialisation
    bool is_saved(const Function * fun) const;
 
    /// \b true iff )SAVE was successful
@@ -262,6 +297,10 @@ class XML_Loading_Archive: public XML_Archive
 {
 public:
    /// constructor: remember file name and workspace
+   /// @param of stream for informational output
+   /// @param ef stream for error output
+   /// @param _filename path of the XML workspace file to read
+   /// @param dump_fd file descriptor for optional hex dump (-1 if unused)
    XML_Loading_Archive(ostream & of, ostream & ef, const char * _filename,
                        int & dump_fd);
 
@@ -272,6 +311,7 @@ public:
    bool is_open() const   { return file_start != 0; }
 
    /// read an entire workspace, throw DOMAIN_ERROR on failure
+   /// @param silent suppress progress messages when true
    void read_Workspace(bool silent);
 
    /// check compatibility information in the workspace and maybe warn the
@@ -279,6 +319,8 @@ public:
    void check_compatibility();
 
    /// set copying and maybe set protection
+   /// @param prot true if protection (⎕PCOPY) is requested
+   /// @param allowed names of objects to copy; empty means copy all
    void set_protection(bool prot, const UCS_string_vector & allowed)
       { copying = true;   protection = prot;   allowed_objects = allowed;
         have_allowed_objects = allowed_objects.size() > 0; }
@@ -287,12 +329,14 @@ public:
    void reset();
 
    /// skip to tag \b tag, return EOF if end of file
+   /// @param tag XML tag name to search for
    bool skip_to_tag(const char * tag);
 
    /// read vids of top-level variables
    void read_vids();
 
    /// move to next tag, return true if EOF
+   /// @param loc caller location for diagnostics
    bool next_tag(const char * loc);
 
 protected:
@@ -307,36 +351,52 @@ protected:
 
    /// read one or more Cell(s) from input into the ravel of Z;
    /// return the  UTF8 * after the cells.
+   /// @param Z target APL value whose ravel receives the cells
+   /// @param input pointer to the encoded cell data in the file buffer
    const UTF8 * read_Cells(Value & Z, const UTF8 * input);
 
    /// input is a UTF8-encoded sequence of bytes, terminated with ".
    /// UTF8-decode the sequence, thereby removing the escape tagging
    /// with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and \n.
    /// return the  UTF8 * pointing to the terminating ".
+   /// @param ucs output string that receives the decoded Unicode characters
+   /// @param input pointer to the UTF-8 encoded attribute value in the file buffer
    const UTF8 * read_XML_string(UCS_string & ucs, const UTF8 * input);
 
    /// read next Ravel element
    void read_Ravel();
 
    /// read next unused-name element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to update
    void read_unused_name(int d, Symbol & symbol);
 
    /// read next Variable element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the variable binding
    void read_Variable(int d, Symbol & symbol);
 
    /// read next Function element
    void read_Function();
 
    /// read next Function element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the function binding
    void read_Function(int d, Symbol & symbol);
 
    /// read next derived function
+   /// @param si state indicator entry that owns the derived function
+   /// @param lev SI nesting level of the derived function
    void read_Derived(StateIndicator & si, int lev);
 
    /// read next Label element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the label value
    void read_Label(int d, Symbol & symbol);
 
    /// read next Shared-Variable element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the shared-variable binding
    void read_Shared_Variable(int d, Symbol & symbol);
 
    /// read next Symbol element
@@ -355,9 +415,12 @@ protected:
    void read_StateIndicator();
 
    /// read next StateIndicator entry
+   /// @param level nesting depth of the SI entry to read
    void read_SI_entry(int level);
 
    /// read parsers in SI entry
+   /// @param si state indicator entry to populate with parser data
+   /// @param lev SI nesting level being restored
    void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
@@ -370,12 +433,14 @@ protected:
    const Executable * read_SI_UserFunction();
 
    /// read a lambda
+   /// @param lambda_name UTF-8 encoded name of the lambda to read
    Executable * read_lambda(const UTF8 * lambda_name);
 
    /// read an UCS string
    UCS_string read_UCS();
 
    /// read a token
+   /// @param tloc token location record to populate
    bool read_Token(Token_loc & tloc);
 
    /// read a system function with attribute id_prefix-id or a user defined
@@ -383,6 +448,7 @@ protected:
    cFunction_P read_Function_name();
 
    /// find a lambda in the current SI entry
+   /// @param lambda Unicode name of the lambda to locate
    cFunction_P find_lambda(const UCS_string & lambda);
 
    /// return true iff there is more data in the file
@@ -400,9 +466,12 @@ protected:
    bool get_uni();
 
    /// return true iff \b tagname starts with prefix
+   /// @param prefix XML tag name prefix to test
    bool is_tag(const char * prefix) const;
 
    /// check that is_tag(prefix) is true and print error info if not
+   /// @param prefix expected XML tag name prefix
+   /// @param loc caller location for diagnostics
    void expect_tag(const char * prefix, const char * loc) const;
 
    /// print current tag
@@ -410,30 +479,44 @@ protected:
 
    /// find attribute \b att_name and return: a pointer to its value if found,
    /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
    const UTF8 * find_attr(const char * att_name, bool optional);
 
    /// find mandatory attribute \b att_name. Return a pointer to its value
    ///  if found and throw DOMAIN ERROR if not.
+   /// @param att_name XML attribute name that must be present
    const UTF8 * find_mandatory_attr(const char * att_name)
       { return find_attr(att_name, false); }
 
    /// find optional attribute \b att_name. Return a pointer to its value
    /// if found and 0 if not.
+   /// @param att_name XML attribute name to look up
    const UTF8 * find_optional_attr(const char * att_name)
       { return find_attr(att_name, true); }
 
    /// return integer value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
    int64_t find_int_attr(const char * att_name, bool optional, int base);
 
    /// return Fid value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
    Fid find_Fid_attr(const char * att_name, bool optional, int base)
       { return Fid(find_int_attr(att_name, optional, base)); }
 
-   /// return Fid value of attribute \b att_name
+   /// return Vid value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
    Vid find_Vid_attr(const char * att_name, bool optional, int base)
       { return Vid(find_int_attr(att_name, optional, base)); }
 
    /// return floating point value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
    APL_Float find_float_attr(const char * att_name);
 
    /// the length of the workspace file
@@ -516,13 +599,18 @@ protected:
    std::vector<fun_map> fid_to_function;
 
    /// return fun_map for fid, or 0 if not found.
+   /// @param fid function ID from the saved workspace
    fun_map * find_fun_map(Fid fid);
 
    /// return function for fid, or 0 if not found.
+   /// @param fid function ID from the saved workspace
    cFunction_P find_function(Fid fid);
 
    /// add fid and function to find_fun_map. Either fid must be new, or else
    /// an existing fid must have its new_fun == 0 (forward declaration).
+   /// @param fid function ID from the saved workspace
+   /// @param new_fun resolved function pointer in the loading workspace
+   /// @param loc caller location for diagnostics
    void add_fid_function(Fid fid, cFunction_P new_fun, const char * loc);
 
    /// properties of a derived function
@@ -542,6 +630,7 @@ protected:
       vector<_derived_todo> derived_todos;
 
    /// instantiate the derived functions in \b derived_todos
+   /// @param allocate true to allocate new derived functions, false to link them
    void instantiate_derived_functions(bool allocate);
 };
 //----------------------------------------------------------------------------

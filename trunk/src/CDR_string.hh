@@ -50,6 +50,7 @@ struct CDR_header
       { return get_be32(utf8P(&be_nelm)); }
 
    /// convert big endian 32 bit value to 32 bit host value (== ntohl())
+   /// @param data pointer to 4 big-endian bytes
    static uint32_t get_be32(const uint8_t * data)
       {
         uint32_t ret  =  *data++;  ret <<= 8;
@@ -69,6 +70,8 @@ public:
    {}
 
    /// Constructor: CDR structure from uint8_t * and length
+   /// @param data pointer to raw CDR bytes
+   /// @param len number of bytes to copy
    CDR_string(const uint8_t * data, int len)
       { loop(l, len)   push_back(*data++); }
 
@@ -121,6 +124,8 @@ public:
       }
 
    /// print properties
+   /// @param out output stream to print to
+   /// @param loc optional caller location for diagnostics
    void debug(ostream & out, const char * loc = 0) const
       {
         const int error = check();
@@ -135,6 +140,7 @@ public:
 
 protected:
    /// return 4 bytes of the header (the header is always big endian)
+   /// @param offset byte offset into the CDR record
    uint32_t get_4(unsigned int offset) const
       { return CDR_header::get_be32(utf8P(&(*this)[0] + offset)); }
 };

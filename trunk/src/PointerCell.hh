@@ -37,13 +37,21 @@ class PointerCell : public Cell
 {
 public:
    /// constructor: a cell containing nested sub-array \b val.
+   /// @param val pointer to the nested APL value to store
+   /// @param cell_owner the APL value that owns this cell
    PointerCell(Value * val, Value & cell_owner);
 
    /// constructor: a cell containing nested sub-array \b val where val
    /// is allowed to be a simple scalar (used only in ScalarFunction.cc)
+   /// @param val pointer to the nested APL value to store
+   /// @param cell_owner the APL value that owns this cell
+   /// @param magic magic number permitting simple-scalar values
    PointerCell(Value * val, Value & cell_owner, uint32_t magic);
 
    /// overloaded Cell::init_other
+   /// @param other raw memory for the destination cell
+   /// @param cell_owner the APL value that will own the new cell
+   /// @param loc caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const;
 
@@ -57,18 +65,24 @@ public:
    virtual bool is_member_anchor() const;
 
    /// overloaded Cell::greater()
+   /// @param other the cell to compare against
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal()
+   /// @param other the cell to compare against
+   /// @param qct comparison tolerance (⎕CT)
    virtual bool equal(const Cell & other, double qct) const;
 
    /// compare \b this with other, throw DOMAIN ERROR on illegal comparisons
+   /// @param other the cell to compare against
    virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded Cell::release()
+   /// @param loc caller location for diagnostics
    virtual void release(const char * loc);
 
    /// the Quad_CR representation of this cell
+   /// @param pcx print context controlling formatting options
    virtual PrintBuffer character_representation(const PrintContext &pcx) const;
 
    /// return the owner of this PointerCell
@@ -76,10 +90,12 @@ public:
       { return value.pval.owner; }
 
    /// isolate value.pval.valp (make \b value.pval the sole owner)
+   /// @param loc caller location for diagnostics
    void isolate(const char * loc)
       { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
 
    /// isolate this value and all of its sub values
+   /// @param loc caller location for diagnostics
    void isolate_deep(const char * loc);
 
 protected:

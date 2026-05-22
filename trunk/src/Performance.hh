@@ -32,19 +32,19 @@
 
 #if defined(cfg_PERFORMANCE_COUNTERS_WANTED)
 
-# define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
-# define PERFORMANCE_END(statistics, counter, len) \
+#  define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
+#  define PERFORMANCE_END(statistics, counter, len) \
    Performance::statistics.add_sample(cycle_counter() - counter, len);
-# define CELL_PERFORMANCE_END(get_stat, counter, subseq)   \
+#  define CELL_PERFORMANCE_END(get_stat, counter, subseq)   \
    { const uint64_t end = cycle_counter();                 \
      CellFunctionStatistics * stat = get_stat;             \
      if (stat)   stat->add_sample(end - counter, subseq); }
 
 #else
 
-# define PERFORMANCE_START(counter)
-# define PERFORMANCE_END(statistics, counter, len)
-# define CELL_PERFORMANCE_END(get_stat, counter, subseq)
+#  define PERFORMANCE_START(counter)
+#  define PERFORMANCE_END(statistics, counter, len)
+#  define CELL_PERFORMANCE_END(get_stat, counter, subseq)
 
 #endif
 
@@ -97,6 +97,9 @@ public:
    Statistics_record()   { reset(); }
 
    /// constructor
+   /// @param cnt initial sample count
+   /// @param da initial sum of sample values
+   /// @param da2 initial sum of squared sample values
    Statistics_record(uint64_t cnt, uint64_t da, double da2)
    : count(cnt),
      data(da),
@@ -112,6 +115,7 @@ public:
       }
 
    /// add one sample
+   /// @param val cycle count of the sample to add
    void add_sample(uint64_t val)
       {
         ++count;
@@ -120,9 +124,11 @@ public:
       }
 
    /// print count, data, and data2
+   /// @param out output stream to write to
    void print(ostream & out);
 
    /// write count, data, and data2 to file
+   /// @param outf output file stream to write to
    void save_record(ostream & outf);
 
    /// return the number of samples
@@ -142,10 +148,14 @@ public:
       { return data2; }
 
    /// the average of \b count items with sum \b sum
+   /// @param sum total of all sample values
+   /// @param count number of samples
    static uint64_t average(uint64_t sum, uint64_t count)
       { return count ? sum/count : 0; }
 
    /// print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)
+   /// @param out output stream to write to
+   /// @param num value to print
    static void print5(ostream & out, uint64_t num);
 
 protected:
@@ -164,6 +174,7 @@ class Statistics
 {
 public:
    /// constructor
+   /// @param _id statistics identifier
    Statistics(Pfstat_ID _id)
   : id(_id)
    {}
@@ -172,9 +183,12 @@ public:
    virtual ~Statistics();
 
    /// print statistics
+   /// @param out output stream to write to
    virtual void print(ostream & out) = 0;
 
    /// write statistics to file
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name) = 0;
 
    /// reset \b this statistics
@@ -193,6 +207,7 @@ public:
       { return get_name(id); }
 
    /// return the name of the statistics with ID \b id
+   /// @param id statistics identifier to look up
    static const char * get_name(Pfstat_ID id);
 
 protected:
@@ -205,6 +220,7 @@ class FunctionStatistics : public Statistics
 {
 public:
    /// constructor: FunctionStatistics with ID \b id
+   /// @param id statistics identifier for this function
    FunctionStatistics(Pfstat_ID id)
    : Statistics(id)
    { reset(); }
@@ -220,6 +236,8 @@ public:
    virtual void print(ostream & out);
 
    /// overloaded Statistics::save_data()
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name);
 
    /// return the (CPU-)cycles statistics
@@ -231,6 +249,8 @@ public:
       { return vec_cycles; }
 
    /// add a sample
+   /// @param cycles CPU cycle count for this sample
+   /// @param veclen vector length (number of elements processed)
    void add_sample(uint64_t cycles, uint64_t veclen)
       {
          vec_cycles.add_sample(cycles);
@@ -250,6 +270,7 @@ class CellFunctionStatistics : public Statistics
 {
 public:
    /// constructor: reset this statistics
+   /// @param _id statistics identifier for this cell function
    CellFunctionStatistics(Pfstat_ID _id)
    : Statistics(_id)
    { reset(); }
@@ -262,6 +283,8 @@ public:
         }
 
    /// add a sample to \b this statistics
+   /// @param val CPU cycle count for this sample
+   /// @param subseq true if this is a subsequent (not first) execution
    void add_sample(uint64_t val, bool subseq)
       {
          if (subseq)   subsequent.add_sample(val);
@@ -269,9 +292,12 @@ public:
        }
 
    /// overloaded Statistics::print()
+   /// @param out output stream to write to
    virtual void print(ostream & out);
 
    /// overloaded Statistics::save_data()
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name);
 
    /// return the record for the first executions
@@ -319,15 +345,21 @@ class Performance
 public:
 
    /// return statistics object for ID \b id
+   /// @param id statistics identifier to look up
    static Statistics * get_statistics(Pfstat_ID id);
 
    /// return statistics type of ID \b id
+   /// @param id statistics identifier to query
    static int get_statistics_type(Pfstat_ID id);
 
    /// print all counters
+   /// @param which selects which counters to print
+   /// @param out output stream to write to
    static void print(Pfstat_ID which, ostream & out);
 
    /// write all counters to .def file
+   /// @param out output stream for human-readable output
+   /// @param out_file output stream for the .def file
    static void save_data(ostream & out, ostream & out_file);
 
    /// reset all counters
@@ -382,6 +414,7 @@ class OptmizationStatistics
 {
 public:
    /// return the value of counter \b opt
+   /// @param opt optimization identifier to query
    static int64_t get(Optimization_ID opt)
       {
         return optimization_counters[opt];
@@ -394,6 +427,7 @@ public:
       }
 
    /// increment counter \b opt
+   /// @param opt optimization identifier whose counter to increment
    static void count(Optimization_ID opt)
       {
         ++optimization_counters[opt];

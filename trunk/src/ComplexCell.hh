@@ -44,12 +44,18 @@ class ComplexCell : public NumericCell
 
 public:
    /// Construct an complex number cell from a complex number
+   /// @param c the complex value to store
    ComplexCell(APL_Complex c);
 
    /// Construct an complex number cell from real part \b r and imag part \b i.
+   /// @param r real part of the complex number
+   /// @param i imaginary part of the complex number
    ComplexCell(APL_Float r, APL_Float i);
 
    /// overloaded Cell::init_other
+   /// @param other pointer to uninitialised storage for the new cell
+   /// @param cell_owner APL value that owns the new cell
+   /// @param loc caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   ComplexCell(value.cval[0], value.cval[1]); }
 
@@ -61,99 +67,146 @@ public:
       { return isfinite(value.cval[0]) && isfinite(value.cval[1]); }
 
    /// overloaded Cell::greater().
+   /// @param other cell to compare against
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal().
+   /// @param other cell to compare against
+   /// @param qct comparison tolerance (⎕CT)
    virtual bool equal(const Cell & other, double qct) const;
 
    /// overloaded Cell::compare()
+   /// @param other cell to compare against
    virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_ceiling(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_conjugate(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_direction(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_exponential(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_factorial(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_floor(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_magnitude(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_nat_log(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_negative(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_pi_times(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_pi_times_inverse(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_reciprocal(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_roll(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_subtract(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_divide(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_equal(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell (the base)
    virtual ErrorCode bif_logarithm(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell (the base)
    virtual ErrorCode bif_power(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_maximum(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_minimum(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell (the modulus)
    virtual ErrorCode bif_residue(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell (circle function selector)
    virtual ErrorCode bif_circle_fun(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell (circle function selector)
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const;
 
    /// the Quad_CR representation of this cell.
+   /// @param pctx print context controlling formatting
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
    /// return true iff this cell needs scaling (exponential format) in pctx.
+   /// @param pctx print context controlling formatting
    virtual bool need_scaling(const PrintContext &pctx) const;
 
    /// overloaded Cell::bif_add_inverse()
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_multiply_inverse()
+   /// @param Z uninitialised result cell to be filled in
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
 
    /// the square of the magnitude of aJb (= a² + b²)
@@ -161,13 +214,19 @@ public:
       { return value.cval[0] * value.cval[0] + value.cval[1] * value.cval[1]; }
 
    /// the square of the magnitude (a² + b² for aJb)
+   /// @param A complex number whose magnitude squared is computed
    static APL_Float mag2(APL_Complex A)
       { return A.real() * A.real() + A.imag() * A.imag(); }
 
    /// the lanczos approximation for gamma(x + iy)
+   /// @param x real part of the argument
+   /// @param y imaginary part of the argument
    static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
    /// compute circle function \b fun
+   /// @param Z uninitialised result cell to be filled in
+   /// @param fun circle function selector (APL left argument to ○)
+   /// @param b right argument as complex number
    static ErrorCode do_bif_circle_fun(Cell * Z, int fun, APL_Complex b);
 
 #ifndef __LIBAPL__
@@ -175,11 +234,16 @@ public:
 #endif // __LIBAPL__
 
    /// initialize the (un-initialized) Cell *Z to complex r + ij
+   /// @param Z uninitialised cell to construct in place
+   /// @param r real part of the complex number
+   /// @param j imaginary part of the complex number
    static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
       { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
 
 protected:
    /// initialize the (un-initialized) Cell *Z to complex cpx
+   /// @param Z uninitialised cell to construct in place
+   /// @param cpx complex value to store
    static ErrorCode zC(Cell * Z, APL_Complex cpx)
       { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
 
@@ -229,9 +293,11 @@ protected:
    virtual bool is_near_int64_t() const;
 
    /// overloaded Cell::bif_near_int64_t()
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_near_int64_t(Cell * Z) const;
 
    /// overloaded Cell::bif_within_quad_CT()
+   /// @param Z uninitialised result cell to be filled in
    virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
 
    /// overloaded Cell::is_near_zero()

@@ -40,6 +40,7 @@ class SystemVariable : public Symbol
 {
 public:
    /// Construct a \b SystemVariable with \b Id \b id
+   /// @param id the identifier of this system variable
    SystemVariable(Id id)
    : Symbol(id)
    {}
@@ -49,21 +50,30 @@ public:
       { return Token(ID::get_token_tag(get_Id()), this); }
 
    /// overloaded Symbol::print().
+   /// @param out output stream to print to
    virtual ostream & print(ostream & out) const;
 
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::get_attributes().
+   /// @param mode attribute mode selector
+   /// @param Z value to receive the attributes
    virtual void get_attributes(int mode, Value & Z) const;
 
    /// system vars cannot be expunged.
    virtual int expunge() { return 0; }
 
    /// do not allow (...⎕xxx)←...
+   /// @param loc caller location for diagnostics
    virtual Token resolve_lv(const char * loc)
       { SYNTAX_ERROR; }
 };
@@ -77,6 +87,7 @@ class NL_SystemVariable : public SystemVariable
 public:
 public:
    /// Constructor.
+   /// @param id the identifier of this system variable
    NL_SystemVariable(Id id)
    : SystemVariable(id)
    {}
@@ -85,12 +96,15 @@ protected:
    virtual void push() {}
 
    /// overloaded Symbol::push_label()
+   /// @param label the function line number label to push
    virtual void push_label(Function_Line label) {}
 
    /// overloaded Symbol::push_function()
+   /// @param function pointer to the function to push
    virtual void push_function(cFunction_P function) {}
 
    /// overloaded Symbol::push_value()
+   /// @param B APL value to push
    virtual void push_value(Value_P B) {}
 
    /// overloaded Symbol::pop()
@@ -105,21 +119,29 @@ class RO_SystemVariable : public NL_SystemVariable
 {
 public:
    /// Constructor.
+   /// @param id the identifier of this system variable
    RO_SystemVariable(Id id)
    : NL_SystemVariable(id)
    {}
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc) {}
 
    /// overloaded Symbol::assign_indexed()
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B) {}
 
    /// overloaded Symbol::is_readonly()
    virtual bool is_readonly() const   { return true; }
 
    /// overloaded Symbol:resolve_left(). Invalid for read-only variables
+   /// @param token token to resolve into
+   /// @param PC program counter reference
    virtual void resolve_left(Token & token, Function_PC & PC) const
       { MORE_ERROR() << "Assignment to read-only system variable "
                      << get_name();
@@ -128,6 +150,8 @@ protected:
    /// overloaded Symbol::resolve_right(). Since this variable is read-only,
    /// push(), pop(), and assign() do nothing, and therefore we may call
    /// get_apl_value() directly.
+   /// @param token token to resolve into
+   /// @param PC program counter reference
    virtual void resolve_right(Token & token, Function_PC & PC) const
       { new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
 };
@@ -143,6 +167,7 @@ public:
    Quad_AI();
 
    /// increase the time waiting for user input
+   /// @param diff elapsed time to add (in microseconds)
    void add_wait(APL_time_us diff)
    { user_wait += diff; }
 
@@ -183,6 +208,7 @@ public:
    Quad_AV();
 
    /// return ⎕AV[pos - ⎕IO]
+   /// @param pos one-origin index into ⎕AV
    static Unicode indexed_at(uint32_t pos);
 
    /// a static ⎕AV
@@ -206,6 +232,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
@@ -268,12 +297,19 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::assign_indexed().
+   /// @param IX index expression
+   /// @param B the APL value to assign
    virtual void assign_indexed(const IndexExpr & IX, Value_P B);
 };
 //----------------------------------------------------------------------------
@@ -294,6 +330,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
@@ -315,10 +354,14 @@ public:
    Quad_L();
 
    /// overloaded Symbol::save()
+   /// @param out output stream to save to
    virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
@@ -352,9 +395,14 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B) {}
 };
 //----------------------------------------------------------------------------
@@ -375,6 +423,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
@@ -401,6 +452,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
@@ -441,9 +495,14 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::push()
@@ -476,6 +535,9 @@ public:
       { return get_first_cell()->get_int_value(); }
 
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
 protected:
@@ -498,12 +560,19 @@ public:
    Quad_Quad();
 
    /// overloaded Symbol::resolve_left().
+   /// @param token token to resolve into
+   /// @param PC program counter reference
    virtual void resolve_left(Token & token, Function_PC & PC) const   { }   // ⎕←xxx
 
    /// overloaded Symbol::resolve_right().
+   /// @param token token to resolve into
+   /// @param PC program counter reference
    virtual void resolve_right(Token & token, Function_PC & PC) const;
 
 protected:
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // should never be called due to overloaded resolve()
@@ -522,10 +591,15 @@ public:
    Quad_QUOTE();
 
    /// end of ⍞ (output, but no input: clear prompt)
+   /// @param with_LF whether to append a line-feed after clearing prompt
+   /// @param loc caller location for diagnostics
    static void done(bool with_LF, const char * loc);
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
@@ -546,10 +620,14 @@ public:
    Quad_R();
 
    /// overloaded Symbol::save()
+   /// @param out output stream to save to
    virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
@@ -568,12 +646,19 @@ public:
       { assign(Value_P(), false, LOC); }
 
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
+   /// @param X index specification
+   /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::assign_indexed()
+   /// @param IDX index expression
+   /// @param B the APL value to assign
    virtual void assign_indexed(const IndexExpr & IDX, Value_P B);
 
    virtual Value_P get_apl_value() const;
@@ -645,6 +730,7 @@ public:
    int64_t get_offset() const   { return offset_seconds; }
 
    /// set the timezone offset
+   /// @param offset timezone offset in seconds from GMT
    void set_offset(int offset)
       { offset_seconds = offset; }
 
@@ -652,10 +738,15 @@ public:
    static int compute_offset();
 
    /// print e.g. 2017-05-17  15:09:12 (GMT+2) to out (no trailing endl)
+   /// @param out output stream to print to
+   /// @param when timestamp to print (in microseconds since epoch)
    ostream & print_timestamp(ostream & out, APL_time_us when) const;
 
 protected:
    /// overloaded Symbol::assign().
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
@@ -705,10 +796,14 @@ public:
    Quad_X();
 
    /// overloaded Symbol::save()
+   /// @param out output stream to save to
    virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param B the APL value to assign
+   /// @param clone whether to clone B before assigning
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().

@@ -39,6 +39,7 @@
 class PipePointer
 {
 public:
+   /// @param fptr the pipe FILE pointer to manage
    PipePointer(FILE * fptr) : ptr(fptr) {}
    ~PipePointer()   { close(); }
 
@@ -67,8 +68,10 @@ public:
 
 #if HAVE_MMAN_H
 
-#include <sys/mman.h>
+#  include <sys/mman.h>
 
+   /// @param fd open file descriptor to map
+   /// @param len number of bytes to map
    static inline const uint8_t * mmap(int fd, int len)
       {
       const void * vp = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
@@ -76,11 +79,15 @@ public:
          return reinterpret_cast<const uint8_t *>(vp);
       }
 
+   /// @param data pointer returned by mmap()
+   /// @param len number of bytes originally mapped
    static inline void munmap(const uint8_t * data, int len)
       { munmap(data, len); }
 
 #else // ! HAVE_MMAN_H =======================================================
 
+   /// @param fd open file descriptor to read
+   /// @param len number of bytes to read
    static inline const uint8_t * mmap(int fd, size_t len)
       {
          if (uint8_t * buffer = new uint8_t[len + 1])
@@ -94,15 +101,23 @@ public:
          return 0;
       }
 
+   /// @param data pointer returned by mmap()
+   /// @param len number of bytes originally allocated (unused on this platform)
    static inline void munmap(const uint8_t * data, size_t len)
       { delete [] data; }
 
 #endif // ! MINGW_SRC
 
    /// invasive memory test
+   /// @param base start address of the memory region to probe
+   /// @param blocks number of 64-bit blocks to probe
+   /// @param verbosity level of diagnostic output
    static int64_t probe_memory(uint64_t * base, uint64_t blocks, int verbosity);
 };
 //---------------------------------------------------------------------------
+/// open a pipe for reading or writing
+/// @param command shell command string to execute
+/// @param mode open mode passed to popen() (e.g. "r" or "w")
 inline FILE * sys_popen(const char * command, const char * mode)
 {
 FILE * file = popen(command, mode);
@@ -114,6 +129,8 @@ FILE * file = popen(command, mode);
    return file;
 }
 //---------------------------------------------------------------------------
+/// close a pipe opened with sys_popen()
+/// @param stream FILE pointer returned by sys_popen()
 inline int sys_pclose(FILE *stream)
 {
 const int ret = pclose(stream);
@@ -134,6 +151,7 @@ public:
 
 
    /// constructor
+   /// @param command shell command to open as a readable pipe
    PipeReader(const char * command)
       {
         fp = sys_popen(command, "r");
@@ -153,12 +171,16 @@ public:
    bool operator +() const
       { return fp != 0; }
 
+   /// @param buffer destination buffer for the line
+   /// @param buflen capacity of buffer in bytes
    char * fgets(char * buffer, int buflen) const
       {
         if (fp)   return ::fgets(buffer, buflen, fp);
         return 0;
       }
 
+   /// @param buffer destination buffer for the data
+   /// @param buflen maximum number of bytes to read
    size_t fread(char * buffer, int buflen) const
       {
         if (fp)   return ::fread(buffer, 1, buflen, fp);
@@ -194,18 +216,21 @@ public:
 
 
    /// constructor: from alrady open FILE *
+   /// @param file already-open FILE pointer to manage
    FileReader(FILE * file)
       {
         fp = file;
       }
 
    /// constructor: from open fd
+   /// @param fd open file descriptor to wrap
    FileReader(int fd)
       {
         fp = fdopen(fd, "r");
       }
 
    /// constructor: from filename
+   /// @param filename path of the file to open for reading
    FileReader(const char * filename)
       {
         fp = fopen(filename, "r");
@@ -228,12 +253,16 @@ public:
    bool operator +() const
       { return fp != 0; }
 
+   /// @param buffer destination buffer for the line
+   /// @param buflen capacity of buffer in bytes
    char * fgets(char * buffer, int buflen) const
       {
         if (fp)   return ::fgets(buffer, buflen, fp);
         return 0;
       }
 
+   /// @param buffer destination buffer for the data
+   /// @param buflen maximum number of bytes to read
    size_t fread(char * buffer, int buflen) const
       {
         if (fp)   return ::fread(buffer, 1, buflen, fp);
@@ -259,18 +288,23 @@ public:
 
 
    /// constructor: from alrady open FILE *
+   /// @param file already-open FILE pointer to manage
    FileWriter(FILE * file)
       {
         fp = file;
       }
 
    /// constructor: from open fd
+   /// @param fd open file descriptor to wrap
+   /// @param mode fopen-style open mode string
    FileWriter(int fd, const char * mode = "w")
       {
         fp = fdopen(fd, mode);
       }
 
    /// constructor: from filename
+   /// @param filename path of the file to open for writing
+   /// @param mode fopen-style open mode string
    FileWriter(const char * filename, const char * mode = "w")
       {
         fp = fopen(filename, mode);
@@ -293,6 +327,8 @@ public:
    bool operator +() const
       { return fp != 0; }
 
+   /// @param buffer source data to write
+   /// @param bufsize number of bytes to write
    size_t fwrite(const void * buffer, size_t bufsize)
       { if (fp)   return ::fwrite(buffer, 1, bufsize, fp);
         return 0;

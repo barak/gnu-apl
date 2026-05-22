@@ -30,6 +30,7 @@
 class CinOut_filebuf : public filebuf
 {
    /// overloaded filebuf::overflow
+   /// @param c character to overflow into the buffer
    virtual int overflow(int c);
 };
 extern CinOut_filebuf CIN_filebuf;
@@ -39,6 +40,7 @@ class ErrOut_filebuf : public filebuf
 {
 protected:
    /// overloaded filebuf::overflow()
+   /// @param c character to overflow into the buffer
    virtual int overflow(int c);
 
 public:
@@ -50,6 +52,7 @@ public:
    /// destructor
    ~ErrOut_filebuf()   { used = false; }
    /// set LF → CRLF expansion mode
+   /// @param on true to enable LF→CRLF expansion
    bool LF_to_CRLF(bool on)
       {
         const int ret = expand_LF;
@@ -82,6 +85,7 @@ class DiffOut : public filebuf
 {
 public:
    /// constructor
+   /// @param _errout true for error-message stream, false for normal APL output
    DiffOut(bool _errout)
    : aplout(""),
      errout(_errout),
@@ -93,15 +97,20 @@ public:
    { aplout.clear(); }
 
    /// set LF → CRLF expansion mode
+   /// @param on non-zero to enable LF→CRLF expansion
    int LF_to_CRLF(int on)
       { const int old = expand_LF;   expand_LF = on;   return old; }
 
 protected:
    /// overloaded filebuf::overflow()
+   /// @param c character to overflow into the buffer
    virtual int overflow(int c);
 
    /// return true iff 0-terminated strings apl and ref differ
    /// at \b pos
+   /// @param apl APL output string to compare
+   /// @param ref reference string to compare against
+   /// @param pos starting position; updated to first difference on return
    bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
 
    /// a buffer for one line of APL output

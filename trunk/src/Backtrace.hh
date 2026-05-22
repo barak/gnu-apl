@@ -30,6 +30,8 @@
 #include "PrintOperator.hh"
 
 /// (maybe) init a dwarf object for the apl binary
+/// @param bin_dir   directory containing the apl binary
+/// @param bin_file  filename of the apl binary
 extern void init_DWARF(const char * bin_dir, const char * bin_file);
 
 /// show the current function call stack.
@@ -37,16 +39,23 @@ class Backtrace
 {
 public:
    /// show the current function call stack.
+   /// @param file  source filename where the call is made
+   /// @param line  source line number where the call is made
    static void show(const char * file, int line);
 
    /// show the current caller (only valid while being called)
+   /// @param offset  stack frame offset from the current call
    static const char * caller(int offset);
 
 protected:
    /// demangle a line returned by backtrace_symbols()
+   /// @param result      output buffer for demangled name
+   /// @param result_max  size of the output buffer
+   /// @param buf         raw mangled symbol string from backtrace_symbols()
    static int demangle_line(char * result, size_t result_max, const char * buf);
 
    /// find the source for PC \b pc
+   /// @param pc  program counter value to look up
    static const char * find_src(int64_t pc);
 
    /// read the file apl.lines (if present) and set main_offset from the
@@ -54,9 +63,13 @@ protected:
    static void read_apl_lines_file();
 
    /// print one item in the backtrace to cerr. NOTE: modifies s.
+   /// @param idx  index (depth) of the stack frame
+   /// @param s    mutable backtrace symbol string for this frame
    static void show_item(int idx, char * s);
 
    /// print the dwarf info of one item in the backtrace to cerr.
+   /// @param idx  index (depth) of the stack frame
+   /// @param s    backtrace symbol string for this frame
    static void show_dwarf(int idx, const char * s);
 
    /// a mapping from PCs to source lines.
@@ -70,6 +83,8 @@ protected:
    static std::vector<PC_src> pc_2_src;
 
    /// compare PCs (helper for binary search)
+   /// @param key  program counter to search for
+   /// @param pc2  PC-to-source entry to compare against
    static int pc_cmp(const int64_t & key,
                      const Backtrace::PC_src & pc2, const void *);
 };

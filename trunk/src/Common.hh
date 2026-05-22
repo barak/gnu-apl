@@ -36,11 +36,11 @@
 // exist on the platform
 
 #ifdef HAVE_UNISTD_H
-# include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #ifdef HAVE_DIRENT_H
-# include <dirent.h>   // typedefs DIR as struct __dirstream
+#  include <dirent.h>   // typedefs DIR as struct __dirstream
 #else
   typedef struct __dirstream DIR;
 #endif
@@ -53,17 +53,17 @@
 #include <sys/time.h>   // for gettimeofday()
 
 #ifndef RLIM_INFINITY   // Raspberry
-#define RLIM_INFINITY (~rlim_t(0))
+#  define RLIM_INFINITY (~rlim_t(0))
 #endif
 
 #ifndef cfg_MAX_RANK_WANTED
-# define cfg_MAX_RANK_WANTED 8
+#  define cfg_MAX_RANK_WANTED 8
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
 #ifdef erase
-#undef erase
+#  undef erase
 #endif
 
 #include <complex>
@@ -102,13 +102,17 @@ extern bool gtk_init_done;
 /// that depend on the command line arguments. Note that different
 /// build targets (main.cc, libapl.cc, and python_apl.cc) provide their own
 /// \b init_modules() function.
+/// @param argv0        path to the interpreter executable (argv[0])
+/// @param log_startup  true to log startup progress to CERR
 extern void init_modules(const char * argv0, bool log_startup);
 
 /// initialize those modules (Output, Svar_DB, LineInput, and Parallel)
 /// that are independent of the command line arguments.
+/// @param log_startup  true to log startup progress to CERR
 extern void init_modules2(bool log_startup);
 
 /// clean up
+/// @param soft  true for a soft (non-fatal) cleanup, false for hard exit
 extern void cleanup(bool soft);
 
 class InterruptContext
@@ -137,21 +141,25 @@ public:
        return interrupt_context.interrupt_raised;
      }
 
+  /// @param loc  caller location for diagnostics
   static void set_attention_raised(const char * loc)
      {
        interrupt_context.attention_raised = true;
      }
 
+  /// @param loc  caller location for diagnostics
   static void clear_attention_raised(const char * loc)
      {
        interrupt_context.attention_raised = false;
      }
 
+   /// @param loc  caller location for diagnostics
    static void set_interrupt_raised(const char * loc)
       {
         interrupt_context.interrupt_raised = true;
       }
 
+   /// @param loc  caller location for diagnostics
    static void clear_interrupt_raised(const char * loc)
       {
         interrupt_context.interrupt_raised = false;
@@ -195,7 +203,8 @@ protected:
 };
 
 /// signal handler for ^C
-extern void control_C(int);
+/// @param sig  signal number (SIGINT)
+extern void control_C(int sig);
 
 /// normal APL output (to stdout)
 extern ostream COUT;
@@ -241,19 +250,19 @@ timeval tv;
    return tv.tv_sec * 1000000ULL + tv.tv_usec;
 }
 #else // neither HAVE_RDTSC nor HAVE_GETTIMEOFDAY
-#define cycle_counter() 0
+#  define cycle_counter() 0
 #endif // HAVE_RDTSC
 
 //----------------------------------------------------------------------------
 #if HAVE_SEM_INIT
 
-# define __sem_destroy(sem) sem_destroy(sem)
-# define __sem_init(sem, pshared, value) sem_init(sem, pshared, value)
+#  define __sem_destroy(sem) sem_destroy(sem)
+#  define __sem_init(sem, pshared, value) sem_init(sem, pshared, value)
 
 #else // not HAVE_SEM_INIT
 
-# define __sem_destroy(sem) { if (sem) sem_close(sem); }
-# define __sem_init(sem, _pshared, value)                   \
+#  define __sem_destroy(sem) { if (sem) sem_close(sem); }
+#  define __sem_init(sem, _pshared, value)                   \
 {                                                          \
 char sname[100];                                           \
    { /* create a unique name */                            \
@@ -293,6 +302,7 @@ public:
       }
 
    /// init the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
    static int init(int p)
       { if (p >= PROBE_COUNT)   return -3;
         probes[p].init();
@@ -338,6 +348,7 @@ public:
       }
 
    /// get the m'th time (from P1 to P2) of this probe
+   /// @param m  measurement index within this probe
    int64_t get_time(int m) const
       { if (m >= idx)   return -1;
         const int64_t diff = measurements[m].cycles_to
@@ -347,36 +358,45 @@ public:
       }
 
    /// get the m'th time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
    static int get_time(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].get_time(m);
       }
 
    /// get the m'th start time of this probe
+   /// @param m  measurement index within this probe
    int64_t get_start(int m) const
       { if (m >= idx)   return -1;
         return measurements[m].cycles_from;
       }
 
    /// get the m'th start time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
    static int get_start(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].get_start(m);
       }
 
    /// get the m'th stop time of this probe
+   /// @param m  measurement index within this probe
    int64_t get_stop(int m) const
       { if (m >= idx)   return -1;
         return measurements[m].cycles_to;
       }
 
    /// get the m'th stop time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
    static int get_stop(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].get_stop(m);
       }
 
    /// get the number of times int the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
    static int get_length(int p)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].idx;
@@ -421,6 +441,7 @@ protected:
 struct YMDhmsu
 {
    /// construct YMDhmsu from usec since Jan. 1. 1970 00:00:00
+   /// @param t  microseconds since Unix epoch (Jan. 1, 1970 00:00:00)
    YMDhmsu(APL_time_us t);
 
    /// return usec since Jan. 1. 1970 00:00:00
@@ -474,6 +495,10 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 #ifdef cfg_VALUE_HISTORY_WANTED
 
    enum { VALUEHISTORY_SIZE = 100000 };
+   /// @param val  the APL value the event applies to
+   /// @param ev   the value-history event type
+   /// @param ia   auxiliary integer parameter for the event
+   /// @param loc  caller location for diagnostics
    extern void add_event(const Value * val, VH_event ev, int ia,
                         const char * loc);
 #  define ADD_EVENT(val, ev, ia, loc)   add_event(val, ev, ia, loc);
@@ -486,6 +511,7 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 #endif
 
 //============================================================================
+/// @param p  pointer into a C string, advanced past any leading whitespace
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
@@ -493,12 +519,16 @@ inline void skip_spaces(const char * & p)
 //---------------------------------------------------------------------------
 inline const char * yes_no(bool yes)   { return yes ? "yes" : "no"; }
 //============================================================================
+/// @param pc     function program counter
+/// @param offset byte offset to add
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
 //----------------------------------------------------------------------------
+/// @param pc     function program counter
+/// @param offset byte offset to subtract
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
@@ -506,15 +536,18 @@ operator -(Function_PC pc, int offset)
 }
 //----------------------------------------------------------------------------
 /// Function_PC ++ (post increment)
+/// @param pc  function program counter to increment
+/// @param     unused post-increment distinguisher
 inline Function_PC
 operator ++(Function_PC & pc, int)
 {
-const Function_PC before_increment = pc; 
+const Function_PC before_increment = pc;
    pc = pc + 1;
    return before_increment;
 }
 //----------------------------------------------------------------------------
 /// Function_PC ++ (pre increment)
+/// @param pc  function program counter to increment
 inline Function_PC &
 operator ++(Function_PC & pc)
 {
@@ -523,6 +556,7 @@ operator ++(Function_PC & pc)
 }
 //----------------------------------------------------------------------------
 /// Function_PC -- (pre decrement)
+/// @param pc  function program counter to decrement
 inline Function_PC &
 operator --(Function_PC & pc)
 {
@@ -531,6 +565,7 @@ operator --(Function_PC & pc)
 }
 //----------------------------------------------------------------------------
 /// frequently used cast to const char *
+/// @param utf  UTF-8 byte pointer to reinterpret as char *
 inline const char *
 charP(const UTF8 * utf)
 {
@@ -538,6 +573,7 @@ charP(const UTF8 * utf)
 }
 //----------------------------------------------------------------------------
 /// frequently used cast to const char *
+/// @param vp  void pointer to reinterpret as char *
 inline const char *
 charP(const void * vp)
 {
@@ -545,6 +581,7 @@ charP(const void * vp)
 }
 //----------------------------------------------------------------------------
 /// frequently used cast to a const void *
+/// @param addr  address to return as const void *
 inline const void *
 voidP(const void * addr)
 {

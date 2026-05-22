@@ -85,6 +85,9 @@ public:
    {}
 
    /// initialize \b sorted_by_name and \b sorted_by_axis.
+   /// @param infos array of function_info entries describing each subfunction
+   /// @param count number of entries in \b infos
+   /// @param group_name the name of this function group (e.g. "⎕SQL")
    void init_function_group(const function_info * infos, size_t count,
                             const char * group_name);
 
@@ -95,24 +98,29 @@ public:
 
    /// return a function number (pseudo-axis) for subfunction \b name,
    /// or -1 if \b name is not a valid subfunction name
-   ///
+   /// @param subfun_name the subfunction name to look up
    sAxis subfun_to_axis(const UCS_string & subfun_name) const;
 
    /// return a function number (pseudo-axis) for \b value. \b value shall
    /// be an integer scalar, or else a valid subfunction name (APL string).
+   /// @param A_or_X APL value that is either an integer axis or a name string
    sAxis value_to_subfun(const Value & A_or_X) const;
    //
    /// print some help (not for )HELP, but for ⎕XXX ⍬).
    /// The help for )HELP is defined in \b Help.def
+   /// @param out output stream to print to
    Token list_functions(ostream & out) const;
 
    /// print the syntax variants for all subfunctions.
+   /// @param out output stream to print to
    Token list_mappings(ostream & out) const;
 
    /// complain about an invalid subfunctioon name
+   /// @param sub_name the invalid subfunction name that was requested
    void bad_subfun_name_ERROR(const UCS_string sub_name) const GNUC__noreturn;
 
    /// complain about an invalid subfunctioon name
+   /// @param number the invalid subfunction number that was requested
    void bad_subfun_number_ERROR(int number) const GNUC__noreturn;
 
    /// static texts before and after syntax tables
@@ -126,23 +134,30 @@ public:
 
 protected:
    /// helper function to print a 1-line function help.
+   /// @param lt which legend text (prefix/suffix for function or mapping table)
    virtual const char * get_legend(Legend_type lt) const
       { return ""; }   // for non-FunctionGroups
 
    /// helper function to print the subfunction function syntax
+   /// @param out output stream to print to
    virtual void print_fun_syntax(ostream & out, const function_info &) const
       { out << "*** missing FunctionGroup::print_fun_syntax()" << endl; }
 
    /// helper function to print the subfunction syntax mapping
+   /// @param out output stream to print to
    virtual void print_map_syntax(ostream & out, const function_info &) const
       { out << "*** missing FunctionGroup::print_map_syntax()" << endl; }
 
    /// compare names. Return \b > 0 if info1 > info2
+   /// @param name the function name key to compare against
+   /// @param info pointer to the function_info entry to compare with
    static int compare_function_name(const char * const & name,
                                      const function_info * const & info,
                                      const void *);
 
    /// compare axes. Return \b > 0 if info1 > info2
+   /// @param key the axis number key to compare against
+   /// @param info pointer to the function_info entry to compare with
    static int compare_function_axis(const uAxis & key,
                                     const function_info * const & info,
                                     const void *);
@@ -160,12 +175,15 @@ protected:
       { return compare_function_axis(info1->axis, info2, 0) > 0; }
  
    /// return the function_info for function name \b name
+   /// @param name the subfunction name to look up
    const function_info * get_info_by_name(const char * name) const;
 
    /// return the function_info for function axis \b axis
+   /// @param axis the function axis number to look up
    const function_info * get_info_by_axis(uAxis axis) const;
 
    /// return the signature \b sig as string
+   /// @param sig the function signature bitmask to stringify
    UCS_string get_signature_string(Fun_signature sig) const;
 
    /// the group name (⎕CR, ⎕FFT, ... Only non-zero if this functiuon is a group

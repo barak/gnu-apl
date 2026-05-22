@@ -25,7 +25,7 @@
 #define __LINEINPUT_HH_DEFINED__
 
 #if HAVE_TERMIOS_H
-#include <termios.h>
+#  include <termios.h>
 #else
 struct termios { int x; };
 #endif // HAVE_TERMIOS_H
@@ -53,21 +53,28 @@ class LineHistory
 {
 public:
    /// constructor: empty line history
+   /// @param maxl maximum number of history lines to retain
    LineHistory(int maxl);
 
    /// constructor: line history from function being ∇-edited
+   /// @param nabla the Nabla editor whose lines seed the history
    LineHistory(const Nabla & nabla);
 
    /// read history from file
+   /// @param filename path to the history file to read
    void read_history(const char * filename);
 
    /// save history to file
+   /// @param filename path to the history file to write
    void save_history(const char * filename);
 
    /// clear history
+   /// @param out output stream for confirmation message
    void clear_history(ostream & out);
 
    /// print history to \b out, maybe filter wirh filter
+   /// @param out output stream to print to
+   /// @param filter substring filter; only matching lines are printed
    void print_history(ostream & out, const UCS_string & filter) const;
 
    /// start a new up/down sequence
@@ -88,9 +95,11 @@ public:
    const void clear_search(void);
 
    /// update search substring (called when current line is edited)
+   /// @param cur_line the current user-input line used as new search key
    const void update_search(const UCS_string &cur_line);
 
    /// find entries like current line in history
+   /// @param cur_line the current user-input line; updated to matched entry
    const UCS_string * search(UCS_string &cur_line);
 
    /// print relevant indices
@@ -100,9 +109,11 @@ public:
                    << "/S=" << hist_lines.size() << endl; }
 
    /// add one line to \b this history
+   /// @param line the line to append to the history
    void add_line(const UCS_string & line);
 
    /// replace the last line of \b this history
+   /// @param line replacement text for the most recent history entry
    void replace_line(const UCS_string & line);
 
    /// the history for ⍞
@@ -139,6 +150,11 @@ class LineEditContext
 {
 public:
    /// constructor
+   /// @param mode input mode (immediate execution, ⍞, ⎕, etc.)
+   /// @param rows number of terminal screen rows
+   /// @param cols number of terminal screen columns
+   /// @param hist line history for up/down navigation
+   /// @param prmt prompt string displayed before user input
    LineEditContext(LineInputMode mode, int rows, int cols,
                    LineHistory & hist, const UCS_string & prmt);
 
@@ -172,6 +188,7 @@ public:
       { if (on_bad_col(uidx))   set_cursor(); }
 
    /// move the cursor
+   /// @param new_idx new cursor offset into user_line
    void move_idx(int new_idx)
       { uidx = new_idx;   set_cursor(); }
 
@@ -198,6 +215,7 @@ public:
    void delete_char();
 
    /// insert uni at cursor position
+   /// @param uni Unicode character to insert at the current cursor position
    void insert_char(Unicode uni);
 
    /// toggle the insert mode
@@ -226,6 +244,7 @@ public:
       { if (uidx > 0)   { move_idx(--uidx);   delete_char(); } }
 
    /// tab expansion
+   /// @param mode current input mode (affects completion candidates)
    void tab_expansion(LineInputMode mode);
 
    /// reset search substring
@@ -295,6 +314,11 @@ class InputMux
 {
 public:
    /// get one line
+   /// @param mode input mode (immediate execution, ⍞, ⎕, etc.)
+   /// @param prompt prompt string shown before user input
+   /// @param line output: the line entered by the user
+   /// @param eof output: set to true if end-of-file was reached
+   /// @param hist line history for up/down navigation
    static void get_line(LineInputMode mode, const UCS_string & prompt,
                         UCS_string & line, bool & eof, LineHistory & hist);
 
@@ -317,40 +341,57 @@ class LineInput
 {
 public:
    /// get a line from the user
+   /// @param mode input mode (immediate execution, ⍞, ⎕, etc.)
+   /// @param prompt prompt string shown before user input
+   /// @param line output: the line entered by the user
+   /// @param eof output: set to true if end-of-file was reached
+   /// @param hist line history for up/down navigation
    static void get_terminal_line(LineInputMode mode, const UCS_string & prompt,
                                  UCS_string & line, bool & eof,
                                  LineHistory & hist);
 
    /// get a line from from user
+   /// @param mode input mode (immediate execution, ⍞, ⎕, etc.)
+   /// @param prompt prompt string shown before user input
+   /// @param user_line output: the line entered by the user
+   /// @param eof output: set to true if end-of-file was reached
+   /// @param hist line history for up/down navigation
    static void edit_line(LineInputMode mode, const UCS_string & prompt,
                          UCS_string & user_line, bool & eof,
                          LineHistory & hist);
 
    /// initialize the input subsystem
+   /// @param do_read_history true to restore history from disk at startup
    static void init(bool do_read_history);
 
    /// undo init()
    static void restore_termios();
 
    /// close this line input, maybe updating the history
+   /// @param do_not_write_hist true to suppress writing history to disk
    static void close(bool do_not_write_hist)
       { if (the_line_input && do_not_write_hist)
             the_line_input->write_history = false;
         delete the_line_input;   the_line_input = 0; }
 
    /// clear history
+   /// @param out output stream for confirmation message
    static void clear_history(ostream & out)
       {  the_line_input->history.clear_history(out); }
 
    /// print history to \b out
+   /// @param out output stream to print to
+   /// @param filter substring filter; only matching lines are printed
    static void print_history(ostream & out, const UCS_string & filter)
       {  the_line_input->history.print_history(out, filter); }
 
    /// add a line to the history
+   /// @param line the line to append to the history
    static void add_history_line(const UCS_string & line)
       {  the_line_input->history.add_line(line); }
 
    /// replace the last line of the history
+   /// @param line replacement text for the most recent history entry
    static void replace_history_line(const UCS_string & line)
       {  the_line_input->history.replace_line(line); }
 
@@ -359,10 +400,13 @@ public:
       { return the_line_input->history; }
 
    // old-fashioned ^N (shift out) / ^O (shift in) replacement for the ALT keys
+   /// @param alt_map_profile keyboard mapping profile index
+   /// @param line input/output line with characters to remap
    static void map_alt(int alt_map_profile, UCS_string & line);
 
 protected:
    /// constructor
+   /// @param do_read_history true to restore history from disk at startup
    LineInput(bool do_read_history);
 
    /// destructor
@@ -407,15 +451,21 @@ protected:
 struct ESCmap
 {
    /// return true if seq is a true prefix of \b this ESCmap
+   /// @param seq the byte sequence to test
+   /// @param seq_len length of \b seq in bytes
    bool has_prefix(const char * seq, int seq_len) const;
 
    /// return true if seq is the sequence of \b this ESCmap
+   /// @param seq the byte sequence to test
+   /// @param seq_len length of \b seq in bytes
    bool is_equal(const char * seq, int seq_len) const;
 
    /// refresh the lengths (after keyboard strings have been updated)
    static void refresh_lengths();
 
    /// return true if an entry has prefix \b seq of length len
+   /// @param seq the byte sequence to test
+   /// @param len length of \b seq in bytes
    static bool need_more(const char * seq, int len);
 
    /// the length of \b seqence

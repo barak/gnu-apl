@@ -97,7 +97,7 @@
 #define __APL_FLOAT_AS_CLASS_HH_DEFINED__
 
 #ifndef __APL_TYPES_HH_DEFINED__
-# error This file shall not be #included directly, but by #including APL_types.hh
+#  error This file shall not be #included directly, but by #including APL_types.hh
 #endif
 
 class APL_Float;
@@ -111,6 +111,7 @@ public:
       { return dval; }
 
    /// set the value from a double
+   /// @param d the double value to store
    APL_Float_Base & _set(double d)
       { dval = d;    return *this; }
 
@@ -148,13 +149,16 @@ public:
    APL_Float()                      { dval = 0.0; }
 
    /// constructor from a \b double value \b d
+   /// @param d the initial floating-point value
    APL_Float(double d)              { dval = d; }
 
    /// assingment from another APL_Float
+   /// @param other the source APL_Float value
    APL_Float & operator =(const APL_Float & other)
       { dval = other.dval; return *this; }
 };
 /// isnormal() for APL_Float
+/// @param val the APL_Float value to test
 inline bool isnormal(const APL_Float & val)
 {
   return std::isnormal(val._get());
@@ -277,6 +281,8 @@ assop_wrap1(*)
 assop_wrap1(/)
 
 //----------------------------------------------------------------------------
+/// complex square root
+/// @param x the complex APL_Float operand
 inline complex<APL_Float>
 complex_sqrt(complex<APL_Float> x)
 {
@@ -285,6 +291,8 @@ const complex<double> cz = sqrt(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
 //----------------------------------------------------------------------------
+/// complex exponent (e^x)
+/// @param x the complex APL_Float exponent
 inline complex<APL_Float>
 complex_exponent(complex<APL_Float> x)
 {
@@ -293,6 +301,9 @@ const complex<double> cz = exp(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
 //----------------------------------------------------------------------------
+/// complex power (x^y)
+/// @param x the complex APL_Float base
+/// @param y the complex APL_Float exponent
 inline complex<APL_Float>
 complex_power(complex<APL_Float> x, complex<APL_Float> y)
 {

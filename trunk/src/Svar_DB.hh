@@ -33,9 +33,9 @@
 using namespace std;
 
 #if cfg_APSERVER_TRANSPORT == 1
-# define ABSTRACT_OFFSET 1
+#  define ABSTRACT_OFFSET 1
 #else
-# define ABSTRACT_OFFSET 0
+#  define ABSTRACT_OFFSET 0
 #endif
 
 //----------------------------------------------------------------------------
@@ -44,6 +44,7 @@ class Svar_record_P
 {
 public:
    /// constructor: fetch record with key \b key from APserver
+   /// @param key shared variable key identifying the record
    Svar_record_P(SV_key key);
 
    /// return pointer to the record (overloaded -> operator)
@@ -62,7 +63,7 @@ private:
    Svar_record_P & operator =(const Svar_record_P & other);
 };
 //----------------------------------------------------------------------------
-# define READ_RECORD(key, open_act, closed_act)         \
+#define READ_RECORD(key, open_act, closed_act)         \
     if (Svar_DB::APserver_available())                  \
          { const Svar_record_P svar(key); open_act }    \
     else { closed_act }
@@ -72,10 +73,18 @@ class Svar_DB
 {
 public:
    /// open (and possibly initialize) the shared variable database
+   /// @param bin_path directory path of the APL interpreter binary
+   /// @param prog name of the program (for APserver startup)
+   /// @param retry_max maximum number of connection retry attempts
+   /// @param logit true to log connection steps
+   /// @param do_svars true to actually connect (false for dry-run)
    static void init(const char * bin_path, const char * prog, int retry_max,
                     bool logit, bool do_svars);
 
    /// open (and possibly initialize) the shared variable database
+   /// @param progname name of the calling program
+   /// @param logit true to log connection steps
+   /// @param do_svars true to actually connect (false for dry-run)
    void open_shared_memory(const char * progname, bool logit, bool do_svars);
 
    /// match a new offer against the DB. Return: 0 on error, 1 if the

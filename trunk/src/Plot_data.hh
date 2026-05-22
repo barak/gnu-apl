@@ -42,12 +42,15 @@ typedef std::string String;
 struct Pixel_XY
 {
    /// constructor
+   /// @param px horizontal pixel coordinate
+   /// @param py vertical pixel coordinate
    Pixel_XY(Pixel_X px, Pixel_Y py)
    : x(px),
      y(py)
    {}
 
    /// the square of the distance between \b this and other
+   /// @param other the other pixel coordinate
    const double distance2(const Pixel_XY other) const
       { const double dx = x - other.x;
         const double dy = y - other.y;
@@ -56,6 +59,7 @@ struct Pixel_XY
 
 
    /// the distance between \b this and other
+   /// @param other the other pixel coordinate
    const double distance(const Pixel_XY other) const
       { return sqrt(distance2(other)); }
 
@@ -73,6 +77,11 @@ public:
        rows are put into the same double * and our ~Plot_data_row() destructor
        is responsible for deleting it (when row 0 is destructed).
     **/
+   /// @param pX pointer to X coordinate array (may be null for implicit 1-based index)
+   /// @param pY pointer to Y coordinate array
+   /// @param pZ pointer to Z coordinate array (may be null for implicit row index)
+   /// @param idx row index within the containing Plot_data
+   /// @param len number of data points in this row
    Plot_data_row(const double * pX, const double * pY, const double * pZ,
                  uint32_t idx, uint32_t len)
    : X(pX), Y(pY), Z(pZ), row_num(idx), N(len)
@@ -110,14 +119,17 @@ public:
       { return N; }
 
    /// return the n-th X coordinate
+   /// @param n zero-based data point index
    double get_X(uint32_t n) const
       { return X ? X[n] : n + 1; }
 
    /// return the n-th Y coordinate
+   /// @param n zero-based data point index
    double get_Y(uint32_t n) const
       { return Y[n]; }
 
    /// return the n-th Z coordinate
+   /// @param n zero-based data point index
    double get_Z(uint32_t n) const
       { return Z ? Z[n] : row_num + 1; }
 
@@ -193,6 +205,7 @@ class Plot_data
 {
 public:
    /// constructor
+   /// @param rows number of plot data rows to allocate
    Plot_data(uint32_t rows)
    : surface(false),
      row_count(rows),
@@ -213,6 +226,10 @@ public:
       { return row_count; }
 
    /// return the X and Y values of the data matrix row/col
+   /// @param X receives the X coordinate
+   /// @param Y receives the Y coordinate
+   /// @param row row index in the data matrix
+   /// @param col column index in the data matrix
    void get_XY(double & X, double & Y, uint32_t row, uint32_t col) const
        {
           Assert(row < idx);
@@ -245,14 +262,20 @@ public:
       { return max_Z; }
 
    /// return the X coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_X(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_X(col); }
 
    /// return the Y coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_Y(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_Y(col); }
 
    /// return the Z coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_Z(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_Z(col); }
 
@@ -260,6 +283,7 @@ public:
    bool is_surface_plot() const       { return surface; }
 
    /// add a row to the data matrix
+   /// @param row pointer to the row to append
    void add_row(const Plot_data_row * row)
       {
         Assert(idx < row_count);
@@ -285,6 +309,7 @@ public:
       }
 
    /// convert integer to a string
+   /// @param val unsigned integer value to convert
    static const char * uint32_t_to_str(uint32_t val)
       {
         static char ret[40];
@@ -294,6 +319,7 @@ public:
       }
 
    /// val as string with unit 'pixel'
+   /// @param val horizontal pixel value to convert
    static const char * Pixel_X_to_str(Pixel_X val)
       {
         static char ret[40];
@@ -303,6 +329,7 @@ public:
       }
 
    /// val as string with unit 'pixel'
+   /// @param val vertical pixel value to convert
    static const char * Pixel_Y_to_str(Pixel_Y val)
       {
         static char ret[40];
@@ -312,6 +339,7 @@ public:
       }
 
    /// convert a double to a string
+   /// @param val floating-point value to convert
    static const char * double_to_str(double val)
       {
         static char ret[40];
@@ -321,6 +349,7 @@ public:
       }
 
    /// convert a Color to a string
+   /// @param val color as a packed RGB integer
    static const char * Color_to_str(Color val)
       {
         static char ret[40];
@@ -331,35 +360,49 @@ public:
       }
 
    /// convert a String to a string
+   /// @param val string value to return
    static String String_to_str(String val)
       {
         return val;
       }
 
    /// return the idx'th row
+   /// @param idx zero-based row index
    const Plot_data_row & operator[](ShapeItem idx) const
       { Assert(idx < row_count);   return *data_rows[idx]; }
 
    /// convert a string to a Pixel
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static Pixel_X Pixel_X_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a Pixel
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static Pixel_Y Pixel_Y_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a double
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static double double_from_str(const char * str, const char * & error)
       { error = 0;   return strtod(str, 0); }
 
    /// convert a string like "#RGB" or "#RRGGB" to a color
+   /// @param str null-terminated color string (e.g. "#FF0000")
+   /// @param error receives an error message, or null on success
    static Color Color_from_str(const char * str, const char * & error);
 
   /// convert a string to a uint32_t
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static uint32_t uint32_t_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a String
+   /// @param str null-terminated string to wrap
+   /// @param error receives an error message, or null on success
    static String String_from_str(const char * str, const char * & error)
       { error = 0;   return str; }
 

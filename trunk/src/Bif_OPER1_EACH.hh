@@ -37,15 +37,22 @@ public:
    Bif_OPER1_EACH() : PrimitiveOperator(TOK_OPER1_EACH) {}
 
    /// Overloaded Function::eval_LB().
+   /// @param LO left operand token
+   /// @param B right argument APL value
    virtual Token eval_LB(Token & LO, Value_P B) const
       { return do_eval_LB(LO, B); }
 
    /// Overloaded Function::eval_ALB().
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param B right argument APL value
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    static Bif_OPER1_EACH  fun;      ///< Built-in function.
 
    /// implementation of eval_LB()
+   /// @param LO left operand token
+   /// @param B right argument APL value
    static Token do_eval_LB(Token & LO, Value_P B);
 
 protected:

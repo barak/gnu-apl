@@ -34,13 +34,16 @@ class Quad_SVx
 {
 public:
    /// start the auxiliary processor \b proc
+   /// @param proc auxiliary processor number to start
    static void start_AP(AP_num proc);
 
 protected:
    /// return true iff \b filename is executable by everybody
+   /// @param filename path of the file to test
    static bool is_executable(const char * filename);
 
    /// disconnect from auxiliary processor proc if connected.
+   /// @param proc auxiliary processor number to disconnect from
    static void disconnect(AP_num proc);
 };
 //----------------------------------------------------------------------------
@@ -58,9 +61,12 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
+   /// @param A left-argument APL value (access control vector)
+   /// @param B right-argument APL value (shared variable name)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   /// Overloaded Function::eval_AB().
+   /// Overloaded Function::eval_B().
+   /// @param B right-argument APL value (shared variable name)
    virtual Token eval_B(Value_P B) const;
 };
 //----------------------------------------------------------------------------
@@ -76,6 +82,9 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
+   /// @param value new APL value to assign to ⎕SVE
+   /// @param clone true to store a deep copy of value
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// Overloaded Symbol::get_apl_value().
@@ -99,12 +108,18 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
+   /// @param A left-argument APL value (processor number)
+   /// @param B right-argument APL value (variable name to share)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   /// Overloaded Function::eval_AB().
+   /// Overloaded Function::eval_B().
+   /// @param B right-argument APL value (variable name to share)
    virtual Token eval_B(Value_P B) const;
 
    /// share one variable
+   /// @param proc target auxiliary processor number
+   /// @param vname null-terminated UCS variable name
+   /// @param coupling output coupling state after the offer
    static SV_key share_one_variable(AP_num proc, const uint32_t * vname,
                                     SV_Coupling & coupling);
 };
@@ -122,13 +137,15 @@ public:
    static Quad_SVQ fun;         ///< Built-in function.
 
 protected:
-   /// Overloaded Function::eval_AB().
+   /// Overloaded Function::eval_B().
+   /// @param B right-argument APL value (query selector)
    virtual Token eval_B(Value_P B) const;
 
    /// return processors with matching offers
    static Value_P get_processors();
 
    /// return variables offered by processor proc
+   /// @param proc auxiliary processor number to query
    static Value_P get_variables(AP_num proc);
 };
 //----------------------------------------------------------------------------
@@ -145,7 +162,8 @@ public:
    static Quad_SVR  fun;         ///< Built-in function.
 
 protected:
-   /// Overloaded Function::eval_AB().
+   /// Overloaded Function::eval_B().
+   /// @param B right-argument APL value (variable name to retract)
    virtual Token eval_B(Value_P B) const;
 };
 //============================================================================
@@ -162,7 +180,8 @@ public:
    static Quad_SVS fun;         ///< Built-in function.
 
 protected:
-   /// Overloaded Function::eval_AB().
+   /// Overloaded Function::eval_B().
+   /// @param B right-argument APL value (variable name to query)
    virtual Token eval_B(Value_P B) const;
 };
 //----------------------------------------------------------------------------

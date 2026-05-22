@@ -32,6 +32,7 @@ class PrintContext
 {
 public:
    /// constructor from another style
+   /// @param st  print style to use
    PrintContext(PrintStyle st)
    : style(st),
      precision(DEFAULT_Quad_PP),
@@ -39,6 +40,9 @@ public:
    {}
 
    /// constructor for given values
+   /// @param st   print style to use
+   /// @param qpp  print precision (⎕PP)
+   /// @param qpw  print width (⎕PW)
    PrintContext(PrintStyle st, int qpp, int qpw)
    : style(st),
      precision(qpp),
@@ -49,6 +53,7 @@ public:
    PrintStyle get_style() const { return style; }
 
    /// set the print style to be used
+   /// @param ps  new print style
    void set_style(PrintStyle ps) { style = ps; }
 
    /// return true iff exponential format shall be used

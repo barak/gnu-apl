@@ -61,6 +61,8 @@ protected:
    {}
 
    /// constructor: an entry with character \b c and shape \b shape
+   /// @param uni Unicode character for this entry
+   /// @param shape_A position of the character within the collating sequence
    CollatingCacheEntry(Unicode uni, const Shape & shape_A)
    : ce_char(uni),
      ce_shape(shape_A)   // shape_A means not found
@@ -73,10 +75,13 @@ protected:
    Shape ce_shape;
 
    /// assignment (to allow const ce_char)
+   /// @param other source entry to copy from
    void operator =(const CollatingCacheEntry & other)
       { new (this)   CollatingCacheEntry(other); }
 
    /// compare this entry with \b other at \b axis
+   /// @param other cache entry to compare against
+   /// @param axis dimension index used for comparison
    int compare_axis(const CollatingCacheEntry & other, sAxis axis) const
       {
         return ce_shape.get_shape_item(axis)
@@ -84,12 +89,17 @@ protected:
       }
 
    /// compare \b key with \b entry (for Heapsort::search())
+   /// @param key Unicode character to search for
+   /// @param entry cache entry to compare against
+   /// @param unused_ctx unused context pointer (required by comparator signature)
    static int compare_chars(const Unicode & key,
                             const CollatingCacheEntry & entry,
                             const void * unused_ctx)
       { return key - entry.ce_char; }
 };
 //----------------------------------------------------------------------------
+/// @param out output stream to write to
+/// @param entry collating cache entry to print
 inline ostream &
 operator << (ostream & out, const CollatingCacheEntry & entry)
 {
@@ -104,6 +114,9 @@ class CollatingCache : public vector<CollatingCacheEntry>
 {
 public:
    /// constructor: cache of rank r and comparison length clen
+   /// @param A left-argument APL value providing the collating sequence
+   /// @param base precomputed base offsets for each dimension of A
+   /// @param clen number of characters to compare per item
    CollatingCache(const Value & A, const vector<ShapeItem> & base,
                   ShapeItem clen);
 
@@ -114,15 +127,22 @@ public:
    ShapeItem get_comp_len() const { return comp_len; }
 
    /// find the significance (= the index of) the entry for \b uni
+   /// @param uni Unicode character to look up
    ShapeItem get_significance(Unicode uni) const;
 
    /// compare cache items \b ia and \b ib ascendingly.
    /// \b comp_arg is a CollatingCache pointer
+   /// @param ia index of first item in B
+   /// @param ib index of second item in B
+   /// @param comp_arg pointer to the CollatingCache used for comparison
    static bool greater_vec(const ShapeItem & ia, const ShapeItem & ib,
                            const void * comp_arg);
 
    /// compare cache items \b ia and \b ib descendingly.
    /// \b comp_arg is a CollatingCache pointer
+   /// @param ia index of first item in B
+   /// @param ib index of second item in B
+   /// @param comp_arg pointer to the CollatingCache used for comparison
    static bool smaller_vec(const ShapeItem & ia, const ShapeItem & ib,
                            const void * comp_arg);
 
@@ -145,11 +165,14 @@ class Bif_F12_SORT : public NonscalarFunction
 {
 public:
    /// Constructor
+   /// @param tag token tag identifying this sort variant
    Bif_F12_SORT(TokenTag tag)
    : NonscalarFunction(tag)
    {}
 
-   /// sort integer vector B 
+   /// sort integer vector B
+   /// @param B right-argument APL value to sort
+   /// @param order ascending or descending sort direction
    static Token sort(Value_P B, Sort_order order);
 
 protected:
@@ -161,9 +184,14 @@ protected:
       };
 
    /// sort char vector B according to collationg sequence A
+   /// @param A left-argument collating sequence
+   /// @param B right-argument APL value to sort
+   /// @param order ascending or descending sort direction
    static Token sort_collating(Value_P A, Value_P B, Sort_order order);
 
    /// find or create the collating cache entry for \b uni
+   /// @param uni Unicode character to look up or insert
+   /// @param cache collating cache to search and update
    static ShapeItem find_collating_cache_entry(Unicode uni,
                                                CollatingCache & cache);
 };
@@ -180,6 +208,7 @@ public:
    {}
 
    /// overloaded Function::eval_B()
+   /// @param B right-argument APL value to grade
    virtual Token eval_B(Value_P B) const
       { Token ret = sort(B, SORT_ASCENDING);
         if (ret.get_Class() == TC_VALUE)   return ret;
@@ -187,6 +216,8 @@ public:
       }
 
    /// overloaded Function::eval_AB()
+   /// @param A left-argument collating sequence
+   /// @param B right-argument APL value to grade
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_ASCENDING); }
 
@@ -206,6 +237,7 @@ public:
    {}
 
    /// overloaded Function::eval_B()
+   /// @param B right-argument APL value to grade
    virtual Token eval_B(Value_P B) const
       { Token ret = sort(B, SORT_DESCENDING);
         if (ret.get_Class() == TC_VALUE)   return ret;
@@ -213,6 +245,8 @@ public:
       }
 
    /// overloaded Function::eval_AB()
+   /// @param A left-argument collating sequence
+   /// @param B right-argument APL value to grade
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_DESCENDING); }
 

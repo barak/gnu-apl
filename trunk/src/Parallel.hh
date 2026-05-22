@@ -33,31 +33,31 @@
    //
    // parallel not wanted
    //
-# undef PARALLEL_ENABLED
+#  undef PARALLEL_ENABLED
 
 #elif HAVE_AFFINITY_NP
    //
    // parallel wanted and pthread_setaffinity_np() supported
    //
-# define PARALLEL_ENABLED 1
+#  define PARALLEL_ENABLED 1
 
 #else
    //
    // parallel wanted, but pthread_setaffinity_np() and friends are missing
    //
-#warning "CORE_COUNT_WANTED configured, but pthread_setaffinity_np() missing"
-# undef PARALLEL_ENABLED
+#  warning "CORE_COUNT_WANTED configured, but pthread_setaffinity_np() missing"
+#  undef PARALLEL_ENABLED
 
 #endif
 
 #ifdef PARALLEL_ENABLED
 
-# define PRINT_LOCKED(x) \
+#  define PRINT_LOCKED(x) \
    { sem_wait(Parallel::print_sema); x; sem_post(Parallel::print_sema); }
 
 #else
 
-# define PRINT_LOCKED(x) x;
+#  define PRINT_LOCKED(x) x;
 
 #endif // PARALLEL_ENABLED
 
@@ -69,19 +69,24 @@
    //
 typedef int _Atomic_word;
 
+/// @param counter counter to update atomically
+/// @param increment amount to add
 inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
    { const int ret = counter;   counter += increment;   return ret; }
 
 /// read \b counter
+/// @param counter counter to read
 inline int atomic_read(volatile _Atomic_word & counter)
    { return counter; }
 
 /// add to \b counter
+/// @param counter counter to update
+/// @param increment amount to add
 inline void atomic_add(volatile _Atomic_word & counter, int increment)
    { counter += increment; }
 
 #elif HAVE_EXT_ATOMICITY_H
-#include <ext/atomicity.h>
+#  include <ext/atomicity.h>
 
 /// atomic \b counter += \b increment, return old value
 inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
@@ -106,7 +111,7 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 #elif HAVE_OSX_ATOMIC
 
-#include <libkern/OSAtomic.h>
+#  include <libkern/OSAtomic.h>
 
 /// a counter for atomic operations
 typedef int32_t _Atomic_word;
@@ -125,7 +130,7 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 #elif HAVE_SOLARIS_ATOMIC
 
-#include <atomic.h>
+#  include <atomic.h>
 
 /// a counter for atomic operations
 typedef uint32_t _Atomic_word;
@@ -215,13 +220,16 @@ public:
    CPU_pool();
 
    /// initialize the pool
+   /// @param logit true to emit diagnostic messages during initialisation
    static void init(bool logit);
 
    /// add a CPU to the pool
+   /// @param cpu CPU number to add
    static void add_CPU(CPU_Number cpu)
       { the_CPUs.push_back(cpu); }
 
    /// get the idx;th CPU
+   /// @param idx zero-based index into the pool
    static CPU_Number get_CPU(size_t idx)
       { return the_CPUs[idx]; }
 
@@ -230,16 +238,21 @@ public:
       { return CoreCount(the_CPUs.size()); }
 
    /// resize the pool
+   /// @param new_size new number of CPUs in the pool
    static void resize(CoreCount new_size)
       { the_CPUs.resize(new_size); }
 
    /// set new active core count, return true on error
+   /// @param new_count desired number of active cores
+   /// @param logit true to emit diagnostic messages
    static bool change_core_count(CoreCount new_count, bool logit);
 
    /// make all pool members lock on their pool_sema
+   /// @param logit true to emit diagnostic messages
    static void lock_pool(bool logit);
 
    /// unlock all pool members from their pool_sema
+   /// @param logit true to emit diagnostic messages
    static void unlock_pool(bool logit);
 
 protected:
@@ -263,9 +276,10 @@ public:
 
    /// a lock coordinating parallel access to shared objects
    typedef _Atomic_word parallel_lock_t;
-#define LOCK_INITIALIZER 0
+#  define LOCK_INITIALIZER 0
 
    /// acquire \b lock
+   /// @param lock lock variable to acquire
    static inline void acquire_lock(volatile parallel_lock_t & lock)
       {
         for (;;)
@@ -276,6 +290,7 @@ public:
       }
 
    /// release \b lock
+   /// @param lock lock variable to release
    static inline void release_lock(volatile parallel_lock_t & lock)
       {
         atomic_add(lock, -1);
@@ -285,7 +300,7 @@ public:
 
    /// a lock coordinating parallel access to shared objects
    typedef pthread_rwlock_t parallel_lock_t;
-#define LOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
+#  define LOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
 
    static inline void acquire_lock(parallel_lock_t & lock)
      { pthread_rwlock_wrlock(&lock); }
@@ -299,6 +314,7 @@ public:
    static bool run_parallel;
 
    /// initialize
+   /// @param logit true to emit diagnostic messages during initialisation
    static void init(bool logit);
 
    /// a semaphore to protect printing from different threads

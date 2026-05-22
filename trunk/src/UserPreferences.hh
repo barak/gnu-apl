@@ -41,6 +41,7 @@ class UserPreferences
 public:
   /// collect all user preferences (from command line arguments and from
   /// preferences file). Return \b true iff start-up logging was requested.
+  /// @param args command-line argument vector passed to main()
   bool collect_preferences(const std::vector<const char *> & args);
 
    /// append test results to summary.log rather than overriding it
@@ -96,6 +97,7 @@ public:
    bool emacs_mode;
 
    /// expand lumped arguments
+   /// @param args raw command-line argument vector to expand
    void expand_args(const std::vector<const char *> & args);
 
    /// --eval expressions
@@ -202,6 +204,8 @@ public:
    std::vector<const char *> expanded_args;
 
    /// read a \b preference file and update parameters set there
+   /// @param sys true to read the system-wide preferences file
+   /// @param log_startup true to log preference file activity at start-up
    void read_config_file(bool sys, bool log_startup);
 
 protected:
@@ -210,23 +214,29 @@ protected:
    UserPreferences();
 
    /// read a \b parallel_thresholds file and update parameters set there
+   /// @param sys true to read the system-wide thresholds file
+   /// @param log_startup true to log threshold file activity at start-up
    void read_threshold_file(bool sys, bool log_startup);
 
    /// print possible command line options and exit
+   /// @param prog name of the interpreter executable (argv[0])
    static void usage(const char * prog);
 
    /// print how the interpreter was configured (via ./configure) and exit
    static void show_configure_options();
 
    /// print the GPL
+   /// @param out stream to write the GPL text to
    static void show_GPL(ostream & out);
 
    /// show version information
+   /// @param out stream to write version text to
    static void show_version(ostream & out);
 
    /// parse the original command line arguments to figure if start-up logging
    /// is desired (BEFORE any expansions). Parses (only) the -l option.
    /// Return true iff startup-logging (aka. -l 37) was requested.
+   /// @param args original (unexpanded) command-line argument vector
    bool parse_args_0(const std::vector<const char *> & args);
 
    /// parse \b expanded_args (BEFORE reading preference
@@ -237,30 +247,42 @@ protected:
    /// parse \b expanded_args (AFTER reading preference files)
    /// Parses all valid options (and overwrite any corresponding settings in
    /// the preference files).
+   /// @param logit true to emit diagnostic output while parsing
    void parse_args_2(bool logit);
 
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
    /// itself), or a 2-character hex value
-   /// 
+   /// @param strg string token from preferences file to decode
    static int decode_ASCII(const char * strg);
 
    /// return true if file \b filename is an APL script (has execute permission
    /// and starts with #!
+   /// @param filename path of the file to test
    static bool is_APL_script(const char * filename);
 
    /// open a user-supplied config file (in $HOME or gnu-apl.d)
+   /// @param fname base name of the config file to open
+   /// @param opened_filename buffer receiving the full path of the opened file
+   /// @param sys true to search the system-wide directory
+   /// @param log_startup true to log file-open activity at start-up
    FILE * open_user_file(const char * fname, char * opened_filename,
                          bool sys, bool log_startup);
 
    /// set the parallel threshold of function \b fun to \b threshold
+   /// @param fun primitive function whose threshold is updated
+   /// @param padic index selecting the monadic/dyadic variant
+   /// @param macn machine-architecture index for the threshold table
+   /// @param threshold minimum element count to enable parallel execution
    static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
 
   /// print \b args
+  /// @param args argument vector to display
   static void show_args(const std::vector<const char *> & args);
 
    /// return " (default)" if yes is true
+   /// @param yes true if the corresponding option is the default
    static const char * is_default(bool yes)
       { return yes ? " (default)" : ""; }
 };

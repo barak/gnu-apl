@@ -25,7 +25,7 @@
 #include "UCS_string.hh"
 
 #ifndef __UCS_STRING_VECTOR_HH_DEFINED__
-#define __UCS_STRING_VECTOR_HH_DEFINED__
+#  define __UCS_STRING_VECTOR_HH_DEFINED__
 
 //----------------------------------------------------------------------------
 /// a vector of UCS_strings.
@@ -36,6 +36,8 @@ public:
    UCS_string_vector()   {}
 
    /// constructor: from APL character matrix (removes trailing blanks)
+   /// @param val        APL character matrix to convert
+   /// @param surrogate  true to treat surrogate pairs as single characters
    UCS_string_vector(const Value & val, bool surrogate);
 
    /// overload vector<UCS_string>::size() so that it returns a signed length
@@ -43,6 +45,7 @@ public:
       { return ShapeItem(std::vector<UCS_string>::size()); }
 
    /// return true iff one of the strings is equal to \b ucs
+   /// @param ucs  string to search for
    bool contains(const UCS_string & ucs) const
       {
         loop(s, size())   if (ucs == at(s))   return true;
@@ -57,24 +60,35 @@ public:
       }
 
    /// compute columns width so that items align nicely (for )VARS, )FNS, etc.)
+   /// @param tab_size  column tab spacing
+   /// @param result    output: computed column widths
    void compute_column_width(int tab_size, std::vector<int> & result);
 
    /// replacement for erase(std::vector::iterator position)
+   /// @param pos  index of the element to remove
    void erase(size_t pos)
       { std::vector<UCS_string>::erase(begin() + pos); }
 
    /// replacement for insert(std::vector::iterator position, value)
+   /// @param pos    index at which to insert
+   /// @param value  string to insert
    void insert(size_t pos, const UCS_string & value)
       { std::vector<UCS_string>::insert(begin() + pos, value); }
 
    /// print items of \b this vector in a table with \b column_count columns
+   /// @param out           output stream
+   /// @param column_count  number of columns in the output table
    std::ostream & print_table(std::ostream & out, size_t column_count) const;
 
    /// return the length of the longest UCS_string in \b this vector,
    /// starting at \b col
+   /// @param col           first column index to consider
+   /// @param column_count  total number of columns (stride between rows)
    ShapeItem max_width(size_t col, size_t column_count) const;
 
    /// dump this string vector (debug function)
+   /// @param out  output stream
+   /// @param loc  caller location for diagnostics
    ostream & dump(ostream & out, const char * loc) const
       {
         out << "────────  " << loc << "  ──────── " << endl;

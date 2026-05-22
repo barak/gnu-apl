@@ -51,26 +51,68 @@ class  Value;
 // the implementations of the operators below are spread over the
 // various files in which their second argument is implemented.
                                                             // Implementation:
-ostream & operator << (ostream &, const AP_num3 &);         // Value.cc
-ostream & operator << (ostream &, const Cell &);            // Cell.cc
-ostream & operator << (ostream &, const DynamicObject &);   // DynamicObject.cc
-ostream & operator << (ostream &, const Format_sub &);      // Bif_F12_FORMAT.cc
-ostream & operator << (ostream &, const Function &);        // Function.cc
-ostream & operator << (ostream &, const Function_PC2 &);    // Common.cc
-ostream & operator << (ostream &,       Id id);             // Id.cc
-ostream & operator << (ostream &, const IndexExpr &);       // IndexExpr.cc
-ostream & operator << (ostream &, const LineLabel &);       // Nabla.cc
-ostream & operator << (ostream &, const PrintBuffer &);     // PrintBuffer.cc
-ostream & operator << (ostream &, const Shape &);           // Shape.cc
-ostream & operator << (ostream &, const Symbol &);          // Symbol.cc
-ostream & operator << (ostream &, const Token &);           // Token.cc
-ostream & operator << (ostream &, const Token_string &);    // Token.cc
-ostream & operator << (ostream &,       TokenTag);          // Token.cc
-ostream & operator << (ostream &,       TokenClass);        // Token.cc
-ostream & operator << (ostream &, const UCS_string &);      //  UCS_string.cc
-ostream & operator << (ostream &,       Unicode);           // UCS_string.cc
-ostream & operator << (ostream &, const UTF8_string &);     // UTF8_string.cc
-ostream & operator << (ostream &, const UTF8 * );           // UTF8_string.cc
-ostream & operator << (ostream &, const Value &);           // Value.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const AP_num3 & x);         // Value.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Cell & x);            // Cell.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const DynamicObject & x);   // DynamicObject.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Format_sub & x);      // Bif_F12_FORMAT.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Function & x);        // Function.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Function_PC2 & x);    // Common.cc
+/// @param out output stream
+/// @param id value to print
+ostream & operator << (ostream & out,       Id id);               // Id.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const IndexExpr & x);       // IndexExpr.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const LineLabel & x);       // Nabla.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const PrintBuffer & x);     // PrintBuffer.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Shape & x);           // Shape.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Symbol & x);          // Symbol.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Token & x);           // Token.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Token_string & x);    // Token.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out,       TokenTag x);          // Token.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out,       TokenClass x);        // Token.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const UCS_string & x);      //  UCS_string.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out,       Unicode x);           // UCS_string.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const UTF8_string & x);     // UTF8_string.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const UTF8 * x);            // UTF8_string.cc
+/// @param out output stream
+/// @param x value to print
+ostream & operator << (ostream & out, const Value & x);           // Value.cc
 
 #endif // __PRINTOPERATOR_HH_DEFINED

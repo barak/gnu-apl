@@ -49,6 +49,8 @@ public:
       { return valid; }
 
    /// ⎕FX a native funtion from a shared library (dlopen) handle
+   /// @param so_name path to the shared library (.so) file
+   /// @param apl_name APL name to assign to the loaded function
    static NativeFunction * fix(const UCS_string & so_name,
                                const UCS_string & apl_name);
 
@@ -65,20 +67,27 @@ public:
       };
 
    /// load shared lib for emacs mode, return error info on failure
+   /// @param emacs_arg argument string passed from emacs mode initialisation
    static UCS_string load_emacs_library(const char * emacs_arg);
 
 protected:
    /// constructor (only fix() may call it)
+   /// @param so_name path to the shared library (.so) file
+   /// @param apl_name APL name to assign to this function
    NativeFunction(const UCS_string & so_name, const UCS_string & apl_name);
 
    /// destructor: close so_handle
    ~NativeFunction();
 
-   /// open .so file in one of several directories. On success set handle 
+   /// open .so file in one of several directories. On success set handle
    /// and update so_path.
+   /// @param t4 error/diagnostic text accumulator (updated on failure)
+   /// @param so_path resolved library path (updated on success)
    static void * open_so_file(UCS_string & t4, UCS_string & so_path);
 
    /// try to open one .so file
+   /// @param filename candidate path for the shared library
+   /// @param t4 error/diagnostic text accumulator (updated on failure)
    static void * try_one_file(const char * filename, UCS_string & t4);
 
    /// overloaded Function::is_defined()
@@ -94,61 +103,106 @@ protected:
    virtual bool is_operator() const;
 
    /// Overloaded Function::print_properties()
+   /// @param out output stream for the property listing
+   /// @param indent indentation level for formatting
    virtual void print_properties(ostream & out, int indent) const;
 
    /// Overloaded Function::print()
+   /// @param out output stream to print the function name to
    virtual ostream & print(std::ostream&) const;
 
    /// Overloaded Function::canonical()
+   /// @param with_lines true to include line numbers in the canonical form
    virtual UCS_string canonical(bool with_lines) const;
 
    /// Overloaded Function::eval_()
    virtual Token eval_() const;
 
    /// Overloaded Function::eval_B()
+   /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_AB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_LB()
+   /// @param LO left operand token
+   /// @param B right APL argument value
    virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALB()
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param B right APL argument value
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LRB()
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right APL argument value
    virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRB()
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right APL argument value
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_XB()
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_AXB()
+   /// @param A left APL argument value
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LXB()
+   /// @param LO left operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB()
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LRXB()
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
                             Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_fill_B()
+   /// @param B right APL argument value
    virtual Token eval_fill_B(Value_P B) const;
 
    /// Overloaded Function::eval_fill_AB()
+   /// @param A left APL argument value
+   /// @param B right APL argument value
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_identity_fun()
+   /// @param B right APL argument value
+   /// @param axis the axis along which the identity element applies
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Overloaded Function::destroy()

@@ -29,6 +29,8 @@ class static_Objects
 {
 public:
    /// constructor
+   /// @param l source location string (typically LOC)
+   /// @param w human-readable description of the object being constructed
    static_Objects(const char * l, const char * w);
 
    /// destructor

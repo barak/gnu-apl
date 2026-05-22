@@ -41,6 +41,9 @@ public:
                  const void * comp_arg);
 
    /// sort array \b a according to greater_fun \b gf
+   /// @param array the vector of items to sort in-place
+   /// @param gf comparison function returning true when item_a > item_b
+   /// @param comp_arg additional context passed to the comparison function
    static void sort(vector<T> & array, greater_fun gf, const void * comp_arg)
       {
         /* Turn array into a heap. An array a is a if for every odd element
@@ -117,6 +120,10 @@ public:
       int compare(const int & key, const T & t, const void *)
          { return key - t.key; }   // return > 0 if key is above t.
     **/
+   /// @param key the search key to locate
+   /// @param array the sorted vector of items to search
+   /// @param compare comparison function: returns >0 if key is above item
+   /// @param ctx additional context passed to the comparison function
    template<typename KEY>
    static const T * search(const KEY & key,
                            const vector<T> & array,
@@ -140,6 +147,10 @@ public:
    /// initialize the (initially empty) vector \b sorted with pointers to the
    /// items of \b array in such a way that *sorted[N] < *sorted[N+1] according
    /// to the comparison function \b gf.
+   /// @param sorted initially-empty output vector of const pointers in order
+   /// @param array source vector whose items are pointed to
+   /// @param gf comparison function returning true when item_a > item_b
+   /// @param comp_arg additional context passed to the comparison function
    static void sorted_pointers(vector<const T *> & sorted,
                                const vector<T> & array,
                                greater_fun gf, const void * comp_arg)
@@ -153,6 +164,10 @@ public:
    /// initialize the (initially empty) vector \b sorted with pointers to the
    /// items of \b array in such a way that *sorted[N] < *sorted[N+1] according
    /// to the comparison function \b gf.
+   /// @param sorted initially-empty output vector of mutable pointers in order
+   /// @param array source vector whose items are pointed to
+   /// @param gf comparison function returning true when item_a > item_b
+   /// @param comp_arg additional context passed to the comparison function
    static void sorted_pointers(vector<T *> & sorted,
                                       vector<T> & array,
                                       greater_fun gf,
@@ -167,6 +182,10 @@ public:
    /// initialize the (initially empty) vector \b sorted with indices of the
    /// array in such a way that arrat[sorted[N]] < array[sorted[N+1]] according
    /// to the comparison function \b gf.
+   /// @param sorted initially-empty output vector of indices in sorted order
+   /// @param array source vector to sort by index
+   /// @param gf comparison function returning true when item_a > item_b
+   /// @param comp_arg additional context passed to the comparison function
    static void sorted_indices(vector<ShapeItem> & sorted,
                               const vector<T> & array,
                               greater_fun gf, const void * comp_arg)
@@ -179,6 +198,11 @@ public:
 
 protected:
    /// establish the heap property of the subtree with root a[parent]
+   /// @param array the vector being heapified
+   /// @param heapsize number of elements currently in the heap
+   /// @param parent root index of the subtree to fix
+   /// @param comp_arg additional context passed to the comparison function
+   /// @param gf comparison function returning true when item_a > item_b
    static void make_heap(vector<T> & array, int64_t heapsize, int64_t parent,
                          const void * comp_arg, greater_fun gf)
       {
@@ -216,7 +240,8 @@ protected:
       }
 
    /// exchange \b a and \b b
-   //
+   /// @param a first item to swap
+   /// @param b second item to swap
    static void swap(T & a, T & b)
       {
         const T t = a;   a = b;   b = t;

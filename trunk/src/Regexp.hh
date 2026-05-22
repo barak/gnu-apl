@@ -34,6 +34,9 @@ class RegexpMatch
 {
 public:
    /// constructor
+   /// @param code compiled PCRE2 pattern to execute
+   /// @param B subject UCS string to match against
+   /// @param start byte offset within B at which to start matching
    RegexpMatch(pcre2_code * code, const UCS_string & B, PCRE2_SIZE start);
 
    /// destructor
@@ -78,12 +81,16 @@ class Regexp
 {
 public:
     /// constructor
+    /// @param pattern the regular expression pattern string
+    /// @param flags PCRE2 compile-option flags
     Regexp(const UCS_string & pattern, int flags);
 
     /// destructor
     virtual ~Regexp();
 
    /// return a new match
+   /// @param match subject UCS string to match against
+   /// @param size length of the subject string in code units
     const RegexpMatch * match(const UCS_string & match, PCRE2_SIZE size) const;
 
    /// return the number of matches
@@ -94,6 +101,7 @@ public:
        { return code; }
 
    /// return a description for error code \b eec
+   /// @param ec PCRE2 error code to describe
    static UCS_string pcre_error(int ec);
 
 protected:

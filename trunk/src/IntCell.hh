@@ -51,10 +51,14 @@ public:
       { value.ival = 0;  }
 
    /// Construct an integer cell with value \b i
+   /// @param i initial integer value
    IntCell(APL_Integer i)
       { value.ival = i;  }
 
    /// overloaded Cell::init_other
+   /// @param other destination memory for placement new
+   /// @param cell_owner value that owns the destination cell
+   /// @param loc caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   IntCell(value.ival); }
 
@@ -63,88 +67,125 @@ public:
       { return true; }
 
    /// overloaded Cell::bif_near_int64_t()
+   /// @param Z result cell
    virtual ErrorCode bif_near_int64_t(Cell * Z) const;
 
    /// overloaded Cell::bif_within_quad_CT()
+   /// @param Z result cell
    virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
 
    /// overloaded Cell::greater()
+   /// @param other cell to compare against
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal()
+   /// @param other cell to compare against
+   /// @param qct comparison tolerance (⎕CT)
    virtual bool equal(const Cell & other, double qct) const;
 
    /// overloaded Cell::bif_add()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_ceiling(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_conjugate(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_direction(Cell * Z) const;
 
    /// overloaded Cell::bif_divide()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_divide(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_exponential(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_factorial(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_floor(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_magnitude(Cell * Z) const;
 
    /// overloaded Cell::bif_multiply()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_power()
+   /// @param Z result cell
+   /// @param A left argument cell (the exponent)
    virtual ErrorCode bif_power(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_nat_log(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_negative(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_pi_times(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_pi_times_inverse(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_reciprocal(Cell * Z) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
    virtual ErrorCode bif_roll(Cell * Z) const;
 
    /// overloaded Cell::bif_subtract()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_subtract(Cell * Z, const Cell * A) const;
 
    /// compare this with other, throw DOMAIN ERROR on illegal comparisons
+   /// @param other cell to compare against
    virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_maximum(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_minimum(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)
+   /// @param Z result cell
+   /// @param A left argument cell (the modulus)
    virtual ErrorCode bif_residue(Cell * Z, const Cell * A) const;
 
    /// the Quad_CR representation of this cell
+   /// @param pctx print context controlling format
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
    /// return true iff this cell needs scaling (exponential format) in pctx
    /// According to lrm p. 13, integer cells ignore ⎕PP an never use scaling
+   /// @param pctx print context controlling format
    virtual bool need_scaling(const PrintContext &pctx) const
       { return false; }
 
@@ -159,12 +200,17 @@ public:
 #endif
 
    /// overloaded Cell::bif_add_inverse()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_multiply_inverse()
+   /// @param Z result cell
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
 
    /// swap \b this Intcell and \b other (for Heapsort<IntCell> )
+   /// @param other cell to swap integer value with
    void swap_ivals(IntCell & other)
       {
          const APL_Integer tmp = value.ival;
@@ -176,6 +222,7 @@ public:
    virtual APL_Integer get_int_value()  const   { return value.ival; }
 
    /// set the integer value of this IntCell
+   /// @param val new integer value
    void set_int_value(APL_Integer val)
      { value.ival = val; }
 
@@ -199,19 +246,24 @@ public:
 #endif // __LIBAPL__
 
    /// initialize Z to APL_Integer v
+   /// @param Z result cell to initialize
+   /// @param aint integer value to store
    static ErrorCode zI(Cell * Z, APL_Integer aint)
       { new (Z) IntCell(aint);   return E_NO_ERROR; }
 
 protected:
    /// initialize the (un-initialized) Cell *Z to integer 0
+   /// @param Z result cell to initialize
    static ErrorCode z0(Cell * Z)
       { new (Z) IntCell();   return E_NO_ERROR; }
 
    /// initialize the (un-initialized) Cell *Z to integer 1
+   /// @param Z result cell to initialize
    static ErrorCode z1(Cell * Z)
       { new (Z) IntCell(1);   return E_NO_ERROR; }
 
    /// initialize the (un-initialized) Cell *Z to integer ¯1
+   /// @param Z result cell to initialize
    static ErrorCode z_1(Cell * Z)
       { new (Z) IntCell(-1);   return E_NO_ERROR; }
 

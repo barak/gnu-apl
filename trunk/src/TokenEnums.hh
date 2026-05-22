@@ -114,6 +114,7 @@ enum TokenClass
 };
 
    /// return true if \b tcl is a niladic, monadic or dyadic function
+   /// @param tcl token class to test
    inline bool is_function_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN0 | 1 << TC_FUN1 | 1 << TC_FUN2 };
@@ -121,12 +122,14 @@ enum TokenClass
       }
 
    /// return true if \b tcl is a monadic or dyadic operator
+   /// @param tcl token class to test
    inline bool is_operator_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_OPER1 | 1 << TC_OPER2 };
         return BITS & 1 << tcl;
       }
 
+   /// @param tcl token class to test
    inline bool is_function_or_operator_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN0  | 1 << TC_FUN1 | 1 << TC_FUN2
@@ -135,6 +138,7 @@ enum TokenClass
       }
 
    /// return if tcl is a token class that needs a right argument
+   /// @param tcl token class to test
    inline bool needs_B(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN1  | 1 << TC_FUN2
@@ -223,6 +227,8 @@ enum TokenTag
 };
 
 /// exchange TokenTags \b t1 and \b t2
+/// @param tag1 first tag to swap
+/// @param tag2 second tag to swap
 inline void
 swap(TokenTag & tag1, TokenTag & tag2)
 { const TokenTag tmp = tag1;

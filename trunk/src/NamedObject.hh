@@ -95,6 +95,7 @@ class NamedObject
 {
 public:
    /// constructor from Id
+   /// @param i the Id to assign to this named object
    NamedObject(Id i)
    : id(i)
    {}

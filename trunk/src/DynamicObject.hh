@@ -47,6 +47,8 @@ class DynamicObject
 
 public:
    /// constructor: a DynamicObject allocated at source location \b loc
+   /// @param loc caller location for diagnostics
+   /// @param anchor the doubly linked list anchor to insert into
    DynamicObject(const char * loc, DynamicObject * anchor)
    : alloc_loc(loc)
    {
@@ -60,6 +62,7 @@ public:
    }
 
    /// a special constructor for the statically allocated anchors
+   /// @param loc caller location for diagnostics
    DynamicObject(const char * loc)
    : alloc_loc(loc),
      next(this),
@@ -97,14 +100,16 @@ public:
    IndexExpr * pIndexExpr();
 
    /// print this object
-   ///
+   /// @param out output stream to print to
    void print(ostream & out) const;
 
    /// print new object message
-   ///
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
    void print_new(ostream & out, const char * loc) const;
 
    /// print the list of objects starting at this object
+   /// @param out output stream to print to
    void print_chain(ostream & out) const;
 
    /// where this value was allocated.

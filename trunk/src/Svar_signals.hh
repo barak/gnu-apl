@@ -76,25 +76,25 @@ and then:
 #include <string.h>
 
 #if HAVE_SYS_SELECT_H
-#include <sys/select.h>
+#  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
 
 #if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+#  include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
 
 #include <sys/types.h>
 
 #if HAVE_NETINET_IN_H
-#include <netinet/in.h>
+#  include <netinet/in.h>
 #endif // HAVE_NETINET_IN_H
 
 #if HAVE_WINSOCK2_H
-# include <winsock2.h>
+#  include <winsock2.h>
 #endif // HAVE_WINSOCK2_H
 
 #if ! MINGW_SRC
-#define SOCKET(x) x
+#  define SOCKET(x) x
 #endif // ! MINGW_SRC
 
 #include <iostream>
@@ -109,9 +109,11 @@ class Sig_item_int
 {
 public:
    /// construct an item with value \b v
+   /// @param v initial integer value
    Sig_item_int(T v) : value(v & get_mask()) {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_int(const uint8_t * & buffer)
       {
         value = 0;
@@ -126,12 +128,14 @@ public:
    T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
+   /// @param buffer destination string to append the serialised bytes to
    void store(string & buffer) const
       {
         for (int b = bytes; b > 0;)   buffer += char(value >> (8*--b));
       }
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         return out << value;
@@ -154,12 +158,15 @@ class Sig_item_xint : public Sig_item_int<T, bytes>
 {
 public:
    /// construct an item with value \b v
+   /// @param v initial integer value
    Sig_item_xint(T v) : Sig_item_int<T, bytes>(v) {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_xint(const uint8_t * & buffer) : Sig_item_int<T, bytes>(buffer) {}
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         return out << "0x" << hex << setfill('0') << setw(bytes)
@@ -192,11 +199,13 @@ class Sig_item_string
 {
 public:
    /// construct an item with value \b v
+   /// @param str initial string value
    Sig_item_string(const string & str)
    : value(str)
    {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_string(const uint8_t * & buffer)
       {
         Sig_item_u16 len (buffer);
@@ -208,6 +217,7 @@ public:
    const string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
+   /// @param buffer destination string to append the serialised bytes to
    void store(string & buffer) const
       {
         const Sig_item_u16 len (value.size());
@@ -216,6 +226,7 @@ public:
       }
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         bool printable = true;
@@ -366,9 +377,11 @@ public:
    virtual ~Signal_base() {}
 
    /// store (encode) the signal into buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const = 0;
 
    /// print the signal
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const = 0;
 
    /// return the ID of the signal
@@ -378,6 +391,8 @@ public:
    virtual const char * get_sigName() const = 0;
 
    /// get function for an item that is not defined for the signal
+   /// @param signal name of the signal class that was queried
+   /// @param member name of the member that does not exist for this signal
    void bad_get(const char * signal, const char * member) const
       {
         cerr << endl << "*** called function get_" << signal << "__" << member
@@ -675,6 +690,12 @@ public:
 
 
    /// receive a signal (TCP)
+   /// @param tcp_sock TCP (or AF_UNIX) socket file descriptor to read from
+   /// @param buffer caller-supplied working buffer for receiving data
+   /// @param bufsize size in bytes of buffer
+   /// @param del set to a heap-allocated buffer if buffer was too small; caller must delete[]
+   /// @param debug optional stream for debug output; nullptr suppresses output
+   /// @param loc set to the source location where the function returned
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
                                         ostream * debug, const char ** loc);
@@ -682,6 +703,7 @@ public:
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
+   /// @param tcp_sock socket file descriptor to send on
    int send_TCP(int tcp_sock) const
        {
          string buffer;
@@ -706,6 +728,8 @@ class MAKE_OFFER_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    MAKE_OFFER_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -713,11 +737,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAKE_OFFER_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAKE_OFFER);
@@ -726,6 +752,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAKE_OFFER(";
@@ -754,6 +781,8 @@ class RETRACT_OFFER_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    RETRACT_OFFER_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -761,11 +790,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    RETRACT_OFFER_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_OFFER);
@@ -774,6 +805,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_OFFER(";
@@ -802,6 +834,8 @@ class RETRACT_VAR_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    RETRACT_VAR_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -809,11 +843,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    RETRACT_VAR_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_VAR);
@@ -822,6 +858,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_VAR(";
@@ -849,6 +886,8 @@ class DISCONNECT_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    DISCONNECT_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -856,11 +895,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    DISCONNECT_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_DISCONNECT);
@@ -869,6 +910,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "DISCONNECT(";
@@ -898,6 +940,10 @@ class SET_STATE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _new_state new state value to set
+   /// @param _sloc source location string for diagnostics
    SET_STATE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_state,
@@ -909,6 +955,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SET_STATE_c(const uint8_t * & buffer)
    : key(buffer),
      new_state(buffer),
@@ -916,6 +963,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_STATE);
@@ -926,6 +974,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SET_STATE(";
@@ -965,6 +1014,9 @@ class SET_CONTROL_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _new_control new control value to set
    SET_CONTROL_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_control)
@@ -974,12 +1026,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SET_CONTROL_c(const uint8_t * & buffer)
    : key(buffer),
      new_control(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_CONTROL);
@@ -989,6 +1043,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SET_CONTROL(";
@@ -1023,6 +1078,8 @@ class GET_VALUE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    GET_VALUE_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1030,11 +1087,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_VALUE_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_VALUE);
@@ -1043,6 +1102,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_VALUE(";
@@ -1072,6 +1132,11 @@ class VALUE_IS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _error error code from the get operation
+   /// @param _error_loc source location where the error occurred
+   /// @param _cdr_value CDR-encoded value of the shared variable
    VALUE_IS_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _error,
@@ -1085,6 +1150,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    VALUE_IS_c(const uint8_t * & buffer)
    : key(buffer),
      error(buffer),
@@ -1093,6 +1159,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_VALUE_IS);
@@ -1104,6 +1171,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "VALUE_IS(";
@@ -1148,6 +1216,9 @@ class ASSIGN_VALUE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _cdr_value CDR-encoded value to assign to the shared variable
    ASSIGN_VALUE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_string _cdr_value)
@@ -1157,12 +1228,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ASSIGN_VALUE_c(const uint8_t * & buffer)
    : key(buffer),
      cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_VALUE);
@@ -1172,6 +1245,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_VALUE(";
@@ -1205,6 +1279,10 @@ class SVAR_ASSIGNED_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _error error code from the assign operation
+   /// @param _error_loc source location where the error occurred
    SVAR_ASSIGNED_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _error,
@@ -1216,6 +1294,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_ASSIGNED_c(const uint8_t * & buffer)
    : key(buffer),
      error(buffer),
@@ -1223,6 +1302,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_ASSIGNED);
@@ -1233,6 +1313,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_ASSIGNED(";
@@ -1272,6 +1353,9 @@ class MAY_USE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _attempt use-attempt counter
    MAY_USE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_i32 _attempt)
@@ -1281,12 +1365,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAY_USE_c(const uint8_t * & buffer)
    : key(buffer),
      attempt(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_USE);
@@ -1296,6 +1382,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAY_USE(";
@@ -1330,6 +1417,9 @@ class MAY_SET_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _attempt set-attempt counter
    MAY_SET_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_i32 _attempt)
@@ -1339,12 +1429,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAY_SET_c(const uint8_t * & buffer)
    : key(buffer),
      attempt(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_SET);
@@ -1354,6 +1446,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAY_SET(";
@@ -1392,6 +1485,8 @@ class READ_SVAR_RECORD_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key whose record is requested
    READ_SVAR_RECORD_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1399,11 +1494,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    READ_SVAR_RECORD_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_SVAR_RECORD);
@@ -1412,6 +1509,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "READ_SVAR_RECORD(";
@@ -1440,6 +1538,8 @@ class SVAR_RECORD_IS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _record serialised SVAR database record
    SVAR_RECORD_IS_c(int s,
                 Sig_item_string _record)
    : record(_record)
@@ -1447,11 +1547,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_RECORD_IS_c(const uint8_t * & buffer)
    : record(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_RECORD_IS);
@@ -1460,6 +1562,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_RECORD_IS(";
@@ -1489,6 +1592,10 @@ class IS_REGISTERED_ID_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID to query
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    IS_REGISTERED_ID_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1500,6 +1607,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    IS_REGISTERED_ID_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1507,6 +1615,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_IS_REGISTERED_ID);
@@ -1517,6 +1626,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "IS_REGISTERED_ID(";
@@ -1556,6 +1666,8 @@ class YES_NO_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _yes boolean result: 1 for yes, 0 for no
    YES_NO_c(int s,
                 Sig_item_u8 _yes)
    : yes(_yes)
@@ -1563,11 +1675,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    YES_NO_c(const uint8_t * & buffer)
    : yes(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_YES_NO);
@@ -1576,6 +1690,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "YES_NO(";
@@ -1605,6 +1720,12 @@ class REGISTER_PROCESSOR_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID to register
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
+   /// @param _evconn event-connection flag
+   /// @param _progname program name of the registering process
    REGISTER_PROCESSOR_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1620,6 +1741,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    REGISTER_PROCESSOR_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1629,6 +1751,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_REGISTER_PROCESSOR);
@@ -1641,6 +1764,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "REGISTER_PROCESSOR(";
@@ -1690,6 +1814,14 @@ class MATCH_OR_MAKE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _varname name of the shared variable
+   /// @param _to_proc target processor ID
+   /// @param _to_parent target parent processor ID
+   /// @param _to_grand target grandparent processor ID
+   /// @param _from_proc offering processor ID
+   /// @param _from_parent offering parent processor ID
+   /// @param _from_grand offering grandparent processor ID
    MATCH_OR_MAKE_c(int s,
                 Sig_item_string _varname,
                 Sig_item_u32 _to_proc,
@@ -1709,6 +1841,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MATCH_OR_MAKE_c(const uint8_t * & buffer)
    : varname(buffer),
      to_proc(buffer),
@@ -1720,6 +1853,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE);
@@ -1734,6 +1868,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE(";
@@ -1793,6 +1928,8 @@ class MATCH_OR_MAKE_RESULT_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key resulting shared variable key
    MATCH_OR_MAKE_RESULT_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1800,11 +1937,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MATCH_OR_MAKE_RESULT_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE_RESULT);
@@ -1813,6 +1952,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE_RESULT(";
@@ -1843,6 +1983,8 @@ class FIND_OFFERING_ID_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key to look up
    FIND_OFFERING_ID_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1850,11 +1992,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    FIND_OFFERING_ID_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_OFFERING_ID);
@@ -1863,6 +2007,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "FIND_OFFERING_ID(";
@@ -1892,6 +2037,10 @@ class OFFERING_ID_IS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID that offers the variable
+   /// @param _parent parent processor ID of the offering processor
+   /// @param _grand grandparent processor ID of the offering processor
    OFFERING_ID_IS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1903,6 +2052,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERING_ID_IS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1910,6 +2060,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_ID_IS);
@@ -1920,6 +2071,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_ID_IS(";
@@ -1959,6 +2111,8 @@ class GET_OFFERING_PROCS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_to_proc processor ID that received the offers
    GET_OFFERING_PROCS_c(int s,
                 Sig_item_u32 _offered_to_proc)
    : offered_to_proc(_offered_to_proc)
@@ -1966,11 +2120,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_OFFERING_PROCS_c(const uint8_t * & buffer)
    : offered_to_proc(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERING_PROCS);
@@ -1979,6 +2135,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERING_PROCS(";
@@ -2008,6 +2165,8 @@ class OFFERING_PROCS_ARE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offering_procs serialised list of offering processor IDs
    OFFERING_PROCS_ARE_c(int s,
                 Sig_item_string _offering_procs)
    : offering_procs(_offering_procs)
@@ -2015,11 +2174,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERING_PROCS_ARE_c(const uint8_t * & buffer)
    : offering_procs(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_PROCS_ARE);
@@ -2028,6 +2189,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_PROCS_ARE(";
@@ -2057,6 +2219,9 @@ class GET_OFFERED_VARS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_to_proc processor ID that received the offers
+   /// @param _accepted_by_proc processor ID that accepted the offers
    GET_OFFERED_VARS_c(int s,
                 Sig_item_u32 _offered_to_proc,
                 Sig_item_u32 _accepted_by_proc)
@@ -2066,12 +2231,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_OFFERED_VARS_c(const uint8_t * & buffer)
    : offered_to_proc(buffer),
      accepted_by_proc(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERED_VARS);
@@ -2081,6 +2248,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERED_VARS(";
@@ -2115,6 +2283,8 @@ class OFFERED_VARS_ARE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_vars serialised list of offered variable names/keys
    OFFERED_VARS_ARE_c(int s,
                 Sig_item_string _offered_vars)
    : offered_vars(_offered_vars)
@@ -2122,11 +2292,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERED_VARS_ARE_c(const uint8_t * & buffer)
    : offered_vars(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERED_VARS_ARE);
@@ -2135,6 +2307,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERED_VARS_ARE(";
@@ -2164,6 +2337,8 @@ class FIND_PAIRING_KEY_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key to find the pairing partner for
    FIND_PAIRING_KEY_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -2171,11 +2346,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    FIND_PAIRING_KEY_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_PAIRING_KEY);
@@ -2184,6 +2361,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "FIND_PAIRING_KEY(";
@@ -2213,6 +2391,8 @@ class PAIRING_KEY_IS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _pairing_key the paired variable key (CTL/DAT counterpart)
    PAIRING_KEY_IS_c(int s,
                 Sig_item_x64 _pairing_key)
    : pairing_key(_pairing_key)
@@ -2220,11 +2400,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    PAIRING_KEY_IS_c(const uint8_t * & buffer)
    : pairing_key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PAIRING_KEY_IS);
@@ -2233,6 +2415,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "PAIRING_KEY_IS(";
@@ -2263,6 +2446,10 @@ class GET_EVENTS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID whose events are requested
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    GET_EVENTS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -2274,6 +2461,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_EVENTS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -2281,6 +2469,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_EVENTS);
@@ -2291,6 +2480,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_EVENTS(";
@@ -2330,6 +2520,10 @@ class CLEAR_ALL_EVENTS_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID whose events are to be cleared
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    CLEAR_ALL_EVENTS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -2341,6 +2535,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    CLEAR_ALL_EVENTS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -2348,6 +2543,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_CLEAR_ALL_EVENTS);
@@ -2358,6 +2554,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "CLEAR_ALL_EVENTS(";
@@ -2398,6 +2595,9 @@ class EVENTS_ARE_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key that has the event
+   /// @param _events bitmask of pending events for the variable
    EVENTS_ARE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _events)
@@ -2407,12 +2607,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    EVENTS_ARE_c(const uint8_t * & buffer)
    : key(buffer),
      events(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_EVENTS_ARE);
@@ -2422,6 +2624,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "EVENTS_ARE(";
@@ -2456,6 +2659,12 @@ class ADD_EVENT_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key for which the event is added
+   /// @param _proc processor ID to notify
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
+   /// @param _event event code to add
    ADD_EVENT_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _proc,
@@ -2471,6 +2680,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ADD_EVENT_c(const uint8_t * & buffer)
    : key(buffer),
      proc(buffer),
@@ -2480,6 +2690,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ADD_EVENT);
@@ -2492,6 +2703,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ADD_EVENT(";
@@ -2541,6 +2753,9 @@ class ASSIGN_WSWS_VAR_c : public Signal_base
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key for the ws-ws variable
+   /// @param _cdr_value CDR-encoded value to assign
    ASSIGN_WSWS_VAR_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_string _cdr_value)
@@ -2550,12 +2765,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ASSIGN_WSWS_VAR_c(const uint8_t * & buffer)
    : key(buffer),
      cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_WSWS_VAR);
@@ -2565,6 +2782,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_WSWS_VAR(";
@@ -2605,11 +2823,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    READ_WSWS_VAR_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_WSWS_VAR);
@@ -2618,6 +2838,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "READ_WSWS_VAR(";
@@ -2653,11 +2874,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    WSWS_VALUE_IS_c(const uint8_t * & buffer)
    : cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_WSWS_VALUE_IS);
@@ -2666,6 +2889,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "WSWS_VALUE_IS(";
@@ -2700,10 +2924,12 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    PRINT_SVAR_DB_c(const uint8_t * & buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PRINT_SVAR_DB);
@@ -2711,6 +2937,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "PRINT_SVAR_DB(";
@@ -2742,11 +2969,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_DB_PRINTED_c(const uint8_t * & buffer)
    : printout(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_DB_PRINTED);
@@ -2755,6 +2984,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_DB_PRINTED(";

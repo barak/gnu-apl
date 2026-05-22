@@ -97,9 +97,11 @@ public:
    static void syntax_error();
 
    /// reset APL errors, expecting cnt
+   /// @param arg string containing the expected error count
    static void expect_apl_errors(const UCS_string & arg);
 
    /// count an APL error
+   /// @param loc caller location for diagnostics
    static void apl_error(const char * loc);
 
    /// count a failed assertion
@@ -109,6 +111,8 @@ public:
    static void diff_error();
 
    /// get one line from the current file, open the next file if necceessary
+   /// @param line output buffer for the line read
+   /// @param eof set to true when no more input is available
    static void get_file_line(UTF8_string & line, bool & eof);
 
    /// open the next test file 
@@ -122,6 +126,8 @@ public:
       { return current_testreport; }
 
    /// read one line from the current input file with CR and LF removed
+   /// @param file_line output buffer for the line read
+   /// @param eof set to true when end of file is reached
    static void read_file_line(UTF8_string & file_line, bool & eof);
 
 protected:

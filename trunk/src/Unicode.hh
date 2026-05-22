@@ -25,7 +25,7 @@
 #define __UNICODE_HH_DEFINED__
 
 #ifndef __COMMON_HH_DEFINED__
-# error This file shall NOT be #included directly, but by #including Common.hh
+#  error This file shall NOT be #included directly, but by #including Common.hh
 #endif
 
 #include "Common.hh"
@@ -108,13 +108,16 @@ enum Unicode
 };
 
 /// value 0-15 of hex digit, or -1 if uni not in "023456789ABCDEFabcdef"
+/// @param uni Unicode character to convert
 extern int nibble(Unicode uni);
 
 /// value 0-63 of base64 digit, or -1 if uni not base64 (RFC 4648)
+/// @param uni Unicode character to convert
 extern int sixbit(Unicode uni);
 
 //----------------------------------------------------------------------------
 /// return true iff \b uni is a padding character (used internally).
+/// @param uni Unicode character to test
 inline bool is_iPAD_char(Unicode uni)
 {
    return ((uni > UNI_iPAD_U2) && (uni <= UNI_PAD_r_NOTCHAR))    // ³ ¹

@@ -26,7 +26,7 @@
 
 #include "config.h"   // for HAVE_xxx
 #if HAVE_SYS_RESOURCE_H
-# include <sys/resource.h>   // for rlim_t
+#  include <sys/resource.h>   // for rlim_t
 #else  // windows
 typedef uint64_t rlim_t;
 #endif // HAVE_SYS_RESOURCE_H
@@ -45,9 +45,11 @@ public:
    Quad_WA();
 
    /// initialize total_memory
+   /// @param log_startup if true print startup diagnostics
    static void init(bool log_startup);
 
    /// parse a -mem command line option
+   /// @param log_startup if true print startup diagnostics
    static void parse_mem(bool log_startup);
 
    /// the estimated (!) the amount of free memory
@@ -87,6 +89,7 @@ protected:
    static int read_meminfo();
 
    /// read a (supposedly short) file in /proc
+   /// @param filename path to the /proc file to read
    static int64_t read_procfile(const char * filename);
 
    /// overloaded Symbol::get_apl_value().

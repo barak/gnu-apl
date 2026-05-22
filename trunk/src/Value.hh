@@ -71,38 +71,61 @@ protected:
    // their counterparts in class Value_P
    //
    /// constructor: scalar value (i.e. a value with rank 0).
+   /// @param loc caller location for diagnostics
    Value(const char * loc);
 
    /// constructor: a scalar value (i.e. a value with rank 0) from a cell
+   /// @param cell the single ravel cell for the scalar
+   /// @param loc caller location for diagnostics
    Value(const Cell & cell, const char * loc);
 
    /// constructor: a true vector (i.e. a value with rank 1) with len items
+   /// @param len number of elements in the vector
+   /// @param loc caller location for diagnostics
    Value(ShapeItem len, const char * loc);
 
    /// constructor: a matrix (i.e. a value with rank 2)
+   /// @param rows number of rows
+   /// @param cols number of columns
+   /// @param loc caller location for diagnostics
    Value(ShapeItem rows, ShapeItem cols, const char * loc);
 
    /// constructor: a general array with shape \b sh
+   /// @param sh shape of the new array
+   /// @param loc caller location for diagnostics
    Value(const Shape & sh, const char * loc);
 
    /// constructor: a packed array with shape \b sh. The caller has allocated
    /// the ravel (bits)
+   /// @param sh shape of the new array
+   /// @param bits caller-allocated packed bit ravel
+   /// @param loc caller location for diagnostics
    Value(const Shape & sh, uint64_t * bits, const char * loc);
 
    /// constructor: a simple character vector from a UCS string.
    /// Rank is always 1, so that is_char_vector() will be true.
+   /// @param ucs source Unicode string
+   /// @param loc caller location for diagnostics
    Value(const UCS_string & ucs, const char * loc);
 
    /// constructor: a simple character vector from a UTF8 string
+   /// @param utf source UTF-8 string
+   /// @param loc caller location for diagnostics
    Value(const UTF8_string & utf, const char * loc);
 
    /// constructor: a simple character vector from a CDR string
+   /// @param cdr source CDR-encoded string
+   /// @param loc caller location for diagnostics
    Value(const CDR_string & cdr, const char * loc);
 
    /// constructor: a character matrix from a PrintBuffer
+   /// @param pb print buffer providing the character rows
+   /// @param loc caller location for diagnostics
    Value(const PrintBuffer & pb, const char * loc);
 
-   /// constructor: a integer vector containing the items of a shape 
+   /// constructor: a integer vector containing the items of a shape
+   /// @param loc caller location for diagnostics
+   /// @param sh shape whose items are copied into the ravel
    Value(const char * loc, const Shape * sh);
 
 public:
@@ -209,6 +232,7 @@ public:
      { return shape; }
 
    /// return the r'th shape element of \b this value
+   /// @param r axis index (0-based)
    ShapeItem get_shape_item(sRank r) const
       { return shape.get_shape_item(r); }
 
@@ -229,6 +253,8 @@ public:
       { return shape.get_rows(); }
 
    /// set the length of axis \b r to \b sh.
+   /// @param r axis index to update (0-based)
+   /// @param sh new length for that axis
    void set_shape_item(sAxis r, ShapeItem sh)
       { shape.set_shape_item(r, sh); }
 
@@ -244,11 +270,13 @@ public:
        The caller is responsible for ensuring that \b this value does not have
        multiple owners.
    **/
+   /// @param new_shape replacement shape (must not exceed current volume)
    void set_shape(const Shape & new_shape)
       { Assert(new_shape.get_volume() <= nz_element_count() && is_complete());
         shape = new_shape; }
 
    /// return the position of cell in the ravel of \b this value.
+   /// @param cell pointer to the ravel cell whose offset is required
    ShapeItem get_offset(const Cell * cell) const
       { return cell - &get_cfirst(); }
 
@@ -290,6 +318,7 @@ public:
    /// return true, if this value has complex cells, false iff it has only
    /// real cells. Throw domain error for other cells (char, nested, etc.)
    /// if check_numeric is \b true.
+   /// @param check_numeric if true, throw DOMAIN_ERROR for non-numeric cells
    bool is_complex(bool check_numeric) const;
 
    /// true if Value flag \b member is set
@@ -317,19 +346,25 @@ public:
    bool can_be_compared() const;
 
    /// optimized comparison function for strings
+   /// @param ucs Unicode string to compare with this value's ravel
    bool equal_string(const UCS_string & ucs) const;
 
    /// return a value containing pointers to all ravel cells of this value.
    /// the result is non-nested and has the same shape as \b this
+   /// @param loc caller location for diagnostics
    Value_P get_cellrefs(const char * loc);
 
    /// assign \b val to the cell references in this value.
+   /// @param val value whose elements are assigned to the cell references
    void assign_cellrefs(Value_P val);
 
    /** return member of this value, defined by \b members. The first name in
        members is the deepest, while the last name is the name of the
        variable containing the members (and is only used in error printouts).
    **/
+   /// @param members path of member names from deepest to outermost
+   /// @param owner set to the value that owns the returned cell
+   /// @param throw_error if true, throw an error when member is not found
    Cell * get_member(const vector<const UCS_string *> & members,
                      Value * & owner, bool throw_error);
 
@@ -338,37 +373,47 @@ public:
        of the variable containing the members (and is only used in error
        printouts). Return 0 if member was not found.
     **/
+   /// @param members path of member names from deepest to outermost
    const Cell * get_existing_member(const vector<const UCS_string *>
                                     & members)const;
 
    /// return the Cell (if any) containing the data of structured value member
    /// \b member, or 0 if member not found.
+   /// @param member name of the structured member to look up
    const Cell * get_member_data(const UCS_string & member) const;
 
    /// return the Cell (if any) containing the data of structured value member
    /// \b member, or 0 if member not found.
+   /// @param member name of the structured member to look up
    Cell * get_member_data(const UCS_string & member);
 
    /// store the row numbers (starting at 0) so that this[rows] is sorted
    /// in result. Only used rows are returned.
+   /// @param result output vector receiving sorted row indices
+   /// @param filter optional Unicode key to restrict which members are included
    void sorted_members(std::vector<ShapeItem> & result,
                        const Unicode * filter) const;
 
    /// store the row numbers (starting at 0) in result so that this[rows]
    /// is a (used) row, maybe sorted.
    /// in result. Only used rows are returned.
+   /// @param result output vector receiving row indices
+   /// @param sorted if true, return indices in sorted order
    void used_members(std::vector<ShapeItem> & result, bool sorted) const;
 
    /// return the number of (valid) members, as per this[1;]
    ShapeItem get_member_count() const;
 
    /// create a new member and return the Cell containing the data for it
+   /// @param new_member name of the member to create
    Cell * get_new_member(const UCS_string & new_member);
 
    /// double the ravel length of \b this value (by appending integer 0s).
+   /// @param loc caller location for diagnostics
    void double_ravel(const char * loc);
 
    /// return the (constant) idx'th element of the ravel.
+   /// @param idx ravel index (0-based)
    const Cell & get_cravel(ShapeItem idx) const
       {
         Assert1(idx < nz_element_count());
@@ -391,6 +436,7 @@ public:
       { return get_cravel(0); }
 
    /// return the (writable) idx'th element of the ravel.
+   /// @param idx ravel index (0-based)
    Cell & get_wravel(ShapeItem idx)
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
 
@@ -428,10 +474,12 @@ public:
       { return more() ? ravel + valid_ravel_items : 0; }
 
    /// return \b true iff \b this value has the same rank as \b other.
+   /// @param other value to compare rank against
    bool same_rank(const Value & other) const
       { return get_rank() == other.get_rank(); }
 
    /// return \b true iff \b this value has the same shape as \b other.
+   /// @param other value to compare shape against
    bool same_shape(const Value & other) const
       { if (get_rank() != other.get_rank())   return false;
         loop (r, get_rank())
@@ -441,6 +489,7 @@ public:
 
    /// return \b true iff \b this value has the same shape as \b other or one
    /// of the values is a scalar
+   /// @param other value to compare shape against
    bool scalar_matching_shape(const Value & other) const
       { return is_scalar_extensible()
             || other.is_scalar_extensible()
@@ -449,13 +498,18 @@ public:
 
    /// return \b true if shapes of this and other differ only by axes of
    /// length 1
+   /// @param other value whose shape is checked for conformance
    bool conforms_to(const Value & other) const
       { return get_shape().conforms_to(other.get_shape()); }
 
    /// set the prototype (according to B) if this value is empty.
+   /// @param B value whose prototype is copied
+   /// @param loc caller location for diagnostics
    inline void set_default(const Value & B, const char * loc);
 
    /// set the prototype (according to B) if this value is empty.
+   /// @param cB cell whose type determines the prototype
+   /// @param loc caller location for diagnostics
    inline void set_default(const Cell & cB, const char * loc);
 
    /// set the prototype to ' ' if this value is empty.
@@ -465,6 +519,8 @@ public:
    inline void set_proto_Int();
 
    /// release ravel Cell z
+   /// @param offset index of the ravel cell to release
+   /// @param loc caller location for diagnostics
    inline void release(ShapeItem offset, const char * loc);
 
    /// Return the number of scalars in this value (enlist).
@@ -474,9 +530,11 @@ public:
    APL_types::Depth compute_depth() const;
 
    /// store the scalars in this (left-)value into dest...
+   /// @param Z destination value to receive the enlisted cells
    void enlist_left(Value & Z) const;
 
    /// store the scalars in this value into dest...
+   /// @param Z destination value to receive the enlisted cells
    void enlist_right(Value & Z) const;
 
    /// compute the cell types contained in the top level of \b this value
@@ -492,49 +550,72 @@ public:
    CellType deep_cell_subtypes() const;
 
    /// print \b this value (line break at Workspace::get_PW())
+   /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
    /// print some information to help identifying \b this value (shape, depth,
    /// and the first few ravel items)
+   /// @param out output stream to write to
    ostream & print_brief(ostream & out) const;
 
    /// print \b this member value
+   /// @param out output stream to write to
+   /// @param member name of the member to display
    ostream & print_member(ostream & out, UCS_string member) const;
 
    /// print \b this value (line break at print_width)
+   /// @param out output stream to write to
+   /// @param pctx print formatting context
    ostream & print1(ostream & out, PrintContext pctx) const;
 
    /// print the properties (shape, flags etc) of \b this value
+   /// @param out output stream to write to
+   /// @param indent indentation level in spaces
+   /// @param help true to include additional help text
    ostream & print_properties(ostream & out, int indent, bool help) const;
 
    /// debug-print \b this value
+   /// @param info descriptive label shown before the value
    void debug(const char * info) const;
 
    /// print this value in 4 ⎕CR style
+   /// @param out output stream to write to
+   /// @param indent indentation level in spaces
    ostream & print_boxed(ostream & out, int indent) const;
 
    /// return \b this indexed by (multi-dimensional) \b IDX.
+   /// @param IDX multi-dimensional index expression
    Value_P index(const IndexExpr & IDX) const;
 
    /// return a bitmap of integers in \b this value. Normalized to ⎕IO←0.
+   /// @param where caller description used in error messages
+   /// @param rank_B rank of the array being indexed (for validation)
    AxesBitmap to_bitmap(const char * where, uRank rank_B) const;
 
    /// return \b this indexed by (one-dimensional) \b IDX.
+   /// @param X one-dimensional index value
    Value_P index(const Value * X) const;
 
    /// If this value is a single axis between ⎕IO and ⎕IO + max_axis then
    /// return that axis. Otherwise throw AXIS_ERROR.
+   /// @param val value expected to contain a single axis number
+   /// @param max_axis exclusive upper bound for valid axis values
    static sRank get_single_axis(const Value * val, sRank max_axis);
 
    /// convert the ravel of Value \b val to a shape (normalized to ⎕IO←0)
    /// An elided index, for example B[], throws an INDEX_ERROR.
+   /// @param val value whose ravel is interpreted as a shape vector
    static Shape to_shape(const Value * val);
 
    /// return the offset'th ravel cell (of an unpack'ed ravel)
+   /// @param offset ravel index (0-based)
+   /// @param ravel pointer to the start of the ravel array
    static const Cell & cell_fetcher(ShapeItem offset, const Cell * ravel)
       { return ravel[offset]; }
 
    /// return the offset'th ravel cell (of an pack'ed ravel)
+   /// @param offset ravel index (0-based)
+   /// @param ravel pointer to the start of the packed bit ravel
    static const Cell & packed_fetcher(ShapeItem offset, const Cell * ravel)
       { return 1 << (offset & 7) &
                reinterpret_cast<const uint8_t *>(ravel)[offset >> 3]
@@ -542,6 +623,9 @@ public:
       }
 
    /// glue two values.
+   /// @param token_A token holding the left value to glue
+   /// @param token_B token holding the right value to glue
+   /// @param loc caller location for diagnostics
    static Value_P glue(const Token & token_A, const Token & token_B,
                        const char * loc);
 
@@ -550,17 +634,23 @@ public:
    Value * get_lval_cellowner() const;
 
    /// initialize the next ravel cell with a character value
+   /// @param u Unicode character to store
    inline void next_ravel_Char(Unicode u);
 
    /// initialize the next ravel cell with a floating point value
+   /// @param f floating-point value to store
    inline void next_ravel_Float(APL_Float f);
 
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// initialize the next ravel cell with a floating point value
+   /// @param numer numerator of the rational number
+   /// @param denom denominator of the rational number
    inline void next_ravel_Float(APL_Integer numer, APL_Integer denom);
 
    /// initialize the next ravel cell with a floating point value, converting
    /// it to integer if possible
+   /// @param numer numerator of the rational number
+   /// @param denom denominator of the rational number
    inline void next_ravel_Number(APL_Integer numer, APL_Integer denom)
       {
          if      (denom == 1)    next_ravel_Int(numer);
@@ -572,29 +662,39 @@ public:
 
    /// initialize the next ravel cell with a floating point value, converting
    /// it to integer if possible
+   /// @param f floating-point value to store (converted to int if near-int)
    inline void next_ravel_Number(APL_Float f);
 
    /// initialize the next ravel cell with a complex value if needed,
    ///  or with (near-real) floating point value if possible.
+   /// @param real real part of the number
+   /// @param imag imaginary part of the number
    inline void next_ravel_Number(APL_Float real, APL_Float imag);
 
    /// initialize the next ravel cell with a complex value if needed,
    ///  or with (near-real) floating point value if possible.
+   /// @param cpx complex value to store
    inline void next_ravel_Number(APL_Complex cpx);
 
    /// initialize the next ravel cell from another Cell
+   /// @param other source cell to copy
    inline void next_ravel_Cell(const Cell & other);
 
    /// initialize the next ravel cell from the type of another Cell
+   /// @param other cell whose type determines the prototype cell
    inline void next_ravel_Proto(const Cell & other);
 
    /// initialize the next ravel cell with a floating point value
+   /// @param cpx complex value to store
    inline void next_ravel_Complex(APL_Complex cpx);
 
    /// initialize the next ravel cell with a floating point value
+   /// @param real real part of the complex value
+   /// @param imag imaginary part of the complex value
    inline void next_ravel_Complex(APL_Float real, APL_Float imag);
 
    /// initialize the next ravel cell with an integer value
+   /// @param i integer value to store
    inline void next_ravel_Int(APL_Integer i);
 
    /// initialize the next ravel cell with integer 0
@@ -605,41 +705,63 @@ public:
 
    /// initialize the next ravel position with \b byte. NOTE that in this
    /// case ravel is a uint8_t * and not a Cell * !!!
+   /// @param byte packed boolean byte to store
    inline void next_ravel_Byte(uint8_t byte);
 
    /// initialize the next ravel cell with a pointer to another Cell
+   /// @param target pointer to the target cell being referenced
+   /// @param target_owner value that owns the target cell
    inline void next_ravel_Lval(Cell * target, Value * target_owner);
 
    /// initialize the next ravel cell with an APL sub-value
+   /// @param val pointer to the nested sub-value
    inline void next_ravel_Pointer(Value * val);
 
    /// initialize the next ravel cell with an APL sub-value
+   /// @param val pointer to the nested sub-value
+   /// @param magic magic number tag stored alongside the pointer
    inline void next_ravel_Pointer(Value * val, uint32_t magic);
 
    /// initialize the next ravel cell from either a APL scalar (if val is one)
    /// or from a non-scalar (producing as PointerCell
+   /// @param val pointer to the APL value to store
    inline void next_ravel_Value(Value * val);
 
    /// set ravel[offset] to \b uni
+   /// @param offset ravel index (0-based)
+   /// @param uni Unicode character to store
    inline void set_ravel_Char(ShapeItem offset, Unicode uni);
 
    /// set ravel[offset] to \b aint
+   /// @param offset ravel index (0-based)
+   /// @param aint integer value to store
    inline void set_ravel_Int(ShapeItem offset, APL_Integer aint);
 
    /// set ravel[offset] to \b flt
+   /// @param offset ravel index (0-based)
+   /// @param flt floating-point value to store
    inline void set_ravel_Float(ShapeItem offset, APL_Float flt);
 
    /// set ravel[offset] to \b Complex(real, imag)
+   /// @param offset ravel index (0-based)
+   /// @param real real part of the complex value
+   /// @param imag imaginary part of the complex value
    inline void set_ravel_Complex(ShapeItem offset, APL_Float real,
                                                    APL_Float imag);
 
    /// set ravel[offset] to \b cell.
+   /// @param offset ravel index (0-based)
+   /// @param cell source cell to copy
    inline void set_ravel_Cell(ShapeItem offset, const Cell & cell);
 
    /// set ravel[offset] to b \b PointerCell(val), where val ≠ simple scalar.
+   /// @param offset ravel index (0-based)
+   /// @param val pointer to the nested sub-value
    inline void set_ravel_Pointer(ShapeItem offset, Value * val);
 
    /// set ravel[offset] to \b value
+   /// @param offset ravel index (0-based)
+   /// @param value pointer to the APL value to store
    inline void set_ravel_Value(ShapeItem offset, Value * value);
 
    /// return the NOTCHAR property of the value. NOTCHAR is false for simple
@@ -649,9 +771,15 @@ public:
    bool NOTCHAR() const;
 
    /// returen \b true if \b sub == \b val or sub is contained in \b val
+   /// @param val outer value to search within
+   /// @param sub candidate sub-value to look for
    static bool is_or_contains(const Value * val, const Value * sub);
 
    /// print debug info about setting or clearing of flags to CERR
+   /// @param loc caller location for diagnostics
+   /// @param flag the value flag being modified
+   /// @param flag_name name of the flag as a C string
+   /// @param set true if the flag is being set, false if cleared
    void flag_info(const char * loc, ValueFlags flag, const char * flag_name,
                   bool set) const;
 
@@ -661,13 +789,13 @@ public:
 /// maybe enable LOC for set/clear of flags
 #if defined(cfg_VF_TRACING_WANTED) || \
     defined(cfg_VALUE_HISTORY_WANTED)  // enable LOC
-# define _LOC LOC
-# define _loc loc
-# define _loc_type const char *
+#  define _LOC LOC
+#  define _loc loc
+#  define _loc_type const char *
 #else                                                           // disable LOC
-# define _LOC
-# define _loc
-# define _loc_type
+#  define _LOC
+#  define _loc
+#  define _loc_type
 #endif
 
 #ifdef cfg_VF_TRACING_WANTED
@@ -681,7 +809,7 @@ public:
       { FLAG_TRACE(member, true)   flags |=  VF_member;
         ADD_EVENT(this, VHE_SetFlag, VF_member, _loc); }
 
-# define set_member() SET_member(_LOC)
+#define set_member() SET_member(_LOC)
 
    /// set the Value flag \b packed
    void SET_packed(_loc_type _loc) const
@@ -693,15 +821,15 @@ public:
       { FLAG_TRACE(packed, false)   flags &=  ~VF_packed;
         ADD_EVENT(this, VHE_ClearFlag, VF_packed, _loc); }
 
-# define set_packed()   SET_packed(_LOC)
-# define clear_packed() CLEAR_packed(_LOC)
+#define set_packed()   SET_packed(_LOC)
+#define clear_packed() CLEAR_packed(_LOC)
 
    /// set the Value flag \b complete
    void SET_complete(_loc_type _loc) const
       { FLAG_TRACE(complete, true)   flags |=  VF_complete;
         ADD_EVENT(this, VHE_SetFlag, VF_complete, _loc); }
 
-# define set_complete() SET_complete(_LOC)
+#define set_complete() SET_complete(_LOC)
 
    /// set the Value flag \b marked
    void SET_marked(_loc_type _loc) const
@@ -713,10 +841,12 @@ public:
       { FLAG_TRACE(marked, false)   flags &=  ~VF_marked;
         ADD_EVENT(this, VHE_ClearFlag, VF_marked, _loc); }
 
-# define set_marked()   SET_marked(_LOC)
-# define clear_marked() CLEAR_marked(_LOC)
+#define set_marked()   SET_marked(_LOC)
+#define clear_marked() CLEAR_marked(_LOC)
 
    /// add a member to a structured variable
+   /// @param member_name name of the new member
+   /// @param member_value value to associate with the member
    void add_member(const UCS_string & member_name, Value * member_value);
 
    /// return the (recursive) number of members in this value
@@ -729,9 +859,12 @@ public:
    void unmark() const;
 
    /// rollback initialization of this value
+   /// @param items number of ravel items to roll back
+   /// @param loc caller location for diagnostics
    void rollback(ShapeItem items, const char * loc);
 
    /// the prototype of this value
+   /// @param loc caller location for diagnostics
    Value_P prototype(const char * loc) const;
 
 /** macro NEW_CLONE selects one of two clone() schemes:
@@ -758,55 +891,68 @@ public:
 #ifdef NEW_CLONE   /* new clone() scheme */
 
 /// clone, given a Value_P. Result is a Value_P.
-# define CLONE_P(B_P, L)   (B_P)
+#  define CLONE_P(B_P, L)   (B_P)
 
 /// clone, given a const Value *. Result is a Value_P.
-# define CLONE(pB, L)      Value_P(const_cast<Value *>(pB), L)
+#  define CLONE(pB, L)      Value_P(const_cast<Value *>(pB), L)
 
 #else   /* old clone() scheme */
 
 /// clone, given a Value_P. Result is a Value_P.
-# define CLONE_P(B_P, L)   (B_P).get()->clone(L)
+#  define CLONE_P(B_P, L)   (B_P).get()->clone(L)
 
 /// clone, given a Value *. Result is a Value_P.
-# define CLONE(pB, L)      (pB)->clone(L)
+#  define CLONE(pB, L)      (pB)->clone(L)
 
 #endif
 
    /// get the min spacing for this column and set/clear NOTCHAR if there
    /// is/isn't a numeric item in the column.
    /// are/ain't numeric items in col.
+   /// @param NOTCHAR set to true if a non-character item is found in the column
+   /// @param col column index to examine (0-based)
+   /// @param framed true if the value is being printed in a framed box
    int32_t get_col_spacing(bool & NOTCHAR, ShapeItem col, bool framed) const;
 
    /// list a value
+   /// @param out output stream to write to
+   /// @param show_owners true to include owner-count information
    ostream & list_one(ostream & out, bool show_owners) const;
 
    /// check \b that this value was completely initialized, and set
    /// VF_complete if so.
+   /// @param loc caller location for diagnostics
    void check_value(const char * loc);
 
    /// return the total CDR size (header + data + padding) for \b this value.
+   /// @param cdr_type CDR encoding type selector
    int total_CDR_size_brutto(CDR_type cdr_type) const
       { return (total_CDR_size_netto(cdr_type) + 15) & ~15; }
 
    /// return the total CDR size in bytes (header + data),
    /// not including any padding for \b this value.
+   /// @param cdr_type CDR encoding type selector
    int total_CDR_size_netto(CDR_type cdr_type) const;
 
    /// return the CDR size in bytes for the data of \b value,
    /// not including the CDR header and padding
+   /// @param cdr_type CDR encoding type selector
    int CDR_data_size(CDR_type cdr_type) const;
 
    /// return the CDR type for \b this value
    CDR_type get_CDR_type() const;
 
    /// erase stale values
+   /// @param loc caller location for diagnostics
    static int erase_stale(const char * loc);
 
    /// erase all values (clean-up after )CLEAR)
+   /// @param out output stream for diagnostic messages
    static void erase_all(ostream & out);
 
    /// list all values
+   /// @param out output stream to write to
+   /// @param show_owners true to include owner-count information
    static ostream & list_all(ostream & out, bool show_owners);
 
    /// return the ravel of \b this value as UCS string, or throw DOMAIN error
@@ -815,15 +961,21 @@ public:
 
    /// recursively replace all numeric ravel elements with 0 and all
    /// characters with blank. See lrm p. 46.
+   /// @param force_numeric if true, prototype is forced to numeric even for char arrays
    void to_type(bool force_numeric);
 
    /// print address, shape, and flags of this value
+   /// @param out output stream to write to
+   /// @param indent indentation level in spaces
+   /// @param idx ravel index shown for nested context
    void print_structure(ostream & out, int indent, ShapeItem idx) const;
 
    /// return the current flags
    ValueFlags get_flags() const   { return ValueFlags(flags); }
 
    /// print info related to a stale value
+   /// @param out output stream to write to
+   /// @param dob dynamic object associated with the stale value
    void print_stale_info(ostream & out, const DynamicObject * dob) const;
 
    /// expand this (packed) Boolean value (in place)
@@ -834,15 +986,19 @@ public:
    const char * try_implode();
 
    /// print incomplete Values, and return the number of incomplete Values.
+   /// @param out output stream to write to
    static int print_incomplete(ostream & out);
 
    /// print stale Values, and return the number of stale Values.
+   /// @param out output stream to write to
    static int print_stale(ostream & out);
 
    /// check the cells of all values, return the number of bad Values.
+   /// @param out output stream for diagnostic messages
    static int check_all_Cells(ostream & out);
 
    /// check the cells of \b this value, return the number of errors.
+   /// @param out output stream for diagnostic messages
    int check_Cells(ostream & out) const;
 
    /// total nz_element_counts of all non-short values
@@ -867,10 +1023,12 @@ public:
       { return pointer_cell_count; }
 
    /// increase \b nz_subcell_count by \b count
+   /// @param count number of sub-cells to add
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
 
    /// increment the number of (smart-) pointers to this value
+   /// @param loc caller location for diagnostics
    void increment_owner_count(const char * loc)
       {
         const char * cp_this = charP(this);
@@ -881,6 +1039,7 @@ public:
 
    /// decrement the number of (smart-) pointers to this value and delete
    /// this value if no more pointers exist
+   /// @param loc caller location for diagnostics
    void decrement_owner_count(const char * loc)
       {
         const char * cp_this = charP(this);
@@ -896,18 +1055,31 @@ public:
       }
 
    /// check if WS is FULL after allocating value with \b cell_count items
+   /// @param args description of the allocation site for error messages
+   /// @param cell_count number of cells being allocated
+   /// @param loc caller location for diagnostics
    static bool check_WS_FULL(const char * args, ShapeItem cell_count,
                              const char * loc);
 
    /// handler for catch(Error) in init_ravel() (never called)
+   /// @param error the caught Error object
+   /// @param args description of the allocation site
+   /// @param loc caller location for diagnostics
    static void catch_Error(const Error & error, const char * args,
                            const char * loc);
 
    /// handler for catch(exception) in init_ravel() (never called)
+   /// @param ex the caught standard exception
+   /// @param args description of the allocation site
+   /// @param caller description of the calling function
+   /// @param loc caller location for diagnostics
    static void catch_exception(const exception & ex, const char * args,
                         const char * caller,  const char * loc);
 
    /// handler for catch(...) in init_ravel() (never called)
+   /// @param args description of the allocation site
+   /// @param caller description of the calling function
+   /// @param loc caller location for diagnostics
    static void catch_ANY(const char * args, const char * caller,
                          const char * loc);
 
@@ -918,22 +1090,35 @@ public:
    static uint64_t slow_new_count;
 
    /// return a deep copy of \b this value
+   /// @param loc caller location for diagnostics
    Value_P clone(const char * loc) const;
 
 protected:
    /// glue items A and B; both non-const to increase their owner count.
+   /// @param item_A left item value to glue
+   /// @param item_B right item value to glue
+   /// @param loc caller location for diagnostics
    static Value_P glue_item_item(Value & item_A, Value & item_B,
                                  const char * loc);
 
    /// glue item A and strand B; A non-const to increase its owner count.
+   /// @param item_A left item value to glue
+   /// @param strand_B right strand value to glue
+   /// @param loc caller location for diagnostics
    static Value_P glue_item_strand(Value & item_A, const Value & strand_B,
                                    const char * loc);
 
    /// glue strand A and item B; B non-const to increase its owner count.
+   /// @param strand_A left strand value to glue
+   /// @param item_B right item value to glue
+   /// @param loc caller location for diagnostics
    static Value_P glue_strand_item(const Value & strand_A, Value & item_B,
                                    const char * loc);
 
    /// glue strands A and B
+   /// @param strand_A left strand value to glue
+   /// @param strand_B right strand value to glue
+   /// @param loc caller location for diagnostics
    static Value_P glue_strand_strand(const Value & strand_A,
                                      const Value & strand_B, const char * loc);
 
@@ -1041,33 +1226,49 @@ private:
 // shortcuts for frequently used APL values...
 
 /// integer scalar
+/// @param val integer value for the scalar
+/// @param loc caller location for diagnostics
 Value_P IntScalar(APL_Integer val, const char * loc);
 
 /// floating-point scalar
+/// @param val floating-point value for the scalar
+/// @param loc caller location for diagnostics
 Value_P FloatScalar(APL_Float val, const char * loc);
 
 /// character scalar
+/// @param uni Unicode character for the scalar
+/// @param loc caller location for diagnostics
 Value_P CharScalar(Unicode uni, const char * loc);
 
 /// complex scalars (from APL_Complex)
+/// @param cpx complex value for the scalar
+/// @param loc caller location for diagnostics
 Value_P ComplexScalar(APL_Complex cpx, const char * loc);
 
 /// complex scalars (from real and imag parts)
+/// @param real real part of the complex scalar
+/// @param imag imaginary part of the complex scalar
+/// @param loc caller location for diagnostics
 Value_P ComplexScalar(APL_Float real, APL_Float imag, const char * loc);
 
 /// ⍳0 (aka. ⍬)
+/// @param loc caller location for diagnostics
 Value_P Idx0(const char * loc);
 
 /// ''
+/// @param loc caller location for diagnostics
 Value_P Str0(const char * loc);
 
 /// 0 0⍴''
+/// @param loc caller location for diagnostics
 Value_P Str0_0(const char * loc);
 
 /// 0 0⍴0
+/// @param loc caller location for diagnostics
 Value_P Idx0_0(const char * loc);
 
 /// empty struct
+/// @param loc caller location for diagnostics
 Value_P EmptyStruct(const char * loc);
 
 //----------------------------------------------------------------------------

@@ -34,16 +34,21 @@
 class PythonPipe
 {
 public:
+   /// @param script path to the python script to launch
    PythonPipe(const char * script);
    ~PythonPipe()   { close(); }
 
    /// read one line from python
+   /// @param keep_LF true to retain the trailing newline character
    UCS_string read(bool keep_LF = false);
 
    /// write to python
+   /// @param cmd command string to send
+   /// @param no_LF true to suppress appending a newline
    void write(UTF8_string cmd, bool no_LF = false);
 
    /// write one line and get one line back
+   /// @param cmd command string to send to python
    UCS_string wr_rd(const char * cmd);
 
 protected:

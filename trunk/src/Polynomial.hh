@@ -43,6 +43,8 @@ public:
    {}
 
    /// constructor: term with indefnitess as per indefs
+   /// @param coeff coefficient of this monomial term
+   /// @param indefs shape whose items are the exponents of each indeterminate
    Monomial(Complex coeff, const Shape & indefs)
    : coefficient(coeff)
      {
@@ -74,6 +76,7 @@ public:
       { return expos.size(); }
 
    /// return the exponent of the r'th indeterminant
+   /// @param r zero-based indeterminate index
    int get_indeterminant_power(size_t r) const
       {
         Assert(r < expos.size());
@@ -89,6 +92,7 @@ public:
       }
 
    /// comparator (aka. lexical order)
+   /// @param other monomial to compare against
    bool operator <(const Monomial & other) const
       {
         Assert(expos.size() == other.expos.size());
@@ -102,6 +106,7 @@ public:
 
    /// return \b true iff \b this polynomial is a multiple of the polynomial
    /// \b factor.
+   /// @param factor monomial to test divisibility by
   bool is_multiple_of(const Monomial & factor) const
       {
         Assert(expos.size() == factor.expos.size());
@@ -117,6 +122,7 @@ public:
       { return coefficient; }
 
    /// subtract \b coeff from \b coefficient
+   /// @param coeff value to subtract from this term's coefficient
    void subtract_coefficient(Complex coeff)
       { coefficient -= coeff; }
 
@@ -125,6 +131,7 @@ public:
       { coefficient = - coefficient; }
 
    /// return \b this divided by \b divisor.
+   /// @param divisor monomial to divide by
    Monomial operator /(const Monomial & divisor) const
       {
         Assert(expos.size() == divisor.expos.size());
@@ -138,6 +145,7 @@ public:
       }
 
    /// return \b this times \b factor.
+   /// @param factor monomial to multiply by
    Monomial operator *(const Monomial & factor) const
       {
         Assert(expos.size() == factor.expos.size());
@@ -151,6 +159,7 @@ public:
 
    /// return \b true if \b this and \b other have the same exponents of
    /// their indeterminants
+   /// @param other monomial to compare exponents with
    bool same_expos(const Monomial & other) const
       {
         if (expos.size() != other.expos.size())   return false;
@@ -165,6 +174,9 @@ public:
       { return coefficient.imag(); }
 
    /// set coefficient (must be called before set_imag())
+   /// @param overbar true if the APL overbar negation prefix was present
+   /// @param term_sign '+' or '-' sign preceding this term
+   /// @param val non-negative real magnitude of the coefficient
    void set_real(bool overbar, char term_sign, double val)
       {
         Assert(val >= 0.0);
@@ -183,17 +195,27 @@ public:
    /// return the (user-defined) value to be used for comparing \b rhis
    /// monomial with
    /// other monomials
+   /// @param order APL value defining the monomial ordering
    int get_order(const Value & order) const;
 
    /// scan the coeffient in \b src.
+   /// @param src Unicode input stream to read from
+   /// @param term_sign '+' or '-' sign preceding this term
+   /// @param got_j set to true if an imaginary 'J' separator was found
+   /// @param got_overbar true if the overbar negation prefix was seen
    void scan_coefficient(Unicode_source & src, char term_sign,
                          bool & got_j, const bool & got_overbar);
 
    /// scan the indeterminants in \b src.
+   /// @param vars list of known indeterminate variable names
+   /// @param src Unicode input stream to read from
    void scan_indeterminants(const UCS_string_vector & vars,
                             Unicode_source & src);
 
    /// set coefficient (must be called before set_imag())
+   /// @param overbar true if the APL overbar negation prefix was present
+   /// @param term_sign '+' or '-' sign preceding this term
+   /// @param val non-negative imaginary magnitude of the coefficient
    void set_imag(bool overbar, char term_sign, double val)
       {
         Assert(val >= 0.0);
@@ -213,6 +235,8 @@ public:
    Value_P to_value() const;
 
    /// print \b this term
+   /// @param out output stream to write to
+   /// @param firsti true if this is the first term (affects sign printing)
    ostream & print(ostream & out, bool firsti = true) const;
 
 protected:
@@ -232,6 +256,7 @@ public:
    {}
 
    /// constructor: from APL value (holding the coefficients).
+   /// @param value APL value whose ravel provides the polynomial coefficients
    Polynomial(const Value & value);
 
    /// return true if any of the terms is complex
@@ -279,9 +304,11 @@ public:
        }
 
    /// return (the index of) the largest term (aka. LT).
+   /// @param order APL value defining the monomial ordering (may be null)
    size_t LT_pos(const Value * order) const;
 
    /// remove the largest term from \b this polynomial and return it.
+   /// @param order APL value defining the monomial ordering (may be null)
    Monomial extract_LT(const Value * order)
       {
         const size_t pos = LT_pos(order);
@@ -291,12 +318,14 @@ public:
       }
 
    /// return the largest term from \b this polynomial.
+   /// @param order APL value defining the monomial ordering (may be null)
    Monomial get_LT(const Value * order)
       {
         return at(LT_pos(order));
       }
 
    /// subtract term \b term from polynomial poly
+   /// @param other monomial term to subtract
    void subtract_term(const Monomial & other)
       {
         loop(t, size())
@@ -321,6 +350,7 @@ public:
       }
 
    /// print \b this polynomial
+   /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
    /// return \b this polynomial as an APL value

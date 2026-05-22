@@ -28,7 +28,7 @@
 #include <signal.h>
 
 #if HAVE_WINSOCK2_H
-# include <winsock2.h>
+#  include <winsock2.h>
 #endif // HAVE_WINSOCK2_H
 
 #include "Error_macros.hh"
@@ -69,11 +69,15 @@ public:
    static int close_handle(int handle);
 
    /// fork(), execve(), and return a connection to fd 3 of forked process
+   /// @param B command string to execute in the forked process
+   /// @param envp environment variables for the forked process
    static int do_FIO_57(const UCS_string & B, char * const * envp);
 
    static Quad_FIO  fun;   ///< Built-in function.
 
    /// get one Unicode from file
+   /// @param file open file to read from
+   /// @param fget_count running count of bytes consumed
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
    /// close all open files
@@ -83,6 +87,7 @@ public:
    static uint64_t benchmark_cycles_from;
 
    /// return the open FILE * for (APL integer value) \b handle
+   /// @param handle APL value holding the integer file handle
    static FILE * get_FILE(const Value & handle)
       { return get_FILE(handle.get_cscalar().get_near_int()); }
 
@@ -100,15 +105,25 @@ protected:
    virtual int get_oper_valence() const   { return 1; }
 
    /// overloaded Function::eval_ALXB().
+   /// @param A left APL value argument
+   /// @param LO left operator function token
+   /// @param X axis value
+   /// @param B right APL value argument
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_LXB().
+   /// @param LO left operator function token
+   /// @param X axis value
+   /// @param B right APL value argument
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// return one or more random values
+   /// @param mode distribution/type selector for random generation
+   /// @param len number of random values to generate
    static Value_P get_random(APL_Integer mode, APL_Integer len);
 
    /// return the open FILE * for (APL integer) \b handle
+   /// @param handle integer file handle index
    static FILE * get_FILE(int handle);
 
    /// one file (openend with open(), fopen(), or fdopen()).
@@ -119,6 +134,8 @@ protected:
         file_entry() {}
 
         /// constructor
+        /// @param fp FILE pointer returned by fopen()
+        /// @param fd file descriptor number
         file_entry(FILE * fp, int fd)
         : fe_FILE(fp),
           fe_fd(fd),
@@ -147,13 +164,16 @@ protected:
       };
 
    /// return the open file for (APL integer) \b handle
+   /// @param handle integer file handle index
    static file_entry & get_file_entry(int handle);
 
    /// return the open file for (APL integer) \b handle
+   /// @param handle APL value holding the integer file handle
    static file_entry & get_file_entry(const Value & handle)
       { return get_file_entry(handle.get_cscalar().get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
+   /// @param value APL value holding the integer file handle
    static int get_fd(const Value & value)
        {
          const file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
@@ -162,9 +182,14 @@ protected:
 
    /// append ASCII-buffer \b buffer to dest, inserting thousands' separators.
    /// Note: \b buffer may be modified.
+   /// @param dest destination string to append to
+   /// @param buffer ASCII numeric buffer (may be modified in place)
+   /// @param flt true if the number is floating-point
    static void group_thousands(UCS_string & dest, char * buffer, bool flt);
 
    /// throw a DOMAIN error if the interpreter runs in safe mode.
+   /// @param funname name of the function being guarded
+   /// @param funnum ⎕FIO subfunction number
    static void UNSAFE(const char * funname, int funnum)
       {
         if (UserPreferences::uprefs.safe_mode)
@@ -183,20 +208,33 @@ protected:
                                  const function_info & info) const;
 
    /// convert bits set in \b fds to an APL integer vector
+   /// @param fds file-descriptor bit set from select()
+   /// @param max_fd highest file descriptor to inspect
    static Value_P fds_to_val(fd_set * fds, int max_fd);
 
    /// fprintf A to file \b out
+   /// @param out file to write formatted output to
+   /// @param A APL value containing format string and data
    static Token do_fprintf(FILE * out, Value_P A);
 
    /// snprintf with format string A and Data items B
+   /// @param UZ output string to append formatted result to
+   /// @param A_format printf-style format string
+   /// @param B APL value containing data items
+   /// @param B_start starting index into B for data items
+   /// @param funname calling function name for error messages
    static void do_snprintf(UCS_string & UZ, const UCS_string & A_format,
                    const Value * B, int B_start, const char * funname);
 
    /// perform an fscanf() from file
+   /// @param input file or string to scan from
+   /// @param format scanf-style format string
+   /// @param function_number ⎕FIO subfunction number for error reporting
    static Token do_scanf(File_or_String & input, const UCS_string & format,
                          int function_number);
 
    /// for Date/Time Bv. return its seconds since midnight Jan 1, 1970
+   /// @param B APL value containing a date/time vector
    static APL_Integer secs_epoch(const Value & B);
 
    /// the open files

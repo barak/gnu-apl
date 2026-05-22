@@ -38,13 +38,18 @@ class CDR
 {
 public:
    /// convert \b value into a CDR_string
+   /// @param result output CDR byte string
+   /// @param value APL value to serialise
    static void to_CDR(CDR_string & result, const Value * value);
 
    /// create a value from a CDR_string, throwing
    /// DOMAIN ERROR if cdr is ill-formed
+   /// @param cdr CDR byte string to deserialise
+   /// @param loc caller location for diagnostics
    static Value_P from_CDR(const CDR_string & cdr, const char * loc);
 
    /// return 2 bytes starting at \b data in network byte order
+   /// @param data pointer to at least 2 bytes of raw data
    static uint32_t get_2_be(const uint8_t * data)
       {
         uint32_t ret =  *data++;   ret <<= 8;
@@ -52,10 +57,12 @@ public:
       }
 
    /// return 4 bytes starting at \b data in network byte order
+   /// @param data pointer to at least 4 bytes of raw data
    static uint32_t get_4_be(const uint8_t * data)
       { return CDR_header::get_be32(data); }
 
    /// return 8 bytes starting at \b data in network byte order
+   /// @param data pointer to at least 8 bytes of raw data
    static uint64_t get_8_be(const uint8_t * data)
       {
         uint64_t ret = get_4_be(data);   ret <<= 32;
@@ -64,6 +71,10 @@ public:
 
 protected:
    /// fill result with the bytes of the CDR of \b value
+   /// @param result output CDR byte string being built
+   /// @param type CDR type code for the value
+   /// @param len total byte length of the CDR representation
+   /// @param val APL value whose CDR bytes are appended
    static void fill(CDR_string & result, int type, int len, const Value & val);
 };
 //----------------------------------------------------------------------------

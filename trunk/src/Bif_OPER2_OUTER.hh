@@ -38,6 +38,8 @@ public:
    Bif_JOT() : PrimitiveFunction(TOK_JOT) {}
  
    /// overloaded Function::eval_AB().
+   /// @param A  left value argument
+   /// @param B  right value argument
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Bif_JOT  fun;             ///< Built-in function.
@@ -58,6 +60,10 @@ public:
    Bif_OPER2_OUTER() : PrimitiveOperator(TOK_OPER2_OUTER) {}
 
    /// Overloaded Function::eval_ALRB().
+   /// @param A   left value argument
+   /// @param LO  left operator function argument (∘ jot)
+   /// @param RO  right operator function argument
+   /// @param B   right value argument
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    static Bif_OPER2_OUTER  fun;   ///< Built-in function.
@@ -85,6 +91,7 @@ protected:
    inline void scalar_outer_product() const;
 
    /// the main loop for an outer product with scalar functions
+   /// @param tctx  thread execution context
    static void PF_scalar_outer_product(Thread_context & tctx);
 };
 //----------------------------------------------------------------------------

@@ -39,33 +39,51 @@ public:
    {}
 
    /// overloaded Function::eval_B()
+   /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { return Token(TOK_APL_VALUE1, first(*B));}
 
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AXB()
+   /// @param A left argument APL value
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_XB()
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Take from B according to ravel_A
+   /// @param shape_Zi shape of the result
+   /// @param B right argument APL value to take from
+   /// @param axes bitmap of axes to which the take applies
    static Value_P do_take(const Shape & shape_Zi, const Value & B,
                           AxesBitmap axes);
 
    /// Fill Z with B, pad as necessary
+   /// @param shape_Zi shape of the result
+   /// @param Z_owner result value to fill
+   /// @param B source APL value
+   /// @param axes bitmap of axes to fill along
    static void fill(const Shape & shape_Zi, Value & Z_owner,
                     const Value & B, AxesBitmap axes);
 
    static Bif_F12_TAKE  fun;   ///< Built-in function
 
    /// ↑B
+   /// @param B right argument APL value
    static Value_P first(const Value & B);
 
 protected:
    /// Take A from B
+   /// @param A left argument specifying take counts per axis
+   /// @param B right argument APL value to take from
    Token take(Value_P A, Value_P B);
 };
 //============================================================================
@@ -80,9 +98,14 @@ public:
    {}
 
    /// overloaded Function::eval_AB()
+   /// @param A left argument specifying drop counts per axis
+   /// @param B right argument APL value to drop from
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AXB()
+   /// @param A left argument specifying drop counts per axis
+   /// @param X axis specification APL value
+   /// @param B right argument APL value to drop from
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    static Bif_F12_DROP  fun;   ///< Built-in function
@@ -98,6 +121,9 @@ class TakeDropIterator
 {
 public:
    /// constructor
+   /// @param take true for take (↑), false for drop (↓)
+   /// @param sh_A shape derived from the left argument A
+   /// @param sh_B shape of the right argument B
    TakeDropIterator(bool take, const Shape & sh_A, const Shape & sh_B)
    : ref_B(sh_B),
      current_offset(0),
@@ -207,6 +233,7 @@ public:
       }
 
    /// return the prototype for an axis
+   /// @param axes bitmap of axes whose prototype is requested
    ShapeItem axis_proto(AxesBitmap axes) const;
 
    /// return true iff this inerator has more items to come.

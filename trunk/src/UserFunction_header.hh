@@ -38,9 +38,13 @@ class UserFunction_header
 {
 public:
    /// constructor from first line in \b txt (for proper defined functions)
+   /// @param txt first line of the function definition text
+   /// @param macro true if parsing macro (not user-defined) code
    UserFunction_header(const UCS_string & txt, bool macro);
 
    /// constructor from signature (for lambdas)
+   /// @param sig function signature bitmap
+   /// @param lambda_num unique number identifying this lambda
    UserFunction_header(Fun_signature sig, int lambda_num);
 
    /// return the number of value arguments
@@ -105,12 +109,16 @@ public:
    ErrorCode get_error() const   { return error; }
 
    /// return \b true if this function localizes \b sym
+   /// @param sym symbol to test for localization
    bool localizes(const Symbol * sym) const;
 
    /// print local vars etc.
+   /// @param out output stream to write to
+   /// @param indent indentation level for pretty-printing
    void print_properties(ostream & out, int indent) const;
 
    /// add a local variable
+   /// @param sym symbol to add to the local variable list
    void add_local_var(Symbol * sym)
       { local_vars.push_back(sym); }
 
@@ -118,6 +126,7 @@ public:
    void pop_local_vars() const;
 
    /// print the local variables for command )SINL
+   /// @param out output stream to write to
    void print_local_vars(ostream & out) const;
 
    /// reverse the order of the local vars (if parsed back-to-front)
@@ -128,6 +137,8 @@ public:
       { label_values.clear(); }
 
    /// add a label
+   /// @param sym symbol representing the label name
+   /// @param line function line number where the label appears
    void add_label(Symbol * sym, Function_Line line)
       {
         labVal label = { sym, line };
@@ -138,6 +149,8 @@ public:
    void remove_duplicate_local_variables();
 
    /// the header (as per SIG_xxx and local_vars)
+   /// @param sig function signature bitmap
+   /// @param lambda_num unique number identifying this lambda
    static UCS_string lambda_header(Fun_signature sig, int lambda_num);
 
    /// push Z (if defined), local variables, and labels.
@@ -148,6 +161,7 @@ public:
       { return local_vars.size(); }
 
    /// return the idx'th local variable
+   /// @param idx zero-based index into local_vars
    const Symbol * get_local_var(ShapeItem idx) const
       { return local_vars[idx]; }
 
@@ -156,6 +170,7 @@ public:
       { return label_values.size(); }
 
    /// return the \b idx'th label (not the label of line idx!).
+   /// @param idx zero-based index into label_values
    const labVal & get_label(int idx) const
       { return label_values[idx]; }
 
@@ -165,15 +180,22 @@ public:
 
 protected:
    /// init the signature from text
+   /// @param text UCS string containing the function header line
+   /// @param macro true if parsing macro (not user-defined) code
    const char * init_signature(const UCS_string & text, bool macro);
 
    /// init the local variables from text
+   /// @param text UCS string containing the local variable declarations
+   /// @param macro true if parsing macro (not user-defined) code
    const char * init_local_vars(const UCS_string & text, bool macro);
 
    /// return true iff bitmap \b sig is a valid funvtion signature
+   /// @param sig function signature bitmap to validate
    static bool signature_is_valid(Fun_signature sig);
 
    /// remove \b sym from local_vars if it occurs at pos or above
+   /// @param sym symbol to check for duplicates
+   /// @param pos position in local_vars from which to start removing duplicates
    void remove_duplicate_local_var(const Symbol * sym, size_t pos);
 
    /// error if header was not parsed successfully

@@ -123,6 +123,7 @@ public:
       {
         public:
            /// constructor
+           /// @param h unique window handle assigned to this context
            PLOT_context(Handle h)
            : handle(h)
            {}
@@ -142,6 +143,7 @@ public:
            const Handle handle;
 
            /// close \b hnadle from all_PLOT_windows
+           /// @param handle window handle to remove from all_PLOT_windows
            static Handle remove_handle(Handle handle);   // GTK only
       };
 
@@ -150,10 +152,13 @@ public:
 
    /// the GTK window that handles one plot window. Always declared here
    /// (to make doxygen happy, but only implemented if apl_GTK3
+   /// @param vp_props pointer to the Plot_window_properties for this window
+   /// @param handle window handle assigned to this plot window
    static void plot_main_GTK(void * vp_props, Handle handle);
 
    /// the pthread that handles all XCB plot windows. Always declared here
    /// (to make doxygen happy, but only implemented if NOT apl_GTK3
+   /// @param vp_props pointer to the Plot_window_properties for this window
    static void * plot_main_XCB(void * vp_props);
 
    enum Plot_driver
@@ -172,10 +177,15 @@ protected:
    ~Quad_PLOT();
 
    /// initialize the GUI
+   /// @param w_props plot window properties for the new window
+   /// @param handle window handle assigned to this plot window
+   /// @param driver_type GUI driver to use (GTK, XCB, or ASCII)
    static void start_GUI(Plot_window_properties * w_props, int handle,
                          Plot_driver driver_type);
 
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value (plot attributes)
+   /// @param B right argument APL value (data to plot)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()

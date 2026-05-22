@@ -37,6 +37,10 @@ public:
    Bif_OPER2_INNER() : PrimitiveOperator(TOK_OPER2_INNER) {}
 
    /// Overloaded Function::eval_ALRB().
+   /// @param A   left value argument
+   /// @param LO  left operator function argument
+   /// @param RO  right operator function argument
+   /// @param B   right value argument
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    static Bif_OPER2_INNER  fun;   ///< Built-in function.
@@ -70,9 +74,15 @@ protected:
    inline void scalar_inner_product() const;
 
    /// the main loop for an inner product with scalar functions
+   /// @param tctx  thread execution context
    static void PF_scalar_inner_product(Thread_context & tctx);
 
    /// evaluate the fill function with arguments A and B
+   /// @param shape_Z  shape of the result
+   /// @param A        left value argument
+   /// @param fun      fill function to apply
+   /// @param B        right value argument
+   /// @param loc      caller location for diagnostics
    static Token fill(const Shape shape_Z, Value_P A, cFunction_P fun,
                      Value_P B, const char * loc);
 };

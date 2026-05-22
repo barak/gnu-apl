@@ -26,12 +26,12 @@
 #include <string.h>
 
 #ifdef AUXILIARY_PROCESSOR
-# define __ASSERT_HH_DEFINED__
-# include <assert.h>
-# define Assert(x) assert(x)
+#  define __ASSERT_HH_DEFINED__
+#  include <assert.h>
+#  define Assert(x) assert(x)
 #else
-# include "Assert.hh"
-# include "Common.hh"
+#  include "Assert.hh"
+#  include "Common.hh"
 #endif
 
 using namespace std;
@@ -52,6 +52,8 @@ public:
       {}
 
    /// constructor: the first \b len items of \b data
+   /// @param data pointer to the source items
+   /// @param len number of items to copy from data
    Simple_string(const T * data, ShapeItem len)
       {
         allocate(len);
@@ -59,6 +61,8 @@ public:
       }
 
    /// constructor: \b len times \b data
+   /// @param len number of repetitions
+   /// @param data value to repeat
    Simple_string(ShapeItem len, const T & data)
       {
         allocate(len);
@@ -66,6 +70,7 @@ public:
       }
 
    /// constructor: copy other string
+   /// @param other the source Simple_string to copy
    Simple_string(const Simple_string & other)
       {
         allocate(other.items_valid);
@@ -73,6 +78,9 @@ public:
       }
 
    /// constructor: copy other string, starting at pos, max. len items
+   /// @param other the source Simple_string to copy from
+   /// @param pos starting index within other
+   /// @param len maximum number of items to copy
    Simple_string(const Simple_string & other, ShapeItem pos, ShapeItem len)
       {
         Assert((pos + len) <= other.items_valid);
@@ -85,6 +93,7 @@ public:
       { deallocate(); }
 
    /// copy \b other
+   /// @param other the source Simple_string to copy
    void operator =(const Simple_string & other)
       {
         deallocate();
@@ -96,10 +105,12 @@ public:
       { return items_valid; }
 
    /// return the idx'th character
+   /// @param idx zero-based index of the item to retrieve
    const T & operator[](ShapeItem idx) const
       { return at(idx); }
 
    /// return the idx'th character
+   /// @param idx zero-based index of the item to retrieve
    T & operator[](ShapeItem idx)
       { return at(idx); }
 
@@ -112,6 +123,8 @@ public:
       { return at(items_valid - 1); }
 
    /// append character \b t to \b this string
+   /// @param t item to append
+   /// @param loc caller location for diagnostics (optional)
    void append(const T & t, const char * loc = 0)
       {
         extend(items_valid + 1);
@@ -119,6 +132,7 @@ public:
       }
 
    /// append string \b other to \b this string
+   /// @param other the Simple_string whose items are appended
    void append(const Simple_string & other)
       {
         extend(items_valid + other.items_valid);
@@ -127,6 +141,8 @@ public:
 
    /// insert character \b t before position \b pos. After that items[]pos]
    /// is the new item and the old items[pos]... are moved up.
+   /// @param pos index before which the new item is inserted
+   /// @param t item to insert
    void insert_before(ShapeItem pos, const T & t)
       {
         Assert(pos <= items_valid);

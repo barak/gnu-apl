@@ -41,30 +41,39 @@ public:
    { memset(&rho, 0, sizeof(rho)); }
 
    /// constructor: shape of a vector of length \b len
+   /// @param len length of the vector
    Shape(ShapeItem len)
    : rho_rho(1),
      volume(len)
    { rho[0] = len; }
 
    /// constructor: shape of a matrix with \b rows rows and \b cols columns
+   /// @param rows number of rows
+   /// @param cols number of columns
    Shape(ShapeItem rows, ShapeItem cols)
    : rho_rho(2),
      volume(rows*cols)
    { rho[0] = rows;   rho[1] = cols; }
 
    /// constructor: shape of a cube
+   /// @param height size of the first (highest) dimension
+   /// @param rows number of rows (second dimension)
+   /// @param cols number of columns (third dimension)
    Shape(ShapeItem height, ShapeItem rows, ShapeItem cols)
    : rho_rho(3),
      volume(height*rows*cols)
    { rho[0] = height;   rho[1] = rows;   rho[2] = cols; }
 
    /// constructor: arbitrary shape
+   /// @param rk rank (number of dimensions)
+   /// @param sh pointer to array of \b rk dimension lengths
    Shape(uRank rk, const ShapeItem * sh)
    : rho_rho(0),
      volume(1)
    { loop(r, rk)   add_shape_item(sh[r]); }
 
    /// constructor: shape of another shape
+   /// @param other shape to copy
    Shape(const Shape & other)
    : rho_rho(other.rho_rho),
      volume(other.volume)
@@ -83,31 +92,38 @@ public:
    /// constructor: shape defined by the ravel of APL value \b A.
    /// Throw RANK or LENGTH error where needed. Negative values are allowed
    /// in order to support e.g. ¯4 ↑ B
+   /// @param A APL value whose ravel elements define the shape
+   /// @param qio_A index origin (⎕IO) for interpreting A
    Shape(const Value & A, int qio_A);
 
    /// return a shape like this, but with negative elements made positive
    Shape abs() const;
 
    /// return a shape with the upper \b cnt dimensions of this shape
+   /// @param cnt number of leading dimensions to retain
    Shape frame_shape(uRank cnt) const
       { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
 
    /// return a shape with the lower \b cnt dimensions of this shape
+   /// @param cnt number of trailing dimensions to retain
    Shape chunk_shape(uRank cnt) const
       { Assert(cnt <= get_rank());
         return Shape(cnt, rho + (get_rank() - cnt)); }
 
    /// catenate two shapes, \b this shape provides the higher dimensions while
    /// \b lower provides the lower dimensions of the shape returned
+   /// @param lower shape whose dimensions are appended as trailing dimensions
    Shape operator +(const Shape & lower) const
    { Shape ret(*this);
      loop(r, lower.rho_rho)    ret.add_shape_item(lower.rho[r]);
      return ret; }
 
    /// return true iff \b this shape equals \b other
+   /// @param other shape to compare against
    bool operator ==(const Shape & other) const;
 
    /// return true iff \b this shape is different from \b other
+   /// @param other shape to compare against
    bool operator !=(const Shape & other) const
       { return ! (*this == other); }
 
@@ -116,10 +132,12 @@ public:
       { return rho_rho; }
 
    /// return the length of dimension \b r
+   /// @param r axis index (0-based from the highest dimension)
    ShapeItem get_shape_item(sAxis r) const
       { Assert(r < rho_rho);   return rho[r]; }
 
    /// return the length of dimension \b r
+   /// @param r axis index counted from the last (lowest) dimension
    ShapeItem get_transposed_shape_item(sAxis r) const
       { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
@@ -144,6 +162,8 @@ public:
         return count; }
 
    /// modify dimension \b r
+   /// @param r axis index to modify
+   /// @param sh new length for axis \b r
    void set_shape_item(sAxis r, ShapeItem sh)
       { Assert(r < rho_rho);
         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
@@ -154,19 +174,23 @@ public:
       { volume = 1;   loop(r, rho_rho)  volume *= rho[r]; }
 
    /// increment length of axis \b r by 1
+   /// @param r axis index to increment
    void increment_shape_item(sRank r)
       { set_shape_item(r, rho[r] + 1); }
 
    /// set last dimension to \b sh
+   /// @param sh new length for the last axis
    void set_last_shape_item(ShapeItem sh)
       { set_shape_item(rho_rho - 1, sh); }
 
    /// add a dimension of length \b len at the end
+   /// @param len length of the new trailing dimension
    void add_shape_item(ShapeItem len)
       { if (rho_rho >= MAX_RANK)   LIMIT_ERROR_RANK;
         rho[rho_rho++] = len;   volume *= len; }
 
    /// possibly increase rank by prepending axes of length 1
+   /// @param new_rank desired minimum rank; no-op if already >= new_rank
    void expand_rank(sRank new_rank)
       { if (rho_rho >= new_rank)   return;   // no need to expand
         const int diff = new_rank - rho_rho;
@@ -176,13 +200,17 @@ public:
       }
 
    /// possibly expand rank and increase axes so that B fits into this shape
+   /// @param B shape that must fit within the expanded shape
    void expand(const Shape & B);
 
    /// return a shape like \b this, but with a new axis of length len
    /// inserted so that Shape[axis] == len in the returned shape.
+   /// @param axis position at which the new axis is inserted
+   /// @param len length of the new axis
    Shape insert_axis(sAxis axis, ShapeItem len) const;
 
    /// return a shape like \b this, but with axis \b axis removed
+   /// @param axis axis index to remove
    Shape without_axis(sAxis axis) const
       { Shape ret;
         loop(r, rho_rho)   if (r != axis)  ret.add_shape_item(rho[r]);
@@ -214,10 +242,12 @@ public:
       { return volume ? volume : 1; }
 
    /// return true iff one of the shape elements is (axis) \b ax
+   /// @param ax axis length value to search for among the shape elements
    bool contains_axis(sAxis ax) const
       { loop(r, rho_rho)   if (rho[r] == ax)   return true;   return false; }
 
    /// return true iff the items of value are at most the items of \b this
+   /// @param value shape whose elements are compared element-wise against this
    bool contains(const Shape & value) const
       { Assert(rho_rho == value.rho_rho);
         loop(r, rho_rho)   if (value.rho[r] >= rho[r])   return false;

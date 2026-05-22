@@ -36,12 +36,18 @@ class LvalCell : public Cell
 {
 public:
    /// Constructor: a cell pointing to another cell
+   /// @param cell        target cell that this lval points to
+   /// @param cell_owner  value that owns the target cell
    LvalCell(Cell * cell, Value * cell_owner);
 
    /// Constructor: copy from other LvalCell
+   /// @param other  source LvalCell to copy from
    LvalCell(const LvalCell & other);
 
    /// overloaded Cell::init_other
+   /// @param other       raw memory for the new cell to initialise
+   /// @param cell_owner  value that will own the new cell
+   /// @param loc         caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const;
 
@@ -52,6 +58,7 @@ public:
    virtual Cell * get_lval_value() const;
 
    /// Overloaded Cell::character_representation()
+   /// @param pctx  print context controlling format
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
    /// return the owner of the cell pointed to

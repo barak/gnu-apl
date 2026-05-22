@@ -77,28 +77,40 @@ protected:
       };
 
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
+   /// @param B right argument APL value
    Token eval_B(Value_P B) const;
 
    /// control logging etc. of ⎕PNG
+   /// @param B integer control code
    Value_P window_control(APL_Integer B) const;
 
    /// read PNG file \b filename and return its pixels as 4×N×M matrix
+   /// @param filename path to the PNG file to read
    static Value_P read_PNG_file(const UTF8_string & filename);
 
    /// display an RGB matrix
+   /// @param B APL value containing the RGB pixel matrix
    static APL_Integer display_PNG(Value & B);
 
    /// display an RGB matrix (interpreter code)
+   /// @param B APL value containing the RGB pixel matrix
    static APL_Integer display_PNG_main(Value_P B);
 
    /// return true iff the combination of color_type and bit_depth is
    /// valid in the PNG standard AND supported by ⎕PNG.
+   /// @param color_type PNG color type code
+   /// @param bit_depth  PNG bit depth value
    static bool valid_type_and_bits(int color_type, int bit_depth);
 
    /// write APL pixel matrix \b B PNG file \b filename
+   /// @param filename  output PNG file path
+   /// @param bit_depth PNG bit depth for the output file
+   /// @param B         APL pixel matrix to write
    static void write_PNG_file(const char * filename, int bit_depth,
                               const Value & B);
 };

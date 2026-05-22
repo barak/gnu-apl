@@ -41,12 +41,17 @@ public:
    virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB()
+   /// @param A left argument APL value (sorted interval boundaries)
+   /// @param B right argument APL value (values to locate in intervals)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Bif_F12_INTERVAL_INDEX  fun;   ///< Built-in function
 
 protected:
    /// find cell in ranges defined by ranges and range_count
+   /// @param cell the cell value to locate
+   /// @param ranges pointer to the sorted array of interval-boundary cells
+   /// @param range_count number of elements in ranges
    static ShapeItem find_range(const Cell & cell, const Cell * ranges,
                                ShapeItem range_count);
 };

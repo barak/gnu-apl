@@ -82,6 +82,7 @@ public:
        { return N; }
 
    /// start parallel execution of work at the master
+   /// @param jname descriptive name of the parallel job being started
    static void M_fork(const char * jname)
       {
         get_master().job_name = jname;
@@ -115,24 +116,34 @@ public:
       }
 
    /// bind thread to core
+   /// @param cpu CPU core number to bind this thread to
+   /// @param logit true to log the binding operation
    void bind_to_cpu(CPU_Number cpu, bool logit);
 
    /// print all TaskTree nodes
+   /// @param out output stream to write to
    static void print_all(ostream & out);
 
    /// print all mileages nodes
+   /// @param out output stream to write to
+   /// @param loc caller location for diagnostics
    static void print_mileages(ostream & out, const char * loc);
 
    /// print this TaskTree node
+   /// @param out output stream to write to
    void print(ostream & out) const;
 
    /// initialize all thread contexts (set all but N and thread)
+   /// @param thread_count number of parallel worker threads to create
+   /// @param logit true to log initialization details
    static void init_parallel(CoreCount thread_count, bool logit);
 
    /// initialize all thread contexts (set all but N and thread)
+   /// @param logit true to log initialization details
    static void init_sequential(bool logit);
 
    /// return the context for core \b n
+   /// @param n core number whose context to retrieve
    static Thread_context * get_context(CoreNumber n)
       { return thread_contexts + n; }
 
@@ -160,6 +171,7 @@ public:
       { return active_core_count; }
 
    /// set the number of currently used cores
+   /// @param new_count desired number of active cores
    static void set_active_core_count(CoreCount new_count);
 
 protected:
@@ -167,6 +179,7 @@ protected:
    CoreNumber N;
 
    /// initialize thread_contexts[n]
+   /// @param n index of the thread context entry to initialize
    void init_entry(CoreNumber n);
 
    /// the cpu core to which this thread is bound

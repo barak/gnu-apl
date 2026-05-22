@@ -89,6 +89,7 @@ public:
 
    /// set the color mode (if colors_enabled). Outputs the escape sequence
    /// for \b mode when the color mode changes
+   /// @param mode the new color mode to apply
    static void set_color_mode(ColorMode mode);
 
    /// reset() dout_filebuf
@@ -98,9 +99,11 @@ public:
    static void reset_colors();
 
    /// set or toggle color mode (implementation of command ]XTERM)
+   /// @param arg UCS string argument from the ]XTERM command
    static void toggle_color(const UCS_string & arg);
 
    /// initialize curses library
+   /// @param logit true to log initialization steps to the startup log
    static void  init(bool logit);
 
    /// escape sequence for CIN colors
@@ -228,6 +231,8 @@ public:
    {}
 
    /// set cursor to y:x (upper left corner is 0:0, negative y: from bottom)
+   /// @param y row position (0 = top; negative counts from bottom)
+   /// @param x column position (0 = leftmost column)
    void set_cursor(int y, int x);
 
    /// clear to end of line

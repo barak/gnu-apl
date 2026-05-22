@@ -58,16 +58,25 @@ public:
    Cell() {}
 
    /// init \b this Cell from a (possibly deep) copy of \b other
+   /// @param other  source cell to copy from
+   /// @param this_owner  value that owns this cell
+   /// @param loc  caller location for diagnostics
    void init(const Cell & other, Value & this_owner, const char * loc)
       { other.init_other(this, this_owner, loc); }
 
    /// init (uninitialized) Cell \b other from \b this initialized cell
+   /// @param other  destination cell (uninitialized memory)
+   /// @param other_owner  value that owns the destination cell
+   /// @param loc  caller location for diagnostics
    virtual void init_other(void * other, Value & other_owner,
                            const char * loc) const
       { Assert(0 && "Cell::init_other() called on base class"); }
 
    /// init this Cell from value. If value is a scalar then its first element
    /// is used (and value is erased). Otherwise a PointerCell is created.
+   /// @param value  APL value to initialize from
+   /// @param cell_owner  value that owns this cell
+   /// @param loc  caller location for diagnostics
    void init_from_value(Value * value, Value & cell_owner, const char * loc);
 
    /// Return \b true if \b this cell is greater than \b other, with:
@@ -75,33 +84,53 @@ public:
    /// 2a. NumericCells sorted by get_real_value(). then by get_imag_value()
    /// 2b. CharCells sorted by get_char_value()
    /// 2c. PointerCells sorted by rank, then by shape, then by ravel
+   /// @param other  cell to compare against
    virtual bool greater(const Cell & other) const;
 
    /// like greater() but static
+   /// @param A  left operand cell
+   /// @param B  right operand cell
+   /// @param unused_comp_arg  unused comparison context
    static bool A_greater_B(const Cell * const & A, const Cell * const & B,
                            const void * unused_comp_arg);
 
    /// return \b true if \b this cell is equal to \b other
+   /// @param other  cell to compare against
+   /// @param qct  comparison tolerance (⎕CT)
    virtual bool equal(const Cell & other, double qct) const;
 
    /// return pointer value of a PointerCell or create a scalar with a
    /// copy of this cell.
+   /// @param loc  caller location for diagnostics
    Value_P to_value(const char * loc) const;
 
    /// init \b this cell to be the type of \b other
+   /// @param other  cell whose type to replicate
+   /// @param cell_owner  value that owns this cell
+   /// @param loc  caller location for diagnostics
    void init_type(const Cell & other, Value & cell_owner, const char * loc);
 
    /// ISO p.15: return \b true if A and B are on the same half-plane
+   /// @param A  first complex value
+   /// @param B  second complex value
    static bool same_half_plane(APL_Complex A, APL_Complex B);
 
    /// ISO p.19: return \b true if real A is tolerantly equal to real B within C
+   /// @param A  first real value
+   /// @param B  second real value
+   /// @param qct  comparison tolerance (⎕CT)
    static bool tolerantly_equal(APL_Float A, APL_Float B, double qct);
 
    /// ISO p. 19: return \b true if complex A and B are tolerantly equal
    /// within real qct
+   /// @param A  first complex value
+   /// @param B  second complex value
+   /// @param qct  comparison tolerance (⎕CT)
    static bool tolerantly_equal(APL_Complex A, APL_Complex B, double qct);
 
    /// ISO p. 19: A is integral (close to a Gaussian Integer) within qct
+   /// @param A  real value to test
+   /// @param qct  comparison tolerance (⎕CT)
    static bool integral_within(APL_Float A, double qct);
 
    /// Return the character value of a cell
@@ -129,10 +158,12 @@ public:
    virtual Cell * get_lval_value() const   { LEFT_SYNTAX_ERROR; }
 
    /// the Quad_CR representation of this cell
+   /// @param pctx  print format context
    virtual PrintBuffer character_representation(const PrintContext &pctx) const
       { DOMAIN_ERROR; }
 
    /// return true if this cell needs scaling (exponential format) in pctx
+   /// @param pctx  print format context
    virtual bool need_scaling(const PrintContext &pctx) const
       { return false; }
 
@@ -276,180 +307,254 @@ public:
    virtual const char * get_classname()  const   { return "Cell"; }
 
    /// round the value of this Cell up and store the result in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_ceiling(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// conjugate the value of this Cell and store the result in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_conjugate(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the direction (sign) of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_direction(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store e to the power of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_exponential(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the factorial (N!) of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_factorial(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// Round the value of this Cell down and store the result in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_floor(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the absolute value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_magnitude(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the base e logarithm of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_nat_log(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the negative of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_negative(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the logical complement of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_not(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the bitwise complement of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_not_bitwise(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the nearby integer of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_near_int64_t(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the nearby integer of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_within_quad_CT(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store pi times the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_pi_times(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store pi times the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_pi_times_inverse(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the reciprocal of the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_reciprocal(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store a random number between 1 and the value of this Cell in Z
+   /// @param Z  destination cell for the result
    virtual ErrorCode bif_roll(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
    /// store the sum of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the logical and of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_and(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the bitwise and of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the binomial (n over k) of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_binomial(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the difference between A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_subtract(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the quotient between A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_divide(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// compare this with other, throw DOMAIN ERROR on illegal comparisons
+   /// @param other  cell to compare against
    virtual Comp_result compare(const Cell & other) const
       { DOMAIN_ERROR; }
 
    /// store 1 in Z if A == the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_equal(Cell * Z, const Cell * A) const;
 
    /// bitwise comparison of *this and A
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const
       { DOMAIN_ERROR; }
 
    /// bitwise comparison of *this and A
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const
       { DOMAIN_ERROR; }
 
    /// store 1 in Z if A != the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_not_equal(Cell * Z, const Cell * A) const;
 
    /// store 1 in Z if A > the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_greater_than(Cell * Z, const Cell * A) const;
 
    /// store 1 in Z if A <= the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_less_eq(Cell * Z, const Cell * A) const;
 
    /// store 1 in Z if A < the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_less_than(Cell * Z, const Cell * A) const;
 
    /// store 1 in Z if A is >= the value of \b this cell in Z, else 0
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    ErrorCode bif_greater_eq(Cell * Z, const Cell * A) const;
 
    /// store the base A logarithm of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell (the base)
    virtual ErrorCode bif_logarithm(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the larger of A and of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_maximum(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the smaller of A and of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_minimum(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the product of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_multiply(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the logical nand of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_nand(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the bitwise nand of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_nand_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the logical NOR of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_nor(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the bitwise NOR of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_nor_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the logical OR of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_or(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the bitwise or of A and \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store A to the power of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell (the base)
    virtual ErrorCode bif_power(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store A modulo \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell (the value to reduce)
    virtual ErrorCode bif_residue(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store a circle function (according to A) of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell (the circle function selector)
    virtual ErrorCode bif_circle_fun(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store a circle function (according to A) of \b this cell in Z
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell (the circle function selector)
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
@@ -462,14 +567,21 @@ public:
 #endif
 
    /// the inverse of bif_add
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// the inverse of bif_bif_multiply
+   /// @param Z  destination cell for the result
+   /// @param A  left operand cell
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// return \b true if z = a + b had an overflow.
+   /// @param z  the computed sum
+   /// @param a  first addend
+   /// @param b  second addend
    static bool sum_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {
         if (z < 0)   return ((a | b) & 0x8000000000000000) == 0;
@@ -477,6 +589,9 @@ public:
       }
 
    /// return \b true if z = a - b had an overflow.
+   /// @param z  the computed difference
+   /// @param a  minuend
+   /// @param b  subtrahend
    static bool diff_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {
         if (z < 0)   return ((a | ~b) & 0x8000000000000000) == 0;
@@ -486,6 +601,8 @@ public:
    /// return \b true if multiplying a and b will (probably) overflow.
    /// For some huge a or b the result may incorrectly return true.
    /// a or b the result may incorrectly return true.
+   /// @param a  first factor
+   /// @param b  second factor
    static bool prod_overflow(int64_t a, int64_t b)
       {
         const int64_t prod = (a >> 4) * (b >> 4);
@@ -494,7 +611,9 @@ public:
       }
 
    /// placement new
-   void * operator new(std::size_t, void *);
+   /// @param s  required allocation size (ignored for placement)
+   /// @param p  target memory address
+   void * operator new(std::size_t s, void * p);
 
    /// copy (deep) count cells from src to dest)
    static void copy(Cell * & dst, const Cell * & src, ShapeItem count,
