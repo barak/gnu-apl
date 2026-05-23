@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -847,9 +847,10 @@ Quad_INP::eval_B(Value_P B) const
    if (B->get_rank() > 1)         RANK_ERROR;
    if (B->element_count() == 0)   LENGTH_ERROR;
 
+   end_marker = B->get_UCS_ravel();
+
    Quad_INP_running = true;
 
-   end_marker = B->get_UCS_ravel();
    read_strings();    // read lines from file or stdin
 
 Value_P Z(raw_lines.size(), LOC);
