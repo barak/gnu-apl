@@ -1122,6 +1122,7 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
          else           // last argument
             {
               const char * arg = strdup(apl_args);
+              if (!arg)   break;
               expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               break;

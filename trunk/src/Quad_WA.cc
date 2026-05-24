@@ -163,7 +163,7 @@ const struct _tag
 
    for (;;)   // read all lines of /proc.meminfo
        {
-         char buffer[2000];
+         char buffer[4096];
          if (reader.fgets(buffer, sizeof(buffer) - 1) == 0)   break;
          buffer[sizeof(buffer) - 1] = 0;   // to allow strncmp()
 

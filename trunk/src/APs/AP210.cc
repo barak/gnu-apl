@@ -243,7 +243,7 @@ const CDR_string & cdr = *var_D.data;
         const int len = cdr.header().get_nb();
         const uint8_t * data = cdr.get_items();
         const int written = fwrite(data, len, 1, file);
-        if (written == len)   return -48;   // partial write
+        if (written != 1)   return -48;   // write error or partial write
 
         ++filepos;
         return 0;

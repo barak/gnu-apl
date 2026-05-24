@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -219,7 +220,7 @@ const time_t apl_lines_time = st.st_mtime;
       }
 
    pc_2_src.reserve(100000);
-char buffer[1000];
+char buffer[4096];
 FileReader reader(fd);
 size_t file_lines = 0;
 size_t asm_lines = 0;
@@ -277,6 +278,7 @@ main():
          if (s[0] == '/')            // case 2: source file path
             {
               src_line = strdup(strrchr(s, '/') + 1);
+              if (!src_line)   continue;
               new_line = true;
               continue;
             }
@@ -1399,11 +1401,8 @@ char ** strings = backtrace_symbols(buffer, size);
             oldest. We want the lines to be displayed from oldest to latest.
           */
          const char * const_si = strings[size - item - 1];
-         const size_t si_len =  strlen(const_si) + 1;
-         char * mutable_si = reinterpret_cast<char *>(alloca(si_len));
-         strcpy(mutable_si, const_si);
-         mutable_si[si_len - 1] = 0;   // 0-terminate mutable_si (just in case)
-         show_item(item - 1, mutable_si);
+         std::vector<char> mutable_si(const_si, const_si + strlen(const_si) + 1);
+         show_item(item - 1, mutable_si.data());
        }
 
    cerr << "========================================" << endl;
@@ -1447,8 +1446,14 @@ char * p = strchr(&tmp[0], '(');
    else *e = 0;
 
 // cerr << "mangled fun is: " << p << endl;
-   __cxxabiv1::__cxa_demangle(p, result, &result_max, &status);
-   if (status)   goto error;
+   {
+   size_t len = 0;
+   char * dm = __cxxabiv1::__cxa_demangle(p, NULL, &len, &status);
+   if (!dm || status)   goto error;
+   strncpy(result, dm, result_max - 1);
+   result[result_max - 1] = 0;
+   free(dm);
+   }
    return 0;
 
 error:
@@ -1464,11 +1469,11 @@ void * buffer[200];
 const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
 char ** strings = backtrace_symbols(buffer, size);
 
-char * demangled = static_cast<char *>(malloc(200));
+char * demangled = static_cast<char *>(malloc(1024));
    if (demangled)
        {
          *demangled = 0;
-         demangle_line(demangled, 200, strings[offset]);
+         demangle_line(demangled, 1024, strings[offset]);
          return demangled;
        }
    return strings[offset];

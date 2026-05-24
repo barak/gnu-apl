@@ -497,10 +497,10 @@ const ShapeItem len_B = rows_B * cols_B;
 
    // split B into X=real B, Y=imag Y
 
+if ((size_t)len_B > SIZE_MAX / 3)   WS_FULL;
 double * X = new double[3*len_B];
 double * Y = X + len_B;
 double * Z = Y + len_B;
-   if (!X)   WS_FULL;
 
 const APL_Integer qio = Workspace::get_IO();
    loop(b, len_B)
@@ -556,10 +556,10 @@ const ShapeItem rows = B.element_count();   // number of plot rows
              }
        }
 
+if ((size_t)data_points > SIZE_MAX / 3)   WS_FULL;
 double * X = new double[3*data_points];
 double * Y = X + data_points;
 double * Z = Y + data_points;
-   if (!X)   WS_FULL;
 
 ShapeItem idx = 0;
 const APL_Integer qio = Workspace::get_IO();
@@ -663,10 +663,10 @@ const ShapeItem data_points = rows * cols;
 
    if (planes == 3)   // X, Y, and Z
       {
+        if ((size_t)data_points > SIZE_MAX / 3)   WS_FULL;
         double * X = new double[3*data_points];
         double * Y = X + data_points;
         double * Z = Y + data_points;
-        if (!X)   WS_FULL;
 
         data = new Plot_data(rows);
         loop(r, rows)

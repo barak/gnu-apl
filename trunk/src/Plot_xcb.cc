@@ -352,16 +352,16 @@ const char * unit = 0;
 
    if (unit == 0)   // very large or very small
       {
-        snprintf(cp, end - cc, "%.2E", val);
+        snprintf(cp, end - cp, "%.2E", val);
         NULL_TERMINATE(cc)
         return cc;
       }
 
    // at this point: 1 ≤ val < 1000
    //
-   if      (val < 10)    snprintf(cp, end - cc, "%.2f%s", val, unit);
-   else if (val < 100)   snprintf(cp, end - cc, "%.1f%s", val, unit);
-   else                  snprintf(cp, end - cc, "%.0f%s", val, unit);
+   if      (val < 10)    snprintf(cp, end - cp, "%.2f%s", val, unit);
+   else if (val < 100)   snprintf(cp, end - cp, "%.1f%s", val, unit);
+   else                  snprintf(cp, end - cp, "%.0f%s", val, unit);
    NULL_TERMINATE(cc)
    return cc;
 }
@@ -1406,6 +1406,7 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
        SPRINTF(cc, "%s-XCB %d", w_props.get_caption().c_str(), handle);
        pctx.caption = strdup(cc);
       }
+   if (!pctx.caption)   return vp_props;
 
    {
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS

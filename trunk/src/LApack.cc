@@ -182,11 +182,11 @@ const size_t bytes_B = items_B * sizeof(t0);
 
    // allocate storage for A and B
    //
-char * work_AB = new char[bytes_A + bytes_B];
-   if (work_AB == 0)   WS_FULL;
+if (bytes_A > SIZE_MAX - bytes_B)   WS_FULL;
+T * work_AB = std::allocator<T>{}.allocate(items_A + items_B);
 
-char * work_A = work_AB;
-char * work_B = work_A + bytes_A;
+T * work_A = work_AB;
+T * work_B = work_A + items_A;
 
    ALL_COLS(cols_A)   // APL columns
       {
@@ -195,7 +195,7 @@ char * work_B = work_A + bytes_A;
         // a[] is  one column A[;col] on entry and one column Z[; col] on exit.
         // Therefore a must not be changed.
         //
-        T * const a = reinterpret_cast<T *>(work_A);
+        T * const a = work_A;
         fMatrix<T> A(a, rows, 1,      /* LDA */ rows);   // rows × 1
 
         ALL_ROWS(rows)   // APL rows
@@ -208,7 +208,7 @@ char * work_B = work_A + bytes_A;
         // initialize entire b[] in FORTRAN (aka. column major) order,
         // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
         //
-        T * b = reinterpret_cast<T *>(work_B);
+        T * b = work_B;
         fMatrix<T> B(b, rows, cols_B, /* LDB */ rows);   // rows × cols_B
 
         ALL_COLS(cols_B)   // APL columns
@@ -222,7 +222,7 @@ char * work_B = work_A + bytes_A;
         const sRank rank = gelsy<T>(A, B, rcond);
         if (rank < cols_B)
            {
-             delete[] work_AB;
+             std::allocator<T>{}.deallocate(work_AB, items_A + items_B);
              return rank;
            }
 
@@ -238,7 +238,7 @@ char * work_B = work_A + bytes_A;
               Z.set_ravel_Float(row*cols_A + col, get_real(a[row]));
       }
 
-   delete[] work_AB;
+   std::allocator<T>{}.deallocate(work_AB, items_A + items_B);
    return cols_B;
 }
 //----------------------------------------------------------------------------
@@ -265,18 +265,25 @@ sRank LA_pack::factorize_matrix(Value & Z, Crow M, Ccol N,
    // work sizes...
    //
 const ShapeItem max_MN = max(M, N);
-const size_t bytes_B  = M * N * sizeof(T);   // size of work_B
-const size_t bytes_HR = M * N * sizeof(T);   // size of work_HR
-const size_t bytes_R  = max_MN * max_MN * sizeof(T);   // size of work_R
-const size_t bytes_Ri = N * M * sizeof(T);   // size of work_Ri
+const size_t items_B  = M * N;
+const size_t items_HR = M * N;
+const size_t items_R  = max_MN * max_MN;
+const size_t items_Ri = N * M;
+const size_t bytes_B  = items_B  * sizeof(T);   // size of work_B
+const size_t bytes_HR = items_HR * sizeof(T);   // size of work_HR
+const size_t bytes_R  = items_R  * sizeof(T);   // size of work_R
+const size_t bytes_Ri = items_Ri * sizeof(T);   // size of work_Ri
 
    // work memories
    //
-char * work_B = new char[bytes_B + bytes_HR + bytes_R + bytes_Ri];
-char * work_HR = work_B  + bytes_B;
-char * work_R  = work_HR + bytes_HR;
-char * work_Ri = work_R  + bytes_R;
-   if (work_B == 0)   WS_FULL;
+if (bytes_HR > SIZE_MAX - bytes_B
+    || bytes_R  > SIZE_MAX - (bytes_B + bytes_HR)
+    || bytes_Ri > SIZE_MAX - (bytes_B + bytes_HR + bytes_R))   WS_FULL;
+const size_t total_items_fac = items_B + items_HR + items_R + items_Ri;
+T * work_B = std::allocator<T>{}.allocate(total_items_fac);
+T * work_HR = work_B  + items_B;
+T * work_R  = work_HR + items_HR;
+T * work_Ri = work_R  + items_R;
 
 fMatrix<T>  B(work_B,  M, N, /* LDB */ M);
 fMatrix<T> HR(work_HR, M, N, /* LDB */ M);
@@ -325,7 +332,7 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
    // store its inverse R⁻¹ into Z[3].  Return R⁻¹ in Ri (destroys R).
    grab_R<T>(HR, Z, Ri);   // HR → R, R⁻¹
 
-   delete[] work_B;
+   std::allocator<T>{}.deallocate(work_B, total_items_fac);
    return N;
 }
 //----------------------------------------------------------------------------
@@ -1765,50 +1772,43 @@ const Ccol lastC = ila_lc<T>(len_v, C);
 //----------------------------------------------------------------------------
 template<typename T>
 LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
+   : N(N)
 {
-   enum
-      {
-        bytes_per_N1 = sizeof(*tau)
-                     + sizeof(*y)
-                     + sizeof(*work_min)
-                     + sizeof(*work_max),
-        bytes_per_N2 = bytes_per_N1
-                    + sizeof(*pivot)
-                    + sizeof(*vn1)
-                    + sizeof(*vn2)
-      };
+   tau      = std::allocator<T>{}.allocate(N);
+   y        = std::allocator<T>{}.allocate(N);
+   work_min = std::allocator<T>{}.allocate(N);
+   work_max = std::allocator<T>{}.allocate(N);
 
    if (with_pivot)   // ⌹B or A⌹B but not ⌹[X]B
       {
-        char * work = new char[N*bytes_per_N2];
-        tau      = reinterpret_cast<T *>        (work);
-        y        = reinterpret_cast<T *>        (tau      + N);
-        work_min = reinterpret_cast<T *>        (y        + N);
-        work_max = reinterpret_cast<T *>        (work_min + N);
-        pivot    = reinterpret_cast<Ccol *>     (work_max + N);
-        vn1      = reinterpret_cast<APL_Float *>(pivot    + N);
-        vn2      = reinterpret_cast<APL_Float *>(vn1      + N);
+        pivot = std::allocator<Ccol>{}.allocate(N);
+        vn1   = std::allocator<APL_Float>{}.allocate(N);
+        vn2   = std::allocator<APL_Float>{}.allocate(N);
 
         // init the pivot
         loop(n, N)   pivot[n] = n;
       }
    else              // only ⌹[X]B
       {
-        char * work = new char[N*bytes_per_N1];
-        tau      = reinterpret_cast<T *>(work);
-        y        = reinterpret_cast<T *>(tau      + N);
-        work_min = reinterpret_cast<T *>(y        + N);
-        work_max = reinterpret_cast<T *>(work_min + N);
-        pivot    = 0;   // as to figure with_pivot later on
-        vn1      = 0;
-        vn2      = 0;
+        pivot = 0;   // as to figure with_pivot later on
+        vn1   = 0;
+        vn2   = 0;
       }
 }
 //----------------------------------------------------------------------------
 template<typename T>
 LA_pack::PTVVy<T>::~PTVVy()
 {
-   delete[] reinterpret_cast<char *>(tau);
+   std::allocator<T>{}.deallocate(tau,      N);
+   std::allocator<T>{}.deallocate(y,        N);
+   std::allocator<T>{}.deallocate(work_min, N);
+   std::allocator<T>{}.deallocate(work_max, N);
+   if (pivot)
+      {
+        std::allocator<Ccol>{}.deallocate(pivot, N);
+        std::allocator<APL_Float>{}.deallocate(vn1, N);
+        std::allocator<APL_Float>{}.deallocate(vn2, N);
+      }
 }
 //----------------------------------------------------------------------------
 template<typename T>

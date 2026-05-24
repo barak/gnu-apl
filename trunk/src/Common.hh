@@ -458,8 +458,10 @@ struct YMDhmsu
 //----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
-inline void * operator new(size_t size)   { return common_new(size); }
-inline void   operator delete(void * p)   { common_delete(p); }
+inline void * operator new(size_t size)    { return common_new(size); }
+inline void   operator delete(void * p)    { common_delete(p); }
+inline void * operator new[](size_t size)  { return common_new(size); }
+inline void   operator delete[](void * p)  { common_delete(p); }
 #endif
 
 using namespace std;

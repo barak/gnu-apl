@@ -247,6 +247,7 @@ const int bytes_per_pixel = planes * bytes_per_color;
 
    // 2. allocate the pixel memory and scanline pointers...
    //
+if ((size_t)planes * height > SIZE_MAX / 2 / (unsigned)width)   WS_FULL;
 UTF8 * RGB = new UTF8[planes*height*width*2];
 UTF8 ** row_pointers = new UTF8 *[height];
 
@@ -584,6 +585,7 @@ png_text text_ptr[1];
              << "planes:        " << planes                        << endl;
       }
 
+if (B.element_count() > (ShapeItem)(SIZE_MAX / 2))   WS_FULL;
 UTF8 * RGB = new UTF8[2*B.element_count()];
 UTF8 ** row_pointers = new UTF8 *[height];
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -908,7 +908,7 @@ int envp_idx = 0;
    envp[envp_idx] = 0;   // 0-terminator
 
 const int fd = Quad_FIO::do_FIO_57(UTF8_string(path), envp);
-   loop(c, evar_count)   delete envp[c];
+   loop(c, evar_count)   delete [] envp[c];
    return fd;
 }
 //----------------------------------------------------------------------------

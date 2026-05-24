@@ -66,6 +66,8 @@
 /** @file
  */
 
+#include <memory>
+
 #define LA_DEBUG     0   /* LApack.cc */
 #define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
@@ -403,15 +405,15 @@ public:
        
         ~TempMatrix()
            {
-             delete[] fMatrix<T>::data;
+             std::allocator<T>{}.deallocate(fMatrix<T>::data,
+                                            fMatrix<T>::get_item_count());
            }
 
          static T * const allocate(const T * src, int item_count)
             {
-             const int bytes = item_count * sizeof(T);
-             char * dest = new char[bytes];
-             memcpy(dest, src, bytes);
-             return reinterpret_cast<T *>(dest);
+             T * dest = std::allocator<T>{}.allocate(item_count);
+             memcpy(dest, src, item_count * sizeof(T));
+             return dest;
             }
      };                                // class TempMatrix<T>
 
@@ -422,6 +424,7 @@ public:
         /// constructor for N column matrices
         PTVVy(Ccol N, bool with_pivot);
         ~PTVVy();                 ///< destructor
+        Ccol        N;            ///< column count (stored for deallocation)
         Ccol *      pivot;        ///< column pivot
         T *         tau;          ///< diagonal elements
         APL_Float * vn1;          ///< column norms 1

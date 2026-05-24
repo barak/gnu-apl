@@ -285,8 +285,8 @@ FileWriter writer;
              if (max_len < len) max_len = len;
            }
      
-       int * rho = ALLOCA(int, B_rank);
-       memset(rho, 0, B_rank * sizeof(int));
+       std::vector<int> rho_v(B_rank, 0);
+       int * rho = rho_v.data();
      
        loop(b, B_count)
            {
@@ -387,7 +387,8 @@ const ShapeItem cols = B->get_cols();
       }
 
 GSL_Matrix * mtx = genMtx(B, false);
-double * data = ALLOCA(double, mtx->rows() * mtx->cols());
+std::vector<double> data_v((size_t)mtx->rows() * mtx->cols());
+double * data = data_v.data();
 int i = 0;
    loop(j, mtx->rows())
    for (int k = 0; k < mtx->cols(); k++, i++)
@@ -449,7 +450,8 @@ const ShapeItem cols = B->get_cols();
       }
 
 GSL_Matrix * mtx = genMtx(B, false);
-double * data = ALLOCA(double, mtx->rows() * mtx->cols());
+std::vector<double> data_v((size_t)mtx->rows() * mtx->cols());
+double * data = data_v.data();
 int i = 0;
    loop(j, mtx->rows())
    loop(k, mtx->cols())

@@ -418,6 +418,7 @@ static char cc[100] = "";   // should suffice
            }
 
         strncpy(cc, tick_text, tick_len);
+        cc[tick_len] = 0;
         return cc;
       }
    else if (strchr("gvSIHhDdMmQqYy", percent[1]))   // some kind of date

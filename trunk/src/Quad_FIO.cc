@@ -261,7 +261,7 @@ const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
    do_snprintf(UZ, A_format, A.get(), 1, "⎕FIO.fprintf B");
 UTF8_string utf(UZ);
-   fwrite(utf.c_str(), 1, utf.size(), outf);
+   if (fwrite(utf.c_str(), 1, utf.size(), outf) != utf.size())   SYSTEM_ERROR;
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
 //----------------------------------------------------------------------------
@@ -2466,6 +2466,7 @@ const int sock = spair[1];
 const UCS_string path_ucs(B);
 const UTF8_string path(path_ucs);
 char * filename = strdup(path.c_str());
+if (!filename)   DOMAIN_ERROR;
 int argc = 1;
    for (const char * f = filename; *f; ++f)
        if (f[0] == ' ' && f[1] != ' ')   ++ argc;

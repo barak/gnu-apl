@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <new>
+#include <string>
 
 #include "../Common.hh"
 #include "Gtk_enums.hh"
@@ -81,6 +83,13 @@ static struct _ID_DB
     widget_name(strdup(wn)),
     obj(0)
     {
+       if (!xml_class || !xml_id || !widget_name)
+          {
+            free(const_cast<char *>(xml_class));
+            free(const_cast<char *>(xml_id));
+            free(const_cast<char *>(widget_name));
+            throw std::bad_alloc();
+          }
        if (verbosity > 2)
           cerr << "Add class='" << cls << "' id='" << id
                    << "' wname ='" << wn << "' to DB" << endl;
@@ -1018,11 +1027,10 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
                    << " id=" << entry->xml_id << " name="
                    << entry->widget_name << endl;
 
-              char data[strlen(10 + callback) + strlen(entry->xml_class)
-                        + strlen(entry->xml_id) + strlen(entry->widget_name)];
-              sprintf(data, "H%s:%s:%s:%s", entry->widget_name, callback,
-                             entry->xml_id, entry->xml_class);
-              send_TLV(Event_widget_fun_id_class, data);
+              const std::string data = std::string("H") + entry->widget_name
+                                       + ":" + callback + ":" + entry->xml_id
+                                       + ":" + entry->xml_class;
+              send_TLV(Event_widget_fun_id_class, data.c_str());
               verbosity > 0 &&
                   cerr << "callback " << callback << "(new-style) done" << endl;
               return;
@@ -1037,9 +1045,8 @@ gchar * widget_name = none;
    verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
                          << "    callback is: " << callback << endl;
 
-char data[strlen(callback) + strlen(widget_name) + 10];
-   sprintf(data, "H%s:%s", widget_name, callback);
-   send_TLV(Event_widget_fun, data);
+const std::string data = std::string("H") + widget_name + ":" + callback;
+   send_TLV(Event_widget_fun, data.c_str());
 
    if (verbosity > 0)
       cerr << "callback " << callback << "(old-style) done" << endl;

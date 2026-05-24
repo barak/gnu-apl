@@ -940,7 +940,8 @@ struct sockaddr_un local;
    memset(&local, 0, sizeof(sockaddr_un));
    local.sun_family = AF_UNIX;
 
-   strcpy(local.sun_path + ABSTRACT_OFFSET, listen_name);
+   strncpy(local.sun_path + ABSTRACT_OFFSET, listen_name,
+           sizeof(local.sun_path) - ABSTRACT_OFFSET);
 
    if (::bind(listen_sock, reinterpret_cast<const sockaddr *>(&local),
               sizeof(sockaddr_un)))

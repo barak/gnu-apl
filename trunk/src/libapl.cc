@@ -696,7 +696,7 @@ stringstream out;
    value->print(out);
 
 const string st = out.str();
-   fwrite(st.data(), 1, st.size(), file);
+   (void)fwrite(st.data(), 1, st.size(), file);
 }
 //----------------------------------------------------------------------------
 char *

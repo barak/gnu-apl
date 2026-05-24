@@ -1059,7 +1059,8 @@ UCS_string data;
                 snprintf(ts_buf + CONTENT_LEN, BUFSIZE - CONTENT_LEN,
                          "%8.8lld\r\n", long_long(seq++));
                NULL_TERMINATE(ts_buf)
-               fwrite(ts_buf, 1, RECORD_SIZE, out);
+               if (fwrite(ts_buf, 1, RECORD_SIZE, out) != RECORD_SIZE)
+                  CERR << "fwrite error during )SAVE" << endl;
 
                // write function record(s)
                //

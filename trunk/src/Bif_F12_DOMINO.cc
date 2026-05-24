@@ -520,7 +520,8 @@ const ShapeItem base_S  = 1 + base_R  + CPLX*len_QR + 1;
 const ShapeItem end     = 1 + base_S  + CPLX*len_QR + 1;
 #define base_AUG  base_Q   /* reuse Q */
 
-double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
+if ((size_t)end > SIZE_MAX / CPLX)   WS_FULL;
+double * data = new double[end*CPLX];
    memset(data, 0, end*sizeof(double));
    data[base_B - 1]  = 42.0;   data[base_B  + CPLX*len_B] = 43.0;
    data[base_Q - 1]  = 44.0;   data[base_Q  + CPLX*len_QR]   = 45.0;

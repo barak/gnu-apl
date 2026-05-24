@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <vector>
 #include "Avec.hh"
 #include "UCS_string_vector.hh"
 #include "Value.hh"
@@ -232,7 +233,8 @@ UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
    /// starting at \b col
 
 const ShapeItem column_count1 = column_count - 1;
-ShapeItem * column_widths = ALLOCA(ShapeItem, column_count);
+std::vector<ShapeItem> column_widths_v(column_count);
+ShapeItem * column_widths = column_widths_v.data();
    loop(col, column_count)   column_widths[col] = max_width(col, column_count);
 
 const UCS_string frame(U"╔╤╗╚╧╝═║│");

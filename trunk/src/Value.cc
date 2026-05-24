@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <memory>
 #include <sys/types.h>
 
 #include "Bif_F12_PARTITION_PICK.hh"
@@ -139,7 +140,7 @@ CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
       }
 
    alloc_size = length * sizeof(Cell);
-   ravel = reinterpret_cast<Cell *>(new char[alloc_size]);
+   ravel = std::allocator<Cell>{}.allocate(length);
 
 /*
    ravel = 0;   // assume new() fails
@@ -458,7 +459,7 @@ const ShapeItem length = nz_element_count();
    if (ravel != short_value)   // long value
       {
         total_ravel_count -= length;
-        delete [] ravel;
+        std::allocator<Cell>{}.deallocate(ravel, length);
       }
 
    Assert(check_ptr == charP(this) + 7);
@@ -3123,7 +3124,7 @@ ShapeItem z = 0;
       }
    else
       {
-        if (ravel != short_value)   delete[] ravel;
+        if (ravel != short_value)   std::allocator<Cell>{}.deallocate(ravel, nz_element_count());
         ravel = reinterpret_cast<Cell *>(bits);
         flags |= VF_packed;
       }
