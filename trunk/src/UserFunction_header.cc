@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -119,36 +119,147 @@ UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
    error_info = 0;
    error = E_NO_ERROR;
 }
-//-------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
-UserFunction_header::signature_is_valid(Fun_signature sig)
+UserFunction_header::localizes(const Symbol * sym) const
 {
-   // if sig is valid then (sig | SIG_Z) is also valid. We can therefore
-   // reduce the number of cases.by pretending that SIG_Z is set.
-   //
-   switch(sig | SIG_Z)
+   if (sym == sym_Z)   return true;
+   if (sym == sym_A)   return true;
+   if (sym == sym_LO)  return true;
+   if (sym == sym_RO)  return true;
+   if (sym == sym_X)   return true;
+   if (sym == sym_B)   return true;
+
+   loop(l, local_vars.size())     if (sym == local_vars[l])         return true;
+   loop(l, label_values.size())   if (sym == label_values[l].sym)   return true;
+
+   return false;
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::print_properties(ostream & out, int indent) const
+{
+UCS_string ind(indent, UNI_SPACE);
+   out << (is_operator() ? "Operator " : "Function ")
+       << function_name << endl;
+
+   if (sym_Z)    out << ind << "Result:        " << *sym_Z  << endl;
+   if (sym_A)    out << ind << "Left Val Arg:  " << *sym_A  << endl;
+   if (sym_LO)   out << ind << "Left Fun Arg:  " << *sym_LO << endl;
+   if (sym_RO)   out << ind << "Right Fun Arg: " << *sym_RO << endl;
+   if (sym_B)    out << ind << "Right Val Arg: " << *sym_B  << endl;
+
+   if (local_vars.size())
       {
-        // niladic
-        //
-        case SIG_Z_F0:
-
-        // monadic
-        //
-        case SIG_Z_F1_B:
-        case SIG_Z_F1_X_B:
-        case SIG_Z_LO_OP1_B:
-        case SIG_Z_LO_OP1_X_B:
-        case SIG_Z_LO_OP2_RO_B:
-
-        // dyadic
-        //
-        case SIG_Z_A_F2_B:
-        case SIG_Z_A_F2_X_B:
-        case SIG_Z_A_LO_OP1_B:
-        case SIG_Z_A_LO_OP1_X_B:
-        case SIG_Z_A_LO_OP2_RO_B:   return true;    // valid signature
-        default:                    return false;   // invalid signature
+        out << ind << "Local Variables:";
+        loop(l, local_vars.size())   out << " " << *local_vars[l];
+        out << endl;
       }
+
+   if (label_values.size())
+      {
+        out << ind << "Labels:        ";
+        loop(l, label_values.size())
+           {
+             if (l)   out << ",";
+             out << " " << *label_values[l].sym
+                 << "=" << label_values[l].line;
+           }
+        out << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::pop_local_vars() const
+{
+   loop(l, label_values.size())   label_values[l].sym->pop();
+
+   loop(l, local_vars.size())   local_vars[l]->pop();
+
+   if (sym_B)    sym_B ->pop();
+   if (sym_X)    sym_X ->pop();
+   if (sym_RO)   sym_RO->pop();
+   if (sym_LO)   sym_LO->pop();
+   if (sym_A)    sym_A ->pop();
+   if (sym_Z)    sym_Z ->pop();
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::print_local_vars(ostream & out) const
+{
+   if (sym_Z)     out << " " << *sym_Z;
+   if (sym_A)     out << " " << *sym_A;
+   if (sym_LO)    out << " " << *sym_LO;
+   if (sym_RO)    out << " " << *sym_RO;
+   if (sym_B)     out << " " << *sym_B;
+
+   loop(l, local_vars.size())   out << " " << *local_vars[l];
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::reverse_local_vars()
+{
+const ShapeItem half = local_vars.size() / 2;   // = rounded down!
+   loop(v, half)
+      {
+        Symbol * tmp = local_vars[v];
+        local_vars[v] = local_vars[local_vars.size() - v - 1];
+        local_vars[local_vars.size() - v - 1] = tmp;
+      }
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::remove_duplicate_local_variables()
+{
+   // remove local vars that are also labels, arguments or return values.
+   // This is to avoid pushing them twice
+   //
+   remove_duplicate_local_var(sym_Z,   0);
+   remove_duplicate_local_var(sym_A,   0);
+
+   // sym_LO, sym_FUN, and sym_RO are not pushed, so they are never duplicates
+
+   remove_duplicate_local_var(sym_X,   0);
+   remove_duplicate_local_var(sym_B,   0);
+
+   loop(l, label_values.size())
+      remove_duplicate_local_var(label_values[l].sym, 0);
+
+   loop(l, local_vars.size())
+      remove_duplicate_local_var(local_vars[l], l + 1);
+}
+//----------------------------------------------------------------------------
+UCS_string
+UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
+{
+UCS_string ucs;
+
+   if (sig & SIG_Z)      ucs << "λ←";
+   if (sig & SIG_A)      ucs << "⍺ ";
+   if (sig & SIG_LORO)   ucs << "(";
+   if (sig & SIG_LO)     ucs << "⍶ ";
+   ucs << UNI_LAMBDA << lambda_num;
+   if (sig & SIG_RO)     ucs << " ⍹ ";
+   if (sig & SIG_LORO)   ucs << ")";
+   if (sig & SIG_X)      ucs << "[χ]";
+   if (sig & SIG_B)      ucs << " ⍵";
+
+   return ucs;
+}
+//----------------------------------------------------------------------------
+void
+UserFunction_header::eval_common() const
+{
+   Log(LOG_UserFunction__enter_leave)   CERR << "eval_common()" << endl;
+
+   // push local variables...
+   //
+   loop(l, local_vars.size())   local_vars[l]->push();
+
+   // push labels...
+   //
+   loop(l, label_values.size())
+       label_values[l].sym->push_label(label_values[l].line);
 }
 //--------------------------------------------------------------------------
 const char *
@@ -368,65 +479,36 @@ Token_string tos;
 
    return 0;
 }
-//----------------------------------------------------------------------------
-void
-UserFunction_header::pop_local_vars() const
+//-------------------------------------------------------------------------
+bool
+UserFunction_header::signature_is_valid(Fun_signature sig)
 {
-   loop(l, label_values.size())   label_values[l].sym->pop();
-
-   loop(l, local_vars.size())   local_vars[l]->pop();
-
-   if (sym_B)    sym_B ->pop();
-   if (sym_X)    sym_X ->pop();
-   if (sym_RO)   sym_RO->pop();
-   if (sym_LO)   sym_LO->pop();
-   if (sym_A)    sym_A ->pop();
-   if (sym_Z)    sym_Z ->pop();
-}
-//----------------------------------------------------------------------------
-void
-UserFunction_header::print_local_vars(ostream & out) const
-{
-   if (sym_Z)     out << " " << *sym_Z;
-   if (sym_A)     out << " " << *sym_A;
-   if (sym_LO)    out << " " << *sym_LO;
-   if (sym_RO)    out << " " << *sym_RO;
-   if (sym_B)     out << " " << *sym_B;
-
-   loop(l, local_vars.size())   out << " " << *local_vars[l];
-}
-//----------------------------------------------------------------------------
-void
-UserFunction_header::reverse_local_vars()
-{
-const ShapeItem half = local_vars.size() / 2;   // = rounded down!
-   loop(v, half)
-      {
-        Symbol * tmp = local_vars[v];
-        local_vars[v] = local_vars[local_vars.size() - v - 1];
-        local_vars[local_vars.size() - v - 1] = tmp;
-      }
-}
-//----------------------------------------------------------------------------
-void
-UserFunction_header::remove_duplicate_local_variables()
-{
-   // remove local vars that are also labels, arguments or return values.
-   // This is to avoid pushing them twice
+   // if sig is valid then (sig | SIG_Z) is also valid. We can therefore
+   // reduce the number of cases.by pretending that SIG_Z is set.
    //
-   remove_duplicate_local_var(sym_Z,   0);
-   remove_duplicate_local_var(sym_A,   0);
+   switch(sig | SIG_Z)
+      {
+        // niladic
+        //
+        case SIG_Z_F0:
 
-   // sym_LO, sym_FUN, and sym_RO are not pushed, so they are never duplicates
+        // monadic
+        //
+        case SIG_Z_F1_B:
+        case SIG_Z_F1_X_B:
+        case SIG_Z_LO_OP1_B:
+        case SIG_Z_LO_OP1_X_B:
+        case SIG_Z_LO_OP2_RO_B:
 
-   remove_duplicate_local_var(sym_X,   0);
-   remove_duplicate_local_var(sym_B,   0);
-
-   loop(l, label_values.size())
-      remove_duplicate_local_var(label_values[l].sym, 0);
-
-   loop(l, local_vars.size())
-      remove_duplicate_local_var(local_vars[l], l + 1);
+        // dyadic
+        //
+        case SIG_Z_A_F2_B:
+        case SIG_Z_A_F2_X_B:
+        case SIG_Z_A_LO_OP1_B:
+        case SIG_Z_A_LO_OP1_X_B:
+        case SIG_Z_A_LO_OP2_RO_B:   return true;    // valid signature
+        default:                    return false;   // invalid signature
+      }
 }
 //----------------------------------------------------------------------------
 void
@@ -447,87 +529,5 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
             }
          ++pos;
        }
-}
-//----------------------------------------------------------------------------
-UCS_string
-UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
-{
-UCS_string ucs;
-
-   if (sig & SIG_Z)      ucs << "λ←";
-   if (sig & SIG_A)      ucs << "⍺ ";
-   if (sig & SIG_LORO)   ucs << "(";
-   if (sig & SIG_LO)     ucs << "⍶ ";
-   ucs << UNI_LAMBDA << lambda_num;
-   if (sig & SIG_RO)     ucs << " ⍹ ";
-   if (sig & SIG_LORO)   ucs << ")";
-   if (sig & SIG_X)      ucs << "[χ]";
-   if (sig & SIG_B)      ucs << " ⍵";
-
-   return ucs;
-}
-//----------------------------------------------------------------------------
-bool
-UserFunction_header::localizes(const Symbol * sym) const
-{
-   if (sym == sym_Z)   return true;
-   if (sym == sym_A)   return true;
-   if (sym == sym_LO)  return true;
-   if (sym == sym_RO)  return true;
-   if (sym == sym_X)   return true;
-   if (sym == sym_B)   return true;
-
-   loop(l, local_vars.size())     if (sym == local_vars[l])         return true;
-   loop(l, label_values.size())   if (sym == label_values[l].sym)   return true;
-
-   return false;
-}
-//----------------------------------------------------------------------------
-void
-UserFunction_header::print_properties(ostream & out, int indent) const
-{
-UCS_string ind(indent, UNI_SPACE);
-   out << (is_operator() ? "Operator " : "Function ")
-       << function_name << endl;
-
-   if (sym_Z)    out << ind << "Result:        " << *sym_Z  << endl;
-   if (sym_A)    out << ind << "Left Val Arg:  " << *sym_A  << endl;
-   if (sym_LO)   out << ind << "Left Fun Arg:  " << *sym_LO << endl;
-   if (sym_RO)   out << ind << "Right Fun Arg: " << *sym_RO << endl;
-   if (sym_B)    out << ind << "Right Val Arg: " << *sym_B  << endl;
-
-   if (local_vars.size())
-      {
-        out << ind << "Local Variables:";
-        loop(l, local_vars.size())   out << " " << *local_vars[l];
-        out << endl;
-      }
-
-   if (label_values.size())
-      {
-        out << ind << "Labels:        ";
-        loop(l, label_values.size())
-           {
-             if (l)   out << ",";
-             out << " " << *label_values[l].sym
-                 << "=" << label_values[l].line;
-           }
-        out << endl;
-      }
-}
-//----------------------------------------------------------------------------
-void
-UserFunction_header::eval_common() const
-{
-   Log(LOG_UserFunction__enter_leave)   CERR << "eval_common()" << endl;
-
-   // push local variables...
-   //
-   loop(l, local_vars.size())   local_vars[l]->push();
-
-   // push labels...
-   //
-   loop(l, label_values.size())
-       label_values[l].sym->push_label(label_values[l].line);
 }
 //----------------------------------------------------------------------------

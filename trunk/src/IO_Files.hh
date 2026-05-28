@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -131,9 +131,6 @@ public:
    static void read_file_line(UTF8_string & file_line, bool & eof);
 
 protected:
-   /// dito (close files, print errors, summary etc).
-   static bool end_of_current_file();
-
    /// how to handle test results
    static enum TestMode
       {
@@ -165,6 +162,9 @@ protected:
         TM_DONE_AFTER_LINE_ERROR = TM_STOP_AFTER_LINE_ERROR
                                  | TM_EXIT_AFTER_LINE_ERROR,
       } test_mode;   ///< the desired test mode as per --TM n
+
+   /// dito (close files, print errors, summary etc).
+   static bool end_of_current_file();
 
    /// write testcases summary file
    static void print_summary();

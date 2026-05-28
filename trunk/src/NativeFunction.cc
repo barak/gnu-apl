@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,116 @@
 
 std::vector<NativeFunction *> NativeFunction::valid_functions;
 
+//----------------------------------------------------------------------------
+NativeFunction *
+NativeFunction::fix(const UCS_string & so_name,
+                    const UCS_string & function_name)
+{
+   // if the function already exists then return it.
+   //
+   loop(v, valid_functions.size())
+      {
+        NativeFunction * fun = valid_functions[v];
+        if (so_name == fun->so_path)
+           {
+             // the NativeFunction object exists, but may have been
+             // )ERASEd at APL level. If so, then re-install it.
+             //
+             Symbol * sym = Workspace::lookup_symbol(fun->get_name());
+             Assert(sym);
+
+             const char * why = sym->cant_be_defined();
+             if (why)
+                {
+                  MORE_ERROR() << why;
+                  return 0;
+                }
+
+             if (fun->is_operator())   sym->set_NC(NC_OPERATOR, fun);
+             else                      sym->set_NC(NC_FUNCTION, fun);
+             return fun;
+           }
+      }
+
+NativeFunction * new_function = new NativeFunction(so_name, function_name);
+   Log(LOG_delete)
+      CERR << "new    " << voidP(new_function) << " at " LOC << endl;
+
+
+   if (!new_function->valid)   // something went wrong
+      {
+        Log(LOG_delete)
+          CERR << "delete " << voidP(new_function) << " at " LOC << endl;
+        delete new_function;
+        return 0;
+      }
+
+   return new_function;
+}
+//----------------------------------------------------------------------------
+void
+NativeFunction::cleanup()
+{
+   // delete in reverse construction order
+   //
+   while(valid_functions.size())
+      {
+        NativeFunction * fun = valid_functions.back();
+        valid_functions.pop_back();
+
+        if (fun->close_fun && fun->handle)
+           {
+             const bool do_dlclose = (*fun->close_fun)(CAUSE_SHUTDOWN, fun);
+             if (do_dlclose)
+                {
+#if MINGW_SRC
+                  MORE_ERROR() << "Native functions work only on GNU/Linux.";
+                  DOMAIN_ERROR;
+#else
+                  dlclose(fun->handle);
+#endif
+                  fun->handle = 0;
+                }
+           }
+
+        // don't delete fun since this will be done when the symbol for the
+        // fun is being deleted
+      }
+}
+//----------------------------------------------------------------------------
+UCS_string
+NativeFunction::load_emacs_library(const char * emacs_arg)
+{
+UCS_string so_path(U"libemacs");
+UCS_string t4;
+
+void * handle = open_so_file(t4, so_path);
+   if (handle == 0)   return t4;
+
+   t4 = UCS_ASCII_string("found emacs library ");
+   t4 << so_path;
+
+void * emacs_start = dlsym(handle, "emacs_start");
+   if (emacs_start == 0)
+      {
+        t4 << ", but it\n   it is lacking the mandatory "
+                       "function emacs_start()\n";
+        return t4;
+      }
+
+UTF8_string so_path_utf(so_path);
+const int error =
+    reinterpret_cast<int (*)(const char *, const char *)>(emacs_start)
+            (emacs_arg, charP(so_path_utf.c_str()));
+
+   if (error)
+      {
+        return t4 << ", but emacs_start()  returned error " << error << UNI_LF;
+      }
+
+   t4.clear();   // success
+   return t4;
+}
 //----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
                                const UCS_string & apl_name)
@@ -176,34 +286,6 @@ NativeFunction::~NativeFunction()
 }
 //----------------------------------------------------------------------------
 void *
-NativeFunction::try_one_file(const char * filename, UCS_string & t4)
-{
-#if MINGW_SRC
-   MORE_ERROR() << "Native functions work only on GNU/Linux.";
-   DOMAIN_ERROR;
-#else
-const int t4_len = t4.size();
-   t4 << "    file " << filename;
-
-   if (access(filename, R_OK) != 0)
-      {
-        while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
-        t4 << " (" << strerror(errno) << ")\n";
-        return 0;
-      }
-
-   if (void * handle = dlopen(filename, RTLD_LAZY))   return handle;
-
-const char * err = dlerror();
-   if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
-
-   while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
-   t4 << " (" << err << " )\n";
-   return 0;
-#endif
-}
-//----------------------------------------------------------------------------
-void *
 NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 {
    // prepare a )MORE error message containing the file names tried.
@@ -307,102 +389,32 @@ const char * dirs[] =
    return 0;
 }
 //----------------------------------------------------------------------------
-void
-NativeFunction::cleanup()
+void *
+NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
-   // delete in reverse construction order
-   //
-   while(valid_functions.size())
-      {
-        NativeFunction * fun = valid_functions.back();
-        valid_functions.pop_back();
-
-        if (fun->close_fun && fun->handle)
-           {
-             const bool do_dlclose = (*fun->close_fun)(CAUSE_SHUTDOWN, fun);
-             if (do_dlclose)
-                {
 #if MINGW_SRC
-                  MORE_ERROR() << "Native functions work only on GNU/Linux.";
-                  DOMAIN_ERROR;
+   MORE_ERROR() << "Native functions work only on GNU/Linux.";
+   DOMAIN_ERROR;
 #else
-                  dlclose(fun->handle);
-#endif
-                  fun->handle = 0;
-                }
-           }
+const int t4_len = t4.size();
+   t4 << "    file " << filename;
 
-        // don't delete fun since this will be done when the symbol for the
-        // fun is being deleted
-      }
-}
-//----------------------------------------------------------------------------
-void
-NativeFunction::destroy()
-{
-   if (close_fun && handle)
+   if (access(filename, R_OK) != 0)
       {
-        const bool do_dlclose = (*close_fun)(CAUSE_ERASED, this);
-        if (do_dlclose)
-           {
-             dlclose(handle);
-             handle = 0;
-             close_fun = 0;
-           }
-      }
-   else if (handle)
-      {
-        dlclose(handle);
-        handle = 0;
-      }
-
-   delete this;
-}
-//----------------------------------------------------------------------------
-NativeFunction *
-NativeFunction::fix(const UCS_string & so_name,
-                    const UCS_string & function_name)
-{
-   // if the function already exists then return it.
-   //
-   loop(v, valid_functions.size())
-      {
-        NativeFunction * fun = valid_functions[v];
-        if (so_name == fun->so_path)
-           {
-             // the NativeFunction object exists, but may have been
-             // )ERASEd at APL level. If so, then re-install it.
-             //
-             Symbol * sym = Workspace::lookup_symbol(fun->get_name());
-             Assert(sym);
-
-             const char * why = sym->cant_be_defined();
-             if (why)
-                {
-                  MORE_ERROR() << why;
-                  return 0;
-                }
-
-             if (fun->is_operator())   sym->set_NC(NC_OPERATOR, fun);
-             else                      sym->set_NC(NC_FUNCTION, fun);
-             return fun;
-           }
-      }
-
-NativeFunction * new_function = new NativeFunction(so_name, function_name);
-   Log(LOG_delete)
-      CERR << "new    " << voidP(new_function) << " at " LOC << endl;
-
-
-   if (!new_function->valid)   // something went wrong
-      {
-        Log(LOG_delete)
-          CERR << "delete " << voidP(new_function) << " at " LOC << endl;
-        delete new_function;
+        while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
+        t4 << " (" << strerror(errno) << ")\n";
         return 0;
       }
 
-   return new_function;
+   if (void * handle = dlopen(filename, RTLD_LAZY))   return handle;
+
+const char * err = dlerror();
+   if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
+
+   while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
+   t4 << " (" << err << " )\n";
+   return 0;
+#endif
 }
 //----------------------------------------------------------------------------
 bool
@@ -434,12 +446,6 @@ UCS_string ind(indent, UNI_SPACE);
    out << ind << "Native Function " << endl;
 }
 //----------------------------------------------------------------------------
-UCS_string
-NativeFunction::canonical(bool with_lines) const
-{
-   return original_so_path;
-}
-//----------------------------------------------------------------------------
 ostream &
 NativeFunction::print(std::ostream & out) const
 {
@@ -450,37 +456,9 @@ NativeFunction::print(std::ostream & out) const
 }
 //----------------------------------------------------------------------------
 UCS_string
-NativeFunction::load_emacs_library(const char * emacs_arg)
+NativeFunction::canonical(bool with_lines) const
 {
-UCS_string so_path(U"libemacs");
-UCS_string t4;
-
-void * handle = open_so_file(t4, so_path);
-   if (handle == 0)   return t4;
-
-   t4 = UCS_ASCII_string("found emacs library ");
-   t4 << so_path;
-
-void * emacs_start = dlsym(handle, "emacs_start");
-   if (emacs_start == 0)
-      {
-        t4 << ", but it\n   it is lacking the mandatory "
-                       "function emacs_start()\n";
-        return t4;
-      }
-
-UTF8_string so_path_utf(so_path);
-const int error =
-    reinterpret_cast<int (*)(const char *, const char *)>(emacs_start)
-            (emacs_arg, charP(so_path_utf.c_str()));
-
-   if (error)
-      {
-        return t4 << ", but emacs_start()  returned error " << error << UNI_LF;
-      }
-
-   t4.clear();   // success
-   return t4;
+   return original_so_path;
 }
 //----------------------------------------------------------------------------
 Token
@@ -621,6 +599,28 @@ NativeFunction::eval_identity_fun(Value_P B, sAxis axis) const
    if (f_eval_ident_Bx)   return (*f_eval_ident_Bx)(B, axis, this);
 
    SYNTAX_ERROR;
+}
+//----------------------------------------------------------------------------
+void
+NativeFunction::destroy()
+{
+   if (close_fun && handle)
+      {
+        const bool do_dlclose = (*close_fun)(CAUSE_ERASED, this);
+        if (do_dlclose)
+           {
+             dlclose(handle);
+             handle = 0;
+             close_fun = 0;
+           }
+      }
+   else if (handle)
+      {
+        dlclose(handle);
+        handle = 0;
+      }
+
+   delete this;
 }
 //----------------------------------------------------------------------------
 

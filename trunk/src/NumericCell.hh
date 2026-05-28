@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,17 +55,12 @@ public:
    static ErrorCode zV(Cell * Z, APL_Float real, APL_Float imag);
 
 protected:
+   /// overloaded Cell::get_classname()
+   virtual const char * get_classname() const   { return "NumericCell"; }
+
    /// overloaded Cell::is_numeric()
    virtual bool is_numeric() const
       { return true; }
-
-   /// overloaded Cell::bif_not()
-   /// @param Z result cell pointer
-   virtual ErrorCode bif_not(Cell * Z) const;
-
-   /// overloaded Cell::bif_not_bitwise()
-   /// @param Z result cell pointer
-   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
 
    /// overloaded Cell::bif_and()
    /// @param Z result cell pointer
@@ -77,28 +72,20 @@ protected:
    /// @param A left operand cell
    virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
 
-   /// overloaded Cell::bif_equal_bitwise()
-   /// @param Z result cell pointer
-   /// @param A left operand cell
-   virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
-
-   /// overloaded Cell::bif_not_equal_bitwise()
-   /// @param Z result cell pointer
-   /// @param A left operand cell
-   virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
-
    /// overloaded Cell::bif_binomial()
    /// @param Z result cell pointer
    /// @param A left operand cell (N in N!K)
    virtual ErrorCode bif_binomial(Cell * Z, const Cell * A) const;
 
-   /// compute binomial funtion for integers a and b
-   /// @param Z      result cell pointer
-   /// @param N      total count (top of binomial)
-   /// @param K      selection count (bottom of binomial)
-   /// @param negate true if result sign should be negated
-   static ErrorCode K33_binomial(Cell * Z, APL_Integer N,
-                                 APL_Integer K, bool negate);
+   /// N over K for complex A and/or B
+   /// @param Z result cell pointer
+   /// @param A left operand cell (N in N!K)
+   ErrorCode complex_binomial(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_equal_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
+   virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_nand()
    /// @param Z result cell pointer
@@ -120,6 +107,19 @@ protected:
    /// @param A left operand cell
    virtual ErrorCode bif_nor_bitwise(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::bif_not()
+   /// @param Z result cell pointer
+   virtual ErrorCode bif_not(Cell * Z) const;
+
+   /// overloaded Cell::bif_not_bitwise()
+   /// @param Z result cell pointer
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
+
+   /// overloaded Cell::bif_not_equal_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
+   virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
+
    /// overloaded Cell::bif_or()
    /// @param Z result cell pointer
    /// @param A left operand cell
@@ -130,40 +130,10 @@ protected:
    /// @param A left operand cell
    virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
 
-   /// overloaded Cell::get_classname()
-   virtual const char * get_classname() const   { return "NumericCell"; }
-
-   /// N over K for complex A and/or B
-   /// @param Z result cell pointer
-   /// @param A left operand cell (N in N!K)
-   ErrorCode complex_binomial(Cell * Z, const Cell * A) const;
-
    /// N over K for non-integer A and/or B
    /// @param Z result cell pointer
    /// @param A left operand cell (N in N!K)
    ErrorCode real_binomial(Cell * Z, const Cell * A) const;
-
-   /// return the greatest common divisor of integers a and b
-   /// @param z result integer GCD
-   /// @param a first integer operand
-   /// @param b second integer operand
-   static ErrorCode int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b);
-
-   /// return the greatest common divisor of real a and b
-   /// @param z   result floating-point GCD
-   /// @param a   first floating-point operand
-   /// @param b   second floating-point operand
-   /// @param qct comparison tolerance ⎕CT
-   static ErrorCode flt_gcd(APL_Float & z, APL_Float a, APL_Float b,
-                            double qct);
-
-   /// N over K for positive integers N and K.
-   /// @param Z      result cell pointer
-   /// @param N      total count (top of binomial)
-   /// @param K      selection count (bottom of binomial)
-   /// @param negate true if result sign should be negated
-   static ErrorCode integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
-                                     bool negate);
 
    /// return the greatest common divisor of complex a and b
    /// @param z   result complex GCD
@@ -176,6 +146,36 @@ protected:
    /// multiply \b a by 1, -1, i, or -i so that a.real is maximal
    /// @param a complex number to rotate
    static APL_Complex cpx_max_real(APL_Complex a);
+
+   /// return the greatest common divisor of real a and b
+   /// @param z   result floating-point GCD
+   /// @param a   first floating-point operand
+   /// @param b   second floating-point operand
+   /// @param qct comparison tolerance ⎕CT
+   static ErrorCode flt_gcd(APL_Float & z, APL_Float a, APL_Float b,
+                            double qct);
+
+   /// return the greatest common divisor of integers a and b
+   /// @param z result integer GCD
+   /// @param a first integer operand
+   /// @param b second integer operand
+   static ErrorCode int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b);
+
+   /// N over K for positive integers N and K.
+   /// @param Z      result cell pointer
+   /// @param N      total count (top of binomial)
+   /// @param K      selection count (bottom of binomial)
+   /// @param negate true if result sign should be negated
+   static ErrorCode integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
+                                     bool negate);
+
+   /// compute binomial funtion for integers a and b
+   /// @param Z      result cell pointer
+   /// @param N      total count (top of binomial)
+   /// @param K      selection count (bottom of binomial)
+   /// @param negate true if result sign should be negated
+   static ErrorCode K33_binomial(Cell * Z, APL_Integer N,
+                                 APL_Integer K, bool negate);
 };
 //----------------------------------------------------------------------------
 

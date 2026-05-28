@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2015  Dr. Jürgen Sauermann
+    Copyright © 2015-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,13 +78,13 @@ public:
    LibRef_name(ostream & out, const UCS_string_vector & args,
                bool allow_LIB_NONE);
 
-   /// return the workspace name
-  const UCS_string & get_name() const
-     { return name; }
-
    /// return the library reference
   LibRef get_libref() const
      { return lib; }
+
+   /// return the workspace name
+  const UCS_string & get_name() const
+     { return name; }
 
    /// set the library reference
    /// @param new_lib new library reference to assign
@@ -108,9 +108,6 @@ public:
         : cfg_src(CSRC_NONE)
         {}
 
-        /// the path (name) of the lib directory
-        UTF8_string dir_path;
-
         /// how a dir_path was computed
         enum CfgSrc
            {
@@ -122,14 +119,12 @@ public:
              CSRC_CMD       = 5,   ///< lib root from )LIBS command
            };
 
+        /// the path (name) of the lib directory
+        UTF8_string dir_path;
+
         /// how this->dir_path was computed
         CfgSrc cfg_src;
       };
-
-   /// initialize library paths based on the location of the APL binary
-   /// @param argv0 argv[0] of the interpreter process
-   /// @param logit true to log path-search steps
-   static void init(const char * argv0, bool logit);
 
    /// return the path (directory) of the APL interpreter binary
    static const char * get_APL_bin_path()   { return APL_bin_path; }
@@ -139,25 +134,6 @@ public:
 
    /// return directory containing (file or directory) workspaces and wslib1
    static const char * get_APL_lib_root()   { return APL_lib_root; }
-
-   /// set library root to \b new_root
-   /// @param new_root new library root directory path
-   static void set_APL_lib_root(const char * new_root);
-
-   /// set library path (from config file)
-   /// @param lib library reference number to configure
-   /// @param path directory path for the library
-   /// @param src source that provided this configuration
-   static void set_lib_dir(LibRef lib, const UTF8_string & path,
-                           LibDir::CfgSrc src);
-
-   /// return 0 if directory \b lib) is present, otherwise the reason why not.
-   /// @param lib library reference to check
-   static const char * is_present(LibRef lib);
-
-   /// return library path (from config file or from libroot)
-   /// @param lib library reference whose directory is returned
-   static UTF8_string get_lib_dir(LibRef lib);
 
    /// return source that configured \b this entry
    /// @param lib library reference to query
@@ -172,6 +148,30 @@ public:
    /// @param ext2 fallback file extension to try second
    static UTF8_string get_filename(const LibRef_name & lib_name, bool existing,
                                    const char * ext1, const char * ext2);
+
+   /// return library path (from config file or from libroot)
+   /// @param lib library reference whose directory is returned
+   static UTF8_string get_lib_dir(LibRef lib);
+
+   /// initialize library paths based on the location of the APL binary
+   /// @param argv0 argv[0] of the interpreter process
+   /// @param logit true to log path-search steps
+   static void init(const char * argv0, bool logit);
+
+   /// return 0 if directory \b lib) is present, otherwise the reason why not.
+   /// @param lib library reference to check
+   static const char * is_present(LibRef lib);
+
+   /// set library root to \b new_root
+   /// @param new_root new library root directory path
+   static void set_APL_lib_root(const char * new_root);
+
+   /// set library path (from config file)
+   /// @param lib library reference number to configure
+   /// @param path directory path for the library
+   /// @param src source that provided this configuration
+   static void set_lib_dir(LibRef lib, const UTF8_string & path,
+                           LibDir::CfgSrc src);
 
 protected:
    /// maybe warn the user if two files that differ only by extension exist

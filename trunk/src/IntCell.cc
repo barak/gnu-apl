@@ -46,71 +46,23 @@ const IntCell IntCell::boolean_TRUE(1);
 
  */
 //----------------------------------------------------------------------------
-CellType
-IntCell::get_cell_subtype() const
+// monadic built-in functions...
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+/// overloaded Cell::bif_near_int64_t()
+ErrorCode
+IntCell::bif_near_int64_t(Cell * Z) const
 {
-   if (value.ival < 0)   // negative integer (only fits in signed containers)
-      {
-        if (-value.ival <= 0x80)
-           return CellType(CT_INT | CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
+   return IntCell::zI(Z, value.ival);
+}
 
-        if (-value.ival <= 0x8000)
-           return CellType(CT_INT | CTS_S16 | CTS_S32 | CTS_S64);
-
-        if (-value.ival <= 0x80000000)
-           return CellType(CT_INT | CTS_S32 | CTS_S64);
-
-        return CellType(CT_INT | CTS_S64);
-      }
-
-   // positive integer
-   //
-   if (value.ival == 0)   // 0: bit (fits in all containers)
-      return CellType(CT_INT | CTS_BIT | CTS_X8  | CTS_S8  | CTS_U8  |
-                                         CTS_X16 | CTS_S16 | CTS_U16 |
-                                         CTS_X32 | CTS_S32 | CTS_U32 |
-                                         CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival == 1)   // 1: bit (fits in all containers)
-      return CellType(CT_INT | CTS_BIT | CTS_X8  | CTS_S8  | CTS_U8  |
-                                         CTS_X16 | CTS_S16 | CTS_U16 |
-                                         CTS_X32 | CTS_S32 | CTS_U32 |
-                                         CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0x7F)
-      return CellType(CT_INT | CTS_X8  | CTS_S8  | CTS_U8  |
-                               CTS_X16 | CTS_S16 | CTS_U16 |
-                               CTS_X32 | CTS_S32 | CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0xFF)
-      return CellType(CT_INT |                     CTS_U8  |
-                               CTS_X16 | CTS_S16 | CTS_U16 |
-                               CTS_X32 | CTS_S32 | CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0x7FFF)
-      return CellType(CT_INT | CTS_X16 | CTS_S16 | CTS_U16 |
-                               CTS_X32 | CTS_S32 | CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0xFFFF)
-      return CellType(CT_INT |                     CTS_U16 |
-                               CTS_X32 | CTS_S32 | CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0x7FFFFFFF)
-      return CellType(CT_INT | CTS_X32 | CTS_S32 | CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0xFFFFFFFF)
-      return CellType(CT_INT |                     CTS_U32 |
-                               CTS_X64 | CTS_S64 | CTS_U64);
-
-   if (value.ival <= 0x7FFFFFFFFFFFFFFFLL)   // note: this is always the case
-      return CellType(CT_INT | CTS_X64 | CTS_S64 | CTS_U64);
-
-   return CellType(CT_INT | CTS_U64);
+//----------------------------------------------------------------------------
+/// overloaded Cell::bif_within_quad_CT()
+ErrorCode
+IntCell::bif_within_quad_CT(Cell * Z) const
+{
+   return IntCell::zI(Z, value.ival);
 }
 //----------------------------------------------------------------------------
 bool
@@ -121,9 +73,106 @@ IntCell::equal(const Cell & other, double qct) const
    return false;
 }
 //----------------------------------------------------------------------------
-// monadic built-in functions...
+// dyadic built-in functions...
+//
+// where possible a function with non-int A is delegated to the corresponding
+// member function of A. For numeric cells that is the FloatCell or ComplexCell
+// function and otherwise the default function (that returns E_DOMAIN_ERROR.
+//
 //----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_add(Cell * Z, const Cell * A) const
+{
+   if (A->is_integer_cell())   // integer A + integer B
+      {
+        // both cells are integers.
+        //
+        const APL_Integer a = A->get_int_value();
+        const APL_Integer b =    get_int_value();
+        const APL_Integer z = a + b;
+        if (sum_overflow(z, a, b))
+           return FloatCell::zF(Z, APL_Float(a) + APL_Float(b));
+        else
+           return IntCell::zI(Z,z);
+      }
 
+   // delegate to A
+   //
+   return A->bif_add(Z, this);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_ceiling(Cell * Z) const
+{
+   return IntCell::zI(Z, value.ival);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_conjugate(Cell * Z) const
+{
+   return IntCell::zI(Z, value.ival);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_direction(Cell * Z) const
+{
+APL_Integer result = 0;
+   if      (value.ival > 0)   result =  1;
+   else if (value.ival < 0)   result = -1;
+   return IntCell::zI(Z, result);
+}
+ErrorCode
+IntCell::bif_divide(Cell * Z, const Cell * A) const
+{
+   if (!A->is_numeric())   return E_DOMAIN_ERROR;
+
+APL_Integer b = get_int_value();
+const bool A_zero = A->is_near_zero();
+   if (b == 0)   // division by 0
+      {
+        if (A_zero)   return IntCell::z1(Z);   // 0÷0 is 1 in APL
+        return E_DOMAIN_ERROR;
+      }
+
+   // at this point B is non-zero
+   //
+   if (A->is_integer_cell())
+      {
+        // both cells are integers.
+        //
+        APL_Integer a = A->get_int_value();
+
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+        if (b < 0)   // make denominator positive
+           {
+             a = -a;
+             b = -b;
+           }
+        const APL_Integer gcd = FloatCell::gcd(b, a);
+        if (b == gcd)   return IntCell::zI(Z, a/gcd);
+        return FloatCell::zR(Z, a/gcd, b/gcd);
+#else   // not cfg_RATIONAL_NUMBERS_WANTED
+        const APL_Integer i_quot = a / b;
+        const APL_Float r_quot = a / APL_Float(b);
+
+        if (a != i_quot * b)   return FloatCell::zF(Z, r_quot);
+        else                   return IntCell::zI(Z, i_quot);
+#endif   // (not) cfg_RATIONAL_NUMBERS_WANTED
+      }
+
+   // delegate to A
+   //
+const ErrorCode ec = this->bif_reciprocal(Z);   // Z = ÷B
+   return ec ? ec : A->bif_multiply(Z, Z);      // Z = A × Z = A × ÷B
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_exponential(Cell * Z) const
+{
+   // e to the B-th power
+   //
+   return FloatCell::zF(Z, exp(APL_Float(value.ival)));
+}
 const APL_Integer int_factorials[] =
 {
    /*  0! */  0x0000000000000001LL,
@@ -355,26 +404,9 @@ const APL_Integer iv = value.ival;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-IntCell::bif_conjugate(Cell * Z) const
+IntCell::bif_floor(Cell * Z) const
 {
    return IntCell::zI(Z, value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_negative(Cell * Z) const
-{
-   if (uint64_t(value.ival) == 0x8000000000000000LL)   // integer overflow
-      return FloatCell::zF(Z, - APL_Float(value.ival));
-   return  IntCell::zI(Z, - value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_direction(Cell * Z) const
-{
-APL_Integer result = 0;
-   if      (value.ival > 0)   result =  1;
-   else if (value.ival < 0)   result = -1;
-   return IntCell::zI(Z, result);
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -383,185 +415,6 @@ IntCell::bif_magnitude(Cell * Z) const
    if (value.ival >= 0)   IntCell::zI(Z, value.ival);
    else                   bif_negative(Z);
    return E_NO_ERROR;
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_reciprocal(Cell * Z) const
-{
-   switch(value.ival)
-      {
-        case  0: return E_DOMAIN_ERROR;
-        case  1: return IntCell::z1(Z);
-        case -1: return IntCell::z_1(Z);
-      }
-
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (value.ival < 0)   // make denominator positive
-      return FloatCell::zR(Z, -1, -value.ival);   // 1 ÷ X = ¯1 ÷ -X
-   else
-      return FloatCell::zR(Z, 1, value.ival);     // 1 ÷ X
-#endif
-
-   return FloatCell::zF(Z, 1.0/value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_roll(Cell * Z) const
-{
-const APL_Integer qio = Workspace::get_IO();
-const APL_Integer set_size = value.ival;
-   if (set_size <= 0)   return E_DOMAIN_ERROR;
-
-const uint64_t rnd = Workspace::get_RL(set_size);
-   return IntCell::zI(Z, qio + (rnd % set_size));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_pi_times(Cell * Z) const
-{
-   return FloatCell::zF(Z, M_PI * value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_pi_times_inverse(Cell * Z) const
-{
-   return FloatCell::zF(Z, value.ival / M_PI);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_ceiling(Cell * Z) const
-{
-   return IntCell::zI(Z, value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_floor(Cell * Z) const
-{
-   return IntCell::zI(Z, value.ival);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_exponential(Cell * Z) const
-{
-   // e to the B-th power
-   //
-   return FloatCell::zF(Z, exp(APL_Float(value.ival)));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_nat_log(Cell * Z) const
-{
-   if (value.ival == 0)     return E_DOMAIN_ERROR;
-
-   if (value.ival > 0)
-      {
-        return FloatCell::zF(Z, log(APL_Float(value.ival)));
-      }
-
-const APL_Complex bb(value.ival, 0);
-   return ComplexCell::zC(Z, log(bb));
-}
-//----------------------------------------------------------------------------
-// dyadic built-in functions...
-//
-// where possible a function with non-int A is delegated to the corresponding
-// member function of A. For numeric cells that is the FloatCell or ComplexCell
-// function and otherwise the default function (that returns E_DOMAIN_ERROR.
-//
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_add(Cell * Z, const Cell * A) const
-{
-   if (A->is_integer_cell())   // integer A + integer B
-      {
-        // both cells are integers.
-        //
-        const APL_Integer a = A->get_int_value();
-        const APL_Integer b =    get_int_value();
-        const APL_Integer z = a + b;
-        if (sum_overflow(z, a, b))
-           return FloatCell::zF(Z, APL_Float(a) + APL_Float(b));
-        else
-           return IntCell::zI(Z,z);
-      }
-
-   // delegate to A
-   //
-   return A->bif_add(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_add_inverse(Cell * Z, const Cell * A) const
-{
-   return A->bif_subtract(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_subtract(Cell * Z, const Cell * A) const
-{
-   if (A->is_integer_cell())   // integer A - integer B
-      {
-        // both cells are integers.
-        //
-        const APL_Integer a = A->get_int_value();
-        const APL_Integer b =    get_int_value();
-        const APL_Integer z = a - b;
-
-        if (diff_overflow(z, a, b))
-           return FloatCell::zF(Z, APL_Float(a) - APL_Float(b));
-        else
-           return IntCell::zI(Z,z);
-      }
-
-   // delegate to A
-   //
-   this->bif_negative(Z);   // Z = -B
-   return A->bif_add(Z, Z);        // Z = A + Z = A + -B
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_divide(Cell * Z, const Cell * A) const
-{
-   if (!A->is_numeric())   return E_DOMAIN_ERROR;
-
-APL_Integer b = get_int_value();
-const bool A_zero = A->is_near_zero();
-   if (b == 0)   // division by 0
-      {
-        if (A_zero)   return IntCell::z1(Z);   // 0÷0 is 1 in APL
-        return E_DOMAIN_ERROR;
-      }
-
-   // at this point B is non-zero
-   //
-   if (A->is_integer_cell())
-      {
-        // both cells are integers.
-        //
-        APL_Integer a = A->get_int_value();
-
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-        if (b < 0)   // make denominator positive
-           {
-             a = -a;
-             b = -b;
-           }
-        const APL_Integer gcd = FloatCell::gcd(b, a);
-        if (b == gcd)   return IntCell::zI(Z, a/gcd);
-        return FloatCell::zR(Z, a/gcd, b/gcd);
-#else   // not cfg_RATIONAL_NUMBERS_WANTED
-        const APL_Integer i_quot = a / b;
-        const APL_Float r_quot = a / APL_Float(b);
-
-        if (a != i_quot * b)   return FloatCell::zF(Z, r_quot);
-        else                   return IntCell::zI(Z, i_quot);
-#endif   // (not) cfg_RATIONAL_NUMBERS_WANTED
-      }
-
-   // delegate to A
-   //
-const ErrorCode ec = this->bif_reciprocal(Z);   // Z = ÷B
-   return ec ? ec : A->bif_multiply(Z, Z);      // Z = A × Z = A × ÷B
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -586,11 +439,6 @@ IntCell::bif_multiply(Cell * Z, const Cell * A) const
    return A->bif_multiply(Z, this);
 }
 //----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
-{
-   return A->bif_divide(Z, this);
-}
 //----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_power(Cell * Z, const Cell * A) const
@@ -722,6 +570,125 @@ const bool invert_Z = b < 0;
 }
 //----------------------------------------------------------------------------
 ErrorCode
+IntCell::bif_nat_log(Cell * Z) const
+{
+   if (value.ival == 0)     return E_DOMAIN_ERROR;
+
+   if (value.ival > 0)
+      {
+        return FloatCell::zF(Z, log(APL_Float(value.ival)));
+      }
+
+const APL_Complex bb(value.ival, 0);
+   return ComplexCell::zC(Z, log(bb));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_negative(Cell * Z) const
+{
+   if (uint64_t(value.ival) == 0x8000000000000000LL)   // integer overflow
+      return FloatCell::zF(Z, - APL_Float(value.ival));
+   return  IntCell::zI(Z, - value.ival);
+}
+ErrorCode
+IntCell::bif_pi_times(Cell * Z) const
+{
+   return FloatCell::zF(Z, M_PI * value.ival);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_pi_times_inverse(Cell * Z) const
+{
+   return FloatCell::zF(Z, value.ival / M_PI);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_reciprocal(Cell * Z) const
+{
+   switch(value.ival)
+      {
+        case  0: return E_DOMAIN_ERROR;
+        case  1: return IntCell::z1(Z);
+        case -1: return IntCell::z_1(Z);
+      }
+
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (value.ival < 0)   // make denominator positive
+      return FloatCell::zR(Z, -1, -value.ival);   // 1 ÷ X = ¯1 ÷ -X
+   else
+      return FloatCell::zR(Z, 1, value.ival);     // 1 ÷ X
+#endif
+
+   return FloatCell::zF(Z, 1.0/value.ival);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_roll(Cell * Z) const
+{
+const APL_Integer qio = Workspace::get_IO();
+const APL_Integer set_size = value.ival;
+   if (set_size <= 0)   return E_DOMAIN_ERROR;
+
+const uint64_t rnd = Workspace::get_RL(set_size);
+   return IntCell::zI(Z, qio + (rnd % set_size));
+}
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_subtract(Cell * Z, const Cell * A) const
+{
+   if (A->is_integer_cell())   // integer A - integer B
+      {
+        // both cells are integers.
+        //
+        const APL_Integer a = A->get_int_value();
+        const APL_Integer b =    get_int_value();
+        const APL_Integer z = a - b;
+
+        if (diff_overflow(z, a, b))
+           return FloatCell::zF(Z, APL_Float(a) - APL_Float(b));
+        else
+           return IntCell::zI(Z,z);
+      }
+
+   // delegate to A
+   //
+   this->bif_negative(Z);   // Z = -B
+   return A->bif_add(Z, Z);        // Z = A + Z = A + -B
+}
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_maximum(Cell * Z, const Cell * A) const
+{
+   if (A->is_integer_cell())
+      {
+         const APL_Integer a = A->get_int_value();
+         if (a >= value.ival)   return IntCell::zI(Z, a);
+         return IntCell::zI(Z, value.ival);
+      }
+
+   // delegate to A
+   //
+   return A->bif_maximum(Z, this);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_minimum(Cell * Z, const Cell * A) const
+{
+   if (A->is_integer_cell())
+      {
+         const APL_Integer a = A->get_int_value();
+         if (a <= value.ival)   return IntCell::zI(Z, a);
+         return IntCell::zI(Z, value.ival);
+      }
+
+   // delegate to A
+   //
+   return A->bif_minimum(Z, this);
+}
+//----------------------------------------------------------------------------
+ErrorCode
 IntCell::bif_residue(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
@@ -793,48 +760,81 @@ APL_Float z = value.ival - a * qf;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-IntCell::bif_maximum(Cell * Z, const Cell * A) const
+IntCell::bif_add_inverse(Cell * Z, const Cell * A) const
 {
-   if (A->is_integer_cell())
+   return A->bif_subtract(Z, this);
+}
+ErrorCode
+IntCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_divide(Z, this);
+}
+//----------------------------------------------------------------------------
+CellType
+IntCell::get_cell_subtype() const
+{
+   if (value.ival < 0)   // negative integer (only fits in signed containers)
       {
-         const APL_Integer a = A->get_int_value();
-         if (a >= value.ival)   return IntCell::zI(Z, a);
-         return IntCell::zI(Z, value.ival);
+        if (-value.ival <= 0x80)
+           return CellType(CT_INT | CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
+
+        if (-value.ival <= 0x8000)
+           return CellType(CT_INT | CTS_S16 | CTS_S32 | CTS_S64);
+
+        if (-value.ival <= 0x80000000)
+           return CellType(CT_INT | CTS_S32 | CTS_S64);
+
+        return CellType(CT_INT | CTS_S64);
       }
 
-   // delegate to A
+   // positive integer
    //
-   return A->bif_maximum(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-IntCell::bif_minimum(Cell * Z, const Cell * A) const
-{
-   if (A->is_integer_cell())
-      {
-         const APL_Integer a = A->get_int_value();
-         if (a <= value.ival)   return IntCell::zI(Z, a);
-         return IntCell::zI(Z, value.ival);
-      }
+   if (value.ival == 0)   // 0: bit (fits in all containers)
+      return CellType(CT_INT | CTS_BIT | CTS_X8  | CTS_S8  | CTS_U8  |
+                                         CTS_X16 | CTS_S16 | CTS_U16 |
+                                         CTS_X32 | CTS_S32 | CTS_U32 |
+                                         CTS_X64 | CTS_S64 | CTS_U64);
 
-   // delegate to A
-   //
-   return A->bif_minimum(Z, this);
-}
-//----------------------------------------------------------------------------
-/// overloaded Cell::bif_near_int64_t()
-ErrorCode
-IntCell::bif_near_int64_t(Cell * Z) const
-{
-   return IntCell::zI(Z, value.ival);
-}
+   if (value.ival == 1)   // 1: bit (fits in all containers)
+      return CellType(CT_INT | CTS_BIT | CTS_X8  | CTS_S8  | CTS_U8  |
+                                         CTS_X16 | CTS_S16 | CTS_U16 |
+                                         CTS_X32 | CTS_S32 | CTS_U32 |
+                                         CTS_X64 | CTS_S64 | CTS_U64);
 
-//----------------------------------------------------------------------------
-/// overloaded Cell::bif_within_quad_CT()
-ErrorCode
-IntCell::bif_within_quad_CT(Cell * Z) const
-{
-   return IntCell::zI(Z, value.ival);
+   if (value.ival <= 0x7F)
+      return CellType(CT_INT | CTS_X8  | CTS_S8  | CTS_U8  |
+                               CTS_X16 | CTS_S16 | CTS_U16 |
+                               CTS_X32 | CTS_S32 | CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0xFF)
+      return CellType(CT_INT |                     CTS_U8  |
+                               CTS_X16 | CTS_S16 | CTS_U16 |
+                               CTS_X32 | CTS_S32 | CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0x7FFF)
+      return CellType(CT_INT | CTS_X16 | CTS_S16 | CTS_U16 |
+                               CTS_X32 | CTS_S32 | CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0xFFFF)
+      return CellType(CT_INT |                     CTS_U16 |
+                               CTS_X32 | CTS_S32 | CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0x7FFFFFFF)
+      return CellType(CT_INT | CTS_X32 | CTS_S32 | CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0xFFFFFFFF)
+      return CellType(CT_INT |                     CTS_U32 |
+                               CTS_X64 | CTS_S64 | CTS_U64);
+
+   if (value.ival <= 0x7FFFFFFFFFFFFFFFLL)   // note: this is always the case
+      return CellType(CT_INT | CTS_X64 | CTS_S64 | CTS_U64);
+
+   return CellType(CT_INT | CTS_U64);
 }
 //============================================================================
 // throw/nothrow boundary. Functions above MUST NOT (directly or indirectly)
@@ -843,25 +843,6 @@ IntCell::bif_within_quad_CT(Cell * Z) const
 
 #include "Error.hh"
 
-//----------------------------------------------------------------------------
-Comp_result
-IntCell::compare(const Cell & other) const
-{
-   if (other.is_integer_cell())
-      {
-       if (value.ival == other.get_int_value())   return COMP_EQ;
-       return (value.ival < other.get_int_value()) ? COMP_LT : COMP_GT;
-      }
-
-   if (other.is_numeric())   // float or complex
-      {
-        return Comp_result(-other.compare(*this));
-      }
-
-   if (other.is_character_cell())   return COMP_GT;   // numeric > char
-   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
-   DOMAIN_ERROR;
-}
 //----------------------------------------------------------------------------
 bool
 IntCell::greater(const Cell & other) const
@@ -894,6 +875,25 @@ const APL_Integer this_val  = get_int_value();
 const Comp_result comp = compare(other);
    if (comp == COMP_EQ)   return this > &other;
    return (comp == COMP_GT);
+}
+//----------------------------------------------------------------------------
+Comp_result
+IntCell::compare(const Cell & other) const
+{
+   if (other.is_integer_cell())
+      {
+       if (value.ival == other.get_int_value())   return COMP_EQ;
+       return (value.ival < other.get_int_value()) ? COMP_LT : COMP_GT;
+      }
+
+   if (other.is_numeric())   // float or complex
+      {
+        return Comp_result(-other.compare(*this));
+      }
+
+   if (other.is_character_cell())   return COMP_GT;   // numeric > char
+   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 PrintBuffer

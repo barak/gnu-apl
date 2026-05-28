@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,10 +35,89 @@
 
 //----------------------------------------------------------------------------
 void
+LineLabel::print(ostream & out) const
+{
+UCS_string ucs;
+   ucs << UNI_L_BRACK << ln_major;
+   if (ln_minor.size())   ucs << UNI_FULLSTOP << ln_minor;
+   ucs << UNI_R_BRACK; 
+
+   while (ucs.size() < 5)   ucs << UNI_SPACE;
+   out << ucs;
+}
+//----------------------------------------------------------------------------
+UCS_string
+LineLabel::print_prompt(int min_size) const
+{
+UCS_string ret;
+   ret << UNI_L_BRACK << ln_major;
+
+   if (ln_minor.size())
+      {
+        ret << UNI_FULLSTOP;
+        loop(s, ln_minor.size())   ret << Unicode(char(ln_minor[s]));
+      }
+
+   ret << UNI_R_BRACK << UNI_SPACE;
+   while (ret.ssize() < min_size)   ret << UNI_SPACE;
+   return ret;
+}
+//----------------------------------------------------------------------------
+bool
+LineLabel::operator ==(const LineLabel & other) const
+{
+   return (ln_major == other.ln_major) && (ln_minor == other.ln_minor);
+}
+//----------------------------------------------------------------------------
+bool
+LineLabel::operator <(const LineLabel & other) const
+{
+   if (ln_major != other.ln_major)   return ln_major < other.ln_major;
+ return  ln_minor.compare(other.ln_minor) < 0;
+}
+//----------------------------------------------------------------------------
+void
+LineLabel::next()
+{
+   if (ln_minor.size() == 0)   // full number: add 1
+      {
+        ++ln_major;
+        return;
+      }
+
+   // fract number: increment last fract digit
+   //
+const Unicode cc = ln_minor[ln_minor.size() - 1];
+   if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
+   else                     ln_minor << UNI_1;
+}
+//----------------------------------------------------------------------------
+void
+LineLabel::insert()
+{
+   ln_minor << UNI_1;
+}
+//----------------------------------------------------------------------------
+ostream &
+operator <<(ostream & out, const LineLabel & lab)
+{
+   lab.print(out);
+   return out;
+}
+//----------------------------------------------------------------------------
+void
 Nabla::edit_function(const UCS_string & cmd)
 {
 Nabla nabla(cmd);
    nabla.edit();
+}
+//----------------------------------------------------------------------------
+UCS_string
+Nabla::get_label_and_text(int line, bool & is_current) const
+{
+const FunLine & fl = lines[line];
+   is_current = fl.label == current_line;
+   return fl.get_label_and_text();
 }
 //----------------------------------------------------------------------------
 Nabla::Nabla(const UCS_string & cmd)
@@ -269,6 +348,24 @@ std::vector<Function_Line> trace_vec;
    ufun->compute_if_else_targets();
 }
 //----------------------------------------------------------------------------
+void
+Nabla::FunLine::print(ostream & out) const
+{
+   label.print(out);
+
+   // print a space unless text is a label or a comment
+   //
+   if (!text.is_comment_or_label())   out << " ";
+   out << text << endl;
+}
+//----------------------------------------------------------------------------
+UCS_string
+Nabla::FunLine::get_label_and_text() const
+{
+UCS_string ret = label.print_prompt(6);
+   return ret << text;
+}
+//----------------------------------------------------------------------------
 const char *
 Nabla::start()
 {
@@ -487,23 +584,6 @@ bool hdr_has_vars;
    return 0;   // no error
 }
 //----------------------------------------------------------------------------
-bool
-Nabla::is_axis(const UCS_string & ucs)
-{
-   // ucs was checked to start with with '['. Return true iff the '['
-   // is the start of an axis specification such as [ Name ]
-   //
-UCS_string::iterator c(ucs);
-   Assert(c.has_more() && c.lookup() == UNI_L_BRACK);   // [
-   c.next();   // skip '['
-   c.skip_white();
-   if (!c.has_more())                           return false;    // not an axis
-   if (!Avec::is_first_symbol_char(c.next()))   return false;    // not an axis
-   while (c.has_more() && Avec::is_symbol_char(c.lookup()))   c.next();
-   c.skip_white();
-   return c.has_more() && c.lookup() == UNI_R_BRACK;
-}
-//----------------------------------------------------------------------------
 const char *
 Nabla::parse_oper(UCS_string & oper, bool initial)
 {
@@ -702,119 +782,6 @@ again:
       }
 
    return 0;   // OK
-}
-//----------------------------------------------------------------------------
-LineLabel
-Nabla::parse_lineno(UCS_string::iterator & c)
-{
-LineLabel ret(0);
-
-   while (c.has_more() && Avec::is_digit(c.lookup()))
-      {
-        ret.ln_major *= 10;
-        ret.ln_major += c.next() - UNI_0;
-      }
-
-   if (c.has_more() && c.lookup() == UNI_FULLSTOP)
-      {
-        c.next();   // eat the .
-        while (c.has_more() && Avec::is_digit(c.lookup()))
-              ret.ln_minor << c.next();
-      }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-const char *
-Nabla::open_new_function()
-{
-   Log(LOG_nabla)
-      UERR << "creating new function with header '"
-           << fun_header << "'" << endl;
-
-   // check for lambda
-   //
-   if (fun_header.contains(UNI_LAMBDA))
-       {
-         CERR << "\n*** WARNING: trying to edit a lambda? Don't!***" << endl;
-       }
-
-   function_existed = false;
-   lines.push_back(FunLine(0, fun_header));
-   return 0;
-}
-//----------------------------------------------------------------------------
-const char *
-Nabla::open_existing_function(const UCS_string & name)
-{
-   Log(LOG_nabla)
-      UERR << "opening existing function '" << name << "'" << endl;
-
-   function_existed = true;
-   if (const char * why = fun_symbol->cant_be_defined())   return why;
-
-   // this function must only be called when editing functions interactively
-   //
-   if (InputFile::running_script())
-      return "∇-edit existing function from a script";
-
-cFunction_P function = fun_symbol->get_function();
-   Assert(function);
-
-   if (function->get_exec_properties()[0])
-      return "function is locked";
-
-   if (function->is_native())
-      return "function is native";
-
-   if (function->is_lambda())
-      return "function is a lambda";
-
-   if (Workspace::is_called(fun_symbol->get_name()))
-      return "function is used, pendent or suspended";
-
-const UserFunction * ufun = function->get_func_ufun();
-   if (ufun == 0)
-      return "function is not editable at " LOC;
-
-const UCS_string ftxt = function->canonical(false);
-   Log(LOG_nabla)   UERR << "existing function is:\n" << ftxt << endl;
-
-UCS_string_vector tlines;
-   ftxt.to_vector(tlines);
-
-   Assert(tlines.size());
-   fun_header = tlines[0];
-   loop(t, tlines.size())
-       {
-         FunLine fl(t, tlines[t]);
-
-         // set stop and trace flags
-         //
-         loop(st, ufun->get_stop_lines().size())
-             {
-               if (t == ufun->get_stop_lines()[st])   // stop set
-                  {
-                    fl.stop_flag = true;
-                    break;
-                  }
-             }
-
-         loop(tr, ufun->get_trace_lines().size())
-             {
-               if (t == ufun->get_trace_lines()[tr])   // trace set
-                  {
-                    fl.trace_flag = true;
-                    break;
-                  }
-             }
-
-         lines.push_back(fl);
-       }
-
-   current_line = LineLabel(tlines.size());
-
-   return 0;
 }
 //----------------------------------------------------------------------------
 const char *
@@ -1126,6 +1093,136 @@ Nabla::execute_escape()
    return 0;
 }
 //----------------------------------------------------------------------------
+const char *
+Nabla::open_new_function()
+{
+   Log(LOG_nabla)
+      UERR << "creating new function with header '"
+           << fun_header << "'" << endl;
+
+   // check for lambda
+   //
+   if (fun_header.contains(UNI_LAMBDA))
+       {
+         CERR << "\n*** WARNING: trying to edit a lambda? Don't!***" << endl;
+       }
+
+   function_existed = false;
+   lines.push_back(FunLine(0, fun_header));
+   return 0;
+}
+//----------------------------------------------------------------------------
+const char *
+Nabla::open_existing_function(const UCS_string & name)
+{
+   Log(LOG_nabla)
+      UERR << "opening existing function '" << name << "'" << endl;
+
+   function_existed = true;
+   if (const char * why = fun_symbol->cant_be_defined())   return why;
+
+   // this function must only be called when editing functions interactively
+   //
+   if (InputFile::running_script())
+      return "∇-edit existing function from a script";
+
+cFunction_P function = fun_symbol->get_function();
+   Assert(function);
+
+   if (function->get_exec_properties()[0])
+      return "function is locked";
+
+   if (function->is_native())
+      return "function is native";
+
+   if (function->is_lambda())
+      return "function is a lambda";
+
+   if (Workspace::is_called(fun_symbol->get_name()))
+      return "function is used, pendent or suspended";
+
+const UserFunction * ufun = function->get_func_ufun();
+   if (ufun == 0)
+      return "function is not editable at " LOC;
+
+const UCS_string ftxt = function->canonical(false);
+   Log(LOG_nabla)   UERR << "existing function is:\n" << ftxt << endl;
+
+UCS_string_vector tlines;
+   ftxt.to_vector(tlines);
+
+   Assert(tlines.size());
+   fun_header = tlines[0];
+   loop(t, tlines.size())
+       {
+         FunLine fl(t, tlines[t]);
+
+         // set stop and trace flags
+         //
+         loop(st, ufun->get_stop_lines().size())
+             {
+               if (t == ufun->get_stop_lines()[st])   // stop set
+                  {
+                    fl.stop_flag = true;
+                    break;
+                  }
+             }
+
+         loop(tr, ufun->get_trace_lines().size())
+             {
+               if (t == ufun->get_trace_lines()[tr])   // trace set
+                  {
+                    fl.trace_flag = true;
+                    break;
+                  }
+             }
+
+         lines.push_back(fl);
+       }
+
+   current_line = LineLabel(tlines.size());
+
+   return 0;
+}
+//----------------------------------------------------------------------------
+bool
+Nabla::is_axis(const UCS_string & ucs)
+{
+   // ucs was checked to start with with '['. Return true iff the '['
+   // is the start of an axis specification such as [ Name ]
+   //
+UCS_string::iterator c(ucs);
+   Assert(c.has_more() && c.lookup() == UNI_L_BRACK);   // [
+   c.next();   // skip '['
+   c.skip_white();
+   if (!c.has_more())                           return false;    // not an axis
+   if (!Avec::is_first_symbol_char(c.next()))   return false;    // not an axis
+   while (c.has_more() && Avec::is_symbol_char(c.lookup()))   c.next();
+   c.skip_white();
+   return c.has_more() && c.lookup() == UNI_R_BRACK;
+}
+//----------------------------------------------------------------------------
+LineLabel
+Nabla::parse_lineno(UCS_string::iterator & c)
+{
+LineLabel ret(0);
+
+   while (c.has_more() && Avec::is_digit(c.lookup()))
+      {
+        ret.ln_major *= 10;
+        ret.ln_major += c.next() - UNI_0;
+      }
+
+   if (c.has_more() && c.lookup() == UNI_FULLSTOP)
+      {
+        c.next();   // eat the .
+        while (c.has_more() && Avec::is_digit(c.lookup()))
+              ret.ln_minor << c.next();
+      }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
 int
 Nabla::find_line(const LineLabel & lab) const
 {
@@ -1134,103 +1231,6 @@ Nabla::find_line(const LineLabel & lab) const
    loop(l, lines.size())   if (lab == lines[l].label)   return l;
 
    return -1;   // not found.
-}
-//----------------------------------------------------------------------------
-void
-Nabla::FunLine::print(ostream & out) const
-{
-   label.print(out);
-
-   // print a space unless text is a label or a comment
-   //
-   if (!text.is_comment_or_label())   out << " ";
-   out << text << endl;
-}
-//----------------------------------------------------------------------------
-void
-LineLabel::print(ostream & out) const
-{
-UCS_string ucs;
-   ucs << UNI_L_BRACK << ln_major;
-   if (ln_minor.size())   ucs << UNI_FULLSTOP << ln_minor;
-   ucs << UNI_R_BRACK; 
-
-   while (ucs.size() < 5)   ucs << UNI_SPACE;
-   out << ucs;
-}
-//----------------------------------------------------------------------------
-UCS_string
-LineLabel::print_prompt(int min_size) const
-{
-UCS_string ret;
-   ret << UNI_L_BRACK << ln_major;
-
-   if (ln_minor.size())
-      {
-        ret << UNI_FULLSTOP;
-        loop(s, ln_minor.size())   ret << Unicode(char(ln_minor[s]));
-      }
-
-   ret << UNI_R_BRACK << UNI_SPACE;
-   while (ret.ssize() < min_size)   ret << UNI_SPACE;
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-LineLabel::next()
-{
-   if (ln_minor.size() == 0)   // full number: add 1
-      {
-        ++ln_major;
-        return;
-      }
-
-   // fract number: increment last fract digit
-   //
-const Unicode cc = ln_minor[ln_minor.size() - 1];
-   if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
-   else                     ln_minor << UNI_1;
-}
-//----------------------------------------------------------------------------
-void
-LineLabel::insert()
-{
-   ln_minor << UNI_1;
-}
-//----------------------------------------------------------------------------
-bool
-LineLabel::operator ==(const LineLabel & other) const
-{
-   return (ln_major == other.ln_major) && (ln_minor == other.ln_minor);
-}
-//----------------------------------------------------------------------------
-bool
-LineLabel::operator <(const LineLabel & other) const
-{
-   if (ln_major != other.ln_major)   return ln_major < other.ln_major;
- return  ln_minor.compare(other.ln_minor) < 0;
-}
-//----------------------------------------------------------------------------
-ostream &
-operator <<(ostream & out, const LineLabel & lab)
-{
-   lab.print(out);
-   return out;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Nabla::FunLine::get_label_and_text() const
-{
-UCS_string ret = label.print_prompt(6);
-   return ret << text;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Nabla::get_label_and_text(int line, bool & is_current) const
-{
-const FunLine & fl = lines[line];
-   is_current = fl.label == current_line;
-   return fl.get_label_and_text();
 }
 //----------------------------------------------------------------------------
 

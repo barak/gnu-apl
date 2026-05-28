@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,39 +43,24 @@ class Value_P_Base
    friend class PointerCell;
 
 public:
-   /// decrement owner-count and reset pointer to 0
-   inline void reset();
-
-   /// reset and add value event
-   /// @param loc caller location for diagnostics
-   inline void clear(const char * loc);
-
-   /// return true if the pointer is valid
-   bool operator+() const
-      { return value_p != 0; }
+   /// return a const pointer to the Value
+   const Value * get() const
+      { return value_p; }
 
    /// return true if the pointer is invalid
    bool operator!() const
       { return value_p == 0; }
 
-   /// return a const pointer to the Value (overloaded *)
-   const Value * operator->()  const
-      { return value_p; }
-
-   /// return a pointer to the Value (overloaded ->)
-   Value * operator->()
-      { return value_p; }
-
    /// return a const reference to the Value
    const Value & operator*() const
       { return *value_p; }
 
-   /// return a reference to the Value
-   Value & operator*()
-      { return *value_p; }
+   /// return true if the pointer is valid
+   bool operator+() const
+      { return value_p != 0; }
 
-   /// return a const pointer to the Value
-   const Value * get() const
+   /// return a const pointer to the Value (overloaded *)
+   const Value * operator->()  const
       { return value_p; }
 
    /// return a pointer to the Value
@@ -87,6 +72,18 @@ public:
       {
          value_p = 0;
       }
+
+   /// return a reference to the Value
+   Value & operator*()
+      { return *value_p; }
+
+   /// return a pointer to the Value (overloaded ->)
+   Value * operator->()
+      { return value_p; }
+
+   /// reset and add value event
+   /// @param loc caller location for diagnostics
+   inline void clear(const char * loc);
 
    /// clear the pointer (and possibly add an event)
    /// @param loc caller location for diagnostics
@@ -104,6 +101,9 @@ public:
    /// @param other source Value_P_Base to move from
    /// @param loc   caller location for diagnostics
    inline void move(Value_P_Base & other, const char * loc);
+
+   /// decrement owner-count and reset pointer to 0
+   inline void reset();
 
 protected:
    /// pointer to the value
@@ -188,12 +188,12 @@ public:
    /// @param other the Value_P to copy from
    inline Value_P(const Value_P & other);
 
+   /// Destructor
+   inline ~Value_P();
+
    /// copy operator
    /// @param other the Value_P to copy from
    void operator =(const Value_P & other);
-
-   /// Destructor
-   inline ~Value_P();
 };
 //----------------------------------------------------------------------------
 

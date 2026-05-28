@@ -406,18 +406,18 @@ protected:
    /// @param B right argument APL value (character class selector)
    Token eval_B(Value_P B) const;
 
-   /// print the classes that were implementee
-   /// @param out output stream to write to
-   static void print_classes(ostream & out);
+   /// retur true if \b is contained in character class \b cls
+   /// @param uni Unicode code point to test
+   /// @param num character class identifier
+   static bool contained_in(Unicode uni, CC_base::CharClass num);
 
    /// return the characters of class \b cls
    /// @param num character class identifier
    static Value_P get_character_class(CC_base::CharClass num);
 
-   /// retur true if \b is contained in character class \b cls
-   /// @param uni Unicode code point to test
-   /// @param num character class identifier
-   static bool contained_in(Unicode uni, CC_base::CharClass num);
+   /// print the classes that were implementee
+   /// @param out output stream to write to
+   static void print_classes(ostream & out);
 };
 //---------------------------------------------------------------------------
 

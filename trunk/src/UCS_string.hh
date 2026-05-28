@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -128,22 +128,47 @@ public:
    ~UCS_string()                   { --total_count; }
 #endif
 
-   /// cast to an array of items with the same size as Unicode. This is for
-   /// interfacing to libraries that have typedef'ed Unicodes differently.
-   template<typename T>
-   const T * raw() const
+   /// an iterator for UCS_strings
+   class iterator
       {
-        Assert(sizeof(T) == sizeof(Unicode));
-        return reinterpret_cast<const T *>(&front());
-      }
+        public:
+           /// constructor: start at position p
+           iterator(const UCS_string & ucs)
+           : s(ucs),
+             pos(0)
+           {}
 
-   /// return this string with the first \b drop_count characters removed
-   UCS_string drop(int drop_count) const
-      {
-        if (drop_count <= 0)        return UCS_string(*this, 0, size());
-        if (ssize() <= drop_count)   return UCS_string();
-        return UCS_string(*this, drop_count, size() - drop_count);
-      }
+           /// return the iterator position in the underlying string
+           int get_pos() const
+              { return pos; }
+
+           /// return true iff there are more chars available
+           bool has_more() const
+              { return pos < s.ssize(); }
+
+           /// return the next char (without pos increment)
+           Unicode lookup() const
+              { Assert(has_more());    return s[pos]; }
+
+        /// the rest (starting at \b pos
+        UCS_string rest() const
+           { return UCS_string(s, pos, s.size() - pos); }
+
+           /// return the next char
+           Unicode next()
+              { Assert(has_more());   return s[pos++]; }
+
+        /// skip whitespace
+        void skip_white()
+           { while (has_more() && Avec::is_white(s[pos]))   ++pos; }
+
+        protected:
+           /// the string
+           const UCS_string & s;
+
+           /// the current position in the string
+           int pos;
+      };
 
    /// return true if every character in \b this string is the digit '0'
    bool all_zeroes() const
@@ -155,13 +180,21 @@ public:
    Unicode back() const
     { return size() ? (*this)[size() - 1] : Invalid_Unicode; }
 
-   /// compute the length of an output row
-   int compute_chunk_length(int quad_PW, int col) const;
+   /// compare \b this with UCS_string \b other
+   Comp_result compare(const UCS_string & other) const
+      {
+        if (*this < other)   return COMP_LT;
+        if (*this > other)   return COMP_GT;
+        return COMP_EQ;
+      }
 
-   /// skip leading whitespaces starting at idx, append the following
-   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces.
-   /// return the idx after that.
-   size_t copy_black(UCS_string & dest, int idx) const;
+   /// return this string with the first \b drop_count characters removed
+   UCS_string drop(int drop_count) const
+      {
+        if (drop_count <= 0)        return UCS_string(*this, 0, size());
+        if (ssize() <= drop_count)   return UCS_string();
+        return UCS_string(*this, drop_count, size() - drop_count);
+      }
 
    /// return the FNV (Fowler-Noll-Vo) hash of \b this_string
    uint32_t FNV_hash() const
@@ -171,159 +204,15 @@ public:
         return hash;
       }
 
-   /// return the number of LF characters in \b this string
-   ShapeItem LF_count() const;
-
-   /// return the start position of \b sub in \b this string or -1 if \b sub
-   /// is not contained in \b this string
-   ShapeItem substr_pos(const UCS_string & sub) const;
-
-   /// return the start position of """ in \b this string or -1 if \b """
-   /// is not contained in \b this string
-   ShapeItem multi_pos() const;
-
-   /// for a string (single quoted, double quoted, or DAQ (Double Arrow
-   /// Quotation Mark)) starting at \b pos, return its end.
-   ShapeItem string_end_pos(ShapeItem start_pos, bool throw_error) const;
-
-   /// return true if \b this string contains any non-whitespace characters
-   bool has_black() const;
-
-   /// return true if \b this starts with prefix (ASCII, case sensitive).
-   bool starts_with(const char * prefix) const;
-
-   /// return true if \b this ends with suffix (ASCII, case sensitive).
-   bool ends_with(const char * suffix) const;
-
-   /// return true if \b this starts with \b prefix (case sensitive).
-   bool starts_with(const UCS_string & prefix) const;
-
-   /// return true if \b this starts with \b prefix (ASCII, case insensitive).
-   bool starts_iwith(const char * prefix) const;
-
-   /// return true if \b this starts with \b prefix (case insensitive).
-   bool starts_iwith(const UCS_string & prefix) const;
-
-   /// return a string like this, but with pad chars mapped to spaces
-   UCS_string no_pad() const;
-
-   /// reverse the characters in \b this string
-   void reverse();
-
-   /// return true if \b this string starts with # or ⍝ or x:
-   bool is_comment_or_label() const;
-
-   /// return the number of unescaped and un-commented " in this string
-   ShapeItem double_quote_count(bool in_quote2) const;
-
-   /// return the position of the first (leftmost) unescaped " in \b this
-   /// string (if any), or else -1
-   ShapeItem double_quote_first() const;
-
-   /// return the position of the last (rightmost) unescaped " in \b this
-   /// string (if any), or else -1
-   ShapeItem double_quote_last() const;
-
-   /// return integer value for a string starting with optional whitespaces,
-   /// followed by digits.
-   int atoi() const;
-
-   /// return a string like this, but with pad chars removed
-   UCS_string remove_pad() const;
-
-   /// split \b this multi-line string into individual lines,
-   /// removing the CR and NL chars in \b this string.
-   size_t to_vector(UCS_string_vector & result) const;
-
-   /// return \b this string with "escape sequences" replaced by their real
-   /// characters ('' → ' if single quoted and \\r, \\n, \\xNNN etc. otherwise.
-   UCS_string un_escape(bool double_quoted, bool keep_LF) const;
-
-   /// the inverse of \b un_escape().
-   UCS_string do_escape(bool double_quoted) const;
-
-   /// dump \b this string to out (like U+nnn U+mmm ... )
-   ostream & dump(ostream & out) const;
-
-   /// sort the characters in this string by their Unicode
-   UCS_string sort() const;
-
-   /// return the characters in this string (sorted and duplicates removed)
-   UCS_string unique() const;
-
-   /// return \b this string HTML-escaped, starting at offset, and using &nbsp;
-   /// for blanks
-   UCS_string to_HTML(int offset, bool preserve_ws) const;
-
-   /// remove comment (if any) from \b this string
-   void remove_comment();
-
-   /// remove trailing pad characters
-   void remove_trailing_padchars();
-
-   /// remove trailing blanks, tabs, etc
-   void remove_trailing_whitespaces();
-
-   /// remove leading blanks, tabs, etc
-   void remove_leading_whitespaces();
-
-   /// remove leading and trailing whitespaces
-   void remove_leading_and_trailing_whitespaces()
-      {
-        remove_trailing_whitespaces();
-        remove_leading_whitespaces();
-      }
-
-   /// increment pos white at(pos) is a whitespace
-   int skip_white(int pos) const;
-
-   /// \b this is a command with optional args. Remove leading and trailing
-   /// whitespaces, append args to rest, and remove args from this.
-   void split_ws(UCS_string & rest);
-
-   /// return the last character in \b this string
-   Unicode & back()
-    { Assert(size());   return at(size() - 1); }
-
-   /// replace pad chars in \b this string by spaces
-   void map_pad();
-
-   /// remove the last character in \b this string
-   void pop_back()
-      { Assert(size() > 0); std::vector<Unicode>::pop_back(); }
-
-   /// more intuitive insert() function
-   void insert(ShapeItem pos, Unicode uni)
-      {  vector<Unicode>::insert(begin() + pos, uni); }
-
-   /// prepend character \b uni
-   void prepend(Unicode uni)
-      { insert(0, uni); }
-
-   /// return true if \b this and \b other are equal (same length and same
-   /// characters).
-   bool operator ==(const UCS_string & other) const
-      { return compare(other) == COMP_EQ; }
-
    /// return false if \b this and \b other are equal (same length and same
    /// characters).
    bool operator !=(const UCS_string & other) const
       { return compare(other) != COMP_EQ; }
 
-   /// return true if \b this and \b UCS_string(other) are equal (same
-   /// length and same characters).
-   bool operator ==(const UTF8_string & other) const
-      { return compare(UCS_string(other)) == COMP_EQ; }
-
    /// return false if \b this and \b UCS_string(other) are equal (same
    /// length and same characters).
    bool operator !=(const UTF8_string & other) const
       { return compare(UCS_string(other)) != COMP_EQ; }
-
-   /// return true if \b this and \b UTF8__string(other) are equal (same
-   /// length and same characters).
-   bool operator ==(const char * other) const
-      { return compare(UTF8_string(other)) == COMP_EQ; }
 
    /// return false if \b this and \b UTF8__string(other) are equal (same
    /// length and same characters).
@@ -336,6 +225,46 @@ public:
         ret << other;
         return ret;
       }
+
+   /// return true if \b this and \b other are equal (same length and same
+   /// characters).
+   bool operator ==(const UCS_string & other) const
+      { return compare(other) == COMP_EQ; }
+
+   /// return true if \b this and \b UCS_string(other) are equal (same
+   /// length and same characters).
+   bool operator ==(const UTF8_string & other) const
+      { return compare(UCS_string(other)) == COMP_EQ; }
+
+   /// return true if \b this and \b UTF8__string(other) are equal (same
+   /// length and same characters).
+   bool operator ==(const char * other) const
+      { return compare(UTF8_string(other)) == COMP_EQ; }
+
+   /// cast to an array of items with the same size as Unicode. This is for
+   /// interfacing to libraries that have typedef'ed Unicodes differently.
+   template<typename T>
+   const T * raw() const
+      {
+        Assert(sizeof(T) == sizeof(Unicode));
+        return reinterpret_cast<const T *>(&front());
+      }
+
+   /// overload vector::size() so that it returns a signed length
+   ShapeItem ssize() const
+      { return  size(); }
+
+   /// return the last character in \b this string
+   Unicode & back()
+    { Assert(size());   return at(size() - 1); }
+
+   /// erase 1 (!) character at pos
+   void erase(ShapeItem pos)
+      { vector<Unicode>::erase(begin() + pos); }
+
+   /// more intuitive insert() function
+   void insert(ShapeItem pos, Unicode uni)
+      {  vector<Unicode>::insert(begin() + pos, uni); }
 
    /// append UTF8_string \b utf
    UCS_string & operator <<(const UTF8_string & utf)
@@ -363,27 +292,141 @@ public:
    UCS_string & operator <<(ShapeItem num)
       { append_int(num);   return *this; }
 
-   /// append \b shape
-   UCS_string & operator <<(const Shape & shape);
-
    /// append character \b uni
    UCS_string & operator <<(Unicode uni)
       { push_back(uni);   return *this; }
-
-   /// append a floating point number (in ASCII encoding like %f) to this string
-   UCS_string & operator << (double num);
 
    /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & suffix)
       { loop(s, suffix.size())   push_back(suffix[s]);   return *this; }
 
-   /// compare \b this with UCS_string \b other
-   Comp_result compare(const UCS_string & other) const
+   /// remove the last character in \b this string
+   void pop_back()
+      { Assert(size() > 0); std::vector<Unicode>::pop_back(); }
+
+   /// prepend character \b uni
+   void prepend(Unicode uni)
+      { insert(0, uni); }
+
+   /// remove leading and trailing whitespaces
+   void remove_leading_and_trailing_whitespaces()
       {
-        if (*this < other)   return COMP_LT;
-        if (*this > other)   return COMP_GT;
-        return COMP_EQ;
+        remove_trailing_whitespaces();
+        remove_leading_whitespaces();
       }
+
+   /// return true if n1 < n2
+   static bool compare_names(const UCS_string & n1,
+                             const UCS_string & n2, const void *)
+      { return n2.compare(n1) == COMP_LT; }
+
+   /// return the total number of UCS_strings
+   static ShapeItem get_total_count()
+      { return total_count; }
+
+   /// helper function for Heapsort<Unicode>::sort()
+   static bool greater_uni(const Unicode & u1, const Unicode & u2,
+                            const void *)
+      { return u1 > u2; }
+
+   /// return integer value for a string starting with optional whitespaces,
+   /// followed by digits.
+   int atoi() const;
+
+   /// compute the length of an output row
+   int compute_chunk_length(int quad_PW, int col) const;
+
+   /// return true if \b this string contains \b uni
+   bool contains(Unicode uni) const;
+
+   /// skip leading whitespaces starting at idx, append the following
+   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces.
+   /// return the idx after that.
+   size_t copy_black(UCS_string & dest, int idx) const;
+
+   /// the inverse of \b un_escape().
+   UCS_string do_escape(bool double_quoted) const;
+
+   /// return the number of unescaped and un-commented " in this string
+   ShapeItem double_quote_count(bool in_quote2) const;
+
+   /// return the position of the first (leftmost) unescaped " in \b this
+   /// string (if any), or else -1
+   ShapeItem double_quote_first() const;
+
+   /// return the position of the last (rightmost) unescaped " in \b this
+   /// string (if any), or else -1
+   ShapeItem double_quote_last() const;
+
+   /// dump \b this string to out (like U+nnn U+mmm ... )
+   ostream & dump(ostream & out) const;
+
+   /// return true if \b this ends with suffix (ASCII, case sensitive).
+   bool ends_with(const char * suffix) const;
+
+   /// return true if \b this string contains any non-whitespace characters
+   bool has_black() const;
+
+   /// return true if \b this string starts with # or ⍝ or x:
+   bool is_comment_or_label() const;
+
+   /// return \b true iff \b this string is in the range \b from (including)
+   /// to 'b to (including).
+   bool is_in_range(const UCS_string & from, const UCS_string & to) const;
+
+   /// return the number of LF characters in \b this string
+   ShapeItem LF_count() const;
+
+   /// return the start position of """ in \b this string or -1 if \b """
+   /// is not contained in \b this string
+   ShapeItem multi_pos() const;
+
+   /// return a string like this, but with pad chars mapped to spaces
+   UCS_string no_pad() const;
+
+   /// return a string like this, but with pad chars removed
+   UCS_string remove_pad() const;
+
+   /// increment pos white at(pos) is a whitespace
+   int skip_white(int pos) const;
+
+   /// sort the characters in this string by their Unicode
+   UCS_string sort() const;
+
+   /// return true if \b this starts with \b prefix (ASCII, case insensitive).
+   bool starts_iwith(const char * prefix) const;
+
+   /// return true if \b this starts with \b prefix (case insensitive).
+   bool starts_iwith(const UCS_string & prefix) const;
+
+   /// return true if \b this starts with prefix (ASCII, case sensitive).
+   bool starts_with(const char * prefix) const;
+
+   /// return true if \b this starts with \b prefix (case sensitive).
+   bool starts_with(const UCS_string & prefix) const;
+
+   /// for a string (single quoted, double quoted, or DAQ (Double Arrow
+   /// Quotation Mark)) starting at \b pos, return its end.
+   ShapeItem string_end_pos(ShapeItem start_pos, bool throw_error) const;
+
+   /// return the start position of \b sub in \b this string or -1 if \b sub
+   /// is not contained in \b this string
+   ShapeItem substr_pos(const UCS_string & sub) const;
+
+   /// return \b this string HTML-escaped, starting at offset, and using &nbsp;
+   /// for blanks
+   UCS_string to_HTML(int offset, bool preserve_ws) const;
+
+   /// split \b this multi-line string into individual lines,
+   /// removing the CR and NL chars in \b this string.
+   size_t to_vector(UCS_string_vector & result) const;
+
+   /// return \b this string with "escape sequences" replaced by their real
+   /// characters ('' → ' if single quoted and \\r, \\n, \\xNNN etc. otherwise.
+   UCS_string un_escape(bool double_quoted, bool keep_LF) const;
+
+   /// return the characters in this string (sorted and duplicates removed)
+   UCS_string unique() const;
 
    /// append \b other in (single) quotes, doubling single quotes in \b other
    void append_single_quoted(const UCS_string & other);
@@ -392,77 +435,37 @@ public:
    /// from the end of \b members to \b this string.
    void append_members(const vector<const UCS_string *> & members, int m);
 
-   /// overload vector::size() so that it returns a signed length
-   ShapeItem ssize() const
-      { return  size(); }
+   /// replace pad chars in \b this string by spaces
+   void map_pad();
 
-   /// an iterator for UCS_strings
-   class iterator
-      {
-        public:
-           /// constructor: start at position p
-           iterator(const UCS_string & ucs)
-           : s(ucs),
-             pos(0)
-           {}
+   /// append \b shape
+   UCS_string & operator <<(const Shape & shape);
 
-           /// return the next char (without pos increment)
-           Unicode lookup() const
-              { Assert(has_more());    return s[pos]; }
+   /// append a floating point number (in ASCII encoding like %f) to this string
+   UCS_string & operator << (double num);
 
-           /// return the next char
-           Unicode next()
-              { Assert(has_more());   return s[pos++]; }
+   /// remove comment (if any) from \b this string
+   void remove_comment();
 
-           /// return the iterator position in the underlying string
-           int get_pos() const
-              { return pos; }
+   /// remove leading blanks, tabs, etc
+   void remove_leading_whitespaces();
 
-           /// return true iff there are more chars available
-           bool has_more() const
-              { return pos < s.ssize(); }
+   /// remove trailing pad characters
+   void remove_trailing_padchars();
 
-        /// skip whitespace
-        void skip_white()
-           { while (has_more() && Avec::is_white(s[pos]))   ++pos; }
+   /// remove trailing blanks, tabs, etc
+   void remove_trailing_whitespaces();
 
-        /// the rest (starting at \b pos
-        UCS_string rest() const
-           { return UCS_string(s, pos, s.size() - pos); }
-       
-        protected:
-           /// the string
-           const UCS_string & s;
-
-           /// the current position in the string
-           int pos;
-      };
+   /// reverse the characters in \b this string
+   void reverse();
 
    /// round last digit and discard it. Note that \b this is always expected
    /// to be in floating point format and never in exponential format
    void round_last_digit();
 
-   /// return true if \b this string contains \b uni
-   bool contains(Unicode uni) const;
-
-   /// return \b true iff \b this string is in the range \b from (including)
-   /// to 'b to (including).
-   bool is_in_range(const UCS_string & from, const UCS_string & to) const;
-
-   /// erase 1 (!) character at pos
-   void erase(ShapeItem pos)
-      { vector<Unicode>::erase(begin() + pos); }
-
-   /// helper function for Heapsort<Unicode>::sort()
-   static bool greater_uni(const Unicode & u1, const Unicode & u2,
-                            const void *)
-      { return u1 > u2; }
-
-   /// convert a signed integer value to an UCS_string (like snprintf("%d"))
-   static UCS_string from_int(int64_t value);
-
-   /// convert an unsigned integer value to an UCS_string (like snprintf("%u"))
-   static UCS_string from_uint(uint64_t value);
+   /// \b this is a command with optional args. Remove leading and trailing
+   /// whitespaces, append args to rest, and remove args from this.
+   void split_ws(UCS_string & rest);
 
    /// convert the integer part of value to an UCS_string and remove it
    /// from value
@@ -476,23 +479,17 @@ public:
    /// (with \b fract_digits fractional digits).
    static UCS_string from_double_to_fixed(APL_Float value, int fract_digits);
 
-   /// return the total number of UCS_strings
-   static ShapeItem get_total_count()
-      { return total_count; }
+   /// convert a signed integer value to an UCS_string (like snprintf("%d"))
+   static UCS_string from_int(int64_t value);
 
-   /// return true if n1 < n2
-   static bool compare_names(const UCS_string & n1,
-                             const UCS_string & n2, const void *)
-      { return n2.compare(n1) == COMP_LT; }
+   /// convert an unsigned integer value to an UCS_string (like snprintf("%u"))
+   static UCS_string from_uint(uint64_t value);
 
    /// print (non-negative) n as power (like 2 in N²)
    //
    static UCS_string power(size_t n);
 
 protected:
-   /// decode UTF8 decoded \b utf into \b this string
-   void decode(const UTF8 * utf, int size);
-
    // prevernt push_back() outside of this class. Use << instead.
    void push_back(Unicode uni)
       { std::vector<Unicode>::push_back(uni); }
@@ -500,35 +497,37 @@ protected:
    /// append number (in ASCII encoding like %d) to this string
    void append_int(ShapeItem num);
 
-   /// the total number of UCS_strings
-   static ShapeItem total_count;
-
-   /// the next unique instance_id
-   static ShapeItem total_id;
+   /// decode UTF8 decoded \b utf into \b this string
+   void decode(const UTF8 * utf, int size);
 
 #if UCS_tracking
    /// a unique number for \b this  UCS_string
    ShapeItem instance_id;
 #endif
 
+   /// the total number of UCS_strings
+   static ShapeItem total_count;
+
+   /// the next unique instance_id
+   static ShapeItem total_id;
+
 private:
-   /// prevent accidental allocation
-   void * operator new[](size_t size);
-
-   /// prevent accidental de-allocation
-   void operator delete[](void *);
-
-private:
-   /// prevent accidental usage of the rather dangerous default len parameter
-   /// in basic_strng::erase(pos, len = npos)
-    vector<Unicode> & erase(size_type pos, size_type len);
-
    /// constructor: UCS_string from 0-terminated C string.
    /// Made private because it was far too often used incorrectly.
    UCS_string(const char * cstring);
 
    /// constructor: UCS_string from 0-terminated C string.
    UCS_string(const UTF8 * cstring);
+
+   /// prevent accidental usage of the rather dangerous default len parameter
+   /// in basic_strng::erase(pos, len = npos)
+    vector<Unicode> & erase(size_type pos, size_type len);
+
+   /// prevent accidental de-allocation
+   void operator delete[](void *);
+
+   /// prevent accidental allocation
+   void * operator new[](size_t size);
 };
 //----------------------------------------------------------------------------
 /// an UCS_string that contains only ASCII characters,
@@ -540,11 +539,11 @@ public:
    UCS_ASCII_string(const char * ascii)
       { *this << ascii; }
 
-   /// return \b tag in a readable form (e.g. TOK_LINE, TOK_SYMBOL, ...).
-   UCS_ASCII_string(TokenTag tag);
-
    /// return \b tc in a readable form (e.g. TC_ASSIGN, TC_R_ARROW, ...).
    UCS_ASCII_string(TokenClass tc);
+
+   /// return \b tag in a readable form (e.g. TOK_LINE, TOK_SYMBOL, ...).
+   UCS_ASCII_string(TokenTag tag);
 
    /// return \b tvt in a readable form (e.g. TV_NONE, TV_CHAR, ...).
    UCS_ASCII_string(TokenValueType tvt);

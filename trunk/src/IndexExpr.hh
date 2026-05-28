@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,11 +44,21 @@ public:
    /// destructor
    ~IndexExpr();
 
-   /// The quad-io for this index.
-   uint32_t quad_io;
+   /// return true iff this index is part of indexed assignment ( A[]← )
+   Assign_state get_assign_state() const
+      { return assign_state; }
 
-   /// The values (0 = elided index as in [] or [;].
-   Value_P values[MAX_RANK];
+   /// return axis rk (rk in shape order as opposed to index order)
+   /// @param ax axis number in shape order
+   const Value * get_axis_value(uAxis ax) const
+      { return values[rank - ax - 1].get(); }
+
+   /// return the number of values (= number of semicolons + 1),
+   /// including elided indices
+   uRank get_rank() const   { return rank; }
+
+   /// return true iff the number of dimensions is 1 (i.e. no ; and non-empty)
+   bool is_axis() const   { return rank == 1; }
 
    /// append a value.
    /// @param val APL value to append as the next index dimension
@@ -59,51 +69,41 @@ public:
        if (+val)   ++value_count;
       }
 
-   /// return the number of values (= number of semicolons + 1),
-   /// including elided indices
-   uRank get_rank() const   { return rank; }
-
-   /// return true iff the number of dimensions is 1 (i.e. no ; and non-empty)
-   bool is_axis() const   { return rank == 1; }
-
-   /// Return an axis (from an IndexExpr of rank 1.
-   /// @param max_axis upper bound on the valid axis value (exclusive)
-   sAxis get_axis(sRank max_axis) const;
-
-   /// return true iff this index is part of indexed assignment ( A[]← )
-   Assign_state get_assign_state() const
-      { return assign_state; }
-
-   /// return the single axis value and clear it in \b this IndexExpr.
-   Value_P extract_axis();
-
    /// check that all indices indices of \b this IndexExpr are valid indices
    /// for \b shape, raise INDEX_ERROR if not.
    /// @param shape the APL array shape that bounds the valid index range
    void check_index_range(const Shape & shape) const;
 
-   /// return axis rk (rk in shape order as opposed to index order)
-   /// @param ax axis number in shape order
-   const Value * get_axis_value(uAxis ax) const
-      { return values[rank - ax - 1].get(); }
+   /// Return an axis (from an IndexExpr of rank 1.
+   /// @param max_axis upper bound on the valid axis value (exclusive)
+   sAxis get_axis(sRank max_axis) const;
 
-   /// print stale IndexExprs, and return the number of stale IndexExprs.
-   /// @param out output stream for the diagnostic report
-   static int print_stale(ostream & out);
+   /// return the single axis value and clear it in \b this IndexExpr.
+   Value_P extract_axis();
 
    /// erase stale IndexExprs
    /// @param loc caller location for diagnostics
    static void erase_stale(const char * loc);
 
+   /// print stale IndexExprs, and return the number of stale IndexExprs.
+   /// @param out output stream for the diagnostic report
+   static int print_stale(ostream & out);
+
+   /// The quad-io for this index.
+   uint32_t quad_io;
+
+   /// The values (0 = elided index as in [] or [;].
+   Value_P values[MAX_RANK];
+
 protected:
+   /// true iff this index is part of indexed assignment ( A[]← )
+   const Assign_state assign_state;
+
    /// the number of dimensions (including elided)
    uRank rank;
 
    /// the number of values (excluding elided)
    uRank value_count;
-
-   /// true iff this index is part of indexed assignment ( A[]← )
-   const Assign_state assign_state;
 };
 //----------------------------------------------------------------------------
 

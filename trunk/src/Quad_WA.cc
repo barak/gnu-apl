@@ -45,16 +45,14 @@ Quad_WA::Quad_WA()
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
-Value_P
-Quad_WA::get_apl_value() const
-{
-   return IntScalar(total_memory -
-                    (Value::total_ravel_count * sizeof(Cell)
-                    + Value::value_count * sizeof(Value)), LOC);
-}
 //---------------------------------------------------------------------------
 #if MINGW_SRC
+//---------------------------------------------------------------------------
+void
+Quad_WA::init(bool log_startup)
+{
+}
+
 int
 Quad_WA::read_meminfo()
 {
@@ -66,12 +64,6 @@ Quad_WA::read_procfile(const char * filename)
 {
    return -1;   // something went wrong
 }
-//---------------------------------------------------------------------------
-void
-Quad_WA::init(bool log_startup)
-{
-}
-
 #else // ! MINGW_SRC
 
 extern uint64_t top_of_memory();
@@ -140,6 +132,23 @@ rlimit rl;
       }
 }
 //----------------------------------------------------------------------------
+uint64_t
+Quad_WA::get_free_memory()
+{
+uint64_t result = 0xC0000000;   // assume ~3 GB on error
+
+   if (read_meminfo() == 3)
+      {
+        result = meminfo.Available ?  meminfo.Available
+                            : meminfo.Cached + meminfo.MemFree;
+      }
+
+   // limit size on 32-bit machines to 2.95 < 3 GB
+   if (sizeof(const void *) == 4 && result > 0xB0000000)  result = 0xB0000000;
+
+   return result;
+}
+//----------------------------------------------------------------------------
 int
 Quad_WA::read_meminfo()
 {
@@ -197,23 +206,6 @@ FileReader reader(filename);
 #endif // !MINGW_SRC
 
    return -1;   // something went wrong
-}
-//----------------------------------------------------------------------------
-uint64_t
-Quad_WA::get_free_memory()
-{
-uint64_t result = 0xC0000000;   // assume ~3 GB on error
-
-   if (read_meminfo() == 3)
-      {
-        result = meminfo.Available ?  meminfo.Available
-                            : meminfo.Cached + meminfo.MemFree;
-      }
-
-   // limit size on 32-bit machines to 2.95 < 3 GB
-   if (sizeof(const void *) == 4 && result > 0xB0000000)  result = 0xB0000000;
-
-   return result;
 }
 #endif // ! MINGW_SRC
 //----------------------------------------------------------------------------
@@ -367,3 +359,11 @@ const int64_t overcommit = read_procfile("/proc/sys/vm/overcommit_memory");
 }
 //============================================================================
 
+//----------------------------------------------------------------------------
+Value_P
+Quad_WA::get_apl_value() const
+{
+   return IntScalar(total_memory -
+                    (Value::total_ravel_count * sizeof(Cell)
+                    + Value::value_count * sizeof(Value)), LOC);
+}

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2025  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,19 +104,8 @@ public:
    /// Constructor.
    Quad_PLOT();
 
-   static Quad_PLOT  fun;          ///< Built-in function.
-
-   /// a semaphore blocking until the plot window has been EXPOSED
-   static sem_t * expose_sema;
-
-   /// a semaphore protecting vector all_PLOT_windows
-   static sem_t * all_PLOT_windows_sema;
-
    /// a small number that identifies a window
    typedef int Handle;
-
-   /// the next handle (-1)
-   static Handle next_handle;
 
    /// the GUI-independent part of ⎕PLOT (at APL level).
    class PLOT_context
@@ -147,9 +136,6 @@ public:
            static Handle remove_handle(Handle handle);   // GTK only
       };
 
-   /// all open ⎕PLOT windows.
-   static vector<PLOT_context *> all_PLOT_windows;
-
    /// the GTK window that handles one plot window. Always declared here
    /// (to make doxygen happy, but only implemented if apl_GTK3
    /// @param vp_props pointer to the Plot_window_properties for this window
@@ -166,11 +152,25 @@ public:
         PltDrv_GTK   = 1,
         PltDrv_XCB   = 2,
         PltDrv_ASCII = 3,
-        
+
       };
 
    static int get_verbosity()
       { return verbosity; }
+
+   static Quad_PLOT  fun;          ///< Built-in function.
+
+   /// a semaphore blocking until the plot window has been EXPOSED
+   static sem_t * expose_sema;
+
+   /// a semaphore protecting vector all_PLOT_windows
+   static sem_t * all_PLOT_windows_sema;
+
+   /// the next handle (-1)
+   static Handle next_handle;
+
+   /// all open ⎕PLOT windows.
+   static vector<PLOT_context *> all_PLOT_windows;
 
 protected:
    /// Destructor.

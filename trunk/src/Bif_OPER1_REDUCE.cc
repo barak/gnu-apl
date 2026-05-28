@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,85 +31,75 @@ Bif_OPER1_REDUCE1   Bif_OPER1_REDUCE1::fun;
 
 //----------------------------------------------------------------------------
 Token
-Bif_REDUCE::replicate(Value_P A, Value_P B, uAxis axis)
+Bif_REDUCE::do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem nwise,
+                      cFunction_P LO, Value_P B, ShapeItem bm)
 {
-   // turn scalar B into ,B
-   //
-Shape shape_B = B->get_shape();
-   if (shape_B.get_rank() == 0)
-      {
-         shape_B.add_shape_item(1);
-         axis = 0;
-      }
-
-   if (A->get_rank() > 1)             RANK_ERROR;
-   if (axis >= shape_B.get_rank())    AXIS_ERROR;
-
-const ShapeItem len_B = shape_B.get_shape_item(axis);
-ShapeItem len_A = A->element_count();
-
-   // compute len_Z ← +/A
-   //
-ShapeItem len_Z = 0;
-std::vector<ShapeItem> rep_counts;
-   rep_counts.reserve(len_B);
-   if (len_A == 1)   // single a -> a a ... a (len_B times)
-      {
-        len_A = len_B;
-        APL_Integer rep_A = A->get_cfirst().get_near_int();
-        loop(a, len_A)   rep_counts.push_back(rep_A);
-        if (rep_A < 0)   len_Z = -rep_A*len_B;   // replicate ↑B
-        else             len_Z =  rep_A*len_B;   // replicat B[a]
-      }
-   else              // normal A
-      {
-        ShapeItem nonneg_A = 0;   // number of items >= 0 in A
-        loop(a, len_A)
-           {
-             const APL_Integer rep_A = A->get_cravel(a).get_near_int();
-             rep_counts.push_back(rep_A);
-             len_Z += rep_A;   ++nonneg_A;        // most likely:  rep_A >= 0
-             if (rep_A < 0)    { len_Z -= 2*rep_A;  --nonneg_A; }   // rare
-           }
-
-        // the B axis shall have an item for every non-negative A
-        if (len_B != 1 && nonneg_A != len_B)   LENGTH_ERROR;
-      }
-
-Shape shape_Z(shape_B);
-   shape_Z.set_shape_item(axis, len_Z);
-
 Value_P Z(shape_Z, LOC);
 
-const Shape3 shape_B3(shape_B, axis);
+   // constants that are valid for the entire reduction
+   //
+const ShapeItem len_Z   = Z->element_count();
+const ShapeItem len_L   = Z3.get_last_shape_item();
+const ShapeItem len_BML = bm * len_L;
+const ShapeItem len_ZM  = Z3.m();
+const ShapeItem len_ZML = len_L * len_ZM;
+prim_f2 scalar_LO       = LO->get_scalar_f2();
 
-   loop(h, shape_B3.h())
+   loop(z, len_Z)
       {
-        ShapeItem bm = 0;
-        loop(m, rep_counts.size())
+        // break down z into H, M, and L components
+        //
+        const ShapeItem z_L =  z % len_L;
+        const ShapeItem z_M = (z / len_L) % len_ZM;
+        const ShapeItem z_H =  z / len_ZML;
+
+        // compute LO_count (= the number of LO-reductions), and b (= the
+        // starting point of the LO-reductions). They depend on z and nwise
+        //
+        const ShapeItem LO_count = (nwise == -1) ? z_M
+                                 : (nwise < -1)  ? - nwise - 1
+                                 :                 nwise - 1;
+
+        ShapeItem b = z_L + z_H * len_BML       // start of row in B
+                          + LO_count * len_L;   // end of beam in B
+
+        // for reverse (i,e. nwise < -1) reduction direction go to the
+        // start of the beam instead of the end of the beam.
+        //
+        if (nwise < -1)    b += (nwise + 1) * len_L;
+        if (nwise != -1)   b += z_M * len_L; // start of beam
+
+        // Z[z] = B[b]. We use Z[z] as accumulator for the reduction
+        //
+        Cell & accu = Z->get_wravel(z);
+        accu.init(B->get_cravel(b), *Z, LOC);
+
+        loop(lo, LO_count)
            {
-             const ShapeItem rep = rep_counts[m];
+             if (nwise < -1)   b += len_L;   // move forward in B
+             else              b -= len_L;   // move backward in B
 
-             if (rep >= 0)   // copy l*rep items
+             // one reduction step (one call of LO)
+             //
+             const Cell & cB = B->get_cravel(b);
+             if (scalar_LO && accu.is_simple_cell() && cB.is_simple_cell())
                 {
-                  loop(r, rep)
-                  loop(l, shape_B3.l())
-                     {
-                       const ShapeItem src = shape_B3.hml(h, bm, l);
-                       Z->next_ravel_Cell(B->get_cravel(src));
-                     }
-                  if (shape_B3.m() > 1)   ++bm;
+                  const ErrorCode ec = (accu.*scalar_LO)(&accu, &cB);
+                  if (ec)   throw_apl_error(ec, LOC);
                 }
-             else  // init l*-rep items with the fill item
+             else
                 {
-                  loop(r, -rep)
-                  loop(l, shape_B3.l())
-                     {
-                       const ShapeItem src = shape_B3.hml(h, 0, l);
-                       Z->next_ravel_Proto(B->get_cravel(src));
-                     }
+                  Value_P LO_A = cB.to_value(LOC);
+                  Value_P LO_B = accu.to_value(LOC);
+                  Token result = LO->eval_AB(LO_A, LO_B);
+                  accu.release(LOC);
 
-                  // cB is not incremented when fill item is used.
+                  if (result.get_tag() == TOK_ERROR)
+                    throw_apl_error(result.get_ErrorCode(), LOC);
+
+                  Assert(result.get_Class() == TC_VALUE);
+                  Value_P ZZ = result.get_apl_val();
+                  accu.init_from_value(ZZ.get(), *Z, LOC);
                 }
            }
       }
@@ -302,75 +292,85 @@ const Shape3 B3(B->get_shape(), axis);
 }
 //----------------------------------------------------------------------------
 Token
-Bif_REDUCE::do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem nwise,
-                      cFunction_P LO, Value_P B, ShapeItem bm)
+Bif_REDUCE::replicate(Value_P A, Value_P B, uAxis axis)
 {
+   // turn scalar B into ,B
+   //
+Shape shape_B = B->get_shape();
+   if (shape_B.get_rank() == 0)
+      {
+         shape_B.add_shape_item(1);
+         axis = 0;
+      }
+
+   if (A->get_rank() > 1)             RANK_ERROR;
+   if (axis >= shape_B.get_rank())    AXIS_ERROR;
+
+const ShapeItem len_B = shape_B.get_shape_item(axis);
+ShapeItem len_A = A->element_count();
+
+   // compute len_Z ← +/A
+   //
+ShapeItem len_Z = 0;
+std::vector<ShapeItem> rep_counts;
+   rep_counts.reserve(len_B);
+   if (len_A == 1)   // single a -> a a ... a (len_B times)
+      {
+        len_A = len_B;
+        APL_Integer rep_A = A->get_cfirst().get_near_int();
+        loop(a, len_A)   rep_counts.push_back(rep_A);
+        if (rep_A < 0)   len_Z = -rep_A*len_B;   // replicate ↑B
+        else             len_Z =  rep_A*len_B;   // replicat B[a]
+      }
+   else              // normal A
+      {
+        ShapeItem nonneg_A = 0;   // number of items >= 0 in A
+        loop(a, len_A)
+           {
+             const APL_Integer rep_A = A->get_cravel(a).get_near_int();
+             rep_counts.push_back(rep_A);
+             len_Z += rep_A;   ++nonneg_A;        // most likely:  rep_A >= 0
+             if (rep_A < 0)    { len_Z -= 2*rep_A;  --nonneg_A; }   // rare
+           }
+
+        // the B axis shall have an item for every non-negative A
+        if (len_B != 1 && nonneg_A != len_B)   LENGTH_ERROR;
+      }
+
+Shape shape_Z(shape_B);
+   shape_Z.set_shape_item(axis, len_Z);
+
 Value_P Z(shape_Z, LOC);
 
-   // constants that are valid for the entire reduction
-   //
-const ShapeItem len_Z   = Z->element_count();
-const ShapeItem len_L   = Z3.get_last_shape_item();
-const ShapeItem len_BML = bm * len_L;
-const ShapeItem len_ZM  = Z3.m();
-const ShapeItem len_ZML = len_L * len_ZM;
-prim_f2 scalar_LO       = LO->get_scalar_f2();
+const Shape3 shape_B3(shape_B, axis);
 
-   loop(z, len_Z)
+   loop(h, shape_B3.h())
       {
-        // break down z into H, M, and L components
-        //
-        const ShapeItem z_L =  z % len_L;
-        const ShapeItem z_M = (z / len_L) % len_ZM;
-        const ShapeItem z_H =  z / len_ZML;
-
-        // compute LO_count (= the number of LO-reductions), and b (= the
-        // starting point of the LO-reductions). They depend on z and nwise
-        //
-        const ShapeItem LO_count = (nwise == -1) ? z_M
-                                 : (nwise < -1)  ? - nwise - 1
-                                 :                 nwise - 1;
-
-        ShapeItem b = z_L + z_H * len_BML       // start of row in B
-                          + LO_count * len_L;   // end of beam in B
-
-        // for reverse (i,e. nwise < -1) reduction direction go to the
-        // start of the beam instead of the end of the beam.
-        //
-        if (nwise < -1)    b += (nwise + 1) * len_L;
-        if (nwise != -1)   b += z_M * len_L; // start of beam
-
-        // Z[z] = B[b]. We use Z[z] as accumulator for the reduction
-        //
-        Cell & accu = Z->get_wravel(z);
-        accu.init(B->get_cravel(b), *Z, LOC);
-
-        loop(lo, LO_count)
+        ShapeItem bm = 0;
+        loop(m, rep_counts.size())
            {
-             if (nwise < -1)   b += len_L;   // move forward in B
-             else              b -= len_L;   // move backward in B
+             const ShapeItem rep = rep_counts[m];
 
-             // one reduction step (one call of LO)
-             //
-             const Cell & cB = B->get_cravel(b);
-             if (scalar_LO && accu.is_simple_cell() && cB.is_simple_cell())
+             if (rep >= 0)   // copy l*rep items
                 {
-                  const ErrorCode ec = (accu.*scalar_LO)(&accu, &cB);
-                  if (ec)   throw_apl_error(ec, LOC);
+                  loop(r, rep)
+                  loop(l, shape_B3.l())
+                     {
+                       const ShapeItem src = shape_B3.hml(h, bm, l);
+                       Z->next_ravel_Cell(B->get_cravel(src));
+                     }
+                  if (shape_B3.m() > 1)   ++bm;
                 }
-             else
+             else  // init l*-rep items with the fill item
                 {
-                  Value_P LO_A = cB.to_value(LOC);
-                  Value_P LO_B = accu.to_value(LOC);
-                  Token result = LO->eval_AB(LO_A, LO_B);
-                  accu.release(LOC);
+                  loop(r, -rep)
+                  loop(l, shape_B3.l())
+                     {
+                       const ShapeItem src = shape_B3.hml(h, 0, l);
+                       Z->next_ravel_Proto(B->get_cravel(src));
+                     }
 
-                  if (result.get_tag() == TOK_ERROR)
-                    throw_apl_error(result.get_ErrorCode(), LOC);
-
-                  Assert(result.get_Class() == TC_VALUE);
-                  Value_P ZZ = result.get_apl_val();
-                  accu.init_from_value(ZZ.get(), *Z, LOC);
+                  // cB is not incremented when fill item is used.
                 }
            }
       }
@@ -378,6 +378,13 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
+Bif_OPER1_REDUCE::eval_ALXB(Value_P A, Token & _LO, Value_P X, Value_P B) const
+{
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
+   return reduce_n_wise(A, _LO, B, axis);
 }
 //----------------------------------------------------------------------------
 Token
@@ -395,10 +402,10 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 }
 //----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE::eval_ALXB(Value_P A, Token & _LO, Value_P X, Value_P B) const
+Bif_OPER1_REDUCE1::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
-   return reduce_n_wise(A, _LO, B, axis);
+   return reduce_n_wise(A, LO, B, axis);
 }
 //----------------------------------------------------------------------------
 Token
@@ -414,12 +421,5 @@ Bif_OPER1_REDUCE1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce(LO, B, axis);
-}
-//----------------------------------------------------------------------------
-Token
-Bif_OPER1_REDUCE1::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
-{
-const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
-   return reduce_n_wise(A, LO, B, axis);
 }
 //----------------------------------------------------------------------------

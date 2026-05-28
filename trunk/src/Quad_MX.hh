@@ -33,12 +33,12 @@
 /// The class implementing ⎕MX
 class Quad_MX : public QuadFunction
 {
-  typedef std::complex<double> Dcomplex;
-
 public:
    /// Constructor. Sorts \b sub_function_infos by name (as needed for binary
    /// searches).
   Quad_MX();
+
+  typedef std::complex<double> Dcomplex;
 
   enum MX_ops
      {
@@ -50,21 +50,6 @@ public:
    static Quad_MX fun;   ///< Built-in function.
 
 protected:
-   /// properties of subfunctions
-   static const FunctionGroup::function_info subfunction_infos[];
-
-   /// overloaded FunctionGroup::print_fun_syntax()
-   /// @param out output stream to write to
-   /// @param info descriptor of the subfunction whose syntax is to be printed
-   virtual void print_fun_syntax(ostream & out,
-                                const function_info & info) const;
-
-   /// overloaded FunctionGroup::print_map_syntax()
-   /// @param out output stream to write to
-   /// @param info descriptor of the subfunction whose map syntax is to be printed
-   virtual void print_map_syntax(ostream & out,
-                                 const function_info & info) const;
-
   /// a matrix suitable for libgsl
   class GSL_Matrix
      {
@@ -85,7 +70,7 @@ protected:
             {
               return vals[col + row * kcols];
             }
-    
+
          /// set the value at \b row and \b col to \b value
          /// @param row zero-based row index
          /// @param col zero-based column index
@@ -94,13 +79,13 @@ protected:
             {
               vals[col + row * kcols] = value;
             }
-    
+
          /// return the number of rows
          int rows() const   { return krows; }
-    
+
          /// return the number of columns
          int cols() const   { return kcols; }
-    
+
          /// print \b this matrix to stderr
          void show() const
             {
@@ -131,6 +116,18 @@ protected:
          int kcols;               ///< the number of columns
          vector<Dcomplex> vals;   ///< the matrix items
      };
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+   /// @param out output stream to write to
+   /// @param info descriptor of the subfunction whose syntax is to be printed
+   virtual void print_fun_syntax(ostream & out,
+                                const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+   /// @param out output stream to write to
+   /// @param info descriptor of the subfunction whose map syntax is to be printed
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// overloaded Function::eval_AXB().
    /// @param A left argument APL value
@@ -252,6 +249,9 @@ protected:
   /// @param A left APL value (rotation parameters)
   /// @param B right APL vector to rotate
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
+
+   /// properties of subfunctions
+   static const FunctionGroup::function_info subfunction_infos[];
 
   /// true if the random number generators were initialized
   static bool rng_initialised;

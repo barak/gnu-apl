@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,11 +40,13 @@ public:
    /// @param B right argument APL value (symbol name or data)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Quad_TF  fun;          ///< Built-in function.
-
    /// return true if val contains an 1⎕TF or 2⎕TF record
    /// @param maybe_name string to test for transfer-format content
    static bool is_inverse(const UCS_string & maybe_name);
+
+   /// undo ⎕UCS() created by tf2_char_vec
+   /// @param ucs encoded string possibly containing ⎕UCS notation
+   static UCS_string no_UCS(const UCS_string & ucs);
 
    /// return B in transfer format 1 (old APL format)
    /// @param symbol_name name of the symbol to transfer
@@ -54,9 +56,22 @@ public:
    /// @param symbol_name name of the symbol to transfer
    static Token tf2(const UCS_string & symbol_name);
 
-   /// return B in transfer format 3 (APL2 CDR format)
-   /// @param symbol_name name of the symbol to transfer
-   static Value_P tf3(const UCS_string & symbol_name);
+   /// store simple character vector \b vec in \b ucs, either as
+   /// 'xxx' or as (UCS nn nnn ...)
+   /// @param ucs output string being built
+   /// @param vec character vector to encode
+   static void tf2_char_vec(UCS_string & ucs, const UCS_string & vec);
+
+   /// store B in transfer format 2 (new APL format) into \b ucs
+   /// @param ucs output string being built
+   /// @param fun_name name of the function
+   /// @param fun the function object to serialize
+   static void tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
+                           const Function & fun);
+
+   /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
+   /// @param ravel transfer-format-2 encoded string to decode
+   static UCS_string tf2_inverse(const UCS_string & ravel);
 
    /// append ravel of \b value in tf2_format to \b ucs.
    /// Return true iff the value should be enclosed in parentheses when grouped.
@@ -67,31 +82,16 @@ public:
    static void tf2_value(int level, UCS_string & ucs,
                                     const Value & value, ShapeItem nesting);
 
-   /// store B in transfer format 2 (new APL format) into \b ucs
-   /// @param ucs output string being built
-   /// @param fun_name name of the function
-   /// @param fun the function object to serialize
-   static void tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
-                           const Function & fun);
-
-   /// store simple character vector \b vec in \b ucs, either as
-   /// 'xxx' or as (UCS nn nnn ...)
-   /// @param ucs output string being built
-   /// @param vec character vector to encode
-   static void tf2_char_vec(UCS_string & ucs, const UCS_string & vec);
-
-   /// undo ⎕UCS() created by tf2_char_vec
-   /// @param ucs encoded string possibly containing ⎕UCS notation
-   static UCS_string no_UCS(const UCS_string & ucs);
-
-   /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
-   /// @param ravel transfer-format-2 encoded string to decode
-   static UCS_string tf2_inverse(const UCS_string & ravel);
-
    /// return B in transfer format 2 (new APL format) for a variable
    /// @param var_name name of the variable
    /// @param val APL value to encode
    static Token tf2_var(const UCS_string & var_name, const Value & val);
+
+   /// return B in transfer format 3 (APL2 CDR format)
+   /// @param symbol_name name of the symbol to transfer
+   static Value_P tf3(const UCS_string & symbol_name);
+
+   static Quad_TF  fun;          ///< Built-in function.
 
 protected:
    /// append \b shape in tf2_format to \b ucs.

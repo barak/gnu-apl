@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,19 +103,6 @@ Value_P Z = do_map(*A, indices, B.get(), recursive);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-bool
-Quad_MAP::greater_map(const ShapeItem & a, const ShapeItem & b,
-                      const void * ctx)
-{
-const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
-const Cell * cells = rcl->ravel;
-
-   if (const Comp_result cr = cells[2*a].compare(cells[2*b]))   // A[1] ≠ B[1]
-      return cr == COMP_GT;
-
-   return a > b;
-}
-//----------------------------------------------------------------------------
 int
 compare_MAP(const Cell & key, const ShapeItem & item, const void * ctx)
 {
@@ -193,5 +180,18 @@ const ShapeItem len_B = B->element_count();
 
    Z->check_value(LOC);
    return Z;
+}
+//----------------------------------------------------------------------------
+bool
+Quad_MAP::greater_map(const ShapeItem & a, const ShapeItem & b,
+                      const void * ctx)
+{
+const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
+const Cell * cells = rcl->ravel;
+
+   if (const Comp_result cr = cells[2*a].compare(cells[2*b]))   // A[1] ≠ B[1]
+      return cr == COMP_GT;
+
+   return a > b;
 }
 //----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,6 +144,307 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 # include "LAdebug.icc"   // print_matrix() etc.
 
 //----------------------------------------------------------------------------
+template<typename T>
+LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
+   : N(N)
+{
+   tau      = std::allocator<T>{}.allocate(N);
+   y        = std::allocator<T>{}.allocate(N);
+   work_min = std::allocator<T>{}.allocate(N);
+   work_max = std::allocator<T>{}.allocate(N);
+
+   if (with_pivot)   // ⌹B or A⌹B but not ⌹[X]B
+      {
+        pivot = std::allocator<Ccol>{}.allocate(N);
+        vn1   = std::allocator<APL_Float>{}.allocate(N);
+        vn2   = std::allocator<APL_Float>{}.allocate(N);
+
+        // init the pivot
+        loop(n, N)   pivot[n] = n;
+      }
+   else              // only ⌹[X]B
+      {
+        pivot = 0;   // as to figure with_pivot later on
+        vn1   = 0;
+        vn2   = 0;
+      }
+}
+//----------------------------------------------------------------------------
+template<typename T>
+LA_pack::PTVVy<T>::~PTVVy()
+{
+   std::allocator<T>{}.deallocate(tau,      N);
+   std::allocator<T>{}.deallocate(y,        N);
+   std::allocator<T>{}.deallocate(work_min, N);
+   std::allocator<T>{}.deallocate(work_max, N);
+   if (pivot)
+      {
+        std::allocator<Ccol>{}.deallocate(pivot, N);
+        std::allocator<APL_Float>{}.deallocate(vn1, N);
+        std::allocator<APL_Float>{}.deallocate(vn2, N);
+      }
+}
+//----------------------------------------------------------------------------
+template<typename T>
+int LA_pack::PTVVy<T>::print_pivot(ostream & out,
+                                    Ccol N, const char * loc) const
+{
+   if (!pivot)   return 0;
+
+   out << "PIVOT:";
+   loop(n, N)   out << " " << pivot[n];
+   out << "   at " << loc << endl;
+   return N;
+}
+//----------------------------------------------------------------------------
+template<typename T>
+int LA_pack::PTVVy<T>::print_tau(ostream & out, Ccol N,
+                                  const char * loc) const
+{
+   out << "TAU:";
+   loop(n, N)   { out << " ";   print_item(tau[n]); }
+   out << endl;
+   return N;
+}
+//============================================================================
+//----------------------------------------------------------------------------
+/* LApack function UNM2R. Overwrite the general complex m-by-n matrix C:
+
+   C ← Q ∘ C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
+   C ← Q° ∘ H ∘ C    if SIDE = 'L' and TRANS = 'C', or   (case 2)   <---
+   C ← C ∘ Q         if SIDE = 'R' and TRANS = 'N', or   (case 3)
+   C ← C ∘ Q° ∘ ×    if SIDE = 'R' and TRANS = 'C',      (case 4)
+
+   where Q is a unitary matrix defined as the product of k
+   elementary reflectors:
+
+   Q = H(1) ∘ H(2) ∘...∘ H(k)
+
+   The reflectors are in the lower triangle of A, the diagonal in tau
+
+   NOTE: in LApack, the real version is DORM2R, while
+                    the complex version is ZUNM2R.
+
+         We use the name unm2r<T> for both.
+ */
+template<typename T>
+void LA_pack::unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
+                    fMatrix<T> & C)
+{
+   // only case 2 (SIDE == "L" and TRANS = 'C') is needed and implemented.
+   // thus NOTRAN is false (and then tau[row] (Q°) is conjugated).
+   //
+   ALL_DIAS(K)
+       {
+         /* for row=dia of A; apply H(dia) to SUB = C(dia:m, 1:n)
+
+          ┬        ╔════════════════╗   0   ╔═════════╗
+          │        ║ \              ║   ↓   ║         ║
+          │        ║  \    A        ║   ↓   ║    C    ║
+          │        ║   \            ║   ↓   ║         ║ 
+          M   ┬    ╟────⍺  v ... v ─╫─ dia ─╫─────────╢  ⍺ := 1.0 before
+          │   │    ║                ║   ↓   ║         ║  restored after
+          │ M-dia  ║       C        ║   K   ║   SUB   ║ 
+          │   │    ║                ║       ║         ║ 
+          ┴   ┴    ╚════════════════╝       ╚═════════╝
+          */
+         const T tau = conjugated(ptvvy.tau[dia]);   // must copy tau[dia] !
+
+         // strictly speaking is A not const. However, we modify it
+         // but then restore again. Therefore the const_cast<T &> is OK.
+         //
+         T & ALPHA = const_cast<T &>(A.diag(dia));
+         const T alpha = ALPHA;   // remember A(dia, dia)
+             ALPHA = T(1.0);
+             fMatrix<T> SUB = C.sub_matrix(dia, 0);
+             larf<T>(&A.diag(dia), tau, SUB, ptvvy.y);
+         ALPHA = alpha;           // restore A(dia, dia);
+       }
+}
+
+Value_P LA_pack::invert_DD_UTM(Crow M, Ccol N,
+                               fMatrix<DD> & UTM, fMatrix<DD> & AUG)
+   { return invert_UTM<DD>(M, N, UTM, AUG); }
+
+Value_P LA_pack::invert_ZZ_UTM(Crow M, Ccol N,
+                               fMatrix<ZZ> & UTM, fMatrix<ZZ> & AUG)
+   { return invert_UTM<ZZ>(M, N, UTM, AUG); }
+
+//----------------------------------------------------------------------------
+template<typename T>
+void LA_pack::invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG)
+{
+print_matrix("  QUTM before invert_QUTM()", QUTM);
+
+   // start with empty qaug. 
+   //
+   ALL_ROWS(N)
+   ALL_COLS(N)   QAUG.at(row, col) = T(0.0);
+
+   // divide every row of UTM by its diagonal element, so that the diagonal
+   // elements of UTM become 1.0. Also initialize the diagonal of AUG.
+   //
+   ALL_ROWS(N)
+       {
+         const T diag = QUTM.diag(row);
+         if (diag == 0.0)
+            {
+              MORE_ERROR() << "⌹[X]B: 0 on the main diagonal of R";
+              DOMAIN_ERROR;
+            }
+
+         // divide all items right of UTM[row;row] as well as the entire
+         // AUG[row;] by diag. Conceptually the entire diagonal of UTM is
+         // set to 1.0. However, we do not use the diagonal of UTM after
+         // this loop and therefore don't bother to set it to 1.0.
+         //
+         for (Ccol col = row + 1; col < N; ++col)   QUTM.AT(row, col) /= diag;
+
+         // divide diagonal items of UTM | AUG by diag_y
+         //
+         QAUG.diag(row) = 1.0 / diag;
+       }
+
+   /* at this point the diagonal of UTM is normalized to 1.0 and AUG is
+      zero except on its diagonal:
+
+       ┌────UTM────┐         ┌────AUG────┐
+       │ 1 u u u u │         │ a         │
+       │   1 u u u │         │   a    0  │ aⱼⱼ = 1.0 ÷ uⱼⱼ
+       │     1 u u │         │     a     │ uⱼⱼ = 1.0
+       │  0    1 u │         │  0    a   │
+       │         1 │         │         a │
+       └───────────┘         └───────────┘
+    */
+
+   // subtract a multiple of the diagonal element from the items above it
+   // so that the item becomes 0.0
+   //
+   REV_COLS(N)   // for every column k
+   ALL_ROWS(k)   // for every row above row k
+       {
+         /* subtract (factor1×k) from row. factor1 is the element of
+            row that is above the diagonal item of k. This makes
+            at(row, k) == 0.0 and updates the columns right of it
+            in both UTM and AUG:
+
+                   0 ←   ← k ← N-1 ──────────── outer loop (row k=N-1:0)
+                           ↓
+                   ┌────UTM────┐   0    ┌────UTM────┐
+                   │ 1 u u u 0 │   ↓    │ 1 u u u 0 │
+                   │   1 u ⍺ 0 │← row → │   1 u 0 0 │  ⍺ ← 0
+                   │     1 0 0 │   ↓    │     1 0 0 │
+                   │  0    1 0 │   k    │  0    1 0 │
+                   │         1 │   │    │         1 │
+                   └───────────┘   │    └───────────┘
+                           ↑       │            ↑
+                          col→     │           col→
+                                   │
+                                   └─────────── inner loop (row=0:k)
+
+            In this double loop, every item ⍺ above the diagonal is
+            visited and set to 0, updating UTM and AUG simultaneously.
+          */
+
+         const T alpha = QUTM.AT(row, k);
+         if (LA_pack::is_zero(alpha))   continue;   // already 0.0
+
+         for (Ccol col = row; col < N; ++col)
+             {
+               // make QUTM[k;col] zero by subtracting QUTM[y;x] × alpha
+               //
+               QUTM.at(row, col) -= QUTM.AT(k, col) * alpha;
+               QAUG.at(row, col) -= QAUG.AT(k, col) * alpha;
+             }
+       }
+   print_matrix("QAUG after invert_T_UTM()", QAUG);
+}
+//----------------------------------------------------------------------------
+/** LApack function UNG2R.
+
+   A is a matrix whose upper triangle matrix (including its diagonal) is
+   not used (the result of laqp2()). The lower triangle of A contains
+   elementary reflecors, and tau[] the diagonal (as returned by larfg()).
+
+   Only K=N is needed and therefore FORTRAN argument K skipped and set to N.
+   On exit, A is Q = H(1)∘H(2)∘...∘H(K).
+
+   In FORTRAN: real DORG2R and complex ZUNG2R
+
+   ung2r() is essentially unm2r() applied to the unit matrix
+ **/
+template<typename T>
+void LA_pack::ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy)
+{
+const Ccol N = A.get_column_count();
+const Crow M = A.get_row_count();
+
+// Assert(M >= N);
+
+   // Initialise columns k+1:n to columns of the unit matrix.
+   // JSA: We have K=N, therefore nothing to do here.
+
+   /* apply reflector loop along the diagonal of A. Something like:
+
+          0 ← ← ← k ← ← ← N
+          ↑  ╔════╪═A═════╗
+          ↑  ║ \  │       ║
+          ↑  ║  \ │       ║
+          ↑  ║   \│       ║
+          k  ╟────⍺┌──────╢   ⍺: Aₖₖ = A.diag(k) := 1.0
+          ↑  ║     │┌─────╢
+          ↑  ║     ││┌────╢
+          ↑  ║     │││┌───╢
+          ↑  ║     ││││ S ║
+          N ─╫─    ││││ U ║
+             ║     ││││ B ║
+          M  ╚═════╧╧╧╧═══╝
+    */
+   REV_COLS(N)   // i in FORTRAN comments is k in C++.
+      {
+        /* Apply reflector H(col) to A(col:m,col:n)
+           (aka. (-col, col)↑A) from the left
+
+                   0 ← ← ← k ← ← ← N
+                   ↑  ╔═A══╪═══════╗
+                   ↑  ║ \  │       ║
+                   ↑  ║  \ │       ║
+                   ↑  ║   \│       ║
+            ┬      k  ╟────⍺┌──────╢   ⍺: Akk = A.diag(k) := 1.0
+            │     S_X ║    ▒│      ║   Z: reflector H(k)
+            │      ↑  ║    ▒│      ║
+          len_X    ↑  ║    X│ SUB  ║
+            │      N  ║    ▒│      ║
+            │         ║    ▒│      ║
+            ┴      M  ╚═════╧══════╝
+         */
+
+        const Crow s_X   = k + 1;   // start of X = the row below diag(k)
+
+        // apply reflector H(k) to A...
+        //
+        A.diag(k) = T(1.0);          // set ⍺ to 1.0
+        fMatrix<T> SUB = A.sub_matrix(k, s_X);
+        larf<T>(&A.diag(k), conjugated(ptvvy.tau[k]), SUB, ptvvy.y);
+
+        /*
+           Update the entire column k of A as follows:
+
+           (a) items above the diagonal:   set to 0.0,
+           (b) items on the diagonal:      set to 1.0 - tau[k];
+           (c) items below the diagonal:   multiply by -tau[k]
+         */
+
+        ALL_ROWS(M)   // for the entire column k
+           {
+             T & Ar = A.at(row, k);
+             if      (row < k)   Ar = T(0.0);                // case (a)
+             else if (row > k)   Ar *=      -ptvvy.tau[k];   // case (c)
+             else                Ar = T(1.0)-ptvvy.tau[k];   // case (b)
+           }
+      }
+}
+//----------------------------------------------------------------------------
 sRank LA_pack::divide_DD_matrix(Value & Z, Crow M,
                                 Ccol cols_A, const Cell * cA,
                                 Ccol cols_B, const Cell * cB)
@@ -156,6 +457,20 @@ sRank LA_pack::divide_ZZ_matrix(Value & Z, Crow M,
                                 Ccol cols_B, const Cell * cB)
 {
    return divide_matrix<ZZ>(Z, M, cols_A, cA, cols_B, cB);
+}
+//----------------------------------------------------------------------------
+// instantiate factorize_matrix<DD>()
+void LA_pack::factorize_DD_matrix(Value & Z, Crow M, Ccol N,
+                                  const Cell * cB, APL_Float rcond)
+{
+   factorize_matrix<DD>(Z, M, N, cB, rcond);
+}
+//----------------------------------------------------------------------------
+// instantiate factorize_matrix<ZZ>()
+void LA_pack::factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
+                                  const Cell * cB, APL_Float rcond)
+{
+   factorize_matrix<ZZ>(Z, M, N, cB, rcond);
 }
 //----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B, where
@@ -240,100 +555,6 @@ T * work_B = work_A + items_A;
 
    std::allocator<T>{}.deallocate(work_AB, items_A + items_B);
    return cols_B;
-}
-//----------------------------------------------------------------------------
-// instantiate factorize_matrix<DD>()
-void LA_pack::factorize_DD_matrix(Value & Z, Crow M, Ccol N,
-                                  const Cell * cB, APL_Float rcond)
-{
-   factorize_matrix<DD>(Z, M, N, cB, rcond);
-}
-//----------------------------------------------------------------------------
-// instantiate factorize_matrix<ZZ>()
-void LA_pack::factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
-                                  const Cell * cB, APL_Float rcond)
-{
-   factorize_matrix<ZZ>(Z, M, N, cB, rcond);
-}
-//----------------------------------------------------------------------------
-/// the implementation of Z←⌹[2]B, where Z is (Q T T⁻¹) and B = T∘Q.
-//
-template<typename T>
-sRank LA_pack::factorize_matrix(Value & Z, Crow M, Ccol N,
-                               const Cell * cB, APL_Float rcond)
-{
-   // work sizes...
-   //
-const ShapeItem max_MN = max(M, N);
-const size_t items_B  = M * N;
-const size_t items_HR = M * N;
-const size_t items_R  = max_MN * max_MN;
-const size_t items_Ri = N * M;
-const size_t bytes_B  = items_B  * sizeof(T);   // size of work_B
-const size_t bytes_HR = items_HR * sizeof(T);   // size of work_HR
-const size_t bytes_R  = items_R  * sizeof(T);   // size of work_R
-const size_t bytes_Ri = items_Ri * sizeof(T);   // size of work_Ri
-
-   // work memories
-   //
-if (bytes_HR > SIZE_MAX - bytes_B
-    || bytes_R  > SIZE_MAX - (bytes_B + bytes_HR)
-    || bytes_Ri > SIZE_MAX - (bytes_B + bytes_HR + bytes_R))   WS_FULL;
-const size_t total_items_fac = items_B + items_HR + items_R + items_Ri;
-T * work_B = std::allocator<T>{}.allocate(total_items_fac);
-T * work_HR = work_B  + items_B;
-T * work_R  = work_HR + items_HR;
-T * work_Ri = work_R  + items_R;
-
-fMatrix<T>  B(work_B,  M, N, /* LDB */ M);
-fMatrix<T> HR(work_HR, M, N, /* LDB */ M);
-fMatrix<T>  R(work_R,  M, N, /* LDB */ M);
-fMatrix<T> Ri(work_Ri, N, M, /* LDB */ M);
-
-T * bb = &B.diag(0);
-T * hr = &HR.diag(0);
-
-   // initialize bb[] and hr[] in FORTRAN (.e. in column major) order,
-   // which is ⍉ APL (i.e. row major) order. I.e. use ⍉B to init bb and hr.
-   //
-const bool cplx = is_complex(*bb);
-
-   ALL_COLS(N)   // FORTRAN columns (left to right)
-   ALL_ROWS(M)   // FORTRAN rows (adjacent, top to bottom)
-      {
-        const ShapeItem APL_offset = col + N*row;
-        *bb++ = *hr++ = cB[APL_offset].get_real_value();
-        if (cplx)   *bb++ = *hr++ = cB[APL_offset].get_imag_value();
-      }
-
-   // at this point: work_B is the items of APL N in FORTRAN order,
-   // work_HR is a copy of B, subject to in-place modification by LApack,
-   // and C allocated but not initialized,
-   //
-PTVVy<T> ptvvy(M, false);   // M !!
-   LA_DEBUG && ptvvy.print_pivot(CERR, N, LOC);
-
-#if LA_DEBUG
-DebugMatrix HR_before("HR_before laqp2()", HR);
-   laqp2<T>(HR, ptvvy);
-   print_QR("HR after laqp2() at " LOC, HR_before, HR, ptvvy);
-#else
-   laqp2<T>(HR, ptvvy);
-#endif
-
-   // compute Q ←→ Z[1]. At this point R was not yet initiaized, so we can
-   // use it a work area.
-   //
-   R = HR;   // copy items of HR into R (no allocate)
-
-   grab_Q<T>(Z, R, ptvvy);
-
-   // extract the upper triangular matrix R of HR into Z[2] and
-   // store its inverse R⁻¹ into Z[3].  Return R⁻¹ in Ri (destroys R).
-   grab_R<T>(HR, Z, Ri);   // HR → R, R⁻¹
-
-   std::allocator<T>{}.deallocate(work_B, total_items_fac);
-   return N;
 }
 //----------------------------------------------------------------------------
 template<typename T>
@@ -430,15 +651,6 @@ Value_P Z3 = invert_UTM<T>(M, N, HR, AUG);
    Z.next_ravel_Pointer(Z3.get());
    Z.check_value(LOC);
 }
-
-Value_P LA_pack::invert_DD_UTM(Crow M, Ccol N,
-                               fMatrix<DD> & UTM, fMatrix<DD> & AUG)
-   { return invert_UTM<DD>(M, N, UTM, AUG); }
-
-Value_P LA_pack::invert_ZZ_UTM(Crow M, Ccol N,
-                               fMatrix<ZZ> & UTM, fMatrix<ZZ> & AUG)
-   { return invert_UTM<ZZ>(M, N, UTM, AUG); }
-
 //----------------------------------------------------------------------------
 /** invert an upper-triangular matrix. Input is an upper triangular M×N matrix
     utm (whose items below the diagonal are ignored but pretended to be 0).
@@ -493,305 +705,87 @@ const bool cplx = is_complex(UTM.diag(0));
    return Z3;
 }
 //----------------------------------------------------------------------------
+/// the implementation of Z←⌹[2]B, where Z is (Q T T⁻¹) and B = T∘Q.
+//
 template<typename T>
-void LA_pack::invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG)
+sRank LA_pack::factorize_matrix(Value & Z, Crow M, Ccol N,
+                               const Cell * cB, APL_Float rcond)
 {
-print_matrix("  QUTM before invert_QUTM()", QUTM);
-
-   // start with empty qaug. 
+   // work sizes...
    //
-   ALL_ROWS(N)
-   ALL_COLS(N)   QAUG.at(row, col) = T(0.0);
+const ShapeItem max_MN = max(M, N);
+const size_t items_B  = M * N;
+const size_t items_HR = M * N;
+const size_t items_R  = max_MN * max_MN;
+const size_t items_Ri = N * M;
+const size_t bytes_B  = items_B  * sizeof(T);   // size of work_B
+const size_t bytes_HR = items_HR * sizeof(T);   // size of work_HR
+const size_t bytes_R  = items_R  * sizeof(T);   // size of work_R
+const size_t bytes_Ri = items_Ri * sizeof(T);   // size of work_Ri
 
-   // divide every row of UTM by its diagonal element, so that the diagonal
-   // elements of UTM become 1.0. Also initialize the diagonal of AUG.
+   // work memories
    //
-   ALL_ROWS(N)
-       {
-         const T diag = QUTM.diag(row);
-         if (diag == 0.0)
-            {
-              MORE_ERROR() << "⌹[X]B: 0 on the main diagonal of R";
-              DOMAIN_ERROR;
-            }
+if (bytes_HR > SIZE_MAX - bytes_B
+    || bytes_R  > SIZE_MAX - (bytes_B + bytes_HR)
+    || bytes_Ri > SIZE_MAX - (bytes_B + bytes_HR + bytes_R))   WS_FULL;
+const size_t total_items_fac = items_B + items_HR + items_R + items_Ri;
+T * work_B = std::allocator<T>{}.allocate(total_items_fac);
+T * work_HR = work_B  + items_B;
+T * work_R  = work_HR + items_HR;
+T * work_Ri = work_R  + items_R;
 
-         // divide all items right of UTM[row;row] as well as the entire
-         // AUG[row;] by diag. Conceptually the entire diagonal of UTM is
-         // set to 1.0. However, we do not use the diagonal of UTM after
-         // this loop and therefore don't bother to set it to 1.0.
-         //
-         for (Ccol col = row + 1; col < N; ++col)   QUTM.AT(row, col) /= diag;
+fMatrix<T>  B(work_B,  M, N, /* LDB */ M);
+fMatrix<T> HR(work_HR, M, N, /* LDB */ M);
+fMatrix<T>  R(work_R,  M, N, /* LDB */ M);
+fMatrix<T> Ri(work_Ri, N, M, /* LDB */ M);
 
-         // divide diagonal items of UTM | AUG by diag_y
-         //
-         QAUG.diag(row) = 1.0 / diag;
-       }
+T * bb = &B.diag(0);
+T * hr = &HR.diag(0);
 
-   /* at this point the diagonal of UTM is normalized to 1.0 and AUG is
-      zero except on its diagonal:
-
-       ┌────UTM────┐         ┌────AUG────┐
-       │ 1 u u u u │         │ a         │
-       │   1 u u u │         │   a    0  │ aⱼⱼ = 1.0 ÷ uⱼⱼ
-       │     1 u u │         │     a     │ uⱼⱼ = 1.0
-       │  0    1 u │         │  0    a   │
-       │         1 │         │         a │
-       └───────────┘         └───────────┘
-    */
-
-   // subtract a multiple of the diagonal element from the items above it
-   // so that the item becomes 0.0
+   // initialize bb[] and hr[] in FORTRAN (.e. in column major) order,
+   // which is ⍉ APL (i.e. row major) order. I.e. use ⍉B to init bb and hr.
    //
-   REV_COLS(N)   // for every column k
-   ALL_ROWS(k)   // for every row above row k
-       {
-         /* subtract (factor1×k) from row. factor1 is the element of
-            row that is above the diagonal item of k. This makes
-            at(row, k) == 0.0 and updates the columns right of it
-            in both UTM and AUG:
-
-                   0 ←   ← k ← N-1 ──────────── outer loop (row k=N-1:0)
-                           ↓
-                   ┌────UTM────┐   0    ┌────UTM────┐
-                   │ 1 u u u 0 │   ↓    │ 1 u u u 0 │
-                   │   1 u ⍺ 0 │← row → │   1 u 0 0 │  ⍺ ← 0
-                   │     1 0 0 │   ↓    │     1 0 0 │
-                   │  0    1 0 │   k    │  0    1 0 │
-                   │         1 │   │    │         1 │
-                   └───────────┘   │    └───────────┘
-                           ↑       │            ↑
-                          col→     │           col→
-                                   │
-                                   └─────────── inner loop (row=0:k)
-
-            In this double loop, every item ⍺ above the diagonal is
-            visited and set to 0, updating UTM and AUG simultaneously.
-          */
-
-         const T alpha = QUTM.AT(row, k);
-         if (LA_pack::is_zero(alpha))   continue;   // already 0.0
-
-         for (Ccol col = row; col < N; ++col)
-             {
-               // make QUTM[k;col] zero by subtracting QUTM[y;x] × alpha
-               //
-               QUTM.at(row, col) -= QUTM.AT(k, col) * alpha;
-               QAUG.at(row, col) -= QAUG.AT(k, col) * alpha;
-             }
-       }
-   print_matrix("QAUG after invert_T_UTM()", QAUG);
-}
-//----------------------------------------------------------------------------
-/*  LApack function laqp2. Compute a QR factorization with or without
- *    column pivoting of matrix A:
-
-    A ∘ P = Q ∘ R
-    A     = Q ∘ R
-
-    P is the permutation of columns produced by the pivoting.
- */
-template<typename T>
-void LA_pack::laqp2(fMatrix<T> & A, PTVVy<T> & ptvvy)
-{
-   print_matrix("laqp2() input", A);
-
-const Crow M = A.get_row_count();
-const Ccol N = A.get_column_count();
-
-   // Initialize the pivot and the partial column norms. Moved from geqp3()
-   // which no longer exists.
-   //
-   if (ptvvy.pivot)   // A⌹B or ⌹B
+   ALL_COLS(N)   // FORTRAN columns (left to right)
+   ALL_ROWS(M)   // FORTRAN rows (adjacent, top to bottom)
       {
-        Assert(M >= N);
-        ALL_COLS(N)
-           {
-             ptvvy.pivot[col] = col;
-             ptvvy.vn1[col] = ptvvy.vn2[col] = sqrt(norm_2(&A.at(0, col), M));
-           }
+        const ShapeItem APL_offset = col + N*row;
+        set_real(*bb,   cB[APL_offset].get_real_value());
+        set_imag(*bb,   cB[APL_offset].get_imag_value());
+        *hr++ = *bb++;
       }
 
-const Cdia D = min(M, N);
-   ALL_DIAS(D)
-      {
-        if (ptvvy.pivot)
-           {
-             // pvt_0 is the column at or right of col that has the largest vn1.
-             // If col already has the largest norm: OK, otherwise exchange
-             // columns col and pvt_0 of a and their column norms
-             //
-             const int pvt_0 = dia + max_pos(ptvvy.vn1 + dia, N - dia);
-             if (pvt_0 != dia)   // unless dia already is the pivot column
-                {
-                  A.exchange_columns(pvt_0, dia);
-                  exchange(ptvvy.pivot[pvt_0], ptvvy.pivot[dia]);
-                  ptvvy.vn1[pvt_0] = ptvvy.vn1[dia];
-                  ptvvy.vn2[pvt_0] = ptvvy.vn2[dia];
-                }
-           }
+   // at this point: work_B is the items of APL N in FORTRAN order,
+   // work_HR is a copy of B, subject to in-place modification by LApack,
+   // and C allocated but not initialized,
+   //
+PTVVy<T> ptvvy(max(M, N), false);
+   LA_DEBUG && ptvvy.print_pivot(CERR, N, LOC);
 
-       /* Generate the elementary reflector H(dia) that annihilates the
-           column vector X= A(s_X:M, dia), where s_X = dia+1.
+#if LA_DEBUG
+DebugMatrix HR_before("HR_before laqp2()", HR);
+   laqp2<T>(HR, ptvvy);
+   print_QR("HR after laqp2() at " LOC, HR_before, HR, ptvvy);
+#else
+   laqp2<T>(HR, ptvvy);
+#endif
 
-               0 → → → dia → → N
-               ↓    ╔═══│═A════╗
-               ↓    ║ \ │      ║
-               ↓    ║  \│      ║
-              dia ──╫───⍺      ║   ⍺: ALPHA aka. X[-1] of reflector X
-           ┬  s_X ──╫   ▒\     ║      len_X is the reflector length
-           │   ↓    ║   ▒ \    ║      (=number fo items below ALPHA)
-           │   ↓    ║   ▒  \   ║ 
-         len   ↓    ║   X   \  ║ 
-           │   ↓    ║   ▒    \ ║
-           │   N  ──╫───▒──────╫── N
-           │        ║   ▒      ║ 
-           ┴   M    ╚═══╪══════╝
-                       dia     
-         */
-        T & tau = ptvvy.tau[dia];
-        const Crow s_X   = dia + 1;   // start of X = row below diag(dia)
-        const Crow len_X = M - s_X;   // length of reflector X
-        tau = len_X ? larfg<T>(&A.at(s_X, dia), len_X) : 0.0;
+   // zero-fill tau entries for virtual reflectors when M < N
+   //
+   for (Cdia k = M; k < N; ++k)   ptvvy.tau[k] = T(0.0);
 
-        /* Apply H(dia)° × H to A(offset+i:m, i+1:n) from the left.
+   // compute Q ←→ Z[1]. At this point R was not yet initiaized, so we can
+   // use it a work area.
+   //
+   R = HR;   // copy items of HR into R (no allocate)
 
-           0→ → → dia → → N
-           ↓  ╔════╪═A═════╗
-           ↓  ║ \  │       ║
-           ↓  ║  \ │       ║
-           ↓  ║   \│       ║ 
-          dia ║    ⍺┌──────╢   ⍺: Acc = A.diag(dia) := 1.0
-        ┬ s_X ║     │      ║ 
-        │  ↓  ║     │ SUB  ║ 
-    len_X  ↓  ║     │      ║ 
-        │  N  ║     │      ║ 
-        ╩  M  ╚═════╪══════╝
-                  dia+1 == s_X
-         */
-        if (s_X < D)
-           {
-             T & ALPHA = A.diag(dia);
-             const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
-                ALPHA = T(1.0);
-                fMatrix<T> SUB = A.sub_matrix(dia, s_X);
-                larf<T>(&A.diag(dia),conjugated(tau), SUB, ptvvy.y);
-             ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
-           }
+   grab_Q<T>(Z, R, ptvvy);
 
-        if (!ptvvy.pivot)   continue;
+   // extract the upper triangular matrix R of HR into Z[2] and
+   // store its inverse R⁻¹ into Z[3].  Return R⁻¹ in Ri (destroys R).
+   grab_R<T>(HR, Z, Ri);   // HR → R, R⁻¹
 
-        // Update the partial column norms vn1 and vn2.
-        //
-        for (Ccol c = dia + 1; c < N; ++c)
-            {
-              if (ptvvy.vn1[c] == 0.0)   continue;
-
-              const APL_Float abs_A = abs(A.at(dia, c)) / ptvvy.vn1[c];
-              const APL_Float temp = max(1.0 - square(abs_A), 0.0);
-              const APL_Float quot = ptvvy.vn1[c] / ptvvy.vn2[c];
-              if (temp * quot * quot <= tol3z)   // temp and/or quot too small
-                 {
-                   ptvvy.vn1[c] = 0.0;   // fallback if  s_X is an invalid row
-                   if (s_X < M)          // s_X is a valid row
-                      {
-                        // vn1[c] = length of the column vector in A that
-                        // starts at row s_X and columns c.
-                        //
-                        ptvvy.vn1[c] = sqrt(norm_2(&A.at(s_X, c), M - s_X));
-                      }
-                   ptvvy.vn2[c] = ptvvy.vn1[c];
-                 }
-              else                                 // "normal" quot
-                 {
-                   ptvvy.vn1[c] *= sqrt(temp);
-                 }
-            }
-      }
-}
-//----------------------------------------------------------------------------
-/** LApack function UNG2R.
-
-   A is a matrix whose upper triangle matrix (including its diagonal) is
-   not used (the result of laqp2()). The lower triangle of A contains
-   elementary reflecors, and tau[] the diagonal (as returned by larfg()).
-
-   Only K=N is needed and therefore FORTRAN argument K skipped and set to N.
-   On exit, A is Q = H(1)∘H(2)∘...∘H(K).
-
-   In FORTRAN: real DORG2R and complex ZUNG2R
-
-   ung2r() is essentially unm2r() applied to the unit matrix
- **/
-template<typename T>
-void LA_pack::ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy)
-{
-const Ccol N = A.get_column_count();
-const Crow M = A.get_row_count();
-
-// Assert(M >= N);
-
-   // Initialise columns k+1:n to columns of the unit matrix.
-   // JSA: We have K=N, therefore nothing to do here.
-
-   /* apply reflector loop along the diagonal of A. Something like:
-
-          0 ← ← ← k ← ← ← N
-          ↑  ╔════╪═A═════╗
-          ↑  ║ \  │       ║
-          ↑  ║  \ │       ║
-          ↑  ║   \│       ║
-          k  ╟────⍺┌──────╢   ⍺: Aₖₖ = A.diag(k) := 1.0
-          ↑  ║     │┌─────╢
-          ↑  ║     ││┌────╢
-          ↑  ║     │││┌───╢
-          ↑  ║     ││││ S ║
-          N ─╫─    ││││ U ║
-             ║     ││││ B ║
-          M  ╚═════╧╧╧╧═══╝
-    */
-   REV_COLS(N)   // i in FORTRAN comments is k in C++.
-      {
-        /* Apply reflector H(col) to A(col:m,col:n)
-           (aka. (-col, col)↑A) from the left
-
-                   0 ← ← ← k ← ← ← N
-                   ↑  ╔═A══╪═══════╗
-                   ↑  ║ \  │       ║
-                   ↑  ║  \ │       ║
-                   ↑  ║   \│       ║
-            ┬      k  ╟────⍺┌──────╢   ⍺: Akk = A.diag(k) := 1.0
-            │     S_X ║    ▒│      ║   Z: reflector H(k)
-            │      ↑  ║    ▒│      ║
-          len_X    ↑  ║    X│ SUB  ║
-            │      N  ║    ▒│      ║
-            │         ║    ▒│      ║
-            ┴      M  ╚═════╧══════╝
-         */
-
-        const Crow s_X   = k + 1;   // start of X = the row below diag(k)
-
-        // apply reflector H(k) to A...
-        //
-        A.diag(k) = T(1.0);          // set ⍺ to 1.0
-        fMatrix<T> SUB = A.sub_matrix(k, s_X);
-        larf<T>(&A.diag(k), conjugated(ptvvy.tau[k]), SUB, ptvvy.y);
-
-        /*
-           Update the entire column k of A as follows:
-
-           (a) items above the diagonal:   set to 0.0,
-           (b) items on the diagonal:      set to 1.0 - tau[k];
-           (c) items below the diagonal:   multiply by -tau[k]
-         */
-
-        ALL_ROWS(M)   // for the entire column k
-           {
-             T & Ar = A.at(row, k);
-             if      (row < k)   Ar = T(0.0);                // case (a)
-             else if (row > k)   Ar *=      -ptvvy.tau[k];   // case (c)
-             else                Ar = T(1.0)-ptvvy.tau[k];   // case (b)
-           }
-      }
+   std::allocator<T>{}.deallocate(work_B, total_items_fac);
+   return N;
 }
 //----------------------------------------------------------------------------
 /**
@@ -902,18 +896,18 @@ APL_Float un_scale_A = 1.0;
         fMatrix<T> A1 = A.take(N, A.get_column_count());
         if (un_scale_B != 1.0)
            {
-             scale(&A1.diag(0), 1.0/un_scale_B, N*A.get_column_count());
+             scale(&A1.diag(0), N*A.get_column_count(), un_scale_B);
            }
-         
+
         if (un_scale_A != 1.0)
            {
-             scale(&A1.diag(0), un_scale_A, N * A.get_column_count());
+             scale(&A1.diag(0), N * A.get_column_count(), 1.0/un_scale_A);
            }
- 
+
         if (un_scale_B != 1.0)
            {
              fMatrix<T> B1 = B.take(N, N);
-             scale(&B1.diag(0), un_scale_B, N*N);
+             scale(&B1.diag(0), N*N, 1.0/un_scale_B);
            }
       }
  
@@ -1101,8 +1095,8 @@ T * work_max = ptvvy.work_max;
          ALL_ROWS(dia)   // all rows above the diagonal
             {
               const T Ard = A.at(row, dia);   // row 'row' above the diagonal
-              alpha_min += conjugated(work_min[row] * Ard);
-              alpha_max += conjugated(work_max[row] * Ard);
+              alpha_min += conjugated(work_min[row]) * Ard;
+              alpha_max += conjugated(work_max[row]) * Ard;
             }
 
          const T gamma(A.diag(dia));
@@ -1127,58 +1121,131 @@ T * work_max = ptvvy.work_max;
    return N;   // OK
 }
 //----------------------------------------------------------------------------
-/* LApack function UNM2R. Overwrite the general complex m-by-n matrix C:
+/*  LApack function laqp2. Compute a QR factorization with or without
+ *    column pivoting of matrix A:
 
-   C ← Q ∘ C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
-   C ← Q° ∘ H ∘ C    if SIDE = 'L' and TRANS = 'C', or   (case 2)   <---
-   C ← C ∘ Q         if SIDE = 'R' and TRANS = 'N', or   (case 3)
-   C ← C ∘ Q° ∘ ×    if SIDE = 'R' and TRANS = 'C',      (case 4)
+    A ∘ P = Q ∘ R
+    A     = Q ∘ R
 
-   where Q is a unitary matrix defined as the product of k
-   elementary reflectors:
-
-   Q = H(1) ∘ H(2) ∘...∘ H(k)
-
-   The reflectors are in the lower triangle of A, the diagonal in tau
-
-   NOTE: in LApack, the real version is DORM2R, while
-                    the complex version is ZUNM2R.
-
-         We use the name unm2r<T> for both.
+    P is the permutation of columns produced by the pivoting.
  */
 template<typename T>
-void LA_pack::unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
-                    fMatrix<T> & C)
+void LA_pack::laqp2(fMatrix<T> & A, PTVVy<T> & ptvvy)
 {
-   // only case 2 (SIDE == "L" and TRANS = 'C') is needed and implemented.
-   // thus NOTRAN is false (and then tau[row] (Q°) is conjugated).
+   print_matrix("laqp2() input", A);
+
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
+
+   // Initialize the pivot and the partial column norms. Moved from geqp3()
+   // which no longer exists.
    //
-   ALL_DIAS(K)
-       {
-         /* for row=dia of A; apply H(dia) to SUB = C(dia:m, 1:n)
+   if (ptvvy.pivot)   // A⌹B or ⌹B
+      {
+        Assert(M >= N);
+        ALL_COLS(N)
+           {
+             ptvvy.pivot[col] = col;
+             ptvvy.vn1[col] = ptvvy.vn2[col] = sqrt(norm_2(&A.at(0, col), M));
+           }
+      }
 
-          ┬        ╔════════════════╗   0   ╔═════════╗
-          │        ║ \              ║   ↓   ║         ║
-          │        ║  \    A        ║   ↓   ║    C    ║
-          │        ║   \            ║   ↓   ║         ║ 
-          M   ┬    ╟────⍺  v ... v ─╫─ dia ─╫─────────╢  ⍺ := 1.0 before
-          │   │    ║                ║   ↓   ║         ║  restored after
-          │ M-dia  ║       C        ║   K   ║   SUB   ║ 
-          │   │    ║                ║       ║         ║ 
-          ┴   ┴    ╚════════════════╝       ╚═════════╝
-          */
-         const T tau = conjugated(ptvvy.tau[dia]);   // must copy tau[dia] !
+const Cdia D = min(M, N);
+   ALL_DIAS(D)
+      {
+        if (ptvvy.pivot)
+           {
+             // pvt_0 is the column at or right of col that has the largest vn1.
+             // If col already has the largest norm: OK, otherwise exchange
+             // columns col and pvt_0 of a and their column norms
+             //
+             const int pvt_0 = dia + max_pos(ptvvy.vn1 + dia, N - dia);
+             if (pvt_0 != dia)   // unless dia already is the pivot column
+                {
+                  A.exchange_columns(pvt_0, dia);
+                  exchange(ptvvy.pivot[pvt_0], ptvvy.pivot[dia]);
+                  ptvvy.vn1[pvt_0] = ptvvy.vn1[dia];
+                  ptvvy.vn2[pvt_0] = ptvvy.vn2[dia];
+                }
+           }
 
-         // strictly speaking is A not const. However, we modify it
-         // but then restore again. Therefore the const_cast<T &> is OK.
-         //
-         T & ALPHA = const_cast<T &>(A.diag(dia));
-         const T alpha = ALPHA;   // remember A(dia, dia)
-             ALPHA = T(1.0);
-             fMatrix<T> SUB = C.sub_matrix(dia, 0);
-             larf<T>(&A.diag(dia), tau, SUB, ptvvy.y);
-         ALPHA = alpha;           // restore A(dia, dia);
-       }
+       /* Generate the elementary reflector H(dia) that annihilates the
+           column vector X= A(s_X:M, dia), where s_X = dia+1.
+
+               0 → → → dia → → N
+               ↓    ╔═══│═A════╗
+               ↓    ║ \ │      ║
+               ↓    ║  \│      ║
+              dia ──╫───⍺      ║   ⍺: ALPHA aka. X[-1] of reflector X
+           ┬  s_X ──╫   ▒\     ║      len_X is the reflector length
+           │   ↓    ║   ▒ \    ║      (=number fo items below ALPHA)
+           │   ↓    ║   ▒  \   ║ 
+         len   ↓    ║   X   \  ║ 
+           │   ↓    ║   ▒    \ ║
+           │   N  ──╫───▒──────╫── N
+           │        ║   ▒      ║ 
+           ┴   M    ╚═══╪══════╝
+                       dia     
+         */
+        T & tau = ptvvy.tau[dia];
+        const Crow s_X   = dia + 1;   // start of X = row below diag(dia)
+        const Crow len_X = M - s_X;   // length of reflector X
+        tau = len_X ? larfg<T>(&A.at(s_X, dia), len_X) : 0.0;
+
+        /* Apply H(dia)° × H to A(offset+i:m, i+1:n) from the left.
+
+           0→ → → dia → → N
+           ↓  ╔════╪═A═════╗
+           ↓  ║ \  │       ║
+           ↓  ║  \ │       ║
+           ↓  ║   \│       ║ 
+          dia ║    ⍺┌──────╢   ⍺: Acc = A.diag(dia) := 1.0
+        ┬ s_X ║     │      ║ 
+        │  ↓  ║     │ SUB  ║ 
+    len_X  ↓  ║     │      ║ 
+        │  N  ║     │      ║ 
+        ╩  M  ╚═════╪══════╝
+                  dia+1 == s_X
+         */
+        if (s_X < D)
+           {
+             T & ALPHA = A.diag(dia);
+             const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
+                ALPHA = T(1.0);
+                fMatrix<T> SUB = A.sub_matrix(dia, s_X);
+                larf<T>(&A.diag(dia),conjugated(tau), SUB, ptvvy.y);
+             ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
+           }
+
+        if (!ptvvy.pivot)   continue;
+
+        // Update the partial column norms vn1 and vn2.
+        //
+        for (Ccol c = dia + 1; c < N; ++c)
+            {
+              if (ptvvy.vn1[c] == 0.0)   continue;
+
+              const APL_Float abs_A = abs(A.at(dia, c)) / ptvvy.vn1[c];
+              const APL_Float temp = max(1.0 - square(abs_A), 0.0);
+              const APL_Float quot = ptvvy.vn1[c] / ptvvy.vn2[c];
+              if (temp * quot * quot <= tol3z)   // temp and/or quot too small
+                 {
+                   ptvvy.vn1[c] = 0.0;   // fallback if  s_X is an invalid row
+                   if (s_X < M)          // s_X is a valid row
+                      {
+                        // vn1[c] = length of the column vector in A that
+                        // starts at row s_X and columns c.
+                        //
+                        ptvvy.vn1[c] = sqrt(norm_2(&A.at(s_X, c), M - s_X));
+                      }
+                   ptvvy.vn2[c] = ptvvy.vn1[c];
+                 }
+              else                                 // "normal" quot
+                 {
+                   ptvvy.vn1[c] *= sqrt(temp);
+                 }
+            }
+      }
 }
 //----------------------------------------------------------------------------
 /** LApack function laic1 (estimate largest singular value).
@@ -1769,67 +1836,3 @@ const Ccol lastC = ila_lc<T>(len_v, C);
    gemv<T>(C, len_v, lastC,       v, y);   // set y[]
    gerc<T>(C, len_v, lastC, -tau, v, y);   // use y[]
 }
-//----------------------------------------------------------------------------
-template<typename T>
-LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
-   : N(N)
-{
-   tau      = std::allocator<T>{}.allocate(N);
-   y        = std::allocator<T>{}.allocate(N);
-   work_min = std::allocator<T>{}.allocate(N);
-   work_max = std::allocator<T>{}.allocate(N);
-
-   if (with_pivot)   // ⌹B or A⌹B but not ⌹[X]B
-      {
-        pivot = std::allocator<Ccol>{}.allocate(N);
-        vn1   = std::allocator<APL_Float>{}.allocate(N);
-        vn2   = std::allocator<APL_Float>{}.allocate(N);
-
-        // init the pivot
-        loop(n, N)   pivot[n] = n;
-      }
-   else              // only ⌹[X]B
-      {
-        pivot = 0;   // as to figure with_pivot later on
-        vn1   = 0;
-        vn2   = 0;
-      }
-}
-//----------------------------------------------------------------------------
-template<typename T>
-LA_pack::PTVVy<T>::~PTVVy()
-{
-   std::allocator<T>{}.deallocate(tau,      N);
-   std::allocator<T>{}.deallocate(y,        N);
-   std::allocator<T>{}.deallocate(work_min, N);
-   std::allocator<T>{}.deallocate(work_max, N);
-   if (pivot)
-      {
-        std::allocator<Ccol>{}.deallocate(pivot, N);
-        std::allocator<APL_Float>{}.deallocate(vn1, N);
-        std::allocator<APL_Float>{}.deallocate(vn2, N);
-      }
-}
-//----------------------------------------------------------------------------
-template<typename T>
-int LA_pack::PTVVy<T>::print_pivot(ostream & out,
-                                    Ccol N, const char * loc) const
-{
-   if (!pivot)   return 0;
-
-   out << "PIVOT:";
-   loop(n, N)   out << " " << pivot[n];
-   out << "   at " << loc << endl;
-   return N;
-}
-//----------------------------------------------------------------------------
-template<typename T>
-int LA_pack::PTVVy<T>::print_tau(ostream & out, Ccol N,
-                                  const char * loc) const
-{
-   out << "TAU:";
-   loop(n, N)   { out << " ";   print_item(tau[n]); }
-   out << endl;
-   return N;
-}
-//============================================================================

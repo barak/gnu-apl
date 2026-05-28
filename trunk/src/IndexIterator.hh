@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,11 +47,18 @@ public:
 
     virtual ~IndexIterator() {}
 
-   /// go the the next index
-   void operator ++();
+   /// get the number of indices.
+   ShapeItem get_index_count() const   { return count; }
+
+   /// return the next higher IndexIterator
+   IndexIterator * get_upper() const   { return upper; };
 
    /// return true if more indices are coming
    bool has_more() const   { return count && pos < count; }
+
+   /// set the next higher IndexIterator
+   /// @param up the IndexIterator one dimension higher
+   void set_upper(IndexIterator * up)   { Assert(upper == 0);   upper = up; };
 
    /// return the current index
    virtual ShapeItem get_ivalue() const = 0;
@@ -64,15 +71,8 @@ public:
    /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
-   /// return the next higher IndexIterator
-   IndexIterator * get_upper() const   { return upper; };
-
-   /// set the next higher IndexIterator
-   /// @param up the IndexIterator one dimension higher
-   void set_upper(IndexIterator * up)   { Assert(upper == 0);   upper = up; };
-
-   /// get the number of indices.
-   ShapeItem get_index_count() const   { return count; }
+   /// go the the next index
+   void operator ++();
 
 protected:
    /// the weight of this IndexIterator
@@ -154,12 +154,12 @@ public:
    /// destructor
    ~MultiIndexIterator();
 
-   /// get the current index (offset into a ravel) and increment iterators
-   ShapeItem operator ++(int);
-
    /// return true if more indices are coming
    bool has_more() const
       { return highest_it && highest_it->has_more(); }
+
+   /// get the current index (offset into a ravel) and increment iterators
+   ShapeItem operator ++(int);
 
 protected:
    /// the iterator for the highest dimension

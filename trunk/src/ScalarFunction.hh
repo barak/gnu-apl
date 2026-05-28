@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,23 +56,6 @@ protected:
      set_monadic_threshold(thresh_B);
    }
 
-   /// overloaded Function::is_scalar_function
-   virtual bool is_scalar_function() const   { return true; }
-
-   /// Evaluate a scalar function monadically.
-   /// @param B right argument APL value
-   /// @param fun cell-level monadic function to apply
-   Token eval_scalar_B(Value_P B, prim_f1 fun) const;
-
-   /// Evaluate a scalar function dyadically.
-   /// @param A left argument APL value
-   /// @param B right argument APL value
-   /// @param fun cell-level dyadic function to apply
-   Token eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const;
-
-   /// overloaded Function::get_scalar_f2
-   virtual prim_f2 get_scalar_f2() const = 0;
-
    /// overloaded Function::eval_fill_AB()
    /// @param A left argument APL value
    /// @param B right argument APL value
@@ -87,14 +70,20 @@ protected:
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
 
+   /// overloaded Function::is_scalar_function
+   virtual bool is_scalar_function() const   { return true; }
+
    /// return true if this function can be parallelized
    virtual bool may_parallel() const   { return true; }
 
-   /// compute the monadic scalar function \b fun along one ravel
-   /// @param ec receives error code on failure
+   /// A helper function for eval_fill_AB().
+   /// @param A left argument APL value
    /// @param B right argument APL value
-   /// @param fun cell-level monadic function to apply
-   Value_P do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const;
+   Token do_eval_fill_AB(const Value_P A, const Value_P B) const;
+
+   /// A helper function for eval_fill_B().
+   /// @param B right argument APL value
+   Token do_eval_fill_B(const Value_P B) const;
 
    /// compute the dyadic scalar function \b fun along one ravel
    /// @param ec receives error code on failure
@@ -104,13 +93,17 @@ protected:
    Value_P do_scalar_AB(ErrorCode & ec, Value_P A,
                                         Value_P B, prim_f2 fun) const;
 
-   /// compute cell_A fun cell_B, scalar-extending PointerCells
-   /// @param Z result value to write into
-   /// @param cell_A left ravel cell (scalar-extended if PointerCell)
-   /// @param cell_B right ravel cell (scalar-extended if PointerCell)
+   /// compute the monadic scalar function \b fun along one ravel
+   /// @param ec receives error code on failure
+   /// @param B right argument APL value
+   /// @param fun cell-level monadic function to apply
+   Value_P do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const;
+
+   /// Evaluate a scalar function dyadically.
+   /// @param A left argument APL value
+   /// @param B right argument APL value
    /// @param fun cell-level dyadic function to apply
-   void expand_nested(Value * Z, const Cell * cell_A,
-                      const Cell * cell_B, prim_f2 fun) const;
+   Token eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const;
 
    /// Evaluate a scalar function dyadically with axis.
    /// @param A left argument APL value
@@ -128,39 +121,21 @@ protected:
    Value_P eval_scalar_AXB(Value_P A, AxesBitmap axes_in_X,
                            Value_P B, prim_f2 fun, bool reversed) const;
 
-   /// A helper function for eval_fill_AB().
-   /// @param A left argument APL value
+   /// Evaluate a scalar function monadically.
    /// @param B right argument APL value
-   Token do_eval_fill_AB(const Value_P A, const Value_P B) const;
+   /// @param fun cell-level monadic function to apply
+   Token eval_scalar_B(Value_P B, prim_f1 fun) const;
 
-   /// A helper function for eval_fill_B().
-   /// @param B right argument APL value
-   Token do_eval_fill_B(const Value_P B) const;
+   /// compute cell_A fun cell_B, scalar-extending PointerCells
+   /// @param Z result value to write into
+   /// @param cell_A left ravel cell (scalar-extended if PointerCell)
+   /// @param cell_B right ravel cell (scalar-extended if PointerCell)
+   /// @param fun cell-level dyadic function to apply
+   void expand_nested(Value * Z, const Cell * cell_A,
+                      const Cell * cell_B, prim_f2 fun) const;
 
-   /// Evaluate \b the identity function.
-   /// @param B right argument APL value
-   /// @param axis axis along which the identity is applied
-   /// @param FI0 fill identity cell value
-   static Token eval_scalar_identity_fun(Value_P B, sAxis axis,
-                                         const Cell & FI0);
-
-   /// parallel eval_scalar_AB
-   static Thread_context::PoolFunction PF_scalar_AB;
-
-   /// parallel eval_scalar_B
-   static Thread_context::PoolFunction PF_scalar_B;
-
-   /// 0 (for eval_scalar_identity_fun)
-   static const IntCell integer_0;
-
-   /// 1 (for eval_scalar_identity_fun)
-   static const IntCell integer_1;
-
-   /// -BIG_FLOAT (for eval_scalar_identity_fun)
-   static const FloatCell float_min;
-
-   /// BIG_FLOAT (for eval_scalar_identity_fun)
-   static const FloatCell float_max;
+   /// overloaded Function::get_scalar_f2
+   virtual prim_f2 get_scalar_f2() const = 0;
 
    /// return the conforming shape of sh_A and sh_A, or set ec and return 0
    /// if shapes cannot be conformed.
@@ -170,6 +145,31 @@ protected:
    /// @param sh_B shape of the right argument
    static const Shape * conforming_shape(ErrorCode & ec, const Shape & sh_A,
                                                          const Shape & sh_B);
+
+   /// Evaluate \b the identity function.
+   /// @param B right argument APL value
+   /// @param axis axis along which the identity is applied
+   /// @param FI0 fill identity cell value
+   static Token eval_scalar_identity_fun(Value_P B, sAxis axis,
+                                         const Cell & FI0);
+
+   /// BIG_FLOAT (for eval_scalar_identity_fun)
+   static const FloatCell float_max;
+
+   /// -BIG_FLOAT (for eval_scalar_identity_fun)
+   static const FloatCell float_min;
+
+   /// 0 (for eval_scalar_identity_fun)
+   static const IntCell integer_0;
+
+   /// 1 (for eval_scalar_identity_fun)
+   static const IntCell integer_1;
+
+   /// parallel eval_scalar_AB
+   static Thread_context::PoolFunction PF_scalar_AB;
+
+   /// parallel eval_scalar_B
+   static Thread_context::PoolFunction PF_scalar_B;
 };
 
 #define PERF_A(x)   TOK_F2_ ## x,                           \

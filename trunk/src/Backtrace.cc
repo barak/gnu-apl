@@ -44,7 +44,7 @@
 #endif
 
 #if defined(HAVE_LIBDWARF) && defined(HAVE_LIBDWARF_LIBDWARF_H)
-# define HAVE_DWARF 0   /* ongoing work, set to 1 if it works */ 
+# define HAVE_DWARF 0   /* ongoing work, set to 1 if it works */
 #endif
 
 #include "Backtrace.hh"
@@ -100,11 +100,109 @@ using namespace std;
 std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
 /// the difference between function main() in the result of backtrace_symbol()
-/// and the address of main() in the loaded program. Only valid after the
-/// line main>: was processes in read_apl_lines_file().
+/// and the address of main() in memory after loading the apl binary.
+/// Only valid after the line main>: was processes in read_apl_lines_file().
 //
 static int64_t main_offset_0 = 0;
 
+//----------------------------------------------------------------------------
+void
+Backtrace::show(const char * file, int line)
+{
+   // CYGWIN, for example, has no execinfo.h and the functions declared there
+   //
+#ifndef HAVE_EXECINFO_H
+   cerr << "Cannot show function call stack since execinfo.h seems not"
+           " to exist on this OS (WINDOWs ?)." << endl;
+   return;
+
+#else
+
+   main_offset_0 = 0;
+   read_apl_lines_file();   // also calls set_main_offset_0()
+
+void * buffer[200];
+const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
+
+char ** strings = backtrace_symbols(buffer, size);
+
+   cerr << endl
+        << "----------------------------------------"  << endl
+        << "-- Stack trace at " << file << ":" << line << endl
+        << "----------------------------------------"  << endl;
+
+   if (strings == 0)
+      {
+        cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
+                " instead..." << endl << endl;
+        // backtrace_symbols_fd(buffer, size, STDERR_FILENO);
+        for (int b = size - 1; b > 0; --b)
+            {
+              for (int s = b + 1; s < size; ++s)   cerr << " ";
+                  backtrace_symbols_fd(buffer + b, 1, STDERR_FILENO);
+            }
+        cerr << "========================================" << endl;
+        return;
+      }
+
+   for (int item = 1; item < size - 1; ++item)   // loop over stacktrace lines
+       {
+         /* make a copy mutable_si of strings[item] which show_item() may mess
+            up.
+            variable item is the number passed to show_item() and counts
+            from oldest to latest, while 'strings' runs from latest to
+            oldest. We want the lines to be displayed from oldest to latest.
+          */
+         const char * const_si = strings[size - item - 1];
+         std::vector<char> mutable_si(const_si, const_si + strlen(const_si) + 1);
+         show_item(item - 1, mutable_si.data());
+       }
+
+   cerr << "========================================" << endl;
+
+   // then repeat with dwarf (experimental)
+   //
+   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
+       {
+         // make a copy si of strings[i] that show_item() can mess up
+         //
+         const char * si = strings[size - i - 1];
+         show_dwarf(i - 1, si);
+       }
+
+   cerr << "========================================" << endl;
+
+   // crashes at times
+   free(strings);   // but not strings[x] !
+
+#endif
+}
+//----------------------------------------------------------------------------
+const char *
+Backtrace::find_src(int64_t pc)
+{
+   if (pc == NO_PC)   return 0;   // no pc
+
+   if (pc_2_src.size())   // database was properly set up.
+      {
+        typedef Heapsort<Backtrace::PC_src> HS;
+        if (const PC_src * posp = HS::search<const int64_t &>
+                                            (pc,         // key
+                                             pc_2_src,   // array
+                                             &pc_cmp,    // compare fun
+                                             0))         // compare arg
+        return posp->src_loc;   // found
+      }
+
+   (0) && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
+   return 0;   // not found
+}
+//----------------------------------------------------------------------------
+int
+Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
+{
+   return key - pc_src.pc;
+}
 //----------------------------------------------------------------------------
 /** compute \b main_offset_0, which is the difference between:
 
@@ -133,32 +231,6 @@ const int64_t loaded_main = get_main();
         << "    ───────────────────────────────────────"               << endl
         << "    = loaded main():       " << setw(16) << loaded_main    << endl
         << dec;
-}
-//----------------------------------------------------------------------------
-int
-Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
-{
-   return key - pc_src.pc;
-}
-//----------------------------------------------------------------------------
-const char *
-Backtrace::find_src(int64_t pc)
-{
-   if (pc == NO_PC)   return 0;   // no pc
-
-   if (pc_2_src.size())   // database was properly set up.
-      {
-        typedef Heapsort<Backtrace::PC_src> HS;
-        if (const PC_src * posp = HS::search<const int64_t &>
-                                            (pc,         // key
-                                             pc_2_src,   // array
-                                             &pc_cmp,    // compare fun
-                                             0))         // compare arg
-        return posp->src_loc;   // found
-      }
-
-   (0) && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
-   return 0;   // not found
 }
 //----------------------------------------------------------------------------
 void
@@ -258,8 +330,8 @@ int64_t prev_pc = NO_PC;
 000000000014c7a9 <main>:                                   [<main> line]
 main():
 /home/eedjsa/apl-1.9/src/main.cc:611                       [source file path]
-  14c7a9:»······55                   »··push   %rbp        [code line]
-  14c7aa:»······48 89 e5             »··mov    %rsp,%rbp   [code line]
+  14c7a9:	55                   	push   %rbp        [code line]
+  14c7aa:	48 89 e5             	mov    %rsp,%rbp   [code line]
   ...
 
             NOTE: case 2 only works with:
@@ -328,168 +400,6 @@ main():
    lines_status = LINES_valid;
 }
 //----------------------------------------------------------------------------
-void
-Backtrace::show_item(int idx, char * s)
-{
-#ifdef HAVE_EXECINFO_H
-    
-// Change this to #define DISPLAY_ASM_OFFSET if you would like the asm_offset
-// displayed in the backtrace the default is not to display
-//
-#undef  DISPLAY_ASM_OFFSET
-    
-int64_t abs_addr = NO_PC;
-char * fun = 0;
-long long asm_offset = 0;
-   (void)asm_offset;   // avoid warning if not used
-    
-#ifdef __APPLE__
-/*
-    on macOS/Darwin, string s looks like this:
-
-    0x00000001000a93f0 _ZN9Workspace19immediate_executionEb + 68
-    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   ││
-    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   └┴─── asm_offset
-    ││││││││││││││││││ └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴──────── fun
-    └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴───────────────────────────────────────────── abs_addr
- */
-
-   // Find the abs_addr by skipping to the first ' 0x'
-
-   if (char * a_a = strstr(s, " 0x") )   // the space before abs_addr
-      {
-          // extract abs_addr now that we found it
-          *a_a = '\0';
-          a_a++;
-          if (char * e = strchr(a_a,' ')) {
-              *e = '\0';
-              fun = e + 1;
-              abs_addr = strtoll(a_a, 0, 16);
-              abs_addr -= main_offset_0;
-          }
-      }
-
-    if (fun)
-    {
-        if (char * e = strchr(fun , ' '))
-        {
-            *e = '\0';
-            e++ ;                                 // skip and look for "+ " ' '
-            if (char * a_o = strstr(e,"+ "))
-            {
-                a_o += 2;
-                asm_offset = strtoll(a_o, 0, 10);
-            }
-        }
-    }
-    
-#else /* __APPLE__ not defined,  a.k.a. other Linux, etc. platforms */
-
-/*
-    string s looks like this:
-    
-     ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
-           │││││││││││││││││││││││││││ │││││   │││││││││
-           │││││││││││││││││││││││││││ │││││   └┴┴┴┴┴┴┴┴───── abs_addr
-           │││││││││││││││││││││││││││ └┴┴┴┴───────────────── asm_offset
-           └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴─────────────────────── fun
-   */
-
-   // split off abs_addr from s.
-   //
-
-   if (char * space = strchr(s, ' '))   // the space before [abs_addr]
-      {
-        *space = '\0';
-        space += 2;
-        if (char * e = strchr(space, ']'))   *e = 0;
-        abs_addr = strtoll(space, 0, 16);
-        abs_addr -= main_offset_0;
-      }
-
-   // split off function from s.
-   //
-   {
-    char * opar = strchr(s, '(');
-    if (opar)
-       {
-         *opar = '\0';
-         fun = opar + 1;
-         char * e = strchr(opar + 1, ')');
-         if (e)   *e = '\0';
-       }
-   }
-
-   // split off +asm_offset from fun.
-   //
-   if (fun)
-      {
-       if (char * plus = strchr(fun, '+'))
-          {
-            *plus++ = '\0';
-            asm_offset = strtoll(plus, 0, 16);
-          }
-      }
-
-# endif /* __APPLE__ */
-
-const char * src_loc = find_src(abs_addr);
-
-char obuf[200] = "@@@@";
-   if (fun)
-      {
-       strncpy(obuf, fun, sizeof(obuf) - 1);
-       obuf[sizeof(obuf) - 1] = '\0';
-
-       size_t obuflen = sizeof(obuf) - 1;
-       int status = 0;
-//     cerr << "mangled fun is: " << fun << endl;
-       __cxxabiv1::__cxa_demangle(fun, obuf, &obuflen, &status);
-       switch(status)
-          {
-            case 0: // demangling succeeded
-                 break;
-
-            case -2: // not a valid name under the C++ ABI mangling rules.
-                 break;
-
-            default:
-                 cerr << "__cxa_demangle() returned " << status << endl;
-                 break;
-          }
-      }
-
-// cerr << setw(2) << idx << ": ";
-
-   // we normally prefer uppercase hex, but 'objcopy' and friends produce
-   // lowercase hex and we follow suit as to simplify searching in their files.
-   //
-   cerr << "0x" << lhex << abs_addr << nohex;
-
-// cerr << left << setw(20) << s << right << " ";
-
-   // indent.
-   //
-   for (int i = -1; i < idx; ++i)   cerr << " ";
-
-   cerr << obuf;
-
-# ifdef DISPLAY_ASM_OFFSET
-   if (asm_offset > 0)   cerr << " + " << asm_offset;
-# endif
-
-   if (src_loc)
-      {
-        char cc[200];
-        SPRINTF(cc, "%s", src_loc);
-        char * disc = strstr(cc, "discriminator");
-        if (disc && disc > cc)   disc[-1] = '\0';
-        cerr << " at " << cc;
-      }
-   cerr << endl;
-#endif   // _APPLE_
-}
-
 #if HAVE_DWARF
 //----------------------------------------------------------------------------
 /// the context of a search in a dwarf file
@@ -546,7 +456,7 @@ public:
    /// find PC in the entire GNU APL binary
    static int find_PC_in_file(Dwarf_context & ctx, int64_t PC);
 
-   /// store all (top-level) CU pointers 
+   /// store all (top-level) CU pointers
    static int init_CU_dies(Dwarf_context & ctx);
 
    /// return attribute \b which_attribute of the die
@@ -612,7 +522,7 @@ ostream &
 Dwarf::print_tag(Dwarf_context & ctx, const Dwarf_Die die)
 {
    if (!ctx.out)   return *ctx.out;   // no output desired
-      
+
 const Dwarf_Half tag = GET_TAG(die);
 
 const char * tagname = 0;
@@ -949,7 +859,7 @@ const char * CU_name = Dwarf::get_die_name(ctx, CU_die);
               if (line_number != previous_line ||   // new source line
                   fileno      != previous_fileno)   // new source file
                  {
-                   start_addr = addr; 
+                   start_addr = addr;
                    if (min_start > start_addr)   min_start = start_addr;
                  }
               previous_line = line_number;
@@ -1089,7 +999,7 @@ int res = DW_DLV_OK;   // = 0. Otherwise DW_DLV_NO_ENTRY=-1 or DW_DLV_ERROR=1
         Assert(res == DW_DLV_OK);
         Assert(tag == DW_TAG_subprogram);
    }
-   
+
 char * function_name = 0;
 Dwarf_Addr PC_low = 0;
 Dwarf_Addr PC_high = 0;
@@ -1154,13 +1064,13 @@ Dwarf_Unsigned next_cu_header = 0;
 Dwarf_Half     header_cu_type = 0;
 Dwarf_Bool     is_info        = true;
 int            res            = DW_DLV_OK;
- 
+
    for (;;)
        {
            Dwarf_Die no_die = 0;
            Dwarf_Die CU_die = 0;
            Dwarf_Unsigned cu_header_length = 0;
-       
+
            memset(&signature,0, sizeof(signature));
            res = dwarf_next_cu_header_d(dbg,is_info,&cu_header_length,
                &version_stamp, &abbrev_offset,
@@ -1187,13 +1097,13 @@ int            res            = DW_DLV_OK;
                 return res;  // all CUs processed
               }
 
-           /*  The CU will have a single sibling, a CU_die. 
+           /*  The CU will have a single sibling, a CU_die.
                It is essential to call this right after
                a call to dwarf_next_cu_header_d() because
                there is no explicit connection provided to
                dwarf_siblingof_b(), which returns a DIE
                from whatever CU was last accessed by
-               dwarf_next_cu_header_d()! 
+               dwarf_next_cu_header_d()!
                The lack of explicit connection was a
                design mistake in the API (made in 1992).
             */
@@ -1222,7 +1132,7 @@ Dwarf::find_PC_in_file(Dwarf_context & ctx, int64_t PC)
  //       dwarf_dealloc_die(CU_die);
           if (ctx.found)   break;
   //////   find_PC_in_CU(CU_die, PC);
-       
+
        }
 
    if (ctx.found)
@@ -1268,7 +1178,7 @@ int64_t PC = 0;
 #else   // not APPLE
 /*
     string s looks like this:
-    
+
      ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
            │││││││││││││││││││││││││││ │││││   │││││││││
            │││││││││││││││││││││││││││ │││││   └┴┴┴┴┴┴┴┴───── abs_addr
@@ -1312,7 +1222,7 @@ const int64_t dwarf_PC = PC - adjust;
       0x55e6fba0d02b   main                      ← OK.
 
       We skip them.
-    */ 
+    */
    if (dwarf_PC > 0x1000000)   return;
 
    cerr << "\n\nNow searching for PC = " << HEX(PC)
@@ -1329,8 +1239,8 @@ const int64_t dwarf_PC = PC - adjust;
         << "\n    ─────────────────────────────────────"
         << "\n    = PC in dwarf:       " << HEX16s(dwarf_PC)
         << left << endl << endl;
-         
-                 
+
+
 
    // now search for the PC. Before that we need to translate the PC in
    // the locaded program to an address in dwarf.
@@ -1354,78 +1264,185 @@ Backtrace::show_dwarf(int idx, const char * s)
 #endif   // HAVE_DWARF
 //----------------------------------------------------------------------------
 void
-Backtrace::show(const char * file, int line)
+Backtrace::show_item(int idx, char * s)
 {
-   // CYGWIN, for example, has no execinfo.h and the functions declared there
-   //
-#ifndef HAVE_EXECINFO_H
-   cerr << "Cannot show function call stack since execinfo.h seems not"
-           " to exist on this OS (WINDOWs ?)." << endl;
-   return;
+#ifdef HAVE_EXECINFO_H
 
-#else
+// Change this to #define DISPLAY_ASM_OFFSET if you would like the asm_offset
+// displayed in the backtrace the default is not to display
+//
+#undef  DISPLAY_ASM_OFFSET
 
-   main_offset_0 = 0;
-   read_apl_lines_file();   // also calls set_main_offset_0()
+int64_t abs_addr = NO_PC;
+char * fun = 0;
+long long asm_offset = 0;
+   (void)asm_offset;   // avoid warning if not used
 
-void * buffer[200];
-const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
+#ifdef __APPLE__
+/*
+    on macOS/Darwin, string s looks like this:
 
-char ** strings = backtrace_symbols(buffer, size);
+    0x00000001000a93f0 _ZN9Workspace19immediate_executionEb + 68
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   ││
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   └┴─── asm_offset
+    ││││││││││││││││││ └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴──────── fun
+    └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴───────────────────────────────────────────── abs_addr
+ */
 
-   cerr << endl
-        << "----------------------------------------"  << endl
-        << "-- Stack trace at " << file << ":" << line << endl
-        << "----------------------------------------"  << endl;
+   // Find the abs_addr by skipping to the first ' 0x'
 
-   if (strings == 0)
+   if (char * a_a = strstr(s, " 0x") )   // the space before abs_addr
       {
-        cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
-                " instead..." << endl << endl;
-        // backtrace_symbols_fd(buffer, size, STDERR_FILENO);
-        for (int b = size - 1; b > 0; --b)
-            {
-              for (int s = b + 1; s < size; ++s)   cerr << " ";
-                  backtrace_symbols_fd(buffer + b, 1, STDERR_FILENO);
-            }
-        cerr << "========================================" << endl;
-        return;
+          // extract abs_addr now that we found it
+          *a_a = '\0';
+          a_a++;
+          if (char * e = strchr(a_a,' ')) {
+              *e = '\0';
+              fun = e + 1;
+              abs_addr = strtoll(a_a, 0, 16);
+              abs_addr -= main_offset_0;
+          }
       }
 
-   for (int item = 1; item < size - 1; ++item)   // loop over stacktrace lines
-       {
-         /* make a copy mutable_si of strings[item] which show_item() may mess
-            up.
-            variable item is the number passed to show_item() and counts
-            from oldest to latest, while 'strings' runs from latest to
-            oldest. We want the lines to be displayed from oldest to latest.
-          */
-         const char * const_si = strings[size - item - 1];
-         std::vector<char> mutable_si(const_si, const_si + strlen(const_si) + 1);
-         show_item(item - 1, mutable_si.data());
-       }
+    if (fun)
+    {
+        if (char * e = strchr(fun , ' '))
+        {
+            *e = '\0';
+            e++ ;                                 // skip and look for "+ " ' '
+            if (char * a_o = strstr(e,"+ "))
+            {
+                a_o += 2;
+                asm_offset = strtoll(a_o, 0, 10);
+            }
+        }
+    }
 
-   cerr << "========================================" << endl;
+#else /* __APPLE__ not defined,  a.k.a. other Linux, etc. platforms */
 
-   // then repeat with dwarf (experimental)
+/*
+    string s looks like this:
+
+     ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
+           │││││││││││││││││││││││││││ │││││   │││││││││
+           │││││││││││││││││││││││││││ │││││   └┴┴┴┴┴┴┴┴───── abs_addr
+           │││││││││││││││││││││││││││ └┴┴┴┴───────────────── asm_offset
+           └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴─────────────────────── fun
+   */
+
+   // split off abs_addr from s.
    //
-   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
+
+   if (char * space = strchr(s, ' '))   // the space before [abs_addr]
+      {
+        *space = '\0';
+        space += 2;
+        if (char * e = strchr(space, ']'))   *e = 0;
+        abs_addr = strtoll(space, 0, 16);
+        abs_addr -= main_offset_0;
+      }
+
+   // split off function from s.
+   //
+   {
+    char * opar = strchr(s, '(');
+    if (opar)
        {
-         // make a copy si of strings[i] that show_item() can mess up
-         //
-         const char * si = strings[size - i - 1];
-         show_dwarf(i - 1, si);
+         *opar = '\0';
+         fun = opar + 1;
+         char * e = strchr(opar + 1, ')');
+         if (e)   *e = '\0';
        }
+   }
 
-   cerr << "========================================" << endl;
+   // split off +asm_offset from fun.
+   //
+   if (fun)
+      {
+       if (char * plus = strchr(fun, '+'))
+          {
+            *plus++ = '\0';
+            asm_offset = strtoll(plus, 0, 16);
+          }
+      }
 
-   // crashes at times
-   free(strings);   // but not strings[x] !
-   
-#endif
+# endif /* __APPLE__ */
+
+const char * src_loc = find_src(abs_addr);
+
+char obuf[200] = "@@@@";
+   if (fun)
+      {
+       strncpy(obuf, fun, sizeof(obuf) - 1);
+       obuf[sizeof(obuf) - 1] = '\0';
+
+       size_t obuflen = sizeof(obuf) - 1;
+       int status = 0;
+//     cerr << "mangled fun is: " << fun << endl;
+       __cxxabiv1::__cxa_demangle(fun, obuf, &obuflen, &status);
+       switch(status)
+          {
+            case 0: // demangling succeeded
+                 break;
+
+            case -2: // not a valid name under the C++ ABI mangling rules.
+                 break;
+
+            default:
+                 cerr << "__cxa_demangle() returned " << status << endl;
+                 break;
+          }
+      }
+
+// cerr << setw(2) << idx << ": ";
+
+   // we normally prefer uppercase hex, but 'objcopy' and friends produce
+   // lowercase hex and we follow suit as to simplify searching in their files.
+   //
+   cerr << "0x" << lhex << abs_addr << nohex;
+
+// cerr << left << setw(20) << s << right << " ";
+
+   // indent.
+   //
+   for (int i = -1; i < idx; ++i)   cerr << " ";
+
+   cerr << obuf;
+
+# ifdef DISPLAY_ASM_OFFSET
+   if (asm_offset > 0)   cerr << " + " << asm_offset;
+# endif
+
+   if (src_loc)
+      {
+        char cc[200];
+        SPRINTF(cc, "%s", src_loc);
+        char * disc = strstr(cc, "discriminator");
+        if (disc && disc > cc)   disc[-1] = '\0';
+        cerr << " at " << cc;
+      }
+   cerr << endl;
+#endif   // _APPLE_
 }
 //----------------------------------------------------------------------------
 #ifdef HAVE_EXECINFO_H
+const char *
+Backtrace::caller(int offset)
+{
+void * buffer[200];
+const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
+char ** strings = backtrace_symbols(buffer, size);
+
+char * demangled = static_cast<char *>(malloc(1024));
+   if (demangled)
+       {
+         *demangled = 0;
+         demangle_line(demangled, 1024, strings[offset]);
+         return demangled;
+       }
+   return strings[offset];
+}
+//----------------------------------------------------------------------------
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
@@ -1460,23 +1477,6 @@ error:
    strncpy(result, buf, result_max);
    result[result_max - 1] = 0;
    return status;
-}
-//----------------------------------------------------------------------------
-const char *
-Backtrace::caller(int offset)
-{
-void * buffer[200];
-const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
-char ** strings = backtrace_symbols(buffer, size);
-
-char * demangled = static_cast<char *>(malloc(1024));
-   if (demangled)
-       {
-         *demangled = 0;
-         demangle_line(demangled, 1024, strings[offset]);
-         return demangled;
-       }
-   return strings[offset];
 }
 //----------------------------------------------------------------------------
 #endif // HAVE_EXECINFO_H

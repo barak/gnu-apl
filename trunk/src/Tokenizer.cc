@@ -78,6 +78,315 @@ size_t rest_2 = 0;
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
+Token
+Tokenizer::tokenize_function(Unicode uni)
+{
+const Token tok = Avec::uni_to_token(uni, LOC);
+
+#define sys(t, f) \
+   case TOK_ ## t: return Token(tok.get_tag(), &Bif_ ## f::fun);   break;
+
+   switch(tok.get_tag())
+      {
+        case TOK_F0_ZILDE:
+             // new ⍬ style: tokenize ⍬ as constant
+             //
+             return Token(TOK_APL_VALUE1, Idx0(LOC));
+
+             // old ⍬ style: tokenize ⍬ as niladic function
+             //
+             // return Token(tok.get_tag(), &Bif_F0_ZILDE::fun);  break;
+
+        sys(F1_EXECUTE,    F1_EXECUTE)
+
+        sys(F2_AND,             F2_AND)
+        sys(F2_EQUAL,           F2_EQUAL)
+        sys(F2_FIND,            F2_FIND)
+        sys(F2_GREATER,         F2_GREATER)
+        sys(F2_INDEX,           F2_INDEX)
+        sys(F2_LESS,            F2_LESS)
+        sys(F2_LEQU,            F2_LEQU)
+        sys(F2_MEQU,            F2_MEQU)
+        sys(F2_NAND,            F2_NAND)
+        sys(F2_NOR,             F2_NOR)
+        sys(F2_OR,              F2_OR)
+        sys(F2_UNEQU,           F2_UNEQU)
+
+        sys(F12_BINOM,          F12_BINOM)
+        sys(F12_CIRCLE,         F12_CIRCLE)
+        sys(F12_COMMA,          F12_COMMA)
+        sys(F12_COMMA1,         F12_COMMA1)
+        sys(F12_DECODE,         F12_DECODE)
+        sys(F12_DIVIDE,         F12_DIVIDE)
+        sys(F12_DOMINO,         F12_DOMINO)
+        sys(F12_DROP,           F12_DROP)
+        sys(F12_ELEMENT,        F12_ELEMENT)
+        sys(F12_ENCODE,         F12_ENCODE)
+        sys(F12_EQUIV,          F12_EQUIV)
+        sys(F12_FORMAT,         F12_FORMAT)
+        sys(F12_INDEX_OF,       F12_INDEX_OF)
+        sys(F12_INTERVAL_INDEX, F12_INTERVAL_INDEX)
+        sys(F2_INTER,           F2_INTER)
+        sys(F2_LEFT,            F2_LEFT)
+        sys(F12_LOGA,           F12_LOGA)
+        sys(F12_MINUS,          F12_MINUS)
+        sys(F12_NEQUIV,         F12_NEQUIV)
+        sys(F12_PARTITION,      F12_PARTITION)
+        sys(F12_PICK,           F12_PICK)
+        sys(F12_PLUS,           F12_PLUS)
+        sys(F12_POWER,          F12_POWER)
+        sys(F12_RHO,            F12_RHO)
+        sys(F2_RIGHT,           F2_RIGHT)
+        sys(F12_RND_DN,         F12_RND_DN)
+        sys(F12_RND_UP,         F12_RND_UP)
+        sys(F12_ROLL,           F12_ROLL)
+        sys(F12_ROTATE,         F12_ROTATE)
+        sys(F12_ROTATE1,        F12_ROTATE1)
+        sys(F12_SORT_ASC,       F12_SORT_ASC)
+        sys(F12_SORT_DES,       F12_SORT_DES)
+        sys(F12_STILE,          F12_STILE)
+        sys(F12_TAKE,           F12_TAKE)
+        sys(F12_TRANSPOSE,      F12_TRANSPOSE)
+        sys(F12_TIMES,          F12_TIMES)
+        sys(F12_UNION,          F12_UNION)
+        sys(F12_WITHOUT,        F12_WITHOUT)
+
+        sys(JOT,           JOT)
+
+        sys(OPER1_COMMUTE, OPER1_COMMUTE)
+        sys(OPER1_EACH,    OPER1_EACH)
+        sys(OPER2_POWER,   OPER2_POWER)
+        sys(OPER2_RANK,    OPER2_RANK)
+        sys(OPER1_REDUCE,  OPER1_REDUCE)
+        sys(OPER1_REDUCE1, OPER1_REDUCE1)
+        sys(OPER1_SCAN,    OPER1_SCAN)
+        sys(OPER1_SCAN1,   OPER1_SCAN1)
+
+        sys(OPER2_INNER,   OPER2_INNER)
+
+        default: break;
+      }
+
+   // CAUTION: cannot print entire token here because Avec::uni_to_token()
+   // inits the token tag but not any token pointers!
+   //
+   CERR << endl << "Token = " << tok.get_tag() << endl;
+   Assert(0 && "Missing Function");
+
+#undef sys
+   return tok;
+}
+//----------------------------------------------------------------------------
+
+Tokenizer::Int_or_Double
+Tokenizer::tokenize_real(Unicode_source & src)
+{
+   // hexadecimal ?
+   //
+   if (src.rest_len() > 1 && *src == UNI_DOLLAR_SIGN)
+      return tokenize_hex(src);
+
+enum { MAX_TOKENIZE_DIGITS = 19 };   // == atrlen("9223372036854775807")
+
+UTF8_string int_digits;     // the digits left of . (if any)
+UTF8_string fract_digits;   // the digits right of . (if any)
+UTF8_string expo_digits;    // the digits  right of E (if any)
+bool need_float = false;
+bool mant_negative = false;   // mantissa is negative
+bool expo_negative = false;   // exponent is negative
+bool skipped_0 = false;     // some leading 0 in the integer part were skipped
+bool dot_seen = false;      // the decimal . was seen
+
+
+   /* 1. split src into integer, fractional, and exponent parts,
+         thereby removing (skipping):
+
+      1a. a leading sign of the integer part,         (sets mant_negative)
+      1b. leading zeros of the integer part,
+      1c. the . between the integer and fractional parts,
+      1d. trailing zeros of the fractional part,
+      1e. the E between the fractional and exponent parts, and/or
+      1f. a sign of the exponent part                 (sets expo_negative)
+    */
+   if (src.has_more() && *src == UNI_OVERBAR)   // 1a.
+      {
+        mant_negative = true;
+        ++src;
+      }
+
+   // 1b. discard leading zeros in the integer part
+   //
+   while (src.skip_if(UNI_0))   { skipped_0 = true; }
+
+   // integer part
+   //
+   while (src.has_more() && Avec::is_digit(*src))   int_digits += src.get();
+
+   // fractional part...
+   //
+   if (src.skip_if(UNI_FULLSTOP))   // fract part present
+      {
+        dot_seen = true;
+        while (src.has_more() && Avec::is_digit(*src))
+           {
+             fract_digits += src.get();
+           }
+
+        while (fract_digits.size() && fract_digits.back() == UNI_0)   // 1d.
+           {
+             fract_digits.pop_back();
+             skipped_0 = true;
+           }
+      }
+
+   // APL syntax requires at least one (integer or fractional) digit
+   //
+   if (int_digits.size()   == 0  &&   // empty integer part, and
+       fract_digits.size() == 0)      // empty fractional part
+      {
+        /* the mantisssa is empty. There are two possibilities:
+
+           1. input was correct (e.g. 0. ), but the 0 was skipped above.;
+           2. syntax error by the user ( . without digits)
+         */
+        if (skipped_0)    return Int_or_Double(APL_Integer(0));   // case 1
+
+        MORE_ERROR() << "expecting 0. or .0 but not . without digits.";
+        return Int_or_Double();                     // case 2: syntax error
+      }
+
+   // exponent part (but could also be a name starting with E or e)
+   //
+   if (src.rest_len() >= 2 &&              // at least E and a digit or ¯
+       (*src == UNI_E || *src == UNI_e))   // and maybe exponent
+      {
+        expo_negative = (src[1] == UNI_OVERBAR);
+        if (expo_negative       &&
+            src.rest_len() >= 3 &&
+            Avec::is_digit(src[2]))                    // E¯nnn
+           {
+             need_float = true;
+             ++src;                        // skip e/E
+             ++src;                        // skip ¯
+             while (src.has_more() && Avec::is_digit(*src))
+                  expo_digits += src.get();
+           }
+        else if (Avec::is_digit(src[1]))               // Ennn
+           {
+             need_float = true;
+             ++src;                        // skip e/E
+             while (src.has_more() && Avec::is_digit(*src))
+                  expo_digits += src.get();
+           }
+      }
+
+   // second dot (which is a syntax error)?
+   //
+   if (dot_seen && src.has_more() && *src == UNI_FULLSTOP)
+      {
+        MORE_ERROR() << "Two . in a number.";
+        return Int_or_Double();
+      }
+
+   // set expo to the optional Ennn (if any) in iii.fff.Ennn)
+   //
+   Log(LOG_tokenize)
+      {
+        Q1(int_digits.size());
+        Q1(int_digits);
+        Q1(fract_digits);
+        Q1(expo_digits);
+      }
+
+   // construct a C string according to the APL string
+   //
+char * buffer = ALLOCA(char, int_digits.size() +
+                             fract_digits.size() +
+                             expo_digits.size() + 20);
+char * b = buffer;
+   if (mant_negative)   *b++ = '-';
+   loop(i, int_digits.size())   *b++ = int_digits[i];
+
+   if (int_digits.size() > MAX_TOKENIZE_DIGITS)   // very big mantissa
+      {
+        need_float = true;
+        fract_digits.clear();   // ignore fract digits
+      }
+   else if (int_digits.size() == MAX_TOKENIZE_DIGITS &&
+            int_digits[0] == UNI_9 &&
+            int_digits[1] >= UNI_2)   // 9200000000000000000 or more
+      {
+        // the max. APL integer is 0x7FFFFFFFFFFFFFFF aka. 9223372036854775807
+        // with 19 deciman digits. int_digits has 19  and starts with 92. The
+        // 2 in 92 somewhat simplifies rounding up of aby fractional digits.
+        // It thus may or may not fit into an APL integer.
+        // This happens rarely so we can afford some extra effort as to figure
+        // precisely whether int_digits is real or integer).
+        //
+        if (fract_digits.size() && fract_digits[0] >= UNI_5)   // round up
+           {
+             for (int d = int_digits.size();;)
+                 {
+                   const UTF8 digit = int_digits[--d];
+                   if (digit == UNI_9)   // propagate carry
+                      {
+                        int_digits[d] = UNI_0;       // 9 → 0 and continue
+                      }
+                   else
+                      {
+                        int_digits[d] = digit + 1;   // ++N and stop
+                        break;
+                      }
+                 }
+           }
+        fract_digits.clear();
+
+        const UTF8_string max_int("9223372036854775807");
+        loop(j, MAX_TOKENIZE_DIGITS)
+            {
+              if (int_digits[j] < max_int[j])   break;   // small (int is OK).
+              if (int_digits[j] > max_int[j])            // float needed
+                 {
+                   need_float = true;
+                   // float precisionm is lower than integer precision, we can
+                   // therefore discard any fractional digits.
+                   fract_digits.clear();   // ignore fract digits
+                   break;
+                 }
+            }
+      }
+
+   if (fract_digits.size())
+      {
+         need_float = true;
+         *b++ = '.';
+         loop(f, fract_digits.size())   *b++ = fract_digits[f];
+      }
+
+   if (expo_digits.size())
+      {
+         need_float = true;
+         *b++ = 'e';
+         if (expo_negative)   *b++ = '-';
+         loop(e, expo_digits.size())   *b++ = expo_digits[e];
+      }
+   *b = 0;
+
+   if (need_float)
+      {
+        return Int_or_Double(APL_Float(strtod(buffer, 0)));
+      }
+   else
+      {
+        errno = 0;
+        const long long  result = strtoll(buffer, 0, 10);   // may set errno
+        if (errno)   // strtoll() failed (int_digits too large)
+           return Int_or_Double(APL_Float(strtod(buffer, 0)));
+        else
+           return Int_or_Double(APL_Integer(result));
+      }
+}
+//----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos. The tokenization
     stops at the end of input (= end of line), or when a comment (⍝ or #)
     is detected.
@@ -416,105 +725,6 @@ Tokenizer::tokenize_function(Unicode_source & src, Token_string & tos) const
 const Unicode uni = src.get();
 const Token tok = tokenize_function(uni);
    tos.push_back(tok);
-}
-//----------------------------------------------------------------------------
-Token
-Tokenizer::tokenize_function(Unicode uni)
-{
-const Token tok = Avec::uni_to_token(uni, LOC);
-
-#define sys(t, f) \
-   case TOK_ ## t: return Token(tok.get_tag(), &Bif_ ## f::fun);   break;
-
-   switch(tok.get_tag())
-      {
-        case TOK_F0_ZILDE:
-             // new ⍬ style: tokenize ⍬ as constant
-             //
-             return Token(TOK_APL_VALUE1, Idx0(LOC));
-
-             // old ⍬ style: tokenize ⍬ as niladic function
-             //
-             // return Token(tok.get_tag(), &Bif_F0_ZILDE::fun);  break;
-
-        sys(F1_EXECUTE,    F1_EXECUTE)
-
-        sys(F2_AND,             F2_AND)
-        sys(F2_EQUAL,           F2_EQUAL)
-        sys(F2_FIND,            F2_FIND)
-        sys(F2_GREATER,         F2_GREATER)
-        sys(F2_INDEX,           F2_INDEX)
-        sys(F2_LESS,            F2_LESS)
-        sys(F2_LEQU,            F2_LEQU)
-        sys(F2_MEQU,            F2_MEQU)
-        sys(F2_NAND,            F2_NAND)
-        sys(F2_NOR,             F2_NOR)
-        sys(F2_OR,              F2_OR)
-        sys(F2_UNEQU,           F2_UNEQU)
-
-        sys(F12_BINOM,          F12_BINOM)
-        sys(F12_CIRCLE,         F12_CIRCLE)
-        sys(F12_COMMA,          F12_COMMA)
-        sys(F12_COMMA1,         F12_COMMA1)
-        sys(F12_DECODE,         F12_DECODE)
-        sys(F12_DIVIDE,         F12_DIVIDE)
-        sys(F12_DOMINO,         F12_DOMINO)
-        sys(F12_DROP,           F12_DROP)
-        sys(F12_ELEMENT,        F12_ELEMENT)
-        sys(F12_ENCODE,         F12_ENCODE)
-        sys(F12_EQUIV,          F12_EQUIV)
-        sys(F12_FORMAT,         F12_FORMAT)
-        sys(F12_INDEX_OF,       F12_INDEX_OF)
-        sys(F12_INTERVAL_INDEX, F12_INTERVAL_INDEX)
-        sys(F2_INTER,           F2_INTER)
-        sys(F2_LEFT,            F2_LEFT)
-        sys(F12_LOGA,           F12_LOGA)
-        sys(F12_MINUS,          F12_MINUS)
-        sys(F12_NEQUIV,         F12_NEQUIV)
-        sys(F12_PARTITION,      F12_PARTITION)
-        sys(F12_PICK,           F12_PICK)
-        sys(F12_PLUS,           F12_PLUS)
-        sys(F12_POWER,          F12_POWER)
-        sys(F12_RHO,            F12_RHO)
-        sys(F2_RIGHT,           F2_RIGHT)
-        sys(F12_RND_DN,         F12_RND_DN)
-        sys(F12_RND_UP,         F12_RND_UP)
-        sys(F12_ROLL,           F12_ROLL)
-        sys(F12_ROTATE,         F12_ROTATE)
-        sys(F12_ROTATE1,        F12_ROTATE1)
-        sys(F12_SORT_ASC,       F12_SORT_ASC)
-        sys(F12_SORT_DES,       F12_SORT_DES)
-        sys(F12_STILE,          F12_STILE)
-        sys(F12_TAKE,           F12_TAKE)
-        sys(F12_TRANSPOSE,      F12_TRANSPOSE)
-        sys(F12_TIMES,          F12_TIMES)
-        sys(F12_UNION,          F12_UNION)
-        sys(F12_WITHOUT,        F12_WITHOUT)
-
-        sys(JOT,           JOT)
-
-        sys(OPER1_COMMUTE, OPER1_COMMUTE)
-        sys(OPER1_EACH,    OPER1_EACH)
-        sys(OPER2_POWER,   OPER2_POWER)
-        sys(OPER2_RANK,    OPER2_RANK)
-        sys(OPER1_REDUCE,  OPER1_REDUCE)
-        sys(OPER1_REDUCE1, OPER1_REDUCE1)
-        sys(OPER1_SCAN,    OPER1_SCAN)
-        sys(OPER1_SCAN1,   OPER1_SCAN1)
-
-        sys(OPER2_INNER,   OPER2_INNER)
-
-        default: break;
-      }
-
-   // CAUTION: cannot print entire token here because Avec::uni_to_token()
-   // inits the token tag but not any token pointers!
-   //
-   CERR << endl << "Token = " << tok.get_tag() << endl;
-   Assert(0 && "Missing Function");
-
-#undef sys
-   return tok;
 }
 //----------------------------------------------------------------------------
 void
@@ -961,216 +1171,6 @@ APL_Integer hex_val = 0;
          }
 
    return Int_or_Double(APL_Integer(hex_val));
-}
-//----------------------------------------------------------------------------
-
-Tokenizer::Int_or_Double
-Tokenizer::tokenize_real(Unicode_source & src)
-{
-   // hexadecimal ?
-   //
-   if (src.rest_len() > 1 && *src == UNI_DOLLAR_SIGN)
-      return tokenize_hex(src);
-
-enum { MAX_TOKENIZE_DIGITS = 19 };   // == atrlen("9223372036854775807")
-
-UTF8_string int_digits;     // the digits left of . (if any)
-UTF8_string fract_digits;   // the digits right of . (if any)
-UTF8_string expo_digits;    // the digits  right of E (if any)
-bool need_float = false;
-bool mant_negative = false;   // mantissa is negative
-bool expo_negative = false;   // exponent is negative
-bool skipped_0 = false;     // some leading 0 in the integer part were skipped
-bool dot_seen = false;      // the decimal . was seen
-
-
-   /* 1. split src into integer, fractional, and exponent parts,
-         thereby removing (skipping):
-
-      1a. a leading sign of the integer part,         (sets mant_negative)
-      1b. leading zeros of the integer part,
-      1c. the . between the integer and fractional parts,
-      1d. trailing zeros of the fractional part,
-      1e. the E between the fractional and exponent parts, and/or
-      1f. a sign of the exponent part                 (sets expo_negative)
-    */
-   if (src.has_more() && *src == UNI_OVERBAR)   // 1a.
-      {
-        mant_negative = true;
-        ++src;
-      }
-
-   // 1b. discard leading zeros in the integer part
-   //
-   while (src.skip_if(UNI_0))   { skipped_0 = true; }
-
-   // integer part
-   //
-   while (src.has_more() && Avec::is_digit(*src))   int_digits += src.get();
-
-   // fractional part...
-   //
-   if (src.skip_if(UNI_FULLSTOP))   // fract part present
-      {
-        dot_seen = true;
-        while (src.has_more() && Avec::is_digit(*src))
-           {
-             fract_digits += src.get();
-           }
-
-        while (fract_digits.size() && fract_digits.back() == UNI_0)   // 1d.
-           {
-             fract_digits.pop_back();
-             skipped_0 = true;
-           }
-      }
-
-   // APL syntax requires at least one (integer or fractional) digit
-   //
-   if (int_digits.size()   == 0  &&   // empty integer part, and
-       fract_digits.size() == 0)      // empty fractional part
-      {
-        /* the mantisssa is empty. There are two possibilities:
-
-           1. input was correct (e.g. 0. ), but the 0 was skipped above.;
-           2. syntax error by the user ( . without digits)
-         */
-        if (skipped_0)    return Int_or_Double(APL_Integer(0));   // case 1
-
-        MORE_ERROR() << "expecting 0. or .0 but not . without digits.";
-        return Int_or_Double();                     // case 2: syntax error
-      }
-
-   // exponent part (but could also be a name starting with E or e)
-   //
-   if (src.rest_len() >= 2 &&              // at least E and a digit or ¯
-       (*src == UNI_E || *src == UNI_e))   // and maybe exponent
-      {
-        expo_negative = (src[1] == UNI_OVERBAR);
-        if (expo_negative       &&
-            src.rest_len() >= 3 &&
-            Avec::is_digit(src[2]))                    // E¯nnn
-           {
-             need_float = true;
-             ++src;                        // skip e/E
-             ++src;                        // skip ¯
-             while (src.has_more() && Avec::is_digit(*src))
-                  expo_digits += src.get();
-           }
-        else if (Avec::is_digit(src[1]))               // Ennn
-           {
-             need_float = true;
-             ++src;                        // skip e/E
-             while (src.has_more() && Avec::is_digit(*src))
-                  expo_digits += src.get();
-           }
-      }
-
-   // second dot (which is a syntax error)?
-   //
-   if (dot_seen && src.has_more() && *src == UNI_FULLSTOP)
-      {
-        MORE_ERROR() << "Two . in a number.";
-        return Int_or_Double();
-      }
-
-   // set expo to the optional Ennn (if any) in iii.fff.Ennn)
-   //
-   Log(LOG_tokenize)
-      {
-        Q1(int_digits.size());
-        Q1(int_digits);
-        Q1(fract_digits);
-        Q1(expo_digits);
-      }
-
-   // construct a C string according to the APL string
-   //
-char * buffer = ALLOCA(char, int_digits.size() +
-                             fract_digits.size() +
-                             expo_digits.size() + 20);
-char * b = buffer;
-   if (mant_negative)   *b++ = '-';
-   loop(i, int_digits.size())   *b++ = int_digits[i];
-
-   if (int_digits.size() > MAX_TOKENIZE_DIGITS)   // very big mantissa
-      {
-        need_float = true;
-        fract_digits.clear();   // ignore fract digits
-      }
-   else if (int_digits.size() == MAX_TOKENIZE_DIGITS &&
-            int_digits[0] == UNI_9 &&
-            int_digits[1] >= UNI_2)   // 9200000000000000000 or more
-      {
-        // the max. APL integer is 0x7FFFFFFFFFFFFFFF aka. 9223372036854775807
-        // with 19 deciman digits. int_digits has 19  and starts with 92. The
-        // 2 in 92 somewhat simplifies rounding up of aby fractional digits.
-        // It thus may or may not fit into an APL integer.
-        // This happens rarely so we can afford some extra effort as to figure
-        // precisely whether int_digits is real or integer).
-        //
-        if (fract_digits.size() && fract_digits[0] >= UNI_5)   // round up
-           {
-             for (int d = int_digits.size();;)
-                 {
-                   const UTF8 digit = int_digits[--d];
-                   if (digit == UNI_9)   // propagate carry
-                      {
-                        int_digits[d] = UNI_0;       // 9 → 0 and continue
-                      }
-                   else
-                      {
-                        int_digits[d] = digit + 1;   // ++N and stop
-                        break;
-                      }
-                 }
-           }
-        fract_digits.clear();
-
-        const UTF8_string max_int("9223372036854775807");
-        loop(j, MAX_TOKENIZE_DIGITS)
-            {
-              if (int_digits[j] < max_int[j])   break;   // small (int is OK).
-              if (int_digits[j] > max_int[j])            // float needed
-                 {
-                   need_float = true;
-                   // float precisionm is lower than integer precision, we can
-                   // therefore discard any fractional digits.
-                   fract_digits.clear();   // ignore fract digits
-                   break;
-                 }
-            }
-      }
-
-   if (fract_digits.size())
-      {
-         need_float = true;
-         *b++ = '.';
-         loop(f, fract_digits.size())   *b++ = fract_digits[f];
-      }
-
-   if (expo_digits.size())
-      {
-         need_float = true;
-         *b++ = 'e';
-         if (expo_negative)   *b++ = '-';
-         loop(e, expo_digits.size())   *b++ = expo_digits[e];
-      }
-   *b = 0;
-
-   if (need_float)
-      {
-        return Int_or_Double(APL_Float(strtod(buffer, 0)));
-      }
-   else
-      {
-        errno = 0;
-        const long long  result = strtoll(buffer, 0, 10);   // may set errno
-        if (errno)   // strtoll() failed (int_digits too large)
-           return Int_or_Double(APL_Float(strtod(buffer, 0)));
-        else
-           return Int_or_Double(APL_Integer(result));
-      }
 }
 //----------------------------------------------------------------------------
 void

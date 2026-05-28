@@ -71,6 +71,14 @@ RegexpMatch::is_match() const
    return match_result > 0;
 }
 //----------------------------------------------------------------------------
+UCS_string
+RegexpMatch::matched_string() const
+{
+const PCRE2_SIZE * ovector = get_ovector();
+UCS_string result(matched_B, ovector[0], ovector[1] - ovector[0]);
+   return result;
+}
+//----------------------------------------------------------------------------
 int
 RegexpMatch::num_matches() const
 {
@@ -81,14 +89,6 @@ RegexpMatch::num_matches() const
       }
 
     return match_result;
-}
-//----------------------------------------------------------------------------
-UCS_string
-RegexpMatch::matched_string() const
-{
-const PCRE2_SIZE * ovector = get_ovector();
-UCS_string result(matched_B, ovector[0], ovector[1] - ovector[0]);
-   return result;
 }
 //----------------------------------------------------------------------------
 Regexp::Regexp(const UCS_string & pattern, int flags)
@@ -121,12 +121,6 @@ Regexp::~Regexp()
    pcre2_code_free(code);
 }
 //----------------------------------------------------------------------------
-const RegexpMatch *
-Regexp::match(const UCS_string &match, PCRE2_SIZE size) const
-{
-   return new RegexpMatch(code, match, size);
-}
-//----------------------------------------------------------------------------
 int
 Regexp::expression_count() const
 {
@@ -134,6 +128,12 @@ uint32_t result;
     pcre2_pattern_info(code, PCRE2_INFO_CAPTURECOUNT, &result);
 
     return result;
+}
+//----------------------------------------------------------------------------
+const RegexpMatch *
+Regexp::match(const UCS_string &match, PCRE2_SIZE size) const
+{
+   return new RegexpMatch(code, match, size);
 }
 //----------------------------------------------------------------------------
 UCS_string

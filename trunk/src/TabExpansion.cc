@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,42 +60,19 @@ TabExpansion::expand_tab(UCS_string & user_input)
    return expand_distinguished_name(user_input);       // ⎕xxx
 }
 //----------------------------------------------------------------------------
-ExpandResult
-TabExpansion::expand_user_name(UCS_string & user_input)
+int
+TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
 {
-std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
+   // we assume that all matches have the same case
 
-UCS_string_vector matches;
-   loop(s, symbols.size())
-      {
-        const Symbol * sym = symbols[s];
-        if (sym->is_erased())    continue;
-
-        const UCS_string & sym_name = sym->get_name();
-        if (!sym_name.starts_with(user_input))   continue;
-        matches.push_back(sym_name);
-      }
-
-   if (matches.size() == 0)   return ER_IGNORE;   // no match
-
-   if (matches.size() > 1)    // multiple names match user input
-      {
-        const int user_len = user_input.size();
-        user_input.clear();
-        return show_alternatives(user_input, user_len, matches);
-      }
-
-   // unique match
-   //
-   if (user_input.size() < matches[0].size())
-      {
-        // the name is longer than user_input, so we expand it.
-        //
-        user_input = matches[0];
-        return ER_REPLACE;
-      }
-
-   return ER_IGNORE;
+   for (;; ++len)
+       {
+         loop(m, matches.size())
+            {
+              if (len >= matches[m].ssize())   return matches[m].size();
+              if (matches[0][len] != matches[m][len])    return len;
+            }
+       }
 }
 //----------------------------------------------------------------------------
 ExpandResult
@@ -177,264 +154,6 @@ const UCS_string & match = matches[0];
       }
 
    return expand_command_arg(user_input, ehint, shint, match, arg);
-}
-//----------------------------------------------------------------------------
-ExpandResult
-TabExpansion::expand_command_arg(UCS_string & user_input,
-                            ExpandHint ehint, const char * shint,
-                            const UCS_string cmd, const UCS_string arg)
-{
-   switch(ehint)
-      {
-        case EH_NO_PARAM:
-             return ER_IGNORE;
-
-        case EH_oWSNAME:
-        case EH_oLIB_WSNAME:
-        case EH_oLIB_oPATH:
-        case EH_oPATH:
-        case EH_FILENAME:
-        case EH_DIR_OR_LIB:
-        case EH_WSNAME:
-             return expand_filename(user_input, ehint, shint, cmd, arg);
-
-        case EH_PRIMITIVE:
-             return expand_help_topics(user_input);
-
-        case EH_CONFIG:
-             return expand_capability(user_input);
-
-        default:
-             CIN << endl;
-             CERR << cmd << " " << shint << endl;
-             return ER_AGAIN;
-      }
-}
-//----------------------------------------------------------------------------
-ExpandResult
-TabExpansion::expand_help_topics(UCS_string & user_input)
-{
-   if (user_input.size() <= 5)
-      return expand_help_topics();   // initial display
-
-const UCS_string help(user_input, 0, 6);
-UCS_string prefix(user_input, 5);   // the name prefix
-   prefix.remove_leading_whitespaces();
-
-std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
-
-UCS_string_vector matches;
-   loop(s, symbols.size())
-      {
-        const Symbol * sym = symbols[s];
-        if (sym->is_erased())    continue;
-
-        const UCS_string & sym_name = sym->get_name();
-        if (!sym_name.starts_with(prefix))   continue;
-        matches.push_back(sym_name);
-      }
-
-   if (matches.size() == 0)   return ER_IGNORE;   // no match
-   if (matches.size() > 1)   // multiple matches
-      {
-        matches.sort();
-
-        const int common_len = compute_common_length(prefix.size(), matches);
-        if (common_len > prefix.ssize())
-           {
-             // all matches can be extended in a unique way
-             //
-             matches[0].resize(common_len);
-             user_input = help + matches[0];
-             return ER_REPLACE;
-           }
-
-        // all possible extensions are different
-        //
-        return show_alternatives(user_input, prefix.size(), matches);
-      }
-
-   // unique match
-   //
-   user_input = help + matches[0];
-   return ER_REPLACE;
-}
-//----------------------------------------------------------------------------
-/// one help topic
-const struct _help
-{
-  int          valence;   ///< -5..2, see explanation in file Help.def
-  const char * prim;      ///< primitive, e.g. "⍬",     "+", ...
-  const char * name;      ///< name,      e.g. "Zilde", "Plus", ...
-  const char * title;     ///< brief description
-  const char * descr;     ///< long description
-} help_texts[] = {
-#define help_def(ar, pr, na, ti, descr) { ar, pr, na, ti, descr },
-#include "Help.def"
-};
-
-enum { HELP_count = sizeof(help_texts) / sizeof(_help) };
-
-ExpandResult
-TabExpansion::expand_help_topics()
-{
-   CIN << "\n";
-   CERR << "Help topics (APL primitives and user-defined names) are:" << endl;
-
-   // show APL primitives (but only once). For that Help.def must be sorted.
-   // Many primitives occur twice (once for their monadic and once for their
-   // dyadic form. We filter those duplicates out with strcmp(prim, last)
-   //
-   // We also remove some duplicates caused by different Unicodes (like ∣ and |)
-   //
-const char * last = "";
-int col = 0;
-const int max_col = Workspace::get_PW() - 4;
-
-   loop(h, HELP_count)
-       {
-         const char * prim = help_texts[h].prim;
-         if (!strcmp(prim, last))    continue;
-         last = prim;   // remember it.
-         if (strchr("|~", *prim))    continue;
-         CERR << " " << prim;
-         col += 2;
-         if (col > max_col)   { CERR << endl;   col = 0; } \
-       }
-
-std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
-
-UCS_string_vector names;
-   loop(s, symbols.size())
-      {
-        const Symbol * sym = symbols[s];
-        if (sym->is_erased())    continue;
-
-        const UCS_string & sym_name = sym->get_name();
-        names.push_back(sym_name);
-      }
-
-   names.sort();
-
-   // see if printing full names takes more than 5 lines. If so then
-   // only print first characters
-   //
-int rows = 1;   // the current row
-int c1 = col;
-   loop(n, names.size())
-      {
-        const int len = 1 + names[n].size();
-        c1 += len;
-        if (c1 > max_col)   { ++rows;   c1 = len; }
-      }
-
-   if (names.size() == 0)   /* nothing to do */;
-   else if (rows < 6)
-      {
-        loop(n, names.size())
-            {
-              const int len = 1 + names[n].size();
-              col += len;
-              if (col > max_col)   { CERR << endl;   col = len; }
-              CERR << " " << names[n];
-            }
-      }
-   else
-      {
-        Unicode uni = names[0][0];
-        CERR << " " << uni;
-        for (ShapeItem n = 1; n < ShapeItem(names.size()); ++n)
-            {
-              if (names[n][0] == uni)   continue;   // same first character
-              uni = names[n][0];
-              CERR << " " << uni;   col += 2;
-              if (col > max_col)   { CERR << endl;   col = 0; }
-            }
-      }
-
-   CERR << endl;
-   return ER_AGAIN;
-}
-//----------------------------------------------------------------------------
-ExpandResult
-TabExpansion::expand_distinguished_name(UCS_string & user_input)
-{
-   // figure the length of longest ⎕xxx name (probably ⎕TRACE == 5)
-   //
-unsigned int max_e = 2;
-#define ro_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
-#define rw_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
-#define sf_def(_q, str, _txt)    if (max_e < strlen(str))   max_e = strlen(str);
-#include "SystemVariable.def"
-
-   // Search for ⎕ backwards from the end
-   //
-int qpos = -1;   // the position of ⎕ in user_input
-
-   loop(e, max_e)
-      {
-        if (e >= user_input.ssize())   break;
-        if (user_input[user_input.size() - e - 1] == UNI_Quad_Quad)
-           {
-             qpos = user_input.size() - e;
-             break;
-           }
-      }
-
-   if (qpos != -1)   // ⎕xxx at end
-      {
-        UCS_string qxx(user_input, qpos);
-        UCS_string_vector matches;
-
-#define ro_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
-
-#define rw_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
-
-#define sf_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));     \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
-
-#include "SystemVariable.def"
-
-        if (matches.size() == 0)   return ER_IGNORE;
-        if (matches.size() > 1)
-           {
-            matches.sort();
-
-            const int common_len = compute_common_length(qxx.size(), matches);
-            if (common_len == qxx.ssize())
-               {
-                 // qxx is already the common part of all matching ⎕xx
-                 // display matching ⎕xx
-                 //
-                 CIN << endl;
-                 loop(m, matches.size())
-                     {
-                        CERR << "⎕" << matches[m] << " ";
-                     }
-                 CERR << endl;
-                 return ER_AGAIN;
-               }
-            else
-               {
-                 // qxx is a prefix of the common part of all matching ⎕xx.
-                 // expand to common part.
-                 //
-                 user_input = matches[0];
-                 user_input.resize(common_len);
-                 return ER_REPLACE;
-               }
-           }
-
-        // unique match
-        //
-        user_input.clear();
-        user_input << UNI_Quad_Quad << matches[0];
-        return ER_REPLACE;
-      }
-
-   return ER_IGNORE;
 }
 //----------------------------------------------------------------------------
 ExpandResult
@@ -545,6 +264,119 @@ vector<const char *> matches;
 const UTF8_string match(matches[0]);
    user_input = stem + UCS_string(match);
    return ER_REPLACE;   // unique match
+}
+//----------------------------------------------------------------------------
+ExpandResult
+TabExpansion::expand_command_arg(UCS_string & user_input,
+                            ExpandHint ehint, const char * shint,
+                            const UCS_string cmd, const UCS_string arg)
+{
+   switch(ehint)
+      {
+        case EH_NO_PARAM:
+             return ER_IGNORE;
+
+        case EH_oWSNAME:
+        case EH_oLIB_WSNAME:
+        case EH_oLIB_oPATH:
+        case EH_oPATH:
+        case EH_FILENAME:
+        case EH_DIR_OR_LIB:
+        case EH_WSNAME:
+             return expand_filename(user_input, ehint, shint, cmd, arg);
+
+        case EH_PRIMITIVE:
+             return expand_help_topics(user_input);
+
+        case EH_CONFIG:
+             return expand_capability(user_input);
+
+        default:
+             CIN << endl;
+             CERR << cmd << " " << shint << endl;
+             return ER_AGAIN;
+      }
+}
+//----------------------------------------------------------------------------
+ExpandResult
+TabExpansion::expand_distinguished_name(UCS_string & user_input)
+{
+   // figure the length of longest ⎕xxx name (probably ⎕TRACE == 5)
+   //
+unsigned int max_e = 2;
+#define ro_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
+#define rw_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
+#define sf_def(_q, str, _txt)    if (max_e < strlen(str))   max_e = strlen(str);
+#include "SystemVariable.def"
+
+   // Search for ⎕ backwards from the end
+   //
+int qpos = -1;   // the position of ⎕ in user_input
+
+   loop(e, max_e)
+      {
+        if (e >= user_input.ssize())   break;
+        if (user_input[user_input.size() - e - 1] == UNI_Quad_Quad)
+           {
+             qpos = user_input.size() - e;
+             break;
+           }
+      }
+
+   if (qpos != -1)   // ⎕xxx at end
+      {
+        UCS_string qxx(user_input, qpos);
+        UCS_string_vector matches;
+
+#define ro_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+
+#define rw_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+
+#define sf_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));     \
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+
+#include "SystemVariable.def"
+
+        if (matches.size() == 0)   return ER_IGNORE;
+        if (matches.size() > 1)
+           {
+            matches.sort();
+
+            const int common_len = compute_common_length(qxx.size(), matches);
+            if (common_len == qxx.ssize())
+               {
+                 // qxx is already the common part of all matching ⎕xx
+                 // display matching ⎕xx
+                 //
+                 CIN << endl;
+                 loop(m, matches.size())
+                     {
+                        CERR << "⎕" << matches[m] << " ";
+                     }
+                 CERR << endl;
+                 return ER_AGAIN;
+               }
+            else
+               {
+                 // qxx is a prefix of the common part of all matching ⎕xx.
+                 // expand to common part.
+                 //
+                 user_input = matches[0];
+                 user_input.resize(common_len);
+                 return ER_REPLACE;
+               }
+           }
+
+        // unique match
+        //
+        user_input.clear();
+        user_input << UNI_Quad_Quad << matches[0];
+        return ER_REPLACE;
+      }
+
+   return ER_IGNORE;
 }
 //----------------------------------------------------------------------------
 ExpandResult
@@ -679,6 +511,189 @@ nothing:
    return ER_AGAIN;
 }
 //----------------------------------------------------------------------------
+/// one help topic
+const struct _help
+{
+  int          valence;   ///< -5..2, see explanation in file Help.def
+  const char * prim;      ///< primitive, e.g. "⍬",     "+", ...
+  const char * name;      ///< name,      e.g. "Zilde", "Plus", ...
+  const char * title;     ///< brief description
+  const char * descr;     ///< long description
+} help_texts[] = {
+#define help_def(ar, pr, na, ti, descr) { ar, pr, na, ti, descr },
+#include "Help.def"
+};
+
+enum { HELP_count = sizeof(help_texts) / sizeof(_help) };
+
+ExpandResult
+TabExpansion::expand_help_topics()
+{
+   CIN << "\n";
+   CERR << "Help topics (APL primitives and user-defined names) are:" << endl;
+
+   // show APL primitives (but only once). For that Help.def must be sorted.
+   // Many primitives occur twice (once for their monadic and once for their
+   // dyadic form. We filter those duplicates out with strcmp(prim, last)
+   //
+   // We also remove some duplicates caused by different Unicodes (like ∣ and |)
+   //
+const char * last = "";
+int col = 0;
+const int max_col = Workspace::get_PW() - 4;
+
+   loop(h, HELP_count)
+       {
+         const char * prim = help_texts[h].prim;
+         if (!strcmp(prim, last))    continue;
+         last = prim;   // remember it.
+         if (strchr("|~", *prim))    continue;
+         CERR << " " << prim;
+         col += 2;
+         if (col > max_col)   { CERR << endl;   col = 0; } \
+       }
+
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
+
+UCS_string_vector names;
+   loop(s, symbols.size())
+      {
+        const Symbol * sym = symbols[s];
+        if (sym->is_erased())    continue;
+
+        const UCS_string & sym_name = sym->get_name();
+        names.push_back(sym_name);
+      }
+
+   names.sort();
+
+   // see if printing full names takes more than 5 lines. If so then
+   // only print first characters
+   //
+int rows = 1;   // the current row
+int c1 = col;
+   loop(n, names.size())
+      {
+        const int len = 1 + names[n].size();
+        c1 += len;
+        if (c1 > max_col)   { ++rows;   c1 = len; }
+      }
+
+   if (names.size() == 0)   /* nothing to do */;
+   else if (rows < 6)
+      {
+        loop(n, names.size())
+            {
+              const int len = 1 + names[n].size();
+              col += len;
+              if (col > max_col)   { CERR << endl;   col = len; }
+              CERR << " " << names[n];
+            }
+      }
+   else
+      {
+        Unicode uni = names[0][0];
+        CERR << " " << uni;
+        for (ShapeItem n = 1; n < ShapeItem(names.size()); ++n)
+            {
+              if (names[n][0] == uni)   continue;   // same first character
+              uni = names[n][0];
+              CERR << " " << uni;   col += 2;
+              if (col > max_col)   { CERR << endl;   col = 0; }
+            }
+      }
+
+   CERR << endl;
+   return ER_AGAIN;
+}
+//----------------------------------------------------------------------------
+ExpandResult
+TabExpansion::expand_help_topics(UCS_string & user_input)
+{
+   if (user_input.size() <= 5)
+      return expand_help_topics();   // initial display
+
+const UCS_string help(user_input, 0, 6);
+UCS_string prefix(user_input, 5);   // the name prefix
+   prefix.remove_leading_whitespaces();
+
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
+
+UCS_string_vector matches;
+   loop(s, symbols.size())
+      {
+        const Symbol * sym = symbols[s];
+        if (sym->is_erased())    continue;
+
+        const UCS_string & sym_name = sym->get_name();
+        if (!sym_name.starts_with(prefix))   continue;
+        matches.push_back(sym_name);
+      }
+
+   if (matches.size() == 0)   return ER_IGNORE;   // no match
+   if (matches.size() > 1)   // multiple matches
+      {
+        matches.sort();
+
+        const int common_len = compute_common_length(prefix.size(), matches);
+        if (common_len > prefix.ssize())
+           {
+             // all matches can be extended in a unique way
+             //
+             matches[0].resize(common_len);
+             user_input = help + matches[0];
+             return ER_REPLACE;
+           }
+
+        // all possible extensions are different
+        //
+        return show_alternatives(user_input, prefix.size(), matches);
+      }
+
+   // unique match
+   //
+   user_input = help + matches[0];
+   return ER_REPLACE;
+}
+//----------------------------------------------------------------------------
+ExpandResult
+TabExpansion::expand_user_name(UCS_string & user_input)
+{
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
+
+UCS_string_vector matches;
+   loop(s, symbols.size())
+      {
+        const Symbol * sym = symbols[s];
+        if (sym->is_erased())    continue;
+
+        const UCS_string & sym_name = sym->get_name();
+        if (!sym_name.starts_with(user_input))   continue;
+        matches.push_back(sym_name);
+      }
+
+   if (matches.size() == 0)   return ER_IGNORE;   // no match
+
+   if (matches.size() > 1)    // multiple names match user input
+      {
+        const int user_len = user_input.size();
+        user_input.clear();
+        return show_alternatives(user_input, user_len, matches);
+      }
+
+   // unique match
+   //
+   if (user_input.size() < matches[0].size())
+      {
+        // the name is longer than user_input, so we expand it.
+        //
+        user_input = matches[0];
+        return ER_REPLACE;
+      }
+
+   return ER_IGNORE;
+}
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_wsname(UCS_string & user_input, const UCS_string cmd,
                        LibRef lib, const UCS_string filename)
@@ -733,21 +748,6 @@ nothing:
    CIN << endl;
    CERR << cmd << " " << lib << " '" << filename << "'" << endl;
    return ER_AGAIN;
-}
-//----------------------------------------------------------------------------
-int
-TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
-{
-   // we assume that all matches have the same case
-
-   for (;; ++len)
-       {
-         loop(m, matches.size())
-            {
-              if (len >= matches[m].ssize())   return matches[m].size();
-              if (matches[0][len] != matches[m][len])    return len;
-            }
-       }
 }
 //----------------------------------------------------------------------------
 void

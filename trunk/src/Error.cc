@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,6 +61,80 @@ const bool have_more = Workspace::more_error().size();
    *error_message_2 = 0;
 }
 //----------------------------------------------------------------------------
+bool
+Error::is_known() const
+{
+   switch(error_code)
+      {
+   /// the cases
+#define err_def(c, _txt, _maj, _min) case  E_ ## c:   return true;
+#include "Error.def"
+      }
+
+   return false;
+}
+//----------------------------------------------------------------------------
+bool
+Error::is_syntax_or_value_error() const
+{
+   if (error_major(error_code) == 2)   return true;   // some SYNTAX ERROR
+   if (error_major(error_code) == 3)   return true;   // VALUE ERROR
+   return false;
+}
+//----------------------------------------------------------------------------
+void
+Error::add_MORE_indicator(bool have_more)
+{
+   if (have_more)   // )MORE info available
+      {
+        const size_t len = strlen(error_message_1);
+        if (error_message_1[len - 1] != UNI_PLUS &&
+            len < sizeof(error_message_1) - 1)
+           {
+             error_message_1[len]     = '+';
+             error_message_1[len + 1] = 0;
+           }
+      }
+}
+//----------------------------------------------------------------------------
+UCS_string
+Error::get_error_line_3() const
+{
+   if (error_code == E_NO_ERROR)   return UCS_string();   // no error
+
+   if (left_caret < 0)   return UCS_string();             // no ^ position
+
+UCS_string ret;
+   if (left_caret > 0)   ret << UCS_string(left_caret, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
+
+const int diff = right_caret - left_caret;
+   if (diff <= 0)   return ret;
+   if (diff > 1)   ret << UCS_string(diff - 1, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+void
+Error::print_em(ostream & out, const char * loc)
+{
+   if (print_loc)
+      {
+        CERR << endl << "*** Error printed twice; first printed at "
+             << print_loc << endl
+             << "now printed from " << loc << endl;
+
+        return;
+      }
+
+   print_loc = loc;
+   out << get_error_line_1() << endl;
+
+   out << get_error_line_2() << endl
+       << get_error_line_3() << endl;
+}
+//----------------------------------------------------------------------------
 void
 Error::print(ostream & out, const char * loc) const
 {
@@ -111,54 +185,11 @@ Error::print(ostream & out, const char * loc) const
       }
 }
 //----------------------------------------------------------------------------
-const char *
-Error::error_name(ErrorCode err)
-{
-   switch(err)
-      {
-   /// the cases
-#define err_def(c, txt, _maj, _min) \
-   case E_ ## c:   return txt;
-
-#include "Error.def"
-      }
-
-   return "Unknown Error";
-}
-//----------------------------------------------------------------------------
-bool
-Error::is_known() const
-{
-   switch(error_code)
-      {
-   /// the cases
-#define err_def(c, _txt, _maj, _min) case  E_ ## c:   return true;
-#include "Error.def"
-      }
-
-   return false;
-}
-//----------------------------------------------------------------------------
 void
 Error::set_error_line_1(const char * msg_1)
 {
    strncpy(error_message_1, msg_1, sizeof(error_message_1));
    error_message_1[sizeof(error_message_1) - 1] = 0;
-}
-//----------------------------------------------------------------------------
-void
-Error::add_MORE_indicator(bool have_more)
-{
-   if (have_more)   // )MORE info available
-      {
-        const size_t len = strlen(error_message_1);
-        if (error_message_1[len - 1] != UNI_PLUS &&
-            len < sizeof(error_message_1) - 1)
-           {
-             error_message_1[len]     = '+';
-             error_message_1[len + 1] = 0;
-           }
-      }
 }
 //----------------------------------------------------------------------------
 void
@@ -176,172 +207,6 @@ UTF8_string utf(ucs);
    error_message_2[sizeof(error_message_2) - 1] = 0;
    left_caret = lcaret;
    right_caret = rcaret;
-}
-//----------------------------------------------------------------------------
-bool
-Error::is_syntax_or_value_error() const
-{
-   if (error_major(error_code) == 2)   return true;   // some SYNTAX ERROR
-   if (error_major(error_code) == 3)   return true;   // VALUE ERROR
-   return false;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Error::get_error_line_3() const
-{
-   if (error_code == E_NO_ERROR)   return UCS_string();   // no error
-
-   if (left_caret < 0)   return UCS_string();             // no ^ position
-
-UCS_string ret;
-   if (left_caret > 0)   ret << UCS_string(left_caret, UNI_SPACE);
-   ret << UNI_CIRCUMFLEX;
-
-const int diff = right_caret - left_caret;
-   if (diff <= 0)   return ret;
-   if (diff > 1)   ret << UCS_string(diff - 1, UNI_SPACE);
-   ret << UNI_CIRCUMFLEX;
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-Error::print_em(ostream & out, const char * loc)
-{
-   if (print_loc)
-      {
-        CERR << endl << "*** Error printed twice; first printed at "
-             << print_loc << endl
-             << "now printed from " << loc << endl;
-
-        return;
-      }
-
-   print_loc = loc;
-   out << get_error_line_1() << endl;
-
-   out << get_error_line_2() << endl
-       << get_error_line_3() << endl;
-}
-//----------------------------------------------------------------------------
-void
-throw_apl_error(ErrorCode code, const char * loc)
-{
-   ADD_EVENT(0, VHE_Error, code, loc);
-
-StateIndicator * si = Workspace::SI_top();   // the current )SI entry
-
-   Log(LOG_error_throw)
-      {
-        CERR << endl
-             << "throwing " << Error::error_name(code)
-             << " at " << loc << endl;
-      }
-
-   Log(LOG_verbose_error)
-      {
-        if (!(si && si->get_safe_execution_depth()))   BACKTRACE
-      }
-
-   // maybe map error to DOMAIN ERROR.
-   //
-   if (si)
-      {
-        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
-        if (ufun && ufun->get_exec_properties()[3])   code = E_DOMAIN_ERROR;
-      }
-
-Error error(code, loc);
-   if (si)   error.update_error_info(si);
-
-const Error & eref = error;
-   throw eref;
-}
-//----------------------------------------------------------------------------
-void
-Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
-{
-   Log(LOG_error_throw)
-      {
-        CERR << "\nthrowing " << Error::error_name(code)
-             << " at " << loc << endl;
-      }
-
-   Log(LOG_verbose_error)   BACKTRACE
-
-   // set )MORE error (unless the caller has done so)
-   if (Workspace::more_error().size() == 0)   // no )MORE info yet
-      {
-        MORE_ERROR() << Error::error_name(code);
-      }
-
-Error error(code, loc);
-   error.parser_loc = par_loc;
-
-// StateIndicator * si = Workspace::SI_top();
-// if (si)   error.update_error_info(si);
-
-const Error & eref = error;
-   throw eref;
-}
-//----------------------------------------------------------------------------
-void
-Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
-{
-   Log(LOG_error_throw)   
-      {   
-        CERR << "throwing VALUE ERROR at " << loc;
-        if (sym_name.size())   CERR << " (symbol is: '" << sym_name << "')"; 
-        CERR << endl;
-      }
-
-   if (Workspace::more_error().size() == 0 &&   // no )MORE info provided, and
-       Workspace::SI_top()->get_safe_execution_depth() == 0)   // and not in ⎕ES
-      {
-        char extra[20] = { 0 };
-        if (sym_name.size() == 1 && sym_name[0] >= 0x80)
-           SPRINTF(extra, " (U+%4.4X)", sym_name[0]);
-        MORE_ERROR() << "Offending symbol: " << sym_name << extra;
-      }
-
-   Log(LOG_verbose_error)     BACKTRACE
-
-Error err(E_VALUE_ERROR, loc);
-UTF8_string sym_name_utf(sym_name);
-   SPRINTF(err.symbol_name, "%s", sym_name_utf.c_str());
-
-   if (StateIndicator * si = Workspace::SI_top())   // )SI not empty
-      err.update_error_info(si);
-
-const Error & eref = err;
-   throw eref;
-}
-//----------------------------------------------------------------------------
-void
-Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
-                          const char * loc)
-{
-   // this error is thrown if the ∇-editor detects an invalid function header,
-   // for example: "∇FOO 2"
-
-   Log(LOG_error_throw)   
-      {   
-        CERR << "throwing DEFN ERROR at " << loc
-             << " (function is " << fun_name << ")" << endl;
-      }
-
-   Log(LOG_verbose_error)     BACKTRACE
-
-Error err(E_DEFN_ERROR, loc);
-Error & eref = err;
-UTF8_string fun_name_utf(fun_name);
-   SPRINTF(err.symbol_name, "%s", fun_name_utf.c_str());
-
-UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
-   SPRINTF(err.error_message_2, "PROMPT%s", cmd_utf.c_str());
-   eref.left_caret = 5 + cmd.size();   // last Unicode of error_message_2
-   if (Workspace::SI_top())   *Workspace::get_error() = eref;
-   throw eref;
 }
 //----------------------------------------------------------------------------
 void
@@ -418,6 +283,141 @@ out:
        }
 
    print_em(UERR, LOC);
+}
+//----------------------------------------------------------------------------
+const char *
+Error::error_name(ErrorCode err)
+{
+   switch(err)
+      {
+   /// the cases
+#define err_def(c, txt, _maj, _min) \
+   case E_ ## c:   return txt;
+
+#include "Error.def"
+      }
+
+   return "Unknown Error";
+}
+//----------------------------------------------------------------------------
+void
+throw_apl_error(ErrorCode code, const char * loc)
+{
+   ADD_EVENT(0, VHE_Error, code, loc);
+
+StateIndicator * si = Workspace::SI_top();   // the current )SI entry
+
+   Log(LOG_error_throw)
+      {
+        CERR << endl
+             << "throwing " << Error::error_name(code)
+             << " at " << loc << endl;
+      }
+
+   Log(LOG_verbose_error)
+      {
+        if (!(si && si->get_safe_execution_depth()))   BACKTRACE
+      }
+
+   // maybe map error to DOMAIN ERROR.
+   //
+   if (si)
+      {
+        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
+        if (ufun && ufun->get_exec_properties()[3])   code = E_DOMAIN_ERROR;
+      }
+
+Error error(code, loc);
+   if (si)   error.update_error_info(si);
+
+const Error & eref = error;
+   throw eref;
+}
+//----------------------------------------------------------------------------
+void
+Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
+                          const char * loc)
+{
+   // this error is thrown if the ∇-editor detects an invalid function header,
+   // for example: "∇FOO 2"
+
+   Log(LOG_error_throw)   
+      {   
+        CERR << "throwing DEFN ERROR at " << loc
+             << " (function is " << fun_name << ")" << endl;
+      }
+
+   Log(LOG_verbose_error)     BACKTRACE
+
+Error err(E_DEFN_ERROR, loc);
+Error & eref = err;
+UTF8_string fun_name_utf(fun_name);
+   SPRINTF(err.symbol_name, "%s", fun_name_utf.c_str());
+
+UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
+   SPRINTF(err.error_message_2, "PROMPT%s", cmd_utf.c_str());
+   eref.left_caret = 5 + cmd.size();   // last Unicode of error_message_2
+   if (Workspace::SI_top())   *Workspace::get_error() = eref;
+   throw eref;
+}
+//----------------------------------------------------------------------------
+void
+Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
+{
+   Log(LOG_error_throw)
+      {
+        CERR << "\nthrowing " << Error::error_name(code)
+             << " at " << loc << endl;
+      }
+
+   Log(LOG_verbose_error)   BACKTRACE
+
+   // set )MORE error (unless the caller has done so)
+   if (Workspace::more_error().size() == 0)   // no )MORE info yet
+      {
+        MORE_ERROR() << Error::error_name(code);
+      }
+
+Error error(code, loc);
+   error.parser_loc = par_loc;
+
+// StateIndicator * si = Workspace::SI_top();
+// if (si)   error.update_error_info(si);
+
+const Error & eref = error;
+   throw eref;
+}
+//----------------------------------------------------------------------------
+void
+Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
+{
+   Log(LOG_error_throw)   
+      {   
+        CERR << "throwing VALUE ERROR at " << loc;
+        if (sym_name.size())   CERR << " (symbol is: '" << sym_name << "')"; 
+        CERR << endl;
+      }
+
+   if (Workspace::more_error().size() == 0 &&   // no )MORE info provided, and
+       Workspace::SI_top()->get_safe_execution_depth() == 0)   // and not in ⎕ES
+      {
+        char extra[20] = { 0 };
+        if (sym_name.size() == 1 && sym_name[0] >= 0x80)
+           SPRINTF(extra, " (U+%4.4X)", sym_name[0]);
+        MORE_ERROR() << "Offending symbol: " << sym_name << extra;
+      }
+
+   Log(LOG_verbose_error)     BACKTRACE
+
+Error err(E_VALUE_ERROR, loc);
+UTF8_string sym_name_utf(sym_name);
+   SPRINTF(err.symbol_name, "%s", sym_name_utf.c_str());
+
+   if (StateIndicator * si = Workspace::SI_top())   // )SI not empty
+      err.update_error_info(si);
+
+const Error & eref = err;
+   throw eref;
 }
 //----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,14 +40,6 @@
 
 //----------------------------------------------------------------------------
 bool
-FloatCell::equal(const Cell & A, double qct) const
-{
-   if (!A.is_numeric())       return false;
-   if (A.is_complex_cell())   return A.equal(*this, qct);
-   return tolerantly_equal(A.get_real_value(), get_real_value(), qct);
-}
-//----------------------------------------------------------------------------
-bool
 FloatCell::greater(const Cell & other) const
 {
 const APL_Float this_val  = get_real_value();
@@ -81,187 +73,65 @@ const Comp_result comp = compare(other);
 }
 //----------------------------------------------------------------------------
 bool
-FloatCell::get_near_bool()  const
+FloatCell::equal(const Cell & A, double qct) const
 {
-   if (dfval() > INTEGER_TOLERANCE)   // maybe 1
+   if (!A.is_numeric())       return false;
+   if (A.is_complex_cell())   return A.equal(*this, qct);
+   return tolerantly_equal(A.get_real_value(), get_real_value(), qct);
+}
+//----------------------------------------------------------------------------
+// dyadic built-in functions...
+//
+// where possible a function with non-real A is delegated to the corresponding
+// member function of A. For numeric cells that is the ComplexCell function
+// and otherwise the default function (that returns E_DOMAIN_ERROR.
+//
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_add(Cell * Z, const Cell * A) const
+{
+   if (A->is_real_cell())
       {
-        if (dfval() > (1.0 + INTEGER_TOLERANCE))   DOMAIN_ERROR;
-        if (dfval() < (1.0 - INTEGER_TOLERANCE))   DOMAIN_ERROR;
-        return true;
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (const APL_Integer denom_B = get_denominator())
+   if (const APL_Integer denom_A = A->get_denominator())
+      {
+        // both A and B are rational
+        //
+        if (Cell::prod_overflow(denom_A, denom_B))   goto big;
+
+        // compute common denominator...
+        const APL_Integer gcd_AB   = gcd(denom_A, denom_B);
+        const APL_Integer mult_A  = denom_A / gcd_AB;
+        const APL_Integer mult_B  = denom_B / gcd_AB;
+        const APL_Integer denom_AB = denom_A * mult_B;
+        if (Cell::prod_overflow(denom_AB, mult_B))                goto big;
+
+        // compute numerators...
+        const APL_Integer numer_A = A->get_numerator();
+        if (Cell::prod_overflow(numer_A, mult_B))                goto big;
+        const APL_Integer numer_A1 = numer_A * mult_B;
+        const APL_Integer numer_B = get_numerator();
+        if (Cell::prod_overflow(numer_B, mult_A))                goto big;
+        const APL_Integer numer_B1 = numer_B * mult_A;
+
+        const APL_Integer sum_AB = numer_A1 + numer_B1;
+        if (Cell::sum_overflow(sum_AB, numer_A1, numer_B1))      goto big;
+        const APL_Integer sum_gcd = gcd(sum_AB, denom_AB);
+        if (sum_gcd == denom_AB)   return IntCell::zI(Z, sum_AB / denom_AB);
+        if (sum_gcd == 1)   return FloatCell::zR(Z, sum_AB, denom_AB);
+        return FloatCell::zR(Z, sum_AB/sum_gcd, denom_AB/sum_gcd);
+      }
+      big:
+
+#endif
+
+        return FloatCell::zF(Z, A->get_real_value() + get_real_value());
       }
 
-   // maybe 0. We already know that dfval() ≤ qct
+   // delegate to A
    //
-   if (dfval() < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
-   return false;
-}
-//----------------------------------------------------------------------------
-Comp_result
-FloatCell::compare(const Cell & other) const
-{
-   if (other.is_integer_cell())   // integer
-      {
-        const double qct = Workspace::get_CT();
-        if (equal(other, qct))   return COMP_EQ;
-        return (dfval() <= other.get_int_value())  ? COMP_LT : COMP_GT;
-      }
-
-   if (other.is_float_cell())
-      {
-        const double qct = Workspace::get_CT();
-        if (equal(other, qct))   return COMP_EQ;
-        return (dfval() <= other.get_real_value()) ? COMP_LT : COMP_GT;
-      }
-
-   if (other.is_complex_cell())   return Comp_result(-other.compare(*this));
-
-   if (other.is_character_cell())   return COMP_GT;   // numeric > char
-   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-// monadic built-in functions...
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_near_int64_t(Cell * Z) const
-{
-   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
-
-   return IntCell::zI(Z, get_near_int());
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_within_quad_CT(Cell * Z) const
-{
-const double val = dfval();
-   if (val > LARGE_INT)   return E_DOMAIN_ERROR;
-   if (val < SMALL_INT)   return E_DOMAIN_ERROR;
-
-const double max_diff = Workspace::get_CT() * fabs(val);   // scale ⎕CT
-
-const APL_Float val_dn = floor(val);
-   if (val < (val_dn + max_diff))   return FloatCell::zF(Z, val_dn);
-
-const APL_Float val_up = ceil(val);
-   if (val > (val_up - max_diff))   return FloatCell::zF(Z, val_up);
-
-   return E_DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_factorial(Cell * Z) const
-{
-   // max N! that fits into double is about 170
-   //
-   if (dfval() > 170.0)   return E_DOMAIN_ERROR;
-
-const APL_Float arg = dfval() + 1.0;
-   return FloatCell::zF(Z, tgamma(arg));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_conjugate(Cell * Z) const
-{
-   // convert quotients (if any) to double
-   return FloatCell::zF(Z, dfval());
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_negative(Cell * Z) const
-{
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom = get_denominator())
-      return FloatCell::zR(Z, -get_numerator(), denom);
-#endif
-
-   return FloatCell::zF(Z, - dfval());
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_direction(Cell * Z) const
-{
-   // Note: bif_direction does NOT use ⎕CT
-   //
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   // denominator is either 0 (for Floats) or positive (for quotients)
-   if (const APL_Integer denom = get_denominator())
-      {
-        if (get_numerator() > 0)   return IntCell::zI(Z,  1);
-        if (get_numerator() < 0)   return IntCell::zI(Z, -1);
-        return FloatCell::zF(Z, 0);
-      }
-#endif
-
-   if (dfval() > 0.0)   return IntCell::z1(Z);
-   if (dfval() < 0.0)   return IntCell::z_1(Z);
-   return IntCell::z0(Z);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_magnitude(Cell * Z) const
-{
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom = get_denominator())
-      {
-        const APL_Integer numer = get_numerator();
-        return FloatCell::zR(Z, numer < 0 ? -numer : numer, denom);
-      }
-#endif
-
-   if (dfval() < 0.0)   return FloatCell::zF(Z, -dfval());
-   else                 return FloatCell::zF(Z, dfval());
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_reciprocal(Cell * Z) const
-{
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom = get_denominator())
-      {
-        if (uint64_t(denom) < 0x8000000000000000ULL)   // small enough for int32
-           {
-             const APL_Integer numer = get_numerator();
-             // simply exchange numerator and denominator, but make sure that
-             // the denominator is positive
-             //
-             if (numer == 1)    return IntCell::zI(Z,  denom);   // 1 ÷ X ÷ X
-             if (numer == -1)   return IntCell::zI(Z, -denom);   // 1 ÷ -X → -X
-             if (numer < 0)     return FloatCell::zR(Z, -denom, -numer);
-             else               return FloatCell::zR(Z, denom, numer);
-           }
-
-        // at this point denom does not fit into numer. Fall through
-      }
-#endif
-
-const APL_Float z = 1.0/dfval();
-   if (!isfinite(z))   return E_DOMAIN_ERROR;
-
-   return FloatCell::zF(Z, 1.0/dfval());
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_roll(Cell * Z) const
-{
-   if (!is_near_int())   return E_DOMAIN_ERROR;
-
-const APL_Integer set_size = get_checked_near_int();
-   if (set_size <= 0)   return E_DOMAIN_ERROR;
-
-const uint64_t rnd = Workspace::get_RL(set_size);
-   return IntCell::zI(Z, Workspace::get_IO() + (rnd % set_size));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_pi_times(Cell * Z) const
-{
-   return FloatCell::zF(Z, dfval() * M_PI);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_pi_times_inverse(Cell * Z) const
-{
-   return FloatCell::zF(Z, dfval() / M_PI);
+   return A->bif_add(Z, this);
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -296,6 +166,98 @@ const APL_Float D = bi - b;
 
    if (D >= (1.0 - Workspace::get_CT()))   --bi;
    return IntCell::zI(Z, bi);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_conjugate(Cell * Z) const
+{
+   // convert quotients (if any) to double
+   return FloatCell::zF(Z, dfval());
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_direction(Cell * Z) const
+{
+   // Note: bif_direction does NOT use ⎕CT
+   //
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   // denominator is either 0 (for Floats) or positive (for quotients)
+   if (const APL_Integer denom = get_denominator())
+      {
+        if (get_numerator() > 0)   return IntCell::zI(Z,  1);
+        if (get_numerator() < 0)   return IntCell::zI(Z, -1);
+        return FloatCell::zF(Z, 0);
+      }
+#endif
+
+   if (dfval() > 0.0)   return IntCell::z1(Z);
+   if (dfval() < 0.0)   return IntCell::z_1(Z);
+   return IntCell::z0(Z);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_divide(Cell * Z, const Cell * A) const
+{
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (const APL_Integer B_denom = get_denominator())  // B is rational
+      {
+        const APL_Integer B_numer = get_numerator();
+        if (B_numer == 0)   // A ÷ 0
+           {
+             if (A->is_near_zero())   return IntCell::z1(Z);   // 0÷0 is 1
+             return E_DOMAIN_ERROR;
+           }
+        const FloatCell inv_B(B_denom, B_numer);
+        return inv_B.bif_multiply(Z, A);
+      }
+#endif
+
+   if (!A->is_numeric())   return E_DOMAIN_ERROR;
+
+const APL_Float ar = A->get_real_value();
+const APL_Float ai = A->get_imag_value();
+
+   if (dfval() == 0.0)   // A ÷ 0
+      {
+         if (ar != 0.0)   return E_DOMAIN_ERROR;
+         if (ai != 0.0)   return E_DOMAIN_ERROR;
+
+         return IntCell::z1(Z);   // 0÷0 is 1 in APL
+      }
+
+
+   if (ai == 0.0)   // real result
+      {
+        const APL_Float real = ar / dfval() ;
+        return isfinite(real) ? FloatCell::zF(Z, real) : E_DOMAIN_ERROR;
+      }
+
+   // complex result
+   //
+const double zar = ar / dfval();
+const double zai = ai / dfval();
+   if (!isfinite(zar))   return E_DOMAIN_ERROR;
+   if (!isfinite(zai))   return E_DOMAIN_ERROR;
+   return ComplexCell::zC(Z, zar, zai);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_exponential(Cell * Z) const
+{
+   // e to the B-th power
+   //
+   return FloatCell::zF(Z, exp(dfval()));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_factorial(Cell * Z) const
+{
+   // max N! that fits into double is about 170
+   //
+   if (dfval() > 170.0)   return E_DOMAIN_ERROR;
+
+const APL_Float arg = dfval() + 1.0;
+   return FloatCell::zF(Z, tgamma(arg));
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -366,136 +328,18 @@ const APL_Float D = b - bi;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-FloatCell::bif_exponential(Cell * Z) const
+FloatCell::bif_magnitude(Cell * Z) const
 {
-   // e to the B-th power
-   //
-   return FloatCell::zF(Z, exp(dfval()));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_nat_log(Cell * Z) const
-{
-const APL_Float val = dfval();
-   if (val == 0.0)     return E_DOMAIN_ERROR;
-
-   if (val > 0.0)   // real result
-      {
-        return FloatCell::zF(Z, log(val));
-      }
-
-const APL_Complex bb(val, 0);
-   return ComplexCell::zC(Z, log(bb));
-}
-//----------------------------------------------------------------------------
-// dyadic built-in functions...
-//
-// where possible a function with non-real A is delegated to the corresponding
-// member function of A. For numeric cells that is the ComplexCell function
-// and otherwise the default function (that returns E_DOMAIN_ERROR.
-//
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_add(Cell * Z, const Cell * A) const
-{
-   if (A->is_real_cell())
-      {
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom_B = get_denominator())
-   if (const APL_Integer denom_A = A->get_denominator())
+   if (const APL_Integer denom = get_denominator())
       {
-        // both A and B are rational
-        //
-        if (Cell::prod_overflow(denom_A, denom_B))   goto big;
-
-        // compute common denominator...
-        const APL_Integer gcd_AB   = gcd(denom_A, denom_B);
-        const APL_Integer mult_A  = denom_A / gcd_AB;
-        const APL_Integer mult_B  = denom_B / gcd_AB;
-        const APL_Integer denom_AB = denom_A * mult_B;
-        if (Cell::prod_overflow(denom_AB, mult_B))                goto big;
-
-        // compute numerators...
-        const APL_Integer numer_A = A->get_numerator();
-        if (Cell::prod_overflow(numer_A, mult_B))                goto big;
-        const APL_Integer numer_A1 = numer_A * mult_B;
-        const APL_Integer numer_B = get_numerator();
-        if (Cell::prod_overflow(numer_B, mult_A))                goto big;
-        const APL_Integer numer_B1 = numer_B * mult_A;
-
-        const APL_Integer sum_AB = numer_A1 + numer_B1;
-        if (Cell::sum_overflow(sum_AB, numer_A1, numer_B1))      goto big;
-        const APL_Integer sum_gcd = gcd(sum_AB, denom_AB);
-        if (sum_gcd == denom_AB)   return IntCell::zI(Z, sum_AB / denom_AB);
-        if (sum_gcd == 1)   return FloatCell::zR(Z, sum_AB, denom_AB);
-        return FloatCell::zR(Z, sum_AB/sum_gcd, denom_AB/sum_gcd);
+        const APL_Integer numer = get_numerator();
+        return FloatCell::zR(Z, numer < 0 ? -numer : numer, denom);
       }
-      big:
-
 #endif
 
-        return FloatCell::zF(Z, A->get_real_value() + get_real_value());
-      }
-
-   // delegate to A
-   //
-   return A->bif_add(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_add_inverse(Cell * Z, const Cell * A) const
-{
-   return A->bif_subtract(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_subtract(Cell * Z, const Cell * A) const
-{
-   if (A->is_real_cell())   // real result
-      {
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom_B = get_denominator())
-   if (const APL_Integer denom_A = A->get_denominator())
-      {
-        // both A and B are rational
-        //
-        if (Cell::prod_overflow(denom_A, denom_B))   goto big;
-
-        // compute common denominator...
-        const APL_Integer gcd_AB   = gcd(denom_A, denom_B);
-        const APL_Integer mult_A  = denom_A / gcd_AB;
-        const APL_Integer mult_B  = denom_B / gcd_AB;
-        const APL_Integer denom_AB = denom_A * mult_B;
-
-        // compute numerators...
-        const APL_Integer numer_A = A->get_numerator();
-        if (Cell::prod_overflow(numer_A, mult_B))                goto big;
-        const APL_Integer numer_A1 = numer_A * mult_B;
-        const APL_Integer numer_B = get_numerator();
-        if (Cell::prod_overflow(numer_B, mult_A))                goto big;
-        const APL_Integer numer_B1 = numer_B * mult_A;
-
-        const APL_Integer diff_AB = numer_A1 - numer_B1;
-        if (Cell::diff_overflow(diff_AB, numer_A1, numer_B1))    goto big;
-        const APL_Integer diff_gcd = gcd(diff_AB, denom_AB);
-        if (diff_gcd == denom_AB)   return IntCell::zI(Z, diff_AB / denom_AB);
-        if (diff_gcd == 1)   return FloatCell::zR(Z, diff_AB, denom_AB);
-        return FloatCell::zR(Z, diff_AB/diff_gcd, denom_AB/diff_gcd);
-      }
-      big:
-
-#endif
-
-       return FloatCell::zF(Z, A->get_real_value() - get_real_value());
-      }
-
-   if (A->is_complex_cell())   // complex result
-      {
-       return ComplexCell::zC(Z, A->get_real_value() - get_real_value(),
-                                 A->get_imag_value());
-      }
-
-   return E_DOMAIN_ERROR;
+   if (dfval() < 0.0)   return FloatCell::zF(Z, -dfval());
+   else                 return FloatCell::zF(Z, dfval());
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -551,58 +395,6 @@ const double zi = ai * dfval();
 } 
 //----------------------------------------------------------------------------
 ErrorCode
-FloatCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
-{
-   return A->bif_divide(Z, this);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-FloatCell::bif_divide(Cell * Z, const Cell * A) const
-{
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer B_denom = get_denominator())  // B is rational
-      {
-        const APL_Integer B_numer = get_numerator();
-        if (B_numer == 0)   // A ÷ 0
-           {
-             if (A->is_near_zero())   return IntCell::z1(Z);   // 0÷0 is 1
-             return E_DOMAIN_ERROR;
-           }
-        const FloatCell inv_B(B_denom, B_numer);
-        return inv_B.bif_multiply(Z, A);
-      }
-#endif
-
-   if (!A->is_numeric())   return E_DOMAIN_ERROR;
-
-const APL_Float ar = A->get_real_value();
-const APL_Float ai = A->get_imag_value();
-
-   if (dfval() == 0.0)   // A ÷ 0
-      {
-         if (ar != 0.0)   return E_DOMAIN_ERROR;
-         if (ai != 0.0)   return E_DOMAIN_ERROR;
-
-         return IntCell::z1(Z);   // 0÷0 is 1 in APL
-      }
-
-
-   if (ai == 0.0)   // real result
-      {
-        const APL_Float real = ar / dfval() ;
-        return isfinite(real) ? FloatCell::zF(Z, real) : E_DOMAIN_ERROR;
-      }
-
-   // complex result
-   //
-const double zar = ar / dfval();
-const double zai = ai / dfval();
-   if (!isfinite(zar))   return E_DOMAIN_ERROR;
-   if (!isfinite(zai))   return E_DOMAIN_ERROR;
-   return ComplexCell::zC(Z, zar, zai);
-}
-//----------------------------------------------------------------------------
-ErrorCode
 FloatCell::bif_power(Cell * Z, const Cell * A) const
 {
    // some A to the real B-th power
@@ -644,6 +436,154 @@ const APL_Complex z = complex_power(a, dfval());
    if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
    return ComplexCell::zC(Z, z);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_nat_log(Cell * Z) const
+{
+const APL_Float val = dfval();
+   if (val == 0.0)     return E_DOMAIN_ERROR;
+
+   if (val > 0.0)   // real result
+      {
+        return FloatCell::zF(Z, log(val));
+      }
+
+const APL_Complex bb(val, 0);
+   return ComplexCell::zC(Z, log(bb));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_negative(Cell * Z) const
+{
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (const APL_Integer denom = get_denominator())
+      return FloatCell::zR(Z, -get_numerator(), denom);
+#endif
+
+   return FloatCell::zF(Z, - dfval());
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_pi_times(Cell * Z) const
+{
+   return FloatCell::zF(Z, dfval() * M_PI);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_pi_times_inverse(Cell * Z) const
+{
+   return FloatCell::zF(Z, dfval() / M_PI);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_reciprocal(Cell * Z) const
+{
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (const APL_Integer denom = get_denominator())
+      {
+        if (uint64_t(denom) < 0x8000000000000000ULL)   // small enough for int32
+           {
+             const APL_Integer numer = get_numerator();
+             // simply exchange numerator and denominator, but make sure that
+             // the denominator is positive
+             //
+             if (numer == 1)    return IntCell::zI(Z,  denom);   // 1 ÷ X ÷ X
+             if (numer == -1)   return IntCell::zI(Z, -denom);   // 1 ÷ -X → -X
+             if (numer < 0)     return FloatCell::zR(Z, -denom, -numer);
+             else               return FloatCell::zR(Z, denom, numer);
+           }
+
+        // at this point denom does not fit into numer. Fall through
+      }
+#endif
+
+const APL_Float z = 1.0/dfval();
+   if (!isfinite(z))   return E_DOMAIN_ERROR;
+
+   return FloatCell::zF(Z, 1.0/dfval());
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_roll(Cell * Z) const
+{
+   if (!is_near_int())   return E_DOMAIN_ERROR;
+
+const APL_Integer set_size = get_checked_near_int();
+   if (set_size <= 0)   return E_DOMAIN_ERROR;
+
+const uint64_t rnd = Workspace::get_RL(set_size);
+   return IntCell::zI(Z, Workspace::get_IO() + (rnd % set_size));
+}
+//----------------------------------------------------------------------------
+Comp_result
+FloatCell::compare(const Cell & other) const
+{
+   if (other.is_integer_cell())   // integer
+      {
+        const double qct = Workspace::get_CT();
+        if (equal(other, qct))   return COMP_EQ;
+        return (dfval() <= other.get_int_value())  ? COMP_LT : COMP_GT;
+      }
+
+   if (other.is_float_cell())
+      {
+        const double qct = Workspace::get_CT();
+        if (equal(other, qct))   return COMP_EQ;
+        return (dfval() <= other.get_real_value()) ? COMP_LT : COMP_GT;
+      }
+
+   if (other.is_complex_cell())   return Comp_result(-other.compare(*this));
+
+   if (other.is_character_cell())   return COMP_GT;   // numeric > char
+   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_maximum(Cell * Z, const Cell * A) const
+{
+const APL_Float b = this->dfval();
+   if (A->is_integer_cell())
+      {
+         const APL_Integer a = A->get_int_value();
+         if (a >= b)   return IntCell::zI(Z, a);
+         else          return FloatCell::zF(Z, b);
+      }
+
+   if (A->is_float_cell())
+      {
+         const APL_Float a = A->get_real_value();
+         if (a >= b)   return FloatCell::zF(Z, a);
+         else          return FloatCell::zF(Z, b);
+      }
+
+   // complex A and float B: delegate to A
+   //
+   return A->bif_maximum(Z, this);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_minimum(Cell * Z, const Cell * A) const
+{
+const APL_Float b = this->dfval();
+   if (A->is_integer_cell())
+      {
+         const APL_Integer a = A->get_int_value();
+         if (a <= dfval())   return IntCell::zI(Z, a);
+         else                return FloatCell::zF(Z, b);
+      }
+
+   if (A->is_float_cell())
+      {
+         const APL_Float a = A->get_real_value();
+         if (a <= b)   return FloatCell::zF(Z, a);
+         else          return FloatCell::zF(Z, b);
+      }
+
+   // complex A and float B: delegate to A
+   //
+   return A->bif_minimum(Z, this);
 }
 //----------------------------------------------------------------------------
 inline double
@@ -767,49 +707,109 @@ Assert(isnormal(r2) || r2 == null);
 }
 //----------------------------------------------------------------------------
 ErrorCode
-FloatCell::bif_maximum(Cell * Z, const Cell * A) const
+FloatCell::bif_subtract(Cell * Z, const Cell * A) const
 {
-const APL_Float b = this->dfval();
-   if (A->is_integer_cell())
+   if (A->is_real_cell())   // real result
       {
-         const APL_Integer a = A->get_int_value();
-         if (a >= b)   return IntCell::zI(Z, a);
-         else          return FloatCell::zF(Z, b);
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   if (const APL_Integer denom_B = get_denominator())
+   if (const APL_Integer denom_A = A->get_denominator())
+      {
+        // both A and B are rational
+        //
+        if (Cell::prod_overflow(denom_A, denom_B))   goto big;
+
+        // compute common denominator...
+        const APL_Integer gcd_AB   = gcd(denom_A, denom_B);
+        const APL_Integer mult_A  = denom_A / gcd_AB;
+        const APL_Integer mult_B  = denom_B / gcd_AB;
+        const APL_Integer denom_AB = denom_A * mult_B;
+
+        // compute numerators...
+        const APL_Integer numer_A = A->get_numerator();
+        if (Cell::prod_overflow(numer_A, mult_B))                goto big;
+        const APL_Integer numer_A1 = numer_A * mult_B;
+        const APL_Integer numer_B = get_numerator();
+        if (Cell::prod_overflow(numer_B, mult_A))                goto big;
+        const APL_Integer numer_B1 = numer_B * mult_A;
+
+        const APL_Integer diff_AB = numer_A1 - numer_B1;
+        if (Cell::diff_overflow(diff_AB, numer_A1, numer_B1))    goto big;
+        const APL_Integer diff_gcd = gcd(diff_AB, denom_AB);
+        if (diff_gcd == denom_AB)   return IntCell::zI(Z, diff_AB / denom_AB);
+        if (diff_gcd == 1)   return FloatCell::zR(Z, diff_AB, denom_AB);
+        return FloatCell::zR(Z, diff_AB/diff_gcd, denom_AB/diff_gcd);
+      }
+      big:
+
+#endif
+
+       return FloatCell::zF(Z, A->get_real_value() - get_real_value());
       }
 
-   if (A->is_float_cell())
+   if (A->is_complex_cell())   // complex result
       {
-         const APL_Float a = A->get_real_value();
-         if (a >= b)   return FloatCell::zF(Z, a);
-         else          return FloatCell::zF(Z, b);
+       return ComplexCell::zC(Z, A->get_real_value() - get_real_value(),
+                                 A->get_imag_value());
       }
 
-   // complex A and float B: delegate to A
-   //
-   return A->bif_maximum(Z, this);
+   return E_DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-FloatCell::bif_minimum(Cell * Z, const Cell * A) const
+FloatCell::bif_add_inverse(Cell * Z, const Cell * A) const
 {
-const APL_Float b = this->dfval();
-   if (A->is_integer_cell())
+   return A->bif_subtract(Z, this);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_divide(Z, this);
+}
+//----------------------------------------------------------------------------
+bool
+FloatCell::get_near_bool()  const
+{
+   if (dfval() > INTEGER_TOLERANCE)   // maybe 1
       {
-         const APL_Integer a = A->get_int_value();
-         if (a <= dfval())   return IntCell::zI(Z, a);
-         else                return FloatCell::zF(Z, b);
+        if (dfval() > (1.0 + INTEGER_TOLERANCE))   DOMAIN_ERROR;
+        if (dfval() < (1.0 - INTEGER_TOLERANCE))   DOMAIN_ERROR;
+        return true;
       }
 
-   if (A->is_float_cell())
-      {
-         const APL_Float a = A->get_real_value();
-         if (a <= b)   return FloatCell::zF(Z, a);
-         else          return FloatCell::zF(Z, b);
-      }
-
-   // complex A and float B: delegate to A
+   // maybe 0. We already know that dfval() ≤ qct
    //
-   return A->bif_minimum(Z, this);
+   if (dfval() < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
+   return false;
+}
+//----------------------------------------------------------------------------
+// monadic built-in functions...
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_near_int64_t(Cell * Z) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+
+   return IntCell::zI(Z, get_near_int());
+}
+//----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_within_quad_CT(Cell * Z) const
+{
+const double val = dfval();
+   if (val > LARGE_INT)   return E_DOMAIN_ERROR;
+   if (val < SMALL_INT)   return E_DOMAIN_ERROR;
+
+const double max_diff = Workspace::get_CT() * fabs(val);   // scale ⎕CT
+
+const APL_Float val_dn = floor(val);
+   if (val < (val_dn + max_diff))   return FloatCell::zF(Z, val_dn);
+
+const APL_Float val_up = ceil(val);
+   if (val > (val_up - max_diff))   return FloatCell::zF(Z, val_up);
+
+   return E_DOMAIN_ERROR;
 }
 /* ╔═════════════════════════════════════════════════════════════════════════╗
    ║ throw/nothrow boundary. Functions above MUST NOT (directly or           ║

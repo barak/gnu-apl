@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,12 +48,12 @@ public:
    /// @param B right argument APL value
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
-   static Bif_OPER1_EACH  fun;      ///< Built-in function.
-
    /// implementation of eval_LB()
    /// @param LO left operand token
    /// @param B right argument APL value
    static Token do_eval_LB(Token & LO, Value_P B);
+
+   static Bif_OPER1_EACH  fun;      ///< Built-in function.
 
 protected:
    /// overloaded Function::may_push_SI()

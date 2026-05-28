@@ -41,8 +41,8 @@ bool static_Objects::show_destructors  = false;
 
 //----------------------------------------------------------------------------
 static_Objects::static_Objects(const char * l, const char * w)
-   : what(w),
-     loc(l)
+   : loc(l),
+     what(w)
 {
    if (show_constructors)   cerr << "++ constructing " << what << endl;
 }

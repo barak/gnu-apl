@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,30 +42,19 @@ public:
    /// default constructor (for DerivedFunctionCache items)
    DerivedFunction() : Function(TOK_FUN0)   {}
 
-   /// deallocate resources held by this DerivedFunction
-   /// @param loc caller location for diagnostics
-   void destroy_derived(const char * loc);
-
-   /// overloaded NamedObject::get_name()
-   virtual UCS_string get_name() const;
-
-   /// overloaded Function::print();
-   virtual ostream & print(ostream & out) const
-      { return out << get_name(); }
-
-   /// overloaded Function::is_derived();
-   virtual bool is_derived() const
-      { return true; }
-
-   /// return the left operand of this derived function
-   cFunction_P get_LO() const
-      { return left_arg.get_function(); }
+   /// return the axis argument (or 0 if none) of this derived function
+   const Value * get_AXIS() const
+      { return axis.get(); }
 
    /// return the value (if any) bound to an operator (that allows it)
    Value_P get_bound_LO_value() const
       {
         return left_arg.is_apl_val() ? left_arg.get_apl_val() : Value_P();
       }
+
+   /// return the left operand of this derived function
+   cFunction_P get_LO() const
+      { return left_arg.get_function(); }
 
    /// return the operator of this derived function
    cFunction_P get_OPER() const
@@ -77,15 +66,26 @@ public:
         return right_arg.get_tag() == TOK_VOID ? 0 : right_arg.get_function();
       }
 
-   /// return the axis argument (or 0 if none) of this derived function
-   const Value * get_AXIS() const
-      { return axis.get(); }
+   /// overloaded Function::is_derived();
+   virtual bool is_derived() const
+      { return true; }
+
+   /// overloaded Function::print();
+   virtual ostream & print(ostream & out) const
+      { return out << get_name(); }
+
+   /// overloaded NamedObject::get_name()
+   virtual UCS_string get_name() const;
 
    /// Overloaded Function::has_result();
    virtual bool has_result() const;
 
    /// clear the marked bit in values bound to this derived functions (if any).
    void unmark_all_values() const;   // unmark values bound to this operator
+
+   /// deallocate resources held by this DerivedFunction
+   /// @param loc caller location for diagnostics
+   void destroy_derived(const char * loc);
 
 protected:
   /// constructor. Set omitted arguments to 0.
@@ -97,8 +97,12 @@ protected:
   DerivedFunction(Token * LO, cFunction_P F_or_M_or_D, Token * RO, Value_P X,
                   const char * loc);
 
-   /// Overloaded Function::print_properties()
-   virtual void print_properties(ostream & out, int indent) const;
+   /// destructor
+   ~DerivedFunction();
+
+   /// overloaded Function::locate_X()
+   virtual Value_P * locate_X() const
+      { return !axis ? 0 : const_cast<Value_P *>(&axis); }
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
@@ -107,14 +111,13 @@ protected:
         || (right_arg.is_function() && right_arg.get_function()->may_push_SI());
       }
 
-   /// overloaded Function::locate_X()
-   virtual Value_P * locate_X() const
-      { return !axis ? 0 : const_cast<Value_P *>(&axis); }
-
    /// debug printout when an eval_XXX() function is called.
    /// @param class_name name of the derived-function class
    /// @param fun_name name of the eval function being entered
    void entering(const char * class_name, const char * fun_name) const;
+
+   /// Overloaded Function::print_properties()
+   virtual void print_properties(ostream & out, int indent) const;
 
    /// the function (to the left of the operator).
    // Token are ephemeral, therefore we need a copy here.
@@ -131,9 +134,6 @@ protected:
 
    /// the axis for \b mon_oper, or 0 if no axis
    Value_P axis;
-
-   /// destructor
-   ~DerivedFunction();
 };
 //============================================================================
 /// A dyadic operator bound to its left and right function. E.g. +.× ←→ (+.×)
@@ -324,21 +324,21 @@ public:
         return *(at(i));
       }
 
-   /// clear the marked bit in values bound to derived functions (if any).
-   void unmark_all_values() const
-      { loop(d, size())   at(d)->unmark_all_values(); }
-
    /// return the number of items in the cache
    size_t size() const
       { return idx; }
 
-   /// reset (clear) the cache
-   void reset();
+   /// clear the marked bit in values bound to derived functions (if any).
+   void unmark_all_values() const
+      { loop(d, size())   at(d)->unmark_all_values(); }
 
    /// return the last cache entry and increment \b idx. To be used with
    /// placement new.
    /// @param loc caller location for diagnostics
    DerivedFunction * get(const char * loc);
+
+   /// reset (clear) the cache
+   void reset();
 
 protected:
    /// a cache for derived functions

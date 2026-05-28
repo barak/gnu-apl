@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,78 +26,6 @@
 
 Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::fun;    // ⍳
 
-//============================================================================
-Token
-Bif_F12_INDEX_OF::eval_B(Value_P B) const
-{
-   if (B->get_rank() > 1)   RANK_ERROR;
-
-const APL_Integer qio = Workspace::get_IO();
-const ShapeItem ec = B->element_count();
-
-   if (ec == 1)
-      {
-        // interval (standard ⍳B with scalar or 1-element B)
-        //
-        const APL_Integer len = B->get_cfirst().get_near_int();
-        if (len < 0)   DOMAIN_ERROR;
-
-        Value_P Z(len, LOC);
-
-        loop(z, len)   Z->next_ravel_Int(qio + z);
-
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-   // generalized ⍳B a la Dyalog APL...
-   //
-   // ⍴B  ←→  ⍴⍴Z, B = ⍴Z
-   if (ec == 0)
-      {
-        Value_P Z(LOC);
-        Z->next_ravel_Pointer(Idx0(LOC).get());
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-Shape sh_Z(*B, 0);
-   loop(b, ec)   if (sh_Z.get_shape_item(b) < 0)   DOMAIN_ERROR;
-
-   // at this point sh is correct and ⍳ cannot fail.
-   //
-Value_P Z(sh_Z, LOC);
-const sRank rank_Z = Z->get_rank();
-   loop(z, Z->element_count())
-      {
-        Value_P ZZ(rank_Z, LOC);
-        ShapeItem N = z;
-        ShapeItem * zz = ALLOCA(ShapeItem, rank_Z);
-        loop(r, rank_Z)
-            {
-              const ShapeItem q = sh_Z.get_shape_item(ec - r - 1);
-              zz[ec - r - 1] = N % q + qio;
-              N /= q;
-            }
-
-        loop(r, rank_Z)   ZZ->next_ravel_Int(zz[r]);
-
-        ZZ->check_value(LOC);
-        Z->next_ravel_Pointer(ZZ.get());
-      }
-
-   if (Z->element_count() == 0)   // empty result
-      {
-        Value_P ZZ(rank_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
-        while (ZZ->more())   ZZ->next_ravel_0();
-        ZZ->check_value(LOC);
-
-        new (&Z->get_wproto())   PointerCell(ZZ.get(), *Z); // ⊂(⍴⍴Z)⍴0
-      }
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
 //----------------------------------------------------------------------------
 /// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
@@ -169,6 +97,78 @@ Value_P Z(B->get_shape(), LOC);
                    Z->next_ravel_Pointer(Vz.get());
                  }
             }
+      }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//============================================================================
+Token
+Bif_F12_INDEX_OF::eval_B(Value_P B) const
+{
+   if (B->get_rank() > 1)   RANK_ERROR;
+
+const APL_Integer qio = Workspace::get_IO();
+const ShapeItem ec = B->element_count();
+
+   if (ec == 1)
+      {
+        // interval (standard ⍳B with scalar or 1-element B)
+        //
+        const APL_Integer len = B->get_cfirst().get_near_int();
+        if (len < 0)   DOMAIN_ERROR;
+
+        Value_P Z(len, LOC);
+
+        loop(z, len)   Z->next_ravel_Int(qio + z);
+
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   // generalized ⍳B a la Dyalog APL...
+   //
+   // ⍴B  ←→  ⍴⍴Z, B = ⍴Z
+   if (ec == 0)
+      {
+        Value_P Z(LOC);
+        Z->next_ravel_Pointer(Idx0(LOC).get());
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+Shape sh_Z(*B, 0);
+   loop(b, ec)   if (sh_Z.get_shape_item(b) < 0)   DOMAIN_ERROR;
+
+   // at this point sh is correct and ⍳ cannot fail.
+   //
+Value_P Z(sh_Z, LOC);
+const sRank rank_Z = Z->get_rank();
+   loop(z, Z->element_count())
+      {
+        Value_P ZZ(rank_Z, LOC);
+        ShapeItem N = z;
+        ShapeItem * zz = ALLOCA(ShapeItem, rank_Z);
+        loop(r, rank_Z)
+            {
+              const ShapeItem q = sh_Z.get_shape_item(ec - r - 1);
+              zz[ec - r - 1] = N % q + qio;
+              N /= q;
+            }
+
+        loop(r, rank_Z)   ZZ->next_ravel_Int(zz[r]);
+
+        ZZ->check_value(LOC);
+        Z->next_ravel_Pointer(ZZ.get());
+      }
+
+   if (Z->element_count() == 0)   // empty result
+      {
+        Value_P ZZ(rank_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
+        while (ZZ->more())   ZZ->next_ravel_0();
+        ZZ->check_value(LOC);
+
+        new (&Z->get_wproto())   PointerCell(ZZ.get(), *Z); // ⊂(⍴⍴Z)⍴0
       }
 
    Z->check_value(LOC);

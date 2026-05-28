@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,6 @@ public:
    /// Constructor.
    Quad_RL();
 
-   /// Return a random number.
-   uint64_t get_random();
-
    enum { INITIAL_SEED = 16807 };
 
    // Xn+1 = a Xn + c
@@ -46,6 +43,9 @@ public:
    /// reset the seed (eg. after )CEAR)
    int reset_seed()
       { state = INITIAL_SEED;   return INITIAL_SEED; }
+
+   /// Return a random number.
+   uint64_t get_random();
 
 protected:
    /// overloaded Symbol::assign()

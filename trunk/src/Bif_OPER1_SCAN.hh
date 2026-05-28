@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,17 +38,17 @@ public:
    Bif_SCAN(TokenTag tag) : PrimitiveOperator(tag) {}
 
 protected:
-   /// Expand B according to A.
-   /// @param A    expansion vector
-   /// @param B    APL value to expand
-   /// @param axis axis along which to expand
-   static Token expand(Value_P A, Value_P B, uAxis axis);
-
    /// Compute the LO-scan of B.
    /// @param LO   left operand function token
    /// @param B    APL value to scan
    /// @param axis axis along which to scan
    Token scan(Token & LO, Value_P B, uAxis axis) const;
+
+   /// Expand B according to A.
+   /// @param A    expansion vector
+   /// @param B    APL value to expand
+   /// @param axis axis along which to expand
+   static Token expand(Value_P A, Value_P B, uAxis axis);
 
    /// Compute one scan item and store result in Z.
    /// @param Z     result cell pointer
@@ -75,17 +75,17 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return expand(A, B, B->get_rank() - 1); }
 
-   /// Overloaded Function::eval_AXB().
-   /// @param A left argument APL value
-   /// @param X axis specification
-   /// @param B right argument APL value
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
    /// Overloaded Function::eval_LB().
    /// @param LO left operand function token
    /// @param B  right argument APL value
    virtual Token eval_LB(Token & LO, Value_P B) const
       { return scan(LO, B, B->get_rank() - 1); }
+
+   /// Overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LXB().
    /// @param LO left operand function token
@@ -117,17 +117,17 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return expand(A, B, 0); }
 
-   /// Overloaded Function::eval_AXB().
-   /// @param A left argument APL value
-   /// @param X axis specification
-   /// @param B right argument APL value
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
    /// Overloaded Function::eval_ALB().
    /// @param LO left operand function token
    /// @param B  right argument APL value
    virtual Token eval_LB(Token & LO, Value_P B) const
       { return scan(LO, B, 0); }
+
+   /// Overloaded Function::eval_AXB().
+   /// @param A left argument APL value
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB().
    /// @param LO left operand function token

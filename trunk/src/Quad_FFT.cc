@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,6 +66,27 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
    system_wisdom_loaded = false;
 }
 //----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_AB(Value_P A, Value_P B) const
+{
+  return do_eval_AorX_B(*A, B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_B(Value_P B) const
+{
+   if (B->element_count())   return do_fft(FFTW_FORWARD, B, 0);
+   if (B->is_str0())         return list_functions(CERR);
+   if (B->is_zilde())        return list_mappings(CERR);
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_XB(Value_P X, Value_P B) const
+{
+  return do_eval_AorX_B(*X, B);
+}
+//----------------------------------------------------------------------------
 void
 Quad_FFT::print_fun_syntax(ostream & out,
                            const function_info & info) const
@@ -92,56 +113,30 @@ const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 }
 //----------------------------------------------------------------------------
 Token
-Quad_FFT::eval_B(Value_P B) const
+Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Value_P B) const
 {
-   if (B->element_count())   return do_fft(FFTW_FORWARD, B, 0);
-   if (B->is_str0())         return list_functions(CERR);
-   if (B->is_zilde())        return list_mappings(CERR);
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-void
-Quad_FFT::init_in(void * _in, Value_P B, window_function win)
-{
-fftw_complex * in = reinterpret_cast<fftw_complex *>(_in);
-const APL_Integer N = B->element_count();
+const sAxis subfunction = value_to_subfun(A_or_X);
+   switch(subfunction)
+      {
+        case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
+        case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
+        case  13: return do_fft(FFTW_FORWARD, B, &blackman_harris_window);
+        case  12: return do_fft(FFTW_FORWARD, B, &blackman_window);
+        case  11: return do_fft(FFTW_FORWARD, B, &hamming_window);
+        case  10: return do_fft(FFTW_FORWARD, B, &hann_window);
 
-   if (N < 2)
-      {
-        in[0][0] = B->get_cfirst().get_real_value();
-        in[0][1] = B->get_cfirst().get_imag_value();
+        case   0: return do_fft(FFTW_FORWARD,  B, 0);
+        case  -1: return do_fft(FFTW_BACKWARD, B, 0);
+
+        case -10: return do_window(B, &hann_window);
+        case -11: return do_window(B, &hamming_window);
+        case -12: return do_window(B, &blackman_window);
+        case -13: return do_window(B, &blackman_harris_window);
+        case -14: return do_window(B, &blackman_nuttall_window);
+        case -15: return do_window(B, &flat_top);
       }
 
-   if (win == 0)
-      {
-        loop(n, N)
-           {
-             in[n][0] = B->get_cravel(n).get_real_value();
-             in[n][1] = B->get_cravel(n).get_imag_value();
-           }
-      }
-   else if (B->get_rank() == 1)
-      {
-        loop(n, N)
-           {
-             const double w = win(n, N);
-             in[n][0] = w * B->get_cravel(n).get_real_value();
-             in[n][1] = w * B->get_cravel(n).get_imag_value();
-           }
-      }
-   else
-      {
-        double * wp = new double[N];
-        if (wp == 0)   WS_FULL;
-        fill_window(wp, B->get_shape(), win);
-        loop(n, N)
-           {
-             const double w = wp[n];
-             in[n][0] = w * B->get_cravel(n).get_real_value();
-             in[n][1] = w * B->get_cravel(n).get_imag_value();
-           }
-        delete [] wp;
-      }
+   bad_subfun_number_ERROR(subfunction);
 }
 //----------------------------------------------------------------------------
 Token
@@ -290,45 +285,6 @@ Value_P Z(B->get_shape(), LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_AB(Value_P A, Value_P B) const
-{
-  return do_eval_AorX_B(*A, B);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_XB(Value_P X, Value_P B) const
-{
-  return do_eval_AorX_B(*X, B);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Value_P B) const
-{
-const sAxis subfunction = value_to_subfun(A_or_X);
-   switch(subfunction)
-      {
-        case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
-        case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
-        case  13: return do_fft(FFTW_FORWARD, B, &blackman_harris_window);
-        case  12: return do_fft(FFTW_FORWARD, B, &blackman_window);
-        case  11: return do_fft(FFTW_FORWARD, B, &hamming_window);
-        case  10: return do_fft(FFTW_FORWARD, B, &hann_window);
-
-        case   0: return do_fft(FFTW_FORWARD,  B, 0);
-        case  -1: return do_fft(FFTW_BACKWARD, B, 0);
-
-        case -10: return do_window(B, &hann_window);
-        case -11: return do_window(B, &hamming_window);
-        case -12: return do_window(B, &blackman_window);
-        case -13: return do_window(B, &blackman_harris_window);
-        case -14: return do_window(B, &blackman_nuttall_window);
-        case -15: return do_window(B, &flat_top);
-      }
-
-   bad_subfun_number_ERROR(subfunction);
-}
-//----------------------------------------------------------------------------
 void
 Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
 {
@@ -353,6 +309,50 @@ ShapeItem rlen = 1;
 }
 //----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+void
+Quad_FFT::init_in(void * _in, Value_P B, window_function win)
+{
+fftw_complex * in = reinterpret_cast<fftw_complex *>(_in);
+const APL_Integer N = B->element_count();
+
+   if (N < 2)
+      {
+        in[0][0] = B->get_cfirst().get_real_value();
+        in[0][1] = B->get_cfirst().get_imag_value();
+      }
+
+   if (win == 0)
+      {
+        loop(n, N)
+           {
+             in[n][0] = B->get_cravel(n).get_real_value();
+             in[n][1] = B->get_cravel(n).get_imag_value();
+           }
+      }
+   else if (B->get_rank() == 1)
+      {
+        loop(n, N)
+           {
+             const double w = win(n, N);
+             in[n][0] = w * B->get_cravel(n).get_real_value();
+             in[n][1] = w * B->get_cravel(n).get_imag_value();
+           }
+      }
+   else
+      {
+        double * wp = new double[N];
+        if (wp == 0)   WS_FULL;
+        fill_window(wp, B->get_shape(), win);
+        loop(n, N)
+           {
+             const double w = wp[n];
+             in[n][0] = w * B->get_cravel(n).get_real_value();
+             in[n][1] = w * B->get_cravel(n).get_imag_value();
+           }
+        delete [] wp;
+      }
+}
 #else   // not apl_FFT
 
 //----------------------------------------------------------------------------
@@ -368,6 +368,17 @@ Token Quad_FFT::eval_AB(Value_P A, Value_P B) const
    return eval_B(B);
 }
 //----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_B(Value_P B) const
+{
+const char * libs[] = { "libfftw3.so",   0 };
+const char * hdrs[] = { "fftw3.h",      0 };
+const char * pkgs[] = { "libfftw3-dev", 0 };
+
+   return missing_files("⎕FFT", libs, hdrs, pkgs);
+}
+
+//----------------------------------------------------------------------------
 
 Token Quad_FFT::eval_XB(Value_P A, Value_P B) const 
 {
@@ -382,16 +393,5 @@ void
 Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
 {
 }
-//----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_B(Value_P B) const
-{
-const char * libs[] = { "libfftw3.so",   0 };
-const char * hdrs[] = { "fftw3.h",      0 };
-const char * pkgs[] = { "libfftw3-dev", 0 };
-
-   return missing_files("⎕FFT", libs, hdrs, pkgs);
-}
-
 #endif // (not) apl_FFT
 

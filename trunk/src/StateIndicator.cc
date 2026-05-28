@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,77 +69,16 @@ StateIndicator::~StateIndicator()
       }
 }
 //----------------------------------------------------------------------------
-void
-StateIndicator::goon(Function_Line new_line, const char * loc)
+const StateIndicator *
+StateIndicator::find_child() const
 {
-   // jump back into a function, i.e. →N from immediate execution
-
-const Function_PC pc = get_executable()->get_exec_ufun()->pc_for_line(new_line);
-
-   Log(LOG_StateIndicator__push_pop)
-      CERR << "Continue SI[" << level << "] at line " << new_line
-           << " pc=" << pc << " at " << loc << endl;
-
-   if (get_executable()->get_body()[pc].get_tag() == TOK_STOP_LINE)   // S∆
-      {
-        // pc points to a S∆ token. We are jumping back from immediate
-        // execution, that was entered with ⎕STOP or S∆. We then don't
-        // want to stop (again) but continue after the stop token.
-        //
-        current_stack.goto_PC(pc + 2);
-      }
-   else  // the "normal" case
-      {
-        current_stack.goto_PC(pc);
-      }
-
-   Log(LOG_prefix_parser)   CERR << "GOTO [" << get_line() << "]" << endl;
-
-   current_stack.reset(LOC);
-}
-//----------------------------------------------------------------------------
-void
-StateIndicator::retry(const char * loc)
-{
-   Log(LOG_StateIndicator__push_pop || LOG_prefix_parser)
-      CERR << endl << "RETRY " << loc << ")" << endl;
-}
-//----------------------------------------------------------------------------
-bool
-StateIndicator::uses_function(const UserFunction * ufun) const
-{
-const Executable * const uexec = ufun;   // cast ufun to uexec
-
-   for (const StateIndicator * si = this; si; si = si->get_parent())
+   for (const StateIndicator * si = Workspace::SI_top();
+        si; si = si->get_parent())
        {
-         const Executable * exec = si->get_executable();
-         Assert1(exec);
-
-         // case 1: ufun is the currently executing function
-         //
-         if (exec == uexec)   return true;
-
-         // case 2: ufun is used on the prefix parser stack
-         //
-         if (si->current_stack.uses_function(ufun))   return true;
-
-         // case 3: ufun is in the body of si->get_executable(). This crashes
-         // )SAVE since the symbol is already resolved and points to the old
-         // function.
-         //
-         const Token_string & body = exec->get_body();
-         loop(b, body.size())
-             {
-               const Token & tok = body[b];
-               if (tok.get_tag() != TOK_SYMBOL)   continue;
-
-               if (ufun->get_name() == tok.get_sym_ptr()->get_name())
-                  {
-                    return true;
-                  }
-             }
+         if (this == si->get_parent())   return si;   // found child si
        }
-   return false;
+
+   return 0;   // si is Workspace::SI_top()
 }
 //----------------------------------------------------------------------------
 UCS_string
@@ -171,49 +110,76 @@ StateIndicator::function_name() const
    return UCS_string();
 } 
 //----------------------------------------------------------------------------
-void
-StateIndicator::print(ostream & out) const
+Value_P
+StateIndicator::get_L(UCS_string & function) const
 {
-   out << "Depth:      " << level                << endl;
-   out << "Exec:       " << executable           << endl;
-   out << "Safe exec:  " << safe_execution_depth << endl;
-
-   Assert(executable);
-
+   if (const Value_P * L = current_stack.locate_L(function))   return *L;
+   return Value_P();
+}
+//----------------------------------------------------------------------------
+Function_Line
+StateIndicator::get_line() const
+{
+int pc = get_PC();
+   if (pc)   --pc;
+   return executable->get_line(Function_PC(pc));
+}
+//----------------------------------------------------------------------------
+Unicode
+StateIndicator::get_parse_mode_name() const
+{
    switch(get_parse_mode())
       {
-        case PM_FUNCTION:
-             out << "Pmode:      ∇ "
-                 << executable->get_exec_ufun()->get_name_and_line(get_PC());
-             break;
+        case PM_FUNCTION:       return UNI_NABLA;
+        case PM_STATEMENT_LIST: return UNI_DIAMOND;
+        case PM_EXECUTE:        return UNI_EXECUTE;
+     }
 
-        case PM_STATEMENT_LIST:
-             out << "Pmode:      ◊ " << " " << executable->get_text(0);
-             break;
-
-        case PM_EXECUTE:
-             out << "Pmode:      ⍎ " << " " << executable->get_text(0);
-             break;
-
-        default:
-             out << "??? Bad pmode " << get_parse_mode();
+   CERR << "pmode = " << get_parse_mode() << endl;
+   FIXME;
+   return Invalid_Unicode;
+}
+//----------------------------------------------------------------------------
+Value_P
+StateIndicator::get_R(UCS_string & function) const
+{
+   if (const Value_P * R = current_stack.locate_R(function))   return *R;
+   return Value_P();
+}
+//----------------------------------------------------------------------------
+Value_P
+StateIndicator::get_X(UCS_string & function) const
+{
+   if (const Value_P * X = current_stack.locate_X(function))   return *X;
+   return Value_P();
+}
+//----------------------------------------------------------------------------
+ostream &
+StateIndicator::indent(ostream & out) const
+{
+   if (level < 0)
+      {
+         CERR << "[negative level " << HEX(level) << "]" << endl;
       }
-   out << endl;
+   else if (level > 100)
+      {
+         CERR << "[huge level " << HEX(level) << "]" << endl;
+      }
+   else
+      {
+         loop(d, level)   out << "   ";
+      }
 
-   out << "PC:         " << get_PC() << " (" << executable->get_body().size()
-                       << ")";
-   out << " " << executable->get_body()[get_PC()] << endl;
-   out << "Stat:       " << executable->statement_text(get_PC());
-   out << endl;
-
-   out << "err_code:   " << HEX(error.get_error_code()) << endl;
-   if (error.get_error_code())
-      out << "thrown at:  " << error.get_throw_loc() << endl
-       << "e_msg_1:    '" << error.get_error_line_1() << "'" << endl
-       << "e_msg_2:    '" << error.get_error_line_2() << "'" << endl
-       << "e_msg_3:    '" << error.get_error_line_3() << "'" << endl;
-
-   out << endl;
+   return out;
+}
+//----------------------------------------------------------------------------
+void
+StateIndicator::info(ostream & out, const char * loc) const
+{
+   out << "SI[" << level << ":" << get_PC() << "] "
+       << get_parse_mode_name() << " "
+       << executable->get_text(0) << " creator: " << executable->get_loc()
+       << "   seen at: " << loc << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -303,23 +269,174 @@ StateIndicator::list(ostream & out, SI_mode mode) const
    out << endl;
 }
 //----------------------------------------------------------------------------
-ostream &
-StateIndicator::indent(ostream & out) const
+int
+StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 {
-   if (level < 0)
+   if (from_tos == 0)   return 0;
+
+  // collect SI entries in reverse order...
+   //
+std::vector<const StateIndicator *> stack;
+
+   for (const StateIndicator * si = Workspace::SI_top();
+        si; si = si->get_parent())
       {
-         CERR << "[negative level " << HEX(level) << "]" << endl;
-      }
-   else if (level > 100)
-      {
-         CERR << "[huge level " << HEX(level) << "]" << endl;
-      }
-   else
-      {
-         loop(d, level)   out << "   ";
+        stack.push_back(si);
       }
 
-   return out;
+   loop(d, stack.size())
+       {
+         const StateIndicator * si = stack[stack.size() - d - 1];
+         const Executable * exec = si->get_executable();
+         Assert(exec);
+         if (!exec->pushes_sym(sym))   continue;
+         if (0 == --from_tos)   return si->get_level();
+       }
+
+   MORE_ERROR() << "Invalid ⎕STACK index";
+   INDEX_ERROR;
+}
+//----------------------------------------------------------------------------
+void
+StateIndicator::print(ostream & out) const
+{
+   out << "Depth:      " << level                << endl;
+   out << "Exec:       " << executable           << endl;
+   out << "Safe exec:  " << safe_execution_depth << endl;
+
+   Assert(executable);
+
+   switch(get_parse_mode())
+      {
+        case PM_FUNCTION:
+             out << "Pmode:      ∇ "
+                 << executable->get_exec_ufun()->get_name_and_line(get_PC());
+             break;
+
+        case PM_STATEMENT_LIST:
+             out << "Pmode:      ◊ " << " " << executable->get_text(0);
+             break;
+
+        case PM_EXECUTE:
+             out << "Pmode:      ⍎ " << " " << executable->get_text(0);
+             break;
+
+        default:
+             out << "??? Bad pmode " << get_parse_mode();
+      }
+   out << endl;
+
+   out << "PC:         " << get_PC() << " (" << executable->get_body().size()
+                       << ")";
+   out << " " << executable->get_body()[get_PC()] << endl;
+   out << "Stat:       " << executable->statement_text(get_PC());
+   out << endl;
+
+   out << "err_code:   " << HEX(error.get_error_code()) << endl;
+   if (error.get_error_code())
+      out << "thrown at:  " << error.get_throw_loc() << endl
+       << "e_msg_1:    '" << error.get_error_line_1() << "'" << endl
+       << "e_msg_2:    '" << error.get_error_line_2() << "'" << endl
+       << "e_msg_3:    '" << error.get_error_line_3() << "'" << endl;
+
+   out << endl;
+}
+//----------------------------------------------------------------------------
+int
+StateIndicator::show_owners(ostream & out, const Value & value) const
+{
+int count = 0;
+
+   Assert(executable);
+char cc[100];
+   SPRINTF(cc, "    SI[%d] ", level);
+   count += executable->show_owners(cc, out, value);
+
+   SPRINTF(cc, "    SI[%d] ", level);
+   count += current_stack.show_owners(cc, out, value);
+
+   return count;
+}
+//----------------------------------------------------------------------------
+void
+StateIndicator::unmark_all_values() const
+{
+   Assert(executable);
+   executable->unmark_all_values();   // values in function body tokens
+
+   current_stack.unmark_all_values();   // values in the parsers
+   fun_oper_cache.unmark_all_values();   // values in the derived function cache
+}
+//----------------------------------------------------------------------------
+bool
+StateIndicator::uses_function(const UserFunction * ufun) const
+{
+const Executable * const uexec = ufun;   // cast ufun to uexec
+
+   for (const StateIndicator * si = this; si; si = si->get_parent())
+       {
+         const Executable * exec = si->get_executable();
+         Assert1(exec);
+
+         // case 1: ufun is the currently executing function
+         //
+         if (exec == uexec)   return true;
+
+         // case 2: ufun is used on the prefix parser stack
+         //
+         if (si->current_stack.uses_function(ufun))   return true;
+
+         // case 3: ufun is in the body of si->get_executable(). This crashes
+         // )SAVE since the symbol is already resolved and points to the old
+         // function.
+         //
+         const Token_string & body = exec->get_body();
+         loop(b, body.size())
+             {
+               const Token & tok = body[b];
+               if (tok.get_tag() != TOK_SYMBOL)   continue;
+
+               if (ufun->get_name() == tok.get_sym_ptr()->get_name())
+                  {
+                    return true;
+                  }
+             }
+       }
+   return false;
+}
+//----------------------------------------------------------------------------
+void
+StateIndicator::escape()
+{
+}
+//----------------------------------------------------------------------------
+void
+StateIndicator::goon(Function_Line new_line, const char * loc)
+{
+   // jump back into a function, i.e. →N from immediate execution
+
+const Function_PC pc = get_executable()->get_exec_ufun()->pc_for_line(new_line);
+
+   Log(LOG_StateIndicator__push_pop)
+      CERR << "Continue SI[" << level << "] at line " << new_line
+           << " pc=" << pc << " at " << loc << endl;
+
+   if (get_executable()->get_body()[pc].get_tag() == TOK_STOP_LINE)   // S∆
+      {
+        // pc points to a S∆ token. We are jumping back from immediate
+        // execution, that was entered with ⎕STOP or S∆. We then don't
+        // want to stop (again) but continue after the stop token.
+        //
+        current_stack.goto_PC(pc + 2);
+      }
+   else  // the "normal" case
+      {
+        current_stack.goto_PC(pc);
+      }
+
+   Log(LOG_prefix_parser)   CERR << "GOTO [" << get_line() << "]" << endl;
+
+   current_stack.reset(LOC);
 }
 //----------------------------------------------------------------------------
 Token
@@ -364,8 +481,10 @@ StateIndicator::jump_to_line(Function_Line line)
 }
 //----------------------------------------------------------------------------
 void
-StateIndicator::escape()
+StateIndicator::retry(const char * loc)
 {
+   Log(LOG_StateIndicator__push_pop || LOG_prefix_parser)
+      CERR << endl << "RETRY " << loc << ")" << endl;
 }
 //----------------------------------------------------------------------------
 Token
@@ -377,62 +496,6 @@ Token result = current_stack.reduce_statements();
       CERR << "Prefix::reduce_statements(si=" << level << ") returned "
            << result << " in StateIndicator::run()" << endl;
    return result;
-}
-//----------------------------------------------------------------------------
-void
-StateIndicator::unmark_all_values() const
-{
-   Assert(executable);
-   executable->unmark_all_values();   // values in function body tokens
-
-   current_stack.unmark_all_values();   // values in the parsers
-   fun_oper_cache.unmark_all_values();   // values in the derived function cache
-}
-//----------------------------------------------------------------------------
-int
-StateIndicator::show_owners(ostream & out, const Value & value) const
-{
-int count = 0;
-
-   Assert(executable);
-char cc[100];
-   SPRINTF(cc, "    SI[%d] ", level);
-   count += executable->show_owners(cc, out, value);
-
-   SPRINTF(cc, "    SI[%d] ", level);
-   count += current_stack.show_owners(cc, out, value);
-
-   return count;
-}
-//----------------------------------------------------------------------------
-void
-StateIndicator::info(ostream & out, const char * loc) const
-{
-   out << "SI[" << level << ":" << get_PC() << "] "
-       << get_parse_mode_name() << " "
-       << executable->get_text(0) << " creator: " << executable->get_loc()
-       << "   seen at: " << loc << endl;
-}
-//----------------------------------------------------------------------------
-Value_P
-StateIndicator::get_L(UCS_string & function) const
-{
-   if (const Value_P * L = current_stack.locate_L(function))   return *L;
-   return Value_P();
-}
-//----------------------------------------------------------------------------
-Value_P
-StateIndicator::get_R(UCS_string & function) const
-{
-   if (const Value_P * R = current_stack.locate_R(function))   return *R;
-   return Value_P();
-}
-//----------------------------------------------------------------------------
-Value_P
-StateIndicator::get_X(UCS_string & function) const
-{
-   if (const Value_P * X = current_stack.locate_X(function))   return *X;
-   return Value_P();
 }
 //----------------------------------------------------------------------------
 void
@@ -454,54 +517,6 @@ StateIndicator::set_X(Value_P new_value)
 {
 UCS_string function;
    if (Value_P * X = current_stack.locate_X(function))   *X = new_value;
-}
-//----------------------------------------------------------------------------
-const StateIndicator *
-StateIndicator::find_child() const
-{
-   for (const StateIndicator * si = Workspace::SI_top();
-        si; si = si->get_parent())
-       {
-         if (this == si->get_parent())   return si;   // found child si
-       }
-
-   return 0;   // si is Workspace::SI_top()
-}
-//----------------------------------------------------------------------------
-int
-StateIndicator::nth_push(const Symbol * sym, int from_tos) const
-{
-   if (from_tos == 0)   return 0;
-
-  // collect SI entries in reverse order...
-   //
-std::vector<const StateIndicator *> stack;
-
-   for (const StateIndicator * si = Workspace::SI_top();
-        si; si = si->get_parent())
-      {
-        stack.push_back(si);
-      }
-
-   loop(d, stack.size())
-       {
-         const StateIndicator * si = stack[stack.size() - d - 1];
-         const Executable * exec = si->get_executable();
-         Assert(exec);
-         if (!exec->pushes_sym(sym))   continue;
-         if (0 == --from_tos)   return si->get_level();
-       }
-
-   MORE_ERROR() << "Invalid ⎕STACK index";
-   INDEX_ERROR;
-}
-//----------------------------------------------------------------------------
-Function_Line
-StateIndicator::get_line() const
-{
-int pc = get_PC();
-   if (pc)   --pc;
-   return executable->get_line(Function_PC(pc));
 }
 //----------------------------------------------------------------------------
 #ifdef apl_TARGET_LIBAPL
@@ -626,21 +641,6 @@ const int boxing_format = Command::get_boxing_format();
         Value_P B1 = Quad_CR::do_CR(boxing_format, B.get(), pctx);
         B1->print(COUT);
       }
-}
-//----------------------------------------------------------------------------
-Unicode
-StateIndicator::get_parse_mode_name() const
-{
-   switch(get_parse_mode())
-      {
-        case PM_FUNCTION:       return UNI_NABLA;
-        case PM_STATEMENT_LIST: return UNI_DIAMOND;
-        case PM_EXECUTE:        return UNI_EXECUTE;
-     }
-
-   CERR << "pmode = " << get_parse_mode() << endl;
-   FIXME;
-   return Invalid_Unicode;
 }
 //----------------------------------------------------------------------------
 

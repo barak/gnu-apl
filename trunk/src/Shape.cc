@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,32 +54,55 @@ Shape ret;
    return ret;
 }
 //----------------------------------------------------------------------------
-bool
-Shape::operator ==(const Shape & other) const
+void
+Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
+                  const char * loc) const
 {
-   if (rho_rho != other.rho_rho)   return false;
- 
-   loop(r, rho_rho)
-   if (rho[r] != other.rho[r])   return false;
+   if (get_rank() != B.get_rank())   throw_apl_error(rank_err, loc);
 
-   return true;
+   loop(r, get_rank())
+      {
+        if (get_shape_item(r) == B.get_shape_item(r))   continue;
+        throw_apl_error(len_err, loc);
+      }
 }
 //----------------------------------------------------------------------------
-void
-Shape::expand(const Shape & B)
+bool
+Shape::conforms_to(const Shape & other) const
 {
-   // increase rank as necessary
-   //
-   expand_rank(B.get_rank());
-
-   // increase axes as necessary
-   //
-   volume = 1;
-   loop(r, rho_rho)
+int other_idx = 0;
+const int other_rank = other.get_rank();
+   loop(r, get_rank())
       {
-        if (rho[r] < B.rho[r])   rho[r] = B.rho[r];
-        volume *= rho[r];
+        const int this_len = get_shape_item(r);
+        if (this_len == 1)   continue;   // ignore length 1 axes of this
+        while (other_idx < other_rank &&
+               other.get_shape_item(other_idx) == 1)
+              ++other_idx;   // ignore length 1 axes of other
+        if (other_idx == other_rank)
+           return false;   // non-1 axis in this and no axis in other
+        const int other_len = other.get_shape_item(other_idx++);
+        if (this_len != other_len)   return false;   // length mismatch
       }
+
+   return other_idx == other_rank;
+}
+//----------------------------------------------------------------------------
+bool
+Shape::fits_into(ShapeItem max_ravel) const
+{
+   // must not throw!
+
+ShapeItem volume = 1;
+   loop(r, rho_rho)
+       {
+         const ShapeItem sr = rho[r];
+         if (sr > 0)         volume *= sr;
+         else if (sr == 0)   return true;
+         else                return false;
+       }
+
+   return volume <= max_ravel;
 }
 //----------------------------------------------------------------------------
 Shape
@@ -111,73 +134,6 @@ Shape ret;
    return ret;
 }
 //----------------------------------------------------------------------------
-ShapeItem
-Shape::ravel_pos(const Shape & idx) const
-{
-ShapeItem p = 0;
-ShapeItem w = 1;
-
-   for (sRank r = get_rank(); r-- > 0;)
-      {
-        p += w*idx.get_shape_item(r);
-        w *= get_shape_item(r);
-      }
-
-   return p;
-}
-//----------------------------------------------------------------------------
-Shape
-Shape::offset_to_index(ShapeItem offset, int quad_io) const
-{
-Shape ret;
-   ret.rho_rho = rho_rho;
-   for (int r = rho_rho; r > 0;)
-       {
-         --r;
-         if (rho[r] == 0)
-            {
-              Assert(offset == 0);
-              ret.rho[r] = 0;
-              continue;
-            }
-
-         ret.rho[r] = quad_io + offset % rho[r];
-         offset /= rho[r];
-       }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
-                  const char * loc) const
-{
-   if (get_rank() != B.get_rank())   throw_apl_error(rank_err, loc);
-
-   loop(r, get_rank())
-      {
-        if (get_shape_item(r) == B.get_shape_item(r))   continue;
-        throw_apl_error(len_err, loc);
-      }
-}
-//----------------------------------------------------------------------------
-bool
-Shape::fits_into(ShapeItem max_ravel) const
-{
-   // must not throw!
-
-ShapeItem volume = 1;
-   loop(r, rho_rho)
-       {
-         const ShapeItem sr = rho[r];
-         if (sr > 0)         volume *= sr;
-         else if (sr == 0)   return true;
-         else                return false;
-       }
-
-   return volume <= max_ravel;
-}
-//----------------------------------------------------------------------------
 bool
 Shape::is_permutation() const
 {
@@ -204,25 +160,69 @@ AxesBitmap axes = 0;   // a bitmap of axes
    return true;
 }
 //----------------------------------------------------------------------------
-bool
-Shape::conforms_to(const Shape & other) const
+Shape
+Shape::offset_to_index(ShapeItem offset, int quad_io) const
 {
-int other_idx = 0;
-const int other_rank = other.get_rank();
-   loop(r, get_rank())
+Shape ret;
+   ret.rho_rho = rho_rho;
+   for (int r = rho_rho; r > 0;)
+       {
+         --r;
+         if (rho[r] == 0)
+            {
+              Assert(offset == 0);
+              ret.rho[r] = 0;
+              continue;
+            }
+
+         ret.rho[r] = quad_io + offset % rho[r];
+         offset /= rho[r];
+       }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+bool
+Shape::operator ==(const Shape & other) const
+{
+   if (rho_rho != other.rho_rho)   return false;
+ 
+   loop(r, rho_rho)
+   if (rho[r] != other.rho[r])   return false;
+
+   return true;
+}
+//----------------------------------------------------------------------------
+ShapeItem
+Shape::ravel_pos(const Shape & idx) const
+{
+ShapeItem p = 0;
+ShapeItem w = 1;
+
+   for (sRank r = get_rank(); r-- > 0;)
       {
-        const int this_len = get_shape_item(r);
-        if (this_len == 1)   continue;   // ignore length 1 axes of this
-        while (other_idx < other_rank &&
-               other.get_shape_item(other_idx) == 1)
-              ++other_idx;   // ignore length 1 axes of other
-        if (other_idx == other_rank)
-           return false;   // non-1 axis in this and no axis in other
-        const int other_len = other.get_shape_item(other_idx++);
-        if (this_len != other_len)   return false;   // length mismatch
+        p += w*idx.get_shape_item(r);
+        w *= get_shape_item(r);
       }
 
-   return other_idx == other_rank;
+   return p;
+}
+//----------------------------------------------------------------------------
+void
+Shape::expand(const Shape & B)
+{
+   // increase rank as necessary
+   //
+   expand_rank(B.get_rank());
+
+   // increase axes as necessary
+   //
+   volume = 1;
+   loop(r, rho_rho)
+      {
+        if (rho[r] < B.rho[r])   rho[r] = B.rho[r];
+        volume *= rho[r];
+      }
 }
 //----------------------------------------------------------------------------
 ostream &

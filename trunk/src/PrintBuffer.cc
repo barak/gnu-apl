@@ -43,6 +43,44 @@ enum
 };
 
 //----------------------------------------------------------------------------
+void
+ColInfo::consider(const ColInfo & item)
+{
+   // this is the collective ColInfo of an entire column, and item
+   // is a new, not yet considered item in the columns.
+   //
+   flags |= item.flags;
+   if (item.imag_len)   flags |= has_j;
+
+   if (int_len < item.int_len)
+      {
+        real_len += item.int_len - int_len;
+        int_len = item.int_len;
+      }
+
+   if (item.denom_len)
+      {
+        if (denom_len < item.denom_len)   denom_len = item.denom_len;
+        if (real_len < int_len + denom_len)   real_len = int_len + denom_len;
+      }
+   else
+      {
+        const int EXPO_LEN = real_len - fract_len - int_len;
+        const int expo_len = item.real_len - item.fract_len - item.int_len;
+
+        if (fract_len < item.fract_len)
+           {
+             fract_len = item.fract_len;
+             if (fract_len + expo_len > denom_len)
+             real_len = int_len + fract_len + EXPO_LEN;
+           }
+
+        if (EXPO_LEN < expo_len)    real_len += expo_len - EXPO_LEN;
+      }
+
+   if (imag_len  < item.imag_len)    imag_len  = item.imag_len;
+}
+//----------------------------------------------------------------------------
 PrintBuffer::PrintBuffer()
    : complete(true)
 {
@@ -459,6 +497,91 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
 }
 //----------------------------------------------------------------------------
 void
+PrintBuffer::pb_for_function(const Value & value, PrintContext pctx, 
+                             PrintStyle outer_style)
+{
+const ShapeItem ec = value.element_count();
+UCS_string ucs;
+
+   if (value.is_char_vector())
+      {
+        ucs << UNI_SINGLE_QUOTE;
+        loop(e, ec)
+           {
+             const Unicode uni = value.get_cravel(e).get_char_value();
+             ucs << uni;
+             if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' -> ''
+           }
+        ucs << UNI_SINGLE_QUOTE;
+      }
+   else
+      {
+        loop(e, ec)
+           {
+             PrintBuffer pb = value.get_cravel(e)
+                                          .character_representation(pctx);
+             if (e)   ucs << UNI_SPACE;
+             ucs << UCS_string(pb, 0, pctx.get_PW());
+           }
+      }
+
+ColInfo ci;
+   *this = PrintBuffer(ucs, ci);
+   add_outer_frame(outer_style);
+}
+//----------------------------------------------------------------------------
+void
+PrintBuffer::pb_empty(const Value & value, PrintContext pctx, 
+                             PrintStyle outer_style)
+{
+   if (value.get_rank() == 1)   // vector: 1 line
+      {
+        if (pctx.get_style() == PR_APL_FUN)
+           {
+             if (value.get_cfirst().is_character_cell())   // ''
+                {
+                  UCS_string ucs(U"''");
+                  ColInfo ci;
+                  *this = PrintBuffer(ucs, ci);
+                  add_outer_frame(outer_style);
+                  return;
+                }
+
+             if (value.get_cfirst().is_numeric())   // ⍬
+                {
+                  UTF8_string utf("⍬");
+                  UCS_string ucs(utf);
+                  ColInfo ci;
+                  *this = PrintBuffer(ucs, ci);
+                  add_outer_frame(outer_style);
+                  return;
+                }
+           }
+
+        UCS_string ucs;   // empty
+        append_ucs(ucs);
+        add_outer_frame(outer_style);
+        return;   // 1 row
+      }
+
+const Shape sh = value.get_shape().without_last_axis();
+   if (sh.get_volume() <= 1)   // empty vector
+      {
+        add_outer_frame(outer_style);
+        return;   // 0 rows
+      }
+
+   // value has > 0 rows. Compute how many lines we need.
+   //
+ShapeItem lines = sh.get_volume();
+   loop(s, sh.get_rank())
+      lines += s * (sh.get_shape_item(sh.get_rank() - s - 1));
+
+   buffer.resize(lines);
+   add_outer_frame(outer_style);
+}
+//----------------------------------------------------------------------------
+void
 PrintBuffer::print_interruptible(ostream & out, sRank rank, int quad_PW)
 {
    if (get_row_count() == 0)   return;      // empty PrintBuffer
@@ -530,132 +653,11 @@ vector<ShapeItem> chunk_lengths;
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::pb_empty(const Value & value, PrintContext pctx, 
-                             PrintStyle outer_style)
+PrintBuffer::set_char(int x, int y, Unicode uc)
 {
-   if (value.get_rank() == 1)   // vector: 1 line
-      {
-        if (pctx.get_style() == PR_APL_FUN)
-           {
-             if (value.get_cfirst().is_character_cell())   // ''
-                {
-                  UCS_string ucs(U"''");
-                  ColInfo ci;
-                  *this = PrintBuffer(ucs, ci);
-                  add_outer_frame(outer_style);
-                  return;
-                }
-
-             if (value.get_cfirst().is_numeric())   // ⍬
-                {
-                  UTF8_string utf("⍬");
-                  UCS_string ucs(utf);
-                  ColInfo ci;
-                  *this = PrintBuffer(ucs, ci);
-                  add_outer_frame(outer_style);
-                  return;
-                }
-           }
-
-        UCS_string ucs;   // empty
-        append_ucs(ucs);
-        add_outer_frame(outer_style);
-        return;   // 1 row
-      }
-
-const Shape sh = value.get_shape().without_last_axis();
-   if (sh.get_volume() <= 1)   // empty vector
-      {
-        add_outer_frame(outer_style);
-        return;   // 0 rows
-      }
-
-   // value has > 0 rows. Compute how many lines we need.
-   //
-ShapeItem lines = sh.get_volume();
-   loop(s, sh.get_rank())
-      lines += s * (sh.get_shape_item(sh.get_rank() - s - 1));
-
-   buffer.resize(lines);
-   add_outer_frame(outer_style);
-}
-//----------------------------------------------------------------------------
-void
-PrintBuffer::pb_for_function(const Value & value, PrintContext pctx, 
-                             PrintStyle outer_style)
-{
-const ShapeItem ec = value.element_count();
-UCS_string ucs;
-
-   if (value.is_char_vector())
-      {
-        ucs << UNI_SINGLE_QUOTE;
-        loop(e, ec)
-           {
-             const Unicode uni = value.get_cravel(e).get_char_value();
-             ucs << uni;
-             if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' -> ''
-           }
-        ucs << UNI_SINGLE_QUOTE;
-      }
-   else
-      {
-        loop(e, ec)
-           {
-             PrintBuffer pb = value.get_cravel(e)
-                                          .character_representation(pctx);
-             if (e)   ucs << UNI_SPACE;
-             ucs << UCS_string(pb, 0, pctx.get_PW());
-           }
-      }
-
-ColInfo ci;
-   *this = PrintBuffer(ucs, ci);
-   add_outer_frame(outer_style);
-}
-//----------------------------------------------------------------------------
-ShapeItem
-PrintBuffer::separator_rows(ShapeItem y, const Value & value, bool nested,
-                            sRank rk1, sRank rk2)
-{
-   if (y == 0)   return 0;
-
-const Shape & shape = value.get_shape();
-
-ShapeItem prod = 1;
-ShapeItem ret = 0;
-   loop(r, shape.get_rank() - 2)
-       {
-         prod *= shape.get_shape_item(shape.get_rank() - r - 2);
-         if (y % prod == 0)   ++ret;
-         else                 break;
-       }
-
-   if (nested)   // see lrm p. 138
-      {
-        /* lrm p. 138. Indeed, examples with IBM APL2 show that:
-
-        N←⊂ 3 3⍴'abcdefghi'   ⍝ nested
-        Q←3 3⍴⍳9 ◊ Q[2;2] ← N ◊ Q
-
-        gives:
-
- 1    2  3 
-
- 4  abc  6 
-    def    
-    ghi    
-
- 7    8  9 
-
-        i.e. with one blank line before and after the nested N.
-
-         */
-        const int max_rk = max(rk1, rk2);
-        if (max_rk > 1)   ret += max_rk - 1;
-      }
-
-   return ret;
+   Assert(y < int(buffer.size()));
+   Assert(x < int(buffer[y].size()));
+   buffer[y][x] = uc;
 }
 //----------------------------------------------------------------------------
 Unicode
@@ -664,14 +666,6 @@ PrintBuffer::get_char(int x, int y) const
    Assert(y < int(buffer.size()));
    Assert(x < int(buffer[y].size()));
    return buffer[y][x];
-}
-//----------------------------------------------------------------------------
-void
-PrintBuffer::set_char(int x, int y, Unicode uc)
-{
-   Assert(y < int(buffer.size()));
-   Assert(x < int(buffer[y].size()));
-   buffer[y][x] = uc;
 }
 //----------------------------------------------------------------------------
 void
@@ -706,14 +700,6 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::pad_to_spaces()
-{
-   loop(y, get_row_count())
-   loop(x, get_column_count(y))
-      if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_SPACE);
-}
-//----------------------------------------------------------------------------
-void
 PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
 {
    if (height > get_row_count())
@@ -724,58 +710,11 @@ PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::get_frame_chars(PrintStyle pst,
-                             Unicode & HORI, Unicode & VERT,
-                             Unicode & NW, Unicode & NE,
-                             Unicode & SE, Unicode & SW)
+PrintBuffer::pad_to_spaces()
 {
-   switch(pst & PST_CS_MASK)
-      {
-        case PST_CS_ASCII:
-             HORI = UNI_MINUS;
-             VERT = UNI_BAR;
-             NW   = UNI_FULLSTOP;
-             NE   = UNI_FULLSTOP;
-             SE   = UNI_SINGLE_QUOTE;
-             SW   = UNI_SINGLE_QUOTE;
-             break;
-
-        case PST_CS_THIN:
-             HORI = UNI_LINE_HORI;
-             VERT = UNI_LINE_VERT;
-             NW   = UNI_LINE_DOWN_LEFT;
-             NE   = UNI_LINE_DOWN_RIGHT;
-             SE   = UNI_LINE_UP_RIGHT;
-             SW   = UNI_LINE_UP_LEFT;
-             break;
-
-        case PST_CS_THICK:
-             HORI = UNI_LINE_HORI2;
-             VERT = UNI_LINE_VERT2;
-             NW   = UNI_LINE_DOWN2_LEFT2;
-             NE   = UNI_LINE_DOWN2_RIGHT2;
-             SE   = UNI_LINE_UP2_RIGHT2;
-             SW   = UNI_LINE_UP2_LEFT2;
-             break;
-
-        case PST_CS_DOUBLE:
-             HORI = UNI_LINE2_HORI;
-             VERT = UNI_LINE2_VERT;
-             NW   = UNI_LINE2_DOWN_LEFT;
-             NE   = UNI_LINE2_DOWN_RIGHT;
-             SE   = UNI_LINE2_UP_RIGHT;
-             SW   = UNI_LINE2_UP_LEFT;
-             break;
-
-        default:
-             HORI = Unicode_0;
-             VERT = Unicode_0;
-             NW   = Unicode_0;
-             NE   = Unicode_0;
-             SE   = Unicode_0;
-             SW   = Unicode_0;
-             FIXME;
-      }
+   loop(y, get_row_count())
+   loop(x, get_column_count(y))
+      if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_SPACE);
 }
 //----------------------------------------------------------------------------
 void
@@ -1163,6 +1102,76 @@ void PrintBuffer::add_row(const PrintBuffer & pb)
    loop(h, pb.get_row_count())   buffer.push_back(pb.buffer[h]);
 }
 //----------------------------------------------------------------------------
+bool
+PrintBuffer::is_rectangular() const
+{
+   if (get_row_count())
+      {
+        const ShapeItem w = get_column_count();
+        loop(h, get_row_count())
+           {
+             if (get_column_count(h) != w)    return false;
+           }
+      }
+
+   return true;
+}
+//----------------------------------------------------------------------------
+void
+PrintBuffer::get_frame_chars(PrintStyle pst,
+                             Unicode & HORI, Unicode & VERT,
+                             Unicode & NW, Unicode & NE,
+                             Unicode & SE, Unicode & SW)
+{
+   switch(pst & PST_CS_MASK)
+      {
+        case PST_CS_ASCII:
+             HORI = UNI_MINUS;
+             VERT = UNI_BAR;
+             NW   = UNI_FULLSTOP;
+             NE   = UNI_FULLSTOP;
+             SE   = UNI_SINGLE_QUOTE;
+             SW   = UNI_SINGLE_QUOTE;
+             break;
+
+        case PST_CS_THIN:
+             HORI = UNI_LINE_HORI;
+             VERT = UNI_LINE_VERT;
+             NW   = UNI_LINE_DOWN_LEFT;
+             NE   = UNI_LINE_DOWN_RIGHT;
+             SE   = UNI_LINE_UP_RIGHT;
+             SW   = UNI_LINE_UP_LEFT;
+             break;
+
+        case PST_CS_THICK:
+             HORI = UNI_LINE_HORI2;
+             VERT = UNI_LINE_VERT2;
+             NW   = UNI_LINE_DOWN2_LEFT2;
+             NE   = UNI_LINE_DOWN2_RIGHT2;
+             SE   = UNI_LINE_UP2_RIGHT2;
+             SW   = UNI_LINE_UP2_LEFT2;
+             break;
+
+        case PST_CS_DOUBLE:
+             HORI = UNI_LINE2_HORI;
+             VERT = UNI_LINE2_VERT;
+             NW   = UNI_LINE2_DOWN_LEFT;
+             NE   = UNI_LINE2_DOWN_RIGHT;
+             SE   = UNI_LINE2_UP_RIGHT;
+             SW   = UNI_LINE2_UP_LEFT;
+             break;
+
+        default:
+             HORI = Unicode_0;
+             VERT = Unicode_0;
+             NW   = Unicode_0;
+             NE   = Unicode_0;
+             SE   = Unicode_0;
+             SW   = Unicode_0;
+             FIXME;
+      }
+}
+//----------------------------------------------------------------------------
 void
 PrintBuffer::align(ColInfo & cols)
 {
@@ -1182,6 +1191,34 @@ PrintBuffer::align(ColInfo & cols)
    else                                  align_left(cols);
 
    Assert(is_rectangular());
+}
+//----------------------------------------------------------------------------
+void
+PrintBuffer::align_left(const ColInfo & COL_INFO)
+{
+   Log(LOG_printbuf_align)
+      {
+        CERR << "before align_left(), COL_INFO = " << COL_INFO.int_len
+             << ":" << COL_INFO.fract_len
+             << ":" << COL_INFO.real_len
+             << ", this col = " << col_info.int_len
+             << ":" << col_info.fract_len
+             << ":" << col_info.real_len << endl;
+        debug(CERR, 0);
+      }
+
+   if (col_info.int_len == COL_INFO.int_len)   return;   // no padding needed.
+
+   Assert(col_info.int_len < COL_INFO.int_len);
+
+const size_t diff = COL_INFO.int_len - col_info.int_len;
+
+   if (buffer.size())   pad_r(UNI_PAD_l_INT, diff);
+   else                 buffer.push_back(UCS_string(diff, UNI_PAD_l_INT));
+
+   col_info.int_len = COL_INFO.int_len;
+
+   Log(LOG_printbuf_align)   debug(CERR, "after align_left()");
 }
 //----------------------------------------------------------------------------
 void
@@ -1391,85 +1428,48 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
       }
 }
 //----------------------------------------------------------------------------
-void
-PrintBuffer::align_left(const ColInfo & COL_INFO)
+ShapeItem
+PrintBuffer::separator_rows(ShapeItem y, const Value & value, bool nested,
+                            sRank rk1, sRank rk2)
 {
-   Log(LOG_printbuf_align)
+   if (y == 0)   return 0;
+
+const Shape & shape = value.get_shape();
+
+ShapeItem prod = 1;
+ShapeItem ret = 0;
+   loop(r, shape.get_rank() - 2)
+       {
+         prod *= shape.get_shape_item(shape.get_rank() - r - 2);
+         if (y % prod == 0)   ++ret;
+         else                 break;
+       }
+
+   if (nested)   // see lrm p. 138
       {
-        CERR << "before align_left(), COL_INFO = " << COL_INFO.int_len
-             << ":" << COL_INFO.fract_len
-             << ":" << COL_INFO.real_len
-             << ", this col = " << col_info.int_len
-             << ":" << col_info.fract_len
-             << ":" << col_info.real_len << endl;
-        debug(CERR, 0);
+        /* lrm p. 138. Indeed, examples with IBM APL2 show that:
+
+        N←⊂ 3 3⍴'abcdefghi'   ⍝ nested
+        Q←3 3⍴⍳9 ◊ Q[2;2] ← N ◊ Q
+
+        gives:
+
+ 1    2  3 
+
+ 4  abc  6 
+    def    
+    ghi    
+
+ 7    8  9 
+
+        i.e. with one blank line before and after the nested N.
+
+         */
+        const int max_rk = max(rk1, rk2);
+        if (max_rk > 1)   ret += max_rk - 1;
       }
 
-   if (col_info.int_len == COL_INFO.int_len)   return;   // no padding needed.
-
-   Assert(col_info.int_len < COL_INFO.int_len);
-
-const size_t diff = COL_INFO.int_len - col_info.int_len;
-
-   if (buffer.size())   pad_r(UNI_PAD_l_INT, diff);
-   else                 buffer.push_back(UCS_string(diff, UNI_PAD_l_INT));
-
-   col_info.int_len = COL_INFO.int_len;
-
-   Log(LOG_printbuf_align)   debug(CERR, "after align_left()");
-}
-//----------------------------------------------------------------------------
-bool
-PrintBuffer::is_rectangular() const
-{
-   if (get_row_count())
-      {
-        const ShapeItem w = get_column_count();
-        loop(h, get_row_count())
-           {
-             if (get_column_count(h) != w)    return false;
-           }
-      }
-
-   return true;
-}
-//----------------------------------------------------------------------------
-void
-ColInfo::consider(const ColInfo & item)
-{
-   // this is the collective ColInfo of an entire column, and item
-   // is a new, not yet considered item in the columns.
-   //
-   flags |= item.flags;
-   if (item.imag_len)   flags |= has_j;
-
-   if (int_len < item.int_len)
-      {
-        real_len += item.int_len - int_len;
-        int_len = item.int_len;
-      }
-
-   if (item.denom_len)
-      {
-        if (denom_len < item.denom_len)   denom_len = item.denom_len;
-        if (real_len < int_len + denom_len)   real_len = int_len + denom_len;
-      }
-   else
-      {
-        const int EXPO_LEN = real_len - fract_len - int_len;
-        const int expo_len = item.real_len - item.fract_len - item.int_len;
-
-        if (fract_len < item.fract_len)
-           {
-             fract_len = item.fract_len;
-             if (fract_len + expo_len > denom_len)
-             real_len = int_len + fract_len + EXPO_LEN;
-           }
-
-        if (EXPO_LEN < expo_len)    real_len += expo_len - EXPO_LEN;
-      }
-
-   if (imag_len  < item.imag_len)    imag_len  = item.imag_len;
+   return ret;
 }
 //----------------------------------------------------------------------------
 ostream &

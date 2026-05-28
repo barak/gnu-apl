@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -192,11 +192,23 @@ extern TCP_socket get_TCP_for_key(SV_key key);
 /// one  shared variable.
 struct Svar_record
 {
-   /// a key that uniquely identifies this variable
-   SV_key key;
-
    /// true if this is a valid entry.
    bool valid() const   { return get_coupling() != NO_COUPLING; }
+
+   /// return the coupling of the variable
+   SV_Coupling get_coupling() const
+       { int ret = 0;   if (offering.is_active())    ++ret;
+                        if (accepting.is_active())   ++ret;
+         return SV_Coupling(ret); }
+
+   /// return the name of the variable, or 0 if fetching it has failed
+   const uint32_t * get_svar_name() const
+      { return *varname ? varname : 0; }
+
+   /// print the name of this variable
+   /// @param out output stream
+   ostream & print_name(ostream & out) const
+      { return print_name(out, varname, 0); }
 
    /// invalidate this entry
    void clear()
@@ -230,13 +242,6 @@ struct Svar_record
    /// @param UCS_other UCS name to match against varname
    bool match_name(const uint32_t * UCS_other) const;
 
-   /// return the coupling of the variable
-   SV_Coupling get_coupling() const
-       { int ret = 0;   if (offering.is_active())    ++ret;
-                        if (accepting.is_active())   ++ret;
-         return SV_Coupling(ret); }
-
-
    /// return the control bits of this variable
    Svar_Control get_control() const;
 
@@ -246,10 +251,6 @@ struct Svar_record
 
    /// return the state of this variable
    Svar_state get_state() const;
-
-   /// return the name of the variable, or 0 if fetching it has failed
-   const uint32_t * get_svar_name() const
-      { return *varname ? varname : 0; }
 
    /// update the state when using or setting this variable, and clear events
    /// @param used true if the variable is being used (read), false if set (written)
@@ -275,10 +276,8 @@ struct Svar_record
    static ostream & print_name(ostream & out, const uint32_t * name,
                                int len = MAX_SVAR_NAMELEN);
 
-   /// print the name of this variable
-   /// @param out output stream
-   ostream & print_name(ostream & out) const
-      { return print_name(out, varname, 0); }
+   /// a key that uniquely identifies this variable
+   SV_key key;
 
    /// name of the offered variable (UCS), 0-terminated
    uint32_t varname[MAX_SVAR_NAMELEN + 1];

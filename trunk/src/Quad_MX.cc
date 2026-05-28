@@ -74,6 +74,190 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
    init_function_group(subfunction_infos, count, "⎕MX");
 }
 //----------------------------------------------------------------------------
+void
+Quad_MX::print_fun_syntax(ostream & out,
+                          const FunctionGroup::function_info & info) const
+{
+  out << "    ";
+  switch(info.valence)
+     {
+       case 1:  out << "    ";   break;
+       case 2:  out << "  A ";   break;
+       case 3:  out << "{A} ";   break;
+       default: FIXME;
+     }
+  out << "⎕MX[" << setw(3) << info.axis << "]    ⍝ ";
+  switch(info.valence)
+     {
+       case 1:  out << "(monadic) ";   break;
+       case 2:  out << "(dyadic)  ";   break;
+       case 3:  out << "(nomadic) ";   break;
+       default: FIXME;
+     }
+      
+  out << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_MX::print_map_syntax(ostream & out,
+                          const FunctionGroup::function_info & info) const
+{
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
+
+   out << "    ⎕MX[" << setw(3) << info.axis << "]  ←→  ⎕MX['" << name << "']"
+       << blanks << "  ←→  ⎕MX." << name << endl;
+}
+//----------------------------------------------------------------------------
+Token
+Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+MX_ops op    = OP_LIST;
+int modifier = 0;
+
+   if (X->is_int_scalar() || X->is_char_string())   // op only
+      {
+        op = MX_ops(value_to_subfun(*X));
+        if (op >= 100 && op <= 104)
+           {
+             op = OP_RANDOMS;
+             modifier = op - 100;
+           } 
+      }
+   else if (X->is_vector())                         // op and modifier
+      {
+        const ShapeItem X_count = X->element_count();
+        op = MX_ops(X->get_cravel(0).get_int_value());
+        if (X_count > 1)   modifier = X->get_cravel(1).get_int_value();
+      }
+   else
+      {
+        MORE_ERROR() << "A ⎕MX[X] B: integer or string X expected.";
+        DOMAIN_ERROR;
+      }
+  
+   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
+
+Value_P Z;
+  switch(op)
+    {
+      case OP_LIST:
+           if (B->is_str0())    return list_functions(CERR);
+           if (B->is_zilde())   return list_mappings(CERR);
+           DOMAIN_ERROR;
+           break;
+
+      case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A, B);   break;
+      case OP_VECTOR_ANGLE:       Z = vectorAngle(A, B);          break;
+      case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation(16, A, B);   break;
+      case OP_COVARIANCE:         Z = dyadicCovariance(A, B);     break;
+      case OP_HISTOGRAM:          Z = histogram(A, B);            break;
+      case OP_RANDOMS:            Z = randoms(A, B, modifier);    break;
+      case OP_PRINT:              Z = printit(A, B);              break;
+
+      default: MORE_ERROR() << "⎕MX[" << op << "] B is monadic.";
+               VALENCE_ERROR;
+    }
+
+  Z->check_value(LOC);
+  return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_MX::eval_XB(Value_P X, Value_P B) const
+{
+MX_ops op    = OP_LIST;
+int modifier = 0;
+
+  if (X->is_int_scalar() || X->is_char_string())   // op only
+     {
+       op = MX_ops(value_to_subfun(*X));
+     }
+  else if (X->is_vector())                         // op and modifier
+     {
+       const ShapeItem X_count = X->element_count();
+       op = MX_ops(X->get_cravel(0).get_int_value());
+        if (X_count > 1)   modifier = X->get_cravel(1).get_int_value();
+      }
+   else
+      {
+        MORE_ERROR() << "⎕MX[X] B: integer or string X expected.";
+        SYNTAX_ERROR;
+      }
+
+   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
+
+Value_P opt_A;   // = 0
+Value_P Z = Idx0_0(LOC);
+   switch(op)
+      {
+        case OP_LIST:
+             if (B->is_str0())   return  list_functions(COUT);
+             if (B->is_zilde())   return list_mappings(COUT);
+             DOMAIN_ERROR;
+       
+        case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
+             //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
+        case OP_RANDOMS:            Z = randoms(opt_A, B, modifier);     break;
+        case OP_DETERMINANT:        Z = determinant(B);                  break;
+        case OP_COVARIANCE:         Z = monadicCovariance(B);            break;
+        case OP_NORM:               Z = norm(B);                         break;
+        case OP_EIGENVECTORS:       Z = eigenvectors(B);                 break;
+        case OP_EIGENVALUES:        Z = eigenvalues(B);                  break;
+        case OP_IDENT:              Z = ident(B);                        break;
+        case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
+        case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
+        default:   MORE_ERROR() << "A ⎕MX[" << op << "] B is dyadic.";
+                   VALENCE_ERROR;
+      }
+
+  Z->check_value(LOC);
+  return Token(TOK_APL_VALUE1, Z);
+}
+
+//----------------------------------------------------------------------------
+Token
+Quad_MX::eval_AB(Value_P A, Value_P B) const
+{
+  return eval_B(B);   // show help
+}
+//----------------------------------------------------------------------------
+Token
+Quad_MX::eval_B(Value_P B) const
+{
+   if (B->is_str0())    return list_functions(CERR);
+   if (B->is_zilde())   return list_mappings(CERR);
+
+   if (!B->is_vector())      RANK_ERROR;
+   if (B->element_count())   LENGTH_ERROR;   // not empty
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+vector<Quad_MX::Dcomplex>
+Quad_MX::getCross(GSL_Matrix *mtx)
+{
+Dcomplex det(0.0, 0.0);
+vector<Dcomplex> rc(mtx->cols());
+   if (mtx->rows() == 2)
+      {
+        det = (mtx->val(0, 0) * mtx->val(1,1)) 
+            - (mtx->val(0, 1) * mtx->val(1,0));
+      }
+   else
+     {
+       loop(k, mtx->rows())
+           {
+             const int sign = k & 1 ? -1 : 1;
+             GSL_Matrix * cf = genCofactor(mtx, 0, k);
+             const Dcomplex id = getDet(cf);
+             delete cf;
+             rc[k] = sign > 0 ? id : -id;
+           }
+     }
+
+  return rc;
+}
+//----------------------------------------------------------------------------
 Quad_MX::GSL_Matrix *
 Quad_MX::genCofactor(GSL_Matrix *mtx, int r, int c)
 {
@@ -117,31 +301,6 @@ Dcomplex det(0.0, 0.0);
       }
 
   return det;
-}
-//----------------------------------------------------------------------------
-vector<Quad_MX::Dcomplex>
-Quad_MX::getCross(GSL_Matrix *mtx)
-{
-Dcomplex det(0.0, 0.0);
-vector<Dcomplex> rc(mtx->cols());
-   if (mtx->rows() == 2)
-      {
-        det = (mtx->val(0, 0) * mtx->val(1,1)) 
-            - (mtx->val(0, 1) * mtx->val(1,0));
-      }
-   else
-     {
-       loop(k, mtx->rows())
-           {
-             const int sign = k & 1 ? -1 : 1;
-             GSL_Matrix * cf = genCofactor(mtx, 0, k);
-             const Dcomplex id = getDet(cf);
-             delete cf;
-             rc[k] = sign > 0 ? id : -id;
-           }
-     }
-
-  return rc;
 }
 //----------------------------------------------------------------------------
 Quad_MX::Dcomplex
@@ -188,26 +347,67 @@ ShapeItem b = 0;
 // ============= end of utility fcns ===============
 
 //----------------------------------------------------------------------------
-
-bool Quad_MX::rng_initialised = false;
-bool Quad_MX::rng_seed_set = false;
-unsigned int Quad_MX::rng_seed = 0;
-mt19937_64 Quad_MX::rgen;   // aka. mersenne_twister_engine<...>
-mt19937_64 Quad_MX::igen;
-
 Value_P
-Quad_MX::set_rng_seed(Value_P B)
+Quad_MX::eigenvectors(Value_P B)
 {
-   if (!B->is_int_scalar())
+   if (B->get_rank() != 2)
       {
-        MORE_ERROR() << "⎕MX.set_rng_seed B: integer scalar B expected.";
-        DOMAIN_ERROR;
+        MORE_ERROR() << "⎕MX.eigenvector B: matrix B expected.";
+        RANK_ERROR;
       }
 
-   rng_seed = B->get_sole_integer();
-   rng_seed_set = true;
+const ShapeItem rows = B->get_rows();
+const ShapeItem cols = B->get_cols();
+    
+   if (rows != cols)
+      {
+        MORE_ERROR() << "⎕MX.eigenvector B: square matrix B expected.";
+        LENGTH_ERROR;
+      }
 
-   return Idx0_0(LOC);
+GSL_Matrix * mtx = genMtx(B, false);
+std::vector<double> data_v((size_t)mtx->rows() * mtx->cols());
+double * data = data_v.data();
+int i = 0;
+   loop(j, mtx->rows())
+   for (int k = 0; k < mtx->cols(); k++, i++)
+       {
+         data[i] = mtx->val(j, k).real();
+       }
+
+gsl_matrix_view m = gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
+
+gsl_vector_complex * eval = gsl_vector_complex_alloc(mtx->rows());
+gsl_matrix_complex * evec = gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
+
+gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(mtx->rows());
+int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
+   if (erc == GSL_SUCCESS)
+      {
+        gsl_eigen_nonsymmv_free(w);
+        erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
+      }
+
+   if (erc != GSL_SUCCESS)
+     {
+       delete mtx;
+       MORE_ERROR() << "Eigensystem computation error.";
+       INTERNAL_ERROR;
+     }
+
+Value_P Z(rows, cols, LOC);
+   loop(c, mtx->cols())
+       {
+         gsl_vector_complex_view evec_c = gsl_matrix_complex_column(evec, c);
+         loop(r, mtx->rows())
+             {
+                gsl_complex z = gsl_vector_complex_get(&evec_c.vector, r);
+                Z->next_ravel_Complex(GSL_REAL(z), GSL_IMAG (z));
+             }
+       }
+  delete mtx;
+
+  return Z;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -369,69 +569,6 @@ const char * mode = "w";
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_MX::eigenvectors(Value_P B)
-{
-   if (B->get_rank() != 2)
-      {
-        MORE_ERROR() << "⎕MX.eigenvector B: matrix B expected.";
-        RANK_ERROR;
-      }
-
-const ShapeItem rows = B->get_rows();
-const ShapeItem cols = B->get_cols();
-    
-   if (rows != cols)
-      {
-        MORE_ERROR() << "⎕MX.eigenvector B: square matrix B expected.";
-        LENGTH_ERROR;
-      }
-
-GSL_Matrix * mtx = genMtx(B, false);
-std::vector<double> data_v((size_t)mtx->rows() * mtx->cols());
-double * data = data_v.data();
-int i = 0;
-   loop(j, mtx->rows())
-   for (int k = 0; k < mtx->cols(); k++, i++)
-       {
-         data[i] = mtx->val(j, k).real();
-       }
-
-gsl_matrix_view m = gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
-
-gsl_vector_complex * eval = gsl_vector_complex_alloc(mtx->rows());
-gsl_matrix_complex * evec = gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
-
-gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(mtx->rows());
-int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
-   if (erc == GSL_SUCCESS)
-      {
-        gsl_eigen_nonsymmv_free(w);
-        erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
-      }
-
-   if (erc != GSL_SUCCESS)
-     {
-       delete mtx;
-       MORE_ERROR() << "Eigensystem computation error.";
-       INTERNAL_ERROR;
-     }
-
-Value_P Z(rows, cols, LOC);
-   loop(c, mtx->cols())
-       {
-         gsl_vector_complex_view evec_c = gsl_matrix_complex_column(evec, c);
-         loop(r, mtx->rows())
-             {
-                gsl_complex z = gsl_vector_complex_get(&evec_c.vector, r);
-                Z->next_ravel_Complex(GSL_REAL(z), GSL_IMAG (z));
-             }
-       }
-  delete mtx;
-
-  return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
 Quad_MX::eigenvalues(Value_P B)
 {
    if (B->get_rank() != 2) 
@@ -492,6 +629,28 @@ Value_P Z(cols, LOC);
   Z->check_value(LOC);
 
   return Z;
+}
+//----------------------------------------------------------------------------
+
+bool Quad_MX::rng_initialised = false;
+bool Quad_MX::rng_seed_set = false;
+unsigned int Quad_MX::rng_seed = 0;
+mt19937_64 Quad_MX::rgen;   // aka. mersenne_twister_engine<...>
+mt19937_64 Quad_MX::igen;
+
+Value_P
+Quad_MX::set_rng_seed(Value_P B)
+{
+   if (!B->is_int_scalar())
+      {
+        MORE_ERROR() << "⎕MX.set_rng_seed B: integer scalar B expected.";
+        DOMAIN_ERROR;
+      }
+
+   rng_seed = B->get_sole_integer();
+   rng_seed_set = true;
+
+   return Idx0_0(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -1087,169 +1246,22 @@ const Dcomplex t22 =  cosb * cosg;
    Z->check_value(LOC);
    return Z;
 }
+#else //====================not apl_GSL =====================================
+ 
+Quad_MX::Quad_MX()
+  : QuadFunction(TOK_Quad_MX)
+{
+}
 //----------------------------------------------------------------------------
 void
 Quad_MX::print_fun_syntax(ostream & out,
                           const FunctionGroup::function_info & info) const
 {
-  out << "    ";
-  switch(info.valence)
-     {
-       case 1:  out << "    ";   break;
-       case 2:  out << "  A ";   break;
-       case 3:  out << "{A} ";   break;
-       default: FIXME;
-     }
-  out << "⎕MX[" << setw(3) << info.axis << "]    ⍝ ";
-  switch(info.valence)
-     {
-       case 1:  out << "(monadic) ";   break;
-       case 2:  out << "(dyadic)  ";   break;
-       case 3:  out << "(nomadic) ";   break;
-       default: FIXME;
-     }
-      
-  out << info.comment_fun << endl;
 }
 //----------------------------------------------------------------------------
 void
 Quad_MX::print_map_syntax(ostream & out,
                           const FunctionGroup::function_info & info) const
-{
-const char * name = info.function_name;
-const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
-
-   out << "    ⎕MX[" << setw(3) << info.axis << "]  ←→  ⎕MX['" << name << "']"
-       << blanks << "  ←→  ⎕MX." << name << endl;
-}
-//----------------------------------------------------------------------------
-Token
-Quad_MX::eval_AB(Value_P A, Value_P B) const
-{
-  return eval_B(B);   // show help
-}
-//----------------------------------------------------------------------------
-Token
-Quad_MX::eval_B(Value_P B) const
-{
-   if (B->is_str0())    return list_functions(CERR);
-   if (B->is_zilde())   return list_mappings(CERR);
-
-   if (!B->is_vector())      RANK_ERROR;
-   if (B->element_count())   LENGTH_ERROR;   // not empty
-  DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-Token
-Quad_MX::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-MX_ops op    = OP_LIST;
-int modifier = 0;
-
-   if (X->is_int_scalar() || X->is_char_string())   // op only
-      {
-        op = MX_ops(value_to_subfun(*X));
-        if (op >= 100 && op <= 104)
-           {
-             op = OP_RANDOMS;
-             modifier = op - 100;
-           } 
-      }
-   else if (X->is_vector())                         // op and modifier
-      {
-        const ShapeItem X_count = X->element_count();
-        op = MX_ops(X->get_cravel(0).get_int_value());
-        if (X_count > 1)   modifier = X->get_cravel(1).get_int_value();
-      }
-   else
-      {
-        MORE_ERROR() << "A ⎕MX[X] B: integer or string X expected.";
-        DOMAIN_ERROR;
-      }
-  
-   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
-
-Value_P Z;
-  switch(op)
-    {
-      case OP_LIST:
-           if (B->is_str0())    return list_functions(CERR);
-           if (B->is_zilde())   return list_mappings(CERR);
-           DOMAIN_ERROR;
-           break;
-
-      case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A, B);   break;
-      case OP_VECTOR_ANGLE:       Z = vectorAngle(A, B);          break;
-      case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation(16, A, B);   break;
-      case OP_COVARIANCE:         Z = dyadicCovariance(A, B);     break;
-      case OP_HISTOGRAM:          Z = histogram(A, B);            break;
-      case OP_RANDOMS:            Z = randoms(A, B, modifier);    break;
-      case OP_PRINT:              Z = printit(A, B);              break;
-
-      default: MORE_ERROR() << "⎕MX[" << op << "] B is monadic.";
-               VALENCE_ERROR;
-    }
-
-  Z->check_value(LOC);
-  return Token(TOK_APL_VALUE1, Z);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_MX::eval_XB(Value_P X, Value_P B) const
-{
-MX_ops op    = OP_LIST;
-int modifier = 0;
-
-  if (X->is_int_scalar() || X->is_char_string())   // op only
-     {
-       op = MX_ops(value_to_subfun(*X));
-     }
-  else if (X->is_vector())                         // op and modifier
-     {
-       const ShapeItem X_count = X->element_count();
-       op = MX_ops(X->get_cravel(0).get_int_value());
-        if (X_count > 1)   modifier = X->get_cravel(1).get_int_value();
-      }
-   else
-      {
-        MORE_ERROR() << "⎕MX[X] B: integer or string X expected.";
-        SYNTAX_ERROR;
-      }
-
-   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
-
-Value_P opt_A;   // = 0
-Value_P Z = Idx0_0(LOC);
-   switch(op)
-      {
-        case OP_LIST:
-             if (B->is_str0())   return  list_functions(COUT);
-             if (B->is_zilde())   return list_mappings(COUT);
-             DOMAIN_ERROR;
-       
-        case OP_CROSS_PRODUCT:      Z = monadicCrossProduct(B);          break;
-             //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
-        case OP_RANDOMS:            Z = randoms(opt_A, B, modifier);     break;
-        case OP_DETERMINANT:        Z = determinant(B);                  break;
-        case OP_COVARIANCE:         Z = monadicCovariance(B);            break;
-        case OP_NORM:               Z = norm(B);                         break;
-        case OP_EIGENVECTORS:       Z = eigenvectors(B);                 break;
-        case OP_EIGENVALUES:        Z = eigenvalues(B);                  break;
-        case OP_IDENT:              Z = ident(B);                        break;
-        case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
-        case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
-        default:   MORE_ERROR() << "A ⎕MX[" << op << "] B is dyadic.";
-                   VALENCE_ERROR;
-      }
-
-  Z->check_value(LOC);
-  return Token(TOK_APL_VALUE1, Z);
-}
-
-#else //====================not apl_GSL =====================================
- 
-Quad_MX::Quad_MX()
-  : QuadFunction(TOK_Quad_MX)
 {
 }
 //----------------------------------------------------------------------------
@@ -1279,18 +1291,6 @@ const char * hdrs[] = { "gsl_statistics.h", "gsl_math.h", "gsl_eigen.h", 0 };
 const char * pkgs[] = { "libgsl-dev", 0 };
 
    return missing_files("⎕MX", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-void
-Quad_MX::print_fun_syntax(ostream & out,
-                          const FunctionGroup::function_info & info) const
-{
-}
-//----------------------------------------------------------------------------
-void
-Quad_MX::print_map_syntax(ostream & out,
-                          const FunctionGroup::function_info & info) const
-{
 }
 //----------------------------------------------------------------------------
 

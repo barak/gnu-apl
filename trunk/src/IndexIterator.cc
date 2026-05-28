@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,19 @@
 #include "PrintOperator.hh"
 
 //----------------------------------------------------------------------------
+ostream &
+IndexIterator::print(ostream & out) const
+{
+   out << "Iterator "     << voidP(this) << ":"  << endl
+       << "   upper:       " << voidP(upper)     << endl
+       << "   value:       " << get_ivalue()     << endl
+       << "   indices[" << get_index_count()     << "] :";
+
+   loop(i, get_index_count())   out << " " << get_pos(i);
+
+   return out << endl;
+}
+//----------------------------------------------------------------------------
 void
 IndexIterator::operator ++()
 {
@@ -46,19 +59,6 @@ IndexIterator::operator ++()
       }
 
    // print(CERR);
-}
-//----------------------------------------------------------------------------
-ostream &
-IndexIterator::print(ostream & out) const
-{
-   out << "Iterator "     << voidP(this) << ":"  << endl
-       << "   upper:       " << voidP(upper)     << endl
-       << "   value:       " << get_ivalue()     << endl
-       << "   indices[" << get_index_count()     << "] :";
-
-   loop(i, get_index_count())   out << " " << get_pos(i);
-
-   return out << endl;
 }
 //============================================================================
 TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,

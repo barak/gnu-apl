@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,15 +84,15 @@ protected:
         CoreCount cores;   ///< number of cores to be used
       };
 
-   /// the context for an outer product
-   static PJob_product job;
-
    /// outer product for scalar RO
    inline void scalar_outer_product() const;
 
    /// the main loop for an outer product with scalar functions
    /// @param tctx  thread execution context
    static void PF_scalar_outer_product(Thread_context & tctx);
+
+   /// the context for an outer product
+   static PJob_product job;
 };
 //----------------------------------------------------------------------------
 

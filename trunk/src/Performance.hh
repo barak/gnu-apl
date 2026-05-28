@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,13 +106,21 @@ public:
      data2(da2)
    {}
 
-   /// reset record to count 0, mean 0, variance 0
-   void reset()
-      {
-        count = 0;
-        data = 0;
-        data2 = 0;
-      }
+   /// return the average
+   uint64_t get_average() const
+      { return average(data, count); }
+
+   /// return the number of samples
+   uint64_t get_count() const
+      { return count; }
+
+   /// return the sum of samples
+   uint64_t get_sum() const
+      { return data; }
+
+   /// return the sum of squares
+   double get_sum2() const
+      { return data2; }
 
    /// add one sample
    /// @param val cycle count of the sample to add
@@ -123,6 +131,14 @@ public:
         data2 += val*val;
       }
 
+   /// reset record to count 0, mean 0, variance 0
+   void reset()
+      {
+        count = 0;
+        data = 0;
+        data2 = 0;
+      }
+
    /// print count, data, and data2
    /// @param out output stream to write to
    void print(ostream & out);
@@ -130,22 +146,6 @@ public:
    /// write count, data, and data2 to file
    /// @param outf output file stream to write to
    void save_record(ostream & outf);
-
-   /// return the number of samples
-   uint64_t get_count() const
-      { return count; }
-
-   /// return the sum of samples
-   uint64_t get_sum() const
-      { return data; }
-
-   /// return the average
-   uint64_t get_average() const
-      { return average(data, count); }
-
-   /// return the sum of squares
-   double get_sum2() const
-      { return data2; }
 
    /// the average of \b count items with sum \b sum
    /// @param sum total of all sample values
@@ -182,29 +182,29 @@ public:
    /// destructor
    virtual ~Statistics();
 
-   /// print statistics
-   /// @param out output stream to write to
-   virtual void print(ostream & out) = 0;
-
-   /// write statistics to file
-   /// @param outf output file stream to write to
-   /// @param perf_name name label for this statistics entry
-   virtual void save_data(ostream & outf, const char * perf_name) = 0;
-
-   /// reset \b this statistics
-   virtual void reset() = 0;
-
    /// return the statistics for the first passes
    virtual const Statistics_record * get_first_record() const
-      { return 0; }
-
-   /// return the statistics for the subsequent passes
-   virtual const Statistics_record * get_record() const
       { return 0; }
 
    /// return the name of \b this statistics
    const char * get_name() const
       { return get_name(id); }
+
+   /// return the statistics for the subsequent passes
+   virtual const Statistics_record * get_record() const
+      { return 0; }
+
+   /// print statistics
+   /// @param out output stream to write to
+   virtual void print(ostream & out) = 0;
+
+   /// reset \b this statistics
+   virtual void reset() = 0;
+
+   /// write statistics to file
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
+   virtual void save_data(ostream & outf, const char * perf_name) = 0;
 
    /// return the name of the statistics with ID \b id
    /// @param id statistics identifier to look up
@@ -225,6 +225,23 @@ public:
    : Statistics(id)
    { reset(); }
 
+   /// return the (CPU-)cycles statistics
+   const Statistics_record & get_data() const
+      { return vec_cycles; }
+
+   /// return the (CPU-)cycles statistics
+   virtual const Statistics_record * get_record() const
+      { return &vec_cycles; }
+
+   /// add a sample
+   /// @param cycles CPU cycle count for this sample
+   /// @param veclen vector length (number of elements processed)
+   void add_sample(uint64_t cycles, uint64_t veclen)
+      {
+         vec_cycles.add_sample(cycles);
+         vec_lengths.add_sample(veclen);
+       }
+
    /// overloaded Statistics::print()
    virtual void reset()
         {
@@ -239,23 +256,6 @@ public:
    /// @param outf output file stream to write to
    /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name);
-
-   /// return the (CPU-)cycles statistics
-   virtual const Statistics_record * get_record() const
-      { return &vec_cycles; }
-
-   /// return the (CPU-)cycles statistics
-   const Statistics_record & get_data() const
-      { return vec_cycles; }
-
-   /// add a sample
-   /// @param cycles CPU cycle count for this sample
-   /// @param veclen vector length (number of elements processed)
-   void add_sample(uint64_t cycles, uint64_t veclen)
-      {
-         vec_cycles.add_sample(cycles);
-         vec_lengths.add_sample(veclen);
-       }
 
 protected:
    /// a statistics of vector lengths

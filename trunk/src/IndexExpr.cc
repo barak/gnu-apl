@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@
 IndexExpr::IndexExpr(Assign_state astate, const char * loc)
    : DynamicObject(loc),
      quad_io(Workspace::get_IO()),
+     assign_state(astate),
      rank(0),
-     value_count(0),
-     assign_state(astate)
+     value_count(0)
 {
 }
 //----------------------------------------------------------------------------
@@ -43,18 +43,6 @@ IndexExpr::~IndexExpr()
       {
         loop(r, rank)   if (+values[r])   values[r].reset();
       }
-}
-//----------------------------------------------------------------------------
-Value_P
-IndexExpr::extract_axis()
-{
-   if (rank == 0 || !values[0])    return Value_P();   // no index or [ ]
-
-   Assert1(rank == 1);   // must only be called for [ axis ]
-   --value_count;
-Value_P ret = values[0];
-   values[0].reset();   // decrement owner count
-   return ret;
 }
 //----------------------------------------------------------------------------
 void
@@ -110,29 +98,16 @@ sRank axis = I->get_cfirst().get_near_int() - qio;
    return axis;
 }
 //----------------------------------------------------------------------------
-int
-IndexExpr::print_stale(ostream & out)
+Value_P
+IndexExpr::extract_axis()
 {
-int count = 0;
+   if (rank == 0 || !values[0])    return Value_P();   // no index or [ ]
 
-   for (const DynamicObject * dob = all_index_exprs.get_next();
-        dob != &all_index_exprs; dob = dob->get_next())
-       {
-         const IndexExpr * idx = dob->pIndexExpr();
-
-         out << dob->where_allocated();
-
-         try           { out << *idx; }
-         catch (Error &)      { out << " *** corrupt ***"; }
-         catch (std::bad_alloc &) { out << " *** corrupt ***"; WS_FULL; }
-         catch (...)          { FIXME; }
-
-         out << endl;
-
-         ++count;
-       }
-
-   return count;
+   Assert1(rank == 1);   // must only be called for [ axis ]
+   --value_count;
+Value_P ret = values[0];
+   values[0].reset();   // decrement owner count
+   return ret;
 }
 //----------------------------------------------------------------------------
 void
@@ -156,6 +131,31 @@ IndexExpr::erase_stale(const char * loc)
          idx->unlink();
          delete idx;
        }
+}
+//----------------------------------------------------------------------------
+int
+IndexExpr::print_stale(ostream & out)
+{
+int count = 0;
+
+   for (const DynamicObject * dob = all_index_exprs.get_next();
+        dob != &all_index_exprs; dob = dob->get_next())
+       {
+         const IndexExpr * idx = dob->pIndexExpr();
+
+         out << dob->where_allocated();
+
+         try           { out << *idx; }
+         catch (Error &)      { out << " *** corrupt ***"; }
+         catch (std::bad_alloc &) { out << " *** corrupt ***"; WS_FULL; }
+         catch (...)          { FIXME; }
+
+         out << endl;
+
+         ++count;
+       }
+
+   return count;
 }
 //----------------------------------------------------------------------------
 ostream &

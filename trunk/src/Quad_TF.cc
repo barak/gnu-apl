@@ -98,6 +98,42 @@ Quad_TF::is_inverse(const UCS_string & maybe_name)
    return false;
 }
 //----------------------------------------------------------------------------
+UCS_string
+Quad_TF::no_UCS(const UCS_string & ucs)
+{
+UCS_string ret;
+
+   loop(u, ucs.size())
+      {
+        if ( u < ucs.ssize() - 6 &&
+             ucs[u]     == '\'' &&
+             ucs[u + 1] == ','  &&
+             ucs[u + 2] == '('  &&
+             ucs[u + 3] == UNI_Quad_Quad &&
+             ucs[u + 4] == 'U'  &&
+             ucs[u + 5] == 'C'  &&
+             ucs[u + 6] == 'S')
+           {
+             u += 7;   // skip '(⎕UCS
+
+             for (;;)
+                 {
+                  while (u < ucs.ssize() && ucs[u] == ' ')   ++u;
+                  if (ucs[u] == ')')   { u += 2;   break; }
+
+                  int num = 0;
+                  while (u < ucs.ssize() && ucs[u] >= '0' && ucs[u] <= '9')
+                     { num *= 10;   num += ucs[u++] - '0'; }
+
+                  ret << Unicode(num);
+                 }
+           }
+        else ret << ucs[u];
+      }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf1(const UCS_string & name)
 {
@@ -124,6 +160,469 @@ const Function * function = obj->get_function();
       }
 
    return Str0(LOC);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_TF::tf2(const UCS_string & name)
+{
+const NamedObject * obj = Workspace::lookup_existing_name(name);
+   if (obj == 0)
+      {
+        Log(LOG_Quad_TF)   CERR << "bad name in tf2(" << name << ")" << endl;
+        return Token(TOK_APL_VALUE1, Str0(LOC));
+      }
+
+const Function * function = obj->get_function();
+
+   if (function)
+      {
+        if (obj->is_user_defined())
+           {
+             UCS_string ucs = tf2_fun(name, *function);
+             Value_P Z(ucs, LOC);
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+           }
+
+        // quad function or primitive: return ''
+        return Token(TOK_APL_VALUE1, Str0(LOC));
+      }
+
+const Symbol * symbol = obj->get_symbol();
+   if (symbol)
+      {
+        Value_P value = symbol->get_apl_value();
+        if (+value)   return tf2_var(name, *value);
+
+        /* not a variable: fall through */
+      }
+
+   Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << endl;
+   return Token(TOK_APL_VALUE1, Str0(LOC));
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
+{
+   if (vec.size() == 0)   return;
+
+bool in_UCS = false;
+   ucs << UNI_SINGLE_QUOTE;
+
+   loop(v, vec.size())
+       {
+         const Unicode uni = vec[v];
+         const bool need_UCS = Avec::need_UCS(uni);
+         if (in_UCS != need_UCS)   // mode changed
+            {
+              if (in_UCS)   ucs << "),'";       // UCS() → 'xxx'
+              else          ucs << "',(⎕UCS";   // 'xxx' → UCS()
+              in_UCS = need_UCS;
+            }
+
+         if (in_UCS)
+            {
+              ucs << UNI_SPACE << int(uni);
+            }
+         else
+            {
+              ucs << uni;
+              if (uni == UNI_SINGLE_QUOTE)   ucs << uni;
+            }
+       }
+
+   if (in_UCS)   ucs << "),''";
+   else          ucs << UNI_SINGLE_QUOTE;
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
+                    const Function & fun)
+{
+const UCS_string text = fun.canonical(false);
+
+   if (fun.is_native())
+      {
+        CERR << "Warning: the workspace contains a native function '"
+             << fun_name << "', making the" << endl
+             << "   .atf output file incompatible with other APL interpreters."
+             << endl;
+
+        ucs << UNI_SINGLE_QUOTE << fun_name << "' ⎕FX '" << text
+            << UNI_SINGLE_QUOTE;;
+        return;
+      }
+
+UCS_string_vector lines;
+   text.to_vector(lines);
+
+   ucs << "⎕FX";
+
+   loop(l, lines.size())
+      {
+        ucs << UNI_SPACE;
+        tf2_char_vec(ucs, lines[l]);
+      }
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_TF::tf2_inverse(const UCS_string & ravel)
+{
+Token_string tos;
+   tos.push_back(Token(TOK_L_PARENT, int64_t(0)));
+
+   Log(LOG_Quad_TF)   CERR << "inverse ⎕TF2: " << ravel << endl;
+
+   try
+      {
+        UCS_string ucs1 = no_UCS(ravel);
+        const Parser parser(PM_EXECUTE, LOC, false);
+        parser.parse(ucs1, tos, true);
+      }
+   catch(Error &)
+      {
+        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
+        return UCS_string();
+      }
+   catch(std::bad_alloc &)
+      {
+        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
+        return UCS_string();
+      }
+   catch(...)
+      { FIXME; }
+
+   // tos is now ( VAR ← ... ) or: ( ⎕FX val ...
+   // make it VAR ← ( ... )    or: leave as is
+   //
+   {
+     if (tos.size() >= 3 && tos[1].get_tag() != TOK_Quad_FX)
+        {
+          tos[0] = tos[1];   // move VAR
+          tos[1] = tos[2];   // move ←
+          tos[2] = Token(TOK_L_PARENT, int64_t(0));
+        }
+   }
+    tos.push_back(Token(TOK_R_PARENT, int64_t(0)));
+
+   // simplify tos as much as possible. We replace A⍴B by reshaped B
+   // and glue values together.
+   //
+   tf2_reduce(tos);
+
+   Log(LOG_Quad_TF)
+      {
+        CERR << "inverse ⎕TF2: tos[" << tos.size() << "] after reduce() is: ";
+        tos.print(CERR, false);
+        CERR << endl;
+      }
+
+   if (tos.size() < 2)
+      {
+        Log(LOG_Quad_TF)
+           CERR << "short tos in tf2_inverse()" << tos.size() << endl;
+        return UCS_string();   // too short for an inverse 2⎕TF
+      }
+
+   // it could happen that some system variable ⎕XX which is not known by
+   // GNU APL is read. This case is parsed as ⎕ XX ← ... 
+   // Issue a warning in that case
+   //
+   if (tos[0].get_tag() == TOK_Quad_Quad &&
+       tos[1].get_Class() == TC_SYMBOL)
+      {
+        UCS_string new_var_or_fun = tos[1].get_sym_ptr()->get_name();
+        CERR << "*** Unknown system variable ⎕" << new_var_or_fun
+             << " in 2⎕TF / )IN (assignment ignored)" << endl;
+        return new_var_or_fun;
+      }
+
+   /* we expect either   VAR ← VALUE
+      or:              ( ⎕FX fun-text    )
+
+      Try VAR ← VALUE first.
+    */
+   if (tos[0].get_Class() == TC_SYMBOL && tos[1].get_Class() == TC_ASSIGN)
+      {
+        // at this point, we expect SYM ← VALUE.
+        //
+        if (tos.size() != 3)                  return UCS_string();
+        if (tos[2].get_Class() != TC_VALUE)   return UCS_string();
+
+         tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
+         Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << endl;
+         return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
+      }
+
+   // try dyadic ⎕FX (native function)
+   //
+   // Then tos[5] is: ( VALUE ⎕FX VALUE )
+   //
+   if (tos.size() == 5                   &&
+       tos[1].get_Class() == TC_VALUE    &&
+       tos[2].get_tag()   == TOK_Quad_FX &&
+       tos[3].get_Class() == TC_VALUE)
+      {
+        const Value * fname   =  tos[1].get_apl_val().get();
+        const Value * so_path =  tos[3].get_apl_val().get();
+
+        const Token tok = Quad_FX::do_eval_AB(so_path, fname);
+        if (tok.get_Class() == TC_VALUE)   // ⎕FX successful
+           {
+             Value_P val = tok.get_apl_val();
+        Log(LOG_Quad_TF)
+           CERR << "valid inverse 2 ⎕TF (native function):" << endl;
+             return UCS_string(*val.get());
+           }
+
+        Log(LOG_Quad_TF)
+           CERR << "invalid inverse 2 ⎕TF (native function):" << endl;
+        return UCS_string();
+      }
+
+   /* monadic ⎕FX. at this point we should have:
+
+      tos[4] =  ( ⎕FX Value )
+    */
+
+   Log(LOG_Quad_TF)
+      CERR << "inverse 2 ⎕TF (monadic ⎕FX):" << endl;
+   if (tos.size() != 4)                   return UCS_string();
+   if (tos[1].get_tag() != TOK_Quad_FX)   return UCS_string();
+   if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
+
+static const int eprops[] = { 0, 0, 0, 0 };
+const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
+                                      UTF8_string("2 ⎕TF"));
+
+   if (tok.get_Class() != TC_VALUE)
+      {
+        Log(LOG_Quad_TF)
+           CERR << "Quad_FX::do_quad_FX() failed in tf2_inverse()" << endl;
+        return UCS_string();   // error in ⎕FX
+      }
+
+   // ⎕FX succeeded (and the token returned is the name of the function)
+   //
+   return UCS_string(*tok.get_apl_val().get());
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
+                   ShapeItem nesting)
+{
+   Log(LOG_Quad_TF)
+      {
+        char cc[100];
+        SPRINTF(cc, "tf2_value() initial level %u\n", level);
+        CERR << "tf2_value(): ucs before at level " << level << ": "
+             << ucs << endl << cc;
+        value.print_boxed(CERR, 0);
+      }
+
+
+   // some (but not all) empty vectors
+   if (value.is_empty())
+      {
+        const Cell & cell = value.get_cfirst();
+        if (cell.is_character_cell())
+           {
+             ucs << UNI_L_PARENT << UNI_SINGLE_QUOTE
+                 << UNI_SINGLE_QUOTE << UNI_R_PARENT;
+             return;
+           }
+      }
+
+const ShapeItem ec = value.nz_element_count();
+
+   // emit e.g. ( shape ⍴
+   //
+   tf2_shape(ucs, value.get_shape(), nesting);
+   if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_cfirst());
+   else                   tf2_all_char_ravel(level, ucs, value);
+   ucs << UNI_R_PARENT;   // close corresponding '(' from tf2_shape()
+
+   Log(LOG_Quad_TF)
+      {
+        CERR << "tf2_value(): ucs after at level " << level
+             << ": " << ucs << endl;
+      }
+   return;
+}
+//----------------------------------------------------------------------------
+Token
+Quad_TF::tf2_var(const UCS_string & var_name, const Value & B)
+{
+   Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << endl;
+
+UCS_string ucs_value; /// the right hand side of VAR←VALUE
+   if (B.is_scalar() && !B.is_simple_scalar())
+      {
+        const Cell & cell = B.get_cfirst();
+        Assert(cell.is_pointer_cell());
+        tf2_value(0, ucs_value, *cell.get_pointer_value(), 1);
+      }
+   else
+      {
+        tf2_value(0, ucs_value, B, 0);
+      }
+
+   Assert(ucs_value[0] == UNI_L_PARENT);
+   Assert(ucs_value[ucs_value.size() - 1] == UNI_R_PARENT);
+
+UCS_string ucs(var_name);
+   ucs << UNI_LEFT_ARROW;
+
+   // copy ucs_value except the outer parrentheses
+   for (ShapeItem v = 1; v < (ucs_value.ssize() - 1); ++v)
+       ucs << ucs_value[v];
+
+   Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
+Value_P Z(ucs, LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_TF::tf3(const UCS_string & name)
+{
+const NamedObject * obj = Workspace::lookup_existing_name(name);
+   if (obj == 0)   return Str0(LOC);
+
+   if (obj->get_function())
+      {
+        // 3⎕TF is not defined for functions.
+        //
+        return Str0(LOC);
+      }
+
+const Symbol * symbol = obj->get_symbol();
+   if (symbol)
+      {
+        if (const Value * value = symbol->get_apl_value().get())
+           {
+             CDR_string cdr;
+             CDR::to_CDR(cdr, value);
+
+             return Value_P(cdr, LOC);
+           }
+
+        /* not a variable: fall through */
+      }
+
+   return Str0(LOC);
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
+{
+   ucs << UNI_L_PARENT;
+   loop(n, nesting)   ucs << UNI_SUBSET;   // ⊂...
+
+   // scalars are ''⍴SCALAR but ''⍴ has no effect and can be omitted
+
+   if (shape.get_rank())   // non-scalar
+      {
+        loop(r, shape.get_rank())
+            {
+              if (r)   ucs << UNI_SPACE;
+              ucs << shape.get_shape_item(r);
+            }
+
+        ucs << UNI_RHO;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
+                   const Cell * cells)
+{
+   Assert(len > 0);
+
+   loop(e, len)
+       {
+         if (e)   ucs << UNI_SPACE;
+         const Cell & cell = *cells++;
+
+         if (cell.is_pointer_cell())
+            {
+              Value_P sub_val = cell.get_pointer_value();
+              ShapeItem nesting = 0;
+              while (sub_val->is_scalar())
+                    {
+                      Assert(sub_val->get_cfirst().is_pointer_cell());
+                      ++nesting;
+                      sub_val = sub_val->get_cfirst().get_pointer_value();
+                    }
+
+              tf2_value(level + 1, ucs, *sub_val, nesting);
+           }
+        else if (cell.is_lval_cell())
+           {
+             DOMAIN_ERROR;
+           }
+        else if (cell.is_complex_cell())
+           {
+             PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
+             bool scaled = true;
+             UCS_string ucs1(cell.get_real_value(), scaled, pctx);
+             UCS_string ucs2(cell.get_imag_value(), scaled, pctx);
+             ucs << ucs1 << UNI_J << ucs2;
+           }
+        else if (cell.is_float_cell())
+           {
+             PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
+             bool scaled = true;
+             UCS_string ucs1(cell.get_real_value(), scaled, pctx);
+             ucs << ucs1;
+           }
+        else
+           {
+             PrintContext pctx(PR_APL_FUN);
+             const PrintBuffer pb = cell.character_representation(pctx);
+             ucs << pb.l1();
+           }
+        }
+}
+//----------------------------------------------------------------------------
+void
+Quad_TF::tf2_all_char_ravel(int level, UCS_string & ucs, const Value & value)
+{
+const ShapeItem ec = value.nz_element_count();
+
+   // check if ⎕UCS is needed. 
+   //
+   // ⎕UCS is needed if the string contains a character that is:
+   //
+   // 1. not in our ⎕AV, or
+   // 2. not in IBM's ⎕AV
+   //
+   bool use_UCS = false;
+   loop(e, ec)
+       {
+         const Unicode uni = value.get_cravel(e).get_char_value();
+         if (Avec::need_UCS(uni))   { use_UCS = true;   break; }
+       }
+
+   if (use_UCS)
+      {
+        ucs << "⎕UCS";
+        loop(e, ec)
+            {
+              ucs << UNI_SPACE << int(value.get_cravel(e).get_char_value());
+            }
+      }
+   else
+      {
+        ucs << UNI_SINGLE_QUOTE;
+        loop(e, ec)
+            {
+              const Unicode uni = value.get_cravel(e).get_char_value();
+              ucs << uni;
+              if (uni == UNI_SINGLE_QUOTE)   ucs << UNI_SINGLE_QUOTE;
+            }
+        ucs << UNI_SINGLE_QUOTE;
+      }
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -437,375 +936,6 @@ const int data_chars = len - idx;
    return Value_P(name, LOC);
 }
 //----------------------------------------------------------------------------
-Token
-Quad_TF::tf2(const UCS_string & name)
-{
-const NamedObject * obj = Workspace::lookup_existing_name(name);
-   if (obj == 0)
-      {
-        Log(LOG_Quad_TF)   CERR << "bad name in tf2(" << name << ")" << endl;
-        return Token(TOK_APL_VALUE1, Str0(LOC));
-      }
-
-const Function * function = obj->get_function();
-
-   if (function)
-      {
-        if (obj->is_user_defined())
-           {
-             UCS_string ucs = tf2_fun(name, *function);
-             Value_P Z(ucs, LOC);
-             Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
-           }
-
-        // quad function or primitive: return ''
-        return Token(TOK_APL_VALUE1, Str0(LOC));
-      }
-
-const Symbol * symbol = obj->get_symbol();
-   if (symbol)
-      {
-        Value_P value = symbol->get_apl_value();
-        if (+value)   return tf2_var(name, *value);
-
-        /* not a variable: fall through */
-      }
-
-   Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << endl;
-   return Token(TOK_APL_VALUE1, Str0(LOC));
-}
-//----------------------------------------------------------------------------
-Token
-Quad_TF::tf2_var(const UCS_string & var_name, const Value & B)
-{
-   Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << endl;
-
-UCS_string ucs_value; /// the right hand side of VAR←VALUE
-   if (B.is_scalar() && !B.is_simple_scalar())
-      {
-        const Cell & cell = B.get_cfirst();
-        Assert(cell.is_pointer_cell());
-        tf2_value(0, ucs_value, *cell.get_pointer_value(), 1);
-      }
-   else
-      {
-        tf2_value(0, ucs_value, B, 0);
-      }
-
-   Assert(ucs_value[0] == UNI_L_PARENT);
-   Assert(ucs_value[ucs_value.size() - 1] == UNI_R_PARENT);
-
-UCS_string ucs(var_name);
-   ucs << UNI_LEFT_ARROW;
-
-   // copy ucs_value except the outer parrentheses
-   for (ShapeItem v = 1; v < (ucs_value.ssize() - 1); ++v)
-       ucs << ucs_value[v];
-
-   Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
-Value_P Z(ucs, LOC);
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-//----------------------------------------------------------------------------
-UCS_string
-Quad_TF::tf2_inverse(const UCS_string & ravel)
-{
-Token_string tos;
-   tos.push_back(Token(TOK_L_PARENT, int64_t(0)));
-
-   Log(LOG_Quad_TF)   CERR << "inverse ⎕TF2: " << ravel << endl;
-
-   try
-      {
-        UCS_string ucs1 = no_UCS(ravel);
-        const Parser parser(PM_EXECUTE, LOC, false);
-        parser.parse(ucs1, tos, true);
-      }
-   catch(Error &)
-      {
-        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
-        return UCS_string();
-      }
-   catch(std::bad_alloc &)
-      {
-        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
-        return UCS_string();
-      }
-   catch(...)
-      { FIXME; }
-
-   // tos is now ( VAR ← ... ) or: ( ⎕FX val ...
-   // make it VAR ← ( ... )    or: leave as is
-   //
-   {
-     if (tos.size() >= 3 && tos[1].get_tag() != TOK_Quad_FX)
-        {
-          tos[0] = tos[1];   // move VAR
-          tos[1] = tos[2];   // move ←
-          tos[2] = Token(TOK_L_PARENT, int64_t(0));
-        }
-   }
-    tos.push_back(Token(TOK_R_PARENT, int64_t(0)));
-
-   // simplify tos as much as possible. We replace A⍴B by reshaped B
-   // and glue values together.
-   //
-   tf2_reduce(tos);
-
-   Log(LOG_Quad_TF)
-      {
-        CERR << "inverse ⎕TF2: tos[" << tos.size() << "] after reduce() is: ";
-        tos.print(CERR, false);
-        CERR << endl;
-      }
-
-   if (tos.size() < 2)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "short tos in tf2_inverse()" << tos.size() << endl;
-        return UCS_string();   // too short for an inverse 2⎕TF
-      }
-
-   // it could happen that some system variable ⎕XX which is not known by
-   // GNU APL is read. This case is parsed as ⎕ XX ← ... 
-   // Issue a warning in that case
-   //
-   if (tos[0].get_tag() == TOK_Quad_Quad &&
-       tos[1].get_Class() == TC_SYMBOL)
-      {
-        UCS_string new_var_or_fun = tos[1].get_sym_ptr()->get_name();
-        CERR << "*** Unknown system variable ⎕" << new_var_or_fun
-             << " in 2⎕TF / )IN (assignment ignored)" << endl;
-        return new_var_or_fun;
-      }
-
-   /* we expect either   VAR ← VALUE
-      or:              ( ⎕FX fun-text    )
-
-      Try VAR ← VALUE first.
-    */
-   if (tos[0].get_Class() == TC_SYMBOL && tos[1].get_Class() == TC_ASSIGN)
-      {
-        // at this point, we expect SYM ← VALUE.
-        //
-        if (tos.size() != 3)                  return UCS_string();
-        if (tos[2].get_Class() != TC_VALUE)   return UCS_string();
-
-         tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
-         Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << endl;
-         return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
-      }
-
-   // try dyadic ⎕FX (native function)
-   //
-   // Then tos[5] is: ( VALUE ⎕FX VALUE )
-   //
-   if (tos.size() == 5                   &&
-       tos[1].get_Class() == TC_VALUE    &&
-       tos[2].get_tag()   == TOK_Quad_FX &&
-       tos[3].get_Class() == TC_VALUE)
-      {
-        const Value * fname   =  tos[1].get_apl_val().get();
-        const Value * so_path =  tos[3].get_apl_val().get();
-
-        const Token tok = Quad_FX::do_eval_AB(so_path, fname);
-        if (tok.get_Class() == TC_VALUE)   // ⎕FX successful
-           {
-             Value_P val = tok.get_apl_val();
-        Log(LOG_Quad_TF)
-           CERR << "valid inverse 2 ⎕TF (native function):" << endl;
-             return UCS_string(*val.get());
-           }
-
-        Log(LOG_Quad_TF)
-           CERR << "invalid inverse 2 ⎕TF (native function):" << endl;
-        return UCS_string();
-      }
-
-   /* monadic ⎕FX. at this point we should have:
-
-      tos[4] =  ( ⎕FX Value )
-    */
-
-   Log(LOG_Quad_TF)
-      CERR << "inverse 2 ⎕TF (monadic ⎕FX):" << endl;
-   if (tos.size() != 4)                   return UCS_string();
-   if (tos[1].get_tag() != TOK_Quad_FX)   return UCS_string();
-   if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
-
-static const int eprops[] = { 0, 0, 0, 0 };
-const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
-                                      UTF8_string("2 ⎕TF"));
-
-   if (tok.get_Class() != TC_VALUE)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "Quad_FX::do_quad_FX() failed in tf2_inverse()" << endl;
-        return UCS_string();   // error in ⎕FX
-      }
-
-   // ⎕FX succeeded (and the token returned is the name of the function)
-   //
-   return UCS_string(*tok.get_apl_val().get());
-}
-//----------------------------------------------------------------------------
-void
-Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
-{
-   ucs << UNI_L_PARENT;
-   loop(n, nesting)   ucs << UNI_SUBSET;   // ⊂...
-
-   // scalars are ''⍴SCALAR but ''⍴ has no effect and can be omitted
-
-   if (shape.get_rank())   // non-scalar
-      {
-        loop(r, shape.get_rank())
-            {
-              if (r)   ucs << UNI_SPACE;
-              ucs << shape.get_shape_item(r);
-            }
-
-        ucs << UNI_RHO;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
-                   ShapeItem nesting)
-{
-   Log(LOG_Quad_TF)
-      {
-        char cc[100];
-        SPRINTF(cc, "tf2_value() initial level %u\n", level);
-        CERR << "tf2_value(): ucs before at level " << level << ": "
-             << ucs << endl << cc;
-        value.print_boxed(CERR, 0);
-      }
-
-
-   // some (but not all) empty vectors
-   if (value.is_empty())
-      {
-        const Cell & cell = value.get_cfirst();
-        if (cell.is_character_cell())
-           {
-             ucs << UNI_L_PARENT << UNI_SINGLE_QUOTE
-                 << UNI_SINGLE_QUOTE << UNI_R_PARENT;
-             return;
-           }
-      }
-
-const ShapeItem ec = value.nz_element_count();
-
-   // emit e.g. ( shape ⍴
-   //
-   tf2_shape(ucs, value.get_shape(), nesting);
-   if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_cfirst());
-   else                   tf2_all_char_ravel(level, ucs, value);
-   ucs << UNI_R_PARENT;   // close corresponding '(' from tf2_shape()
-
-   Log(LOG_Quad_TF)
-      {
-        CERR << "tf2_value(): ucs after at level " << level
-             << ": " << ucs << endl;
-      }
-   return;
-}
-//----------------------------------------------------------------------------
-void
-Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
-                   const Cell * cells)
-{
-   Assert(len > 0);
-
-   loop(e, len)
-       {
-         if (e)   ucs << UNI_SPACE;
-         const Cell & cell = *cells++;
-
-         if (cell.is_pointer_cell())
-            {
-              Value_P sub_val = cell.get_pointer_value();
-              ShapeItem nesting = 0;
-              while (sub_val->is_scalar())
-                    {
-                      Assert(sub_val->get_cfirst().is_pointer_cell());
-                      ++nesting;
-                      sub_val = sub_val->get_cfirst().get_pointer_value();
-                    }
-
-              tf2_value(level + 1, ucs, *sub_val, nesting);
-           }
-        else if (cell.is_lval_cell())
-           {
-             DOMAIN_ERROR;
-           }
-        else if (cell.is_complex_cell())
-           {
-             PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
-             bool scaled = true;
-             UCS_string ucs1(cell.get_real_value(), scaled, pctx);
-             UCS_string ucs2(cell.get_imag_value(), scaled, pctx);
-             ucs << ucs1 << UNI_J << ucs2;
-           }
-        else if (cell.is_float_cell())
-           {
-             PrintContext pctx(PR_APL_MIN, Quad_PP_TF, MAX_Quad_PW);
-             bool scaled = true;
-             UCS_string ucs1(cell.get_real_value(), scaled, pctx);
-             ucs << ucs1;
-           }
-        else
-           {
-             PrintContext pctx(PR_APL_FUN);
-             const PrintBuffer pb = cell.character_representation(pctx);
-             ucs << pb.l1();
-           }
-        }
-}
-//----------------------------------------------------------------------------
-void
-Quad_TF::tf2_all_char_ravel(int level, UCS_string & ucs, const Value & value)
-{
-const ShapeItem ec = value.nz_element_count();
-
-   // check if ⎕UCS is needed. 
-   //
-   // ⎕UCS is needed if the string contains a character that is:
-   //
-   // 1. not in our ⎕AV, or
-   // 2. not in IBM's ⎕AV
-   //
-   bool use_UCS = false;
-   loop(e, ec)
-       {
-         const Unicode uni = value.get_cravel(e).get_char_value();
-         if (Avec::need_UCS(uni))   { use_UCS = true;   break; }
-       }
-
-   if (use_UCS)
-      {
-        ucs << "⎕UCS";
-        loop(e, ec)
-            {
-              ucs << UNI_SPACE << int(value.get_cravel(e).get_char_value());
-            }
-      }
-   else
-      {
-        ucs << UNI_SINGLE_QUOTE;
-        loop(e, ec)
-            {
-              const Unicode uni = value.get_cravel(e).get_char_value();
-              ucs << uni;
-              if (uni == UNI_SINGLE_QUOTE)   ucs << UNI_SINGLE_QUOTE;
-            }
-        ucs << UNI_SINGLE_QUOTE;
-      }
-}
-//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_reduce(Token_string & tos)
 {
@@ -828,68 +958,52 @@ Quad_TF::tf2_reduce(Token_string & tos)
        }
 }
 //----------------------------------------------------------------------------
-void
-Quad_TF::tf2_reduce_UCS(Token_string & tos)
+bool
+Quad_TF::tf2_reduce_ENCLOSE(Token_string & tos)
 {
 ShapeItem skipped = 0;
 
+   // replace  ⊂ B ) by an enclosed B )
+   //
    loop(s, tos.size())
       {
-        if (s < ShapeItem(tos.size() - 1) && tos[s].get_tag() == TOK_Quad_UCS)
+        if ((s + 2) >= ShapeItem(tos.size())            ||
+            tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
+            tos[s + 1].get_Class() != TC_VALUE          ||   // not B
+            tos[s + 2].get_tag()   == TOK_F12_RHO)           // followed by ⍴
            {
-             s += 1;     skipped += 1;    // skip ⎕UCS
-             for (; s < ShapeItem(tos.size()) &&
-                    tos[s].get_Class() == TC_VALUE; ++s)
-                {
-                  tf2_toggle_UCS(*tos[s].get_apl_val().get());
-                  tos[s - skipped].move_from(tos[s], LOC);
-                }
+             if (skipped)   // dont copy to itself
+                tos[s - skipped].move_from(tos[s], LOC);
+             continue;
            }
 
-        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
-
+        Value_P B = tos[s + 1].get_apl_val();
+        if (B->is_simple_scalar())
+           {
+             tos[s - skipped].move_from(tos[s + 1], LOC);
+           }
+        else
+           {
+             Value_P enc_B(LOC);
+             enc_B->next_ravel_Pointer(B.get());
+             enc_B->check_value(LOC);
+             Token tok(TOK_APL_VALUE1, enc_B);
+             tos[s - skipped].move_from(tok, LOC);
+             tos[s + 1].clear(LOC);   // B
+           }
+        s += 1;   skipped += 1;
       }
 
    if (skipped)
       {
         Log(LOG_Quad_TF)
-           CERR << "tf2_reduce_UCS() has skipped "
+           CERR << "tf2_reduce_ENCLOSE() has skipped "
                 << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
 
-}
-//----------------------------------------------------------------------------
-ShapeItem
-Quad_TF::tf2_toggle_UCS(Value & val)
-{
-ShapeItem error_count = 0;
-
-   loop(e, val.nz_element_count())
-       {
-        const Cell & cell = val.get_cravel(e);
-        if (cell.is_character_cell())       // char → integer
-           {
-             val.set_ravel_Int(e, cell.get_char_value());
-           }
-        else if (cell.is_integer_cell())   // integer → char
-           {
-             val.set_ravel_Char(e, Unicode(cell.get_int_value()));
-           }
-        else if (cell.is_pointer_cell())   // nested
-           {
-             error_count += tf2_toggle_UCS(*cell.get_pointer_value());
-           }
-        else
-           {
-             ++error_count;
-           }
-      }
-
-   if (val.is_empty())   val.to_type(false);   // unlikely
-
-   return error_count;
+   return skipped > 0;
 }
 //----------------------------------------------------------------------------
 bool
@@ -1060,205 +1174,6 @@ ShapeItem skipped = 0;
 }
 //----------------------------------------------------------------------------
 bool
-Quad_TF::tf2_reduce_ENCLOSE(Token_string & tos)
-{
-ShapeItem skipped = 0;
-
-   // replace  ⊂ B ) by an enclosed B )
-   //
-   loop(s, tos.size())
-      {
-        if ((s + 2) >= ShapeItem(tos.size())            ||
-            tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
-            tos[s + 1].get_Class() != TC_VALUE          ||   // not B
-            tos[s + 2].get_tag()   == TOK_F12_RHO)           // followed by ⍴
-           {
-             if (skipped)   // dont copy to itself
-                tos[s - skipped].move_from(tos[s], LOC);
-             continue;
-           }
-
-        Value_P B = tos[s + 1].get_apl_val();
-        if (B->is_simple_scalar())
-           {
-             tos[s - skipped].move_from(tos[s + 1], LOC);
-           }
-        else
-           {
-             Value_P enc_B(LOC);
-             enc_B->next_ravel_Pointer(B.get());
-             enc_B->check_value(LOC);
-             Token tok(TOK_APL_VALUE1, enc_B);
-             tos[s - skipped].move_from(tok, LOC);
-             tos[s + 1].clear(LOC);   // B
-           }
-        s += 1;   skipped += 1;
-      }
-
-   if (skipped)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "tf2_reduce_ENCLOSE() has skipped "
-                << skipped << " token" << endl;
-
-        tos.resize(tos.size() - skipped);
-      }
-
-   return skipped > 0;
-}
-//----------------------------------------------------------------------------
-bool
-Quad_TF::tf2_reduce_COMMA(Token_string & tos)
-{
-ShapeItem skipped = 0;
-
-   loop(s, tos.size())
-      {
-        // we replace , B by B reshaped or A , B by AB
-        //
-        if (s < ShapeItem(tos.size() - 1)     &&
-            tos[s].get_tag() == TOK_F12_COMMA &&   // ,
-            tos[s + 1].get_Class() == TC_VALUE)    // B 
-           {
-             const ShapeItem d_1 = s - skipped - 1;
-             if (s > 0 && tos[d_1].get_tag() == TOK_R_PARENT)   // value to be
-                {
-                  // TOK_R_PARENT will become a value: just copy it for now
-                  //
-                  if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
-                  continue;
-                }
-
-             if (s > 0 && tos[d_1].get_Class() == TC_VALUE)   // value
-                {
-                  Value_P A = tos[d_1].get_apl_val();
-                  Value_P B = tos[s + 1].get_apl_val();
-                  Assert(A->get_rank() <= 1);
-                  Assert(B->get_rank() <= 1);
-                  Value_P Z(A->element_count() + B->element_count(), LOC);
-                  loop(a, A->element_count())
-                     Z->next_ravel_Cell(A->get_cravel(a));
-                  loop(b, B->element_count())
-                     Z->next_ravel_Cell(B->get_cravel(b));
-
-                  tos[s + 1].clear(LOC);
-                  Token tok_AB(TOK_APL_VALUE1, Z);
-                  tos[d_1].move_from(tok_AB, LOC);
-                  s += 1;   skipped += 2;   // skip , (of A , B) but not B
-                  continue;   // don't move_from() below
-                }
-
-             // monadic , B
-             s += 1;   skipped += 1;    // skip ,
-
-             Value_P bval = tos[s].get_apl_val();
-             const Shape sh(bval->element_count());
-             bval->set_shape(sh);
-
-             tos[s].ChangeTag(TOK_APL_VALUE1);
-             tos[s - skipped].move_from(tos[s], LOC);
-             continue;
-           }
-
-        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
-      }
-
-   if (skipped)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "tf2_reduce_COMMA() has skipped "
-                << skipped << " token" << endl;
-
-        tos.resize(tos.size() - skipped);
-      }
-
-   return skipped > 0;
-}
-//----------------------------------------------------------------------------
-bool
-Quad_TF::tf2_reduce_ENCLOSE_ENCLOSE(Token_string & tos)
-{
-ShapeItem skipped = 0;
-
-   loop(s, tos.size())
-      {
-        if ((s + 2) >= ShapeItem(tos.size())            ||
-            (s && tos[s - 1].get_Class() == TC_VALUE)   ||   // dyadic ⊂
-            tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
-            tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
-            tos[s + 2].get_Class() != TC_VALUE          ||   // not B 
-            skipped)            // remove at most one ⊂ (may enable ⍴)
-           {
-             if (skipped)   // dont copy to itself
-                tos[s - skipped].move_from(tos[s], LOC);
-             continue;
-           }
-
-        skipped++;   // ignore ⊂ at tos[s]
-      }
-
-   if (skipped)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "tf2_reduce_ENCLOSE_ENCLOSE() has skipped "
-                << skipped << " token" << endl;
-
-        tos.resize(tos.size() - skipped);
-      }
-   return skipped > 0;
-}
-//----------------------------------------------------------------------------
-bool
-Quad_TF::tf2_reduce_ENCLOSE1(Token_string & tos)
-{
-ShapeItem skipped = 0;
-
-   // replace  ⍴ ⊂ B  by ⍴ enclosed B
-   //
-   loop(s, tos.size())
-      {
-        if ((s + 2) >= ShapeItem(tos.size())            ||
-            tos[s    ].get_tag()   != TOK_F12_RHO       ||   // not ⍴
-            tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
-            tos[s + 2].get_Class() != TC_VALUE)              // not B 
-           {
-             if (skipped)   // dont copy to itself
-                tos[s - skipped].move_from(tos[s], LOC);
-             continue;
-           }
-
-        if (skipped)   // dont copy to itself
-           tos[s - skipped].move_from(tos[s], LOC);   // move ⍴
-
-        Value_P B = tos[s + 2].get_apl_val();
-        if (B->is_scalar())
-           {
-             tos[s - skipped + 1].move_from(tos[s + 2], LOC);
-           }
-        else
-           {
-             Value_P enc_B(LOC);
-             enc_B->next_ravel_Pointer(B.get());
-             Token tok(TOK_APL_VALUE1, enc_B);
-             tos[s - skipped + 1].move_from(tok, LOC);
-             tos[s + 2].clear(LOC);   // B
-           }
-        s += 2;   ++skipped;
-      }
-
-   if (skipped)
-      {
-        Log(LOG_Quad_TF)
-           CERR << "tf2_reduce_ENCLOSE1() has skipped "
-                << skipped << " token" << endl;
-
-        tos.resize(tos.size() - skipped);
-      }
-
-   return skipped > 0;
-}
-//----------------------------------------------------------------------------
-bool
 Quad_TF::tf2_reduce_parentheses(Token_string & tos)
 {
 ShapeItem skipped = 0;
@@ -1347,6 +1262,74 @@ ShapeItem skipped = 0;
    return skipped > 0;
 }
 //----------------------------------------------------------------------------
+bool
+Quad_TF::tf2_reduce_COMMA(Token_string & tos)
+{
+ShapeItem skipped = 0;
+
+   loop(s, tos.size())
+      {
+        // we replace , B by B reshaped or A , B by AB
+        //
+        if (s < ShapeItem(tos.size() - 1)     &&
+            tos[s].get_tag() == TOK_F12_COMMA &&   // ,
+            tos[s + 1].get_Class() == TC_VALUE)    // B 
+           {
+             const ShapeItem d_1 = s - skipped - 1;
+             if (s > 0 && tos[d_1].get_tag() == TOK_R_PARENT)   // value to be
+                {
+                  // TOK_R_PARENT will become a value: just copy it for now
+                  //
+                  if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
+                  continue;
+                }
+
+             if (s > 0 && tos[d_1].get_Class() == TC_VALUE)   // value
+                {
+                  Value_P A = tos[d_1].get_apl_val();
+                  Value_P B = tos[s + 1].get_apl_val();
+                  Assert(A->get_rank() <= 1);
+                  Assert(B->get_rank() <= 1);
+                  Value_P Z(A->element_count() + B->element_count(), LOC);
+                  loop(a, A->element_count())
+                     Z->next_ravel_Cell(A->get_cravel(a));
+                  loop(b, B->element_count())
+                     Z->next_ravel_Cell(B->get_cravel(b));
+
+                  tos[s + 1].clear(LOC);
+                  Token tok_AB(TOK_APL_VALUE1, Z);
+                  tos[d_1].move_from(tok_AB, LOC);
+                  s += 1;   skipped += 2;   // skip , (of A , B) but not B
+                  continue;   // don't move_from() below
+                }
+
+             // monadic , B
+             s += 1;   skipped += 1;    // skip ,
+
+             Value_P bval = tos[s].get_apl_val();
+             const Shape sh(bval->element_count());
+             bval->set_shape(sh);
+
+             tos[s].ChangeTag(TOK_APL_VALUE1);
+             tos[s - skipped].move_from(tos[s], LOC);
+             continue;
+           }
+
+        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
+      }
+
+   if (skipped)
+      {
+        Log(LOG_Quad_TF)
+           CERR << "tf2_reduce_COMMA() has skipped "
+                << skipped << " token" << endl;
+
+        tos.resize(tos.size() - skipped);
+      }
+
+   return skipped > 0;
+}
+//----------------------------------------------------------------------------
 UCS_string
 Quad_TF::tf2_fun(const UCS_string & fun_name, const Function & fun)
 {
@@ -1356,133 +1339,150 @@ UCS_string ucs;
    return ucs;
 }
 //----------------------------------------------------------------------------
-void
-Quad_TF::tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
-                    const Function & fun)
+bool
+Quad_TF::tf2_reduce_ENCLOSE_ENCLOSE(Token_string & tos)
 {
-const UCS_string text = fun.canonical(false);
+ShapeItem skipped = 0;
 
-   if (fun.is_native())
+   loop(s, tos.size())
       {
-        CERR << "Warning: the workspace contains a native function '"
-             << fun_name << "', making the" << endl
-             << "   .atf output file incompatible with other APL interpreters."
-             << endl;
+        if ((s + 2) >= ShapeItem(tos.size())            ||
+            (s && tos[s - 1].get_Class() == TC_VALUE)   ||   // dyadic ⊂
+            tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
+            tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
+            tos[s + 2].get_Class() != TC_VALUE          ||   // not B 
+            skipped)            // remove at most one ⊂ (may enable ⍴)
+           {
+             if (skipped)   // dont copy to itself
+                tos[s - skipped].move_from(tos[s], LOC);
+             continue;
+           }
 
-        ucs << UNI_SINGLE_QUOTE << fun_name << "' ⎕FX '" << text
-            << UNI_SINGLE_QUOTE;;
-        return;
+        skipped++;   // ignore ⊂ at tos[s]
       }
 
-UCS_string_vector lines;
-   text.to_vector(lines);
-
-   ucs << "⎕FX";
-
-   loop(l, lines.size())
+   if (skipped)
       {
-        ucs << UNI_SPACE;
-        tf2_char_vec(ucs, lines[l]);
+        Log(LOG_Quad_TF)
+           CERR << "tf2_reduce_ENCLOSE_ENCLOSE() has skipped "
+                << skipped << " token" << endl;
+
+        tos.resize(tos.size() - skipped);
       }
+   return skipped > 0;
+}
+//----------------------------------------------------------------------------
+bool
+Quad_TF::tf2_reduce_ENCLOSE1(Token_string & tos)
+{
+ShapeItem skipped = 0;
+
+   // replace  ⍴ ⊂ B  by ⍴ enclosed B
+   //
+   loop(s, tos.size())
+      {
+        if ((s + 2) >= ShapeItem(tos.size())            ||
+            tos[s    ].get_tag()   != TOK_F12_RHO       ||   // not ⍴
+            tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
+            tos[s + 2].get_Class() != TC_VALUE)              // not B 
+           {
+             if (skipped)   // dont copy to itself
+                tos[s - skipped].move_from(tos[s], LOC);
+             continue;
+           }
+
+        if (skipped)   // dont copy to itself
+           tos[s - skipped].move_from(tos[s], LOC);   // move ⍴
+
+        Value_P B = tos[s + 2].get_apl_val();
+        if (B->is_scalar())
+           {
+             tos[s - skipped + 1].move_from(tos[s + 2], LOC);
+           }
+        else
+           {
+             Value_P enc_B(LOC);
+             enc_B->next_ravel_Pointer(B.get());
+             Token tok(TOK_APL_VALUE1, enc_B);
+             tos[s - skipped + 1].move_from(tok, LOC);
+             tos[s + 2].clear(LOC);   // B
+           }
+        s += 2;   ++skipped;
+      }
+
+   if (skipped)
+      {
+        Log(LOG_Quad_TF)
+           CERR << "tf2_reduce_ENCLOSE1() has skipped "
+                << skipped << " token" << endl;
+
+        tos.resize(tos.size() - skipped);
+      }
+
+   return skipped > 0;
 }
 //----------------------------------------------------------------------------
 void
-Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
+Quad_TF::tf2_reduce_UCS(Token_string & tos)
 {
-   if (vec.size() == 0)   return;
+ShapeItem skipped = 0;
 
-bool in_UCS = false;
-   ucs << UNI_SINGLE_QUOTE;
+   loop(s, tos.size())
+      {
+        if (s < ShapeItem(tos.size() - 1) && tos[s].get_tag() == TOK_Quad_UCS)
+           {
+             s += 1;     skipped += 1;    // skip ⎕UCS
+             for (; s < ShapeItem(tos.size()) &&
+                    tos[s].get_Class() == TC_VALUE; ++s)
+                {
+                  tf2_toggle_UCS(*tos[s].get_apl_val().get());
+                  tos[s - skipped].move_from(tos[s], LOC);
+                }
+           }
 
-   loop(v, vec.size())
+        if (skipped)   tos[s - skipped].move_from(tos[s], LOC);
+
+      }
+
+   if (skipped)
+      {
+        Log(LOG_Quad_TF)
+           CERR << "tf2_reduce_UCS() has skipped "
+                << skipped << " token" << endl;
+
+        tos.resize(tos.size() - skipped);
+      }
+
+}
+//----------------------------------------------------------------------------
+ShapeItem
+Quad_TF::tf2_toggle_UCS(Value & val)
+{
+ShapeItem error_count = 0;
+
+   loop(e, val.nz_element_count())
        {
-         const Unicode uni = vec[v];
-         const bool need_UCS = Avec::need_UCS(uni);
-         if (in_UCS != need_UCS)   // mode changed
-            {
-              if (in_UCS)   ucs << "),'";       // UCS() → 'xxx'
-              else          ucs << "',(⎕UCS";   // 'xxx' → UCS()
-              in_UCS = need_UCS;
-            }
-
-         if (in_UCS)
-            {
-              ucs << UNI_SPACE << int(uni);
-            }
-         else
-            {
-              ucs << uni;
-              if (uni == UNI_SINGLE_QUOTE)   ucs << uni;
-            }
-       }
-
-   if (in_UCS)   ucs << "),''";
-   else          ucs << UNI_SINGLE_QUOTE;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Quad_TF::no_UCS(const UCS_string & ucs)
-{
-UCS_string ret;
-
-   loop(u, ucs.size())
-      {
-        if ( u < ucs.ssize() - 6 &&
-             ucs[u]     == '\'' &&
-             ucs[u + 1] == ','  &&
-             ucs[u + 2] == '('  &&
-             ucs[u + 3] == UNI_Quad_Quad &&
-             ucs[u + 4] == 'U'  &&
-             ucs[u + 5] == 'C'  &&
-             ucs[u + 6] == 'S')
+        const Cell & cell = val.get_cravel(e);
+        if (cell.is_character_cell())       // char → integer
            {
-             u += 7;   // skip '(⎕UCS
-
-             for (;;)
-                 {
-                  while (u < ucs.ssize() && ucs[u] == ' ')   ++u;
-                  if (ucs[u] == ')')   { u += 2;   break; }
-
-                  int num = 0;
-                  while (u < ucs.ssize() && ucs[u] >= '0' && ucs[u] <= '9')
-                     { num *= 10;   num += ucs[u++] - '0'; }
-
-                  ret << Unicode(num);
-                 }
+             val.set_ravel_Int(e, cell.get_char_value());
            }
-        else ret << ucs[u];
-      }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_TF::tf3(const UCS_string & name)
-{
-const NamedObject * obj = Workspace::lookup_existing_name(name);
-   if (obj == 0)   return Str0(LOC);
-
-   if (obj->get_function())
-      {
-        // 3⎕TF is not defined for functions.
-        //
-        return Str0(LOC);
-      }
-
-const Symbol * symbol = obj->get_symbol();
-   if (symbol)
-      {
-        if (const Value * value = symbol->get_apl_value().get())
+        else if (cell.is_integer_cell())   // integer → char
            {
-             CDR_string cdr;
-             CDR::to_CDR(cdr, value);
-
-             return Value_P(cdr, LOC);
+             val.set_ravel_Char(e, Unicode(cell.get_int_value()));
            }
-
-        /* not a variable: fall through */
+        else if (cell.is_pointer_cell())   // nested
+           {
+             error_count += tf2_toggle_UCS(*cell.get_pointer_value());
+           }
+        else
+           {
+             ++error_count;
+           }
       }
 
-   return Str0(LOC);
+   if (val.is_empty())   val.to_type(false);   // unlikely
+
+   return error_count;
 }
 //----------------------------------------------------------------------------

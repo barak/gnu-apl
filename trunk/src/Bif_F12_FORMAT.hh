@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,14 +39,40 @@ struct Format_sub
      min_len(0)
    {}
 
-   UCS_string      format;         ///< the format ('0'...'9' and comma)
-   int             out_len;        ///< the length in the output
-   uint32_t        flt_mask;       ///< decorator floating mode
-   int             min_len;        ///< the minimum length in the output
+   /// return true if the decorator is floating floating
+   /// @param value_is_negative true if the formatted number is negative
+   bool do_float(bool value_is_negative) const
+      { if (flt_mask & BIT_1)   return  value_is_negative;
+        if (flt_mask & BIT_2)   return !value_is_negative;
+        return true;
+      }
+
+   /// return true iff format contains a '4' (i.e. counteract the effect of
+   /// 1, 2, or 3) or none of 1 (float if negative), 2 (float if positive),
+   /// or 3 (always float) was given
+   bool no_float() const
+        { if (flt_mask & BIT_4)   return true;        // counteract 1, 2, or 3
+          return ! (flt_mask & (BIT_1 | BIT_2 | BIT_3));   // no 1, 2, or 3
+        }
+
+   /// return the pad character (default: space, otherwise controlled by ⎕FC)
+   /// @param qfc current ⎕FC fill character
+   Unicode pad_char(Unicode qfc) const
+      { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
 
    /// return the number of characters in \b format
    size_t size() const
       { return format.size(); }
+
+   /// Fill buf at position x,y with data according to fmt
+   /// @param data digit string for the fractional part
+   UCS_string insert_fract_commas(const UCS_string & data) const;
+
+   /// Fill buf at position x,y with data according to fmt
+   /// @param data digit string for the integer part
+   /// @param overflow output flag set if the field is too narrow
+   UCS_string insert_int_commas(const UCS_string & data,
+                                bool & overflow) const;
 
    /// set flt_mask according to the digits in member \b format
    /// return the number of digits from '1' to '4' (including)
@@ -57,36 +83,10 @@ struct Format_sub
    /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
-   /// return true iff format contains a '4' (i.e. counteract the effect of 
-   /// 1, 2, or 3) or none of 1 (float if negative), 2 (float if positive),
-   /// or 3 (always float) was given
-   bool no_float() const
-        { if (flt_mask & BIT_4)   return true;        // counteract 1, 2, or 3
-          return ! (flt_mask & (BIT_1 | BIT_2 | BIT_3));   // no 1, 2, or 3
-        }
-
-   /// return true if the decorator is floating floating
-   /// @param value_is_negative true if the formatted number is negative
-   bool do_float(bool value_is_negative) const
-      { if (flt_mask & BIT_1)   return  value_is_negative;
-        if (flt_mask & BIT_2)   return !value_is_negative;
-        return true;
-      }
-
-   /// return the pad character (default: space, otherwise controlled by ⎕FC)
-   /// @param qfc current ⎕FC fill character
-   Unicode pad_char(Unicode qfc) const
-      { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
-
-   /// Fill buf at position x,y with data according to fmt
-   /// @param data digit string for the integer part
-   /// @param overflow output flag set if the field is too narrow
-   UCS_string insert_int_commas(const UCS_string & data,
-                                bool & overflow) const;
-
-   /// Fill buf at position x,y with data according to fmt
-   /// @param data digit string for the fractional part
-   UCS_string insert_fract_commas(const UCS_string & data) const;
+   UCS_string      format;         ///< the format ('0'...'9' and comma)
+   int             out_len;        ///< the length in the output
+   uint32_t        flt_mask;       ///< decorator floating mode
+   int             min_len;        ///< the minimum length in the output
 };
 //----------------------------------------------------------------------------
 /** System function format
@@ -99,17 +99,6 @@ public:
    Bif_F12_FORMAT()
    : NonscalarFunction(TOK_F12_FORMAT)
    {}
-
-   /// A character array with B formatted by specification
-   /// @param A format specification APL value (numeric width and precision)
-   /// @param B APL value to format
-   static Value_P format_by_specification(Value_P A, Value_P B);
-
-   static Bif_F12_FORMAT  fun;   ///< Built-in function
-
-   /// Return true iff uni is '0' .. '9', comma, or full-stop
-   /// @param uni Unicode character to test
-   static bool is_control_char(Unicode uni);
 
    /// An entire format field (LIFER = Left-Int-Fract-Expo-Right
    struct Format_LIFER
@@ -135,6 +124,16 @@ public:
         /// @param value floating-point number to format
         UCS_string format_example(APL_Float value);
 
+        /// fill data fields from value
+        /// @param value floating-point number to decompose
+        /// @param data_int output string for the integer digits
+        /// @param data_fract output string for the fractional digits
+        /// @param data_expo output string for the exponent digits
+        /// @param overflow output flag set if the value exceeds field width
+        void fill_data_fields(APL_Float value, UCS_string & data_int,
+                              UCS_string & data_fract, UCS_string & data_expo,
+                              bool & overflow);
+
         /// format the left decorator and integer part (everything left of the
         /// decimal dot)
         /// @param data_int digit string for the integer part
@@ -151,16 +150,6 @@ public:
         UCS_string format_right_side(const UCS_string data_fract, bool negative,
                                      const UCS_string data_expo);
 
-        /// Print \b value into int, fract, and expo fields
-        /// @param value floating-point number to decompose
-        /// @param data_int output string for the integer digits
-        /// @param data_fract output string for the fractional digits
-        /// @param data_expo output string for the exponent digits
-        /// @param overflow output flag set if the value exceeds field width
-        void fill_data_fields(APL_Float value, UCS_string & data_int,
-                              UCS_string & data_fract, UCS_string & data_expo,
-                              bool & overflow);
-
         Format_sub left_deco;    ///< the left decorator
         Format_sub int_part;     ///< the integer part
         Format_sub fract_part;   ///< the fractional part
@@ -175,9 +164,20 @@ public:
         bool expo_negative;
       };
 
+   /// A character array with B formatted by specification
+   /// @param A format specification APL value (numeric width and precision)
+   /// @param B APL value to format
+   static Value_P format_by_specification(Value_P A, Value_P B);
+
+   /// Return true iff uni is '0' .. '9', comma, or full-stop
+   /// @param uni Unicode character to test
+   static bool is_control_char(Unicode uni);
+
    /// A character array with the display of B
    /// @param B APL value to format
    static Value_P monadic_format(Value_P B);
+
+   static Bif_F12_FORMAT  fun;   ///< Built-in function
 
 protected:
    /// Overloaded Function::eval_B()

@@ -23,29 +23,6 @@
 #include "Token_string.hh"
 
 //----------------------------------------------------------------------------
-void
-Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
-{
-Token * t1 = &at(from);
-Token * t2 = &at(to);
-   Assert(0 <= from);
-   Assert(from <= to);
-   Assert(to <= ShapeItem(size()));
-
-   while (t1 < t2)   t1++->swap_token(*t2--);
-}
-//----------------------------------------------------------------------------
-ShapeItem
-Token_string::replace_segment(const Token_string & src, ShapeItem pos)
-{
-   loop(s, src.size())
-       {
-         at(pos).clear(LOC);
-         new (&at(pos++)) Token(src[s], LOC);
-       }
-   return pos;
-}
-//----------------------------------------------------------------------------
 int
 Token_string::find_closing_bracket(int pos) const
 {
@@ -67,30 +44,6 @@ int others = 0;
        }
 
    MORE_ERROR() << "No closing ] for opening ]";
-   SYNTAX_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Token_string::find_opening_bracket(int pos) const
-{
-   Assert(at(pos).get_tag() == TOK_R_BRACK);
-
-int others = 0;
-
-   for (int p = pos - 1; p >= 0; --p)
-       {
-         Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << at(p) << endl;
-
-         if (at(p).get_tag() == TOK_L_BRACK)
-            {
-             if (others == 0)   return p;
-             --others;
-            }
-         else if (at(p).get_tag() == TOK_R_BRACK)   ++others;
-       }
-
-   MORE_ERROR() << "No opening [ for closing ]";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -119,9 +72,9 @@ int others = 0;
 }
 //----------------------------------------------------------------------------
 int
-Token_string::find_opening_parent(int pos) const
+Token_string::find_opening_bracket(int pos) const
 {
-   Assert(at(pos).get_Class() == TC_R_PARENT);
+   Assert(at(pos).get_tag() == TOK_R_BRACK);
 
 int others = 0;
 
@@ -130,14 +83,15 @@ int others = 0;
          Log(LOG_find_closing)
             CERR << "find_opening_bracket() sees " << at(p) << endl;
 
-         if (at(p).get_Class() == TC_L_PARENT)
+         if (at(p).get_tag() == TOK_L_BRACK)
             {
              if (others == 0)   return p;
              --others;
             }
-         else if (at(p).get_Class() == TC_R_PARENT)   ++others;
+         else if (at(p).get_tag() == TOK_R_BRACK)   ++others;
        }
-   MORE_ERROR() << "No opening ( for closing )";
+
+   MORE_ERROR() << "No opening [ for closing ]";
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -165,42 +119,27 @@ int others = 0;
    SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
-VoidCount
-Token_string::remove_TOK_VOID()
+int
+Token_string::find_opening_parent(int pos) const
 {
-ShapeItem dst = 0;
+   Assert(at(pos).get_Class() == TC_R_PARENT);
 
-   loop(src, size())
-       {
-         if (at(src).get_tag() == TOK_VOID)   continue;   // ignore (skip)
-         if (src != dst)   at(dst).move_from(at(src), LOC);
-         ++dst;
-       }
+int others = 0;
 
-const VoidCount ret = VoidCount(size() - dst);
-   resize(dst);
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-Token_string::insert_1(int pos)
-{
-   push_back(Token(TOK_VOID));
-   for (int from = size() - 2; from > pos; --from)
+   for (int p = pos - 1; p >= 0; --p)
        {
-         at(from + 1).move_from(at(from), LOC);   // shift towards end
+         Log(LOG_find_closing)
+            CERR << "find_opening_bracket() sees " << at(p) << endl;
+
+         if (at(p).get_Class() == TC_L_PARENT)
+            {
+             if (others == 0)   return p;
+             --others;
+            }
+         else if (at(p).get_Class() == TC_R_PARENT)   ++others;
        }
-}
-//----------------------------------------------------------------------------
-void
-Token_string::insert_2(int pos)
-{
-   push_back(Token(TOK_VOID));
-   push_back(Token(TOK_VOID));
-   for (int from = size() - 3; from > pos; --from)
-       {
-         at(from + 2).move_from(at(from), LOC);   // shift towards end
-       }
+   MORE_ERROR() << "No opening ( for closing )";
+   SYNTAX_ERROR;
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -237,6 +176,67 @@ const bool VAL = details & 2;
        }
 
    out << endl;
+}
+//----------------------------------------------------------------------------
+void
+Token_string::insert_1(int pos)
+{
+   push_back(Token(TOK_VOID));
+   for (int from = size() - 2; from > pos; --from)
+       {
+         at(from + 1).move_from(at(from), LOC);   // shift towards end
+       }
+}
+//----------------------------------------------------------------------------
+void
+Token_string::insert_2(int pos)
+{
+   push_back(Token(TOK_VOID));
+   push_back(Token(TOK_VOID));
+   for (int from = size() - 3; from > pos; --from)
+       {
+         at(from + 2).move_from(at(from), LOC);   // shift towards end
+       }
+}
+//----------------------------------------------------------------------------
+VoidCount
+Token_string::remove_TOK_VOID()
+{
+ShapeItem dst = 0;
+
+   loop(src, size())
+       {
+         if (at(src).get_tag() == TOK_VOID)   continue;   // ignore (skip)
+         if (src != dst)   at(dst).move_from(at(src), LOC);
+         ++dst;
+       }
+
+const VoidCount ret = VoidCount(size() - dst);
+   resize(dst);
+   return ret;
+}
+//----------------------------------------------------------------------------
+ShapeItem
+Token_string::replace_segment(const Token_string & src, ShapeItem pos)
+{
+   loop(s, src.size())
+       {
+         at(pos).clear(LOC);
+         new (&at(pos++)) Token(src[s], LOC);
+       }
+   return pos;
+}
+//----------------------------------------------------------------------------
+void
+Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
+{
+Token * t1 = &at(from);
+Token * t2 = &at(to);
+   Assert(0 <= from);
+   Assert(from <= to);
+   Assert(to <= ShapeItem(size()));
+
+   while (t1 < t2)   t1++->swap_token(*t2--);
 }
 //----------------------------------------------------------------------------
 

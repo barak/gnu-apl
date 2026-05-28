@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,19 +36,19 @@ public:
    /// @param tag token tag identifying this quad function
    QuadFunction(TokenTag tag) : PrimitiveFunction(tag) {}
 
-   /// overloaded Function::has_alpha()
-   virtual bool has_alpha() const   { return true; }
+   /// overloaded Function::eval_AB().
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(Value_P A, Value_P B) const
+      { VALENCE_ERROR; }
 
    /// overloaded Function::eval_B().
    /// @param B right argument APL value
    virtual Token eval_B(Value_P B) const
       { VALENCE_ERROR; }
 
-   /// overloaded Function::eval_AB().
-   /// @param A left argument APL value
-   /// @param B right argument APL value
-   virtual Token eval_AB(Value_P A, Value_P B) const
-      { VALENCE_ERROR; }
+   /// overloaded Function::has_alpha()
+   virtual bool has_alpha() const   { return true; }
 
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
@@ -162,11 +162,11 @@ public:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 
-   static Quad_EC  fun;          ///< Built-in function.
-
    /// end of context handler for ⎕EC
    /// @param token result token produced by the controlled expression
    static void eoc(Token & token);
+
+   static Quad_EC  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B().
@@ -239,11 +239,11 @@ public:
    /// Constructor.
    Quad_EX() : QuadFunction(TOK_Quad_EX) {}
 
-   static Quad_EX  fun;          ///< Built-in function.
-
    /// disassociate name from value, return 0 on failure or 1 on success.
    /// @param name Unicode name of the symbol to expunge
    static int expunge(const UCS_string & name);
+
+   static Quad_EX  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B().
@@ -294,6 +294,12 @@ protected:
    /// split \b raw_lines into \b prefixes, \b escapes, and \b suffixes
    static void split_strings();
 
+   /// bool to prevent recursive ⎕INP calls
+   static bool Quad_INP_running;
+
+   /// the end merker for the entire ⎕INP input
+   static UCS_string end_marker;
+
    /// the end merker for APL escapes (dyadic ⎕INP only)
    /// the start merker for APL escapes (dyadic ⎕INP only)
    static UCS_string esc1;
@@ -301,23 +307,17 @@ protected:
    /// the end merker for APL escapes (dyadic ⎕INP only)
    static UCS_string esc2;
 
-   /// the end merker for the entire ⎕INP input
-   static UCS_string end_marker;
-
-   /// the raw lines read from stdin
-   static UCS_string_vector raw_lines;
+   /// the line parts to exe executed
+   static UCS_string_vector escapes;
 
    /// the line parts left of the escapes
    static UCS_string_vector prefixes;
 
-   /// the line parts to exe executed
-   static UCS_string_vector escapes;
+   /// the raw lines read from stdin
+   static UCS_string_vector raw_lines;
 
    /// the line parts right of the escapes
    static UCS_string_vector suffixes;
-
-   /// bool to prevent recursive ⎕INP calls
-   static bool Quad_INP_running;
 };
 //----------------------------------------------------------------------------
 /**
@@ -378,16 +378,16 @@ public:
    /// Constructor.
    Quad_NL() : QuadFunction(TOK_Quad_NL) {}
 
-   /// overloaded Function::eval_B().
-   /// @param B right argument APL value (name-class filter)
-   virtual Token eval_B(Value_P B) const
-      { return do_quad_NL(Value_P(), B); }
-
    /// overloaded Function::eval_AB().
    /// @param A left argument APL value (name prefix filter)
    /// @param B right argument APL value (name-class filter)
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return do_quad_NL(A, B); }
+
+   /// overloaded Function::eval_B().
+   /// @param B right argument APL value (name-class filter)
+   virtual Token eval_B(Value_P B) const
+      { return do_quad_NL(Value_P(), B); }
 
    static Quad_NL  fun;          ///< Built-in function.
 
@@ -451,6 +451,12 @@ protected:
    : QuadFunction (tag)
    {}
 
+   /// return assign lines in new_value to stop or trace vector in ufun
+   /// @param ufun user-defined function whose stop/trace lines are updated
+   /// @param new_value APL value containing the new line numbers
+   /// @param stop true for ⎕STOP, false for ⎕TRACE
+   static void assign(UserFunction * ufun, const Value & new_value, bool stop);
+
    /// find UserFunction named \b fun_name
    /// @param fun_name APL value containing the function name to locate
    static const UserFunction * locate_fun(const Value & fun_name);
@@ -460,12 +466,6 @@ protected:
    /// @param assigned true if called in an assignment context
    static Token reference(const std::vector<Function_Line> & lines,
                           bool assigned);
-
-   /// return assign lines in new_value to stop or trace vector in ufun
-   /// @param ufun user-defined function whose stop/trace lines are updated
-   /// @param new_value APL value containing the new line numbers
-   /// @param stop true for ⎕STOP, false for ⎕TRACE
-   static void assign(UserFunction * ufun, const Value & new_value, bool stop);
 };
 //----------------------------------------------------------------------------
 /// The class implementing ⎕STOP

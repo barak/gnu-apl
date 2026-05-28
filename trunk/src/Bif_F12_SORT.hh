@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,12 +68,6 @@ protected:
      ce_shape(shape_A)   // shape_A means not found
    {}
 
-   /// the character
-   const Unicode ce_char;
-
-   /// the shape
-   Shape ce_shape;
-
    /// assignment (to allow const ce_char)
    /// @param other source entry to copy from
    void operator =(const CollatingCacheEntry & other)
@@ -96,6 +90,12 @@ protected:
                             const CollatingCacheEntry & entry,
                             const void * unused_ctx)
       { return key - entry.ce_char; }
+
+   /// the character
+   const Unicode ce_char;
+
+   /// the shape
+   Shape ce_shape;
 };
 //----------------------------------------------------------------------------
 /// @param out output stream to write to

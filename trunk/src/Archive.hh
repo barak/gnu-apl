@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ protected:
    /// @param of stream for informational output
    /// @param ef stream for error output
    XML_Archive(ostream & of, ostream & ef)
-   : out(of),
-     err(ef)
+   : err(ef),
+     out(of)
    {}
 
    /** archive syntax version, hopefully stepped up after Archive.hh or
@@ -78,11 +78,11 @@ protected:
         ASX_OTHER =  5,   ///< ++ if no XML file format change (code cleanup)
       };
 
-   /// where to send information messages (such as "SAVED...")
-   ostream & out;
-
    /// where to send error messages
    ostream & err;
+
+   /// where to send information messages (such as "SAVED...")
+   ostream & out;
 };
 //----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
@@ -100,65 +100,6 @@ public:
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
-
-   /// write user-defined function \b fun
-   /// @param fun function to serialise
-   void save_Function(const Function & fun);
-
-   /// write either the name and SI-level of user-defined function or the
-   /// id of a system function. Return number of attribute= items written
-   /// @param fun function whose name/id is written
-   int save_Function_name(const Function & fun);
-
-   /// write the Prefix parser of \b si (and its derived functions)
-   /// @param si state indicator entry whose parser is written
-   void save_Parser(const StateIndicator & si);
-
-   /// write derived functions cache
-   /// @param fns cache of derived functions to serialise
-   void save_Derived(const DerivedFunctionCache & fns);
-
-   /// write Symbol \b sym
-   /// @param sym symbol to serialise
-   void save_Symbol(const Symbol & sym);
-
-   /// write all function
-   void save_functions();
-
-   /// write all user defined commands
-   /// @param cmds list of user-defined commands to serialise
-   void save_user_commands(const std::vector<Command::user_command> & cmds);
-
-   /// write SymbolTable \b symtab
-   /// @param symtab symbol table to serialise
-   void save_symtab(const SymbolTable & symtab);
-
-   /// write StateIndicator entry \b si
-   /// @param si state indicator entry to serialise
-   void save_SI_entry(const StateIndicator & si);
-
-   /// write Token_loc \b tloc
-   /// @param tloc token location record to serialise
-   void save_token_loc(const Token_loc & tloc);
-
-   /// write ValueStackItem \b vsi
-   /// @param vsi value stack item to serialise
-   void save_vstack_item(const ValueStackItem & vsi);
-
-   /// write UCS_string \b str
-   /// @param str Unicode string to serialise
-   void save_UCS(const UCS_string & str);
-
-   /// write Value \b v except its ravel
-   /// @param vid index of the value in the values array
-   XML_Saving_Archive & save_shape(Vid vid);
-
-   /// write ravel of Value \b v
-   /// @param vid index of the value whose ravel is written
-   XML_Saving_Archive & save_Ravel(Vid vid);
-
-   /// write entire workspace
-   XML_Saving_Archive & save();
 
    /// a value and its parent (if the parent is nested, -1 if not)
    struct _val_par
@@ -219,31 +160,69 @@ public:
    bool saved_OK()
       { return save_success; }
 
+   /// write entire workspace
+   XML_Saving_Archive & save();
+
+   /// write derived functions cache
+   /// @param fns cache of derived functions to serialise
+   void save_Derived(const DerivedFunctionCache & fns);
+
+   /// write user-defined function \b fun
+   /// @param fun function to serialise
+   void save_Function(const Function & fun);
+
+   /// write either the name and SI-level of user-defined function or the
+   /// id of a system function. Return number of attribute= items written
+   /// @param fun function whose name/id is written
+   int save_Function_name(const Function & fun);
+
+   /// write all function
+   void save_functions();
+
+   /// write the Prefix parser of \b si (and its derived functions)
+   /// @param si state indicator entry whose parser is written
+   void save_Parser(const StateIndicator & si);
+
+   /// write ravel of Value \b v
+   /// @param vid index of the value whose ravel is written
+   XML_Saving_Archive & save_Ravel(Vid vid);
+
+   /// write Value \b v except its ravel
+   /// @param vid index of the value in the values array
+   XML_Saving_Archive & save_shape(Vid vid);
+
+   /// write StateIndicator entry \b si
+   /// @param si state indicator entry to serialise
+   void save_SI_entry(const StateIndicator & si);
+
+   /// write Symbol \b sym
+   /// @param sym symbol to serialise
+   void save_Symbol(const Symbol & sym);
+
+   /// write SymbolTable \b symtab
+   /// @param symtab symbol table to serialise
+   void save_symtab(const SymbolTable & symtab);
+
+   /// write Token_loc \b tloc
+   /// @param tloc token location record to serialise
+   void save_token_loc(const Token_loc & tloc);
+
+   /// write UCS_string \b str
+   /// @param str Unicode string to serialise
+   void save_UCS(const UCS_string & str);
+
+   /// write all user defined commands
+   /// @param cmds list of user-defined commands to serialise
+   void save_user_commands(const std::vector<Command::user_command> & cmds);
+
+   /// write ValueStackItem \b vsi
+   /// @param vsi value stack item to serialise
+   void save_vstack_item(const ValueStackItem & vsi);
+
 
 protected:
    /// width of one indentation level
    enum { INDENT_LEN = 2 };
-
-   /// indent by \b indent levels, return space left on line
-   int do_indent();
-
-   /// return the index of \b val in values
-   /// @param val pointer to the APL value to look up
-   Vid find_vid(const Value * val);
-
-   /// emit one unicode character (inside "...")
-   /// @param uni Unicode code point to emit
-   /// @param space remaining character budget on the current line
-   void emit_unicode(Unicode uni, int & space);
-
-   /// emit one ravel cell \b cell
-   /// @param cell ravel cell to emit
-   /// @param space remaining character budget on the current line
-   void emit_cell(const Cell & cell, int & space);
-
-   /// emit a token value up to (excluding) the '>' of the end token
-   /// @param tok token whose value is emitted
-   void emit_token_val(const Token & tok);
 
    /// enter char mode. maybe print ² and return the number of chars printed
    int enter_char_mode()
@@ -254,6 +233,31 @@ protected:
    int leave_char_mode()
       { if (!char_mode)   return 0;   // not in char mode
         outf << UNI_PAD_U0;   char_mode = false;   return 1; }
+
+   /// return true iff (the definition of) \b fun was already saved.
+   /// @param fun function to check for prior serialisation
+   bool is_saved(const Function * fun) const;
+
+   /// indent by \b indent levels, return space left on line
+   int do_indent();
+
+   /// emit one ravel cell \b cell
+   /// @param cell ravel cell to emit
+   /// @param space remaining character budget on the current line
+   void emit_cell(const Cell & cell, int & space);
+
+   /// emit a token value up to (excluding) the '>' of the end token
+   /// @param tok token whose value is emitted
+   void emit_token_val(const Token & tok);
+
+   /// emit one unicode character (inside "...")
+   /// @param uni Unicode code point to emit
+   /// @param space remaining character budget on the current line
+   void emit_unicode(Unicode uni, int & space);
+
+   /// return the index of \b val in values
+   /// @param val pointer to the APL value to look up
+   Vid find_vid(const Value * val);
 
    void write_XML_header();
 
@@ -266,30 +270,26 @@ protected:
    /// @param uni Unicode code point to test
    static bool xml_allowed(Unicode uni);
 
+   /// true iff ² is pending
+   bool char_mode;
+
    /// current indentation level
    int indent;
 
    /// output XML file
    ofstream outf;
 
+   /// \b true iff )SAVE was successful
+   bool save_success;
+
+   /// functions saved so far
+   vector<const Function *> saved_Functions;
+
    /// an array of values and the Vid of its parent (if value is a
    ///sub-value of a nested parent). The top-level of an APL value has
    /// has no parents (i.e. INVALID_VID).
    /// all values in the workspace
    vector<_val_par> val_pars;
-
-   /// true iff ² is pending
-   bool char_mode;
-
-   /// functions saved so far
-   vector<const Function *> saved_Functions;
-
-   /// return true iff (the definition of) \b fun was already saved.
-   /// @param fun function to check for prior serialisation
-   bool is_saved(const Function * fun) const;
-
-   /// \b true iff )SAVE was successful
-   bool save_success;
 };
 //----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
@@ -310,20 +310,27 @@ public:
    /// return true iff constructor could open the file
    bool is_open() const   { return file_start != 0; }
 
-   /// read an entire workspace, throw DOMAIN_ERROR on failure
-   /// @param silent suppress progress messages when true
-   void read_Workspace(bool silent);
-
-   /// check compatibility information in the workspace and maybe warn the
-   /// user
-   void check_compatibility();
-
    /// set copying and maybe set protection
    /// @param prot true if protection (⎕PCOPY) is requested
    /// @param allowed names of objects to copy; empty means copy all
    void set_protection(bool prot, const UCS_string_vector & allowed)
       { copying = true;   protection = prot;   allowed_objects = allowed;
         have_allowed_objects = allowed_objects.size() > 0; }
+
+   /// check compatibility information in the workspace and maybe warn the
+   /// user
+   void check_compatibility();
+
+   /// move to next tag, return true if EOF
+   /// @param loc caller location for diagnostics
+   bool next_tag(const char * loc);
+
+   /// read vids of top-level variables
+   void read_vids();
+
+   /// read an entire workspace, throw DOMAIN_ERROR on failure
+   /// @param silent suppress progress messages when true
+   void read_Workspace(bool silent);
 
    /// reset archive to the start position
    void reset();
@@ -332,13 +339,6 @@ public:
    /// @param tag XML tag name to search for
    bool skip_to_tag(const char * tag);
 
-   /// read vids of top-level variables
-   void read_vids();
-
-   /// move to next tag, return true if EOF
-   /// @param loc caller location for diagnostics
-   bool next_tag(const char * loc);
-
 protected:
    /// a value ID in a )SAVEd workspace
    enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
@@ -346,245 +346,12 @@ protected:
    /// the address of a function in a )SAVEd workspace
    enum Fid { NO_FID = int(-1) };   ///< no (invalid) function ID
 
-   /// read next Value element
-   void read_Value();
-
-   /// read one or more Cell(s) from input into the ravel of Z;
-   /// return the  UTF8 * after the cells.
-   /// @param Z target APL value whose ravel receives the cells
-   /// @param input pointer to the encoded cell data in the file buffer
-   const UTF8 * read_Cells(Value & Z, const UTF8 * input);
-
-   /// input is a UTF8-encoded sequence of bytes, terminated with ".
-   /// UTF8-decode the sequence, thereby removing the escape tagging
-   /// with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and \n.
-   /// return the  UTF8 * pointing to the terminating ".
-   /// @param ucs output string that receives the decoded Unicode characters
-   /// @param input pointer to the UTF-8 encoded attribute value in the file buffer
-   const UTF8 * read_XML_string(UCS_string & ucs, const UTF8 * input);
-
-   /// read next Ravel element
-   void read_Ravel();
-
-   /// read next unused-name element
-   /// @param d depth (SI level) of the symbol entry
-   /// @param symbol symbol to update
-   void read_unused_name(int d, Symbol & symbol);
-
-   /// read next Variable element
-   /// @param d depth (SI level) of the symbol entry
-   /// @param symbol symbol to receive the variable binding
-   void read_Variable(int d, Symbol & symbol);
-
-   /// read next Function element
-   void read_Function();
-
-   /// read next Function element
-   /// @param d depth (SI level) of the symbol entry
-   /// @param symbol symbol to receive the function binding
-   void read_Function(int d, Symbol & symbol);
-
-   /// read next derived function
-   /// @param si state indicator entry that owns the derived function
-   /// @param lev SI nesting level of the derived function
-   void read_Derived(StateIndicator & si, int lev);
-
-   /// read next Label element
-   /// @param d depth (SI level) of the symbol entry
-   /// @param symbol symbol to receive the label value
-   void read_Label(int d, Symbol & symbol);
-
-   /// read next Shared-Variable element
-   /// @param d depth (SI level) of the symbol entry
-   /// @param symbol symbol to receive the shared-variable binding
-   void read_Shared_Variable(int d, Symbol & symbol);
-
-   /// read next Symbol element
-   void read_SymbolTable();
-
-   /// read next Symbol element
-   void read_Symbol();
-
-   /// read all user-defined commands
-   void read_Commands();
-
-   /// read next Command element
-   void read_Command();
-
-   /// read next StateIndicator element
-   void read_StateIndicator();
-
-   /// read next StateIndicator entry
-   /// @param level nesting depth of the SI entry to read
-   void read_SI_entry(int level);
-
-   /// read parsers in SI entry
-   /// @param si state indicator entry to populate with parser data
-   /// @param lev SI nesting level being restored
-   void read_Parser(StateIndicator & si, int lev);
-
-   /// read ⍎ Executable
-   const Executable * read_SI_Execute();
-
-   /// read ◊ Executable
-   const Executable * read_SI_Statement();
-
-   /// read a user defined Executable
-   const Executable * read_SI_UserFunction();
-
-   /// read a lambda
-   /// @param lambda_name UTF-8 encoded name of the lambda to read
-   Executable * read_lambda(const UTF8 * lambda_name);
-
-   /// read an UCS string
-   UCS_string read_UCS();
-
-   /// read a token
-   /// @param tloc token location record to populate
-   bool read_Token(Token_loc & tloc);
-
-   /// read a system function with attribute id_prefix-id or a user defined
-   /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
-   cFunction_P read_Function_name();
-
-   /// find a lambda in the current SI entry
-   /// @param lambda Unicode name of the lambda to locate
-   cFunction_P find_lambda(const UCS_string & lambda);
-
-   /// return true iff there is more data in the file
-   bool more() const   { return data < file_end; }
-
-   /// show some characters starting at the current position.
-   /// Debug function, currently defined but not used.
-   void where();
-
-   /// show attributes of current tag
-   /// Debug function, currently defined but not used.
-   void where_att();
-
-   /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
-   bool get_uni();
-
-   /// return true iff \b tagname starts with prefix
-   /// @param prefix XML tag name prefix to test
-   bool is_tag(const char * prefix) const;
-
-   /// check that is_tag(prefix) is true and print error info if not
-   /// @param prefix expected XML tag name prefix
-   /// @param loc caller location for diagnostics
-   void expect_tag(const char * prefix, const char * loc) const;
-
-   /// print current tag
-   void print_tag() const;
-
-   /// find attribute \b att_name and return: a pointer to its value if found,
-   /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
-   /// @param att_name XML attribute name to look up
-   /// @param optional true if the attribute may be absent
-   const UTF8 * find_attr(const char * att_name, bool optional);
-
-   /// find mandatory attribute \b att_name. Return a pointer to its value
-   ///  if found and throw DOMAIN ERROR if not.
-   /// @param att_name XML attribute name that must be present
-   const UTF8 * find_mandatory_attr(const char * att_name)
-      { return find_attr(att_name, false); }
-
-   /// find optional attribute \b att_name. Return a pointer to its value
-   /// if found and 0 if not.
-   /// @param att_name XML attribute name to look up
-   const UTF8 * find_optional_attr(const char * att_name)
-      { return find_attr(att_name, true); }
-
-   /// return integer value of attribute \b att_name
-   /// @param att_name XML attribute name to look up
-   /// @param optional true if the attribute may be absent
-   /// @param base numeric base for integer parsing (e.g. 10 or 16)
-   int64_t find_int_attr(const char * att_name, bool optional, int base);
-
-   /// return Fid value of attribute \b att_name
-   /// @param att_name XML attribute name to look up
-   /// @param optional true if the attribute may be absent
-   /// @param base numeric base for integer parsing (e.g. 10 or 16)
-   Fid find_Fid_attr(const char * att_name, bool optional, int base)
-      { return Fid(find_int_attr(att_name, optional, base)); }
-
-   /// return Vid value of attribute \b att_name
-   /// @param att_name XML attribute name to look up
-   /// @param optional true if the attribute may be absent
-   /// @param base numeric base for integer parsing (e.g. 10 or 16)
-   Vid find_Vid_attr(const char * att_name, bool optional, int base)
-      { return Vid(find_int_attr(att_name, optional, base)); }
-
-   /// return floating point value of attribute \b att_name
-   /// @param att_name XML attribute name to look up
-   APL_Float find_float_attr(const char * att_name);
-
-   /// the length of the workspace file
-   ssize_t file_length;
-
-   /// the start of the workspace file
-   const UTF8 * file_start;
-
-   /// the start of the current line
-   const UTF8 * line_start;
-
-   /// the current line
-   int line_no;
-
-   /// the current char
-   Unicode current_char;
-
-   /// the next char
-   const UTF8 * data;
-
-   /// the name of the current tag, e.g. "Symbol" or "/Symbol"
-   const UTF8 * tag_name;
-
-   /// the attributes of the current tag
-   const UTF8 * attributes;
-
-   /// the end of attributes
-   const UTF8 * end_attr;
-
-   /// the end of the workspace file
-   const UTF8 * file_end;
-
-   /// all values in the workspace
-   std::vector<Value_P> values;
-
-   /// true for )COPY and )PCOPY, false for )LOAD
-   bool copying;
-
-   /// true for )PCOPY, false for )COPY and )LOAD
-   bool protection;
-
-   /// true if reading vids (preparation for )COPY or )PCOPY)
-   bool reading_vids;
-
-   /// the vids to be copied (empty if all)
-   std::vector<Vid> vids_COPY;
-
-   /// the names of objects (empty if all)
-   UCS_string_vector allowed_objects;
-
-   /// true for selective copy (COPY with symbol names)
-   bool have_allowed_objects;
-
    /// a value ID and the ID of its parent
    struct _vid_pvid
      {
        Vid vid;    ///< value ID
        Vid pvid;   ///< parent's value ID
      };
-
-   /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
-   std::vector<Vid> parents;
-
-   /// the file name from which this archive was read
-   const char * filename;
-
-   /// true if file contains a <\/Workspace> tag at the end
-   bool file_is_complete;
 
    /// one mapping from an fid in the old (SAVEed) workspace to the function
    /// address in the new (LOADing) workspace
@@ -594,24 +361,6 @@ protected:
         cFunction_P new_fun;   ///< address in the )LOADing workspace
         const char * loc;      ///< where allocated
       };
-
-   /// all mappings from fids to functions
-   std::vector<fun_map> fid_to_function;
-
-   /// return fun_map for fid, or 0 if not found.
-   /// @param fid function ID from the saved workspace
-   fun_map * find_fun_map(Fid fid);
-
-   /// return function for fid, or 0 if not found.
-   /// @param fid function ID from the saved workspace
-   cFunction_P find_function(Fid fid);
-
-   /// add fid and function to find_fun_map. Either fid must be new, or else
-   /// an existing fid must have its new_fun == 0 (forward declaration).
-   /// @param fid function ID from the saved workspace
-   /// @param new_fun resolved function pointer in the loading workspace
-   /// @param loc caller location for diagnostics
-   void add_fid_function(Fid fid, cFunction_P new_fun, const char * loc);
 
    /// properties of a derived function
    struct _derived_todo
@@ -626,12 +375,263 @@ protected:
         const char * loc;       ///< where \b this was initialized
       };
 
-      /// derived functions that need to be instantiated
-      vector<_derived_todo> derived_todos;
+   /// return true iff there is more data in the file
+   bool more() const   { return data < file_end; }
+
+   /// return Fid value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
+   Fid find_Fid_attr(const char * att_name, bool optional, int base)
+      { return Fid(find_int_attr(att_name, optional, base)); }
+
+   /// find mandatory attribute \b att_name. Return a pointer to its value
+   ///  if found and throw DOMAIN ERROR if not.
+   /// @param att_name XML attribute name that must be present
+   const UTF8 * find_mandatory_attr(const char * att_name)
+      { return find_attr(att_name, false); }
+
+   /// find optional attribute \b att_name. Return a pointer to its value
+   /// if found and 0 if not.
+   /// @param att_name XML attribute name to look up
+   const UTF8 * find_optional_attr(const char * att_name)
+      { return find_attr(att_name, true); }
+
+   /// return Vid value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
+   Vid find_Vid_attr(const char * att_name, bool optional, int base)
+      { return Vid(find_int_attr(att_name, optional, base)); }
+
+   /// check that is_tag(prefix) is true and print error info if not
+   /// @param prefix expected XML tag name prefix
+   /// @param loc caller location for diagnostics
+   void expect_tag(const char * prefix, const char * loc) const;
+
+   /// return true iff \b tagname starts with prefix
+   /// @param prefix XML tag name prefix to test
+   bool is_tag(const char * prefix) const;
+
+   /// print current tag
+   void print_tag() const;
+
+   /// add fid and function to find_fun_map. Either fid must be new, or else
+   /// an existing fid must have its new_fun == 0 (forward declaration).
+   /// @param fid function ID from the saved workspace
+   /// @param new_fun resolved function pointer in the loading workspace
+   /// @param loc caller location for diagnostics
+   void add_fid_function(Fid fid, cFunction_P new_fun, const char * loc);
+
+   /// find attribute \b att_name and return: a pointer to its value if found,
+   /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   const UTF8 * find_attr(const char * att_name, bool optional);
+
+   /// return floating point value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   APL_Float find_float_attr(const char * att_name);
+
+   /// return fun_map for fid, or 0 if not found.
+   /// @param fid function ID from the saved workspace
+   fun_map * find_fun_map(Fid fid);
+
+   /// return function for fid, or 0 if not found.
+   /// @param fid function ID from the saved workspace
+   cFunction_P find_function(Fid fid);
+
+   /// return integer value of attribute \b att_name
+   /// @param att_name XML attribute name to look up
+   /// @param optional true if the attribute may be absent
+   /// @param base numeric base for integer parsing (e.g. 10 or 16)
+   int64_t find_int_attr(const char * att_name, bool optional, int base);
+
+   /// find a lambda in the current SI entry
+   /// @param lambda Unicode name of the lambda to locate
+   cFunction_P find_lambda(const UCS_string & lambda);
+
+   /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
+   bool get_uni();
 
    /// instantiate the derived functions in \b derived_todos
    /// @param allocate true to allocate new derived functions, false to link them
    void instantiate_derived_functions(bool allocate);
+
+   /// read one or more Cell(s) from input into the ravel of Z;
+   /// return the  UTF8 * after the cells.
+   /// @param Z target APL value whose ravel receives the cells
+   /// @param input pointer to the encoded cell data in the file buffer
+   const UTF8 * read_Cells(Value & Z, const UTF8 * input);
+
+   /// read next Command element
+   void read_Command();
+
+   /// read all user-defined commands
+   void read_Commands();
+
+   /// read next derived function
+   /// @param si state indicator entry that owns the derived function
+   /// @param lev SI nesting level of the derived function
+   void read_Derived(StateIndicator & si, int lev);
+
+   /// read next Function element
+   void read_Function();
+
+   /// read next Function element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the function binding
+   void read_Function(int d, Symbol & symbol);
+
+   /// read a system function with attribute id_prefix-id or a user defined
+   /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
+   cFunction_P read_Function_name();
+
+   /// read next Label element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the label value
+   void read_Label(int d, Symbol & symbol);
+
+   /// read a lambda
+   /// @param lambda_name UTF-8 encoded name of the lambda to read
+   Executable * read_lambda(const UTF8 * lambda_name);
+
+   /// read parsers in SI entry
+   /// @param si state indicator entry to populate with parser data
+   /// @param lev SI nesting level being restored
+   void read_Parser(StateIndicator & si, int lev);
+
+   /// read next Ravel element
+   void read_Ravel();
+
+   /// read next Shared-Variable element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the shared-variable binding
+   void read_Shared_Variable(int d, Symbol & symbol);
+
+   /// read next StateIndicator entry
+   /// @param level nesting depth of the SI entry to read
+   void read_SI_entry(int level);
+
+   /// read ⍎ Executable
+   const Executable * read_SI_Execute();
+
+   /// read ◊ Executable
+   const Executable * read_SI_Statement();
+
+   /// read a user defined Executable
+   const Executable * read_SI_UserFunction();
+
+   /// read next StateIndicator element
+   void read_StateIndicator();
+
+   /// read next Symbol element
+   void read_Symbol();
+
+   /// read next Symbol element
+   void read_SymbolTable();
+
+   /// read a token
+   /// @param tloc token location record to populate
+   bool read_Token(Token_loc & tloc);
+
+   /// read an UCS string
+   UCS_string read_UCS();
+
+   /// read next unused-name element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to update
+   void read_unused_name(int d, Symbol & symbol);
+
+   /// read next Value element
+   void read_Value();
+
+   /// read next Variable element
+   /// @param d depth (SI level) of the symbol entry
+   /// @param symbol symbol to receive the variable binding
+   void read_Variable(int d, Symbol & symbol);
+
+   /// input is a UTF8-encoded sequence of bytes, terminated with ".
+   /// UTF8-decode the sequence, thereby removing the escape tagging
+   /// with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and \n.
+   /// return the  UTF8 * pointing to the terminating ".
+   /// @param ucs output string that receives the decoded Unicode characters
+   /// @param input pointer to the UTF-8 encoded attribute value in the file buffer
+   const UTF8 * read_XML_string(UCS_string & ucs, const UTF8 * input);
+
+   /// show some characters starting at the current position.
+   /// Debug function, currently defined but not used.
+   void where();
+
+   /// show attributes of current tag
+   /// Debug function, currently defined but not used.
+   void where_att();
+
+   /// the names of objects (empty if all)
+   UCS_string_vector allowed_objects;
+
+   /// the attributes of the current tag
+   const UTF8 * attributes;
+
+   /// true for )COPY and )PCOPY, false for )LOAD
+   bool copying;
+
+   /// the current char
+   Unicode current_char;
+
+   /// the next char
+   const UTF8 * data;
+
+      /// derived functions that need to be instantiated
+      vector<_derived_todo> derived_todos;
+
+   /// the end of attributes
+   const UTF8 * end_attr;
+
+   /// all mappings from fids to functions
+   std::vector<fun_map> fid_to_function;
+
+   /// the end of the workspace file
+   const UTF8 * file_end;
+
+   /// true if file contains a <\/Workspace> tag at the end
+   bool file_is_complete;
+
+   /// the length of the workspace file
+   ssize_t file_length;
+
+   /// the start of the workspace file
+   const UTF8 * file_start;
+
+   /// the file name from which this archive was read
+   const char * filename;
+
+   /// true for selective copy (COPY with symbol names)
+   bool have_allowed_objects;
+
+   /// the current line
+   int line_no;
+
+   /// the start of the current line
+   const UTF8 * line_start;
+
+   /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
+   std::vector<Vid> parents;
+
+   /// true for )PCOPY, false for )COPY and )LOAD
+   bool protection;
+
+   /// true if reading vids (preparation for )COPY or )PCOPY)
+   bool reading_vids;
+
+   /// the name of the current tag, e.g. "Symbol" or "/Symbol"
+   const UTF8 * tag_name;
+
+   /// all values in the workspace
+   std::vector<Value_P> values;
+
+   /// the vids to be copied (empty if all)
+   std::vector<Vid> vids_COPY;
 };
 //----------------------------------------------------------------------------
 

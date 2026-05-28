@@ -63,82 +63,72 @@ public:
    /// destructor: release values held by the body
    virtual ~Executable();
 
-   /// the parse mode of \b this Executable
-   ParseMode get_parse_mode() const
-      { return pmode; }
-
-   /// delete values in body and (maybe) remove lambdas
-   void clear_body();
-
-   /// return the name of this function, or ◊ or ⍎
-   virtual UCS_string get_name() const = 0;
-
    /// return true iff this Executable cannot be suspended
    virtual bool cannot_suspend() const
       { return false; }
 
-   /// return the result symbol iff this is a user defined function or
-   /// operator that returns a value
-   virtual Symbol * get_sym_Z() const
-      { return 0; }
+   /// return the body of this executable
+   const Token_string & get_body() const
+      { return body; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
    virtual const UserFunction * get_exec_ufun() const
       { return 0; }
-
-   /// return true if this Executable localizes Symbol \b sym
-   /// @param sym symbol to check for localisation
-   virtual bool pushes_sym(const Symbol * sym) const
-      { return false; }
-
-   /// return a UserFunction * (if \b this is one) or else 0.
-   virtual UserFunction * get_exec_ufun()
-   { return 0; }
 
    /// get the line number for pc
    /// @param pc program counter value to map to a line number
    virtual Function_Line get_line(Function_PC pc) const
       { return Function_Line_0; }
 
-   /// print this user defined executable to \b out
-   /// @param out output stream to write to
-   virtual ostream & print(ostream & out) const
-      { print_token(out, false);   return out; }
+   /// say where this SI entry was allocated
+   const char * get_loc() const
+      { return alloc_loc; }
 
-   /// print a body range (in APL order)
-   /// @param out output stream to write to
-   /// @param from_to PC range (start and end) to print
-   ostream & print_range(ostream & out, Function_PC2 from_to) const;
+   /// the parse mode of \b this Executable
+   ParseMode get_parse_mode() const
+      { return pmode; }
 
-   /// print this user defined executable to \b out
-   /// @param out output stream to write to
-   /// @param details non-zero to include additional token detail
-   void print_token(ostream & out, int details) const;
+   /// return the refcount
+   int get_refcount() const
+      { return refcount; }
 
-   /// print the text of this user defined executable to \b out
-   /// @param out output stream to write to
-   void print_text(ostream & out) const;
-
-   /// execute the body of this executable
-   Token execute_body() const;
-
-   /// return the body of this executable
-   const Token_string & get_body() const
-      { return body; }
-
-   /// return number of function lines (including header line 0)
-   const int get_text_size() const 
-      { return text.size(); }
+   /// return the result symbol iff this is a user defined function or
+   /// operator that returns a value
+   virtual Symbol * get_sym_Z() const
+      { return 0; }
 
    /// return function line n (0 = header line)
    /// @param l line number (0 = header)
    const UCS_string & get_text(int l) const
       { return text[l]; }
 
+   /// return number of function lines (including header line 0)
+   const int get_text_size() const
+      { return text.size(); }
+
+   /// return the first PC of the \b line
+   /// @param line function line number whose start PC is requested
+   virtual Function_PC line_start(Function_Line line) const
+      { return Function_PC_0; }
+
+   /// print this user defined executable to \b out
+   /// @param out output stream to write to
+   virtual ostream & print(ostream & out) const
+      { print_token(out, false);   return out; }
+
+   /// return true if this Executable localizes Symbol \b sym
+   /// @param sym symbol to check for localisation
+   virtual bool pushes_sym(const Symbol * sym) const
+      { return false; }
+
    /// clear the text of line n (0 = header line)
    /// @param l line number to clear (0 = header)
    void clear_text(int l)
       { text[l].clear(); }
+
+   /// return a UserFunction * (if \b this is one) or else 0.
+   virtual UserFunction * get_exec_ufun()
+   { return 0; }
 
    /// set the text of line n (0 = header line)
    /// @param l line number to replace (0 = header)
@@ -146,19 +136,38 @@ public:
    void set_text(int l, const UCS_string & new_line)
       { text[l] = new_line; }
 
-   /// return the text of statement at \b pc
-   /// @param pc program counter identifying the statement
-   UCS_string statement_text(Function_PC pc) const;
+   /// execute the body of this executable
+   Token execute_body() const;
 
-   /// return the first PC of the \b line
-   /// @param line function line number whose start PC is requested
-   virtual Function_PC line_start(Function_Line line) const
-      { return Function_PC_0; }
+   /// return the name of this function, or ◊ or ⍎
+   virtual UCS_string get_name() const = 0;
 
-   /// remove all TOK_VOID token from the body. \b UserFunction needs to
-   /// overload this function, e.g. to update its jump table.
-   /// Return the number of tokens removed
-   virtual VoidCount remove_TOK_VOID();
+   /// return the end of the statement (excluding) to which pc belongs
+   /// @param pc program counter within the statement
+   Function_PC get_statement_end(Function_PC pc) const;
+
+   /// return the start of the statement to which pc belongs
+   /// @param pc program counter within the statement
+   Function_PC get_statement_start(Function_PC pc) const;
+
+   /// print a body range (in APL order)
+   /// @param out output stream to write to
+   /// @param from_to PC range (start and end) to print
+   ostream & print_range(ostream & out, Function_PC2 from_to) const;
+
+   /// print the text of this user defined executable to \b out
+   /// @param out output stream to write to
+   void print_text(ostream & out) const;
+
+   /// print this user defined executable to \b out
+   /// @param out output stream to write to
+   /// @param details non-zero to include additional token detail
+   void print_token(ostream & out, int details) const;
+
+   /// restore the original (un-optimized) tokens for a failed statement
+   /// @param original token string to restore into
+   /// @param low_PC first PC of the statement to restore
+   void reparse(Token_string & original, Function_PC low_PC) const;
 
    /// compute error lines 2 and 3 in \b error
    /// @param error error object to fill with location information
@@ -172,22 +181,6 @@ public:
    void set_error_info(Error & error, const Token_string & failed_statement,
                        Function_PC2 range) const;
 
-   /// restore the original (un-optimized) tokens for a failed statement
-   /// @param original token string to restore into
-   /// @param low_PC first PC of the statement to restore
-   void reparse(Token_string & original, Function_PC low_PC) const;
-
-   /// return the end of the statement (excluding) to which pc belongs
-   /// @param pc program counter within the statement
-   Function_PC get_statement_end(Function_PC pc) const;
-
-   /// return the start of the statement to which pc belongs
-   /// @param pc program counter within the statement
-   Function_PC get_statement_start(Function_PC pc) const;
-
-   /// clear marked flag in all body token
-   void unmark_all_values() const;
-
    /// print all owners of \b value
    /// @param prefix string prepended to each output line
    /// @param out output stream to write to
@@ -195,26 +188,33 @@ public:
    int show_owners(const char * prefix, ostream & out,
                    const Value & value) const;
 
-   /// say where this SI entry was allocated
-   const char * get_loc() const
-      { return alloc_loc; }
+   /// return the text of statement at \b pc
+   /// @param pc program counter identifying the statement
+   UCS_string statement_text(Function_PC pc) const;
 
-   /// return the refcount
-   int get_refcount() const
-      { return refcount; }
+   /// clear marked flag in all body token
+   void unmark_all_values() const;
+
+   /// delete values in body and (maybe) remove lambdas
+   void clear_body();
+
+   /// compute the targets for if/else aka →→ ←→ and ←←.
+   /// Maybe set MORE() info and return true on error.
+   bool compute_if_else_targets();
+
+   /// decrement the reference counter
+   /// @param loc caller location for diagnostics
+   void decrement_refcount(const char * loc);
 
    /// increment the reference counter
    /// @param loc caller location for diagnostics
    /// @param creator description of the entity acquiring the reference
    void increment_refcount(const char * loc, const char * creator);
 
-   /// decrement the reference counter
-   /// @param loc caller location for diagnostics
-   void decrement_refcount(const char * loc);
-
-   /// compute the targets for if/else aka →→ ←→ and ←←.
-   /// Maybe set MORE() info and return true on error.
-   bool compute_if_else_targets();
+   /// remove all TOK_VOID token from the body. \b UserFunction needs to
+   /// overload this function, e.g. to update its jump table.
+   /// Return the number of tokens removed
+   virtual VoidCount remove_TOK_VOID();
 
 protected:
    /// the body positions of the ←← and ←→ tokens of a conditional
@@ -248,27 +248,10 @@ protected:
         return false;
       }
 
-   /// recursively extract all lambda expressions from body and store
-   /// them in lambdas
-   void setup_lambdas();
-
-   /// reverse the token order in each statement of tos (statement by
-   /// statement reversal). The order pf statements is not changed).
-   /// @param tos token string whose statements are reversed in place
-  static void reverse_each_statement(Token_string & tos);
-
-   /// reverse the token order of the entire Token_string (i.e. not statement
-   /// by statement)
-   /// @param tos token string to reverse in place
-  static void reverse_all_token(Token_string & tos);
-
-   /// extract one lambda expressions from body and store it in lambdas
-   /// body[b] is { and body[bend] is }.
-   /// @param b index of the opening '{' in the body
-   /// @param nend index of the matching '}' in the body
-   /// @param lambda_num sequential number to assign to this lambda
-   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend,
-                              Lambda_number lambda_num);
+   /// extract the skip'th { ... } from the function text
+   /// @param signature function signature of the lambda
+   /// @param skip zero-based index of which lambda to extract
+   UCS_string extract_lambda_text(Fun_signature signature, int skip) const;
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.
@@ -277,14 +260,6 @@ protected:
    /// @param bend index of the matching '}' in the body
    Fun_signature compute_lambda_body(Token_string & rev_lambda_body,
                                      ShapeItem b, ShapeItem bend);
-
-   /// extract the skip'th { ... } from the function text
-   /// @param signature function signature of the lambda
-   /// @param skip zero-based index of which lambda to extract
-   UCS_string extract_lambda_text(Fun_signature signature, int skip) const;
-
-   /// where this SI entry was allocated
-   const char * alloc_loc;
 
    /// parse the body line number \b line of \b this function
    /// @param line function line number being parsed
@@ -303,19 +278,44 @@ protected:
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              bool trace, const char * loc);
 
-   /// the mode \b this Executable
-   const ParseMode pmode;
+   /// recursively extract all lambda expressions from body and store
+   /// them in lambdas
+   void setup_lambdas();
 
-   /// the program text from which \b body was created
-   UCS_string_vector text;
+   /// extract one lambda expressions from body and store it in lambdas
+   /// body[b] is { and body[bend] is }.
+   /// @param b index of the opening '{' in the body
+   /// @param nend index of the matching '}' in the body
+   /// @param lambda_num sequential number to assign to this lambda
+   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend,
+                              Lambda_number lambda_num);
+
+   /// reverse the token order of the entire Token_string (i.e. not statement
+   /// by statement)
+   /// @param tos token string to reverse in place
+  static void reverse_all_token(Token_string & tos);
+
+   /// reverse the token order in each statement of tos (statement by
+   /// statement reversal). The order pf statements is not changed).
+   /// @param tos token string whose statements are reversed in place
+  static void reverse_each_statement(Token_string & tos);
+
+   /// where this SI entry was allocated
+   const char * alloc_loc;
 
    /// The token to be executed. They are organized line by line and
    /// statement by statement, but the token within a statement reversed
    /// due to the right-to-left execution of APL.
    Token_string body;
 
+   /// the mode \b this Executable
+   const ParseMode pmode;
+
    /// reference counter (for lambdas)
    int refcount;
+
+   /// the program text from which \b body was created
+   UCS_string_vector text;
 };
 //----------------------------------------------------------------------------
 /**
@@ -327,17 +327,17 @@ class ExecuteList : public Executable
    friend class XML_Loading_Archive;
 
 public:
-   /// compute body token from text \b data
-   /// @param data APL source text of the execute expression
-   /// @param loc caller location for diagnostics
-   static ExecuteList * fix(const UCS_string & data, const char * loc);
-
    /// constructor
    /// @param txt source text of the execute expression
    /// @param loc caller location for diagnostics
    ExecuteList(const UCS_string & txt, const char * loc)
    : Executable(txt, false, PM_EXECUTE, loc)
    {}
+
+   /// compute body token from text \b data
+   /// @param data APL source text of the execute expression
+   /// @param loc caller location for diagnostics
+   static ExecuteList * fix(const UCS_string & data, const char * loc);
 
 protected:
    /// overloaded Executable::get_name()

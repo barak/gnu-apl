@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,23 @@ public:
    /// @param other  source LvalCell to copy from
    LvalCell(const LvalCell & other);
 
+   /// Overloaded Cell::is_lval_cell()
+   virtual bool is_lval_cell()  const   { return true; }
+
+   /// return the owner of the cell pointed to
+   Value * get_cell_owner() const
+      { return value.pval.owner; }
+
+   /// Overloaded Cell::character_representation()
+   /// @param pctx  print context controlling format
+   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+
+   /// Overloaded Cell::get_lval_value()
+   virtual Cell * get_lval_value() const;
+
+   /// make sure that owner (if any) owns this Cell
+   void check_consistency() const;
+
    /// overloaded Cell::init_other
    /// @param other       raw memory for the new cell to initialise
    /// @param cell_owner  value that will own the new cell
@@ -51,31 +68,9 @@ public:
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const;
 
-   /// Overloaded Cell::is_lval_cell()
-   virtual bool is_lval_cell()  const   { return true; }
-
-   /// Overloaded Cell::get_lval_value()
-   virtual Cell * get_lval_value() const;
-
-   /// Overloaded Cell::character_representation()
-   /// @param pctx  print context controlling format
-   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
-
-   /// return the owner of the cell pointed to
-   Value * get_cell_owner() const
-      { return value.pval.owner; }
-
-   /// make sure that owner (if any) owns this Cell
-   void check_consistency() const;
-
 protected:
-   ///  Overloaded Cell::get_cell_type()
-   virtual CellType get_cell_type() const
-      { return CT_CELLREF; }
-
-   /// Overloaded Cell::greater().
-   virtual bool greater(const Cell & other) const
-      { DOMAIN_ERROR; }
+   /// downcast to const LvalCell
+   virtual const LvalCell & cLvalCell() const   { return *this; }
 
    /// Overloaded Cell::get_classname().
    virtual const char * get_classname() const   { return "LvalCell"; }
@@ -84,8 +79,13 @@ protected:
    virtual int CDR_size() const
       { NeverReach("CDR_size called on LvalCell base class"); }
 
-   /// downcast to const LvalCell
-   virtual const LvalCell & cLvalCell() const   { return *this; }
+   ///  Overloaded Cell::get_cell_type()
+   virtual CellType get_cell_type() const
+      { return CT_CELLREF; }
+
+   /// Overloaded Cell::greater().
+   virtual bool greater(const Cell & other) const
+      { DOMAIN_ERROR; }
 
    /// downcast to LvalCell
    virtual LvalCell & vLvalCell()   { return *this; }

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2025  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -164,9 +164,93 @@ Quad_PLOT::Quad_PLOT()
    verbosity = 0;
 }
 //----------------------------------------------------------------------------
+Quad_PLOT::Handle
+Quad_PLOT::PLOT_context::remove_handle(Handle handle)
+{
+// CERR << "remove_handle(" << handle << ")" << endl;
+
+   loop(h, all_PLOT_windows.size())
+      {
+        if (all_PLOT_windows[h]->handle == handle)
+           {
+             all_PLOT_windows[h] = all_PLOT_windows.back();
+             all_PLOT_windows.pop_back();
+             return handle;
+           }
+      }
+
+   return 0;
+}
+//----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
 {
    __sem_destroy(all_PLOT_windows_sema);
+}
+//----------------------------------------------------------------------------
+void
+Quad_PLOT::start_GUI(Plot_window_properties * w_props, int handle,
+                     Plot_driver driver_type)
+{
+Plot_driver driver;
+const string driver_attr = w_props->get_gui_driver();
+ 
+   if      (driver_attr == "")        driver = default_plot_driver;
+   else if (driver_attr == "GTK")     driver = PltDrv_GTK;
+   else if (driver_attr == "XCB")     driver = PltDrv_XCB;
+   else if (driver_attr == "ASCII")   driver = PltDrv_ASCII;
+   else
+           {
+             MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver '"
+                          << driver_attr.c_str() << "'";
+             DOMAIN_ERROR;
+           }
+
+   if (driver == PltDrv_GTK)
+      {
+#if apl_GTK3 && apl_X11
+        // plot_main_GTK() pushes a new GTK_context into variable
+        // Quad_PLOT::all_PLOT_windows and  posts expose_sema after
+        // its plot window was exposed.
+        //
+        plot_main_GTK(w_props, handle);
+        sem_wait(expose_sema);   // blocks until window shown
+        sem_post(expose_sema);   // for the next window (if any)
+        Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
+        return;
+#else   // not apl_GTK3
+
+   MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK requested, "
+                   "but GTK was not completely installed.\n"
+                   "Missing: " MISSING_X11 MISSING_GTK;
+   DOMAIN_ERROR;
+#endif   // (not) apl_GTK3 && apl_X11
+      }
+
+   if (driver == PltDrv_XCB)
+      {
+#if apl_XCB
+        // start a thread that pushes a XCB_context and then posts the
+        // expose_sema after its plot window was exposed.
+        //
+        pthread_t th;
+        pthread_create(&th, 0, plot_main_XCB, w_props);
+        sem_wait(expose_sema);   // blocks until window shown
+        sem_post(expose_sema);   // for the next window (if any)
+        Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
+        return;
+#else   // not apl_XCB
+   MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB requested, "
+                   "but XCB was not completely installed.\n"
+                   "Missing: " MISSING_X11 MISSING_XCB;
+   DOMAIN_ERROR;
+#endif   // (not) apl_XCB
+      }
+
+   // neither GTK nor XCB. Use ASCII fallback
+   Assert(driver == PltDrv_ASCII);
+   Log(LOG_Quad_PLOT)
+      CERR << "gui_driver: " << driver_attr.c_str() 
+           << " (no driver needed)." << endl;
 }
 //----------------------------------------------------------------------------
 Token
@@ -242,72 +326,6 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    //
 const APL_Integer Z = do_plot_data(w_props, data);
    return Token(TOK_APL_VALUE2, IntScalar(Z, LOC));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
-{
-   if (A.is_member())   // new-style attributes
-      {
-        loop(row, A.get_rows())
-            {
-              const Cell & att_name = A.get_cravel(2*row);       // A[row; 1]
-              const Cell & att_val  = A.get_cravel(2*row + 1);   // A[row; 2]
-              if (att_name.is_pointer_cell())   // used entry in A
-                 {
-                   const UCS_string ucs = att_name.get_pointer_value()
-                                                 ->get_UCS_ravel();
-                   if (const char * error = w_props->set_attribute(ucs, att_val))
-                      {
-                        MORE_ERROR() << "A ⎕PLOT B: " << error
-                                     << " in attribute A." << ucs;
-                        return E_DOMAIN_ERROR;
-                      }
-                 }
-            }
-        return E_NO_ERROR;
-      }
-
-   // old-style attributes
-   //
-   if (A.get_rank() > 1)   { delete w_props;   RANK_ERROR; }
-
-const ShapeItem len_A = A.element_count();
-   if (len_A < 1)   return E_LENGTH_ERROR;
-
-const APL_Integer qio = Workspace::get_IO();
-
-   loop(a, len_A)
-       {
-         const Cell & cell_A = A.get_cravel(a);
-         if (!cell_A.is_pointer_cell())
-            {
-               MORE_ERROR() << "A[" << (a + qio)
-                            << "] is not a string in A ⎕PLOT B";
-               return E_DOMAIN_ERROR;
-            }
-
-         const Value * attr = cell_A.get_pointer_value().get();
-         if (!attr->is_char_string())
-            {
-               MORE_ERROR() << "A[" << (a + qio)
-                            << "] is not a string in A ⎕PLOT B";
-               return E_DOMAIN_ERROR;
-            }
-
-         UCS_string ucs = attr->get_UCS_ravel();
-         ucs.remove_leading_and_trailing_whitespaces();
-         if (ucs.size() == 0)               continue;
-         if (Avec::is_comment(ucs[0]))      continue;
-         UTF8_string utf(ucs);
-         if (const char * error = w_props->set_attribute(utf.c_str()))
-            {
-              MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
-              return E_DOMAIN_ERROR;
-            }
-       }
-
-   return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
@@ -446,6 +464,111 @@ bool found = false;
    return IntScalar(found ? B0 : 0, LOC);
 }
 //----------------------------------------------------------------------------
+static UCS_string
+fill_14(const std::string & name)
+{
+UTF8_string name_utf(name.c_str());
+UCS_string ret(name_utf);
+   while (ret.size() < 14)   ret << UNI_SPACE;
+   return ret;
+}
+
+void
+Quad_PLOT::help()
+{
+   CERR <<
+"\n"
+"   ⎕PLOT Usage:\n"
+"\n"
+"   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values\n"
+"   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions\n"
+"   A ⎕PLOT B   plot B with attribute overrides specified by A\n"
+"           ├────────  0: verbosity OFF\n"
+"           ├──────── ¯1: show X events\n"
+"           ├──────── ¯2: show data\n"
+"           ├──────── ¯3: close all ⎕PLOT windows\n"
+"           ├──────── ¯4: show rendering\n"
+"           ├──────── ¯6: show open ⎕PLOT windows\n"
+"           └───── N > 0: close ⎕PLOT window N\n"
+"\n"
+"   A is a nested vector of strings.\n"
+"   Each string A[i] has the form \"Attribute: Value\"\n"
+"   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)\n"
+"\n"
+"   The attributes understood by ⎕PLOT and their default values are:\n"
+"\n"
+"   1. Global (plot window) Attributes:\n"
+"\n";
+
+   CERR << left;
+
+# define gdef(ty,  na,  val, descr)                                        \
+   CERR << setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
+        << " (" << descr << ")" << endl;
+# include "Quad_PLOT.def"
+
+   CERR <<
+"\n"
+"color_level-P:      (none)         "
+                    "(color gradient at P% (surface plots only))\n"
+"\n"
+"   2. Local (plot line N) Attributes:\n"
+"\n";
+
+# define ldef(ty,  na,  val, descr)             \
+   CERR << setw(20) << #na "-N:  " << setw(14) \
+        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
+# include "Quad_PLOT.def"
+
+   CERR << right;
+}
+//----------------------------------------------------------------------------
+// the ⎕PLOT workhorse
+APL_Integer
+Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
+                        const Plot_data * data)
+{
+   w_props->set_verbosity(verbosity);
+   verbosity > 0 && w_props->print(CERR);
+
+   // check (possibly again) for empty plot ranges which could be caused
+   // by bad plot data but also by bad window properties.
+   //
+   if (w_props->get_min_X() >= w_props->get_max_X())
+      {
+        MORE_ERROR() << "A ⎕PLOT B: empty X range in A.";
+        DOMAIN_ERROR;
+      }
+   if (w_props->get_min_Y() >= w_props->get_max_Y())
+      {
+        MORE_ERROR() << "A ⎕PLOT B: empty Y range in A.";
+        DOMAIN_ERROR;
+      }
+
+   if (w_props->get_min_Z() >= w_props->get_max_Z())
+      {
+        MORE_ERROR() << "A ⎕PLOT B: eZ range in A.";
+        DOMAIN_ERROR;
+      }
+
+const APL_Integer Z = ++next_handle;
+   sem_wait(all_PLOT_windows_sema);
+       start_GUI(w_props, Z, PltDrv_GTK);
+   sem_post(all_PLOT_windows_sema);
+
+   if (w_props->get_with_border())
+      {
+        // the user wants window borders, which requires a delay (of 100 ms,
+        // see WM_timeout() in Event_handler 'Draw' in Plot_gtk.cc). We add
+        // twice that timeout at ⎕PLOT level so that the next ⎕PLOT (if any)
+        // does not interfer with the saving of the current plot window.
+        //
+        usleep(2000 * SAVE_BORDER_DELAY_ms);
+      }
+
+   return Z;
+}
+//----------------------------------------------------------------------------
 Plot_data *
 Quad_PLOT::setup_data(const Value & B)
 {
@@ -468,138 +591,6 @@ const Value * pB = &B;
    if (pB->get_rank() == 3)                   return setup_data_3D(*pB);
    if (!pB->get_cfirst().is_pointer_cell())   return setup_data_2D(*pB);
    return setup_data_2D_2b(*pB);
-}
-//----------------------------------------------------------------------------
-Plot_data *
-Quad_PLOT::setup_data_2D(const Value & B)
-{
-   /** initialize the data for a 2D plot. B is the right argument
-       of ⎕PLOT B or A ⎕PLOT B and contains the plot coordinates of
-       the plot points as simple numeric values. Every B[line;] is one
-       plot line.
-
-       A complex number xJy means 2D plot coordinates (x, y) while a
-       real number x means 2D plot coordinates (N, y) where N is the
-       position of x in B[d;];
-
-       The third dimension Z is set to Y although not used.
-    **/
-
-const ShapeItem cols_B = B.get_cols();
-const ShapeItem rows_B = B.get_rows();
-const ShapeItem len_B = rows_B * cols_B;
-
-   // all items of B shall be simple numbers (integer, real, or complex).
-   loop(b, len_B)
-       {
-         if (!B.get_cravel(b).is_numeric())   return 0;
-       }
-
-   // split B into X=real B, Y=imag Y
-
-if ((size_t)len_B > SIZE_MAX / 3)   WS_FULL;
-double * X = new double[3*len_B];
-double * Y = X + len_B;
-double * Z = Y + len_B;
-
-const APL_Integer qio = Workspace::get_IO();
-   loop(b, len_B)
-       {
-         const Cell & cB = B.get_cravel(b);
-         if (cB.is_complex_cell())   // (x, y)
-            {
-              X[b] = cB.get_real_value();
-              Z[b] = Y[b] = cB.get_imag_value();
-            }
-         else                        // (N, y)
-            {
-              X[b] = qio + b % cols_B;
-              Z[b] = Y[b] = cB.get_real_value();
-            }
-       }
-
-Plot_data * data = new Plot_data(rows_B);
-   loop(r, rows_B)
-       {
-         const double * pX = X + r*cols_B;
-         const double * pY = Y + r*cols_B;
-         const double * pZ = Z + r*cols_B;
-         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r, cols_B);
-         data->add_row(pdr);
-       }
-
-   return data;
-}
-//----------------------------------------------------------------------------
-Plot_data *
-Quad_PLOT::setup_data_2D_2b(const Value & B)
-{
-   /** initialize the data for a 2D plot. B is the right argument
-       of ⎕PLOT B or A ⎕PLOT B and contains the plot lines as nested
-       values. Every ⊃B[line] is one plot line.
-
-       The third dimension Z is set to Y although not used.
-    **/
-
-ShapeItem data_points = 0;
-   if (B.get_rank() > 1)   RANK_ERROR;
-const ShapeItem rows = B.element_count();   // number of plot rows
-   loop(r, rows)
-       {
-         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
-         if (vrow->get_rank() > 1)   RANK_ERROR;
-         const ShapeItem row_len = vrow->element_count();
-         data_points += row_len;
-         loop(rb, row_len)
-             {
-               if (!vrow->get_cravel(rb).is_numeric())   DOMAIN_ERROR;
-             }
-       }
-
-if ((size_t)data_points > SIZE_MAX / 3)   WS_FULL;
-double * X = new double[3*data_points];
-double * Y = X + data_points;
-double * Z = Y + data_points;
-
-ShapeItem idx = 0;
-const APL_Integer qio = Workspace::get_IO();
-
-   loop(r, rows)
-       {
-         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
-         loop(v, vrow->element_count())
-             {
-               const Cell & cB = vrow->get_cravel(v);
-               if (cB.is_complex_cell())
-                  {
-                    X[idx] = cB.get_real_value();
-                    Z[idx] = Y[idx] = cB.get_imag_value();
-                  }
-               else
-                  {
-                    X[idx] = qio + v;
-                    Z[idx] = Y[idx] = cB.get_real_value();
-                  }
-               ++idx;
-             }
-       }
-
-Plot_data * data = new Plot_data(rows);
-   idx = 0;
-   loop(r, rows)
-       {
-         const double * pX = X + idx;
-         const double * pY = Y + idx;
-         const double * pZ = Z + idx;
-         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
-         const ShapeItem row_len = vrow->element_count();
-         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
-                                                            row_len);
-         data->add_row(pdr);
-         idx += row_len;
-       }
-
-   return data;
 }
 //----------------------------------------------------------------------------
 Plot_data *
@@ -754,192 +745,201 @@ const ShapeItem data_points = rows * cols;
    return data;
 }
 //----------------------------------------------------------------------------
-void
-Quad_PLOT::start_GUI(Plot_window_properties * w_props, int handle,
-                     Plot_driver driver_type)
+Plot_data *
+Quad_PLOT::setup_data_2D(const Value & B)
 {
-Plot_driver driver;
-const string driver_attr = w_props->get_gui_driver();
- 
-   if      (driver_attr == "")        driver = default_plot_driver;
-   else if (driver_attr == "GTK")     driver = PltDrv_GTK;
-   else if (driver_attr == "XCB")     driver = PltDrv_XCB;
-   else if (driver_attr == "ASCII")   driver = PltDrv_ASCII;
-   else
-           {
-             MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver '"
-                          << driver_attr.c_str() << "'";
-             DOMAIN_ERROR;
-           }
+   /** initialize the data for a 2D plot. B is the right argument
+       of ⎕PLOT B or A ⎕PLOT B and contains the plot coordinates of
+       the plot points as simple numeric values. Every B[line;] is one
+       plot line.
 
-   if (driver == PltDrv_GTK)
-      {
-#if apl_GTK3 && apl_X11
-        // plot_main_GTK() pushes a new GTK_context into variable
-        // Quad_PLOT::all_PLOT_windows and  posts expose_sema after
-        // its plot window was exposed.
-        //
-        plot_main_GTK(w_props, handle);
-        sem_wait(expose_sema);   // blocks until window shown
-        sem_post(expose_sema);   // for the next window (if any)
-        Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
-        return;
-#else   // not apl_GTK3
+       A complex number xJy means 2D plot coordinates (x, y) while a
+       real number x means 2D plot coordinates (N, y) where N is the
+       position of x in B[d;];
 
-   MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK requested, "
-                   "but GTK was not completely installed.\n"
-                   "Missing: " MISSING_X11 MISSING_GTK;
-   DOMAIN_ERROR;
-#endif   // (not) apl_GTK3 && apl_X11
-      }
+       The third dimension Z is set to Y although not used.
+    **/
 
-   if (driver == PltDrv_XCB)
-      {
-#if apl_XCB
-        // start a thread that pushes a XCB_context and then posts the
-        // expose_sema after its plot window was exposed.
-        //
-        pthread_t th;
-        pthread_create(&th, 0, plot_main_XCB, w_props);
-        sem_wait(expose_sema);   // blocks until window shown
-        sem_post(expose_sema);   // for the next window (if any)
-        Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
-        return;
-#else   // not apl_XCB
-   MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB requested, "
-                   "but XCB was not completely installed.\n"
-                   "Missing: " MISSING_X11 MISSING_XCB;
-   DOMAIN_ERROR;
-#endif   // (not) apl_XCB
-      }
+const ShapeItem cols_B = B.get_cols();
+const ShapeItem rows_B = B.get_rows();
+const ShapeItem len_B = rows_B * cols_B;
 
-   // neither GTK nor XCB. Use ASCII fallback
-   Assert(driver == PltDrv_ASCII);
-   Log(LOG_Quad_PLOT)
-      CERR << "gui_driver: " << driver_attr.c_str() 
-           << " (no driver needed)." << endl;
+   // all items of B shall be simple numbers (integer, real, or complex).
+   loop(b, len_B)
+       {
+         if (!B.get_cravel(b).is_numeric())   return 0;
+       }
+
+   // split B into X=real B, Y=imag Y
+
+if ((size_t)len_B > SIZE_MAX / 3)   WS_FULL;
+double * X = new double[3*len_B];
+double * Y = X + len_B;
+double * Z = Y + len_B;
+
+const APL_Integer qio = Workspace::get_IO();
+   loop(b, len_B)
+       {
+         const Cell & cB = B.get_cravel(b);
+         if (cB.is_complex_cell())   // (x, y)
+            {
+              X[b] = cB.get_real_value();
+              Z[b] = Y[b] = cB.get_imag_value();
+            }
+         else                        // (N, y)
+            {
+              X[b] = qio + b % cols_B;
+              Z[b] = Y[b] = cB.get_real_value();
+            }
+       }
+
+Plot_data * data = new Plot_data(rows_B);
+   loop(r, rows_B)
+       {
+         const double * pX = X + r*cols_B;
+         const double * pY = Y + r*cols_B;
+         const double * pZ = Z + r*cols_B;
+         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r, cols_B);
+         data->add_row(pdr);
+       }
+
+   return data;
 }
 //----------------------------------------------------------------------------
-// the ⎕PLOT workhorse
-APL_Integer
-Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
-                        const Plot_data * data)
+Plot_data *
+Quad_PLOT::setup_data_2D_2b(const Value & B)
 {
-   w_props->set_verbosity(verbosity);
-   verbosity > 0 && w_props->print(CERR);
+   /** initialize the data for a 2D plot. B is the right argument
+       of ⎕PLOT B or A ⎕PLOT B and contains the plot lines as nested
+       values. Every ⊃B[line] is one plot line.
 
-   // check (possibly again) for empty plot ranges which could be caused
-   // by bad plot data but also by bad window properties.
+       The third dimension Z is set to Y although not used.
+    **/
+
+ShapeItem data_points = 0;
+   if (B.get_rank() > 1)   RANK_ERROR;
+const ShapeItem rows = B.element_count();   // number of plot rows
+   loop(r, rows)
+       {
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         if (vrow->get_rank() > 1)   RANK_ERROR;
+         const ShapeItem row_len = vrow->element_count();
+         data_points += row_len;
+         loop(rb, row_len)
+             {
+               if (!vrow->get_cravel(rb).is_numeric())   DOMAIN_ERROR;
+             }
+       }
+
+if ((size_t)data_points > SIZE_MAX / 3)   WS_FULL;
+double * X = new double[3*data_points];
+double * Y = X + data_points;
+double * Z = Y + data_points;
+
+ShapeItem idx = 0;
+const APL_Integer qio = Workspace::get_IO();
+
+   loop(r, rows)
+       {
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         loop(v, vrow->element_count())
+             {
+               const Cell & cB = vrow->get_cravel(v);
+               if (cB.is_complex_cell())
+                  {
+                    X[idx] = cB.get_real_value();
+                    Z[idx] = Y[idx] = cB.get_imag_value();
+                  }
+               else
+                  {
+                    X[idx] = qio + v;
+                    Z[idx] = Y[idx] = cB.get_real_value();
+                  }
+               ++idx;
+             }
+       }
+
+Plot_data * data = new Plot_data(rows);
+   idx = 0;
+   loop(r, rows)
+       {
+         const double * pX = X + idx;
+         const double * pY = Y + idx;
+         const double * pZ = Z + idx;
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         const ShapeItem row_len = vrow->element_count();
+         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
+                                                            row_len);
+         data->add_row(pdr);
+         idx += row_len;
+       }
+
+   return data;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
+{
+   if (A.is_member())   // new-style attributes
+      {
+        loop(row, A.get_rows())
+            {
+              const Cell & att_name = A.get_cravel(2*row);       // A[row; 1]
+              const Cell & att_val  = A.get_cravel(2*row + 1);   // A[row; 2]
+              if (att_name.is_pointer_cell())   // used entry in A
+                 {
+                   const UCS_string ucs = att_name.get_pointer_value()
+                                                 ->get_UCS_ravel();
+                   if (const char * error = w_props->set_attribute(ucs, att_val))
+                      {
+                        MORE_ERROR() << "A ⎕PLOT B: " << error
+                                     << " in attribute A." << ucs;
+                        return E_DOMAIN_ERROR;
+                      }
+                 }
+            }
+        return E_NO_ERROR;
+      }
+
+   // old-style attributes
    //
-   if (w_props->get_min_X() >= w_props->get_max_X())
-      {
-        MORE_ERROR() << "A ⎕PLOT B: empty X range in A.";
-        DOMAIN_ERROR;
-      }
-   if (w_props->get_min_Y() >= w_props->get_max_Y())
-      {
-        MORE_ERROR() << "A ⎕PLOT B: empty Y range in A.";
-        DOMAIN_ERROR;
-      }
+   if (A.get_rank() > 1)   { delete w_props;   RANK_ERROR; }
 
-   if (w_props->get_min_Z() >= w_props->get_max_Z())
-      {
-        MORE_ERROR() << "A ⎕PLOT B: eZ range in A.";
-        DOMAIN_ERROR;
-      }
+const ShapeItem len_A = A.element_count();
+   if (len_A < 1)   return E_LENGTH_ERROR;
 
-const APL_Integer Z = ++next_handle;
-   sem_wait(all_PLOT_windows_sema);
-       start_GUI(w_props, Z, PltDrv_GTK);
-   sem_post(all_PLOT_windows_sema);
+const APL_Integer qio = Workspace::get_IO();
 
-   if (w_props->get_with_border())
-      {
-        // the user wants window borders, which requires a delay (of 100 ms,
-        // see WM_timeout() in Event_handler 'Draw' in Plot_gtk.cc). We add
-        // twice that timeout at ⎕PLOT level so that the next ⎕PLOT (if any)
-        // does not interfer with the saving of the current plot window.
-        //
-        usleep(2000 * SAVE_BORDER_DELAY_ms);
-      }
+   loop(a, len_A)
+       {
+         const Cell & cell_A = A.get_cravel(a);
+         if (!cell_A.is_pointer_cell())
+            {
+               MORE_ERROR() << "A[" << (a + qio)
+                            << "] is not a string in A ⎕PLOT B";
+               return E_DOMAIN_ERROR;
+            }
 
-   return Z;
-}
-//----------------------------------------------------------------------------
-static UCS_string
-fill_14(const std::string & name)
-{
-UTF8_string name_utf(name.c_str());
-UCS_string ret(name_utf);
-   while (ret.size() < 14)   ret << UNI_SPACE;
-   return ret;
-}
+         const Value * attr = cell_A.get_pointer_value().get();
+         if (!attr->is_char_string())
+            {
+               MORE_ERROR() << "A[" << (a + qio)
+                            << "] is not a string in A ⎕PLOT B";
+               return E_DOMAIN_ERROR;
+            }
 
-void
-Quad_PLOT::help()
-{
-   CERR <<
-"\n"
-"   ⎕PLOT Usage:\n"
-"\n"
-"   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values\n"
-"   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions\n"
-"   A ⎕PLOT B   plot B with attribute overrides specified by A\n"
-"           ├────────  0: verbosity OFF\n"
-"           ├──────── ¯1: show X events\n"
-"           ├──────── ¯2: show data\n"
-"           ├──────── ¯3: close all ⎕PLOT windows\n"
-"           ├──────── ¯4: show rendering\n"
-"           ├──────── ¯6: show open ⎕PLOT windows\n"
-"           └───── N > 0: close ⎕PLOT window N\n"
-"\n"
-"   A is a nested vector of strings.\n"
-"   Each string A[i] has the form \"Attribute: Value\"\n"
-"   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)\n"
-"\n"
-"   The attributes understood by ⎕PLOT and their default values are:\n"
-"\n"
-"   1. Global (plot window) Attributes:\n"
-"\n";
+         UCS_string ucs = attr->get_UCS_ravel();
+         ucs.remove_leading_and_trailing_whitespaces();
+         if (ucs.size() == 0)               continue;
+         if (Avec::is_comment(ucs[0]))      continue;
+         UTF8_string utf(ucs);
+         if (const char * error = w_props->set_attribute(utf.c_str()))
+            {
+              MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
+              return E_DOMAIN_ERROR;
+            }
+       }
 
-   CERR << left;
-
-# define gdef(ty,  na,  val, descr)                                        \
-   CERR << setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
-        << " (" << descr << ")" << endl;
-# include "Quad_PLOT.def"
-
-   CERR <<
-"\n"
-"color_level-P:      (none)         "
-                    "(color gradient at P% (surface plots only))\n"
-"\n"
-"   2. Local (plot line N) Attributes:\n"
-"\n";
-
-# define ldef(ty,  na,  val, descr)             \
-   CERR << setw(20) << #na "-N:  " << setw(14) \
-        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
-# include "Quad_PLOT.def"
-
-   CERR << right;
-}
-//----------------------------------------------------------------------------
-Quad_PLOT::Handle
-Quad_PLOT::PLOT_context::remove_handle(Handle handle)
-{
-// CERR << "remove_handle(" << handle << ")" << endl;
-
-   loop(h, all_PLOT_windows.size())
-      {
-        if (all_PLOT_windows[h]->handle == handle)
-           {
-             all_PLOT_windows[h] = all_PLOT_windows.back();
-             all_PLOT_windows.pop_back();
-             return handle;
-           }
-      }
-
-   return 0;
+   return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------

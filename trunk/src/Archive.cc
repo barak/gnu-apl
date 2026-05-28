@@ -97,8 +97,8 @@ using namespace std;
 XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
                                        const char * filename)
   : XML_Archive(of, ef),
-     indent(0),
      char_mode(false),
+     indent(0),
      save_success(false)
 {
    outf.open(filename, ofstream::out);
@@ -113,891 +113,6 @@ XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
    save();
    Log(LOG_archive)   err << "done XML_Saving_Archive." << endl;
    save_success = true;
-}
-//----------------------------------------------------------------------------
-bool
-XML_Saving_Archive::xml_allowed(Unicode uni)
-{
-   if (uni < ' ')    return false;    // control chars and negative
-   if (uni == '<')   return false;   // < not allowed
-   if (uni == '&')   return false;   // < not allowed
-   if (uni == '"')   return false;   // not allowed in "..."
-   if (uni > '~')
-      {
-        // non-ASCII character. This is, in principle, allowed in XML but
-        // may not print properly if the font used does not provide the
-        // character. We therefore allow characters in ⎕AV and their alternate
-        // characters except our own type markers (⁰¹²...)
-        //
-        if (is_iPAD_char(uni))   return false;
-        if (Avec::find_char(uni) != Avec::Invalid_CHT)              return true;
-        if (Avec::map_alternative_char(uni) != Avec::Invalid_CHT)   return true;
-        return false;    // allowed, but may
-      }
-   return true;
-}
-//----------------------------------------------------------------------------
-const char *
-XML_Saving_Archive::decr(int & counter, const char * str)
-{
-   counter -= strlen(str);
-   return str;
-}
-//----------------------------------------------------------------------------
-int
-XML_Saving_Archive::do_indent()
-{
-const int spaces = indent * INDENT_LEN;
-   loop(s, spaces)   outf << " ";
-
-   return 72 - spaces;
-}
-//----------------------------------------------------------------------------
-XML_Saving_Archive::Vid
-XML_Saving_Archive::find_vid(const Value * value)
-{
-const void * item = Heapsort<_val_par>
-                    ::search<const Value *>
-                    (value, val_pars, _val_par::compare, 0);
-   Assert(item);
-   return Vid(reinterpret_cast<const _val_par *>(item) - val_pars.data());
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
-{
-   if (uni == UNI_LF)
-      {
-        leave_char_mode();
-        outf << UNI_PAD_U1 << "A" << "\n";
-        space = do_indent();
-      }
-   else if (!xml_allowed(uni))
-      {
-        space -= leave_char_mode();
-        char cc[40];
-        SPRINTF(cc, "%X", uni);
-        NEED(1 + strlen(cc)) << UNI_PAD_U1 << decr(space, cc);
-        space--;   // PAD_U1
-      }
-   else 
-      {
-        NEED(1) << "";
-        space -= enter_char_mode();
-        outf << uni;
-        space--;   // uni
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_UCS(const UCS_string & ucs)
-{
-int space = do_indent();
-   outf << decr(space, "<UCS uni=\"");
-   Assert(char_mode == false);
-   indent += 5;
-   loop(u, ucs.size())   emit_unicode(ucs[u], space);
-   leave_char_mode();
-   outf << "\"/>" << endl;
-   space -= 2;
-   indent -= 5;
-}
-//----------------------------------------------------------------------------
-XML_Saving_Archive &
-XML_Saving_Archive::save_shape(Vid vid)
-{
-const Value & v = *val_pars[vid]._val;
-const Vid parent_vid = val_pars[vid]._par;
-
-   do_indent();
-   outf << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
-                 "vid=\"" << vid                << "\" "
-                 "parent=\"" << parent_vid      << "\" "
-                 "rk=\"" << v.get_rank()        << "\"";
-
-   loop (r, v.get_rank())
-      {
-        outf << " sh-" << r << "=\"" << v.get_shape_item(r) << "\"";
-      }
-
-   outf << "/>" << endl;
-   return *this;
-}
-//----------------------------------------------------------------------------
-XML_Saving_Archive &
-XML_Saving_Archive::save_Ravel(Vid vid)
-{
-   Log(LOG_archive)   err << "save_Ravel(Vid " << vid << ")" << endl;
-
-const Value & v = *val_pars[vid]._val;
-const APL_types::Depth depth = val_pars[vid]._depth;
-const ShapeItem len = v.nz_element_count();
-const Cell * C = &v.get_cfirst();
-
-int space = do_indent();
-   if (v.is_packed())   // Value has a packed (non-Cell) ravel
-      {
-        const uint8_t * bytes = reinterpret_cast<const uint8_t *>(C);
-        const ShapeItem byte_count = (len + 7)/8;
-
-        // print the start of the XML element
-        {
-          char cc[80];   // output line buffer
-          SPRINTF(cc, "<Ravel vid=\"%d\" bytes=\"", vid);
-          outf << cc;
-        }
-
-        // print the data of the bytes attribute
-        //
-        ++indent;
-        outf << uhex << UNI_PAD_U9;   // emit the following bytes in hex
-        if (space < byte_count)   outf << endl;
-
-        loop(b, byte_count)   // print with max. 64 bytes per line
-            {
-              if (b && (b & 0x3F) == 0)   outf << "\n    " << UNI_PAD_U9;
-              outf << (bytes[b] & 0xFF);
-            }
-        outf << nohex << "\"/>" << endl;
-        --indent;
-      }
-   else   // normal ravel
-      {
-        // print the start of the XML element
-        {
-          char cc[80];   // output line buffer
-          SPRINTF(cc, "<Ravel vid=\"%d\" depth=\"%d\" cells=\"", vid, depth);
-          outf << decr(space, cc);
-        }
-
-        // print the data of the 'cells' attribute
-        ++indent;
-        loop(l, len)   emit_cell(*C++, space);
-
-        space -= leave_char_mode();
-        space -= 2;
-
-        outf << "\"/>" << endl;
-        --indent;
-      }
-
-   return *this;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::emit_cell(const Cell & cell, int & space)
-{
-char cc[80];
-   switch(cell.get_cell_type())
-      {
-        case CT_CHAR:   // uses UNI_PAD_U0, UNI_PAD_U1, and UNI_PAD_U2
-             emit_unicode(cell.get_char_value(), space);
-             break;
-
-        case CT_INT:   // uses UNI_PAD_U3
-             space -= leave_char_mode();
-             SPRINTF(cc, "%lld", long_long(cell.get_int_value()));
-             NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
-             break;
-
-        case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
-             space -= leave_char_mode();
-#ifdef cfg_RATIONAL_NUMBERS_WANTED
-             {
-               const FloatCell & flt =
-                                 reinterpret_cast<const FloatCell &>(cell);
-               if (const APL_Integer denom = flt.get_denominator())
-                  {
-                    // a non-zero denominator indicates a rational quotient)
-                    //
-                    const APL_Integer numer = flt.get_numerator();
-                    SPRINTF(cc, "%lld÷%lld", long_long(numer),
-                                             long_long(denom));
-                    NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
-                    break;
-                  }
-             }
-#endif
-             SPRINTF(cc, "%.16g", double(cell.get_real_value()));
-             NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
-             break;
-
-        case CT_COMPLEX:   // uses UNI_PAD_U5
-             space -= leave_char_mode();
-             SPRINTF(cc, "%.16gJ%.16g", double(cell.get_real_value()),
-                                        double(cell.get_imag_value()));
-             NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
-             break;
-
-        case CT_POINTER:   // uses UNI_PAD_U6
-             space -= leave_char_mode();
-             {
-               const Vid vid = find_vid(cell.get_pointer_value().get());
-               SPRINTF(cc, "%d", vid);
-               NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
-             }
-             break;
-
-        case CT_CELLREF:   // uses UNI_PAD_U7
-             {
-             space -= leave_char_mode();
-             const LvalCell & lv = reinterpret_cast<const LvalCell &>(cell);
-             if (lv.get_lval_value())   // lv has a valid target
-                {
-                  const Value * owner = lv.get_cell_owner();
-                  const long long offset = owner->get_offset(&lv);
-                  const Vid vid = find_vid(owner);
-                  SPRINTF(cc, "%d[%lld]", vid, offset);
-                  NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
-                }
-             else     // 0-cell-pointer (from selective assignment)
-                {
-                  SPRINTF(cc, "0");
-                  NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
-                }
-             }
-             break;
-
-        default: Assert(0);
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_functions()
-{
-   // save build-in functions
-   //
-   do_indent();
-   outf << "<!-- system functions and primitives... -->" << endl;
-#define sf_def(x, _str, _txt)   save_Function(x::fun);
-#define pf_def(x, _str, _txt)   save_Function(x::fun);
-#include "SystemVariable.def"
-
-   outf << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_Function(const Function & fun)
-{
-   do_indent();
-   outf << "<Function fid=\"" << HEX(&fun) << "\"";
-
-   if (is_saved(&fun))
-      {
-         outf << " ref=\"true\"/>"    << endl;
-      }
-   else if (fun.is_macro())
-      {
-        const UserFunction * ufun = fun.get_func_ufun();
-        Assert(ufun);
-
-        outf << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
-      }
-   else if (fun.is_derived())
-      {
-        err << endl <<
-"WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
-"         such a state is currently not supported and WILL cause problems\n"
-"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
-"         )SAVE this workspace again.\n"
-"\n"
-"         As a precaution for loosing data or function definitions, please\n"
-"         also )DUMP this workspace (before )SIC or →).\n"
-             << endl;
-
-        const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
-        outf << " LO-fid=\"" << HEX(dfn.get_LO())     << "\""
-               " OPER-fid=\"" << HEX(dfn.get_OPER()) << "\"";
-
-        const Function * ro = dfn.get_RO();
-        const Value * axis = dfn.get_AXIS();
-        if (ro || axis)
-           {
-             outf << endl;
-             do_indent();
-             outf << "        ";
-           }
-        if (ro)     outf << " RO-fid=\""   << HEX(ro) << "\"";
-        if (axis)   outf << " AXIS-vid=\"" << HEX(find_vid(axis)) << "\"";
-
-        outf << "/>" << endl;
-      }
-   else if (fun.is_defined())   // defined APL function
-      {
-        const int * eprops = fun.get_exec_properties();
-        const APL_time_us creation_time = fun.get_creation_time();
-
-        outf << " creation-time=\"" << creation_time << "\"" << endl
-            << "                exec-properties=\""
-            << eprops[0] << "," << eprops[1] << ","
-            << eprops[2] << "," << eprops[3] << "\"";
-
-        if (fun.is_native())   outf << " native=\"1\"";
-        outf << ">" << endl;
-        ++indent;
-
-        save_UCS(fun.canonical(false));
-
-        --indent;
-        do_indent();
-        outf << "</Function>" << endl;
-        saved_Functions.push_back(&fun);
-      }
-   else // primitive APL function
-      {
-        outf << " tag=\"" << fun.get_tag()  << "\""
-               "/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
-            << " -->" << endl;
-      }
-}
-//----------------------------------------------------------------------------
-bool
-XML_Saving_Archive::is_saved(const Function * fun) const
-{
-   loop(f, saved_Functions.size())
-       if (fun == saved_Functions[f])   return true;
-
-   return false;
-}
-//----------------------------------------------------------------------------
-int
-XML_Saving_Archive::save_Function_name(const Function & fun)
-{
-   if (fun.is_derived())
-      {
-        err << endl <<
-"WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
-"         such a state is currently not supported and WILL cause problems\n"
-"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
-"         )SAVE this workspace again.\n"
-"\n"
-"         As an alternative (and to be on the safe side), you should also\n"
-"         consider to )DUMP this workspace.\n"
-             << endl;
-      }
-
-const UserFunction * ufun = fun.get_func_ufun();
-   if (ufun)   // user defined function
-      {
-        const UCS_string & fname = ufun->get_name();
-        Symbol * sym = Workspace::lookup_symbol(fname);
-        Assert(sym);
-        const int sym_depth = sym->get_exec_ufun_depth(ufun);
-        outf << " ufun-name=\""  << fname     << "\""
-            << " symbol-level=\"" << sym_depth << "\"";
-        return 2;   // two attributes
-      }
-   else        // primitive or quad function
-      {
-        outf << " fun-id=\"" << HEX(fun.get_Id()) << "\"";
-        return 1;   // one attribute
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_Parser(const StateIndicator & si)
-{
-const Prefix & prefix = si.current_stack;
-
-   do_indent();
-    outf << "<Parser size=\""      << prefix.ssize()
-        << "\" assign-pending=\"" << prefix.get_assign_state()
-        << "\" action=\""         << prefix.action
-        << "\" lookahead-high=\"" << prefix.get_lookahead_PC()
-        << "\">" << endl;
-
-   ++indent;
-
-   // write the derived functions cache...
-   //
-   save_Derived(si.fun_oper_cache);
-
-   // write the lookahead token, starting at the fifo's get position
-   //
-   loop(s, prefix.ssize())
-      {
-        const Token_loc & tloc = prefix.at(prefix.ssize() - s - 1);
-        save_token_loc(tloc);
-      }
-
-   // write the remaining token
-   //
-   save_token_loc(prefix.saved_MISC);
-
-   --indent;
-
-   do_indent();
-   outf << "</Parser>" << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
-{
-   loop(f, fns.size())
-      {
-        const DerivedFunction & derived = fns[f];
-        save_Function(derived);
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
-{
-   Log(LOG_archive)   err << "save_symtab()" << endl;
-
-std::vector<const Symbol *> symbols = symtab.get_all_symbols();
-
-   // remove erased symbols
-   //
-   for (size_t s = 0; s < symbols.size();)
-      {
-        const Symbol * sym = symbols[s];
-        if (sym->is_erased())
-            {
-              symbols[s] = symbols.back();
-              symbols.pop_back();
-              continue;
-            }
-
-        ++s;
-      }
-
-   outf << endl;
-   do_indent();
-   outf << "<!-- Symbol Table -->" << endl;
-   do_indent();
-   outf << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
-
-   ++indent;
-
-   while (symbols.size() > 0)
-      {
-        // set idx to the alphabetically smallest name
-        //
-        int idx = 0;
-        for (size_t i = 1; i < symbols.size(); ++i)
-            {
-              if (symbols[idx]->compare(*symbols[i]) > 0)   idx = i;
-            }
-
-        const Symbol * sym = symbols[idx];
-        save_Symbol(*sym);
-
-        symbols[idx] = symbols.back();
-        symbols.pop_back();
-      }
-
-   --indent;
-
-   do_indent();
-   outf << "</SymbolTable>" << endl << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_SI_entry(const StateIndicator & si)
-{
-   Log(LOG_archive)   err << "save_SI_entry()" << endl;
-
-const Executable & exec = *si.get_executable();
-
-   do_indent();
-   outf << "<SI-entry level=\"" << si.get_level()
-       << "\" pc=\"" << si.get_PC()
-       << "\" line=\"" << exec.get_line(si.get_PC()) << "\""
-       <<">" << endl << flush;
-
-   ++indent;
-   do_indent();
-   switch(exec.get_parse_mode())
-      {
-        case PM_FUNCTION:
-             {
-               Symbol * sym = Workspace::lookup_symbol(exec.get_name());
-               Assert(sym);
-               const UserFunction * ufun = exec.get_exec_ufun();
-               Assert(ufun);
-               const int sym_depth = sym->get_exec_ufun_depth(ufun);
-
-               if (ufun->is_macro())
-                  outf << "<UserFunction macro-num=\"" << ufun->get_macnum()
-                      << "\"/>" << endl;
-               else if (ufun->is_lambda())
-                  {
-                    outf << "<UserFunction lambda-name=\"" << ufun->get_name()
-                        << "\">" << endl;
-                    ++indent;
-                    save_UCS(ufun->canonical(false));
-                    --indent;
-                    do_indent();
-                    outf << "</UserFunction>" << endl;
-                  }
-               else
-                  outf << "<UserFunction ufun-name=\"" << sym->get_name()
-                      << "\" symbol-level=\"" << sym_depth << "\"/>" << endl;
-             }
-             break;
-
-        case PM_STATEMENT_LIST:
-             outf << "<Statements>" << endl;
-             ++indent;
-             save_UCS(exec.get_text(0));
-             --indent;
-             do_indent();
-             outf << "</Statements>" << endl;
-               break;
-
-        case PM_EXECUTE:
-             outf << "<Execute>" << endl;
-             ++indent;
-             save_UCS(exec.get_text(0));
-             --indent;
-             do_indent();
-             outf << "</Execute>" << endl;
-             break;
-
-          default: FIXME;
-      }
-
-   // print the parser states...
-   //
-   save_Parser(si);
-
-   --indent;
-
-   do_indent();
-   outf << "</SI-entry>" << endl << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_Symbol(const Symbol & sym)
-{
-   Log(LOG_archive)   err << "save_Symbol(Vid "
-                           << sym.get_name() << ")" << endl;
-
-   do_indent();
-   outf << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
-       << sym.value_stack_size() << "\">" << endl;
-
-   ++indent;
-   loop(v, sym.value_stack_size())  save_vstack_item(sym[v]);
-   --indent;
-
-   do_indent();
-   outf << "</Symbol>" << endl << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_user_commands(
-               const std::vector<Command::user_command> & cmds)
-{
-   Log(LOG_archive)   err << "save_user_commands()" << endl;
-   if (cmds.size() == 0)   return;
-
-   do_indent();
-   outf << "<Commands size=\"" << cmds.size() << "\">" << endl;
-
-   ++indent;
-   loop(u, cmds.size())
-      {
-        const Command::user_command & ucmd = cmds[u];
-        do_indent();
-        outf << "<Command name=\"" << ucmd.prefix
-            << "\" mode=\"" << ucmd.mode
-            << "\" fun=\"" <<  ucmd.apl_function << "\"/>" << endl;
-      }
-
-   --indent;
-   do_indent();
-   outf << "</Commands>" << endl << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
-{
-   do_indent();
-   outf << "<Token pc=\"" << tloc.get_PC()
-       << "\" tag=\"" << HEX(tloc.get_token().get_tag()) << "\"";
-   emit_token_val(tloc.get_token());
-
-   outf << "/>" << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::emit_token_val(const Token & tok)
-{
-   switch(tok.get_ValueType())
-      {
-        case TV_NONE:  break;
-
-        case TV_CHAR:  Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
-                       outf << " char=\"" << int(tok.get_char_val()) << "\"";
-                       break;
-
-        case TV_INT:   Log(LOG_archive)   err << "Saving TV_INT Token" << endl;
-                       outf << " int=\"" << tok.get_int_val() << "\"";
-                       break;
-
-        case TV_FLT:   Log(LOG_archive)   err << "Saving TV_FLT Token" << endl;
-                       outf << " float=\"" << tok.get_flt_val() << "\"";
-                       break;
-
-        case TV_CPX:   Log(LOG_archive)   err << "Saving TV_CPX Token" << endl;
-                       outf << " real=\"" << tok.get_cpx_real()
-                           << "\" imag=\"" << tok.get_cpx_imag() << "\"";
-                       break;
-
-        case TV_SYM:   Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
-                       {
-                         Symbol * sym = tok.get_sym_ptr();
-                         const UCS_string name = sym->get_name();
-                         outf << " sym=\"" << name << "\"";
-                       }
-                       break;
-
-        case TV_LIN:   Log(LOG_archive)   err << "Saving TV_LIN Token" << endl;
-                       outf << " line=\"" << tok.get_fun_line() << "\"";
-                       break;
-
-        case TV_VAL:   {
-                         Log(LOG_archive)
-                            err << "Saving TV_VAL Token" << endl;
-
-                         const Vid vid = find_vid(tok.get_apl_val().get());
-                         outf << " vid=\"" << vid << "\"";
-                       }
-                       break;
-
-        case TV_INDEX: {
-                         Log(LOG_archive)
-                            err << "Saving TV_INDEX Token" << endl;
-                         const IndexExpr & idx = tok.get_index_val();
-                         const int rank = idx.get_rank();
-                         outf << " index=\"";
-                         loop(i, rank)
-                             {
-                               if (i)   outf << ",";
-                               const Value * val = idx.values[i].get();
-                               if (val)   outf << "vid_" << find_vid(val);
-                               else       outf << "-";
-                                outf << "\"";
-                             }
-                       }
-                       break;
-
-        case TV_FUN:   {
-                         Log(LOG_archive)
-                            err << "Saving TV_FUN Token" << endl;
-
-                         cFunction_P fun = tok.get_function();
-                         Assert1(fun);
-                         save_Function_name(*fun);
-                       }
-                       break;
-
-        default:       FIXME;
-
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
-{
-   Log(LOG_archive)   err << "    save_vstack_item(name_class "
-                           << vsi.get_NC() << ")" << endl;
-   switch(vsi.get_NC())
-      {
-        case NC_UNUSED_USER_NAME:
-             do_indent();
-             outf << "<unused-name/>" << endl;
-             break;
-
-        case NC_LABEL:
-             do_indent();
-             outf << "<Label value=\"" << vsi.get_label() << "\"/>" << endl;
-             break;
-
-        case NC_VARIABLE:
-             do_indent();
-             outf << "<Variable vid=\"" << find_vid(vsi.get_val_cptr())
-                 << "\"/>" << endl;
-             break;
-
-        case NC_FUNCTION:
-        case NC_OPERATOR:
-             save_Function(*vsi.get_function());
-             break;
-
-        case NC_SYSTEM_VAR:
-             do_indent();
-             outf << "<Shared-Variable key=\"" << vsi.get_key()
-                 << "\"/>" << endl;
-             break;
-
-        default: Assert(0);
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Saving_Archive::write_XML_header()
-{
-tm * t;
-   {
-     timeval now;   gettimeofday(&now, 0);
-     time_t seconds = now.tv_sec;
-     t = gmtime(&seconds);
-   }
-
-const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
-
-   // check with: xmllint --valid workspace.xml >/dev/null
-   //
-   outf <<
-"<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n"
-"\n"
-"<!DOCTYPE Workspace\n"
-"[\n"
-"    <!ELEMENT Workspace (Function*, Value*, Ravel*, SymbolTable,\n"
-"                         Symbol*, Commands?, StateIndicator)>\n"
-"    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  year       CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  month      CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  day        CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  hour       CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  minute     CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  second     CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  timezone   CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  saving_SVN CDATA #REQUIRED>\n"
-"    <!ATTLIST Workspace  syntax     CDATA #IMPLIED>\n"
-"\n"
-"        <!ELEMENT Value (#PCDATA)>\n"
-"        <!ATTLIST Value flg    CDATA #REQUIRED>\n"
-"        <!ATTLIST Value vid    CDATA #REQUIRED>\n"
-"        <!ATTLIST Value parent CDATA #IMPLIED>\n"
-"        <!ATTLIST Value rk     CDATA #REQUIRED>\n"
-"        <!ATTLIST Value sh-0   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-1   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-2   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-3   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-4   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-5   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-6   CDATA #IMPLIED>\n"
-"        <!ATTLIST Value sh-7   CDATA #IMPLIED>\n"
-"\n"
-"        <!ELEMENT Ravel (#PCDATA)>\n"
-"        <!ATTLIST Ravel vid    CDATA #REQUIRED>\n"
-"        <!ATTLIST Ravel bytes  CDATA #IMPLIED>\n"
-"        <!ATTLIST Ravel cells  CDATA #IMPLIED>\n"
-"        <!ATTLIST Ravel depth  CDATA #IMPLIED>\n"
-"\n"
-"        <!ELEMENT SymbolTable (Symbol*)>\n"
-"        <!ATTLIST SymbolTable size CDATA #REQUIRED>\n"
-"\n"
-"            <!ELEMENT Symbol (unused-name | Variable | Function|\n"
-"                              Label       | Shared-Variable)*>\n"
-"            <!ATTLIST Symbol name       CDATA #REQUIRED>\n"
-"            <!ATTLIST Symbol stack-size CDATA #REQUIRED>\n"
-"\n"
-"                <!ELEMENT unused-name EMPTY>\n"
-"\n"
-"                <!ELEMENT Variable (#PCDATA)>\n"
-"                <!ATTLIST Variable vid CDATA #REQUIRED>\n"
-"\n"
-"                <!ELEMENT Function (UCS*)>\n"
-"                <!ATTLIST Function fid             CDATA #REQUIRED>\n"
-"                <!ATTLIST Function creation-time   CDATA #IMPLIED>\n"
-"                <!ATTLIST Function LO-fid          CDATA #IMPLIED>\n"
-"                <!ATTLIST Function OPER-fid        CDATA #IMPLIED>\n"
-"                <!ATTLIST Function RO-fid          CDATA #IMPLIED>\n"
-"                <!ATTLIST Function AXIS-vid        CDATA #IMPLIED>\n"
-"                <!ATTLIST Function exec-properties CDATA #IMPLIED>\n"
-"                <!ATTLIST Function macro           CDATA #IMPLIED>\n"
-"                <!ATTLIST Function tag             CDATA #IMPLIED>\n"
-"\n"
-"                <!ELEMENT Label (#PCDATA)>\n"
-"                <!ATTLIST Label value CDATA #REQUIRED>\n"
-"\n"
-"                <!ELEMENT Shared-Variable (#PCDATA)>\n"
-"                <!ATTLIST Shared-Variable key CDATA #REQUIRED>\n"
-"\n"
-"        <!ELEMENT UCS (#PCDATA)>\n"
-"        <!ATTLIST UCS uni CDATA #REQUIRED>\n"
-"\n"
-"        <!ELEMENT Commands (Command*)>\n"
-"        <!ATTLIST Commands size CDATA #REQUIRED>\n"
-"\n"
-"            <!ELEMENT Command (#PCDATA)>\n"
-"            <!ATTLIST Command name       CDATA #REQUIRED>\n"
-"            <!ATTLIST Command mode       CDATA #REQUIRED>\n"
-"            <!ATTLIST Command fun        CDATA #REQUIRED>\n"
-"\n"
-"        <!ELEMENT StateIndicator (SI-entry*)>\n"
-"        <!ATTLIST StateIndicator levels CDATA #REQUIRED>\n"
-"\n"
-"            <!ELEMENT SI-entry ((Execute | Statements | UserFunction),\n"
-"                                Parser+)>\n"
-"            <!ATTLIST SI-entry level     CDATA #REQUIRED>\n"
-"            <!ATTLIST SI-entry pc        CDATA #REQUIRED>\n"
-"            <!ATTLIST SI-entry line      CDATA #REQUIRED>\n"
-"\n"
-"                <!ELEMENT Statements (UCS)>\n"
-"\n"
-"                <!ELEMENT Execute (UCS)>\n"
-"\n"
-"                <!ELEMENT UserFunction (#PCDATA)>\n"
-"                <!ATTLIST UserFunction ufun-name       CDATA #IMPLIED>\n"
-"                <!ATTLIST UserFunction macro-num       CDATA #IMPLIED>\n"
-"                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>\n"
-"                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>\n"
-"\n"
-"                <!ELEMENT Parser (Token*, Function*)>\n"
-"                <!ATTLIST Parser size           CDATA #REQUIRED>\n"
-"                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
-"                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
-"                <!ATTLIST Parser action         CDATA #REQUIRED>\n"
-
-"                    <!ELEMENT Token (#PCDATA)>\n"
-"                    <!ATTLIST Token pc           CDATA #REQUIRED>\n"
-"                    <!ATTLIST Token tag          CDATA #REQUIRED>\n"
-"                    <!ATTLIST Token char         CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token int          CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token float        CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token real         CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token imag         CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token sym          CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token line         CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token vid          CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token index        CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token fun-id       CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token ufun-name    CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token symbol-level CDATA #IMPLIED>\n"
-"                    <!ATTLIST Token comment      CDATA #IMPLIED>\n"
-"\n"
-"]>\n"
-"\n"
-"    <!-- hour/minute/second is )SAVE time in UTC (aka. GMT).\n"
-"         timezone is +/- offset to UTC in seconds.\n"
-"         local time is UTC + offset -->\n"
-"\n"
-"<Workspace wsid=\"";
-
-   /// libref if provided
-   {
-     const LibRef lib = Workspace::get_WSID().get_libref();
-     if (lib != LIB_NONE)   outf << lib << " ";
-   }
-   outf <<
-        Workspace::get_WSID().get_name()
-     << "\" year=\""       << (t->tm_year + 1900)
-     << "\" month=\""      << (t->tm_mon  + 1)
-     << "\" day=\""        <<  t->tm_mday << "\"" << endl <<
-"           hour=\""       <<  t->tm_hour
-     << "\" minute=\""     <<  t->tm_min
-     << "\" second=\""     <<  t->tm_sec
-     << "\" timezone=\""   << offset << "\"" << endl <<
-"           saving_SVN=\"" << ARCHIVE_SVN
-     << "\" syntax=\"" << ASX_MAJOR << "."
-                       << ASX_MINOR << "."
-                       << ASX_OTHER << "\">\n" << endl;
 }
 //----------------------------------------------------------------------------
 XML_Saving_Archive &
@@ -1231,23 +346,908 @@ ShapeItem done_count = 0;
 
    return *this;
 }
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
+{
+   loop(f, fns.size())
+      {
+        const DerivedFunction & derived = fns[f];
+        save_Function(derived);
+      }
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_Function(const Function & fun)
+{
+   do_indent();
+   outf << "<Function fid=\"" << HEX(&fun) << "\"";
+
+   if (is_saved(&fun))
+      {
+         outf << " ref=\"true\"/>"    << endl;
+      }
+   else if (fun.is_macro())
+      {
+        const UserFunction * ufun = fun.get_func_ufun();
+        Assert(ufun);
+
+        outf << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
+      }
+   else if (fun.is_derived())
+      {
+        err << endl <<
+"WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
+"         such a state is currently not supported and WILL cause problems\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+"         )SAVE this workspace again.\n"
+"\n"
+"         As a precaution for loosing data or function definitions, please\n"
+"         also )DUMP this workspace (before )SIC or →).\n"
+             << endl;
+
+        const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
+        outf << " LO-fid=\"" << HEX(dfn.get_LO())     << "\""
+               " OPER-fid=\"" << HEX(dfn.get_OPER()) << "\"";
+
+        const Function * ro = dfn.get_RO();
+        const Value * axis = dfn.get_AXIS();
+        if (ro || axis)
+           {
+             outf << endl;
+             do_indent();
+             outf << "        ";
+           }
+        if (ro)     outf << " RO-fid=\""   << HEX(ro) << "\"";
+        if (axis)   outf << " AXIS-vid=\"" << HEX(find_vid(axis)) << "\"";
+
+        outf << "/>" << endl;
+      }
+   else if (fun.is_defined())   // defined APL function
+      {
+        const int * eprops = fun.get_exec_properties();
+        const APL_time_us creation_time = fun.get_creation_time();
+
+        outf << " creation-time=\"" << creation_time << "\"" << endl
+            << "                exec-properties=\""
+            << eprops[0] << "," << eprops[1] << ","
+            << eprops[2] << "," << eprops[3] << "\"";
+
+        if (fun.is_native())   outf << " native=\"1\"";
+        outf << ">" << endl;
+        ++indent;
+
+        save_UCS(fun.canonical(false));
+
+        --indent;
+        do_indent();
+        outf << "</Function>" << endl;
+        saved_Functions.push_back(&fun);
+      }
+   else // primitive APL function
+      {
+        outf << " tag=\"" << fun.get_tag()  << "\""
+               "/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
+            << " -->" << endl;
+      }
+}
+//----------------------------------------------------------------------------
+int
+XML_Saving_Archive::save_Function_name(const Function & fun)
+{
+   if (fun.is_derived())
+      {
+        err << endl <<
+"WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
+"         such a state is currently not supported and WILL cause problems\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+"         )SAVE this workspace again.\n"
+"\n"
+"         As an alternative (and to be on the safe side), you should also\n"
+"         consider to )DUMP this workspace.\n"
+             << endl;
+      }
+
+const UserFunction * ufun = fun.get_func_ufun();
+   if (ufun)   // user defined function
+      {
+        const UCS_string & fname = ufun->get_name();
+        Symbol * sym = Workspace::lookup_symbol(fname);
+        Assert(sym);
+        const int sym_depth = sym->get_exec_ufun_depth(ufun);
+        outf << " ufun-name=\""  << fname     << "\""
+            << " symbol-level=\"" << sym_depth << "\"";
+        return 2;   // two attributes
+      }
+   else        // primitive or quad function
+      {
+        outf << " fun-id=\"" << HEX(fun.get_Id()) << "\"";
+        return 1;   // one attribute
+      }
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_functions()
+{
+   // save build-in functions
+   //
+   do_indent();
+   outf << "<!-- system functions and primitives... -->" << endl;
+#define sf_def(x, _str, _txt)   save_Function(x::fun);
+#define pf_def(x, _str, _txt)   save_Function(x::fun);
+#include "SystemVariable.def"
+
+   outf << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_Parser(const StateIndicator & si)
+{
+const Prefix & prefix = si.current_stack;
+
+   do_indent();
+    outf << "<Parser size=\""      << prefix.ssize()
+        << "\" assign-pending=\"" << prefix.get_assign_state()
+        << "\" action=\""         << prefix.action
+        << "\" lookahead-high=\"" << prefix.get_lookahead_PC()
+        << "\">" << endl;
+
+   ++indent;
+
+   // write the derived functions cache...
+   //
+   save_Derived(si.fun_oper_cache);
+
+   // write the lookahead token, starting at the fifo's get position
+   //
+   loop(s, prefix.ssize())
+      {
+        const Token_loc & tloc = prefix.at(prefix.ssize() - s - 1);
+        save_token_loc(tloc);
+      }
+
+   // write the remaining token
+   //
+   save_token_loc(prefix.saved_MISC);
+
+   --indent;
+
+   do_indent();
+   outf << "</Parser>" << endl;
+}
+//----------------------------------------------------------------------------
+XML_Saving_Archive &
+XML_Saving_Archive::save_Ravel(Vid vid)
+{
+   Log(LOG_archive)   err << "save_Ravel(Vid " << vid << ")" << endl;
+
+const Value & v = *val_pars[vid]._val;
+const APL_types::Depth depth = val_pars[vid]._depth;
+const ShapeItem len = v.nz_element_count();
+const Cell * C = &v.get_cfirst();
+
+int space = do_indent();
+   if (v.is_packed())   // Value has a packed (non-Cell) ravel
+      {
+        const uint8_t * bytes = reinterpret_cast<const uint8_t *>(C);
+        const ShapeItem byte_count = (len + 7)/8;
+
+        // print the start of the XML element
+        {
+          char cc[80];   // output line buffer
+          SPRINTF(cc, "<Ravel vid=\"%d\" bytes=\"", vid);
+          outf << cc;
+        }
+
+        // print the data of the bytes attribute
+        //
+        ++indent;
+        outf << uhex << UNI_PAD_U9;   // emit the following bytes in hex
+        if (space < byte_count)   outf << endl;
+
+        loop(b, byte_count)   // print with max. 64 bytes per line
+            {
+              if (b && (b & 0x3F) == 0)   outf << "\n    " << UNI_PAD_U9;
+              outf << (bytes[b] & 0xFF);
+            }
+        outf << nohex << "\"/>" << endl;
+        --indent;
+      }
+   else   // normal ravel
+      {
+        // print the start of the XML element
+        {
+          char cc[80];   // output line buffer
+          SPRINTF(cc, "<Ravel vid=\"%d\" depth=\"%d\" cells=\"", vid, depth);
+          outf << decr(space, cc);
+        }
+
+        // print the data of the 'cells' attribute
+        ++indent;
+        loop(l, len)   emit_cell(*C++, space);
+
+        space -= leave_char_mode();
+        space -= 2;
+
+        outf << "\"/>" << endl;
+        --indent;
+      }
+
+   return *this;
+}
+//----------------------------------------------------------------------------
+XML_Saving_Archive &
+XML_Saving_Archive::save_shape(Vid vid)
+{
+const Value & v = *val_pars[vid]._val;
+const Vid parent_vid = val_pars[vid]._par;
+
+   do_indent();
+   outf << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
+                 "vid=\"" << vid                << "\" "
+                 "parent=\"" << parent_vid      << "\" "
+                 "rk=\"" << v.get_rank()        << "\"";
+
+   loop (r, v.get_rank())
+      {
+        outf << " sh-" << r << "=\"" << v.get_shape_item(r) << "\"";
+      }
+
+   outf << "/>" << endl;
+   return *this;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_SI_entry(const StateIndicator & si)
+{
+   Log(LOG_archive)   err << "save_SI_entry()" << endl;
+
+const Executable & exec = *si.get_executable();
+
+   do_indent();
+   outf << "<SI-entry level=\"" << si.get_level()
+       << "\" pc=\"" << si.get_PC()
+       << "\" line=\"" << exec.get_line(si.get_PC()) << "\""
+       <<">" << endl << flush;
+
+   ++indent;
+   do_indent();
+   switch(exec.get_parse_mode())
+      {
+        case PM_FUNCTION:
+             {
+               Symbol * sym = Workspace::lookup_symbol(exec.get_name());
+               Assert(sym);
+               const UserFunction * ufun = exec.get_exec_ufun();
+               Assert(ufun);
+               const int sym_depth = sym->get_exec_ufun_depth(ufun);
+
+               if (ufun->is_macro())
+                  outf << "<UserFunction macro-num=\"" << ufun->get_macnum()
+                      << "\"/>" << endl;
+               else if (ufun->is_lambda())
+                  {
+                    outf << "<UserFunction lambda-name=\"" << ufun->get_name()
+                        << "\">" << endl;
+                    ++indent;
+                    save_UCS(ufun->canonical(false));
+                    --indent;
+                    do_indent();
+                    outf << "</UserFunction>" << endl;
+                  }
+               else
+                  outf << "<UserFunction ufun-name=\"" << sym->get_name()
+                      << "\" symbol-level=\"" << sym_depth << "\"/>" << endl;
+             }
+             break;
+
+        case PM_STATEMENT_LIST:
+             outf << "<Statements>" << endl;
+             ++indent;
+             save_UCS(exec.get_text(0));
+             --indent;
+             do_indent();
+             outf << "</Statements>" << endl;
+               break;
+
+        case PM_EXECUTE:
+             outf << "<Execute>" << endl;
+             ++indent;
+             save_UCS(exec.get_text(0));
+             --indent;
+             do_indent();
+             outf << "</Execute>" << endl;
+             break;
+
+          default: FIXME;
+      }
+
+   // print the parser states...
+   //
+   save_Parser(si);
+
+   --indent;
+
+   do_indent();
+   outf << "</SI-entry>" << endl << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_Symbol(const Symbol & sym)
+{
+   Log(LOG_archive)   err << "save_Symbol(Vid "
+                           << sym.get_name() << ")" << endl;
+
+   do_indent();
+   outf << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
+       << sym.value_stack_size() << "\">" << endl;
+
+   ++indent;
+   loop(v, sym.value_stack_size())  save_vstack_item(sym[v]);
+   --indent;
+
+   do_indent();
+   outf << "</Symbol>" << endl << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
+{
+   Log(LOG_archive)   err << "save_symtab()" << endl;
+
+std::vector<const Symbol *> symbols = symtab.get_all_symbols();
+
+   // remove erased symbols
+   //
+   for (size_t s = 0; s < symbols.size();)
+      {
+        const Symbol * sym = symbols[s];
+        if (sym->is_erased())
+            {
+              symbols[s] = symbols.back();
+              symbols.pop_back();
+              continue;
+            }
+
+        ++s;
+      }
+
+   outf << endl;
+   do_indent();
+   outf << "<!-- Symbol Table -->" << endl;
+   do_indent();
+   outf << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
+
+   ++indent;
+
+   while (symbols.size() > 0)
+      {
+        // set idx to the alphabetically smallest name
+        //
+        int idx = 0;
+        for (size_t i = 1; i < symbols.size(); ++i)
+            {
+              if (symbols[idx]->compare(*symbols[i]) > 0)   idx = i;
+            }
+
+        const Symbol * sym = symbols[idx];
+        save_Symbol(*sym);
+
+        symbols[idx] = symbols.back();
+        symbols.pop_back();
+      }
+
+   --indent;
+
+   do_indent();
+   outf << "</SymbolTable>" << endl << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
+{
+   do_indent();
+   outf << "<Token pc=\"" << tloc.get_PC()
+       << "\" tag=\"" << HEX(tloc.get_token().get_tag()) << "\"";
+   emit_token_val(tloc.get_token());
+
+   outf << "/>" << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_UCS(const UCS_string & ucs)
+{
+int space = do_indent();
+   outf << decr(space, "<UCS uni=\"");
+   Assert(char_mode == false);
+   indent += 5;
+   loop(u, ucs.size())   emit_unicode(ucs[u], space);
+   leave_char_mode();
+   outf << "\"/>" << endl;
+   space -= 2;
+   indent -= 5;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_user_commands(
+               const std::vector<Command::user_command> & cmds)
+{
+   Log(LOG_archive)   err << "save_user_commands()" << endl;
+   if (cmds.size() == 0)   return;
+
+   do_indent();
+   outf << "<Commands size=\"" << cmds.size() << "\">" << endl;
+
+   ++indent;
+   loop(u, cmds.size())
+      {
+        const Command::user_command & ucmd = cmds[u];
+        do_indent();
+        outf << "<Command name=\"" << ucmd.prefix
+            << "\" mode=\"" << ucmd.mode
+            << "\" fun=\"" <<  ucmd.apl_function << "\"/>" << endl;
+      }
+
+   --indent;
+   do_indent();
+   outf << "</Commands>" << endl << endl;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
+{
+   Log(LOG_archive)   err << "    save_vstack_item(name_class "
+                           << vsi.get_NC() << ")" << endl;
+   switch(vsi.get_NC())
+      {
+        case NC_UNUSED_USER_NAME:
+             do_indent();
+             outf << "<unused-name/>" << endl;
+             break;
+
+        case NC_LABEL:
+             do_indent();
+             outf << "<Label value=\"" << vsi.get_label() << "\"/>" << endl;
+             break;
+
+        case NC_VARIABLE:
+             do_indent();
+             outf << "<Variable vid=\"" << find_vid(vsi.get_val_cptr())
+                 << "\"/>" << endl;
+             break;
+
+        case NC_FUNCTION:
+        case NC_OPERATOR:
+             save_Function(*vsi.get_function());
+             break;
+
+        case NC_SYSTEM_VAR:
+             do_indent();
+             outf << "<Shared-Variable key=\"" << vsi.get_key()
+                 << "\"/>" << endl;
+             break;
+
+        default: Assert(0);
+      }
+}
+//----------------------------------------------------------------------------
+bool
+XML_Saving_Archive::is_saved(const Function * fun) const
+{
+   loop(f, saved_Functions.size())
+       if (fun == saved_Functions[f])   return true;
+
+   return false;
+}
+//----------------------------------------------------------------------------
+int
+XML_Saving_Archive::do_indent()
+{
+const int spaces = indent * INDENT_LEN;
+   loop(s, spaces)   outf << " ";
+
+   return 72 - spaces;
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::emit_cell(const Cell & cell, int & space)
+{
+char cc[80];
+   switch(cell.get_cell_type())
+      {
+        case CT_CHAR:   // uses UNI_PAD_U0, UNI_PAD_U1, and UNI_PAD_U2
+             emit_unicode(cell.get_char_value(), space);
+             break;
+
+        case CT_INT:   // uses UNI_PAD_U3
+             space -= leave_char_mode();
+             SPRINTF(cc, "%lld", long_long(cell.get_int_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
+             break;
+
+        case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
+             space -= leave_char_mode();
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+             {
+               const FloatCell & flt =
+                                 reinterpret_cast<const FloatCell &>(cell);
+               if (const APL_Integer denom = flt.get_denominator())
+                  {
+                    // a non-zero denominator indicates a rational quotient)
+                    //
+                    const APL_Integer numer = flt.get_numerator();
+                    SPRINTF(cc, "%lld÷%lld", long_long(numer),
+                                             long_long(denom));
+                    NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
+                    break;
+                  }
+             }
+#endif
+             SPRINTF(cc, "%.16g", double(cell.get_real_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
+             break;
+
+        case CT_COMPLEX:   // uses UNI_PAD_U5
+             space -= leave_char_mode();
+             SPRINTF(cc, "%.16gJ%.16g", double(cell.get_real_value()),
+                                        double(cell.get_imag_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
+             break;
+
+        case CT_POINTER:   // uses UNI_PAD_U6
+             space -= leave_char_mode();
+             {
+               const Vid vid = find_vid(cell.get_pointer_value().get());
+               SPRINTF(cc, "%d", vid);
+               NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
+             }
+             break;
+
+        case CT_CELLREF:   // uses UNI_PAD_U7
+             {
+             space -= leave_char_mode();
+             const LvalCell & lv = reinterpret_cast<const LvalCell &>(cell);
+             if (lv.get_lval_value())   // lv has a valid target
+                {
+                  const Value * owner = lv.get_cell_owner();
+                  const long long offset = owner->get_offset(&lv);
+                  const Vid vid = find_vid(owner);
+                  SPRINTF(cc, "%d[%lld]", vid, offset);
+                  NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
+                }
+             else     // 0-cell-pointer (from selective assignment)
+                {
+                  SPRINTF(cc, "0");
+                  NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
+                }
+             }
+             break;
+
+        default: Assert(0);
+      }
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::emit_token_val(const Token & tok)
+{
+   switch(tok.get_ValueType())
+      {
+        case TV_NONE:  break;
+
+        case TV_CHAR:  Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
+                       outf << " char=\"" << int(tok.get_char_val()) << "\"";
+                       break;
+
+        case TV_INT:   Log(LOG_archive)   err << "Saving TV_INT Token" << endl;
+                       outf << " int=\"" << tok.get_int_val() << "\"";
+                       break;
+
+        case TV_FLT:   Log(LOG_archive)   err << "Saving TV_FLT Token" << endl;
+                       outf << " float=\"" << tok.get_flt_val() << "\"";
+                       break;
+
+        case TV_CPX:   Log(LOG_archive)   err << "Saving TV_CPX Token" << endl;
+                       outf << " real=\"" << tok.get_cpx_real()
+                           << "\" imag=\"" << tok.get_cpx_imag() << "\"";
+                       break;
+
+        case TV_SYM:   Log(LOG_archive)   err << "Saving TV_SYM Token" << endl;
+                       {
+                         Symbol * sym = tok.get_sym_ptr();
+                         const UCS_string name = sym->get_name();
+                         outf << " sym=\"" << name << "\"";
+                       }
+                       break;
+
+        case TV_LIN:   Log(LOG_archive)   err << "Saving TV_LIN Token" << endl;
+                       outf << " line=\"" << tok.get_fun_line() << "\"";
+                       break;
+
+        case TV_VAL:   {
+                         Log(LOG_archive)
+                            err << "Saving TV_VAL Token" << endl;
+
+                         const Vid vid = find_vid(tok.get_apl_val().get());
+                         outf << " vid=\"" << vid << "\"";
+                       }
+                       break;
+
+        case TV_INDEX: {
+                         Log(LOG_archive)
+                            err << "Saving TV_INDEX Token" << endl;
+                         const IndexExpr & idx = tok.get_index_val();
+                         const int rank = idx.get_rank();
+                         outf << " index=\"";
+                         loop(i, rank)
+                             {
+                               if (i)   outf << ",";
+                               const Value * val = idx.values[i].get();
+                               if (val)   outf << "vid_" << find_vid(val);
+                               else       outf << "-";
+                                outf << "\"";
+                             }
+                       }
+                       break;
+
+        case TV_FUN:   {
+                         Log(LOG_archive)
+                            err << "Saving TV_FUN Token" << endl;
+
+                         cFunction_P fun = tok.get_function();
+                         Assert1(fun);
+                         save_Function_name(*fun);
+                       }
+                       break;
+
+        default:       FIXME;
+
+      }
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
+{
+   if (uni == UNI_LF)
+      {
+        leave_char_mode();
+        outf << UNI_PAD_U1 << "A" << "\n";
+        space = do_indent();
+      }
+   else if (!xml_allowed(uni))
+      {
+        space -= leave_char_mode();
+        char cc[40];
+        SPRINTF(cc, "%X", uni);
+        NEED(1 + strlen(cc)) << UNI_PAD_U1 << decr(space, cc);
+        space--;   // PAD_U1
+      }
+   else 
+      {
+        NEED(1) << "";
+        space -= enter_char_mode();
+        outf << uni;
+        space--;   // uni
+      }
+}
+//----------------------------------------------------------------------------
+XML_Saving_Archive::Vid
+XML_Saving_Archive::find_vid(const Value * value)
+{
+const void * item = Heapsort<_val_par>
+                    ::search<const Value *>
+                    (value, val_pars, _val_par::compare, 0);
+   Assert(item);
+   return Vid(reinterpret_cast<const _val_par *>(item) - val_pars.data());
+}
+//----------------------------------------------------------------------------
+void
+XML_Saving_Archive::write_XML_header()
+{
+tm * t;
+   {
+     timeval now;   gettimeofday(&now, 0);
+     time_t seconds = now.tv_sec;
+     t = gmtime(&seconds);
+   }
+
+const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
+
+   // check with: xmllint --valid workspace.xml >/dev/null
+   //
+   outf <<
+"<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n"
+"\n"
+"<!DOCTYPE Workspace\n"
+"[\n"
+"    <!ELEMENT Workspace (Function*, Value*, Ravel*, SymbolTable,\n"
+"                         Symbol*, Commands?, StateIndicator)>\n"
+"    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  year       CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  month      CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  day        CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  hour       CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  minute     CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  second     CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  timezone   CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  saving_SVN CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  syntax     CDATA #IMPLIED>\n"
+"\n"
+"        <!ELEMENT Value (#PCDATA)>\n"
+"        <!ATTLIST Value flg    CDATA #REQUIRED>\n"
+"        <!ATTLIST Value vid    CDATA #REQUIRED>\n"
+"        <!ATTLIST Value parent CDATA #IMPLIED>\n"
+"        <!ATTLIST Value rk     CDATA #REQUIRED>\n"
+"        <!ATTLIST Value sh-0   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-1   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-2   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-3   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-4   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-5   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-6   CDATA #IMPLIED>\n"
+"        <!ATTLIST Value sh-7   CDATA #IMPLIED>\n"
+"\n"
+"        <!ELEMENT Ravel (#PCDATA)>\n"
+"        <!ATTLIST Ravel vid    CDATA #REQUIRED>\n"
+"        <!ATTLIST Ravel bytes  CDATA #IMPLIED>\n"
+"        <!ATTLIST Ravel cells  CDATA #IMPLIED>\n"
+"        <!ATTLIST Ravel depth  CDATA #IMPLIED>\n"
+"\n"
+"        <!ELEMENT SymbolTable (Symbol*)>\n"
+"        <!ATTLIST SymbolTable size CDATA #REQUIRED>\n"
+"\n"
+"            <!ELEMENT Symbol (unused-name | Variable | Function|\n"
+"                              Label       | Shared-Variable)*>\n"
+"            <!ATTLIST Symbol name       CDATA #REQUIRED>\n"
+"            <!ATTLIST Symbol stack-size CDATA #REQUIRED>\n"
+"\n"
+"                <!ELEMENT unused-name EMPTY>\n"
+"\n"
+"                <!ELEMENT Variable (#PCDATA)>\n"
+"                <!ATTLIST Variable vid CDATA #REQUIRED>\n"
+"\n"
+"                <!ELEMENT Function (UCS*)>\n"
+"                <!ATTLIST Function fid             CDATA #REQUIRED>\n"
+"                <!ATTLIST Function creation-time   CDATA #IMPLIED>\n"
+"                <!ATTLIST Function LO-fid          CDATA #IMPLIED>\n"
+"                <!ATTLIST Function OPER-fid        CDATA #IMPLIED>\n"
+"                <!ATTLIST Function RO-fid          CDATA #IMPLIED>\n"
+"                <!ATTLIST Function AXIS-vid        CDATA #IMPLIED>\n"
+"                <!ATTLIST Function exec-properties CDATA #IMPLIED>\n"
+"                <!ATTLIST Function macro           CDATA #IMPLIED>\n"
+"                <!ATTLIST Function tag             CDATA #IMPLIED>\n"
+"\n"
+"                <!ELEMENT Label (#PCDATA)>\n"
+"                <!ATTLIST Label value CDATA #REQUIRED>\n"
+"\n"
+"                <!ELEMENT Shared-Variable (#PCDATA)>\n"
+"                <!ATTLIST Shared-Variable key CDATA #REQUIRED>\n"
+"\n"
+"        <!ELEMENT UCS (#PCDATA)>\n"
+"        <!ATTLIST UCS uni CDATA #REQUIRED>\n"
+"\n"
+"        <!ELEMENT Commands (Command*)>\n"
+"        <!ATTLIST Commands size CDATA #REQUIRED>\n"
+"\n"
+"            <!ELEMENT Command (#PCDATA)>\n"
+"            <!ATTLIST Command name       CDATA #REQUIRED>\n"
+"            <!ATTLIST Command mode       CDATA #REQUIRED>\n"
+"            <!ATTLIST Command fun        CDATA #REQUIRED>\n"
+"\n"
+"        <!ELEMENT StateIndicator (SI-entry*)>\n"
+"        <!ATTLIST StateIndicator levels CDATA #REQUIRED>\n"
+"\n"
+"            <!ELEMENT SI-entry ((Execute | Statements | UserFunction),\n"
+"                                Parser+)>\n"
+"            <!ATTLIST SI-entry level     CDATA #REQUIRED>\n"
+"            <!ATTLIST SI-entry pc        CDATA #REQUIRED>\n"
+"            <!ATTLIST SI-entry line      CDATA #REQUIRED>\n"
+"\n"
+"                <!ELEMENT Statements (UCS)>\n"
+"\n"
+"                <!ELEMENT Execute (UCS)>\n"
+"\n"
+"                <!ELEMENT UserFunction (#PCDATA)>\n"
+"                <!ATTLIST UserFunction ufun-name       CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction macro-num       CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>\n"
+"\n"
+"                <!ELEMENT Parser (Token*, Function*)>\n"
+"                <!ATTLIST Parser size           CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser action         CDATA #REQUIRED>\n"
+
+"                    <!ELEMENT Token (#PCDATA)>\n"
+"                    <!ATTLIST Token pc           CDATA #REQUIRED>\n"
+"                    <!ATTLIST Token tag          CDATA #REQUIRED>\n"
+"                    <!ATTLIST Token char         CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token int          CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token float        CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token real         CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token imag         CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token sym          CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token line         CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token vid          CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token index        CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token fun-id       CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token ufun-name    CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token symbol-level CDATA #IMPLIED>\n"
+"                    <!ATTLIST Token comment      CDATA #IMPLIED>\n"
+"\n"
+"]>\n"
+"\n"
+"    <!-- hour/minute/second is )SAVE time in UTC (aka. GMT).\n"
+"         timezone is +/- offset to UTC in seconds.\n"
+"         local time is UTC + offset -->\n"
+"\n"
+"<Workspace wsid=\"";
+
+   /// libref if provided
+   {
+     const LibRef lib = Workspace::get_WSID().get_libref();
+     if (lib != LIB_NONE)   outf << lib << " ";
+   }
+   outf <<
+        Workspace::get_WSID().get_name()
+     << "\" year=\""       << (t->tm_year + 1900)
+     << "\" month=\""      << (t->tm_mon  + 1)
+     << "\" day=\""        <<  t->tm_mday << "\"" << endl <<
+"           hour=\""       <<  t->tm_hour
+     << "\" minute=\""     <<  t->tm_min
+     << "\" second=\""     <<  t->tm_sec
+     << "\" timezone=\""   << offset << "\"" << endl <<
+"           saving_SVN=\"" << ARCHIVE_SVN
+     << "\" syntax=\"" << ASX_MAJOR << "."
+                       << ASX_MINOR << "."
+                       << ASX_OTHER << "\">\n" << endl;
+}
+//----------------------------------------------------------------------------
+const char *
+XML_Saving_Archive::decr(int & counter, const char * str)
+{
+   counter -= strlen(str);
+   return str;
+}
+//----------------------------------------------------------------------------
+bool
+XML_Saving_Archive::xml_allowed(Unicode uni)
+{
+   if (uni < ' ')    return false;    // control chars and negative
+   if (uni == '<')   return false;   // < not allowed
+   if (uni == '&')   return false;   // < not allowed
+   if (uni == '"')   return false;   // not allowed in "..."
+   if (uni > '~')
+      {
+        // non-ASCII character. This is, in principle, allowed in XML but
+        // may not print properly if the font used does not provide the
+        // character. We therefore allow characters in ⎕AV and their alternate
+        // characters except our own type markers (⁰¹²...)
+        //
+        if (is_iPAD_char(uni))   return false;
+        if (Avec::find_char(uni) != Avec::Invalid_CHT)              return true;
+        if (Avec::map_alternative_char(uni) != Avec::Invalid_CHT)   return true;
+        return false;    // allowed, but may
+      }
+   return true;
+}
 //============================================================================
 XML_Loading_Archive::XML_Loading_Archive(ostream & of, ostream & ef,
                                          const char * _filename, int & dump_fd)
    : XML_Archive(of, ef),
-     file_length(0),
-     file_start(0),
-     line_start(0),
-     line_no(1),
+     copying(false),
      current_char(UNI_SPACE),
      data(0),
      file_end(0),
-     copying(false),
-     protection(false),
-     reading_vids(false),
-     have_allowed_objects(false),
+     file_is_complete(false),
+     file_length(0),
+     file_start(0),
      filename(_filename),
-     file_is_complete(false)
+     have_allowed_objects(false),
+     line_no(1),
+     line_start(0),
+     protection(false),
+     reading_vids(false)
 {
    Log(LOG_archive)   err << "Loading workspace file " << filename << endl;
 
@@ -1326,144 +1326,62 @@ XML_Loading_Archive::~XML_Loading_Archive()
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::reset()
+XML_Loading_Archive::check_compatibility()
 {
-   line_start = data = utf8P(file_start);
-   line_no = 1;
-   next_tag(LOC);
-}
-//----------------------------------------------------------------------------
-bool
-XML_Loading_Archive::skip_to_tag(const char * tag)
-{
-   for (;;)
-      {
-         if (next_tag(LOC))   return true;
-         if (is_tag(tag))     break;
-      }
-
-   return false;
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_vids()
-{
-   reset();   // skips to <Workspace>
-   reading_vids = true;
-   read_Workspace(true);
-   reading_vids = false;
-
-   reset();
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::where()
-{
-   err << "line=" << line_no << "+" << (data - line_start) << " '";
-
-   loop(j, 40)   { if (data[j] == 0x0A)   break;   err << data[j]; }
-   err << "'" << endl;
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::where_att()
-{
-   err << "line=" << line_no << "+" << (attributes - line_start) << " '";
-
-   loop(j, 40)
-      {
-        if (attributes[j] == 0x0A)        break;
-        if (attributes + j >= end_attr)   break;
-        err << attributes[j];
-      }
-
-   err << "'" << endl;
-}
-//----------------------------------------------------------------------------
-bool
-XML_Loading_Archive::get_uni()
-{
-   if (data > file_end)   return true;   // EOF
-
-int len = 0;
-   current_char = UTF8_string::toUni(data, len, true);
-   data += len;
-   if (current_char == 0x0A)   { ++line_no;   line_start = data; }
-   return false;
-}
-//----------------------------------------------------------------------------
-bool
-XML_Loading_Archive::is_tag(const char * prefix) const
-{
-   return !strncmp(charP(tag_name), prefix, strlen(prefix));
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
-{
-   if (!is_tag(prefix))
-      {
-        err << "   Got tag ";
-        print_tag();
-        err << " when expecting tag " << prefix
-            << " at " << loc << "  line " << line_no << endl;
-        DOMAIN_ERROR;
-      }
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::print_tag() const
-{
-   loop(t, attributes - tag_name)   err << tag_name[t];
-}
-//----------------------------------------------------------------------------
-const UTF8 *
-XML_Loading_Archive::find_attr(const char * att_name, bool optional)
-{
-const int att_len = strlen(att_name);
-
-   for (const UTF8 * d = attributes; d < end_attr; ++d)
-       {
-         if (strncmp(att_name, charP(d), att_len))   continue;
-         const UTF8 * dd = d + att_len;
-         while (*dd <= ' ')   ++dd;   // skip whitespaces
-         if (*dd++ != '=')   continue;
-
-         // attribute= found. find value.
-         while (*dd <= ' ')   ++dd;   // skip whitespaces
-         Assert(*dd == '"');
-         return dd + 1;
-       }
-
-   // not found
+   // new compatibility mechanism?
    //
-   if (!optional)
+   if (const char * syntax = charP(find_optional_attr("syntax")))   // yes
       {
-         const int offset = attributes - line_start;
-         MORE_ERROR() << "mandatory Attribute '" << att_name
-              << "' is missing in line " << line_no << ":" << offset
-              << " of file " << filename;
-         DOMAIN_ERROR;
+        unsigned int major = 0;
+        unsigned int minor = 0;
+        unsigned int other  = 0;
+        sscanf(syntax, "%u.%u.%u", &major, &minor, &other);
+        if (major == ASX_MAJOR && minor == ASX_MINOR)   return;
+        if (major == ASX_MAJOR)
+           {
+              err << "NOTE: this workspaces was )SAVEd with syntax version "
+                   << major << "." << minor << "." << other << endl
+                   << "but is now )LOADed with a newer version " << ASX_MAJOR
+                   << "." << ASX_MINOR << "." << ASX_OTHER << "." << endl
+                   << "That should be OK, but new features introduced by the"
+                   << " newer version will not be supported." << endl;
+           }
+        return;
       }
-   return 0;   // not found
-}
-//----------------------------------------------------------------------------
-int64_t
-XML_Loading_Archive::find_int_attr(const char * attrib, bool optional, int base)
-{
-const UTF8 * value = find_attr(attrib, optional);
-   if (value == 0)   return -1;   // not found
 
-const int64_t val = strtoll(charP(value), 0, base);
-   return val;
-}
-//----------------------------------------------------------------------------
-APL_Float
-XML_Loading_Archive::find_float_attr(const char * attrib)
-{
-const UTF8 * value = find_mandatory_attr(attrib);
-const APL_Float val = strtod(charP(value), 0);
-   return val;
+bool mismatch = false;
+
+   // old (SVN-version based) compatibility mechanism
+
+UCS_string saving_SVN;   // from the XML file
+UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
+   {
+     const UTF8 * saving = find_optional_attr("saving_SVN");
+     while (saving && *saving != '"')   saving_SVN << Unicode(*saving++);
+   }
+
+   if (saving_SVN.size() == 0)   // saved with very old version
+      {
+        mismatch = true;
+        err << "WARNING: this workspace was )SAVEd with a VERY "
+             << "old SVN version of GNU APL." << endl;
+      }
+   else if (saving_SVN != current_SVN)   // saved with different version
+      {
+        mismatch = true;
+        err << "WARNING: this workspace was )SAVEd with SVN version "
+             << saving_SVN << endl <<
+        "          but is now being )LOADed with a SVN version "
+             << current_SVN << " or greater" << endl;
+      }
+
+   if (mismatch)
+      {
+        err << "Expect problems, in particular when the )SI was not clear.\n";
+        if (!copying)
+           err << "In case of problems, please try )COPY instead of )LOAD."
+                << endl;
+      }
 }
 //----------------------------------------------------------------------------
 bool
@@ -1534,6 +1452,17 @@ again:
 */
 
    return false;
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_vids()
+{
+   reset();   // skips to <Workspace>
+   reading_vids = true;
+   read_Workspace(true);
+   reading_vids = false;
+
+   reset();
 }
 //----------------------------------------------------------------------------
 void
@@ -1715,143 +1644,268 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::check_compatibility()
+XML_Loading_Archive::reset()
 {
-   // new compatibility mechanism?
-   //
-   if (const char * syntax = charP(find_optional_attr("syntax")))   // yes
+   line_start = data = utf8P(file_start);
+   line_no = 1;
+   next_tag(LOC);
+}
+//----------------------------------------------------------------------------
+bool
+XML_Loading_Archive::skip_to_tag(const char * tag)
+{
+   for (;;)
       {
-        unsigned int major = 0;
-        unsigned int minor = 0;
-        unsigned int other  = 0;
-        sscanf(syntax, "%u.%u.%u", &major, &minor, &other);
-        if (major == ASX_MAJOR && minor == ASX_MINOR)   return;
-        if (major == ASX_MAJOR)
-           {
-              err << "NOTE: this workspaces was )SAVEd with syntax version "
-                   << major << "." << minor << "." << other << endl
-                   << "but is now )LOADed with a newer version " << ASX_MAJOR
-                   << "." << ASX_MINOR << "." << ASX_OTHER << "." << endl
-                   << "That should be OK, but new features introduced by the"
-                   << " newer version will not be supported." << endl;
-           }
-        return;
+         if (next_tag(LOC))   return true;
+         if (is_tag(tag))     break;
       }
 
-bool mismatch = false;
-
-   // old (SVN-version based) compatibility mechanism
-
-UCS_string saving_SVN;   // from the XML file
-UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
-   {
-     const UTF8 * saving = find_optional_attr("saving_SVN");
-     while (saving && *saving != '"')   saving_SVN << Unicode(*saving++);
-   }
-
-   if (saving_SVN.size() == 0)   // saved with very old version
-      {
-        mismatch = true;
-        err << "WARNING: this workspace was )SAVEd with a VERY "
-             << "old SVN version of GNU APL." << endl;
-      }
-   else if (saving_SVN != current_SVN)   // saved with different version
-      {
-        mismatch = true;
-        err << "WARNING: this workspace was )SAVEd with SVN version "
-             << saving_SVN << endl <<
-        "          but is now being )LOADed with a SVN version "
-             << current_SVN << " or greater" << endl;
-      }
-
-   if (mismatch)
-      {
-        err << "Expect problems, in particular when the )SI was not clear.\n";
-        if (!copying)
-           err << "In case of problems, please try )COPY instead of )LOAD."
-                << endl;
-      }
+   return false;
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::read_Value()
+XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
 {
-   expect_tag("Value", LOC);
-
-   // read all mandatory attributes even if they are no used in this pass
-   //
-const Vid vid    = find_Vid_attr("vid",    false, 10);
-const int flags  = find_int_attr("flg",    false, 16);
-const Vid parent = find_Vid_attr("parent", false, 10);
-const int rk     = find_int_attr("rk",     false, 10);
-
-   Log(LOG_archive)   err << "  read_Value() vid=" << vid << endl;
-
-   if (reading_vids)
+   if (!is_tag(prefix))
       {
-         parents.push_back(parent);
-         return;
+        err << "   Got tag ";
+        print_tag();
+        err << " when expecting tag " << prefix
+            << " at " << loc << "  line " << line_no << endl;
+        DOMAIN_ERROR;
       }
-
-Shape sh_value;
-   loop(r, rk)
+}
+//----------------------------------------------------------------------------
+bool
+XML_Loading_Archive::is_tag(const char * prefix) const
+{
+   return !strncmp(charP(tag_name), prefix, strlen(prefix));
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::print_tag() const
+{
+   loop(t, attributes - tag_name)   err << tag_name[t];
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::add_fid_function(Fid fid, cFunction_P new_fun,
+                                      const char * loc)
+{
+   if (fun_map * map = find_fun_map(fid))   // fid exists
       {
-        char sh[20];
-        SPRINTF(sh, "sh-%d", int(r));
-        const UTF8 * sh_r = find_mandatory_attr(sh);
-        sh_value.add_shape_item(atoll(charP(sh_r)));
-      }
-
-   /* if:
-
-      1. we do )COPY or )PCOPY, and
-      2. vid is not in vids_COPY list,
-
-      then we push 0 (so that indexing with vid still works) and ignore such
-      values in read_Ravel.
-    */
-
-bool no_copy = false;   // assume the value is needed
-   if (copying)
-      {
-        // if vid is a sub-value then find its topmost owner
-        //
-        int parent = vid;
-        for (;;)
-            {
-              Assert(parent < int(parents.size()));
-              if (parents[parent] == -1)   break;   // topmost owner found
-              parent = parents[parent];
-            }
-
-        no_copy = true;   // assume the value is not needed
-        loop(v, vids_COPY.size())
+        if (map->new_fun)   // function also exists.
            {
-              if (parent == vids_COPY[v])   // vid is in the list: copy
-                 {
-                   no_copy = false;
-                   break;
-                 }
+             // function already exists. Setting it multiple times is OK
+             // as long as the pointers are the same (e.g. pointer to
+             // primitive APL functions).
+             //
+             if (new_fun == map->new_fun)   return;
+
+             err << "*** OVERRIDING fid " << HEX(fid)
+                  << " (from " << map->loc << ") at " << loc << "***" << endl;
            }
-      }
-
-   if (no_copy)
-      {
-        values.push_back(Value_P());
-      }
-   else
-      {
-        Assert(vid == int(values.size()));
-        if (flags & VF_packed)
-           {
-             Value_P val(sh_value, /* constructor allocates */ 0, LOC);
-             values.push_back(val);
-            }
         else
            {
-             Value_P val(sh_value, LOC);
-             if (flags & VF_member)   val->set_member();
-             values.push_back(val);
+             map->new_fun = new_fun;
+             map->loc = loc;
+           }
+
+        return;
+      }
+
+   // new fid/function
+   //
+const fun_map fm =  { fid, new_fun, loc };
+   fid_to_function.push_back(fm);
+}
+//----------------------------------------------------------------------------
+const UTF8 *
+XML_Loading_Archive::find_attr(const char * att_name, bool optional)
+{
+const int att_len = strlen(att_name);
+
+   for (const UTF8 * d = attributes; d < end_attr; ++d)
+       {
+         if (strncmp(att_name, charP(d), att_len))   continue;
+         const UTF8 * dd = d + att_len;
+         while (*dd <= ' ')   ++dd;   // skip whitespaces
+         if (*dd++ != '=')   continue;
+
+         // attribute= found. find value.
+         while (*dd <= ' ')   ++dd;   // skip whitespaces
+         Assert(*dd == '"');
+         return dd + 1;
+       }
+
+   // not found
+   //
+   if (!optional)
+      {
+         const int offset = attributes - line_start;
+         MORE_ERROR() << "mandatory Attribute '" << att_name
+              << "' is missing in line " << line_no << ":" << offset
+              << " of file " << filename;
+         DOMAIN_ERROR;
+      }
+   return 0;   // not found
+}
+//----------------------------------------------------------------------------
+APL_Float
+XML_Loading_Archive::find_float_attr(const char * attrib)
+{
+const UTF8 * value = find_mandatory_attr(attrib);
+const APL_Float val = strtod(charP(value), 0);
+   return val;
+}
+//----------------------------------------------------------------------------
+XML_Loading_Archive::fun_map *
+XML_Loading_Archive::find_fun_map(Fid fid)
+{
+   loop(f, fid_to_function.size())
+       {
+         if (fid_to_function[f].old_fid == fid)   return &fid_to_function[f];
+       }
+
+   return 0;
+}
+//----------------------------------------------------------------------------
+cFunction_P
+XML_Loading_Archive::find_function(Fid fid)
+{
+   if (fun_map * map = find_fun_map(fid))   return map->new_fun;
+   return 0;
+}
+//----------------------------------------------------------------------------
+int64_t
+XML_Loading_Archive::find_int_attr(const char * attrib, bool optional, int base)
+{
+const UTF8 * value = find_attr(attrib, optional);
+   if (value == 0)   return -1;   // not found
+
+const int64_t val = strtoll(charP(value), 0, base);
+   return val;
+}
+//----------------------------------------------------------------------------
+cFunction_P
+XML_Loading_Archive::find_lambda(const UCS_string & lambda)
+{
+const StateIndicator & si = *Workspace::SI_top();
+const Executable & exec = *si.get_executable();
+const Token_string & body = exec.get_body();
+
+   loop(b, body.size())
+      {
+        const Token & tok = body[b];
+        if (tok.get_ValueType() == TV_SYM)
+           {
+             const Symbol * sym = tok.get_sym_ptr();
+             Assert(sym);
+             loop(v, sym->value_stack_size())
+                {
+                  const ValueStackItem & vs = (*sym)[v];
+                  if (vs.get_NC() & NC_FUN_OPER)
+                     {
+                       if (vs.get_function()->get_name() == lambda)
+                          {
+                            return vs.get_function();
+                          }
+                     }
+                }
+             continue;   // not found
+           }
+        else if (tok.get_ValueType() != TV_FUN)   continue;
+
+        cFunction_P fun = tok.get_function();
+        Assert1(fun);
+        const UserFunction * ufun = fun->get_func_ufun();
+        if (!ufun)   continue;   // not a user defined function
+
+        const UCS_string & fname = ufun->get_name();
+        if (fname == lambda)   return fun;
+      }
+
+   err << "find_lambda() failed for " << lambda
+        << " at )SI level=" << si.get_level() << endl;
+   return 0;
+}
+//----------------------------------------------------------------------------
+bool
+XML_Loading_Archive::get_uni()
+{
+   if (data > file_end)   return true;   // EOF
+
+int len = 0;
+   current_char = UTF8_string::toUni(data, len, true);
+   data += len;
+   if (current_char == 0x0A)   { ++line_no;   line_start = data; }
+   return false;
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::instantiate_derived_functions(bool allocate)
+{
+   /* derived functions are allocated i 2 phases:
+
+      phase 1: allocate=true and todo.cache set: create the function
+      phase 2: allocate=false and todo.symptr set: store pointer
+    */
+
+   loop(d, derived_todos.size())
+      {
+        _derived_todo & todo = derived_todos[d];
+        Assert(todo.fid != -1);
+
+        cFunction_P fun = find_function(todo.fid);
+        Assert(fun);
+
+        if (!allocate)
+           {
+             if (todo.symptr)   *todo.symptr = fun;
+             continue;
+           }
+
+        if (!todo.cache)   continue;
+
+        Assert(todo.LO_fid   != -1);
+        cFunction_P LO = find_function(todo.LO_fid);
+        Assert(LO);
+
+        Assert(todo.OPER_fid != -1);
+        cFunction_P OPER = find_function(todo.OPER_fid);
+        Assert(OPER);
+        Token tok_LO(TOK_FUN2, LO);
+
+        if (todo.RO_fid   != -1)   // dyadic operator
+           {
+             Assert(todo.RO_fid != -1);
+             cFunction_P RO = find_function(todo.RO_fid);
+             Assert(RO);
+             Token tok_RO(TOK_FUN2, RO);
+
+             if (todo.AXIS_vid == -1)   // dyadic operator without axis
+                {
+                  new (todo.cache)
+                      Derived_LO_D_RO(tok_LO, OPER, tok_RO, LOC);
+                }
+             else                       // dyadic operator with axis
+                {
+                  Value_P val_X = values[todo.AXIS_vid];
+                  new (todo.cache) Derived_LO_D_X_RO(tok_LO, OPER, val_X,
+                                                     tok_RO, LOC);
+                }
+           }
+        else                       // monadic operator
+           {
+             if (todo.AXIS_vid == -1)   // monadic operator without axis
+                {
+                  new (todo.cache) Derived_LO_M(tok_LO, OPER, LOC);
+                }
+             else                       // monadic operator with axis
+                {
+                  Value_P X = values[todo.AXIS_vid];
+                  new (todo.cache) Derived_LO_M_X(tok_LO, OPER, X, LOC);
+                }
            }
       }
 }
@@ -1996,214 +2050,68 @@ char **pend = reinterpret_cast<char **>(&end);
       }
 }
 //----------------------------------------------------------------------------
-const UTF8 *
-XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
+void
+XML_Loading_Archive::read_Command()
 {
-   /* argument 'utf' is the source for a sequence of characters.
-      'utf' comes from find_attr() and is therefore NOT 0-terminated but
-      instead terminated by '"'.
+   expect_tag("Command", LOC);
 
-      The Unicodes read from 'utf' are stored in result 'ucs'.
+const UTF8 * name = find_mandatory_attr("name");
+const UTF8 * name_end = name;
+   while (*name_end != '"')   ++name_end;
+UTF8_string name_UTF(name, name_end - name);
+UCS_string  name_UCS(name_UTF);
 
-      On return, 'utf' points to the terminating '"'.
-    */
+const UTF8 * fun = find_mandatory_attr("fun");
+const UTF8 * fun_end = fun;
+   while (*fun_end != '"')   ++fun_end;
+UTF8_string fun_UTF(fun, fun_end - fun);
+UCS_string  fun_UCS(fun_UTF);
 
-   while (*utf <= ' ')   ++utf;   // skip leading whitespace
+const int mode = find_int_attr("mode", false, 10);
 
-   // char mode is controlled by delimiters:
-   //
-   // ² (UNI_PAD_U2 = start of char mode),
-   // ¹ (UNI_PAD_U1 = start of hex mode = implicit end of char mode), and
-   // ⁰ (UNI_PAD_U0 = end of char mode).
-   //
-   // This function processes a sequence of ²strings⁰ and ¹unicodes.
-   // It returns at the end of the XML attribute (") or a the next
-   // micro-tag (³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹)
-
-   for (bool char_mode = false; *utf && (*utf != '"');)
-       {
-         // get next Unicode and advance utf
-         //
-         const UTF8 * from = utf;
-         int len = 0;   // length of uni
-         const Unicode uni = UTF8_string::toUni(utf, len, true);
-         utf += len;     // skip uni
-
-          if (char_mode && uni != '\n' && uni != UNI_PAD_U0)
-             {
-               ucs << uni;
-               continue;
-             }
-
-         if (uni == UNI_PAD_U2)   // start of char_mode
-            {
-              char_mode = true;
-              continue;
-            }
-
-         if (uni == UNI_PAD_U1)   // start of hex mode
-            {
-              char_mode = false;
-              char * end = 0;
-              const int hex = strtoll(charP(utf), &end, 16);
-              ucs << Unicode(hex);
-              utf = utf8P(end);
-              continue;
-            }
-
-         if (uni == UNI_PAD_U0)   // end of ²char_mode⁰
-            {
-              char_mode = false;
-              continue;
-            }
-
-         if (uni == '\n')   // end of char_mode (fix old bug)
-            {
-              // due to an old bug, the trailing UNI_PAD_U0 may be missing
-              // at the end of the line. We therefore reset char_mode at the
-              // end of the line so that workspaces save with that fault can
-              // be read.
-              //
-              char_mode = false;
-              continue;
-            }
-
-         if (uni == ' ')   // indentation
-            {
-              continue;
-            }
-
-         if (!char_mode)   // outside of ²char_mode⁰
-            {
-              if (uni == UNI_PAD_U3 ||
-                  uni == UNI_PAD_U4 ||
-                  uni == UNI_PAD_U5 ||
-                  uni == UNI_PAD_U6 ||
-                  uni == UNI_PAD_U7 ||
-                  uni == UNI_PAD_U8 ||
-                  uni == UNI_PAD_U9)    return from;
-            }
-
-         FIXME   // not reached
-       }
-
-   return utf;
+Command::user_command ucmd = { name_UCS, fun_UCS, mode };
+   Workspace::get_user_commands().push_back(ucmd);
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::read_Ravel()
+XML_Loading_Archive::read_Commands()
 {
-   if (reading_vids)   return;
+const int size = find_int_attr("size", false, 10);
 
-const int vid = find_int_attr("vid", false, 10);
-const UTF8 * cells_utf = find_optional_attr("cells");
-   if (!cells_utf)   cells_utf = find_mandatory_attr("bytes");
+   Log(LOG_archive)   err << "  read_Commands()" << endl;
 
-   Log(LOG_archive)
-      err << "    read_Ravel() vid=" << vid
-           << ", XML line " << line_no << " - ";
-
-   Assert(vid < int(values.size()));
-Value_P Z = values[vid];
-
-   if (!Z)
+   loop(s, size)
       {
-        Log(LOG_archive) err << "NO (vids_COPY or static)" << endl;
-        return;   // )COPY with vids_COPY or static value
+        next_tag(LOC);
+        read_Command();
       }
 
-   if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
+   next_tag(LOC);
+   expect_tag("/Commands", LOC);
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
+{
+   Log(LOG_archive)   err << "  read_Derived()" << endl;
+
+const Fid fid      = find_Fid_attr("fid", false, 16);   // in the )SAVEing WS
+const Fid LO_fid   = find_Fid_attr("LO-fid",   false, 16);
+const Fid OPER_fid = find_Fid_attr("OPER-fid", false, 16);
+const Fid RO_fid   = find_Fid_attr("RO-fid",   true,  16);
+const Vid AXIS_vid = find_Vid_attr("AXIS-vid", true,  10);
+Function * derived = si.fun_oper_cache.get(LOC);
+
+   if (LO_fid == NO_FID)
       {
-        read_Cells(*Z, cells_utf);
-        Log(LOG_archive)   err << "YES (packed)" << endl;
+        err << "got non-derived function when expecting a derived one" << endl;
         return;
       }
 
-   if (Z->element_count() == 0)   // then Z->has_more() is 0 and can't be used
-      {
-        Value_P Z0(LOC);   // a scalar to read the prototype
-        read_Cells(*Z0, cells_utf);   // prototype
-        Z->set_default(*Z0, LOC);
-        Log(LOG_archive)   err << "YES (empty)" << endl;
-      }
-   else
-      {
-        while (Z->more())
-            {
-              cells_utf = read_Cells(*Z, cells_utf);
-           // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
-            }
-        Log(LOG_archive) err << "YES (" << Z->element_count()
-                              << " items)" << endl;
-         }
-   Z->check_value(LOC);
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
-{
-   Log(LOG_archive)   err << "      [" << d << "] unused name" << endl;
-
-   if (d == 0)   return;   // Symbol::Symbol has already created the top level
-
-   symbol.push();
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
-{
-const int vid = find_int_attr("vid", false, 10);
-   Assert(vid < int(values.size()));
-
-   Log(LOG_archive)   err << "      [" << d << "] read_Variable() vid=" << vid
-                           << " name=" << symbol.get_name() << endl;
-
-   // some system variables are saved for troubleshooting purposes, but
-   // should not be loaded...
-   //
-   if (symbol.is_readonly())                     return;
-   if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
-   if (symbol.get_Id() == ID_Quad_SVE)           return;
-   if (symbol.get_Id() == ID_Quad_SYL)           return;
-   if (symbol.get_Id() == ID_Quad_PS)            return;
-
-   if (vid == -1)   // stale variable
-      {
-        Log(LOG_archive)   err << "      " << symbol.get_name()
-                                << " looks like a stale variable" << endl;
-        return;
-      }
-
-   if (!values[vid])   return;   // value filtered out
-
-   while (symbol.value_stack_size() <= d)   symbol.push();
-// if (d != 0)   symbol.push();
-
-   try
-      {
-        symbol.assign(values[vid], true, LOC);
-      }
-   catch (Error &)
-      {
-        err << "*** Could not assign value " << *values[vid]
-             << "    to variable " << symbol.get_name() << " ***" << endl;
-      }
-   catch (std::bad_alloc &)
-      {
-        err << "*** Could not assign value " << *values[vid]
-             << "    to variable " << symbol.get_name() << " ***" << endl;
-        WS_FULL;
-      }
-   catch (...)
-      { FIXME; }
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Label(int d, Symbol & symbol)
-{
-const int value = find_int_attr("value", false, 10);
-   if (d == 0)   symbol.pop();
-   symbol.push_label(Function_Line(value));
+_derived_todo td = { derived, 0, fid, LO_fid, OPER_fid, RO_fid,
+                     AXIS_vid, LOC };
+   add_fid_function(fid, derived, LOC);
+   derived_todos.push_back(td);
 }
 //----------------------------------------------------------------------------
 void
@@ -2345,28 +2253,175 @@ UCS_string text;
       }
 }
 //----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
+cFunction_P
+XML_Loading_Archive::read_Function_name()
 {
-   Log(LOG_archive)   err << "  read_Derived()" << endl;
+const UTF8 * fun_name = find_optional_attr("ufun-name");
 
-const Fid fid      = find_Fid_attr("fid", false, 16);   // in the )SAVEing WS
-const Fid LO_fid   = find_Fid_attr("LO-fid",   false, 16);
-const Fid OPER_fid = find_Fid_attr("OPER-fid", false, 16);
-const Fid RO_fid   = find_Fid_attr("RO-fid",   true,  16);
-const Vid AXIS_vid = find_Vid_attr("AXIS-vid", true,  10);
-Function * derived = si.fun_oper_cache.get(LOC);
-
-   if (LO_fid == NO_FID)
+   if (fun_name)   // user defined function
       {
-        err << "got non-derived function when expecting a derived one" << endl;
+        const int level = find_int_attr("symbol-level", false, 10);
+        const UTF8 * end = fun_name;
+        while (*end != '"')   ++end;
+        UTF8_string name_UTF(fun_name, end - fun_name);
+        UCS_string name_UCS(name_UTF);
+        if (name_UCS == ID::get_name_UCS(ID_LAMBDA))
+           {
+             Assert(level == -1);
+             return find_lambda(name_UCS);
+           }
+
+        const Symbol & symbol = *Workspace::lookup_symbol(name_UCS);
+
+        Assert(level >= 0);
+        Assert(level < symbol.value_stack_size());
+        const ValueStackItem & vsi = symbol[level];
+        Assert(vsi.get_NC() == NC_FUNCTION);
+        cFunction_P fun = vsi.get_function();
+        Assert(fun);
+        return fun;
+      }
+
+const int fun_id = find_int_attr("fun-id", true, 16);
+   if (fun_id != -1)
+      {
+        cFunction_P sysfun = ID::get_system_function(Id(fun_id));
+        Assert(sysfun);
+        return sysfun;
+      }
+
+   // not found. This can happen when the function is optional.
+   //
+   return 0;
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Label(int d, Symbol & symbol)
+{
+const int value = find_int_attr("value", false, 10);
+   if (d == 0)   symbol.pop();
+   symbol.push_label(Function_Line(value));
+}
+//----------------------------------------------------------------------------
+Executable *
+XML_Loading_Archive::read_lambda(const UTF8 * lambda_name)
+{
+UCS_string lambda = read_UCS();
+
+Symbol dummy(ID_No_ID);
+UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
+   Assert(ufun);
+const char * creator = ")LOAD )SI λ";
+   ufun->increment_refcount(LOC, creator);
+
+   next_tag(LOC);
+   expect_tag("/UserFunction", LOC);
+   return ufun;
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
+{
+   next_tag(LOC);
+   expect_tag("Parser", LOC);
+
+   Log(LOG_archive)   err << "        read_Parser() level=" << lev << endl;
+
+const int stack_size = find_int_attr("size",           false, 10);
+const int ass_state  = find_int_attr("assign-pending", false, 10);
+const int lah_high   = find_int_attr("lookahead-high", false, 10);
+const int action     = find_int_attr("action",         false, 10);
+
+Prefix & parser = si.current_stack;
+
+   parser.set_assign_state(Assign_state(ass_state));
+   parser.action = R_action(action);
+   parser.set_lookahead_PC(Function_PC(lah_high));
+
+   // read derived functions cache
+   //
+   for (;;)
+       {
+         next_tag(LOC);
+         if (is_tag("/Parser"))   break;
+         if (is_tag("Token"))     break;
+
+          read_Derived(si, lev);
+       }
+
+   // read parser token
+   //
+   for (;;)
+       {
+         next_tag(LOC);
+         if (is_tag("/Parser"))   break;
+
+         if (is_tag("Token"))
+            {
+              Token_loc tl;
+              read_Token(tl);
+
+              if (parser.ssize() < stack_size)   parser.push(tl);
+              else                             parser.saved_MISC.copy(tl, LOC);
+            }
+       }
+
+   Log(LOG_archive)
+      {
+         err << "        ";
+         parser.print_stack(err, LOC);
+      }
+
+   expect_tag("/Parser", LOC);
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Ravel()
+{
+   if (reading_vids)   return;
+
+const int vid = find_int_attr("vid", false, 10);
+const UTF8 * cells_utf = find_optional_attr("cells");
+   if (!cells_utf)   cells_utf = find_mandatory_attr("bytes");
+
+   Log(LOG_archive)
+      err << "    read_Ravel() vid=" << vid
+           << ", XML line " << line_no << " - ";
+
+   Assert(vid < int(values.size()));
+Value_P Z = values[vid];
+
+   if (!Z)
+      {
+        Log(LOG_archive) err << "NO (vids_COPY or static)" << endl;
+        return;   // )COPY with vids_COPY or static value
+      }
+
+   if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
+      {
+        read_Cells(*Z, cells_utf);
+        Log(LOG_archive)   err << "YES (packed)" << endl;
         return;
       }
 
-_derived_todo td = { derived, 0, fid, LO_fid, OPER_fid, RO_fid,
-                     AXIS_vid, LOC };
-   add_fid_function(fid, derived, LOC);
-   derived_todos.push_back(td);
+   if (Z->element_count() == 0)   // then Z->has_more() is 0 and can't be used
+      {
+        Value_P Z0(LOC);   // a scalar to read the prototype
+        read_Cells(*Z0, cells_utf);   // prototype
+        Z->set_default(*Z0, LOC);
+        Log(LOG_archive)   err << "YES (empty)" << endl;
+      }
+   else
+      {
+        while (Z->more())
+            {
+              cells_utf = read_Cells(*Z, cells_utf);
+           // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
+            }
+        Log(LOG_archive) err << "YES (" << Z->element_count()
+                              << " items)" << endl;
+         }
+   Z->check_value(LOC);
 }
 //----------------------------------------------------------------------------
 void
@@ -2383,20 +2438,164 @@ XML_Loading_Archive::read_Shared_Variable(int d, Symbol & symbol)
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::read_SymbolTable()
+XML_Loading_Archive::read_SI_entry(int lev)
 {
-const int size = find_int_attr("size", false, 10);
+const int level = find_int_attr("level", false, 10);
+const int pc = find_int_attr("pc", false, 10);
 
-   Log(LOG_archive)   err << "  read_SymbolTable()" << endl;
+   Log(LOG_archive)   err << "    read_SI_entry() level=" << level << endl;
 
-   loop(s, size)
-      {
-        next_tag(LOC);
-        read_Symbol();
-      }
+const Executable * exec = 0;
+   next_tag(LOC);
+   if      (is_tag("Execute"))        exec = read_SI_Execute();
+   else if (is_tag("Statements"))     exec = read_SI_Statement();
+   else if (is_tag("UserFunction"))   exec = read_SI_UserFunction();
+   else    Assert(0 && "Bad tag at " LOC); 
+
+   Assert(lev == level);
+   Assert(exec);
+
+   Workspace::push_SI(exec, LOC);
+StateIndicator * si = Workspace::SI_top();
+   Assert(si);
+   si->get_prefix().goto_PC(Function_PC(pc));
+   read_Parser(*si, lev);
+
+   for (;;)
+       {
+         // skip old EOC tags
+         //
+         next_tag(LOC);
+         if (is_tag("/SI-entry"))   break;
+       }
+}
+//----------------------------------------------------------------------------
+const Executable *
+XML_Loading_Archive::read_SI_Execute()
+{
+   next_tag(LOC);
+   expect_tag("UCS", LOC);
+
+const UTF8 * utf = find_mandatory_attr("uni");
+UCS_string text;
+   read_XML_string(text, utf);
+   next_tag(LOC);
+   expect_tag("/Execute", LOC);
+
+ExecuteList * exec = ExecuteList::fix(text, LOC);
+   Assert(exec);
+   return exec;
+}
+//----------------------------------------------------------------------------
+const Executable *
+XML_Loading_Archive::read_SI_Statement()
+{
+   next_tag(LOC);
+   expect_tag("UCS", LOC);
+const UTF8 * utf = find_mandatory_attr("uni");
+UCS_string text;
+   read_XML_string(text, utf);
 
    next_tag(LOC);
-   expect_tag("/SymbolTable", LOC);
+   expect_tag("/Statements", LOC);
+
+StatementList * exec = StatementList::fix(text, Value_P(), LOC);
+   Assert(exec);
+   return exec;
+}
+//----------------------------------------------------------------------------
+const Executable *
+XML_Loading_Archive::read_SI_UserFunction()
+{
+const int macro_num = find_int_attr("macro-num", true, 10);
+   if (macro_num != -1)
+      return Macro::get_macro(Macro::Macro_num(macro_num));
+
+const UTF8 * lambda_name = find_optional_attr("lambda-name");
+   if (lambda_name)   return read_lambda(lambda_name);
+
+const int level     = find_int_attr("symbol-level", false, 10);
+const UTF8 * name   = find_mandatory_attr("ufun-name");
+const UTF8 * n  = name;
+   while (*n != '"')   ++n;
+UTF8_string name_UTF(name, n - name);
+UCS_string name_UCS(name_UTF);
+
+Symbol * symbol = Workspace::lookup_symbol(name_UCS);
+   Assert(symbol);
+   Assert(level >= 0);
+   Assert(level < symbol->value_stack_size());
+const ValueStackItem & vsi = (*symbol)[level];
+   Assert(vsi.get_NC() == NC_FUNCTION || vsi.get_NC() == NC_OPERATOR);
+cFunction_P fun = vsi.get_function();
+   Assert(fun);
+const UserFunction * ufun = fun->get_func_ufun();
+   Assert(fun == ufun);
+
+   return ufun;
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_StateIndicator()
+{
+   if (copying)
+      {
+        skip_to_tag("/StateIndicator");
+        return;
+      }
+
+   Log(LOG_archive)   err << "read_StateIndicator()" << endl;
+
+const int levels = find_int_attr("levels", false, 10);
+
+   loop(l, levels)
+      {
+        next_tag(LOC);
+        expect_tag("SI-entry", LOC);
+
+        try
+           {
+             read_SI_entry(l);
+           }
+        catch (Error &)
+           {
+             err <<
+"\n"
+"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
+"    workspace. The )SI stack was reconstructed to the extent possible.\n"
+"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
+"    a different name.\n" << endl;
+
+             // skip rest of <StateIndicator>
+             //
+             skip_to_tag("/StateIndicator");
+             return;
+           }
+        catch (std::bad_alloc &)
+           {
+             err <<
+"\n"
+"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
+"    workspace. The )SI stack was reconstructed to the extent possible.\n"
+"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
+"    a different name.\n" << endl;
+
+             // skip rest of <StateIndicator>
+             //
+             skip_to_tag("/StateIndicator");
+             return;
+           }
+        catch (...)
+           { FIXME; }
+
+        // the parsers loop eats the terminating /SI-entry
+      }
+
+   instantiate_derived_functions(true);
+   instantiate_derived_functions(false);
+
+   next_tag(LOC);
+   expect_tag("/StateIndicator", LOC);
 }
 //----------------------------------------------------------------------------
 void
@@ -2565,286 +2764,20 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::read_Commands()
+XML_Loading_Archive::read_SymbolTable()
 {
 const int size = find_int_attr("size", false, 10);
 
-   Log(LOG_archive)   err << "  read_Commands()" << endl;
+   Log(LOG_archive)   err << "  read_SymbolTable()" << endl;
 
    loop(s, size)
       {
         next_tag(LOC);
-        read_Command();
+        read_Symbol();
       }
 
    next_tag(LOC);
-   expect_tag("/Commands", LOC);
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Command()
-{
-   expect_tag("Command", LOC);
-
-const UTF8 * name = find_mandatory_attr("name");
-const UTF8 * name_end = name;
-   while (*name_end != '"')   ++name_end;
-UTF8_string name_UTF(name, name_end - name);
-UCS_string  name_UCS(name_UTF);
-
-const UTF8 * fun = find_mandatory_attr("fun");
-const UTF8 * fun_end = fun;
-   while (*fun_end != '"')   ++fun_end;
-UTF8_string fun_UTF(fun, fun_end - fun);
-UCS_string  fun_UCS(fun_UTF);
-
-const int mode = find_int_attr("mode", false, 10);
-
-Command::user_command ucmd = { name_UCS, fun_UCS, mode };
-   Workspace::get_user_commands().push_back(ucmd);
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_StateIndicator()
-{
-   if (copying)
-      {
-        skip_to_tag("/StateIndicator");
-        return;
-      }
-
-   Log(LOG_archive)   err << "read_StateIndicator()" << endl;
-
-const int levels = find_int_attr("levels", false, 10);
-
-   loop(l, levels)
-      {
-        next_tag(LOC);
-        expect_tag("SI-entry", LOC);
-
-        try
-           {
-             read_SI_entry(l);
-           }
-        catch (Error &)
-           {
-             err <<
-"\n"
-"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
-"    workspace. The )SI stack was reconstructed to the extent possible.\n"
-"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
-"    a different name.\n" << endl;
-
-             // skip rest of <StateIndicator>
-             //
-             skip_to_tag("/StateIndicator");
-             return;
-           }
-        catch (std::bad_alloc &)
-           {
-             err <<
-"\n"
-"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
-"    workspace. The )SI stack was reconstructed to the extent possible.\n"
-"    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
-"    a different name.\n" << endl;
-
-             // skip rest of <StateIndicator>
-             //
-             skip_to_tag("/StateIndicator");
-             return;
-           }
-        catch (...)
-           { FIXME; }
-
-        // the parsers loop eats the terminating /SI-entry
-      }
-
-   instantiate_derived_functions(true);
-   instantiate_derived_functions(false);
-
-   next_tag(LOC);
-   expect_tag("/StateIndicator", LOC);
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_SI_entry(int lev)
-{
-const int level = find_int_attr("level", false, 10);
-const int pc = find_int_attr("pc", false, 10);
-
-   Log(LOG_archive)   err << "    read_SI_entry() level=" << level << endl;
-
-const Executable * exec = 0;
-   next_tag(LOC);
-   if      (is_tag("Execute"))        exec = read_SI_Execute();
-   else if (is_tag("Statements"))     exec = read_SI_Statement();
-   else if (is_tag("UserFunction"))   exec = read_SI_UserFunction();
-   else    Assert(0 && "Bad tag at " LOC); 
-
-   Assert(lev == level);
-   Assert(exec);
-
-   Workspace::push_SI(exec, LOC);
-StateIndicator * si = Workspace::SI_top();
-   Assert(si);
-   si->get_prefix().goto_PC(Function_PC(pc));
-   read_Parser(*si, lev);
-
-   for (;;)
-       {
-         // skip old EOC tags
-         //
-         next_tag(LOC);
-         if (is_tag("/SI-entry"))   break;
-       }
-}
-//----------------------------------------------------------------------------
-const Executable *
-XML_Loading_Archive::read_SI_Execute()
-{
-   next_tag(LOC);
-   expect_tag("UCS", LOC);
-
-const UTF8 * utf = find_mandatory_attr("uni");
-UCS_string text;
-   read_XML_string(text, utf);
-   next_tag(LOC);
-   expect_tag("/Execute", LOC);
-
-ExecuteList * exec = ExecuteList::fix(text, LOC);
-   Assert(exec);
-   return exec;
-}
-//----------------------------------------------------------------------------
-const Executable *
-XML_Loading_Archive::read_SI_Statement()
-{
-   next_tag(LOC);
-   expect_tag("UCS", LOC);
-const UTF8 * utf = find_mandatory_attr("uni");
-UCS_string text;
-   read_XML_string(text, utf);
-
-   next_tag(LOC);
-   expect_tag("/Statements", LOC);
-
-StatementList * exec = StatementList::fix(text, Value_P(), LOC);
-   Assert(exec);
-   return exec;
-}
-//----------------------------------------------------------------------------
-const Executable *
-XML_Loading_Archive::read_SI_UserFunction()
-{
-const int macro_num = find_int_attr("macro-num", true, 10);
-   if (macro_num != -1)
-      return Macro::get_macro(Macro::Macro_num(macro_num));
-
-const UTF8 * lambda_name = find_optional_attr("lambda-name");
-   if (lambda_name)   return read_lambda(lambda_name);
-
-const int level     = find_int_attr("symbol-level", false, 10);
-const UTF8 * name   = find_mandatory_attr("ufun-name");
-const UTF8 * n  = name;
-   while (*n != '"')   ++n;
-UTF8_string name_UTF(name, n - name);
-UCS_string name_UCS(name_UTF);
-
-Symbol * symbol = Workspace::lookup_symbol(name_UCS);
-   Assert(symbol);
-   Assert(level >= 0);
-   Assert(level < symbol->value_stack_size());
-const ValueStackItem & vsi = (*symbol)[level];
-   Assert(vsi.get_NC() == NC_FUNCTION || vsi.get_NC() == NC_OPERATOR);
-cFunction_P fun = vsi.get_function();
-   Assert(fun);
-const UserFunction * ufun = fun->get_func_ufun();
-   Assert(fun == ufun);
-
-   return ufun;
-}
-//----------------------------------------------------------------------------
-Executable *
-XML_Loading_Archive::read_lambda(const UTF8 * lambda_name)
-{
-UCS_string lambda = read_UCS();
-
-Symbol dummy(ID_No_ID);
-UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
-   Assert(ufun);
-const char * creator = ")LOAD )SI λ";
-   ufun->increment_refcount(LOC, creator);
-
-   next_tag(LOC);
-   expect_tag("/UserFunction", LOC);
-   return ufun;
-}
-//----------------------------------------------------------------------------
-UCS_string
-XML_Loading_Archive::read_UCS()
-{
-   skip_to_tag("UCS");
-const UTF8 * utf = find_mandatory_attr("uni");
-UCS_string text;
-   read_XML_string(text, utf);
-   return text;
-}
-//----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
-{
-   next_tag(LOC);
-   expect_tag("Parser", LOC);
-
-   Log(LOG_archive)   err << "        read_Parser() level=" << lev << endl;
-
-const int stack_size = find_int_attr("size",           false, 10);
-const int ass_state  = find_int_attr("assign-pending", false, 10);
-const int lah_high   = find_int_attr("lookahead-high", false, 10);
-const int action     = find_int_attr("action",         false, 10);
-
-Prefix & parser = si.current_stack;
-
-   parser.set_assign_state(Assign_state(ass_state));
-   parser.action = R_action(action);
-   parser.set_lookahead_PC(Function_PC(lah_high));
-
-   // read derived functions cache
-   //
-   for (;;)
-       {
-         next_tag(LOC);
-         if (is_tag("/Parser"))   break;
-         if (is_tag("Token"))     break;
-
-          read_Derived(si, lev);
-       }
-
-   // read parser token
-   //
-   for (;;)
-       {
-         next_tag(LOC);
-         if (is_tag("/Parser"))   break;
-
-         if (is_tag("Token"))
-            {
-              Token_loc tl;
-              read_Token(tl);
-
-              if (parser.ssize() < stack_size)   parser.push(tl);
-              else                             parser.saved_MISC.copy(tl, LOC);
-            }
-       }
-
-   Log(LOG_archive)
-      {
-         err << "        ";
-         parser.print_stack(err, LOC);
-      }
-
-   expect_tag("/Parser", LOC);
+   expect_tag("/SymbolTable", LOC);
 }
 //----------------------------------------------------------------------------
 bool
@@ -2963,207 +2896,274 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
    return true;
 }
 //----------------------------------------------------------------------------
-cFunction_P
-XML_Loading_Archive::read_Function_name()
+UCS_string
+XML_Loading_Archive::read_UCS()
 {
-const UTF8 * fun_name = find_optional_attr("ufun-name");
-
-   if (fun_name)   // user defined function
-      {
-        const int level = find_int_attr("symbol-level", false, 10);
-        const UTF8 * end = fun_name;
-        while (*end != '"')   ++end;
-        UTF8_string name_UTF(fun_name, end - fun_name);
-        UCS_string name_UCS(name_UTF);
-        if (name_UCS == ID::get_name_UCS(ID_LAMBDA))
-           {
-             Assert(level == -1);
-             return find_lambda(name_UCS);
-           }
-
-        const Symbol & symbol = *Workspace::lookup_symbol(name_UCS);
-
-        Assert(level >= 0);
-        Assert(level < symbol.value_stack_size());
-        const ValueStackItem & vsi = symbol[level];
-        Assert(vsi.get_NC() == NC_FUNCTION);
-        cFunction_P fun = vsi.get_function();
-        Assert(fun);
-        return fun;
-      }
-
-const int fun_id = find_int_attr("fun-id", true, 16);
-   if (fun_id != -1)
-      {
-        cFunction_P sysfun = ID::get_system_function(Id(fun_id));
-        Assert(sysfun);
-        return sysfun;
-      }
-
-   // not found. This can happen when the function is optional.
-   //
-   return 0;
-}
-//----------------------------------------------------------------------------
-XML_Loading_Archive::fun_map *
-XML_Loading_Archive::find_fun_map(Fid fid)
-{
-   loop(f, fid_to_function.size())
-       {
-         if (fid_to_function[f].old_fid == fid)   return &fid_to_function[f];
-       }
-
-   return 0;
-}
-//----------------------------------------------------------------------------
-cFunction_P
-XML_Loading_Archive::find_function(Fid fid)
-{
-   if (fun_map * map = find_fun_map(fid))   return map->new_fun;
-   return 0;
+   skip_to_tag("UCS");
+const UTF8 * utf = find_mandatory_attr("uni");
+UCS_string text;
+   read_XML_string(text, utf);
+   return text;
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::add_fid_function(Fid fid, cFunction_P new_fun,
-                                      const char * loc)
+XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
 {
-   if (fun_map * map = find_fun_map(fid))   // fid exists
-      {
-        if (map->new_fun)   // function also exists.
-           {
-             // function already exists. Setting it multiple times is OK
-             // as long as the pointers are the same (e.g. pointer to
-             // primitive APL functions).
-             //
-             if (new_fun == map->new_fun)   return;
+   Log(LOG_archive)   err << "      [" << d << "] unused name" << endl;
 
-             err << "*** OVERRIDING fid " << HEX(fid)
-                  << " (from " << map->loc << ") at " << loc << "***" << endl;
+   if (d == 0)   return;   // Symbol::Symbol has already created the top level
+
+   symbol.push();
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Value()
+{
+   expect_tag("Value", LOC);
+
+   // read all mandatory attributes even if they are no used in this pass
+   //
+const Vid vid    = find_Vid_attr("vid",    false, 10);
+const int flags  = find_int_attr("flg",    false, 16);
+const Vid parent = find_Vid_attr("parent", false, 10);
+const int rk     = find_int_attr("rk",     false, 10);
+
+   Log(LOG_archive)   err << "  read_Value() vid=" << vid << endl;
+
+   if (reading_vids)
+      {
+         parents.push_back(parent);
+         return;
+      }
+
+Shape sh_value;
+   loop(r, rk)
+      {
+        char sh[20];
+        SPRINTF(sh, "sh-%d", int(r));
+        const UTF8 * sh_r = find_mandatory_attr(sh);
+        sh_value.add_shape_item(atoll(charP(sh_r)));
+      }
+
+   /* if:
+
+      1. we do )COPY or )PCOPY, and
+      2. vid is not in vids_COPY list,
+
+      then we push 0 (so that indexing with vid still works) and ignore such
+      values in read_Ravel.
+    */
+
+bool no_copy = false;   // assume the value is needed
+   if (copying)
+      {
+        // if vid is a sub-value then find its topmost owner
+        //
+        int parent = vid;
+        for (;;)
+            {
+              Assert(parent < int(parents.size()));
+              if (parents[parent] == -1)   break;   // topmost owner found
+              parent = parents[parent];
+            }
+
+        no_copy = true;   // assume the value is not needed
+        loop(v, vids_COPY.size())
+           {
+              if (parent == vids_COPY[v])   // vid is in the list: copy
+                 {
+                   no_copy = false;
+                   break;
+                 }
            }
+      }
+
+   if (no_copy)
+      {
+        values.push_back(Value_P());
+      }
+   else
+      {
+        Assert(vid == int(values.size()));
+        if (flags & VF_packed)
+           {
+             Value_P val(sh_value, /* constructor allocates */ 0, LOC);
+             values.push_back(val);
+            }
         else
            {
-             map->new_fun = new_fun;
-             map->loc = loc;
+             Value_P val(sh_value, LOC);
+             if (flags & VF_member)   val->set_member();
+             values.push_back(val);
            }
+      }
+}
+//----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
+{
+const int vid = find_int_attr("vid", false, 10);
+   Assert(vid < int(values.size()));
 
+   Log(LOG_archive)   err << "      [" << d << "] read_Variable() vid=" << vid
+                           << " name=" << symbol.get_name() << endl;
+
+   // some system variables are saved for troubleshooting purposes, but
+   // should not be loaded...
+   //
+   if (symbol.is_readonly())                     return;
+   if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
+   if (symbol.get_Id() == ID_Quad_SVE)           return;
+   if (symbol.get_Id() == ID_Quad_SYL)           return;
+   if (symbol.get_Id() == ID_Quad_PS)            return;
+
+   if (vid == -1)   // stale variable
+      {
+        Log(LOG_archive)   err << "      " << symbol.get_name()
+                                << " looks like a stale variable" << endl;
         return;
       }
 
-   // new fid/function
+   if (!values[vid])   return;   // value filtered out
+
+   while (symbol.value_stack_size() <= d)   symbol.push();
+// if (d != 0)   symbol.push();
+
+   try
+      {
+        symbol.assign(values[vid], true, LOC);
+      }
+   catch (Error &)
+      {
+        err << "*** Could not assign value " << *values[vid]
+             << "    to variable " << symbol.get_name() << " ***" << endl;
+      }
+   catch (std::bad_alloc &)
+      {
+        err << "*** Could not assign value " << *values[vid]
+             << "    to variable " << symbol.get_name() << " ***" << endl;
+        WS_FULL;
+      }
+   catch (...)
+      { FIXME; }
+}
+//----------------------------------------------------------------------------
+const UTF8 *
+XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
+{
+   /* argument 'utf' is the source for a sequence of characters.
+      'utf' comes from find_attr() and is therefore NOT 0-terminated but
+      instead terminated by '"'.
+
+      The Unicodes read from 'utf' are stored in result 'ucs'.
+
+      On return, 'utf' points to the terminating '"'.
+    */
+
+   while (*utf <= ' ')   ++utf;   // skip leading whitespace
+
+   // char mode is controlled by delimiters:
    //
-const fun_map fm =  { fid, new_fun, loc };
-   fid_to_function.push_back(fm);
+   // ² (UNI_PAD_U2 = start of char mode),
+   // ¹ (UNI_PAD_U1 = start of hex mode = implicit end of char mode), and
+   // ⁰ (UNI_PAD_U0 = end of char mode).
+   //
+   // This function processes a sequence of ²strings⁰ and ¹unicodes.
+   // It returns at the end of the XML attribute (") or a the next
+   // micro-tag (³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹)
+
+   for (bool char_mode = false; *utf && (*utf != '"');)
+       {
+         // get next Unicode and advance utf
+         //
+         const UTF8 * from = utf;
+         int len = 0;   // length of uni
+         const Unicode uni = UTF8_string::toUni(utf, len, true);
+         utf += len;     // skip uni
+
+          if (char_mode && uni != '\n' && uni != UNI_PAD_U0)
+             {
+               ucs << uni;
+               continue;
+             }
+
+         if (uni == UNI_PAD_U2)   // start of char_mode
+            {
+              char_mode = true;
+              continue;
+            }
+
+         if (uni == UNI_PAD_U1)   // start of hex mode
+            {
+              char_mode = false;
+              char * end = 0;
+              const int hex = strtoll(charP(utf), &end, 16);
+              ucs << Unicode(hex);
+              utf = utf8P(end);
+              continue;
+            }
+
+         if (uni == UNI_PAD_U0)   // end of ²char_mode⁰
+            {
+              char_mode = false;
+              continue;
+            }
+
+         if (uni == '\n')   // end of char_mode (fix old bug)
+            {
+              // due to an old bug, the trailing UNI_PAD_U0 may be missing
+              // at the end of the line. We therefore reset char_mode at the
+              // end of the line so that workspaces save with that fault can
+              // be read.
+              //
+              char_mode = false;
+              continue;
+            }
+
+         if (uni == ' ')   // indentation
+            {
+              continue;
+            }
+
+         if (!char_mode)   // outside of ²char_mode⁰
+            {
+              if (uni == UNI_PAD_U3 ||
+                  uni == UNI_PAD_U4 ||
+                  uni == UNI_PAD_U5 ||
+                  uni == UNI_PAD_U6 ||
+                  uni == UNI_PAD_U7 ||
+                  uni == UNI_PAD_U8 ||
+                  uni == UNI_PAD_U9)    return from;
+            }
+
+         FIXME   // not reached
+       }
+
+   return utf;
 }
 //----------------------------------------------------------------------------
 void
-XML_Loading_Archive::instantiate_derived_functions(bool allocate)
+XML_Loading_Archive::where()
 {
-   /* derived functions are allocated i 2 phases:
+   err << "line=" << line_no << "+" << (data - line_start) << " '";
 
-      phase 1: allocate=true and todo.cache set: create the function
-      phase 2: allocate=false and todo.symptr set: store pointer
-    */
-
-   loop(d, derived_todos.size())
-      {
-        _derived_todo & todo = derived_todos[d];
-        Assert(todo.fid != -1);
-
-        cFunction_P fun = find_function(todo.fid);
-        Assert(fun);
-
-        if (!allocate)
-           {
-             if (todo.symptr)   *todo.symptr = fun;
-             continue;
-           }
-
-        if (!todo.cache)   continue;
-
-        Assert(todo.LO_fid   != -1);
-        cFunction_P LO = find_function(todo.LO_fid);
-        Assert(LO);
-
-        Assert(todo.OPER_fid != -1);
-        cFunction_P OPER = find_function(todo.OPER_fid);
-        Assert(OPER);
-        Token tok_LO(TOK_FUN2, LO);
-
-        if (todo.RO_fid   != -1)   // dyadic operator
-           {
-             Assert(todo.RO_fid != -1);
-             cFunction_P RO = find_function(todo.RO_fid);
-             Assert(RO);
-             Token tok_RO(TOK_FUN2, RO);
-
-             if (todo.AXIS_vid == -1)   // dyadic operator without axis
-                {
-                  new (todo.cache)
-                      Derived_LO_D_RO(tok_LO, OPER, tok_RO, LOC);
-                }
-             else                       // dyadic operator with axis
-                {
-                  Value_P val_X = values[todo.AXIS_vid];
-                  new (todo.cache) Derived_LO_D_X_RO(tok_LO, OPER, val_X,
-                                                     tok_RO, LOC);
-                }
-           }
-        else                       // monadic operator
-           {
-             if (todo.AXIS_vid == -1)   // monadic operator without axis
-                {
-                  new (todo.cache) Derived_LO_M(tok_LO, OPER, LOC);
-                }
-             else                       // monadic operator with axis
-                {
-                  Value_P X = values[todo.AXIS_vid];
-                  new (todo.cache) Derived_LO_M_X(tok_LO, OPER, X, LOC);
-                }
-           }
-      }
+   loop(j, 40)   { if (data[j] == 0x0A)   break;   err << data[j]; }
+   err << "'" << endl;
 }
 //----------------------------------------------------------------------------
-cFunction_P
-XML_Loading_Archive::find_lambda(const UCS_string & lambda)
+void
+XML_Loading_Archive::where_att()
 {
-const StateIndicator & si = *Workspace::SI_top();
-const Executable & exec = *si.get_executable();
-const Token_string & body = exec.get_body();
+   err << "line=" << line_no << "+" << (attributes - line_start) << " '";
 
-   loop(b, body.size())
+   loop(j, 40)
       {
-        const Token & tok = body[b];
-        if (tok.get_ValueType() == TV_SYM)
-           {
-             const Symbol * sym = tok.get_sym_ptr();
-             Assert(sym);
-             loop(v, sym->value_stack_size())
-                {
-                  const ValueStackItem & vs = (*sym)[v];
-                  if (vs.get_NC() & NC_FUN_OPER)
-                     {
-                       if (vs.get_function()->get_name() == lambda)
-                          {
-                            return vs.get_function();
-                          }
-                     }
-                }
-             continue;   // not found
-           }
-        else if (tok.get_ValueType() != TV_FUN)   continue;
-
-        cFunction_P fun = tok.get_function();
-        Assert1(fun);
-        const UserFunction * ufun = fun->get_func_ufun();
-        if (!ufun)   continue;   // not a user defined function
-
-        const UCS_string & fname = ufun->get_name();
-        if (fname == lambda)   return fun;
+        if (attributes[j] == 0x0A)        break;
+        if (attributes + j >= end_attr)   break;
+        err << attributes[j];
       }
 
-   err << "find_lambda() failed for " << lambda
-        << " at )SI level=" << si.get_level() << endl;
-   return 0;
+   err << "'" << endl;
 }
 //============================================================================
 

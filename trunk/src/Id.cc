@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,14 +67,6 @@
 vector<ID> ID::all_IDs;
 
 //----------------------------------------------------------------------------
-UCS_string
-ID::get_name_UCS(Id id)
-{
-const UTF8 * name = get_name(id);
-const UTF8_string utf(charP(name));
-   return UCS_string(utf);
-}
-//----------------------------------------------------------------------------
 const UTF8 *
 ID::get_name(Id id)
 {
@@ -101,6 +93,14 @@ ostream &
 operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
+}
+//----------------------------------------------------------------------------
+UCS_string
+ID::get_name_UCS(Id id)
+{
+const UTF8 * name = get_name(id);
+const UTF8_string utf(charP(name));
+   return UCS_string(utf);
 }
 //----------------------------------------------------------------------------
 cFunction_P

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,36 +33,6 @@ Bif_OPER2_INNER   Bif_OPER2_INNER::fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
-//----------------------------------------------------------------------------
-Token
-Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, cFunction_P fun,
-                      Value_P B, const char * loc)
-{
-   // this function is called from A f.g B when A fun B is called with an
-   // empty A or B. In this case shape_Z is empty since A->get_shape() or
-   // B->get_shape() (or both) contain axes of length 0.
-
-Value_P Fill_A;   // argument A of the fill function
-Value_P Fill_B;   // argument B of the fill function
-
-   if (A->is_empty())   Fill_A = A->prototype(LOC);
-   else                 Fill_A = Bif_F12_TAKE::first(*A);
-
-   if (B->is_empty())   Fill_B = B->prototype(LOC);
-   else                 Fill_B = Bif_F12_TAKE::first(*B);
-
-Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
-
-   if (tok.get_Class() != TC_VALUE)   return tok;
-
-Value * Z = tok.get_apl_val().get();
-
-Value_P Z1(shape_Z, LOC);   // shape_Z is empty
-   Z1->get_wproto().init_from_value(Z, *Z1, loc);
-
-   Z1->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z1);
-}
 //----------------------------------------------------------------------------
 Token
 Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const
@@ -246,6 +216,36 @@ const uint64_t start_1 = cycle_counter();
 const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_INNER_AB.add_sample(end_1-start_1, job.ZAh * job.ZBl);
 #endif
+}
+//----------------------------------------------------------------------------
+Token
+Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, cFunction_P fun,
+                      Value_P B, const char * loc)
+{
+   // this function is called from A f.g B when A fun B is called with an
+   // empty A or B. In this case shape_Z is empty since A->get_shape() or
+   // B->get_shape() (or both) contain axes of length 0.
+
+Value_P Fill_A;   // argument A of the fill function
+Value_P Fill_B;   // argument B of the fill function
+
+   if (A->is_empty())   Fill_A = A->prototype(LOC);
+   else                 Fill_A = Bif_F12_TAKE::first(*A);
+
+   if (B->is_empty())   Fill_B = B->prototype(LOC);
+   else                 Fill_B = Bif_F12_TAKE::first(*B);
+
+Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
+
+   if (tok.get_Class() != TC_VALUE)   return tok;
+
+Value * Z = tok.get_apl_val().get();
+
+Value_P Z1(shape_Z, LOC);   // shape_Z is empty
+   Z1->get_wproto().init_from_value(Z, *Z1, loc);
+
+   Z1->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z1);
 }
 //----------------------------------------------------------------------------
 void

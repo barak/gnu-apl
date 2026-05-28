@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,16 +162,6 @@ protected:
    /// @param rank_tolerant if true, allow rank mismatches when padding items
    static Shape compute_item_shape(Value_P B, bool rank_tolerant);
 
-   /// compute the offset of the Cell in B that shall be picked.
-   /// @param A0 pointer to the first cell of the index array A
-   /// @param idx_A current index position in A
-   /// @param len_A total number of index cells in A
-   /// @param B right argument APL value
-   /// @param qio current value of ⎕IO
-   static ShapeItem pick_offset(const Cell * const A0, ShapeItem idx_A,
-                                ShapeItem len_A, const Value * B,
-                                APL_Integer qio);
-
    /// Pick from B according to cA and len_A. \b cell_owner is non-zero
    /// if a left-vlues is picked, (e.g (2 1⊃B)←'TR')
    /// @param A0 pointer to the first cell of the index array A
@@ -181,6 +171,16 @@ protected:
    /// @param qio current value of ⎕IO
    static Value_P pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
                        const Value * B, APL_Integer qio);
+
+   /// compute the offset of the Cell in B that shall be picked.
+   /// @param A0 pointer to the first cell of the index array A
+   /// @param idx_A current index position in A
+   /// @param len_A total number of index cells in A
+   /// @param B right argument APL value
+   /// @param qio current value of ⎕IO
+   static ShapeItem pick_offset(const Cell * const A0, ShapeItem idx_A,
+                                ShapeItem len_A, const Value * B,
+                                APL_Integer qio);
 };
 //============================================================================
 

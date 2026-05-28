@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,6 +77,15 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
 }
 //----------------------------------------------------------------------------
 Token
+Quad_RVAL::eval_AB(Value_P A, Value_P B) const
+{
+const sAxis subfunction = value_to_subfun(*A);
+
+Value_P Z = do_eval_AB(subfunction, *B);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
 Quad_RVAL::eval_B(Value_P B) const
 {
    if (B->is_str0())    return list_functions(CERR);
@@ -89,6 +98,28 @@ Quad_RVAL::eval_B(Value_P B) const
       }
 
    return Token(TOK_APL_VALUE1, do_eval_B(*B, 0));
+}
+//----------------------------------------------------------------------------
+Token
+Quad_RVAL::eval_XB(Value_P X, Value_P B) const
+{
+   return eval_AB(X, B);
+}
+//----------------------------------------------------------------------------
+void Quad_RVAL::print_fun_syntax(ostream & out,
+                                 const function_info & info) const
+{
+   out << "    ⎕RVAL[" << info.axis << "] B   ⍝ " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void Quad_RVAL::print_map_syntax(ostream & out,
+                                 const function_info & info) const
+{
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
+
+   out << "   ⎕RVAL[" << info.axis << "]  ←→  ⎕RVAL['" << name << "']"
+       << blanks << "  ←→  ⎕RVAL." << name << endl;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -233,19 +264,58 @@ const ShapeItem ec = Z->element_count();
    return Z;
 }
 //----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_AB(Value_P A, Value_P B) const
+void
+Quad_RVAL::random_nested(Value & Z, const Value & B, int depth) const
 {
-const sAxis subfunction = value_to_subfun(*A);
+Value_P Zsub;
 
-Value_P Z = do_eval_AB(subfunction, *B);
-   return Token(TOK_APL_VALUE1, Z);
+   do Zsub = do_eval_B(B, depth + 1);
+   while (Zsub->is_simple_scalar());
+
+   Z.next_ravel_Pointer(Zsub.get());
 }
 //----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_XB(Value_P X, Value_P B) const
+int
+Quad_RVAL::choose_integer(const vector<int> & dist)
 {
-   return eval_AB(X, B);
+const int dist_len = dist.size();
+   Assert(dist_len > 0);
+
+   /* a distribution with a single value N shall mean:
+
+       N > 0: fixed value N
+       N < 0: equal distribution 0..N-1
+    */
+    if (dist_len == 1)   // fixed value or equal distribution 0, 1, ... n
+      {
+        const int desired = dist[0];
+        if (desired >= 0)   return desired;   // fixed value
+        const int rand = rand17();
+        return rand % (1 - desired);          // = 0... desired
+      }
+
+   // dist is a distribution...
+
+   // 1. compute the sum of the weights.
+   //    The weights should be reasonably small (sum ≤ 0xFFFF).
+   //
+int sum = 0;
+   for (size_t d = 0; d < dist.size(); ++d)   sum += dist[d];
+
+   // 2. pick a random number 0...sum
+   //
+const int rand = (rand17() & 0xFFFF) % sum;
+
+   // 3. return the index of rand in +\dist
+   //
+   sum = 0;
+   for (size_t d = 0; d < dist.size(); ++d)
+       {
+          sum += dist[d];
+          if (rand < sum)   return d;
+       }
+
+   FIXME;   // not reached
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -311,20 +381,110 @@ Value_P Z(N, LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
-void Quad_RVAL::print_fun_syntax(ostream & out,
-                                 const function_info & info) const
+uint64_t
+Quad_RVAL::rand17()
 {
-   out << "    ⎕RVAL[" << info.axis << "] B   ⍝ " << info.comment_fun << endl;
+#if ! MINGW_SRC
+const int32_t rnd = random();
+
+   // the lower bits are less random, so we xor the upper 16 bits into
+   // the lower 16 bits and return them.
+   return (rnd ^ (rnd >> 16)) & 0x1FFFF;
+#else
+   return 0;
+#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
-void Quad_RVAL::print_map_syntax(ostream & out,
-                                 const function_info & info) const
+void
+Quad_RVAL::random_character(Value & Z)
 {
-const char * name = info.function_name;
-const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
+const int32_t rnd = rand17();
+   Z.next_ravel_Char(Unicode((rnd & 0x1FFF) + ((rnd & 0x2000) >> 1)));
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::random_complex(Value & Z)
+{
+   Z.next_ravel_Complex(random_ieee(), random_ieee());
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::random_float(Value & Z)
+{
+   Z.next_ravel_Float(random_ieee());
+}
+//----------------------------------------------------------------------------
+double
+Quad_RVAL::random_ieee()
+{
+union { double f;
+        char bytes[8];
+      } u;
+   do {
+        const int64_t rand64 = rand17()
+                             ^ (rand17() << 16)
+                             ^ (rand17() << 32)
+                             ^ (rand17() << 48);
+        
+        enum { BIAS     = 1023,          // IEEE
+               EXPO     = 0 + BIAS,      // 2^0
+               EXPO_LSB = EXPO & 0x0F,   // 0..15
+               EXPO_MSB = EXPO >> 4      // 0..15
+             };
 
-   out << "   ⎕RVAL[" << info.axis << "]  ←→  ⎕RVAL['" << name << "']"
-       << blanks << "  ←→  ⎕RVAL." << name << endl;
+        u.bytes[7] = EXPO_MSB;                // SIGN + and exponent MSBs
+        u.bytes[6] = (EXPO_LSB << 4)          // exponent LSBs
+                   | (rand64 >> 56 & 0x0F);   // 52 bit fraction MSBs
+        u.bytes[5] = rand64 >> 40;            // 52 bit fraction
+        u.bytes[4] = rand64 >> 32;            // 52 bit fraction
+        u.bytes[3] = rand64 >> 24;            // 52 bit fraction
+        u.bytes[2] = rand64 >> 16;            // 52 bit fraction
+        u.bytes[1] = rand64 >>  8;            // 52 bit fraction
+        u.bytes[0] = rand64 >>  0;            // 52 bit fraction LSBs
+      } while (!isnormal(u.f));
+
+   // at this point: 1.0 < u.f < 2.0
+   //
+   return u.f - 1.0;
+}
+//----------------------------------------------------------------------------
+void
+Quad_RVAL::random_integer(Value & Z)
+{
+const int64_t rnd = rand17()
+                  ^ (rand17() << 16)
+                  ^ (rand17() << 32)
+                  ^ (rand17() << 48);
+   Z.next_ravel_Int(rnd);
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::result_maxdepth(const Value & B)
+{
+   if (B.get_rank() > 1)        RANK_ERROR;
+   if (B.element_count() > 1)   LENGTH_ERROR;
+
+   // result Z is the current max. depth
+   //
+Value_P Z = IntScalar(desired_maxdepth, LOC);
+
+   if (B.element_count())   // set the desired maxdepth
+      {
+        const APL_Integer mxd = B.get_cfirst().get_int_value();
+        if (mxd < 0)
+           {
+             MORE_ERROR() << "bad max.depth";
+             DOMAIN_ERROR;
+           }
+        desired_maxdepth = mxd;
+
+        Log(LOG_Quad_RVAL)
+           {
+             CERR << "set desired_maxdepth to" << desired_maxdepth << endl;
+           }
+      }
+
+   return Z;   // previous desired_maxdepth
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -506,166 +666,6 @@ Value_P Z(desired_types.size(), LOC);
       }
 
    return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::result_maxdepth(const Value & B)
-{
-   if (B.get_rank() > 1)        RANK_ERROR;
-   if (B.element_count() > 1)   LENGTH_ERROR;
-
-   // result Z is the current max. depth
-   //
-Value_P Z = IntScalar(desired_maxdepth, LOC);
-
-   if (B.element_count())   // set the desired maxdepth
-      {
-        const APL_Integer mxd = B.get_cfirst().get_int_value();
-        if (mxd < 0)
-           {
-             MORE_ERROR() << "bad max.depth";
-             DOMAIN_ERROR;
-           }
-        desired_maxdepth = mxd;
-
-        Log(LOG_Quad_RVAL)
-           {
-             CERR << "set desired_maxdepth to" << desired_maxdepth << endl;
-           }
-      }
-
-   return Z;   // previous desired_maxdepth
-}
-//----------------------------------------------------------------------------
-int
-Quad_RVAL::choose_integer(const vector<int> & dist)
-{
-const int dist_len = dist.size();
-   Assert(dist_len > 0);
-
-   /* a distribution with a single value N shall mean:
-
-       N > 0: fixed value N
-       N < 0: equal distribution 0..N-1
-    */
-    if (dist_len == 1)   // fixed value or equal distribution 0, 1, ... n
-      {
-        const int desired = dist[0];
-        if (desired >= 0)   return desired;   // fixed value
-        const int rand = rand17();
-        return rand % (1 - desired);          // = 0... desired
-      }
-
-   // dist is a distribution...
-
-   // 1. compute the sum of the weights.
-   //    The weights should be reasonably small (sum ≤ 0xFFFF).
-   //
-int sum = 0;
-   for (size_t d = 0; d < dist.size(); ++d)   sum += dist[d];
-
-   // 2. pick a random number 0...sum
-   //
-const int rand = (rand17() & 0xFFFF) % sum;
-
-   // 3. return the index of rand in +\dist
-   //
-   sum = 0;
-   for (size_t d = 0; d < dist.size(); ++d)
-       {
-          sum += dist[d];
-          if (rand < sum)   return d;
-       }
-
-   FIXME;   // not reached
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::random_character(Value & Z)
-{
-const int32_t rnd = rand17();
-   Z.next_ravel_Char(Unicode((rnd & 0x1FFF) + ((rnd & 0x2000) >> 1)));
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::random_integer(Value & Z)
-{
-const int64_t rnd = rand17()
-                  ^ (rand17() << 16)
-                  ^ (rand17() << 32)
-                  ^ (rand17() << 48);
-   Z.next_ravel_Int(rnd);
-}
-//----------------------------------------------------------------------------
-double
-Quad_RVAL::random_ieee()
-{
-union { double f;
-        char bytes[8];
-      } u;
-   do {
-        const int64_t rand64 = rand17()
-                             ^ (rand17() << 16)
-                             ^ (rand17() << 32)
-                             ^ (rand17() << 48);
-        
-        enum { BIAS     = 1023,          // IEEE
-               EXPO     = 0 + BIAS,      // 2^0
-               EXPO_LSB = EXPO & 0x0F,   // 0..15
-               EXPO_MSB = EXPO >> 4      // 0..15
-             };
-
-        u.bytes[7] = EXPO_MSB;                // SIGN + and exponent MSBs
-        u.bytes[6] = (EXPO_LSB << 4)          // exponent LSBs
-                   | (rand64 >> 56 & 0x0F);   // 52 bit fraction MSBs
-        u.bytes[5] = rand64 >> 40;            // 52 bit fraction
-        u.bytes[4] = rand64 >> 32;            // 52 bit fraction
-        u.bytes[3] = rand64 >> 24;            // 52 bit fraction
-        u.bytes[2] = rand64 >> 16;            // 52 bit fraction
-        u.bytes[1] = rand64 >>  8;            // 52 bit fraction
-        u.bytes[0] = rand64 >>  0;            // 52 bit fraction LSBs
-      } while (!isnormal(u.f));
-
-   // at this point: 1.0 < u.f < 2.0
-   //
-   return u.f - 1.0;
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::random_float(Value & Z)
-{
-   Z.next_ravel_Float(random_ieee());
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::random_complex(Value & Z)
-{
-   Z.next_ravel_Complex(random_ieee(), random_ieee());
-}
-//----------------------------------------------------------------------------
-void
-Quad_RVAL::random_nested(Value & Z, const Value & B, int depth) const
-{
-Value_P Zsub;
-
-   do Zsub = do_eval_B(B, depth + 1);
-   while (Zsub->is_simple_scalar());
-
-   Z.next_ravel_Pointer(Zsub.get());
-}
-//----------------------------------------------------------------------------
-uint64_t
-Quad_RVAL::rand17()
-{
-#if ! MINGW_SRC
-const int32_t rnd = random();
-
-   // the lower bits are less random, so we xor the upper 16 bits into
-   // the lower 16 bits and return them.
-   return (rnd ^ (rnd >> 16)) & 0x1FFFF;
-#else
-   return 0;
-#endif // ! MINGW_SRC
 }
 //----------------------------------------------------------------------------
 // EOF

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2020-2022  Dr. Jürgen Sauermann
+    Copyright © 2020-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@ public:
    : NonscalarFunction(TOK_F12_INTERVAL_INDEX)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB()
    /// @param A left argument APL value (sorted interval boundaries)
    /// @param B right argument APL value (values to locate in intervals)
    virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const;
 
    static Bif_F12_INTERVAL_INDEX  fun;   ///< Built-in function
 

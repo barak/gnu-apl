@@ -93,6 +93,19 @@ CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
    push_back(others);
 }
 //----------------------------------------------------------------------------
+ShapeItem
+CollatingCache::get_significance(Unicode uni) const
+{
+const CollatingCacheEntry * entries = &at(0);
+const CollatingCacheEntry * entry =
+
+   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, *this,
+                                         CollatingCacheEntry::compare_chars, 0);
+
+   if (entry)   return entry - entries;
+   return size() - 1;   // the entry for characters not in A
+}
+//----------------------------------------------------------------------------
 bool
 CollatingCache::greater_vec(const ShapeItem & Za, const ShapeItem & Zb,
                             const void * comp_arg)
@@ -135,19 +148,6 @@ const sRank rank = cache.get_rank();
        }
 
    return significance_a < significance_b;
-}
-//----------------------------------------------------------------------------
-ShapeItem
-CollatingCache::get_significance(Unicode uni) const
-{
-const CollatingCacheEntry * entries = &at(0);
-const CollatingCacheEntry * entry =
-
-   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, *this,
-                                         CollatingCacheEntry::compare_chars, 0);
-
-   if (entry)   return entry - entries;
-   return size() - 1;   // the entry for characters not in A
 }
 //============================================================================
 Token

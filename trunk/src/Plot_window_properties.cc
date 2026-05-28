@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,16 +102,6 @@ Plot_window_properties::~Plot_window_properties()
       CERR << "~Plot_window_properties(): deleting plot_data" << endl;
 
    delete &plot_data;
-}
-//----------------------------------------------------------------------------
-void
-Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
-{
-   // pa_width and pa_height are the size of the plot area (without borders).
-   //
-   pa_width  = width  - pa_border_L - origin_X - pa_border_R;
-   pa_height = height - pa_border_T - origin_Y - pa_border_B;
-   update(0);
 }
 //----------------------------------------------------------------------------
 
@@ -273,6 +263,27 @@ const int max_Zi = ceil(max_Z / tile_Z);
    return false;   // OK
 }
 //----------------------------------------------------------------------------
+void
+Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
+{
+   // pa_width and pa_height are the size of the plot area (without borders).
+   //
+   pa_width  = width  - pa_border_L - origin_X - pa_border_R;
+   pa_height = height - pa_border_T - origin_Y - pa_border_B;
+   update(0);
+}
+//----------------------------------------------------------------------------
+Pixel_XY
+Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
+{
+const double phi = atan2(get_origin_Y(), get_origin_X());
+const Pixel_Z pz = valZ2pixel(Z - get_min_Z());
+const Pixel_X px = valX2pixel(X - get_min_X()) + get_origin_X() - pz*cos(phi);
+const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
+
+   return Pixel_XY(px, py);
+}
+//----------------------------------------------------------------------------
 int
 Plot_window_properties::print(ostream & out) const
 {
@@ -423,17 +434,6 @@ int line_number = -1;
    return tmp_error;
 }
 //----------------------------------------------------------------------------
-bool
-Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
-{
-   loop(ps, properties_set.size())
-       {
-         if (properties_set[ps] == (line << 8 | propnum))   return false;
-       }
-
-   return true;
-}
-//----------------------------------------------------------------------------
 const char *
 Plot_window_properties::set_attribute(const UCS_string & att, const Cell & val)
 {
@@ -478,6 +478,52 @@ const char * attname_cp = attname_utf.c_str();
       {
         return "Bad attribute value type";
       }
+}
+//----------------------------------------------------------------------------
+uint32_t
+Plot_window_properties::get_color(double alpha) const
+{
+   Assert(alpha >= 0.0);
+   Assert(alpha <= 1.0);
+
+   if (gradient.size() == 0)   // no gradient specified: use gray-scale
+      return uint32_t(255*alpha) << 16
+           | uint32_t(255*alpha) << 8
+           | uint32_t(255*alpha);
+
+   if (gradient.size() == 1)   // only one gradient specified: use it
+      return gradient[0].rgb;
+
+   loop(g, gradient.size())
+       {
+         const double level_g = 0.01*gradient[g].level;
+         if (alpha == level_g)   return gradient[g].rgb;
+         if (alpha < level_g)   // level_g is the first level above alpha
+            {
+               if (g == 0)   return gradient[0].rgb;   // use first gradient
+
+               // interpolate
+               //
+               const double l0 = 0.01*gradient[g-1].level;   // previous level
+               const double beta1 = (alpha - l0) / (level_g - l0);
+               Assert(beta1 >= 0.0);
+               Assert(beta1 <= 1.0);
+               const double beta0 = 1.0 - beta1;
+               const uint32_t rgb0 = gradient[g-1].rgb;
+               const uint32_t rgb1 = gradient[g].rgb;
+               const uint32_t red = beta1*(rgb1 >> 16 & 0xFF)
+                                  + beta0*(rgb0 >> 16 & 0xFF);
+               const uint32_t grn = beta1*(rgb1 >>  8 & 0xFF)
+                                  + beta0*(rgb0 >>  8 & 0xFF);
+               const uint32_t blu = beta1*(rgb1       & 0xFF)
+                                  + beta0*(rgb0       & 0xFF);
+               return red << 16 | grn << 8 | blu;
+            }
+       }
+
+   // alpha is above last gradient: use last gradient
+   //
+   return gradient.back().rgb;
 }
 //----------------------------------------------------------------------------
 double
@@ -587,61 +633,15 @@ tm rounded;   // tile rounded up
    return mktime(&rounded);   // back to seconds
 }
 //----------------------------------------------------------------------------
-uint32_t
-Plot_window_properties::get_color(double alpha) const
+bool
+Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
 {
-   Assert(alpha >= 0.0);
-   Assert(alpha <= 1.0);
-
-   if (gradient.size() == 0)   // no gradient specified: use gray-scale
-      return uint32_t(255*alpha) << 16
-           | uint32_t(255*alpha) << 8
-           | uint32_t(255*alpha);
-
-   if (gradient.size() == 1)   // only one gradient specified: use it
-      return gradient[0].rgb;
-
-   loop(g, gradient.size())
+   loop(ps, properties_set.size())
        {
-         const double level_g = 0.01*gradient[g].level;
-         if (alpha == level_g)   return gradient[g].rgb;
-         if (alpha < level_g)   // level_g is the first level above alpha
-            {
-               if (g == 0)   return gradient[0].rgb;   // use first gradient
-
-               // interpolate
-               //
-               const double l0 = 0.01*gradient[g-1].level;   // previous level
-               const double beta1 = (alpha - l0) / (level_g - l0);
-               Assert(beta1 >= 0.0);
-               Assert(beta1 <= 1.0);
-               const double beta0 = 1.0 - beta1;
-               const uint32_t rgb0 = gradient[g-1].rgb;
-               const uint32_t rgb1 = gradient[g].rgb;
-               const uint32_t red = beta1*(rgb1 >> 16 & 0xFF)
-                                  + beta0*(rgb0 >> 16 & 0xFF);
-               const uint32_t grn = beta1*(rgb1 >>  8 & 0xFF)
-                                  + beta0*(rgb0 >>  8 & 0xFF);
-               const uint32_t blu = beta1*(rgb1       & 0xFF)
-                                  + beta0*(rgb0       & 0xFF);
-               return red << 16 | grn << 8 | blu;
-            }
+         if (properties_set[ps] == (line << 8 | propnum))   return false;
        }
 
-   // alpha is above last gradient: use last gradient
-   //
-   return gradient.back().rgb;
-}
-//----------------------------------------------------------------------------
-Pixel_XY
-Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
-{
-const double phi = atan2(get_origin_Y(), get_origin_X());
-const Pixel_Z pz = valZ2pixel(Z - get_min_Z());
-const Pixel_X px = valX2pixel(X - get_min_X()) + get_origin_X() - pz*cos(phi);
-const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
-
-   return Pixel_XY(px, py);
+   return true;
 }
 //----------------------------------------------------------------------------
 

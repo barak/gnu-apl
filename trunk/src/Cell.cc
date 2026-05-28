@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,23 +37,84 @@
 #include "Cell.icc"
 
 //----------------------------------------------------------------------------
-void *
-Cell::operator new(std::size_t s, void * pos)
+ErrorCode
+Cell::bif_equal(Cell * Z, const Cell * A) const
 {
-   return pos;
+   // incompatible types ?
+   //
+   if (is_character_cell() != A->is_character_cell())   return IntCell::z0(Z);
+
+   return IntCell::zI(Z, equal(*A, Workspace::get_CT()));
 }
 //----------------------------------------------------------------------------
-void
-Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
+ErrorCode
+Cell::bif_greater_eq(Cell * Z, const Cell * A) const
 {
-   if (value->is_simple_scalar())
-      {
-        value->get_cfirst().init_other(this, cell_owner, loc);
-      }
-   else
-      {
-        new (this) PointerCell(value, cell_owner);
-      }
+   return IntCell::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Cell::bif_greater_than(Cell * Z, const Cell * A) const
+{
+   return IntCell::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Cell::bif_less_eq(Cell * Z, const Cell * A) const
+{
+   return IntCell::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Cell::bif_less_than(Cell * Z, const Cell * A) const
+{
+   return IntCell::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Cell::bif_not_equal(Cell * Z, const Cell * A) const
+{
+   // incompatible types ?
+   //
+   if (is_character_cell() != A->is_character_cell())   return IntCell::z1(Z);
+
+   return IntCell::zI(Z, !equal(*A, Workspace::get_CT()));
+}
+//----------------------------------------------------------------------------
+bool
+Cell::equal(const Cell & other, double qct) const
+{
+   MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
+                << " cannot be compared with objects of class"
+                << other.get_classname();
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Unicode
+Cell::get_char_value() const
+{
+   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
+                << " aka. " << get_cell_type_name(get_cell_type())
+                << " when expecting a CHARACTER cell";
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Value_P
+Cell::get_pointer_value() const
+{
+   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
+                << " aka. " << get_cell_type_name(get_cell_type())
+                << " when expecting a nested cell";
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+bool
+Cell::greater(const Cell & other) const
+{
+   MORE_ERROR() << "Cell::greater() : Objects of class " << get_classname()
+                << " cannot be compared with objects of class"
+                << other.get_classname();
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -70,6 +131,19 @@ Cell::to_value(const char * loc) const
         Z->set_ravel_Cell(0, *this);
         Z->check_value(LOC);
         return Z;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
+{
+   if (value->is_simple_scalar())
+      {
+        value->get_cfirst().init_other(this, cell_owner, loc);
+      }
+   else
+      {
+        new (this) PointerCell(value, cell_owner);
       }
 }
 //----------------------------------------------------------------------------
@@ -91,32 +165,10 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
    else                                new (this) IntCell(0);
 }
 //----------------------------------------------------------------------------
-void
-Cell::copy(Value & val, const Cell * & src, ShapeItem count)
+void *
+Cell::operator new(std::size_t s, void * pos)
 {
-   loop(c, count)
-      {
-        Assert1(val.more());
-        val.next_ravel_Cell(*src++);
-      }
-}
-//----------------------------------------------------------------------------
-bool
-Cell::greater(const Cell & other) const
-{
-   MORE_ERROR() << "Cell::greater() : Objects of class " << get_classname()
-                << " cannot be compared with objects of class"
-                << other.get_classname();
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-bool
-Cell::equal(const Cell & other, double qct) const
-{
-   MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
-                << " cannot be compared with objects of class"
-                << other.get_classname();
-   DOMAIN_ERROR;
+   return pos;
 }
 //----------------------------------------------------------------------------
 bool
@@ -127,6 +179,13 @@ Cell::A_greater_B(const Cell * const & A, const Cell * const & B,
 }
 //----------------------------------------------------------------------------
 bool
+Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
+                  const void * unused_comp_arg)
+{
+   return A > B;
+}
+//----------------------------------------------------------------------------
+bool
 Cell::compare_stable(const Cell * const & A, const Cell * const & B,
                   const void * unused_comp_arg)
 {
@@ -134,29 +193,52 @@ Cell::compare_stable(const Cell * const & A, const Cell * const & B,
    return A > B;
 }
 //----------------------------------------------------------------------------
+void
+Cell::copy(Value & val, const Cell * & src, ShapeItem count)
+{
+   loop(c, count)
+      {
+        Assert1(val.more());
+        val.next_ravel_Cell(*src++);
+      }
+}
+//----------------------------------------------------------------------------
+const char *
+Cell::get_cell_type_name(CellType ct)
+{
+   switch(ct & CT_MASK)
+      {
+        case CT_NONE:    return "NONE";
+        case CT_BASE:    return "BASE";
+        case CT_CHAR:    return "CHARACTER";
+        case CT_POINTER: return "NESTED";
+        case CT_CELLREF: return "LEFTVAL";
+        case CT_INT:     return "INTEGER";
+        case CT_FLOAT:   return "FLOAT";
+        case CT_COMPLEX: return "COMPLEX";
+      }
+
+   return "UNKNOWN";
+}
+//----------------------------------------------------------------------------
 bool
-Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
-                  const void * unused_comp_arg)
+Cell::greater_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
+const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
+const Cell * cells = rcl->ravel;
+const ShapeItem comp_len = rcl->comp_len;
+const Cell * cell_A = cells + A * comp_len;
+const Cell * cell_B = cells + B * comp_len;
+
+   loop(l, comp_len)
+       {
+         if (const Comp_result cr = cell_A++->compare(*cell_B++))
+            return cr == COMP_GT;
+       }
+
+   // at this point all cells were equal
+   //
    return A > B;
-}
-//----------------------------------------------------------------------------
-Unicode
-Cell::get_char_value() const
-{
-   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
-                << " aka. " << get_cell_type_name(get_cell_type())
-                << " when expecting a CHARACTER cell";
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-Value_P
-Cell::get_pointer_value() const
-{
-   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
-                << " aka. " << get_cell_type_name(get_cell_type())
-                << " when expecting a nested cell";
-   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 bool
@@ -207,26 +289,6 @@ const APL_Float diff = value - result;
 }
 //----------------------------------------------------------------------------
 bool
-Cell::greater_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
-{
-const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
-const Cell * cells = rcl->ravel;
-const ShapeItem comp_len = rcl->comp_len;
-const Cell * cell_A = cells + A * comp_len;
-const Cell * cell_B = cells + B * comp_len;
-
-   loop(l, comp_len)
-       {
-         if (const Comp_result cr = cell_A++->compare(*cell_B++))
-            return cr == COMP_GT;
-       }
-
-   // at this point all cells were equal
-   //
-   return A > B;
-}
-//----------------------------------------------------------------------------
-bool
 Cell::smaller_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
 const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
@@ -255,50 +317,6 @@ UCS_string ucs(pb, 0, Workspace::get_PW());
 }
 //----------------------------------------------------------------------------
 ErrorCode
-Cell::bif_equal(Cell * Z, const Cell * A) const
-{
-   // incompatible types ?
-   //
-   if (is_character_cell() != A->is_character_cell())   return IntCell::z0(Z);
-
-   return IntCell::zI(Z, equal(*A, Workspace::get_CT()));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Cell::bif_not_equal(Cell * Z, const Cell * A) const
-{
-   // incompatible types ?
-   //
-   if (is_character_cell() != A->is_character_cell())   return IntCell::z1(Z);
-
-   return IntCell::zI(Z, !equal(*A, Workspace::get_CT()));
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Cell::bif_greater_than(Cell * Z, const Cell * A) const
-{
-   return IntCell::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Cell::bif_less_eq(Cell * Z, const Cell * A) const
-{
-   return IntCell::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Cell::bif_less_than(Cell * Z, const Cell * A) const
-{
-   return IntCell::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
-}
-//----------------------------------------------------------------------------
-ErrorCode
-Cell::bif_greater_eq(Cell * Z, const Cell * A) const
-{
-   return IntCell::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
-}
-//----------------------------------------------------------------------------
-ErrorCode
 Cell::sorted_indices(vector<ShapeItem> & indices, const Value & value,
                      Sort_order order, ShapeItem comp_len)
 {
@@ -324,23 +342,5 @@ const ravel_comp_len ctx = { &value.get_cfirst(), comp_len};
    else
       Heapsort<ShapeItem>::sort(indices, &Cell::smaller_cp, &ctx);
    return E_NO_ERROR;
-}
-//----------------------------------------------------------------------------
-const char *
-Cell::get_cell_type_name(CellType ct)
-{
-   switch(ct & CT_MASK)
-      {
-        case CT_NONE:    return "NONE";
-        case CT_BASE:    return "BASE";
-        case CT_CHAR:    return "CHARACTER";
-        case CT_POINTER: return "NESTED";
-        case CT_CELLREF: return "LEFTVAL";
-        case CT_INT:     return "INTEGER";
-        case CT_FLOAT:   return "FLOAT";
-        case CT_COMPLEX: return "COMPLEX";
-      }
-
-   return "UNKNOWN";
 }
 //----------------------------------------------------------------------------

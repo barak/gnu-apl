@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@ public:
    static void start_AP(AP_num proc);
 
 protected:
-   /// return true iff \b filename is executable by everybody
-   /// @param filename path of the file to test
-   static bool is_executable(const char * filename);
-
    /// disconnect from auxiliary processor proc if connected.
    /// @param proc auxiliary processor number to disconnect from
    static void disconnect(AP_num proc);
+
+   /// return true iff \b filename is executable by everybody
+   /// @param filename path of the file to test
+   static bool is_executable(const char * filename);
 };
 //----------------------------------------------------------------------------
 /**

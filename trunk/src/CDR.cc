@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,6 +30,208 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
+//----------------------------------------------------------------------------
+Value_P
+CDR::from_CDR(const CDR_string & cdr, const char * loc)
+{
+   // read header...
+   //
+/*
+struct tf3_header
+    {
+       uint32_t ptr;      //  0: byte reversed
+       uint32_t nb;       //  4: byte reversed
+       uint32_t nelm;     //  8: byte reversed
+       uint8_t  type;     // 12:
+       uint8_t  rank;     // 13:
+       uint8_t  fill[2];  // 14:
+       uint32_t dim[1];   // 16: byte reversed
+    }
+*/
+
+   if (cdr.size() < 20)
+      {
+        MORE_ERROR() << "CDR strings must have a header of at least 20 bytes";
+        LENGTH_ERROR;
+      }
+
+const uint8_t * data = cdr.get_items();
+
+const uint32_t nelm = get_4_be(data + 8);
+const CDR_type vtype = CDR_type(data[12]);
+const sRank rank = data[13];
+Shape shape;
+   loop(r, rank)
+      {
+        const ShapeItem sh = get_4_be(data + 16 + 4*r);
+        shape.add_shape_item(sh);
+      }
+
+Value_P Z(shape, loc);
+
+const uint8_t * ravel = data + 16 + 4*rank;
+
+   if (vtype == CDR_BOOL1)        // packed bit vector
+      {
+        loop(n, nelm)
+           {
+             const int bit = ravel[n >> 3] & (0x80 >> (n & 7));
+             Z->next_ravel_Int(bit ? 1 : 0);
+           }
+      }
+   else if (vtype == CDR_INT32)   // 4 byte ints vector
+      {
+        loop(n, nelm)
+           {
+             APL_Integer d = *reinterpret_cast<const uint32_t *>(ravel + 4*n);
+             if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
+             Z->next_ravel_Int(d);
+           }
+      }
+   else if (vtype == CDR_FLT64)   // 8 byte float vector
+      {
+        loop(n, nelm)
+           {
+             const APL_Float v =
+                  *reinterpret_cast<const APL_Float *>(ravel + 8*n);
+             Z->next_ravel_Float(v);
+           }
+      }
+  else if (vtype == CDR_CPLX128)   // 16 byte complex vector
+      {
+        loop(n, nelm)
+           {
+             const APL_Float vr =
+                  *reinterpret_cast<const APL_Float *>(ravel + 16*n);
+             const APL_Float vi =
+                  *reinterpret_cast<const APL_Float *>(ravel + 16*n + 8);
+             Z->next_ravel_Complex(vr, vi);
+           }
+      }
+   else if (vtype == CDR_CHAR8)   // 1 byte char vector
+      {
+        loop(n, nelm)
+           {
+             uint32_t d = ravel[n];
+             if (d & 0x80)   d |= 0xFFFFFFFFFFFFFF00ULL;
+             Z->next_ravel_Char(Unicode(d));
+           }
+      }
+   else if (vtype == CDR_CHAR32)   // 4 byte UNICODE vector
+      {
+        loop(n, nelm)
+           {
+             const uint32_t d = *reinterpret_cast<const uint32_t *>(ravel+4*n);
+             Z->next_ravel_Char(Unicode(d));
+           }
+      }
+   else if (vtype == CDR_NEST32)   // packed vector with 4 bytes offsets.
+      {
+        loop(n, nelm)
+            {
+              APL_Integer offset =
+                         *reinterpret_cast<const uint32_t *>(ravel + 4*n);
+              const uint8_t * sub_data = data + offset;
+              const uint32_t sub_vtype = sub_data[12];
+              const sRank sub_rank = sub_data[13];
+              const uint8_t * sub_ravel = sub_data + 16 + 4*sub_rank;
+
+              // if the sub-item is a non-nested scalar then we append it to
+              // ret directly; otherwise we append a pointer to it,
+              //
+              if (sub_rank == 0)   // scalar
+                 {
+                   if (sub_vtype == 0)        // bit
+                      {
+                        Z->next_ravel_Int((*sub_ravel & 0x80) ? 1 : 0);
+                        continue;   // next n
+                      }
+
+                   if (sub_vtype == 1)        // 4 byte int
+                      {
+                        APL_Integer d = *reinterpret_cast<const uint32_t *>
+                                                         (sub_ravel);
+                        if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
+                        Z->next_ravel_Int(d);
+                        continue;   // next n
+                      }
+
+                   if (sub_vtype == 2)        // 8 byte real
+                      {
+                        Z->next_ravel_Float(
+                                        *reinterpret_cast<const APL_Float *>
+                                                                (sub_ravel));
+                        continue;   // next n
+                      }
+
+                   if (sub_vtype == 3)        // 16 byte complex
+                      {
+                        Z->next_ravel_Complex(
+                                        *reinterpret_cast<const APL_Float *>
+                                                         (sub_ravel),
+                                        *reinterpret_cast<const APL_Float *>
+                                                          (sub_ravel + 8));
+                        continue;   // next n
+                      }
+
+                   if (sub_vtype == 4)        // 1 byte ASCII char
+                      {
+                        Z->next_ravel_Char(Unicode(*sub_ravel));
+                        continue;   // next n
+                      }
+
+                   if (sub_vtype == 5)        // 4 byte Unicode
+                      {
+                        Z->next_ravel_Char(Unicode(get_4_be(sub_ravel)));
+                        continue;   // next n
+                      }
+
+                   // sub_vtype 6 (progression vector) can't be scalar
+                 }
+
+              // at this point the sub-item is not a scalar
+              //
+              if (sub_vtype == 6)        // arithmetic progression vector
+                 {
+                   // arithmetic progression vectors (APVs) are not well
+                   // described. Normally a progression vector is a triple
+                   //
+                   // { initial-value, element-count, increment }
+                   //
+                   // But: we have only 8 bytes = 2 integers. We therefore
+                   // assume that element-count == nelm so that the two
+                   // integers are initial-value and increment.
+                   //
+                   Shape sh;
+                   loop(r, sub_rank)
+                      sh.add_shape_item(get_4_be(sub_data + 16));
+
+                   Value_P sub_val(sh, LOC);
+                   const APL_Integer qio = Workspace::get_IO();
+                   loop(v, sh.get_volume())
+                       {
+                         sub_val->next_ravel_Int(v + qio);
+                       }
+
+                   continue;   // next n
+                 }
+
+              const uint32_t sub_cdr_len = get_4_be(sub_data + 4);
+              CDR_string sub_cdr(sub_data, sub_cdr_len);
+              Value_P sub_val = from_CDR(sub_cdr, LOC);
+              Assert(+sub_val);
+              Z->next_ravel_Pointer(sub_val.get());
+            }
+      }
+   else
+      {
+        CERR << "Unsupported CDR type " << vtype << endl;
+        Assert(0 && "Bad/unsupported CDR type");
+      }
+
+   Z->check_value(LOC);
+   return Z;
+}
 //----------------------------------------------------------------------------
 void
 CDR::to_CDR(CDR_string & result, const Value * value)
@@ -299,208 +501,6 @@ const uint32_t nelm = val.element_count();
    // final padding
    //
    while (result.size() & 15)   result.push_back(Unicode_0);
-}
-//----------------------------------------------------------------------------
-Value_P
-CDR::from_CDR(const CDR_string & cdr, const char * loc)
-{
-   // read header...
-   //
-/*
-struct tf3_header
-    {
-       uint32_t ptr;      //  0: byte reversed
-       uint32_t nb;       //  4: byte reversed
-       uint32_t nelm;     //  8: byte reversed
-       uint8_t  type;     // 12:
-       uint8_t  rank;     // 13:
-       uint8_t  fill[2];  // 14:
-       uint32_t dim[1];   // 16: byte reversed
-    }
-*/
-
-   if (cdr.size() < 20)
-      {
-        MORE_ERROR() << "CDR strings must have a header of at least 20 bytes";
-        LENGTH_ERROR;
-      }
-
-const uint8_t * data = cdr.get_items();
-
-const uint32_t nelm = get_4_be(data + 8);
-const CDR_type vtype = CDR_type(data[12]);
-const sRank rank = data[13];
-Shape shape;
-   loop(r, rank)
-      {
-        const ShapeItem sh = get_4_be(data + 16 + 4*r);
-        shape.add_shape_item(sh);
-      }
-
-Value_P Z(shape, loc);
-
-const uint8_t * ravel = data + 16 + 4*rank;
-
-   if (vtype == CDR_BOOL1)        // packed bit vector
-      {
-        loop(n, nelm)
-           {
-             const int bit = ravel[n >> 3] & (0x80 >> (n & 7));
-             Z->next_ravel_Int(bit ? 1 : 0);
-           }
-      }
-   else if (vtype == CDR_INT32)   // 4 byte ints vector
-      {
-        loop(n, nelm)
-           {
-             APL_Integer d = *reinterpret_cast<const uint32_t *>(ravel + 4*n);
-             if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
-             Z->next_ravel_Int(d);
-           }
-      }
-   else if (vtype == CDR_FLT64)   // 8 byte float vector
-      {
-        loop(n, nelm)
-           {
-             const APL_Float v =
-                  *reinterpret_cast<const APL_Float *>(ravel + 8*n);
-             Z->next_ravel_Float(v);
-           }
-      }
-  else if (vtype == CDR_CPLX128)   // 16 byte complex vector
-      {
-        loop(n, nelm)
-           {
-             const APL_Float vr =
-                  *reinterpret_cast<const APL_Float *>(ravel + 16*n);
-             const APL_Float vi =
-                  *reinterpret_cast<const APL_Float *>(ravel + 16*n + 8);
-             Z->next_ravel_Complex(vr, vi);
-           }
-      }
-   else if (vtype == CDR_CHAR8)   // 1 byte char vector
-      {
-        loop(n, nelm)
-           {
-             uint32_t d = ravel[n];
-             if (d & 0x80)   d |= 0xFFFFFFFFFFFFFF00ULL;
-             Z->next_ravel_Char(Unicode(d));
-           }
-      }
-   else if (vtype == CDR_CHAR32)   // 4 byte UNICODE vector
-      {
-        loop(n, nelm)
-           {
-             const uint32_t d = *reinterpret_cast<const uint32_t *>(ravel+4*n);
-             Z->next_ravel_Char(Unicode(d));
-           }
-      }
-   else if (vtype == CDR_NEST32)   // packed vector with 4 bytes offsets.
-      {
-        loop(n, nelm)
-            {
-              APL_Integer offset =
-                         *reinterpret_cast<const uint32_t *>(ravel + 4*n);
-              const uint8_t * sub_data = data + offset;
-              const uint32_t sub_vtype = sub_data[12];
-              const sRank sub_rank = sub_data[13];
-              const uint8_t * sub_ravel = sub_data + 16 + 4*sub_rank;
-
-              // if the sub-item is a non-nested scalar then we append it to
-              // ret directly; otherwise we append a pointer to it,
-              //
-              if (sub_rank == 0)   // scalar
-                 {
-                   if (sub_vtype == 0)        // bit
-                      {
-                        Z->next_ravel_Int((*sub_ravel & 0x80) ? 1 : 0);
-                        continue;   // next n
-                      }
-
-                   if (sub_vtype == 1)        // 4 byte int
-                      {
-                        APL_Integer d = *reinterpret_cast<const uint32_t *>
-                                                         (sub_ravel);
-                        if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
-                        Z->next_ravel_Int(d);
-                        continue;   // next n
-                      }
-
-                   if (sub_vtype == 2)        // 8 byte real
-                      {
-                        Z->next_ravel_Float(
-                                        *reinterpret_cast<const APL_Float *>
-                                                                (sub_ravel));
-                        continue;   // next n
-                      }
-
-                   if (sub_vtype == 3)        // 16 byte complex
-                      {
-                        Z->next_ravel_Complex(
-                                        *reinterpret_cast<const APL_Float *>
-                                                         (sub_ravel),
-                                        *reinterpret_cast<const APL_Float *>
-                                                          (sub_ravel + 8));
-                        continue;   // next n
-                      }
-
-                   if (sub_vtype == 4)        // 1 byte ASCII char
-                      {
-                        Z->next_ravel_Char(Unicode(*sub_ravel));
-                        continue;   // next n
-                      }
-
-                   if (sub_vtype == 5)        // 4 byte Unicode
-                      {
-                        Z->next_ravel_Char(Unicode(get_4_be(sub_ravel)));
-                        continue;   // next n
-                      }
-
-                   // sub_vtype 6 (progression vector) can't be scalar
-                 }
-
-              // at this point the sub-item is not a scalar
-              //
-              if (sub_vtype == 6)        // arithmetic progression vector
-                 {
-                   // arithmetic progression vectors (APVs) are not well
-                   // described. Normally a progression vector is a triple
-                   //
-                   // { initial-value, element-count, increment }
-                   //
-                   // But: we have only 8 bytes = 2 integers. We therefore
-                   // assume that element-count == nelm so that the two
-                   // integers are initial-value and increment.
-                   //
-                   Shape sh;
-                   loop(r, sub_rank)
-                      sh.add_shape_item(get_4_be(sub_data + 16));
-
-                   Value_P sub_val(sh, LOC);
-                   const APL_Integer qio = Workspace::get_IO();
-                   loop(v, sh.get_volume())
-                       {
-                         sub_val->next_ravel_Int(v + qio);
-                       }
-
-                   continue;   // next n
-                 }
-
-              const uint32_t sub_cdr_len = get_4_be(sub_data + 4);
-              CDR_string sub_cdr(sub_data, sub_cdr_len);
-              Value_P sub_val = from_CDR(sub_cdr, LOC);
-              Assert(+sub_val);
-              Z->next_ravel_Pointer(sub_val.get());
-            }
-      }
-   else
-      {
-        CERR << "Unsupported CDR type " << vtype << endl;
-        Assert(0 && "Bad/unsupported CDR type");
-      }
-
-   Z->check_value(LOC);
-   return Z;
 }
 //----------------------------------------------------------------------------
 

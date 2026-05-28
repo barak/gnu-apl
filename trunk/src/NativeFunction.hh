@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,6 +78,9 @@ protected:
 
    /// destructor: close so_handle
    ~NativeFunction();
+
+   UCS_string get_name() const
+      { return name; }
 
    /// open .so file in one of several directories. On success set handle
    /// and update so_path.
@@ -207,9 +210,6 @@ protected:
 
    /// Overloaded Function::destroy()
    virtual void destroy();
-
-   UCS_string get_name() const
-      { return name; }
 
    /// dl_open() handle of shared library
    void * handle;

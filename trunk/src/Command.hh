@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,58 +43,6 @@ struct _XDisplay;
 class Command
 {
 public:
-   /// process a single line entered by the user (in immediate execution mode)
-   static void process_lines();
-
-   /// return \b true if the input os inside a multiline string or literal
-   static bool inside_multi()
-      { return multiline_status >= MLS_Start_of_multi; }
-
-   /// return the line number where a multiline string or literal began
-   static int get_multiline_start()
-      { return multiline_start; }
-
-   /// process \b line which contains a command or statements
-   /// @param line  the input line to process (modified in place)
-   /// @param out   output stream, or null to suppress output
-   static void process_line(UCS_string & line, ostream * out);
-
-   /// process \b line which contains an APL command. Return true iff the
-   /// command was user-defined (and then the function for that command is
-   /// stored in \b line and shall be executed)).
-   /// @param out   output stream for command result
-   /// @param line  the input command line (modified to hold APL function if user-defined)
-   static bool do_APL_command(ostream & out, UCS_string & line);
-
-   /// process \b line which contains APL statements
-   /// @param line    the APL statement text to execute
-   /// @param suffix  optional value appended as result suffix, or empty
-   static void do_APL_expression(const UCS_string & line, Value_P suffix);
-
-   /// finish the current SI->top() and pop it when done
-   static void finish_context();
-
-   /// parse user-suplied argument (of )VARS, )OPS, or )NMS commands)
-   /// into strings from and to
-   /// @param from        filled with the lower bound of the name range
-   /// @param to          filled with the upper bound of the name range
-   /// @param user_input  the raw argument string from the user
-   static bool parse_from_to(UCS_string & from, UCS_string & to,
-                             const UCS_string & user_input);
-
-   /// return true if \b lib looks like a library reference (a 1-digit number
-   /// or a path containing . or / chars
-   /// @param lib  the string to test as a library reference
-   static bool is_lib_ref(const UCS_string & lib);
-
-   /// return the current boxing format
-   static int get_boxing_format()
-      { return boxing_format; }
-
-   /// return the number of APL expressions entered in immediate execution mode
-   static ShapeItem get_APL_expression_count()
-      { return APL_expression_count; }
-
    /// one user defined command
    struct user_command
       {
@@ -130,6 +78,22 @@ public:
            { return key - B->child; }
       };
 
+   /// return the number of APL expressions entered in immediate execution mode
+   static ShapeItem get_APL_expression_count()
+      { return APL_expression_count; }
+
+   /// return the current boxing format
+   static int get_boxing_format()
+      { return boxing_format; }
+
+   /// return the line number where a multiline string or literal began
+   static int get_multiline_start()
+      { return multiline_start; }
+
+   /// return \b true if the input os inside a multiline string or literal
+   static bool inside_multi()
+      { return multiline_status >= MLS_Start_of_multi; }
+
    /// clear the copy_once_table.
    static void clear_copy_once_table();
 
@@ -142,6 +106,42 @@ public:
    /// @param exit_val  process exit status code
    static void cmd_OFF(int exit_val);
 
+   /// process \b line which contains an APL command. Return true iff the
+   /// command was user-defined (and then the function for that command is
+   /// stored in \b line and shall be executed)).
+   /// @param out   output stream for command result
+   /// @param line  the input command line (modified to hold APL function if user-defined)
+   static bool do_APL_command(ostream & out, UCS_string & line);
+
+   /// process \b line which contains APL statements
+   /// @param line    the APL statement text to execute
+   /// @param suffix  optional value appended as result suffix, or empty
+   static void do_APL_expression(const UCS_string & line, Value_P suffix);
+
+   /// finish the current SI->top() and pop it when done
+   static void finish_context();
+
+   /// return true if \b lib looks like a library reference (a 1-digit number
+   /// or a path containing . or / chars
+   /// @param lib  the string to test as a library reference
+   static bool is_lib_ref(const UCS_string & lib);
+
+   /// parse user-suplied argument (of )VARS, )OPS, or )NMS commands)
+   /// into strings from and to
+   /// @param from        filled with the lower bound of the name range
+   /// @param to          filled with the upper bound of the name range
+   /// @param user_input  the raw argument string from the user
+   static bool parse_from_to(UCS_string & from, UCS_string & to,
+                             const UCS_string & user_input);
+
+   /// process \b line which contains a command or statements
+   /// @param line  the input line to process (modified in place)
+   /// @param out   output stream, or null to suppress output
+   static void process_line(UCS_string & line, ostream * out);
+
+   /// process a single line entered by the user (in immediate execution mode)
+   static void process_lines();
+
    /// format for ]BOXING
    static int boxing_format;
 
@@ -152,9 +152,6 @@ public:
    static Multiline_status multiline_status;
 
 protected:
-   /// line number of miltiline start
-   static int multiline_start;
-
    /// On, Off, or Toggle
    enum OOT
       {
@@ -179,10 +176,34 @@ protected:
         return cmd.starts_iwith(prefix) &&
                (prefix_len == cmd.size() || cmd[prefix_len] <= UNI_SPACE);
       }
+
    /// )BOXING: select output format for APL values
    /// @param out  output stream for command result
    /// @param arg  boxing format argument string
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
+
+   /// check if a command name conflicts with an existing command
+   /// @param out   output stream for conflict error message
+   /// @param cnew  the new command name being defined
+   /// @param cold  an existing command name to compare against
+   static bool check_name_conflict(ostream & out, const UCS_string & cnew,
+                                   const UCS_string cold);
+
+   /// check the number of parameters in a command
+   /// @param out      output stream for error message if check fails
+   /// @param command  name of the command being checked
+   /// @param argc     actual number of arguments provided
+   /// @param args     description of expected arguments
+   static bool check_params(ostream & out, const char * command, int argc,
+                            const char * args);
+
+   /// check if a command is being redefined
+   /// @param out   output stream for redefinition warning
+   /// @param cnew  the new command name
+   /// @param fnew  the new APL function name implementing the command
+   /// @param mnew  the new mode value for the command
+   static bool check_redefinition(ostream & out, const UCS_string & cnew,
+                                  const UCS_string fnew, const int mnew);
 
    /// )CLEAR: clear the current Workspace
    /// @param out  output stream for command result
@@ -373,6 +394,25 @@ protected:
    /// @param args  "ON", "OFF", or empty to toggle color support
    static void cmd_XTERM(ostream & out, const UCS_string & args);
 
+   /// execute a user defined command
+   /// @param out   output stream for command result
+   /// @param line  the full input line (modified to APL function call)
+   /// @param line1 the first token on the input line
+   /// @param cmd   the matched user command prefix
+   /// @param args  the remaining arguments after the command name
+   /// @param uidx  index into the user_command table
+   static void do_USERCMD(ostream & out, UCS_string & line,
+                          const UCS_string & line1, const UCS_string & cmd,
+                          UCS_string_vector & args, int uidx);
+
+   /// return true iff, according to config.h, capability \b capa is available
+   /// @param capa  the capability name to check (e.g. "⎕FFT", "GTK")
+   static bool have_capability(const UCS_string & capa);
+
+   /// parse the argument of the ]LOG command and set logging accordingly
+   /// @param args  the logging control argument string
+   static void log_control(const UCS_string & args);
+
    /// )HELP: show help for APL primitives
    /// @param out    output stream for help text
    /// @param arg    the argument the user typed after )HELP
@@ -389,53 +429,14 @@ protected:
    /// @param arg  the whitespace-delimited argument string to split
    static UCS_string_vector split_arg(const UCS_string & arg);
 
-   /// execute a user defined command
-   /// @param out   output stream for command result
-   /// @param line  the full input line (modified to APL function call)
-   /// @param line1 the first token on the input line
-   /// @param cmd   the matched user command prefix
-   /// @param args  the remaining arguments after the command name
-   /// @param uidx  index into the user_command table
-   static void do_USERCMD(ostream & out, UCS_string & line,
-                          const UCS_string & line1, const UCS_string & cmd,
-                          UCS_string_vector & args, int uidx);
-
-   /// check if a command name conflicts with an existing command
-   /// @param out   output stream for conflict error message
-   /// @param cnew  the new command name being defined
-   /// @param cold  an existing command name to compare against
-   static bool check_name_conflict(ostream & out, const UCS_string & cnew,
-                                   const UCS_string cold);
-
-   /// check if a command is being redefined
-   /// @param out   output stream for redefinition warning
-   /// @param cnew  the new command name
-   /// @param fnew  the new APL function name implementing the command
-   /// @param mnew  the new mode value for the command
-   static bool check_redefinition(ostream & out, const UCS_string & cnew,
-                                  const UCS_string fnew, const int mnew);
-
-   /// check the number of parameters in a command
-   /// @param out      output stream for error message if check fails
-   /// @param command  name of the command being checked
-   /// @param argc     actual number of arguments provided
-   /// @param args     description of expected arguments
-   static bool check_params(ostream & out, const char * command, int argc,
-                            const char * args);
-
-   /// parse the argument of the ]LOG command and set logging accordingly
-   /// @param args  the logging control argument string
-   static void log_control(const UCS_string & args);
-
    /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;
 
    /// workspaces that shall not be copied twice
    static UCS_string_vector copy_once_table;
 
-   /// return true iff, according to config.h, capability \b capa is available
-   /// @param capa  the capability name to check (e.g. "⎕FFT", "GTK")
-   static bool have_capability(const UCS_string & capa);
+   /// line number of miltiline start
+   static int multiline_start;
 };
 //----------------------------------------------------------------------------
 class Cmd_IN
@@ -455,21 +456,10 @@ protected:
         /// @param prot  true to protect existing objects
         transfer_context(bool prot)
         : new_record(true),
+          protection(prot),
           recnum(0),
-          timestamp(0),
-          protection(prot)
+          timestamp(0)
         {}
-
-        /// process one record of a workspace file
-        /// @param record   pointer to the UTF-8 encoded record data
-        /// @param objects  list of object names to selectively import (empty = all)
-        void process_record(const UTF8 * record,
-                            const UCS_string_vector & objects);
-
-        /// get the name, rank, and shape of a 1 ⎕TF record
-        /// @param name   filled with the object name from the record
-        /// @param shape  filled with the array shape from the record
-        uint32_t get_nrs(UCS_string & name, Shape & shape) const;
 
         /// process a 'A' (array in 2 ⎕TF format) item.
         /// @param objects  list of object names to selectively import (empty = all)
@@ -483,6 +473,11 @@ protected:
         /// @param objects  list of object names to selectively import (empty = all)
         void function_2TF(const UCS_string_vector & objects) const;
 
+        /// get the name, rank, and shape of a 1 ⎕TF record
+        /// @param name   filled with the object name from the record
+        /// @param shape  filled with the array shape from the record
+        uint32_t get_nrs(UCS_string & name, Shape & shape) const;
+
         /// process an 'N' (numeric in 1 ⎕TF format) item.
         /// @param objects  list of object names to selectively import (empty = all)
         void numeric_1TF(const UCS_string_vector & objects) const;
@@ -492,26 +487,32 @@ protected:
         /// @param len  number of bytes to append
         void add(const UTF8 * str, int len);
 
-        /// true if a new record has started
-        bool new_record;
+        /// process one record of a workspace file
+        /// @param record   pointer to the UTF-8 encoded record data
+        /// @param objects  list of object names to selectively import (empty = all)
+        void process_record(const UTF8 * record,
+                            const UCS_string_vector & objects);
+
+        /// accumulator for data of different records
+        UCS_string data;
 
         /// true if record is EBCDIC (not yet supported)
         bool is_ebcdic;
 
-        /// the record number
-        int recnum;
-
         /// the record type ('A', 'C', 'N', or 'F')
         int item_type;
 
-        /// the last timestamp (if any)
-        APL_time_us timestamp;
+        /// true if a new record has started
+        bool new_record;
 
         /// true if )IN shall not iverride existing objects
         bool protection;   // protect existing objects
 
-        /// accumulator for data of different records
-        UCS_string data;
+        /// the record number
+        int recnum;
+
+        /// the last timestamp (if any)
+        APL_time_us timestamp;
       };
 };
 //----------------------------------------------------------------------------
@@ -531,16 +532,13 @@ public:
    /// @param args  optional area specifiers (e.g. "MAIN", "CURSOR")
    static void cmd_KEYB(ostream & out, const UCS_string_vector & args);
 
+   /// copy text into UCS_string
+   /// @param start  reference to the first Unicode character position to fill
+   /// @param text   the ASCII/UTF-8 text to copy
+   static void copy_text(Unicode & start, const char * text);
+
    /// execute xmodmap -pk and parse its output.
   static bool parse_xmodmap();
-
-   /// read the mappings for all templates
-   static bool read_xkbd_map();
-
-   /// read the mappings for one template
-   /// @param lines       array of C strings forming the template
-   /// @param line_count  number of lines in the template array
-   static void read_xkbd_template(const char ** lines, int line_count);
 
    /// print the keycodes
    /// @param out   output stream for keycode table
@@ -552,16 +550,19 @@ public:
    /// @param area  keyboard area bitmask to print
    static ostream & print_keymap(ostream & out, KB_Area area);
 
-   /// copy text into UCS_string
-   /// @param start  reference to the first Unicode character position to fill
-   /// @param text   the ASCII/UTF-8 text to copy
-   static void copy_text(Unicode & start, const char * text);
-
    /// read a key symbol and translate it to a Unicode
    /// @param display  the X11 display connection
    /// @param keycode  the X11 keycode to look up
    /// @param level    the shift level (0=unshifted, 1=shifted, etc.)
     static Unicode read_xkbd_Ksym(_XDisplay * display, int keycode, int level);
+
+   /// read the mappings for all templates
+   static bool read_xkbd_map();
+
+   /// read the mappings for one template
+   /// @param lines       array of C strings forming the template
+   /// @param line_count  number of lines in the template array
+   static void read_xkbd_template(const char ** lines, int line_count);
 
    /// true for XkbKeycodeToKeysym(), false for xmodmap -pke
    static bool keymap_from_xkbd;
@@ -573,6 +574,11 @@ protected:
         keycode_min  =   8,  // including
         keycode_max  = 255   // including;
       };
+
+   /// fill \b result with a keyboard templace according to bitmap \b area
+   /// @param result  filled with the keyboard template lines
+   /// @param area    keyboard area bitmask selecting which sections to include
+   static void get_template(UCS_string_vector & result, KB_Area area);
 
    /// parse one output line of xmodmap -pke.
    /// @param buffer  the line text to parse
@@ -586,11 +592,6 @@ protected:
    /// @param unicode  filled with the parsed Unicode codepoint
    static bool parse_xmodmap_Unicode(Keycode keycode, const char * & p,
                                      uint32_t & unicode);
-
-   /// fill \b result with a keyboard templace according to bitmap \b area
-   /// @param result  filled with the keyboard template lines
-   /// @param area    keyboard area bitmask selecting which sections to include
-   static void get_template(UCS_string_vector & result, KB_Area area);
 
    static struct map_item
       {
@@ -608,11 +609,6 @@ protected:
 class Cmd_LIB
 {
 public:
-   /// list paths of workspace and wslib directories
-   /// @param out      output stream for library path listing
-   /// @param lib_ref  optional library reference (digit 0-9) to filter
-   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
-
    /// list content of workspace and wslib directories: )LIB [N]
    /// @param out   output stream for library listing
    /// @param args  optional library reference
@@ -622,6 +618,11 @@ public:
    /// @param out   output stream for library listing
    /// @param args  optional library reference and sort options
    static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
+
+   /// list paths of workspace and wslib directories
+   /// @param out      output stream for library path listing
+   /// @param lib_ref  optional library reference (digit 0-9) to filter
+   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
 
    /// return true if entry is a directory
    /// @param entry  the directory entry to test
@@ -635,13 +636,6 @@ protected:
         SORT_SIZE = 1,      ///< sort by size
         SORT_TIME = 2,      ///< sort by time
       };
-
-   /// open directory arg and follow symlinks
-   /// @param path  filled with the resolved directory path
-   /// @param out   output stream for error messages
-   /// @param args  library reference argument tokens
-   static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
-                            const UCS_string_vector & args);
 
    /// list library: common helper. variant tells apart )LIB and ]LIB.
    /// @param out   output stream for library listing
@@ -668,6 +662,13 @@ protected:
    static void LIB_print_sorted(ostream & out, const UTF8_string lib_path,
                            const UCS_string_vector & directories,
                            const UCS_string_vector & files, SORT_ORDER sort);
+
+   /// open directory arg and follow symlinks
+   /// @param path  filled with the resolved directory path
+   /// @param out   output stream for error messages
+   /// @param args  library reference argument tokens
+   static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
+                            const UCS_string_vector & args);
 
    /// return the property by which file names shall be sorted
    /// @param sort      the sort order (SORT_SIZE or SORT_TIME)

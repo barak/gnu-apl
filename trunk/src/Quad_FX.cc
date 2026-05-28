@@ -34,14 +34,18 @@
 
 Quad_FX Quad_FX::fun;
 
-//============================================================================
+//----------------------------------------------------------------------------
 Token
-Quad_FX::do_eval_B(const Value * B)
+Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
-   //
-static const int default_eprops[] = { 0, 0, 0, 0 };
-   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"));
+   CHECK_SECURITY(disable_native_functions);
+
+   if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
+   if (A->get_rank() > 1)                RANK_ERROR;
+   if (!A->is_char_string())             DOMAIN_ERROR;
+
+const sAxis axis = Value::get_single_axis(X.get(), 10);
+   return Token(TOK_APL_VALUE1, do_native_FX(A.get(), axis, B.get()));
 }
 //----------------------------------------------------------------------------
 Token
@@ -106,18 +110,14 @@ UTF8_string creator("⎕FX");
 
    return do_quad_FX(eprops, B, creator);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 Token
-Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
+Quad_FX::do_eval_B(const Value * B)
 {
-   CHECK_SECURITY(disable_native_functions);
-
-   if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
-   if (A->get_rank() > 1)                RANK_ERROR;
-   if (!A->is_char_string())             DOMAIN_ERROR;
-
-const sAxis axis = Value::get_single_axis(X.get(), 10);
-   return Token(TOK_APL_VALUE1, do_native_FX(A.get(), axis, B.get()));
+   // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
+   //
+static const int default_eprops[] = { 0, 0, 0, 0 };
+   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"));
 }
 //----------------------------------------------------------------------------
 Token
@@ -235,6 +235,23 @@ const bool keep_indent = !UserPreferences::uprefs.discard_indentation;
    return do_quad_FX(exec_props, text, creator);
 }
 //----------------------------------------------------------------------------
+Value_P
+Quad_FX::do_native_FX(const Value * A, sAxis axis, const Value * B)
+{
+   if (UserPreferences::uprefs.safe_mode)   DOMAIN_ERROR;
+
+const UCS_string so_name       = A->get_UCS_ravel();
+const UCS_string function_name = B->get_UCS_ravel();
+
+   if (so_name.size() == 0)         LENGTH_ERROR;
+   if (function_name.size() == 0)   LENGTH_ERROR;
+
+NativeFunction * fun = NativeFunction::fix(so_name, function_name);
+   if (fun == 0)  return IntScalar(0, LOC);
+
+   return CLONE(B, LOC);
+}
+//----------------------------------------------------------------------------
 Token
 Quad_FX::do_quad_FX(const int * exec_props, const UCS_string & text,
                     const UTF8_string & creator)
@@ -261,22 +278,5 @@ Value_P Z(fun_name, LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_FX::do_native_FX(const Value * A, sAxis axis, const Value * B)
-{
-   if (UserPreferences::uprefs.safe_mode)   DOMAIN_ERROR;
-
-const UCS_string so_name       = A->get_UCS_ravel();
-const UCS_string function_name = B->get_UCS_ravel();
-
-   if (so_name.size() == 0)         LENGTH_ERROR;
-   if (function_name.size() == 0)   LENGTH_ERROR;
-
-NativeFunction * fun = NativeFunction::fix(so_name, function_name);
-   if (fun == 0)  return IntScalar(0, LOC);
-
-   return CLONE(B, LOC);
 }
 //============================================================================

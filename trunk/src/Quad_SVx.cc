@@ -65,19 +65,6 @@ TCP_socket get_TCP_for_key(SV_key key)
 {
    return Svar_DB::get_DB_tcp();
 }
-//============================================================================
-/**
-    return true iff \b filename is an executable file
- **/
-bool
-Quad_SVx::is_executable(const char * file_and_args)
-{
-string filename(file_and_args);
-const char * end = strchr(file_and_args, ' ');
-   if (end)   filename.resize(end - file_and_args);
-
-   return access(filename.c_str(), X_OK) == 0;
-}
 //----------------------------------------------------------------------------
 void
 Quad_SVx::start_AP(AP_num ap)
@@ -143,6 +130,19 @@ PipeReader reader(filename);
    CERR << endl;
 
    usleep(100000);   // give new AP time to register with APserver
+}
+//============================================================================
+/**
+    return true iff \b filename is an executable file
+ **/
+bool
+Quad_SVx::is_executable(const char * file_and_args)
+{
+string filename(file_and_args);
+const char * end = strchr(file_and_args, ' ');
+   if (end)   filename.resize(end - file_and_args);
+
+   return access(filename.c_str(), X_OK) == 0;
 }
 //============================================================================
 Token
@@ -386,6 +386,47 @@ Value_P Z(sh_Z, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
+/**
+ ** Return degree of coupling for variables in B
+ **/
+Token
+Quad_SVO::eval_B(Value_P B) const
+{
+   if (B->get_rank() > 2)   RANK_ERROR;
+
+const ShapeItem var_count = B->get_rows();
+const UCS_string_vector vars(*B, false);
+
+Shape sh_Z;
+   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+Value_P Z(sh_Z, LOC);
+
+   loop(z, var_count)
+      {
+        Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
+        if (sym == 0)   // variable does not exist
+           {
+             Z->next_ravel_0();
+             continue;
+           }
+
+        // the coupling of a non-shared variables has coupling 0
+        //
+        if (sym->get_NC() != NC_SYSTEM_VAR)
+           {
+             Z->next_ravel_0();
+             continue;
+           }
+
+        const SV_key key = sym->get_SV_key();
+        const SV_Coupling coupling = Svar_DB::get_coupling(key);
+         Z->next_ravel_Int(coupling);
+      }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
 SV_key
 Quad_SVO::share_one_variable(AP_num to_ap, const uint32_t * vname,
                              SV_Coupling & coupling)
@@ -437,47 +478,6 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
    Assert(coupling == SV_OFFERED);
 
    return key;
-}
-//----------------------------------------------------------------------------
-/**
- ** Return degree of coupling for variables in B
- **/
-Token
-Quad_SVO::eval_B(Value_P B) const
-{
-   if (B->get_rank() > 2)   RANK_ERROR;
-
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
-
-Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
-Value_P Z(sh_Z, LOC);
-
-   loop(z, var_count)
-      {
-        Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   // variable does not exist
-           {
-             Z->next_ravel_0();
-             continue;
-           }
-
-        // the coupling of a non-shared variables has coupling 0
-        //
-        if (sym->get_NC() != NC_SYSTEM_VAR)
-           {
-             Z->next_ravel_0();
-             continue;
-           }
-
-        const SV_key key = sym->get_SV_key();
-        const SV_Coupling coupling = Svar_DB::get_coupling(key);
-         Z->next_ravel_Int(coupling);
-      }
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
 }
 //============================================================================
 Token

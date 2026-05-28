@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2021-2022  Dr. Jürgen Sauermann
+    Copyright © 2021-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,35 +82,35 @@ public:
      increment(0)
    {}
 
+   /// return the lengths of the Cells
+   const Cell_offset get_length() const
+      { return end; }
+
+   /// return the ravel offset of the current Cell
+   Cell_offset operator ()() const
+      { return offset; }
+
+   /// return a reference to the current Cell
+   const Cell & operator *() const
+      { return base[offset]; }
+
    /// return true iff offset is valid (and then *() != 0). For this to work,
    /// increment needs to be true
    bool operator +() const
       { Assert1(increment);   return offset < end || offset == 0; }
 
-   /// return the ravel offset of the current Cell
-   Cell_offset operator ()() const
-      { return offset; }
+   /// return a pointer to the current Cell (or 0 at the end)
+   const Cell * operator ->() const
+      { return operator +() ? base + offset : 0; }
 
    /// return a reference to the Cell at off
    /// @param off ravel offset of the desired Cell
    const Cell & operator [](Cell_offset off) const
       { return base[off]; }
 
-   /// return a reference to the current Cell
-   const Cell & operator *() const
-      { return base[offset]; }
-
-   /// return a pointer to the current Cell (or 0 at the end)
-   const Cell * operator ->() const
-      { return operator +() ? base + offset : 0; }
-
    /// move to the next Cell
    void operator ++()
       { if (increment)   ++offset; }
-
-   /// return the lengths of the Cells
-   const Cell_offset get_length() const
-      { return end; }
 
 protected:
    /// the first Cell of the ravel (aka. cfirst() in class Value)
@@ -151,10 +151,13 @@ public:
      increment(_inc)
    {}
 
-   /// return true iff offset is valid (and then *() != 0). For this to work,
-   /// increment needs to be true
-   bool operator +() const
-      { Assert1(increment);   return offset < end || offset == 0; }
+   /// return the lengths of the Cells
+   const Cell_offset get_length() const
+      { return end; }
+
+   /// return the owner of the Cells
+   const Value & get_owner() const
+      { return owner; }
 
    /// return the ravel offset of the current Cell
    Cell_offset operator ()() const
@@ -164,6 +167,11 @@ public:
    const Cell & operator *() const
       { return owner.get_cravel(offset); }
 
+   /// return true iff offset is valid (and then *() != 0). For this to work,
+   /// increment needs to be true
+   bool operator +() const
+      { Assert1(increment);   return offset < end || offset == 0; }
+
    /// return a pointer to the current Cell (or 0 at the end)
    const Cell * operator ->() const
       { return operator +() ? &owner.get_cravel(offset) : 0; }
@@ -171,14 +179,6 @@ public:
    /// move to the next Cell
    void operator ++()
       { if (increment)   ++offset; }
-
-   /// return the lengths of the Cells
-   const Cell_offset get_length() const
-      { return end; }
-
-   /// return the owner of the Cells
-   const Value & get_owner() const
-      { return owner; }
 
 protected:
    /// the owner of the ravel

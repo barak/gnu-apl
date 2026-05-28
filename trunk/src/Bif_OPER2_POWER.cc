@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,78 +28,6 @@
 
 Bif_OPER2_POWER   Bif_OPER2_POWER::fun;
 
-//----------------------------------------------------------------------------
-Token
-Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
-{
-   if (RO.get_ValueType() == TV_VAL)   // integer count
-      return eval_form_1(A, LO, RO.get_apl_val(), B);
-   if (RO.get_ValueType() == TV_INT)   // integer count
-      return eval_form_1(A, LO, IntScalar(RO.get_int_val(), LOC), B);
-
-   // Boolean termonation function
-   return eval_form_2(A, LO, RO, B);
-}
-//----------------------------------------------------------------------------
-Token
-Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
-{
-   if (RO.get_ValueType() == TV_VAL)   // integer count
-      return eval_form_1(Value_P(), LO, RO.get_apl_val(), B);
-   else                               // Boolean termonation function
-      return eval_form_2(Value_P(), LO, RO, B);
-}
-//----------------------------------------------------------------------------
-// the eval_form_2() function is for LO ⍣ N B and A LO ⍣ N B variants
-// (with condition function RO and worker function LO)
-Token
-Bif_OPER2_POWER::eval_form_2(Value_P A, Token & _LO, Token & _RO, Value_P B)
-{
-cFunction_P LO = _LO.get_function();   Assert(LO);
-cFunction_P RO = _RO.get_function();   Assert(RO);
-
-   if (!LO->has_result())   DOMAIN_ERROR;
-   if (!RO->has_result())   DOMAIN_ERROR;
-
-   if (LO->may_push_SI() || RO->may_push_SI())   // user-defined or macro
-      {
-        if (!A)   return Macro::get_macro(Macro::MAC_Z__LO_POWER_RO_B)
-                              ->eval_LRB (_LO, _RO, B);
-        else      return Macro::get_macro(Macro::MAC_Z__A_LO_POWER_RO_B)
-                              ->eval_ALRB(A, _LO, _RO, B);
-      }
-
-   // primitive LO and RO
-   //
-   for (;;)
-       {
-         const Token result_LO = !A ? LO->eval_B(B) : LO->eval_AB(A, B);
-         if (result_LO.get_tag() == TOK_ERROR)   return result_LO;
-
-         Assert(result_LO.get_Class() == TC_VALUE);
-         Value_P LO_Z = result_LO.get_apl_val();
-
-         const Token result_RO = RO->eval_AB(LO_Z, B);
-         if (result_RO.get_tag() == TOK_ERROR)   return result_RO;
-
-         Assert(result_RO.get_Class() == TC_VALUE);
-         Value_P condition = result_RO.get_apl_val();
-         if (condition->is_scalar_extensible() &&
-             condition->get_cfirst().is_near_bool() &&
-             condition->get_cfirst().get_near_int() == 1)
-            return Token(TOK_APL_VALUE1, LO_Z);
-
-         if (InterruptContext::interrupt_is_raised())
-            {
-              InterruptContext::clear_attention_raised(LOC);
-              InterruptContext::clear_interrupt_raised(LOC);
-              INTERRUPT
-            }
-
-        B = LO_Z;
-        LO_Z.clear(LOC);
-      }
-}
 //----------------------------------------------------------------------------
 void
 Bif_OPER2_POWER::unstrand_RO_B(Value_P N_B, Value_P & N, Value_P & B)
@@ -145,6 +73,27 @@ const Cell & second = N_B->get_cravel(1);
    B = Value_P(LOC);
    B->next_ravel_Cell(second);
    B->check_value(LOC);
+}
+//----------------------------------------------------------------------------
+Token
+Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
+{
+   if (RO.get_ValueType() == TV_VAL)   // integer count
+      return eval_form_1(A, LO, RO.get_apl_val(), B);
+   if (RO.get_ValueType() == TV_INT)   // integer count
+      return eval_form_1(A, LO, IntScalar(RO.get_int_val(), LOC), B);
+
+   // Boolean termonation function
+   return eval_form_2(A, LO, RO, B);
+}
+//----------------------------------------------------------------------------
+Token
+Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
+{
+   if (RO.get_ValueType() == TV_VAL)   // integer count
+      return eval_form_1(Value_P(), LO, RO.get_apl_val(), B);
+   else                               // Boolean termonation function
+      return eval_form_2(Value_P(), LO, RO, B);
 }
 //----------------------------------------------------------------------------
 // the eval_form_1() function is for LO ⍣ N B and A LO ⍣ N B variants
@@ -215,5 +164,56 @@ ShapeItem repeat_cnt = N->get_cfirst().get_checked_near_int();
          if (--repeat_cnt == 0)   return result;
          B = result.get_apl_val();
        }
+}
+//----------------------------------------------------------------------------
+// the eval_form_2() function is for LO ⍣ N B and A LO ⍣ N B variants
+// (with condition function RO and worker function LO)
+Token
+Bif_OPER2_POWER::eval_form_2(Value_P A, Token & _LO, Token & _RO, Value_P B)
+{
+cFunction_P LO = _LO.get_function();   Assert(LO);
+cFunction_P RO = _RO.get_function();   Assert(RO);
+
+   if (!LO->has_result())   DOMAIN_ERROR;
+   if (!RO->has_result())   DOMAIN_ERROR;
+
+   if (LO->may_push_SI() || RO->may_push_SI())   // user-defined or macro
+      {
+        if (!A)   return Macro::get_macro(Macro::MAC_Z__LO_POWER_RO_B)
+                              ->eval_LRB (_LO, _RO, B);
+        else      return Macro::get_macro(Macro::MAC_Z__A_LO_POWER_RO_B)
+                              ->eval_ALRB(A, _LO, _RO, B);
+      }
+
+   // primitive LO and RO
+   //
+   for (;;)
+       {
+         const Token result_LO = !A ? LO->eval_B(B) : LO->eval_AB(A, B);
+         if (result_LO.get_tag() == TOK_ERROR)   return result_LO;
+
+         Assert(result_LO.get_Class() == TC_VALUE);
+         Value_P LO_Z = result_LO.get_apl_val();
+
+         const Token result_RO = RO->eval_AB(LO_Z, B);
+         if (result_RO.get_tag() == TOK_ERROR)   return result_RO;
+
+         Assert(result_RO.get_Class() == TC_VALUE);
+         Value_P condition = result_RO.get_apl_val();
+         if (condition->is_scalar_extensible() &&
+             condition->get_cfirst().is_near_bool() &&
+             condition->get_cfirst().get_near_int() == 1)
+            return Token(TOK_APL_VALUE1, LO_Z);
+
+         if (InterruptContext::interrupt_is_raised())
+            {
+              InterruptContext::clear_attention_raised(LOC);
+              InterruptContext::clear_interrupt_raised(LOC);
+              INTERRUPT
+            }
+
+        B = LO_Z;
+        LO_Z.clear(LOC);
+      }
 }
 //----------------------------------------------------------------------------

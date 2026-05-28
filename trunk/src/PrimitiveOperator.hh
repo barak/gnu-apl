@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,6 @@ public:
    /// @param tag token tag identifying this operator
    PrimitiveOperator(TokenTag tag) : PrimitiveFunction(tag) {}
 
-   /// overloaded Function::is_operator()
-   virtual bool is_operator() const   { return true; }
-
    /// overloaded Function::get_fun_valence()
    virtual int get_fun_valence() const   { return 2; }
 
@@ -47,6 +44,9 @@ public:
    /// monadic, so we return 1 and overload dyadic operators (i.e. inner/outer
    /// product) to return 2
    virtual int get_oper_valence() const   { return 1; }
+
+   /// overloaded Function::is_operator()
+   virtual bool is_operator() const   { return true; }
 };
 //----------------------------------------------------------------------------
 

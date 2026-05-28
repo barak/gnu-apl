@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,29 +100,29 @@ public:
    : id(i)
    {}
 
-   /// return the name of the named object
-   virtual UCS_string get_name() const
-      { return ID::get_name_UCS(id); }
+   /// return the Id of this object (ID_USER_SYMBOL for user defined objects)
+   Id get_Id() const
+      { return id; }
 
    /// return the function for this Id (if any) or 0 if this Id does
    /// (currently) represent a function.
    virtual const Function * get_function() const  { return 0; }
 
-   /// return the symbol for this user defined symbol (if any) or 0 if this Id
-   /// refers to a system name
-   virtual Symbol * get_symbol()   { return 0; }
+   /// return the name of the named object
+   virtual UCS_string get_name() const
+      { return ID::get_name_UCS(id); }
 
    /// return the symbol for this user defined symbol (if any) or 0 if this Id
    /// refers to a system name
    virtual const Symbol * get_symbol() const  { return 0; }
 
-   /// return the Id of this object (ID_USER_SYMBOL for user defined objects)
-   Id get_Id() const
-      { return id; }
-
    /// return true, iff this object is user-defined
    bool is_user_defined() const
       { return id == ID_USER_SYMBOL; }
+
+   /// return the symbol for this user defined symbol (if any) or 0 if this Id
+   /// refers to a system name
+   virtual Symbol * get_symbol()   { return 0; }
 
    /// Get current \b NameClass of \b this name.
    NameClass get_NC() const;

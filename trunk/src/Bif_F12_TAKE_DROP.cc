@@ -31,42 +31,25 @@
 Bif_F12_TAKE      Bif_F12_TAKE     ::fun;    // ↑
 Bif_F12_DROP      Bif_F12_DROP     ::fun;    // ↓
 
-//============================================================================
-Value_P
-Bif_F12_TAKE::first(const Value & B)
+//----------------------------------------------------------------------------
+Token
+Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
-   /*
-      lrm p. 131: ⍴ Z ← ↑ B depends on the shape of the first item.
+Shape ravel_A1(*A, /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
 
-      IBM APL2:
-          A.  ↑'DO' 'RE' 'MI'   is: 'DO' with shape 2
-          B.  ↑⊂'DO'       also is: 'DO' with shape 2
-
-      Therefore: S ≡ ↑S ≡ ↑⊃S for simple scalars S,
-            but: V ≢ ↑V ≡ ⊃V[⎕IO]
-
-      We handle the nested first_B case first because all others return scalars
-    */
-const Cell & first_B = B.get_cfirst();
-   if (first_B.is_pointer_cell())   // first item is nested
+   if (B->is_scalar())
       {
-        Value_P sub = first_B.get_pointer_value();
-        return CLONE_P(sub, LOC);
+        Shape shape_B1;
+        loop(a, ravel_A1.get_rank())   shape_B1.add_shape_item(1);
+        Value_P B1 = CLONE_P(B, LOC);   // so that we can set_shape()
+        B1->set_shape(shape_B1);
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B1, false));
       }
-
-   if (B.element_count() ||      // the normal case,         e.g. Z ← ↑ 1 2 3
-       first_B.is_lval_cell())   // selective specification, e.g. (↑ B) ← V
+   else
       {
-        Value_P Z(LOC);   // the (always) scalar result of ↑B
-        Z->next_ravel_Cell(first_B);
-        Z->check_value(LOC);
-        return Z;
+        if (ravel_A1.get_rank() != B->get_rank())   LENGTH_ERROR;
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B, false));
       }
-
-   // ↑ '' or ↑ ⍬ : return prototype
-   //
-   if (first_B.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
-   else                               return IntScalar(0, LOC);
 }
 //----------------------------------------------------------------------------
 Token
@@ -121,26 +104,6 @@ Shape sh_take = B->get_shape();   // start with ⍴B
    return Token(TOK_APL_VALUE1, do_take(sh_take, *B, axes_X));
 }
 //----------------------------------------------------------------------------
-Token
-Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
-{
-Shape ravel_A1(*A, /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
-
-   if (B->is_scalar())
-      {
-        Shape shape_B1;
-        loop(a, ravel_A1.get_rank())   shape_B1.add_shape_item(1);
-        Value_P B1 = CLONE_P(B, LOC);   // so that we can set_shape()
-        B1->set_shape(shape_B1);
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B1, false));
-      }
-   else
-      {
-        if (ravel_A1.get_rank() != B->get_rank())   LENGTH_ERROR;
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B, false));
-      }
-}
-//----------------------------------------------------------------------------
 Value_P
 Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value & B,
                       AxesBitmap axes)
@@ -176,6 +139,43 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
               Z.next_ravel_Proto(B.get_cproto());
             }
        }
+}
+//============================================================================
+Value_P
+Bif_F12_TAKE::first(const Value & B)
+{
+   /*
+      lrm p. 131: ⍴ Z ← ↑ B depends on the shape of the first item.
+
+      IBM APL2:
+          A.  ↑'DO' 'RE' 'MI'   is: 'DO' with shape 2
+          B.  ↑⊂'DO'       also is: 'DO' with shape 2
+
+      Therefore: S ≡ ↑S ≡ ↑⊃S for simple scalars S,
+            but: V ≢ ↑V ≡ ⊃V[⎕IO]
+
+      We handle the nested first_B case first because all others return scalars
+    */
+const Cell & first_B = B.get_cfirst();
+   if (first_B.is_pointer_cell())   // first item is nested
+      {
+        Value_P sub = first_B.get_pointer_value();
+        return CLONE_P(sub, LOC);
+      }
+
+   if (B.element_count() ||      // the normal case,         e.g. Z ← ↑ 1 2 3
+       first_B.is_lval_cell())   // selective specification, e.g. (↑ B) ← V
+      {
+        Value_P Z(LOC);   // the (always) scalar result of ↑B
+        Z->next_ravel_Cell(first_B);
+        Z->check_value(LOC);
+        return Z;
+      }
+
+   // ↑ '' or ↑ ⍬ : return prototype
+   //
+   if (first_B.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
+   else                               return IntScalar(0, LOC);
 }
 //============================================================================
 Token

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2020-2020  Dr. Jürgen Sauermann
+    Copyright © 2020-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,52 @@
 
 Bif_F12_INTERVAL_INDEX Bif_F12_INTERVAL_INDEX::fun;    // ⍳
 
+//----------------------------------------------------------------------------
+/// search elements of B in ntervals defined by A. ⍴Z is ⍴B, and elements of Z
+/// are indices of A so that A[Z[N]] ≤ B[N] < A[Z[N] + 1]
+Token
+Bif_F12_INTERVAL_INDEX::eval_AB(Value_P A, Value_P B) const
+{
+  // A must be a non-empty sorted vector
+  //
+   if (A->get_rank() > 1)   RANK_ERROR;
+const ShapeItem ec_A = A->element_count();
+   if (ec_A < 1)
+      {
+        MORE_ERROR() << "the left argument of A ⍸ B is empty";
+        LENGTH_ERROR;
+      }
+
+   for(ShapeItem a = 1; a < ec_A; ++a)
+       {
+         const Cell & c1 = A->get_cravel(a-1);
+         const Cell & c2 = A->get_cravel(a);
+         const Comp_result c1_c2 = c1.compare(c2);
+         if (c1_c2 != COMP_LT)
+            {
+              MORE_ERROR() << "the left argument of A ⍸ B "
+                              "is not sorted ascendingly";
+              DOMAIN_ERROR;
+            }
+       }
+
+   // from here on nothing can fail.
+   //
+Value_P Z(B->get_shape(), LOC);
+const ShapeItem ec_B = B->element_count();
+const Cell * cells_A = &A->get_cfirst();
+const APL_Integer qio = Workspace::get_IO();
+
+   loop(b, ec_B)
+      {
+        const ShapeItem z = find_range(B->get_cravel(b), cells_A, ec_A);
+        Z->next_ravel_Int(z + qio);
+      }
+
+   Z->set_proto_Int();
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
 //============================================================================
 /** return { (,⍵) / ,⍳⍴⍵ }. ⍸B is similar to ⍳B except that:
     * ⍸Z is a vector ⍴,B instead of an array with shape ⍴B, and'
@@ -93,52 +139,6 @@ const uRank rank = B->get_rank();
                   }
              }
        }
-
-   Z->set_proto_Int();
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-//----------------------------------------------------------------------------
-/// search elements of B in ntervals defined by A. ⍴Z is ⍴B, and elements of Z
-/// are indices of A so that A[Z[N]] ≤ B[N] < A[Z[N] + 1]
-Token
-Bif_F12_INTERVAL_INDEX::eval_AB(Value_P A, Value_P B) const
-{
-  // A must be a non-empty sorted vector
-  //
-   if (A->get_rank() > 1)   RANK_ERROR;
-const ShapeItem ec_A = A->element_count();
-   if (ec_A < 1)
-      {
-        MORE_ERROR() << "the left argument of A ⍸ B is empty";
-        LENGTH_ERROR;
-      }
-
-   for(ShapeItem a = 1; a < ec_A; ++a)
-       {
-         const Cell & c1 = A->get_cravel(a-1);
-         const Cell & c2 = A->get_cravel(a);
-         const Comp_result c1_c2 = c1.compare(c2);
-         if (c1_c2 != COMP_LT)
-            {
-              MORE_ERROR() << "the left argument of A ⍸ B "
-                              "is not sorted ascendingly";
-              DOMAIN_ERROR;
-            }
-       }
-
-   // from here on nothing can fail.
-   //
-Value_P Z(B->get_shape(), LOC);
-const ShapeItem ec_B = B->element_count();
-const Cell * cells_A = &A->get_cfirst();
-const APL_Integer qio = Workspace::get_IO();
-
-   loop(b, ec_B)
-      {
-        const ShapeItem z = find_range(B->get_cravel(b), cells_A, ec_A);
-        Z->next_ravel_Int(z + qio);
-      }
 
    Z->set_proto_Int();
    Z->check_value(LOC);

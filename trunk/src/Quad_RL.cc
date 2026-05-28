@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,19 @@ const unsigned int seed = reset_seed();
    Symbol::assign(Z, false, LOC);
 }
 //----------------------------------------------------------------------------
+uint64_t
+Quad_RL::get_random()
+{
+   Assert(value_stack.size());   // by Quad_RL::assign()
+   if (value_stack.back().get_NC() != NC_VARIABLE)   VALUE_ERROR;  // localized
+
+   state *= Knuth_a;
+   state += Knuth_c;
+
+   value_stack.back().get_val_wptr()->set_ravel_Int(0, state);
+   return state;
+}
+//----------------------------------------------------------------------------
 void
 Quad_RL::assign(Value_P B, bool /* clone */, const char * loc)
 {
@@ -59,18 +72,13 @@ const APL_Integer val = cell.get_near_int();
    Symbol::assign(IntScalar(state, loc), false, LOC);
 }
 //----------------------------------------------------------------------------
-uint64_t
-Quad_RL::get_random()
+void
+Quad_RL::pop()
 {
-   Assert(value_stack.size());   // by Quad_RL::assign()
-   if (value_stack.back().get_NC() != NC_VARIABLE)   VALUE_ERROR;  // localized
-
-   state *= Knuth_a;
-   state += Knuth_c;
-
-   value_stack.back().get_val_wptr()->set_ravel_Int(0, state);
-   return state;
+   Symbol::pop();
+   state = value_stack.back().get_val_cptr()->get_cfirst().get_near_int();
 }
+//============================================================================
 //----------------------------------------------------------------------------
 void
 Quad_RL::push()
@@ -79,11 +87,3 @@ Quad_RL::push()
    //
    Symbol::push_value(IntScalar(state, LOC));
 }
-//----------------------------------------------------------------------------
-void
-Quad_RL::pop()
-{
-   Symbol::pop();
-   state = value_stack.back().get_val_cptr()->get_cfirst().get_near_int();
-}
-//============================================================================

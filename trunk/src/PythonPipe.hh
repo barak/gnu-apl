@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,14 +55,14 @@ protected:
    /// close the connection to python
    void close();
 
-   /// name of the python script
-   const char * python_script;
+   /// socket to the python process
+   int fd;
 
    /// PID of the python process
    pid_t pid;
 
-   /// socket to the python process
-   int fd;
+   /// name of the python script
+   const char * python_script;
 
 };
 

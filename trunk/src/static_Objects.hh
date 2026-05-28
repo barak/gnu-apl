@@ -36,11 +36,11 @@ public:
    /// destructor
    ~static_Objects();
 
-   /// object description
-   const char * what;
-
    /// where the object was created (source location)
    const char * loc;
+
+   /// object description
+   const char * what;
 
    /// enable debug output for construction
    static bool show_constructors;

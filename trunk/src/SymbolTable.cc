@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,33 +103,6 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
        }
 
    return UCS_string();
-}
-//----------------------------------------------------------------------------
-ostream &
-SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
-{
-UCS_string buf(buf1);
-   buf.remove_leading_and_trailing_whitespaces();
-   if (buf1.size() == 1)   switch(buf1[0])
-      {
-        case UNI_ALPHA:  return Workspace::get_v_ALPHA().print_verbose(out);
-        case UNI_ALPHA_UNDERBAR:
-                         return Workspace::get_v_ALPHA_U().print_verbose(out);
-        case UNI_OMEGA:  return Workspace::get_v_OMEGA().print_verbose(out);
-        case UNI_CHI:    return Workspace::get_v_CHI().print_verbose(out);
-        case UNI_OMEGA_UNDERBAR:
-                         return Workspace::get_v_OMEGA_U().print_verbose(out);
-        case UNI_LAMBDA: return Workspace::get_v_LAMBDA().print_verbose(out);
-        default:         break;
-      }
-
-const Symbol * sym = Workspace::lookup_existing_symbol(buf);
-
-   if (sym)   return sym->print_verbose(out);
-
-   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
-
-   return out << "no symbol '" << buf1 << "'" << endl;
 }
 //----------------------------------------------------------------------------
 void
@@ -267,35 +240,6 @@ int count = 0;
 }
 //----------------------------------------------------------------------------
 void
-SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
-{
-   loop(s, SYMBOL_HASH_TABLE_SIZE)
-       {
-         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
-             {
-               sym->write_OUT(out, seq);
-             }
-       }
-}
-//----------------------------------------------------------------------------
-void
-SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
-{
-size_t error_count = 0;
-   loop(s, symbols.size())
-       {
-         if (erase_one_symbol(symbols[s]))
-            {
-              if (error_count == 0)   out << "NOT ERASED:";
-              ++error_count;
-              out << " " << symbols[s];
-            }
-       }
-
-   if (error_count)   out << endl;
-}
-//----------------------------------------------------------------------------
-void
 SymbolTable::clear(ostream & out)
 {
    // SymbolTable::clear() should only be called after Workspace::clear_SI()
@@ -331,6 +275,128 @@ Symbol * next;   // the symbol after sym
               symbol_table[hash] = sym;
             }
        }
+}
+//----------------------------------------------------------------------------
+void
+SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
+{
+size_t error_count = 0;
+   loop(s, symbols.size())
+       {
+         if (erase_one_symbol(symbols[s]))
+            {
+              if (error_count == 0)   out << "NOT ERASED:";
+              ++error_count;
+              out << " " << symbols[s];
+            }
+       }
+
+   if (error_count)   out << endl;
+}
+//----------------------------------------------------------------------------
+ostream &
+SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
+{
+UCS_string buf(buf1);
+   buf.remove_leading_and_trailing_whitespaces();
+   if (buf1.size() == 1)   switch(buf1[0])
+      {
+        case UNI_ALPHA:  return Workspace::get_v_ALPHA().print_verbose(out);
+        case UNI_ALPHA_UNDERBAR:
+                         return Workspace::get_v_ALPHA_U().print_verbose(out);
+        case UNI_OMEGA:  return Workspace::get_v_OMEGA().print_verbose(out);
+        case UNI_CHI:    return Workspace::get_v_CHI().print_verbose(out);
+        case UNI_OMEGA_UNDERBAR:
+                         return Workspace::get_v_OMEGA_U().print_verbose(out);
+        case UNI_LAMBDA: return Workspace::get_v_LAMBDA().print_verbose(out);
+        default:         break;
+      }
+
+const Symbol * sym = Workspace::lookup_existing_symbol(buf);
+
+   if (sym)   return sym->print_verbose(out);
+
+   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
+
+   return out << "no symbol '" << buf1 << "'" << endl;
+}
+//----------------------------------------------------------------------------
+void
+SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
+{
+   loop(s, SYMBOL_HASH_TABLE_SIZE)
+       {
+         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
+             {
+               sym->write_OUT(out, seq);
+             }
+       }
+}
+//----------------------------------------------------------------------------
+std::vector<const Symbol *>
+SymbolTable::get_all_symbols() const
+{
+std::vector<const Symbol *> ret;
+   ret.reserve(1000);
+
+   loop(hash, SYMBOL_HASH_TABLE_SIZE)
+      {
+        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              ret.push_back(sym);
+            }
+      }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+void
+SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
+{
+std::vector<const Symbol *> symbols;
+   loop(hash, SYMBOL_HASH_TABLE_SIZE)
+      {
+        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              if (sym->is_erased())              continue;
+              if (sym->value_stack_size() < 1)   continue;
+              symbols.push_back(sym);
+            }
+      }
+
+   // sort symbols by name
+   //
+   loop(d, symbols.size())
+      {
+        for (ShapeItem j = d + 1; j < ShapeItem(symbols.size()); ++j)
+            {
+              if (symbols[d]->get_name().compare(symbols[j]->get_name()) > 0)
+                 {
+                   const Symbol * ss = symbols[d];
+                   symbols[d] = symbols[j];
+                   symbols[j] = ss;
+                 }
+            }
+      }
+
+   // pass 1: defined functions and operators
+   //
+   loop(s, symbols.size())
+      {
+        const Symbol & sym = *symbols[s];
+        const ValueStackItem & vs = sym[0];
+         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
+         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
+      }
+
+   // pass 2: variables
+   //
+   loop(s, symbols.size())
+      {
+        const Symbol & sym = *symbols[s];
+        const ValueStackItem & vs = sym[0];
+        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
+      }
 }
 //----------------------------------------------------------------------------
 bool
@@ -429,72 +495,6 @@ ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
 
     Assert(0 && "Bad name_class in SymbolTable::erase_one_symbol()");
    return true;
-}
-//----------------------------------------------------------------------------
-std::vector<const Symbol *>
-SymbolTable::get_all_symbols() const
-{
-std::vector<const Symbol *> ret;
-   ret.reserve(1000);
-
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)
-      {
-        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
-            {
-              ret.push_back(sym);
-            }
-      }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
-{
-std::vector<const Symbol *> symbols;
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)
-      {
-        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
-            {
-              if (sym->is_erased())              continue;
-              if (sym->value_stack_size() < 1)   continue;
-              symbols.push_back(sym);
-            }
-      }
-
-   // sort symbols by name
-   //
-   loop(d, symbols.size())
-      {
-        for (ShapeItem j = d + 1; j < ShapeItem(symbols.size()); ++j)
-            {
-              if (symbols[d]->get_name().compare(symbols[j]->get_name()) > 0)
-                 {
-                   const Symbol * ss = symbols[d];
-                   symbols[d] = symbols[j];
-                   symbols[j] = ss;
-                 }
-            }
-      }
-
-   // pass 1: defined functions and operators
-   //
-   loop(s, symbols.size())
-      {
-        const Symbol & sym = *symbols[s];
-        const ValueStackItem & vs = sym[0];
-         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
-         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
-      }
-
-   // pass 2: variables
-   //
-   loop(s, symbols.size())
-      {
-        const Symbol & sym = *symbols[s];
-        const ValueStackItem & vs = sym[0];
-        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
-      }
 }
 //============================================================================
 void

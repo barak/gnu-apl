@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,10 +46,6 @@ Macro::Macro(Macro_num num, const UTF8_string & text)
       }
 }
 //----------------------------------------------------------------------------
-Macro::~Macro()
-{
-}
-//----------------------------------------------------------------------------
 Macro *
 Macro::get_macro(Macro_num num)
 {
@@ -63,6 +59,10 @@ Macro::unmark_all_macros()
 {
 #define mac_def(name, _txt) get_macro(MAC_ ## name)->unmark_all_values();
 #include "Macro.def"
+}
+//----------------------------------------------------------------------------
+Macro::~Macro()
+{
 }
 //----------------------------------------------------------------------------
 

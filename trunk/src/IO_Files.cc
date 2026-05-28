@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,6 +52,86 @@ APL_time_us IO_Files::start_usecs = 0;
 
 static  ios_base::openmode summary_flags = ofstream::trunc;
 
+//----------------------------------------------------------------------------
+void
+IO_Files::syntax_error()
+{
+   if (!InputFile::current_file())         return;
+   if (!InputFile::current_file()->file)   return;
+
+   ++parse_errors;
+
+   Log(LOG_test_execution)
+      CERR << "parse errors incremented to " << parse_errors << endl;
+
+   current_testreport << "**\n** Parse Error ********\n**" << endl;
+}
+//----------------------------------------------------------------------------
+void
+IO_Files::expect_apl_errors(const UCS_string & arg)
+{
+const int cnt = arg.atoi();
+   if (apl_errors == cnt)
+      {
+        Log(LOG_test_execution)
+           CERR << "APL errors reset from (expected) " << apl_errors
+                << " to 0" << endl;
+        apl_errors = 0;
+        last_apl_error_line = -1;
+        last_apl_error_loc = "";
+      }
+   else
+      {
+        Log(LOG_test_execution)
+           CERR << "*** Not reseting APL errors (got " << apl_errors
+                << " expecing " << cnt << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
+IO_Files::apl_error(const char * loc)
+{
+   if (!InputFile::current_file())         return;
+   if (!InputFile::current_file()->file)   return;
+
+   ++apl_errors;
+   last_apl_error_loc = loc;
+   last_apl_error_line = InputFile::current_line_no();
+
+   Log(LOG_test_execution)
+      CERR << "APL errors incremented to " << apl_errors << endl;
+}
+//----------------------------------------------------------------------------
+void
+IO_Files::assert_error()
+{
+   if (!InputFile::current_file())         return;
+   if (!InputFile::current_file()->file)   return;
+
+   ++assert_errors;
+   Log(LOG_test_execution)
+      CERR << "Assert errors incremented to " << assert_errors << endl;
+}
+//----------------------------------------------------------------------------
+void
+IO_Files::diff_error()
+{
+   if (!InputFile::current_file())         return;
+   if (!InputFile::current_file()->file)   return;
+
+   ++diff_errors;
+   Log(LOG_test_execution)
+      CERR << "Diff errors incremented to " << diff_errors << endl;
+
+   if (test_mode & TM_DONE_AFTER_LINE_ERROR)
+      {
+        ++total_errors;
+        ++testcases_done;
+        InputFile::close_current_file();
+        InputFile::files_todo.clear();
+        if (test_mode == TM_EXIT_AFTER_LINE_ERROR)   Command::cmd_OFF(1);
+      }
+}
 //----------------------------------------------------------------------------
 void
 IO_Files::get_file_line(UTF8_string & line, bool & eof)
@@ -132,6 +212,113 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
 }
 //----------------------------------------------------------------------------
 void
+IO_Files::open_next_file()
+{
+   if (InputFile::current_file() == 0)
+      {
+        CERR << "IO_Files::open_next_file(): no more files" << endl;
+        return;
+      }
+
+   if (InputFile::current_file()->file)
+      {
+        if (InputFile::current_file()->is_pushed_pending())
+           {
+             InputFile::current_file()->set_pushed_pending(false);
+             CERR << "*** Leaving the pushed immediate execution context"
+                  << endl;
+           }
+        else
+           {
+             CERR << "IO_Files::open_next_file(): already open" << endl;
+           }
+        return;
+      }
+
+     while (InputFile::current_file())
+         {
+           char log_file_name[FILENAME_MAX] = "";
+
+           if (InputFile::current_file()->test)
+              {
+                SPRINTF(log_file_name, "%s.log",
+                        InputFile::current_filename());
+                if (const char * slash = strrchr(log_file_name, '/'))
+                   {
+                     summary_path = UTF8_string(utf8P(log_file_name),
+                                                slash + 1 - log_file_name);
+                     summary_path << "summary.log";
+                   }
+
+                CERR << "  #######################################"
+                        "#####################################\n"
+                     << " ########################################"
+                        "######################################\n"
+                     << " ##    Testfile: " << left << setw(60)
+                     << InputFile::current_filename() << "##\n"
+                     << " ##    Log file: " << setw(60) << log_file_name
+                     << "##\n"
+                     << " ########################################"
+                        "######################################" << endl
+                     << "  #######################################"
+                        "#####################################\n" << endl
+                     << right;
+              }
+
+           InputFile::open_current_file();
+           if (InputFile::current_file()->file == 0)
+              {
+                CERR << "could not open "
+                     << InputFile::current_filename() << endl;
+                InputFile::files_todo.erase(InputFile::files_todo.begin());
+                continue;
+              }
+
+           Log(LOG_test_execution)
+              CERR << "opened testcase file "
+                   << InputFile::current_filename() << endl;
+
+           Output::reset_dout();
+           reset_errors();
+
+           current_testreport.close();
+
+           if (InputFile::current_file()->test)
+              {
+                // open a testcase file
+                //
+                current_testreport.open(log_file_name,
+                                        ofstream::out | ofstream::trunc);
+                if (!current_testreport.is_open())
+                   {
+                     CERR << "could not open testcase log file "
+                          << log_file_name
+                          << "; producing no .log file" << endl;
+                   }
+              }
+
+           // remember when test execution was started
+           start_usecs = now();
+           return;
+         }
+}
+//----------------------------------------------------------------------------
+void
+IO_Files::next_file()
+{
+   if (InputFile::current_file() &&
+       InputFile::current_file()->file)
+      {
+        end_of_current_file();
+      }
+   else
+      {
+        CERR << "]NEXTFILE: no current file" << endl;
+      }
+   open_next_file();
+}
+//----------------------------------------------------------------------------
+void
 IO_Files::read_file_line(UTF8_string & file_line, bool & eof)
 {
 InputFile * input = InputFile::current_file();
@@ -183,21 +370,6 @@ InputFile * input = InputFile::current_file();
 
    Log(LOG_test_execution)
       CERR << "read_file_line() -> " << file_line << endl;
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::next_file()
-{
-   if (InputFile::current_file() &&
-       InputFile::current_file()->file)
-      {
-        end_of_current_file();
-      }
-   else
-      {
-        CERR << "]NEXTFILE: no current file" << endl;
-      }
-   open_next_file();
 }
 //----------------------------------------------------------------------------
 bool
@@ -375,177 +547,5 @@ int done = testcases_done;
            << total_errors << " errors in " << done
            << "(" << testcase_count << ")"
            << " testcase files" << endl;
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::open_next_file()
-{
-   if (InputFile::current_file() == 0)
-      {
-        CERR << "IO_Files::open_next_file(): no more files" << endl;
-        return;
-      }
-
-   if (InputFile::current_file()->file)
-      {
-        if (InputFile::current_file()->is_pushed_pending())
-           {
-             InputFile::current_file()->set_pushed_pending(false);
-             CERR << "*** Leaving the pushed immediate execution context"
-                  << endl;
-           }
-        else
-           {
-             CERR << "IO_Files::open_next_file(): already open" << endl;
-           }
-        return;
-      }
-
-     while (InputFile::current_file())
-         {
-           char log_file_name[FILENAME_MAX] = "";
-
-           if (InputFile::current_file()->test)
-              {
-                SPRINTF(log_file_name, "%s.log",
-                        InputFile::current_filename());
-                if (const char * slash = strrchr(log_file_name, '/'))
-                   {
-                     summary_path = UTF8_string(utf8P(log_file_name),
-                                                slash + 1 - log_file_name);
-                     summary_path << "summary.log";
-                   }
-
-                CERR << "  #######################################"
-                        "#####################################\n"
-                     << " ########################################"
-                        "######################################\n"
-                     << " ##    Testfile: " << left << setw(60)
-                     << InputFile::current_filename() << "##\n"
-                     << " ##    Log file: " << setw(60) << log_file_name
-                     << "##\n"
-                     << " ########################################"
-                        "######################################" << endl
-                     << "  #######################################"
-                        "#####################################\n" << endl
-                     << right;
-              }
-
-           InputFile::open_current_file();
-           if (InputFile::current_file()->file == 0)
-              {
-                CERR << "could not open "
-                     << InputFile::current_filename() << endl;
-                InputFile::files_todo.erase(InputFile::files_todo.begin());
-                continue;
-              }
-
-           Log(LOG_test_execution)
-              CERR << "opened testcase file "
-                   << InputFile::current_filename() << endl;
-
-           Output::reset_dout();
-           reset_errors();
-
-           current_testreport.close();
-
-           if (InputFile::current_file()->test)
-              {
-                // open a testcase file
-                //
-                current_testreport.open(log_file_name,
-                                        ofstream::out | ofstream::trunc);
-                if (!current_testreport.is_open())
-                   {
-                     CERR << "could not open testcase log file "
-                          << log_file_name
-                          << "; producing no .log file" << endl;
-                   }
-              }
-
-           // remember when test execution was started
-           start_usecs = now();
-           return;
-         }
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::expect_apl_errors(const UCS_string & arg)
-{
-const int cnt = arg.atoi();
-   if (apl_errors == cnt)
-      {
-        Log(LOG_test_execution)
-           CERR << "APL errors reset from (expected) " << apl_errors
-                << " to 0" << endl;
-        apl_errors = 0;
-        last_apl_error_line = -1;
-        last_apl_error_loc = "";
-      }
-   else
-      {
-        Log(LOG_test_execution)
-           CERR << "*** Not reseting APL errors (got " << apl_errors
-                << " expecing " << cnt << endl;
-      }
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::syntax_error()
-{
-   if (!InputFile::current_file())         return;
-   if (!InputFile::current_file()->file)   return;
-
-   ++parse_errors;
-
-   Log(LOG_test_execution)
-      CERR << "parse errors incremented to " << parse_errors << endl;
-
-   current_testreport << "**\n** Parse Error ********\n**" << endl;
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::apl_error(const char * loc)
-{
-   if (!InputFile::current_file())         return;
-   if (!InputFile::current_file()->file)   return;
-
-   ++apl_errors;
-   last_apl_error_loc = loc;
-   last_apl_error_line = InputFile::current_line_no();
-
-   Log(LOG_test_execution)
-      CERR << "APL errors incremented to " << apl_errors << endl;
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::assert_error()
-{
-   if (!InputFile::current_file())         return;
-   if (!InputFile::current_file()->file)   return;
-
-   ++assert_errors;
-   Log(LOG_test_execution)
-      CERR << "Assert errors incremented to " << assert_errors << endl;
-}
-//----------------------------------------------------------------------------
-void
-IO_Files::diff_error()
-{
-   if (!InputFile::current_file())         return;
-   if (!InputFile::current_file()->file)   return;
-
-   ++diff_errors;
-   Log(LOG_test_execution)
-      CERR << "Diff errors incremented to " << diff_errors << endl;
-
-   if (test_mode & TM_DONE_AFTER_LINE_ERROR)
-      {
-        ++total_errors;
-        ++testcases_done;
-        InputFile::close_current_file();
-        InputFile::files_todo.clear();
-        if (test_mode == TM_EXIT_AFTER_LINE_ERROR)   Command::cmd_OFF(1);
-      }
 }
 //----------------------------------------------------------------------------

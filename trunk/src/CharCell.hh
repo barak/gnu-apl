@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,25 +54,25 @@ public:
    virtual bool is_character_cell() const
       { return true; }
 
-   /// overloaded Cell::greater()
+   /// the Quad_CR representation of this cell
+   /// @param pctx print context controlling formatting options
+   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+
+   /// overloaded Cell::compare()
    /// @param other cell to compare against
-   virtual bool greater(const Cell & other) const;
+   virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded Cell::equal()
    /// @param other cell to compare against
    /// @param qct   comparison tolerance ⎕CT
    virtual bool equal(const Cell & other, double qct) const;
 
+   /// overloaded Cell::greater()
+   /// @param other cell to compare against
+   virtual bool greater(const Cell & other) const;
+
    /// overloaded Cell::is_example_field()
    virtual bool is_example_field() const;
-
-   /// overloaded Cell::compare()
-   /// @param other cell to compare against
-   virtual Comp_result compare(const Cell & other) const;
-
-   /// the Quad_CR representation of this cell
-   /// @param pctx print context controlling formatting options
-   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
 #ifndef __LIBAPL__
  protected:   // public: in libapl.cc
@@ -89,44 +89,44 @@ protected:
    virtual CellType get_cell_type() const
       { return CT_CHAR; }
 
-   /// overloaded Cell::get_cell_subtype()
-   virtual CellType get_cell_subtype() const;
-
    /// overloaded Cell::get_char_value()
    virtual Unicode get_char_value() const   { return value.aval; }
 
-   /// overloaded Cell::get_byte_value()
-   virtual int get_byte_value() const;
-
    /// overloaded Cell::get_classname()
    virtual const char * get_classname()  const   { return "CharCell"; }
-
-   /// overloaded Cell::CDR_size()
-   virtual int CDR_size() const;
-
-   /// overloaded Cell::bif_not_bitwise()
-   /// @param Z result cell pointer
-   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
 
    /// overloaded Cell::bif_and_bitwise()
    /// @param Z result cell pointer
    /// @param A left operand cell
    virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
 
-   /// overloaded Cell::bif_and_bitwise()
-   /// @param Z result cell pointer
-   /// @param A left operand cell
-   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
+   /// overloaded Cell::CDR_size()
+   virtual int CDR_size() const;
 
    /// overloaded Cell::bif_equal_bitwise()
    /// @param Z result cell pointer
    /// @param A left operand cell
    virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::get_byte_value()
+   virtual int get_byte_value() const;
+
+   /// overloaded Cell::get_cell_subtype()
+   virtual CellType get_cell_subtype() const;
+
+   /// overloaded Cell::bif_not_bitwise()
+   /// @param Z result cell pointer
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
+
    /// overloaded Cell::bif_not_equal_bitwise()
    /// @param Z result cell pointer
    /// @param A left operand cell
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_and_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
+   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
 };
 //----------------------------------------------------------------------------
 

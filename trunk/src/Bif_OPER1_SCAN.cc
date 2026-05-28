@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,96 +30,6 @@
 Bif_OPER1_SCAN    Bif_OPER1_SCAN ::fun;
 Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::fun;
 
-//----------------------------------------------------------------------------
-Token
-Bif_SCAN::expand(Value_P A, Value_P B, uAxis axis)
-{
-   // turn scalar B into ,B
-   //
-Shape shape_B = B->get_shape();
-   if (shape_B.get_rank() == 0)
-      {
-         shape_B.add_shape_item(1);
-         axis = 0;
-      }
-   if (axis >= shape_B.get_rank())   INDEX_ERROR;
-
-   if (A->get_rank() > 1)            RANK_ERROR;
-   if (shape_B.get_rank() <= axis)   RANK_ERROR;
-
-const ShapeItem ec_A = A->element_count();
-ShapeItem ones_A = 0;
-std::vector<ShapeItem> rep_counts;
-   rep_counts.reserve(ec_A);
-   loop(a, ec_A)
-      {
-        APL_Integer rep_A = A->get_cravel(a).get_near_int();
-        rep_counts.push_back(rep_A);
-        if      (rep_A == 0)        ;
-        else if (rep_A == 1)        ++ones_A;
-        else                        DOMAIN_ERROR;
-      }
-
-Shape shape_Z(shape_B);
-   shape_Z.set_shape_item(axis, ec_A);
-Value_P Z(shape_Z, LOC);
-
-   if (ec_A == 0)   // (⍳0)/B : 
-      {
-        if (shape_B.get_shape_item(axis) > 1)   LENGTH_ERROR;
-
-        Z->set_default(*B.get(), LOC);
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-const Shape3 shape_Z3(shape_Z, axis);
-
-const Cell * cB = &B->get_cfirst();
-const bool lval = cB->is_lval_cell();
-
-ShapeItem inc_1 = shape_Z3.l();   // increment after result l items
-ShapeItem inc_2 = 0;              // increment after result m*l items
-
-   if (B->is_scalar() || (shape_B.get_shape_item(axis) == 1
-                      && (shape_Z3.l() != 1)))
-      {
-         inc_1 = 0;
-         inc_2 = shape_Z3.l();
-      }
-   else if (ones_A != shape_B.get_shape_item(axis))   LENGTH_ERROR;
-
-   loop(h, shape_Z3.h())
-      {
-        const Cell * fill = cB;
-        loop(m, rep_counts.size())
-           {
-             if (rep_counts[m] == 1)   // copy items from B
-                {
-                  loop(l, shape_Z3.l())   Z->next_ravel_Cell(cB[l]);
-                  cB += inc_1;
-                }
-             else                      // init items
-                {
-                  if (lval)
-                     {
-                       loop(l, shape_Z3.l())   Z->next_ravel_Lval(0, 0);
-                     }
-                  else
-                     {
-                       loop(l, shape_Z3.l())   Z->next_ravel_Proto(fill[l]);
-                     }
-                }
-           }
-
-        cB += inc_2;
-      }
-
-   Z->set_default(*B.get(), LOC);
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
 //----------------------------------------------------------------------------
 Token
 Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
@@ -219,6 +129,96 @@ const Shape3 Z3(B->get_shape(), axis);
    if (B->get_shape().is_empty())   return LO->eval_identity_fun(B, axis);
 
    return Bif_REDUCE::do_reduce(B->get_shape(), Z3, -1, LO, B, m_len);
+}
+//----------------------------------------------------------------------------
+Token
+Bif_SCAN::expand(Value_P A, Value_P B, uAxis axis)
+{
+   // turn scalar B into ,B
+   //
+Shape shape_B = B->get_shape();
+   if (shape_B.get_rank() == 0)
+      {
+         shape_B.add_shape_item(1);
+         axis = 0;
+      }
+   if (axis >= shape_B.get_rank())   INDEX_ERROR;
+
+   if (A->get_rank() > 1)            RANK_ERROR;
+   if (shape_B.get_rank() <= axis)   RANK_ERROR;
+
+const ShapeItem ec_A = A->element_count();
+ShapeItem ones_A = 0;
+std::vector<ShapeItem> rep_counts;
+   rep_counts.reserve(ec_A);
+   loop(a, ec_A)
+      {
+        APL_Integer rep_A = A->get_cravel(a).get_near_int();
+        rep_counts.push_back(rep_A);
+        if      (rep_A == 0)        ;
+        else if (rep_A == 1)        ++ones_A;
+        else                        DOMAIN_ERROR;
+      }
+
+Shape shape_Z(shape_B);
+   shape_Z.set_shape_item(axis, ec_A);
+Value_P Z(shape_Z, LOC);
+
+   if (ec_A == 0)   // (⍳0)/B : 
+      {
+        if (shape_B.get_shape_item(axis) > 1)   LENGTH_ERROR;
+
+        Z->set_default(*B.get(), LOC);
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+const Shape3 shape_Z3(shape_Z, axis);
+
+const Cell * cB = &B->get_cfirst();
+const bool lval = cB->is_lval_cell();
+
+ShapeItem inc_1 = shape_Z3.l();   // increment after result l items
+ShapeItem inc_2 = 0;              // increment after result m*l items
+
+   if (B->is_scalar() || (shape_B.get_shape_item(axis) == 1
+                      && (shape_Z3.l() != 1)))
+      {
+         inc_1 = 0;
+         inc_2 = shape_Z3.l();
+      }
+   else if (ones_A != shape_B.get_shape_item(axis))   LENGTH_ERROR;
+
+   loop(h, shape_Z3.h())
+      {
+        const Cell * fill = cB;
+        loop(m, rep_counts.size())
+           {
+             if (rep_counts[m] == 1)   // copy items from B
+                {
+                  loop(l, shape_Z3.l())   Z->next_ravel_Cell(cB[l]);
+                  cB += inc_1;
+                }
+             else                      // init items
+                {
+                  if (lval)
+                     {
+                       loop(l, shape_Z3.l())   Z->next_ravel_Lval(0, 0);
+                     }
+                  else
+                     {
+                       loop(l, shape_Z3.l())   Z->next_ravel_Proto(fill[l]);
+                     }
+                }
+           }
+
+        cB += inc_2;
+      }
+
+   Z->set_default(*B.get(), LOC);
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
 Token

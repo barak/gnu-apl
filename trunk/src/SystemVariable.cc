@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,6 +62,12 @@ ShapeItem Quad_SYL::print_length_limit = 0;
 
 Unicode Quad_AV::qav[Avec::MAX_AV];
 
+//----------------------------------------------------------------------------
+ostream &
+SystemVariable::print(ostream & out) const
+{
+   return out << get_Id();
+}
 //============================================================================
 void
 SystemVariable::assign(Value_P B, bool clone, const char * loc)
@@ -77,12 +83,6 @@ SystemVariable::assign_indexed(const Value * X, Value_P B)
    CERR << "SystemVariable::assign_indexed() not (yet) implemented for "
         << get_Id() << endl;
    FIXME;
-}
-//----------------------------------------------------------------------------
-ostream &
-SystemVariable::print(ostream & out) const
-{
-   return out << get_Id();
 }
 //----------------------------------------------------------------------------
 void
@@ -127,39 +127,6 @@ SystemVariable::get_attributes(int mode, Value & Z) const
         default:  Assert(0 && "bad mode");
       }
 
-}
-//============================================================================
-Quad_AV::Quad_AV()
-   : RO_SystemVariable(ID_Quad_AV)
-{
-   Assert1(Avec::MAX_AV == 256);
-
-Value_P AV(Avec::MAX_AV, LOC);
-
-   // Avec::character_table is sorted by ascending Unicodes, while ⎕AV
-   // is not. We construct qav (which is sorted by ⎕AV position) from
-   // Avec::character_table and assign it to ⎕AV.
-   //
-   loop(cti, Avec::MAX_AV)
-       {
-         const int av_pos = Avec::get_av_pos(Avec::CHT_Index(cti));
-         const Unicode uni = Avec::unicode(Avec::CHT_Index(cti));
-
-         qav[av_pos] = uni;   // remember unicode for indexed_at()
-       }
-
-   loop(av, Avec::MAX_AV)  AV->next_ravel_Char(qav[av]);
-
-   AV->check_value(LOC);
-
-   Symbol::assign(AV, false, LOC);
-}
-//----------------------------------------------------------------------------
-Unicode
-Quad_AV::indexed_at(uint32_t pos)
-{
-   if (pos < Avec::MAX_AV)   return qav[pos];
-   return UNI_AV_MAX;
 }
 //============================================================================
 Quad_AI::Quad_AI()
@@ -209,6 +176,39 @@ Value_P Z(argc, LOC);
 
    Z->check_value(LOC);
    return Z;
+}
+//============================================================================
+Quad_AV::Quad_AV()
+   : RO_SystemVariable(ID_Quad_AV)
+{
+   Assert1(Avec::MAX_AV == 256);
+
+Value_P AV(Avec::MAX_AV, LOC);
+
+   // Avec::character_table is sorted by ascending Unicodes, while ⎕AV
+   // is not. We construct qav (which is sorted by ⎕AV position) from
+   // Avec::character_table and assign it to ⎕AV.
+   //
+   loop(cti, Avec::MAX_AV)
+       {
+         const int av_pos = Avec::get_av_pos(Avec::CHT_Index(cti));
+         const Unicode uni = Avec::unicode(Avec::CHT_Index(cti));
+
+         qav[av_pos] = uni;   // remember unicode for indexed_at()
+       }
+
+   loop(av, Avec::MAX_AV)  AV->next_ravel_Char(qav[av]);
+
+   AV->check_value(LOC);
+
+   Symbol::assign(AV, false, LOC);
+}
+//----------------------------------------------------------------------------
+Unicode
+Quad_AV::indexed_at(uint32_t pos)
+{
+   if (pos < Avec::MAX_AV)   return qav[pos];
+   return UNI_AV_MAX;
 }
 //============================================================================
 Quad_CT::Quad_CT()
@@ -370,19 +370,6 @@ Value_P new_val(ucs, LOC);
 }
 //----------------------------------------------------------------------------
 void
-Quad_FC::assign_indexed(const IndexExpr & IX, Value_P B)
-{
-   if (!IX.is_axis())   INDEX_ERROR;
-
-   // at this point we have a one dimensional index. It it were non-empty,
-   // then assign_indexed(Value) would have been called instead. Therefore
-   // IX must be an elided index (like in ⎕FC[] ← B)
-   //
-   Assert1(!IX.values[0]);
-   assign(B, true, LOC);   // ⎕FC[]←value
-}
-//----------------------------------------------------------------------------
-void
 Quad_FC::assign_indexed(const Value * X, Value_P B)
 {
    // we don't do scalar extension but require indices to match the value.
@@ -418,6 +405,19 @@ Unicode fc[6];
 UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
    Symbol::assign(new_val, false, LOC);
+}
+//----------------------------------------------------------------------------
+void
+Quad_FC::assign_indexed(const IndexExpr & IX, Value_P B)
+{
+   if (!IX.is_axis())   INDEX_ERROR;
+
+   // at this point we have a one dimensional index. It it were non-empty,
+   // then assign_indexed(Value) would have been called instead. Therefore
+   // IX must be an elided index (like in ⎕FC[] ← B)
+   //
+   Assert1(!IX.values[0]);
+   assign(B, true, LOC);   // ⎕FC[]←value
 }
 //============================================================================
 Quad_IO::Quad_IO()
@@ -730,15 +730,6 @@ Quad_Quad::Quad_Quad()
 }
 //----------------------------------------------------------------------------
 void
-Quad_Quad::assign(Value_P B, bool clone, const char * loc)
-{
-   // write pending LF from  ⍞ (if any)
-   Quad_QUOTE::done(true, LOC);
-
-   B->print(COUT);
-}
-//----------------------------------------------------------------------------
-void
 Quad_Quad::resolve_right(Token & token, Function_PC & PC) const
 {
    // write pending LF from  ⍞ (if any)
@@ -755,6 +746,15 @@ UCS_string line;
 
 Token tok_exec(Bif_F1_EXECUTE::execute_statement(line));
    token.move_from(tok_exec, LOC);
+}
+//----------------------------------------------------------------------------
+void
+Quad_Quad::assign(Value_P B, bool clone, const char * loc)
+{
+   // write pending LF from  ⍞ (if any)
+   Quad_QUOTE::done(true, LOC);
+
+   B->print(COUT);
 }
 //============================================================================
 Quad_QUOTE::Quad_QUOTE()
@@ -922,40 +922,6 @@ Quad_SYL::assign(Value_P B, bool clone, const char * loc)
 }
 //----------------------------------------------------------------------------
 void
-Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
-{
-   //  must be an array index of the form [something; 2]
-   //
-   if (IDX.get_rank() != 2)   RANK_ERROR;
-
-   // The only point of getting X2 is to check that it is not elided
-   // but quasi-scalar qio + 1
-   //
-const Value * X2 = IDX.get_axis_value(1);
-const APL_Integer qio = Workspace::get_IO();
-
-   if (!X2)                                          INDEX_ERROR;
-   if (X2->element_count() != 1)                     INDEX_ERROR;
-   if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
-   if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
-
-   if (const Value * X1 = IDX.get_axis_value(0))   // normal index
-      {
-        assign_indexed(X1, B);
-      }
-   else                                            // elided index: ⎕SYL[;2]←B
-      {
-        Value_P E1(SYL_MAX, LOC);
-        loop(col, E1->element_count())
-            {
-              E1->next_ravel_Int(col + qio);
-            }
-        E1->check_value(LOC);
-        assign_indexed(E1.get(), B);
-      }
-}
-//----------------------------------------------------------------------------
-void
 Quad_SYL::assign_indexed(const Value * X, Value_P B)
 {
    // try to assign ⎕SYL[X;2]
@@ -1028,6 +994,40 @@ const APL_Integer qio = Workspace::get_IO();
              MORE_ERROR() << "Bad ⎕SYL index " << x;
              INDEX_ERROR;
            }
+      }
+}
+//----------------------------------------------------------------------------
+void
+Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
+{
+   //  must be an array index of the form [something; 2]
+   //
+   if (IDX.get_rank() != 2)   RANK_ERROR;
+
+   // The only point of getting X2 is to check that it is not elided
+   // but quasi-scalar qio + 1
+   //
+const Value * X2 = IDX.get_axis_value(1);
+const APL_Integer qio = Workspace::get_IO();
+
+   if (!X2)                                          INDEX_ERROR;
+   if (X2->element_count() != 1)                     INDEX_ERROR;
+   if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
+   if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
+
+   if (const Value * X1 = IDX.get_axis_value(0))   // normal index
+      {
+        assign_indexed(X1, B);
+      }
+   else                                            // elided index: ⎕SYL[;2]←B
+      {
+        Value_P E1(SYL_MAX, LOC);
+        loop(col, E1->element_count())
+            {
+              E1->next_ravel_Int(col + qio);
+            }
+        E1->check_value(LOC);
+        assign_indexed(E1.get(), B);
       }
 }
 //----------------------------------------------------------------------------

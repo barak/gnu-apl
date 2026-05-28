@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,13 +30,6 @@
 Bif_F12_PARTITION Bif_F12_PARTITION::fun;    // ⊂
 Bif_F12_PICK      Bif_F12_PICK     ::fun;    // ⊃
 
-//============================================================================
-Token
-Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
-   return Token(TOK_APL_VALUE1, partition(A, B, axis));
-}
 //----------------------------------------------------------------------------
 Value_P
 Bif_F12_PARTITION::do_eval_B(Value_P B)
@@ -54,6 +47,13 @@ Value_P Z(LOC);   // Z ← ⊂B is always a scalar
       }
    Z->check_value(LOC);
    return Z;
+}
+//============================================================================
+Token
+Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
+   return Token(TOK_APL_VALUE1, partition(A, B, axis));
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -536,89 +536,6 @@ ShapeItem ret[MAX_RANK];
    return Shape(ret_rank, ret);
 }
 //----------------------------------------------------------------------------
-ShapeItem
-Bif_F12_PICK::pick_offset(const Cell * const A0, ShapeItem idx_A,
-                          ShapeItem len_A, const Value * B, APL_Integer qio)
-{
-const Cell & cA = A0[idx_A];
-
-   if (cA.is_pointer_cell())   // then B shall be a 1-dimensional array
-      {
-        /*
-           cA = A[idx_A] is nested, e.g.
-
-           case i.    (⊂"b") ⊃ A.b.c ← 'leaf-A.b.c'   (structured variable A)
-
-           case ii.   (⊂1 1) ⊃ A←3 3⍴⍳9               (normal A)
-         */
-
-        const Value & A = *cA.get_pointer_value();
-
-        if (B->is_member())   // case i. (structured B)
-           {
-             if (!A.is_char_string())
-                {
-                  MORE_ERROR() << "member name expected for A⊃B (nested A["
-                               << (idx_A + qio) << "])";
-                  DOMAIN_ERROR;
-                }
-
-             const UCS_string top_level(UNI_B);
-             const UCS_string member(A);
-             vector<const UCS_string *> members;
-             members.push_back(&member);
-             members.push_back(&top_level);   // dummy, must be last
-             const Cell * Bsub = B->get_existing_member(members);  // may throw
-             return Bsub - &B->get_cfirst();
-           }
-        else                  // case ii. (normal B)
-           {
-             if (A.get_rank() > 1)
-                {
-                  MORE_ERROR() << "rank A ≤ 1 expected for A⊃B (nested A["
-                               << (idx_A + qio) << "])";
-                  RANK_ERROR;
-                }
-
-             const ShapeItem len_A = A.element_count();
-             if (B->get_rank() != len_A)
-                {
-                  MORE_ERROR() << "⍴⍴B (" << B->get_rank()
-                               << ") = ⍴,A (" << len_A
-                               << ") expected for A⊃B (nested A["
-                               << (idx_A + qio) << "])";
-                  RANK_ERROR;
-                }
-
-             const Shape weights_B = B->get_shape().get_weights();
-             const Shape A_as_shape(A, qio);
-             ShapeItem offset = 0;
-
-             loop(r, A.element_count())
-                 {
-                   const ShapeItem ar = A_as_shape.get_shape_item(r);
-                   if (ar < 0)                       INDEX_ERROR;
-                   if (ar >= B->get_shape_item(r))   INDEX_ERROR;
-                   offset += weights_B.get_shape_item(r) * ar;
-                 }
-             return offset;
-           }
-      }
-   else   // A is a scalar, so B must be a vector.
-      {
-        if (B->get_rank() != 1)
-           {
-             MORE_ERROR() << "⍴⍴B (" << B->get_rank()
-                          << ") = 1 expected for A⊃B (with scalar A)";
-             RANK_ERROR;
-           }
-        const APL_Integer a = cA.get_near_int() - qio;
-        if (a < 0)                       INDEX_ERROR;
-        if (a >= B->get_shape_item(0))   INDEX_ERROR;
-        return a;
-      }
-}
-//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
                    const Value * B, APL_Integer qio)
@@ -708,6 +625,89 @@ const Cell * cB = &B->get_cravel(offset);
         Value_P Z(LOC);
         Z->next_ravel_Cell(*cB);
         return Z;
+      }
+}
+//----------------------------------------------------------------------------
+ShapeItem
+Bif_F12_PICK::pick_offset(const Cell * const A0, ShapeItem idx_A,
+                          ShapeItem len_A, const Value * B, APL_Integer qio)
+{
+const Cell & cA = A0[idx_A];
+
+   if (cA.is_pointer_cell())   // then B shall be a 1-dimensional array
+      {
+        /*
+           cA = A[idx_A] is nested, e.g.
+
+           case i.    (⊂"b") ⊃ A.b.c ← 'leaf-A.b.c'   (structured variable A)
+
+           case ii.   (⊂1 1) ⊃ A←3 3⍴⍳9               (normal A)
+         */
+
+        const Value & A = *cA.get_pointer_value();
+
+        if (B->is_member())   // case i. (structured B)
+           {
+             if (!A.is_char_string())
+                {
+                  MORE_ERROR() << "member name expected for A⊃B (nested A["
+                               << (idx_A + qio) << "])";
+                  DOMAIN_ERROR;
+                }
+
+             const UCS_string top_level(UNI_B);
+             const UCS_string member(A);
+             vector<const UCS_string *> members;
+             members.push_back(&member);
+             members.push_back(&top_level);   // dummy, must be last
+             const Cell * Bsub = B->get_existing_member(members);  // may throw
+             return Bsub - &B->get_cfirst();
+           }
+        else                  // case ii. (normal B)
+           {
+             if (A.get_rank() > 1)
+                {
+                  MORE_ERROR() << "rank A ≤ 1 expected for A⊃B (nested A["
+                               << (idx_A + qio) << "])";
+                  RANK_ERROR;
+                }
+
+             const ShapeItem len_A = A.element_count();
+             if (B->get_rank() != len_A)
+                {
+                  MORE_ERROR() << "⍴⍴B (" << B->get_rank()
+                               << ") = ⍴,A (" << len_A
+                               << ") expected for A⊃B (nested A["
+                               << (idx_A + qio) << "])";
+                  RANK_ERROR;
+                }
+
+             const Shape weights_B = B->get_shape().get_weights();
+             const Shape A_as_shape(A, qio);
+             ShapeItem offset = 0;
+
+             loop(r, A.element_count())
+                 {
+                   const ShapeItem ar = A_as_shape.get_shape_item(r);
+                   if (ar < 0)                       INDEX_ERROR;
+                   if (ar >= B->get_shape_item(r))   INDEX_ERROR;
+                   offset += weights_B.get_shape_item(r) * ar;
+                 }
+             return offset;
+           }
+      }
+   else   // A is a scalar, so B must be a vector.
+      {
+        if (B->get_rank() != 1)
+           {
+             MORE_ERROR() << "⍴⍴B (" << B->get_rank()
+                          << ") = 1 expected for A⊃B (with scalar A)";
+             RANK_ERROR;
+           }
+        const APL_Integer a = cA.get_near_int() - qio;
+        if (a < 0)                       INDEX_ERROR;
+        if (a >= B->get_shape_item(0))   INDEX_ERROR;
+        return a;
       }
 }
 //============================================================================

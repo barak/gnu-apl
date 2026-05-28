@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,9 @@
 class RealCell : public NumericCell
 {
 protected:
+   /// overloaded Cell::get_classname().
+   virtual const char * get_classname() const   { return "RealCell"; }
+
    /// overloaded Cell::is_real_cell().
    virtual bool is_real_cell() const { return true; }
 
@@ -47,18 +50,15 @@ protected:
    /// @param A cell containing the circle function index
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const;
 
-   /// compute circle function \b fun
-   /// @param Z output cell for the result
-   /// @param fun circle function index
-   ErrorCode do_bif_circle_fun(Cell * Z, int fun) const;
-
    /// overloaded Cell::bif_logarithm().
    /// @param Z output cell for the result
    /// @param A cell containing the logarithm base
    virtual ErrorCode bif_logarithm(Cell * Z, const Cell * A) const;
 
-   /// overloaded Cell::get_classname().
-   virtual const char * get_classname() const   { return "RealCell"; }
+   /// compute circle function \b fun
+   /// @param Z output cell for the result
+   /// @param fun circle function index
+   ErrorCode do_bif_circle_fun(Cell * Z, int fun) const;
 };
 //----------------------------------------------------------------------------
 

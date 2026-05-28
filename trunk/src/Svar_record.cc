@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -130,6 +130,14 @@ Svar_record::is_ws_to_ws()   const
 
    return offering.id.proc  >= AP_FIRST_USER &&
           accepting.id.proc >= AP_FIRST_USER;
+}
+//----------------------------------------------------------------------------
+void
+Svar_record::bad_proc(const char * function, const AP_num3 & id) const
+{
+   get_CERR() << function << "(): proc " << id.proc
+        << " does not match offering proc " << offering.id.proc
+        << " nor accepting proc " << accepting.id.proc << endl;
 }
 //----------------------------------------------------------------------------
 bool
@@ -352,14 +360,6 @@ const int restriction = control & state;
 
    bad_proc(__FUNCTION__, ProcessorID::get_id());
    return false;
-}
-//----------------------------------------------------------------------------
-void
-Svar_record::bad_proc(const char * function, const AP_num3 & id) const
-{
-   get_CERR() << function << "(): proc " << id.proc
-        << " does not match offering proc " << offering.id.proc
-        << " nor accepting proc " << accepting.id.proc << endl;
 }
 //----------------------------------------------------------------------------
 void

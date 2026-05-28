@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,85 +43,6 @@ bool Parallel::run_parallel = true;
 #endif   // cfg_CORE_COUNT_WANTED == 0
 
 bool Parallel::init_done = false;
-
-//============================================================================
-void
-Parallel::init(bool logit)
-{
-   // supposedly called only once...
-   //
-   Assert(!init_done);
-   init_done = true;
-
-#if PARALLEL_ENABLED
-
-   // init global semaphores
-   //
-   __sem_init(print_sema,          /* shared */ 0, /* value */ 1);
-   __sem_init(pthread_create_sema, /* shared */ 0, /* value */ 0);
-
-   // compute number of cores available and set total_CPU_count accordingly
-   //
-   CPU_pool::init(logit);
-
-   // initialize thread contexts
-   //
-   Thread_context::init_parallel(CPU_pool::get_count(), logit);
-
-   // create threads...
-   //
-   Thread_context::get_context(CNUM_MASTER)->thread = pthread_self();
-   for (int w = CNUM_WORKER1; w < CPU_pool::get_count(); ++w)
-       {
-         Thread_context * tctx = Thread_context::get_context(CoreNumber(w));
-         const int result = pthread_create(&(tctx->thread), /* attr */ 0,
-                                             worker_main, tctx);
-         if (result)
-            {
-              CERR << "pthread_create() failed at " << LOC
-                   << " : " << strerror(result) << endl;
-              Thread_context::set_active_core_count(CCNT_1);
-              return;
-            }
-
-         // pthread_setname_np() fails for names ≥ 16 chars (including \0).
-         char worker_name[40];   // max 16 chars!
-         SPRINTF(worker_name, "apl/pool-%d", w);
-         pthread_setname_np(tctx->thread, worker_name);
-         // wait until new thread has reached its work loop
-         sem_wait(pthread_create_sema);
-       }
-
-   // bind threads to cores
-   //
-   loop(c, CPU_pool::get_count())
-       {
-         const CPU_Number cpu = CPU_pool::get_CPU(c);
-         Thread_context::get_context(CoreNumber(c))->bind_to_cpu(cpu, logit);
-       }
-
-   if (logit)   Thread_context::print_all(CERR);
-
-   // the threads above start in state locked. Wake them up...
-   //
-# if cfg_CORE_COUNT_WANTED == -3
-   CPU_pool::change_core_count(CCNT_1, logit);
-# else
-   CPU_pool::change_core_count(CPU_pool::get_count(), logit);
-# endif
-
-#else // not PARALLEL_ENABLED
-
-   Thread_context::init_sequential(logit);
-   CPU_pool::add_CPU(CPU_0);
-
-#endif // PARALLEL_ENABLED
-}
-
-sem_t __print_sema;
-sem_t __pthread_create_sema;
-sem_t * Parallel::print_sema          = &__print_sema;
-sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
 
 //============================================================================
 bool
@@ -354,6 +275,85 @@ CPU_pool::unlock_pool(bool logit)
             sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
+//============================================================================
+void
+Parallel::init(bool logit)
+{
+   // supposedly called only once...
+   //
+   Assert(!init_done);
+   init_done = true;
+
+#if PARALLEL_ENABLED
+
+   // init global semaphores
+   //
+   __sem_init(print_sema,          /* shared */ 0, /* value */ 1);
+   __sem_init(pthread_create_sema, /* shared */ 0, /* value */ 0);
+
+   // compute number of cores available and set total_CPU_count accordingly
+   //
+   CPU_pool::init(logit);
+
+   // initialize thread contexts
+   //
+   Thread_context::init_parallel(CPU_pool::get_count(), logit);
+
+   // create threads...
+   //
+   Thread_context::get_context(CNUM_MASTER)->thread = pthread_self();
+   for (int w = CNUM_WORKER1; w < CPU_pool::get_count(); ++w)
+       {
+         Thread_context * tctx = Thread_context::get_context(CoreNumber(w));
+         const int result = pthread_create(&(tctx->thread), /* attr */ 0,
+                                             worker_main, tctx);
+         if (result)
+            {
+              CERR << "pthread_create() failed at " << LOC
+                   << " : " << strerror(result) << endl;
+              Thread_context::set_active_core_count(CCNT_1);
+              return;
+            }
+
+         // pthread_setname_np() fails for names ≥ 16 chars (including \0).
+         char worker_name[40];   // max 16 chars!
+         SPRINTF(worker_name, "apl/pool-%d", w);
+         pthread_setname_np(tctx->thread, worker_name);
+         // wait until new thread has reached its work loop
+         sem_wait(pthread_create_sema);
+       }
+
+   // bind threads to cores
+   //
+   loop(c, CPU_pool::get_count())
+       {
+         const CPU_Number cpu = CPU_pool::get_CPU(c);
+         Thread_context::get_context(CoreNumber(c))->bind_to_cpu(cpu, logit);
+       }
+
+   if (logit)   Thread_context::print_all(CERR);
+
+   // the threads above start in state locked. Wake them up...
+   //
+# if cfg_CORE_COUNT_WANTED == -3
+   CPU_pool::change_core_count(CCNT_1, logit);
+# else
+   CPU_pool::change_core_count(CPU_pool::get_count(), logit);
+# endif
+
+#else // not PARALLEL_ENABLED
+
+   Thread_context::init_sequential(logit);
+   CPU_pool::add_CPU(CPU_0);
+
+#endif // PARALLEL_ENABLED
+}
+
+sem_t __print_sema;
+sem_t __pthread_create_sema;
+sem_t * Parallel::print_sema          = &__print_sema;
+sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
+
 //----------------------------------------------------------------------------
 void *
 Parallel::worker_main(void * arg)

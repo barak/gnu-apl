@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,6 @@ public:
    /// @param surrogate  true to treat surrogate pairs as single characters
    UCS_string_vector(const Value & val, bool surrogate);
 
-   /// overload vector<UCS_string>::size() so that it returns a signed length
-   ShapeItem ssize() const
-      { return ShapeItem(std::vector<UCS_string>::size()); }
-
    /// return true iff one of the strings is equal to \b ucs
    /// @param ucs  string to search for
    bool contains(const UCS_string & ucs) const
@@ -52,17 +48,19 @@ public:
         return false;
       }
 
-   /// sort the strings in this vector alphabetically
-   void sort()
+   /// dump this string vector (debug function)
+   /// @param out  output stream
+   /// @param loc  caller location for diagnostics
+   ostream & dump(ostream & out, const char * loc) const
       {
-        if (size() < 2)   return;
-        Heapsort<UCS_string>::sort(*this, UCS_string::compare_names, 0);
+        out << "────────  " << loc << "  ──────── " << endl;
+        loop(c, size())   out << "[" << c << "]  '" << at(c) << "'" << endl;
+        return out << "═══════════════════════════════" << endl;
       }
 
-   /// compute columns width so that items align nicely (for )VARS, )FNS, etc.)
-   /// @param tab_size  column tab spacing
-   /// @param result    output: computed column widths
-   void compute_column_width(int tab_size, std::vector<int> & result);
+   /// overload vector<UCS_string>::size() so that it returns a signed length
+   ShapeItem ssize() const
+      { return ShapeItem(std::vector<UCS_string>::size()); }
 
    /// replacement for erase(std::vector::iterator position)
    /// @param pos  index of the element to remove
@@ -75,10 +73,12 @@ public:
    void insert(size_t pos, const UCS_string & value)
       { std::vector<UCS_string>::insert(begin() + pos, value); }
 
-   /// print items of \b this vector in a table with \b column_count columns
-   /// @param out           output stream
-   /// @param column_count  number of columns in the output table
-   std::ostream & print_table(std::ostream & out, size_t column_count) const;
+   /// sort the strings in this vector alphabetically
+   void sort()
+      {
+        if (size() < 2)   return;
+        Heapsort<UCS_string>::sort(*this, UCS_string::compare_names, 0);
+      }
 
    /// return the length of the longest UCS_string in \b this vector,
    /// starting at \b col
@@ -86,15 +86,15 @@ public:
    /// @param column_count  total number of columns (stride between rows)
    ShapeItem max_width(size_t col, size_t column_count) const;
 
-   /// dump this string vector (debug function)
-   /// @param out  output stream
-   /// @param loc  caller location for diagnostics
-   ostream & dump(ostream & out, const char * loc) const
-      {
-        out << "────────  " << loc << "  ──────── " << endl;
-        loop(c, size())   out << "[" << c << "]  '" << at(c) << "'" << endl;
-        return out << "═══════════════════════════════" << endl;
-      }
+   /// print items of \b this vector in a table with \b column_count columns
+   /// @param out           output stream
+   /// @param column_count  number of columns in the output table
+   std::ostream & print_table(std::ostream & out, size_t column_count) const;
+
+   /// compute columns width so that items align nicely (for )VARS, )FNS, etc.)
+   /// @param tab_size  column tab spacing
+   /// @param result    output: computed column widths
+   void compute_column_width(int tab_size, std::vector<int> & result);
 
 private:
    /// prevent the inadvertent use of iterator nonsense

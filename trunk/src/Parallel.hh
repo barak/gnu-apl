@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -219,23 +219,19 @@ public:
    /// constructor
    CPU_pool();
 
-   /// initialize the pool
-   /// @param logit true to emit diagnostic messages during initialisation
-   static void init(bool logit);
-
    /// add a CPU to the pool
    /// @param cpu CPU number to add
    static void add_CPU(CPU_Number cpu)
       { the_CPUs.push_back(cpu); }
 
+   /// get the number of (active) CPUs
+   static CoreCount get_count()
+      { return CoreCount(the_CPUs.size()); }
+
    /// get the idx;th CPU
    /// @param idx zero-based index into the pool
    static CPU_Number get_CPU(size_t idx)
       { return the_CPUs[idx]; }
-
-   /// get the number of (active) CPUs
-   static CoreCount get_count()
-      { return CoreCount(the_CPUs.size()); }
 
    /// resize the pool
    /// @param new_size new number of CPUs in the pool
@@ -246,6 +242,10 @@ public:
    /// @param new_count desired number of active cores
    /// @param logit true to emit diagnostic messages
    static bool change_core_count(CoreCount new_count, bool logit);
+
+   /// initialize the pool
+   /// @param logit true to emit diagnostic messages during initialisation
+   static void init(bool logit);
 
    /// make all pool members lock on their pool_sema
    /// @param logit true to emit diagnostic messages
@@ -310,12 +310,12 @@ public:
 
 #endif
 
-   /// true if parallel execution is enabled
-   static bool run_parallel;
-
    /// initialize
    /// @param logit true to emit diagnostic messages during initialisation
    static void init(bool logit);
+
+   /// true if parallel execution is enabled
+   static bool run_parallel;
 
    /// a semaphore to protect printing from different threads
    static sem_t * print_sema;
@@ -325,11 +325,11 @@ public:
 
    /// return the core number for \b idx
 protected:
-   /// the main() function of the worker threads
-   static void * worker_main(void *);
-
    /// initialize \b all_CPUs (which then determines the max. core count)
    static void init_all_CPUs(bool logit);
+
+   /// the main() function of the worker threads
+   static void * worker_main(void *);
 
    /// true after init() has been called
    static bool init_done;

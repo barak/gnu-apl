@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,28 +90,18 @@ public:
    ExpandResult expand_tab(UCS_string & line);
 
 protected:
-   /// tab-expand a user-defined name (variable or defined function).
-   /// @param user_input user input string to expand in place
-   ExpandResult expand_user_name(UCS_string & user_input);
+   /// compute the lenght of the common part in all matches
+   /// @param len initial length to compare from
+   /// @param matches vector of candidate completion strings
+   int compute_common_length(int len, const UCS_string_vector & matches);
 
    /// tab-expand an APL command
    /// @param user_input user input string to expand in place
    ExpandResult expand_APL_command(UCS_string & user_input);
 
-   /// tab-expand a system-defined name (⎕xxx)
-   /// @param user_input user input string to expand in place
-   ExpandResult expand_distinguished_name(UCS_string & user_input);
-
    /// show the names of all APL capabilities (in config.h)
    /// @param user user input string to expand in place
    ExpandResult expand_capability(UCS_string & user);
-
-   /// show the names of all APL primitives and user defined functions
-   ExpandResult expand_help_topics();
-
-   /// tab-expand or show help for user defined functions
-   /// @param user_input user input string to expand in place
-   ExpandResult expand_help_topics(UCS_string & user_input);
 
    /// perform tab expansion for command arguments
    /// @param user_input user input string to expand in place
@@ -125,6 +115,10 @@ protected:
                                    const UCS_string cmd,
                                    const UCS_string arg);
 
+   /// tab-expand a system-defined name (⎕xxx)
+   /// @param user_input user input string to expand in place
+   ExpandResult expand_distinguished_name(UCS_string & user_input);
+
    /// perform tab expansion for a filename
    /// @param user_input user input string to expand in place
    /// @param ehint structured hint indicating expected argument type
@@ -135,6 +129,17 @@ protected:
                                 ExpandHint ehint, const char * shint,
                                 const UCS_string cmd, UCS_string arg);
 
+   /// show the names of all APL primitives and user defined functions
+   ExpandResult expand_help_topics();
+
+   /// tab-expand or show help for user defined functions
+   /// @param user_input user input string to expand in place
+   ExpandResult expand_help_topics(UCS_string & user_input);
+
+   /// tab-expand a user-defined name (variable or defined function).
+   /// @param user_input user input string to expand in place
+   ExpandResult expand_user_name(UCS_string & user_input);
+
    /// perform tab expansion for a workspace name
    /// @param user_input user input string to expand in place
    /// @param cmd the command being completed
@@ -142,11 +147,6 @@ protected:
    /// @param filename partial filename to match against
    ExpandResult expand_wsname(UCS_string & user_input, const UCS_string cmd,
                               LibRef lib, const UCS_string filename);
-
-   /// compute the lenght of the common part in all matches
-   /// @param len initial length to compare from
-   /// @param matches vector of candidate completion strings
-   int compute_common_length(int len, const UCS_string_vector & matches);
 
    /// read filenames in \b dir and append matching filenames to \b matches
    /// @param dir open directory handle to scan

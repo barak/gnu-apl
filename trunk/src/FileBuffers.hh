@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,11 +38,6 @@ extern CinOut_filebuf CIN_filebuf;
 // a filebuf for stderr output
 class ErrOut_filebuf : public filebuf
 {
-protected:
-   /// overloaded filebuf::overflow()
-   /// @param c character to overflow into the buffer
-   virtual int overflow(int c);
-
 public:
    /// constructor
    ErrOut_filebuf()
@@ -78,6 +73,11 @@ public:
    bool expand_LF;
 
    /// current column
+
+protected:
+   /// overloaded filebuf::overflow()
+   /// @param c character to overflow into the buffer
+   virtual int overflow(int c);
 };
 //============================================================================
 /// a filebuf that compares its output with a file.

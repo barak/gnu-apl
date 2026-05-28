@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ public:
    /// @param tag token tag identifying this operator variant
    Bif_REDUCE(TokenTag tag) : PrimitiveOperator(tag) {}
 
+   bool has_result() const
+      { return true; }
+
    /// common implementation of reduce() and reduce_n_wise.
    /// @param shape_Z result shape
    /// @param Z3 three-part shape decomposition around the reduce axis
@@ -46,9 +49,6 @@ public:
    /// @param bm number of elements along the reduced axis
    static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3,
                           ShapeItem a, cFunction_P LO, Value_P B, ShapeItem bm);
-
-   bool has_result() const
-      { return true; }
 
    /// LO-reduce B along axis.
    /// @param LO left-operand function applied during reduction
@@ -61,18 +61,18 @@ protected:
    virtual bool may_push_SI() const
       { return false; }
 
-   /// Replicate B according to A along axis.
-   /// @param A left-argument replication counts
-   /// @param B right-argument APL value
-   /// @param axis axis along which to replicate
-   static Token replicate(Value_P A, Value_P B, uAxis axis);
-
    /// LO-reduce B n-wise along axis.
    /// @param A left-argument window size
    /// @param LO left-operand function applied during reduction
    /// @param B right-argument APL value
    /// @param axis axis along which to reduce n-wise
    Token reduce_n_wise(Value_P A, Token & LO, Value_P B, uAxis axis) const;
+
+   /// Replicate B according to A along axis.
+   /// @param A left-argument replication counts
+   /// @param B right-argument APL value
+   /// @param axis axis along which to replicate
+   static Token replicate(Value_P A, Value_P B, uAxis axis);
 
 };
 //----------------------------------------------------------------------------
@@ -91,18 +91,6 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return replicate(A, B, B->get_rank() - 1); }
 
-   /// Overloaded Function::eval_AXB().
-   /// @param A left-argument replication counts
-   /// @param X axis specification
-   /// @param B right-argument APL value
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
-   /// Overloaded Function::eval_LB().
-   /// @param LO left-operand function
-   /// @param B right-argument APL value
-   virtual Token eval_LB(Token & LO, Value_P B) const
-      { return reduce(LO, B, B->get_rank() - 1); }
-
    /// Overloaded Function::eval_ALB().
    /// @param A left-argument window size
    /// @param LO left-operand function
@@ -110,11 +98,11 @@ public:
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const
       { return reduce_n_wise(A, LO, B, B->get_rank() - 1); }
 
-   /// Overloaded Function::eval_LXB().
+   /// Overloaded Function::eval_LB().
    /// @param LO left-operand function
-   /// @param X axis specification
    /// @param B right-argument APL value
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+   virtual Token eval_LB(Token & LO, Value_P B) const
+      { return reduce(LO, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_ALXB().
    /// @param A left-argument window size
@@ -122,6 +110,18 @@ public:
    /// @param X axis specification
    /// @param B right-argument APL value
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+
+   /// Overloaded Function::eval_AXB().
+   /// @param A left-argument replication counts
+   /// @param X axis specification
+   /// @param B right-argument APL value
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// Overloaded Function::eval_LXB().
+   /// @param LO left-operand function
+   /// @param X axis specification
+   /// @param B right-argument APL value
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_REDUCE  fun;    ///< Built-in function.
 
@@ -143,18 +143,6 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return replicate(A, B, 0); }
 
-   /// Overloaded Function::eval_AXB().
-   /// @param A left-argument replication counts
-   /// @param X axis specification
-   /// @param B right-argument APL value
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
-   /// Overloaded Function::eval_LB().
-   /// @param LO left-operand function
-   /// @param B right-argument APL value
-   virtual Token eval_LB(Token & LO, Value_P B) const
-      { return reduce(LO, B, 0); }
-
    /// Overloaded Function::eval_ALB().
    /// @param A left-argument window size
    /// @param LO left-operand function
@@ -162,11 +150,11 @@ public:
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const
       { return reduce_n_wise(A, LO, B, 0); }
 
-   /// Overloaded Function::eval_LXB().
+   /// Overloaded Function::eval_LB().
    /// @param LO left-operand function
-   /// @param X axis specification
    /// @param B right-argument APL value
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+   virtual Token eval_LB(Token & LO, Value_P B) const
+      { return reduce(LO, B, 0); }
 
    /// Overloaded Function::eval_ALXB().
    /// @param A left-argument window size
@@ -174,6 +162,18 @@ public:
    /// @param X axis specification
    /// @param B right-argument APL value
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+
+   /// Overloaded Function::eval_AXB().
+   /// @param A left-argument replication counts
+   /// @param X axis specification
+   /// @param B right-argument APL value
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// Overloaded Function::eval_LXB().
+   /// @param LO left-operand function
+   /// @param X axis specification
+   /// @param B right-argument APL value
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_REDUCE1  fun;   ///< Built-in function.
 

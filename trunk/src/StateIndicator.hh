@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,127 +54,6 @@ public:
    /// destructor
    ~StateIndicator();
 
-   /// continue this StateIndicator (to line N after →N back into it)
-   /// @param N function line to continue execution at
-   /// @param loc caller location for diagnostics
-   void goon(Function_Line N, const char * loc);
-
-   /// retry this StateIndicator (after →'')
-   /// @param loc caller location for diagnostics
-   void retry(const char * loc);
-
-   /// return true iff
-   ///  (1) this SI entry is executing \b funname, or
-   ///  (2) has resolved \b funname on its prefix parser stack
-   /// @param ufun user function to check for
-   bool uses_function(const UserFunction * ufun) const;
-
-   /// Return the function name, or "*" for an immediate execution context
-   UCS_string function_name() const;
-
-   /// list the stack entry (for commands ]SI, )SI, and )SIS)
-   /// @param out destination output stream
-   /// @param mode which fields to include in the listing
-   void list(ostream & out, SI_mode mode) const;
-
-   /// list the stack entry (for command ]SI)
-   /// @param out destination output stream
-   void print(ostream & out) const;
-
-   /// print spaces according to level
-   /// @param out destination output stream
-   ostream & indent(ostream & out) const;
-
-   /// return pointer to the current user function, statements, or execute
-   const Executable * get_executable() const
-      { return executable; }
-
-   /// return the name of the parse mode
-   Unicode get_parse_mode_name() const;
-
-   /// return the current PC
-   Function_PC get_PC() const
-      { return current_stack.get_PC(); }
-
-   /// return the mode of this entry
-   ParseMode get_parse_mode() const
-      { return executable->get_parse_mode(); }
-
-   /// evaluate a →B statement. Update PC if needed, maybe do nothing (→'')
-   /// @param B right argument giving the target line number or empty vector
-   Token jump(const Value * B);
-
-   /// do a jump to function line \b line
-   /// @param line target function line number
-   Token jump_to_line(Function_Line line);
-
-   /// return the nesting level (oldest SI has level 0, next has level 1, ...)
-   SI_level get_level() const   { return level; };
-
-   /// return the current line number
-   Function_Line get_line() const;
-
-   /// Maybe print B (according to tag) and erase B
-   /// @param result token holding the statement result value
-   /// @param trace true if tracing is active for this function
-   void statement_result(const Token & result, bool trace);
-
-   /// Escape from \b user function (exit from each invocation until
-   /// immediate execution is reached)
-   void escape();
-
-   /// execute token in body...
-   Token run();
-
-   /// clear the marked bit in the executable, in the fun_oper_cache, and
-   /// in all parsers
-   void unmark_all_values() const;
-
-   /// print all owners of \b value
-   /// @param out destination output stream
-   /// @param value APL value whose owners are to be listed
-   int show_owners(ostream & out, const Value & value) const;
-
-   /// print a short debug info
-   void info(ostream & out, const char * loc) const;
-
-   /// return the error related info in this context
-   static Error & get_error(StateIndicator * si)
-       { return si ? si->error : top_level_error; }
-
-   /// return the error related info in this context
-   static const Error & get_error(const StateIndicator * si)
-       { return si ? si->error : top_level_error; }
-
-   /// return left arg (and set \b function)
-   Value_P get_L(UCS_string & function) const;
-
-   /// change the left argument (if any) of a failed primitive
-   void set_L(Value_P value);
-
-   /// return the right arg (and set \b function)
-   Value_P get_R(UCS_string & function) const;
-
-   /// change right argument of a failed primitive
-   void set_R(Value_P value);
-
-   /// return axis arg (and set \b function)
-   Value_P get_X(UCS_string & function) const;
-
-   /// change the axis left argument (if any) of a failed primitive
-   void set_X(Value_P value);
-
-   /// return true if \b this )SI entry has entered safe execution mode.
-   /// That is, \b this )SI entry has initiated  ⎕EC)
-   bool is_safe_execution_start() const
-      { if (!parent)   return safe_execution_depth > 0;
-        return safe_execution_depth > parent->safe_execution_depth;
-      }
-
-   /// return the number of pending ⎕ECs (or other safe execution contexts)
-   int get_safe_execution_depth() const
-      { return safe_execution_depth; }
-
    /// return the depth of this )SI entry
    int get_depth() const
        {
@@ -182,11 +61,39 @@ public:
          for (const StateIndicator * p = this; p->parent; p = p->parent)  ++ret;
          return ret;
        }
-   /// set safe_execution mode
-   void set_safe_execution_depth()
-      {
-        if (parent)  safe_execution_depth = parent->safe_execution_depth + 1;
-        else         safe_execution_depth = 1;
+
+   /// return pointer to the current user function, statements, or execute
+   const Executable * get_executable() const
+      { return executable; }
+
+   /// return the nesting level (oldest SI has level 0, next has level 1, ...)
+   SI_level get_level() const   { return level; };
+
+   /// return the mode of this entry
+   ParseMode get_parse_mode() const
+      { return executable->get_parse_mode(); }
+
+   /// return the SI entry that has called \b this one
+   StateIndicator * get_parent() const
+      { return parent; }
+
+   /// return the current PC
+   Function_PC get_PC() const
+      { return current_stack.get_PC(); }
+
+   /// get the current prefix parser
+   const Prefix & get_prefix() const
+      { return current_stack; }
+
+   /// return the number of pending ⎕ECs (or other safe execution contexts)
+   int get_safe_execution_depth() const
+      { return safe_execution_depth; }
+
+   /// return true if \b this )SI entry has entered safe execution mode.
+   /// That is, \b this )SI entry has initiated  ⎕EC)
+   bool is_safe_execution_start() const
+      { if (!parent)   return safe_execution_depth > 0;
+        return safe_execution_depth > parent->safe_execution_depth;
       }
 
    /// clear safe_execution mode
@@ -196,27 +103,121 @@ public:
         else         safe_execution_depth = 0;
       }
 
-   /// get the current prefix parser
-   Prefix & get_prefix()
-      { return current_stack; }
-
-   /// get the current prefix parser
-   const Prefix & get_prefix() const
-      { return current_stack; }
-
-   /// return the SI entry that has called \b this one
-   StateIndicator * get_parent() const
-      { return parent; }
-
    /// return uninitialized memory for a new derived function
    DerivedFunction * get_fun_oper_slot(const char * loc)
       { return fun_oper_cache.get(loc); }
 
+   /// get the current prefix parser
+   Prefix & get_prefix()
+      { return current_stack; }
+
+   /// set safe_execution mode
+   void set_safe_execution_depth()
+      {
+        if (parent)  safe_execution_depth = parent->safe_execution_depth + 1;
+        else         safe_execution_depth = 1;
+      }
+
+   /// return the error related info in this context
+   static const Error & get_error(const StateIndicator * si)
+       { return si ? si->error : top_level_error; }
+
+   /// return the error related info in this context
+   static Error & get_error(StateIndicator * si)
+       { return si ? si->error : top_level_error; }
+
    /// return the immediate child SI (if any) of \b this )SI entry
    const StateIndicator * find_child() const;
 
+   /// Return the function name, or "*" for an immediate execution context
+   UCS_string function_name() const;
+
+   /// return left arg (and set \b function)
+   Value_P get_L(UCS_string & function) const;
+
+   /// return the current line number
+   Function_Line get_line() const;
+
+   /// return the name of the parse mode
+   Unicode get_parse_mode_name() const;
+
+   /// return the right arg (and set \b function)
+   Value_P get_R(UCS_string & function) const;
+
+   /// return axis arg (and set \b function)
+   Value_P get_X(UCS_string & function) const;
+
+   /// print spaces according to level
+   /// @param out destination output stream
+   ostream & indent(ostream & out) const;
+
+   /// print a short debug info
+   void info(ostream & out, const char * loc) const;
+
+   /// list the stack entry (for commands ]SI, )SI, and )SIS)
+   /// @param out destination output stream
+   /// @param mode which fields to include in the listing
+   void list(ostream & out, SI_mode mode) const;
+
    /// return the level at which sym is pushed for the nth. time
    SI_level nth_push(const Symbol * sym, int from_tos) const;
+
+   /// list the stack entry (for command ]SI)
+   /// @param out destination output stream
+   void print(ostream & out) const;
+
+   /// print all owners of \b value
+   /// @param out destination output stream
+   /// @param value APL value whose owners are to be listed
+   int show_owners(ostream & out, const Value & value) const;
+
+   /// clear the marked bit in the executable, in the fun_oper_cache, and
+   /// in all parsers
+   void unmark_all_values() const;
+
+   /// return true iff
+   ///  (1) this SI entry is executing \b funname, or
+   ///  (2) has resolved \b funname on its prefix parser stack
+   /// @param ufun user function to check for
+   bool uses_function(const UserFunction * ufun) const;
+
+   /// Escape from \b user function (exit from each invocation until
+   /// immediate execution is reached)
+   void escape();
+
+   /// continue this StateIndicator (to line N after →N back into it)
+   /// @param N function line to continue execution at
+   /// @param loc caller location for diagnostics
+   void goon(Function_Line N, const char * loc);
+
+   /// evaluate a →B statement. Update PC if needed, maybe do nothing (→'')
+   /// @param B right argument giving the target line number or empty vector
+   Token jump(const Value * B);
+
+   /// do a jump to function line \b line
+   /// @param line target function line number
+   Token jump_to_line(Function_Line line);
+
+   /// retry this StateIndicator (after →'')
+   /// @param loc caller location for diagnostics
+   void retry(const char * loc);
+
+   /// execute token in body...
+   Token run();
+
+   /// change the left argument (if any) of a failed primitive
+   void set_L(Value_P value);
+
+   /// change right argument of a failed primitive
+   void set_R(Value_P value);
+
+   /// change the axis left argument (if any) of a failed primitive
+   void set_X(Value_P value);
+
+   /// Maybe print B (according to tag) and erase B
+   /// @param result token holding the statement result value
+   /// @param trace true if tracing is active for this function
+   void statement_result(const Token & result, bool trace);
 
    /// a small storage for DerivedFunction objects.
    DerivedFunctionCache fun_oper_cache;
@@ -225,6 +226,7 @@ public:
    static Error top_level_error;
 
 protected:
+
    /// the user function that is being executed
    const Executable * executable;
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,49 +80,6 @@ public:
         // as to avoid deleting of an un-initialized pointer
         value.apl_val.init_pointer();
         copy(other, loc);
-      }
-
-   /// copy Token \b src into \b this token.
-   /// @param src source token to copy from
-   /// @param loc caller location for diagnostics
-   void copy(const Token & src, const char * loc)
-      {
-         clear(loc);   // clear our Value_P
-
-#ifdef cfg_VALUE_HISTORY_WANTED
-
-         if (src.is_apl_val())   // according to its get_ValueType()
-            {
-              int use_count = -1;   // assume this token has no Value *
-              const Value * valp = src.value.apl_val.get();
-              if (valp)   use_count = valp->get_owner_count();
-              ADD_EVENT(valp, VHE_TokCopy, use_count, loc);
-            }
-
-#endif
-         copy_N(src);
-      }
-
-   /// move the mutable (!) \b src into \b this token. If \b src is an APL
-   /// value, then it is properly cleared. and an event is added.
-   /// @param src source token to move from (cleared after move)
-   /// @param loc caller location for diagnostics
-   void move_from(Token & src, const char * loc)
-      {
-         clear(loc);   // clear our Value_P
-         copy_N(src);
-
-#ifdef cfg_VALUE_HISTORY_WANTED
-
-         if (src.is_apl_val())   // according to its get_ValueType()
-            {
-              const Value * valp = src.value.apl_val.get();
-              const int use_count = valp ? valp->get_owner_count() - 1 : -1;
-              ADD_EVENT(valp, VHE_TokMove, use_count, loc);
-            }
-
-#endif
-         src.clear(loc);
       }
 
    /// Construct a token without a value
@@ -209,205 +166,6 @@ public:
    ~Token()
      { release_apl_val("~Token()");  }
 
-   /// swap this and \b other
-   /// @param other token to swap with
-   inline void swap_token(Token & other)
-      { swap(tag, other.tag);
-        swap(value.int_vals[0], other.value.int_vals[0]);
-        swap(value.int_vals[1], other.value.int_vals[1]);
-      }
-
-   /// return the TokenValueType of this token.
-   TokenValueType get_ValueType() const
-      { return TokenValueType(tag & TV_MASK); }
-
-   /// return the TokenClass of this token.
-   TokenClass get_Class() const
-      { return TokenClass(tag & TC_MASK); }
-
-   /// return the Id of this token.
-   Id get_Id() const
-      { return Id(tag >> 16); }
-
-   /// return the tag of this token
-   const TokenTag get_tag() const
-      { return tag; }
-
-   /// return the Unicode value of this token
-   Unicode get_char_val() const
-      { Assert(get_ValueType() == TV_CHAR);   return value.char_val; }
-
-   /// return the integer value of this token
-   int64_t get_int_val() const
-      { Assert(get_ValueType() == TV_INT);   return value.int_vals[0]; }
-
-   /// return the second integer value of this token
-   int64_t get_int_val2() const
-      { return value.int_vals[1]; }
-
-   /// return the error code value of this token
-   ErrorCode get_ErrorCode() const
-      { Assert1(get_tag() == TOK_ERROR);
-        Assert1(get_ValueType() == TV_INT);
-        return ErrorCode(value.int_vals[0]); }
-
-   /// set the integer value of this token
-   /// @param val new integer value to store
-   void set_int_val(int64_t val)
-      { Assert(get_ValueType() == TV_INT);   value.int_vals[0] = val; }
-
-   /// set the second integer value of this token
-   /// @param val new second integer value to store
-   void set_int_val2(int64_t val)
-      { value.int_vals[1] = val; }
-
-   /// return the float value of this token
-   APL_Float get_flt_val() const
-      { Assert(get_ValueType() == TV_FLT);   return value.float_vals[0]; }
-
-   /// return the complex real value of this token
-   APL_Float get_cpx_real() const
-      { Assert(get_ValueType() == TV_CPX);   return value.float_vals[0]; }
-
-   /// return the complex imag value of this token
-   APL_Float get_cpx_imag() const
-      { Assert(get_ValueType() == TV_CPX);   return value.float_vals[1]; }
-
-   /// return the Symbol * value of this token
-   Symbol * get_sym_ptr() const
-      { Assert(get_ValueType() == TV_SYM);   return value.sym_ptr; }
-
-   /// return the Function_Line value of this token
-   Function_Line get_fun_line() const
-      { Assert(get_ValueType() == TV_LIN);   return value.fun_line; }
-
-   /// return \b true iff \b this token has no value
-   bool is_void() const
-      { return get_ValueType() == TV_NONE; }
-
-   /// return true iff \b this token is an apl value
-   bool is_apl_val() const
-      { return get_ValueType() == TV_VAL; }
-
-   /// return \b true iff \b this token is a function (or operator)
-   bool is_function() const
-      { return get_ValueType() == TV_FUN; }
-
-   /// return \b true iff \b this token is /, ⌿, \\, or ⍀
-   bool is_SLASH_or_BACKSLASH() const
-      {
-        const Id id = get_Id();   // use Id, not tag (which may change) !!!
-        return id == ID_OPER1_REDUCE  || id == ID_OPER1_SCAN ||
-               id == ID_OPER1_REDUCE1 || id == ID_OPER1_SCAN1;
-      }
-
-   /// return \b true iff \b this token is ⍴, /, or ⌿
-   bool is_RHO_or_SLASH() const
-      {
-        const Id id = get_Id();   // use Id, not tag (which may change) !!!
-        return id == ID_OPER1_REDUCE  || id == ID_F12_RHO ||
-               id == ID_OPER1_REDUCE1;
-      }
-
-   /// return \b true iff \b this token is END or ENDL
-   bool is_ENDx() const
-      { return tag == TOK_END || tag == TOK_ENDL; }
-
-   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
-   bool is_COND() const
-      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
-
-   /// return the Value_P value of this token. The token could be TOK_NO_VALUE;
-   /// in that case VALUE_ERROR is thrown.
-   Value_P get_apl_val() const
-      { if (is_apl_val())   return value._apl_val();   VALUE_ERROR; }
-
-   /// return the address of the Value_P value of this token.
-   Value_P * get_apl_valp() const
-      { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
-
-   /// clear this token, properly clearing its Value token (if any)
-   /// @param loc caller location for diagnostics
-   void clear(const char * loc)
-      {
-         if (is_apl_val())   value.apl_val.reset();
-         new (this) Token();
-      }
-
-   /// return the axis specification of this token
-   Value_P get_axes() const
-      { Assert1(get_tag() == TOK_AXIS);  return value._apl_val(); }
-
-   /// set the Value_P value of this token
-   /// @param val APL value to store
-   void set_apl_val(Value_P val)
-      { Assert(get_ValueType() == TV_VAL);   value._apl_val() = val; }
-
-   /// return the IndexExpr value of this token
-   IndexExpr & get_index_val() const
-      { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
-
-   /// return the cFunction_P value of this token
-   cFunction_P get_function() const
-      { if (!is_function())   SYNTAX_ERROR;   return value.function; }
-
-   /// return the function axis specification of this token and check its
-   /// dimension. That is, throw AXIS error for [] anf for  [;...]
-   Value_P get_function_axis() const;
-
-   /// return value usage counter
-   int value_use_count() const;
-
-  /// clear the Value_P value (if any) of this token, updating
-   /// its refcount as needed. Left-over in libapl?
-   /// @param loc caller location for diagnostics
-   void extract_apl_val(const char * loc);
-
-   /// clear the Value_P (if any) without updating its refcount. Return
-   /// the old Value * that was overridden. Left-over in libapl?
-   /// @param loc caller location for diagnostics
-   Value * extract_and_keep(const char * loc);
-
-
-   /// clear the Value_P value (if any) of this token, updating
-   /// its refcount as needed
-   /// @param loc caller location for diagnostics
-   void release_apl_val(const char * loc);
-
-   /// change the tag (within the same TokenValueType)
-   /// @param new_tag replacement tag (must share the same TokenValueType)
-   void ChangeTag(TokenTag new_tag);
-
-   /// helper function to print a function.
-   ostream & print_function(ostream & out) const;
-
-   /// helper function to print an APL value
-   ostream & print_value(ostream & out) const;
-
-   /// show trace output for this token
-   /// @param out output stream to write trace to
-   /// @param fun_name name of the function being traced
-   /// @param line current function line number
-   void show_trace(ostream & out, const UCS_string & fun_name,
-                   Function_Line line) const;
-
-   /// the Quad_CR representation of the token.
-   /// @param style print style controlling output format
-   UCS_string canonical(PrintStyle style) const;
-
-   /// the tag in readable form (TOK_...)
-   UCS_string tag_name() const;
-
-   /// print the token to \b out in the format used by print_error_info().
-   /// return the number of characters printed.
-   int error_info(UCS_string & out) const;
-
-   /// copy src to \b this token, updating ref counts for APL values
-   inline void copy_N(const Token & src);
-
-   /// return a brief token class name for debugging purposes
-   static const char * short_class_name(TokenTag tag);
-
    /// the optional value of the token.
    union sval
       {
@@ -426,8 +184,249 @@ public:
                     (const_cast<Value_P_Base &>(apl_val)); }
       };
 
+   /// return the Value_P value of this token. The token could be TOK_NO_VALUE;
+   /// in that case VALUE_ERROR is thrown.
+   Value_P get_apl_val() const
+      { if (is_apl_val())   return value._apl_val();   VALUE_ERROR; }
+
+   /// return the address of the Value_P value of this token.
+   Value_P * get_apl_valp() const
+      { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
+
+   /// return the axis specification of this token
+   Value_P get_axes() const
+      { Assert1(get_tag() == TOK_AXIS);  return value._apl_val(); }
+
+   /// return the Unicode value of this token
+   Unicode get_char_val() const
+      { Assert(get_ValueType() == TV_CHAR);   return value.char_val; }
+
+   /// return the TokenClass of this token.
+   TokenClass get_Class() const
+      { return TokenClass(tag & TC_MASK); }
+
+   /// return the complex imag value of this token
+   APL_Float get_cpx_imag() const
+      { Assert(get_ValueType() == TV_CPX);   return value.float_vals[1]; }
+
+   /// return the complex real value of this token
+   APL_Float get_cpx_real() const
+      { Assert(get_ValueType() == TV_CPX);   return value.float_vals[0]; }
+
+   /// return the error code value of this token
+   ErrorCode get_ErrorCode() const
+      { Assert1(get_tag() == TOK_ERROR);
+        Assert1(get_ValueType() == TV_INT);
+        return ErrorCode(value.int_vals[0]); }
+
+   /// return the float value of this token
+   APL_Float get_flt_val() const
+      { Assert(get_ValueType() == TV_FLT);   return value.float_vals[0]; }
+
+   /// return the Function_Line value of this token
+   Function_Line get_fun_line() const
+      { Assert(get_ValueType() == TV_LIN);   return value.fun_line; }
+
+   /// return the cFunction_P value of this token
+   cFunction_P get_function() const
+      { if (!is_function())   SYNTAX_ERROR;   return value.function; }
+
+   /// return the Id of this token.
+   Id get_Id() const
+      { return Id(tag >> 16); }
+
+   /// return the IndexExpr value of this token
+   IndexExpr & get_index_val() const
+      { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
+
+   /// return the integer value of this token
+   int64_t get_int_val() const
+      { Assert(get_ValueType() == TV_INT);   return value.int_vals[0]; }
+
+   /// return the second integer value of this token
+   int64_t get_int_val2() const
+      { return value.int_vals[1]; }
+
+   /// return the Symbol * value of this token
+   Symbol * get_sym_ptr() const
+      { Assert(get_ValueType() == TV_SYM);   return value.sym_ptr; }
+
+   /// return the tag of this token
+   const TokenTag get_tag() const
+      { return tag; }
+
+   /// return the TokenValueType of this token.
+   TokenValueType get_ValueType() const
+      { return TokenValueType(tag & TV_MASK); }
+
+   /// return true iff \b this token is an apl value
+   bool is_apl_val() const
+      { return get_ValueType() == TV_VAL; }
+
+   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
+   bool is_COND() const
+      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
+
+   /// return \b true iff \b this token is END or ENDL
+   bool is_ENDx() const
+      { return tag == TOK_END || tag == TOK_ENDL; }
+
+   /// return \b true iff \b this token is a function (or operator)
+   bool is_function() const
+      { return get_ValueType() == TV_FUN; }
+
+   /// return \b true iff \b this token is ⍴, /, or ⌿
+   bool is_RHO_or_SLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_F12_RHO ||
+               id == ID_OPER1_REDUCE1;
+      }
+
+   /// return \b true iff \b this token is /, ⌿, \\, or ⍀
+   bool is_SLASH_or_BACKSLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_OPER1_SCAN ||
+               id == ID_OPER1_REDUCE1 || id == ID_OPER1_SCAN1;
+      }
+
+   /// return \b true iff \b this token has no value
+   bool is_void() const
+      { return get_ValueType() == TV_NONE; }
+
+   /// clear this token, properly clearing its Value token (if any)
+   /// @param loc caller location for diagnostics
+   void clear(const char * loc)
+      {
+         if (is_apl_val())   value.apl_val.reset();
+         new (this) Token();
+      }
+
+   /// copy Token \b src into \b this token.
+   /// @param src source token to copy from
+   /// @param loc caller location for diagnostics
+   void copy(const Token & src, const char * loc)
+      {
+         clear(loc);   // clear our Value_P
+
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
+            {
+              int use_count = -1;   // assume this token has no Value *
+              const Value * valp = src.value.apl_val.get();
+              if (valp)   use_count = valp->get_owner_count();
+              ADD_EVENT(valp, VHE_TokCopy, use_count, loc);
+            }
+
+#endif
+         copy_N(src);
+      }
+
+   /// move the mutable (!) \b src into \b this token. If \b src is an APL
+   /// value, then it is properly cleared. and an event is added.
+   /// @param src source token to move from (cleared after move)
+   /// @param loc caller location for diagnostics
+   void move_from(Token & src, const char * loc)
+      {
+         clear(loc);   // clear our Value_P
+         copy_N(src);
+
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
+            {
+              const Value * valp = src.value.apl_val.get();
+              const int use_count = valp ? valp->get_owner_count() - 1 : -1;
+              ADD_EVENT(valp, VHE_TokMove, use_count, loc);
+            }
+
+#endif
+         src.clear(loc);
+      }
+
+   /// set the Value_P value of this token
+   /// @param val APL value to store
+   void set_apl_val(Value_P val)
+      { Assert(get_ValueType() == TV_VAL);   value._apl_val() = val; }
+
+   /// set the integer value of this token
+   /// @param val new integer value to store
+   void set_int_val(int64_t val)
+      { Assert(get_ValueType() == TV_INT);   value.int_vals[0] = val; }
+
+   /// set the second integer value of this token
+   /// @param val new second integer value to store
+   void set_int_val2(int64_t val)
+      { value.int_vals[1] = val; }
+
+   /// swap this and \b other
+   /// @param other token to swap with
+   inline void swap_token(Token & other)
+      { swap(tag, other.tag);
+        swap(value.int_vals[0], other.value.int_vals[0]);
+        swap(value.int_vals[1], other.value.int_vals[1]);
+      }
+
+   /// copy src to \b this token, updating ref counts for APL values
+   inline void copy_N(const Token & src);
+
+   /// the Quad_CR representation of the token.
+   /// @param style print style controlling output format
+   UCS_string canonical(PrintStyle style) const;
+
+   /// print the token to \b out in the format used by print_error_info().
+   /// return the number of characters printed.
+   int error_info(UCS_string & out) const;
+
+   /// return the function axis specification of this token and check its
+   /// dimension. That is, throw AXIS error for [] anf for  [;...]
+   Value_P get_function_axis() const;
+
+   /// helper function to print a function.
+   ostream & print_function(ostream & out) const;
+
+   /// helper function to print an APL value
+   ostream & print_value(ostream & out) const;
+
+   /// show trace output for this token
+   /// @param out output stream to write trace to
+   /// @param fun_name name of the function being traced
+   /// @param line current function line number
+   void show_trace(ostream & out, const UCS_string & fun_name,
+                   Function_Line line) const;
+
+   /// the tag in readable form (TOK_...)
+   UCS_string tag_name() const;
+
+   /// return value usage counter
+   int value_use_count() const;
+
+   /// change the tag (within the same TokenValueType)
+   /// @param new_tag replacement tag (must share the same TokenValueType)
+   void ChangeTag(TokenTag new_tag);
+
+   /// clear the Value_P (if any) without updating its refcount. Return
+   /// the old Value * that was overridden. Left-over in libapl?
+   /// @param loc caller location for diagnostics
+   Value * extract_and_keep(const char * loc);
+
+  /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed. Left-over in libapl?
+   /// @param loc caller location for diagnostics
+   void extract_apl_val(const char * loc);
+
+   /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed
+   /// @param loc caller location for diagnostics
+   void release_apl_val(const char * loc);
+
    /// the name of \b tc
    static const char * class_name(TokenTag tag);
+
+   /// return a brief token class name for debugging purposes
+   static const char * short_class_name(TokenTag tag);
 
 protected:
    /// The tag indicating the type of \b this token
@@ -490,36 +489,28 @@ public:
      pc(_pc)
    {}
 
+   /// return the class of the token
+   TokenClass get_Class() const
+      { return token.get_Class(); }
+
    /// return the position of token in the body that contains it
    const Function_PC get_PC() const
       { return pc; }
 
-   /// set the position of token in the body that contains it
-   void set_PC(Function_PC new_pc)
-      { pc = new_pc; }
+   /// return the token value type of token
+   TokenValueType get_ValueType() const
+      { return token.get_ValueType(); }
 
-   /// return the token
-   const Token & get_token() const
-      { return token; }
-
-   /// return the token
-   Token & get_token()
-      { return token; }
+   cFunction_P get_function() const
+      { return token.get_function(); }
 
    /// return the tag of the token
    TokenTag get_tag() const
       { return token.get_tag(); }
 
-   /// return the class of the token
-   TokenClass get_Class() const
-      { return token.get_Class(); }
-
-   cFunction_P get_function() const
-      { return token.get_function(); }
-
-   /// return the token value type of token
-   TokenValueType get_ValueType() const
-      { return token.get_ValueType(); }
+   /// return the token
+   const Token & get_token() const
+      { return token; }
 
    /// copy \b other to this Token_loc
    void copy(const Token_loc & other, const char * loc)
@@ -527,6 +518,14 @@ public:
         pc = other.pc;
         token.copy(other.token, loc);
       }
+
+   /// return the token
+   Token & get_token()
+      { return token; }
+
+   /// set the position of token in the body that contains it
+   void set_PC(Function_PC new_pc)
+      { pc = new_pc; }
 
 protected:
    /// the token

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,6 +54,12 @@ protected:
         gtype_F = 3,   ///< float
       };
 
+   /// the context for a GTL window
+   struct window_entry
+      {
+        int fd;   ///< pipe to the windw process
+      };
+
    /// true iff tag is a Gtk command without response (as opposed to
    /// response tags or event classes
    /// @param tag GTK message tag to classify
@@ -92,12 +98,6 @@ protected:
       }
 
 #include "Gtk/Gtk_enums.hh"
-
-   /// the context for a GTL window
-   struct window_entry
-      {
-        int fd;   ///< pipe to the windw process
-      };
 
    /// overloaded Function::eval_AB()
    /// @param A left-argument APL value (GTK command or parameters)

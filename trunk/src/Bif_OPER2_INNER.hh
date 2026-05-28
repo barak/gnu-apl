@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,10 +46,6 @@ public:
    static Bif_OPER2_INNER  fun;   ///< Built-in function.
 
 protected:
-   /// overloaded Function::may_push_SI()
-   virtual bool may_push_SI() const
-      { return false; }
-
    /// the context for an inner product
    struct PJob_product
       {
@@ -67,15 +63,12 @@ protected:
         CoreCount cores;    ///< number of cores to be used
       };
 
-   /// the context for an inner product
-   static PJob_product job;
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return false; }
 
    /// inner product for scalar LO and RO
    inline void scalar_inner_product() const;
-
-   /// the main loop for an inner product with scalar functions
-   /// @param tctx  thread execution context
-   static void PF_scalar_inner_product(Thread_context & tctx);
 
    /// evaluate the fill function with arguments A and B
    /// @param shape_Z  shape of the result
@@ -85,6 +78,13 @@ protected:
    /// @param loc      caller location for diagnostics
    static Token fill(const Shape shape_Z, Value_P A, cFunction_P fun,
                      Value_P B, const char * loc);
+
+   /// the main loop for an inner product with scalar functions
+   /// @param tctx  thread execution context
+   static void PF_scalar_inner_product(Thread_context & tctx);
+
+   /// the context for an inner product
+   static PJob_product job;
 };
 //----------------------------------------------------------------------------
 

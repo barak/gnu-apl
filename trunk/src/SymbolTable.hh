@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,20 +53,6 @@ public:
 
    /// return a \b Symbol with name \b name in \b this \b SymbolTable.
    /// @param name symbol name to look up
-   T * lookup_existing_symbol(const UCS_string & name)
-      {
-        const uint32_t hash = compute_hash(name);
-        for (T * sym = symbol_table[hash]; sym; sym = sym->next)
-            {
-              if (!sym->equal(name))   continue;   // name mismatch
-              if (!sym->is_erased())      return sym;
-            }
-
-        return 0;
-      }
-
-   /// return a \b Symbol with name \b name in \b this \b SymbolTable.
-   /// @param name symbol name to look up
    const T * lookup_existing_symbol(const UCS_string & name) const
       {
         const uint32_t hash = compute_hash(name);
@@ -106,6 +92,20 @@ public:
                   }
              }
        }
+
+   /// return a \b Symbol with name \b name in \b this \b SymbolTable.
+   /// @param name symbol name to look up
+   T * lookup_existing_symbol(const UCS_string & name)
+      {
+        const uint32_t hash = compute_hash(name);
+        for (T * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              if (!sym->equal(name))   continue;   // name mismatch
+              if (!sym->is_erased())      return sym;
+            }
+
+        return 0;
+      }
 
    /// compute a 16-bit hash for \b name
    /// @param name symbol name to hash
@@ -217,21 +217,10 @@ public:
       sysvar(var)
    {}
 
-   /// return the distinguished name
-   UCS_string get_name() const
-      { return name; }
-
-   /// system variables are never erased
-   bool is_erased() const   { return false; }
-
    /// Compare the name of \b this \b Symbol with \b ucs
    /// @param ucs name to compare against
    bool equal(const UCS_string & ucs) const
       { return (name.compare(ucs) == COMP_EQ); }
-
-   /// return the variable (if any) that this name represents
-   SystemVariable * get_variable() const
-      { return sysvar; }
 
    /// return the function (if any) that this name represents
    QuadFunction * get_function() const
@@ -240,6 +229,17 @@ public:
    /// return the ID of this name
    Id get_id() const
       { return id; }
+
+   /// return the distinguished name
+   UCS_string get_name() const
+      { return name; }
+
+   /// return the variable (if any) that this name represents
+   SystemVariable * get_variable() const
+      { return sysvar; }
+
+   /// system variables are never erased
+   bool is_erased() const   { return false; }
 
    /// The next name with the same hash value as \b this \b SystemName
    SystemName * next;
@@ -267,15 +267,6 @@ public:
    : max_name_len(0)
    {}
 
-   /// clear this symbol table (remove all user-defined symbols)
-   /// @param out output stream for diagnostic messages
-   void clear(ostream & out);
-
-   /// clear one slot (hash) in this symbol table
-   /// @param out output stream for diagnostic messages
-   /// @param hash slot index to clear
-   void clear_slot(ostream & out, int hash);
-
    /// add \b function to the symbol table
    /// @param name distinguished name string for the function
    /// @param id internal Id enum for this function
@@ -297,6 +288,15 @@ public:
    /// @param variable user Symbol pointer (ignored)
    void add_variable(const UCS_string & name, Id id, Symbol * variable)
       { }
+
+   /// clear this symbol table (remove all user-defined symbols)
+   /// @param out output stream for diagnostic messages
+   void clear(ostream & out);
+
+   /// clear one slot (hash) in this symbol table
+   /// @param out output stream for diagnostic messages
+   /// @param hash slot index to clear
+   void clear_slot(ostream & out, int hash);
 
 protected:
    /// add a function or variable

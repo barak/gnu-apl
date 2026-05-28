@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,36 +30,6 @@
 #include "RealCell.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
-ErrorCode
-RealCell::bif_logarithm(Cell * Z, const Cell * A) const
-{
-   // ISO p. 88
-   //
-   if (!A->is_numeric())   return E_DOMAIN_ERROR;
-
-   if (get_real_value() == A->get_real_value() &&
-       A->get_imag_value() == 0.0)   return IntCell::z1(Z);
-
-   if (get_real_value() == 0.0)   return E_DOMAIN_ERROR;
-   if (A->is_near_one())          return E_DOMAIN_ERROR;
-
-   if (A->is_real_cell()          &&
-       A->get_real_value() >= 0.0 &&
-          get_real_value() >= 0.0)
-      {
-        const APL_Float z = log(get_real_value()) / log(A->get_real_value());
-        if (!isfinite(z))   return E_DOMAIN_ERROR;
-        return FloatCell::zF(Z, z);
-      }
-
-   // complex result (complex B or negative A)
-   //
-const APL_Complex z = log(get_complex_value()) / log(A->get_complex_value());
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
-   return ComplexCell::zC(Z, z);
-}
 //----------------------------------------------------------------------------
 ErrorCode
 RealCell::bif_circle_fun(Cell * Z, const Cell * A) const
@@ -106,6 +76,36 @@ ErrorCode ret = E_DOMAIN_ERROR;
 
    // not reached
    return E_DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+ErrorCode
+RealCell::bif_logarithm(Cell * Z, const Cell * A) const
+{
+   // ISO p. 88
+   //
+   if (!A->is_numeric())   return E_DOMAIN_ERROR;
+
+   if (get_real_value() == A->get_real_value() &&
+       A->get_imag_value() == 0.0)   return IntCell::z1(Z);
+
+   if (get_real_value() == 0.0)   return E_DOMAIN_ERROR;
+   if (A->is_near_one())          return E_DOMAIN_ERROR;
+
+   if (A->is_real_cell()          &&
+       A->get_real_value() >= 0.0 &&
+          get_real_value() >= 0.0)
+      {
+        const APL_Float z = log(get_real_value()) / log(A->get_real_value());
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        return FloatCell::zF(Z, z);
+      }
+
+   // complex result (complex B or negative A)
+   //
+const APL_Complex z = log(get_complex_value()) / log(A->get_complex_value());
+   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+   return ComplexCell::zC(Z, z);
 }
 //----------------------------------------------------------------------------
 ErrorCode

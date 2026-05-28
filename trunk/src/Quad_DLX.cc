@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -430,6 +430,33 @@ const Cell * b = &B.get_cfirst();
 }
 //----------------------------------------------------------------------------
 void
+DLX_Root_Node::deep_check() const
+{
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         const DLX_Header_Node & hdr =
+               *reinterpret_cast<const DLX_Header_Node *>(x);
+         Assert(hdr.row == -1);
+         hdr.check();
+         ShapeItem ones = 0;
+         for (const DLX_Node * y = x->down; y != x; y = y->down)
+             {
+               y->check();
+              ++ones;
+             }
+         Assert(ones == hdr.count);
+       }
+}
+//----------------------------------------------------------------------------
+ShapeItem
+DLX_Root_Node::get_column_count() const
+{
+ShapeItem cols_Z = 0;
+   for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
+   return cols_Z;
+}
+//----------------------------------------------------------------------------
+void
 DLX_Root_Node::display(ostream & out) const
 {
 int w = 1;
@@ -499,25 +526,6 @@ char * rows_used = rows_used_v.data();
        }
    out << endl;
 
-}
-//----------------------------------------------------------------------------
-void
-DLX_Root_Node::deep_check() const
-{
-   for (const DLX_Node * x = right; x != this; x = x->right)
-       {
-         const DLX_Header_Node & hdr =
-               *reinterpret_cast<const DLX_Header_Node *>(x);
-         Assert(hdr.row == -1);
-         hdr.check();
-         ShapeItem ones = 0;
-         for (const DLX_Node * y = x->down; y != x; y = y->down)
-             {
-               y->check();
-              ++ones;
-             }
-         Assert(ones == hdr.count);
-       }
 }
 //----------------------------------------------------------------------------
 void
@@ -654,14 +662,6 @@ level_done:
 
         goto rloop;
       }
-}
-//----------------------------------------------------------------------------
-ShapeItem
-DLX_Root_Node::get_column_count() const
-{
-ShapeItem cols_Z = 0;
-   for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
-   return cols_Z;
 }
 //----------------------------------------------------------------------------
 Token

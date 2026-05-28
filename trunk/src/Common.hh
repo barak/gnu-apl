@@ -119,21 +119,42 @@ class InterruptContext
 {
 public:
   InterruptContext()
-  : attention_raised(false),
+  : attention_count(0),
+    attention_raised(false),
+    interrupt_count(0),
     interrupt_raised(false),
-    interrupt_when(0),
-    attention_count(0),
-    interrupt_count(0)
+    interrupt_when(0)
   {}
-
-  // ^C handler
-  static void control_C(int);
 
   /// true if Control-C was hit (once)
   static bool attention_is_raised()
      {
        return interrupt_context.attention_raised;
      }
+
+  /// @param loc  caller location for diagnostics
+  static void clear_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = false;
+     }
+
+   /// @param loc  caller location for diagnostics
+   static void clear_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = false;
+      }
+
+  /// return the range in the prefix parser when ^C was hit (once)
+  static const Function_PC2 & get_attention_range()
+     { return interrupt_context.attention_range; };
+
+   /// return the number of interrupts
+   static uint64_t get_interrupt_count()
+      { return interrupt_context.interrupt_count; }
+
+  /// return the range in the prefix parser when ^C was hit (twice)
+  static const Function_PC2 & get_interrupt_range()
+     { return interrupt_context.interrupt_range; }
 
   /// true if Control-C was hit twice within 500 ms
   static bool interrupt_is_raised()
@@ -147,56 +168,35 @@ public:
        interrupt_context.attention_raised = true;
      }
 
-  /// @param loc  caller location for diagnostics
-  static void clear_attention_raised(const char * loc)
-     {
-       interrupt_context.attention_raised = false;
-     }
-
    /// @param loc  caller location for diagnostics
    static void set_interrupt_raised(const char * loc)
       {
         interrupt_context.interrupt_raised = true;
       }
 
-   /// @param loc  caller location for diagnostics
-   static void clear_interrupt_raised(const char * loc)
-      {
-        interrupt_context.interrupt_raised = false;
-      }
-
-   /// return the number of interrupts
-   static uint64_t get_interrupt_count()
-      { return interrupt_context.interrupt_count; }
-
-  /// return the range in the prefix parser when ^C was hit (once)
-  static const Function_PC2 & get_attention_range()
-     { return interrupt_context.attention_range; };
-
-  /// return the range in the prefix parser when ^C was hit (twice)
-  static const Function_PC2 & get_interrupt_range()
-     { return interrupt_context.interrupt_range; }
+  // ^C handler
+  static void control_C(int);
 
 protected:
-  /// true if ^C was hit (once)
-  bool attention_raised;
-
-  /// true if ^C was hit (twice)
-  bool interrupt_raised;
-
-  APL_time_us interrupt_when = 0;   // to detect double ^C
-
   /// the number of attentions
   uint64_t attention_count;
 
-  /// the number of interrupts
-  uint64_t interrupt_count;
+  /// true if ^C was hit (once)
+  bool attention_raised;
 
   /// The range in the prefix parser when ^C was hit (once)
   Function_PC2 attention_range;
 
+  /// the number of interrupts
+  uint64_t interrupt_count;
+
+  /// true if ^C was hit (twice)
+  bool interrupt_raised;
+
   /// The range in the prefix parser when ^C was hit (twice)
   Function_PC2 interrupt_range;
+
+  APL_time_us interrupt_when = 0;   // to detect double ^C
 
   /// the context for Attention and Interrupt.
   static InterruptContext interrupt_context;
@@ -284,14 +284,38 @@ char sname[100];                                           \
 class Probe
 {
 public:
+   /// constructor
+   Probe()
+      { init(); }
+
    /// some Proble related parameters
    enum { PROBE_COUNT = 100,   ///< the number of probes
           PROBE_LEN   = 20     ///< the number of measurements in each probe
         };
 
-   /// constructor
-   Probe()
-      { init(); }
+   /// get the m'th start time of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_start(int m) const
+      { if (m >= idx)   return -1;
+        return measurements[m].cycles_from;
+      }
+
+   /// get the m'th stop time of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_stop(int m) const
+      { if (m >= idx)   return -1;
+        return measurements[m].cycles_to;
+      }
+
+   /// get the m'th time (from P1 to P2) of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_time(int m) const
+      { if (m >= idx)   return -1;
+        const int64_t diff = measurements[m].cycles_to
+                           - measurements[m].cycles_from;
+        if (diff < 0)   return -2;
+        return diff;
+      }
 
    /// initialize this probe
    void init()
@@ -300,18 +324,6 @@ public:
         start_p = &dummy;
         stop_p  = &dummy;
       }
-
-   /// init the p'th probe
-   /// @param p  probe index (0 .. PROBE_COUNT-1)
-   static int init(int p)
-      { if (p >= PROBE_COUNT)   return -3;
-        probes[p].init();
-        return 0;
-      }
-
-   /// initialize all probes
-   static void init_all()
-      { loop(p, PROBE_COUNT)   init(p); }
 
    /// start time measurement
    void start()
@@ -347,29 +359,11 @@ public:
         ++idx;
       }
 
-   /// get the m'th time (from P1 to P2) of this probe
-   /// @param m  measurement index within this probe
-   int64_t get_time(int m) const
-      { if (m >= idx)   return -1;
-        const int64_t diff = measurements[m].cycles_to
-                           - measurements[m].cycles_from;
-        if (diff < 0)   return -2;
-        return diff;
-      }
-
-   /// get the m'th time of the p'th probe
+   /// get the number of times int the p'th probe
    /// @param p  probe index (0 .. PROBE_COUNT-1)
-   /// @param m  measurement index within the probe
-   static int get_time(int p, int m)
+   static int get_length(int p)
       { if (p >= PROBE_COUNT)   return -3;
-        return probes[p].get_time(m);
-      }
-
-   /// get the m'th start time of this probe
-   /// @param m  measurement index within this probe
-   int64_t get_start(int m) const
-      { if (m >= idx)   return -1;
-        return measurements[m].cycles_from;
+        return probes[p].idx;
       }
 
    /// get the m'th start time of the p'th probe
@@ -380,13 +374,6 @@ public:
         return probes[p].get_start(m);
       }
 
-   /// get the m'th stop time of this probe
-   /// @param m  measurement index within this probe
-   int64_t get_stop(int m) const
-      { if (m >= idx)   return -1;
-        return measurements[m].cycles_to;
-      }
-
    /// get the m'th stop time of the p'th probe
    /// @param p  probe index (0 .. PROBE_COUNT-1)
    /// @param m  measurement index within the probe
@@ -395,12 +382,25 @@ public:
         return probes[p].get_stop(m);
       }
 
-   /// get the number of times int the p'th probe
+   /// get the m'th time of the p'th probe
    /// @param p  probe index (0 .. PROBE_COUNT-1)
-   static int get_length(int p)
+   /// @param m  measurement index within the probe
+   static int get_time(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
-        return probes[p].idx;
+        return probes[p].get_time(m);
       }
+
+   /// init the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   static int init(int p)
+      { if (p >= PROBE_COUNT)   return -3;
+        probes[p].init();
+        return 0;
+      }
+
+   /// initialize all probes
+   static void init_all()
+      { loop(p, PROBE_COUNT)   init(p); }
 
    static Probe & P0;    ///< start of vector probes
    static Probe & P_1;   ///< individual probe 1
@@ -418,11 +418,11 @@ protected:
         int64_t cycles_to;     ///< the cycle counter at point 2
       };
 
-   /// all measurements
-   measurement measurements[PROBE_LEN];
-
    /// index into \b probes
    int idx;
+
+   /// all measurements
+   measurement measurements[PROBE_LEN];
 
    /// start time
    int64_t * start_p;
@@ -447,13 +447,13 @@ struct YMDhmsu
    /// return usec since Jan. 1. 1970 00:00:00
    APL_time_us get() const;
 
-   int year;     ///< year, e.g. 2013
-   int month;    ///< month 1-12
    int day;      ///< day 1-31
    int hour;     ///< hour 0-23
-   int minute;   ///< minute 0-59
-   int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
+   int minute;   ///< minute 0-59
+   int month;    ///< month 1-12
+   int second;   ///< second 0-59
+   int year;     ///< year, e.g. 2013
 };
 //----------------------------------------------------------------------------
 

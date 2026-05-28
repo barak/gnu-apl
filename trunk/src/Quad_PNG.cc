@@ -155,6 +155,207 @@ Quad_PNG::~Quad_PNG()
    __sem_destroy(PNG_window_sema);
 #endif   // PNG_LIBS
 }
+//-----------------------------------------------------------------------------
+#if PNG_LIBS
+Token
+Quad_PNG::eval_AB(Value_P A, Value_P B) const
+{
+   // write pixels B to file A. A is either
+   //
+   // 1. a string for the filename, or
+   // 2. a 2-element vector (nested filename, bit-depth)
+   //
+   if (A->is_apl_char_vector())   // case 1: write PNG-file A depth 8
+      {
+        if (B->get_rank() != 3)   RANK_ERROR;
+
+        UCS_string filename_ucs(*A);
+        UTF8_string filename_utf8(filename_ucs);
+        write_PNG_file(filename_utf8.c_str(), 8, *B);
+
+        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+      }
+   else if (A->element_count() == 2)   // case 2: PNG file A[1] depth A[2]
+      {
+        const APL_Integer A1 = A->get_cravel(1).get_int_value();   // bit depth
+        if (A->get_cravel(0).is_pointer_cell())   // probably file name
+           {
+             const Value_P A0 = A->get_cravel(0).get_pointer_value();
+             UCS_string filename_ucs(*A0);
+             UTF8_string filename_utf8(filename_ucs);
+             write_PNG_file(filename_utf8.c_str(), A1, *B);
+
+        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+           }
+        else
+           {
+             MORE_ERROR() << "A1 is not a string (filename) in A1 A2 ⎕PNG B";
+             DOMAIN_ERROR;
+           }
+      }
+   else   // A is not a file name
+      {
+        MORE_ERROR() << "A is not a filename in A ⎕PNG B";
+        LENGTH_ERROR;
+      }
+}
+#else   // not PNG_LIBS
+
+Token
+Quad_PNG::eval_AB(Value_P A, Value_P B) const
+{
+  // complain about missing libraries. Same as monadic eval_B().
+  return eval_B(B);
+}
+#endif   // PNG_LIBS
+//-----------------------------------------------------------------------------
+#if PNG_LIBS
+Token
+Quad_PNG::eval_B(Value_P B) const
+{
+   if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
+      {
+        // scalar (integer) argument: window control and logging
+        //
+        const APL_Integer B0 = B->get_cscalar().get_int_value();
+        Value_P Z = window_control(B0);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   if (B->is_apl_char_vector())   // read PNG file
+      {
+        const UCS_string filename_ucs(*B);
+        UTF8_string filename_utf(filename_ucs);
+        Value_P Z = read_PNG_file(filename_utf);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+#if PNG_GTK
+   if (B->get_rank() == 3)   // display B (an RGB or RGBA matrix)
+      {
+        const APL_Integer handle = display_PNG_main(B);
+
+        sem_wait(PNG_window_sema);   // blocks until window shown
+        sem_post(PNG_window_sema);   // restore for next sem_wait()
+
+        return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
+      }
+#endif   // PNG_GTK
+
+   MORE_ERROR() << "Bad B in ⎕PNG B";
+   VALENCE_ERROR;
+}
+#else   // not PNG_LIBS
+Token
+Quad_PNG::eval_B(Value_P B) const
+{
+const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
+const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
+const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
+
+   return missing_files("⎕PNG", libs, hdrs, pkgs);
+}
+#endif   // PNG_LIBS
+//-----------------------------------------------------------------------------
+Value_P
+Quad_PNG::window_control(APL_Integer B0) const
+{
+   if (B0 == 0)                 // reset plot verbosity
+       {
+         verbosity = 0;
+         CERR << "⎕PNG verbosity turned off" << endl;
+         return Idx0_0(LOC);
+       }
+
+    if (B0 == -1)                // enable SHOW_EVENTS
+       {
+         verbosity |= SHOW_EVENTS;
+         CERR << "⎕PNG will show X events " << endl;
+         return Idx0_0(LOC);
+       }
+
+    if (B0 == -2)                // enable SHOW_DATA
+       {
+         verbosity |= SHOW_DATA;
+         CERR << "⎕PNG will  show APL data " << endl;
+         return Idx0_0(LOC);
+       }
+
+#if PNG_GTK
+    if (B0 == -3)   // close all ⎕PNG windows, return their handles
+       {
+         Value_P Z = window_control(-6);   // get all open handles, see below
+         loop(p, all_PNG_contexts.size())
+            {
+              PNG_context * pctx = all_PNG_contexts[p];
+              gtk_window_close(GTK_WINDOW(pctx->window));
+              delete pctx;
+            }
+         all_PNG_contexts.clear();
+         PNG_context::next_handle = 0;
+         return Z;
+       }
+#endif    // PNG_GTK
+
+    if (B0 == -4)                // enable SHOW_DRAW
+       {
+         verbosity |= SHOW_DRAW;
+         CERR << "⎕PNG will show rendering details " << endl;
+         return Idx0_0(LOC);
+       }
+
+    if (B0 == -5)                // enable SHOW_FUNS
+       {
+         verbosity |= SHOW_FUNS;
+         CERR << "⎕PNG will show function calls " << endl;
+         return Idx0_0(LOC);
+       }
+
+    if (B0 == -6)                // return all open handles
+       {
+         Value_P Z(all_PNG_contexts.size(), LOC);
+         for (int offset = 0; Z->more(); offset += 64)
+             {
+               uint64_t bits = 0;
+               loop(p, all_PNG_contexts.size())
+                  {
+                    const int handle = all_PNG_contexts[p]->handle;
+                    const int bit = handle - offset;
+                    if (bit >= 0 && bit < 64)   bits |= 1ULL << bit;
+                  }
+
+               loop(bit, 64)
+                  {
+                    if (bits & 1ULL << bit)   Z->next_ravel_Int(offset + bit);
+                  }
+             }
+
+         Z->check_value(LOC);
+         return Z;
+       }
+
+    // otherwise B0 is supposed to be a ⎕PNG window handle.
+    // Find it and close (only) that window.
+
+    loop(p, all_PNG_contexts.size())
+        {
+          PNG_context * pctx = all_PNG_contexts[p];
+          if (B0 == pctx->handle)   // found
+             {
+               all_PNG_contexts[p] = all_PNG_contexts.back();
+               all_PNG_contexts.pop_back();
+#if PNG_GTK
+               gtk_window_close(GTK_WINDOW(pctx->window));
+#endif   // PNG_GTK
+               delete pctx;
+
+               if (all_PNG_contexts.size() == 0)   PNG_context::next_handle = 0;
+               return IntScalar(B0, LOC);
+             }
+        }
+
+   return IntScalar(0, LOC);
+}
 //---------------------------------------------------------------------------
 /// callback for libpng warnings
 void
@@ -335,154 +536,6 @@ Value_P Z(shape_Z, LOC);
 #else   // not PNG_LIBS
    return Value_P();
 #endif  // (not) PNG_LIBS
-}
-//-----------------------------------------------------------------------------
-#if PNG_LIBS
-Token
-Quad_PNG::eval_B(Value_P B) const
-{
-   if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
-      {
-        // scalar (integer) argument: window control and logging
-        //
-        const APL_Integer B0 = B->get_cscalar().get_int_value();
-        Value_P Z = window_control(B0);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-   if (B->is_apl_char_vector())   // read PNG file
-      {
-        const UCS_string filename_ucs(*B);
-        UTF8_string filename_utf(filename_ucs);
-        Value_P Z = read_PNG_file(filename_utf);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-#if PNG_GTK
-   if (B->get_rank() == 3)   // display B (an RGB or RGBA matrix)
-      {
-        const APL_Integer handle = display_PNG_main(B);
-
-        sem_wait(PNG_window_sema);   // blocks until window shown
-        sem_post(PNG_window_sema);   // restore for next sem_wait()
-
-        return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
-      }
-#endif   // PNG_GTK
-
-   MORE_ERROR() << "Bad B in ⎕PNG B";
-   VALENCE_ERROR;
-}
-#else   // not PNG_LIBS
-Token
-Quad_PNG::eval_B(Value_P B) const
-{
-const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
-const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
-
-   return missing_files("⎕PNG", libs, hdrs, pkgs);
-}
-#endif   // PNG_LIBS
-//-----------------------------------------------------------------------------
-Value_P
-Quad_PNG::window_control(APL_Integer B0) const
-{
-   if (B0 == 0)                 // reset plot verbosity
-       {
-         verbosity = 0;
-         CERR << "⎕PNG verbosity turned off" << endl;
-         return Idx0_0(LOC);
-       }
-
-    if (B0 == -1)                // enable SHOW_EVENTS
-       {
-         verbosity |= SHOW_EVENTS;
-         CERR << "⎕PNG will show X events " << endl;
-         return Idx0_0(LOC);
-       }
-
-    if (B0 == -2)                // enable SHOW_DATA
-       {
-         verbosity |= SHOW_DATA;
-         CERR << "⎕PNG will  show APL data " << endl;
-         return Idx0_0(LOC);
-       }
-
-#if PNG_GTK
-    if (B0 == -3)   // close all ⎕PNG windows, return their handles
-       {
-         Value_P Z = window_control(-6);   // get all open handles, see below
-         loop(p, all_PNG_contexts.size())
-            {
-              PNG_context * pctx = all_PNG_contexts[p];
-              gtk_window_close(GTK_WINDOW(pctx->window));
-              delete pctx;
-            }
-         all_PNG_contexts.clear();
-         PNG_context::next_handle = 0;
-         return Z;
-       }
-#endif    // PNG_GTK
-
-    if (B0 == -4)                // enable SHOW_DRAW
-       {
-         verbosity |= SHOW_DRAW;
-         CERR << "⎕PNG will show rendering details " << endl;
-         return Idx0_0(LOC);
-       }
-
-    if (B0 == -5)                // enable SHOW_FUNS
-       {
-         verbosity |= SHOW_FUNS;
-         CERR << "⎕PNG will show function calls " << endl;
-         return Idx0_0(LOC);
-       }
-
-    if (B0 == -6)                // return all open handles
-       {
-         Value_P Z(all_PNG_contexts.size(), LOC);
-         for (int offset = 0; Z->more(); offset += 64)
-             {
-               uint64_t bits = 0;
-               loop(p, all_PNG_contexts.size())
-                  {
-                    const int handle = all_PNG_contexts[p]->handle;
-                    const int bit = handle - offset;
-                    if (bit >= 0 && bit < 64)   bits |= 1ULL << bit;
-                  }
-
-               loop(bit, 64)
-                  {
-                    if (bits & 1ULL << bit)   Z->next_ravel_Int(offset + bit);
-                  }
-             }
-
-         Z->check_value(LOC);
-         return Z;
-       }
-
-    // otherwise B0 is supposed to be a ⎕PNG window handle.
-    // Find it and close (only) that window.
-
-    loop(p, all_PNG_contexts.size())
-        {
-          PNG_context * pctx = all_PNG_contexts[p];
-          if (B0 == pctx->handle)   // found
-             {
-               all_PNG_contexts[p] = all_PNG_contexts.back();
-               all_PNG_contexts.pop_back();
-#if PNG_GTK
-               gtk_window_close(GTK_WINDOW(pctx->window));
-#endif   // PNG_GTK
-               delete pctx;
-
-               if (all_PNG_contexts.size() == 0)   PNG_context::next_handle = 0;
-               return IntScalar(B0, LOC);
-             }
-        }
-
-   return IntScalar(0, LOC);
 }
 //---------------------------------------------------------------------------
 bool
@@ -671,59 +724,6 @@ UTF8 * scanline = RGB;
 
 #endif   // PNG_LIBS
 }
-//-----------------------------------------------------------------------------
-#if PNG_LIBS
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const
-{
-   // write pixels B to file A. A is either
-   //
-   // 1. a string for the filename, or
-   // 2. a 2-element vector (nested filename, bit-depth)
-   //
-   if (A->is_apl_char_vector())   // case 1: write PNG-file A depth 8
-      {
-        if (B->get_rank() != 3)   RANK_ERROR;
-
-        UCS_string filename_ucs(*A);
-        UTF8_string filename_utf8(filename_ucs);
-        write_PNG_file(filename_utf8.c_str(), 8, *B);
-
-        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
-      }
-   else if (A->element_count() == 2)   // case 2: PNG file A[1] depth A[2]
-      {
-        const APL_Integer A1 = A->get_cravel(1).get_int_value();   // bit depth
-        if (A->get_cravel(0).is_pointer_cell())   // probably file name
-           {
-             const Value_P A0 = A->get_cravel(0).get_pointer_value();
-             UCS_string filename_ucs(*A0);
-             UTF8_string filename_utf8(filename_ucs);
-             write_PNG_file(filename_utf8.c_str(), A1, *B);
-
-        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
-           }
-        else
-           {
-             MORE_ERROR() << "A1 is not a string (filename) in A1 A2 ⎕PNG B";
-             DOMAIN_ERROR;
-           }
-      }
-   else   // A is not a file name
-      {
-        MORE_ERROR() << "A is not a filename in A ⎕PNG B";
-        LENGTH_ERROR;
-      }
-}
-#else   // not PNG_LIBS
-
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const
-{
-  // complain about missing libraries. Same as monadic eval_B().
-  return eval_B(B);
-}
-#endif   // PNG_LIBS
 //-----------------------------------------------------------------------------
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished. Executed in the thread named apl/⎕PNG.

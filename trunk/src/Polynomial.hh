@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2025  Dr. Jürgen Sauermann
+    Copyright © 2025-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,18 +51,6 @@ public:
        loop(n, indefs.get_rank())   expos.push_back(indefs.get_shape_item(n));
      }
 
-   /// return true if the imaginary part of the coefficient is significant.
-   bool needs_complex() const
-      { return !Cell::is_near_zero(coefficient.imag()); }
-
-   /// return the largest exponent of the indeterminants
-   int max_expo() const
-      {
-        int maxi = 0;
-        loop(n, expos.size())   if (maxi < expos[n])   maxi = expos[n];
-        return maxi;
-      }
-
    /// return the degree of the the term.
    int degree() const
       {
@@ -71,9 +59,12 @@ public:
         return sum;
       }
 
-   /// return the number of indeterminats
-   int indeterminant_count() const
-      { return expos.size(); }
+   /// return the coefficient
+   Complex get_coefficient() const
+      { return coefficient; }
+
+   double get_imag() const
+      { return coefficient.imag(); }
 
    /// return the exponent of the r'th indeterminant
    /// @param r zero-based indeterminate index
@@ -83,26 +74,12 @@ public:
         return expos[r];
       }
 
-   /// return the exponents as a shape
-   Shape to_shape() const
-      {
-        Shape shape;
-        loop(e, expos.size())   shape.add_shape_item(expos[e]);
-        return shape;
-      }
+   double get_real() const
+      { return coefficient.real(); }
 
-   /// comparator (aka. lexical order)
-   /// @param other monomial to compare against
-   bool operator <(const Monomial & other) const
-      {
-        Assert(expos.size() == other.expos.size());
-        loop(n, expos.size())
-            {
-              if (expos[n] < other.expos[n])   return true;
-              if (expos[n] > other.expos[n])   return false;
-            }
-        return false;   // equai
-      }
+   /// return the number of indeterminats
+   int indeterminant_count() const
+      { return expos.size(); }
 
    /// return \b true iff \b this polynomial is a multiple of the polynomial
    /// \b factor.
@@ -117,18 +94,30 @@ public:
         return true;
       }
 
-   /// return the coefficient
-   Complex get_coefficient() const
-      { return coefficient; }
+   /// return the largest exponent of the indeterminants
+   int max_expo() const
+      {
+        int maxi = 0;
+        loop(n, expos.size())   if (maxi < expos[n])   maxi = expos[n];
+        return maxi;
+      }
 
-   /// subtract \b coeff from \b coefficient
-   /// @param coeff value to subtract from this term's coefficient
-   void subtract_coefficient(Complex coeff)
-      { coefficient -= coeff; }
+   /// return true if the imaginary part of the coefficient is significant.
+   bool needs_complex() const
+      { return !Cell::is_near_zero(coefficient.imag()); }
 
-   /// negate \b coefficient
-   void negate_coefficient()
-      { coefficient = - coefficient; }
+   /// return \b this times \b factor.
+   /// @param factor monomial to multiply by
+   Monomial operator *(const Monomial & factor) const
+      {
+        Assert(expos.size() == factor.expos.size());
+        Shape prod;
+        loop(n, expos.size())
+            {
+              prod.add_shape_item(expos[n] + factor.expos[n]);
+            }
+        return Monomial(coefficient * factor.coefficient, prod);
+      }
 
    /// return \b this divided by \b divisor.
    /// @param divisor monomial to divide by
@@ -144,17 +133,17 @@ public:
         return Monomial(coefficient / divisor.coefficient, quot);
       }
 
-   /// return \b this times \b factor.
-   /// @param factor monomial to multiply by
-   Monomial operator *(const Monomial & factor) const
+   /// comparator (aka. lexical order)
+   /// @param other monomial to compare against
+   bool operator <(const Monomial & other) const
       {
-        Assert(expos.size() == factor.expos.size());
-        Shape prod;
+        Assert(expos.size() == other.expos.size());
         loop(n, expos.size())
             {
-              prod.add_shape_item(expos[n] + factor.expos[n]);
+              if (expos[n] < other.expos[n])   return true;
+              if (expos[n] > other.expos[n])   return false;
             }
-        return Monomial(coefficient * factor.coefficient, prod);
+        return false;   // equai
       }
 
    /// return \b true if \b this and \b other have the same exponents of
@@ -167,50 +156,17 @@ public:
         return true;
       }
 
-   double get_real() const
-      { return coefficient.real(); }
-
-   double get_imag() const
-      { return coefficient.imag(); }
-
-   /// set coefficient (must be called before set_imag())
-   /// @param overbar true if the APL overbar negation prefix was present
-   /// @param term_sign '+' or '-' sign preceding this term
-   /// @param val non-negative real magnitude of the coefficient
-   void set_real(bool overbar, char term_sign, double val)
+   /// return the exponents as a shape
+   Shape to_shape() const
       {
-        Assert(val >= 0.0);
-        if (term_sign == '-' )
-           {
-             if (overbar)   coefficient = val;
-             else           coefficient = -val;
-           }
-        else
-           {
-             if (overbar)   coefficient = -val;
-             else           coefficient = val;
-           }
+        Shape shape;
+        loop(e, expos.size())   shape.add_shape_item(expos[e]);
+        return shape;
       }
 
-   /// return the (user-defined) value to be used for comparing \b rhis
-   /// monomial with
-   /// other monomials
-   /// @param order APL value defining the monomial ordering
-   int get_order(const Value & order) const;
-
-   /// scan the coeffient in \b src.
-   /// @param src Unicode input stream to read from
-   /// @param term_sign '+' or '-' sign preceding this term
-   /// @param got_j set to true if an imaginary 'J' separator was found
-   /// @param got_overbar true if the overbar negation prefix was seen
-   void scan_coefficient(Unicode_source & src, char term_sign,
-                         bool & got_j, const bool & got_overbar);
-
-   /// scan the indeterminants in \b src.
-   /// @param vars list of known indeterminate variable names
-   /// @param src Unicode input stream to read from
-   void scan_indeterminants(const UCS_string_vector & vars,
-                            Unicode_source & src);
+   /// negate \b coefficient
+   void negate_coefficient()
+      { coefficient = - coefficient; }
 
    /// set coefficient (must be called before set_imag())
    /// @param overbar true if the APL overbar negation prefix was present
@@ -231,13 +187,57 @@ public:
            }
       }
 
-   /// return \b this polynomial as an APL value
-   Value_P to_value() const;
+   /// set coefficient (must be called before set_imag())
+   /// @param overbar true if the APL overbar negation prefix was present
+   /// @param term_sign '+' or '-' sign preceding this term
+   /// @param val non-negative real magnitude of the coefficient
+   void set_real(bool overbar, char term_sign, double val)
+      {
+        Assert(val >= 0.0);
+        if (term_sign == '-' )
+           {
+             if (overbar)   coefficient = val;
+             else           coefficient = -val;
+           }
+        else
+           {
+             if (overbar)   coefficient = -val;
+             else           coefficient = val;
+           }
+      }
+
+   /// subtract \b coeff from \b coefficient
+   /// @param coeff value to subtract from this term's coefficient
+   void subtract_coefficient(Complex coeff)
+      { coefficient -= coeff; }
+
+   /// return the (user-defined) value to be used for comparing \b rhis
+   /// monomial with
+   /// other monomials
+   /// @param order APL value defining the monomial ordering
+   int get_order(const Value & order) const;
 
    /// print \b this term
    /// @param out output stream to write to
    /// @param firsti true if this is the first term (affects sign printing)
    ostream & print(ostream & out, bool firsti = true) const;
+
+   /// return \b this polynomial as an APL value
+   Value_P to_value() const;
+
+   /// scan the coeffient in \b src.
+   /// @param src Unicode input stream to read from
+   /// @param term_sign '+' or '-' sign preceding this term
+   /// @param got_j set to true if an imaginary 'J' separator was found
+   /// @param got_overbar true if the overbar negation prefix was seen
+   void scan_coefficient(Unicode_source & src, char term_sign,
+                         bool & got_j, const bool & got_overbar);
+
+   /// scan the indeterminants in \b src.
+   /// @param vars list of known indeterminate variable names
+   /// @param src Unicode input stream to read from
+   void scan_indeterminants(const UCS_string_vector & vars,
+                            Unicode_source & src);
 
 protected:
    Complex coefficient;       ///< the coefficient
@@ -249,8 +249,6 @@ public:
 class Polynomial : public vector<Monomial>
 {
 public:
-   typedef complex<double> Complex;
-
    /// constructor: 0-polynomial
    Polynomial()
    {}
@@ -259,12 +257,19 @@ public:
    /// @param value APL value whose ravel provides the polynomial coefficients
    Polynomial(const Value & value);
 
-   /// return true if any of the terms is complex
-   bool needs_complex() const
-      {
-         loop(t, size())   if (at(t).needs_complex())   return true;
-         return false;
-      }
+   typedef complex<double> Complex;
+
+   /// return the degree of the polynomial ( := the max degree of its terms).
+   int degree() const
+       {
+         int deg = 0;
+         loop(t, size())
+             {
+              const int d = at(t).degree();
+              if (deg < d)   deg = d;
+             }
+         return deg;
+       }
 
    /// return the number of indeterminants (including omitted indeterminants)
    int indeterminant_count() const
@@ -291,21 +296,12 @@ public:
         return pos;
       }
 
-   /// return the degree of the polynomial ( := the max degree of its terms).
-   int degree() const
-       {
-         int deg = 0;
-         loop(t, size())
-             {
-              const int d = at(t).degree();
-              if (deg < d)   deg = d;
-             }
-         return deg;
-       }
-
-   /// return (the index of) the largest term (aka. LT).
-   /// @param order APL value defining the monomial ordering (may be null)
-   size_t LT_pos(const Value * order) const;
+   /// return true if any of the terms is complex
+   bool needs_complex() const
+      {
+         loop(t, size())   if (at(t).needs_complex())   return true;
+         return false;
+      }
 
    /// remove the largest term from \b this polynomial and return it.
    /// @param order APL value defining the monomial ordering (may be null)
@@ -348,6 +344,10 @@ public:
         push_back(other);
         back().negate_coefficient();
       }
+
+   /// return (the index of) the largest term (aka. LT).
+   /// @param order APL value defining the monomial ordering (may be null)
+   size_t LT_pos(const Value * order) const;
 
    /// print \b this polynomial
    /// @param out output stream to write to

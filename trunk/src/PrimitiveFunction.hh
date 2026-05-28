@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,9 +59,6 @@ public:
        statistics_B(stat_B)
    {}
 
-   /// overloaded Function::has_result()
-   virtual bool has_result() const   { return true; }
-
    /// return the dyadic cell statistics of \b this (scalar) function
    CellFunctionStatistics *
    get_statistics_AB() const   { return statistics_AB; }
@@ -70,17 +67,15 @@ public:
    CellFunctionStatistics *
    get_statistics_B() const   { return statistics_B; }
 
+   /// overloaded Function::has_result()
+   virtual bool has_result() const   { return true; }
+
    /// overloaded Function::eval_fill_AB()
    /// @param A  the left APL argument value
    /// @param B  the right APL argument value
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
 protected:
-   /// overloaded Function::print_properties()
-   /// @param out     output stream for property display
-   /// @param indent  indentation level for nested output
-   virtual void print_properties(ostream & out, int indent) const;
-
    /// overloaded Function::eval_fill_B()
    /// @param B  the right APL argument value
    virtual Token eval_fill_B(Value_P B) const;
@@ -88,6 +83,11 @@ protected:
    /// Print the name of \b this PrimitiveFunction to \b out
    /// @param out  output stream to print the function name to
    virtual ostream & print(ostream & out) const;
+
+   /// overloaded Function::print_properties()
+   /// @param out     output stream for property display
+   /// @param indent  indentation level for nested output
+   virtual void print_properties(ostream & out, int indent) const;
 
    /// performance statistics for eval_B()
    CellFunctionStatistics * statistics_AB;
@@ -140,10 +140,10 @@ public:
    : NonscalarFunction(TOK_F0_ZILDE)
    {}
 
-   static Bif_F0_ZILDE  fun;   ///< Built-in function
-
    /// overladed Function::eval_()
    virtual Token eval_() const;
+
+   static Bif_F0_ZILDE  fun;   ///< Built-in function
 
 protected:
    /// overladed Function::may_push_SI()
@@ -160,16 +160,6 @@ public:
    : NonscalarFunction(TOK_F1_EXECUTE)
    {}
 
-   static Bif_F1_EXECUTE  fun;   ///< Built-in function
-
-   /// execute string containing an APL expression or an APL command
-   /// @param statement  the APL expression or command text to execute
-   static Token execute_statement(UCS_string & statement);
-
-   /// execute string containing an APL command
-   /// @param command  the APL command text to execute
-   static Token execute_command(UCS_string & command);
-
    /// overladed Function::eval_B()
    /// @param B  the right APL argument value
    virtual Token eval_B(Value_P B) const;
@@ -178,8 +168,18 @@ public:
    /// @param B  the right APL argument value
    virtual Token eval_fill_B(Value_P B) const;
 
+   /// execute string containing an APL command
+   /// @param command  the APL command text to execute
+   static Token execute_command(UCS_string & command);
+
+   /// execute string containing an APL expression or an APL command
+   /// @param statement  the APL expression or command text to execute
+   static Token execute_statement(UCS_string & statement);
+
    /// the number of outstanding )COPYs with APL scipts
    static int copy_pending;
+
+   static Bif_F1_EXECUTE  fun;   ///< Built-in function
 
 protected:
    /// overladed Function::may_push_SI()
@@ -231,11 +231,11 @@ public:
    /// @param B  the right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_ELEMENT  fun;   ///< Built-in function
-
    /// implementation of eval_B()
    /// @param B  the right APL value (raw pointer)
    static Value_P do_eval_B(const Value * B);
+
+   static Bif_F12_ELEMENT  fun;   ///< Built-in function
 
 protected:
 };
@@ -250,16 +250,16 @@ public:
    : NonscalarFunction(TOK_F12_EQUIV)
    {}
 
-   /// overloaded Function::eval_B() : B
-   /// @param B  the right APL argument value
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB() : A ≡ B
    /// @param A  the left APL argument value
    /// @param B  the right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return Token(TOK_APL_VALUE1,
                      IntScalar((do_eval_AB(A, B) ? 1 : 0), LOC)); }
+
+   /// overloaded Function::eval_B() : B
+   /// @param B  the right APL argument value
+   virtual Token eval_B(Value_P B) const;
 
    /// @param A  the left APL argument value
    /// @param B  the right APL argument value
@@ -283,14 +283,14 @@ public:
    : NonscalarFunction(TOK_F12_NEQUIV)
    {}
 
-   /// overloaded Function::eval_B()
-   /// @param B  the right APL argument value
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB()
    /// @param A  the left APL argument value
    /// @param B  the right APL argument value
    virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   /// @param B  the right APL argument value
+   virtual Token eval_B(Value_P B) const;
 
    static Bif_F12_NEQUIV  fun;   ///< Built-in function
 };
@@ -319,21 +319,16 @@ public:
    static Bif_F12_ENCODE  fun;   ///< Built-in function
 
 protected:
-   /// return the (minimum) number of digits needed to represent every
-   /// item in B in a number system with base A0.
-   /// @param A0  the radix (base) of the number system
-   /// @param B   the APL value containing the numbers to represent
-   static int get_X0(APL_Integer A0, const Value & B);
-
-   /// encode *ib() according to A (integer A and b)
-   /// @param Z   the output value to fill with encoded digits
-   /// @param aH  high dimension of the A argument (number of digits)
-   /// @param aL  low dimension of the A argument (number of elements)
-   /// @param iA  ravel iterator over the bases array
-   /// @param iB  ravel iterator over the numbers to encode
-   static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
-                          const ConstRavel_P & iA,
-                          const ConstRavel_P & iB);
+   /// encode *ib() according to A
+   /// @param Z    the output value to fill with encoded digits
+   /// @param aH   high dimension of the A argument
+   /// @param aL   low dimension of the A argument
+   /// @param iA   ravel iterator over the bases array
+   /// @param iB   ravel iterator over the numbers to encode
+   /// @param qct  comparison tolerance for floating-point equality
+   static void encode_Cpx(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA, const ConstRavel_P & iB,
+                          double qct);
 
    /// encode *ib() according to A
    /// @param Z    the output value to fill with encoded digits
@@ -346,16 +341,21 @@ protected:
                           const ConstRavel_P & iA, const ConstRavel_P & iB,
                          double qct);
 
-   /// encode *ib() according to A
-   /// @param Z    the output value to fill with encoded digits
-   /// @param aH   high dimension of the A argument
-   /// @param aL   low dimension of the A argument
-   /// @param iA   ravel iterator over the bases array
-   /// @param iB   ravel iterator over the numbers to encode
-   /// @param qct  comparison tolerance for floating-point equality
-   static void encode_Cpx(Value & Z, ShapeItem aH, ShapeItem aL,
-                          const ConstRavel_P & iA, const ConstRavel_P & iB,
-                          double qct);
+   /// encode *ib() according to A (integer A and b)
+   /// @param Z   the output value to fill with encoded digits
+   /// @param aH  high dimension of the A argument (number of digits)
+   /// @param aL  low dimension of the A argument (number of elements)
+   /// @param iA  ravel iterator over the bases array
+   /// @param iB  ravel iterator over the numbers to encode
+   static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA,
+                          const ConstRavel_P & iB);
+
+   /// return the (minimum) number of digits needed to represent every
+   /// item in B in a number system with base A0.
+   /// @param A0  the radix (base) of the number system
+   /// @param B   the APL value containing the numbers to represent
+   static int get_X0(APL_Integer A0, const Value & B);
 };
 //----------------------------------------------------------------------------
 /** System function decode */
@@ -376,6 +376,16 @@ public:
    static Bif_F12_DECODE  fun;   ///< Built-in function
 
 protected:
+   /// decode B according to len_A and cA (complex A or B)
+   /// @param Z      the output value receiving decoded complex numbers
+   /// @param len_A  number of elements in the bases array
+   /// @param cA     pointer to the first cell of the bases array
+   /// @param len_B  number of digit-vectors in B
+   /// @param cB     pointer to the first cell of B
+   /// @param dB     stride between successive digit-vectors in B
+   static void decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
+                              ShapeItem len_B, const Cell * cB, ShapeItem dB);
+
    /// decode B according to len_A and cA (integer A, B and Z)
    /// @param Z      the output value receiving decoded integers
    /// @param len_A  number of elements in the bases array
@@ -395,16 +405,6 @@ protected:
    /// @param dB     stride between successive digit-vectors in B
    static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
                            ShapeItem len_B, const Cell * cB, ShapeItem dB);
-
-   /// decode B according to len_A and cA (complex A or B)
-   /// @param Z      the output value receiving decoded complex numbers
-   /// @param len_A  number of elements in the bases array
-   /// @param cA     pointer to the first cell of the bases array
-   /// @param len_B  number of digit-vectors in B
-   /// @param cB     pointer to the first cell of B
-   /// @param dB     stride between successive digit-vectors in B
-   static void decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
-                              ShapeItem len_B, const Cell * cB, ShapeItem dB);
 };
 //----------------------------------------------------------------------------
 /** primitive functions rotate and reverse */
@@ -419,16 +419,16 @@ public:
    {}
 
 protected:
+   /// Reverse B along axis
+   /// @param B     the right APL argument value (array to reverse)
+   /// @param axis  the axis along which to reverse
+   static Token reverse(Value_P B, sAxis axis);
+
    /// Rotate B according to A along axis
    /// @param A     the left APL argument value (rotation amounts)
    /// @param B     the right APL argument value (array to rotate)
    /// @param axis  the axis along which to rotate
    static Token rotate(Value_P A, Value_P B, sAxis axis);
-
-   /// Reverse B along axis
-   /// @param B     the right APL argument value (array to reverse)
-   /// @param axis  the axis along which to reverse
-   static Token reverse(Value_P B, sAxis axis);
 };
 //----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along last axis */
@@ -441,24 +441,24 @@ public:
    : Bif_ROTATE(TOK_F12_ROTATE)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return reverse(B, B->get_rank() - 1); }
-
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return rotate(A, B, B->get_rank() - 1); }
 
-   /// overloaded Function::eval_XB()
-   /// @param X  the axis specification value
-   /// @param B  the right APL argument value
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const
+      { return reverse(B, B->get_rank() - 1); }
 
    /// overloaded Function::eval_AXB()
    /// @param A  the left APL argument value (rotation amounts)
    /// @param X  the axis specification value
    /// @param B  the right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_XB()
+   /// @param X  the axis specification value
+   /// @param B  the right APL argument value
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    static Bif_F12_ROTATE  fun;   ///< Built-in function
 protected:
@@ -474,24 +474,24 @@ public:
    : Bif_ROTATE(TOK_F12_ROTATE1)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return reverse(B, 0); }
-
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return rotate(A, B, 0); }
 
-   /// overloaded Function::eval_XB()
-   /// @param X  the axis specification value
-   /// @param B  the right APL argument value
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const
+      { return reverse(B, 0); }
 
    /// overloaded Function::eval_AXB()
    /// @param A  the left APL argument value (rotation amounts)
    /// @param X  the axis specification value
    /// @param B  the right APL argument value
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_XB()
+   /// @param X  the axis specification value
+   /// @param B  the right APL argument value
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    static Bif_F12_ROTATE1  fun;   ///< Built-in function
 protected:
@@ -517,23 +517,18 @@ public:
    /// @param B  the right APL argument value (array to transpose)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_TRANSPOSE  fun;   ///< Built-in function
+   /// implementation of eval_B()
+   /// @param B  the APL array to reverse-transpose (raw pointer)
+   static Token do_eval_B(const Value * B);
 
    /// Transpose B according to axes A (without diagonals)
    /// @param A  the permutation shape specifying new axis order
    /// @param B  the APL array to transpose (raw pointer)
    static Value_P transpose(const Shape & A, const Value * B);
 
-   /// implementation of eval_B()
-   /// @param B  the APL array to reverse-transpose (raw pointer)
-   static Token do_eval_B(const Value * B);
+   static Bif_F12_TRANSPOSE  fun;   ///< Built-in function
 
 protected:
-   /// Transpose B according to axes A (with diagonals)
-   /// @param A  the permutation shape (may map multiple axes to one)
-   /// @param B  the APL array to transpose (raw pointer)
-   static Value_P transpose_diag(const Shape & A, const Value * B);
-
    /// for \b sh being a permutation of 0, 1, ... rank - 1,
    /// return the inverse permutation sh⁻¹
    /// @param sh  the permutation shape to invert
@@ -543,6 +538,11 @@ protected:
    /// @param sh    the shape to permute
    /// @param perm  the permutation to apply
    static Shape permute(const Shape & sh, const Shape & perm);
+
+   /// Transpose B according to axes A (with diagonals)
+   /// @param A  the permutation shape (may map multiple axes to one)
+   /// @param B  the APL array to transpose (raw pointer)
+   static Value_P transpose_diag(const Shape & A, const Value * B);
 };
 //----------------------------------------------------------------------------
 /** primitive functions reshape and shape */
@@ -555,11 +555,11 @@ public:
    : NonscalarFunction_default_identity(TOK_F12_RHO)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const;
 
    /// Reshape B according to rank and shape
    static Token do_reshape(const Shape & shape, const Value & B);
@@ -616,13 +616,13 @@ public:
    : NonscalarFunction(TOK_F2_LEFT)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE2, IntScalar(0, LOC)); }
-
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return Token(TOK_APL_VALUE1, A->clone(LOC)); }
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const
+      { return Token(TOK_APL_VALUE2, IntScalar(0, LOC)); }
 
    static Bif_F2_LEFT  fun;   ///< Built-in function
 protected:
@@ -638,12 +638,12 @@ public:
    : NonscalarFunction(TOK_F2_RIGHT)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, B->clone(LOC)); }
-
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
+      { return Token(TOK_APL_VALUE1, B->clone(LOC)); }
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const
       { return Token(TOK_APL_VALUE1, B->clone(LOC)); }
 
    /// overloaded Function::eval_AXB()

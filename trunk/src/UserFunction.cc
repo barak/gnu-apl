@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,82 +41,16 @@
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
-// constructor for a normal (non-lambda) define function
-UserFunction::UserFunction(const UCS_string txt, const char * loc,
-                           const UTF8_string & _creator, bool macro)
-  : Function(ID_USER_SYMBOL, TOK_FUN2),
-    Executable(txt, true, PM_FUNCTION, loc),
-    header(txt, macro),
-    creator(_creator),
-    error_line(0),   // assume header is wrong
-    error_info("Unspecified")
-{
-   if (header.get_error())
-      {
-        error_info = header.get_error_info();
-        return;
-      }
-
-   set_creation_time(now());
-
-   exec_properties[0] = 0;
-   exec_properties[1] = 0;
-   exec_properties[2] = 0;
-   exec_properties[3] = 0;
-
-   line_starts.push_back(Function_PC_0);   // will be set later.
-
-   if (header.get_error() != E_NO_ERROR)   // bad header
-      {
-        error_info = header.get_error_info();
-        return;
-      }
-
-   // set Function::tag
-   //
-   if      (header.RO())   tag = TOK_OPER2;
-   else if (header.LO())   tag = TOK_OPER1;
-   else if (header.A())    tag = TOK_FUN2;
-   else if (header.B())    tag = TOK_FUN1;
-   else                    tag = TOK_FUN0;
-
-   parse_body(loc, macro);
-   if (error_line > 0)
-      {
-        error_info = "Error in function body";
-        return;
-      }
-
-   if (UserPreferences::uprefs.discard_indentation)   // really ?
-      {
-        Multi_line_SM sm;
-        loop(l, get_text_size())
-            {
-              UCS_string line = get_text(l);
-              const ShapeItem multi_pos = line.multi_pos();
-              if (multi_pos != -1)   sm.next(line[multi_pos]);
-              if (sm.inside_multi())
-                 {
-                   line.remove_leading_and_trailing_whitespaces();
-                   set_text(l, line);
-                 }
-            }
-      }
-
-   error_line = -1;   // no error
-   error_info = 0;
-}
-//----------------------------------------------------------------------------
 // conatructor for a lambda
 UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
                            const UCS_string & text, const Token_string & lambda_body,
                            const vector<Symbol *> & lvars)
   : Function(ID_USER_SYMBOL, TOK_FUN0),
     Executable(sig, lambda_num, text, LOC),
-    header(sig, lambda_num),
     creator(UNI_LAMBDA),
+    error_info("Unspecified"),
     error_line(0),
-    error_info("Unspecified")
+    header(sig, lambda_num)
 {
    set_creation_time(now());
 
@@ -157,6 +91,19 @@ UserFunction::~UserFunction()
       CERR << "Function " << get_name() << " deleted." << endl;
 }
 //----------------------------------------------------------------------------
+UCS_string
+UserFunction::canonical(bool with_lines) const
+{
+UCS_string ucs;
+   loop(t, text.size())
+      {
+        if (with_lines)   ucs << line_prefix(Function_Line(t));
+        ucs << text[t] << UNI_LF;
+      }
+
+   return ucs;
+}
+//----------------------------------------------------------------------------
 Token
 UserFunction::eval_() const
 {
@@ -167,53 +114,6 @@ UserFunction::eval_() const
 
    Workspace::push_SI(this, LOC);
    if (header.Z())   header.Z()->push();
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_B(Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls eval_B("
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (header.LO())    SYNTAX_ERROR;   // defined as operator
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())   header.Z()->push();
-   if (header.A())   header.A()->push();
-   if (header.X())   header.X()->push();
-   if (header.B())   header.B()->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_XB(Value_P X, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls eval_B("
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (!header.X())    AXIS_ERROR;
-   if (header.LO())    SYNTAX_ERROR;   // defined as operator
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())   header.Z()->push();
-   if (header.A())   header.A()->push();
-   if (header.X())   header.X()->push_value(X);
-   if (header.B())   header.B()->push_value(B);
 
    header.eval_common();
 
@@ -246,86 +146,6 @@ UserFunction::eval_AB(Value_P A, Value_P B) const
 }
 //----------------------------------------------------------------------------
 Token
-UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls eval_AB("
-             << Token(TOK_APL_VALUE1, A) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (header.LO())    SYNTAX_ERROR;    // defined as operator
-   if (!header.A())    VALENCE_ERROR;   // monadic
-   if (!header.X())    AXIS_ERROR;
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())   header.Z()->push();
-   if (header.A())   header.A()->push_value(A);
-   if (header.X())   header.X()->push_value(X);
-   if (header.B())   header.B()->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_LB(Token & LO, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
-        print_val_or_fun(CERR, LO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())         header.Z() ->push();
-   if (header.A())         header.A() ->push();
-   if (LO.is_function())   header.LO()->push_function(LO.get_function());
-   else                    header.LO()->push_value(LO.get_apl_val());
-   if (header.X())         header.X() ->push();
-   header                        .B() ->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
-        print_val_or_fun(CERR, LO) << ", "
-             << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
-   if (!header.X())    AXIS_ERROR;
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())         header.Z()->push();
-   if (header.A())         header.A()->push();
-   if (LO.is_function())   header.LO()->push_function(LO.get_function());
-   else                    header.LO()->push_value(LO.get_apl_val());
-   if (header.X())         header.X()->push_value(X);
-   header                        .B()->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
 UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
@@ -348,97 +168,6 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    /* ALWAYS */            header.B()->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
-             << Token(TOK_APL_VALUE1, A) << ", " << endl;
-        print_val_or_fun(CERR, LO) << ", "
-             << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (header.RO())    SYNTAX_ERROR;    // defined as dyadic operator
-   if (!header.A())    VALENCE_ERROR;   // monadic
-   if (!header.X())    AXIS_ERROR;
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())         header.Z()->push();
-   header                        .A()->push_value(A);
-   if (LO.is_function())   header.LO()->push_function(LO.get_function());
-   else                    header.LO()->push_value(LO.get_apl_val());
-   if (header.X())         header.X()->push_value(X);
-   header                        .B()->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
-        print_val_or_fun(CERR, LO) << ", ";
-        print_val_or_fun(CERR, RO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (!header.RO())    SYNTAX_ERROR;   // not defined as dyadic operator
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())         header.Z()->push();
-   if (header.A())         header.A()->push();
-
-   if (LO.is_function())   header.LO()->push_function(LO.get_function());
-   else                    header.LO()->push_value(LO.get_apl_val());
-   if (RO.is_function())   header.RO()->push_function(RO.get_function());
-   else                    header.RO()->push_value(RO.get_apl_val());
-   if (header.X())         header.X() ->push();
-   header                        .B() ->push_value(B);
-
-   header.eval_common();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
-{
-   Log(LOG_UserFunction__enter_leave)
-      {
-        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
-        print_val_or_fun(CERR, LO) << ", ";
-        print_val_or_fun(CERR, RO) << ", "
-             << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << endl;
-      }
-
-   if (!header.RO())   SYNTAX_ERROR;   // not defined as dyadic operator
-   if (!header.X())    AXIS_ERROR;
-
-   Workspace::push_SI(this, LOC);
-
-   if (header.Z())         header.Z()->push();
-   if (header.A())         header.A()->push();
-   if (LO.is_function())   header.LO()->push_function(LO.get_function());
-   else                    header.LO()->push_value(LO.get_apl_val());
-   if (RO.is_function())   header.RO()->push_function(RO.get_function());
-   if (header.X())         header.X()->push_value(X);
-   else                    header.RO()->push_value(RO.get_apl_val());
-   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -512,17 +241,417 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
 }
 //----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_B(Value_P B) const
+UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
-Value_P Z = CLONE_P(B, LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
+             << Token(TOK_APL_VALUE1, A) << ", " << endl;
+        print_val_or_fun(CERR, LO) << ", "
+             << Token(TOK_APL_VALUE1, X) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (header.RO())    SYNTAX_ERROR;    // defined as dyadic operator
+   if (!header.A())    VALENCE_ERROR;   // monadic
+   if (!header.X())    AXIS_ERROR;
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())         header.Z()->push();
+   header                        .A()->push_value(A);
+   if (LO.is_function())   header.LO()->push_function(LO.get_function());
+   else                    header.LO()->push_value(LO.get_apl_val());
+   if (header.X())         header.X()->push_value(X);
+   header                        .B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
 }
 //----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_AB(Value_P A, Value_P B) const
+UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-Value_P Z = CLONE_P(B, LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls eval_AB("
+             << Token(TOK_APL_VALUE1, A) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (header.LO())    SYNTAX_ERROR;    // defined as operator
+   if (!header.A())    VALENCE_ERROR;   // monadic
+   if (!header.X())    AXIS_ERROR;
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())   header.Z()->push();
+   if (header.A())   header.A()->push_value(A);
+   if (header.X())   header.X()->push_value(X);
+   if (header.B())   header.B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_B(Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls eval_B("
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (header.LO())    SYNTAX_ERROR;   // defined as operator
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())   header.Z()->push();
+   if (header.A())   header.A()->push();
+   if (header.X())   header.X()->push();
+   if (header.B())   header.B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_LB(Token & LO, Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
+        print_val_or_fun(CERR, LO) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())         header.Z() ->push();
+   if (header.A())         header.A() ->push();
+   if (LO.is_function())   header.LO()->push_function(LO.get_function());
+   else                    header.LO()->push_value(LO.get_apl_val());
+   if (header.X())         header.X() ->push();
+   header                        .B() ->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
+        print_val_or_fun(CERR, LO) << ", ";
+        print_val_or_fun(CERR, RO) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (!header.RO())    SYNTAX_ERROR;   // not defined as dyadic operator
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())         header.Z()->push();
+   if (header.A())         header.A()->push();
+
+   if (LO.is_function())   header.LO()->push_function(LO.get_function());
+   else                    header.LO()->push_value(LO.get_apl_val());
+   if (RO.is_function())   header.RO()->push_function(RO.get_function());
+   else                    header.RO()->push_value(RO.get_apl_val());
+   if (header.X())         header.X() ->push();
+   header                        .B() ->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
+        print_val_or_fun(CERR, LO) << ", ";
+        print_val_or_fun(CERR, RO) << ", "
+             << Token(TOK_APL_VALUE1, X) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (!header.RO())   SYNTAX_ERROR;   // not defined as dyadic operator
+   if (!header.X())    AXIS_ERROR;
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())         header.Z()->push();
+   if (header.A())         header.A()->push();
+   if (LO.is_function())   header.LO()->push_function(LO.get_function());
+   else                    header.LO()->push_value(LO.get_apl_val());
+   if (RO.is_function())   header.RO()->push_function(RO.get_function());
+   if (header.X())         header.X()->push_value(X);
+   else                    header.RO()->push_value(RO.get_apl_val());
+   header                        .B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
+        print_val_or_fun(CERR, LO) << ", "
+             << Token(TOK_APL_VALUE1, X) << ", "
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
+   if (!header.X())    AXIS_ERROR;
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())         header.Z()->push();
+   if (header.A())         header.A()->push();
+   if (LO.is_function())   header.LO()->push_function(LO.get_function());
+   else                    header.LO()->push_value(LO.get_apl_val());
+   if (header.X())         header.X()->push_value(X);
+   header                        .B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_XB(Value_P X, Value_P B) const
+{
+   Log(LOG_UserFunction__enter_leave)
+      {
+        CERR << "Function " << get_name() << " calls eval_B("
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
+      }
+
+   if (!header.X())    AXIS_ERROR;
+   if (header.LO())    SYNTAX_ERROR;   // defined as operator
+
+   Workspace::push_SI(this, LOC);
+
+   if (header.Z())   header.Z()->push();
+   if (header.A())   header.A()->push();
+   if (header.X())   header.X()->push_value(X);
+   if (header.B())   header.B()->push_value(B);
+
+   header.eval_common();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Function_Line
+UserFunction::get_line(Function_PC pc) const
+{
+   Assert(pc >= -1);
+   if (pc < 0)   pc = Function_PC_0;
+
+   // search line_starts backwards until a line with non-greater pc is found.
+   //
+   for (int l = line_starts.size() - 1; l > 0; --l)
+       {
+         if (line_starts[l] <= pc)   return Function_Line(l);
+       }
+
+   return Function_Line_1;
+}
+//----------------------------------------------------------------------------
+UCS_string
+UserFunction::get_name_and_line(Function_PC pc) const
+{
+UCS_string ret = header.get_name();
+   if (ret.size() && ret[0] == UNI_LAMBDA)
+      {
+        UCS_string name = Workspace::find_lambda_name(this);
+        if (name.size())   ret = name;
+      }
+   ret << UNI_L_BRACK;
+
+   // pc may point to the next token already. If that is the case then
+   // we go back one token.
+   //
+   if (pc > 0 && body[pc - 1].get_Class() == TC_END)   pc = Function_PC(pc - 1);
+
+const Function_Line line = get_line(pc);
+   return ret << line << UNI_R_BRACK;
+}
+//----------------------------------------------------------------------------
+void 
+UserFunction::help(ostream & out) const
+{
+   CERR << "    Header: " << get_text(0) << endl;
+
+   if (is_lambda())
+      {
+         UCS_string body(get_text(1), 2);
+         CERR << "Lambda: { " << body << " ";
+         loop(v, local_var_count())
+            {
+              const Symbol & sym = *get_local_var(v);
+              CERR << ";" << sym.get_name();
+            }
+         CERR << " }" << endl;
+         return;
+      }
+
+bool got_lamps = false;
+bool toronto = false;
+const UCS_string two_lamps(U"⍝⍝");
+   for (int l = 1; l < get_text_size(); ++l)
+       {
+         UCS_string line(get_text(l));
+         line.remove_leading_and_trailing_whitespaces();
+         if (line.size() < 2)          continue;   // too short
+
+         if (line[0] != UNI_COMMENT)   // not a comment
+            {
+              toronto = false;
+              continue;
+            }
+
+         const bool double_lamps = line[1] == UNI_COMMENT;   // ⍝⍝ line
+         if (line[1] == UNI_FULLSTOP)                  // ⍝. line
+            {
+              toronto = true;
+            }
+
+         if (double_lamps || toronto)
+            {
+              got_lamps = true;
+              CERR << "    " << line << endl;
+            }
+       }
+
+   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
+}
+//----------------------------------------------------------------------------
+Function_PC
+UserFunction::line_start(Function_Line line) const
+{
+   if (line < 0 || size_t(line) >= line_starts.size())
+      {
+        Q1(line)
+        Q1(line_starts.size())
+        Assert(0);
+      }
+
+   return line_starts[line];
+}
+//----------------------------------------------------------------------------
+Function_PC
+UserFunction::pc_for_line(Function_Line line) const
+{
+   if (line <= Function_Line_0 || line >= Function_Line(line_starts.size()))
+      return Function_PC(body.ssize() - 1);
+
+   return line_starts[line];
+}
+//----------------------------------------------------------------------------
+ostream &
+UserFunction::print(ostream & out) const
+{
+   out << header.get_name();
+   return out;
+
+/*
+   out << "Function header:" << endl;
+   if (header.Z())     out << "Result:         " << *header.Z()   << endl;
+   if (header.A())     out << "Left Argument:  " << *header.A()   << endl;
+   if (header.LO())    out << "Left Op Arg:    " << *header.LO()  << endl;
+                       out << "Function:       " << header.get_name() << endl;
+   if (header.RO())    out << "Right Op Arg:   " << *header.RO()  << endl;
+   if (header.B())     out << "Right Argument: " << *header.B()   << endl;
+   return Executable::print(out);
+*/
+}
+//----------------------------------------------------------------------------
+void
+UserFunction::print_line_PCs(const char * loc) const
+{
+   CERR << "At " << loc << ":" << endl;
+   for (size_t j = 1; j < line_starts.size(); ++j)
+       {
+         CERR << "   " << get_name() << "[" << j << "]: PC= ";
+         const Function_PC PC_from = line_starts[j];
+
+         // Note: line_starts[0] is the end of the function
+         const int next = j < (line_starts.size() - 1) ? j + 1 : 0;
+         const Function_PC PC_to = line_starts[next];
+         CERR << PC_from << "..." << (PC_to - 1) << endl;
+       }
+}
+//----------------------------------------------------------------------------
+void
+UserFunction::print_properties(ostream & out, int indent) const
+{
+   header.print_properties(out, indent);
+UCS_string ind(indent, UNI_SPACE);
+   out << ind << "Body Lines:     " << (line_starts.size() - 1) << "+[0]" << endl
+       << ind << "Creator:        " << get_creator()      << endl
+       << ind << "Body[" << body.ssize() << "⏩]: ";
+
+   loop(b, body.ssize())
+       {
+         // maybe print line prefix
+         //
+         Function_Line line_number = Function_Invalid;
+         loop(ls, line_starts.size())
+            {
+              if (b == line_starts[ls])   // b is the start of a line
+                 {
+                   line_number = Function_Line(ls);
+                   out << endl << ind << "    [" << line_number << "]";
+
+                   loop(lab, header.get_label_count())
+                       {
+                         const labVal & lv = header.get_label(lab);
+                         if (lv.line == line_number)
+                            {
+                              out << " " << lv.sym->get_name() << ":";
+                            }
+                       }
+                 }
+            }
+
+         out << " ⏩" << body[b];
+       }
+   out << endl;
+}
+//----------------------------------------------------------------------------
+bool
+UserFunction::pushes_sym(const Symbol * sym) const
+{
+   if (sym == header.Z())   return true;
+   if (sym == header.A())   return true;
+   if (sym == header.LO())   return true;
+   if (sym == header.X())   return true;
+   if (sym == header.RO())   return true;
+   if (sym == header.B())   return true;
+
+   loop(l, local_var_count())
+       {
+         if (sym == get_local_var(l))   return true;
+       }
+
+   return false;
 }
 //----------------------------------------------------------------------------
 void
@@ -573,42 +702,190 @@ UCS_string message_2(error.get_error_line_2());
 }
 //----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(const std::vector<Function_Line> & B, bool stop)
+UserFunction::destroy()
 {
-   // Sort B, so that stop_lines resp. trace_lines will be sorted.
+   // delete will call ~Executable(), which releases the values owned by body.
    //
-std::vector<bool> ts_lines;
+   if (is_lambda())   decrement_refcount(LOC);
+   else               delete this;
+}
+//----------------------------------------------------------------------------
+bool
+UserFunction::optimize_label_vectors()
+{
+   /* Frequent design patterns are:
 
-   // clear all bits in ts_lines
-   loop(ts, line_starts.size())   ts_lines.push_back(false);
+      → EXPR / L1, L2 ... Ln
+      → EXPR / L1 L2 ... Ln
+      → EXPR ⍴ L
+               ├── const B ──┤
 
-   // set all bits in B, ignorin invalid ones.
-   loop(b, B.size())
-      {
-        const Function_Line Bb = B[b];
-        if (Bb < 1)                          continue;   // not valid
-        if (Bb >= int(line_starts.size()))   continue;   // not valid
-        ts_lines[Bb] = true;
-      }
+      In these cases, the right argument of / or ⍴ is a constant, so we can
+      resolve the label values of L or L1, ... Ln into a single APL value B.
+      That avoids the resolution (symbol lookup, line extraction) at runtime.
+    */
+   if (DONT_FT_DIRECT_BRANCHES)   return false;
 
-   if (stop)   // ⎕STOP or S∆
-      {
-        stop_lines.clear();
-        loop(ts, ts_lines.size())
-           {
-             if (ts_lines[ts])   stop_lines.push_back(Function_Line(ts));
+   /* check for: VALUE → ENDL      e.g. → 4
+      or:        SYMBOL → ENDL     e.g. → LABEL
+
+      but rule out expressions:   e.g. → 4 + 5
+
+      ⎕FX "FOO" "X←2" "→2" "Y←5"
+      ⎕FX "FOO" "X←2" "→0" "'NOT REACHED'"
+      ⎕FX "FOO" "X←2" "LABEL: Z←3 ◊ →LABEL" "Y←5"
+
+    */
+bool VOID_inserted = false;
+   for (Function_PC pc = Function_PC(1); pc < body.ssize() - 3; ++pc)
+       {
+         if (!body[pc].is_RHO_or_SLASH())        continue;
+         if (!is_label_or_value(body[pc - 1]))   continue;
+
+         // at this point we have N⍴... or N/... or N⌿...
+
+         // collect items in the right argument B of /B. ⌿B, or ⍴B.
+         //
+         vector<Function_PC> items_B;
+
+         items_B.push_back(Function_PC(pc - 1));
+         for (Function_PC pos = pc - 2; pos >= 0; --pos)
+             {
+               const TokenTag tag_pos = body[pos].get_tag();
+               const TokenClass class_pos = body[pos].get_Class();
+               if (is_label(body[pos]))
+                  {
+                    items_B.push_back(Function_PC(pos));
+                  }
+               else if (class_pos == TC_VALUE &&
+                        body[pos].get_apl_val()->is_int_scalar())
+                  {
+                    items_B.push_back(Function_PC(pos));
+                  }
+               else if (tag_pos == TOK_F12_COMMA ||
+                        tag_pos == TOK_F12_COMMA)
+                  {
+                    // skip , or ⍪
+                  }
+               else if (pos == 0 || class_pos == TC_END)
+                  {
+                    break;   // for (int pos...)
+                  }
+               else   // something else: do nothing
+                  {
+                    items_B.clear();
+                    break;
+                  }
+             }
+
+         if (items_B.size() == 0)   continue;   // for (Function_PC pc...
+
+         if (items_B.size() == 1)
+            {
+              // single item. If it is a value then leave it as is.
+              // Otherwise resolve the label symbol.
+              //
+              const Function_PC pc0 = items_B[0];
+              Token & tok0 = body[pc0];
+              if (tok0.get_Class() == TC_SYMBOL)
+                 {
+                   const Symbol * symbol = tok0.get_sym_ptr();
+                   const int64_t line = get_label_line(symbol);
+                   Value_P value = IntScalar(line, LOC);
+                   value->increment_owner_count(LOC);
+                   tok0 = Token(TOK_APL_VALUE1, value);
+                 }
+            }
+         else   // vector B
+            {
+              Value_P B(items_B.size(), LOC);
+              loop(b, items_B.size())
+                  {
+                    const Function_PC pc_b = items_B[b];
+                    Token & tok_b = body[pc_b];
+                    if (tok_b.get_Class() == TC_SYMBOL)
+                       {
+                         const Symbol * symbol = tok_b.get_sym_ptr();
+                         const int64_t line = get_label_line(symbol);
+                         B->next_ravel_Int(line);
+                       }
+                    else if (tok_b.get_Class() == TC_VALUE)
+                       {
+                         const int64_t line = tok_b.get_apl_val()->get_cfirst()
+                                                   .get_int_value();
+                         B->next_ravel_Int(line);
+                       }
+                  }
+              B->check_value(LOC);
+
+              // items_B is decreasing, so back() < front()
+              for (Function_PC pc = items_B.back(); pc <= items_B.front(); ++pc)
+                  {
+                    body[pc].clear(LOC);
+                  }
+              body[items_B.back()] = Token(TOK_APL_VALUE1, B);
+              B->increment_owner_count(LOC);   // keep it
+              VOID_inserted = true;
            }
-      }
-   else        // ⎕TRACE or T∆
-      {
-        trace_lines.clear();
-        loop(ts, ts_lines.size())
-           {
-             if (ts_lines[ts])   trace_lines.push_back(Function_Line(ts));
-           }
-      }
+       }
 
-   parse_body(LOC, false);
+   if (VOID_inserted)   remove_TOK_VOID();
+
+   return VOID_inserted;
+}
+//----------------------------------------------------------------------------
+bool
+UserFunction::optimize_labels()
+{
+   if (DONT_FT_LABEL_LITERAL)   return false;
+
+const size_t labels_declared = header.get_label_count();
+   if (labels_declared == 0)   return false;   // function has no labels
+
+   for (int pc = Function_PC(-1); pc < body.ssize() - 4; ++pc)
+       {
+         if (body[pc + 2].get_tag() == TOK_R_ARROW &&   // least likely first
+             body[pc + 3].get_tag() == TOK_ENDL    &&
+             (pc == -1 || body[pc].get_tag() == TOK_ENDL))
+            {
+              const Token & tok = body[pc + 1];
+              if (tok.get_tag() == TOK_SYMBOL)        // → SYMBOL
+                 {
+                   const Symbol * symbol = tok.get_sym_ptr();
+                   loop(idx, labels_declared)
+                       {
+                         const labVal & label = header.get_label(idx);
+                         if (symbol != label.sym)   continue;
+
+                         const int64_t target_pc = line_starts[label.line];
+                         body[pc + 1] = Token(TOK_GOTO_PC, target_pc);
+                         body[pc + 2] = body[pc + 3];   // was TOK_R_ARROW
+
+                         OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
+                       }
+                 }
+              else if (tok.get_Class() == TC_VALUE)   // →N
+                 {
+                   const Value * val_N = tok.get_apl_val().get();
+                   const Cell & cell_N = val_N->get_cfirst();
+                   if (val_N->is_int_scalar())
+                      {
+                        const unsigned int N = cell_N.get_int_value();
+                        if (N < line_starts.size())
+                           {
+                             const int64_t target_pc = line_starts[N];
+                             body[pc + 1].clear(LOC);
+                             body[pc + 1] = Token(TOK_GOTO_PC, target_pc);
+                             body[pc + 2] = body[pc + 3];   // was TOK_R_ARROW
+
+                             OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
+                           }
+                      }
+                 }
+            }
+       }
+
+   return false;   // no TOK_VOID inserted
 }
 //----------------------------------------------------------------------------
 void
@@ -787,209 +1064,108 @@ Lit_DB literals;
    Assert(literals.size() == 0);
 }
 //----------------------------------------------------------------------------
-UserFunction *
-UserFunction::load(const char * workspace, const char * function)
+VoidCount
+UserFunction::remove_TOK_VOID()
 {
-UserFunction * fun = 0;
-
-   try
+   // if line_starts is empty (= not yet initialized )then line_starts need
+   // not be updated. Only the TOK_VOID need to be removed, and we pretend
+   // that no token were removed (so the caller needs not care),
+   //
+   if (line_starts.size() == 0)
       {
-        fun = do_load(workspace, function);
+        body.remove_TOK_VOID();
+        return NO_VOID_TOKEN_REMOVED;
       }
-   catch (Error & err)
+
+   // line_starts was initialized.
+   // 
+size_t src_line    = Function_Line_1;
+Function_PC dst_PC = Function_PC_0;
+
+   // be careful not to increment src_PC if a line is empty!
+
+   loop(src_PC, body.ssize())
       {
-        delete fun;
-
-        err.print(CERR, LOC);
-      }
-   catch (std::bad_alloc &)
-      {
-        delete fun;
-        CERR << "Caught unexpected exception at " << LOC << endl;
-        return 0;
-      }
-   catch (...)
-      { FIXME; }
-
-   return fun;
-}
-//----------------------------------------------------------------------------
-bool
-UserFunction::optimize_labels()
-{
-   if (DONT_FT_LABEL_LITERAL)   return false;
-
-const size_t labels_declared = header.get_label_count();
-   if (labels_declared == 0)   return false;   // function has no labels
-
-   for (int pc = Function_PC(-1); pc < body.ssize() - 4; ++pc)
-       {
-         if (body[pc + 2].get_tag() == TOK_R_ARROW &&   // least likely first
-             body[pc + 3].get_tag() == TOK_ENDL    &&
-             (pc == -1 || body[pc].get_tag() == TOK_ENDL))
-            {
-              const Token & tok = body[pc + 1];
-              if (tok.get_tag() == TOK_SYMBOL)        // → SYMBOL
-                 {
-                   const Symbol * symbol = tok.get_sym_ptr();
-                   loop(idx, labels_declared)
-                       {
-                         const labVal & label = header.get_label(idx);
-                         if (symbol != label.sym)   continue;
-
-                         const int64_t target_pc = line_starts[label.line];
-                         body[pc + 1] = Token(TOK_GOTO_PC, target_pc);
-                         body[pc + 2] = body[pc + 3];   // was TOK_R_ARROW
-
-                         OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
-                       }
-                 }
-              else if (tok.get_Class() == TC_VALUE)   // →N
-                 {
-                   const Value * val_N = tok.get_apl_val().get();
-                   const Cell & cell_N = val_N->get_cfirst();
-                   if (val_N->is_int_scalar())
-                      {
-                        const unsigned int N = cell_N.get_int_value();
-                        if (N < line_starts.size())
-                           {
-                             const int64_t target_pc = line_starts[N];
-                             body[pc + 1].clear(LOC);
-                             body[pc + 1] = Token(TOK_GOTO_PC, target_pc);
-                             body[pc + 2] = body[pc + 3];   // was TOK_R_ARROW
-
-                             OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
-                           }
-                      }
-                 }
-            }
-       }
-
-   return false;   // no TOK_VOID inserted
-}
-//----------------------------------------------------------------------------
-bool
-UserFunction::optimize_label_vectors()
-{
-   /* Frequent design patterns are:
-
-      → EXPR / L1, L2 ... Ln
-      → EXPR / L1 L2 ... Ln
-      → EXPR ⍴ L
-               ├── const B ──┤
-
-      In these cases, the right argument of / or ⍴ is a constant, so we can
-      resolve the label values of L or L1, ... Ln into a single APL value B.
-      That avoids the resolution (symbol lookup, line extraction) at runtime.
-    */
-   if (DONT_FT_DIRECT_BRANCHES)   return false;
-
-   /* check for: VALUE → ENDL      e.g. → 4
-      or:        SYMBOL → ENDL     e.g. → LABEL
-
-      but rule out expressions:   e.g. → 4 + 5
-
-      ⎕FX "FOO" "X←2" "→2" "Y←5"
-      ⎕FX "FOO" "X←2" "→0" "'NOT REACHED'"
-      ⎕FX "FOO" "X←2" "LABEL: Z←3 ◊ →LABEL" "Y←5"
-
-    */
-bool VOID_inserted = false;
-   for (Function_PC pc = Function_PC(1); pc < body.ssize() - 3; ++pc)
-       {
-         if (!body[pc].is_RHO_or_SLASH())        continue;
-         if (!is_label_or_value(body[pc - 1]))   continue;
-
-         // at this point we have N⍴... or N/... or N⌿...
-
-         // collect items in the right argument B of /B. ⌿B, or ⍴B.
-         //
-         vector<Function_PC> items_B;
-
-         items_B.push_back(Function_PC(pc - 1));
-         for (Function_PC pos = pc - 2; pos >= 0; --pos)
-             {
-               const TokenTag tag_pos = body[pos].get_tag();
-               const TokenClass class_pos = body[pos].get_Class();
-               if (is_label(body[pos]))
-                  {
-                    items_B.push_back(Function_PC(pos));
-                  }
-               else if (class_pos == TC_VALUE &&
-                        body[pos].get_apl_val()->is_int_scalar())
-                  {
-                    items_B.push_back(Function_PC(pos));
-                  }
-               else if (tag_pos == TOK_F12_COMMA ||
-                        tag_pos == TOK_F12_COMMA)
-                  {
-                    // skip , or ⍪
-                  }
-               else if (pos == 0 || class_pos == TC_END)
-                  {
-                    break;   // for (int pos...)
-                  }
-               else   // something else: do nothing
-                  {
-                    items_B.clear();
-                    break;
-                  }
-             }
-
-         if (items_B.size() == 0)   continue;   // for (Function_PC pc...
-
-         if (items_B.size() == 1)
-            {
-              // single item. If it is a value then leave it as is.
-              // Otherwise resolve the label symbol.
-              //
-              const Function_PC pc0 = items_B[0];
-              Token & tok0 = body[pc0];
-              if (tok0.get_Class() == TC_SYMBOL)
-                 {
-                   const Symbol * symbol = tok0.get_sym_ptr();
-                   const int64_t line = get_label_line(symbol);
-                   Value_P value = IntScalar(line, LOC);
-                   value->increment_owner_count(LOC);
-                   tok0 = Token(TOK_APL_VALUE1, value);
-                 }
-            }
-         else   // vector B
-            {
-              Value_P B(items_B.size(), LOC);
-              loop(b, items_B.size())
-                  {
-                    const Function_PC pc_b = items_B[b];
-                    Token & tok_b = body[pc_b];
-                    if (tok_b.get_Class() == TC_SYMBOL)
-                       {
-                         const Symbol * symbol = tok_b.get_sym_ptr();
-                         const int64_t line = get_label_line(symbol);
-                         B->next_ravel_Int(line);
-                       }
-                    else if (tok_b.get_Class() == TC_VALUE)
-                       {
-                         const int64_t line = tok_b.get_apl_val()->get_cfirst()
-                                                   .get_int_value();
-                         B->next_ravel_Int(line);
-                       }
-                  }
-              B->check_value(LOC);
-
-              // items_B is decreasing, so back() < front()
-              for (Function_PC pc = items_B.back(); pc <= items_B.front(); ++pc)
-                  {
-                    body[pc].clear(LOC);
-                  }
-              body[items_B.back()] = Token(TOK_APL_VALUE1, B);
-              B->increment_owner_count(LOC);   // keep it
-              VOID_inserted = true;
+        // take care of empty lines. Empty lines have the same PC as the
+        // current line (src_line)
+        //
+        while ((src_line + 1) < line_starts.size() &&
+               src_PC == line_starts[src_line + 1])
+           {
+             // src_PC has reached the first token of the next line.
+             // Increment the current line and adjust line_starts.
+             ++src_line;
+             line_starts[src_line] = Function_PC(dst_PC);
            }
-       }
 
-   if (VOID_inserted)   remove_TOK_VOID();
+        if (body[src_PC].get_tag() != TOK_VOID)
+           {
+             if (src_PC != dst_PC)   body[dst_PC].move_from(body[src_PC], LOC);
+             ++dst_PC;
+           }
+        else   // TOK_VOID
+           {
+             // Do not copy but ignore (skip) body[src_PC]. After the removal
+             // of the TOK_VOID have all GOTO_PC targets above src_PC become
+             // are too high (by 1). Adjust these token.
+             //
+             loop(bb, body.ssize())
+                 {
+                   Token & tok = body[bb];
+                   if (tok.get_tag() == TOK_GOTO_PC)
+                      {
+                        const int64_t tok_pc = tok.get_int_val();
+                        if (tok_pc >= src_PC)   tok.set_int_val(tok_pc - 1);
+                      }
+                
+                 }
+           }
+      }
 
-   return VOID_inserted;
+const VoidCount ret = VoidCount(body.ssize() - dst_PC);
+   body.resize(dst_PC);
+   line_starts[0] = dst_PC - 1;   // convention: line_starts[0] is the end of body
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+void
+UserFunction::set_trace_stop(const std::vector<Function_Line> & B, bool stop)
+{
+   // Sort B, so that stop_lines resp. trace_lines will be sorted.
+   //
+std::vector<bool> ts_lines;
+
+   // clear all bits in ts_lines
+   loop(ts, line_starts.size())   ts_lines.push_back(false);
+
+   // set all bits in B, ignorin invalid ones.
+   loop(b, B.size())
+      {
+        const Function_Line Bb = B[b];
+        if (Bb < 1)                          continue;   // not valid
+        if (Bb >= int(line_starts.size()))   continue;   // not valid
+        ts_lines[Bb] = true;
+      }
+
+   if (stop)   // ⎕STOP or S∆
+      {
+        stop_lines.clear();
+        loop(ts, ts_lines.size())
+           {
+             if (ts_lines[ts])   stop_lines.push_back(Function_Line(ts));
+           }
+      }
+   else        // ⎕TRACE or T∆
+      {
+        trace_lines.clear();
+        loop(ts, ts_lines.size())
+           {
+             if (ts_lines[ts])   trace_lines.push_back(Function_Line(ts));
+           }
+      }
+
+   parse_body(LOC, false);
 }
 //----------------------------------------------------------------------------
 UserFunction *
@@ -1048,15 +1224,6 @@ UTF8_string utf(utf8P(start), len);
 const UCS_string ucs(utf);
 int error_line = -1;
    return fix(ucs, error_line, false, LOC, filename);
-}
-//----------------------------------------------------------------------------
-Function_PC
-UserFunction::pc_for_line(Function_Line line) const
-{
-   if (line <= Function_Line_0 || line >= Function_Line(line_starts.size()))
-      return Function_PC(body.ssize() - 1);
-
-   return line_starts[line];
 }
 //----------------------------------------------------------------------------
 UserFunction *
@@ -1285,184 +1452,121 @@ vector<Symbol *> local_vars;
                                          body_text, body, local_vars);
 }
 //----------------------------------------------------------------------------
-void
-UserFunction::destroy()
+UserFunction *
+UserFunction::load(const char * workspace, const char * function)
 {
-   // delete will call ~Executable(), which releases the values owned by body.
-   //
-   if (is_lambda())   decrement_refcount(LOC);
-   else               delete this;
-}
-//----------------------------------------------------------------------------
-bool
-UserFunction::pushes_sym(const Symbol * sym) const
-{
-   if (sym == header.Z())   return true;
-   if (sym == header.A())   return true;
-   if (sym == header.LO())   return true;
-   if (sym == header.X())   return true;
-   if (sym == header.RO())   return true;
-   if (sym == header.B())   return true;
+UserFunction * fun = 0;
 
-   loop(l, local_var_count())
-       {
-         if (sym == get_local_var(l))   return true;
-       }
-
-   return false;
-}
-//----------------------------------------------------------------------------
-void 
-UserFunction::help(ostream & out) const
-{
-   CERR << "    Header: " << get_text(0) << endl;
-
-   if (is_lambda())
+   try
       {
-         UCS_string body(get_text(1), 2);
-         CERR << "Lambda: { " << body << " ";
-         loop(v, local_var_count())
-            {
-              const Symbol & sym = *get_local_var(v);
-              CERR << ";" << sym.get_name();
-            }
-         CERR << " }" << endl;
-         return;
+        fun = do_load(workspace, function);
+      }
+   catch (Error & err)
+      {
+        delete fun;
+
+        err.print(CERR, LOC);
+      }
+   catch (std::bad_alloc &)
+      {
+        delete fun;
+        CERR << "Caught unexpected exception at " << LOC << endl;
+        return 0;
+      }
+   catch (...)
+      { FIXME; }
+
+   return fun;
+}
+//----------------------------------------------------------------------------
+// constructor for a normal (non-lambda) define function
+UserFunction::UserFunction(const UCS_string txt, const char * loc,
+                           const UTF8_string & _creator, bool macro)
+  : Function(ID_USER_SYMBOL, TOK_FUN2),
+    Executable(txt, true, PM_FUNCTION, loc),
+    creator(_creator),
+    error_info("Unspecified"),
+    error_line(0),   // assume header is wrong
+    header(txt, macro)
+{
+   if (header.get_error())
+      {
+        error_info = header.get_error_info();
+        return;
       }
 
-bool got_lamps = false;
-bool toronto = false;
-const UCS_string two_lamps(U"⍝⍝");
-   for (int l = 1; l < get_text_size(); ++l)
-       {
-         UCS_string line(get_text(l));
-         line.remove_leading_and_trailing_whitespaces();
-         if (line.size() < 2)          continue;   // too short
+   set_creation_time(now());
 
-         if (line[0] != UNI_COMMENT)   // not a comment
+   exec_properties[0] = 0;
+   exec_properties[1] = 0;
+   exec_properties[2] = 0;
+   exec_properties[3] = 0;
+
+   line_starts.push_back(Function_PC_0);   // will be set later.
+
+   if (header.get_error() != E_NO_ERROR)   // bad header
+      {
+        error_info = header.get_error_info();
+        return;
+      }
+
+   // set Function::tag
+   //
+   if      (header.RO())   tag = TOK_OPER2;
+   else if (header.LO())   tag = TOK_OPER1;
+   else if (header.A())    tag = TOK_FUN2;
+   else if (header.B())    tag = TOK_FUN1;
+   else                    tag = TOK_FUN0;
+
+   parse_body(loc, macro);
+   if (error_line > 0)
+      {
+        error_info = "Error in function body";
+        return;
+      }
+
+   if (UserPreferences::uprefs.discard_indentation)   // really ?
+      {
+        Multi_line_SM sm;
+        loop(l, get_text_size())
             {
-              toronto = false;
-              continue;
-            }
-
-         const bool double_lamps = line[1] == UNI_COMMENT;   // ⍝⍝ line
-         if (line[1] == UNI_FULLSTOP)                  // ⍝. line
-            {
-              toronto = true;
-            }
-
-         if (double_lamps || toronto)
-            {
-              got_lamps = true;
-              CERR << "    " << line << endl;
-            }
-       }
-
-   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
-}
-//----------------------------------------------------------------------------
-ostream &
-UserFunction::print(ostream & out) const
-{
-   out << header.get_name();
-   return out;
-
-/*
-   out << "Function header:" << endl;
-   if (header.Z())     out << "Result:         " << *header.Z()   << endl;
-   if (header.A())     out << "Left Argument:  " << *header.A()   << endl;
-   if (header.LO())    out << "Left Op Arg:    " << *header.LO()  << endl;
-                       out << "Function:       " << header.get_name() << endl;
-   if (header.RO())    out << "Right Op Arg:   " << *header.RO()  << endl;
-   if (header.B())     out << "Right Argument: " << *header.B()   << endl;
-   return Executable::print(out);
-*/
-}
-//----------------------------------------------------------------------------
-void
-UserFunction::print_properties(ostream & out, int indent) const
-{
-   header.print_properties(out, indent);
-UCS_string ind(indent, UNI_SPACE);
-   out << ind << "Body Lines:     " << (line_starts.size() - 1) << "+[0]" << endl
-       << ind << "Creator:        " << get_creator()      << endl
-       << ind << "Body[" << body.ssize() << "⏩]: ";
-
-   loop(b, body.ssize())
-       {
-         // maybe print line prefix
-         //
-         Function_Line line_number = Function_Invalid;
-         loop(ls, line_starts.size())
-            {
-              if (b == line_starts[ls])   // b is the start of a line
+              UCS_string line = get_text(l);
+              const ShapeItem multi_pos = line.multi_pos();
+              if (multi_pos != -1)   sm.next(line[multi_pos]);
+              if (sm.inside_multi())
                  {
-                   line_number = Function_Line(ls);
-                   out << endl << ind << "    [" << line_number << "]";
-
-                   loop(lab, header.get_label_count())
-                       {
-                         const labVal & lv = header.get_label(lab);
-                         if (lv.line == line_number)
-                            {
-                              out << " " << lv.sym->get_name() << ":";
-                            }
-                       }
+                   line.remove_leading_and_trailing_whitespaces();
+                   set_text(l, line);
                  }
             }
+      }
 
-         out << " ⏩" << body[b];
-       }
-   out << endl;
+   error_line = -1;   // no error
+   error_info = 0;
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_fill_AB(Value_P A, Value_P B) const
+{
+Value_P Z = CLONE_P(B, LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
+UserFunction::eval_fill_B(Value_P B) const
+{
+Value_P Z = CLONE_P(B, LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
 UCS_string
-UserFunction::get_name_and_line(Function_PC pc) const
+UserFunction::line_prefix(Function_Line l) const
 {
-UCS_string ret = header.get_name();
-   if (ret.size() && ret[0] == UNI_LAMBDA)
-      {
-        UCS_string name = Workspace::find_lambda_name(this);
-        if (name.size())   ret = name;
-      }
-   ret << UNI_L_BRACK;
-
-   // pc may point to the next token already. If that is the case then
-   // we go back one token.
-   //
-   if (pc > 0 && body[pc - 1].get_Class() == TC_END)   pc = Function_PC(pc - 1);
-
-const Function_Line line = get_line(pc);
-   return ret << line << UNI_R_BRACK;
-}
-//----------------------------------------------------------------------------
-Function_Line
-UserFunction::get_line(Function_PC pc) const
-{
-   Assert(pc >= -1);
-   if (pc < 0)   pc = Function_PC_0;
-
-   // search line_starts backwards until a line with non-greater pc is found.
-   //
-   for (int l = line_starts.size() - 1; l > 0; --l)
-       {
-         if (line_starts[l] <= pc)   return Function_Line(l);
-       }
-
-   return Function_Line_1;
-}
-//----------------------------------------------------------------------------
-UCS_string
-UserFunction::canonical(bool with_lines) const
-{
-UCS_string ucs;
-   loop(t, text.size())
-      {
-        if (with_lines)   ucs << line_prefix(Function_Line(t));
-        ucs << text[t] << UNI_LF;
-      }
-
-   return ucs;
+char cc[40];
+   if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
+   else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
+   else                          SPRINTF(cc, "[%d] ",  l)
+   return UCS_ASCII_string(cc);
 }
 //----------------------------------------------------------------------------
 void
@@ -1481,100 +1585,6 @@ UserFunction::print_body_by_line(const char * where) const
       }
 }
 //----------------------------------------------------------------------------
-void
-UserFunction::print_line_PCs(const char * loc) const
-{
-   CERR << "At " << loc << ":" << endl;
-   for (size_t j = 1; j < line_starts.size(); ++j)
-       {
-         CERR << "   " << get_name() << "[" << j << "]: PC= ";
-         const Function_PC PC_from = line_starts[j];
-
-         // Note: line_starts[0] is the end of the function
-         const int next = j < (line_starts.size() - 1) ? j + 1 : 0;
-         const Function_PC PC_to = line_starts[next];
-         CERR << PC_from << "..." << (PC_to - 1) << endl;
-       }
-}
-//----------------------------------------------------------------------------
-VoidCount
-UserFunction::remove_TOK_VOID()
-{
-   // if line_starts is empty (= not yet initialized )then line_starts need
-   // not be updated. Only the TOK_VOID need to be removed, and we pretend
-   // that no token were removed (so the caller needs not care),
-   //
-   if (line_starts.size() == 0)
-      {
-        body.remove_TOK_VOID();
-        return NO_VOID_TOKEN_REMOVED;
-      }
-
-   // line_starts was initialized.
-   // 
-size_t src_line    = Function_Line_1;
-Function_PC dst_PC = Function_PC_0;
-
-   // be careful not to increment src_PC if a line is empty!
-
-   loop(src_PC, body.ssize())
-      {
-        // take care of empty lines. Empty lines have the same PC as the
-        // current line (src_line)
-        //
-        while ((src_line + 1) < line_starts.size() &&
-               src_PC == line_starts[src_line + 1])
-           {
-             // src_PC has reached the first token of the next line.
-             // Increment the current line and adjust line_starts.
-             ++src_line;
-             line_starts[src_line] = Function_PC(dst_PC);
-           }
-
-        if (body[src_PC].get_tag() != TOK_VOID)
-           {
-             if (src_PC != dst_PC)   body[dst_PC].move_from(body[src_PC], LOC);
-             ++dst_PC;
-           }
-        else   // TOK_VOID
-           {
-             // Do not copy but ignore (skip) body[src_PC]. After the removal
-             // of the TOK_VOID have all GOTO_PC targets above src_PC become
-             // are too high (by 1). Adjust these token.
-             //
-             loop(bb, body.ssize())
-                 {
-                   Token & tok = body[bb];
-                   if (tok.get_tag() == TOK_GOTO_PC)
-                      {
-                        const int64_t tok_pc = tok.get_int_val();
-                        if (tok_pc >= src_PC)   tok.set_int_val(tok_pc - 1);
-                      }
-                
-                 }
-           }
-      }
-
-const VoidCount ret = VoidCount(body.ssize() - dst_PC);
-   body.resize(dst_PC);
-   line_starts[0] = dst_PC - 1;   // convention: line_starts[0] is the end of body
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-Function_PC
-UserFunction::line_start(Function_Line line) const
-{
-   if (line < 0 || size_t(line) >= line_starts.size())
-      {
-        Q1(line)
-        Q1(line_starts.size())
-        Assert(0);
-      }
-
-   return line_starts[line];
-}
-//----------------------------------------------------------------------------
 ostream &
 UserFunction::print_val_or_fun(ostream & out, const Token & tok)
 {
@@ -1584,15 +1594,5 @@ UserFunction::print_val_or_fun(ostream & out, const Token & tok)
    else                           FIXME;
 
    return out;
-}
-//----------------------------------------------------------------------------
-UCS_string
-UserFunction::line_prefix(Function_Line l) const
-{
-char cc[40];
-   if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
-   else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
-   else                          SPRINTF(cc, "[%d] ",  l)
-   return UCS_ASCII_string(cc);
 }
 //----------------------------------------------------------------------------

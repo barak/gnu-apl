@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,12 +158,12 @@ public:
               is_valid(true)
             {   value.APL_flt = aflt; }
 
-         const bool is_double;   ///< true if so.
-         const bool is_valid;    ///< true if so.
-
         /// return value as APL_Float
         double get_double() const
            { return is_double ? value.APL_flt : value.APL_int; }
+
+         const bool is_double;   ///< true if so.
+         const bool is_valid;    ///< true if so.
 
          /// an APL_Float or an APL_Float
          union

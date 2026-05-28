@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -194,12 +194,6 @@ Output::init(bool logit)
 }
 //----------------------------------------------------------------------------
 void
-Output::reset_dout()
-{
-   DOUT_filebuf.reset();
-}
-//----------------------------------------------------------------------------
-void
 Output::reset_colors()
 {
    if (colors_changed)
@@ -207,6 +201,12 @@ Output::reset_colors()
         cout << color_RESET << clear_EOL;
         cerr << color_RESET << clear_EOL;
       }
+}
+//----------------------------------------------------------------------------
+void
+Output::reset_dout()
+{
+   DOUT_filebuf.reset();
 }
 //----------------------------------------------------------------------------
 void

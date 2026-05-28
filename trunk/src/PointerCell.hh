@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,38 @@ public:
    /// @param magic magic number permitting simple-scalar values
    PointerCell(Value * val, Value & cell_owner, uint32_t magic);
 
+   /// return the owner of this PointerCell
+   Value * get_cell_owner() const
+      { return value.pval.owner; }
+
+   /// overloaded Cell::is_pointer_cell()
+   virtual bool is_pointer_cell() const   { return true; }
+
+   /// isolate value.pval.valp (make \b value.pval the sole owner)
+   /// @param loc caller location for diagnostics
+   void isolate(const char * loc)
+      { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
+
+   /// the Quad_CR representation of this cell
+   /// @param pcx print context controlling formatting options
+   virtual PrintBuffer character_representation(const PrintContext &pcx) const;
+
+   /// compare \b this with other, throw DOMAIN ERROR on illegal comparisons
+   /// @param other the cell to compare against
+   virtual Comp_result compare(const Cell & other) const;
+
+   /// overloaded Cell::equal()
+   /// @param other the cell to compare against
+   /// @param qct comparison tolerance (⎕CT)
+   virtual bool equal(const Cell & other, double qct) const;
+
+   /// overloaded Cell::get_pointer_value()
+   virtual Value_P get_pointer_value()  const;
+
+   /// overloaded Cell::greater()
+   /// @param other the cell to compare against
+   virtual bool greater(const Cell & other) const;
+
    /// overloaded Cell::init_other
    /// @param other raw memory for the destination cell
    /// @param cell_owner the APL value that will own the new cell
@@ -55,65 +87,33 @@ public:
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const;
 
-   /// overloaded Cell::is_pointer_cell()
-   virtual bool is_pointer_cell() const   { return true; }
-
-   /// overloaded Cell::get_pointer_value()
-   virtual Value_P get_pointer_value()  const;
-
    /// overloaded Cell::_is_member_anchor()
    virtual bool is_member_anchor() const;
-
-   /// overloaded Cell::greater()
-   /// @param other the cell to compare against
-   virtual bool greater(const Cell & other) const;
-
-   /// overloaded Cell::equal()
-   /// @param other the cell to compare against
-   /// @param qct comparison tolerance (⎕CT)
-   virtual bool equal(const Cell & other, double qct) const;
-
-   /// compare \b this with other, throw DOMAIN ERROR on illegal comparisons
-   /// @param other the cell to compare against
-   virtual Comp_result compare(const Cell & other) const;
-
-   /// overloaded Cell::release()
-   /// @param loc caller location for diagnostics
-   virtual void release(const char * loc);
-
-   /// the Quad_CR representation of this cell
-   /// @param pcx print context controlling formatting options
-   virtual PrintBuffer character_representation(const PrintContext &pcx) const;
-
-   /// return the owner of this PointerCell
-   Value * get_cell_owner() const
-      { return value.pval.owner; }
-
-   /// isolate value.pval.valp (make \b value.pval the sole owner)
-   /// @param loc caller location for diagnostics
-   void isolate(const char * loc)
-      { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
 
    /// isolate this value and all of its sub values
    /// @param loc caller location for diagnostics
    void isolate_deep(const char * loc);
 
+   /// overloaded Cell::release()
+   /// @param loc caller location for diagnostics
+   virtual void release(const char * loc);
+
 protected:
+   /// overloaded Cell::CDR_size() should not be called for pointer cells
+   virtual int CDR_size() const { NeverReach("PointerCell::CDR_size() called");}
+
    ///  overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
       { return CT_POINTER; }
 
-   ///  overloaded Cell::deep_cell_types()
-   CellType deep_cell_types() const;
+   /// overloaded Cell::get_classname()
+   virtual const char * get_classname() const   { return "PointerCell"; }
 
    ///  overloaded Cell::deep_cell_types()
    CellType deep_cell_subtypes() const;
 
-   /// overloaded Cell::get_classname()
-   virtual const char * get_classname() const   { return "PointerCell"; }
-
-   /// overloaded Cell::CDR_size() should not be called for pointer cells
-   virtual int CDR_size() const { NeverReach("PointerCell::CDR_size() called");}
+   ///  overloaded Cell::deep_cell_types()
+   CellType deep_cell_types() const;
 };
 //============================================================================
 

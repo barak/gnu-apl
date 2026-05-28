@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,17 +37,6 @@ class Value;
 class CDR
 {
 public:
-   /// convert \b value into a CDR_string
-   /// @param result output CDR byte string
-   /// @param value APL value to serialise
-   static void to_CDR(CDR_string & result, const Value * value);
-
-   /// create a value from a CDR_string, throwing
-   /// DOMAIN ERROR if cdr is ill-formed
-   /// @param cdr CDR byte string to deserialise
-   /// @param loc caller location for diagnostics
-   static Value_P from_CDR(const CDR_string & cdr, const char * loc);
-
    /// return 2 bytes starting at \b data in network byte order
    /// @param data pointer to at least 2 bytes of raw data
    static uint32_t get_2_be(const uint8_t * data)
@@ -68,6 +57,17 @@ public:
         uint64_t ret = get_4_be(data);   ret <<= 32;
                  return ret | get_4_be(data + 4);
       }
+
+   /// create a value from a CDR_string, throwing
+   /// DOMAIN ERROR if cdr is ill-formed
+   /// @param cdr CDR byte string to deserialise
+   /// @param loc caller location for diagnostics
+   static Value_P from_CDR(const CDR_string & cdr, const char * loc);
+
+   /// convert \b value into a CDR_string
+   /// @param result output CDR byte string
+   /// @param value APL value to serialise
+   static void to_CDR(CDR_string & result, const Value * value);
 
 protected:
    /// fill result with the bytes of the CDR of \b value

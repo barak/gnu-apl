@@ -86,18 +86,14 @@ public:
    /// @param ucs source Unicode string to encode as UTF-8
    UTF8_string(const UCS_string & ucs);
 
-   /// erase one item at \b pos
-   /// @param pos byte position of the element to remove
-   void erase(size_t pos)
-      { std::string::erase(begin() + pos); }
-
    /// return the last byte in this string
    UTF8 back() const
       { Assert(size());   return at(size() - 1); }
 
-   /// discard the last byte in this string
-   void pop_back()
-      { Assert(size());   resize(size() - 1); }
+   /// erase one item at \b pos
+   /// @param pos byte position of the element to remove
+   void erase(size_t pos)
+      { std::string::erase(begin() + pos); }
 
    /// append a (0-terminated) C string
    /// @param ascii null-terminated ASCII string to append
@@ -109,41 +105,34 @@ public:
    UTF8_string & operator <<(const UTF8_string & suffix)
       { loop(s, suffix.size())   *this += suffix[s];   return *this; }
 
+   /// discard the last byte in this string
+   void pop_back()
+      { Assert(size());   resize(size() - 1); }
+
    /// return true iff string ends with ext (usually a file name extension)
    /// @param ext expected file extension (including dot, e.g. ".apl")
    bool ends_with(const char * ext) const;
 
+   /// essentially strtol(this, 0, 10)
+   uint64_t long_value() const;
+
    /// return true iff string starts with path (usually a file path)
    /// @param path expected path prefix to check for
    bool starts_with(const char * path) const;
-
-   /// skip over < ... > and expand &lt; and friends
-   /// @param in_HTML current HTML nesting depth on entry
-   int un_HTML(int in_HTML);
-
-   /// essentially strtol(this, 0, 10)
-   uint64_t long_value() const;
 
    /// round a digit string is the fractional part of a number between
    /// 0.0... and 0.9... up or down according to its last digit, return true
    /// if the exponent shall be increased (because 1.0 -> 0.1)
    bool round_0_1();
 
-   /// convert the first char(s) in UTF8-encoded string to Unicode,
-   /// setting len to the number of bytes in the UTF8 encoding of the char
-   /// @param string pointer to the start of a UTF-8 encoded byte sequence
-   /// @param len output: number of bytes consumed by the first character
-   /// @param verbose true to print diagnostics for malformed sequences
-   static Unicode toUni(const UTF8 * string, int & len, bool verbose);
+   /// skip over < ... > and expand &lt; and friends
+   /// @param in_HTML current HTML nesting depth on entry
+   int un_HTML(int in_HTML);
 
    /// return the (always positive) difference between the number of bytes
    /// and the number of chars in the (UTF8 encoded) \b string.
    /// @param string pointer to a null-terminated UTF-8 encoded string
    static int bytes_chars(const void * string);
-
-   /// return the next UTF8 encoded char from an input file
-   /// @param in input stream to read from
-   static Unicode getc(istream & in);
 
    /// display bytes in \b utf
    /// @param out output stream to write to
@@ -152,6 +141,17 @@ public:
    /// @param max_bytes maximum number of bytes to display
    static void dump_hex(ostream & out, const UTF8 * utf, int size,
                         int max_bytes);
+
+   /// return the next UTF8 encoded char from an input file
+   /// @param in input stream to read from
+   static Unicode getc(istream & in);
+
+   /// convert the first char(s) in UTF8-encoded string to Unicode,
+   /// setting len to the number of bytes in the UTF8 encoding of the char
+   /// @param string pointer to the start of a UTF-8 encoded byte sequence
+   /// @param len output: number of bytes consumed by the first character
+   /// @param verbose true to print diagnostics for malformed sequences
+   static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
 };
 //============================================================================

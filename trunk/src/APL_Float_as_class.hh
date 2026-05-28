@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -110,24 +110,6 @@ public:
    double _get() const
       { return dval; }
 
-   /// set the value from a double
-   /// @param d the double value to store
-   APL_Float_Base & _set(double d)
-      { dval = d;    return *this; }
-
-   /// cast to APL_Float (creates a copy)
-   inline operator APL_Float() const;
-
-   /// up-cast const APL_Float_Base * to const APL_Float *
-   inline const APL_Float * pAPL_Float() const;
-
-   /// up-cast APL_Float_Base * to APL_Float *
-   inline APL_Float * pAPL_Float();
-
-   /// cast to double
-   inline operator double()
-      { return dval; }
-
    /// cast to APL_Integer
    inline operator const APL_Integer() const
       {
@@ -135,6 +117,24 @@ public:
         const APL_Integer pa(-dval);
         return -pa;
       }
+
+   /// cast to APL_Float (creates a copy)
+   inline operator APL_Float() const;
+
+   /// up-cast const APL_Float_Base * to const APL_Float *
+   inline const APL_Float * pAPL_Float() const;
+
+   /// set the value from a double
+   /// @param d the double value to store
+   APL_Float_Base & _set(double d)
+      { dval = d;    return *this; }
+
+   /// cast to double
+   inline operator double()
+      { return dval; }
+
+   /// up-cast APL_Float_Base * to APL_Float *
+   inline APL_Float * pAPL_Float();
 
 protected:
    /// the value

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,6 +76,30 @@ public:
    /// Construct an empty workspace.
    Workspace();
 
+   /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
+   /// @param ufun the user function that was expunged
+   static void add_expunged_function(const UserFunction * ufun)
+      { the_workspace.expunged_functions.push_back(ufun); }
+
+   /// increase the wait time for user input as reported in ⎕AI
+   /// @param diff additional wait time in microseconds
+   static void add_wait(APL_time_us diff)
+      { the_workspace.v_Quad_AI.add_wait(diff); }
+
+   /// erase the symbols in \b symbols from the symbol table
+   /// @param out output stream for messages
+   /// @param symbols list of symbol names to erase
+   static void erase_symbols(ostream & out, const UCS_string_vector & symbols)
+      { the_workspace.symbol_table.erase_symbols(CERR, symbols); }
+
+   /// return the name to which \b lambda ia assigned (empty if not found)
+   static UCS_string find_lambda_name(const UserFunction * lambda)
+      { return the_workspace.symbol_table.find_lambda_name(lambda); }
+
+   /// copy all allocated symbols into \b table of size \b table_size
+   static std::vector<const Symbol *> get_all_symbols()
+      { return the_workspace.symbol_table.get_all_symbols(); }
+
    /// return the current ⎕CT
    static APL_Float get_CT()
       { return the_workspace.v_Quad_CT.current(); }
@@ -85,18 +109,6 @@ public:
    static APL_Char get_FC(int p)
       { return the_workspace.v_Quad_FC.current()[p]; }
 
-   /// push ⎕FC
-   static void push_FC()
-      {
-        the_workspace.v_Quad_FC.push();
-      }
-
-   /// pop ⎕FC
-   static void pop_FC()
-      {
-        the_workspace.v_Quad_FC.pop();
-      }
-
    /// return the current ⎕IO
    static APL_Integer get_IO()
       { return the_workspace.v_Quad_IO.current(); }
@@ -104,6 +116,14 @@ public:
    /// return the current ⎕LX
    static UCS_string get_LX()
       { return UCS_string(*the_workspace.v_Quad_LX.get_apl_value()); }
+
+   /// return the current ⎕PW
+   static int get_PP()
+      { return the_workspace.v_Quad_PP.current(); }
+
+   /// return the current ⎕PR
+   static const UCS_string get_PR()
+      { return the_workspace.v_Quad_PR.current(); }
 
    /// return style and the current ⎕PP, and ⎕PW
    /// @param style the print style to embed in the context
@@ -113,58 +133,29 @@ public:
                                    the_workspace.v_Quad_PW.current());
       }
 
-   /// return the current ⎕PR
-   static const UCS_string get_PR()
-      { return the_workspace.v_Quad_PR.current(); }
+   /// return the APL prompt
+   static const UCS_string & get_prompt()
+      { return the_workspace.prompt; }
 
-   /// return the current ⎕PW
-   static int get_PP()
-      { return the_workspace.v_Quad_PP.current(); }
+   /// return the pushed command
+   static const UCS_string & get_pushed_Command()
+      { return the_workspace.pushed_command; }
 
    /// return the current ⎕PW
    static int get_PW()
       { return the_workspace.v_Quad_PW.current(); }
 
-   /// set the current ⎕PW
-   /// @param PW new print width value
-   /// @param loc caller location for diagnostics
-   static void set_PW(int PW, const char * loc)
-      { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
+   /// return the symbol table of the current workspace.
+   static const SymbolTable & get_symbol_table()
+      { return the_workspace.symbol_table; }
 
-   /// the number of )SI stack entries
-   static inline int SI_entry_count();
+   /// Return all user-defined commands
+   static vector<Command::user_command> & get_user_commands()
+      {  return the_workspace.user_commands; }
 
-   /// the top of the SI stack (the SI pushed last)
-   static StateIndicator * SI_top()
-      { return the_workspace.top_SI; }
-
-   /// copy all allocated symbols into \b table of size \b table_size
-   static std::vector<const Symbol *> get_all_symbols()
-      { return the_workspace.symbol_table.get_all_symbols(); }
-
-   /// lookup an existing user defined symbol. If not found, create one
-   /// (unless this would be a quad symbol)
-   /// @param symbol_name the name of the symbol to look up or create
-   static Symbol * lookup_symbol(const UCS_string & symbol_name)
-      { return the_workspace.symbol_table.lookup_symbol(symbol_name);}
-
-   /// increase the wait time for user input as reported in ⎕AI
-   /// @param diff additional wait time in microseconds
-   static void add_wait(APL_time_us diff)
-      { the_workspace.v_Quad_AI.add_wait(diff); }
-
-   /// return information in SI_top()
-   static inline Error * get_error();
-
-   /// return reference to more info about last error
-   static UCS_string & more_error()
-      { return the_workspace.more_error_info; }
-
-   /// erase the symbols in \b symbols from the symbol table
-   /// @param out output stream for messages
-   /// @param symbols list of symbol names to erase
-   static void erase_symbols(ostream & out, const UCS_string_vector & symbols)
-      { the_workspace.symbol_table.erase_symbols(CERR, symbols); }
+   /// return the name of the current workspace.
+   static const LibRef_name & get_WSID()
+      { return the_workspace.WS_id; }
 
    /// list all symbols (of category \b which) with names in \b from_to
    /// @param out output stream for the listing
@@ -179,105 +170,105 @@ public:
    static ostream & list_symbol(ostream & out, const UCS_string & buf)
       { return the_workspace.symbol_table.list_symbol(out, buf); }
 
-   /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
-   /// @param ufun the user function that was expunged
-   static void add_expunged_function(const UserFunction * ufun)
-      { the_workspace.expunged_functions.push_back(ufun); }
+   /// lookup an existing user defined symbol. If not found, create one
+   /// (unless this would be a quad symbol)
+   /// @param symbol_name the name of the symbol to look up or create
+   static Symbol * lookup_symbol(const UCS_string & symbol_name)
+      { return the_workspace.symbol_table.lookup_symbol(symbol_name);}
 
-   /// return the symbol table of the current workspace.
-   static const SymbolTable & get_symbol_table()
-      { return the_workspace.symbol_table; }
+   /// return reference to more info about last error
+   static UCS_string & more_error()
+      { return the_workspace.more_error_info; }
 
-   /// return the APL prompt
-   static const UCS_string & get_prompt()
-      { return the_workspace.prompt; }
+   /// pop ⎕FC
+   static void pop_FC()
+      {
+        the_workspace.v_Quad_FC.pop();
+      }
 
-   /// return the name of the current workspace.
-   static const LibRef_name & get_WSID()
-      { return the_workspace.WS_id; }
+   /// push a command. This is done when ⍎Command is performed and the command
+   /// would push the SI stack (i.e. )LOAD, )QLOAD, )CLEAR, or )SIC)
+   static void push_Command(const UCS_string & command)
+      { the_workspace.pushed_command = command; }
+
+   /// push ⎕FC
+   static void push_FC()
+      {
+        the_workspace.v_Quad_FC.push();
+      }
+
+   /// set the current ⎕PW
+   /// @param PW new print width value
+   /// @param loc caller location for diagnostics
+   static void set_PW(int PW, const char * loc)
+      { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
 
    /// set the name of the current workspace.
    /// @param new_id new workspace identifier
    static void set_WSID(const LibRef_name & new_id)
       { the_workspace.WS_id = new_id; }
 
-   /// Return all user-defined commands
-   static vector<Command::user_command> & get_user_commands()
-      {  return the_workspace.user_commands; }
+   /// the top of the SI stack (the SI pushed last)
+   static StateIndicator * SI_top()
+      { return the_workspace.top_SI; }
 
-   /// return \b true if \b the_workspace is the CLEAR WS
-   static bool is_CLEAR_WS();
-
-   /// Create a new SI-entry on the SI stack.
-   /// @param fun the executable (function or statement) being pushed
-   /// @param loc caller location for diagnostics
-   static void push_SI(const Executable * fun, const char * loc);
-
-   /// Remove the current SI-entry from the SI stack.
-   /// @param loc caller location for diagnostics
-   static void pop_SI(const char * loc);
-
-   /// return the Quad-RL (to be taken % mod)
-   /// @param mod modulus to apply to the random value
-   static uint64_t get_RL(uint64_t mod);
+   /// backup an existing file \b filename, return true on error
+   static bool backup_existing_file(const char * filename);
 
    /// clear ⎕EM and ⎕ET related errors (error entries on SI up to (including)
    /// the next user-defined function
    /// @param loc caller location for diagnostics
    static void clear_error(const char * loc);
 
-   /// create and execute one immediate execution context
-   // (leave with TOK_ESCAPE)
-   /// @param exit_on_error if true, exit the interpreter on error
-   static Token immediate_execution(bool exit_on_error);
+   /// clear the SI
+   /// @param out output stream for messages
+   static void clear_SI(ostream & out);
 
    /// clear the workspace
    /// @param out output stream for messages
    /// @param silent if true, suppress informational output
    static void clear_WS(ostream & out, bool silent);
 
-   /// clear the SI
-   /// @param out output stream for messages
-   static void clear_SI(ostream & out);
+   /// maybe remove functions for which ⎕EX has failed
+   static int cleanup_expunged(ostream & out, bool & erased);
 
-   /// print the SI on \b out
-   /// @param out output stream for the listing
-   /// @param mode controls which SI details to display
-   static void list_SI(ostream & out, SI_mode mode);
+   /// copy objects from another workspace
+   static void copy_WS(ostream & out, ostream & err,
+                      const LibRef_name & lib_name,
+                       UCS_string_vector & objects, bool protection);
 
-   /// the topmost SI with parse mode PM_FUNCTION
-   static StateIndicator * SI_top_fun();
-
-   /// the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X.
-   static StateIndicator * SI_top_error(bool quad_LRX);
-
-   /// lookup an existing name (user defined or ⎕xx, var or function).
-   /// return 0 if not found.
-   static const NamedObject * lookup_existing_name(const UCS_string & name);
-
-   /// lookup an existing symbol (user defined or ⎕xx).
-   static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
-
-   /// return the name to which \b lambda ia assigned (empty if not found)
-   static UCS_string find_lambda_name(const UserFunction * lambda)
-      { return the_workspace.symbol_table.find_lambda_name(lambda); }
-
-   /// save this workspace
-   static void save_WS(ostream & out, const LibRef_name & lib_name,
-                       bool name_from_WSID);
-
-   /// backup an existing file \b filename, return true on error
-   static bool backup_existing_file(const char * filename);
+   /// dump the commands in this workspace
+   static void dump_commands(ostream & out);
 
    /// dump this workspace
    static void dump_WS(ostream & out, const LibRef_name & lib_name, bool html,
                        bool silent);
 
-   /// dump the commands in this workspace
-   static void dump_commands(ostream & out);
+   /// return information in SI_top()
+   static inline Error * get_error();
 
-   /// set or inquire the workspace ID
-   static void wsid(ostream & out, UCS_string arg, LibRef lib, bool silent);
+   /// return a token for system function or variable \b ucs
+   static Token get_quad(const UCS_string & ucs, int & len);
+
+   /// return the Quad-RL (to be taken % mod)
+   /// @param mod modulus to apply to the random value
+   static uint64_t get_RL(uint64_t mod);
+
+   /// create and execute one immediate execution context
+   // (leave with TOK_ESCAPE)
+   /// @param exit_on_error if true, exit the interpreter on error
+   static Token immediate_execution(bool exit_on_error);
+
+   /// return \b true if \b the_workspace is the CLEAR WS
+   static bool is_CLEAR_WS();
+
+   /// return true iff function \b funname is on the current call stack
+   static bool is_called(const UCS_string & funname);
+
+   /// print the SI on \b out
+   /// @param out output stream for the listing
+   /// @param mode controls which SI details to display
+   static void list_SI(ostream & out, SI_mode mode);
 
    /// load )DUMPed file from open file descriptor fd (closes fd)
    static void load_DUMP(ostream & out, const UTF8_string & filename, int fd,
@@ -289,31 +280,49 @@ public:
                        const LibRef_name & lib_name,
                        UCS_string & quad_lx, bool silent);
 
-   /// copy objects from another workspace
-   static void copy_WS(ostream & out, ostream & err,
-                      const LibRef_name & lib_name,
-                       UCS_string_vector & objects, bool protection);
+   /// lookup an existing name (user defined or ⎕xx, var or function).
+   /// return 0 if not found.
+   static const NamedObject * lookup_existing_name(const UCS_string & name);
 
-   /// return a token for system function or variable \b ucs
-   static Token get_quad(const UCS_string & ucs, int & len);
+   /// lookup an existing symbol (user defined or ⎕xx).
+   static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
 
    /// return the oldest SI entry that is running \b exex, or 0 if none
    static StateIndicator * oldest_exec(const Executable * exec);
 
-   /// return true iff function \b funname is on the current call stack
-   static bool is_called(const UCS_string & funname);
+   /// Remove the current SI-entry from the SI stack.
+   /// @param loc caller location for diagnostics
+   static void pop_SI(const char * loc);
 
-   /// write symbols for )OUT command
-   static void write_OUT(FILE * out, const UCS_string_vector & objects);
+   /// Create a new SI-entry on the SI stack.
+   /// @param fun the executable (function or statement) being pushed
+   /// @param loc caller location for diagnostics
+   static void push_SI(const Executable * fun, const char * loc);
 
-   /// clear the marked flag in all values known in this workspace
-   static void unmark_all_values();
+   /// save this workspace
+   static void save_WS(ostream & out, const LibRef_name & lib_name,
+                       bool name_from_WSID);
 
    /// print all owners of \b value
    static int show_owners(ostream & out, const Value & value);
 
-   /// maybe remove functions for which ⎕EX has failed
-   static int cleanup_expunged(ostream & out, bool & erased);
+   /// the number of )SI stack entries
+   static inline int SI_entry_count();
+
+   /// the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X.
+   static StateIndicator * SI_top_error(bool quad_LRX);
+
+   /// the topmost SI with parse mode PM_FUNCTION
+   static StateIndicator * SI_top_fun();
+
+   /// clear the marked flag in all values known in this workspace
+   static void unmark_all_values();
+
+   /// write symbols for )OUT command
+   static void write_OUT(FILE * out, const UCS_string_vector & objects);
+
+   /// set or inquire the workspace ID
+   static void wsid(ostream & out, UCS_string arg, LibRef lib, bool silent);
 
    // access to system variables.
    //
@@ -329,18 +338,24 @@ public:
    rw_sv_def(Quad_QUOTE, "", "⍞")   /**< ⍞⎕ (QuoteQuad) */
 #include "SystemVariable.def"
 
-   /// push a command. This is done when ⍎Command is performed and the command
-   /// would push the SI stack (i.e. )LOAD, )QLOAD, )CLEAR, or )SIC)
-   static void push_Command(const UCS_string & command)
-      { the_workspace.pushed_command = command; }
-
-   /// return the pushed command
-   static const UCS_string & get_pushed_Command()
-      { return the_workspace.pushed_command; }
-
 protected:
-   /// Optional library reference, mandatory workspace name
-   LibRef_name WS_id;
+   /// user defined functions that were ⎕EX'ed while on the SI stack
+   std::vector<const UserFunction *> expunged_functions;
+
+   /// more info about last error
+   UCS_string more_error_info;
+
+   /// the APL prompt (6 blanks by default)
+   UCS_string prompt;
+
+   /// )LOAD, )QLOAD, )CLEAR, or )SIC
+   UCS_string pushed_command;
+
+   /// the SI stack. Initially top_SI is 0 (empty stack)
+   StateIndicator * top_SI;
+
+   /// user defined commands
+   std::vector<Command::user_command> user_commands;
 
    // system variables.
    //
@@ -352,23 +367,8 @@ protected:
    rw_sv_def(Quad_QUOTE, "", "⍞")
 #include "SystemVariable.def"
 
-   /// the APL prompt (6 blanks by default)
-   UCS_string prompt;
-
-   /// user defined functions that were ⎕EX'ed while on the SI stack
-   std::vector<const UserFunction *> expunged_functions;
-
-   /// more info about last error
-   UCS_string more_error_info;
-
-   /// the SI stack. Initially top_SI is 0 (empty stack)
-   StateIndicator * top_SI;
-
-   /// )LOAD, )QLOAD, )CLEAR, or )SIC
-   UCS_string pushed_command;
-
-   /// user defined commands
-   std::vector<Command::user_command> user_commands;
+   /// Optional library reference, mandatory workspace name
+   LibRef_name WS_id;
 
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,16 +70,20 @@ public:
    {}
 
    /// return the next DynamicObject in its list
-   DynamicObject * get_next()              { return next; }
-
-   /// return the next DynamicObject in its list
    const DynamicObject * get_next()  const { return next; }
 
    /// return the previous DynamicObject in its list
-   DynamicObject * get_prev()             { return prev; }
+   const DynamicObject * get_prev() const { return prev; }
+
+   /// where this value was allocated.
+   const char * where_allocated() const
+      { return alloc_loc; }
+
+   /// return the next DynamicObject in its list
+   DynamicObject * get_next()              { return next; }
 
    /// return the previous DynamicObject in its list
-   const DynamicObject * get_prev() const { return prev; }
+   DynamicObject * get_prev()             { return prev; }
 
    /// unlink this DynamicObject from its list
    void unlink()
@@ -93,32 +97,28 @@ public:
         next = this;
       }
 
-   /// cast to IndexExpr *. Caller must check that this cast is valid.
-   const IndexExpr * pIndexExpr() const;
+   /// return a pointer to all allocated Values
+   static const DynamicObject * get_all_values()
+      { return &all_values; }
 
    /// cast to IndexExpr *. Caller must check that this cast is valid.
-   IndexExpr * pIndexExpr();
+   const IndexExpr * pIndexExpr() const;
 
    /// print this object
    /// @param out output stream to print to
    void print(ostream & out) const;
+
+   /// print the list of objects starting at this object
+   /// @param out output stream to print to
+   void print_chain(ostream & out) const;
 
    /// print new object message
    /// @param out output stream to print to
    /// @param loc caller location for diagnostics
    void print_new(ostream & out, const char * loc) const;
 
-   /// print the list of objects starting at this object
-   /// @param out output stream to print to
-   void print_chain(ostream & out) const;
-
-   /// where this value was allocated.
-   const char * where_allocated() const
-      { return alloc_loc; }
-
-   /// return a pointer to all allocated Values
-   static const DynamicObject * get_all_values()
-      { return &all_values; }
+   /// cast to IndexExpr *. Caller must check that this cast is valid.
+   IndexExpr * pIndexExpr();
 
 protected:
    /// downcast to const Value &. Caller must check that this cast is valid.

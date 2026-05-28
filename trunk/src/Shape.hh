@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,40 +96,57 @@ public:
    /// @param qio_A index origin (⎕IO) for interpreting A
    Shape(const Value & A, int qio_A);
 
-   /// return a shape like this, but with negative elements made positive
-   Shape abs() const;
-
-   /// return a shape with the upper \b cnt dimensions of this shape
-   /// @param cnt number of leading dimensions to retain
-   Shape frame_shape(uRank cnt) const
-      { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
-
    /// return a shape with the lower \b cnt dimensions of this shape
    /// @param cnt number of trailing dimensions to retain
    Shape chunk_shape(uRank cnt) const
       { Assert(cnt <= get_rank());
         return Shape(cnt, rho + (get_rank() - cnt)); }
 
-   /// catenate two shapes, \b this shape provides the higher dimensions while
-   /// \b lower provides the lower dimensions of the shape returned
-   /// @param lower shape whose dimensions are appended as trailing dimensions
-   Shape operator +(const Shape & lower) const
-   { Shape ret(*this);
-     loop(r, lower.rho_rho)    ret.add_shape_item(lower.rho[r]);
-     return ret; }
+   /// return true iff the items of value are at most the items of \b this
+   /// @param value shape whose elements are compared element-wise against this
+   bool contains(const Shape & value) const
+      { Assert(rho_rho == value.rho_rho);
+        loop(r, rho_rho)   if (value.rho[r] >= rho[r])   return false;
+        return true; }
 
-   /// return true iff \b this shape equals \b other
-   /// @param other shape to compare against
-   bool operator ==(const Shape & other) const;
+   /// return true iff one of the shape elements is (axis) \b ax
+   /// @param ax axis length value to search for among the shape elements
+   bool contains_axis(sAxis ax) const
+      { loop(r, rho_rho)   if (rho[r] == ax)   return true;   return false; }
 
-   /// return true iff \b this shape is different from \b other
-   /// @param other shape to compare against
-   bool operator !=(const Shape & other) const
-      { return ! (*this == other); }
+   /// return a shape with the upper \b cnt dimensions of this shape
+   /// @param cnt number of leading dimensions to retain
+   Shape frame_shape(uRank cnt) const
+      { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
+
+   /// return the length of the last axis, or 1 for scalars
+   ShapeItem get_cols() const
+      { return rho_rho ?  rho[rho_rho - 1] : 1; }
+
+   /// return the length of the first axis, or 1 for scalars
+   ShapeItem get_first_shape_item() const
+      { return rho_rho ? rho[0] : 1; }
+
+   /// return the length of the last axis, or 1 for scalars
+   ShapeItem get_last_shape_item() const
+      { return rho_rho ? rho[rho_rho - 1] : 1; }
+
+   /// return the number of ravel elements, but at least 1 (for empty values
+   /// and scalars) else product of shapes)
+   ShapeItem get_nz_volume() const
+      { return volume ? volume : 1; }
 
    /// return the rank
    uRank get_rank() const
       { return rho_rho; }
+
+   /// return the product of all but the the last dimension, or 1 for scalars
+   ShapeItem get_rows() const
+      { if (rho_rho == 0)   return 1;   // scalar
+        if (const ShapeItem cols = rho[rho_rho - 1])   return volume / cols;
+        ShapeItem count = 1;
+        loop(r, rho_rho - 1)   count *= rho[r];
+        return count; }
 
    /// return the length of dimension \b r
    /// @param r axis index (0-based from the highest dimension)
@@ -141,73 +158,41 @@ public:
    ShapeItem get_transposed_shape_item(sAxis r) const
       { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
-   /// return the length of the first axis, or 1 for scalars
-   ShapeItem get_first_shape_item() const
-      { return rho_rho ? rho[0] : 1; }
+   /// return the number of ravel elements (1 for scalars,i
+   ///  else product of shapes)
+   ShapeItem get_volume() const
+      { return volume; }
 
-   /// return the length of the last axis, or 1 for scalars
-   ShapeItem get_last_shape_item() const
-      { return rho_rho ? rho[rho_rho - 1] : 1; }
-
-   /// return the length of the last axis, or 1 for scalars
-   ShapeItem get_cols() const
-      { return rho_rho ?  rho[rho_rho - 1] : 1; }
-
-   /// return the product of all but the the last dimension, or 1 for scalars
-   ShapeItem get_rows() const
-      { if (rho_rho == 0)   return 1;   // scalar
-        if (const ShapeItem cols = rho[rho_rho - 1])   return volume / cols;
-        ShapeItem count = 1;
-        loop(r, rho_rho - 1)   count *= rho[r];
-        return count; }
-
-   /// modify dimension \b r
-   /// @param r axis index to modify
-   /// @param sh new length for axis \b r
-   void set_shape_item(sAxis r, ShapeItem sh)
-      { Assert(r < rho_rho);
-        if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
-        else          { rho[r] = sh;   recompute_volume();                 } }
-
-   /// recompute volume (after changing a dimension of len 0)
-   void recompute_volume()
-      { volume = 1;   loop(r, rho_rho)  volume *= rho[r]; }
-
-   /// increment length of axis \b r by 1
-   /// @param r axis index to increment
-   void increment_shape_item(sRank r)
-      { set_shape_item(r, rho[r] + 1); }
-
-   /// set last dimension to \b sh
-   /// @param sh new length for the last axis
-   void set_last_shape_item(ShapeItem sh)
-      { set_shape_item(rho_rho - 1, sh); }
-
-   /// add a dimension of length \b len at the end
-   /// @param len length of the new trailing dimension
-   void add_shape_item(ShapeItem len)
-      { if (rho_rho >= MAX_RANK)   LIMIT_ERROR_RANK;
-        rho[rho_rho++] = len;   volume *= len; }
-
-   /// possibly increase rank by prepending axes of length 1
-   /// @param new_rank desired minimum rank; no-op if already >= new_rank
-   void expand_rank(sRank new_rank)
-      { if (rho_rho >= new_rank)   return;   // no need to expand
-        const int diff = new_rank - rho_rho;
-        for (sRank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
-        loop(r, diff)      rho[r] = 1;
-        rho_rho = new_rank;
+   /// return ⌽ ×\ ⍴ ⌽ this
+   Shape get_weights() const
+      { Shape ret;   ret.rho_rho = rho_rho;
+        ShapeItem weight = 1;
+        ret.volume = 1;
+        for (sRank r = rho_rho - 1; r >= 0; --r)
+           {
+             ret.rho[r] = weight;
+             ret.volume *= weight;
+             weight *= rho[r];
+           }
+        return ret;
       }
 
-   /// possibly expand rank and increase axes so that B fits into this shape
-   /// @param B shape that must fit within the expanded shape
-   void expand(const Shape & B);
+   /// return \b true iff \b this shape is empty (some dimension is 0).
+   bool is_empty() const
+      { loop(r, rho_rho)   if (rho[r] == 0) return true;   return false; }
 
-   /// return a shape like \b this, but with a new axis of length len
-   /// inserted so that Shape[axis] == len in the returned shape.
-   /// @param axis position at which the new axis is inserted
-   /// @param len length of the new axis
-   Shape insert_axis(sAxis axis, ShapeItem len) const;
+   /// return true iff \b this shape is different from \b other
+   /// @param other shape to compare against
+   bool operator !=(const Shape & other) const
+      { return ! (*this == other); }
+
+   /// catenate two shapes, \b this shape provides the higher dimensions while
+   /// \b lower provides the lower dimensions of the shape returned
+   /// @param lower shape whose dimensions are appended as trailing dimensions
+   Shape operator +(const Shape & lower) const
+   { Shape ret(*this);
+     loop(r, lower.rho_rho)    ret.add_shape_item(lower.rho[r]);
+     return ret; }
 
    /// return a shape like \b this, but with axis \b axis removed
    /// @param axis axis index to remove
@@ -231,66 +216,81 @@ public:
         return ret;
       }
 
-   /// return the number of ravel elements (1 for scalars,i
-   ///  else product of shapes)
-   ShapeItem get_volume() const
-      { return volume; }
+   /// add a dimension of length \b len at the end
+   /// @param len length of the new trailing dimension
+   void add_shape_item(ShapeItem len)
+      { if (rho_rho >= MAX_RANK)   LIMIT_ERROR_RANK;
+        rho[rho_rho++] = len;   volume *= len; }
 
-   /// return the number of ravel elements, but at least 1 (for empty values
-   /// and scalars) else product of shapes)
-   ShapeItem get_nz_volume() const
-      { return volume ? volume : 1; }
-
-   /// return true iff one of the shape elements is (axis) \b ax
-   /// @param ax axis length value to search for among the shape elements
-   bool contains_axis(sAxis ax) const
-      { loop(r, rho_rho)   if (rho[r] == ax)   return true;   return false; }
-
-   /// return true iff the items of value are at most the items of \b this
-   /// @param value shape whose elements are compared element-wise against this
-   bool contains(const Shape & value) const
-      { Assert(rho_rho == value.rho_rho);
-        loop(r, rho_rho)   if (value.rho[r] >= rho[r])   return false;
-        return true; }
-
-   /// return ⌽ ×\ ⍴ ⌽ this
-   Shape get_weights() const
-      { Shape ret;   ret.rho_rho = rho_rho;
-        ShapeItem weight = 1;
-        ret.volume = 1;
-        for (sRank r = rho_rho - 1; r >= 0; --r)
-           {
-             ret.rho[r] = weight;
-             ret.volume *= weight;
-             weight *= rho[r];
-           }
-        return ret;
+   /// possibly increase rank by prepending axes of length 1
+   /// @param new_rank desired minimum rank; no-op if already >= new_rank
+   void expand_rank(sRank new_rank)
+      { if (rho_rho >= new_rank)   return;   // no need to expand
+        const int diff = new_rank - rho_rho;
+        for (sRank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
+        loop(r, diff)      rho[r] = 1;
+        rho_rho = new_rank;
       }
+
+   /// increment length of axis \b r by 1
+   /// @param r axis index to increment
+   void increment_shape_item(sRank r)
+      { set_shape_item(r, rho[r] + 1); }
+
+   /// recompute volume (after changing a dimension of len 0)
+   void recompute_volume()
+      { volume = 1;   loop(r, rho_rho)  volume *= rho[r]; }
+
+   /// set last dimension to \b sh
+   /// @param sh new length for the last axis
+   void set_last_shape_item(ShapeItem sh)
+      { set_shape_item(rho_rho - 1, sh); }
+
+   /// modify dimension \b r
+   /// @param r axis index to modify
+   /// @param sh new length for axis \b r
+   void set_shape_item(sAxis r, ShapeItem sh)
+      { Assert(r < rho_rho);
+        if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
+        else          { rho[r] = sh;   recompute_volume();                 } }
+
+   /// return a shape like this, but with negative elements made positive
+   Shape abs() const;
 
    /// throw an APL error if \b this shape differs from shape B
    void check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
                    const char * loc) const;
 
-   /// return \b true iff \b this shape is empty (some dimension is 0).
-   bool is_empty() const
-      { loop(r, rho_rho)   if (rho[r] == 0) return true;   return false; }
+   /// return \b true if shapes \b this and \b other differ only by axes
+   ///of length 1
+   bool conforms_to(const Shape & other) const;
 
    /// return \b true iff a value with this shape fits into a ravel of length
    /// max_ravel. DOMAIN ERROR id any shape item is < 0.
    bool fits_into(ShapeItem max_ravel) const;
 
+   /// return a shape like \b this, but with a new axis of length len
+   /// inserted so that Shape[axis] == len in the returned shape.
+   /// @param axis position at which the new axis is inserted
+   /// @param len length of the new axis
+   Shape insert_axis(sAxis axis, ShapeItem len) const;
+
    /// return \b true iff this shape is a permutation of 0, 1, ... rank-1.
    bool is_permutation() const;
-
-   /// return the position of \b idx in the ravel.
-   ShapeItem ravel_pos(const Shape & idx) const;
 
    /// the inverse of \b ravel_pos()
    Shape offset_to_index(ShapeItem offset, int quad_io) const;
 
-   /// return \b true if shapes \b this and \b other differ only by axes 
-   ///of length 1
-   bool conforms_to(const Shape & other) const;
+   /// return true iff \b this shape equals \b other
+   /// @param other shape to compare against
+   bool operator ==(const Shape & other) const;
+
+   /// return the position of \b idx in the ravel.
+   ShapeItem ravel_pos(const Shape & idx) const;
+
+   /// possibly expand rank and increase axes so that B fits into this shape
+   /// @param B shape that must fit within the expanded shape
+   void expand(const Shape & B);
 
 protected:
    /// the rank (number of valid shape items)
@@ -332,13 +332,13 @@ public:
    ShapeItem hml(ShapeItem hh, ShapeItem mm, ShapeItem ll) const
       { return ll + l()*(mm + m()*hh); }
 
-   /// the axis dimension
-   ShapeItem m() const
-   { return rho[1]; }
-
    /// the dimensions below the axis
    ShapeItem l() const
    { return rho[2]; }
+
+   /// the axis dimension
+   ShapeItem m() const
+   { return rho[1]; }
 };
 // ----------------------------------------------------------------------------
 

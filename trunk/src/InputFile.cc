@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,105 +40,6 @@ vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 int64_t InputFile::next_file_seq = 0;
 
-//----------------------------------------------------------------------------
-void
-InputFile::open_current_file()
-{
-   if (files_todo.size() && files_todo[0].file == 0)
-      {
-        if (!strcmp(current_filename(), "-"))
-           files_todo[0].file = stdin;
-        else if (!strcmp(current_filename(), "stdin"))
-           files_todo[0].file = stdin;
-        else
-             files_todo[0].file = fopen(current_filename(), "r");
-
-        files_todo[0].line_no = 0;
-      }
-}
-//----------------------------------------------------------------------------
-void
-InputFile::close_current_file()
-{
-   if (files_todo.size())   // there are input files
-      {
-        if (files_todo[0].from_COPY)
-           {
-              files_todo[0].from_COPY = false;
-              --Bif_F1_EXECUTE::copy_pending;
-           }
-
-        if (files_todo[0].file)   // and the first file is open
-           {
-             if (files_todo[0].file != stdin)
-                {
-                  fclose(files_todo[0].file);
-                  files_todo[0].file = 0;
-                  files_todo[0].line_no = -1;
-                }
-           }
-      }
-}
-//----------------------------------------------------------------------------
-void
-InputFile::randomize_files()
-{
-#if ! MINGW_SRC
-   {
-     timeval now;
-     gettimeofday(&now, 0);
-     srandom(now.tv_sec + now.tv_usec);
-   }
-
-   // check that all file are test files
-   //
-   loop(f, files_todo.size())
-      {
-        if (files_todo[f].test == false)   // not a test file
-           {
-             CERR << "Cannot randomise testfiles when a mix of -T"
-                     " and -f is used (--TR ignored)" << endl;
-             return;
-           }
-      }
-
-   for (size_t done = 0; done < 4*files_todo.size();)
-       {
-         const int n1 = random() % files_todo.size();
-         const int n2 = random() % files_todo.size();
-         if (n1 == n2)   continue;
-
-         InputFile f1 = files_todo[n1];
-         InputFile f2 = files_todo[n2];
-
-         const char * ff1 = strrchr(f1.filename.c_str(), '/');
-         if (!ff1++)   ff1 = f1.filename.c_str();
-         const char * ff2 = strrchr(f2.filename.c_str(), '/');
-         if (!ff2++)   ff2 = f2.filename.c_str();
-
-         // the order of files named AAA... or ZZZ... shall not be changed
-         //
-         if (strncmp(ff1, "AAA", 3) == 0)   continue;
-         if (strncmp(ff1, "ZZZ", 3) == 0)   continue;
-         if (strncmp(ff2, "AAA", 3) == 0)   continue;
-         if (strncmp(ff2, "ZZZ", 3) == 0)   continue;
-
-         // at this point f1 and f2 shall be swapped.
-         //
-         files_todo[n1] = f2;
-         files_todo[n2] = f1;
-         ++done;
-       }
-#endif // ! MINGW_SRC
-}
-//----------------------------------------------------------------------------
-bool
-InputFile::echo_current_file()
-{
-   if (files_todo.size()) return files_todo[0].echo;
-   return UserPreferences::uprefs.echo_CIN ||
-          ! UserPreferences::uprefs.do_not_echo;
-}
 //----------------------------------------------------------------------------
 bool
 InputFile::COPY_filter::check_filter(const UTF8_string & line)
@@ -233,3 +134,102 @@ const Unicode u1 = ucs_line.size() ? ucs_line.back()  : Invalid_Unicode;
 }
 //----------------------------------------------------------------------------
 
+bool
+InputFile::echo_current_file()
+{
+   if (files_todo.size()) return files_todo[0].echo;
+   return UserPreferences::uprefs.echo_CIN ||
+          ! UserPreferences::uprefs.do_not_echo;
+}
+//----------------------------------------------------------------------------
+void
+InputFile::close_current_file()
+{
+   if (files_todo.size())   // there are input files
+      {
+        if (files_todo[0].from_COPY)
+           {
+              files_todo[0].from_COPY = false;
+              --Bif_F1_EXECUTE::copy_pending;
+           }
+
+        if (files_todo[0].file)   // and the first file is open
+           {
+             if (files_todo[0].file != stdin)
+                {
+                  fclose(files_todo[0].file);
+                  files_todo[0].file = 0;
+                  files_todo[0].line_no = -1;
+                }
+           }
+      }
+}
+//----------------------------------------------------------------------------
+void
+InputFile::open_current_file()
+{
+   if (files_todo.size() && files_todo[0].file == 0)
+      {
+        if (!strcmp(current_filename(), "-"))
+           files_todo[0].file = stdin;
+        else if (!strcmp(current_filename(), "stdin"))
+           files_todo[0].file = stdin;
+        else
+             files_todo[0].file = fopen(current_filename(), "r");
+
+        files_todo[0].line_no = 0;
+      }
+}
+//----------------------------------------------------------------------------
+void
+InputFile::randomize_files()
+{
+#if ! MINGW_SRC
+   {
+     timeval now;
+     gettimeofday(&now, 0);
+     srandom(now.tv_sec + now.tv_usec);
+   }
+
+   // check that all file are test files
+   //
+   loop(f, files_todo.size())
+      {
+        if (files_todo[f].test == false)   // not a test file
+           {
+             CERR << "Cannot randomise testfiles when a mix of -T"
+                     " and -f is used (--TR ignored)" << endl;
+             return;
+           }
+      }
+
+   for (size_t done = 0; done < 4*files_todo.size();)
+       {
+         const int n1 = random() % files_todo.size();
+         const int n2 = random() % files_todo.size();
+         if (n1 == n2)   continue;
+
+         InputFile f1 = files_todo[n1];
+         InputFile f2 = files_todo[n2];
+
+         const char * ff1 = strrchr(f1.filename.c_str(), '/');
+         if (!ff1++)   ff1 = f1.filename.c_str();
+         const char * ff2 = strrchr(f2.filename.c_str(), '/');
+         if (!ff2++)   ff2 = f2.filename.c_str();
+
+         // the order of files named AAA... or ZZZ... shall not be changed
+         //
+         if (strncmp(ff1, "AAA", 3) == 0)   continue;
+         if (strncmp(ff1, "ZZZ", 3) == 0)   continue;
+         if (strncmp(ff2, "AAA", 3) == 0)   continue;
+         if (strncmp(ff2, "ZZZ", 3) == 0)   continue;
+
+         // at this point f1 and f2 shall be swapped.
+         //
+         files_todo[n1] = f2;
+         files_todo[n2] = f1;
+         ++done;
+       }
+#endif // ! MINGW_SRC
+}
+//----------------------------------------------------------------------------

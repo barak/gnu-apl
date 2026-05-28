@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -226,26 +226,6 @@ public:
    virtual ~Function()
    {}
 
-   /// return \b true iff \b this is an operator.
-   virtual bool is_operator() const   { return false; }
-
-   /// return \b true iff \b this is a native function
-   virtual bool is_native() const   { return false; }
-   virtual bool is_scalar_function() const   { return false; }
-
-   /// return \b true iff \b this function is a lambda
-   virtual bool is_lambda() const   { return false; }
-
-   /// return \b true iff \b this function is a macro
-   virtual bool is_macro() const   { return false; }
-
-   /// return \b true iff \b this function is defined (= has an APL body)
-   virtual bool is_defined() const   { return false; }
-
-   /// return \b true iff \b this function is a derived function
-   virtual bool is_derived() const
-      { return false; }
-
    /// a monadic Cell function that returns bool
    typedef bool (*bool_f1)(const Cell & B);
 
@@ -258,12 +238,20 @@ public:
    /// a dyadic function that returns packed bool for packed A and packed B
    typedef uint64_t (*bool_f2_bool)(uint64_t A, uint64_t B);
 
-   /// return \b a bool_f1() (if any), otherwise 0.
-   virtual bool_f1 get_bool_f1() const
+   /// an associative cell function
+   typedef ErrorCode (Cell::*assoc_f2)(Cell *, const Cell *) const;
+
+   /// Quad_CR of this function.
+   virtual UCS_string canonical(bool with_lines) const
+      { NeverReach("Function::canonical() called"); }
+
+   /// if this function is an associative scalar function then return
+   /// its associative cell function, otherwise 0.
+   virtual assoc_f2 get_assoc() const
       { return 0; }
 
-   /// return \b a bool_f2() (if any), otherwise 0.
-   virtual bool_f2 get_bool_f2() const
+   /// return \b a bool_f1() (if any), otherwise 0.
+   virtual bool_f1 get_bool_f1() const
       { return 0; }
 
    /// return \b a bool_f1() (if any), otherwise 0.
@@ -271,18 +259,27 @@ public:
       { return 0; }
 
    /// return \b a bool_f2() (if any), otherwise 0.
+   virtual bool_f2 get_bool_f2() const
+      { return 0; }
+
+   /// return \b a bool_f2() (if any), otherwise 0.
    virtual bool_f2_bool get_bool_f2_bool() const
       { return 0; }
 
-   /// return \b true iff \b this function returns a (possibly nested)
-   /// boolean result and takes (only) boolean arguments.
-   /// For example: ∧, ∨, ∼, ...
-   virtual bool is_bool_bool() const
-      { return 0; }
+   /// GMT when this function was created; 0 for system functions
+   APL_time_us get_creation_time() const
+      {  return creation_time; }
 
-   /// return \b true if \b eval_XXX may push the SI. True for ⍎, user defined
-   /// functions, and operators derived from user defined functions
-   virtual bool may_push_SI() const   { return false; }
+   /// the dyadic inverse function of \b this function (if any)
+   virtual cFunction_P get_dyadic_inverse() const   { return 0; }
+
+   /// return break-even point for dyadic parallel execution
+   ShapeItem get_dyadic_threshold() const
+      { return parallel_thresholds[1]; }
+
+   /// return the execution properties (3 ⎕AT) for this function
+   virtual const int * get_exec_properties() const
+      { static int ep[] = { 1, 1, 1, 0 };   return ep; }
 
    /// return the number of value arguments (0, 1, or 2) of a user defined
    /// function, For non-user defined functions, throw DOMAIN_ERROR.
@@ -294,17 +291,8 @@ public:
         return 0;
       }
 
-   /// return the number of function arguments (1 or 2) of an operator,
-   /// or 0 for a "normal" function that isn't an operator.
-   virtual int get_oper_valence() const   { return 0; }
-
-   /// return 1 if the function returns a result, otherwise 0.
-   /// For non-user defined functions, throw DOMAIN_ERROR.
-   virtual bool has_result() const = 0;
-
-   /// return true iff the function has and axis (system functions
-   /// always have an axis even though most of them ignore it).
-   virtual bool has_axis() const    { return true; }
+   /// return a pointer to \b this UserFunction (if it is one)
+   virtual const UserFunction * get_func_ufun() const   { return 0; }
 
    /// overloaded NamedObject::get_function()
    virtual const Function * get_function() const   { return this; }
@@ -312,100 +300,112 @@ public:
    /// the monadic inverse function of \b this function (if any)
    virtual cFunction_P get_monadic_inverse() const   { return 0; }
 
-   /// the dyadic inverse function of \b this function (if any)
-   virtual cFunction_P get_dyadic_inverse() const   { return 0; }
+   /// return break-even point for monadic parallel execution
+   ShapeItem get_monadic_threshold() const
+      { return parallel_thresholds[0]; }
 
-   /// GMT when this function was created; 0 for system functions
-   APL_time_us get_creation_time() const
-      {  return creation_time; }
-
-   /// set the time when the function was created (0 for built-in functions)
-   void set_creation_time(APL_time_us t)
-      { creation_time = t; }
-
-   /// return the execution properties (3 ⎕AT) for this function
-   virtual const int * get_exec_properties() const
-      { static int ep[] = { 1, 1, 1, 0 };   return ep; }
-
-   /// print the properties of this function
-   virtual void print_properties(ostream & out, int indent) const = 0;
-
-   /// store the attributes (as per ⎕AT) of symbol in Z, ...
-   virtual void get_attributes(int mode, Value & Z) const;
-
-   /// return a pointer to \b this UserFunction (if it is one)
-   virtual const UserFunction * get_func_ufun() const   { return 0; }
-
-   /// return true if this function has a name with alphabetic chars,
-   /// i.e. the function is either a defined function or a ⎕-function
-   virtual bool has_alpha() const   { return false; }
-
-   /// Print \b this function.
-   virtual ostream & print(ostream & out) const = 0;
+   /// return the number of function arguments (1 or 2) of an operator,
+   /// or 0 for a "normal" function that isn't an operator.
+   virtual int get_oper_valence() const   { return 0; }
 
    /// return the dyadic scalar primitive if \b this function
    virtual prim_f2 get_scalar_f2() const
       { return 0; }
 
-   /// an associative cell function
-   typedef ErrorCode (Cell::*assoc_f2)(Cell *, const Cell *) const;
-
-   /// if this function is an associative scalar function then return
-   /// its associative cell function, otherwise 0.
-   virtual assoc_f2 get_assoc() const
-      { return 0; }
+   /// return the \b Token Tag for \b this function.
+   TokenTag get_tag() const { return tag; }
 
    /// return a \b Token for \b this function.
    Token get_token() const { return Token(tag, this); }
 
-   /// return the \b Token Tag for \b this function.
-   TokenTag get_tag() const { return tag; }
+   /// return true if this function has a name with alphabetic chars,
+   /// i.e. the function is either a defined function or a ⎕-function
+   virtual bool has_alpha() const   { return false; }
+
+   /// return true iff the function has and axis (system functions
+   /// always have an axis even though most of them ignore it).
+   virtual bool has_axis() const    { return true; }
+
+   /// return \b true iff \b this function returns a (possibly nested)
+   /// boolean result and takes (only) boolean arguments.
+   /// For example: ∧, ∨, ∼, ...
+   virtual bool is_bool_bool() const
+      { return 0; }
+
+   /// return \b true iff \b this function is defined (= has an APL body)
+   virtual bool is_defined() const   { return false; }
+
+   /// return \b true iff \b this function is a derived function
+   virtual bool is_derived() const
+      { return false; }
+
+   /// return \b true iff \b this function is a lambda
+   virtual bool is_lambda() const   { return false; }
+
+   /// return \b true iff \b this function is a macro
+   virtual bool is_macro() const   { return false; }
+
+   /// return \b true iff \b this is a native function
+   virtual bool is_native() const   { return false; }
+
+   /// return \b true iff \b this is an operator.
+   virtual bool is_operator() const   { return false; }
+
+   virtual bool is_scalar_function() const   { return false; }
+
+   /// return axis (non-0 only for derived functions)
+   virtual Value_P * locate_X() const
+      { return 0; }
+
+   /// return \b true if \b eval_XXX may push the SI. True for ⍎, user defined
+   /// functions, and operators derived from user defined functions
+   virtual bool may_push_SI() const   { return false; }
 
    /// plain function, 0 arguments
    virtual Token eval_() const;
 
-   /// plain function, 1 argument
-   virtual Token eval_B(Value_P B) const;
-
    /// plain function, 2 arguments
    virtual Token eval_AB(Value_P A, Value_P B) const;
-
-   /// monadic operator, 1 argument
-   virtual Token eval_LB(Token & LO, Value_P B) const;
-
-   /// plain function, 1 argument, plus axis
-   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// monadic operator, 2 arguments
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
-   /// plain function, 2 arguments, plus axis
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
-   /// dyadic operator, 1 arguments
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
-
-   /// monadic operator, 1 arguments, plus axis
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
-
    /// dyadic operator, 2 arguments
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
-
-   /// monadic operator, 2 arguments, plus axis
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
-
-   /// dyadic operator, 1 arguments, plus axis
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// dyadic operator, 2 arguments, plus axis
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
                             Value_P X, Value_P B) const;
 
-   /// Evaluate \b the fill function.
-   virtual Token eval_fill_B(Value_P B) const;
+   /// monadic operator, 2 arguments, plus axis
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+
+   /// plain function, 2 arguments, plus axis
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// plain function, 1 argument
+   virtual Token eval_B(Value_P B) const;
+
+   /// monadic operator, 1 argument
+   virtual Token eval_LB(Token & LO, Value_P B) const;
+
+   /// dyadic operator, 1 arguments
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
+
+   /// dyadic operator, 1 arguments, plus axis
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
+
+   /// monadic operator, 1 arguments, plus axis
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+
+   /// plain function, 1 argument, plus axis
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Evaluate \b the fill function.
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
+
+   /// Evaluate \b the fill function.
+   virtual Token eval_fill_B(Value_P B) const;
 
    /** Evaluate \b the identity function. B is empty and the result is a
    /// value f/B0 with (B0 f ↑B) ≡ B for all B (and f is \b this function).
@@ -415,49 +415,50 @@ public:
     **/
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
-   /// Delete this function (do nothing, overloaded by UserFunction).
-   virtual void destroy() {}
-
-   /// Quad_CR of this function.
-   virtual UCS_string canonical(bool with_lines) const
-      { NeverReach("Function::canonical() called"); }
-
-   /// return axis (non-0 only for derived functions)
-   virtual Value_P * locate_X() const
-      { return 0; }
+   /// store the attributes (as per ⎕AT) of symbol in Z, ...
+   virtual void get_attributes(int mode, Value & Z) const;
 
    /// return the signature of this function (currently only valid
    /// for user-defined functions)
    Fun_signature get_signature() const;
 
+   /// return 1 if the function returns a result, otherwise 0.
+   /// For non-user defined functions, throw DOMAIN_ERROR.
+   virtual bool has_result() const = 0;
+
    /// raise an invalid phrase error
    Token phrase_error(const char * pattern) const;
 
-   /// return break-even point for monadic parallel execution
-   ShapeItem get_monadic_threshold() const
-      { return parallel_thresholds[0]; }
+   /// Print \b this function.
+   virtual ostream & print(ostream & out) const = 0;
 
-   /// set the break-even point for monadic parallel execution
-   void set_monadic_threshold(ShapeItem new_threshold)
-      { parallel_thresholds[0] = new_threshold; }
+   /// print the properties of this function
+   virtual void print_properties(ostream & out, int indent) const = 0;
 
-   /// return break-even point for dyadic parallel execution
-   ShapeItem get_dyadic_threshold() const
-      { return parallel_thresholds[1]; }
+   /// Delete this function (do nothing, overloaded by UserFunction).
+   virtual void destroy() {}
+
+   /// set the time when the function was created (0 for built-in functions)
+   void set_creation_time(APL_time_us t)
+      { creation_time = t; }
 
    /// set the break-even point for dyadic parallel execution
    void set_dyadic_threshold(ShapeItem new_threshold)
       { parallel_thresholds[1] = new_threshold; }
 
+   /// set the break-even point for monadic parallel execution
+   void set_monadic_threshold(ShapeItem new_threshold)
+      { parallel_thresholds[0] = new_threshold; }
+
    /// when this function was created (0.0 for system functions)
    APL_time_us creation_time;
 
 protected:
-   /// the tag for token pointing to \b this function
-   TokenTag tag;
-
    /// the thresholds for parallel execution
    ShapeItem parallel_thresholds[2];
+
+   /// the tag for token pointing to \b this function
+   TokenTag tag;
 };
 //----------------------------------------------------------------------------
 

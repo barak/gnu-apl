@@ -163,13 +163,11 @@ public:
         if (fp)   sys_pclose(fp);
       }
 
-   /// return \b true if ptr is not open
-   bool operator !() const
-      { return fp == 0; }
-
-   /// return \b true if ptr is (open)
-   bool operator +() const
-      { return fp != 0; }
+   int fgetc() const
+      {
+        if (fp)   return ::fgetc(fp);
+        return EOF;
+      }
 
    /// @param buffer destination buffer for the line
    /// @param buflen capacity of buffer in bytes
@@ -187,11 +185,14 @@ public:
         return 0;
       }
 
-   int fgetc() const
-      {
-        if (fp)   return ::fgetc(fp);
-        return EOF;
-      }
+   /// return \b true if ptr is not open
+   bool operator !() const
+      { return fp == 0; }
+
+   /// return \b true if ptr is (open)
+   bool operator +() const
+      { return fp != 0; }
+
    int close()
       {
        if (fp)
@@ -242,16 +243,11 @@ public:
         if (fp)   fclose(fp);
       }
 
-   FILE * get_FILE() const
-      { return fp; }
-
-   /// return \b true if ptr is not open
-   bool operator !() const
-      { return fp == 0; }
-
-   /// return \b true if ptr is (open)
-   bool operator +() const
-      { return fp != 0; }
+   int fgetc() const
+      {
+        if (fp)   return ::fgetc(fp);
+        return EOF;
+      }
 
    /// @param buffer destination buffer for the line
    /// @param buflen capacity of buffer in bytes
@@ -269,11 +265,16 @@ public:
         return 0;
       }
 
-   int fgetc() const
-      {
-        if (fp)   return ::fgetc(fp);
-        return EOF;
-      }
+   FILE * get_FILE() const
+      { return fp; }
+
+   /// return \b true if ptr is not open
+   bool operator !() const
+      { return fp == 0; }
+
+   /// return \b true if ptr is (open)
+   bool operator +() const
+      { return fp != 0; }
 
 protected:
    FILE * fp;

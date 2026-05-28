@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,10 +37,10 @@ int VH_entry::idx = 0;
 //----------------------------------------------------------------------------
 VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
                    const char * _loc)
-  : val(_val),
-    event(_ev),
+  : event(_ev),
     iarg(_iarg),
-    loc(_loc)
+    loc(_loc),
+    val(_val)
 {
    testcase_file = InputFile::current_filename();
    testcase_line = InputFile::current_line_no();

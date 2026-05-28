@@ -38,203 +38,6 @@
 
 //============================================================================
 void
-Function::get_attributes(int mode, Value & Z) const
-{
-   switch(mode)
-      {
-        case 1: // valences
-                Z.next_ravel_Int(has_result() ? 1 : 0);
-                Z.next_ravel_Int(get_fun_valence());
-                Z.next_ravel_Int(get_oper_valence());
-                return;
-
-        case 2: // creation time (7⍴0 for system functions)
-                {
-                  const YMDhmsu created(get_creation_time());
-                  Z.next_ravel_Int(created.year);
-                  Z.next_ravel_Int(created.month);
-                  Z.next_ravel_Int(created.day);
-                  Z.next_ravel_Int(created.hour);
-                  Z.next_ravel_Int(created.minute);
-                  Z.next_ravel_Int(created.second);
-                  Z.next_ravel_Int(created.micro/1000);
-                }
-                return;
-
-        case 3: // execution properties
-                Z.next_ravel_Int(get_exec_properties()[0]);
-                Z.next_ravel_Int(get_exec_properties()[1]);
-                Z.next_ravel_Int(get_exec_properties()[2]);
-                Z.next_ravel_Int(get_exec_properties()[3]);
-                return;
-
-        case 4: // 4 ⎕DR for functions is always 0 0
-                Z.next_ravel_0();
-                Z.next_ravel_0();
-                return;
-      }
-
-   Assert(0 && "Not reached");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_() const
-{
-   return phrase_error("");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_B(Value_P B) const
-{
-   return phrase_error("B");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_AB(Value_P A, Value_P B) const
-{
-   return phrase_error("AB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_LB(Token & LO, Value_P B) const
-{
-   return phrase_error("LB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_XB(Value_P X, Value_P B) const
-{
-   return phrase_error("XB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
-{
-   return phrase_error("ALB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-   return phrase_error("AXB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
-{
-   return phrase_error("LRB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
-{
-   return phrase_error("ALRB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
-{
-   return phrase_error("ALXB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                     Value_P X, Value_P B) const
-{
-   return phrase_error("ALRXB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_LXB(Token & LO, Value_P X, Value_P B) const
-{
-   return phrase_error("LXB");
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_LRXB(Token & LO, Token & RO,
-                     Value_P X, Value_P B) const
-{
-   return phrase_error("LRXB");
-}
-//----------------------------------------------------------------------------
-Fun_signature
-Function::get_signature() const
-{
-int sig = SIG_FUN;
-   if (has_result())   sig |= SIG_Z;
-   if (has_axis())     sig |= SIG_X;
-
-   if (get_oper_valence() == 2)   sig |= SIG_RO;
-   if (get_oper_valence() >= 1)   sig |= SIG_LO;
-
-   if (get_fun_valence() == 2)    sig |= SIG_A;
-   if (get_fun_valence() >= 1)    sig |= SIG_B;
-
-   return Fun_signature(sig);
-}
-//----------------------------------------------------------------------------
-Token
-Function::phrase_error(const char * pattern) const
-{
-   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << endl;
-
-int signature = 0;   // the signature for pattern
-
-   for (; *pattern; ++pattern)
-       {
-         switch(*pattern)
-            {
-              case 'A': signature |= SIG_A;    break;
-              case 'L': signature |= SIG_LO;   break;
-              case 'R': signature |= SIG_RO;   break;
-              case 'X': signature |= SIG_X;    break;
-              case 'B': signature |= SIG_B;    break;
-              default:  FIXME;
-            }
-       }
-
-UCS_string & more = MORE_ERROR();
-   more << "Invalid phrase '";
-   if (signature & SIG_A)   more << "A";
-   if (signature & SIG_LO)   more << " (L ";
-   more << get_name();
-   if (signature & SIG_X)   more << "[X]";
-   if (signature & SIG_RO)   more << " R)";
-   if (signature & SIG_B)   more << " B";
-
-   more << "'. The phrase may be valid in general, but not for function "
-        << get_name();
-   VALENCE_ERROR;
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_fill_AB(Value_P A, Value_P B) const
-{
-  MORE_ERROR() << "Function " << get_name() 
-                     << " has no dyadic fill function";
-
-  DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_fill_B(Value_P B) const
-{
-  MORE_ERROR() << "Function " << get_name() 
-                     << " has no monadic fill function";
-
-  DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-Token
-Function::eval_identity_fun(Value_P B, sAxis axis) const
-{
-  MORE_ERROR() << "Function " << get_name() 
-                     << " has no identity function";
-  DOMAIN_ERROR;
-}
-//============================================================================
-void
 FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted,
                                    size_t count, const char * grp_name)
 {
@@ -302,44 +105,6 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
            Assert_fatal(found->axis == key);
          }
        }
-}
-//----------------------------------------------------------------------------
-int
-FunctionGroup::compare_function_name(const char * const & name,
-                                     const function_info * const & info,
-                                     const void *)
-{
-   return strcmp(name, info->function_name);
-}
-//----------------------------------------------------------------------------
-int
-FunctionGroup::compare_function_axis(const uAxis & key,
-                                     const function_info * const & info,
-                                     const void *)
-{
-   return key - info->axis;
-}
-//----------------------------------------------------------------------------
-const FunctionGroup::function_info *
-FunctionGroup::get_info_by_name(const char * name) const
-{
-const FunctionGroup::function_info* const * ret =
-      Heapsort<const FunctionGroup::function_info *>
-      ::search<const char *>(name, sorted_by_name, compare_function_name, 0);
-
-   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
-   return *ret;
-}
-//----------------------------------------------------------------------------
-const FunctionGroup::function_info *
-FunctionGroup::get_info_by_axis(uAxis axis) const
-{
-const FunctionGroup::function_info* const * ret =
-      Heapsort<const FunctionGroup::function_info *>
-      ::search<const uAxis>(axis, sorted_by_axis, compare_function_axis, 0);
-                     
-   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
-   return *reinterpret_cast<const function_info * const *>(ret);
 }
 //----------------------------------------------------------------------------
 sAxis
@@ -463,6 +228,44 @@ const char * AX = signature & SIG_X ? "X" : "A";
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
+int
+FunctionGroup::compare_function_name(const char * const & name,
+                                     const function_info * const & info,
+                                     const void *)
+{
+   return strcmp(name, info->function_name);
+}
+//----------------------------------------------------------------------------
+int
+FunctionGroup::compare_function_axis(const uAxis & key,
+                                     const function_info * const & info,
+                                     const void *)
+{
+   return key - info->axis;
+}
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info *
+FunctionGroup::get_info_by_name(const char * name) const
+{
+const FunctionGroup::function_info* const * ret =
+      Heapsort<const FunctionGroup::function_info *>
+      ::search<const char *>(name, sorted_by_name, compare_function_name, 0);
+
+   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
+   return *ret;
+}
+//----------------------------------------------------------------------------
+const FunctionGroup::function_info *
+FunctionGroup::get_info_by_axis(uAxis axis) const
+{
+const FunctionGroup::function_info* const * ret =
+      Heapsort<const FunctionGroup::function_info *>
+      ::search<const uAxis>(axis, sorted_by_axis, compare_function_axis, 0);
+                     
+   if (ret == 0)   return reinterpret_cast<const function_info *>(0);
+   return *reinterpret_cast<const function_info * const *>(ret);
+}
+//----------------------------------------------------------------------------
 UCS_string
 FunctionGroup::get_signature_string(Fun_signature sig) const
 {
@@ -484,6 +287,203 @@ UCS_string ret;
       }
    if (sig & SIG_B)        ret << " B";
    return ret;
+}
+//============================================================================
+Token
+Function::eval_() const
+{
+   return phrase_error("");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_AB(Value_P A, Value_P B) const
+{
+   return phrase_error("AB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
+{
+   return phrase_error("ALB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
+{
+   return phrase_error("ALRB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                     Value_P X, Value_P B) const
+{
+   return phrase_error("ALRXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
+{
+   return phrase_error("ALXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   return phrase_error("AXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_B(Value_P B) const
+{
+   return phrase_error("B");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LB(Token & LO, Value_P B) const
+{
+   return phrase_error("LB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
+{
+   return phrase_error("LRB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LRXB(Token & LO, Token & RO,
+                     Value_P X, Value_P B) const
+{
+   return phrase_error("LRXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_LXB(Token & LO, Value_P X, Value_P B) const
+{
+   return phrase_error("LXB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_XB(Value_P X, Value_P B) const
+{
+   return phrase_error("XB");
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_fill_AB(Value_P A, Value_P B) const
+{
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no dyadic fill function";
+
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_fill_B(Value_P B) const
+{
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no monadic fill function";
+
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token
+Function::eval_identity_fun(Value_P B, sAxis axis) const
+{
+  MORE_ERROR() << "Function " << get_name() 
+                     << " has no identity function";
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+void
+Function::get_attributes(int mode, Value & Z) const
+{
+   switch(mode)
+      {
+        case 1: // valences
+                Z.next_ravel_Int(has_result() ? 1 : 0);
+                Z.next_ravel_Int(get_fun_valence());
+                Z.next_ravel_Int(get_oper_valence());
+                return;
+
+        case 2: // creation time (7⍴0 for system functions)
+                {
+                  const YMDhmsu created(get_creation_time());
+                  Z.next_ravel_Int(created.year);
+                  Z.next_ravel_Int(created.month);
+                  Z.next_ravel_Int(created.day);
+                  Z.next_ravel_Int(created.hour);
+                  Z.next_ravel_Int(created.minute);
+                  Z.next_ravel_Int(created.second);
+                  Z.next_ravel_Int(created.micro/1000);
+                }
+                return;
+
+        case 3: // execution properties
+                Z.next_ravel_Int(get_exec_properties()[0]);
+                Z.next_ravel_Int(get_exec_properties()[1]);
+                Z.next_ravel_Int(get_exec_properties()[2]);
+                Z.next_ravel_Int(get_exec_properties()[3]);
+                return;
+
+        case 4: // 4 ⎕DR for functions is always 0 0
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                return;
+      }
+
+   Assert(0 && "Not reached");
+}
+//----------------------------------------------------------------------------
+Fun_signature
+Function::get_signature() const
+{
+int sig = SIG_FUN;
+   if (has_result())   sig |= SIG_Z;
+   if (has_axis())     sig |= SIG_X;
+
+   if (get_oper_valence() == 2)   sig |= SIG_RO;
+   if (get_oper_valence() >= 1)   sig |= SIG_LO;
+
+   if (get_fun_valence() == 2)    sig |= SIG_A;
+   if (get_fun_valence() >= 1)    sig |= SIG_B;
+
+   return Fun_signature(sig);
+}
+//----------------------------------------------------------------------------
+Token
+Function::phrase_error(const char * pattern) const
+{
+   Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
+        << "() called (overloaded variant not yet implemented?)" << endl;
+
+int signature = 0;   // the signature for pattern
+
+   for (; *pattern; ++pattern)
+       {
+         switch(*pattern)
+            {
+              case 'A': signature |= SIG_A;    break;
+              case 'L': signature |= SIG_LO;   break;
+              case 'R': signature |= SIG_RO;   break;
+              case 'X': signature |= SIG_X;    break;
+              case 'B': signature |= SIG_B;    break;
+              default:  FIXME;
+            }
+       }
+
+UCS_string & more = MORE_ERROR();
+   more << "Invalid phrase '";
+   if (signature & SIG_A)   more << "A";
+   if (signature & SIG_LO)   more << " (L ";
+   more << get_name();
+   if (signature & SIG_X)   more << "[X]";
+   if (signature & SIG_RO)   more << " R)";
+   if (signature & SIG_B)   more << " B";
+
+   more << "'. The phrase may be valid in general, but not for function "
+        << get_name();
+   VALENCE_ERROR;
 }
 //============================================================================
 ostream &

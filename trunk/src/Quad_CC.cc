@@ -124,6 +124,38 @@ CC_base::get_instance(CharClass cls)
    DOMAIN_ERROR;
 }
 //---------------------------------------------------------------------------
+bool
+CC_SUPERSCRIPT::contains(Unicode uni) const
+{
+   if (uni < 178)    return false;
+   if (uni > 8319)   return false;
+   return CC_base::contains(uni);
+}
+//---------------------------------------------------------------------------
+bool
+CC_SUBSCRIPT::contains(Unicode uni) const
+{
+   if (uni < 7522)    return false;
+   if (uni > 11388)   return false;
+   return CC_base::contains(uni);
+}
+//---------------------------------------------------------------------------
+bool
+CC_LINE_DRAWING::contains(Unicode uni) const
+{
+   if (uni < 9472)   return false;
+   if (uni > 9580)   return false;
+   return CC_base::contains(uni);
+}
+//---------------------------------------------------------------------------
+bool
+CC_MATH::contains(Unicode uni) const
+{
+   if (uni < 8450)   return false;
+   if (uni > 9139)   return false;
+   return CC_base::contains(uni);
+}
+//---------------------------------------------------------------------------
 Token
 Quad_CC::eval_AB(Value_P A, Value_P B) const
 {
@@ -183,30 +215,11 @@ Value_P Z(B->get_shape(), LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //---------------------------------------------------------------------------
-void
-Quad_CC::print_classes(ostream & out)
+bool
+Quad_CC::contained_in(Unicode uni, CC_base::CharClass cls)
 {
-   out << "      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
-       << "      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
-       << "      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
-       << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
-       << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
-       << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
-       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
-       << "      ⎕CC   8:  Octal digits 0-7"                           << endl
-       << "      ⎕CC   9:  Some mathematical symbols"                  << endl
-       << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
-       << "      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
-       << "      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
-       << "      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
-       << "      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
-       << "      ⎕CC ¯26:  lowercase characters a-z"                   << endl
-       << "      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
-       << "      ⎕CC  52:  characters A-Z a-z"                         << endl
-       << "      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
-       << "      ⎕CC 128:  ASCII characters"                           << endl;
+const CC_base & inst = CC_base::get_instance(cls);
+   return inst.contains(uni);
 }
 //---------------------------------------------------------------------------
 Value_P
@@ -232,42 +245,29 @@ Value_P Z(inst.get_shape(), LOC);
    return Z;
 }
 //---------------------------------------------------------------------------
-bool
-Quad_CC::contained_in(Unicode uni, CC_base::CharClass cls)
+void
+Quad_CC::print_classes(ostream & out)
 {
-const CC_base & inst = CC_base::get_instance(cls);
-   return inst.contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_SUPERSCRIPT::contains(Unicode uni) const
-{
-   if (uni < 178)    return false;
-   if (uni > 8319)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_SUBSCRIPT::contains(Unicode uni) const
-{
-   if (uni < 7522)    return false;
-   if (uni > 11388)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_LINE_DRAWING::contains(Unicode uni) const
-{
-   if (uni < 9472)   return false;
-   if (uni > 9580)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_MATH::contains(Unicode uni) const
-{
-   if (uni < 8450)   return false;
-   if (uni > 9139)   return false;
-   return CC_base::contains(uni);
+   out << "      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
+       << "      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
+       << "      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
+       << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
+       << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
+       << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
+       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
+       << "      ⎕CC   8:  Octal digits 0-7"                           << endl
+       << "      ⎕CC   9:  Some mathematical symbols"                  << endl
+       << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
+       << "      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
+       << "      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
+       << "      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
+       << "      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
+       << "      ⎕CC ¯26:  lowercase characters a-z"                   << endl
+       << "      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
+       << "      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
+       << "      ⎕CC  52:  characters A-Z a-z"                         << endl
+       << "      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
+       << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
+       << "      ⎕CC 128:  ASCII characters"                           << endl;
 }
 //---------------------------------------------------------------------------

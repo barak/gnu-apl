@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,21 +93,6 @@ public:
    : Bif_COMMA(TOK_F12_COMMA)
    {}
 
-   /// overloaded Function::eval_B()
-   /// @param B right argument APL value
-   virtual Token eval_B(Value_P B) const;
-
-   /// overloaded Function::eval_AB()
-   /// @param A left argument APL value
-   /// @param B right argument APL value
-   virtual Token eval_AB(Value_P A, Value_P B) const;
-
-   /// overloaded Function::eval_XB()
-   /// @param X axis specification
-   /// @param B right argument APL value
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { return ravel_axis(X, B, B->get_rank()); }
-
    /// overloaded Function::eval_AXB()
    /// @param A left argument APL value
    /// @param X axis specification
@@ -115,6 +100,21 @@ public:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return Token(TOK_APL_VALUE1,
                catenate_or_laminate(*A, *X, *B)); }
+
+   /// overloaded Function::eval_XB()
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_XB(Value_P X, Value_P B) const
+      { return ravel_axis(X, B, B->get_rank()); }
+
+   /// overloaded Function::eval_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   /// @param B right argument APL value
+   virtual Token eval_B(Value_P B) const;
 
    static Bif_F12_COMMA  fun;   ///< Built-in function
 

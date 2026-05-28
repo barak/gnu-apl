@@ -56,54 +56,8 @@ Avec::character_table[MAX_AV] =
 #include "Avec.def"
 };
 //----------------------------------------------------------------------------
-int
-Avec::show_error_pos(int i, int line, bool cond, int def_line)
-{
-   if (!cond)
-      {
-        CERR << "Error index (line " << line << ", Avec.def line "
-             << def_line << ") = " << i << " = " << HEX(i) << endl;
-        Assert(0);
-        return 1;
-      }
-
-   return 0;   // OK
-}
-//----------------------------------------------------------------------------
 #ifdef cfg_DEVELOP_WANTED
 
-void
-Avec::check_file(const char * filename)
-{
-const int fd = open(filename, O_RDONLY);
-   if (fd == -1)   return;
-
-   Log(LOG_startup)   CERR << "Checking " << filename << endl;
-
-uint32_t datalen;
-   {
-     struct stat s;
-     const int res = fstat(fd, &s);
-     Assert(res == 0);
-     datalen = s.st_size;
-   }
-
-const UTF8 * data = Sys::mmap(fd, datalen);
-   Assert(data);
-
-const UTF8_string utf(data, datalen);
-UCS_string ucs(utf);
-
-   loop(i, ucs.size())
-       {
-         if (!is_known_char(ucs[i]))
-            CERR << "APL char " << UNI(ucs[i]) << " is missing in AV ("
-                 << i << ")" << endl;
-       }
-
-   close(fd);
-}
-//----------------------------------------------------------------------------
 void
 Avec::init()
 {
@@ -193,6 +147,38 @@ int errors = 0;
 
    if (errors)   exit(1);
 }
+//----------------------------------------------------------------------------
+void
+Avec::check_file(const char * filename)
+{
+const int fd = open(filename, O_RDONLY);
+   if (fd == -1)   return;
+
+   Log(LOG_startup)   CERR << "Checking " << filename << endl;
+
+uint32_t datalen;
+   {
+     struct stat s;
+     const int res = fstat(fd, &s);
+     Assert(res == 0);
+     datalen = s.st_size;
+   }
+
+const UTF8 * data = Sys::mmap(fd, datalen);
+   Assert(data);
+
+const UTF8_string utf(data, datalen);
+UCS_string ucs(utf);
+
+   loop(i, ucs.size())
+       {
+         if (!is_known_char(ucs[i]))
+            CERR << "APL char " << UNI(ucs[i]) << " is missing in AV ("
+                 << i << ")" << endl;
+       }
+
+   close(fd);
+}
 #else  // ! cfg_DEVELOP_WANTED
 
 void
@@ -251,73 +237,18 @@ const CHT_Index idx = map_alternative_char(uni);
    return Token();
 }
 //----------------------------------------------------------------------------
-uint32_t Avec::find_av_pos(Unicode av)
+bool
+Avec::is_symbol_char(Unicode av)
 {
-const CHT_Index pos = find_char(av);
-
-   if (pos < 0)   return MAX_AV;   // not found
-
-   return character_table[pos].av_pos;
+const int32_t idx = find_char(av);
+   if (idx == -1)   return false;
+   return (character_table[idx].flags & FLG_SYMBOL) != 0;
 }
 //----------------------------------------------------------------------------
-Avec::CHT_Index
-Avec::find_char(Unicode av)
+bool
+Avec::is_first_symbol_char(Unicode av)
 {
-int l = 0;
-int h = sizeof(character_table)/sizeof(*character_table) - 1;
-
-   for (;;)
-       {
-         if (l > h)   return Invalid_CHT;   // not in table.
-
-         const int m((h + l)/2);
-         const Unicode um = character_table[m].unicode;
-         if      (av < um)   h = m - 1;
-         else if (av > um)   l = m + 1;
-         else                return CHT_Index(m);
-       }
-}
-//----------------------------------------------------------------------------
-Avec::CHT_Index
-Avec::map_alternative_char(Unicode alt_av)
-{
-   // map Unicodes that look similar to characters used in GNU APL's ⎕AV
-   // to the corresponding character in GNU APL's ⎕AV.
-   //
-   switch(int(alt_av))
-      {
-        case 0x005E: return AV_AND;              //  map ^ to ∧
-        case 0x007C: return AV_DIVIDES;          //  map | to ∣
-        case 0x007E: return AV_TILDE_OPERATOR;   //  map ~ to ∼
-        case 0x00B5: return AV_MUE;              //  map µ to μ
-        case 0x03B1: return AV_ALPHA;            //  map α to ⍺
-        case 0x03B5: return AV_ELEMENT;          //  map ϵ to itself
-        case 0x03B9: return AV_IOTA;             //  map ι to ⍳
-        case 0x03C1: return AV_RHO;              //  map ρ to ⍴
-        case 0x03C9: return AV_OMEGA;            //  map ω to ⍵
-        case 0x03F5: return AV_ELEMENT;          //  map ϵ to ϵ
-        case 0x2018: return AV_SINGLE_QUOTE;     //  map ‘ to '
-        case 0x2019: return AV_SINGLE_QUOTE;     //  map ’ to '
-        case 0x2208: return AV_ELEMENT;          //  map ∈ to ϵ
-        case 0x220A: return AV_ELEMENT;          //  map ∊ to ϵ
-        case 0x2212: return AV_MINUS;            //  map − to -
-        case 0x22BC: return AV_NAND;             //  map ⊼ to ⍲
-        case 0x22BD: return AV_NOR;              //  map ⊽ to ⍱
-        case 0x22C4: return AV_DIAMOND;          //  map ⋄ to ◊
-        case 0x22F8: return AV_EPSILON_UNDERBAR; //  map ⋸ to ⍷
-        case 0x25AF: return AV_Quad_Quad;        //  map ▯ to ⎕
-        case 0x25E6: return AV_RING_OPERATOR;    //  map ◦ to ∘
-        case 0x25C7: return AV_DIAMOND;          //  map ◇ to ◊
-        case 0x2662: return AV_DIAMOND;          //  map ♢ to ◊
-        case 0x26AA: return AV_CIRCLE;           //  map ⚪ to ○
-        case 0x2A7D: return AV_LESS_OR_EQUAL;    //  map ⩽ to ≤
-        case 0x2A7E: return AV_MORE_OR_EQUAL;    //  map ⩾ to ≥
-        case 0x2B25: return AV_DIAMOND;          //  map ⬥ to ◊
-        case 0x2B26: return AV_DIAMOND;          //  map ⬦ to ◊
-        case 0x2B27: return AV_DIAMOND;          //  map ⬧ to ◊
-
-        default:     return Invalid_CHT;         // unknown alt_av
-      }
+   return is_symbol_char(av) && ! is_digit(av);
 }
 //----------------------------------------------------------------------------
 Unicode
@@ -371,20 +302,6 @@ const CHT_Index idx = find_char(uni);
    if (unicode_to_cp(uni) == 0xB0)   return true;   // not in IBM's ⎕AV
 
    return false;
-}
-//----------------------------------------------------------------------------
-bool
-Avec::is_symbol_char(Unicode av)
-{
-const int32_t idx = find_char(av);
-   if (idx == -1)   return false;
-   return (character_table[idx].flags & FLG_SYMBOL) != 0;
-}
-//----------------------------------------------------------------------------
-bool
-Avec::is_first_symbol_char(Unicode av)
-{
-   return is_symbol_char(av) && ! is_digit(av);
 }
 //----------------------------------------------------------------------------
 bool
@@ -443,6 +360,75 @@ Avec::superscript(uint32_t i)
    return Unicode(0x207A);
 }
 //----------------------------------------------------------------------------
+uint32_t Avec::find_av_pos(Unicode av)
+{
+const CHT_Index pos = find_char(av);
+
+   if (pos < 0)   return MAX_AV;   // not found
+
+   return character_table[pos].av_pos;
+}
+//----------------------------------------------------------------------------
+Avec::CHT_Index
+Avec::find_char(Unicode av)
+{
+int l = 0;
+int h = sizeof(character_table)/sizeof(*character_table) - 1;
+
+   for (;;)
+       {
+         if (l > h)   return Invalid_CHT;   // not in table.
+
+         const int m((h + l)/2);
+         const Unicode um = character_table[m].unicode;
+         if      (av < um)   h = m - 1;
+         else if (av > um)   l = m + 1;
+         else                return CHT_Index(m);
+       }
+}
+//----------------------------------------------------------------------------
+Avec::CHT_Index
+Avec::map_alternative_char(Unicode alt_av)
+{
+   // map Unicodes that look similar to characters used in GNU APL's ⎕AV
+   // to the corresponding character in GNU APL's ⎕AV.
+   //
+   switch(int(alt_av))
+      {
+        case 0x005E: return AV_AND;              //  map ^ to ∧
+        case 0x007C: return AV_DIVIDES;          //  map | to ∣
+        case 0x007E: return AV_TILDE_OPERATOR;   //  map ~ to ∼
+        case 0x00B5: return AV_MUE;              //  map µ to μ
+        case 0x03B1: return AV_ALPHA;            //  map α to ⍺
+        case 0x03B5: return AV_ELEMENT;          //  map ϵ to itself
+        case 0x03B9: return AV_IOTA;             //  map ι to ⍳
+        case 0x03C1: return AV_RHO;              //  map ρ to ⍴
+        case 0x03C9: return AV_OMEGA;            //  map ω to ⍵
+        case 0x03F5: return AV_ELEMENT;          //  map ϵ to ϵ
+        case 0x2018: return AV_SINGLE_QUOTE;     //  map ' to '
+        case 0x2019: return AV_SINGLE_QUOTE;     //  map ' to '
+        case 0x2208: return AV_ELEMENT;          //  map ∈ to ϵ
+        case 0x220A: return AV_ELEMENT;          //  map ∊ to ϵ
+        case 0x2212: return AV_MINUS;            //  map − to -
+        case 0x22BC: return AV_NAND;             //  map ⊼ to ⍲
+        case 0x22BD: return AV_NOR;              //  map ⊽ to ⍱
+        case 0x22C4: return AV_DIAMOND;          //  map ⋄ to ◊
+        case 0x22F8: return AV_EPSILON_UNDERBAR; //  map ⋸ to ⍷
+        case 0x25AF: return AV_Quad_Quad;        //  map ▯ to ⎕
+        case 0x25E6: return AV_RING_OPERATOR;    //  map ◦ to ∘
+        case 0x25C7: return AV_DIAMOND;          //  map ◇ to ◊
+        case 0x2662: return AV_DIAMOND;          //  map ♢ to ◊
+        case 0x26AA: return AV_CIRCLE;           //  map ⚪ to ○
+        case 0x2A7D: return AV_LESS_OR_EQUAL;    //  map ⩽ to ≤
+        case 0x2A7E: return AV_MORE_OR_EQUAL;    //  map ⩾ to ≥
+        case 0x2B25: return AV_DIAMOND;          //  map ⬥ to ◊
+        case 0x2B26: return AV_DIAMOND;          //  map ⬦ to ◊
+        case 0x2B27: return AV_DIAMOND;          //  map ⬧ to ◊
+
+        default:     return Invalid_CHT;         // unknown alt_av
+      }
+}
+//----------------------------------------------------------------------------
 /* the IBM APL2 character set shown in lrm figure 68 on page 470
 
    The table is indexed with an 8-bit position in IBM's ⎕AV and returns
@@ -465,28 +451,28 @@ Avec::superscript(uint32_t i)
    │ 0xC0 │ └ ┴ ┬ ├ ─ ┼ ↑ ↓ ╚ ╔ ╩ ╦ ╠ ═ ╬ ≡ │
    │ 0xD0 │ ⍸ ⋸ ∵ ⌷ ⍂ ⌻ ⊢ ⊣ ◊ ┘ ┌ █ ▄ ¦ Ì ▀ │
    │ 0xE0 │ ⍺ ⍹ ⊂ ⊃ ⍝ ⍲ ⍴ ⍱ ⌽ ⊖ ○ ∨ ⍳ ⍉ ϵ ∩ │
-   │ 0xF0 │ ⌿ ⍀ ≥ ≤ ≠ × ÷ ⍙ ∘ ⍵ ⍫ ⍋ ⍒ ¯ ¨   │
+   │ 0xF0 │ ⌿ ⍀ ≥ ≤ ≠ × ÷ ⍙ ∘ ⍵ ⍫ ⍋ ⍒ ¯ ¨   │
    └──────┴─────────────────────────────────┘
 
  */
 static const int ibm_av[] =
 {
-  0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 
-  0x0008, 0x0009, 0x000A, 0x236C, 0x000C, 0x000D, 0x000E, 0x000F, 
-  0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 
-  0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F, 
-  0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 
-  0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F, 
-  0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 
-  0x0038, 0x0039, 0x003A, 0x003B, 0x003C, 0x003D, 0x003E, 0x003F, 
-  0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 
-  0x0048, 0x0049, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F, 
-  0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 
-  0x0058, 0x0059, 0x005A, 0x005B, 0x005C, 0x005D, 0x005E, 0x005F, 
-  0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067, 
-  0x0068, 0x0069, 0x006A, 0x006B, 0x006C, 0x006D, 0x006E, 0x006F, 
-  0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077, 
-  0x0078, 0x0079, 0x007A, 0x007B, 0x007C, 0x007D, 0x007E, 0x007F, 
+  0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
+  0x0008, 0x0009, 0x000A, 0x236C, 0x000C, 0x000D, 0x000E, 0x000F,
+  0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017,
+  0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
+  0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+  0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
+  0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+  0x0038, 0x0039, 0x003A, 0x003B, 0x003C, 0x003D, 0x003E, 0x003F,
+  0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+  0x0048, 0x0049, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F,
+  0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+  0x0058, 0x0059, 0x005A, 0x005B, 0x005C, 0x005D, 0x005E, 0x005F,
+  0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067,
+  0x0068, 0x0069, 0x006A, 0x006B, 0x006C, 0x006D, 0x006E, 0x006F,
+  0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077,
+  0x0078, 0x0079, 0x007A, 0x007B, 0x007C, 0x007D, 0x007E, 0x007F,
   0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7,
   0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x00EE, 0x00EC, 0x00C4, 0x00C5,
   0x2395, 0x235E, 0x2339, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9,
@@ -579,6 +565,35 @@ Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
   { 0x2592, 177 }, { 0x2593, 178 }, { 0x25CA, 216 }, { 0x25CB, 234 }
 };
 
+unsigned char
+Avec::unicode_to_cp(Unicode uni)
+{
+   if (uni <= 0x80)                return uni;
+   if (uni == UNI_STAR_OPERATOR)   return '*';   // ⋆ → *
+   if (uni == UNI_AND)             return '^';   // ∧ → ^
+   if (uni == UNI_TILDE_OPERATOR)  return 126;   // ∼ → ~
+
+   // search in uni_to_cp_map table
+   //
+static vector<Unicode_to_IBM_codepoint> inverse;
+   if (inverse.size() == 0)
+      {
+        loop(j, 256)   inverse.push_back(inverse_ibm_av[j]);
+      }
+const void * where = Heapsort<Unicode_to_IBM_codepoint>
+                     ::search<uint32_t>(uni, inverse, compare_uni, 0);
+
+   if (where == 0)
+      {
+        // the workspace being )OUT'ed can contain characters that are not
+        // in IBM's APL character set. We replace such characters by 0xB0
+        //
+        return 0xB0;
+      }
+
+   return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->quad_av_pos;
+}
+//----------------------------------------------------------------------------
 void
 Avec::print_inverse_IBM_quad_AV()
 {
@@ -636,33 +651,17 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
       }
 }
 //----------------------------------------------------------------------------
-unsigned char
-Avec::unicode_to_cp(Unicode uni)
+int
+Avec::show_error_pos(int i, int line, bool cond, int def_line)
 {
-   if (uni <= 0x80)                return uni;
-   if (uni == UNI_STAR_OPERATOR)   return '*';   // ⋆ → *
-   if (uni == UNI_AND)             return '^';   // ∧ → ^
-   if (uni == UNI_TILDE_OPERATOR)  return 126;   // ∼ → ~
-
-   // search in uni_to_cp_map table
-   //
-static vector<Unicode_to_IBM_codepoint> inverse;
-   if (inverse.size() == 0)
+   if (!cond)
       {
-        loop(j, 256)   inverse.push_back(inverse_ibm_av[j]);
-      }
-const void * where = Heapsort<Unicode_to_IBM_codepoint>
-                     ::search<uint32_t>(uni, inverse, compare_uni, 0);
-
-   if (where == 0)
-      {
-        // the workspace being )OUT'ed can contain characters that are not
-        // in IBM's APL character set. We replace such characters by 0xB0
-        //
-        return 0xB0;
+        CERR << "Error index (line " << line << ", Avec.def line "
+             << def_line << ") = " << i << " = " << HEX(i) << endl;
+        Assert(0);
+        return 1;
       }
 
-   return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->quad_av_pos;
+   return 0;   // OK
 }
 //----------------------------------------------------------------------------
-

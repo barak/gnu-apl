@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,18 +43,6 @@ LvalCell::LvalCell(const LvalCell & other)
    // check_consistency();   supposedly not needed, since other should be OK.
 }
 //----------------------------------------------------------------------------
-void
-LvalCell::init_other(void * other, Value &, const char * loc) const
-{
-   new (other)  LvalCell(get_lval_value(), get_cell_owner());
-}
-//----------------------------------------------------------------------------
-Cell *
-LvalCell::get_lval_value()  const
-{
-  return value.lval;
-}
-//----------------------------------------------------------------------------
 PrintBuffer
 LvalCell::character_representation(const PrintContext & pctx) const
 {
@@ -71,6 +59,12 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_l(Unicode('='), 1);
    pb.pad_r(Unicode('='), 1);
    return pb;
+}
+//----------------------------------------------------------------------------
+Cell *
+LvalCell::get_lval_value()  const
+{
+  return value.lval;
 }
 //----------------------------------------------------------------------------
 void
@@ -91,6 +85,12 @@ LvalCell::check_consistency() const
           }
      }
   else Assert(value.pval.owner == 0);   // no owner
+}
+//----------------------------------------------------------------------------
+void
+LvalCell::init_other(void * other, Value &, const char * loc) const
+{
+   new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
 //----------------------------------------------------------------------------
 

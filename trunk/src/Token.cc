@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -260,12 +260,130 @@ const TokenTag tag = token.get_tag();
    return out <<  "{-unknown Token " << tag << "-}";
 }
 //----------------------------------------------------------------------------
-void
-Token::ChangeTag(TokenTag new_tag)
+UCS_string
+Token::canonical(PrintStyle style) const
 {
-   Assert((tag & TV_MASK) == (new_tag & TV_MASK));
-   // tag is ia const TokenTag, so we cheat a little here.
-   const_cast<TokenTag &>(tag) = new_tag;
+UCS_string ucs;
+   switch(get_Class())
+      {
+        case TC_ASSIGN:
+             ucs << UNI_LEFT_ARROW;
+             break;
+
+        case TC_R_ARROW:
+             ucs << UNI_RIGHT_ARROW;
+             break;
+
+        case TC_L_BRACK:
+             if (get_tag() == TOK_L_BRACK)        ucs << UNI_L_BRACK;
+             else if (get_tag() == TOK_SEMICOL)   ucs << UNI_SEMICOLON;
+             else
+                FIXME;
+             break;
+
+        case TC_R_BRACK:
+             ucs << UNI_R_BRACK;
+             break;
+
+        case TC_END:
+             ucs << UNI_DIAMOND;
+             break;
+
+        case TC_RETURN:                                                  break;
+        case TC_LINE:
+             ucs << UNI_LF;
+             break;
+
+        case TC_VALUE:
+             {
+               PrintContext pctx(style, DEFAULT_Quad_PP, DEFAULT_Quad_PW);
+               PrintBuffer pbuf(*get_apl_val(), pctx, 0);
+               if (pbuf.get_row_count() == 0)   return ucs;
+               return pbuf.l1();
+             }
+
+        case TC_SYMBOL:
+             ucs << get_sym_ptr()->get_name();
+             break;
+
+        case TC_R_PARENT:
+        case TC_L_PARENT:
+        case TC_R_CURLY:
+        case TC_L_CURLY:
+             return ID::get_name_UCS(get_Id());
+
+        case TC_FUN0:
+        case TC_FUN12:
+        case TC_OPER1:
+        case TC_OPER2:
+             if (get_Id() == ID_No_ID)   return get_function()->get_name();
+             return ID::get_name_UCS(get_Id());
+
+
+        case TC_INDEX:
+             if (get_tag() == TOK_AXIS)
+                {
+                  UCS_string ret;
+                  ret << "[";
+
+                  // caution: get_apl_val() may be 0 (for index []).
+                  //
+                  if (const Value * axis = get_apl_val().get())
+                     {
+                      ret << ShapeItem(axis->get_cfirst().get_int_value());
+                     }
+                  ret << "]";
+                  return ret;
+                }
+
+             if (get_tag() == TOK_FAXIS)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "[" << get_int_val() << "]";
+                }
+
+             if (get_tag() == TOK_MARKER)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "@" << get_int_val() << "@";
+                }
+
+             FIXME;
+
+        case TC_VOID:
+             {
+               UCS_string ret;
+               ret << "-VOID-";
+               return ret;
+             }
+
+        default:
+             CERR << "Token: " << HEX4(tag) << " " << *this
+                  << " at " << LOC << endl;
+             Q1(get_Class())
+             BACKTRACE
+             FIXME;
+      }
+
+   return ucs;
+}
+//----------------------------------------------------------------------------
+int
+Token::error_info(UCS_string & ucs) const
+{
+UCS_string canon = canonical(PR_APL_FUN).remove_pad();
+
+const Unicode c1 = ucs.back();
+const Unicode c2 = canon.size() ? canon[0] : Invalid_Unicode;
+
+   // conditions when we don't need a space
+   //
+bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
+
+   if (need_space)   ucs << UNI_SPACE;
+
+   ucs << canon;
+   return need_space ? -canon.size() : canon.size();
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -299,36 +417,6 @@ Token::get_function_axis() const
    Q1(*this);
    MORE_ERROR() << "Invalid Token type for function axis.";
    AXIS_ERROR;
-}
-//----------------------------------------------------------------------------
-int
-Token::value_use_count() const
-{
-   if (!is_apl_val())    return 0;            // token is not a TV_VALUE token
-   if (!value.apl_val)   return -98;          // it is, but its Value * is -
-   return value.apl_val->get_owner_count();   // non-zero Value *
-}
-//----------------------------------------------------------------------------
-void
-Token::release_apl_val(const char * loc)
-{
-   if (is_apl_val())   value.apl_val.reset();
-}
-//----------------------------------------------------------------------------
-void
-Token::extract_apl_val(const char * loc)
-{
-   if (is_apl_val())   value.apl_val.reset();
-}
-//----------------------------------------------------------------------------
-Value *
-Token::extract_and_keep(const char * loc)
-{
-   if (!is_apl_val())   return 0;
-
-Value * ret = value.apl_val.get();
-   value.apl_val.clear_pointer(loc);
-   return ret;
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -597,120 +685,6 @@ const UCS_string indent(fn.size(), UNI_SPACE);
    if (pb.get_row_count() == 0)   out << endl;
 }
 //----------------------------------------------------------------------------
-ostream &
-Token::print_quad(ostream & out) const
-{
-   return out << UNI_Quad_Quad << get_Id();
-}
-//----------------------------------------------------------------------------
-UCS_string
-Token::canonical(PrintStyle style) const
-{
-UCS_string ucs;
-   switch(get_Class())
-      {
-        case TC_ASSIGN:
-             ucs << UNI_LEFT_ARROW;
-             break;
-
-        case TC_R_ARROW:
-             ucs << UNI_RIGHT_ARROW;
-             break;
-
-        case TC_L_BRACK:
-             if (get_tag() == TOK_L_BRACK)        ucs << UNI_L_BRACK;
-             else if (get_tag() == TOK_SEMICOL)   ucs << UNI_SEMICOLON;
-             else
-                FIXME;
-             break;
-
-        case TC_R_BRACK:
-             ucs << UNI_R_BRACK;
-             break;
-
-        case TC_END:
-             ucs << UNI_DIAMOND;
-             break;
-
-        case TC_RETURN:                                                  break;
-        case TC_LINE:
-             ucs << UNI_LF;
-             break;
-
-        case TC_VALUE:
-             {
-               PrintContext pctx(style, DEFAULT_Quad_PP, DEFAULT_Quad_PW);
-               PrintBuffer pbuf(*get_apl_val(), pctx, 0);
-               if (pbuf.get_row_count() == 0)   return ucs;
-               return pbuf.l1();
-             }
-
-        case TC_SYMBOL:
-             ucs << get_sym_ptr()->get_name();
-             break;
-
-        case TC_R_PARENT:
-        case TC_L_PARENT:
-        case TC_R_CURLY:
-        case TC_L_CURLY:
-             return ID::get_name_UCS(get_Id());
-
-        case TC_FUN0:
-        case TC_FUN12:
-        case TC_OPER1:
-        case TC_OPER2:
-             if (get_Id() == ID_No_ID)   return get_function()->get_name();
-             return ID::get_name_UCS(get_Id());
-
-
-        case TC_INDEX:
-             if (get_tag() == TOK_AXIS)
-                {
-                  UCS_string ret;
-                  ret << "[";
-
-                  // caution: get_apl_val() may be 0 (for index []).
-                  //
-                  if (const Value * axis = get_apl_val().get())
-                     {
-                      ret << ShapeItem(axis->get_cfirst().get_int_value());
-                     }
-                  ret << "]";
-                  return ret;
-                }
-
-             if (get_tag() == TOK_FAXIS)   // function axis
-                {
-                  UCS_string ret;
-                  return ret << "[" << get_int_val() << "]";
-                }
-
-             if (get_tag() == TOK_MARKER)   // function axis
-                {
-                  UCS_string ret;
-                  return ret << "@" << get_int_val() << "@";
-                }
-
-             FIXME;
-
-        case TC_VOID:
-             {
-               UCS_string ret;
-               ret << "-VOID-";
-               return ret;
-             }
-
-        default:
-             CERR << "Token: " << HEX4(tag) << " " << *this
-                  << " at " << LOC << endl;
-             Q1(get_Class())
-             BACKTRACE
-             FIXME;
-      }
-
-   return ucs;
-}
-//----------------------------------------------------------------------------
 UCS_string
 Token::tag_name() const
 {
@@ -729,21 +703,86 @@ UCS_string ucs(utf);
 }
 //----------------------------------------------------------------------------
 int
-Token::error_info(UCS_string & ucs) const
+Token::value_use_count() const
 {
-UCS_string canon = canonical(PR_APL_FUN).remove_pad();
+   if (!is_apl_val())    return 0;            // token is not a TV_VALUE token
+   if (!value.apl_val)   return -98;          // it is, but its Value * is -
+   return value.apl_val->get_owner_count();   // non-zero Value *
+}
+//----------------------------------------------------------------------------
+void
+Token::ChangeTag(TokenTag new_tag)
+{
+   Assert((tag & TV_MASK) == (new_tag & TV_MASK));
+   // tag is ia const TokenTag, so we cheat a little here.
+   const_cast<TokenTag &>(tag) = new_tag;
+}
+//----------------------------------------------------------------------------
+Value *
+Token::extract_and_keep(const char * loc)
+{
+   if (!is_apl_val())   return 0;
 
-const Unicode c1 = ucs.back();
-const Unicode c2 = canon.size() ? canon[0] : Invalid_Unicode;
+Value * ret = value.apl_val.get();
+   value.apl_val.clear_pointer(loc);
+   return ret;
+}
+//----------------------------------------------------------------------------
+void
+Token::extract_apl_val(const char * loc)
+{
+   if (is_apl_val())   value.apl_val.reset();
+}
+//----------------------------------------------------------------------------
+void
+Token::release_apl_val(const char * loc)
+{
+   if (is_apl_val())   value.apl_val.reset();
+}
+//----------------------------------------------------------------------------
+const char *
+Token::class_name(TokenTag tag)
+{
+#define tcn(x) case x: return #x;
 
-   // conditions when we don't need a space
-   //
-bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
+const TokenClass tc = TokenClass(tag & TC_MASK);
+   switch(tc)
+      {
+        tcn(TC_ASSIGN)
+        tcn(TC_R_ARROW)
+        tcn(TC_L_BRACK)
+        tcn(TC_R_BRACK)
+        tcn(TC_END)
+        tcn(TC_FUN0)
+        tcn(TC_FUN12)
+        tcn(TC_INDEX)
+        tcn(TC_OPER1)
+        tcn(TC_OPER2)
+        tcn(TC_L_PARENT)
+        tcn(TC_R_PARENT)
+        tcn(TC_RETURN)
+        tcn(TC_SYMBOL)
+        tcn(TC_VALUE)
 
-   if (need_space)   ucs << UNI_SPACE;
+        tcn(TC_PINDEX)
+        tcn(TC_VOID)
 
-   ucs << canon;
-   return need_space ? -canon.size() : canon.size();
+        tcn(TC_OFF)
+        tcn(TC_SI_CHANGE)
+        tcn(TC_LINE)
+        tcn(TC_NUMERIC)
+        tcn(TC_SPACE)
+        tcn(TC_NEWLINE)
+        tcn(TC_COLON)
+        tcn(TC_QUOTE)
+        tcn(TC_L_CURLY)
+        tcn(TC_R_CURLY)
+
+        tcn(TC_INVALID)
+        default: ;
+      }
+
+   return "*** Obscure token class ***";
 }
 //----------------------------------------------------------------------------
 const char * 
@@ -796,49 +835,10 @@ const TokenClass tc = TokenClass(tag & TC_MASK);
    return "???";
 }
 //----------------------------------------------------------------------------
-const char *
-Token::class_name(TokenTag tag)
+ostream &
+Token::print_quad(ostream & out) const
 {
-#define tcn(x) case x: return #x;
-
-const TokenClass tc = TokenClass(tag & TC_MASK);
-   switch(tc)
-      {
-        tcn(TC_ASSIGN)
-        tcn(TC_R_ARROW)
-        tcn(TC_L_BRACK)
-        tcn(TC_R_BRACK)
-        tcn(TC_END)
-        tcn(TC_FUN0)
-        tcn(TC_FUN12)
-        tcn(TC_INDEX)
-        tcn(TC_OPER1)
-        tcn(TC_OPER2)
-        tcn(TC_L_PARENT)
-        tcn(TC_R_PARENT)
-        tcn(TC_RETURN)
-        tcn(TC_SYMBOL)
-        tcn(TC_VALUE)
-
-        tcn(TC_PINDEX)
-        tcn(TC_VOID)
-
-        tcn(TC_OFF)
-        tcn(TC_SI_CHANGE)
-        tcn(TC_LINE)
-        tcn(TC_NUMERIC)
-        tcn(TC_SPACE)
-        tcn(TC_NEWLINE)
-        tcn(TC_COLON)
-        tcn(TC_QUOTE)
-        tcn(TC_L_CURLY)
-        tcn(TC_R_CURLY)
-
-        tcn(TC_INVALID)
-        default: ;
-      }
-
-   return "*** Obscure token class ***";
+   return out << UNI_Quad_Quad << get_Id();
 }
 //----------------------------------------------------------------------------
 // EOF

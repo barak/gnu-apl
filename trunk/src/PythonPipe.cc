@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,9 +49,10 @@
 
 //============================================================================
 PythonPipe::PythonPipe(const char * script)
-  : python_script(script),
+  : fd(-1),
     pid(-1),
-    fd(-1)
+    python_script(script)
+
 {
    // check that script is readable. We expect in in the current directory, or
    // else in APL_bin_path.
@@ -122,13 +123,6 @@ char * env[] = { 0 };
    cout << "\n\n*** child: execve() failed: " << strerror(errno) << "\n\n";
 }
 //----------------------------------------------------------------------------
-void
-PythonPipe::close()
-{
-   if (fd != -1)   ::close(fd);
-   fd = -1;
-}
-//----------------------------------------------------------------------------
 UCS_string
 PythonPipe::read(bool keep_LF)
 {
@@ -179,6 +173,13 @@ PythonPipe::wr_rd(const char * cmd)
 UTF8_string cmd_utf(cmd);
    write(cmd_utf);
    return read();
+}
+//----------------------------------------------------------------------------
+void
+PythonPipe::close()
+{
+   if (fd != -1)   ::close(fd);
+   fd = -1;
 }
 //============================================================================
 

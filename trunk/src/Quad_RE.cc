@@ -32,6 +32,53 @@ Quad_RE Quad_RE::fun;
 # include "Regexp.hh"
 
 //----------------------------------------------------------------------------
+Token
+Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   if (A->get_rank() > 1)   RANK_ERROR;
+   if (X->get_rank() > 1)   RANK_ERROR;
+
+   if (!A->is_char_string())
+      {
+        MORE_ERROR() << "left ⎕RE arguments must be a string value";
+        DOMAIN_ERROR;
+      }
+
+Flags flags(X->get_UCS_ravel());
+Regexp regexp(A->get_UCS_ravel(), flags.get_compflags());
+
+const Shape & shape = B->get_shape();
+    if (shape.get_rank() == 0)
+        return Token(TOK_APL_VALUE1, Idx0(LOC));
+
+    if (B->is_char_string())
+       {
+         Value_P Z = regex_results(regexp, flags, B->get_UCS_ravel());
+         Z->check_value(LOC);
+         return Token(TOK_APL_VALUE1, Z);
+       }
+
+Value_P Z(shape, LOC);
+   for (ShapeItem i = 0 ; i < shape.get_volume() ; i++)
+       {
+         const Cell & cell = B->get_cravel(i);
+         Value_P B_sub = cell.to_value(LOC);
+         if (!B_sub->is_char_string())
+            {
+              MORE_ERROR() << "Cell does not contain a string";
+              DOMAIN_ERROR;
+            }
+
+         Value_P Z_sub = regex_results(regexp, flags, B_sub->get_UCS_ravel());
+         Z_sub->check_value(LOC);
+         Z->next_ravel_Pointer(Z_sub.get());
+       }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+
+//----------------------------------------------------------------------------
 Quad_RE::Flags::Flags(const UCS_string & flags_string)
    : flags(0),
      error_on_no_match(false),
@@ -354,53 +401,6 @@ vector<int> ccount(ovector_count,   0);   // 0 children
    return deep_value(0, ovector, ovector_count,
                      parents.data(), ccount.data(), 0);
 }
-//----------------------------------------------------------------------------
-Token
-Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-   if (A->get_rank() > 1)   RANK_ERROR;
-   if (X->get_rank() > 1)   RANK_ERROR;
-
-   if (!A->is_char_string())
-      {
-        MORE_ERROR() << "left ⎕RE arguments must be a string value";
-        DOMAIN_ERROR;
-      }
-
-Flags flags(X->get_UCS_ravel());
-Regexp regexp(A->get_UCS_ravel(), flags.get_compflags());
-
-const Shape & shape = B->get_shape();
-    if (shape.get_rank() == 0)
-        return Token(TOK_APL_VALUE1, Idx0(LOC));
-
-    if (B->is_char_string())
-       {
-         Value_P Z = regex_results(regexp, flags, B->get_UCS_ravel());
-         Z->check_value(LOC);
-         return Token(TOK_APL_VALUE1, Z);
-       }
-
-Value_P Z(shape, LOC);
-   for (ShapeItem i = 0 ; i < shape.get_volume() ; i++)
-       {
-         const Cell & cell = B->get_cravel(i);
-         Value_P B_sub = cell.to_value(LOC);
-         if (!B_sub->is_char_string())
-            {
-              MORE_ERROR() << "Cell does not contain a string";
-              DOMAIN_ERROR;
-            }
-
-         Value_P Z_sub = regex_results(regexp, flags, B_sub->get_UCS_ravel());
-         Z_sub->check_value(LOC);
-         Z->next_ravel_Pointer(Z_sub.get());
-       }
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-
 #else // ! HAVE_LIBPCRE2_32
 
 Token

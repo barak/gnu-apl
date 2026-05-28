@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,32 +32,32 @@ using namespace std;
 class ProcessorID
 {
 public:
+   /// return the grandparent's ID
+   static AP_num get_grand_ID()           { return id.grand; }
+
    /// return the current ID (proc, parent, and grandparent)
    static const AP_num3 & get_id()        { return id; }
 
-   /// @param ap3 processor triplet (proc, parent, grandparent) to assign
-   static void set_id(AP_num3 ap3)       { id = ap3; }
+   /// return the parent's ID
+   static AP_num get_parent_ID()          { return id.parent; }
 
    static void clear_id()
       { id.proc = id.parent = id.grand = AP_NULL; }
+
+   /// set the grandparent's ID
+   /// @param ap the AP number to assign as the grandparent's ID
+   static void set_grand_ID(AP_num ap)    { id.grand = ap; }
+
+   /// @param ap3 processor triplet (proc, parent, grandparent) to assign
+   static void set_id(AP_num3 ap3)       { id = ap3; }
 
    /// set the current ID
    /// @param ap the AP number to assign as this processor's own ID
    static void set_own_ID(AP_num ap)      { id.proc = ap; }
 
-   /// return the parent's ID
-   static AP_num get_parent_ID()          { return id.parent; }
-
    /// set the parent's ID
    /// @param ap the AP number to assign as the parent's ID
    static void set_parent_ID(AP_num ap)   { id.parent = ap; }
-
-   /// return the grandparent's ID
-   static AP_num get_grand_ID()           { return id.grand; }
-
-   /// set the grandparent's ID
-   /// @param ap the AP number to assign as the grandparent's ID
-   static void set_grand_ID(AP_num ap)    { id.grand = ap; }
 
 protected:
    /// the current ID (proc, parent, and grandparent)
@@ -116,13 +116,6 @@ struct Network_Profile
 class ProcessorID
 {
 public:
-   /// initialize our own process ID, return non-0 on error.
-   /// proc_id == 0 uses the next free ID > 1000; otherwise proc_id is used.
-   /// \b do_sv defines if an APnnn process for incoming ⎕SVO offers
-   /// shall be forked.
-   /// @param log_startup true to log startup diagnostics
-   static bool init(bool log_startup);
-
    /// return the own id, parent, and grand-parent
    static const AP_num3 & get_id()        { return id; }
 
@@ -132,22 +125,23 @@ public:
    /// return the processor ID of the parent of this apl interpreter
    static AP_num get_parent_ID()   { return id.parent; }
 
-   /// read the network profile file from its default location
-   static int read_network_profile();
-
    /// disconnect from APnnn process
    static void disconnect();
+
+   /// initialize our own process ID, return non-0 on error.
+   /// proc_id == 0 uses the next free ID > 1000; otherwise proc_id is used.
+   /// \b do_sv defines if an APnnn process for incoming ⎕SVO offers
+   /// shall be forked.
+   /// @param log_startup true to log startup diagnostics
+   static bool init(bool log_startup);
+
+   /// read the network profile file from its default location
+   static int read_network_profile();
 
 protected:
    /// read the network profile file from file \b file
    /// @param filename path to the network profile file
    static int read_network_profile(const char * filename);
-
-   /// read one SvoPid entry from \b file
-   /// @param file open FILE pointer to read from
-   /// @param svopid output SvoPid record to populate
-   /// @param line current line number (updated on read)
-   static const char * read_svopid(FILE * file, SvoPid & svopid, int & line);
 
    /// read one ProcAuth entry from \b file
    /// @param file open FILE pointer to read from
@@ -155,6 +149,12 @@ protected:
    /// @param line current line number (updated on read)
    static const char * read_procauth(FILE * file, ProcAuth & procauth,
                                      int & line);
+
+   /// read one SvoPid entry from \b file
+   /// @param file open FILE pointer to read from
+   /// @param svopid output SvoPid record to populate
+   /// @param line current line number (updated on read)
+   static const char * read_svopid(FILE * file, SvoPid & svopid, int & line);
 
    /// the processor, parent, and grandparent of this apl interpreter
    static AP_num3 id;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2019  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,14 +36,6 @@ public:
    /// Constructor.
    Quad_PNG();
 
-   static Quad_PNG  fun;          ///< Built-in function.
-
-   /// a semaphore blocking until gtk_widget_show_all() was called
-   static sem_t * PNG_window_sema;
-
-   /// a semaphore waiting from pthread_create() until the thread has started.
-   static sem_t * PNG_threads_sema;
-
    /// the type and compressed length of a PNG filter
    struct filter_info
       {
@@ -51,6 +43,14 @@ public:
         int filter_type;         ///< PNG filter type
         int compressed_length;   ///< compressed length
       };
+
+   static Quad_PNG  fun;          ///< Built-in function.
+
+   /// a semaphore blocking until gtk_widget_show_all() was called
+   static sem_t * PNG_window_sema;
+
+   /// a semaphore waiting from pthread_create() until the thread has started.
+   static sem_t * PNG_threads_sema;
 
 protected:
    /// Destructor.
@@ -89,10 +89,6 @@ protected:
    /// @param B integer control code
    Value_P window_control(APL_Integer B) const;
 
-   /// read PNG file \b filename and return its pixels as 4×N×M matrix
-   /// @param filename path to the PNG file to read
-   static Value_P read_PNG_file(const UTF8_string & filename);
-
    /// display an RGB matrix
    /// @param B APL value containing the RGB pixel matrix
    static APL_Integer display_PNG(Value & B);
@@ -100,6 +96,10 @@ protected:
    /// display an RGB matrix (interpreter code)
    /// @param B APL value containing the RGB pixel matrix
    static APL_Integer display_PNG_main(Value_P B);
+
+   /// read PNG file \b filename and return its pixels as 4×N×M matrix
+   /// @param filename path to the PNG file to read
+   static Value_P read_PNG_file(const UTF8_string & filename);
 
    /// return true iff the combination of color_type and bit_depth is
    /// valid in the PNG standard AND supported by ⎕PNG.

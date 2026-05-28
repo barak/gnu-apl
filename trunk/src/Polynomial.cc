@@ -26,6 +26,84 @@
 #include "Polynomial.hh"
 #include "Tokenizer.hh"
 
+//-----------------------------------------------------------------------
+int
+Monomial::get_order(const Value & order) const
+{
+   // find the index of this monomial in order.
+   //
+Shape index;
+   loop(e, expos.size())   index.add_shape_item(expos[e]);
+
+const ShapeItem offset = order.get_shape().ravel_pos(index);
+   return order.get_cravel(offset).get_int_value();
+}
+//-----------------------------------------------------------------------
+ostream &
+Monomial::print(ostream & out, bool first) const
+{
+Complex coeff = coefficient;
+   if (Cell::is_near_zero(coeff.real()) &&
+       Cell::is_near_zero(coeff.imag()))   return out;
+
+   if (first)
+      {
+        if (coeff.real() < 0)
+           {
+             out << "¯";
+             coeff = - coeff;
+           }
+      }
+   else
+      {
+        if (coeff.real() < 0)
+           {
+             out << " - ";
+             coeff = - coeff;
+           }
+        else
+           {
+             out << " + ";
+           }
+      }
+   if (coeff.imag() || !Cell::is_near_zero(coeff.real() - 1.0))
+      {
+        Assert(coeff.real() >= 0.0);
+        out << coeff.real();
+      }
+
+   if (coeff.imag())   out << "J" << coeff.imag();
+   loop(r, expos.size())
+       {
+         if (const int expo = expos[r])   // more than X⁰
+            {
+              out << Unicode('x' + r);
+              if (expo > 1)   out << UCS_string::power(expo);
+            }
+       }
+
+   return out;
+}
+//-----------------------------------------------------------------------
+Value_P
+Monomial::to_value() const
+{
+Value_P Z(expos.size() + 1, LOC);
+
+   if (Cell::is_near_zero(coefficient.imag()))       // real coefficient
+      {
+        Z->next_ravel_Number(coefficient.real());
+      }
+   else if (!Cell::is_near_int(coefficient.imag()))   // complex coefficient
+      {
+        Z->next_ravel_Complex(coefficient.real(), coefficient.imag());
+      }
+
+   loop(e, expos.size())   Z->next_ravel_Int(expos[e]);
+
+   Z->check_value(LOC);
+   return Z;
+}
 //============================================================================
 void
 Monomial::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
@@ -130,84 +208,6 @@ size_t found_len = 0;
                }
       }
 }
-//-----------------------------------------------------------------------
-Value_P
-Monomial::to_value() const
-{
-Value_P Z(expos.size() + 1, LOC);
-
-   if (Cell::is_near_zero(coefficient.imag()))       // real coefficient
-      {
-        Z->next_ravel_Number(coefficient.real());
-      }
-   else if (!Cell::is_near_int(coefficient.imag()))   // complex coefficient
-      {
-        Z->next_ravel_Complex(coefficient.real(), coefficient.imag());
-      }
-
-   loop(e, expos.size())   Z->next_ravel_Int(expos[e]);
-
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------
-int
-Monomial::get_order(const Value & order) const
-{
-   // find the index of this monomial in order.
-   //
-Shape index;
-   loop(e, expos.size())   index.add_shape_item(expos[e]);
-
-const ShapeItem offset = order.get_shape().ravel_pos(index);
-   return order.get_cravel(offset).get_int_value();
-}
-//-----------------------------------------------------------------------
-ostream &
-Monomial::print(ostream & out, bool first) const
-{
-Complex coeff = coefficient;
-   if (Cell::is_near_zero(coeff.real()) &&
-       Cell::is_near_zero(coeff.imag()))   return out;
-
-   if (first)
-      {
-        if (coeff.real() < 0)
-           {
-             out << "¯";
-             coeff = - coeff;
-           }
-      }
-   else
-      {
-        if (coeff.real() < 0)
-           {
-             out << " - ";
-             coeff = - coeff;
-           }
-        else
-           {
-             out << " + ";
-           }
-      }
-   if (coeff.imag() || !Cell::is_near_zero(coeff.real() - 1.0))
-      {
-        Assert(coeff.real() >= 0.0);
-        out << coeff.real();
-      }
-
-   if (coeff.imag())   out << "J" << coeff.imag();
-   loop(r, expos.size())
-       {
-         if (const int expo = expos[r])   // more than X⁰
-            {
-              out << Unicode('x' + r);
-              if (expo > 1)   out << UCS_string::power(expo);
-            }
-       }
-
-   return out;
-}
 //============================================================================
 Polynomial::Polynomial(const Value & value)
 {
@@ -223,6 +223,31 @@ Polynomial::Polynomial(const Value & value)
          const Monomial term(coeff, shape);
          push_back(term);
        }
+}
+//----------------------------------------------------------------------------
+size_t
+Polynomial::LT_pos(const Value * order) const
+{
+size_t pos = 0;
+
+   if (order)   // user-defined order beyween monomials
+      {
+        int ord = at(0).get_order(*order);
+        for (size_t t = 1; t < size(); ++t)
+            {
+              const int ord_t = at(t).get_order(*order);
+              if (ord < ord_t)   { pos = t;   ord = ord_t; }
+            }
+      }
+
+   /// no user defined order, use lexicographical order
+   ///
+   for (size_t t = 1; t < size(); ++t)
+       {
+         if (at(pos) < at(t))   pos = t;
+       }
+   return pos;
+
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -255,31 +280,6 @@ const Monomial * largest = &at(0);
          largest = next;
        }
    return out;
-}
-//----------------------------------------------------------------------------
-size_t
-Polynomial::LT_pos(const Value * order) const
-{
-size_t pos = 0;
-
-   if (order)   // user-defined order beyween monomials
-      {
-        int ord = at(0).get_order(*order);
-        for (size_t t = 1; t < size(); ++t)
-            {
-              const int ord_t = at(t).get_order(*order);
-              if (ord < ord_t)   { pos = t;   ord = ord_t; }
-            }
-      }
-
-   /// no user defined order, use lexicographical order
-   ///
-   for (size_t t = 1; t < size(); ++t)
-       {
-         if (at(pos) < at(t))   pos = t;
-       }
-   return pos;
-
 }
 //----------------------------------------------------------------------------
 Value_P

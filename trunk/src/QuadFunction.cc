@@ -270,70 +270,6 @@ Quad_EB::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EB_B)->eval_AB(A, B);
 }
-//============================================================================
-Token
-Quad_EC::eval_B(Value_P B) const
-{
-const UCS_string statement_B(*B.get());
-
-ExecuteList * fun = 0;
-   try {
-         fun = ExecuteList::fix(statement_B, LOC);
-       }
-     catch (Error &)          {}
-     catch (std::bad_alloc &) { WS_FULL; }
-     catch (...)              { FIXME; }
-
-   if (fun == 0)
-      {
-        // syntax error in B
-        //
-        Value_P Z2(2, LOC);
-            Z2->next_ravel_Int(Error::error_major(E_SYNTAX_ERROR));
-            Z2->next_ravel_Int(Error::error_minor(E_SYNTAX_ERROR));
-            Z2->check_value(LOC);
-
-        UTF8_string Z3_utf(Error::error_name(E_SYNTAX_ERROR));
-        UCS_string Z3_ucs(Z3_utf);
-        Value_P Z3(Z3_ucs, LOC);
-        Value_P Z(3, LOC);
-        Z->next_ravel_0();              // return code = error
-        Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
-        Z->next_ravel_Pointer(Z3.get());   // ⎕EM
-
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-   Assert(fun);
-
-   Log(LOG_UserFunction__execute)   fun->print(CERR);
-
-   Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution_depth();
-
-   return Token(TOK_SI_PUSHED);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_EC::eval_fill_B(Value_P B) const
-{
-Value_P Z2(2, LOC);                             // Z2←0 0 0
-   Z2->next_ravel_0();
-   Z2->next_ravel_0();
-   Z2->check_value(LOC);
-
-Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)...
-   Zsub->next_ravel_Int(3);                     // Zsub[1] ← 3
-   Zsub->next_ravel_Pointer(Z2.get());          // Zsub[2] ← ⊂ 0 0 0
-   Zsub->next_ravel_Pointer(Idx0(LOC).get());   // Zsub[3] ← ⊂⍬
-   Zsub->check_value(LOC);
-
-Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
-  new (&Z->get_wproto())   PointerCell(Zsub.get(), *Z);
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
 //----------------------------------------------------------------------------
 void
 Quad_EC::eoc(Token & result)
@@ -442,6 +378,70 @@ Value_P Z2(2, LOC);
    Z->check_value(LOC);
 Token tok_Z(TOK_APL_VALUE1, Z);
    result.move_from(tok_Z, LOC);
+}
+//============================================================================
+Token
+Quad_EC::eval_B(Value_P B) const
+{
+const UCS_string statement_B(*B.get());
+
+ExecuteList * fun = 0;
+   try {
+         fun = ExecuteList::fix(statement_B, LOC);
+       }
+     catch (Error &)          {}
+     catch (std::bad_alloc &) { WS_FULL; }
+     catch (...)              { FIXME; }
+
+   if (fun == 0)
+      {
+        // syntax error in B
+        //
+        Value_P Z2(2, LOC);
+            Z2->next_ravel_Int(Error::error_major(E_SYNTAX_ERROR));
+            Z2->next_ravel_Int(Error::error_minor(E_SYNTAX_ERROR));
+            Z2->check_value(LOC);
+
+        UTF8_string Z3_utf(Error::error_name(E_SYNTAX_ERROR));
+        UCS_string Z3_ucs(Z3_utf);
+        Value_P Z3(Z3_ucs, LOC);
+        Value_P Z(3, LOC);
+        Z->next_ravel_0();              // return code = error
+        Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
+        Z->next_ravel_Pointer(Z3.get());   // ⎕EM
+
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   Assert(fun);
+
+   Log(LOG_UserFunction__execute)   fun->print(CERR);
+
+   Workspace::push_SI(fun, LOC);
+   Workspace::SI_top()->set_safe_execution_depth();
+
+   return Token(TOK_SI_PUSHED);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_EC::eval_fill_B(Value_P B) const
+{
+Value_P Z2(2, LOC);                             // Z2←0 0 0
+   Z2->next_ravel_0();
+   Z2->next_ravel_0();
+   Z2->check_value(LOC);
+
+Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)...
+   Zsub->next_ravel_Int(3);                     // Zsub[1] ← 3
+   Zsub->next_ravel_Pointer(Z2.get());          // Zsub[2] ← ⊂ 0 0 0
+   Zsub->next_ravel_Pointer(Idx0(LOC).get());   // Zsub[3] ← ⊂⍬
+   Zsub->check_value(LOC);
+
+Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
+  new (&Z->get_wproto())   PointerCell(Zsub.get(), *Z);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //============================================================================
 Token
@@ -643,53 +643,6 @@ const APL_Integer err = (B->get_cfirst().get_near_int() << 16)
 
    return ErrorCode(err);
 }
-//============================================================================
-Token
-Quad_EX::eval_B(Value_P B) const
-{
-   if (B->get_rank() > 2)   RANK_ERROR;
-
-   // we don't throw a DOMAIN ERROR if B is bad, but provide info for
-   // the user if she asks for it with )MORE.
-   loop(b, B->element_count())
-       {
-         const Cell & cell = B->get_cravel(b);
-         if (!cell.is_character_cell())
-            {
-              MORE_ERROR() << "⎕EX B: non-character in list B "
-                              "(of symbol names)";
-              break;
-            }
-
-        const Unicode uni = cell.get_char_value();
-        if (!( Avec::is_symbol_char(uni) ||
-               Avec::is_white(uni)       ||
-               (uni == UNI_FULLSTOP)))
-           {
-              MORE_ERROR() << "⎕EX B: invalid character "
-                           << uni << " in list B (of symbol names)";
-              break;
-           }
-       }
-
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
-
-Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
-Value_P Z(sh_Z, LOC);
-
-   loop(z, var_count)
-      {
-        const UCS_string & var = vars[z];
-        const int erased = expunge(var);
-
-        Z->next_ravel_Int(erased);
-      }
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
 //----------------------------------------------------------------------------
 int
 Quad_EX::expunge(const UCS_string & name)
@@ -743,6 +696,53 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
 cleanup:
    loop(m, members.size())   delete members[m];
    return ret;
+}
+//============================================================================
+Token
+Quad_EX::eval_B(Value_P B) const
+{
+   if (B->get_rank() > 2)   RANK_ERROR;
+
+   // we don't throw a DOMAIN ERROR if B is bad, but provide info for
+   // the user if she asks for it with )MORE.
+   loop(b, B->element_count())
+       {
+         const Cell & cell = B->get_cravel(b);
+         if (!cell.is_character_cell())
+            {
+              MORE_ERROR() << "⎕EX B: non-character in list B "
+                              "(of symbol names)";
+              break;
+            }
+
+        const Unicode uni = cell.get_char_value();
+        if (!( Avec::is_symbol_char(uni) ||
+               Avec::is_white(uni)       ||
+               (uni == UNI_FULLSTOP)))
+           {
+              MORE_ERROR() << "⎕EX B: invalid character "
+                           << uni << " in list B (of symbol names)";
+              break;
+           }
+       }
+
+const ShapeItem var_count = B->get_rows();
+const UCS_string_vector vars(*B, false);
+
+Shape sh_Z;
+   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+Value_P Z(sh_Z, LOC);
+
+   loop(z, var_count)
+      {
+        const UCS_string & var = vars[z];
+        const int erased = expunge(var);
+
+        Z->next_ravel_Int(erased);
+      }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //============================================================================
 UCS_string Quad_INP::esc1;
@@ -1517,6 +1517,22 @@ const ShapeItem ec = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
+//----------------------------------------------------------------------------
+void
+Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
+{
+std::vector<Function_Line> lines;
+   lines.reserve(new_value.element_count());
+
+   loop(l, new_value.element_count())
+      {
+        APL_Integer line = new_value.get_cravel(l).get_near_int();
+        if (line < 1)   continue;
+        lines.push_back(Function_Line(line));
+      }
+
+   ufun->set_trace_stop(lines, stop);
+}
 //============================================================================
 const UserFunction *
 Stop_Trace::locate_fun(const Value & fun_name)
@@ -1560,22 +1576,6 @@ Value_P Z(lines.size(), LOC);
 
    if (assigned)   return Token(TOK_APL_VALUE2, Z);
    else            return Token(TOK_APL_VALUE1, Z);
-}
-//----------------------------------------------------------------------------
-void
-Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
-{
-std::vector<Function_Line> lines;
-   lines.reserve(new_value.element_count());
-
-   loop(l, new_value.element_count())
-      {
-        APL_Integer line = new_value.get_cravel(l).get_near_int();
-        if (line < 1)   continue;
-        lines.push_back(Function_Line(line));
-      }
-
-   ufun->set_trace_stop(lines, stop);
 }
 //============================================================================
 Token

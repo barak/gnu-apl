@@ -50,6 +50,12 @@ AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 Network_Profile ProcessorID::network_profile;
 
 //----------------------------------------------------------------------------
+void
+ProcessorID::disconnect()
+{
+   Svar_DB::DB_tcp_error(0, 0, 0);
+}
+//----------------------------------------------------------------------------
 bool
 ProcessorID::init(bool log_startup)
 {
@@ -126,142 +132,6 @@ const TCP_socket sock = Svar_DB::get_DB_tcp();
       }
 
    return false;   // no error
-}
-//----------------------------------------------------------------------------
-const char *
-ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
-{
-const char * loc = 0;
-
-   for (line = 1;; ++line)
-       {
-         char buffer[200];
-         const long filepos = ftell(file);   // remember file position
-         char * s = fgets(buffer, sizeof(buffer) - 1, file);
-
-         if (s == 0)   break;   // end of file
-
-
-         // skip leading whitespaces
-         //
-         while (*s && *s < ' ')   ++s;
-
-         if (*s == '*')   continue;   // comment line
-         if (*s == 0)     continue;   // empty line
-
-         if (!strcmp(s, ":processor,"))
-            {
-              int i = NO_AP;
-              int j = AP_NULL;
-              int k = AP_NULL;
-
-              const int count = sscanf(s, ":processor,%u,%u,%u", &i, &j, &k);
-              if (count < 1)   { loc = LOC;   break; }
-              if (count > 3)   { loc = LOC;   break; }
-
-              svopid.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
-              continue;
-            }
-
-         if (!strcmp(s, ":address,"))
-            {
-              // skip tag and remove trailing whitespaces
-              //
-              s += 9;
-              char * e = s + strlen(s);
-              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
-
-              hostent * host = gethostbyname(s);
-              if (host == 0)
-                 {
-                   CERR << "gethostbyname(" << s << ") failed" << endl;
-                   loc = LOC;
-                   break;
-                 }
-
-              unsigned int hh = host->h_addr_list[0][0];
-              unsigned int hl = host->h_addr_list[0][1];
-              unsigned int lh = host->h_addr_list[0][2];
-              unsigned int ll = host->h_addr_list[0][3];
-
-              svopid.ip_addr = hh << 24 | hl << 16 | lh << 8 | ll;
-              continue;
-            }
-
-         if (!strcmp(s, ":userid,"))
-            {
-              s += 8;
-              for (unsigned int u = 1; u < sizeof(svopid.user); ++u)
-                  {
-                    if (*s < ' ')   break;
-                    svopid.user[u - 1] = *s++;
-                    svopid.user[u] = 0;
-                  }
-
-              continue;
-            }
-
-         if (!strcmp(s, ":crypt,"))
-            {
-              // ignored
-              continue;
-            }
-
-         // invalid tag (probably next entry). restore file position
-         //
-         fseek(file, filepos, SEEK_SET);
-         break;
-       }
-
-   return loc;
-}
-//----------------------------------------------------------------------------
-const char *
-ProcessorID::read_procauth(FILE * file, ProcAuth & procauth, int & line)
-{
-const char * loc = 0;
-
-   for (line = 1;; ++line)
-       {
-         char buffer[200];
-         const long filepos = ftell(file);   // remember file position
-         char * s = fgets(buffer, sizeof(buffer) - 1, file);
-
-         if (s == 0)   break;   // end of file
-
-
-         // skip leading whitespaces
-         //
-         while (*s && *s < ' ')   ++s;
-
-         if (*s == '*')   continue;   // comment line
-         if (*s == 0)     continue;   // empty line
-
-         if (!strcmp(s, ":rsvopid,"))
-            {
-              // skip tag and remove trailing whitespaces
-              //
-              s += 8;   // leave comma
-              char * e = s + strlen(s);
-              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
-
-              for (errno = 0; s && !errno; s = strchr(s, ','))
-                  {
-                    ++s;   // skip comma
-                    const unsigned int id = strtoll(s, 0, 10);
-
-                    procauth.rsvopid.push_back(id);
-                  }
-              continue;   // for (line = 1;; ++line)
-            }
-
-         // invalid tag (probably next entry). restore file position
-         //
-         fseek(file, filepos, SEEK_SET);
-         break;
-       }
-
-   return loc;
 }
 //----------------------------------------------------------------------------
 int
@@ -358,9 +228,139 @@ const char * loc = 0;
    return line;
 }
 //----------------------------------------------------------------------------
-void
-ProcessorID::disconnect()
+const char *
+ProcessorID::read_procauth(FILE * file, ProcAuth & procauth, int & line)
 {
-   Svar_DB::DB_tcp_error(0, 0, 0);
+const char * loc = 0;
+
+   for (line = 1;; ++line)
+       {
+         char buffer[200];
+         const long filepos = ftell(file);   // remember file position
+         char * s = fgets(buffer, sizeof(buffer) - 1, file);
+
+         if (s == 0)   break;   // end of file
+
+
+         // skip leading whitespaces
+         //
+         while (*s && *s < ' ')   ++s;
+
+         if (*s == '*')   continue;   // comment line
+         if (*s == 0)     continue;   // empty line
+
+         if (!strcmp(s, ":rsvopid,"))
+            {
+              // skip tag and remove trailing whitespaces
+              //
+              s += 8;   // leave comma
+              char * e = s + strlen(s);
+              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
+
+              for (errno = 0; s && !errno; s = strchr(s, ','))
+                  {
+                    ++s;   // skip comma
+                    const unsigned int id = strtoll(s, 0, 10);
+
+                    procauth.rsvopid.push_back(id);
+                  }
+              continue;   // for (line = 1;; ++line)
+            }
+
+         // invalid tag (probably next entry). restore file position
+         //
+         fseek(file, filepos, SEEK_SET);
+         break;
+       }
+
+   return loc;
+}
+//----------------------------------------------------------------------------
+const char *
+ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
+{
+const char * loc = 0;
+
+   for (line = 1;; ++line)
+       {
+         char buffer[200];
+         const long filepos = ftell(file);   // remember file position
+         char * s = fgets(buffer, sizeof(buffer) - 1, file);
+
+         if (s == 0)   break;   // end of file
+
+
+         // skip leading whitespaces
+         //
+         while (*s && *s < ' ')   ++s;
+
+         if (*s == '*')   continue;   // comment line
+         if (*s == 0)     continue;   // empty line
+
+         if (!strcmp(s, ":processor,"))
+            {
+              int i = NO_AP;
+              int j = AP_NULL;
+              int k = AP_NULL;
+
+              const int count = sscanf(s, ":processor,%u,%u,%u", &i, &j, &k);
+              if (count < 1)   { loc = LOC;   break; }
+              if (count > 3)   { loc = LOC;   break; }
+
+              svopid.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
+              continue;
+            }
+
+         if (!strcmp(s, ":address,"))
+            {
+              // skip tag and remove trailing whitespaces
+              //
+              s += 9;
+              char * e = s + strlen(s);
+              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
+
+              hostent * host = gethostbyname(s);
+              if (host == 0)
+                 {
+                   CERR << "gethostbyname(" << s << ") failed" << endl;
+                   loc = LOC;
+                   break;
+                 }
+
+              unsigned int hh = host->h_addr_list[0][0];
+              unsigned int hl = host->h_addr_list[0][1];
+              unsigned int lh = host->h_addr_list[0][2];
+              unsigned int ll = host->h_addr_list[0][3];
+
+              svopid.ip_addr = hh << 24 | hl << 16 | lh << 8 | ll;
+              continue;
+            }
+
+         if (!strcmp(s, ":userid,"))
+            {
+              s += 8;
+              for (unsigned int u = 1; u < sizeof(svopid.user); ++u)
+                  {
+                    if (*s < ' ')   break;
+                    svopid.user[u - 1] = *s++;
+                    svopid.user[u] = 0;
+                  }
+
+              continue;
+            }
+
+         if (!strcmp(s, ":crypt,"))
+            {
+              // ignored
+              continue;
+            }
+
+         // invalid tag (probably next entry). restore file position
+         //
+         fseek(file, filepos, SEEK_SET);
+         break;
+       }
+
+   return loc;
 }
 //----------------------------------------------------------------------------

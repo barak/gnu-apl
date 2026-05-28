@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,24 +87,32 @@ public:
 
    enum { MAX_ESC_LEN = 100 };   ///< max. length of an ESC sequence
 
+   /// true if xterm/color is ON
+   static bool color_enabled()
+      { return colors_enabled; }
+
+   /// return the current column (chars since last LF).
+   static int get_column()
+       { return output_column; }
+
+   /// initialize curses library
+   /// @param logit true to log initialization steps to the startup log
+   static void  init(bool logit);
+
+   /// reset colors to black and white
+   static void reset_colors();
+
+   /// reset() dout_filebuf
+   static void reset_dout();
+
    /// set the color mode (if colors_enabled). Outputs the escape sequence
    /// for \b mode when the color mode changes
    /// @param mode the new color mode to apply
    static void set_color_mode(ColorMode mode);
 
-   /// reset() dout_filebuf
-   static void reset_dout();
-
-   /// reset colors to black and white
-   static void reset_colors();
-
    /// set or toggle color mode (implementation of command ]XTERM)
    /// @param arg UCS string argument from the ]XTERM command
    static void toggle_color(const UCS_string & arg);
-
-   /// initialize curses library
-   /// @param logit true to log initialization steps to the startup log
-   static void  init(bool logit);
 
    /// escape sequence for CIN colors
    static char color_CIN[MAX_ESC_LEN];
@@ -126,25 +134,25 @@ public:
 
    /// background color for CIN
    static int color_CIN_background;
- 
+
    /// foreground color for COUT
    static int color_COUT_foreground;
 
    /// background color for COUT
    static int color_COUT_background;
- 
+
    /// foreground color for CERR
    static int color_CERR_foreground;
 
    /// background color for CERR
    static int color_CERR_background;
- 
+
    /// foreground color for UERR
    static int color_UERR_foreground;
 
    /// background color for UERR
    static int color_UERR_background;
- 
+
    /// escape sequence for clear to end of line
    static char clear_EOL[MAX_ESC_LEN];
 
@@ -198,14 +206,6 @@ public:
 
    /// default ESC sequence for Delete key with SHIFT and/or CTRL
    static char ESC_Delete_1[MAX_ESC_LEN];
-
-   /// true if xterm/color is ON
-   static bool color_enabled()
-      { return colors_enabled; }
-
-   /// return the current column (chars since last LF).
-   static int get_column()
-       { return output_column; }
 
    /// the current output column
    static int output_column;
