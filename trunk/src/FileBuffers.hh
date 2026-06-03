@@ -25,7 +25,7 @@
 
 #include "UTF8_string.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a filebuf for stdin echo
 class CinOut_filebuf : public filebuf
 {
@@ -34,7 +34,7 @@ class CinOut_filebuf : public filebuf
    virtual int overflow(int c);
 };
 extern CinOut_filebuf CIN_filebuf;
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 // a filebuf for stderr output
 class ErrOut_filebuf : public filebuf
 {
@@ -79,7 +79,7 @@ protected:
    /// @param c character to overflow into the buffer
    virtual int overflow(int c);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a filebuf that compares its output with a file.
 class DiffOut : public filebuf
 {
@@ -122,5 +122,5 @@ protected:
    /// expand LF to CRLF
    bool expand_LF;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __FILEBUFFERS_HH_DEFINED__

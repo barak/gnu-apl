@@ -34,7 +34,7 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
      safe_execution_depth(_par ? _par->safe_execution_depth : 0),
@@ -44,7 +44,7 @@ StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
      parent(_par)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 StateIndicator::~StateIndicator()
 {
    // flush the FIFO. Do that before delete executable so that values
@@ -68,7 +68,7 @@ StateIndicator::~StateIndicator()
          executable = 0;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const StateIndicator *
 StateIndicator::find_child() const
 {
@@ -80,7 +80,7 @@ StateIndicator::find_child() const
 
    return 0;   // si is Workspace::SI_top()
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 StateIndicator::function_name() const
 {
@@ -109,14 +109,14 @@ StateIndicator::function_name() const
    FIXME;
    return UCS_string();
 } 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 StateIndicator::get_L(UCS_string & function) const
 {
    if (const Value_P * L = current_stack.locate_L(function))   return *L;
    return Value_P();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_Line
 StateIndicator::get_line() const
 {
@@ -124,7 +124,7 @@ int pc = get_PC();
    if (pc)   --pc;
    return executable->get_line(Function_PC(pc));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 StateIndicator::get_parse_mode_name() const
 {
@@ -139,21 +139,21 @@ StateIndicator::get_parse_mode_name() const
    FIXME;
    return Invalid_Unicode;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 StateIndicator::get_R(UCS_string & function) const
 {
    if (const Value_P * R = current_stack.locate_R(function))   return *R;
    return Value_P();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 StateIndicator::get_X(UCS_string & function) const
 {
    if (const Value_P * X = current_stack.locate_X(function))   return *X;
    return Value_P();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 StateIndicator::indent(ostream & out) const
 {
@@ -172,7 +172,7 @@ StateIndicator::indent(ostream & out) const
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::info(ostream & out, const char * loc) const
 {
@@ -181,7 +181,7 @@ StateIndicator::info(ostream & out, const char * loc) const
        << executable->get_text(0) << " creator: " << executable->get_loc()
        << "   seen at: " << loc << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::list(ostream & out, SI_mode mode) const
 {
@@ -268,7 +268,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
 
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 {
@@ -296,7 +296,7 @@ std::vector<const StateIndicator *> stack;
    MORE_ERROR() << "Invalid ⎕STACK index";
    INDEX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::print(ostream & out) const
 {
@@ -341,7 +341,7 @@ StateIndicator::print(ostream & out) const
 
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 StateIndicator::show_owners(ostream & out, const Value & value) const
 {
@@ -357,7 +357,7 @@ char cc[100];
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::unmark_all_values() const
 {
@@ -367,7 +367,7 @@ StateIndicator::unmark_all_values() const
    current_stack.unmark_all_values();   // values in the parsers
    fun_oper_cache.unmark_all_values();   // values in the derived function cache
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 StateIndicator::uses_function(const UserFunction * ufun) const
 {
@@ -404,12 +404,12 @@ const Executable * const uexec = ufun;   // cast ufun to uexec
        }
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::escape()
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::goon(Function_Line new_line, const char * loc)
 {
@@ -438,7 +438,7 @@ const Function_PC pc = get_executable()->get_exec_ufun()->pc_for_line(new_line);
 
    current_stack.reset(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 StateIndicator::jump(const Value * B)
 {
@@ -463,7 +463,7 @@ StateIndicator::jump(const Value * B)
 const Function_Line line = B->get_line_number();
    return jump_to_line(line);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 StateIndicator::jump_to_line(Function_Line line)
 {
@@ -479,14 +479,14 @@ StateIndicator::jump_to_line(Function_Line line)
    //
    return Token(TOK_BRANCH, int64_t(line < 0 ? Function_Line_0 : line));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::retry(const char * loc)
 {
    Log(LOG_StateIndicator__push_pop || LOG_prefix_parser)
       CERR << endl << "RETRY " << loc << ")" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 StateIndicator::run()
 {
@@ -497,28 +497,28 @@ Token result = current_stack.reduce_statements();
            << result << " in StateIndicator::run()" << endl;
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::set_L(Value_P new_value)
 {
 UCS_string function;
    if (Value_P * L = current_stack.locate_L(function))   *L = new_value;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::set_R(Value_P new_value)
 {
 UCS_string function;
    if (Value_P * R = current_stack.locate_R(function))   *R = new_value;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::set_X(Value_P new_value)
 {
 UCS_string function;
    if (Value_P * X = current_stack.locate_X(function))   *X = new_value;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #ifdef apl_TARGET_LIBAPL
 typedef int (*result_callback)(const Value * result, int committed);
 extern "C" result_callback res_callback;
@@ -642,5 +642,5 @@ const int boxing_format = Command::get_boxing_format();
         B1->print(COUT);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

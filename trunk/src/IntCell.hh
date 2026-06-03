@@ -27,7 +27,7 @@
 #include "Common.hh"   // for cfg_RATIONAL_NUMBERS_WANTED
 #include "RealCell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /*!
     A cell containing a single APL integer.  This class essentially
     overloads certain functions in class Cell with integer specific
@@ -326,6 +326,6 @@ protected:
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __INTCELL_HH_DEFINED__

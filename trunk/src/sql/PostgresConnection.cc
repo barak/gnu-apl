@@ -36,7 +36,7 @@ private:
     char *ptr;
 };
 
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PostgresConnection::PostgresConnection(PGconn * db_in)
     : db(db_in)
 {
@@ -46,7 +46,7 @@ PostgresConnection::~PostgresConnection()
 {
     PQfinish(db);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ArgListBuilder *
 PostgresConnection::make_prepared_query(const string & sql)
 {
@@ -59,7 +59,7 @@ PostgresConnection::make_prepared_update( const string &sql )
     return new PostgresArgListBuilder( this, sql );    
 }
 
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PostgresConnection::transaction_begin( void )
 {
@@ -72,7 +72,7 @@ PostgresConnection::transaction_begin( void )
         DOMAIN_ERROR;
     }
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PostgresConnection::transaction_commit( void )
 {
@@ -84,7 +84,7 @@ PostgresConnection::transaction_commit( void )
         DOMAIN_ERROR;
     }
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PostgresConnection::transaction_rollback( void )
 {
@@ -96,7 +96,7 @@ PostgresConnection::transaction_rollback( void )
         DOMAIN_ERROR;
     }
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PostgresConnection::fill_tables( vector<string> &tables )
 {
@@ -114,7 +114,7 @@ PostgresConnection::fill_tables( vector<string> &tables )
         tables.push_back( PQgetvalue( result.get_result(), row, 0 ) );
     }
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PostgresConnection::fill_cols(const string &table,
                               vector<ColumnDescriptor> &cols)
@@ -146,4 +146,4 @@ int rows = PQntuples( result.get_result() );
           cols.push_back( ColumnDescriptor(colname, coltype));
         }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

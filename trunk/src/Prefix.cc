@@ -41,7 +41,7 @@
 
 uint64_t Prefix::instance_counter = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
    : instance(++instance_counter),
      si(_si),
@@ -53,7 +53,7 @@ Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
      action(RA_FIXME)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::clean_up()
 {
@@ -72,7 +72,7 @@ Prefix::clean_up()
 
    put = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::uses_function(const UserFunction * ufun) const
 {
@@ -88,7 +88,7 @@ Prefix::uses_function(const UserFunction * ufun) const
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::has_quad_LRX() const
 {
@@ -110,7 +110,7 @@ Prefix::has_quad_LRX() const
         default: return content[0].get_Class() == TC_VALUE;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::print(ostream & out, int indent) const
 {
@@ -119,7 +119,7 @@ Prefix::print(ostream & out, int indent) const
    loop(s, ssize())   out << " " << at(s).get_token();
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::syntax_error(const char * loc)
 {
@@ -171,7 +171,7 @@ Prefix::syntax_error(const char * loc)
    throw_apl_error(get_assign_state() == ASS_none ? E_SYNTAX_ERROR
                                                   : E_LEFT_SYNTAX_ERROR, loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::unmark_all_values() const
 {
@@ -184,7 +184,7 @@ Prefix::unmark_all_values() const
         if (+value)   value->unmark();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Prefix::show_owners(const char * prefix, ostream & out,
                           const Value & value) const
@@ -206,7 +206,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P *
 Prefix::locate_L(UCS_string & function) const
 {
@@ -241,7 +241,7 @@ Prefix::locate_L(UCS_string & function) const
    if (at0().get_Class() == TC_VALUE)   return at0().get_apl_valp();
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P *
 Prefix::locate_R(UCS_string & function) const
 {
@@ -265,7 +265,7 @@ const Token & ret = content[ssize() - prefix_len].get_token();
    if (ret.get_Class() == TC_VALUE)   return ret.get_apl_valp();
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P *
 Prefix::locate_X(UCS_string & function) const
 {
@@ -296,7 +296,7 @@ Prefix::locate_X(UCS_string & function) const
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 // one entry of a hash table for all prefixes that can be reduced.
 // Used in Prefix.def
@@ -491,7 +491,7 @@ const uint64_t inst = instance;
 
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::do_shift(TokenClass next) const
 {
@@ -542,7 +542,7 @@ Prefix::do_shift(TokenClass next) const
         default: return false;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::print_stack(ostream & out, const char * loc) const
 {
@@ -559,7 +559,7 @@ const int si_depth = si.get_level();
 
    out << "  at " << loc << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Prefix::print_patterns(ostream & out, int which)
 {
@@ -659,7 +659,7 @@ const bool reverse  = which & 4;   // print ahead in APL order
       }
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Prefix::print_token_value(ostream & out, const Token & tok)
 {
@@ -699,7 +699,7 @@ const TokenClass tc = tok.get_Class();
 
    return out << (Token::class_name(tok.get_tag()) + 3);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::collect_symbols(vector<Symbol *> & symbols)
 {
@@ -721,7 +721,7 @@ Prefix::collect_symbols(vector<Symbol *> & symbols)
          symbols.push_back(sym_var);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::value_expected() const
 {
@@ -785,7 +785,7 @@ Prefix::value_expected() const
    //
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::adjust_right_caret(Function_PC2 & range,
                            const Token_string & failed_statement)
@@ -856,7 +856,7 @@ Prefix::adjust_right_caret(Function_PC2 & range,
              }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Fun_signature
 Prefix::get_current_signature()
 {
@@ -884,13 +884,13 @@ int ret = SIG_NONE;
 
    return Fun_signature(ret);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DerivedFunction *
 Prefix::get_fun_oper_slot(const char * loc) const
 {
    return si.get_fun_oper_slot(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::handle_ELSE(const Token & maybe_else, int num)
 {
@@ -908,7 +908,7 @@ const Function_PC PC_from = PC = Function_PC(maybe_else.get_int_val());
              << "(" << PC_from << ")" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::set_action(const Token & result)
 {
@@ -942,11 +942,11 @@ Prefix::set_action(const Token & result)
                  FIXME;
       }
 }
-//=======================================================================
+//════════════════════════════════════════════════════════════════════════════
 //
 // e reduce functions...
 //
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::is_value_bracket() const
 {
@@ -962,7 +962,7 @@ Symbol * sym = tok1.get_sym_ptr();
 const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
    return sym->resolve_class(is_left_sym) == TC_VALUE;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Prefix::is_value_parenthesis(int pc) const
 {
@@ -1038,7 +1038,7 @@ TokenClass next = body[pc].get_Class();
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline bool
 Prefix::push_next_token()
 {
@@ -1090,7 +1090,7 @@ const Token_loc tloc(tok, old_PC);
    push(tloc);
    return false;   // )SI not pushed
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #ifdef PREFIX_HASH
 inline void
 Prefix::find_best_phrase()
@@ -1167,7 +1167,7 @@ int idx = 0;
 // CERR << "end of prefix" << endl;
 }
 #endif
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline bool
 Prefix::check_next_binding()
 {
@@ -1229,7 +1229,7 @@ TokenClass next = TC_INVALID;   // assume no bext
 
    return false;    // don't bind
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::check_interrupt_or_attention(bool end_of_line)
 {
@@ -1242,7 +1242,7 @@ Prefix::check_interrupt_or_attention(bool end_of_line)
         else              ATTENTION
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::push_END_error()
 {
@@ -1311,7 +1311,7 @@ UCS_string & more = MORE_ERROR();
 
    syntax_error(LOC);   // no more token
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline bool
 Prefix::push_Symbol(Token_loc & tl)
 {
@@ -1429,7 +1429,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
    push(tl);
    return tl.get_tag() == TOK_SI_PUSHED;   // )SI not pushed
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline bool
 Prefix::MM_is_FM(Function_PC pc)
 {
@@ -1498,7 +1498,7 @@ Prefix::MM_is_FM(Function_PC pc)
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::handle_QUAD_ES_COM(const Token & result)
 {
@@ -1525,7 +1525,7 @@ Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
         new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::handle_QUAD_ES_ESC()
 {
@@ -1539,7 +1539,7 @@ Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
    Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
    new (&si_pushed)  Token(TOK_ESCAPE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::handle_QUAD_ES_BRA(const Token & result)
 {
@@ -1558,7 +1558,7 @@ const Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
 Value_P v_line = IntScalar(line, LOC);
    Workspace::SI_top()->jump(v_line.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::handle_QUAD_ES_ERR(const Token & result)
 {
@@ -1588,7 +1588,7 @@ Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
       }
    new (&StateIndicator::get_error(top)) Error(ec, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce____()
 {
@@ -1598,7 +1598,7 @@ Prefix::reduce____()
    print_stack(CERR, LOC);
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_LPAR_B_RPAR_()
 {
@@ -1619,7 +1619,7 @@ Prefix::reduce_LPAR_B_RPAR_()
 
    set_action(RA_CONTINUE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_LPAR_F_C_RPAR()
 {
@@ -1640,7 +1640,7 @@ Prefix::reduce_LPAR_F_C_RPAR()
    pop_and_discard();          // discard old RPAR
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_N___()
 {
@@ -1652,7 +1652,7 @@ const Token result = at0().get_function()->eval_();
    pop_args_push_result(result);
    set_action(RA_CONTINUE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_MISC_F_B_()
 {
@@ -1749,7 +1749,7 @@ const Token result = at0().get_function()->eval_B(at1().get_apl_val());
    Q1(result.get_tag())
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_MISC_F_C_B()
 {
@@ -1810,7 +1810,7 @@ const Token Z = M->eval_XB(C, B);
    pop_args_push_result(Z);
    set_action(Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_F_B_()
 {
@@ -1823,14 +1823,14 @@ const Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
    pop_args_push_result(result);
    set_action(result);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_M_B_()
 {
    if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_B_();
    syntax_error(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_F_C_B()
 {
@@ -1852,14 +1852,14 @@ const Token Z = F->eval_AXB(A, C, B);
    pop_args_push_result(Z);
    set_action(Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_M_C_B()
 {
    if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_C_B();
    syntax_error(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_M__()
 {
@@ -1874,7 +1874,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_M_M__()
 {
@@ -1887,7 +1887,7 @@ Prefix::reduce_M_M__()
         set_action(RA_PUSH_NEXT);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_M_C_()
 {
@@ -1903,7 +1903,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_C_M_()
 {
@@ -1923,7 +1923,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_C_M_C()
 {
@@ -1944,7 +1944,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_M__()
 {
@@ -1959,7 +1959,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN1, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_D_V__()
 {
@@ -2189,7 +2189,7 @@ Value_P top_val = top_sym->get_var_value();
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_D_B_()
 {
@@ -2270,7 +2270,7 @@ const Token dD(TOK_FUN2, derived);
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_D_G_()
 {
@@ -2286,7 +2286,7 @@ DerivedFunction * derived = get_fun_oper_slot(LOC);
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_D_C_B()
 {
@@ -2394,7 +2394,7 @@ const Token tok_derived(TOK_FUN2, derived);
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_C__()
 {
@@ -2432,7 +2432,7 @@ const Token result(TOK_APL_VALUE1, Z);
 
    set_action(result);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_V_C__()
 {
@@ -2442,7 +2442,7 @@ Token tok = V->resolve_lv(LOC);   // not Token & !
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_V_C_ASS_B()
 {
@@ -2498,7 +2498,7 @@ const Token result(TOK_APL_VALUE2, B);
    set_assign_state(ASS_none);
    set_action(result);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_F_V__()
 {
@@ -2510,7 +2510,7 @@ Token tok = V->resolve_lv(LOC);   // not Token & !
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_ASS_B_()
 {
@@ -2525,7 +2525,7 @@ const Token result(TOK_APL_VALUE2, B);
    set_assign_state(ASS_none);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_V_ASS_B_()
 {
@@ -2544,7 +2544,7 @@ Symbol * V = at0().get_sym_ptr();
 
    V->assign(B, clone, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_D_V_ASS_B()
 {
@@ -2552,7 +2552,7 @@ Prefix::reduce_D_V_ASS_B()
   reduce_D_V__();
   set_assign_state(ASS_none);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_V_ASS_F_()
 {
@@ -2571,7 +2571,7 @@ const Token result(TOK_APL_VALUE2, Z);
    set_assign_state(ASS_none);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_RBRA___()
 {
@@ -2589,7 +2589,7 @@ IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
    set_assign_state(ASS_none);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_LBRA_I__()
 {
@@ -2648,7 +2648,7 @@ Token result = at1();
    pop_args_push_result(result);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_LBRA_B_I_()
 {
@@ -2690,7 +2690,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
    pop_args_push_result(I);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_B__()
 {
@@ -2748,7 +2748,7 @@ const Token result(TOK_APL_VALUE3, Z);
 
    set_action(RA_CONTINUE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// pattern V ) ← B.
 void
 Prefix::reduce_V_RPAR_ASS_B()
@@ -2851,7 +2851,7 @@ const Token result(TOK_APL_VALUE2, at3().get_apl_val());
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_END___()
 {
@@ -2885,7 +2885,7 @@ Prefix::reduce_END___()
    put = 0;
    set_action(RA_PUSH_NEXT);   // match again (w/o SHIFT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_END_VOID__()
 {
@@ -2912,7 +2912,7 @@ Token Void(TOK_VOID);
         else              ATTENTION
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_END_B__()
 {
@@ -2990,7 +2990,7 @@ Token B = pop().get_token();   // pop B
         else              ATTENTION
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_END_GOTO__()   // Escape ( → )
 {
@@ -3072,7 +3072,7 @@ const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
         set_action(RA_RETURN);            // return from context;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_END_GOTO_B_()
 {
@@ -3134,7 +3134,7 @@ const Token result = si.jump(line);   // may change the PC
    Assert(result.get_tag() == TOK_VOID);   // branch taken, i.e. →N in ∇-context
    branch_within_function(end_of_line);    // does set_action(RA_PUSH_NEXT)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_A_GOTO_B_()
 {
@@ -3212,7 +3212,7 @@ const APL_Integer jump_offset = A0.get_near_int();
         set_action(RA_PUSH_NEXT);   // aka. SHIFT
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_RETC___()
 {
@@ -3293,7 +3293,7 @@ Prefix::reduce_RETC___()
    //
    Q1(at0().get_tag())   FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_RETC_VOID__()
 {
@@ -3311,7 +3311,7 @@ const Token result(TOK_VOID);   // function result is VOID
    pop_args_push_result(result);
    set_action(RA_RETURN);            // return from context;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // Note: reduce_RETC_A___ happens only for context ⍎,
 //       since contexts ◊ and ∇ use reduce_END_B___ instead.
 //
@@ -3335,7 +3335,7 @@ Token B = at1();
 
    set_action(RA_RETURN);            // return from context;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_RETC_GOTO__()
 {
@@ -3346,7 +3346,7 @@ Prefix::reduce_RETC_GOTO__()
 
    reduce_END_GOTO__();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Prefix::reduce_RETC_GOTO_B_()
 {
@@ -3420,7 +3420,7 @@ const Token result = si.jump(line);   // may change the PC
    pop_args_push_result(result);   // proposed by Claude Code
    set_action(RA_RETURN);          // return from context;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // Note: reduce_RETC_A_GOTO_B happens only for context ⍎, since
 //       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
 //
@@ -3430,5 +3430,5 @@ Prefix::reduce_RETC_A_GOTO_B()
    Assert1(prefix_len == 4);
    syntax_error(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

@@ -29,7 +29,7 @@
 #include "StateIndicator.hh"
 #include "Workspace.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 DerivedFunction::get_name() const
 {
@@ -55,7 +55,7 @@ UCS_string name;
    name << ")";
    return name;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 DerivedFunction::has_result() const
 {
@@ -63,14 +63,14 @@ DerivedFunction::has_result() const
    if (left_arg.is_function())   return left_arg.get_function()->has_result();
    return true;   // operator bound to left value
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DerivedFunction::unmark_all_values() const
 {
    if (+axis)   axis->unmark();
    if (left_arg.is_apl_val())   left_arg.get_apl_val()->unmark();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DerivedFunction::destroy_derived(const char * loc)
 {
@@ -84,7 +84,7 @@ DerivedFunction::destroy_derived(const char * loc)
    right_arg.clear(loc);
    axis.clear(loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DerivedFunction::DerivedFunction(Token * LO, cFunction_P F_or_M_or_D,
                                  Token * RO, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -119,7 +119,7 @@ const char * sepa = "";
         CERR << ") at " << loc << endl;
      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DerivedFunction::~DerivedFunction()
 {
    Log(LOG_FunOperX)
@@ -127,7 +127,7 @@ DerivedFunction::~DerivedFunction()
         CERR << "~DerivedFunction()" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DerivedFunction::entering(const char * class_name, const char * fun_name) const
 {
@@ -135,7 +135,7 @@ DerivedFunction::entering(const char * class_name, const char * fun_name) const
    print(CERR);
    CERR << "::" << fun_name << "() , this = " << voidP(this) << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
@@ -157,7 +157,7 @@ UCS_string ind(indent, UNI_SPACE);
 
    out << endl;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Derived_LO_D_RO::eval_AB(Value_P A, Value_P B) const
 {
@@ -167,7 +167,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRB(A, left, right, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_D_RO::eval_B(Value_P B) const
 {
@@ -177,7 +177,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRB(left, right, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_D_RO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -187,7 +187,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRXB(A, left, right, X, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_D_RO::eval_XB(Value_P X, Value_P B) const
 {
@@ -197,7 +197,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRXB(left, right, X, B);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Derived_LO_D_X_RO::eval_AB(Value_P A, Value_P B) const
 {
@@ -207,7 +207,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_ALRXB(A, left, right, axis, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_D_X_RO::eval_B(Value_P B) const
 {
@@ -217,7 +217,7 @@ Token & left  = const_cast<Token &>(left_arg);
 Token & right = const_cast<Token &>(right_arg);
    return oper->eval_LRXB(left, right, axis, B);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Derived_LO_M::eval_AB(Value_P A, Value_P B) const
 {
@@ -236,7 +236,7 @@ Derived_LO_M::eval_AB(Value_P A, Value_P B) const
         else         return oper->eval_AXB(A, axis, B);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M::eval_B(Value_P B) const
 {
@@ -264,7 +264,7 @@ Derived_LO_M::eval_B(Value_P B) const
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -273,7 +273,7 @@ Derived_LO_M::eval_AXB(Value_P A, Value_P X, Value_P B) const
 Token & left  = const_cast<Token &>(left_arg);
    return oper->eval_ALXB(A, left, X, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M::eval_XB(Value_P X, Value_P B) const
 {
@@ -292,7 +292,7 @@ Derived_LO_M::eval_XB(Value_P X, Value_P B) const
         else         return oper->eval_AXB(A, axis, B);
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Derived_LO_M_X::eval_AB(Value_P A, Value_P B) const
 {
@@ -311,7 +311,7 @@ Derived_LO_M_X::eval_AB(Value_P A, Value_P B) const
         else         return oper->eval_AXB(A, axis, B);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M_X::eval_B(Value_P B) const
 {
@@ -330,7 +330,7 @@ Derived_LO_M_X::eval_B(Value_P B) const
         else         return oper->eval_AXB(A, axis, B);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M_X::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -339,7 +339,7 @@ Derived_LO_M_X::eval_AXB(Value_P A, Value_P X, Value_P B) const
 Token & left  = const_cast<Token &>(left_arg);
    return oper->eval_ALXB(A, left, X, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_LO_M_X::eval_XB(Value_P X, Value_P B) const
 {
@@ -358,7 +358,7 @@ Derived_LO_M_X::eval_XB(Value_P X, Value_P B) const
         else         return oper->eval_AXB(A, axis, B);
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Derived_F_X::eval_AB(Value_P A, Value_P B) const
 {
@@ -366,7 +366,7 @@ Derived_F_X::eval_AB(Value_P A, Value_P B) const
 
    return oper->eval_AXB(A, axis, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Derived_F_X::eval_B(Value_P B) const
 {
@@ -374,7 +374,7 @@ Derived_F_X::eval_B(Value_P B) const
 
    return oper->eval_XB(axis, B);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 DerivedFunctionCache::DerivedFunctionCache()
    : idx(0)
 {
@@ -386,7 +386,7 @@ DerivedFunctionCache::DerivedFunctionCache()
               << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DerivedFunctionCache::~DerivedFunctionCache()
 {
    reset();
@@ -398,7 +398,7 @@ DerivedFunctionCache::~DerivedFunctionCache()
               << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DerivedFunction *
 DerivedFunctionCache::get(const char * loc)
 {
@@ -415,7 +415,7 @@ DerivedFunctionCache::get(const char * loc)
    return reinterpret_cast<DerivedFunction *>
                           (cache + idx++*sizeof(DerivedFunction));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DerivedFunctionCache::reset()
 {
@@ -434,5 +434,5 @@ DerivedFunctionCache::reset()
               << endl;
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

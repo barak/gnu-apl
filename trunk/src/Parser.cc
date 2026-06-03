@@ -46,14 +46,14 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Multi_line_SM::~Multi_line_SM()
 {
    if (in_string)       CERR << "*** Multiline string not closed." << endl;
    if (literal_depth)   CERR << "*** Multiline literal not closed (depth"
                              << literal_depth << ")." << endl;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Multi_line_SM::next(Unicode triple)
 {
@@ -157,7 +157,7 @@ Multi_line_SM::next(Unicode triple)
                 << " outside multiline string or literal." << endl;
    return;   // error
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 Parser::parse(const UCS_string & input, Token_string & tos,
               bool optimize) const
@@ -182,7 +182,7 @@ Token_string tos1;
 
    return parse(tos1, tos, optimize);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::parse(const Token_string & input, Token_string & tos,
               bool optimize) const
@@ -264,7 +264,7 @@ std::vector<Token_string *> statements;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Assign_state
 Parser::get_assign_state(Token_string & tos, ShapeItem pos)
 {
@@ -280,7 +280,7 @@ Parser::get_assign_state(Token_string & tos, ShapeItem pos)
 
    return ASS_none;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::get_multiline_status(vector<Multiline_status> & status,
                              const UCS_string_vector & text,
@@ -365,7 +365,7 @@ Multiline_status current = MLS_APL_text;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
@@ -436,7 +436,7 @@ std::vector<ShapeItem> stack;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::optimize_literal_axes(Token_string & tos)
 {
@@ -518,7 +518,7 @@ bool progress = false;
 
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::optimize_short_primitives(Token_string & tos)
 {
@@ -693,7 +693,7 @@ vector<ShapeItem> ends;
 
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Parser::parse_multi_literal(UCS_string_vector & text, Lit_DB & literals,
                             bool fun_header)
@@ -890,7 +890,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::replace_multi_line_literals(UCS_string_vector & text,
                                     Lit_DB & literals, bool fun_header)
@@ -990,7 +990,7 @@ const int start = fun_header ? 1 : 0;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::replace_multi_line_strings(UCS_string_vector & text,
                                    Lit_DB & literals, bool fun_header)
@@ -1079,7 +1079,7 @@ vector<Multiline_status> status;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::transform_old_multi_line_strings(UCS_string_vector & text)
 {
@@ -1163,7 +1163,7 @@ Multiline_status current = MLS_APL_text;
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::check_if_value(const Token_string & tos, int pos)
 {
@@ -1209,7 +1209,7 @@ Parser::check_if_value(const Token_string & tos, int pos)
 
    return false;   // tos[pos] is at the end of a function
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::collect_constants(Token_string & tos)
 {
@@ -1285,7 +1285,7 @@ bool progress = false;
 
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::collect_value_groups(Token_string & tos)
 {
@@ -1345,7 +1345,7 @@ int opening = -1;
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Parser::create_scalar_value(Token & output)
 {
@@ -1396,7 +1396,7 @@ Parser::create_scalar_value(Token & output)
    CERR << "Unexpected token " << output.get_tag() << ": " << output << endl;
    Assert(0 && "Unexpected token");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Parser::create_value(Token_string & tos, int pos, int count)
 {
@@ -1417,7 +1417,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
         tos.print(CERR, 1);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Parser::create_vector_value(Token_string & tos, int pos, int count)
 {
@@ -1472,7 +1472,7 @@ Token tok(TOK_APL_VALUE3, Z);
         tos.print(CERR, 1);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::fix_POWER_syntax(Token_string & tos)
 {
@@ -1547,7 +1547,7 @@ bool progress = false;
        }
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::fix_RANK_syntax(Token_string & tos)
 {
@@ -1655,7 +1655,7 @@ bool progress = false;
 
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Parser::j_length(Token_string & tos, int pos)
 {
@@ -1697,7 +1697,7 @@ int len = 0;
        }
    return len;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::map_function_groups(Token_string & tos)
 {
@@ -1780,7 +1780,7 @@ bool progress = false;
        }
    return progress;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// in tos, (re-) mark the symbols left of ← as left symbols
 void
 Parser::mark_lsymb(Token_string & tos)
@@ -1872,7 +1872,7 @@ Parser::mark_lsymb(Token_string & tos)
             }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Parser::optimize_static_patterns(Token_string & tos)
 {
@@ -1952,7 +1952,7 @@ bool TOK_VOID_inserted = false;
 
    if (TOK_VOID_inserted)   tos.remove_TOK_VOID();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Parser::parse_log(int N, const Token_string & tos)
 {
@@ -1962,7 +1962,7 @@ Parser::parse_log(int N, const Token_string & tos)
         tos.print(CERR, 3);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Parser::parse_statement(Token_string & tos, bool optimize)
 {
@@ -2061,7 +2061,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
@@ -2126,4 +2126,4 @@ bool progress = false;   // per iteration progress
    while(progress);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

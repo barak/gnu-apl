@@ -253,7 +253,7 @@ timeval tv;
 #  define cycle_counter() 0
 #endif // HAVE_RDTSC
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if HAVE_SEM_INIT
 
 #  define __sem_destroy(sem) sem_destroy(sem)
@@ -275,7 +275,7 @@ char sname[100];                                           \
    sem = sem_open(sname, O_CREAT, mode, value);            \
 }
 #endif // HAVE_SEM_INIT
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
@@ -436,7 +436,7 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Year, Month, Day, hour, minute, second, μsecond
 struct YMDhmsu
 {
@@ -455,7 +455,7 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int year;     ///< year, e.g. 2013
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)    { return common_new(size); }
@@ -466,7 +466,7 @@ inline void   operator delete[](void * p)  { common_delete(p); }
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// a function to be used if CERR might not (yet) be initialized. Returns cerr
 /// in that case.
@@ -492,7 +492,7 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 #define ALLOCA(typ, count) \
         reinterpret_cast<typ *>(alloca((count) * sizeof(typ)))
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #ifdef cfg_VALUE_HISTORY_WANTED
 
@@ -512,15 +512,15 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 
 #endif
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// @param p  pointer into a C string, advanced past any leading whitespace
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline const char * yes_no(bool yes)   { return yes ? "yes" : "no"; }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// @param pc     function program counter
 /// @param offset byte offset to add
 inline Function_PC
@@ -528,7 +528,7 @@ operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// @param pc     function program counter
 /// @param offset byte offset to subtract
 inline Function_PC
@@ -536,7 +536,7 @@ operator -(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) - offset);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC ++ (post increment)
 /// @param pc  function program counter to increment
 /// @param     unused post-increment distinguisher
@@ -547,7 +547,7 @@ const Function_PC before_increment = pc;
    pc = pc + 1;
    return before_increment;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC ++ (pre increment)
 /// @param pc  function program counter to increment
 inline Function_PC &
@@ -556,7 +556,7 @@ operator ++(Function_PC & pc)
    pc = pc + 1;
    return pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC -- (pre decrement)
 /// @param pc  function program counter to decrement
 inline Function_PC &
@@ -565,7 +565,7 @@ operator --(Function_PC & pc)
    pc = pc - 1;
    return pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to const char *
 /// @param utf  UTF-8 byte pointer to reinterpret as char *
 inline const char *
@@ -573,7 +573,7 @@ charP(const UTF8 * utf)
 {
    return reinterpret_cast<const char *>(utf);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to const char *
 /// @param vp  void pointer to reinterpret as char *
 inline const char *
@@ -581,7 +581,7 @@ charP(const void * vp)
 {
    return reinterpret_cast<const char *>(vp);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to a const void *
 /// @param addr  address to return as const void *
 inline const void *
@@ -589,7 +589,7 @@ voidP(const void * addr)
 {
    return addr;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #define uhex  std::hex << uppercase << setfill('0')
 #define uhexs  std::hex << uppercase

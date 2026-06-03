@@ -37,7 +37,7 @@ class IndexExpr;
 class RavelIterator;
 class UserFunction;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** One entry in the value stack of a symbol. The value stack
     is pushed/poped when the symbol is localized on entry/return of
     a user defined function.
@@ -177,7 +177,7 @@ protected:
    /// the (current) name class (like ⎕NC, unless shared variable)
    NameClass name_class;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Base class for variables, defined functions, and distinguished names
 class Symbol : public NamedObject
 {
@@ -468,7 +468,7 @@ protected:
    /// the value stack of \b this \b Symbol
    std::vector<ValueStackItem> value_stack;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda result λ
 class LAMBDA : public Symbol
 {
@@ -488,7 +488,7 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda variable ⍺
 class ALPHA : public Symbol
 {
@@ -508,7 +508,7 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda variable ⍶
 class ALPHA_U : public Symbol
 {
@@ -528,7 +528,7 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda variable χ
 class CHI : public Symbol
 {
@@ -548,7 +548,7 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda variable ⍵
 class OMEGA : public Symbol
 {
@@ -568,7 +568,7 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// lambda variable ⍹
 class OMEGA_U : public Symbol
 {
@@ -588,6 +588,6 @@ public:
    /// destroy variable (don't)
    void destroy_var() {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __SYMBOL_HH_DEFINED__

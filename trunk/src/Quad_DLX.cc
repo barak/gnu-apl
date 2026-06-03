@@ -31,7 +31,7 @@
 
 Quad_DLX  Quad_DLX::fun;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// one '1' in a sparse constraint matrix
 class DLX_Node
 {
@@ -137,7 +137,7 @@ public:
    /// true if ths node is a header node (containing no data)
    const bool is_header;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A (column-) header node
 class DLX_Header_Node : public DLX_Node
 {
@@ -164,7 +164,7 @@ public:
    /// the items r and j in the double-loop around cover()/uncover()
    DLX_Node * item_r;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DLX_Node::Col_Type
 DLX_Node::get_col_type(const Cell & cell)
 {
@@ -194,7 +194,7 @@ DLX_Node::get_col_type(const Cell & cell)
 
    return Col_INVALID;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// The root node of the constraints matrix
 class DLX_Root_Node : public DLX_Node
 {
@@ -316,7 +316,7 @@ protected:
    /// the first 0 in the matrix (for figuring the format)
    const Cell * first_0;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
                              const Value & B)
    : DLX_Node(true, -1, -1, this, this, this, this),
@@ -428,7 +428,7 @@ const Cell * b = &B.get_cfirst();
 
    Log(LOG_Quad_DLX)   { loop(n, ones)   nodes[n].print(CERR); }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DLX_Root_Node::deep_check() const
 {
@@ -447,7 +447,7 @@ DLX_Root_Node::deep_check() const
          Assert(ones == hdr.count);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 DLX_Root_Node::get_column_count() const
 {
@@ -455,7 +455,7 @@ ShapeItem cols_Z = 0;
    for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
    return cols_Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DLX_Root_Node::display(ostream & out) const
 {
@@ -527,7 +527,7 @@ char * rows_used = rows_used_v.data();
    out << endl;
 
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DLX_Root_Node::solve()
 {
@@ -663,7 +663,7 @@ level_done:
         goto rloop;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 DLX_Root_Node::preset(const Cell * steps, ShapeItem step_count, const Cell * cB)
 {
@@ -744,7 +744,7 @@ DLX_Node * h = right;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_DLX::eval_AB(Value_P A, Value_P B) const
 {
@@ -767,14 +767,14 @@ const APL_Integer a0 = A->get_cfirst().get_int_value();
    if (A->element_count() != 1)   LENGTH_ERROR;
    return do_DLX(a0, *B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_DLX::eval_B(Value_P B) const
 {
    if (B->get_rank() != 2)   RANK_ERROR;
    return do_DLX(0, *B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_DLX::do_DLX(ShapeItem how, const Value & B)
 {
@@ -846,5 +846,5 @@ Value_P Z(root.get_solution_count(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

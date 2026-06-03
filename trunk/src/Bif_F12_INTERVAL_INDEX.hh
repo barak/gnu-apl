@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function interval index (⍸) */
 /// The class implementing ⍸
 class Bif_F12_INTERVAL_INDEX: public NonscalarFunction
@@ -55,7 +55,7 @@ protected:
    static ShapeItem find_range(const Cell & cell, const Cell * ranges,
                                ShapeItem range_count);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __Bif_F12_INTERVAL_INDEX_HH_DEFINED__
 

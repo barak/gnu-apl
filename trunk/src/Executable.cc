@@ -33,7 +33,7 @@
 
 #include "Workspace.icc"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Executable::Executable(const UCS_string & ucs,  bool multi_line,
                        ParseMode pm, const char * loc)
    : alloc_loc(loc),
@@ -66,7 +66,7 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
         text.push_back(ucs);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Executable::Executable(Fun_signature sig, int lambda_num,
                        const UCS_string & lambda_text, const char * loc)
    : alloc_loc(loc),
@@ -105,7 +105,7 @@ ShapeItem last_semi = -1;
         text.push_back(lambda_text);
      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Executable::~Executable()
 {
    Log(LOG_UserFunction__fix)
@@ -116,7 +116,7 @@ Executable::~Executable()
 
    clear_body();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Executable::execute_body() const
 {
@@ -131,7 +131,7 @@ StateIndicator & si = *Workspace::SI_top();
    // not reached
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_PC
 Executable::get_statement_end(Function_PC pc) const
 {
@@ -139,7 +139,7 @@ Executable::get_statement_end(Function_PC pc) const
           body[pc].get_tag() != TOK_RETURN_EXEC)   ++pc;
    return pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_PC
 Executable::get_statement_start(Function_PC pc) const
 {
@@ -164,7 +164,7 @@ Executable::get_statement_start(Function_PC pc) const
 
    return Function_PC_0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Executable::print_range(ostream & out, Function_PC2 from_to) const
 {
@@ -174,13 +174,13 @@ Executable::print_range(ostream & out, Function_PC2 from_to) const
        }
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::print_text(ostream & out) const
 {
    loop(l, text.size())   out << text[l] << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::print_token(ostream & out, int details) const
 {
@@ -190,7 +190,7 @@ Executable::print_token(ostream & out, int details) const
 
    body.print(out, details);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::reparse(Token_string & original, Function_PC low_PC) const
 {
@@ -259,7 +259,7 @@ const ErrorCode ec = parser.parse(failed_statement, orig, false);
         loop(b, body.size())   original.push_back(body[b]);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
 {
@@ -443,7 +443,7 @@ vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
    else
       set_error_info(error, stat_after, after_from_to);
 }
-//--------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::set_error_info(Error & error,
                            const Token_string & failed_statement, 
@@ -526,7 +526,7 @@ UCS_string message_2(error.get_error_line_2());
         error.set_right_caret(error.get_left_caret() + len_between);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Executable::show_owners(const char * prefix, ostream & out,
                         const Value & value) const
@@ -547,7 +547,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Executable::statement_text(Function_PC pc) const
 {
@@ -602,7 +602,7 @@ UCS_string ret;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::unmark_all_values() const
 {
@@ -626,7 +626,7 @@ Executable::unmark_all_values() const
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::clear_body()
 {
@@ -646,7 +646,7 @@ Executable::clear_body()
 
    body.clear();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Executable::compute_if_else_targets()
 {
@@ -845,7 +845,7 @@ error:
       }
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::decrement_refcount(const char * loc)
 {
@@ -874,7 +874,7 @@ UserFunction * ufun = get_exec_ufun();
         delete ufun;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::increment_refcount(const char * loc, const char * creator)
 {
@@ -892,13 +892,13 @@ const UserFunction * ufun = get_exec_ufun();
 // CERR << "*** increment_refcount() of " << get_name()
 //      << " to " << refcount << " at " << loc << endl;A
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 VoidCount
 Executable::remove_TOK_VOID()
 {
    return body.remove_TOK_VOID();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::conditional::print(ostream & out, int level,
                                const Token_string & body) const
@@ -920,7 +920,7 @@ int endif_PC;
    Assert1(body[endif_PC].get_tag() == TOK_IF_END);
    out << " ENDIF@PC=" << endif_PC << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
@@ -1040,7 +1040,7 @@ UCS_string ret;
        }
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Fun_signature
 Executable::compute_lambda_body(Token_string & lambda_body,
                                 ShapeItem b, ShapeItem bend)
@@ -1147,7 +1147,7 @@ ShapeItem insertion_point = b;
 
    return Fun_signature(signature);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Executable::parse_body_line(Function_Line line, const UCS_string & ucs_line,
                             bool trace, const char * loc, bool macro)
@@ -1170,7 +1170,7 @@ const Parser parser(get_parse_mode(), loc, macro);
 
    return parse_body_line(line, in, trace, loc);
 } 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Executable::parse_body_line(Function_Line line, const Token_string & input,
                             bool trace, const char * loc)
@@ -1312,7 +1312,7 @@ Token_string output;   // in reverse order
    loop(t, output.size())   body.push_back(output[t]);
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::setup_lambdas()
 {
@@ -1373,7 +1373,7 @@ Lambda_number lambda_num = LAMBDA_NUM_0;
    Parser::match_par_bra(body, true);
    remove_TOK_VOID();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Executable::setup_one_lambda(ShapeItem b, ShapeItem bend,
                              Lambda_number lambda_num)
@@ -1450,14 +1450,14 @@ Token tok_ufun = ufun->get_token();
 
    return bend;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::reverse_all_token(Token_string & tos)
 {
    for (Token * t1 = &tos[0], * t2 = &tos[tos.size() - 1]; t1 < t2;)
        t1++->swap_token(*t2--);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Executable::reverse_each_statement(Token_string & tos)
 {
@@ -1482,7 +1482,7 @@ const ShapeItem last = tos.size();
             }
        }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
@@ -1546,7 +1546,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 StatementList *
 StatementList::fix(const UCS_string & data, Value_P literal, const char * loc)
 {
@@ -1635,4 +1635,4 @@ StatementList * fun = new StatementList(data, loc);
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

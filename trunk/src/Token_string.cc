@@ -22,7 +22,7 @@
 */
 #include "Token_string.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_closing_bracket(int pos) const
 {
@@ -46,7 +46,7 @@ int others = 0;
    MORE_ERROR() << "No closing ] for opening ]";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_closing_parent(int pos) const
 {
@@ -70,7 +70,7 @@ int others = 0;
    MORE_ERROR() << "No closing ) for opening (";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_opening_bracket(int pos) const
 {
@@ -94,7 +94,7 @@ int others = 0;
    MORE_ERROR() << "No opening [ for closing ]";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_opening_curly(int pos) const
 {
@@ -118,7 +118,7 @@ int others = 0;
    MORE_ERROR() << "No opening { for closing }";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_opening_parent(int pos) const
 {
@@ -141,7 +141,7 @@ int others = 0;
    MORE_ERROR() << "No opening ( for closing )";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, const Token_string & tos)
 {
@@ -150,7 +150,7 @@ operator << (ostream & out, const Token_string & tos)
    out << endl;
    return out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token_string::print(ostream & out, int details) const
 {
@@ -177,7 +177,7 @@ const bool VAL = details & 2;
 
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token_string::insert_1(int pos)
 {
@@ -187,7 +187,7 @@ Token_string::insert_1(int pos)
          at(from + 1).move_from(at(from), LOC);   // shift towards end
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token_string::insert_2(int pos)
 {
@@ -198,7 +198,7 @@ Token_string::insert_2(int pos)
          at(from + 2).move_from(at(from), LOC);   // shift towards end
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 VoidCount
 Token_string::remove_TOK_VOID()
 {
@@ -215,7 +215,7 @@ const VoidCount ret = VoidCount(size() - dst);
    resize(dst);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Token_string::replace_segment(const Token_string & src, ShapeItem pos)
 {
@@ -226,7 +226,7 @@ Token_string::replace_segment(const Token_string & src, ShapeItem pos)
        }
    return pos;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
 {
@@ -238,5 +238,5 @@ Token * t2 = &at(to);
 
    while (t1 < t2)   t1++->swap_token(*t2--);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

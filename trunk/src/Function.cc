@@ -36,7 +36,7 @@
 #include "Symbol.hh"
 #include "Value.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted,
                                    size_t count, const char * grp_name)
@@ -106,7 +106,7 @@ FunctionGroup::init_function_group(const FunctionGroup::function_info * unsorted
          }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 sAxis
 FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
 {
@@ -121,7 +121,7 @@ FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
 
    return -1;   // not found (or no real FunctionGroup)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 sAxis
 FunctionGroup::value_to_subfun(const Value & A_or_X) const
 {
@@ -150,7 +150,7 @@ FunctionGroup::value_to_subfun(const Value & A_or_X) const
    if (A_or_X.get_rank() > 1)   RANK_ERROR;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 FunctionGroup::list_functions(ostream & out) const
 {
@@ -182,7 +182,7 @@ FunctionGroup::list_functions(ostream & out) const
 
    return Token();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 FunctionGroup::list_mappings(ostream & out) const
 {
@@ -205,7 +205,7 @@ FunctionGroup::list_mappings(ostream & out) const
 
    return Token();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 FunctionGroup::bad_subfun_name_ERROR(const UCS_string sub_name) const
 {
@@ -214,7 +214,7 @@ FunctionGroup::bad_subfun_name_ERROR(const UCS_string sub_name) const
                    "or: " << group_name << " ⍬ for a list of valid names.";
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 FunctionGroup::bad_subfun_number_ERROR(int number) const
 {
@@ -227,7 +227,7 @@ const char * AX = signature & SIG_X ? "X" : "A";
                 << " ⍬ for a list of valid numbers.";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 FunctionGroup::compare_function_name(const char * const & name,
                                      const function_info * const & info,
@@ -235,7 +235,7 @@ FunctionGroup::compare_function_name(const char * const & name,
 {
    return strcmp(name, info->function_name);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 FunctionGroup::compare_function_axis(const uAxis & key,
                                      const function_info * const & info,
@@ -243,7 +243,7 @@ FunctionGroup::compare_function_axis(const uAxis & key,
 {
    return key - info->axis;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const FunctionGroup::function_info *
 FunctionGroup::get_info_by_name(const char * name) const
 {
@@ -254,7 +254,7 @@ const FunctionGroup::function_info* const * ret =
    if (ret == 0)   return reinterpret_cast<const function_info *>(0);
    return *ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const FunctionGroup::function_info *
 FunctionGroup::get_info_by_axis(uAxis axis) const
 {
@@ -265,7 +265,7 @@ const FunctionGroup::function_info* const * ret =
    if (ret == 0)   return reinterpret_cast<const function_info *>(0);
    return *reinterpret_cast<const function_info * const *>(ret);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 FunctionGroup::get_signature_string(Fun_signature sig) const
 {
@@ -288,87 +288,87 @@ UCS_string ret;
    if (sig & SIG_B)        ret << " B";
    return ret;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Function::eval_() const
 {
    return phrase_error("");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_AB(Value_P A, Value_P B) const
 {
    return phrase_error("AB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    return phrase_error("ALB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    return phrase_error("ALRB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_ALRXB(Value_P A, Token & LO, Token & RO,
                      Value_P X, Value_P B) const
 {
    return phrase_error("ALRXB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
    return phrase_error("ALXB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    return phrase_error("AXB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_B(Value_P B) const
 {
    return phrase_error("B");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_LB(Token & LO, Value_P B) const
 {
    return phrase_error("LB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    return phrase_error("LRB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_LRXB(Token & LO, Token & RO,
                      Value_P X, Value_P B) const
 {
    return phrase_error("LRXB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
    return phrase_error("LXB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_XB(Value_P X, Value_P B) const
 {
    return phrase_error("XB");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -377,7 +377,7 @@ Function::eval_fill_AB(Value_P A, Value_P B) const
 
   DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_fill_B(Value_P B) const
 {
@@ -386,7 +386,7 @@ Function::eval_fill_B(Value_P B) const
 
   DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::eval_identity_fun(Value_P B, sAxis axis) const
 {
@@ -394,7 +394,7 @@ Function::eval_identity_fun(Value_P B, sAxis axis) const
                      << " has no identity function";
   DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Function::get_attributes(int mode, Value & Z) const
 {
@@ -434,7 +434,7 @@ Function::get_attributes(int mode, Value & Z) const
 
    Assert(0 && "Not reached");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Fun_signature
 Function::get_signature() const
 {
@@ -450,7 +450,7 @@ int sig = SIG_FUN;
 
    return Fun_signature(sig);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Function::phrase_error(const char * pattern) const
 {
@@ -485,12 +485,12 @@ UCS_string & more = MORE_ERROR();
         << get_name();
    VALENCE_ERROR;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & out, const Function & fun)
 {
    fun.print(out);
    return out;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

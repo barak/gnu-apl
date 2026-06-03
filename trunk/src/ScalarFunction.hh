@@ -31,7 +31,7 @@
 
 #include "Value.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Base class for all scalar functions
 class ScalarFunction : public PrimitiveFunction
 {
@@ -186,7 +186,7 @@ protected:
                   0, & Performance::cfs_F12_    ## x ## _B, \
                   -1,  Performance::thresh_F12_ ## x ## _B
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** Scalar functions binomial and factorial.
  */
 /// The class implementing !
@@ -229,7 +229,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_binomial); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function less than.
  */
 /// The class implementing <
@@ -267,7 +267,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_less_than); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function equal.
  */
 /// The class implementing =
@@ -305,7 +305,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_equal); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function EQ bitwise (i.e. bitwise not A xor B)
  */
 /// The class implementing ⊤=
@@ -344,7 +344,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_equal_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function NE bitwise (i.e. bitwise A xor B)
  */
 /// The class implementing ⊤≠
@@ -382,7 +382,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_not_equal_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function greater than.
  */
 /// The class implementing >
@@ -420,7 +420,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_greater_than); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function AND/LCM
  */
 /// The class implementing ∧
@@ -461,7 +461,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_and); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function AND bitwise
  */
 /// The class implementing ⊤∧
@@ -508,7 +508,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_and_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function OR/GCD
  */
 /// The class implementing ∨
@@ -549,7 +549,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_or); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function OR bitwise
  */
 /// The class implementing ⊤∨
@@ -595,7 +595,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_or_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function less or equal.
  */
 /// The class implementing ≤
@@ -633,7 +633,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_less_eq); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function greater or equal.
  */
 /// The class implementing ≥
@@ -664,7 +664,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_greater_eq); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function not equal
  */
 /// The class implementing ≠
@@ -698,7 +698,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_not_equal); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function find.
  */
 /// The class implementing ⋸
@@ -727,7 +727,7 @@ protected:
    static bool contained(const Shape & shape_A, const Cell * cA,
                          Value_P B, const Shape & idx_B, double qct);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function NOR
  */
 /// The class implementing ⍱
@@ -754,7 +754,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nor); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function NOR bitwise
  */
 /// The class implementing ⊤⍱
@@ -786,7 +786,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nor_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function nand.
  */
 /// The class implementing ⍲
@@ -813,7 +813,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nand); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function NAND bitwise
  */
 /// The class implementing ⊤⍲
@@ -840,7 +840,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nand_bitwise); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions power and exponential.
  */
 /// The class implementing ⋆
@@ -881,7 +881,7 @@ protected:
    /// overloaded Function::get_dyadic_inverse()
    virtual cFunction_P get_dyadic_inverse() const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions add and conjugate.
  */
 /// The class implementing +
@@ -930,7 +930,7 @@ protected:
    /// inverted operation, and both instances can share some code in this class
    const bool inverse;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions subtract and negative.
  */
 /// The class implementing -
@@ -971,7 +971,7 @@ protected:
    /// overloaded Function::get_dyadic_inverse()
    virtual cFunction_P get_dyadic_inverse() const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function roll and non-scalar function dial.
  */
 /// The class implementing ?
@@ -1004,7 +1004,7 @@ protected:
    /// return \b true iff not.
    static bool check_B(const Value & B, double qct);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar function not and non-scalar function without.
  */
 /// The class implementing ∼
@@ -1041,7 +1041,7 @@ protected:
    /// eval_AB for large A and/or B
    static Value_P large_eval_AB(const Value & A, const Value & B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions times and direction.
  */
 /// The class implementing ×
@@ -1090,7 +1090,7 @@ protected:
    /// inverted operation, and both instances can share some code in this class
    const bool inverse;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions divide and reciprocal.
  */
 /// The class implementing ÷
@@ -1131,7 +1131,7 @@ protected:
    /// overloaded Function::get_dyadic_inverse()
    virtual cFunction_P get_dyadic_inverse() const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions circle functions and pi times.
  */
 /// The class implementing ○
@@ -1174,7 +1174,7 @@ protected:
    /// inverted operation, and both instances can share some code in this class
    const bool inverse;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions maximum and round up.
  */
 /// The class implementing ⌈
@@ -1212,7 +1212,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_maximum); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions minimum and round down.
  */
 /// The class implementing ⌊
@@ -1250,7 +1250,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_minimum); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions residue and magnitude.
  */
 /// The class implementing ∣
@@ -1285,7 +1285,7 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return eval_scalar_AXB(A, X, B, &Cell::bif_residue); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Scalar functions logarithms.
  */
 /// The class implementing ⍟
@@ -1322,6 +1322,6 @@ protected:
    /// overloaded Function::get_dyadic_inverse()
    virtual cFunction_P get_dyadic_inverse() const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __SCALAR_FUNCTION_HH_DEFINED__

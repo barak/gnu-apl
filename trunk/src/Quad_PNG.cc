@@ -140,7 +140,7 @@ int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
 static vector<PNG_context *> all_PNG_contexts;
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)
 {
@@ -148,14 +148,14 @@ Quad_PNG::Quad_PNG()
    __sem_init(PNG_window_sema, /* processes */ 0, /* initial */ 0);
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_PNG::~Quad_PNG()
 {
 #if PNG_LIBS
    __sem_destroy(PNG_window_sema);
 #endif   // PNG_LIBS
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if PNG_LIBS
 Token
 Quad_PNG::eval_AB(Value_P A, Value_P B) const
@@ -208,7 +208,7 @@ Quad_PNG::eval_AB(Value_P A, Value_P B) const
   return eval_B(B);
 }
 #endif   // PNG_LIBS
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if PNG_LIBS
 Token
 Quad_PNG::eval_B(Value_P B) const
@@ -256,7 +256,7 @@ const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
    return missing_files("⎕PNG", libs, hdrs, pkgs);
 }
 #endif   // PNG_LIBS
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_PNG::window_control(APL_Integer B0) const
 {
@@ -356,14 +356,14 @@ Quad_PNG::window_control(APL_Integer B0) const
 
    return IntScalar(0, LOC);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback for libpng warnings
 void
 PNG_warn(png_structp png_ptr, png_const_charp reason)
 {
    CERR << "*** libpng warning: " << reason << " ***" << endl;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback for libpng errors
 void
 PNG_err(png_structp png_ptr, png_const_charp reason)
@@ -371,7 +371,7 @@ PNG_err(png_structp png_ptr, png_const_charp reason)
    MORE_ERROR() << "libpng error: " << reason;
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_PNG::read_PNG_file(const UTF8_string & filename1)
 {
@@ -537,7 +537,7 @@ Value_P Z(shape_Z, LOC);
    return Value_P();
 #endif  // (not) PNG_LIBS
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Quad_PNG::valid_type_and_bits(int color_type, int bit_depth)
 {
@@ -564,7 +564,7 @@ enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
 
    return false;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PNG::write_PNG_file(const char * filename, int bit_depth,
                          const Value & B)
@@ -724,7 +724,7 @@ UTF8 * scanline = RGB;
 
 #endif   // PNG_LIBS
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished. Executed in the thread named apl/⎕PNG.
 #if PNG_GTK
@@ -736,7 +736,7 @@ gtk_main_wrapper(void * w_props)
    if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback when the plot window is destroyed
 extern "C" gboolean
 PNG_plot_destroyed(GtkWidget * top_level, gpointer user_data);
@@ -766,7 +766,7 @@ const PNG_context * pctx = reinterpret_cast<PNG_context *>(user_data);
 
   return TRUE;   // event handled by this handler
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// convert APL pixel data to a Gtk/Cairo surface
 static cairo_surface_t *
 paint_data(const PNG_context & pctx)
@@ -838,7 +838,7 @@ const int stride = cairo_image_surface_get_stride(ret);   // = row size (bytes)
    cairo_surface_mark_dirty(ret);   // end of direct access (commit caches)
    return ret;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Gtk callback to draw the ⎕PNG window
 extern "C" gboolean
 PNG_draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data);
@@ -868,7 +868,7 @@ cairo_surface_t * source_surfrace = paint_data(*pctx);
    if (verbosity & SHOW_EVENTS)   CERR << "PNG_draw_callback() done." << endl;
    return TRUE;   // event handled by this handler
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #include "Focus.icc"
 
@@ -950,7 +950,7 @@ PNG_context * pctx = new PNG_context(B);
    sem_post(Quad_PNG::PNG_window_sema);   // unleash the APL interpreter
    return pctx->handle;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif   // PNG_GTK
 

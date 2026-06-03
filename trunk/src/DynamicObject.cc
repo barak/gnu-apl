@@ -28,7 +28,7 @@
 #include "PrintOperator.hh"
 #include "Value.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// cast DynamicObject to derived class IndexExpr.
 // This only works properly after #include IndexExpr.hh !
 const IndexExpr *
@@ -36,14 +36,14 @@ DynamicObject::pIndexExpr() const
 {
   return static_cast<const IndexExpr *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, const DynamicObject & dob)
 {
    dob.print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DynamicObject::print(ostream & out) const
 {
@@ -53,7 +53,7 @@ DynamicObject::print(ostream & out) const
        << "    next:      " << voidP(next)          << endl
        << "    allocated: " << where_allocated()    << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DynamicObject::print_chain(ostream & out) const
 {
@@ -70,13 +70,13 @@ int pos = 0;
           if (p == this)   break;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 DynamicObject::print_new(ostream & out, const char * loc) const
 {
    out << "new    " << voidP(this) << " at " << loc << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// cast DynamicObject to derived class Value.
 // This only works properly after #include IndexExpr.hh !
 IndexExpr *
@@ -84,7 +84,7 @@ DynamicObject::pIndexExpr()
 {
   return static_cast<IndexExpr *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// cast DynamicObject to derived class Value.
 /// This only works properly after including Value.hh !
 const Value &
@@ -99,7 +99,7 @@ DynamicObject::rValue() const
     */
   return *static_cast<const Value *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// cast DynamicObject to derived class Value.
 /// This only works properly after including Value.hh !
 Value &
@@ -115,5 +115,5 @@ DynamicObject::rValue()
 
    return *static_cast<Value *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

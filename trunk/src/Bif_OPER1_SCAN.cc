@@ -30,7 +30,7 @@
 Bif_OPER1_SCAN    Bif_OPER1_SCAN ::fun;
 Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::fun;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
 {
@@ -130,7 +130,7 @@ const Shape3 Z3(B->get_shape(), axis);
 
    return Bif_REDUCE::do_reduce(B->get_shape(), Z3, -1, LO, B, m_len);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_SCAN::expand(Value_P A, Value_P B, uAxis axis)
 {
@@ -220,32 +220,32 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_SCAN::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_SCAN::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_SCAN1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_SCAN1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

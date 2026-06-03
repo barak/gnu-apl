@@ -41,7 +41,7 @@
 
 std::vector<NativeFunction *> NativeFunction::valid_functions;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 NativeFunction *
 NativeFunction::fix(const UCS_string & so_name,
                     const UCS_string & function_name)
@@ -87,7 +87,7 @@ NativeFunction * new_function = new NativeFunction(so_name, function_name);
 
    return new_function;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 NativeFunction::cleanup()
 {
@@ -117,7 +117,7 @@ NativeFunction::cleanup()
         // fun is being deleted
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 NativeFunction::load_emacs_library(const char * emacs_arg)
 {
@@ -151,7 +151,7 @@ const int error =
    t4.clear();   // success
    return t4;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 NativeFunction::NativeFunction(const UCS_string & so_name,
                                const UCS_string & apl_name)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -270,7 +270,7 @@ const char * why = sym->cant_be_defined();
    valid = true;
    valid_functions.push_back(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 NativeFunction::~NativeFunction()
 {
   Log(LOG_UserFunction__enter_leave)
@@ -284,7 +284,7 @@ NativeFunction::~NativeFunction()
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void *
 NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 {
@@ -388,7 +388,7 @@ const char * dirs[] =
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void *
 NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
@@ -416,13 +416,13 @@ const char * err = dlerror();
    return 0;
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 NativeFunction::has_result() const
 {
    return signature & SIG_Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 NativeFunction::is_operator() const
 {
@@ -438,14 +438,14 @@ NativeFunction::is_operator() const
        || f_eval_LRXB
        || f_eval_ALRXB;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 NativeFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
    out << ind << "Native Function " << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 NativeFunction::print(std::ostream & out) const
 {
@@ -454,13 +454,13 @@ NativeFunction::print(std::ostream & out) const
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 NativeFunction::canonical(bool with_lines) const
 {
    return original_so_path;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_() const
 {
@@ -468,7 +468,7 @@ NativeFunction::eval_() const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_B(Value_P B) const
 {
@@ -476,7 +476,7 @@ NativeFunction::eval_B(Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_AB(Value_P A, Value_P B) const
 {
@@ -484,7 +484,7 @@ NativeFunction::eval_AB(Value_P A, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_LB(Token & LO, Value_P B) const
 {
@@ -492,7 +492,7 @@ NativeFunction::eval_LB(Token & LO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
@@ -500,7 +500,7 @@ NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -509,7 +509,7 @@ NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -518,7 +518,7 @@ NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_XB(Value_P X, Value_P B) const
 {
@@ -527,7 +527,7 @@ NativeFunction::eval_XB(Value_P X, Value_P B) const
    if (f_eval_XB)   return (*f_eval_XB)(X, B, this);
    else             return eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -536,7 +536,7 @@ NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
    if (f_eval_AXB)   return (*f_eval_AXB)(A, X, B, this);
    else              return eval_AB(A, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -545,7 +545,7 @@ NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
    if (f_eval_LXB)   return (*f_eval_LXB)(*LO.get_function(), X, B, this);
    else              return eval_LB(LO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
@@ -554,7 +554,7 @@ NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
    if (f_eval_ALXB)   return (*f_eval_ALXB)(A, *LO.get_function(), X, B, this);
    else               return eval_ALB(A, LO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
@@ -564,7 +564,7 @@ NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
                                             *RO.get_function(), X, B, this);
    else                return eval_LRB(LO, RO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
                            Value_P B) const
@@ -576,7 +576,7 @@ NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
                              X, B, this);
    return eval_ALRB(A, LO, RO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_fill_B(Value_P B) const
 {
@@ -584,7 +584,7 @@ NativeFunction::eval_fill_B(Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -592,7 +592,7 @@ NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 NativeFunction::eval_identity_fun(Value_P B, sAxis axis) const
 {
@@ -600,7 +600,7 @@ NativeFunction::eval_identity_fun(Value_P B, sAxis axis) const
 
    SYNTAX_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 NativeFunction::destroy()
 {
@@ -622,5 +622,5 @@ NativeFunction::destroy()
 
    delete this;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

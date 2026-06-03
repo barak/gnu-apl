@@ -35,8 +35,8 @@
 
 Quad_JSON  Quad_JSON::fun;
 
-//============================================================================
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_JSON::convert_file(const Value & B) const
 {
@@ -120,7 +120,7 @@ const int function_number = A->get_cfirst().get_int_value();
    MORE_ERROR() << "A ⎕JSON B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_JSON::eval_B(Value_P B) const
 {
@@ -130,7 +130,7 @@ Value_P Z = JSON_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Quad_JSON::number_len(const UCS_string & ucs_B, ShapeItem b)
 {
@@ -159,7 +159,7 @@ const ShapeItem B0 = b;
 
    return b - B0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_JSON::APL_to_JSON(const Value & B, bool sorted)
 {
@@ -171,7 +171,7 @@ UCS_string ucs_Z;
 Value_P Z(ucs_Z, LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                               bool level, bool sorted)
@@ -275,7 +275,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
    MORE_ERROR() << "⎕JSON B: bad rank " << B.get_rank();
    result.clear();   // indicate error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
                               bool level, bool sorted)
@@ -339,7 +339,7 @@ const UCS_string lit_ucs(*Z);
                 << "'. Expecting ⊂'true', ⊂'false', or ⊂'null'";
    result.clear();   // indicate error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Quad_JSON::comma_count(const UCS_string & ucs_B,
                        const std::vector<ShapeItem> & tokens_B,
@@ -454,8 +454,8 @@ bool expect_colon = true;
                 << " at " << tokens_B[token0] << "↓B ";
    DOMAIN_ERROR;
 }
-//============================================================================
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 Quad_JSON::decode_UUUU(const UCS_string & ucs_B, ShapeItem b)
 {
@@ -471,7 +471,7 @@ char cc[5];
 
    return Unicode(strtoll(cc, 0, 16));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_JSON::JSON_to_APL(const Value & B)
 {
@@ -551,7 +551,7 @@ size_t token0 = 0;
    Assert(Z->get_cfirst().is_pointer_cell());
    return Z->get_cfirst().get_pointer_value();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_array(Value & Z, const UCS_string & ucs_B,
                        const std::vector<ShapeItem> & tokens_B,
@@ -609,7 +609,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
    ++token0;   // skip final ]
    Assert(token0 == token_from);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_literal(Value & Z, const UCS_string & ucs_B,
                          ShapeItem b, const char * expected_literal)
@@ -637,7 +637,7 @@ Value_P Zsub(LOC);
 
    Z.next_ravel_Pointer(Zsub.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_number(Value & Z, const UCS_string & ucs_B, ShapeItem b)
 {
@@ -723,7 +723,7 @@ number_too_long:
                 << "↓B (max. length is " << MAX_NUMLEN << ")";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_object(Value & Z, const UCS_string & ucs_B,
                         const std::vector<ShapeItem> & tokens_B,
@@ -766,7 +766,7 @@ Value_P assoc_array = EmptyStruct(LOC);
    ++token0;   // skip final }
    Assert(token0 == token_from);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_object_member(Value & Z, const UCS_string & ucs_B,
                                const std::vector<ShapeItem> & tokens_B,
@@ -847,7 +847,7 @@ UCS_string member_name;
         }
    }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_string(Value & Z, const UCS_string & ucs_B, ShapeItem b)
 {
@@ -905,7 +905,7 @@ Value_P Zsub(content_len, LOC);
    Zsub->check_value(LOC);
    Z.next_ravel_Pointer(Zsub.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_JSON::parse_value(Value & Z, const UCS_string & ucs_B,
                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
@@ -950,7 +950,7 @@ const ShapeItem b = tokens_B.at(token0);
         default: FIXME;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Quad_JSON::skip_string(const UCS_string & ucs_B, ShapeItem & b)
 {

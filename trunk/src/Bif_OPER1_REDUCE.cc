@@ -29,7 +29,7 @@
 Bif_OPER1_REDUCE    Bif_OPER1_REDUCE ::fun;
 Bif_OPER1_REDUCE1   Bif_OPER1_REDUCE1::fun;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_REDUCE::do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem nwise,
                       cFunction_P LO, Value_P B, ShapeItem bm)
@@ -108,7 +108,7 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
 {
@@ -176,7 +176,7 @@ const Shape3 B3(B->get_shape(), axis);
 const Shape3 Z3(B3.h(), 1, B3.l());
    return do_reduce(shape_Z, Z3, B3.m(), LO, B, B->get_shape_item(axis));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO,
                           Value_P B, uAxis axis) const
@@ -290,7 +290,7 @@ const Shape3 B3(B->get_shape(), axis);
 
    return do_reduce(shape_Z, Z3, A0, LO, B, B->get_shape_item(axis));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_REDUCE::replicate(Value_P A, Value_P B, uAxis axis)
 {
@@ -379,35 +379,35 @@ const Shape3 shape_B3(shape_B, axis);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE::eval_ALXB(Value_P A, Token & _LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce_n_wise(A, _LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return replicate(A, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE::eval_LXB(Token & _LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce(_LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE1::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce_n_wise(A, LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -415,11 +415,11 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 
    return replicate(A, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER1_REDUCE1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce(LO, B, axis);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

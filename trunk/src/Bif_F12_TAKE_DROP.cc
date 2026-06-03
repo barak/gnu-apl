@@ -31,7 +31,7 @@
 Bif_F12_TAKE      Bif_F12_TAKE     ::fun;    // ↑
 Bif_F12_DROP      Bif_F12_DROP     ::fun;    // ↓
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
@@ -51,7 +51,7 @@ Shape ravel_A1(*A, /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RA
         return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B, false));
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -83,7 +83,7 @@ Shape sh_take = B->get_shape();   // start with ⍴B
 
    return Token(TOK_APL_VALUE1, do_take(sh_take, *B, axes_X));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_TAKE::eval_XB(Value_P X, Value_P B) const
 {
@@ -103,7 +103,7 @@ Shape sh_take = B->get_shape();   // start with ⍴B
 
    return Token(TOK_APL_VALUE1, do_take(sh_take, *B, axes_X));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value & B,
                       AxesBitmap axes)
@@ -117,7 +117,7 @@ Value_P Z(ravel_A1.abs(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
                    const Value & B, AxesBitmap axes)
@@ -140,7 +140,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
             }
        }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_TAKE::first(const Value & B)
 {
@@ -177,7 +177,7 @@ const Cell & first_B = B.get_cfirst();
    if (first_B.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
    else                               return IntScalar(0, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
@@ -247,7 +247,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DROP::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -297,7 +297,7 @@ bool seen[MAX_RANK];
    return Token(TOK_APL_VALUE1,
                 Bif_F12_TAKE::do_take(ravel_A, *B, 0));
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 ShapeItem
 TakeDropIterator::axis_proto(AxesBitmap axes) const
 {
@@ -324,5 +324,5 @@ ShapeItem ret = 0;
 
    return ret;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

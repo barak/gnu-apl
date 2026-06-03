@@ -27,7 +27,7 @@
 #include "QuadFunction.hh"
 #include "SystemVariable.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** some helper functions to start auxiliary processors */
 /// Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS
 class Quad_SVx
@@ -46,7 +46,7 @@ protected:
    /// @param filename path of the file to test
    static bool is_executable(const char * filename);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕SVC (Shared Variable Control).
  */
@@ -69,7 +69,7 @@ protected:
    /// @param B right-argument APL value (shared variable name)
    virtual Token eval_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system variable ⎕SVE (Shared Variable Event).
  */
@@ -93,7 +93,7 @@ protected:
    /// when the current ⎕SVE timer expires (as float)
    static APL_time_us timer_end;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function Quad-SVO (Shared Variable Offer).
  */
@@ -123,7 +123,7 @@ protected:
    static SV_key share_one_variable(AP_num proc, const uint32_t * vname,
                                     SV_Coupling & coupling);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function Quad-SVQ (Shared Variable Query).
  */
@@ -148,7 +148,7 @@ protected:
    /// @param proc auxiliary processor number to query
    static Value_P get_variables(AP_num proc);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕SVR (shared Variable Retraction).
  */
@@ -166,7 +166,7 @@ protected:
    /// @param B right-argument APL value (variable name to retract)
    virtual Token eval_B(Value_P B) const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕SVS (Shared Variable State).
  */
@@ -184,6 +184,6 @@ protected:
    /// @param B right-argument APL value (variable name to query)
    virtual Token eval_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __SHARED_VARIABLES_HH_DEFINED__

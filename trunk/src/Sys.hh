@@ -114,7 +114,7 @@ public:
    /// @param verbosity level of diagnostic output
    static int64_t probe_memory(uint64_t * base, uint64_t blocks, int verbosity);
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// open a pipe for reading or writing
 /// @param command shell command string to execute
 /// @param mode open mode passed to popen() (e.g. "r" or "w")
@@ -128,7 +128,7 @@ FILE * file = popen(command, mode);
 
    return file;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// close a pipe opened with sys_popen()
 /// @param stream FILE pointer returned by sys_popen()
 inline int sys_pclose(FILE *stream)
@@ -141,7 +141,7 @@ const int ret = pclose(stream);
 
    return ret;
 }
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A MAII compliant wrapper for popen()/pclose()
 class PipeReader
 {
@@ -207,7 +207,7 @@ public:
 protected:
    FILE * fp;
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A MAII compliant wrapper for fopen()/fclose()
 class FileReader
 {
@@ -279,7 +279,7 @@ public:
 protected:
    FILE * fp;
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A MAII compliant wrapper for fopen()/fclose()
 class FileWriter
 {
@@ -338,7 +338,7 @@ public:
 protected:
    FILE * fp;
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // SYS_HH_DEFINED
 

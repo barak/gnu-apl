@@ -176,7 +176,7 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 using namespace std;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1
 
@@ -210,7 +210,7 @@ using namespace std;
   sufficiently long).
 
  **/
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// The set of CPUs (= hyper-threads) over which the computational load is
 /// being distrinuted.
 class CPU_pool
@@ -259,7 +259,7 @@ protected:
    /// the CPU numbers that can be used
    static std::vector<CPU_Number> the_CPUs;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
   _Atomic_word class coordinating the different cores working in parallel on the
   same ravel(s)
@@ -334,6 +334,6 @@ protected:
    /// true after init() has been called
    static bool init_done;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PARALLEL_HH_DEFINED__

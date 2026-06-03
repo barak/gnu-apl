@@ -102,7 +102,7 @@ and then:
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// an integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_int
@@ -151,7 +151,7 @@ public:
    /// the value of the item
    T value;
 };
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a hexadecimal integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_xint : public Sig_item_int<T, bytes>
@@ -174,7 +174,7 @@ public:
                    << setfill(' ') << dec;
       }
 };
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 typedef Sig_item_int < int16_t, 1> Sig_item_i8;   ///<   8-bit signed integer
 typedef Sig_item_int <uint16_t, 1> Sig_item_u8;   ///<   8-bit unsigned integer
 typedef Sig_item_xint<uint16_t, 1> Sig_item_x8;   ///<   8-bit hex integer
@@ -251,8 +251,8 @@ protected:
    /// the value of the item
    string value;
 };
-//-----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+//────────────────────────────────────────────────────────────────────────────
 /// a number identifying the signal
 enum Signal_id
 {
@@ -368,7 +368,7 @@ enum Signal_id
 
    sid_MAX,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the base class for all signal classes
 class Signal_base
 {
@@ -721,7 +721,7 @@ protected:
 
 
 /// APserver request: ⎕SVO
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAKE_OFFER
 class MAKE_OFFER_c : public Signal_base
 {
@@ -774,7 +774,7 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver request: ⎕SVR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal RETRACT_OFFER
 class RETRACT_OFFER_c : public Signal_base
 {
@@ -827,7 +827,7 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver request: ⎕SVR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal RETRACT_VAR
 class RETRACT_VAR_c : public Signal_base
 {
@@ -879,7 +879,7 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal DISCONNECT
 class DISCONNECT_c : public Signal_base
 {
@@ -933,7 +933,7 @@ protected:
 };
 
 /// APserver request: set state of shared var \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SET_STATE
 class SET_STATE_c : public Signal_base
 {
@@ -1007,7 +1007,7 @@ protected:
 };
 
 /// APserver request: set control of shared var \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SET_CONTROL
 class SET_CONTROL_c : public Signal_base
 {
@@ -1071,7 +1071,7 @@ protected:
 };
 
 /// APserver request: X←SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_VALUE
 class GET_VALUE_c : public Signal_base
 {
@@ -1125,7 +1125,7 @@ protected:
 };
 
 /// APserver result for: X←SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal VALUE_IS
 class VALUE_IS_c : public Signal_base
 {
@@ -1209,7 +1209,7 @@ protected:
 };
 
 /// APserver request: SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ASSIGN_VALUE
 class ASSIGN_VALUE_c : public Signal_base
 {
@@ -1272,7 +1272,7 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 /// APserver result for: SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_ASSIGNED
 class SVAR_ASSIGNED_c : public Signal_base
 {
@@ -1346,7 +1346,7 @@ protected:
 };
 
 /// APserver request: Can svar key be referenced ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAY_USE
 class MAY_USE_c : public Signal_base
 {
@@ -1410,7 +1410,7 @@ protected:
 };
 
 /// APserver request: Can svar key be assigned ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAY_SET
 class MAY_SET_c : public Signal_base
 {
@@ -1478,7 +1478,7 @@ protected:
 ///             apl/APnnn       --> READ_SVAR_RECORD            APserver
 ///                             <-- SVAR_RECORD_IS
 ///
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal READ_SVAR_RECORD
 class READ_SVAR_RECORD_c : public Signal_base
 {
@@ -1531,7 +1531,7 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver result (record) for: read SVAR database record from APserver
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_RECORD_IS
 class SVAR_RECORD_IS_c : public Signal_base
 {
@@ -1585,7 +1585,7 @@ protected:
 };
 
 /// APserver request: is ID registered ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal IS_REGISTERED_ID
 class IS_REGISTERED_ID_c : public Signal_base
 {
@@ -1659,7 +1659,7 @@ protected:
 };
 
 /// APserver result: yes (1) or no (0)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal YES_NO
 class YES_NO_c : public Signal_base
 {
@@ -1713,7 +1713,7 @@ protected:
 };
 
 /// APserver request: register processor proc in APserver
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal REGISTER_PROCESSOR
 class REGISTER_PROCESSOR_c : public Signal_base
 {
@@ -1807,7 +1807,7 @@ protected:
 };
 
 /// APserver request: match offered shared variable or make a new offer
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MATCH_OR_MAKE
 class MATCH_OR_MAKE_c : public Signal_base
 {
@@ -1921,7 +1921,7 @@ protected:
 };
 
 /// APserver result for: match or make
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MATCH_OR_MAKE_RESULT
 class MATCH_OR_MAKE_RESULT_c : public Signal_base
 {
@@ -1976,7 +1976,7 @@ protected:
 
 
 /// APserver request: find processor ID that offers \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal FIND_OFFERING_ID
 class FIND_OFFERING_ID_c : public Signal_base
 {
@@ -2030,7 +2030,7 @@ protected:
 };
 
 /// APserver result for: find processor ID that offers \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERING_ID_IS
 class OFFERING_ID_IS_c : public Signal_base
 {
@@ -2104,7 +2104,7 @@ protected:
 };
 
 /// APserver request: get offering processors  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_OFFERING_PROCS
 class GET_OFFERING_PROCS_c : public Signal_base
 {
@@ -2158,7 +2158,7 @@ protected:
 };
 
 /// APserver result for: get offering processors  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERING_PROCS_ARE
 class OFFERING_PROCS_ARE_c : public Signal_base
 {
@@ -2212,7 +2212,7 @@ protected:
 };
 
 /// APserver request: get offered variables  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_OFFERED_VARS
 class GET_OFFERED_VARS_c : public Signal_base
 {
@@ -2276,7 +2276,7 @@ protected:
 };
 
 /// APserver result for: get offered variables  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERED_VARS_ARE
 class OFFERED_VARS_ARE_c : public Signal_base
 {
@@ -2330,7 +2330,7 @@ protected:
 };
 
 /// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal FIND_PAIRING_KEY
 class FIND_PAIRING_KEY_c : public Signal_base
 {
@@ -2384,7 +2384,7 @@ protected:
 };
 
 /// APserver result for: find pairing key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal PAIRING_KEY_IS
 class PAIRING_KEY_IS_c : public Signal_base
 {
@@ -2439,7 +2439,7 @@ protected:
 
 /// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_EVENTS
 class GET_EVENTS_c : public Signal_base
 {
@@ -2513,7 +2513,7 @@ protected:
 };
 
 /// APserver request: clear all events for one processor
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal CLEAR_ALL_EVENTS
 class CLEAR_ALL_EVENTS_c : public Signal_base
 {
@@ -2588,7 +2588,7 @@ protected:
 
 
 /// APserver result for: clear all events for one processor (first cleared svar
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal EVENTS_ARE
 class EVENTS_ARE_c : public Signal_base
 {
@@ -2652,7 +2652,7 @@ protected:
 };
 
 /// APserver request: add an event for \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ADD_EVENT
 class ADD_EVENT_c : public Signal_base
 {
@@ -2746,7 +2746,7 @@ protected:
 };
 
 /// APserver request: ws-ws SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ASSIGN_WSWS_VAR
 class ASSIGN_WSWS_VAR_c : public Signal_base
 {
@@ -2809,7 +2809,7 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 /// APserver request: X←ws-ws SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal READ_WSWS_VAR
 class READ_WSWS_VAR_c : public Signal_base
 {
@@ -2860,7 +2860,7 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver result for: X←ws-ws SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal WSWS_VALUE_IS
 class WSWS_VALUE_IS_c : public Signal_base
 {
@@ -2912,7 +2912,7 @@ protected:
 };
 
 /// APserver request: print the entire database (for command ]SVARS)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal PRINT_SVAR_DB
 class PRINT_SVAR_DB_c : public Signal_base
 {
@@ -2955,7 +2955,7 @@ public:
 protected:
 };
 /// APserver result for: print the entire database
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_DB_PRINTED
 class SVAR_DB_PRINTED_c : public Signal_base
 {
@@ -3006,7 +3006,7 @@ protected:
    Sig_item_string printout;   ///< printout
 };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// a union big enough for all signal classes
 struct _all_signal_classes_
@@ -3126,7 +3126,7 @@ struct _all_signal_classes_
 
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
                       char * & del, ostream * debug,
@@ -3362,4 +3362,4 @@ Signal_base * ret = 0;
    *loc = LOC;
    return ret;   // invalid id
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

@@ -26,7 +26,7 @@
 
 #include "QuadFunction.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The system function Quad-TF (Transfer Form).  */
 /// The class implementing ⎕TF
 class Quad_TF : public QuadFunction
@@ -179,5 +179,5 @@ protected:
    /// in-place exchange of IntCells and CharCells
    static ShapeItem tf2_toggle_UCS(Value & val);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // __QUAD_TF_HH_DEFINED__

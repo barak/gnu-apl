@@ -28,7 +28,7 @@
 
 Bif_OPER2_POWER   Bif_OPER2_POWER::fun;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_OPER2_POWER::unstrand_RO_B(Value_P N_B, Value_P & N, Value_P & B)
 {
@@ -74,7 +74,7 @@ const Cell & second = N_B->get_cravel(1);
    B->next_ravel_Cell(second);
    B->check_value(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -86,7 +86,7 @@ Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
    // Boolean termonation function
    return eval_form_2(A, LO, RO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -95,7 +95,7 @@ Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
    else                               // Boolean termonation function
       return eval_form_2(Value_P(), LO, RO, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // the eval_form_1() function is for LO ⍣ N B and A LO ⍣ N B variants
 // (with numeric RO and worker function LO)
 Token
@@ -165,7 +165,7 @@ ShapeItem repeat_cnt = N->get_cfirst().get_checked_near_int();
          B = result.get_apl_val();
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // the eval_form_2() function is for LO ⍣ N B and A LO ⍣ N B variants
 // (with condition function RO and worker function LO)
 Token
@@ -216,4 +216,4 @@ cFunction_P RO = _RO.get_function();   Assert(RO);
         LO_Z.clear(LOC);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

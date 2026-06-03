@@ -28,7 +28,7 @@
 Bif_F12_COMMA  Bif_F12_COMMA ::fun;    // ,
 Bif_F12_COMMA1 Bif_F12_COMMA1::fun;    // ⍪
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_COMMA::ravel_axis(Value_P X, Value_P B, uAxis axis)
 {
@@ -104,7 +104,7 @@ Shape shape_Z;
 
    return ravel(shape_Z, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_COMMA::ravel(const Shape & new_shape, Value_P B)
 {
@@ -119,7 +119,7 @@ const ShapeItem count = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::catenate(const Value & A, sAxis axis, const Value & B)
 {
@@ -279,7 +279,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::laminate(const Value & A, sAxis axis, const Value & B)
 {
@@ -341,7 +341,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::catenate_or_laminate(const Value & A, const Value & X,
                                 const Value & B)
@@ -370,7 +370,7 @@ const APL_Float axis = cX.get_real_value() - qio;
        axis >= (B.get_rank() + 1.0))   AXIS_ERROR;
    return laminate(A, sAxis(axis + 1.0), B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, const Value & B)
 {
@@ -422,7 +422,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::append_scalar(const Value & A, uAxis axis, const Cell & cell_B)
 {
@@ -465,7 +465,7 @@ const Cell * cA = &A.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
 {
@@ -482,7 +482,7 @@ uRank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank();
    return Token(TOK_APL_VALUE1, catenate(*A, max_rank-1, *B));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_COMMA::eval_B(Value_P B) const
 {
@@ -504,7 +504,7 @@ const Shape shape_Z(B->element_count());
 
    return ravel(shape_Z, B);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_COMMA1::eval_B(Value_P B) const
 {
@@ -533,7 +533,7 @@ Shape shape_Z(c1, c2);
       }
    return ravel(shape_Z, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
 {
@@ -548,5 +548,5 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
 
    return Token(TOK_APL_VALUE1, catenate(*A, 0, *B));
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

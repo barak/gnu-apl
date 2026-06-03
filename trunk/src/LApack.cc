@@ -114,7 +114,7 @@ inline void next_Cell(Value & value, const LA_pack::ZZ & zz)
    * All complex FORTRAN functions start with Z, all real FORTRAN functions
      with D (omitted above and in C/C++).
  */
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* numerical limits
      
    DLAMCH determines double precision machine parameters.
@@ -139,11 +139,11 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 #undef dlamch_S
 #undef dlamch_P
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 # include "LAdebug.icc"   // print_matrix() etc.
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
    : N(N)
@@ -169,7 +169,7 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
         vn2   = 0;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 LA_pack::PTVVy<T>::~PTVVy()
 {
@@ -184,7 +184,7 @@ LA_pack::PTVVy<T>::~PTVVy()
         std::allocator<APL_Float>{}.deallocate(vn2, N);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 int LA_pack::PTVVy<T>::print_pivot(ostream & out,
                                     Ccol N, const char * loc) const
@@ -196,7 +196,7 @@ int LA_pack::PTVVy<T>::print_pivot(ostream & out,
    out << "   at " << loc << endl;
    return N;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 int LA_pack::PTVVy<T>::print_tau(ostream & out, Ccol N,
                                   const char * loc) const
@@ -206,8 +206,8 @@ int LA_pack::PTVVy<T>::print_tau(ostream & out, Ccol N,
    out << endl;
    return N;
 }
-//============================================================================
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 /* LApack function UNM2R. Overwrite the general complex m-by-n matrix C:
 
    C ← Q ∘ C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
@@ -270,7 +270,7 @@ Value_P LA_pack::invert_ZZ_UTM(Crow M, Ccol N,
                                fMatrix<ZZ> & UTM, fMatrix<ZZ> & AUG)
    { return invert_UTM<ZZ>(M, N, UTM, AUG); }
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 void LA_pack::invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG)
 {
@@ -359,7 +359,7 @@ print_matrix("  QUTM before invert_QUTM()", QUTM);
        }
    print_matrix("QAUG after invert_T_UTM()", QAUG);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** LApack function UNG2R.
 
    A is a matrix whose upper triangle matrix (including its diagonal) is
@@ -444,35 +444,35 @@ const Crow M = A.get_row_count();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 sRank LA_pack::divide_DD_matrix(Value & Z, Crow M,
                                 Ccol cols_A, const Cell * cA,
                                 Ccol cols_B, const Cell * cB)
 {
    return divide_matrix<DD>(Z, M, cols_A, cA, cols_B, cB);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 sRank LA_pack::divide_ZZ_matrix(Value & Z, Crow M,
                                 Ccol cols_A, const Cell * cA,
                                 Ccol cols_B, const Cell * cB)
 {
    return divide_matrix<ZZ>(Z, M, cols_A, cA, cols_B, cB);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // instantiate factorize_matrix<DD>()
 void LA_pack::factorize_DD_matrix(Value & Z, Crow M, Ccol N,
                                   const Cell * cB, APL_Float rcond)
 {
    factorize_matrix<DD>(Z, M, N, cB, rcond);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // instantiate factorize_matrix<ZZ>()
 void LA_pack::factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
                                   const Cell * cB, APL_Float rcond)
 {
    factorize_matrix<ZZ>(Z, M, N, cB, rcond);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the implementation of Z←A⌹B, where
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]   (if rows == cols_B),
 /// or else: A[;j] - B +.× Z[j] is minimal         (if rows > cols_B)
@@ -556,7 +556,7 @@ T * work_B = work_A + items_A;
    std::allocator<T>{}.deallocate(work_AB, items_A + items_B);
    return cols_B;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 void LA_pack::grab_Q (Value & Z, fMatrix<T> & C, PTVVy<T> & ptvvy)
 {
@@ -608,7 +608,7 @@ Value_P Z1(shape_Z1, LOC);
    Z1->check_value(LOC);
    Z.next_ravel_Pointer(Z1.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<typename T>
 void LA_pack::grab_R(fMatrix<T> & HR, Value & Z, fMatrix<T> & AUG)
 {
@@ -651,7 +651,7 @@ Value_P Z3 = invert_UTM<T>(M, N, HR, AUG);
    Z.next_ravel_Pointer(Z3.get());
    Z.check_value(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** invert an upper-triangular matrix. Input is an upper triangular M×N matrix
     utm (whose items below the diagonal are ignored but pretended to be 0).
     Result is the inverse N×M matrix aug.
@@ -704,7 +704,7 @@ const bool cplx = is_complex(UTM.diag(0));
    Z3->check_value(LOC);
    return Z3;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the implementation of Z←⌹[2]B, where Z is (Q T T⁻¹) and B = T∘Q.
 //
 template<typename T>
@@ -787,7 +787,7 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
    std::allocator<T>{}.deallocate(work_B, total_items_fac);
    return N;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
     LApack functions DGELSY and ZGELSY aka. xGELSY:
 
@@ -913,7 +913,7 @@ APL_Float un_scale_A = 1.0;
  
    return N;   // success
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// scaled_gelsy() computes gelsy() with B and A scaled nicely.
 /*
    B is the matrix to be inverted, and
@@ -1027,7 +1027,7 @@ DebugMatrix B_before("B_before laqp2()", B);
 
    return N;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// function estimating the rank of \b A. (simplified part of GELSY)
 template<typename T>
 sRank LA_pack::estimate_rank(const fMatrix<T> & A, APL_Float rcond,
@@ -1120,7 +1120,7 @@ T * work_max = ptvvy.work_max;
 
    return N;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /*  LApack function laqp2. Compute a QR factorization with or without
  *    column pivoting of matrix A:
 
@@ -1247,7 +1247,7 @@ const Cdia D = min(M, N);
             }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** LApack function laic1 (estimate largest singular value).
     apply one step of incremental condition estimation.
 
@@ -1354,7 +1354,7 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
    normalize(SIN, COS);
    SEST = sqrt(t + 1.0) * abs_SEST;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** LApack function laic1 (estimate smallest singular value).
     Results are: SEST, SIN, and COS, updated in place (i.e. IN/OUT
     parameters in FORTRAN). Apply one step of incremental condition
@@ -1523,7 +1523,7 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
 
    normalize(SIN, COS);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** LApack function larfg. It generates one elementary reflector,
     i.e. one Householder matrix H.
 
@@ -1609,7 +1609,7 @@ T           tau( (  BETA_r - ALPHA_r) / BETA_r);
 
    return tau;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// LApack function trsm. Solves op(A) * X = alpha * B
 //  The result is stored in the first NRHS columns of B
 //  Only the special case needed for A⌹B is implemented.
@@ -1654,7 +1654,7 @@ void LA_pack::trsm(const fMatrix<T> & A, fMatrix<T> & B, Ccol NRHS)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// LApack function ila_lc
 template<typename T>
 Ccol LA_pack::ila_lc(Crow M, const fMatrix<T> & C)
@@ -1694,7 +1694,7 @@ const Ccol N = C.get_column_count();
     */
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* LApack function gemv. Multiply every (conjugated) partial column vector
    M↑(+C)[;col] of C with vector x. Set the row vector y to the sums
    of the products.
@@ -1734,7 +1734,7 @@ inline void LA_pack::gemv(const fMatrix<T> & C, Crow M, Ccol N,
         y[col] = sum;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* LApack function gerc. Let SUB←M N↑C.
 
    C[m; n] ← ALPHA × x[m] × y[n] × C[m; n] for SUB ←→ M N↑C
@@ -1771,7 +1771,7 @@ void LA_pack::gerc(fMatrix<T> & C, Crow M, Ccol N,
         ALL_ROWS(M)   C.at(row, col) += Ay * x[row];   //
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** LApack function larf: applies the elementary reflector H to the
     rectangular matrix C.
 

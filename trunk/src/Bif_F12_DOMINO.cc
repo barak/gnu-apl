@@ -60,14 +60,14 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def(20, integral       , "compute integral for B"                    )
 #undef domino_def
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Bif_F12_DOMINO::Bif_F12_DOMINO()
    : NonscalarFunction_default_identity(TOK_F12_DOMINO)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
    init_function_group(subfunction_infos, count, "⌹");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_B(Value_P B) const
 {
@@ -149,7 +149,7 @@ Value_P I(shape_I, LOC);
 Token result = eval_AB(I, B);
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
@@ -281,7 +281,7 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -301,7 +301,7 @@ const APL_Integer X0 = X->get_sole_integer();
    MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_AB(Value_P A, Value_P B) const
 {
@@ -382,13 +382,13 @@ const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
    return Bif_F12_TRANSPOSE::do_eval_B(B.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_DOMINO::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -401,7 +401,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::print_fun_syntax(ostream & out,
                                 const function_info & info) const
@@ -431,7 +431,7 @@ const char * A = "←   ";   // left arg
    out << Z << A << "LO ⌹[" << setw(2) << axis << "] B   ⍝ "
        << "dito with optional monomial order LO" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::print_map_syntax(ostream & out,
                                  const function_info & info) const
@@ -441,7 +441,7 @@ const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
    out << "    ⌹[" << setw(2) << info.axis << "]  ←→  ⌹['" << name << "']"
        << blanks << "  ←→  ⌹." << name << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print debug infos for \b this real matrix
 template<>
 void Bif_F12_DOMINO::Matrix<false>::debug(const char * name) const
@@ -464,7 +464,7 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print debug infos for \b this complex matrix
 template<>
 void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
@@ -487,7 +487,7 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::QR_Helzer(Value_P Z, bool need_complex, ShapeItem M,
                           ShapeItem N, const Cell * cB, double EPS)
@@ -716,7 +716,7 @@ const ShapeItem D = M < N ? M : N;   // length of the diagonal
    delete[] data;
 #undef base_AUG
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<bool cplx>
 double *
 Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
@@ -875,7 +875,7 @@ mB.debug("[13] B");
          --rows;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
 {
@@ -934,7 +934,7 @@ UCS_string_vector vars;
 const UCS_string Z_ucs = print_polynomial(vars, B);
    return Value_P(Z_ucs, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
                                  const Value & B)
@@ -1077,7 +1077,7 @@ int term = 0;
    if (poly.size() == 0)   poly << UNI_0;
    return poly;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & B)
 {
@@ -1096,7 +1096,7 @@ UCS_string_vector vars;   vars.reserve(8);
 const UCS_string Z = print_polynomial(vars, B);
    return Value_P(Z, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::polynomial_product(const Value & A, const Value & B)
 {
@@ -1198,7 +1198,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::poly_quotient(const Value & A, const Value & B)
 {
@@ -1405,7 +1405,7 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::poly_quotient_NO(const Value & A, const Value & B,
                               const Value * order_A, const Value * order_B)
@@ -1497,7 +1497,7 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::poly_quotient_N(const Value & A, const Value & B)
 {
@@ -1562,7 +1562,7 @@ Value_P order_B(shape_B, LOC);  // B[2;...]
 
    return poly_quotient_NO(*poly_A, *poly_B, order_A.get(), order_B.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const Value & A, const Value & B)
 {
@@ -1620,7 +1620,7 @@ UCS_string_vector vars;
 
    return scan_polynomial(vars, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const Value & B)
 {
@@ -1638,7 +1638,7 @@ UCS_string_vector vars;   vars.reserve(8);
 
    return scan_polynomial(vars, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::scan_polynomial(const UCS_string_vector & vars, const Value & B)
 {
@@ -1788,7 +1788,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if 0 // not used
 void
 Bif_F12_DOMINO::run_script(const UTF8_string & script,
@@ -1863,7 +1863,7 @@ char buffer[BUFSIZE + 1];
        }
 }
 #endif
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_DOMINO::integral(const Value * A, const Value & B)
 {
@@ -1964,7 +1964,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
 {
@@ -1982,7 +1982,7 @@ Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
         else   DOMAIN_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
 {
@@ -1996,5 +1996,5 @@ Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
         else                               DOMAIN_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

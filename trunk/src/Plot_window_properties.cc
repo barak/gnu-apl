@@ -29,7 +29,7 @@
 /// a shared buffer for SPRINTF of various error texts.
 static char tmp_error[80];
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
@@ -94,7 +94,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 
    update(verbosity);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_window_properties::~Plot_window_properties()
 
 {
@@ -103,7 +103,7 @@ Plot_window_properties::~Plot_window_properties()
 
    delete &plot_data;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 bool
 Plot_window_properties::update(int verbosity)
@@ -262,7 +262,7 @@ const int max_Zi = ceil(max_Z / tile_Z);
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {
@@ -272,7 +272,7 @@ Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
    pa_height = height - pa_border_T - origin_Y - pa_border_B;
    update(0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Pixel_XY
 Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
 {
@@ -283,7 +283,7 @@ const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
 
    return Pixel_XY(px, py);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Plot_window_properties::print(ostream & out) const
 {
@@ -307,7 +307,7 @@ Plot_window_properties::print(ostream & out) const
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
@@ -433,7 +433,7 @@ int line_number = -1;
    SPRINTF(tmp_error, "Unknown attribute A.%s", att_and_val);
    return tmp_error;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Plot_window_properties::set_attribute(const UCS_string & att, const Cell & val)
 {
@@ -479,7 +479,7 @@ const char * attname_cp = attname_utf.c_str();
         return "Bad attribute value type";
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint32_t
 Plot_window_properties::get_color(double alpha) const
 {
@@ -525,7 +525,7 @@ Plot_window_properties::get_color(double alpha) const
    //
    return gradient.back().rgb;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 double
 Plot_window_properties::round_up_1_2_5(double val)
 {
@@ -553,7 +553,7 @@ int expo = 0;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Plot_window_properties::round_up_24(int val)
 {
@@ -563,7 +563,7 @@ Plot_window_properties::round_up_24(int val)
    if (val < 12)   return 12;    // 12 evenly divides 24
    return 24;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Plot_window_properties::round_up_60(int val)
 {
@@ -575,7 +575,7 @@ Plot_window_properties::round_up_60(int val)
    if (val < 30)   return 30;    // 30 evenly divides 60
    return 60;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 double
 Plot_window_properties::round_up_seconds(double val)
 {
@@ -632,7 +632,7 @@ tm rounded;   // tile rounded up
 
    return mktime(&rounded);   // back to seconds
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
 {
@@ -643,5 +643,5 @@ Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

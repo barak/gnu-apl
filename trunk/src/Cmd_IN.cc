@@ -31,7 +31,7 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -92,7 +92,7 @@ transfer_context tctx(protection);
         break;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::process_record(const UTF8 * record,
                                           const UCS_string_vector & objects)
@@ -171,7 +171,7 @@ const char sub_type = record[1];
              << "*** bad record type '" << rec_type << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint32_t
 Cmd_IN::transfer_context::get_nrs(UCS_string & name, Shape & shape) const
 {
@@ -208,7 +208,7 @@ int rank = 0;
 
    return idx;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::numeric_1TF(const UCS_string_vector & objects) const
 {
@@ -267,7 +267,7 @@ const ShapeItem ec = Z->element_count();
    Assert(sym);
    sym->assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::chars_1TF(const UCS_string_vector & objects) const
 {
@@ -322,7 +322,7 @@ ShapeItem padded = 0;
    Assert(sym);
    sym->assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
@@ -353,7 +353,7 @@ UCS_string var_or_fun;
         CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::function_2TF(const UCS_string_vector & objects)const
 {
@@ -397,7 +397,7 @@ Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
             << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::add(const UTF8 * str, int len)
 {
@@ -423,4 +423,4 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

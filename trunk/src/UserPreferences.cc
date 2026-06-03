@@ -49,7 +49,7 @@ UserPreferences UserPreferences::uprefs;
 #undef _B
 #endif
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserPreferences::UserPreferences()
    :
      append_summary(false),
@@ -99,7 +99,7 @@ UserPreferences::UserPreferences()
 {
    gettimeofday(&session_start, 0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::collect_preferences(const std::vector<const char *> & args)
 {
@@ -141,7 +141,7 @@ const bool log_startup = parse_args_1() || log_startup0;
 
   return log_startup0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print args
 void
 UserPreferences::show_args(const std::vector<const char *> & args)
@@ -166,7 +166,7 @@ UserPreferences::show_args(const std::vector<const char *> & args)
       CERR << "fd 3 is:  OPEN" << endl;
 #endif // MINGW_SRC
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::usage(const char * prog)
 {
@@ -252,7 +252,7 @@ UserPreferences::usage(const char * prog)
 "\n"
 "Please report problems to: bug-apl@gnu.org\n" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_GPL(ostream & out)
 {
@@ -298,7 +298,7 @@ UserPreferences::show_GPL(ostream & out)
 "   See also: http://www.netlib.org/lapack/LICENSE\n"
 "\n";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::is_APL_script(const char * filename)
 {
@@ -324,7 +324,7 @@ const size_t len = read(fd, buf, sizeof(buf));
    if (buf[1] != '!')   return false;
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::parse_args_0(const std::vector<const char *> & args)
 {
@@ -336,7 +336,7 @@ UserPreferences::parse_args_0(const std::vector<const char *> & args)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #define IFOPT(x)     if (!strcmp(opt, #x))
 #define IFOPT2(x, y) if ((!strcmp(opt, #x)) || (!strcmp(opt, #y)))
@@ -430,7 +430,7 @@ bool log_startup = false;
 
    return log_startup;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::parse_args_2(bool logit)
 {
@@ -994,7 +994,7 @@ UserPreferences::parse_args_2(bool logit)
    //
    IO_Files::testcase_count = InputFile::testcase_file_count();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
     GNU APL can be started in a number of ways:
 
@@ -1129,7 +1129,7 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_version(ostream & out)
 {
@@ -1153,7 +1153,7 @@ UserPreferences::show_version(ostream & out)
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_configure_options()
 {
@@ -1260,7 +1260,7 @@ UserPreferences::show_configure_options()
 
    show_version(CERR);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 FILE *
 UserPreferences::open_user_file(const char * fname, char * filename,
                                 bool sys, bool log_startup)
@@ -1309,7 +1309,7 @@ FILE * f = fopen(filename, "r");
 
    return f;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::read_config_file(bool sys, bool log_startup)
 {
@@ -1723,7 +1723,7 @@ int file_profile = 0;   // the current profile in the preferences file
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 UserPreferences::decode_ASCII(const char * strg)
 {
@@ -1765,7 +1765,7 @@ UserPreferences::decode_ASCII(const char * strg)
    CERR << "invalid parameter " << strg << " in preferences file" << endl;
    return -1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::read_threshold_file(bool sys, bool log_startup)
 {
@@ -1846,7 +1846,7 @@ int line = 0;
                  << " line " << line << endl;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
                                ShapeItem threshold)
@@ -1857,5 +1857,5 @@ UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
    if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
    else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

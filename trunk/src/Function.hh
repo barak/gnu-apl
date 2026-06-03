@@ -47,7 +47,7 @@ class RavelIterator;
 
    default implementation functions with axis: ignore axis
 */
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** additional functionality for functions with named sub-functions.
     I.e one of ⌹, ⎕CR, ⎕FFT, FIO, ⎕MX, ⎕RVAL, or ⎕SQL.
   */
@@ -202,7 +202,7 @@ protected:
    /// the longest subfunction name (for tabular output)
    size_t max_function_name_length;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The base class for all functions (user defined or system functions).  */
 /// Base class for all APL functions and operators (system or defined)
 class Function : public NamedObject, public FunctionGroup
@@ -460,6 +460,6 @@ protected:
    /// the tag for token pointing to \b this function
    TokenTag tag;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __FUNCTION_HH_DEFINED__

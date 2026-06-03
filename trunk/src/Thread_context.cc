@@ -39,7 +39,7 @@ Thread_context::PoolFunction * Thread_context::do_work =
     &Thread_context::PF_no_work;
 volatile _Atomic_word Thread_context::busy_worker_count = 0;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Thread_context::Thread_context()
    : thread(0),
      job_number(0),
@@ -48,7 +48,7 @@ Thread_context::Thread_context()
      N(CNUM_INVALID)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Thread_context::~Thread_context()
 {
    // PRINT_LOCKED(CERR << "\n*** DELETING Thread_context #" << N << endl)
@@ -58,14 +58,14 @@ Thread_context::~Thread_context()
    if (thread && N)   pthread_cancel(thread);
    thread = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::M_lock_pool()
 {
    do_work = PF_lock_unlock_pool;
    M_fork("PF_lock_unlock_pool");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::print(ostream & out) const
 {
@@ -76,7 +76,7 @@ const void * vpth = reinterpret_cast<const void *>(thread);
        << " job:"        << setw(5) << int(job_number)
        << " " << job_name << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::cleanup()
 {
@@ -86,7 +86,7 @@ Thread_context::cleanup()
     delete [] thread_contexts;
    thread_contexts = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::init_sequential(bool logit)
 {
@@ -94,7 +94,7 @@ Thread_context::init_sequential(bool logit)
    thread_contexts = new Thread_context[thread_contexts_count];
    thread_contexts[0].N = CNUM_MASTER;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::print_all(ostream & out)
 {
@@ -109,7 +109,7 @@ Thread_context::print_all(ostream & out)
            out << endl)
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void Thread_context::set_active_core_count(CoreCount new_count)
 {
    Log(LOG_Parallel)
@@ -118,14 +118,14 @@ void Thread_context::set_active_core_count(CoreCount new_count)
 
    active_core_count = new_count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::PF_no_work(Thread_context & tctx)
 {
    PRINT_LOCKED(CERR << "*** function no_work() called by thread #"
                      << tctx.get_N() << endl)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
 {
@@ -149,12 +149,12 @@ Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
       }
 }
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // functions and variables  that are only needed #if PARALLEL_ENABLED...
 
 #if PARALLEL_ENABLED
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::bind_to_cpu(CPU_Number core, bool logit)
 {
@@ -196,7 +196,7 @@ const int err = pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpus);
       }
 #endif // HAVE_AFFINITY_NP
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::init_parallel(CoreCount count, bool logit)
 {
@@ -207,7 +207,7 @@ Thread_context::init_parallel(CoreCount count, bool logit)
    loop(c, thread_contexts_count)
        thread_contexts[c].init_entry(CoreNumber(c));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::kill_pool()
 {
@@ -216,12 +216,12 @@ Thread_context::kill_pool()
         if (c)   pthread_kill(thread_contexts[c].thread, SIGKILL);
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 Thread_context::init_entry(CoreNumber n)
 {
    N = n;
    __sem_init(&pool_sema, 0, 0);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // PARALLEL_ENABLED

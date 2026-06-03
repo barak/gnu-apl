@@ -36,11 +36,11 @@ using namespace std;
 class UCS_string;
 class Value;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// one byte (= 7-bit character !) of an ASCII string
 typedef char ASCII;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// frequently used cast to const UTF8 *
 /// @param vp pointer to cast
 inline const UTF8 *
@@ -48,7 +48,7 @@ utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// frequently used cast to UTF8 *
 /// @param cp ASCII pointer to cast
 inline UTF8 *
@@ -56,7 +56,7 @@ utf8P(ASCII * cp)
 {
   return reinterpret_cast<UTF8 *>(cp);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// an UTF8 encoded Unicode (RFC 3629) string
 class UTF8_string : public std::string
 {
@@ -154,7 +154,7 @@ public:
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 class UTF8_string_vector : public std::vector<UTF8_string>
 {
 public:
@@ -163,7 +163,7 @@ public:
    /// @param lines newline-separated C string to split into individual lines
    UTF8_string_vector(const char * lines);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A UTF8 string to be used as filebuf in UTF8_ostream
 class UTF8_filebuf : public filebuf
 {
@@ -180,7 +180,7 @@ protected:
    /// the data in this filebuf
    UTF8_string data;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a UTF8 string that can be used as ostream
 class UTF8_ostream : public ostream
 {
@@ -198,6 +198,6 @@ protected:
    /// the filebuf of this ostream
    UTF8_filebuf utf8_filebuf;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __UTF8_STRING_HH_DEFINED__

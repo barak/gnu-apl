@@ -93,7 +93,7 @@ using namespace std;
 #define NEED(x)   if (space < int(x)) \
    { leave_char_mode();   outf << "\n";   space = do_indent(); } outf
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
                                        const char * filename)
   : XML_Archive(of, ef),
@@ -114,7 +114,7 @@ XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
    Log(LOG_archive)   err << "done XML_Saving_Archive." << endl;
    save_success = true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Saving_Archive &
 XML_Saving_Archive::save()
 {
@@ -346,7 +346,7 @@ ShapeItem done_count = 0;
 
    return *this;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
 {
@@ -356,7 +356,7 @@ XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
         save_Function(derived);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_Function(const Function & fun)
 {
@@ -431,7 +431,7 @@ XML_Saving_Archive::save_Function(const Function & fun)
             << " -->" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 XML_Saving_Archive::save_Function_name(const Function & fun)
 {
@@ -465,7 +465,7 @@ const UserFunction * ufun = fun.get_func_ufun();
         return 1;   // one attribute
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_functions()
 {
@@ -479,7 +479,7 @@ XML_Saving_Archive::save_functions()
 
    outf << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_Parser(const StateIndicator & si)
 {
@@ -515,7 +515,7 @@ const Prefix & prefix = si.current_stack;
    do_indent();
    outf << "</Parser>" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Saving_Archive &
 XML_Saving_Archive::save_Ravel(Vid vid)
 {
@@ -575,7 +575,7 @@ int space = do_indent();
 
    return *this;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Saving_Archive &
 XML_Saving_Archive::save_shape(Vid vid)
 {
@@ -596,7 +596,7 @@ const Vid parent_vid = val_pars[vid]._par;
    outf << "/>" << endl;
    return *this;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_SI_entry(const StateIndicator & si)
 {
@@ -671,7 +671,7 @@ const Executable & exec = *si.get_executable();
    do_indent();
    outf << "</SI-entry>" << endl << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_Symbol(const Symbol & sym)
 {
@@ -689,7 +689,7 @@ XML_Saving_Archive::save_Symbol(const Symbol & sym)
    do_indent();
    outf << "</Symbol>" << endl << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
@@ -742,7 +742,7 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
    do_indent();
    outf << "</SymbolTable>" << endl << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 {
@@ -753,7 +753,7 @@ XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 
    outf << "/>" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_UCS(const UCS_string & ucs)
 {
@@ -767,7 +767,7 @@ int space = do_indent();
    space -= 2;
    indent -= 5;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_user_commands(
                const std::vector<Command::user_command> & cmds)
@@ -792,7 +792,7 @@ XML_Saving_Archive::save_user_commands(
    do_indent();
    outf << "</Commands>" << endl << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
@@ -830,7 +830,7 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
         default: Assert(0);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Saving_Archive::is_saved(const Function * fun) const
 {
@@ -839,7 +839,7 @@ XML_Saving_Archive::is_saved(const Function * fun) const
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 XML_Saving_Archive::do_indent()
 {
@@ -848,7 +848,7 @@ const int spaces = indent * INDENT_LEN;
 
    return 72 - spaces;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::emit_cell(const Cell & cell, int & space)
 {
@@ -926,7 +926,7 @@ char cc[80];
         default: Assert(0);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::emit_token_val(const Token & tok)
 {
@@ -1003,7 +1003,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
 
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
 {
@@ -1029,7 +1029,7 @@ XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
         space--;   // uni
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Saving_Archive::Vid
 XML_Saving_Archive::find_vid(const Value * value)
 {
@@ -1039,7 +1039,7 @@ const void * item = Heapsort<_val_par>
    Assert(item);
    return Vid(reinterpret_cast<const _val_par *>(item) - val_pars.data());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Saving_Archive::write_XML_header()
 {
@@ -1202,14 +1202,14 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
                        << ASX_MINOR << "."
                        << ASX_OTHER << "\">\n" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 XML_Saving_Archive::decr(int & counter, const char * str)
 {
    counter -= strlen(str);
    return str;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Saving_Archive::xml_allowed(Unicode uni)
 {
@@ -1231,7 +1231,7 @@ XML_Saving_Archive::xml_allowed(Unicode uni)
       }
    return true;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 XML_Loading_Archive::XML_Loading_Archive(ostream & of, ostream & ef,
                                          const char * _filename, int & dump_fd)
    : XML_Archive(of, ef),
@@ -1319,12 +1319,12 @@ const int fd = open(filename, O_RDONLY);
              << "have the format of a GNU APL .xml or .apl file" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Loading_Archive::~XML_Loading_Archive()
 {
    Sys::munmap(file_start, file_length);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::check_compatibility()
 {
@@ -1383,7 +1383,7 @@ UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
                 << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Loading_Archive::next_tag(const char * loc)
 {
@@ -1453,7 +1453,7 @@ again:
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_vids()
 {
@@ -1464,7 +1464,7 @@ XML_Loading_Archive::read_vids()
 
    reset();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Workspace(bool silent)
 {
@@ -1642,7 +1642,7 @@ const char * tz_sign = (offset < 0) ? "" : "+";
         err << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::reset()
 {
@@ -1650,7 +1650,7 @@ XML_Loading_Archive::reset()
    line_no = 1;
    next_tag(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Loading_Archive::skip_to_tag(const char * tag)
 {
@@ -1662,7 +1662,7 @@ XML_Loading_Archive::skip_to_tag(const char * tag)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
 {
@@ -1675,19 +1675,19 @@ XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
         DOMAIN_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Loading_Archive::is_tag(const char * prefix) const
 {
    return !strncmp(charP(tag_name), prefix, strlen(prefix));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::print_tag() const
 {
    loop(t, attributes - tag_name)   err << tag_name[t];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::add_fid_function(Fid fid, cFunction_P new_fun,
                                       const char * loc)
@@ -1719,7 +1719,7 @@ XML_Loading_Archive::add_fid_function(Fid fid, cFunction_P new_fun,
 const fun_map fm =  { fid, new_fun, loc };
    fid_to_function.push_back(fm);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const UTF8 *
 XML_Loading_Archive::find_attr(const char * att_name, bool optional)
 {
@@ -1750,7 +1750,7 @@ const int att_len = strlen(att_name);
       }
    return 0;   // not found
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_Float
 XML_Loading_Archive::find_float_attr(const char * attrib)
 {
@@ -1758,7 +1758,7 @@ const UTF8 * value = find_mandatory_attr(attrib);
 const APL_Float val = strtod(charP(value), 0);
    return val;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_Loading_Archive::fun_map *
 XML_Loading_Archive::find_fun_map(Fid fid)
 {
@@ -1769,14 +1769,14 @@ XML_Loading_Archive::find_fun_map(Fid fid)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 XML_Loading_Archive::find_function(Fid fid)
 {
    if (fun_map * map = find_fun_map(fid))   return map->new_fun;
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int64_t
 XML_Loading_Archive::find_int_attr(const char * attrib, bool optional, int base)
 {
@@ -1786,7 +1786,7 @@ const UTF8 * value = find_attr(attrib, optional);
 const int64_t val = strtoll(charP(value), 0, base);
    return val;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 XML_Loading_Archive::find_lambda(const UCS_string & lambda)
 {
@@ -1829,7 +1829,7 @@ const Token_string & body = exec.get_body();
         << " at )SI level=" << si.get_level() << endl;
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Loading_Archive::get_uni()
 {
@@ -1841,7 +1841,7 @@ int len = 0;
    if (current_char == 0x0A)   { ++line_no;   line_start = data; }
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::instantiate_derived_functions(bool allocate)
 {
@@ -1909,7 +1909,7 @@ XML_Loading_Archive::instantiate_derived_functions(bool allocate)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const UTF8 *
 XML_Loading_Archive::read_Cells(Value & Z, const UTF8 * input)
 {
@@ -2049,7 +2049,7 @@ char **pend = reinterpret_cast<char **>(&end);
         default: Q1(type) Q1(line_no) DOMAIN_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Command()
 {
@@ -2072,7 +2072,7 @@ const int mode = find_int_attr("mode", false, 10);
 Command::user_command ucmd = { name_UCS, fun_UCS, mode };
    Workspace::get_user_commands().push_back(ucmd);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Commands()
 {
@@ -2089,7 +2089,7 @@ const int size = find_int_attr("size", false, 10);
    next_tag(LOC);
    expect_tag("/Commands", LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
 {
@@ -2113,7 +2113,7 @@ _derived_todo td = { derived, 0, fid, LO_fid, OPER_fid, RO_fid,
    add_fid_function(fid, derived, LOC);
    derived_todos.push_back(td);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Function()
 {
@@ -2124,7 +2124,7 @@ const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
    Assert(pfun);
    add_fid_function(fid, pfun, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Function(int d, Symbol & symbol)
 {
@@ -2252,7 +2252,7 @@ UCS_string text;
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 XML_Loading_Archive::read_Function_name()
 {
@@ -2294,7 +2294,7 @@ const int fun_id = find_int_attr("fun-id", true, 16);
    //
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Label(int d, Symbol & symbol)
 {
@@ -2302,7 +2302,7 @@ const int value = find_int_attr("value", false, 10);
    if (d == 0)   symbol.pop();
    symbol.push_label(Function_Line(value));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Executable *
 XML_Loading_Archive::read_lambda(const UTF8 * lambda_name)
 {
@@ -2318,7 +2318,7 @@ const char * creator = ")LOAD )SI λ";
    expect_tag("/UserFunction", LOC);
    return ufun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
 {
@@ -2374,7 +2374,7 @@ Prefix & parser = si.current_stack;
 
    expect_tag("/Parser", LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Ravel()
 {
@@ -2423,7 +2423,7 @@ Value_P Z = values[vid];
          }
    Z->check_value(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Shared_Variable(int d, Symbol & symbol)
 {
@@ -2436,7 +2436,7 @@ XML_Loading_Archive::read_Shared_Variable(int d, Symbol & symbol)
 
    // symbol.share_var(key);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_SI_entry(int lev)
 {
@@ -2469,7 +2469,7 @@ StateIndicator * si = Workspace::SI_top();
          if (is_tag("/SI-entry"))   break;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Executable *
 XML_Loading_Archive::read_SI_Execute()
 {
@@ -2486,7 +2486,7 @@ ExecuteList * exec = ExecuteList::fix(text, LOC);
    Assert(exec);
    return exec;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Executable *
 XML_Loading_Archive::read_SI_Statement()
 {
@@ -2503,7 +2503,7 @@ StatementList * exec = StatementList::fix(text, Value_P(), LOC);
    Assert(exec);
    return exec;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Executable *
 XML_Loading_Archive::read_SI_UserFunction()
 {
@@ -2534,7 +2534,7 @@ const UserFunction * ufun = fun->get_func_ufun();
 
    return ufun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_StateIndicator()
 {
@@ -2597,7 +2597,7 @@ const int levels = find_int_attr("levels", false, 10);
    next_tag(LOC);
    expect_tag("/StateIndicator", LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Symbol()
 {
@@ -2762,7 +2762,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    next_tag(LOC);
    expect_tag("/Symbol", LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_SymbolTable()
 {
@@ -2779,7 +2779,7 @@ const int size = find_int_attr("size", false, 10);
    next_tag(LOC);
    expect_tag("/SymbolTable", LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_Loading_Archive::read_Token(Token_loc & tloc)
 {
@@ -2895,7 +2895,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 XML_Loading_Archive::read_UCS()
 {
@@ -2905,7 +2905,7 @@ UCS_string text;
    read_XML_string(text, utf);
    return text;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
 {
@@ -2915,7 +2915,7 @@ XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
 
    symbol.push();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Value()
 {
@@ -2998,7 +2998,7 @@ bool no_copy = false;   // assume the value is needed
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
 {
@@ -3047,7 +3047,7 @@ const int vid = find_int_attr("vid", false, 10);
    catch (...)
       { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const UTF8 *
 XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
 {
@@ -3141,7 +3141,7 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
 
    return utf;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::where()
 {
@@ -3150,7 +3150,7 @@ XML_Loading_Archive::where()
    loop(j, 40)   { if (data[j] == 0x0A)   break;   err << data[j]; }
    err << "'" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_Loading_Archive::where_att()
 {
@@ -3165,5 +3165,5 @@ XML_Loading_Archive::where_att()
 
    err << "'" << endl;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

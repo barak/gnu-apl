@@ -30,7 +30,7 @@
 #include "RealCell.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 RealCell::bif_circle_fun(Cell * Z, const Cell * A) const
 {
@@ -43,7 +43,7 @@ const ErrorCode ret = do_bif_circle_fun(Z, fun);
    if (!Z->is_finite())   return E_DOMAIN_ERROR;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 RealCell::bif_circle_fun_inverse(Cell * Z, const Cell * A) const
 {
@@ -77,7 +77,7 @@ ErrorCode ret = E_DOMAIN_ERROR;
    // not reached
    return E_DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 RealCell::bif_logarithm(Cell * Z, const Cell * A) const
 {
@@ -107,7 +107,7 @@ const APL_Complex z = log(get_complex_value()) / log(A->get_complex_value());
    if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
    return ComplexCell::zC(Z, z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 RealCell::do_bif_circle_fun(Cell * Z, int fun) const
 {
@@ -233,4 +233,4 @@ const APL_Float b = get_real_value();
    //
    return E_DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

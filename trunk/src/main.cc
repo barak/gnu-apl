@@ -118,7 +118,7 @@ static struct sigaction new_WINCH_action;       // new WINCH handler
 /// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// signal handler for segfaults
 static void
 signal_SEGV_handler(int)
@@ -143,7 +143,7 @@ signal_SEGV_handler(int)
 
    Command::cmd_OFF(3);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// signal handler for SIGWINCH
 static void
 signal_WINCH_handler(int)
@@ -180,14 +180,14 @@ struct winsize wsize;
    // just return if we don't have ioctl TIOCGWINSZ
    return;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// signal handler for SIGUSR1
 static void
 signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// signal handler for SIGTERM
 static void
 signal_TERM_handler(int)
@@ -196,7 +196,7 @@ signal_TERM_handler(int)
    sigaction(SIGTERM, &old_TERM_action, 0);
    raise(SIGTERM);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if PARALLEL_ENABLED
 /// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
@@ -212,7 +212,7 @@ control_BSL(int sig)
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// new signal handler for SIGHUP
 static void
 signal_HUP_handler(int)
@@ -221,7 +221,7 @@ signal_HUP_handler(int)
    sigaction(SIGHUP, &old_HUP_action, 0);
    raise(SIGHUP);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0, Silence silence)
@@ -285,7 +285,7 @@ const int left_pad = (80 - len)/2;
          out<< endl;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
 /// port UserPreferences::uprefs.tcp_port on localhost
 void
@@ -381,7 +381,7 @@ sockaddr_in local;
          return;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// initialize the interpreter
 int
 init_apl(const std::vector<const char *> & args)
@@ -629,7 +629,7 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    return 0;   // OK.
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// dito.
 int
 main(int argc, const char *argv[])
@@ -691,4 +691,4 @@ int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

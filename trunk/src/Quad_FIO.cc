@@ -115,13 +115,13 @@ union SockAddr
    // If the axis is missing, then a list of functions implemented by
    // ⎕FIO is displayed
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const FunctionGroup::function_info Quad_FIO::subfunction_infos[] =
 {
 #define fio_def(N, name)   { N, #name, "", "", -1 },
 #include "Quad_FIO.def"
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
@@ -146,7 +146,7 @@ file_entry f2(stderr, STDERR_FILENO);   f2.path << "stderr";
       }
 #endif // ! MINGW_SRC
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AB(Value_P A, Value_P B) const
 {
@@ -169,7 +169,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
 
    return list_functions(COUT);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
@@ -282,7 +282,7 @@ const sAxis function_number = value_to_subfun(*X);
         default: bad_subfun_number_ERROR(function_number);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B(Value_P B) const
 {
@@ -378,7 +378,7 @@ NOT_MINGW(
 
    return list_functions(CERR);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB(Value_P X, Value_P B) const
 {
@@ -534,7 +534,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FIO::clear()
 {
@@ -553,7 +553,7 @@ Quad_FIO::clear()
         open_files.pop_back();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_FIO::close_handle(int fd)
 {
@@ -580,7 +580,7 @@ Quad_FIO::close_handle(int fd)
    MORE_ERROR() << "Invalid ⎕FIO handle " << fd;
    return -EBADF;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
@@ -661,7 +661,7 @@ char * from = filename;
          ) // NOT_MINGW
    exit(-1);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 Quad_FIO::fget_utf8(FILE * file, ShapeItem & fget_count)
 {
@@ -692,7 +692,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
@@ -706,7 +706,7 @@ const APL_Integer function_number = X->get_cfirst().get_int_value();
    MORE_ERROR() << "Bad function number (axis X) in operator A LO ⎕FIO[X] B";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -745,7 +745,7 @@ const APL_Integer function_number = X->get_cfirst().get_int_value();
 "case use (⎕FIO[X]) or H←⎕FIO[X]";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::list_functions(ostream & out) const
 {
@@ -877,7 +877,7 @@ Quad_FIO::list_functions(ostream & out) const
 
    return Token();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FIO::print_map_syntax(ostream & out, const function_info & info) const
 {
@@ -887,7 +887,7 @@ const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
    out << "    ⎕FIO[" << info.axis << "]  ←→  ⎕FIO['" << name << "']"
        << blanks << "←→  ⎕FIO." << name << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::do_fprintf(FILE * outf, Value_P A)
 {
@@ -905,7 +905,7 @@ UTF8_string utf(UZ);
    if (fwrite(utf.c_str(), 1, utf.size(), outf) != utf.size())   SYSTEM_ERROR;
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a Unicode source from either a file or a UCS_string
 class File_or_String
 {
@@ -1076,7 +1076,7 @@ protected:
    /// number of chars consumed thus far
    ShapeItem unicodes_read;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
                    int function_number)
@@ -1350,7 +1350,7 @@ const Shape sh_Z(Z->get_valid_item_count());
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FIO::do_snprintf(UCS_string & UZ, const UCS_string & A_format,
                     const Value * B, int off_B, const char * funname)
@@ -1551,7 +1551,7 @@ missing_arg:
                    "    The format string was: '" << A_format << "'";
     LENGTH_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AB___3(Value_P A)
 {
@@ -1571,7 +1571,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_ALXB___1(Value_P A, Token & LO, Value_P B)
 {
@@ -1599,7 +1599,7 @@ const uint64_t to = cycle_counter();
    //
    return Token(TOK_APL_VALUE1, IntScalar(to - from, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__13(Value_P A, Value_P B)
 {
@@ -1609,7 +1609,7 @@ const APL_Integer pos = A->get_cfirst().get_near_int();
    fseek(file, pos, SEEK_SET);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__14(Value_P A, Value_P B)
 {
@@ -1619,7 +1619,7 @@ const APL_Integer pos = A->get_cfirst().get_near_int();
    fseek(file, pos, SEEK_CUR);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__15(Value_P A, Value_P B)
 {
@@ -1629,7 +1629,7 @@ const APL_Integer pos = A->get_cfirst().get_near_int();
    fseek(file, pos, SEEK_END);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__20(Value_P A, Value_P B)
 {
@@ -1645,7 +1645,7 @@ const int mask = A->get_cfirst().get_near_int();
    if (errno == EEXIST)   errno = 0;   // frequent non-error
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__202(Value_P A, Value_P B, APL_Integer function_number)
 {
@@ -1678,7 +1678,7 @@ APL_Integer old_threshold;
       }
    return Token(TOK_APL_VALUE1, IntScalar(old_threshold, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__22(Value_P A, Value_P B)
 {
@@ -1686,7 +1686,7 @@ Quad_FIO::eval_AXB__22(Value_P A, Value_P B)
 FILE * file = get_FILE(*B.get());
    return do_fprintf(file, A);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__23(Value_P A, Value_P B)
 {
@@ -1698,7 +1698,7 @@ UTF8_string utf(text);
 const size_t len = fwrite(utf.c_str(), 1, utf.size(), file);
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__24(Value_P A, Value_P B)
 {
@@ -1731,7 +1731,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__27(Value_P A, Value_P B)
 {
@@ -1744,7 +1744,7 @@ const int result = rename(old_name.c_str(), new_name.c_str());
    if (result && errno)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__3(Value_P A, Value_P B)
 {
@@ -1772,7 +1772,7 @@ file_entry fe(f, fileno(f));
    open_files.push_back(fe);
    return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__31(Value_P A, Value_P B)
 {
@@ -1799,7 +1799,7 @@ const int not_ok = access(path.c_str(), perms);
    if (not_ok)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__33(Value_P A, Value_P B)
 {
@@ -1813,7 +1813,7 @@ SockAddr addr;
    bind(fd, &addr.addr, sizeof(addr.inet));
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__34(Value_P A, Value_P B)
 {
@@ -1825,7 +1825,7 @@ APL_Integer backlog = 10;
    listen(fd, backlog);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__36(Value_P A, Value_P B)
 {
@@ -1840,7 +1840,7 @@ SockAddr addr;
    connect(fd, &addr.addr, sizeof(addr));
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__37(Value_P A, Value_P B)
 {
@@ -1864,7 +1864,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__38(Value_P A, Value_P B)
 {
@@ -1886,7 +1886,7 @@ const ssize_t len = send(fd, buffer, bytes, 0);
    delete [] del;
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__39(Value_P A, Value_P B)
 {
@@ -1898,7 +1898,7 @@ const ssize_t len = send(fd, utf.c_str(), utf.size(), 0);
    if (len < 0)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__41(Value_P A, Value_P B)
 {
@@ -1922,7 +1922,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__42(Value_P A, Value_P B)
 {
@@ -1941,7 +1941,7 @@ const ssize_t len = write(fd, buffer, bytes);
    if (len < 0)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__43(Value_P A, Value_P B)
 {
@@ -1954,7 +1954,7 @@ const ssize_t len = write(fd, utf.c_str(), utf.size());
    if (len < 0)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__46(Value_P A, Value_P B)
 {
@@ -1969,7 +1969,7 @@ const int ret = getsockopt(fd, level, optname,
    if (ret < 0)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(optval, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__47(Value_P A, Value_P B)
 {
@@ -1981,7 +1981,7 @@ const int fd = get_fd(*B.get());
    setsockopt(fd, level, optname, charP(&optval), sizeof(optval));
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__48(Value_P A, Value_P B)
 {
@@ -1991,7 +1991,7 @@ File_or_String fos(file);
    errno = 0;
    return do_scanf(fos, format, 48);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__55(Value_P A, Value_P B)
 {
@@ -2001,7 +2001,7 @@ File_or_String fos(&data);
    errno = 0;
    return do_scanf(fos, format, 55);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__56(Value_P A, Value_P B)
 {
@@ -2059,7 +2059,7 @@ FILE * f = fopen(path.c_str(), "w");
    fclose(f);
    return Token(TOK_APL_VALUE1, IntScalar(items_written, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__58(Value_P A, Value_P B)
 {
@@ -2069,7 +2069,7 @@ UCS_string UZ;
 Value_P Z(UZ, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__59(Value_P A, Value_P B)
 {
@@ -2097,7 +2097,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__6(Value_P A, Value_P B)
 {
@@ -2122,7 +2122,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__60(Value_P A, Value_P B)
 {
@@ -2136,7 +2136,7 @@ const APL_Integer len  = B->get_cfirst().get_int_value();
 Value_P Z = get_random(mode, len);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__7(Value_P A, Value_P B)
 {
@@ -2154,7 +2154,7 @@ const size_t len = fwrite(buffer, 1, bytes, file);
    delete [] del;
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_AXB__8(Value_P A, Value_P B)
 {
@@ -2175,7 +2175,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B__0()
 {
@@ -2189,7 +2189,7 @@ Quad_FIO::eval_B__0()
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B__30(Value_P B)
 {
@@ -2208,7 +2208,7 @@ Quad_FIO::eval_B__30(Value_P B)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___14()
 {
@@ -2221,7 +2221,7 @@ Quad_FIO::eval_B___14()
        }
     return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___15()
 {
@@ -2240,7 +2240,7 @@ Value_P Z(sh, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___18(Value_P B)
 {
@@ -2264,7 +2264,7 @@ const APL_Integer errors =
    delete[] p;
    return Token(TOK_APL_VALUE1, IntScalar(errors, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___2()
 {
@@ -2275,7 +2275,7 @@ const uint64_t to = cycle_counter();
 
    return Token(TOK_APL_VALUE1, IntScalar(10*(to - from), LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___5()
 {
@@ -2285,7 +2285,7 @@ const Unicode * ibm = Avec::IBM_quad_AV();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___6()
 {
@@ -2306,7 +2306,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___7()
 {
@@ -2317,7 +2317,7 @@ const APL_Integer result = *reinterpret_cast<char *>(4343);
    CERR << "NOTE: Throwing a segfault failed." << endl;
    return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___8()
 {
@@ -2329,7 +2329,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_B___9()
 {
@@ -2341,7 +2341,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_LXB___1(Token & LO, Value_P B)
 {
@@ -2367,7 +2367,7 @@ const uint64_t to = cycle_counter();
    Workspace::SI_top()->clear_safe_execution();
    return Token(TOK_APL_VALUE1, IntScalar(to - from, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__16(Value_P B)
 {
@@ -2376,7 +2376,7 @@ FILE * file = get_FILE(*B.get());
    fflush(file);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__17(Value_P B)
 {
@@ -2389,7 +2389,7 @@ NOT_MINGW(
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__18(Value_P B)
 {
@@ -2419,7 +2419,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__19(Value_P B)
 {
@@ -2429,7 +2429,7 @@ const UTF8_string path(path_ucs);
    unlink(path.c_str());
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__2(Value_P B)
 {
@@ -2442,7 +2442,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__20(Value_P B)
 {
@@ -2457,7 +2457,7 @@ const UTF8_string path(path_ucs);
    if (errno == EEXIST)   errno = 0;   // frequent non-error
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__200(Value_P B, APL_Integer function_number)
 {
@@ -2505,7 +2505,7 @@ Value_P Zsub(stat_name, LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__202(Value_P B, APL_Integer function_number)
 {
@@ -2541,7 +2541,7 @@ APL_Integer old_threshold;
       }
    return Token(TOK_APL_VALUE1, IntScalar(old_threshold, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__21(Value_P B)
 {
@@ -2551,7 +2551,7 @@ const UTF8_string path(path_ucs);
    rmdir(path.c_str());
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__24(Value_P B)
 {
@@ -2570,7 +2570,7 @@ file_entry fe(f, fileno(f));
    open_files.push_back(fe);
    return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__25(Value_P B)
 {
@@ -2586,7 +2586,7 @@ int err = EBADF;   /* Bad file number */
    if (err == -1)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(err, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__26(Value_P B)
 {
@@ -2623,7 +2623,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__28(Value_P B, APL_Integer function_number)
 {
@@ -2698,7 +2698,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__3(Value_P B)
 {
@@ -2714,7 +2714,7 @@ file_entry fe(f, fileno(f));
    open_files.push_back(fe);
    return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__32(Value_P B)
 {
@@ -2735,7 +2735,7 @@ file_entry fe(0, sock);
    open_files.push_back(fe);
    return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__34(Value_P B)
 {
@@ -2744,7 +2744,7 @@ const int fd = get_fd(*B.get());
    listen(fd, 10);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__35(Value_P B)
 {
@@ -2764,7 +2764,7 @@ Value_P Z(4, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__37(Value_P B)
 {
@@ -2778,7 +2778,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__4(Value_P B)
 {
@@ -2792,7 +2792,7 @@ file_entry & fe = get_file_entry(*B.get());
    open_files.pop_back();        // erase last file
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__40(Value_P B)
 {
@@ -2878,7 +2878,7 @@ const APL_Integer milli_seconds = timeout.tv_sec*1000 + timeout.tv_usec/1000;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__41(Value_P B)
 {
@@ -2893,7 +2893,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__44(Value_P B)
 {
@@ -2910,7 +2910,7 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__45(Value_P B)
 {
@@ -2927,7 +2927,7 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__49(Value_P B)
 {
@@ -3000,7 +3000,7 @@ NOT_MINGW(
    }
 ) // NOT_MINGW
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__50(Value_P B)
 {
@@ -3022,7 +3022,7 @@ APL_Integer z = 0;
       }
    return Token(TOK_APL_VALUE1, IntScalar(z, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__51(Value_P B)
 {
@@ -3048,7 +3048,7 @@ Value_P Z(4, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__52(Value_P B, APL_Integer function_number)
 {
@@ -3069,7 +3069,7 @@ Value_P Z(9, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__54(Value_P B)
 {
@@ -3078,7 +3078,7 @@ const UTF8_string path(path_ucs);
    errno = chdir(path.c_str());
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__57(Value_P B)
 {
@@ -3088,7 +3088,7 @@ const int fd = do_FIO_57(*B.get(), 0);
    if (fd == -1)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__6(Value_P B)
 {
@@ -3103,7 +3103,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__60(Value_P B)
 {
@@ -3114,7 +3114,7 @@ const APL_Integer len = B->get_cfirst().get_int_value();
 Value_P Z = get_random(0, len);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FIO::eval_XB__8(Value_P B)
 {
@@ -3129,7 +3129,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_FIO::fds_to_val(fd_set * fds, int max_fd)
 {
@@ -3148,7 +3148,7 @@ Value_P Z(ShapeItem(fd_count), LOC);
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 FILE *
 Quad_FIO::get_FILE(int handle)
 {
@@ -3170,7 +3170,7 @@ file_entry & fe = get_file_entry(handle);
 
    return fe.fe_FILE;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_FIO::file_entry &
 Quad_FIO::get_file_entry(int handle)
 {
@@ -3183,7 +3183,7 @@ Quad_FIO::get_file_entry(int handle)
                 << " is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_FIO::get_random(APL_Integer mode, APL_Integer len)
 {
@@ -3222,7 +3222,7 @@ const ssize_t bytes = read(device, buffer, len);
    MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FIO::group_thousands(UCS_string & dest, char * buffer, bool flt)
 {
@@ -3258,7 +3258,7 @@ int digit_count = 0;
             }
          }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_Integer
 Quad_FIO::secs_epoch(const Value & B)
 {
@@ -3326,5 +3326,5 @@ const time_t z = mktime(&tm);
    MORE_ERROR() << "⎕FIO B: bad B";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

@@ -70,7 +70,7 @@ uint64_t Value::slow_new_count = 0;
 
 uint64_t Value::alloc_size = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const char * loc)
    : DynamicObject(loc, &all_values),
      flags(VF_NONE),
@@ -79,7 +79,7 @@ Value::Value(const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Cell & cell, const char * loc)
    : DynamicObject(loc, &all_values),
      flags(VF_NONE),
@@ -91,7 +91,7 @@ Value::Value(const Cell & cell, const char * loc)
    set_ravel_Cell(0, cell);
    check_value(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(ShapeItem len, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(len),
@@ -101,7 +101,7 @@ Value::Value(ShapeItem len, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(ShapeItem rows, ShapeItem cols, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(rows, cols),
@@ -111,7 +111,7 @@ Value::Value(ShapeItem rows, ShapeItem cols, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Shape & sh, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(sh),
@@ -121,7 +121,7 @@ Value::Value(const Shape & sh, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Shape & sh, uint64_t * bits, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(sh),
@@ -145,7 +145,7 @@ const size_t uint64_count = (sh.get_nz_volume() + 63) >> 6;
    ravel = reinterpret_cast<Cell *>(bits);
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const UCS_string & ucs, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(ucs.size()),
@@ -159,7 +159,7 @@ Value::Value(const UCS_string & ucs, const char * loc)
    loop(l, ucs.size())   next_ravel_Char(ucs[l]);
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const UTF8_string & utf, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(utf.size()),
@@ -173,7 +173,7 @@ Value::Value(const UTF8_string & utf, const char * loc)
    loop(l, utf.size())   next_ravel_Char(Unicode(utf[l] & 0xFF));
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const CDR_string & ui8, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(ui8.size()),
@@ -187,7 +187,7 @@ Value::Value(const CDR_string & ui8, const char * loc)
    loop(l, ui8.size())   next_ravel_Char(Unicode(ui8[l]));
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const PrintBuffer & pb, const char * loc)
    : DynamicObject(loc, &all_values),
      shape(pb.get_row_count(), pb.get_column_count()),
@@ -207,7 +207,7 @@ const ShapeItem width = pb.get_column_count();
 
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const char * loc, const Shape * sh)
    : DynamicObject(loc, &all_values),
      shape(ShapeItem(sh->get_rank())),
@@ -223,7 +223,7 @@ Value::Value(const char * loc, const Shape * sh)
 
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::~Value()
 {
    ADD_EVENT(this, VHE_Destruct, 0, LOC);
@@ -275,7 +275,7 @@ const ShapeItem length = nz_element_count();
    Assert(check_ptr == charP(this) + 7);
    check_ptr = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_apl_char_vector() const
 {
@@ -292,7 +292,7 @@ Value::is_apl_char_vector() const
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_char_array() const
 {
@@ -301,7 +301,7 @@ const Cell * C = &get_cfirst();
       if (!C++->is_character_cell())   return false;   // not char
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::get_sole_bool() const
 {
@@ -322,7 +322,7 @@ const Cell & c0 = get_cfirst();
    MORE_ERROR() << "array is not Boolean (expecting 0 or 1).";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_simple() const
 {
@@ -340,7 +340,7 @@ const Cell * C = &get_cfirst();
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_one_dimensional() const
 {
@@ -365,7 +365,7 @@ const Cell * C = &get_cfirst();
 
    return true;   // all items are scalars or vectors
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_int_array() const
 {
@@ -377,7 +377,7 @@ const ShapeItem ec = nz_element_count();
 
    return true;   // all ravel items are near-int
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_complex(bool check_numeric) const
 {
@@ -396,7 +396,7 @@ const ShapeItem ec = nz_element_count();
 
    return false;   // all cells numeric and not complex
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_structured() const
 {
@@ -417,7 +417,7 @@ const ShapeItem rows = get_rows();
 
    return true;    // OK: all rows were OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::can_be_compared() const
 {
@@ -435,7 +435,7 @@ const ShapeItem count = nz_element_count();
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::equal_string(const UCS_string & ucs) const
 {
@@ -456,7 +456,7 @@ Value::equal_string(const UCS_string & ucs) const
 
    RANK_ERROR;            // never
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::get_cellrefs(const char * loc)
 {
@@ -501,7 +501,7 @@ Value_P left_Z(get_shape(), loc);
    left_Z->check_value(LOC);
    return left_Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::assign_cellrefs(Value_P new_value)
 {
@@ -637,7 +637,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         else   LEFT_SYNTAX_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_member(const vector<const UCS_string *> & members,
                   Value * & owner, bool throw_error)
@@ -724,7 +724,7 @@ Value::get_member(const vector<const UCS_string *> & members,
 
    FIXME;   // not reached
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Cell *
 Value::get_existing_member(const vector<const UCS_string *> & members) const
 {
@@ -798,7 +798,7 @@ const Value * parent = this;
 
    FIXME;   // not reached
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Cell *
 Value::get_member_data(const UCS_string & member) const
 {
@@ -819,7 +819,7 @@ ShapeItem row = member.FNV_hash() % rows;
    //
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_member_data(const UCS_string & member_name)
 {
@@ -845,7 +845,7 @@ ShapeItem row = member_name.FNV_hash() % rows;
    //
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::sorted_members(std::vector<ShapeItem> & result,
                       const Unicode * filters) const
@@ -908,14 +908,14 @@ ShapeItem * sorted_nodes = sorted + max_member_count;   // ∆ and _
 
    delete [] sorted;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static bool
 member_name_greater(const ShapeItem & a, const ShapeItem & b, const void * ctx)
 {
 const Value * val = reinterpret_cast<const Value *>(ctx);
    return val->get_cravel(2*a).greater(val->get_cravel(2*b));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::used_members(std::vector<ShapeItem> & result, bool sorted) const
 {
@@ -937,7 +937,7 @@ const ShapeItem rows = get_rows();
 
    Heapsort<ShapeItem>::sort(result, &member_name_greater, this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Value::get_member_count() const
 {
@@ -997,7 +997,7 @@ ShapeItem valid_rows = 0;
 
    return valid_rows;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_new_member(const UCS_string & new_member_name)
 {
@@ -1044,7 +1044,7 @@ Value::get_new_member(const UCS_string & new_member_name)
          double_ravel(LOC);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::double_ravel(const char * loc)
 {
@@ -1088,7 +1088,7 @@ Cell * doubled = new Cell[new_cells];
 
    delete [] del;   // del is char *, so no cell destructor is called
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Value::get_enlist_count() const
 {
@@ -1127,7 +1127,7 @@ ShapeItem count = ec;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_types::Depth
 Value::compute_depth() const
 {
@@ -1158,7 +1158,7 @@ APL_types::Depth sub_depth = 0;
 
    return sub_depth + 1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::enlist_left(Value & Z) const
 {
@@ -1214,7 +1214,7 @@ Value::enlist_left(Value & Z) const
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::enlist_right(Value & Z) const
 {
@@ -1236,7 +1236,7 @@ Value::enlist_right(Value & Z) const
          else   FIXME;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 Value::flat_cell_types() const
 {
@@ -1247,7 +1247,7 @@ const ShapeItem count = nz_element_count();
 
    return CellType(ctypes);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 Value::flat_cell_subtypes() const
 {
@@ -1258,7 +1258,7 @@ const ShapeItem count = nz_element_count();
 
    return CellType(ctypes);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 Value::deep_cell_types() const
 {
@@ -1275,7 +1275,7 @@ const ShapeItem count = nz_element_count();
 
    return CellType(ctypes);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 Value::deep_cell_subtypes() const
 {
@@ -1292,7 +1292,7 @@ const ShapeItem count = nz_element_count();
 
    return CellType(ctypes);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print(ostream & out) const
 {
@@ -1321,7 +1321,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 PrintBuffer pb(*this, pctx, &out);   // constructor prints it
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print_brief(ostream & out) const
 {
@@ -1355,7 +1355,7 @@ const int count = min(3, int(element_count()));
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print_member(ostream & out, UCS_string member_prefix) const
 {
@@ -1441,7 +1441,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print1(ostream & out, PrintContext pctx) const
 {
@@ -1460,7 +1460,7 @@ int style = pctx.get_style();
 PrintBuffer pb(*this, pctx, &out);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print_properties(ostream & out, int indent, bool help) const
 {
@@ -1500,7 +1500,7 @@ UCS_string ind(indent, UNI_SPACE);
       }
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::debug(const char * info) const
 {
@@ -1508,7 +1508,7 @@ const PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 PrintBuffer pb(*this, pctx, 0);
    pb.debug(CERR, info);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::print_boxed(ostream & out, int indent) const
 {
@@ -1527,7 +1527,7 @@ const ShapeItem cols = Z->get_cols();
    out << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::index(const IndexExpr & IX) const
 {
@@ -1647,7 +1647,7 @@ const ShapeItem ec_z = Z->element_count();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 AxesBitmap
 Value::to_bitmap(const char * where, uRank rank_B) const
 {
@@ -1703,7 +1703,7 @@ AxesBitmap ret = 0;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::index(const Value * X) const
 {
@@ -1794,7 +1794,7 @@ const Cell * cI = &X->get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 sRank
 Value::get_single_axis(const Value * val, sRank max_axis)
 {
@@ -1812,7 +1812,7 @@ const int axis = val->get_cfirst().get_near_int() - Workspace::get_IO();
 
    return axis;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Shape
 Value::to_shape(const Value * val)
 {
@@ -1831,7 +1831,7 @@ Shape shape;
 
    return shape;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::glue(const Token & token_A, const Token & token_B, const char * loc)
 {
@@ -1856,7 +1856,7 @@ const bool strand_B = token_B.get_tag() == TOK_APL_VALUE3;
         else            return glue_item_item(*A, *B, loc);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value *
 Value::get_lval_cellowner() const
 {
@@ -1886,7 +1886,7 @@ Value::get_lval_cellowner() const
 
    return 0;   // not found (this is most likely not a left value)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::NOTCHAR() const
 {
@@ -1900,7 +1900,7 @@ const ShapeItem ec = element_count();
    // all ravel items are (single) characters.
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::is_or_contains(const Value * value, const Value * sub)
 {
@@ -1915,7 +1915,7 @@ Value::is_or_contains(const Value * value, const Value * sub)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::flag_info(const char * loc, ValueFlags flag, const char * flag_name,
                  bool set) const
@@ -1929,14 +1929,14 @@ const char * chg = flags == new_flags ? " (no change)" : " (changed)";
         << " at " << loc << " now = " << HEX(new_flags)
         << chg << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::init()
 {
    Log(LOG_startup)
       CERR << "Max. Rank            is " << MAX_RANK << endl;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::add_member(const UCS_string & member_name, Value * member_value)
 {
@@ -1957,7 +1957,7 @@ Cell * data = get_member(members, member_owner, false);
    Assert(member_owner == this);
    new (data) PointerCell(member_value, *this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Value::get_all_members_count() const
 {
@@ -1983,7 +1983,7 @@ const ShapeItem rows = get_rows();
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::mark_all_dynamic_values()
 {
@@ -1993,7 +1993,7 @@ Value::mark_all_dynamic_values()
          dob->rValue().set_marked();
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::unmark() const
 {
@@ -2008,7 +2008,7 @@ const Cell * C = &get_cfirst();
         ++C;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::rollback(ShapeItem items, const char * loc)
 {
@@ -2021,7 +2021,7 @@ Value::rollback(ShapeItem items, const char * loc)
 
    const_cast<Value *>(this)->alloc_loc = loc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::prototype(const char * loc) const
 {
@@ -2051,7 +2051,7 @@ const Cell & first = get_cfirst();
 
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* lrp p.138: S←⍴⍴A + NOTCHAR (per column)
 
    lrm defines NOTCHAR as (comments by jsa)
@@ -2117,7 +2117,7 @@ const ShapeItem rows = ec/cols;
 
    return max_spacing;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::list_one(ostream & out, bool show_owners) const
 {
@@ -2150,7 +2150,7 @@ Value::list_one(ostream & out, bool show_owners) const
    out << "---------------------------" << endl << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::check_value(const char * loc)
 {
@@ -2211,7 +2211,7 @@ const ShapeItem ec = nz_element_count();
 
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::total_CDR_size_netto(CDR_type cdr_type) const
 {
@@ -2246,7 +2246,7 @@ int size = 16 + 4*get_rank() + 4*ec;   // top_level size
 
    return size;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::CDR_data_size(CDR_type cdr_type) const
 {
@@ -2289,7 +2289,7 @@ int size = 0;
 
    return size;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CDR_type
 Value::get_CDR_type() const
 {
@@ -2352,7 +2352,7 @@ const Cell & cell_0 = get_cfirst();
 
    return CDR_NEST32;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::erase_stale(const char * loc)
 {
@@ -2408,7 +2408,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::erase_all(ostream & out)
 {
@@ -2422,7 +2422,7 @@ Value::erase_all(ostream & out)
          value.list_one(CERR, false);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::list_all(ostream & out, bool show_owners)
 {
@@ -2436,7 +2436,7 @@ int num = 0;
 
    return out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Value::get_UCS_ravel() const
 {
@@ -2447,7 +2447,7 @@ const ShapeItem ec = element_count();
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::to_type(bool force_numeric)
 {
@@ -2470,7 +2470,7 @@ Value::to_type(bool force_numeric)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::print_structure(ostream & out, int indent, ShapeItem idx) const
 {
@@ -2493,7 +2493,7 @@ const Cell * c = &get_cfirst();
         ++c;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::print_stale_info(ostream & out, const DynamicObject * dob) const
 {
@@ -2516,7 +2516,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
 
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::explode()
 {
@@ -2536,7 +2536,7 @@ IntCell * new_ravel = 0;
    clear_packed();
    fetcher = &cell_fetcher;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Value::try_implode()
 {
@@ -2593,7 +2593,7 @@ ShapeItem z = 0;
 
    return error_reason;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::print_incomplete(ostream & out)
 {
@@ -2634,7 +2634,7 @@ int count = 0;
 
    return incomplete.size();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::print_stale(ostream & out)
 {
@@ -2717,7 +2717,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::check_all_Cells(ostream & out)
 {
@@ -2732,7 +2732,7 @@ int errors = 0;
 
    return errors;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::check_Cells(ostream & out) const
 {
@@ -2766,7 +2766,7 @@ ShapeItem lval_count = 0;
 
    return errors;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::clone(const char * loc) const
 {
@@ -2800,7 +2800,7 @@ const uint64_t count1 = nz_element_count();
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::glue_item_item(Value & item_A, Value & item_B, const char * loc)
 {
@@ -2819,7 +2819,7 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::glue_item_strand(Value & item_A, const Value & strand_B,
                         const char * loc)
@@ -2844,7 +2844,7 @@ Value_P Z(len_B + 1, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::glue_strand_item(const Value & strand_A, Value & item_B,
                         const char * loc)
@@ -2868,7 +2868,7 @@ Value_P Z(len_A + 1, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::glue_strand_strand(const Value & strand_A, const Value & strand_B,
                           const char * loc)
@@ -2897,7 +2897,7 @@ Value_P Z(len_A + len_B, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::check_lval_consistency() const
 {
@@ -2930,7 +2930,7 @@ const ShapeItem ec = nz_element_count();
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Value::check_WS_FULL(const char * args, ShapeItem requested_cell_count,
                      const char * loc)
@@ -2955,7 +2955,7 @@ const int64_t used_memory
            << " at " << LOC << endl;
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::catch_Error(const Error & error, const char * args, const char * loc)
 {
@@ -2964,7 +2964,7 @@ Value::catch_Error(const Error & error, const char * args, const char * loc)
                 << ") failed (APL error in ravel allocation)";
    throw error;   // rethrow
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::catch_exception(const exception & ex, const char * args,
                       const char * caller,  const char * loc)
@@ -2988,7 +2988,7 @@ const int64_t used_memory
    MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
    WS_FULL;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::catch_ANY(const char * args, const char * caller, const char * loc)
 {
@@ -2998,7 +2998,7 @@ Value::catch_ANY(const char * args, const char * caller, const char * loc)
    MORE_ERROR() << "new Value(" << args << ") failed (ANY)";
    WS_FULL;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::init_ravel()
 {
@@ -3121,14 +3121,14 @@ CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
    check_ptr = charP(this) + 7;
    total_ravel_count += length;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator <<(ostream & out, const Value & v)
 {
    v.print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 IntScalar(APL_Integer val, const char * loc)
 {
@@ -3137,7 +3137,7 @@ Value_P Z(loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 FloatScalar(APL_Float val, const char * loc)
 {
@@ -3146,7 +3146,7 @@ Value_P Z(loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ComplexScalar(APL_Complex val, const char * loc)
 {
@@ -3155,7 +3155,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ComplexScalar(APL_Float real, APL_Float imag, const char * loc)
 {
@@ -3164,7 +3164,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 CharScalar(Unicode uni, const char * loc)
 {
@@ -3173,7 +3173,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Idx0(const char * loc)
 {
@@ -3182,7 +3182,7 @@ Value_P Z(ShapeItem(0), loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Str0(const char * loc)
 {
@@ -3191,7 +3191,7 @@ Value_P Z(ShapeItem(0), loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Str0_0(const char * loc)
 {
@@ -3201,7 +3201,7 @@ Value_P Z(sh, loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Idx0_0(const char * loc)
 {
@@ -3210,7 +3210,7 @@ Value_P Z(sh, loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 EmptyStruct(const char * loc)
 {
@@ -3227,12 +3227,12 @@ Value_P Z(shape_Z, loc);
    Z->set_member();
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// declared in PrintOperator.hh
 ostream &
 operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

@@ -26,7 +26,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** Primitive operator ⍤ (rank)
  */
 /// The class implementing ⍤[X] (NARS only) and ⍤.
@@ -107,6 +107,6 @@ protected:
    /// @param rk_B  output: chunk rank for right argument B
    static void y123_to_AB(Value_P y123, sRank & rk_A, sRank & rk_B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __BIF_OPER2_RANK_HH_DEFINED__

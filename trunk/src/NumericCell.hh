@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /*! A cell that is either an integer cell, a floating point cell, or a
     complex number cell. This class contains all cell functions for which
     the detailed type makes no difference.
@@ -177,6 +177,6 @@ protected:
    static ErrorCode K33_binomial(Cell * Z, APL_Integer N,
                                  APL_Integer K, bool negate);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __NUMERICCELL_HH_DEFINED__

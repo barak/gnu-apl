@@ -27,7 +27,7 @@
 
 class Plot_line_properties;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// properties of the entire plot window (from A in A ⎕PLOT B)
 class Plot_window_properties
 {
@@ -377,7 +377,7 @@ protected:
    /// (lower 8 bits).
    vector<uint16_t> properties_set;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PLOT_WINDOW_PROPERTIES_HH_DEFINED__
 

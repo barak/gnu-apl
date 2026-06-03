@@ -105,7 +105,7 @@ std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 //
 static int64_t main_offset_0 = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Backtrace::show(const char * file, int line)
 {
@@ -177,7 +177,7 @@ char ** strings = backtrace_symbols(buffer, size);
 
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Backtrace::find_src(int64_t pc)
 {
@@ -197,13 +197,13 @@ Backtrace::find_src(int64_t pc)
    (0) && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
    return 0;   // not found
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
 {
    return key - pc_src.pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** compute \b main_offset_0, which is the difference between:
 
     a.  the 0-based address of main() in file apl.lines, and
@@ -232,7 +232,7 @@ const int64_t loaded_main = get_main();
         << "    = loaded main():       " << setw(16) << loaded_main    << endl
         << dec;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Backtrace::read_apl_lines_file()
 {
@@ -399,9 +399,9 @@ main():
         << endl;
    lines_status = LINES_valid;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if HAVE_DWARF
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the context of a search in a dwarf file
 struct Dwarf_context
 {
@@ -449,7 +449,7 @@ struct Dwarf_context
    /// one step of indentation (blanks)
    const char * indent;
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 class Dwarf
 {
 public:
@@ -502,7 +502,7 @@ protected:
 
    static vector<Dwarf_Die> CU_dies;
 };
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 vector<Dwarf_Die> Dwarf::CU_dies;
 
 Dwarf_Half
@@ -517,7 +517,7 @@ Dwarf_Half tag = 0;
       }
    return tag;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Dwarf::print_tag(Dwarf_context & ctx, const Dwarf_Die die)
 {
@@ -531,7 +531,7 @@ const char * tagname = 0;
 
    return *ctx.out << HEX2(tag) << " - " << tagname;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Dwarf_Addr
 Dwarf::get_highpc(Dwarf_context & ctx, Dwarf_Attribute attr, Dwarf_Addr lowpc)
 {
@@ -557,7 +557,7 @@ Dwarf_Unsigned offset = 0;
    Assert(ctx.res == DW_DLV_OK);
    return lowpc + offset;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Dwarf::decode_ranges(Dwarf_context & ctx, const Dwarf_Attribute attribute)
 {
@@ -623,7 +623,7 @@ int idx_len = 1;
    dwarf_dealloc_rnglists_head(rl_head);
    ctx.out && *ctx.out << endl;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 string
 Dwarf::get_file_and_line(Dwarf_context & ctx, const Dwarf_Line & line)
 {
@@ -644,7 +644,7 @@ string ret(filename);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Dwarf::decode_attribute(Dwarf_context & ctx, const Dwarf_Attribute attribute)
 {
@@ -733,7 +733,7 @@ Dwarf_Bool hasform = false;
 
    return *ctx.out;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Dwarf::decode_subprogram(Dwarf_context & ctx, const Dwarf_Die child)
 {
@@ -806,7 +806,7 @@ const char * sub_name = "NO-NAME";
        }
     //          print_tag(ctx, child) << endl;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Dwarf::decode_CU(Dwarf_context & ctx, const Dwarf_Die CU_die, Dwarf_Addr PC)
 {
@@ -949,7 +949,7 @@ Dwarf_Die child = 0;
 
    ctx.out && *ctx.out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Dwarf::get_die_name(Dwarf_context & ctx, Dwarf_Die die)
 {
@@ -961,7 +961,7 @@ char * name = 0;
    Assert(ctx.res == DW_DLV_OK);
    return name;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Dwarf_Attribute
 Dwarf::get_die_attribute(Dwarf_context & ctx, Dwarf_Die die,
                          Dwarf_Half which_attribute)
@@ -985,7 +985,7 @@ int res = 0;
    cerr << "could not find attribute " << HEX2(which_attribute) << endl;
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if 0
 static Dwarf_Die
 find_PC_in_subprogram(Dwarf_Die subprogram_die, int64_t PC)
@@ -1049,7 +1049,7 @@ Dwarf_Addr PC_high = 0;
    return 0;
 }
 #endif // 0
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Dwarf::init_CU_dies(Dwarf_context & ctx)
 {
@@ -1116,7 +1116,7 @@ int            res            = DW_DLV_OK;
            CU_dies.push_back(CU_die);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// find the PC in the entire binary file
 int
 Dwarf::find_PC_in_file(Dwarf_context & ctx, int64_t PC)
@@ -1154,7 +1154,7 @@ Dwarf::find_PC_in_file(Dwarf_context & ctx, int64_t PC)
         return DW_DLV_NO_ENTRY;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Backtrace::show_dwarf(int idx, const char * s)
 {
@@ -1255,14 +1255,14 @@ const int64_t dwarf_PC = PC - adjust;
              << " not found in dwarf" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #else   // not HAVE_DWARF
 void
 Backtrace::show_dwarf(int idx, const char * s)
 {
 }
 #endif   // HAVE_DWARF
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Backtrace::show_item(int idx, char * s)
 {
@@ -1424,7 +1424,7 @@ char obuf[200] = "@@@@";
    cerr << endl;
 #endif   // _APPLE_
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #ifdef HAVE_EXECINFO_H
 const char *
 Backtrace::caller(int offset)
@@ -1442,7 +1442,7 @@ char * demangled = static_cast<char *>(malloc(1024));
        }
    return strings[offset];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
@@ -1478,5 +1478,5 @@ error:
    result[result_max - 1] = 0;
    return status;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // HAVE_EXECINFO_H

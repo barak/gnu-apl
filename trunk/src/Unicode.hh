@@ -115,7 +115,7 @@ extern int nibble(Unicode uni);
 /// @param uni Unicode character to convert
 extern int sixbit(Unicode uni);
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return true iff \b uni is a padding character (used internally).
 /// @param uni Unicode character to test
 inline bool is_iPAD_char(Unicode uni)
@@ -123,6 +123,6 @@ inline bool is_iPAD_char(Unicode uni)
    return ((uni > UNI_iPAD_U2) && (uni <= UNI_PAD_r_NOTCHAR))    // ³ ¹
        || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __UNICODE_HH_DEFINED__

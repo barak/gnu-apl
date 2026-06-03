@@ -75,7 +75,7 @@ enum ExpandHint
    EH_CONFIG,         ///< config.h item (capability)
    EH_oAUTO,          ///< optional AUTO
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a class for doing interactivw Tab-expansion on input lines
 class TabExpansion
 {

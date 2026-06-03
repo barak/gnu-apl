@@ -90,7 +90,7 @@ Parallel::parallel_lock_t jobs_lock = LOCK_INITIALIZER;
 PJob_scalar_AB * job_AB = 0;
 PJob_scalar_B  * job_B  = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::do_eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -139,7 +139,7 @@ ScalarFunction::do_eval_fill_AB(Value_P A, Value_P B) const
    if (A->element_count() == 0)   return do_eval_fill_B(A);
    return do_eval_fill_B(A);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::do_eval_fill_B(Value_P B) const
 {
@@ -176,7 +176,7 @@ Value_P Z = B->clone(LOC);
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ScalarFunction::do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B,
                              prim_f2 fun) const
@@ -358,7 +358,7 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const
 {
@@ -451,7 +451,7 @@ CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const
 {
@@ -473,7 +473,7 @@ PERFORMANCE_END(fs_SCALAR_AB, start, Z->nz_element_count());
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::eval_scalar_AXB(Value_P A, Value_P X, Value_P B,
                                 prim_f2 fun) const
@@ -540,7 +540,7 @@ PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ScalarFunction::eval_scalar_AXB(Value_P A, AxesBitmap axes_X, Value_P B,
                                 prim_f2 fun, bool reversed) const
@@ -600,7 +600,7 @@ const Cell * cB = &B->get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::eval_scalar_B(Value_P B, prim_f1 fun) const
 {
@@ -625,7 +625,7 @@ PERFORMANCE_END(fs_SCALAR_B, start, Z->nz_element_count());
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
                                          const Cell * cell_B, prim_f2 fun) const
@@ -664,7 +664,7 @@ ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
           }
       }
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Shape *
 ScalarFunction::conforming_shape(ErrorCode & ec, const Shape & shape_A,
                                                  const Shape & shape_B)
@@ -684,7 +684,7 @@ ScalarFunction::conforming_shape(ErrorCode & ec, const Shape & shape_A,
    else                                            ec = E_LENGTH_ERROR;
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 ScalarFunction::eval_scalar_identity_fun(Value_P B, sAxis axis,
                                          const Cell & FI0)
@@ -715,7 +715,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ScalarFunction::PF_scalar_AB(Thread_context & tctx)
 {
@@ -836,7 +836,7 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
 
 #endif   // PARALLEL_ENABLED
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ScalarFunction::PF_scalar_B(Thread_context & tctx)
 {
@@ -906,7 +906,7 @@ CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
        }
 #endif   // PARALLEL_ENABLED
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F2_UNEQU::eval_B(Value_P B) const
 {
@@ -966,7 +966,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F2_FIND::eval_AB(Value_P A, Value_P B) const
 {
@@ -1021,7 +1021,7 @@ done:
 PERFORMANCE_END(fs_SCALAR_AB, start_1, len_Z);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 bool
 Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
                        Value_P B, const Shape & idx_B, double qct)
@@ -1056,42 +1056,42 @@ const Shape weights_B = B->get_shape().get_weights();
 
    return true;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 // Inverse functions...
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
    return &Bif_F12_LOGA::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_POWER::get_dyadic_inverse() const
 {
    return &Bif_F12_LOGA::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
    // - is self-inverse: B = --B
    return &Bif_F12_PLUS::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
    // - is self-inverse: B = (A-(A-B))
    return &Bif_F12_PLUS::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_ROLL::eval_B(Value_P B) const
 {
@@ -1102,7 +1102,7 @@ Bif_F12_ROLL::eval_B(Value_P B) const
 
    return eval_scalar_B(B, &Cell::bif_roll);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROLL::eval_AB(Value_P A, Value_P B) const
 {
@@ -1147,7 +1147,7 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Bif_F12_ROLL::check_B(const Value & B, const double qct)
 {
@@ -1171,7 +1171,7 @@ const Cell * C = &B.get_cfirst();
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
@@ -1218,7 +1218,7 @@ ShapeItem len_Z = 0;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_WITHOUT::eval_identity_fun(Value_P B, sAxis axis) const
 {
@@ -1247,7 +1247,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_WITHOUT::large_eval_AB(const Value & A, const Value & B)
 {
@@ -1305,49 +1305,49 @@ Value_P Z(cells_Z.size(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
    // ÷ is self-inverse: B = ÷÷B
    return &Bif_F12_DIVIDE::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
    // ÷ is self-inverse: B = (A÷(A÷B))
    return &Bif_F12_DIVIDE::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {
    return &Bif_F12_POWER::fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Bif_F12_LOGA::get_dyadic_inverse() const
 {
    return &Bif_F12_POWER::fun;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

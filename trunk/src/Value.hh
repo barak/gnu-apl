@@ -50,7 +50,7 @@ struct _deleted_value
   _deleted_value * next;
 };
 
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
     An APL value. It consists of a fixed header (rank, shape) and
     and a ravel (a sequence of cells). If the ravel is short, then it
@@ -1221,7 +1221,7 @@ private:
    /// limit the use of & (which is frequently a mistake)
    Value * operator &()   { return this; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 // shortcuts for frequently used APL values...
 
@@ -1271,7 +1271,7 @@ Value_P Idx0_0(const char * loc);
 /// @param loc caller location for diagnostics
 Value_P EmptyStruct(const char * loc);
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 // NOTE: there exist cross-dependencies between Value.hh and Value_P.hh on
 // one hand and Value.icc and Value_P.icc on the other. It is therefore

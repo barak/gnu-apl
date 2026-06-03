@@ -50,7 +50,7 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// performance statistics IDs
 enum Pfstat_ID
 {
@@ -88,7 +88,7 @@ enum Pfstat_ID
         PFS_SCALAR_AB_overhead,
         PFS_ALL
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// one statistics for computing the mean and the variance of samples
 class Statistics_record
 {
@@ -168,7 +168,7 @@ protected:
    /// sum of squares of sample values
    double data2;   // can grow quickly!
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// Base class for different kinds of statistics
 class Statistics
 {
@@ -214,7 +214,7 @@ protected:
    /// the ID of \b this statistics
    const Pfstat_ID id;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// Performance counters for an entire APL system function
 class FunctionStatistics : public Statistics
 {
@@ -264,7 +264,7 @@ protected:
    /// the cycles executed
    Statistics_record vec_cycles;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Performance counters for one cell level function
 class CellFunctionStatistics : public Statistics
 {
@@ -335,7 +335,7 @@ protected:
    /// statistics for subsequent executions
    Statistics_record subsequent;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
      Performance (cycle-) counters at different levels
  **/
@@ -387,7 +387,7 @@ public:
 
 #include "Performance.def"
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// The (unique) ID of an optimization
 enum Optimization_ID
 {
@@ -409,7 +409,7 @@ enum Do_Optimization
 #include "Performance.def"
 };
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 class OptmizationStatistics
 {
 public:
@@ -437,5 +437,5 @@ protected:
    /// an array of counters (one for each \b Optimization_ID)
    static int64_t optimization_counters[OPT_COUNTER_COUNT];
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __PERFORMANCE_HH_DEFINED__

@@ -30,7 +30,7 @@
 #include "Token.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token::Token(TokenTag t, IndexExpr & idx)
 {
    /* construct a token for an index expressions. There are 3 cases which
@@ -74,7 +74,7 @@ Token::Token(TokenTag t, IndexExpr & idx)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, TokenTag tag)
 {
@@ -83,7 +83,7 @@ operator << (ostream & out, TokenTag tag)
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, TokenClass tc)
 {
@@ -123,7 +123,7 @@ operator << (ostream & out, TokenClass tc)
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, const Token & token)
 {
@@ -259,7 +259,7 @@ const TokenTag tag = token.get_tag();
 
    return out <<  "{-unknown Token " << tag << "-}";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Token::canonical(PrintStyle style) const
 {
@@ -367,7 +367,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token::error_info(UCS_string & ucs) const
 {
@@ -385,7 +385,7 @@ bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
    ucs << canon;
    return need_space ? -canon.size() : canon.size();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Token::get_function_axis() const
 {
@@ -418,7 +418,7 @@ Token::get_function_axis() const
    MORE_ERROR() << "Invalid Token type for function axis.";
    AXIS_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Token::print_function(ostream & out) const
 {
@@ -537,7 +537,7 @@ Token::print_function(ostream & out) const
       }
    return out <<  ", }";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Token::print_value(ostream & out) const
 {
@@ -613,7 +613,7 @@ Token::print_value(ostream & out) const
 
    return out <<  ", }";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token::show_trace(ostream & out, const UCS_string & fun_name, 
                   Function_Line line) const
@@ -684,7 +684,7 @@ const UCS_string indent(fn.size(), UNI_SPACE);
 
    if (pb.get_row_count() == 0)   out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Token::tag_name() const
 {
@@ -701,7 +701,7 @@ const UTF8_string utf(cc);
 UCS_string ucs(utf);
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Token::value_use_count() const
 {
@@ -709,7 +709,7 @@ Token::value_use_count() const
    if (!value.apl_val)   return -98;          // it is, but its Value * is -
    return value.apl_val->get_owner_count();   // non-zero Value *
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token::ChangeTag(TokenTag new_tag)
 {
@@ -717,7 +717,7 @@ Token::ChangeTag(TokenTag new_tag)
    // tag is ia const TokenTag, so we cheat a little here.
    const_cast<TokenTag &>(tag) = new_tag;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value *
 Token::extract_and_keep(const char * loc)
 {
@@ -727,19 +727,19 @@ Value * ret = value.apl_val.get();
    value.apl_val.clear_pointer(loc);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token::extract_apl_val(const char * loc)
 {
    if (is_apl_val())   value.apl_val.reset();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Token::release_apl_val(const char * loc)
 {
    if (is_apl_val())   value.apl_val.reset();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Token::class_name(TokenTag tag)
 {
@@ -784,7 +784,7 @@ const TokenClass tc = TokenClass(tag & TC_MASK);
 
    return "*** Obscure token class ***";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char * 
 Token::short_class_name(TokenTag tag)
 {
@@ -834,11 +834,11 @@ const TokenClass tc = TokenClass(tag & TC_MASK);
 
    return "???";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Token::print_quad(ostream & out) const
 {
    return out << UNI_Quad_Quad << get_Id();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // EOF

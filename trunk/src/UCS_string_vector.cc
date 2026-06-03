@@ -28,7 +28,7 @@
 #include "Workspace.hh"
 
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
 {
   // val is a simple text matrix with var_count rows and name_len columns.
@@ -128,7 +128,7 @@ const ShapeItem name_len = val.get_cols();
         push_back(name);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
@@ -145,7 +145,7 @@ ShapeItem ret = 0;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 std::ostream & 
 UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
 {
@@ -209,7 +209,7 @@ const UCS_string frame(U"╔╤╗╚╧╝═║│");
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UCS_string_vector::compute_column_width(int tab_size,
                                         std::vector<int> & result)
@@ -289,4 +289,4 @@ int max_nb = 0;
    loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
    result.push_back(max_nb);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

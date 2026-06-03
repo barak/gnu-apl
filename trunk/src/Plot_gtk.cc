@@ -53,7 +53,7 @@ const char * FONT_NAME = "sans-serif";
 /// the size of the font to be used for texts
 enum {  FONT_SIZE = 10 };
 
-// ===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** a structure that aggregates:
 
      plot data and plot attributes (Plot_window_properties) and
@@ -159,7 +159,7 @@ protected:
    /// stored in w_props.
    Pixel_Y legend_Y0, legend_Y1;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// same as standard cairo_set_RGB_source() but with Color instead of double
 /// red, green, and blue values.
 static inline void
@@ -171,7 +171,7 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
                              (color >>  8 & 0xFF) / 255.0,
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a line from P0 to P1
 static void
 draw_line(cairo_t * cr, Color line_color, int line_style, int line_width,
@@ -200,7 +200,7 @@ double dashes_3[] = { 10.0, 5.0 };     // ─╴─╴─╴─╴
 
    if (line_style != 1)   cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a circle with diameter \b size around P0
 static void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
@@ -209,7 +209,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
    cairo_arc(cr, P0.x, P0.y, 0.5*size, 0.0, 2*M_PI);
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a ▲ or ▼ with given \b size around P0
 static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
@@ -237,7 +237,7 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
 
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a ■ or ◆ with given \b size around P0
 static void
 draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
@@ -261,7 +261,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a cross with thw given \b size around P0
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
@@ -291,7 +291,7 @@ const double half = 0.5*size;
 
    cairo_stroke(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a point with given \b point_style and \b size around P
 static void
 draw_point(cairo_t * cr, Pixel_XY P, int point_style,
@@ -331,14 +331,14 @@ const bool es = ! (point_style & 1);   // even style
         case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return;   // ■
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a red marker for debugging purposes (to show where pixel P0 is)
 inline void
 draw_marker(cairo_t * cr, Pixel_XY P0)
 {
    draw_point(cr, P0, 1, 0xFF0000, 10, 0, 0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw an arrow from O to A
 static void
 draw_arrow(cairo_t * cr, Pixel_XY O, Pixel_XY A, const Color color)
@@ -376,7 +376,7 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
    cairo_close_path(cr);
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// format \b val according to \b format (with \b percent pointing to % in
 /// format, e.g. %d or %f like in printf()).
 const char *
@@ -495,7 +495,7 @@ bool round = false;
 
    return cc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// format the text of tick \b idx (with value \b val) according to \b format.
 const char *
 format_tick(double val, double dV, int idx, const char * format)
@@ -544,7 +544,7 @@ short digits = 0;
    // skip leading 0 in -0.xxx
    return cc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return the size of single_line string \b text when printed with font \b
 /// font_name of /// size \b font_size
 void
@@ -573,7 +573,7 @@ cairo_text_extents_t extends;
              <<  lx << " pixels" << endl;
      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return the size len_x:len_y of the multi_line string \b lines when
 /// printed with font \b font_name of size \b font_size
 void
@@ -612,7 +612,7 @@ char line[strlen(lines) + 10];
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw single-line string \b text at position xy
 void
 draw_text(cairo_t * cr, const char * text, const Pixel_XY & xy)
@@ -628,7 +628,7 @@ draw_text(cairo_t * cr, const char * text, const Pixel_XY & xy)
   cairo_text_path(cr, text);
   cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw multi-line string \b lines at position xy
 void
 draw_multiline(cairo_t * cr, const char * lines, Pixel_XY xy, double width)
@@ -670,7 +670,7 @@ char line[strlen(lines) + 10];
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 double
 longest_legend_string(cairo_t * cr, int line_count, 
                       const Plot_line_properties * const * l_props)
@@ -686,7 +686,7 @@ double longest_len = 0.0;
        }
    return longest_len;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a legend for the different plot lines
 void
 draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
@@ -792,7 +792,7 @@ const Pixel_Y dy = w_props.get_legend_dY();
          draw_text(cr, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// swap pixels P0 with value Y0, and P1 with value Y1
 static inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
@@ -800,7 +800,7 @@ pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a 3D triangle where one point P0 is at visual height H0 and the
 /// other two points P1 and P2 are the same at visual height H12.
 void
@@ -836,7 +836,7 @@ const double dH = (H12 - H0) / steps;
          draw_line(cr, line_color, 1, 1, P0_P1, P0_P2);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw a 3D triangle where the points P0, P1, and P2 are at visual
 /// heights H0, H1, and H2 respectively. This is done by splitting the
 /// triangle into two triangles that each have 2 points at the same height.
@@ -894,7 +894,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
         draw_triangle(cr, pctx, verbosity, P2, H2, P1, P, H1);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw the (vertical) X grid-lines of the plot (starting from the Y axis)
 /// and proceeding with equal distances w_props.get_value_per_tile_X().
 void
@@ -960,7 +960,7 @@ const int grid_style = w_props.get_gridX_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw (vertical) X grid-lines where plot points exist.
 void
 draw_X_vargrid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
@@ -1044,7 +1044,7 @@ const Plot_data & data = w_props.get_plot_data();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw the (horizontal) Y grid-lines of the plot (starting at the Y axis)
 void
 draw_Y_grid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
@@ -1132,7 +1132,7 @@ const int grid_style = w_props.get_gridY_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw the (slanted) Z grid-lines of the plot
 void
 draw_Z_grid(cairo_t * cr, const GTK_context & pctx)
@@ -1252,7 +1252,7 @@ int grid_style = w_props.get_gridZ_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw normal (2D) data lines
 void
 draw_plot_lines(cairo_t * cr, const GTK_context & pctx)
@@ -1298,7 +1298,7 @@ const Plot_line_properties * const * l_props = w_props.get_line_properties();
              }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// draw surface (3D) data lines
 void
 draw_surface_lines(cairo_t * cr, const GTK_context & pctx)
@@ -1467,7 +1467,7 @@ const int point_style  = lp0.get_point_style();
         draw_point(cr, P0, point_style, point_color, 2, canvas_color, 0);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// plot the data
 static void
 do_plot(GtkWidget * drawing_area, GTK_context & pctx, cairo_t * cr)
@@ -1500,7 +1500,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   //
   draw_legend(cr, pctx, surface_plot);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // event handlers (callbacks). They should be declared extern "C" as to be
 // linked properly... In our case every event handler has a trailing
 // GTK_context * pctc argument
@@ -1509,7 +1509,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback when the mouse button is pressed. This may or may not start
 /// the dragging of the legend.
 Event_handler(Button_press_event, GtkWidget * widget, GdkEventButton * ev)
@@ -1536,7 +1536,7 @@ const int y = ev->y;
    pctx->legend_drag_Y = y;
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the mouse button was released. Stop any ongoing dragging of the legend
 Event_handler(Button_release_event, GtkWidget * widget, GdkEventButton *)
 {
@@ -1548,7 +1548,7 @@ Event_handler(Button_release_event, GtkWidget * widget, GdkEventButton *)
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the mouse was moved.
 Event_handler(Motion_notify_event, GtkWidget * widget, GdkEventMotion * ev)
 {
@@ -1582,7 +1582,7 @@ const int dy = y - pctx->legend_drag_Y;
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // the plot window is closed
 Event_handler(Hide, GtkWidget * widget)
 {
@@ -1591,7 +1591,7 @@ Event_handler(Hide, GtkWidget * widget)
    if (pctx->w_props.get_with_border())   pctx->save_to_file_with_border();
    return FALSE;   // propagate this event further further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // the plot window is destroyed
 Event_handler(Destroy, GtkWidget * widget)
 {
@@ -1605,7 +1605,7 @@ Event_handler(Destroy, GtkWidget * widget)
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback when the plot window shall be (re-)drawn
 Event_handler(Draw, GtkWidget * widget, cairo_t * cr)
 {
@@ -1660,7 +1660,7 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
       CERR << "Draw() done." << endl;
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GTK_context::save_to_file_no_border(cairo_surface_t * surface)
 {
@@ -1688,7 +1688,7 @@ cairo_status_t stat = cairo_surface_write_to_png(surface, fname.c_str());
        //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GTK_context::save_to_file_with_border()
 {
@@ -1748,7 +1748,7 @@ cairo_surface_t *
              << strerror(errno) << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** gtk_main_wrapper() makes gtk_main() suitable for pthread_create()
     and warn if it returns (which is not expected to happen).
 
@@ -1785,7 +1785,7 @@ gtk_main_wrapper(void *)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 void
 Quad_PLOT::plot_main_GTK(void * vp_props, Handle handle)
@@ -1882,5 +1882,5 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // apl_GTK3

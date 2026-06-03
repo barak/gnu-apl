@@ -32,7 +32,7 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_and(Cell * Z, const Cell * A) const
 {
@@ -97,7 +97,7 @@ const double qct = Workspace::get_CT();
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 {
@@ -106,7 +106,7 @@ NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, A->get_near_int() & get_near_int());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 {
@@ -161,7 +161,7 @@ const APL_Integer N =    get_checked_near_int();
    FIXME;
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::complex_binomial(Cell * Z, const Cell * A) const
 {
@@ -179,7 +179,7 @@ const APL_Complex gam_1_b__a = ComplexCell::gamma(r_B__A + 1.0, i_B__A);
 
    return ComplexCell::zC(Z, gam_1_b / (gam_1_a * gam_1_b__a));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
@@ -188,7 +188,7 @@ NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, ~(A->get_near_int() ^ get_near_int()));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_nand(Cell * Z, const Cell * A) const
 {
@@ -198,7 +198,7 @@ NumericCell::bif_nand(Cell * Z, const Cell * A) const
    if (A->get_near_bool() && get_near_bool())   return IntCell::z0(Z);
    else                                         return IntCell::z1(Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_nand_bitwise(Cell * Z, const Cell * A) const
 {
@@ -207,7 +207,7 @@ NumericCell::bif_nand_bitwise(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, ~(A->get_near_int() & get_near_int()));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_nor(Cell * Z, const Cell * A) const
 {
@@ -217,7 +217,7 @@ NumericCell::bif_nor(Cell * Z, const Cell * A) const
    if (A->get_near_bool() || get_near_bool())   return IntCell::z0(Z);
    else                                         return IntCell::z1(Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_nor_bitwise(Cell * Z, const Cell * A) const
 {
@@ -226,7 +226,7 @@ NumericCell::bif_nor_bitwise(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, ~(A->get_near_int() | get_near_int()));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_not(Cell * Z) const
 {
@@ -236,7 +236,7 @@ NumericCell::bif_not(Cell * Z) const
    else                   IntCell::z1(Z);
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_not_bitwise(Cell * Z) const
 {
@@ -244,7 +244,7 @@ NumericCell::bif_not_bitwise(Cell * Z) const
 
    return IntCell::zI(Z, ~get_near_int());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
 {
@@ -253,7 +253,7 @@ NumericCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, A->get_near_int() ^ get_near_int());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_or(Cell * Z, const Cell * A) const
 {
@@ -313,7 +313,7 @@ const double qct = Workspace::get_CT();
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 {
@@ -323,7 +323,7 @@ NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
    IntCell::zI(Z, A->get_near_int() | get_near_int());
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::real_binomial(Cell * Z, const Cell * A) const
 {
@@ -349,7 +349,7 @@ const APL_Float z = (gam_r_1_B / gam_r_1_A) / gam_r_1_B__A;
 
    return FloatCell::zF(Z, z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b, double qct)
 {
@@ -403,7 +403,7 @@ NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b, double qct)
          a = r;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_Complex
 NumericCell::cpx_max_real(APL_Complex a)
 {
@@ -427,7 +427,7 @@ APL_Complex z;
 
    return z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, double qct)
 {
@@ -450,7 +450,7 @@ NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, double qct)
          a = r;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b)
 {
@@ -459,7 +459,7 @@ NumericCell::int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b)
    z = FloatCell::gcd(a, b);
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 NumericCell::integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
                               bool negate)
@@ -501,7 +501,7 @@ APL_Float Q = 1.0;
    if (is_near_int64_t(Q))   return IntCell::zI(Z, near_int(Q));
    else                      return FloatCell::zF(Z, Q);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// lookup table for N over 8 with integer result
 const uint64_t N_choose_8[] = { (887), 1, 9, 45, 165, 495, 1287, 3003, 6435,
@@ -1720,4 +1720,4 @@ Assert(found);
 
    return integer_binomial(Z, N, K, negate);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

@@ -28,12 +28,12 @@
 #include "TabExpansion.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 TabExpansion::TabExpansion(UCS_string & line)
    : have_trailing_blank(line.size() && line.back() == UNI_SPACE)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_tab(UCS_string & user_input)
 {
@@ -59,7 +59,7 @@ TabExpansion::expand_tab(UCS_string & user_input)
 
    return expand_distinguished_name(user_input);       // ⎕xxx
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
 {
@@ -74,7 +74,7 @@ TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_APL_command(UCS_string & user_input)
 {
@@ -155,7 +155,7 @@ const UCS_string & match = matches[0];
 
    return expand_command_arg(user_input, ehint, shint, match, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_capability(UCS_string & user_input)
 {
@@ -265,7 +265,7 @@ const UTF8_string match(matches[0]);
    user_input = stem + UCS_string(match);
    return ER_REPLACE;   // unique match
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_command_arg(UCS_string & user_input,
                             ExpandHint ehint, const char * shint,
@@ -297,7 +297,7 @@ TabExpansion::expand_command_arg(UCS_string & user_input,
              return ER_AGAIN;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_distinguished_name(UCS_string & user_input)
 {
@@ -378,7 +378,7 @@ int qpos = -1;   // the position of ⎕ in user_input
 
    return ER_IGNORE;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_filename(UCS_string & user_input,
                               ExpandHint ehint, const char * shint,
@@ -510,7 +510,7 @@ nothing:
    CERR << cmd << " " << shint << endl;
    return ER_AGAIN;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// one help topic
 const struct _help
 {
@@ -606,7 +606,7 @@ int c1 = col;
    CERR << endl;
    return ER_AGAIN;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_help_topics(UCS_string & user_input)
 {
@@ -655,7 +655,7 @@ UCS_string_vector matches;
    user_input = help + matches[0];
    return ER_REPLACE;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_user_name(UCS_string & user_input)
 {
@@ -693,7 +693,7 @@ UCS_string_vector matches;
 
    return ER_IGNORE;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::expand_wsname(UCS_string & user_input, const UCS_string cmd,
                        LibRef lib, const UCS_string filename)
@@ -749,7 +749,7 @@ nothing:
    CERR << cmd << " " << lib << " '" << filename << "'" << endl;
    return ER_AGAIN;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 TabExpansion::read_matching_filenames(DIR * dir, UTF8_string dirname,
                                  UTF8_string prefix, ExpandHint ehint,
@@ -787,7 +787,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
           matches.push_back(name);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ExpandResult
 TabExpansion::show_alternatives(UCS_string & user_input, int prefix_len,
                            UCS_string_vector & matches)
@@ -818,7 +818,7 @@ const int common_len = compute_common_length(prefix_len, matches);
         return ER_REPLACE;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 
 

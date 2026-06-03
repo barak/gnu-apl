@@ -30,7 +30,7 @@
 
 typedef uint64_t Cell_offset;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a "smart" Cell *, allowing only a subset of what a normal Cell *
 /// is capable of. MUST NOT BE USED FOR RAVELs OF PACKED VALUES
 class ConstCell_P
@@ -125,7 +125,7 @@ protected:
    /// whether operator ++() shall increment \b offset
    const bool increment;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a "smart" Cell *, remembering its owner and allowing only a subset
 /// of what a normal Cell * is capable of.
 class ConstRavel_P
@@ -193,5 +193,5 @@ protected:
    /// whether operator ++() shall increment \b offset
    const bool increment;   // ++ shall/shall not increment offset
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // __CONSTCELL_P_DEFINED__

@@ -33,7 +33,7 @@ Bif_OPER2_INNER   Bif_OPER2_INNER::fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const
 {
@@ -182,7 +182,7 @@ const bool B_enclosed = B->get_rank() > 1;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_OPER2_INNER::scalar_inner_product() const
 {
@@ -217,7 +217,7 @@ const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_INNER_AB.add_sample(end_1-start_1, job.ZAh * job.ZBl);
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, cFunction_P fun,
                       Value_P B, const char * loc)
@@ -247,7 +247,7 @@ Value_P Z1(shape_Z, LOC);   // shape_Z is empty
    Z1->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z1);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_OPER2_INNER::PF_scalar_inner_product(Thread_context & tctx)
 {
@@ -295,4 +295,4 @@ ShapeItem end_z = z + slice_len;
            }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

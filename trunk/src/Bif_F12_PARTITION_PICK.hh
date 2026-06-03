@@ -27,7 +27,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions partition and enclose */
 /// The class implementing ⊂
 class Bif_F12_PARTITION : public NonscalarFunction_default_identity
@@ -103,7 +103,7 @@ protected:
    /// @param axis axis along which to partition
    static Value_P partition(Value_P A, Value_P B, sAxis axis);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions pick and disclose */
 /// The class implementing ⊃
 class Bif_F12_PICK : public NonscalarFunction
@@ -182,7 +182,7 @@ protected:
                                 ShapeItem len_A, const Value * B,
                                 APL_Integer qio);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Bif_F12_PARTITION_PICK_HH_DEFINED__
 

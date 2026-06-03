@@ -43,7 +43,7 @@ bool Quad_GTK::focus_on_map = false;   // focus for new windows
 #include <poll.h>
 #include <sys/ioctl.h>
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_GTK::close_all_windows()
 {
@@ -52,7 +52,7 @@ Quad_GTK::close_all_windows()
         close_window(open_windows.back().fd);   // does open_windows.pop_back()
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
@@ -130,7 +130,7 @@ bad_fd:
                 << " expects a handle (i.e. an integer scalar) Ah";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -239,7 +239,7 @@ UTF8_string utf_A(ucs_A);
    write_TLV(fd, command_tag, utf_A);
    return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_B(Value_P B) const
 {
@@ -377,7 +377,7 @@ const int function = B->get_cfirst().get_int_value();
    MORE_ERROR() << "Unexpected B in ⎕GTK B";
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
@@ -423,7 +423,7 @@ Gtype Atype = gtype_V;
    write_TL0(fd, command_tag);   // send command to TLV_server
    return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_GTK::Fnum
 Quad_GTK::resolve_fun_name(UTF8_string & widget_id, const Value * B)
 {
@@ -473,7 +473,7 @@ const char * fun_name = utf_B.c_str();        // gtk_widget_get_state_flags
         << ", function=" << fun_name << " could not be resolved";
    return FNUM_INVALID;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_GTK::write_TL0(int fd, int tag)
 {
@@ -496,7 +496,7 @@ const size_t tx_len = write(fd, TLV, 8);
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_GTK::write_TLV(int fd, int tag, const UTF8_string & value)
 {
@@ -520,7 +520,7 @@ unsigned char TLV[TLV_len];
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_GTK::start_Gtk_server()
 {
@@ -568,7 +568,7 @@ const int fd = Quad_FIO::do_FIO_57(UTF8_string(path), envp);
    loop(c, evar_count)   delete [] envp[c];
    return fd;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_GTK::send_name_or_data(int fd, int tag, const UCS_string & name_or_data)
 {
@@ -604,7 +604,7 @@ const size_t wlen = write(fd, path, TLV_len);
 
    delete del;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_GTK::open_window(const UCS_string & gui_name_or_data,   // mandatory
                       const UCS_string * css_name_or_data)   // optional
@@ -639,7 +639,7 @@ window_entry we = { fd };
    open_windows.push_back(we);
    return fd;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::close_window(int fd)
 {
@@ -662,7 +662,7 @@ Quad_GTK::close_window(int fd)
    MORE_ERROR() << "Invalid ⎕GTK handle " << fd;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_GTK::poll_all()
 {
@@ -695,7 +695,7 @@ const int ready = poll(fds, count, 0);
         CERR << "*** poll() failed: " << strerror(errno) << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::poll_response(int fd, int tag)
 {
@@ -727,7 +727,7 @@ const int ready = poll(&pfd, 1, 0);
    CERR << "*** poll() failed" << endl;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::window_list()
 {
@@ -742,7 +742,7 @@ Value_P Z(open_windows.size(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_GTK::resolve_window(const Value * X, UTF8_string & widget_id)
 {
@@ -776,7 +776,7 @@ bool window_valid = false;
 
    return fd;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::read_fd(int fd, int expected_tag)
 {
@@ -891,7 +891,7 @@ const UTF8 Z_type = V[0];   // s, d, or f (like conversion char in snprintf())
 
   FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::fnum_to_function_name(Fnum fnum)
 {
@@ -919,7 +919,7 @@ const char * fname = 0;
    MORE_ERROR() << "A ⎕GTK 5: Invalid function number A=" << fnum;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_GTK::fnum_to_widget_class(Fnum fnum)
 {
@@ -947,28 +947,28 @@ const char * cname = 0;
    MORE_ERROR() << "A ⎕GTK 6: Invalid function number A=" << fnum;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #else   // ! apl_GTK3 or ! apl_X11
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_GTK::close_all_windows()
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
    return eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    return eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_B(Value_P B) const
 {
@@ -978,12 +978,12 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    return eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif   // apl_GTK3
 

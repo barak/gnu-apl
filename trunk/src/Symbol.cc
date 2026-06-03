@@ -44,7 +44,7 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Symbol::Symbol(Id id)
    : NamedObject(id),
      next(0),
@@ -53,7 +53,7 @@ Symbol::Symbol(Id id)
 {
    push();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Symbol::Symbol(const UCS_string & ucs, Id id)
    : NamedObject(id),
      next(0),
@@ -62,13 +62,13 @@ Symbol::Symbol(const UCS_string & ucs, Id id)
 {
    push();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Symbol::can_be_assigned() const
 {
    return value_stack.back().get_NC() & NC_left;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Symbol::cant_be_defined() const
 {
@@ -86,7 +86,7 @@ Symbol::cant_be_defined() const
 
    return "bad name class";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::dump(ostream & out) const
 {
@@ -183,7 +183,7 @@ const ValueStackItem & vs = value_stack[0];
       }
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Symbol::get_apl_value() const
 {
@@ -193,7 +193,7 @@ Symbol::get_apl_value() const
 
    return Value_P(const_cast<Value *>(value_stack.back().get_val_cptr()), LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const Cell *
 Symbol::get_first_cell() const
 {
@@ -201,7 +201,7 @@ Symbol::get_first_cell() const
    if (value_stack.back().get_NC() != NC_VARIABLE)   return 0;
    return &value_stack.back().get_val_cptr()->get_cfirst();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Symbol::get_function() const
 {
@@ -210,7 +210,7 @@ Symbol::get_function() const
       return value_stack.back().get_function();
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Symbol::get_function(unsigned int si) const
 {
@@ -219,7 +219,7 @@ Symbol::get_function(unsigned int si) const
       return value_stack[si].get_function();
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Symbol::get_SI_level(cFunction_P fun) const
 {
@@ -233,7 +233,7 @@ Symbol::get_SI_level(cFunction_P fun) const
 
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Symbol::get_SI_level(const Value & val) const
 {
@@ -247,7 +247,7 @@ Symbol::get_SI_level(const Value & val) const
 
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Symbol::get_SV_key() const
 {
@@ -257,7 +257,7 @@ Symbol::get_SV_key() const
 
    return value_stack.back().get_key();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Symbol::list(ostream & out) const
 {
@@ -281,7 +281,7 @@ Symbol::list(ostream & out) const
 
    return out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Symbol::M_is_F() const
 {
@@ -309,7 +309,7 @@ const NameClass nc = get_NC();
    FIXME;
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 TokenClass
 Symbol::resolve_class(bool left) const
 {
@@ -341,7 +341,7 @@ Symbol::resolve_class(bool left) const
         default: return TC_SYMBOL;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::resolve_shared_variable(Token & tok) const
 {
@@ -471,7 +471,7 @@ Value_P value = CDR::from_CDR(cdr, LOC);
    value->check_value(LOC);
    new (&tok) Token(TOK_APL_VALUE1, value);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Symbol::show_owners(ostream & out, const Value & value) const
 {
@@ -512,7 +512,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::unmark_all_values() const
 {
@@ -544,7 +544,7 @@ Symbol::unmark_all_values() const
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::assign(Value_P new_value, bool clone, const char * loc)
 {
@@ -591,7 +591,7 @@ ValueStackItem & vs = value_stack.back();
         default: SYNTAX_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::assign_indexed(const IndexExpr & IX, Value_P B)   // A[IX;...] ← B
 {
@@ -676,7 +676,7 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
 
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::assign_indexed(const Value * X, Value_P B)   // A[X] ← B
 {
@@ -769,7 +769,7 @@ const Cell * cB = &B->get_cfirst();
 
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Symbol::assign_named_lambda(cFunction_P lambda, const char * loc)
 {
@@ -823,13 +823,13 @@ ValueStackItem & vs = value_stack.back();
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator <<(ostream & out, const Symbol & sym)
 {
    return sym.print(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::assign_shared_variable(Value_P new_value, const char * loc)
 {
@@ -929,7 +929,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
    delete response;
    if (del)   delete del;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::clear_vs()
 {
@@ -964,7 +964,7 @@ ValueStackItem & tos = value_stack[0];
         default: break;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Symbol::expunge()
 {
@@ -1015,7 +1015,7 @@ ValueStackItem & vs = value_stack.back();
    call_monitor_callback(SEV_ERASED);
    return 1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::get_attributes(int mode, Value & Z) const
 {
@@ -1064,7 +1064,7 @@ int has_result = 0;   // no result
         default:  Assert(0 && "bad mode");
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Symbol::get_exec_ufun_depth(const UserFunction * ufun)
 {
@@ -1086,7 +1086,7 @@ const int sym_stack_size = value_stack_size();
    // not found: return -1
    return -1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 Symbol::get_function()
 {
@@ -1096,7 +1096,7 @@ const ValueStackItem & vs = value_stack.back();
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Symbol::get_var_value()
 {
@@ -1107,7 +1107,7 @@ Symbol::get_var_value()
 
    return Value_P();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::pop()
 {
@@ -1146,13 +1146,13 @@ const ValueStackItem & vs = value_stack.back();
         if (monitor_callback)   monitor_callback(*this, SEV_POPED);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Symbol::print(ostream & out) const
 {
    return out << name;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Symbol::print_verbose(ostream & out) const
 {
@@ -1206,7 +1206,7 @@ Symbol::print_verbose(ostream & out) const
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::push()
 {
@@ -1220,7 +1220,7 @@ Symbol::push()
    value_stack.push_back(ValueStackItem());
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::push_function(cFunction_P function)
 {
@@ -1236,7 +1236,7 @@ ValueStackItem vs;
    value_stack.push_back(vs);
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::push_label(Function_Line label)
 {
@@ -1250,7 +1250,7 @@ Symbol::push_label(Function_Line label)
    value_stack.push_back(ValueStackItem(label));
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::push_value(Value_P value)
 {
@@ -1267,7 +1267,7 @@ ValueStackItem vs;
         CERR << " addr " << voidP(get_var_value().get()) << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::resolve_left(Token & tok, Function_PC & PC) const
 {
@@ -1313,7 +1313,7 @@ const ValueStackItem & vs = value_stack.back();
              SYNTAX_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Symbol::resolve_lv(const char * loc)
 {
@@ -1335,7 +1335,7 @@ Symbol::resolve_lv(const char * loc)
                 << "\nwhile executing an assignment\n";
    throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::resolve_right(Token & tok, Function_PC & PC) const
 {
@@ -1385,7 +1385,7 @@ const ValueStackItem & vs = value_stack.back();
              SYNTAX_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::set_NC(NameClass nc)
 {
@@ -1401,7 +1401,7 @@ ValueStackItem & vs = value_stack.back();
 
    DEFN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::set_NC(NameClass nc, cFunction_P fun)
 {
@@ -1418,13 +1418,13 @@ const bool can_set = (vs.get_NC() == NC_FUNCTION) ||
    if (fun)   vs.set_function(fun);
    else       vs.clear_function();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::set_SV_key(SV_key key)
 {
    value_stack.back().set_key(key);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::share_var(SV_key key)
 {
@@ -1454,7 +1454,7 @@ const ValueStackItem & vs = value_stack.back();
 
    DEFN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_Coupling
 Symbol::unshare_var()
 {
@@ -1473,7 +1473,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 
    return old_coupling;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
@@ -1560,7 +1560,7 @@ char buffer[BUFSIZE];
         fwrite(buffer, 1, RECORD_SIZE, out);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::vector_assignment(std::vector<Symbol *> & symbols, Value_P values)
 {
@@ -1588,4 +1588,4 @@ const Cell * cV = &values->get_cfirst();
         cV += incr;   // scalar extend values
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

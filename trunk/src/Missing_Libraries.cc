@@ -28,7 +28,7 @@
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a generic function for all ⎕XXX errors caused by missing libraries.
 /// Declared extern (rather than /// static) to avoid -Wunused-function
 /// warnings.
@@ -124,4 +124,4 @@ UCS_string & more = MORE_ERROR() <<
    SYNTAX_ERROR;
    return Token();
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

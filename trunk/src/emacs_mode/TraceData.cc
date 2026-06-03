@@ -75,7 +75,7 @@ TraceData::display_value_for_trace( ostream &out, Value_P value, int cr_level)
          cr_formatted->print1(out, context2);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void TraceData::send_update( Symbol_Event ev )
 {
     const Value_P v = symbol->get_apl_value();

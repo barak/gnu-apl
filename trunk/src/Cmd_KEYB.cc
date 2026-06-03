@@ -122,7 +122,7 @@ static_assert(MAIN_rows == CURSOR_rows);
 
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
@@ -296,7 +296,7 @@ UTF8_string_vector utf(
    loop(u, utf.size())   out << utf[u] << endl << flush;
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap()
 {
@@ -412,7 +412,7 @@ int bad_lines  = 0;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap_line(const char * buffer, int line)
 {
@@ -474,7 +474,7 @@ int Ucount = 0;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if HAVE_X11_XKBLIB_H
 
 bool
@@ -491,7 +491,7 @@ Cmd_KEYB::read_xkbd_map()
 
    return false;   // OK
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 Cmd_KEYB::read_xkbd_Ksym(_XDisplay * display, int keycode, int level)
 {
@@ -506,7 +506,7 @@ KeySym symbol = XkbKeycodeToKeysym(display, keycode, 0, level);
    if ((symbol & 0xFFFF0000) == 0x01000000)   return Unicode(symbol & 0xFFFF);
    return Unicode_0;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::read_xkbd_template(const char ** lines, int line_count)
 {
@@ -587,7 +587,7 @@ Cmd_KEYB::read_xkbd_map()
 }
 #endif   // do/don't HAVE_X11_XKBLIB_H
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap_Unicode(Keycode keycode, const char * & p,
                                 uint32_t & unicode)
@@ -719,7 +719,7 @@ static const struct symkey
    while (*p > ' ')   ++p;
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::get_template(UCS_string_vector & result, KB_Area area)
 {
@@ -756,7 +756,7 @@ Cmd_KEYB::get_template(UCS_string_vector & result, KB_Area area)
              }
         }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Cmd_KEYB::print_keycodes(ostream & out, KB_Area area)
 {
@@ -770,7 +770,7 @@ UCS_string_vector lines;
    out << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Cmd_KEYB::print_keymap(ostream & out, KB_Area area)
 {
@@ -880,12 +880,12 @@ bool data_coming = false;
    for (int y = 0; y < rows; ++y)   out << lines[y] << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::copy_text(Unicode & start, const char * text)
 {
 Unicode * p = &start;
    while (*text)   *p++ = Unicode(*text++);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // EOF

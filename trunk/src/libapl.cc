@@ -61,7 +61,7 @@ Value_P Z(loc);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// A new floating point scalar.
 APL_value
 double_scalar(APL_Float val, const char * loc)
@@ -71,7 +71,7 @@ Value_P Z(loc);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// A new complex scalar.
 APL_value
 complex_scalar(APL_Float real, APL_Float imag, const char * loc)
@@ -81,7 +81,7 @@ Value_P Z(loc);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// A new character scalar.
 APL_value
 char_scalar(int uni, const char * loc)
@@ -91,7 +91,7 @@ Value_P Z(loc);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// A new APL value with given rank and shape. All ravel elements are
 /// initialized to integer 0.
@@ -107,7 +107,7 @@ Value_P Z(sh, loc);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// A new character vector.
 APL_value
 char_vector(const char * str, const char * loc)
@@ -137,14 +137,14 @@ Value * v = const_cast<Value *>(val);
    3. read access to APL values. All ravel indices count from ⎕IO←0.
  */
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return ⍴⍴val
 int
 get_rank(const APL_value val)
 {
    return val->get_rank();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return (⍴val)[axis]
 int64_t
@@ -152,7 +152,7 @@ get_axis(const APL_value val, unsigned int axis)
 {
    return uRank(axis) < val->get_rank() ? val->get_shape_item(axis) : -1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return ×/⍴val
 uint64_t
@@ -160,7 +160,7 @@ get_element_count(const APL_value val)
 {
    return val->element_count();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return the type of (,val)[idx]
 int
 get_type(const APL_value val, uint64_t idx)
@@ -168,14 +168,14 @@ get_type(const APL_value val, uint64_t idx)
    if (idx >= uint64_t(val->nz_element_count()))   return 0;
    return val->get_cravel(idx).get_cell_type();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return non-0 if val is a simple character vector.
 int
 is_string(const APL_value val)
 {
    return val->is_char_vector();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the character val[idx] (after having checked is_char())
 int
@@ -183,7 +183,7 @@ get_char(const APL_value val, uint64_t idx)
 {
    return val->get_cravel(idx).get_char_value();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the integer val[idx] (after having checked is_int())
 int64_t
@@ -191,7 +191,7 @@ get_int(const APL_value val, uint64_t idx)
 {
    return val->get_cravel(idx).get_int_value();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the real part of val[idx] (after having checked is_numeric())
 APL_Float
@@ -199,7 +199,7 @@ get_real(const APL_value val, uint64_t idx)
 {
    return val->get_cravel(idx).get_real_value();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the imag part of val[idx] (after having checked is_numeric())
 APL_Float
@@ -207,7 +207,7 @@ get_imag(const APL_value val, uint64_t idx)
 {
    return val->get_cravel(idx).get_imag_value();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the (nested) value val[idx] (after having checked is_value()).
 /// The APL_value returned must be released with release_value() later on.
@@ -223,7 +223,7 @@ Value_P sub = val->get_cravel(idx).get_pointer_value();
    4. write access to APL values. All ravel indices count from ⎕IO←0.
  */
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return a value with the given rank and shape with all ravel items
 /// initialized to 0. Optionally, assing that value to a variable with the
 /// given name.
@@ -272,7 +272,7 @@ Symbol * symbol = Workspace::lookup_symbol(var_name);
    if (Z->get_owner_count() < 2)   return 0;
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// val[idx]←unicode
 void
 set_char(int new_char, APL_value val, uint64_t idx)
@@ -286,7 +286,7 @@ Cell * cell = &val->get_wravel(idx);
 
    CharCell::zU(cell, Unicode(new_char));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// val[idx]←new_int
 void
@@ -301,7 +301,7 @@ Cell * cell = &val->get_wravel(idx);
 
    IntCell::zI(cell, new_int);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// val[idx]←new_double
 void
@@ -316,7 +316,7 @@ Cell * cell = &val->get_wravel(idx);
 
    FloatCell::zF(cell, new_double);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// val[idx]←new_complex
 void
@@ -332,7 +332,7 @@ Cell * cell = &val->get_wravel(idx);
 
    ComplexCell::zC(cell, new_real, new_imag);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 set_value(APL_value new_value, APL_value val, uint64_t idx)
 {
@@ -378,7 +378,7 @@ const StateIndicator * si = Workspace::SI_top();
    if (si == 0)   return LAE_UNKNOWN_ERROR;
    return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 } 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 LIBAPL_error
 apl_exec_ucs(const unsigned int * line_ucs)
 { 
@@ -394,7 +394,7 @@ const StateIndicator * si = Workspace::SI_top();
    if (si == 0)   return LAE_UNKNOWN_ERROR;
    return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 apl_command(const char * command)
 {
@@ -406,13 +406,13 @@ ostringstream out;
 
   return strndup(out.str().data(), out.str().size());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 extern void sync_apl_scripts()
 {
   do {} while(repl(0, 0, 0, 0, 0));
 
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 long
 repl(char * input_buffer,  int * input_bufsize,
      char * output_buffer, int * output_bufsize,
@@ -479,7 +479,7 @@ ostringstream out;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const unsigned int *
 apl_command_ucs(const unsigned int * command)
 {
@@ -501,7 +501,7 @@ unsigned int * ret = reinterpret_cast<unsigned int *>
    ret[result_ucs.size()] = 0;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 class Quad_FX
 {
 public:
@@ -540,13 +540,13 @@ UTF8_string text;
 
    return fix_function_NL(text.c_str());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 get_owner_count(APL_value val)
 {
    return val->get_owner_count();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_function
 get_function_ucs(const unsigned int * name, APL_function * L, APL_function * R)
 {
@@ -631,7 +631,7 @@ Token_string tos;
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 print_ucs(FILE * out, const unsigned int * string_ucs)
 {
@@ -642,7 +642,7 @@ UCS_string ucs;
 UTF8_string utf8(ucs);
    fprintf(out, "%s", utf8.c_str());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 get_var_value(const char * var_name, const char * loc)
 {
@@ -658,7 +658,7 @@ Value_P Z = symbol->get_apl_value();
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 set_var_value(const char * var_name, const APL_value new_value,
               const char * loc)
@@ -688,7 +688,7 @@ Value_P B(new_value, loc);
    symbol->assign(B, true, loc); 
    return 0;   // ok
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 print_value(const APL_value value, FILE * file)
 {
@@ -698,7 +698,7 @@ stringstream out;
 const string st = out.str();
    (void)fwrite(st.data(), 1, st.size(), file);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 char *
 print_value_to_string(const APL_value value)
 {
@@ -708,14 +708,14 @@ stringstream out;
 const string st = out.str();
    return strndup(st.data(), st.size());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 print_value(const APL_value value, ostream & out)
 {
    value->print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 UTF8_to_Unicode(const char * utf, int * length)
 {
@@ -724,7 +724,7 @@ const Unicode uni = UTF8_string::toUni(utf8P(utf), len, false);
    if (length)   *length = len;
    return uni;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Unicode_to_UTF8(int uni, char * dest, int * length)
 {
@@ -734,7 +734,7 @@ UTF8_string utf8(ucs);
    dest[utf8.size()] = 0;
    if (length)   *length = utf8.size();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 extern void init_modules(const char * argv0, bool log_startup);
 extern void init_modules2(bool log_startup);
 
@@ -756,7 +756,7 @@ init_libapl(const char * progname, int log_startup)
 
    init_modules2(log_startup);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 extern DiffOut DOUT_filebuf;
 extern DiffOut UERR_filebuf;
 extern ErrOut  CERR_filebuf;
@@ -770,7 +770,7 @@ const int ret = DOUT_filebuf.LF_to_CRLF(on != 0);
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 get_line_from_user_cb * glfu = 0;
 
 void
@@ -799,7 +799,7 @@ get_line_from_user_cb * ret = glfu;
    else                 InputMux::install_get_line_callback(0);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__fun(APL_function fun)
 {
@@ -813,7 +813,7 @@ eval__fun(APL_function fun)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_fun_B(APL_value vA, APL_function fun, APL_value vB)
 {
@@ -829,7 +829,7 @@ eval__A_fun_B(APL_value vA, APL_function fun, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_L_oper_B(APL_value vA, APL_function fL, APL_function fun, APL_value vB)
 {
@@ -846,7 +846,7 @@ eval__A_L_oper_B(APL_value vA, APL_function fL, APL_function fun, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_fun_X_B(APL_value vA, APL_function fun, APL_value vX, APL_value vB)
 {
@@ -863,7 +863,7 @@ eval__A_fun_X_B(APL_value vA, APL_function fun, APL_value vX, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_L_oper_R_B(APL_value vA, APL_function fL, APL_function fun,
                    APL_function fR, APL_value vB)
@@ -882,7 +882,7 @@ eval__A_L_oper_R_B(APL_value vA, APL_function fL, APL_function fun,
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_L_oper_X_B(APL_value vA, APL_function fL, APL_function fun,
                    APL_value vX, APL_value vB)
@@ -901,7 +901,7 @@ eval__A_L_oper_X_B(APL_value vA, APL_function fL, APL_function fun,
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__A_L_oper_R_X_B(APL_value vA, APL_function fL, APL_function fun,
                      APL_function fR, APL_value vX, APL_value vB)
@@ -921,7 +921,7 @@ eval__A_L_oper_R_X_B(APL_value vA, APL_function fL, APL_function fun,
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__fun_B(APL_function fun, APL_value vB)
 {
@@ -936,7 +936,7 @@ eval__fun_B(APL_function fun, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__L_oper_B(APL_function L, APL_function oper, APL_value vB)
 {
@@ -952,7 +952,7 @@ eval__L_oper_B(APL_function L, APL_function oper, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__fun_X_B(APL_function fun, APL_value vX, APL_value vB)
 {
@@ -968,7 +968,7 @@ eval__fun_X_B(APL_function fun, APL_value vX, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__L_oper_R_B(APL_function fL, APL_function fun, APL_function fR,
                  APL_value vB)
@@ -986,7 +986,7 @@ eval__L_oper_R_B(APL_function fL, APL_function fun, APL_function fR,
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__L_oper_X_B(APL_function fL, APL_function fun, APL_value vX, APL_value vB)
 {
@@ -1003,7 +1003,7 @@ eval__L_oper_X_B(APL_function fL, APL_function fun, APL_value vX, APL_value vB)
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_value
 eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
                    APL_value vX, APL_value vB)
@@ -1022,17 +1022,17 @@ eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
          catch (std::bad_alloc &) { return 0; }
          catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 disable_safe_mode()
 {
    UserPreferences::uprefs.safe_mode = false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const int libapl_version = 0;   // not standard interpreter
 int64_t get_main()
 {
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

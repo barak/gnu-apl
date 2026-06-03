@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /*!
     A cell pointing to another APL value. This is used to create nested
     arrays. This class essentially overloads certain functions in class
@@ -115,6 +115,6 @@ protected:
    ///  overloaded Cell::deep_cell_types()
    CellType deep_cell_types() const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __POINTERCELL_HH_DEFINED__

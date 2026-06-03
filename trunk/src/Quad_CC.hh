@@ -29,7 +29,7 @@
 #include "QuadFunction.hh"
 #include "UCS_string.hh"
 
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** base class for all character classes */
 class CC_base
 {
@@ -79,7 +79,7 @@ public:
    /// @param cls character class identifier
    static const CC_base & get_instance(CharClass cls);
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class octal digits (0..9) */
 class CC_OCTAL : public CC_base
 {
@@ -95,7 +95,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return UNI_0 <= uni && uni <= UNI_7; }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class decimal digits (0..9) */
 class CC_DECIMAL : public CC_base
 {
@@ -111,7 +111,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return UNI_0 <= uni && uni <= UNI_9; }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class UPPERCASE hexadecimal digits (0..9) */
 class CC_HEXA : public CC_base
 {
@@ -128,7 +128,7 @@ protected:
       { return (UNI_0 <= uni && uni <= UNI_9) ||
                (UNI_A <= uni && uni <= UNI_F); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class lowercase hexadecimal digits (0..9) */
 class CC_hexa : public CC_base
 {
@@ -145,7 +145,7 @@ protected:
       { return (UNI_0 <= uni && uni <= UNI_9) ||
                (UNI_a <= uni && uni <= UNI_f); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase hexadecimal digits (0..9) */
 class CC_Hexa : public CC_base
 {
@@ -164,7 +164,7 @@ protected:
                (UNI_A <= uni && uni <= UNI_F) ||
                (UNI_a <= uni && uni <= UNI_f); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase hexadecimal digits (0..9) */
 class CC_SUPERSCRIPT : public CC_base
 {
@@ -179,7 +179,7 @@ protected:
    virtual const char * get_ravel() const   { return "²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ"; }
    virtual bool contains(Unicode uni) const;
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase hexadecimal digits (0..9) */
 class CC_SUBSCRIPT : public CC_base
 {
@@ -194,7 +194,7 @@ protected:
    virtual const char * get_ravel() const   { return "ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ"; }
    virtual bool contains(Unicode uni) const;
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class UPPERCASE alphabetical chars (A-Z) */
 class CC_ALPHA : public CC_base
 {
@@ -211,7 +211,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return UNI_A <= uni && uni <= UNI_Z; }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class lowercase alphabetical chars (a-z) */
 class CC_alpha : public CC_base
 {
@@ -228,7 +228,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return UNI_a <= uni && uni <= UNI_z; }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_GREEK : public CC_base
 {
@@ -248,7 +248,7 @@ protected:
       { return (0x0391 <= uni && uni <= 0x03A9 && uni != 0x03A2) ||
                (0x03B1 <= uni && uni <= 0x03C9 && uni != 0x03C2); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_ASCII : public CC_base
 {
@@ -264,7 +264,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return (0 <= uni && uni <= 127); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_Alpha : public CC_base
 {
@@ -284,7 +284,7 @@ protected:
       { return (UNI_A <= uni && uni <= UNI_Z) ||
                (UNI_a <= uni && uni <= UNI_z); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_LINE_DRAWING: public CC_base
 {
@@ -305,7 +305,7 @@ protected:
 ; }
    virtual bool contains(Unicode uni) const;
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_MATH: public CC_base
 {
@@ -323,7 +323,7 @@ protected:
                                                       "ℕℤℚℝℂ⎩⎭"; }
    virtual bool contains(Unicode uni) const;
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_BASE_32 : public CC_base
 {
@@ -341,7 +341,7 @@ protected:
       { return (UNI_A <= uni && uni <= UNI_Z) ||
                strchr("234567=", int(uni)); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_BASE_64 : public CC_base
 {
@@ -363,7 +363,7 @@ protected:
                (UNI_0 <= uni && uni <= UNI_9) ||
                strchr("+/=", int(uni)); }
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
 class CC_PRINT : public CC_base
 {
@@ -385,7 +385,7 @@ protected:
    virtual bool contains(Unicode uni) const
       { return 0x20 <= uni && uni <= 0x7E; }
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 class Quad_CC : public QuadFunction
 {
 public:
@@ -419,7 +419,7 @@ protected:
    /// @param out output stream to write to
    static void print_classes(ostream & out);
 };
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __Quad_CC_DEFINED__
 // EOF

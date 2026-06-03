@@ -113,7 +113,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_F12
 
@@ -146,7 +146,7 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_B(Value_P B, const NativeFunction * caller)
 {
@@ -155,7 +155,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
@@ -164,7 +164,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
@@ -173,7 +173,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_AXB(Value_P A, Value_P X, Value_P B, const NativeFunction * caller)
 {
@@ -182,7 +182,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_OP1
 
@@ -217,7 +217,7 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_LB(Function & LO, Value_P B, const NativeFunction * caller)
 {
@@ -226,7 +226,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_ALB(Value_P A, Function & LO, Value_P B, const NativeFunction * caller)
 {
@@ -235,7 +235,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_LXB(Function & LO, Value_P X, Value_P B, const NativeFunction * caller)
 {
@@ -244,7 +244,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_ALXB(Value_P A, Function & LO, Value_P X, Value_P B,
           const NativeFunction * caller)
@@ -254,7 +254,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_OP2
 
@@ -290,7 +290,7 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_LRB(Function & LO, Function & RO, Value_P B,
          const NativeFunction * caller)
@@ -300,7 +300,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_ALRB(Value_P A, Function & LO, Function & RO, Value_P B,
           const NativeFunction * caller)
@@ -311,7 +311,7 @@ Value_P Z(ucs, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_LRXB(Function & LO, Function & RO, Value_P X, Value_P B,
           const NativeFunction * caller)
@@ -321,7 +321,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_ALRXB(Value_P A, Function & LO, Function & RO, Value_P X, Value_P B,
            const NativeFunction * caller)
@@ -331,7 +331,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif
 
@@ -347,7 +347,7 @@ close_fun(Cause cause, const NativeFunction * caller)
 // prevent compiler warning
 bool (*close_fun_is_unused)(Cause, const NativeFunction *) = &close_fun;
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_fill_B(Value_P B, const NativeFunction * caller)
 {
@@ -356,7 +356,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
@@ -365,7 +365,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller)
 {
@@ -374,5 +374,5 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

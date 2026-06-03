@@ -33,7 +33,7 @@ using namespace std;
 
 class UserFunction;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// one endge in a (directed) function call graph
 struct fcall_edge
 {
@@ -76,7 +76,7 @@ struct fcall_edge
 
 typedef std::vector<fcall_edge> CallGraph;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// implementation of the ]Doxy command.
 class Doxy
 {
@@ -205,5 +205,5 @@ protected:
    /// the number of errors that have occurred
    int errors;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // __DOXY_HH_DEFINED__

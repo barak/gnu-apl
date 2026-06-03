@@ -24,7 +24,7 @@
 #include "PostgresProvider.hh"
 #include "PostgresConnection.hh"
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PostgresConnection *
 create_postgres_connection(const Value & B)
 {
@@ -60,14 +60,14 @@ create_postgres_connection(const Value & B)
 
    return new PostgresConnection(db);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Connection *
 PostgresProvider::open_database(const Value & B)
 {
 Connection * connection = create_postgres_connection(B);
     return connection;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 PostgresProvider::version_string() const
 {
@@ -79,11 +79,11 @@ static char version[100];
             version_number%100);
    return version;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 PostgresProvider::version_number() const
 {
    return PQlibVersion();
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

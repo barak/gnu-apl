@@ -32,7 +32,7 @@ class Symbol;
 class UCS_string;
 class Value;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The possible values returned by \b ⎕NC.
 enum NameClass
 {
@@ -76,7 +76,7 @@ enum NameClass
   /// name whose class may be changed
   NC_unknown          = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
  A named object is something with a name.
  The name can be user defined or system defined.

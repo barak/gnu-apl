@@ -38,7 +38,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//=========================================================================
+//════════════════════════════════════════════════════════════════════════════
 //// constructor for a normal (non-lambda) defined function header
 UserFunction_header::UserFunction_header(const UCS_string & text0, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
@@ -88,7 +88,7 @@ UCS_string lvar_text;
 
    error = E_NO_ERROR;
 }
-//-------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 //s/ constructor for lambda header
 UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
   : error(E_DEFN_ERROR),
@@ -119,7 +119,7 @@ UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
    error_info = 0;
    error = E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserFunction_header::localizes(const Symbol * sym) const
 {
@@ -135,7 +135,7 @@ UserFunction_header::localizes(const Symbol * sym) const
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {
@@ -168,7 +168,7 @@ UCS_string ind(indent, UNI_SPACE);
         out << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::pop_local_vars() const
 {
@@ -183,7 +183,7 @@ UserFunction_header::pop_local_vars() const
    if (sym_A)    sym_A ->pop();
    if (sym_Z)    sym_Z ->pop();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::print_local_vars(ostream & out) const
 {
@@ -195,7 +195,7 @@ UserFunction_header::print_local_vars(ostream & out) const
 
    loop(l, local_vars.size())   out << " " << *local_vars[l];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::reverse_local_vars()
 {
@@ -207,7 +207,7 @@ const ShapeItem half = local_vars.size() / 2;   // = rounded down!
         local_vars[local_vars.size() - v - 1] = tmp;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::remove_duplicate_local_variables()
 {
@@ -228,7 +228,7 @@ UserFunction_header::remove_duplicate_local_variables()
    loop(l, local_vars.size())
       remove_duplicate_local_var(local_vars[l], l + 1);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
@@ -246,7 +246,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::eval_common() const
 {
@@ -261,7 +261,7 @@ UserFunction_header::eval_common() const
    loop(l, label_values.size())
        label_values[l].sym->push_label(label_values[l].line);
 }
-//--------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 UserFunction_header::init_signature(const UCS_string & text, bool macro)
 {
@@ -423,7 +423,7 @@ size_t len   = tos.size();
    sym_RO = tos[start + 3].get_sym_ptr();
    return 0;
 }
-//--------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 UserFunction_header::init_local_vars(const UCS_string & text, bool macro)
 {
@@ -479,7 +479,7 @@ Token_string tos;
 
    return 0;
 }
-//-------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserFunction_header::signature_is_valid(Fun_signature sig)
 {
@@ -510,7 +510,7 @@ UserFunction_header::signature_is_valid(Fun_signature sig)
         default:                    return false;   // invalid signature
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
 {
@@ -530,4 +530,4 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
          ++pos;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

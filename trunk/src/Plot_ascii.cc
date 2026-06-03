@@ -35,7 +35,7 @@ enum VT100_color
   VT100_bright_cyan    =  66,
   VT100_bright_white   =  67,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// convert a 32-bit rgb value to its nearest VT100 color
 
 const struct
@@ -92,7 +92,7 @@ uint32_t best_sq = 0x40000;   // > 3*FF*FF
 
    return VT100_RGB[best_idx].vt100;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 struct ASCII_Point
 {
    ASCII_Point()
@@ -103,7 +103,7 @@ struct ASCII_Point
    Unicode uni;
    VT100_color color;   /// foreground color index
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 class ASCII_canvas
 {
 public:
@@ -147,7 +147,7 @@ protected:
    const ASCII_Point & get_point(int x, int y) const
       { return points[x + y * W]; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_horizontal_grid(const Plot_window_properties & w_props)
 {
@@ -172,7 +172,7 @@ const int H1 = H - 1;
          for (int x = 1; x < W1; ++x)   set_point(x, y, u1, color);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_vertical_grid(const Plot_window_properties & w_props)
 {
@@ -204,7 +204,7 @@ const int H1 = H - 1;
              }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_grid(const Plot_window_properties & w_props)
 {
@@ -231,7 +231,7 @@ const VT100_color color = VT100_dark_black;
    draw_horizontal_grid(w_props);
    draw_vertical_grid(w_props);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_plot_line(const Plot_window_properties & w_props,
                              int row, const Plot_data & data)
@@ -294,7 +294,7 @@ const VT100_color color = round_color(lp.get_point_color());
         set_point(X, H1 - Y, POINT, color);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::emit(ostream & out, const Plot_window_properties & w_props)
 {
@@ -326,7 +326,7 @@ VT100_color color = VT100_NONE;   // to force an initial color change
 
    cerr << Output::color_CIN << Output::clear_EOL << "\n";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ASCII_canvas::emit_value(const Plot_window_properties & w_props)
 {
@@ -363,7 +363,7 @@ const VT100_color color = round_color(w_props.get_canvas_color());
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
 {
@@ -385,4 +385,4 @@ ASCII_canvas ctx(H, W);
    ctx.emit(cerr, w_props);
    return ctx.emit_value(w_props);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

@@ -28,7 +28,7 @@
 
 #include "UCS_string.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// common part of user-defined names and distinguished names
 template <typename T, size_t SYMBOL_COUNT>
 class SymbolTableBase
@@ -131,7 +131,7 @@ protected:
 
 class Symbol;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The table containing all user defined symbols.
 class SymbolTable : public SymbolTableBase<Symbol, SYMBOL_HASH_TABLE_SIZE>
 {
@@ -196,7 +196,7 @@ protected:
    /// @param sym name of the symbol to erase
    bool erase_one_symbol(const UCS_string & sym);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 class QuadFunction;
 class SystemVariable;
 
@@ -257,7 +257,7 @@ protected:
    /// the variable if the name refers to a system variable, or 0 if not
    SystemVariable * sysvar;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The table containing all system defined symbols (aka. distinguished names)
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {
@@ -310,6 +310,6 @@ protected:
    /// the length of the longest name
    int max_name_len;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SYMBOLTABLE_HH_DEFINED__

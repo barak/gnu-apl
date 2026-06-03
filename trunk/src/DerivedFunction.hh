@@ -28,7 +28,7 @@
 #include "Function.hh"
 #include "Output.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** base class for all Derived_XXX classes. Used to bind an axis and/or left
     and/or right function or operator arguments to a function or operator.
 
@@ -135,7 +135,7 @@ protected:
    /// the axis for \b mon_oper, or 0 if no axis
    Value_P axis;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A dyadic operator bound to its left and right function. E.g. +.× ←→ (+.×)
 class Derived_LO_D_RO: public DerivedFunction
 {
@@ -171,7 +171,7 @@ public:
    /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A dyadic operator bound to its left and right functions and its axis.
 class Derived_LO_D_X_RO : public DerivedFunction
 {
@@ -199,7 +199,7 @@ public:
    /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A monadic operator bound to its left function. E.g. +/ ←→ (+/)
 class Derived_LO_M: public DerivedFunction
 {
@@ -234,7 +234,7 @@ public:
    /// @param B right APL argument value
    virtual Token eval_XB(Value_P X, Value_P B) const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A monadic operator bound to its left function and to its axis.
 /// E.g. +/[X] ←→ (+/[X])
 class Derived_LO_M_X: public DerivedFunction
@@ -272,7 +272,7 @@ public:
 
 
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A function axis bound to its function (not operaator). E.g. f[X] ←→ (f[X])
 class Derived_F_X : public DerivedFunction
 {
@@ -297,7 +297,7 @@ public:
    /// @param B right APL argument value
    virtual Token eval_B(Value_P B) const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a small cache for storing a few DerivedFunction objects
 class DerivedFunctionCache
 {
@@ -347,5 +347,5 @@ protected:
    /// the number of elements in \b cache
    size_t idx;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __DERIVED_FUNCTION__DEFINED__

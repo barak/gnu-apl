@@ -39,7 +39,7 @@ class PrimitiveFunction;
  ravels of the result Z, the right argument B, and possibly (for dyadic Cell
  functions) the left argument A.
  **/
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// one monadic scalar job
 class PJob_scalar_B
 {
@@ -99,7 +99,7 @@ public:
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// one dyadic scalar job
 class PJob_scalar_AB
 {
@@ -180,7 +180,7 @@ public:
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
-// ============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a number of jobs, where each job can be executed in parallel
 class Parallel_job_list_base
 {
@@ -188,7 +188,7 @@ public:
    /// from where the joblist was started
    static const char * started_loc;
 };
-// ----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** a list of parallel jobs. It is used to control the parallel computation
     of nested results. Initially the Parallel_job_list is created with one
     job. If nested values are encountered they are not computed immediately
@@ -275,5 +275,5 @@ protected:
    /// the currently executed worklist item
    T current_job;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // PJOB_HH_DEFINED

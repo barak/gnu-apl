@@ -40,7 +40,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // conatructor for a lambda
 UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
                            const UCS_string & text, const Token_string & lambda_body,
@@ -84,13 +84,13 @@ UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
    error_line = -1;   // no error
    error_info = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserFunction::~UserFunction()
 {
    Log(LOG_UserFunction__enter_leave)
       CERR << "Function " << get_name() << " deleted." << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 UserFunction::canonical(bool with_lines) const
 {
@@ -103,7 +103,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_() const
 {
@@ -119,7 +119,7 @@ UserFunction::eval_() const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_AB(Value_P A, Value_P B) const
 {
@@ -144,7 +144,7 @@ UserFunction::eval_AB(Value_P A, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
@@ -173,7 +173,7 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -205,7 +205,7 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
                          Value_P X, Value_P B) const
@@ -239,7 +239,7 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
@@ -269,7 +269,7 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -295,7 +295,7 @@ UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_B(Value_P B) const
 {
@@ -318,7 +318,7 @@ UserFunction::eval_B(Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_LB(Token & LO, Value_P B) const
 {
@@ -344,7 +344,7 @@ UserFunction::eval_LB(Token & LO, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -374,7 +374,7 @@ UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
@@ -405,7 +405,7 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -433,7 +433,7 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_XB(Value_P X, Value_P B) const
 {
@@ -457,7 +457,7 @@ UserFunction::eval_XB(Value_P X, Value_P B) const
 
    return Token(TOK_SI_PUSHED);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_Line
 UserFunction::get_line(Function_PC pc) const
 {
@@ -473,7 +473,7 @@ UserFunction::get_line(Function_PC pc) const
 
    return Function_Line_1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 UserFunction::get_name_and_line(Function_PC pc) const
 {
@@ -493,7 +493,7 @@ UCS_string ret = header.get_name();
 const Function_Line line = get_line(pc);
    return ret << line << UNI_R_BRACK;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void 
 UserFunction::help(ostream & out) const
 {
@@ -542,7 +542,7 @@ const UCS_string two_lamps(U"⍝⍝");
 
    if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_PC
 UserFunction::line_start(Function_Line line) const
 {
@@ -555,7 +555,7 @@ UserFunction::line_start(Function_Line line) const
 
    return line_starts[line];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Function_PC
 UserFunction::pc_for_line(Function_Line line) const
 {
@@ -564,7 +564,7 @@ UserFunction::pc_for_line(Function_Line line) const
 
    return line_starts[line];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 UserFunction::print(ostream & out) const
 {
@@ -582,7 +582,7 @@ UserFunction::print(ostream & out) const
    return Executable::print(out);
 */
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::print_line_PCs(const char * loc) const
 {
@@ -598,7 +598,7 @@ UserFunction::print_line_PCs(const char * loc) const
          CERR << PC_from << "..." << (PC_to - 1) << endl;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::print_properties(ostream & out, int indent) const
 {
@@ -635,7 +635,7 @@ UCS_string ind(indent, UNI_SPACE);
        }
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserFunction::pushes_sym(const Symbol * sym) const
 {
@@ -653,7 +653,7 @@ UserFunction::pushes_sym(const Symbol * sym) const
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::set_locked_error_info(Error & error) const
 {
@@ -700,7 +700,7 @@ UCS_string message_2(error.get_error_line_2());
 
    error.set_right_caret(error.get_left_caret() + message_2.size() - 7);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::destroy()
 {
@@ -709,7 +709,7 @@ UserFunction::destroy()
    if (is_lambda())   decrement_refcount(LOC);
    else               delete this;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserFunction::optimize_label_vectors()
 {
@@ -833,7 +833,7 @@ bool VOID_inserted = false;
 
    return VOID_inserted;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserFunction::optimize_labels()
 {
@@ -887,7 +887,7 @@ const size_t labels_declared = header.get_label_count();
 
    return false;   // no TOK_VOID inserted
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::parse_body(const char * loc, bool macro)
 {
@@ -1063,7 +1063,7 @@ Lit_DB literals;
    //
    Assert(literals.size() == 0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 VoidCount
 UserFunction::remove_TOK_VOID()
 {
@@ -1128,7 +1128,7 @@ const VoidCount ret = VoidCount(body.ssize() - dst_PC);
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::set_trace_stop(const std::vector<Function_Line> & B, bool stop)
 {
@@ -1167,7 +1167,7 @@ std::vector<bool> ts_lines;
 
    parse_body(LOC, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserFunction *
 UserFunction::do_load(const char * workspace, const char * function)
 {
@@ -1225,7 +1225,7 @@ const UCS_string ucs(utf);
 int error_line = -1;
    return fix(ucs, error_line, false, LOC, filename);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserFunction *
 UserFunction::fix(const UCS_string & text, int & err_line,
                   bool keep_existing, const char * loc,
@@ -1339,7 +1339,7 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
 
    return ufun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserFunction *
 UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 {
@@ -1451,7 +1451,7 @@ vector<Symbol *> local_vars;
    return new UserFunction(Fun_signature(signature), LAMBDA_NUM_0,
                                          body_text, body, local_vars);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UserFunction *
 UserFunction::load(const char * workspace, const char * function)
 {
@@ -1478,7 +1478,7 @@ UserFunction * fun = 0;
 
    return fun;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // constructor for a normal (non-lambda) define function
 UserFunction::UserFunction(const UCS_string txt, const char * loc,
                            const UTF8_string & _creator, bool macro)
@@ -1544,21 +1544,21 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
    error_line = -1;   // no error
    error_info = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
 Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 UserFunction::eval_fill_B(Value_P B) const
 {
 Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 UserFunction::line_prefix(Function_Line l) const
 {
@@ -1568,7 +1568,7 @@ char cc[40];
    else                          SPRINTF(cc, "[%d] ",  l)
    return UCS_ASCII_string(cc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserFunction::print_body_by_line(const char * where) const
 {
@@ -1584,7 +1584,7 @@ UserFunction::print_body_by_line(const char * where) const
         CERR << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 UserFunction::print_val_or_fun(ostream & out, const Token & tok)
 {
@@ -1595,4 +1595,4 @@ UserFunction::print_val_or_fun(ostream & out, const Token & tok)
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

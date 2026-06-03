@@ -29,7 +29,7 @@
 #include <string>
 #include <Workspace.hh>
 
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// properties of a single plot line. The properties, their type, and their
 /// default values are defined in file Quad_PLOT.def.
 
@@ -87,7 +87,7 @@ protected:
   /// a buffer for creating a (default) legend name from a macro
   char legend_name_buffer[50];
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PLOT_LINE_PROPERTIES_HH_DEFINED__
 

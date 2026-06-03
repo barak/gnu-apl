@@ -56,7 +56,7 @@ Quad_SQL_4 Quad_SQL_4::fun;   // ⎕SQL[4, DB]
 # include "sql/PostgresProvider.hh"
 #endif
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
 {
 #define sql_def(N, name, map_comm, fun_comm) \
@@ -74,7 +74,7 @@ const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
    sql_def( 10, version  , "SQL provider version number", "")
    sql_def( 11, vstring  , "SQL provider version string", "")
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_SQL::Quad_SQL()
    : QuadFunction(TOK_Quad_SQL)
 {
@@ -83,13 +83,13 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
 
    init_provider_map();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_SQL::~Quad_SQL()
 {
    loop(p, SQL_providers.size())   delete SQL_providers[p];
    SQL_providers.clear();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SQL::close_all_connections()
 {
@@ -106,14 +106,14 @@ Quad_SQL::close_all_connections()
       }
    SQL_connections.clear();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
@@ -141,7 +141,7 @@ const APL_Integer function_number = X->get_cfirst().get_near_int();
                 << function_number;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::eval_B(Value_P B) const
 {
@@ -190,7 +190,7 @@ Quad_SQL::eval_B(Value_P B) const
    if (B->element_count() != 0)   LENGTH_ERROR;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::eval_XB(Value_P X, Value_P B) const
 {
@@ -221,7 +221,7 @@ const bool map = B->get_cfirst().is_character_cell();
          default: bad_subfun_number_ERROR(subfunction);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SQL::print_map_syntax(ostream & out, const function_info & info) const
 {
@@ -244,7 +244,7 @@ const char * name = info.function_name;
    // comment
    out << "⍝ " << info.comment_map << endl;   // comment
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::list_functions(ostream & out) const
 {
@@ -289,7 +289,7 @@ const char * funs[] =
 
    return Token();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char * Quad_SQL::get_legend(Legend_type lt) const
 {
    switch(lt)
@@ -310,7 +310,7 @@ const char * Quad_SQL::get_legend(Legend_type lt) const
 "\n";
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SQL::open_database(const Value & A, const Value & B)
 {
@@ -355,7 +355,7 @@ UCS_string & more = MORE_ERROR();
 
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SQL::column_names(Value_P A, Value_P B)
 {
@@ -399,7 +399,7 @@ Value_P Z(shape, LOC);
     Z->check_value( LOC );
     return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SQL::run_generic(Connection * conn, const Value & A, const Value & B,
                       bool query)
@@ -457,7 +457,7 @@ ArgListBuilder * builder = query ? conn->make_prepared_query(statement)
            }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P 
 Quad_SQL::get_version_number(const UCS_string & ucs_B)
 {
@@ -488,7 +488,7 @@ UCS_string & more = MORE_ERROR();
        }
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P 
 Quad_SQL::get_version_string(const UCS_string & ucs_B)
 {
@@ -523,7 +523,7 @@ UCS_string & more = MORE_ERROR();
        }
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SQL::run_generic_one_query(ArgListBuilder * arg_list, const Value & B,
                                 int start, int num_args)
@@ -562,7 +562,7 @@ Quad_SQL::run_generic_one_query(ArgListBuilder * arg_list, const Value & B,
 
     return arg_list->run_query();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_SQL::find_free_connection(const UTF8_string & filename)
 {
@@ -582,7 +582,7 @@ Quad_SQL::find_free_connection(const UTF8_string & filename)
    SQL_connections.push_back(slot);
    return SQL_connections.size() - 1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SQL::throw_illegal_db_handle(int handle)
 {
@@ -590,7 +590,7 @@ Quad_SQL::throw_illegal_db_handle(int handle)
    else  MORE_ERROR() << "⎕SQL: Illegal database handle " << handle;
     DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Connection *
 Quad_SQL::db_id_to_connection(int db_id)
 {
@@ -602,7 +602,7 @@ Quad_SQL::db_id_to_connection(int db_id)
    if (Connection * conn = SQL_connections[db_id].connection)   return conn;
    throw_illegal_db_handle(db_id);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Connection *
 Quad_SQL::value_to_db_id(const Value & B)
 {
@@ -621,7 +621,7 @@ Quad_SQL::value_to_db_id(const Value & B)
 const APL_Integer db_id = B.get_cfirst().get_int_value();
     return db_id_to_connection(db_id);
  }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::close_database(Value_P B)
 {
@@ -648,7 +648,7 @@ int db_id = B->get_cfirst().get_int_value();
 
    throw_illegal_db_handle(db_id);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::run_transaction_begin(Value_P B)
 {
@@ -656,7 +656,7 @@ Connection * conn = value_to_db_id(*B);
     conn->transaction_begin();
     return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::run_transaction_commit(Value_P B)
 {
@@ -664,7 +664,7 @@ Connection * conn = value_to_db_id(*B);
     conn->transaction_commit();
     return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::run_transaction_rollback(Value_P B)
 {
@@ -672,7 +672,7 @@ Connection * conn = value_to_db_id(*B);
    conn->transaction_rollback();
    return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::show_tables(Value_P B)
 {
@@ -700,7 +700,7 @@ Value_P value;
    value->check_value( LOC );
    return Token(TOK_APL_VALUE1, value);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Connection *
 Quad_SQL::param_to_db(const Value & X)
 {
@@ -714,7 +714,7 @@ const Shape & shape = X.get_shape();
 
     return db_id_to_connection(X.get_cravel(1).get_near_int());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SQL::init_provider_map()
 {
@@ -741,12 +741,12 @@ Provider * postgresProvider = new PostgresProvider();
 # endif
 #endif
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_SQL_3::Quad_SQL_3()
    : QuadFunction(TOK_Quad_SQL_3)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL_3::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -760,12 +760,12 @@ Value_P FUN_DB(2, LOC);
    FUN_DB->check_value(LOC);
    return Token(TOK_APL_VALUE1, Quad_SQL::run_query(*A, *FUN_DB, *B));
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_SQL_4::Quad_SQL_4()
    : QuadFunction(TOK_Quad_SQL_4)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL_4::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -779,4 +779,4 @@ Value_P FUN_DB(2, LOC);
    FUN_DB->check_value(LOC);
    return Token(TOK_APL_VALUE1, Quad_SQL::run_update(*A, *FUN_DB, *B));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

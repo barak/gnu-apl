@@ -38,7 +38,7 @@ class IntCell;
 class LvalCell;
 class PointerCell;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
  **   Base class for one item of an APL ravel. The item is one of the following:
  **
@@ -691,7 +691,7 @@ private:
 
    Cell & operator =(const Cell & other);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 typedef ErrorCode (Cell::*prim_f1)(Cell *) const;
 typedef ErrorCode (Cell::*prim_f2)(Cell *, const Cell *) const;

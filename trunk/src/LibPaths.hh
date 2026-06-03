@@ -29,7 +29,7 @@
 
 class UCS_string_vector;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// a library reference number for commands )LOAD, )SAVE, and )COPY.
 /// No library reference number is the same as LIB0.
@@ -48,7 +48,7 @@ enum LibRef
    LIB9 = 9,         ///< library 9
    LIB_MAX,          ///< valid library references are smaller than this
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a library reference number (0..9) and a workspace name
 class LibRef_name
 {
@@ -95,7 +95,7 @@ protected:
   LibRef lib;
   UCS_string name;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a class mapping library reference numbers to directories
 class LibPaths
 {
@@ -214,5 +214,5 @@ protected:
    /// true if APL_lib_root was not found (thus "." taken as fallback)
    static bool root_from_pwd;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // __LIBPATHS_HH_DEFINED__

@@ -26,7 +26,7 @@
 #include "Polynomial.hh"
 #include "Tokenizer.hh"
 
-//-----------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Monomial::get_order(const Value & order) const
 {
@@ -38,7 +38,7 @@ Shape index;
 const ShapeItem offset = order.get_shape().ravel_pos(index);
    return order.get_cravel(offset).get_int_value();
 }
-//-----------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Monomial::print(ostream & out, bool first) const
 {
@@ -84,7 +84,7 @@ Complex coeff = coefficient;
 
    return out;
 }
-//-----------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Monomial::to_value() const
 {
@@ -104,7 +104,7 @@ Value_P Z(expos.size() + 1, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 Monomial::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
                             const bool & got_overbar)
@@ -122,7 +122,7 @@ const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
         set_real(got_overbar, term_sign, id.get_double());
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Monomial::scan_indeterminants(const UCS_string_vector & vars,
                                Unicode_source & src)
@@ -208,7 +208,7 @@ size_t found_len = 0;
                }
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Polynomial::Polynomial(const Value & value)
 {
    reserve(40);
@@ -224,7 +224,7 @@ Polynomial::Polynomial(const Value & value)
          push_back(term);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Polynomial::LT_pos(const Value * order) const
 {
@@ -249,7 +249,7 @@ size_t pos = 0;
    return pos;
 
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Polynomial::print(ostream & out) const
 {
@@ -281,7 +281,7 @@ const Monomial * largest = &at(0);
        }
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Polynomial::to_value() const
 {
@@ -336,5 +336,5 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 // EOF

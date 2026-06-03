@@ -36,7 +36,7 @@ class CollatingCache;
 class ConstRavel_P;
 class IntCell;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
     Base class for the APL system functions (Quad functions and primitives
     like +, -, ...) and operators
@@ -95,7 +95,7 @@ protected:
    /// performance statistics for dyadic calls
    CellFunctionStatistics * statistics_B;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Base class for all internal non-scalar functions of the interpreter
 class NonscalarFunction : public PrimitiveFunction
 {
@@ -106,7 +106,7 @@ public:
    : PrimitiveFunction(tag)
    {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Base class for all internal non-scalar functions of the interpreter
 // that have the default identity function
 class NonscalarFunction_default_identity : public NonscalarFunction
@@ -129,7 +129,7 @@ public:
    /// @param axis  the axis along which to apply the identity
    static Token do_eval_identity_fun(Value_P B, sAxis axis);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function zilde (⍬) */
 /// The class implementing ⍬ (the empty numeric vector)
 class Bif_F0_ZILDE : public NonscalarFunction
@@ -149,7 +149,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return false; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function execute */
 /// The class implementing ⍎
 class Bif_F1_EXECUTE : public NonscalarFunction
@@ -185,7 +185,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function index (⌷) */
 /// The class implementing ⌷
 class Bif_F2_INDEX : public NonscalarFunction
@@ -210,7 +210,7 @@ public:
    static Bif_F2_INDEX  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions member and enlist */
 /// The class implementing ϵ
 class Bif_F12_ELEMENT : public NonscalarFunction
@@ -239,7 +239,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions match and depth */
 /// The class implementing ≡
 class Bif_F12_EQUIV : public NonscalarFunction
@@ -272,7 +272,7 @@ protected:
    /// @param B  the APL value whose depth to compute
    Token depth(Value_P B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive function natch (≢) */
 /// The class implementing ≡
 class Bif_F12_NEQUIV : public NonscalarFunction
@@ -294,7 +294,7 @@ public:
 
    static Bif_F12_NEQUIV  fun;   ///< Built-in function
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function encode */
 /// The class implementing ⊤
 class Bif_F12_ENCODE : public NonscalarFunction
@@ -357,7 +357,7 @@ protected:
    /// @param B   the APL value containing the numbers to represent
    static int get_X0(APL_Integer A0, const Value & B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function decode */
 /// The class implementing ⊥
 class Bif_F12_DECODE : public NonscalarFunction
@@ -406,7 +406,7 @@ protected:
    static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
                            ShapeItem len_B, const Cell * cB, ShapeItem dB);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
 class Bif_ROTATE : public NonscalarFunction_default_identity
@@ -430,7 +430,7 @@ protected:
    /// @param axis  the axis along which to rotate
    static Token rotate(Value_P A, Value_P B, sAxis axis);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions rotate and reverse along last axis */
 /// The class implementing ⌽
 class Bif_F12_ROTATE : public Bif_ROTATE
@@ -463,7 +463,7 @@ public:
    static Bif_F12_ROTATE  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions rotate and reverse along first axis */
 /// The class implementing ⊖
 class Bif_F12_ROTATE1 : public Bif_ROTATE
@@ -496,7 +496,7 @@ public:
    static Bif_F12_ROTATE1  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function transpose */
 /// The class implementing ⍉
 class Bif_F12_TRANSPOSE : public NonscalarFunction_default_identity
@@ -544,7 +544,7 @@ protected:
    /// @param B  the APL array to transpose (raw pointer)
    static Value_P transpose_diag(const Shape & A, const Value * B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions reshape and shape */
 /// The class implementing ⍴
 class Bif_F12_RHO : public NonscalarFunction_default_identity
@@ -567,7 +567,7 @@ public:
    static Bif_F12_RHO  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function ∪ (unique/union) */
 /// The class implementing ∪
 class Bif_F12_UNION : public NonscalarFunction
@@ -587,7 +587,7 @@ public:
    /// Built-in function
    static Bif_F12_UNION  fun;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function ∩ (intersection) */
 /// The class implementing ∩
 class Bif_F2_INTER : public NonscalarFunction
@@ -605,7 +605,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function left (⊣) */
 /// The class implementing ⊣
 class Bif_F2_LEFT : public NonscalarFunction
@@ -627,7 +627,7 @@ public:
    static Bif_F2_LEFT  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function right (⊢) */
 /// The class implementing ⊢
 class Bif_F2_RIGHT : public NonscalarFunction
@@ -652,6 +652,6 @@ public:
    static Bif_F2_RIGHT  fun;   ///< Built-in function
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __PRIMITIVE_FUNCTION_HH_DEFINED__

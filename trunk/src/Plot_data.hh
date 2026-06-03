@@ -36,7 +36,7 @@ typedef uint32_t Color;
 
 typedef std::string String;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 /// a window coordinate in pixels
 struct Pixel_XY
@@ -66,7 +66,7 @@ struct Pixel_XY
    Pixel_X x;   ///< horizontal pixels
    Pixel_Y y;   ///< vertical pixels
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// data for one plot line, aka. data row. The plot line consists of N
 /// data points, each with coordinates X, Y, and Z.
 class Plot_data_row
@@ -191,7 +191,7 @@ protected:
    /// the largest value in Z
    double max_Z;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// data for all plot lines
 
 struct level_color
@@ -437,7 +437,7 @@ protected:
    /// the largest value in Z
    double max_Z;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PLOT_DATA_HH_DEFINED__
 

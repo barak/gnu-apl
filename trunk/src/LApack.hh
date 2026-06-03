@@ -216,7 +216,7 @@ public:
           { return real()*real() + imag()*imag(); }
      };   // class ZZ
  
-  //----------------------------------------------------------------------------
+  //────────────────────────────────────────────────────────────────────────────
   /// A double or complex matrix. Actually a matrix view of some data (where
   /// data is similar to an APL ravel)
   template<typename T>
@@ -540,7 +540,7 @@ public:
   static void scale(ZZ * data, size_t len, const ZZ & factor)
      { loop(l, len)   data[l] *= factor; }
 
-  //============================================================================
+  //════════════════════════════════════════════════════════════════════════════
   // (static) functions ported from LAPACK (FORTRAN) .f files...
 public:
   /// return ║ vec ║²
@@ -781,4 +781,4 @@ protected:   // class LA_pack
      template<typename T>
      static void larf(const T * v, T tau, fMatrix<T> & C, T * y);
 };                                     // class LA_pack
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

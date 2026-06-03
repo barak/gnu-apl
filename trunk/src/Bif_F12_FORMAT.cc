@@ -34,7 +34,7 @@
 
 Bif_F12_FORMAT   Bif_F12_FORMAT::fun;       // ⍕
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Format_sub::insert_fract_commas(const UCS_string & data) const
 {
@@ -64,7 +64,7 @@ int d = 0;
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
 {
@@ -142,7 +142,7 @@ size_t d = data.size();
    ucs.reverse();
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Format_sub::map_field(int type)
 {
@@ -181,7 +181,7 @@ int flt_cnt = 0;
 
    return flt_cnt;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Format_sub::print(ostream & out) const
 {
@@ -190,7 +190,7 @@ Format_sub::print(ostream & out) const
    loop(d, 32)   if (flt_mask & (1 << d))   out << char('0' + d);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
    : exponent_char(UNI_E),
      expo_negative(false)
@@ -336,7 +336,7 @@ fields_done:
      exponent.map_field(2);
    }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_example(APL_Float value)
 {
@@ -366,7 +366,7 @@ const UCS_string right = format_right_side(data_fract, value < 0.0, data_expo);
 
    return left + right;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_FORMAT::Format_LIFER::fill_data_fields(APL_Float value,
                 UCS_string & data_int, UCS_string & data_fract,
@@ -478,7 +478,7 @@ const int ilen = int_end - &data_buf[0];
              << "    data_expo:  '" << data_expo << "'"  << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_left_side(const UCS_string data_int,
                                                bool negative, bool & overflow)
@@ -507,7 +507,7 @@ UCS_string ucs;
 
    return ucs << data;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_right_side(const UCS_string data_fract,
                                                 bool negative,
@@ -572,7 +572,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_FORMAT::format_by_specification(Value_P A, Value_P B)
 {
@@ -668,7 +668,7 @@ Value_P Z(shape_Z, LOC);
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Bif_F12_FORMAT::is_control_char(Unicode uni)
 {
@@ -676,7 +676,7 @@ Bif_F12_FORMAT::is_control_char(Unicode uni)
           (uni == UNI_COMMA) ||
           (uni == UNI_FULLSTOP);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_FORMAT::monadic_format(Value_P B)
 {
@@ -709,7 +709,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_FORMAT::eval_B(Value_P B) const
 {
@@ -846,7 +846,7 @@ Shape sZ;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B) const
 {
@@ -868,7 +868,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_F12_FORMAT::format_by_example(Value_P A, Value_P B)
 {
@@ -971,7 +971,7 @@ Value_P Z(shape_Z, LOC);
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
                                    UCS_string_vector & col_formats)
@@ -1019,7 +1019,7 @@ UCS_string current_format;
         col_formats.push_back(current_format);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer
 Bif_F12_FORMAT::format_one_col_by_spec(int width, int precision,
                                        const Cell * cB, ShapeItem cols,
@@ -1166,7 +1166,7 @@ bool has_complex = false;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
                         bool has_num, Unicode align_char, UCS_string & data)
@@ -1194,7 +1194,7 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
         ret.append_ucs(data);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_FORMAT::format_float_by_spec(APL_Float value, int precision)
 {
@@ -1229,10 +1229,10 @@ UCS_string ret = UCS_string::from_double_to_fixed(value, precision);
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator <<(ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

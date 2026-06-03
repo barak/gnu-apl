@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /*!
     A cell containing a single Unicode (most likely an APL character)
  */
@@ -128,6 +128,6 @@ protected:
    /// @param A left operand cell
    virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __CHARCELL_HH_DEFINED__

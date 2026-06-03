@@ -28,7 +28,7 @@
 #include "Common.hh"
 #include "Command.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
@@ -134,7 +134,7 @@ const bool query = args.size() &&
 
    out << right;   // restore the default
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DIR *
 Cmd_LIB::open_LIB_dir(UTF8_string & path, ostream & out,
                       const UCS_string_vector & args)
@@ -197,7 +197,7 @@ const char * why = strerror(errno);
                 << "Reason: " << why;
    return 0;   // error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_LIB::is_directory(const dirent * entry, const UTF8_string & path)
 {
@@ -214,7 +214,7 @@ DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
    return dir != 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_common(ostream & out, const UCS_string_vector & cmd_args, bool dbg)
 {
@@ -354,7 +354,7 @@ UCS_string_vector directories;
    if (sort)   LIB_print_sorted(out, path, directories, files, sort);
    else        LIB_print_flat(out, path, directories, files);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_print_flat(ostream & out, const UTF8_string lib_path,
                      const UCS_string_vector & directories,
@@ -412,7 +412,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_print_sorted(ostream & out, const UTF8_string lib_path,
                           const UCS_string_vector & directories,
@@ -486,7 +486,7 @@ vector<bool> appended;         // appended[f] is true if file[f] was appended
          else FIXME;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Cmd_LIB::sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
                        const UCS_string & wsid)
@@ -511,7 +511,7 @@ UTF8_string name(lib_path);   // e.g. /home/workspaces
 
    return 0;   // invalid
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
@@ -528,7 +528,7 @@ Cmd_LIB::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 
    LIB_common(out, args, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
@@ -548,4 +548,4 @@ Cmd_LIB::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 
    LIB_common(out, args, true);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

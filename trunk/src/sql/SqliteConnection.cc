@@ -45,46 +45,46 @@ SqliteConnection::~SqliteConnection()
         raise_sqlite_error( "Error closing database" );
     }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ArgListBuilder *
 SqliteConnection::make_prepared_query(const string & sql)
 {
 SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
    return builder;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ArgListBuilder *
 SqliteConnection::make_prepared_update(const string & sql)
 {
     SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
     return builder;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::run_simple(const string & sql)
 {
 SqliteArgListBuilder builder(this, sql);
    builder.run_query();
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::transaction_begin()
 {
   run_simple("begin");
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::transaction_commit()
 {
   run_simple("commit");
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::transaction_rollback()
 {
   run_simple("rollback");
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::fill_tables(vector<string> & tables)
 {
@@ -116,7 +116,7 @@ SqliteStmtWrapper statement_wrapper(statement);
                           (sqlite3_column_text(statement, 0)));
        }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SqliteConnection::fill_cols(const string &table,
                             vector<ColumnDescriptor> & cols)

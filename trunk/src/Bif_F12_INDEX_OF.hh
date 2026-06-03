@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** System function index of (⍳) */
 /// The class implementing ⍳
 class Bif_F12_INDEX_OF : public NonscalarFunction
@@ -78,7 +78,7 @@ protected:
                                        const vector<ShapeItem> & Idx_A,
                                        const Cell & cell_B, double qct);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __Bif_F12_INDEX_OF_HH_DEFINED__
 

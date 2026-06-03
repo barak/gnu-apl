@@ -27,7 +27,7 @@
 #ifndef __UCS_STRING_VECTOR_HH_DEFINED__
 #  define __UCS_STRING_VECTOR_HH_DEFINED__
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a vector of UCS_strings.
 class UCS_string_vector : public std::vector<UCS_string>
 {
@@ -106,6 +106,6 @@ private:
         std::vector<UCS_string>::iterator position,
         const UCS_string & value);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __UCS_STRING_VECTOR_HH_DEFINED__

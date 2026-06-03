@@ -56,7 +56,7 @@ const FunctionGroup::function_info Quad_FFT::subfunction_infos[] =
   fftdef( 15,fft_flat_top          ,"Z is FFT with flat-top window"           )
 };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_FFT::Quad_FFT()
       : QuadFunction(TOK_Quad_FFT)
 {
@@ -65,13 +65,13 @@ enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
 
    system_wisdom_loaded = false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
   return do_eval_AorX_B(*A, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
@@ -80,13 +80,13 @@ Quad_FFT::eval_B(Value_P B) const
    if (B->is_zilde())        return list_mappings(CERR);
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::eval_XB(Value_P X, Value_P B) const
 {
   return do_eval_AorX_B(*X, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FFT::print_fun_syntax(ostream & out,
                            const function_info & info) const
@@ -99,7 +99,7 @@ const sRank axis = info.axis;
    else                  out << " "  <<   axis;
    out<< " ⎕FFT B   ⍝ " << info.comment_fun << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FFT::print_map_syntax(ostream & out,
                            const function_info & info) const
@@ -111,7 +111,7 @@ const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
    out << "    " << NN << " ⎕FFT  ←→  ⎕FFT['" << name << "']"
        << blanks << "  ←→  ⎕FFT." << name << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Value_P B) const
 {
@@ -138,7 +138,7 @@ const sAxis subfunction = value_to_subfun(A_or_X);
 
    bad_subfun_number_ERROR(subfunction);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::do_fft(int dir, Value_P B, window_function win)
 {
@@ -237,7 +237,7 @@ const double norm = sqrt(N);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::do_window(Value_P B, window_function win)
 {
@@ -284,7 +284,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
 {
@@ -307,9 +307,9 @@ ShapeItem rlen = 1;
          rlen *= axis_len;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FFT::init_in(void * _in, Value_P B, window_function win)
 {
@@ -355,19 +355,19 @@ const APL_Integer N = B->element_count();
 }
 #else   // not apl_FFT
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_FFT::Quad_FFT()
    : QuadFunction(TOK_Quad_FFT)
 {
    system_wisdom_loaded = false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 Token Quad_FFT::eval_AB(Value_P A, Value_P B) const 
 {
    return eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
@@ -378,7 +378,7 @@ const char * pkgs[] = { "libfftw3-dev", 0 };
    return missing_files("⎕FFT", libs, hdrs, pkgs);
 }
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 Token Quad_FFT::eval_XB(Value_P A, Value_P B) const 
 {
@@ -388,7 +388,7 @@ void
 Quad_FFT::print_fun_syntax(ostream & out, const function_info & info) const
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
 {

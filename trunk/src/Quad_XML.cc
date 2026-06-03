@@ -34,7 +34,7 @@
 
 Quad_XML  Quad_XML::fun;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
                    ShapeItem spos, ShapeItem slen)
   : src(string_B),
@@ -191,11 +191,11 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
 
    Assert(node_type != NT_error);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 XML_node::~XML_node()
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 XML_node::get_tagname() const
 {
@@ -231,7 +231,7 @@ UCS_string ret;
    ret << UCS_string(src, start, end - start);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_node::print(ostream & out) const
 {
@@ -240,7 +240,7 @@ XML_node::print(ostream & out) const
 const UCS_string item(src, src_pos, src_len);
    out << get_node_type_name() << "[" << level << "] '" << item << "'" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::parse_tag()
 {
@@ -318,7 +318,7 @@ size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_node::print_all(ostream & out, const XML_node & anchor)
 {
@@ -327,7 +327,7 @@ XML_node::print_all(ostream & out, const XML_node & anchor)
           x->print(CERR);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 XML_node::get_node_type_name() const
 {
@@ -345,7 +345,7 @@ XML_node::get_node_type_name() const
 
    return "--???";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::translate(XML_node & anchor, XML_node & garbage)
 {
@@ -393,7 +393,7 @@ int level = 0;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::collect(XML_node & anchor, XML_node & garbage, Value * Z)
 {
@@ -528,7 +528,7 @@ vector<size_t> pos_stack;   // a stack of node positions
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 XML_node::add_member(Value * Z, Unicode first, const char * cp_member_name,
                      int number, Value * member_value)
@@ -539,7 +539,7 @@ UCS_string member_name(first);
    member_name << cp_member_name;
    Z->add_member(member_name, member_value);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::merge_range(XML_node & start, XML_node & end, XML_node & garbage)
 {
@@ -600,7 +600,7 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::is_name_char(Unicode uni)
 {
@@ -613,7 +613,7 @@ XML_node::is_name_char(Unicode uni)
    if (uni >= 0x203F && uni <= 0x2040)   return true;
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::is_XML_char(Unicode uni)
 {
@@ -634,7 +634,7 @@ XML_node::is_XML_char(Unicode uni)
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const int first_ranges[] =
 {
      0xC0,    0xD6,
@@ -667,7 +667,7 @@ XML_node::is_first_name_char(Unicode uni)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 XML_node::get_taglen(const UCS_string & string_B, ShapeItem offset)
 {
@@ -727,7 +727,7 @@ UCS_string where(string_B, offset, len1);
    else            MORE_ERROR() << "No tag end found in: " << where;
    return -1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::normalize_attribute_value(UCS_string & attval)
 {
@@ -840,7 +840,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
    attval.resize(dest);
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 XML_node::denormalize_attribute_value(const UCS_string & attval, bool quoted)
 {
@@ -880,7 +880,7 @@ UCS_string ret;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 XML_node::matches(const XML_node * end_tag) const
 {
@@ -895,7 +895,7 @@ ShapeItem d = end_tag->src_pos + 2;
           if (uni != end_tag->src[d++])   return false;
        }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 Quad_XML::skip_pos_prefix(const UCS_string & ucs)
 {
@@ -906,7 +906,7 @@ UCS_string ret;
    while (pos < ucs.ssize())   ret << ucs[pos++];
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_XML::split_name(Unicode * category, ShapeItem * position,
                      UCS_string * name, const Value & value)
@@ -957,7 +957,7 @@ ShapeItem pos = 0;
    if (name)   { while (src < end)   (*name) << src++->get_char_value(); }
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
@@ -1057,7 +1057,7 @@ const int function_number = A->get_cfirst().get_int_value();
    MORE_ERROR() << "A ⎕XML B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::APL_to_XML(const Value & B)
 {
@@ -1079,7 +1079,7 @@ Value_P Z(len_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_XML::add_sorted_entities(vector<const UCS_string *> & entities,
                               const Value & B)
@@ -1184,7 +1184,7 @@ bool tag_open = false;
         entities.push_back(new UCS_string(start_tag));
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::XML_to_APL(const Value & B)
 {
@@ -1283,7 +1283,7 @@ cleanup:
    if (error)   DOMAIN_ERROR;
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_XML::eval_B(Value_P B) const
 {
@@ -1300,7 +1300,7 @@ Value_P Z = XML_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_XML::convert_file(const Value & B) const
 {
@@ -1360,7 +1360,7 @@ Value_P xml_document_value(xml_document_ucs, LOC);
 
    return eval_B(xml_document_value);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::path_split(const Value & B)
 {
@@ -1414,7 +1414,7 @@ ShapeItem from = 0;
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::name_split(const Value & B)
 {
@@ -1435,7 +1435,7 @@ Value_P Z3(name, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::name_unsplit(const Value & B)
 {
@@ -1478,7 +1478,7 @@ UCS_string UCS_Z;
 Value_P Z(UCS_Z, LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_XML::all_members(const Value & B, int flags)
 {
@@ -1503,7 +1503,7 @@ Value_P Z(result.size(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_XML::next_member(const Value & A, const Value & B)
 {
@@ -1607,7 +1607,7 @@ std::vector<ShapeItem> member_indices;
 
    return Token(TOK_APL_VALUE1, Str0(LOC));   // no next item: return ""
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_XML::tree(const Value & B, int flags)
 {
@@ -1624,7 +1624,7 @@ const UCS_string name_prefix;
 
    return Value_P(z, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix,
                const UCS_string & name_prefix, int flags)
@@ -1717,7 +1717,7 @@ std::vector<const Cell *>member_values;
       }
    prefix.pop_back();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_XML::all_members(UCS_string_vector & result, const Value & B,
                       const UCS_string & name_prefix, int flags)
@@ -1783,4 +1783,4 @@ std::vector<const Cell *>member_values;
         if (sub.is_structured())   all_members(result, sub, path, flags);
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

@@ -48,7 +48,7 @@ class UCS_string_vector;
 /// track construction and destruction of UCS_strings
 #define UCS_tracking 0
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A string of Unicode characters (32-bit)
 class UCS_string : public std::vector<Unicode>
 {
@@ -529,7 +529,7 @@ private:
    /// prevent accidental allocation
    void * operator new[](size_t size);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// an UCS_string that contains only ASCII characters,
 class UCS_ASCII_string : public UCS_string
 {
@@ -548,7 +548,7 @@ public:
    /// return \b tvt in a readable form (e.g. TV_NONE, TV_CHAR, ...).
    UCS_ASCII_string(TokenValueType tvt);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __UCS_STRING_HH_DEFINED__
 

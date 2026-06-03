@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The various Quad functions.  */
 /// Base class for all system functions
 class QuadFunction : public PrimitiveFunction
@@ -53,7 +53,7 @@ public:
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The system function ⎕AF (Atomic Function) */
 /// The class implementing ⎕AF
 class Quad_AF : public QuadFunction
@@ -70,7 +70,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The system function ⎕AT (Attributes) */
 /// The class implementing ⎕AT
 class Quad_AT : public QuadFunction
@@ -88,7 +88,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** The system function ⎕DL (Delay).  */
 /// The class implementing ⎕DL
 class Quad_DL : public QuadFunction
@@ -104,7 +104,7 @@ protected:
    /// @param B right argument APL value (delay in seconds)
    virtual Token eval_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕EA (Execute Alternate)
  */
@@ -126,7 +126,7 @@ protected:
    /// @param B right argument APL value (primary expression string)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕EB (Execute Both)
  */
@@ -148,7 +148,7 @@ protected:
    /// @param B right argument APL value (expression string)
    virtual Token eval_AB(Value_P A, Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕EC (Execute Controlled)
  */
@@ -177,7 +177,7 @@ protected:
    /// @param B right argument APL value (expression string)
    virtual Token eval_fill_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕ENV (ENvironment Variables)
  */
@@ -195,7 +195,7 @@ protected:
    /// @param B right argument APL value (variable name pattern)
    virtual Token eval_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕ES (Event Simulate).
  */
@@ -228,7 +228,7 @@ protected:
    /// @param B right argument APL value encoding the error code
    static ErrorCode get_error_code(Value_P B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕EX (Expunge).
  */
@@ -250,7 +250,7 @@ protected:
    /// @param B right argument APL value (name(s) to expunge)
    virtual Token eval_B(Value_P B) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕INP (input from script, aka. HERE document)
  */
@@ -319,7 +319,7 @@ protected:
    /// the line parts right of the escapes
    static UCS_string_vector suffixes;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕NA (Name Association).
  */
@@ -344,7 +344,7 @@ protected:
    virtual Token eval_B(Value_P B) const
       { TODO; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕NC (Name class).
  */
@@ -367,7 +367,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕NL (Name List).
  */
@@ -397,7 +397,7 @@ protected:
    /// @param B right argument APL value (name-class filter)
    static Token do_quad_NL(Value_P A, Value_P B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕SI (State Indicator)
  */
@@ -421,7 +421,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕UCS (Universal Character Set)
  */
@@ -440,7 +440,7 @@ public:
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Base class for ⎕STOP and ⎕TRACE
 class Stop_Trace : public QuadFunction
 {
@@ -467,7 +467,7 @@ protected:
    static Token reference(const std::vector<Function_Line> & lines,
                           bool assigned);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class implementing ⎕STOP
 class Quad_STOP : public Stop_Trace
 {
@@ -488,7 +488,7 @@ public:
 
    static Quad_STOP  fun;          ///< Built-in function.
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class implementing ⎕TRACE
 class Quad_TRACE : public Stop_Trace
 {
@@ -509,6 +509,6 @@ public:
 
    static Quad_TRACE  fun;          ///< Built-in function.
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __Quad_FUNCTION_HH_DEFINED__

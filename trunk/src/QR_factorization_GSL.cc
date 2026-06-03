@@ -33,7 +33,7 @@
 #include <gsl/gsl_linalg.h>
 #include "QR_factorization_GSL.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GSL::LQ_factorize(Value & Z, int M, int N, Value_P B, bool need_complex)
 {
@@ -74,7 +74,7 @@ Value_P Z2 = Bif_F12_TRANSPOSE::transpose(shape_Ri, RiT.get());   // BT←⍉B
   Z.next_ravel_Pointer(Z2.get());
   Z.check_value(LOC);
 }
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 GSL::LU_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB)
 {
@@ -121,7 +121,7 @@ Value_P Z2(M, min_MN, LOC);   // Z2 is L
   Z.next_ravel_Pointer(Z2.get());
   Z.check_value(LOC);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GSL::LU_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB)
 {
@@ -190,7 +190,7 @@ Value_P Z2(M, min_MN, LOC);   // Z2 is L
   Z.next_ravel_Pointer(Z2.get());
   Z.check_value(LOC);
 }
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 GSL::QL_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB)
 {
@@ -252,7 +252,7 @@ Value_P Z2(N, N, LOC);   // Z[2] is the inverse of L
   Z.next_ravel_Pointer(Z2.get());
   Z1->check_value(LOC);
 }
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 GSL::QR_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB)
 {
@@ -332,7 +332,7 @@ Value_P Z0(M, M, LOC);   // Z[0] is the orthogonal M×M matrix Q
   Z.next_ravel_Pointer(Z2.get());
   Z.check_value(LOC);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GSL::QR_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB)
 {
@@ -424,7 +424,7 @@ Value_P Z0(M, M, LOC);   // Z[0] is the orthogonal M×M matrix Q
   Z.next_ravel_Pointer(Z2.get());
   Z.check_value(LOC);
 }
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 GSL::RQ_factorize(Value & Z, int M, int N, Value_P B)
 {
@@ -469,8 +469,8 @@ GSL::GSL_error_handler(const char * reason, const char * file,
   MORE_ERROR() << "GSL error: " << reason << " in " << file;
   DOMAIN_ERROR;
 }
-//=============================================================================
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
+//════════════════════════════════════════════════════════════════════════════
 void
 GSL::set_GSL_error_handler()
 {
@@ -481,5 +481,5 @@ static bool GSL_handler_set = false;
        GSL_handler_set = true;
      }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // apl_GSL

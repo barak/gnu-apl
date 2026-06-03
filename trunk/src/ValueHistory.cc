@@ -34,7 +34,7 @@
 VH_entry VH_entry::history[VALUEHISTORY_SIZE + 1];
 int VH_entry::idx = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
                    const char * _loc)
   : event(_ev),
@@ -45,14 +45,14 @@ VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
    testcase_file = InputFile::current_filename();
    testcase_line = InputFile::current_line_no();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 VH_entry::init()
 {
 void * h = history;
    memset(h, 0, sizeof(history));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// add event \b ev with event argumant \b ia to the history of \b val
 void
 add_event(const Value * val, VH_event ev, int ia, const char * loc)
@@ -64,7 +64,7 @@ VH_entry * entry = VH_entry::history + VH_entry::idx++;
 
    new (entry) VH_entry(val, ev, ia, loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 VH_entry::print_history(ostream & out, const Value & val, const char * loc)
 {
@@ -120,7 +120,7 @@ const VH_entry * previous = 0;
       }
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return the letters of some \b flags set
 static UCS_string
 flags_name(ValueFlags flags)
@@ -135,7 +135,7 @@ UCS_string ret;
    while (ret.size() < 4)   ret << UNI_SPACE;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 VH_entry::print(int & flags, ostream & out, const Value & val,
                const VH_entry * previous) const
@@ -258,5 +258,5 @@ const ValueFlags flags_before = ValueFlags(flags);
 
    out << left << setw(30) << (loc ? loc : "<no-loc>") << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

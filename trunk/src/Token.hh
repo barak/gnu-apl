@@ -438,7 +438,7 @@ protected:
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline void
 Token::copy_N(const Token & src)
 {
@@ -461,7 +461,7 @@ Token::copy_N(const Token & src)
         default:       Q1(src.get_ValueType());   FIXME;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location
     of the first token and high is the high of the last token of the token
@@ -534,7 +534,7 @@ protected:
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// complain about missing ioptional functions, libraries, and/or packages
 /// needed by ⎕XXX function qfun.
 extern Token missing_files(const char * qfun,  const char ** libs,

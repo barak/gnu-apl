@@ -154,7 +154,7 @@ using namespace std;
 # include "Security.hh"
 # include "Workspace.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
@@ -163,7 +163,7 @@ Quad_PLOT::Quad_PLOT()
    __sem_init(expose_sema,           /* thread sema */ 0, /* value */ 0);
    verbosity = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_PLOT::Handle
 Quad_PLOT::PLOT_context::remove_handle(Handle handle)
 {
@@ -181,12 +181,12 @@ Quad_PLOT::PLOT_context::remove_handle(Handle handle)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_PLOT::~Quad_PLOT()
 {
    __sem_destroy(all_PLOT_windows_sema);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PLOT::start_GUI(Plot_window_properties * w_props, int handle,
                      Plot_driver driver_type)
@@ -252,7 +252,7 @@ const string driver_attr = w_props->get_gui_driver();
       CERR << "gui_driver: " << driver_attr.c_str() 
            << " (no driver needed)." << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 {
@@ -327,7 +327,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 const APL_Integer Z = do_plot_data(w_props, data);
    return Token(TOK_APL_VALUE2, IntScalar(Z, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_PLOT::eval_B(Value_P B) const
 {
@@ -371,7 +371,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 const APL_Integer Z = do_plot_data(w_props, data);
    return Token(TOK_APL_VALUE2, IntScalar(Z, LOC));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_PLOT::window_control(APL_Integer B0) const
 {
@@ -463,7 +463,7 @@ bool found = false;
 
    return IntScalar(found ? B0 : 0, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static UCS_string
 fill_14(const std::string & name)
 {
@@ -522,7 +522,7 @@ Quad_PLOT::help()
 
    CERR << right;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // the ⎕PLOT workhorse
 APL_Integer
 Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
@@ -568,7 +568,7 @@ const APL_Integer Z = ++next_handle;
 
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_data *
 Quad_PLOT::setup_data(const Value & B)
 {
@@ -592,7 +592,7 @@ const Value * pB = &B;
    if (!pB->get_cfirst().is_pointer_cell())   return setup_data_2D(*pB);
    return setup_data_2D_2b(*pB);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_data *
 Quad_PLOT::setup_data_3D(const Value & B)
 {
@@ -744,7 +744,7 @@ const ShapeItem data_points = rows * cols;
    data->surface = true;
    return data;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_data *
 Quad_PLOT::setup_data_2D(const Value & B)
 {
@@ -805,7 +805,7 @@ Plot_data * data = new Plot_data(rows_B);
 
    return data;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_data *
 Quad_PLOT::setup_data_2D_2b(const Value & B)
 {
@@ -876,7 +876,7 @@ Plot_data * data = new Plot_data(rows);
 
    return data;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ErrorCode
 Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
 {
@@ -942,4 +942,4 @@ const APL_Integer qio = Workspace::get_IO();
 
    return E_NO_ERROR;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

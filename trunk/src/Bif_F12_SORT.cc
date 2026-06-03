@@ -32,7 +32,7 @@
 Bif_F12_SORT_ASC  Bif_F12_SORT_ASC::fun;     // ⍋
 Bif_F12_SORT_DES  Bif_F12_SORT_DES::fun;     // ⍒
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** class CollatingCache is a helper that efficiently maps characters in
     vector B to an integer vector B1 (the significances of B) according to
     the collating sequence A.
@@ -92,7 +92,7 @@ UCS_string UA1 = UA.unique();
 CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
    push_back(others);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 CollatingCache::get_significance(Unicode uni) const
 {
@@ -105,7 +105,7 @@ const CollatingCacheEntry * entry =
    if (entry)   return entry - entries;
    return size() - 1;   // the entry for characters not in A
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 CollatingCache::greater_vec(const ShapeItem & Za, const ShapeItem & Zb,
                             const void * comp_arg)
@@ -127,7 +127,7 @@ const sRank rank = cache.get_rank();
 
    return significance_a > significance_b;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 CollatingCache::smaller_vec(const ShapeItem & Za, const ShapeItem & Zb,
                             const void * comp_arg)
@@ -149,7 +149,7 @@ const sRank rank = cache.get_rank();
 
    return significance_a < significance_b;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_SORT::sort(Value_P B, Sort_order order)
 {
@@ -171,7 +171,7 @@ const int qio = Workspace::get_IO();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_SORT::sort_collating(Value_P A, Value_P B, Sort_order order)
 {
@@ -221,5 +221,5 @@ Value_P Z(len_BZ, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

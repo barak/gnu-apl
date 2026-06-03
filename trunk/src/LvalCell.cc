@@ -28,21 +28,21 @@
 #include "Value.hh"
 #include "ValueHistory.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 LvalCell::LvalCell(Cell * target, Value * target_owner)
 {
    value.lval = target;
    value.pval.owner = target_owner;
    check_consistency();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 LvalCell::LvalCell(const LvalCell & other)
 {
    value.lval = other.value.lval;
    value.pval.owner = other.value.pval.owner;
    // check_consistency();   supposedly not needed, since other should be OK.
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer
 LvalCell::character_representation(const PrintContext & pctx) const
 {
@@ -60,13 +60,13 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_r(Unicode('='), 1);
    return pb;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 LvalCell::get_lval_value()  const
 {
   return value.lval;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LvalCell::check_consistency() const
 {
@@ -86,11 +86,11 @@ LvalCell::check_consistency() const
      }
   else Assert(value.pval.owner == 0);   // no owner
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LvalCell::init_other(void * other, Value &, const char * loc) const
 {
    new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

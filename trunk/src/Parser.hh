@@ -32,7 +32,7 @@ class Executable;
      Functions related to parsing of input lines and defined functions.
  */
 
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** A small dictionary for literals and their markers. A marker is a substring
     of the form "@N@" in the program text, @b  N is a key in the \b Lit_DB,
     and \b value is the value of the multiline string or literal.
@@ -115,7 +115,7 @@ protected:
    ShapeItem    next_key;
 };
 
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A state machine for multiline strings and literals
 class Multi_line_SM
 {
@@ -155,7 +155,7 @@ protected:
    bool in_string;
    int literal_depth;
 };
-//===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A parser for APL code
 class Parser
 {

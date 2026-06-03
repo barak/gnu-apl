@@ -84,7 +84,7 @@ protected:
    /// where to send information messages (such as "SAVED...")
    ostream & out;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a helper class for saving an APL workspace
 class XML_Saving_Archive: public XML_Archive
 {
@@ -291,7 +291,7 @@ protected:
    /// all values in the workspace
    vector<_val_par> val_pars;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a helper class for loading an APL workspace
 class XML_Loading_Archive: public XML_Archive
 {
@@ -633,5 +633,5 @@ protected:
    /// the vids to be copied (empty if all)
    std::vector<Vid> vids_COPY;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

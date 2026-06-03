@@ -32,7 +32,7 @@ class NativeFunction;
 
 enum { SMALL_BUF = Quad_FIO::SMALL_BUF };
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 extern "C" void * get_function_mux(const char * function_name);
 static Fun_signature get_signature();
 static bool close_fun(Cause cause,          const NativeFunction * caller);
@@ -59,7 +59,7 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_AXB);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a mandatory function that returns the signature of the eval_XXX()
 /// function(s) provided by this library.
 ///
@@ -68,7 +68,7 @@ get_signature()
 {
    return SIG_Z_A_F2_B;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// an optional function that is called when the native function in the
 /// APL interpreter is about to be removed. Return true if the caller shall
 /// dlclose() this library
@@ -77,7 +77,7 @@ close_fun(Cause cause, const NativeFunction * caller)
 {
    return true;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static Token
 list_functions(ostream & out)
 {
@@ -171,7 +171,7 @@ list_functions(ostream & out)
 
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_B(Value_P B, const NativeFunction * caller)
 {
@@ -181,24 +181,24 @@ eval_B(Value_P B, const NativeFunction * caller)
 
    return Quad_FIO::fun.eval_B(B);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
    return Quad_FIO::fun.eval_AB(A, B);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
    return Quad_FIO::fun.eval_XB(X, B);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 eval_AXB(const Value_P A, const Value_P X, const Value_P B,
          const NativeFunction * caller)
 {
    return Quad_FIO::fun.eval_AXB(A, X, B);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

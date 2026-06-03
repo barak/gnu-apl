@@ -26,7 +26,7 @@
 
 Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::fun;    // ⍳
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
 Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B) const
@@ -102,7 +102,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_INDEX_OF::eval_B(Value_P B) const
 {
@@ -174,7 +174,7 @@ const sRank rank_Z = Z->get_rank();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A,
                          const void * ctx)
@@ -187,7 +187,7 @@ const Cell & cell_A = cells_A[A];
 const int ret = cell.compare(cell_A);
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 Bif_F12_INDEX_OF::find_B_in_sorted_A(const Value & A,
                                      const vector<ShapeItem> & Idx_A,
@@ -226,5 +226,5 @@ ShapeItem ret = pos;
 
    return ret;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

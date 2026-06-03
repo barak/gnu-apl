@@ -28,7 +28,7 @@
 #include "IntCell.hh"
 #include "RealCell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
  A cell containing a single APL floating point value.  This class overloads
  certain functions in class Cell with floating point number specific
@@ -403,6 +403,6 @@ protected:
    /// downcast to FloatCell
    virtual FloatCell & vFloatCell()   { return *this; }
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __FLOATCELL_HH_DEFINED__

@@ -33,7 +33,7 @@
 #include "Prefix.hh"
 #include "PrintOperator.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
     One entry of the state indicator (SI) of the APL interpreter.
     Compared to e.g.  C++, the state indicator is (one element of) the
@@ -252,6 +252,6 @@ protected:
    /// the StateIndicator that has called this one
    StateIndicator * const parent;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __STATE_INDICATOR_HH_DEFINED__

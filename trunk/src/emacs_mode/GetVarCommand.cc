@@ -74,7 +74,7 @@ void scalar_value_to_el( ostream &out, Value_P value )
 
 static void apl_value_to_el( ostream &out, Value_P value );
 
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static void
 output_onelevel(ostream &out, Value_P value, int level, int start, int end)
 {

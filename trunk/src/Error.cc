@@ -32,7 +32,7 @@
 
 #include "Workspace.icc"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Error::Error(ErrorCode ec, const char * loc)
    : error_code(ec),
      throw_loc(loc),
@@ -60,7 +60,7 @@ const bool have_more = Workspace::more_error().size();
    *symbol_name = 0;
    *error_message_2 = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Error::is_known() const
 {
@@ -73,7 +73,7 @@ Error::is_known() const
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Error::is_syntax_or_value_error() const
 {
@@ -81,7 +81,7 @@ Error::is_syntax_or_value_error() const
    if (error_major(error_code) == 3)   return true;   // VALUE ERROR
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::add_MORE_indicator(bool have_more)
 {
@@ -96,7 +96,7 @@ Error::add_MORE_indicator(bool have_more)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Error::get_error_line_3() const
 {
@@ -115,7 +115,7 @@ const int diff = right_caret - left_caret;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::print_em(ostream & out, const char * loc)
 {
@@ -134,7 +134,7 @@ Error::print_em(ostream & out, const char * loc)
    out << get_error_line_2() << endl
        << get_error_line_3() << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::print(ostream & out, const char * loc) const
 {
@@ -184,21 +184,21 @@ Error::print(ostream & out, const char * loc) const
                                                                   << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::set_error_line_1(const char * msg_1)
 {
    strncpy(error_message_1, msg_1, sizeof(error_message_1));
    error_message_1[sizeof(error_message_1) - 1] = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::set_error_line_2(const char * msg_2)
 {
    strncpy(error_message_2, msg_2, sizeof(error_message_2));
    error_message_2[sizeof(error_message_2) - 1] = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret)
 {
@@ -208,7 +208,7 @@ UTF8_string utf(ucs);
    left_caret = lcaret;
    right_caret = rcaret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::update_error_info(StateIndicator * si)
 {
@@ -284,7 +284,7 @@ out:
 
    print_em(UERR, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Error::error_name(ErrorCode err)
 {
@@ -299,7 +299,7 @@ Error::error_name(ErrorCode err)
 
    return "Unknown Error";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 throw_apl_error(ErrorCode code, const char * loc)
 {
@@ -333,7 +333,7 @@ Error error(code, loc);
 const Error & eref = error;
    throw eref;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
                           const char * loc)
@@ -360,7 +360,7 @@ UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
@@ -387,7 +387,7 @@ Error error(code, loc);
 const Error & eref = error;
    throw eref;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
 {
@@ -419,5 +419,5 @@ UTF8_string sym_name_utf(sym_name);
 const Error & eref = err;
    throw eref;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

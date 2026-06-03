@@ -51,7 +51,7 @@ Quad_SVS Quad_SVS::fun;
 
 APL_time_us Quad_SVE::timer_end = 0;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 // there is a different prog_name() function around (in APserver) so we
 // declare the one for the APL interpreter here
 const char *
@@ -60,12 +60,12 @@ prog_name()
    return "apl";
 }
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket get_TCP_for_key(SV_key key)
 {
    return Svar_DB::get_DB_tcp();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SVx::start_AP(AP_num ap)
 {
@@ -131,7 +131,7 @@ PipeReader reader(filename);
 
    usleep(100000);   // give new AP time to register with APserver
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
     return true iff \b filename is an executable file
  **/
@@ -144,7 +144,7 @@ const char * end = strchr(file_and_args, ' ');
 
    return access(filename.c_str(), X_OK) == 0;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_SVC::eval_AB(Value_P A, Value_P B) const
 {
@@ -206,7 +206,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SVC::eval_B(Value_P B) const
 {
@@ -237,13 +237,13 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_SVE::Quad_SVE()
    : NL_SystemVariable(ID_Quad_SVE)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SVE::assign(Value_P value, bool clone, const char * loc)
 {
@@ -268,7 +268,7 @@ const APL_time_us duration = 1000000 * value->get_cfirst().get_real_value();
    //
    timer_end = now() + duration;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVE::get_apl_value() const
 {
@@ -300,7 +300,7 @@ const APL_Float remaining = timer_end - now();
 
    return FloatScalar(0.000001 * remaining, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
  ** Offer variables in B to corresponding processors in A
  **/
@@ -385,7 +385,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
  ** Return degree of coupling for variables in B
  **/
@@ -426,7 +426,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Quad_SVO::share_one_variable(AP_num to_ap, const uint32_t * vname,
                              SV_Coupling & coupling)
@@ -479,7 +479,7 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
 
    return key;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_SVQ::eval_B(Value_P B) const
 {
@@ -503,7 +503,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVQ::get_processors()
 {
@@ -610,7 +610,7 @@ Value_P Z(sorted.size(), LOC);
    loop(z, sorted.size())   Z->next_ravel_Int(sorted[z]);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
@@ -656,7 +656,7 @@ int v = 0;
    Z->set_proto_Spc();   // prototype: character
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_SVR::eval_B(Value_P B) const
 {
@@ -686,7 +686,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_SVS::eval_B(Value_P B) const
 {
@@ -717,4 +717,4 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

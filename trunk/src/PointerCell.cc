@@ -27,7 +27,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
 {
    Assert(!sub_val->is_simple_scalar());
@@ -39,7 +39,7 @@ PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
 {
    // DO NOT: Assert(!sub_val->is_simple_scalar()); This is a special
@@ -55,7 +55,7 @@ PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer
 PointerCell::character_representation(const PrintContext & pctx) const
 {
@@ -194,7 +194,7 @@ PrintBuffer ret(*val, pctx, 0);
    ret.get_info().real_len = ret.get_column_count();
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Comp_result
 PointerCell::compare(const Cell & other) const
 {
@@ -236,7 +236,7 @@ const Cell * C2 = &v2->get_cfirst();
    //
    return COMP_EQ;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 PointerCell::equal(const Cell & other, double qct) const
 {
@@ -253,7 +253,7 @@ const ShapeItem count = A->nz_element_count();
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 PointerCell::get_pointer_value() const
 {
@@ -261,7 +261,7 @@ Value * vp = const_cast<Value *>(value.pval.valp.get());
 Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 PointerCell::greater(const Cell & other) const
 {
@@ -269,7 +269,7 @@ PointerCell::greater(const Cell & other) const
    if (compare(other) == COMP_LT)   return false;
    return this > &other;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PointerCell::init_other(void * other, Value & other_owner,
                             const char * loc) const
@@ -282,14 +282,14 @@ Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
    Assert(+sub);
    new (other) PointerCell(sub.get(), other_owner);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 PointerCell::is_member_anchor() const
 {
    return value.pval.valp.value_p &&
           value.pval.valp.value_p->is_member();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PointerCell::isolate_deep(const char * loc)
 {
@@ -305,7 +305,7 @@ Value * val = value.pval.valp.get();
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PointerCell::release(const char * loc)
 {
@@ -325,17 +325,17 @@ PointerCell::release(const char * loc)
    //
    IntCell::z0(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 PointerCell::deep_cell_subtypes() const
 {
    return CellType(CT_POINTER | get_pointer_value()->deep_cell_subtypes());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 CellType
 PointerCell::deep_cell_types() const
 {
    return CellType(CT_POINTER | get_pointer_value()->deep_cell_types());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

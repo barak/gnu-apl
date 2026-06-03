@@ -28,18 +28,18 @@
 #ifndef __APL_ENUMS_HH_DEFINED__
 #define __APL_ENUMS_HH_DEFINED__
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// supposedly the longest possible filename
 enum
 {
   APL_PATH_MAX = 4096
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 enum
 {
    MAX_RANK = cfg_MAX_RANK_WANTED
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Auxiliary processor numbers
 enum AP_num
 {
@@ -49,7 +49,7 @@ enum AP_num
   AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
   AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the state of an assignment
 enum Assign_state
 {
@@ -58,7 +58,7 @@ enum Assign_state
    ASS_var_seen   = 2,   ///< var and ← seen
    ASS_unknown    = 3,   ///< not known (too much effort to figure it)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The bits in an uint32_t
 enum Bitmask
 {
@@ -95,7 +95,7 @@ enum Bitmask
    BIT_30 = 1 << 30,   ///<< dito.
    BIT_31 = 1 << 31    ///<< dito.
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the cause for something
 enum Cause
 {
@@ -103,7 +103,7 @@ enum Cause
    CAUSE_SHUTDOWN = 1,
    CAUSE_ERASED   = 2,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the CDR data types
 enum CDR_type
 {
@@ -116,7 +116,7 @@ enum CDR_type
    CDR_PROG64  = 6,   ///< 2*32 bit progression vector
    CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The possible cell types (in the ravel of an APL value)
 enum CellType
 {
@@ -149,7 +149,7 @@ enum CellType
    CTS_U64    = 0x1000000,   ///< unsigned           64-bit integer
    CTS_MASK   = 0x1FFF000,   ///< 
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// flags of a line to be printed. These flags extend CellType
 enum Col_flags
 {
@@ -157,7 +157,7 @@ enum Col_flags
    real_has_E    = 0x0200,   // real part scaled (exponential format)
    imag_has_E    = 0x0400,   // imag part scaled (exponential format)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the result of a comparison cell_1.compare(cell_2)
 enum Comp_result
 {
@@ -165,7 +165,7 @@ enum Comp_result
   COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
   COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of cores/tasks to be used
 enum CoreCount
 {
@@ -173,7 +173,7 @@ enum CoreCount
   CCNT_0       = 0,    ///<< no core
   CCNT_1       = 1,    ///< one core ...
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the cores/tasks to be used
 enum CoreNumber
 {
@@ -181,19 +181,19 @@ enum CoreNumber
   CNUM_MASTER  = 0,   ///< the interpreter core
   CNUM_WORKER1 = 1,   ///< the first worker core ...
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the CPUs reported by the OS
 enum CPU_Number
 {
    CPU_0 = 0   ///< the first (only) CPU
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of CPUs available
 enum CPU_count
 {
    CPU_CNT_1 = 1   ///< one CPU
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the line number of an APL function line (0 being the line to
 /// return from the function).
 enum Function_Line
@@ -223,7 +223,7 @@ const Function_Line before_increment = fl;
    fl = Function_Line(fl + 1);
    return before_increment;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// an offset into the body of a user-defined function. If we consider the APL
 /// interpreter as a high-level machine that executes token in user defined
 /// functions then this offset is the "program counter" of the high-level
@@ -234,7 +234,7 @@ enum Function_PC
    Function_PC_done    = -1,   ///< goto 0 (leave function)
    Function_PC_invalid = -1    ///< dito
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// signature of a defined function
 enum Fun_signature
 {
@@ -299,13 +299,13 @@ enum Fun_signature
    SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
    SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// (unnamed) lambda number
 enum Lambda_number
 {
    LAMBDA_NUM_0 = 0   // first (or named) lambda
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ///  What to list, used by )SYMBOLS, )VARS, and )FUNS.
 enum ListCategory
 {
@@ -322,14 +322,14 @@ enum ListCategory
                | LIST_OPERS,
   LIST_ALL     = 0xFFFFFFFF   ///< list everything
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // whether ⎕LX shall be executed at the end of the file
 enum LX_mode
 {
    no_LX = 0,     ///< no
    do_LX = 1      ///< yes
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the status of a function line
 enum Multiline_status
 {
@@ -339,7 +339,7 @@ enum Multiline_status
    MLS_Inside_multi    = 3,   ///< start of a nulti-line string or literal
    MLS_End_of_multi    = 4   ///< end of a nulti-line string or literal 
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ///  What is being parsed (defined function, immediate execution statements,
 /// or ⍎expr)
 enum ParseMode
@@ -348,7 +348,7 @@ enum ParseMode
    PM_STATEMENT_LIST = 1,   ///< immediate execution
    PM_EXECUTE        = 2,   ///< execute (⍎)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Different ways of printing APL values.
 enum PrintStyle
 {
@@ -460,7 +460,7 @@ enum PrintStyle
                      | PR_BOXED_GRAPHIC2
                      | PST_NARS,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {
@@ -474,21 +474,21 @@ enum SI_mode
    SIM_SI_dbg     = SIM_debug,
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 enum Silence
 {
   FULL_BANNER  = 0,
   BRIEF_BANNER = 1,
   NO_BANNER    = 2,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the order of a comparison
 enum Sort_order
 {
    SORT_DESCENDING = 0,   ///< sort descending
    SORT_ASCENDING  = 1,   ///< sort asscending
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// events for a symbol
 enum Symbol_Event
 {
@@ -498,7 +498,7 @@ enum Symbol_Event
    SEV_ASSIGNED = 4,
    SEV_ERASED   = 5,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 enum TimeScale
 {
   SECONDS_PER_MINUTE  =     60 * 1,                      ///<         60
@@ -509,7 +509,7 @@ enum TimeScale
   SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
   SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// possible properties of a Value.
 enum ValueFlags
 {
@@ -525,7 +525,7 @@ enum ValueFlags
 /// @param flags  value flags bitmask to display
 extern ostream & print_flags(ostream & out, ValueFlags flags);
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// events for APL values
 enum VH_event
 {
@@ -551,13 +551,13 @@ enum VH_event
   VHE_Stale,       ///< stale value erased
   VHE_Visit,       ///< test point
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of TOK_VOID removed from the body of an \b Executable
 enum VoidCount
 {
   NO_VOID_TOKEN_REMOVED = 0
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __APL_ENUMS_HH_DEFINED__
 

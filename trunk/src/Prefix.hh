@@ -37,7 +37,7 @@ class Token_string;
 /// the max. number of token in one reduction
 enum { MAX_REDUCTION_LEN = 4 };   // == MAX_PHRASE_LEN in Prefix.def
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// how to continue after return from a reduce_XXX() function
 enum R_action
 {
@@ -68,7 +68,7 @@ enum R_action
    /// internal error: action was not set by some reduce_XXX() function
    RA_FIXME  = 4,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a class for reducing all statements of an Executable
 class Prefix
 {
@@ -475,6 +475,6 @@ protected:
    /// a generator for unique identifiers
    static uint64_t instance_counter;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __PREFIX_HH_DEFINED__

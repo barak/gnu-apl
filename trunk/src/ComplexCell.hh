@@ -27,7 +27,7 @@
 #include "NumericCell.hh"
 #include "IntCell.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
  A cell containing a single APL complex value. This class essentially
  overloads certain functions in class Cell with complex number specific
@@ -316,6 +316,6 @@ protected:
    virtual int CDR_size() const
       { return 16; }
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __COMPLEXCELL_HH_DEFINED__

@@ -27,7 +27,7 @@
 
 class Unicode_source;   // Tokenizer.hh
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** one term aₖXᵐYⁿ... of a polynomial. The indeterminats powers are
     represented by a Shape, and the coefficient by a type T. The rank
     of the shape is the number of indeterminants.
@@ -245,7 +245,7 @@ protected:
 public:
    vector<int> expos;   ///< the (powers of) the indeterminants
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 class Polynomial : public vector<Monomial>
 {
 public:
@@ -356,6 +356,6 @@ public:
    /// return \b this polynomial as an APL value
    Value_P to_value() const;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 

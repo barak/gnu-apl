@@ -76,7 +76,7 @@ ShapeItem Command::APL_expression_count = 0;
 
 UCS_string_vector Command::copy_once_table;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::clear_copy_once_table()
 {
@@ -86,7 +86,7 @@ Command::clear_copy_once_table()
         CERR << ")COPY_ONCE table cleared (" << count << " entries)" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
@@ -231,7 +231,7 @@ bool show_OK = true;   // assume more verbose output
    //
    Value::check_all_Cells(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_OFF(int exit_val)
 {
@@ -265,7 +265,7 @@ rlimit rl;
 
    exit(exit_val);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
@@ -325,7 +325,7 @@ UCS_string_vector args = split_arg(arg);
      out << "BAD COMMAND" << endl;
      return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::do_APL_expression(const UCS_string & line, Value_P literal)
 {
@@ -415,7 +415,7 @@ Executable * statements = 0;
    Workspace::push_SI(statements, LOC);
    finish_context();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::finish_context()
 {
@@ -646,7 +646,7 @@ check_EOC:
    //
    Workspace::pop_SI(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::is_lib_ref(const UCS_string & lib)
 {
@@ -666,7 +666,7 @@ Command::is_lib_ref(const UCS_string & lib)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::parse_from_to(UCS_string & from, UCS_string & to,
                        const UCS_string & user_arg)
@@ -727,7 +727,7 @@ bool got_minus = false;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::process_line(UCS_string & line, ostream * out)
 {
@@ -772,7 +772,7 @@ Command::process_line(UCS_string & line, ostream * out)
 
    do_APL_expression(line, Value_P());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::process_lines()
 {
@@ -892,7 +892,7 @@ const UCS_string suffix(line, multi_pos + 3);
         process_line(content[0], 0);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_BOXING(ostream & out, const UCS_string & arg)
 {
@@ -930,7 +930,7 @@ int format = arg.atoi();
       "  Valid parameters are OFF, N, and -N with\n"
       "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::check_name_conflict(ostream & out, const UCS_string & cnew,
                              const UCS_string cold)
@@ -953,7 +953,7 @@ int len = cnew.size();
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::check_params(ostream & out, const char * command, int argc,
                       const char * args)
@@ -1029,7 +1029,7 @@ UCS_string args_ucs(args_utf);
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::check_redefinition(ostream & out, const UCS_string & cnew,
                             const UCS_string fnew, const int mnew)
@@ -1055,13 +1055,13 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_CLEAR(ostream & out)
 {
    Workspace::clear_WS(out, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_CONTINUE(ostream & out)
 {
@@ -1071,7 +1071,7 @@ const LibRef_name lib_name(wsname, false);
    Workspace::save_WS(out, lib_name, true);           // )SAVE
    cmd_OFF(0);                                        // )OFF
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -1100,7 +1100,7 @@ UCS_string wsname = args.front();
    LibRef_name lib_name(libref, wsname);
    Workspace::copy_WS(out, CERR, lib_name, args, protection);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
 {
@@ -1173,7 +1173,7 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
    LibRef_name lib_name(libref, wsname);
    Workspace::copy_WS(out, CERR, lib_name, args, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_DOXY(ostream & out, const UCS_string_vector & args)
 {
@@ -1200,7 +1200,7 @@ UTF8_string root("/tmp");
    catch (std::bad_alloc &) { WS_FULL; }
    catch (...)              { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
@@ -1228,7 +1228,7 @@ const int result = unlink(filename.c_str());
         Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
@@ -1268,25 +1268,25 @@ LibRef_name wsid  = Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::dump_WS(out, wsid, html, silent);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_ERASE(ostream & out, const UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_EXPECT(ostream & out, const UCS_string & arg)
 {
    IO_Files::expect_apl_errors(arg);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_FNS(ostream & out, const UCS_string & arg)
 {
    Workspace::list(out, LIST_FUNS, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// return the length differece between a UCS_string and its UTF8 encoding
 static inline int
@@ -1296,7 +1296,7 @@ int ret = 0;
    while (const char cc = *txt++)   if ((cc & 0xC0) == 0x80)   ++ret;
    return ret;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 {
@@ -1494,7 +1494,7 @@ bool left_col = true;
    left_col = !left_col;
 #include "SystemVariable.def"
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
@@ -1509,7 +1509,7 @@ Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
         LineInput::print_history(out, no_filter);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_HOST(ostream & out, const UCS_string & arg)
 {
@@ -1546,7 +1546,7 @@ const int result = reader.close();
 
    out << endl << result << ' ' << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_LOAD(ostream & out, const UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
@@ -1577,7 +1577,7 @@ const LibRef_name lib_name(out, args, false);
    catch (...)
       { FIXME; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_LOG(ostream & out, const UCS_string & arg)
 {
@@ -1603,7 +1603,7 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
 {
@@ -1651,7 +1651,7 @@ Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
    out << Workspace::more_error() << endl;
    return;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
 {
@@ -1682,19 +1682,19 @@ Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
 
    IO_Files::next_file();
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_NMS(ostream & out, const UCS_string & arg)
 {
    Workspace::list(out, LIST_NAMES, arg);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_OPS(ostream & out, const UCS_string & arg)
 {
    Workspace::list(out, LIST_OPERS, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
 {
@@ -1713,7 +1713,7 @@ int ulen;
    out << endl;
 #include "Performance.def"
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
@@ -1738,13 +1738,13 @@ FileWriter writer(filename.c_str());
 
    Workspace::write_OUT(writer.get_FILE(), args);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_OWNERS(ostream & out)
 {
    Value::list_all(out, true);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 {
@@ -1796,7 +1796,7 @@ Pfstat_ID iarg = PFS_ALL;
 
    Performance::print(iarg, out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_PUSHFILE()
 {
@@ -1811,7 +1811,7 @@ InputFile fam("stdin", stdin, false, true, true, no_LX);
    fam.set_pushed_IE();
    InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 {
@@ -1847,51 +1847,51 @@ LibRef_name wsid =  Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::save_WS(out, wsid, true);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SI(ostream & out, bool dbg)
 {
    if (dbg)   Workspace::list_SI(out, SIM_SI_dbg);
    else       Workspace::list_SI(out, SIM_SI);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SIC(ostream & out)
 {
    Workspace::clear_SI(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SINL(ostream & out)
 {
    Workspace::list_SI(out, SIM_SINL);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SIS(ostream & out, bool dbg)
 {
    if (dbg)   Workspace::list_SI(out, SIM_SIS_dbg);
    else       Workspace::list_SI(out, SIM_SIS);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SVARS(ostream & out)
 {
    Svar_DB::print(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SYMBOL(ostream & out, const UCS_string & arg)
 {
    Workspace::get_symbol_table().list_symbol(out, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_SYMBOLS(ostream & out, const UCS_string & arg)
 {
    Workspace::list(out, LIST_NONE, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                      UCS_string_vector & args)
@@ -2096,19 +2096,19 @@ bool inserted = false;
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_VALUES(ostream & out)
 {
    Value::list_all(out, false);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_VARS(ostream & out, const UCS_string & arg)
 {
    Workspace::list(out, LIST_VARS, arg);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_WSID(ostream & out, const UCS_string_vector & args)
 {
@@ -2133,7 +2133,7 @@ UCS_string arg;   // ""
       }
    Workspace::wsid(out, arg, lib, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::cmd_XTERM(ostream & out, const UCS_string & arg)
 {
@@ -2158,7 +2158,7 @@ const char * term = getenv("TERM");
         return;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
@@ -2187,7 +2187,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
    apl_cmd << Workspace::get_user_commands()[uidx].apl_function << UNI_SPACE;
    apl_cmd.append_single_quoted(line);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::have_capability(const UCS_string & capa)
 {
@@ -2211,7 +2211,7 @@ const int len = capa.size();
    CERR << "]NEXTFILE: Unknown capability '" << capa << "'" << endl;
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #ifdef cfg_DYNAMIC_LOG_WANTED
 void
 Command::log_control(const UCS_string & arg)
@@ -2272,7 +2272,7 @@ OOT action = Toggle;
        }
 }
 #endif
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Command::primitive_help(ostream & out, const char * arg, int arity,
                         const char * prim,  const char * name,
@@ -2320,7 +2320,7 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
 
    if (descr)   out << descr << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
@@ -2336,4 +2336,4 @@ UCS_string_vector result;
         result.push_back(token_ucs);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

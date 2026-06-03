@@ -33,7 +33,7 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LineLabel::print(ostream & out) const
 {
@@ -45,7 +45,7 @@ UCS_string ucs;
    while (ucs.size() < 5)   ucs << UNI_SPACE;
    out << ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 LineLabel::print_prompt(int min_size) const
 {
@@ -62,20 +62,20 @@ UCS_string ret;
    while (ret.ssize() < min_size)   ret << UNI_SPACE;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 LineLabel::operator ==(const LineLabel & other) const
 {
    return (ln_major == other.ln_major) && (ln_minor == other.ln_minor);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 LineLabel::operator <(const LineLabel & other) const
 {
    if (ln_major != other.ln_major)   return ln_major < other.ln_major;
  return  ln_minor.compare(other.ln_minor) < 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LineLabel::next()
 {
@@ -91,27 +91,27 @@ const Unicode cc = ln_minor[ln_minor.size() - 1];
    if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
    else                     ln_minor << UNI_1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LineLabel::insert()
 {
    ln_minor << UNI_1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator <<(ostream & out, const LineLabel & lab)
 {
    lab.print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Nabla::edit_function(const UCS_string & cmd)
 {
 Nabla nabla(cmd);
    nabla.edit();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Nabla::get_label_and_text(int line, bool & is_current) const
 {
@@ -119,7 +119,7 @@ const FunLine & fl = lines[line];
    is_current = fl.label == current_line;
    return fl.get_label_and_text();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Nabla::Nabla(const UCS_string & cmd)
    : defn_line_no(InputFile::current_line_no()),
      fun_symbol(0),
@@ -135,7 +135,7 @@ Nabla::Nabla(const UCS_string & cmd)
 {
    Workspace::more_error().clear();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Nabla::throw_edit_error(const char * why)
 {
@@ -151,7 +151,7 @@ UCS_string command = first_command;
 
    Error::throw_define_error(fun_header, first_command, why);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Nabla::edit()
 {
@@ -207,9 +207,18 @@ try_again:
               continue;
             }
 
-         if (const char * loc = execute_oper())
+         try
             {
-              UERR << "∇-command failed: " << loc << endl;
+              if (const char * loc = execute_oper())
+                 {
+                   UERR << "∇-command failed: " << loc << endl;
+                   Output::set_color_mode(Output::COLM_INPUT);
+                 }
+            }
+         catch (Error & err)
+            {
+              if (InputFile::running_script())   throw;
+              if (!err.get_print_loc())   err.print_em(COUT, LOC);
               Output::set_color_mode(Output::COLM_INPUT);
             }
        }
@@ -347,7 +356,7 @@ std::vector<Function_Line> trace_vec;
    ufun->optimize_label_vectors();
    ufun->compute_if_else_targets();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Nabla::FunLine::print(ostream & out) const
 {
@@ -358,14 +367,14 @@ Nabla::FunLine::print(ostream & out) const
    if (!text.is_comment_or_label())   out << " ";
    out << text << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Nabla::FunLine::get_label_and_text() const
 {
 UCS_string ret = label.print_prompt(6);
    return ret << text;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::start()
 {
@@ -583,7 +592,7 @@ bool hdr_has_vars;
 
    return 0;   // no error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::parse_oper(UCS_string & oper, bool initial)
 {
@@ -783,7 +792,7 @@ again:
 
    return 0;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::execute_oper()
 {
@@ -814,7 +823,7 @@ const bool have_to = edit_to.ln_major != -1;
 
    return LOC;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::execute_show()
 {
@@ -865,7 +874,7 @@ const LineLabel user_edit_to = edit_to;
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::execute_delete()
 {
@@ -892,7 +901,7 @@ const int idx_from = find_line(LineLabel(edit_from));
    current_line = lines.back().label;
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::execute_edit()
 {
@@ -917,7 +926,7 @@ Nabla::execute_edit()
    if (current_line.is_header_line_number())   return edit_header_line();
    else                                        return edit_body_line();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::edit_header_line()
 {
@@ -961,7 +970,7 @@ const UCS_string & new_name = header.get_name();
    current_line.next();
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::edit_body_line()
 {
@@ -1059,7 +1068,7 @@ const int idx_from = find_line(edit_from);
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::execute_escape()
 {
@@ -1092,7 +1101,7 @@ Nabla::execute_escape()
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::open_new_function()
 {
@@ -1111,7 +1120,7 @@ Nabla::open_new_function()
    lines.push_back(FunLine(0, fun_header));
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Nabla::open_existing_function(const UCS_string & name)
 {
@@ -1184,7 +1193,7 @@ UCS_string_vector tlines;
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Nabla::is_axis(const UCS_string & ucs)
 {
@@ -1201,7 +1210,7 @@ UCS_string::iterator c(ucs);
    c.skip_white();
    return c.has_more() && c.lookup() == UNI_R_BRACK;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 LineLabel
 Nabla::parse_lineno(UCS_string::iterator & c)
 {
@@ -1222,7 +1231,7 @@ LineLabel ret(0);
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Nabla::find_line(const LineLabel & lab) const
 {
@@ -1232,5 +1241,5 @@ Nabla::find_line(const LineLabel & lab) const
 
    return -1;   // not found.
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

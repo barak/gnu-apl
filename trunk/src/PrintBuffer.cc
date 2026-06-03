@@ -42,7 +42,7 @@ enum
    PB_MAX_CHUNKS = 200,
 };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ColInfo::consider(const ColInfo & item)
 {
@@ -80,19 +80,19 @@ ColInfo::consider(const ColInfo & item)
 
    if (imag_len  < item.imag_len)    imag_len  = item.imag_len;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer::PrintBuffer()
    : complete(true)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer::PrintBuffer(const UCS_string & ucs, const ColInfo & ci)
    : col_info(ci),
      complete(true)
 {
    buffer.push_back(ucs);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer::PrintBuffer(const Value & value, const PrintContext & _pctx,
                          ostream * out)
    : complete(false)
@@ -214,7 +214,7 @@ PrintBuffer * item_matrix = 0;
 
    PERFORMANCE_END(fs_PrintBuffer_B, start_0, ec)
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 PrintBuffer::do_PrintBuffer(const Value & value, const PrintContext & pctx,
                             ostream * out, PrintStyle outer_style,
@@ -495,7 +495,7 @@ vector<PrintBuffer> pcols;    pcols.reserve(cols);
    update_info();
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pb_for_function(const Value & value, PrintContext pctx, 
                              PrintStyle outer_style)
@@ -529,7 +529,7 @@ ColInfo ci;
    *this = PrintBuffer(ucs, ci);
    add_outer_frame(outer_style);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pb_empty(const Value & value, PrintContext pctx, 
                              PrintStyle outer_style)
@@ -580,7 +580,7 @@ ShapeItem lines = sh.get_volume();
    buffer.resize(lines);
    add_outer_frame(outer_style);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::print_interruptible(ostream & out, sRank rank, int quad_PW)
 {
@@ -651,7 +651,7 @@ vector<ShapeItem> chunk_lengths;
          out << endl;   // end of row
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::set_char(int x, int y, Unicode uc)
 {
@@ -659,7 +659,7 @@ PrintBuffer::set_char(int x, int y, Unicode uc)
    Assert(x < int(buffer[y].size()));
    buffer[y][x] = uc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 PrintBuffer::get_char(int x, int y) const
 { 
@@ -667,7 +667,7 @@ PrintBuffer::get_char(int x, int y) const
    Assert(x < int(buffer[y].size()));
    return buffer[y][x];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_l(Unicode pad, ShapeItem count)
 {
@@ -681,14 +681,14 @@ PrintBuffer::pad_l(Unicode pad, ShapeItem count)
         loop(y, get_row_count())   buffer[y] = pads + buffer[y];
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_r(Unicode pad, ShapeItem count)
 {
 UCS_string ucs(count, pad);
    loop(y, get_row_count())   buffer[y] << ucs;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_height(Unicode pad, ShapeItem height)
 {
@@ -698,7 +698,7 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
         while (height > get_row_count())   buffer.push_back(ucs);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
 {
@@ -708,7 +708,7 @@ PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
         while (height > get_row_count())   buffer.insert(0, ucs);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_to_spaces()
 {
@@ -716,7 +716,7 @@ PrintBuffer::pad_to_spaces()
    loop(x, get_column_count(y))
       if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_SPACE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::add_frame(PrintStyle style, const Shape & shape, int depth)
 {
@@ -845,7 +845,7 @@ UCS_string hori(get_column_count(), HORI);
 
    Assert(is_rectangular());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::add_outer_frame(PrintStyle style)
 {
@@ -898,7 +898,7 @@ UCS_string hori(get_column_count(), HORI);
 
    Assert(is_rectangular());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 PrintBuffer::debug(ostream & out, const char * title) const
 {
@@ -934,7 +934,7 @@ PrintBuffer::debug(ostream & out, const char * title) const
 
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::append_col(const PrintBuffer & pb1)
 {
@@ -942,7 +942,7 @@ PrintBuffer::append_col(const PrintBuffer & pb1)
 
    loop(h, get_row_count())   buffer[h] << pb1.buffer[h];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::append_ucs(const UCS_string & ucs)
 {
@@ -972,7 +972,7 @@ const int size = ucs.size();
 
    buffer.push_back(ucs);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::append_aligned(const UCS_string & ucs, Unicode align)
 {
@@ -1075,7 +1075,7 @@ UCS_string ucs1;
 
    Assert(is_rectangular());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::add_column(Unicode pad, int32_t pad_count, const PrintBuffer & pb)
 {
@@ -1095,13 +1095,13 @@ PrintBuffer::add_column(Unicode pad, int32_t pad_count, const PrintBuffer & pb)
 
    loop(y, get_row_count())   buffer[y] << pb.buffer[y];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void PrintBuffer::add_row(const PrintBuffer & pb)
 {
    buffer.reserve(buffer.size() + pb.get_row_count());
    loop(h, pb.get_row_count())   buffer.push_back(pb.buffer[h]);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 PrintBuffer::is_rectangular() const
 {
@@ -1116,7 +1116,7 @@ PrintBuffer::is_rectangular() const
 
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::get_frame_chars(PrintStyle pst,
                              Unicode & HORI, Unicode & VERT,
@@ -1171,7 +1171,7 @@ PrintBuffer::get_frame_chars(PrintStyle pst,
              FIXME;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::align(ColInfo & cols)
 {
@@ -1192,7 +1192,7 @@ PrintBuffer::align(ColInfo & cols)
 
    Assert(is_rectangular());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::align_left(const ColInfo & COL_INFO)
 {
@@ -1220,7 +1220,7 @@ const size_t diff = COL_INFO.int_len - col_info.int_len;
 
    Log(LOG_printbuf_align)   debug(CERR, "after align_left()");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::align_dot(const ColInfo & COL_INFO)
 {
@@ -1321,7 +1321,7 @@ PrintBuffer::align_dot(const ColInfo & COL_INFO)
 
    Log(LOG_printbuf_align)   debug(CERR, "after align_dot()");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::align_j(const ColInfo & COL_INFO)
 {
@@ -1377,7 +1377,7 @@ PrintBuffer::align_j(const ColInfo & COL_INFO)
 
    Log(LOG_printbuf_align)   debug(CERR, "after align_j()");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PrintBuffer::pad_fraction(int wanted_fract_len, bool want_expo)
 {
@@ -1427,7 +1427,7 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
         if (diff > 0)   buffer[h] << UCS_string(diff, UNI_PAD_r_FRACT);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 PrintBuffer::separator_rows(ShapeItem y, const Value & value, bool nested,
                             sRank rk1, sRank rk2)
@@ -1471,10 +1471,10 @@ ShapeItem ret = 0;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, const PrintBuffer & pb)
 {
    out << endl;   return pb.debug(out);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

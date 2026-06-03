@@ -31,7 +31,7 @@ Quad_RE Quad_RE::fun;
 
 # include "Regexp.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -78,7 +78,7 @@ Value_P Z(shape, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_RE::Flags::Flags(const UCS_string & flags_string)
    : flags(0),
      error_on_no_match(false),
@@ -114,7 +114,7 @@ int ofcnt = 0;
         DOMAIN_ERROR;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static Value_P
 deep_value(int idx, const PCRE2_SIZE * ovector, int count, const int * parents,
            const int * child_count, const UCS_string * B)
@@ -167,7 +167,7 @@ Value_P Z(ini + child_count[idx], LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::regex_results(const Regexp & A, const Flags & X, const UCS_string & B)
 {
@@ -247,7 +247,7 @@ const Shape sh_Z(Z->get_valid_item_count());
    Z->set_shape(sh_Z);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::partition_result(const Regexp & A, const Flags & X,
                           const UCS_string & B)
@@ -293,7 +293,7 @@ PCRE2_SIZE last_end = 0;
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::string_result(const Regexp & A, const Flags & X,
                        const UCS_string & B, ShapeItem & B_offset)
@@ -347,7 +347,7 @@ vector<int> ccount(ovector_count, 0);     // 0 children
    return deep_value(0, ovector, ovector_count,
                      parents.data(), ccount.data(), &B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::index_result(const Regexp & A, const Flags & X,
                       const UCS_string & B, ShapeItem & B_offset)

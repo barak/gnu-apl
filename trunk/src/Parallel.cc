@@ -44,7 +44,7 @@ bool Parallel::run_parallel = true;
 
 bool Parallel::init_done = false;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 bool
 CPU_pool::change_core_count(CoreCount new_count, bool logit)
 {
@@ -102,7 +102,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
 
    return false;   // no error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if PARALLEL_ENABLED
 void
 CPU_pool::init(bool logit)
@@ -235,7 +235,7 @@ CPU_pool::init(bool logit)
 }
 #endif  // not PARALLEL_ENABLED
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 CPU_pool::lock_pool(bool logit)
 {
@@ -251,7 +251,7 @@ CPU_pool::lock_pool(bool logit)
         Thread_context::print_all(CERR);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 CPU_pool::unlock_pool(bool logit)
 {
@@ -275,7 +275,7 @@ CPU_pool::unlock_pool(bool logit)
             sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 Parallel::init(bool logit)
 {
@@ -354,7 +354,7 @@ sem_t __pthread_create_sema;
 sem_t * Parallel::print_sema          = &__print_sema;
 sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void *
 Parallel::worker_main(void * arg)
 {
@@ -391,4 +391,4 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
    /* not reached */
    return 0;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

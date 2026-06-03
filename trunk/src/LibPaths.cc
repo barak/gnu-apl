@@ -47,7 +47,7 @@ LibPaths::LibDir LibPaths::lib_dirs[LIB_MAX];
 //
 const void * unused = 0;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UTF8_string
 LibPaths::get_filename(const LibRef_name & lib_name, bool existing,
                        const char * ext1, const char * ext2)
@@ -146,7 +146,7 @@ UTF8_string filename = get_lib_dir(lib_name.get_libref());
         return filename;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UTF8_string
 LibPaths::get_lib_dir(LibRef libref)
 {
@@ -174,7 +174,7 @@ UTF8_string ret(APL_lib_root);
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::init(const char * argv0, bool logit)
 {
@@ -190,7 +190,7 @@ LibPaths::init(const char * argv0, bool logit)
         else                      lib_dirs[d].cfg_src = LibDir::CSRC_NONE;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 LibPaths::is_present(LibRef lib)
 {
@@ -209,7 +209,7 @@ DIR * dir = opendir(path.c_str());
       }
 
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 LibRef_name::LibRef_name(ostream & out, const UCS_string_vector & args,
                          bool allow_LIB_NONE)
 {
@@ -237,9 +237,9 @@ const UCS_string & libref = args.front();
 
    // error (lib_name.name is "").
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::set_APL_lib_root(const char * new_root)
 {
@@ -249,7 +249,7 @@ LibPaths::set_APL_lib_root(const char * new_root)
    unused = realpath(new_root, APL_lib_root);
 #endif // ! MINGW_SRC
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::set_lib_dir(LibRef libref, const UTF8_string & path,
                       LibDir::CfgSrc src)
@@ -257,7 +257,7 @@ LibPaths::set_lib_dir(LibRef libref, const UTF8_string & path,
    lib_dirs[libref].dir_path = path;
    lib_dirs[libref].cfg_src = src;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::maybe_warn_ambiguous(int has_extension, const UTF8_string name,
                                const char * ext1, const char * ext2)
@@ -275,7 +275,7 @@ UTF8_string filename_ext2 = name;
         << filename_ext2 << endl
         << "    exists as well. Using the first (.xml) file." << endl << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::compute_bin_path(const char * argv0, bool logit)
 {
@@ -367,7 +367,7 @@ done:
    logit && CERR << "APL_bin_path is: " << APL_bin_path << endl
                  << "APL_bin_name is: " << APL_bin_name << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 LibPaths::search_APL_lib_root()
 {
@@ -400,7 +400,7 @@ LibPaths::search_APL_lib_root()
 
    set_APL_lib_root(".");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 LibPaths::is_lib_root(const char * dir)
 {

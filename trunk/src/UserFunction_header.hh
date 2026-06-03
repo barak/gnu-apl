@@ -32,7 +32,7 @@
 #include "Symbol.hh"
 #include "UTF8_string.hh"
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The (symbols in the) header of a defined function
 class UserFunction_header
 {
@@ -235,6 +235,6 @@ protected:
    /// The labels of \b this function.
    std::vector<labVal> label_values;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __USERFUNCTION__HEADER_HH_DEFINED__
