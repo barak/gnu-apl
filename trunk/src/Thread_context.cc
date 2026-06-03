@@ -216,7 +216,7 @@ Thread_context::kill_pool()
         if (c)   pthread_kill(thread_contexts[c].thread, SIGKILL);
       }
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 void
 Thread_context::init_entry(CoreNumber n)
 {

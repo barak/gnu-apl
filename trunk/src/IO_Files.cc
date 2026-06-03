@@ -47,6 +47,7 @@ int IO_Files::parse_errors = 0;
 IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST_FILE;
 bool IO_Files::need_total = false;
 ofstream IO_Files::current_testreport;
+//════════════════════════════════════════════════════════════════════════════
 UTF8_string IO_Files::summary_path("testcases/summary.log");
 APL_time_us IO_Files::start_usecs = 0;
 
@@ -371,7 +372,7 @@ InputFile * input = InputFile::current_file();
    Log(LOG_test_execution)
       CERR << "read_file_line() -> " << file_line << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 IO_Files::end_of_current_file()
 {
@@ -548,4 +549,4 @@ int done = testcases_done;
            << "(" << testcase_count << ")"
            << " testcase files" << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

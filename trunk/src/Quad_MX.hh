@@ -30,6 +30,7 @@
 #include <random>
 
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕MX
 class Quad_MX : public QuadFunction
 {
@@ -268,5 +269,6 @@ protected:
   /// random number generator fore imaginary parts
   static mt19937_64 igen;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif  // __Quad_MX_DEFINED__

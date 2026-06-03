@@ -24,7 +24,7 @@
 #include "Workspace.hh"
 #include "Regexp.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static const PCRE2_UCHAR32 *
 ucs_to_codepoints(const UCS_string & string)
 {
@@ -33,7 +33,7 @@ PCRE2_UCHAR32 * buf = new PCRE2_UCHAR32[size];
     loop(i, size)   buf[i] = string[i];
     return buf;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 RegexpMatch::RegexpMatch(pcre2_code * code, const UCS_string & B,
                          PCRE2_SIZE start)
    : matched_B(B)
@@ -90,7 +90,7 @@ RegexpMatch::num_matches() const
 
     return match_result;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Regexp::Regexp(const UCS_string & pattern, int flags)
 {
 const PCRE2_UCHAR32 * pattern_ucs = ucs_to_codepoints(pattern);
@@ -150,4 +150,4 @@ const int len = pcre2_get_error_message_32(ec, buffer.pbuff, 256);
 UCS_string ret(U"Unknown libpcre error ");
    return ret << ec;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

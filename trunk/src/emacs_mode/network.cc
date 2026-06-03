@@ -63,6 +63,7 @@ ListenerWrapper listener_wrapper(listener);
 void start_listener(int port)
 {
 pthread_t thread_id;
+//════════════════════════════════════════════════════════════════════════════
 
 unique_ptr<Listener> listener( Listener::create_listener( port ) );
 
@@ -131,3 +132,4 @@ void close_listeners( void )
     pthread_mutex_unlock( &registered_listeners_lock );
 #endif
 }
+//════════════════════════════════════════════════════════════════════════════

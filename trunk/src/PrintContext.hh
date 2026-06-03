@@ -27,6 +27,7 @@
 #include "Common.hh"
 #include "SystemLimits.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// Attributes that control how APL values are being printed.
 class PrintContext
 {
@@ -78,5 +79,6 @@ protected:
    /// the print width to be used
    int width;          // aka. ⎕PW
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PRINT_CONTEXT_HH_DEFINED__

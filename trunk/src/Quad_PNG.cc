@@ -140,7 +140,7 @@ int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
 static vector<PNG_context *> all_PNG_contexts;
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)
 {
@@ -950,7 +950,7 @@ PNG_context * pctx = new PNG_context(B);
    sem_post(Quad_PNG::PNG_window_sema);   // unleash the APL interpreter
    return pctx->handle;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif   // PNG_GTK
 

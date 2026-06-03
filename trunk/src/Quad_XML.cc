@@ -34,7 +34,7 @@
 
 Quad_XML  Quad_XML::fun;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
                    ShapeItem spos, ShapeItem slen)
   : src(string_B),
@@ -318,7 +318,7 @@ size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
 
    return false;   // OK
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 XML_node::print_all(ostream & out, const XML_node & anchor)
 {
@@ -600,7 +600,7 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
 
    return false;   // OK
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 XML_node::is_name_char(Unicode uni)
 {
@@ -1283,7 +1283,7 @@ cleanup:
    if (error)   DOMAIN_ERROR;
    return Z;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_XML::eval_B(Value_P B) const
 {

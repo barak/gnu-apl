@@ -47,7 +47,7 @@ class Executable;
 class StateIndicator;
 class UTF8_string;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
  The symbol tables of the Workspace. We put them into a base class for
  Workspace, so that they are initialized before all other members of
@@ -373,6 +373,6 @@ protected:
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __WORKSPACE_HH_DEFINED__

@@ -29,6 +29,7 @@
 
 class NetworkConnection;
 
+//════════════════════════════════════════════════════════════════════════════
 class NetworkCommand {
 public:
     NetworkCommand( std::string name_in ) : name( name_in ) {};
@@ -39,5 +40,6 @@ public:
 private:
     std::string name;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

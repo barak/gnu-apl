@@ -26,7 +26,7 @@
 
 #include "QuadFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// a helper class (doubly linked list) for parsing XML
 class XML_node
 {
@@ -218,7 +218,7 @@ protected:
    /// the position of this node (at its level)
    int position;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕XML
  */
@@ -302,6 +302,7 @@ protected:
    static void all_members(UCS_string_vector & result, const Value & B,
                            const UCS_string & name_prefix, int flags);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_XML_DEFINED__
 

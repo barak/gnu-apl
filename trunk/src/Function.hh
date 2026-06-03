@@ -47,7 +47,7 @@ class RavelIterator;
 
    default implementation functions with axis: ignore axis
 */
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** additional functionality for functions with named sub-functions.
     I.e one of ⌹, ⎕CR, ⎕FFT, FIO, ⎕MX, ⎕RVAL, or ⎕SQL.
   */
@@ -460,6 +460,6 @@ protected:
    /// the tag for token pointing to \b this function
    TokenTag tag;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __FUNCTION_HH_DEFINED__

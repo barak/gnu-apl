@@ -41,7 +41,7 @@
 
 #include "Workspace.icc"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Symbol *
 SymbolTable::lookup_symbol(const UCS_string & sym_name)
 {
@@ -320,7 +320,7 @@ const Symbol * sym = Workspace::lookup_existing_symbol(buf);
 
    return out << "no symbol '" << buf1 << "'" << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 {
@@ -539,4 +539,4 @@ SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
    if (max_name_len < name.ssize())   max_name_len = name.size();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

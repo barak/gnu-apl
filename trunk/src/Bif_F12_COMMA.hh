@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** Comma related functions (catenate, laminate, and ravel.) */
 /// Base class for , and ⍪
 class Bif_COMMA : public NonscalarFunction_default_identity
@@ -157,7 +157,7 @@ public:
 
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __BIF_COMMA_HH_DEFINED__
 

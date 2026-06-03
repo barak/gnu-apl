@@ -28,6 +28,7 @@ using namespace std;
 
 #include "QuadFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// a random APL value
 class Quad_RVAL : public QuadFunction
 {
@@ -135,6 +136,7 @@ protected:
    /// the state buffer of the random number generator
    static char state[256];
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_RVAL_DEFINED__
 

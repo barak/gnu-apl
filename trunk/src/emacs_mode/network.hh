@@ -47,6 +47,7 @@
 
 class Listener;
 
+//════════════════════════════════════════════════════════════════════════════
 class AddrWrapper {
 public:
     AddrWrapper(struct addrinfo *addr_in) : addr(addr_in) {}
@@ -65,6 +66,7 @@ public:
 protected:
     std::string message;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 void start_listener( int port );
 void *connection_loop( void *arg );

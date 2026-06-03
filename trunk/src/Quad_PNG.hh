@@ -29,6 +29,7 @@
 
 #include "QuadFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕PNG
 class Quad_PNG : public QuadFunction
 {
@@ -114,5 +115,6 @@ protected:
    static void write_PNG_file(const char * filename, int bit_depth,
                               const Value & B);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_PNG_DEFINED__

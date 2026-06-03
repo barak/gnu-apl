@@ -27,6 +27,7 @@
 #include "UTF8_string.hh"
 #include "UCS_string_vector.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /** an input file and its properties. The file can be an apl script(.apl) file
     or a testcase (.tc) file. The file names initially come from the command
     line, but can be extended by )COPY commands 
@@ -230,5 +231,6 @@ protected:
    /// the next unique file number
    static int64_t next_file_seq;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __INPUT_FILE_HH_DEFINED__

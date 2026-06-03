@@ -27,6 +27,7 @@
 
 #include "QuadFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕CR (Character Representation).
  */
@@ -293,7 +294,7 @@ protected:
    /// return an (almost) unique variable name
    static UCS_string temp_varname();
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif //__Quad_CR_HH_DEFINED__
 

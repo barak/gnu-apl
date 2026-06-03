@@ -26,6 +26,7 @@
 #include "emacs.hh"
 
 #include <sstream>
+//════════════════════════════════════════════════════════════════════════════
 
 void SystemVariableCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -39,3 +40,4 @@ void SystemVariableCommand::run_command( NetworkConnection &conn, const std::vec
     out << END_TAG << "\n";
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

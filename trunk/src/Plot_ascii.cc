@@ -35,7 +35,7 @@ enum VT100_color
   VT100_bright_cyan    =  66,
   VT100_bright_white   =  67,
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// convert a 32-bit rgb value to its nearest VT100 color
 
 const struct
@@ -92,7 +92,7 @@ uint32_t best_sq = 0x40000;   // > 3*FF*FF
 
    return VT100_RGB[best_idx].vt100;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 struct ASCII_Point
 {
    ASCII_Point()
@@ -103,7 +103,7 @@ struct ASCII_Point
    Unicode uni;
    VT100_color color;   /// foreground color index
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 class ASCII_canvas
 {
 public:
@@ -147,7 +147,7 @@ protected:
    const ASCII_Point & get_point(int x, int y) const
       { return points[x + y * W]; }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 ASCII_canvas::draw_horizontal_grid(const Plot_window_properties & w_props)
 {
@@ -363,7 +363,7 @@ const VT100_color color = round_color(w_props.get_canvas_color());
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
 {
@@ -385,4 +385,4 @@ ASCII_canvas ctx(H, W);
    ctx.emit(cerr, w_props);
    return ctx.emit_value(w_props);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

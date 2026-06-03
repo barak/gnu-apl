@@ -29,6 +29,7 @@ class gsl_matrix;
 class Value;
 class Cell;
 
+//════════════════════════════════════════════════════════════════════════════
 class GSL
 {
 public:

@@ -46,6 +46,7 @@ enum
 //  into a .png file
 enum { SAVE_BORDER_DELAY_ms = 100 };
 
+//════════════════════════════════════════════════════════════════════════════
 /** The class implementing ⎕PLOT. \b Quad_PLOT implements the APL
     side of plotting, while the actual output work is performed by
     plot drivers for different GUI environments (X11/XCB or GTK).
@@ -223,5 +224,6 @@ protected:
    /// whether to print some debug info during plotting
    static int verbosity;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_PLOT_DEFINED__

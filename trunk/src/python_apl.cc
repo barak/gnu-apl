@@ -19,7 +19,7 @@ using namespace std;
 
 static int display_mode = 1;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // initialization...
 
 extern void init_modules(const char * argv0, bool log_startup);
@@ -52,7 +52,7 @@ init_if_necessary()
 static bool init_done = false;
    if (!init_done) { do_init(); init_done = true; }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_command(PyObject * self, PyObject * args)
 {
@@ -73,7 +73,7 @@ ostringstream out;
 
   return PyUnicode_DecodeUTF8(out.str().data(), out.str().size(), 0);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_to_python(const Value * value)
 {
@@ -115,7 +115,7 @@ PyObject * ravel = PyList_New(ravel_len);
 
    return PyTuple_Pack(2, shape, ravel);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject * exec_result = 0;
 
 bool
@@ -163,7 +163,7 @@ bool do_display = false;
 
    return do_display;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_exec(PyObject * self, PyObject * args)
 {
@@ -218,7 +218,7 @@ PyObject * ret = exec_result;
    exec_result = 0;
    return ret;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static const Value *
 apl_get_var_value(PyObject * args)
 {
@@ -233,6 +233,7 @@ const char * varname = 0;
 
 UTF8_string varname_utf8(varname);
 UCS_string varname_ucs(varname_utf8);
+//════════════════════════════════════════════════════════════════════════════
 Symbol * sym = Workspace::lookup_existing_symbol(varname_ucs);
    if (sym == 0)
       {
@@ -485,7 +486,7 @@ Value_P value = python_to_apl(ravel, shape);
    sym->assign(value, true, LOC);
    return Py_None;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_fix_function(PyObject * self, PyObject * args)
 {
@@ -513,7 +514,7 @@ UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
 
    return PyLong_FromLong(error_line);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_set_display(PyObject * self, PyObject * args)
 {
@@ -794,7 +795,7 @@ const char * topic = 0;
 
    return Py_None;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static PyMethodDef AplMethods[] =
 {
   { "help",         apl_help,         METH_VARARGS, DESCR_help         },
@@ -808,7 +809,7 @@ static PyMethodDef AplMethods[] =
   { "set_display",  apl_set_display,  METH_VARARGS, DESCR_set_display  },
   { NULL,           0,                0,            0 }   /* Sentinel */
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static struct PyModuleDef apl_module =
 {
   PyModuleDef_HEAD_INIT,
@@ -818,13 +819,13 @@ static struct PyModuleDef apl_module =
                   -1 if the module keeps state in global variables. */
   AplMethods
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 PyMODINIT_FUNC
 PyInit_gnu_apl(void)
 {
     return PyModule_Create(&apl_module);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int64_t
 get_main()
 {

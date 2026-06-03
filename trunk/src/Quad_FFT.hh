@@ -33,6 +33,7 @@
 #include "QuadFunction.hh"
 #include "Value.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕FFT
 class Quad_FFT : public QuadFunction
 {
@@ -161,5 +162,6 @@ protected:
    /// a mapping between function names and function numbers
    static const FunctionGroup::function_info subfunction_infos[];
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_FFT_DEFINED__

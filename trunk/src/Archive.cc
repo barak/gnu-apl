@@ -93,7 +93,7 @@ using namespace std;
 #define NEED(x)   if (space < int(x)) \
    { leave_char_mode();   outf << "\n";   space = do_indent(); } outf
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 XML_Saving_Archive::XML_Saving_Archive(ostream & of, ostream & ef,
                                        const char * filename)
   : XML_Archive(of, ef),
@@ -742,7 +742,7 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
    do_indent();
    outf << "</SymbolTable>" << endl << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 {
@@ -1202,7 +1202,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
                        << ASX_MINOR << "."
                        << ASX_OTHER << "\">\n" << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const char *
 XML_Saving_Archive::decr(int & counter, const char * str)
 {
@@ -1829,7 +1829,7 @@ const Token_string & body = exec.get_body();
         << " at )SI level=" << si.get_level() << endl;
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 XML_Loading_Archive::get_uni()
 {
@@ -2049,7 +2049,7 @@ char **pend = reinterpret_cast<char **>(&end);
         default: Q1(type) Q1(line_no) DOMAIN_ERROR;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 XML_Loading_Archive::read_Command()
 {
@@ -2318,7 +2318,7 @@ const char * creator = ")LOAD )SI λ";
    expect_tag("/UserFunction", LOC);
    return ufun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
 {
@@ -2469,7 +2469,7 @@ StateIndicator * si = Workspace::SI_top();
          if (is_tag("/SI-entry"))   break;
        }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const Executable *
 XML_Loading_Archive::read_SI_Execute()
 {
@@ -2486,7 +2486,7 @@ ExecuteList * exec = ExecuteList::fix(text, LOC);
    Assert(exec);
    return exec;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const Executable *
 XML_Loading_Archive::read_SI_Statement()
 {
@@ -2503,7 +2503,7 @@ StatementList * exec = StatementList::fix(text, Value_P(), LOC);
    Assert(exec);
    return exec;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const Executable *
 XML_Loading_Archive::read_SI_UserFunction()
 {
@@ -2534,7 +2534,7 @@ const UserFunction * ufun = fun->get_func_ufun();
 
    return ufun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 XML_Loading_Archive::read_StateIndicator()
 {

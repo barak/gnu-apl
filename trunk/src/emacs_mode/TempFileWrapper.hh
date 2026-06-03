@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 
+//════════════════════════════════════════════════════════════════════════════
 class FileWrapper {
 public:
     FileWrapper( int fd_in );
@@ -49,5 +50,6 @@ private:
     int fd;
     bool closed;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

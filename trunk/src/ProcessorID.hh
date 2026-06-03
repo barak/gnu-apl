@@ -28,6 +28,7 @@ using namespace std;
 
 #ifdef AP_NUM
 
+//════════════════════════════════════════════════════════════════════════════
 /// a simple ProcessorID to be used by APs
 class ProcessorID
 {
@@ -162,6 +163,7 @@ protected:
    /// the network profile currently used
    static Network_Profile network_profile;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif
 

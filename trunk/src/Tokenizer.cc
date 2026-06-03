@@ -54,12 +54,13 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 inline ostream & operator << (ostream & out, const Unicode_source & src)
    { loop(s, src.rest_len())   out << src[s];   return out; }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** convert \b UCS_string input into a Token_string tos.
 */
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 Tokenizer::tokenize(const UCS_string & input, Token_string & tos) const
 {
@@ -176,7 +177,7 @@ const Token tok = Avec::uni_to_token(uni, LOC);
 #undef sys
    return tok;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 Tokenizer::Int_or_Double
 Tokenizer::tokenize_real(Unicode_source & src)
@@ -748,7 +749,7 @@ const Token t = Workspace::get_quad(ucs, len);
    src.skip(len - 1);
    tos.push_back(t);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** tokenize a single quoted string.
  ** If the string is a single character, then we
  **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
@@ -1230,5 +1231,5 @@ Symbol * sym = Workspace::lookup_symbol(symbol);
    Assert(sym);
    tos.push_back(Token(TOK_SYMBOL, sym));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

@@ -72,7 +72,7 @@ Bif_F0_ZILDE      Bif_F0_ZILDE     ::fun;    // ⍬
 
 int Bif_F1_EXECUTE::copy_pending = 0;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 PrimitiveFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -99,7 +99,7 @@ UCS_string ind(indent, UNI_SPACE);
    print(out);
    out << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 NonscalarFunction_default_identity::eval_identity_fun(Value_P B,
                                                       sAxis axis) const
@@ -235,7 +235,7 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
 {
@@ -271,7 +271,7 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
 
    return Token(TOK_SI_PUSHED);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F2_INDEX::eval_AB(Value_P A, Value_P B) const
 {
@@ -376,7 +376,7 @@ ShapeItem a = ec_A;   // index_expr[0] ←→  B[;;;b]
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 {
@@ -409,7 +409,7 @@ Value_P Z(A->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_ELEMENT::do_eval_B(const Value * B)
 {
@@ -494,7 +494,7 @@ const double qct = Workspace::get_CT();
 
    return true;   // match
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B) const
 {
@@ -525,7 +525,7 @@ const ShapeItem len = B->is_scalar() ? 1 : B->get_shape().get_shape_item(0);
 
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));   // match
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B) const
 {
@@ -592,7 +592,7 @@ ConstRavel_P iA(A, true);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ENCODE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -1081,35 +1081,35 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROTATE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROTATE::eval_XB(Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROTATE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROTATE1::eval_XB(Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
 {
@@ -1153,7 +1153,7 @@ Value_P Z = shape_A.get_rank() == B->get_rank() && shape_A.is_permutation()
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_TRANSPOSE::do_eval_B(const Value * B)
 {
@@ -1416,7 +1416,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 {
@@ -1503,7 +1503,7 @@ const uint64_t end_1 = cycle_counter();
    return do_reshape(shape_Z, *B);
 #endif
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_RHO::eval_B(Value_P B) const
 {

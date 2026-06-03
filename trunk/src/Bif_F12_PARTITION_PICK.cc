@@ -30,7 +30,7 @@
 Bif_F12_PARTITION Bif_F12_PARTITION::fun;    // ⊂
 Bif_F12_PICK      Bif_F12_PICK     ::fun;    // ⊃
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_PARTITION::do_eval_B(Value_P B)
 {
@@ -48,14 +48,14 @@ Value_P Z(LOC);   // Z ← ⊂B is always a scalar
    Z->check_value(LOC);
    return Z;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return Token(TOK_APL_VALUE1, partition(A, B, axis));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_PARTITION::enclose_with_axes(const Shape & sh_X, Value_P B)
 {
@@ -264,7 +264,7 @@ Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B.get(), qio);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_PICK::disclose(Value_P B, bool rank_tolerant)
 {

@@ -124,7 +124,7 @@ char Output::ESC_CursorHome_1 [MAX_ESC_LEN] = CSI "1;" "\0" "H";   ///< Key Home
 char Output::ESC_InsertMode_1 [MAX_ESC_LEN] = CSI "2;" "\0" "~";   ///< Key Ins
 char Output::ESC_Delete_1     [MAX_ESC_LEN] = CSI "3;" "\0" "~";   ///< Key Del
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 CinOut_filebuf::overflow(int c)
 {
@@ -139,7 +139,7 @@ PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
    else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 ErrOut_filebuf::overflow(int c)
 {
@@ -156,7 +156,7 @@ PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Output::init(bool logit)
 {

@@ -41,7 +41,7 @@
 
 uint64_t Prefix::instance_counter = 0;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
    : instance(++instance_counter),
      si(_si),
@@ -884,7 +884,7 @@ int ret = SIG_NONE;
 
    return Fun_signature(ret);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 DerivedFunction *
 Prefix::get_fun_oper_slot(const char * loc) const
 {
@@ -942,7 +942,7 @@ Prefix::set_action(const Token & result)
                  FIXME;
       }
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 //
 // e reduce functions...
 //
@@ -1525,7 +1525,7 @@ Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
         new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Prefix::handle_QUAD_ES_ESC()
 {
@@ -1539,7 +1539,7 @@ Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
    Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
    new (&si_pushed)  Token(TOK_ESCAPE);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Prefix::handle_QUAD_ES_BRA(const Token & result)
 {
@@ -1558,7 +1558,7 @@ const Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
 Value_P v_line = IntScalar(line, LOC);
    Workspace::SI_top()->jump(v_line.get());
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Prefix::handle_QUAD_ES_ERR(const Token & result)
 {
@@ -1588,7 +1588,7 @@ Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
       }
    new (&StateIndicator::get_error(top)) Error(ec, LOC);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Prefix::reduce____()
 {
@@ -2748,7 +2748,7 @@ const Token result(TOK_APL_VALUE3, Z);
 
    set_action(RA_CONTINUE);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// pattern V ) ← B.
 void
 Prefix::reduce_V_RPAR_ASS_B()
@@ -3430,5 +3430,5 @@ Prefix::reduce_RETC_A_GOTO_B()
    Assert1(prefix_len == 4);
    syntax_error(LOC);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

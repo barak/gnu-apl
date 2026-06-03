@@ -136,7 +136,7 @@ static void throw_illegal_db_id( void )
     MORE_ERROR() << "Illegal database id";
     DOMAIN_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static Connection *db_id_to_connection( int db_id )
 {
    if( db_id < 0 || db_id >= int(connections.size())) {
@@ -181,7 +181,7 @@ static Token close_database( Value_P B )
 
     return Token( TOK_APL_VALUE1, Str0( LOC ) );
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static Value_P
 run_generic_one_query(ArgListBuilder *arg_list, Value_P B,
                       int start, int num_args, bool ignore_result)
@@ -274,7 +274,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
          RANK_ERROR;
        }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static Token
 run_query(Connection *conn, Value_P A, Value_P B)
 {
@@ -306,7 +306,7 @@ Connection *conn = value_to_db_id(B);
     conn->transaction_rollback();
     return Token( TOK_APL_VALUE1, Idx0(LOC));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static Token
 show_tables(Value_P B)
 {
@@ -335,7 +335,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Token( TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static Token
 show_cols(Value_P A, Value_P B)
 {
@@ -384,7 +384,7 @@ Value_P Z;
     Z->check_value(LOC);
     return Token( TOK_APL_VALUE1, Z );
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Fun_signature get_signature()
 {
     init_provider_map();

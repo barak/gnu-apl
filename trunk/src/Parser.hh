@@ -114,7 +114,6 @@ protected:
    /// the key for the next key/value pair
    ShapeItem    next_key;
 };
-
 //════════════════════════════════════════════════════════════════════════════
 /// A state machine for multiline strings and literals
 class Multi_line_SM
@@ -329,5 +328,6 @@ protected:
    /// the parsing mode of this parser
    const ParseMode pmode;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PARSER_HH_DEFINED__

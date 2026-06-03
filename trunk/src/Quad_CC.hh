@@ -29,7 +29,7 @@
 #include "QuadFunction.hh"
 #include "UCS_string.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** base class for all character classes */
 class CC_base
 {
@@ -419,7 +419,7 @@ protected:
    /// @param out output stream to write to
    static void print_classes(ostream & out);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_CC_DEFINED__
 // EOF

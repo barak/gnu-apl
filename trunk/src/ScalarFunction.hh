@@ -31,7 +31,7 @@
 
 #include "Value.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// Base class for all scalar functions
 class ScalarFunction : public PrimitiveFunction
 {
@@ -1322,6 +1322,6 @@ protected:
    /// overloaded Function::get_dyadic_inverse()
    virtual cFunction_P get_dyadic_inverse() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SCALAR_FUNCTION_HH_DEFINED__

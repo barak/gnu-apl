@@ -30,6 +30,7 @@
 #include <sqlite3.h>
 #include <vector>
 
+//════════════════════════════════════════════════════════════════════════════
 class ResultValue
 {
 public:
@@ -100,5 +101,6 @@ public:
 private:
     vector<const ResultValue *> values;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

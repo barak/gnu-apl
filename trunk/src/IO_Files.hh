@@ -65,6 +65,7 @@ using namespace std;
  
  */
 
+//════════════════════════════════════════════════════════════════════════════
 /** handling of Input files. IO_Files reads lines from files until they
     are all executed. The output of the APL interpreter is compared against
     the testcase files and mismatches are recorded.
@@ -208,5 +209,6 @@ protected:
    /// when a .tc file was started
    static APL_time_us start_usecs;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __IO_FILES_HH_DEFINED__

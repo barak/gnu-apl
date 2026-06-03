@@ -39,7 +39,7 @@ class PrimitiveFunction;
  ravels of the result Z, the right argument B, and possibly (for dyadic Cell
  functions) the left argument A.
  **/
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// one monadic scalar job
 class PJob_scalar_B
 {
@@ -99,7 +99,7 @@ public:
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// one dyadic scalar job
 class PJob_scalar_AB
 {

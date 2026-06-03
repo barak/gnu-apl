@@ -28,7 +28,7 @@
 #include "Value.hh"
 #include "ValueHistory.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 LvalCell::LvalCell(Cell * target, Value * target_owner)
 {
    value.lval = target;
@@ -92,5 +92,5 @@ LvalCell::init_other(void * other, Value &, const char * loc) const
 {
    new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

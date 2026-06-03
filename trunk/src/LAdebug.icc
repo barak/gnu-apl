@@ -150,6 +150,7 @@ print_item(const LA_pack::DD & dd)
 
    if (dd <= 1e-14 && dd >= -1e-14)   // near 0
       { CERR << " ≈0   ";   return; }
+//════════════════════════════════════════════════════════════════════════════
 
 const LA_pack::DD rounded = round(dd);
    if ((rounded - dd) <= 1e-14 && (rounded - dd) >= -1e-14)   // near integer
@@ -166,7 +167,7 @@ char cc[40];
    else          { SPRINTF(cc, "%6.3f", dd)   }
    CERR << cc;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 /// print a complex matrix or vector item
 inline void
@@ -176,7 +177,7 @@ char cc[100];
    SPRINTF(cc, "%.2fj%.2f", zz.real(), zz.imag());
    CERR << "  " << setw(13) << cc;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 
 /// print vector \b data of length N
@@ -188,7 +189,7 @@ print_vector(const char * title, const T * data, int N)
   ALL_COLS(N)   print_item(data[col]);
   CERR << endl;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// print a matrix
 template<class T>
 void
@@ -203,7 +204,7 @@ const Ccol N = A.get_column_count();
        CERR << endl;
      }
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 inline Ccol
 un_pivot(const Ccol * pivot, int len, Ccol col)
 {
@@ -220,7 +221,7 @@ un_pivot(const Ccol * pivot, int len, Ccol col)
    CERR << endl;
    return -1;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// print the inner product A∘B (or Q∘R)
 template<class T>
 void
@@ -256,7 +257,7 @@ const Ccol NB = B.get_column_count();
        CERR << endl;
      }
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// Print the result of a QR factorization geqpX()
 
 /** Print the inner product Q∘R. Both Q and R are contained in A:
@@ -324,7 +325,7 @@ DebugMatrix<T> QC("C", max_MN, max_MN);        // a mutable copy of HR
                  QC, R, ptvvy.pivot, false);
    CERR << "──────────────────────────────────────────" << endl;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #else   // not  LA_DEBUG
 

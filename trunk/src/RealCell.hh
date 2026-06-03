@@ -26,6 +26,7 @@
 
 #include "NumericCell.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /*! A cell that is either an integer cell or a floating point cell.
     This class contains all cell functions for which the detailed type
     makes no difference.
@@ -60,6 +61,6 @@ protected:
    /// @param fun circle function index
    ErrorCode do_bif_circle_fun(Cell * Z, int fun) const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __REALCELL_HH_DEFINED__

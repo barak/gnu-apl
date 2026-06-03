@@ -46,7 +46,7 @@ extern TCP_socket get_tcp2_for_id();
 extern uint16_t get_udp_port_for_id(const AP_num3 & id);
 extern TCP_socket get_tcp_fd2_for_id(const AP_num3 & id);
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Svar_event
 Svar_DB_server::clear_all_events(AP_num3 id)
 {
@@ -393,4 +393,4 @@ const TCP_socket peer = get_tcp_fd2_for_id(to);
 
    return svar;   // success
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

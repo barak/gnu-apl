@@ -36,7 +36,7 @@ class UTF8_string;
 class UCS_string;
 class PrintBuffer;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// A Value smart * and access functions (except constructors)
 class Value_P_Base
 {
@@ -195,6 +195,6 @@ public:
    /// @param other the Value_P to copy from
    void operator =(const Value_P & other);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

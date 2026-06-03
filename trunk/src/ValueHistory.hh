@@ -31,6 +31,7 @@ using namespace std;
 
 class Value;
 
+//════════════════════════════════════════════════════════════════════════════
 /// a ringbuffer of events related to the manipulation of values
 class VH_entry
 {
@@ -89,5 +90,6 @@ protected:
    /// not have one.
    const Value * val;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __VALUEHISTORY_HH_DEFINED__

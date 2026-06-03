@@ -26,7 +26,7 @@
 
 #include "UserFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// a system function or operator implemented as an internal defined function
 class Macro : public UserFunction
 {
@@ -73,7 +73,7 @@ private:
    /// destructor (not supposed to be called)
    ~Macro();
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __MACRO_HH_DEFINED__
 

@@ -408,8 +408,7 @@ enum Do_Optimization
    DO_ ## tag = enabled, DONT_ ## tag = 1 - enabled,
 #include "Performance.def"
 };
-
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 class OptmizationStatistics
 {
 public:

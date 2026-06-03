@@ -31,6 +31,7 @@
 //────────────────────────────────────────────────────────────────────────────
 /// common part of user-defined names and distinguished names
 template <typename T, size_t SYMBOL_COUNT>
+//════════════════════════════════════════════════════════════════════════════
 class SymbolTableBase
 {
 public:
@@ -257,7 +258,7 @@ protected:
    /// the variable if the name refers to a system variable, or 0 if not
    SystemVariable * sysvar;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// The table containing all system defined symbols (aka. distinguished names)
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {

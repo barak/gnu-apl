@@ -123,6 +123,7 @@ class Cell;
 // C. structs                                               //
 //////////////////////////////////////////////////////////////
 
+//════════════════════════════════════════════════════════════════════════════
 /// three AP numbers that uniquely identify a processor
 struct AP_num3
 {
@@ -178,7 +179,7 @@ struct Function_PC2
    Function_PC low;    ///< low PC  (including)
    Function_PC high;   ///< high PC (including)
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** A single label. A label is a local variable (sym) with an integer function
     line (in which \b sym: was specified as the first 2 tokens in the line)
  */
@@ -188,7 +189,7 @@ struct labVal
    Symbol      * sym;    ///< The symbol for the label variable.
    Function_Line line;   ///< The line number of the label.
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// The end and the state of an abstract iterator along one axis
 /// (to / weight / current)
 struct _twc
@@ -212,7 +213,7 @@ struct _ftwc : public _twc
    /// over-Take from the end.
    ShapeItem from;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// the ravel (of an APL value) and a comparison lenght (= number of
 /// consecutive cells to be compared)
 struct ravel_comp_len
@@ -223,7 +224,7 @@ struct ravel_comp_len
    /// the number of consecutive Cells to be compared
    ShapeItem comp_len;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 //////////////////////////////////////////////////////////////
 // D. Namespace APL_types

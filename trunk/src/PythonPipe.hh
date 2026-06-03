@@ -30,6 +30,7 @@
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// a pipe to a process running python
 class PythonPipe
 {
@@ -65,6 +66,7 @@ protected:
    const char * python_script;
 
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PYTHONPIPE_HH_DEFINED__
 // EOF

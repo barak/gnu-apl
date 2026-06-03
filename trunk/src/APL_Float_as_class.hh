@@ -102,6 +102,7 @@
 
 class APL_Float;
 
+//════════════════════════════════════════════════════════════════════════════
 /// the essential data of an APL_Float, so that it can be used in a union
 class APL_Float_Base
 {
@@ -157,6 +158,7 @@ public:
    APL_Float & operator =(const APL_Float & other)
       { dval = other.dval; return *this; }
 };
+//════════════════════════════════════════════════════════════════════════════
 /// isnormal() for APL_Float
 /// @param val the APL_Float value to test
 inline bool isnormal(const APL_Float & val)

@@ -102,7 +102,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
    else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
    if (del)   delete del;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Svar_DB::add_event(SV_key key, AP_num3 id, Svar_event event)
 {
@@ -140,7 +140,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         return SVE_NO_EVENTS;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Svar_DB::close_connection()
 {
@@ -376,7 +376,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return offering_id;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 SV_key
 Svar_DB::find_pairing_key(SV_key key)
 {
@@ -400,7 +400,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 SV_key
 Svar_DB::get_events(Svar_event & events, AP_num3 id)
 {
@@ -458,7 +458,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         delete response; 
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Svar_DB::get_offering_processors(AP_num to_proc,
                                  std::vector<AP_num> & processors)
@@ -484,7 +484,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         delete response; 
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket
 Svar_DB::get_Svar_DB_tcp(const char * calling_function)
 {
@@ -497,7 +497,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
 
    return tcp;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
               bool logit, bool do_svars)
@@ -541,7 +541,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return false;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 SV_key
 Svar_DB::match_or_make(const uint32_t * UCS_varname, const AP_num3 & to,
                        const Svar_partner & from)
@@ -579,7 +579,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    else            return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 Svar_DB::may_set(SV_key key, int attempt)
 {
@@ -603,7 +603,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return true;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 Svar_DB::may_use(SV_key key, int attempt)
 {
@@ -626,7 +626,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
      }
    return true;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Svar_DB::print(ostream & out)
 {
@@ -751,5 +751,5 @@ const int APserver_result = reader.close();
 
    return false;   // success
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

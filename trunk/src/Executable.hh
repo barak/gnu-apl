@@ -33,7 +33,7 @@ class Error;
 class UCS_string;
 class UserFunction;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
      A sequence of APL token. An executable is created for one of 3 purposes:
      - an APL expression for execute (⍎), or
@@ -373,6 +373,6 @@ protected:
    virtual UCS_string get_name() const
       { return UCS_string(UNI_DIAMOND); }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __EXECUTABLE_HH_DEFINED__

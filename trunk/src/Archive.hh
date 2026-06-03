@@ -47,6 +47,7 @@ class ValueStackItem;
 
 using namespace std;
 
+//════════════════════════════════════════════════════════════════════════════
 /// class for )SAVEing and )LOADing APL Workspaces in an XML file format
 class XML_Archive
 {
@@ -633,5 +634,5 @@ protected:
    /// the vids to be copied (empty if all)
    std::vector<Vid> vids_COPY;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

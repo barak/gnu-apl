@@ -39,6 +39,7 @@ class Symbol;
 class Value;
 class Workspace;
 
+//════════════════════════════════════════════════════════════════════════════
 /**
     A Token, consisting of a \b tag and a \b value. The \b tag (actually
     already (tag & TV_MASK) identifies the type of the \b value.
@@ -534,7 +535,7 @@ protected:
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// complain about missing ioptional functions, libraries, and/or packages
 /// needed by ⎕XXX function qfun.
 extern Token missing_files(const char * qfun,  const char ** libs,

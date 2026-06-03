@@ -38,7 +38,7 @@ using namespace std;
 #  define ABSTRACT_OFFSET 0
 #endif
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// a pointer to one record (one shared variable) of the shared Svar_DB_memory
 class Svar_record_P
 {
@@ -219,5 +219,6 @@ private:
    /// don't copy...
    Svar_DB& operator =(const Svar_DB & other);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SVAR_DB_HH_DEFINED__

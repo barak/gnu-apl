@@ -34,7 +34,7 @@
 VH_entry VH_entry::history[VALUEHISTORY_SIZE + 1];
 int VH_entry::idx = 0;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
                    const char * _loc)
   : event(_ev),
@@ -258,5 +258,5 @@ const ValueFlags flags_before = ValueFlags(flags);
 
    out << left << setw(30) << (loc ? loc : "<no-loc>") << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

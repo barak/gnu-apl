@@ -227,7 +227,7 @@ const char * AX = signature & SIG_X ? "X" : "A";
                 << " ⍬ for a list of valid numbers.";
    DOMAIN_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 FunctionGroup::compare_function_name(const char * const & name,
                                      const function_info * const & info,

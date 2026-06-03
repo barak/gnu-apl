@@ -114,7 +114,7 @@ inline void next_Cell(Value & value, const LA_pack::ZZ & zz)
    * All complex FORTRAN functions start with Z, all real FORTRAN functions
      with D (omitted above and in C/C++).
  */
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /* numerical limits
      
    DLAMCH determines double precision machine parameters.
@@ -139,12 +139,13 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 #undef dlamch_S
 #undef dlamch_P
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 # include "LAdebug.icc"   // print_matrix() etc.
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 template<typename T>
+//════════════════════════════════════════════════════════════════════════════
 LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
    : N(N)
 {
@@ -206,7 +207,7 @@ int LA_pack::PTVVy<T>::print_tau(ostream & out, Ccol N,
    out << endl;
    return N;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 //────────────────────────────────────────────────────────────────────────────
 /* LApack function UNM2R. Overwrite the general complex m-by-n matrix C:
 
@@ -556,7 +557,7 @@ T * work_B = work_A + items_A;
    std::allocator<T>{}.deallocate(work_AB, items_A + items_B);
    return cols_B;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 template<typename T>
 void LA_pack::grab_Q (Value & Z, fMatrix<T> & C, PTVVy<T> & ptvvy)
 {
@@ -787,7 +788,7 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
    std::allocator<T>{}.deallocate(work_B, total_items_fac);
    return N;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
     LApack functions DGELSY and ZGELSY aka. xGELSY:
 
@@ -1836,3 +1837,4 @@ const Ccol lastC = ila_lc<T>(len_v, C);
    gemv<T>(C, len_v, lastC,       v, y);   // set y[]
    gerc<T>(C, len_v, lastC, -tau, v, y);   // use y[]
 }
+//════════════════════════════════════════════════════════════════════════════

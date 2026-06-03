@@ -25,7 +25,7 @@
 #ifndef __CELL_ICC_DEFINED__
 #define __CELL_ICC_DEFINED__
 
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 inline bool
 Cell::tolerantly_equal(APL_Float A, APL_Float B, double C)
 {
@@ -97,7 +97,7 @@ const APL_Float mag2_max = Cmag2_A > Cmag2_B ? Cmag2_A : Cmag2_B;
    //
    return dist2_A_B <= mag2_max;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 inline bool
 Cell::integral_within(APL_Float A, double qct)
 {
@@ -118,7 +118,7 @@ const APL_Float real_dn = floor(A) + qct;
 
    return A > real_up || A < real_dn;
 }
-//──────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __CELL_ICC_DEFINED__
 

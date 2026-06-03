@@ -26,6 +26,7 @@
 
 #include "Listener.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class TcpListener : public Listener {
 public:
     TcpListener( int port_in ) : port( port_in ), closing( false ) {};
@@ -39,5 +40,6 @@ private:
     int server_socket;
     bool closing;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

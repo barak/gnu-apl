@@ -26,6 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /** A helper struct for Bif_F12_FORMAT
  It represents a sub-field (int part, fract part, or exponent)
  of the format field
@@ -88,7 +89,7 @@ struct Format_sub
    uint32_t        flt_mask;       ///< decorator floating mode
    int             min_len;        ///< the minimum length in the output
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** System function format
  */
 /// The class implementing ⍕
@@ -225,6 +226,6 @@ protected:
    /// @param precision number of significant mantissa digits
    static UCS_string format_float_by_spec(APL_Float value, int precision);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __BIF_F12_FORMAT_HH_DEFINED__

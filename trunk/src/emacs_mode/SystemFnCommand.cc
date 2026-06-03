@@ -27,6 +27,7 @@
 #include "../Command.hh"
 
 #include <sstream>
+//════════════════════════════════════════════════════════════════════════════
 
 void
 SystemFnCommand::run_command(NetworkConnection &conn,
@@ -44,3 +45,4 @@ stringstream sout;
     sout << END_TAG << "\n";
     conn.write_string_to_fd( sout.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

@@ -56,7 +56,7 @@ const FunctionGroup::function_info Quad_FFT::subfunction_infos[] =
   fftdef( 15,fft_flat_top          ,"Z is FFT with flat-top window"           )
 };
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Quad_FFT::Quad_FFT()
       : QuadFunction(TOK_Quad_FFT)
 {
@@ -393,5 +393,6 @@ void
 Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
 {
 }
+//════════════════════════════════════════════════════════════════════════════
 #endif // (not) apl_FFT
 

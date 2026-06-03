@@ -36,6 +36,7 @@ extern char pref[];   ///< a prefix for debug printouts
 
 struct SVAR_context;
 
+//════════════════════════════════════════════════════════════════════════════
 /// a coupled shared variable
 struct Coupled_var
 {
@@ -55,6 +56,7 @@ enum APL_error_code
 #define err_def(c, t, maj, min) E_ ## c = (maj) << 16 | (min),
 #include "../Error.def"
 };
+//════════════════════════════════════════════════════════════════════════════
 #else
 #define APL_error_code ErrorCode
 #endif

@@ -56,7 +56,7 @@ Quad_SQL_4 Quad_SQL_4::fun;   // ⎕SQL[4, DB]
 # include "sql/PostgresProvider.hh"
 #endif
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
 {
 #define sql_def(N, name, map_comm, fun_comm) \
@@ -74,7 +74,7 @@ const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
    sql_def( 10, version  , "SQL provider version number", "")
    sql_def( 11, vstring  , "SQL provider version string", "")
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Quad_SQL::Quad_SQL()
    : QuadFunction(TOK_Quad_SQL)
 {
@@ -779,4 +779,4 @@ Value_P FUN_DB(2, LOC);
    FUN_DB->check_value(LOC);
    return Token(TOK_APL_VALUE1, Quad_SQL::run_update(*A, *FUN_DB, *B));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

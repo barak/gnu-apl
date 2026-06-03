@@ -33,6 +33,7 @@
 /// properties of a single plot line. The properties, their type, and their
 /// default values are defined in file Quad_PLOT.def.
 
+//════════════════════════════════════════════════════════════════════════════
 class Plot_line_properties
 {
 public:

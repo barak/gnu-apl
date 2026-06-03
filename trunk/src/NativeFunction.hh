@@ -30,7 +30,7 @@
 #include "Function.hh"
 #include "Error.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
     A defined function written in C++.
  */
@@ -291,6 +291,6 @@ protected:
    /// callback before library is closed
    bool (*close_fun)(Cause cause, const NativeFunction * caller);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __NATIVE_FUNCTION_HH_DEFINED__

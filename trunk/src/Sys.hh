@@ -35,6 +35,7 @@
 
 #include "config.h"   // for HAVE_MMAN_H
 
+//════════════════════════════════════════════════════════════════════════════
 /// A FILE * that pclose()s itself FILE * when destructed.
 class PipePointer
 {

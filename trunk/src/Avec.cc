@@ -46,7 +46,7 @@ struct Avec::Character_definition
    CharacterFlag flags;       ///< Character class.
    int           av_pos;      ///< position in ⎕AV (== ⎕AF unicode)
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const Avec::Character_definition
 Avec::character_table[MAX_AV] =
 {
@@ -55,8 +55,9 @@ Avec::character_table[MAX_AV] =
 #define char_uni(_name, _uni, _tag, _flags)
 #include "Avec.def"
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 #ifdef cfg_DEVELOP_WANTED
+//════════════════════════════════════════════════════════════════════════════
 
 void
 Avec::init()
@@ -664,4 +665,4 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
 
    return 0;   // OK
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

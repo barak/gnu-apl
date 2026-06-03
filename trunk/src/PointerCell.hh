@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /*!
     A cell pointing to another APL value. This is used to create nested
     arrays. This class essentially overloads certain functions in class

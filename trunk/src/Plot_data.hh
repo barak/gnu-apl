@@ -37,7 +37,6 @@ typedef uint32_t Color;
 typedef std::string String;
 
 //════════════════════════════════════════════════════════════════════════════
-
 /// a window coordinate in pixels
 struct Pixel_XY
 {

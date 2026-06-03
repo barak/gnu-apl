@@ -35,6 +35,7 @@
 #include <sys/un.h>
 #include <errno.h>
 #include <netdb.h>
+//════════════════════════════════════════════════════════════════════════════
 
 std::string TcpListener::start( void )
 {
@@ -149,3 +150,4 @@ void TcpListener::close_connection( void )
         close( server_socket );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

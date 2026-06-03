@@ -31,7 +31,7 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -92,7 +92,7 @@ transfer_context tctx(protection);
         break;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::transfer_context::process_record(const UTF8 * record,
                                           const UCS_string_vector & objects)
@@ -397,7 +397,7 @@ Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
             << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::transfer_context::add(const UTF8 * str, int len)
 {
@@ -423,4 +423,4 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
            }
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

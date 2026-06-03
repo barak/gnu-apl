@@ -34,7 +34,7 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
      safe_execution_depth(_par ? _par->safe_execution_depth : 0),
@@ -642,5 +642,5 @@ const int boxing_format = Command::get_boxing_format();
         B1->print(COUT);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

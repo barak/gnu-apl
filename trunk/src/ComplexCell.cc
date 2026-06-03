@@ -38,7 +38,7 @@
 #include "Cell.icc"
 #include "NumericCell.icc"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ComplexCell::ComplexCell(APL_Complex c)
 {
    value.cval[0]  = c.real();
@@ -142,7 +142,7 @@ const double limit = 1.0 - qct;
    if (Dr < (Di - qct))    return NumericCell::zV(Z, fr, fi + 1.0);
    return NumericCell::zV(Z, fr + 1.0, fi);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 ComplexCell::bif_magnitude(Cell * Z) const
 {
@@ -211,9 +211,9 @@ const APL_Integer set_size = get_checked_near_int();
 const uint64_t rnd = Workspace::get_RL(set_size);
    return IntCell::zI(Z, qio + (rnd % set_size));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // dyadic build-in functions...
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 ComplexCell::bif_add(Cell * Z, const Cell * A) const
 {
@@ -266,7 +266,7 @@ const double qct = Workspace::get_CT();
 
    return IntCell::z1(Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 ComplexCell::bif_logarithm(Cell * Z, const Cell * A) const
 {
@@ -749,7 +749,7 @@ double z_i;
 
    return ComplexCell::zC(Z, z_r, z_i);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 ComplexCell::is_near_zero() const
 {
@@ -781,10 +781,10 @@ const APL_Float I2 = value.cval[1] * value.cval[1];
 const APL_Float R2 = value.cval[0] * value.cval[0];
    return (I2 < R2*B2);   // I is relatively small
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 // throw/nothrow boundary. Functions above MUST NOT (directly or indirectly)
 // throw while funcions below MAY throw.
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 
 #include "Error.hh"   // throws
 
@@ -833,7 +833,7 @@ APL_Float breal = get_real_value();
 
    return (breal < areal) ? COMP_LT : COMP_GT;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 PrintBuffer
 ComplexCell::character_representation(const PrintContext & pctx) const
 {
@@ -965,4 +965,4 @@ const APL_Float diff = val - result;
 
    return APL_Integer(result + 0.3);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

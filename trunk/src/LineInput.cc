@@ -53,6 +53,7 @@ LineInput * LineInput::the_line_input = 0;
 
 bool LineInput::map_next = false;
 bool LineInput::map_all  = false;
+//════════════════════════════════════════════════════════════════════════════
 
 LineHistory LineHistory::quote_quad_history(10);
 LineHistory LineHistory::quad_quad_history(10);
@@ -814,7 +815,7 @@ const APL_time_us from = now();
 
    if (UserPreferences::uprefs.echo_CIN)   COUT << prompt << line << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
                      UCS_string & user_line, bool & eof, LineHistory & hist)
@@ -1026,7 +1027,7 @@ LineInput::restore_termios()
    initial_termios_errno = 1;   // prevent multiple calls
 #endif // ! MINGW_SRC
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 LineInput::LineInput(bool do_read_history)
    : history(UserPreferences::uprefs.line_history_len),
      write_history(false)
@@ -1283,7 +1284,7 @@ LineInput::safe_fgetc()
          return EOF;   // EOF
        }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 ESCmap::has_prefix(const char * seq, int seq_len) const
 {
@@ -1307,7 +1308,7 @@ ESCmap::is_equal(const char * seq, int seq_len) const
 
    return true;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 bool
 ESCmap::need_more(const char * seq, int len)
 {
@@ -1326,3 +1327,4 @@ return;
    loop(e, ESCmap_entry_count)
      the_ESCmap[e].len = strlen(the_ESCmap[e].seqence);
 }
+//════════════════════════════════════════════════════════════════════════════

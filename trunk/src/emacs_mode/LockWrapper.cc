@@ -22,6 +22,7 @@
 */
 
 #include "LockWrapper.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 LockWrapper::LockWrapper( pthread_mutex_t *lock_in ) : lock( lock_in )
 {
@@ -32,3 +33,4 @@ LockWrapper::~LockWrapper()
 {
     pthread_mutex_unlock( lock );
 }
+//════════════════════════════════════════════════════════════════════════════

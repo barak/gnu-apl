@@ -26,6 +26,7 @@
 
 #include "apl-sqlite.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class ArgListBuilder
 {
 public:
@@ -37,5 +38,6 @@ public:
     virtual Value_P run_query()                            = 0;
     virtual void clear_args()                              = 0;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

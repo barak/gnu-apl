@@ -28,7 +28,7 @@
 #include "TabExpansion.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 TabExpansion::TabExpansion(UCS_string & line)
    : have_trailing_blank(line.size() && line.back() == UNI_SPACE)
 {
@@ -606,7 +606,7 @@ int c1 = col;
    CERR << endl;
    return ER_AGAIN;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ExpandResult
 TabExpansion::expand_help_topics(UCS_string & user_input)
 {
@@ -655,7 +655,7 @@ UCS_string_vector matches;
    user_input = help + matches[0];
    return ER_REPLACE;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ExpandResult
 TabExpansion::expand_user_name(UCS_string & user_input)
 {
@@ -693,7 +693,7 @@ UCS_string_vector matches;
 
    return ER_IGNORE;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ExpandResult
 TabExpansion::expand_wsname(UCS_string & user_input, const UCS_string cmd,
                        LibRef lib, const UCS_string filename)
@@ -749,7 +749,7 @@ nothing:
    CERR << cmd << " " << lib << " '" << filename << "'" << endl;
    return ER_AGAIN;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 TabExpansion::read_matching_filenames(DIR * dir, UTF8_string dirname,
                                  UTF8_string prefix, ExpandHint ehint,
@@ -818,7 +818,7 @@ const int common_len = compute_common_length(prefix_len, matches);
         return ER_REPLACE;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 
 

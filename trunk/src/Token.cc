@@ -30,7 +30,7 @@
 #include "Token.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token::Token(TokenTag t, IndexExpr & idx)
 {
    /* construct a token for an index expressions. There are 3 cases which
@@ -385,7 +385,7 @@ bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
    ucs << canon;
    return need_space ? -canon.size() : canon.size();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Token::get_function_axis() const
 {
@@ -684,7 +684,7 @@ const UCS_string indent(fn.size(), UNI_SPACE);
 
    if (pb.get_row_count() == 0)   out << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 Token::tag_name() const
 {
@@ -840,5 +840,5 @@ Token::print_quad(ostream & out) const
 {
    return out << UNI_Quad_Quad << get_Id();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // EOF

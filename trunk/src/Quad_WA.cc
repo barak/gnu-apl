@@ -71,7 +71,7 @@ extern uint64_t top_of_memory();
 rlim_t Quad_WA::initial_rlimit = RLIM_INFINITY;
 unsigned long long Quad_WA::initial_sbrk = 0;
 
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_WA::init(bool log_startup)
 {
@@ -357,7 +357,7 @@ const int64_t overcommit = read_procfile("/proc/sys/vm/overcommit_memory");
    total_memory = mem_val;
    total_memory_by_user = true;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 
 //────────────────────────────────────────────────────────────────────────────
 Value_P
@@ -367,3 +367,4 @@ Quad_WA::get_apl_value() const
                     (Value::total_ravel_count * sizeof(Cell)
                     + Value::value_count * sizeof(Value)), LOC);
 }
+//════════════════════════════════════════════════════════════════════════════

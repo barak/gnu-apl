@@ -30,6 +30,7 @@
 #include "Value.hh"
 #include "UCS_string_vector.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕GTK
 class Quad_GTK : public QuadFunction
 {
@@ -199,5 +200,6 @@ protected:
    /// whether the next new window shall grab the focus
    static bool focus_on_map;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_GTK_DEFINED__

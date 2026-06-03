@@ -40,8 +40,9 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // conatructor for a lambda
+//════════════════════════════════════════════════════════════════════════════
 UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
                            const UCS_string & text, const Token_string & lambda_body,
                            const vector<Symbol *> & lvars)
@@ -1225,7 +1226,7 @@ const UCS_string ucs(utf);
 int error_line = -1;
    return fix(ucs, error_line, false, LOC, filename);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UserFunction *
 UserFunction::fix(const UCS_string & text, int & err_line,
                   bool keep_existing, const char * loc,
@@ -1339,7 +1340,7 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
 
    return ufun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UserFunction *
 UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 {
@@ -1595,4 +1596,4 @@ UserFunction::print_val_or_fun(ostream & out, const Token & tok)
 
    return out;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

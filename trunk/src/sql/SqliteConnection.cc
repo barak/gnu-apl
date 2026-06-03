@@ -25,6 +25,7 @@
 #include "SqliteConnection.hh"
 #include "SqliteResultValue.hh"
 #include "SqliteArgListBuilder.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 void SqliteConnection::raise_sqlite_error( const string &message )
 {
@@ -141,4 +142,5 @@ SqliteStmtWrapper statement_wrapper(statement);
                                           (sqlite3_column_text(statement, 2))));
         }
 }
+//════════════════════════════════════════════════════════════════════════════
 

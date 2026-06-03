@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** The various Quad functions.  */
 /// Base class for all system functions
 class QuadFunction : public PrimitiveFunction
@@ -509,6 +509,6 @@ public:
 
    static Quad_TRACE  fun;          ///< Built-in function.
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_FUNCTION_HH_DEFINED__

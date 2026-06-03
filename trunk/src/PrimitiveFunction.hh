@@ -36,7 +36,7 @@ class CollatingCache;
 class ConstRavel_P;
 class IntCell;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
     Base class for the APL system functions (Quad functions and primitives
     like +, -, ...) and operators
@@ -406,7 +406,7 @@ protected:
    static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
                            ShapeItem len_B, const Cell * cB, ShapeItem dB);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
 class Bif_ROTATE : public NonscalarFunction_default_identity
@@ -496,7 +496,7 @@ public:
    static Bif_F12_ROTATE1  fun;   ///< Built-in function
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** System function transpose */
 /// The class implementing ⍉
 class Bif_F12_TRANSPOSE : public NonscalarFunction_default_identity
@@ -567,7 +567,7 @@ public:
    static Bif_F12_RHO  fun;   ///< Built-in function
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** System function ∪ (unique/union) */
 /// The class implementing ∪
 class Bif_F12_UNION : public NonscalarFunction
@@ -652,6 +652,6 @@ public:
    static Bif_F2_RIGHT  fun;   ///< Built-in function
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PRIMITIVE_FUNCTION_HH_DEFINED__

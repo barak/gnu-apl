@@ -166,7 +166,7 @@ PythonPipe::write(UTF8_string cmd, bool no_LF )
 const ssize_t len = ::write(fd, cmd.c_str(), cmd.size());
    Assert(len == int(cmd.size()));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 PythonPipe::wr_rd(const char * cmd)
 {

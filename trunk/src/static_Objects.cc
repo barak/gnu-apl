@@ -39,7 +39,7 @@
 bool static_Objects::show_constructors = false;
 bool static_Objects::show_destructors  = false;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static_Objects::static_Objects(const char * l, const char * w)
    : loc(l),
      what(w)
@@ -51,7 +51,7 @@ static_Objects::~static_Objects()
 {
    if (show_destructors)   cerr << "-- destructing " << what << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #define INFO(m, l) DO_INFO(#m, l)
 #define DO_INFO(m, l)   extern static_Objects info_ ## l; \

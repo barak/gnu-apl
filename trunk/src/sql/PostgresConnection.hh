@@ -28,6 +28,7 @@
 
 #include <libpq-fe.h>
 
+//════════════════════════════════════════════════════════════════════════════
 class PostgresConnection : public Connection {
 public:
     PostgresConnection(PGconn * db_in);
@@ -59,5 +60,6 @@ public:
 private:
     PGconn *db;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

@@ -105,6 +105,7 @@ using namespace std;
 //────────────────────────────────────────────────────────────────────────────
 /// an integer signal item of size \b bytes
 template<typename T, int bytes>
+//════════════════════════════════════════════════════════════════════════════
 class Sig_item_int
 {
 public:
@@ -252,7 +253,6 @@ protected:
    string value;
 };
 //────────────────────────────────────────────────────────────────────────────
-//────────────────────────────────────────────────────────────────────────────
 /// a number identifying the signal
 enum Signal_id
 {
@@ -368,7 +368,7 @@ enum Signal_id
 
    sid_MAX,
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// the base class for all signal classes
 class Signal_base
 {
@@ -3005,8 +3005,7 @@ public:
 protected:
    Sig_item_string printout;   ///< printout
 };
-
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 /// a union big enough for all signal classes
 struct _all_signal_classes_
@@ -3123,6 +3122,7 @@ struct _all_signal_classes_
         char u_SVAR_DB_PRINTED[sizeof(SVAR_DB_PRINTED_c)];
 
 };
+//════════════════════════════════════════════════════════════════════════════
 
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 

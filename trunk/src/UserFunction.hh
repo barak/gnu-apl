@@ -33,7 +33,7 @@
 #include "UserFunction_header.hh"
 #include "UTF8_string.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// One user-defined function
 class UserFunction : public Function, public Executable
 {
@@ -470,6 +470,6 @@ protected:
    /// trace lines (from S∆fun ← lines)
    vector<Function_Line> trace_lines;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __USERFUNCTION_HH_DEFINED__

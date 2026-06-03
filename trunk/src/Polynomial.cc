@@ -26,7 +26,7 @@
 #include "Polynomial.hh"
 #include "Tokenizer.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 Monomial::get_order(const Value & order) const
 {
@@ -104,7 +104,7 @@ Value_P Z(expos.size() + 1, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 void
 Monomial::scan_coefficient(Unicode_source & src, char term_sign, bool & got_j,
                             const bool & got_overbar)
@@ -122,7 +122,7 @@ const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
         set_real(got_overbar, term_sign, id.get_double());
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Monomial::scan_indeterminants(const UCS_string_vector & vars,
                                Unicode_source & src)

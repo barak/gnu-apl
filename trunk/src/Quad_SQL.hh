@@ -31,7 +31,7 @@ class ArgListBuilder;
 class Connection;
 class Provider;   // SQL provider (SQLite, PostgreSQL)
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕SQL
  */
@@ -209,7 +209,6 @@ protected:
    /// @param B right-argument APL value (query parameters)
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 };
-
 //────────────────────────────────────────────────────────────────────────────
 
 class Quad_SQL_4 : public QuadFunction
@@ -227,6 +226,7 @@ protected:
    /// @param B right-argument APL value (query parameters)
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_SQL_HH_DEFINED__
 

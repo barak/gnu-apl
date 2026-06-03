@@ -29,6 +29,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 32
 #include <pcre2.h>
 
+//════════════════════════════════════════════════════════════════════════════
 /// A Regular expression match
 class RegexpMatch
 {
@@ -108,5 +109,6 @@ protected:
    /// compiled regular expression
    pcre2_code * code;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Regexp_HH__DEFINED__

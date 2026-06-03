@@ -36,7 +36,7 @@
 
 #include "Cell.icc"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 Cell::bif_equal(Cell * Z, const Cell * A) const
 {
@@ -307,7 +307,7 @@ const Cell * cell_B = cells + B * comp_len;
    //
    return A > B;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator <<(ostream & out, const Cell & cell)
 {
@@ -315,7 +315,7 @@ PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
 UCS_string ucs(pb, 0, Workspace::get_PW());
    return out << ucs;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 Cell::sorted_indices(vector<ShapeItem> & indices, const Value & value,
                      Sort_order order, ShapeItem comp_len)
@@ -343,4 +343,4 @@ const ravel_comp_len ctx = { &value.get_cfirst(), comp_len};
       Heapsort<ShapeItem>::sort(indices, &Cell::smaller_cp, &ctx);
    return E_NO_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

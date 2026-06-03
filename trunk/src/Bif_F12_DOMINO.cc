@@ -60,7 +60,7 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def(20, integral       , "compute integral for B"                    )
 #undef domino_def
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Bif_F12_DOMINO::Bif_F12_DOMINO()
    : NonscalarFunction_default_identity(TOK_F12_DOMINO)
 {
@@ -281,7 +281,7 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -382,7 +382,7 @@ const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
@@ -464,7 +464,7 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// print debug infos for \b this complex matrix
 template<>
 void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
@@ -487,7 +487,7 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Bif_F12_DOMINO::QR_Helzer(Value_P Z, bool need_complex, ShapeItem M,
                           ShapeItem N, const Cell * cB, double EPS)
@@ -875,7 +875,7 @@ mB.debug("[13] B");
          --rows;
        }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
 {
@@ -1996,5 +1996,5 @@ Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
         else                               DOMAIN_ERROR;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

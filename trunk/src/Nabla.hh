@@ -28,6 +28,7 @@
 
 class Symbol;
 
+//════════════════════════════════════════════════════════════════════════════
 /// a line number like 1.2 while editing it
 struct LineLabel
 {
@@ -275,5 +276,6 @@ protected:
    /// the text for line \b current_line
    UCS_string current_text;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __NABLA_HH_DEFINED__

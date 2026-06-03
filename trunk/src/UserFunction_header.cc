@@ -40,6 +40,7 @@
 
 //════════════════════════════════════════════════════════════════════════════
 //// constructor for a normal (non-lambda) defined function header
+//════════════════════════════════════════════════════════════════════════════
 UserFunction_header::UserFunction_header(const UCS_string & text0, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
     error_info("Bad header"),
@@ -530,4 +531,4 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
          ++pos;
        }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

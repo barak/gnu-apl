@@ -33,13 +33,13 @@
 #include "UCS_string.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const FunctionGroup::function_info Quad_CR::subfunction_infos[] =
 {
 #define crdef(N, name, comm_2)   { N, #name, "", comm_2, -1 },
 #include "Quad_CR.def"
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Quad_CR::Quad_CR()
  : QuadFunction(TOK_Quad_CR)
 {
@@ -87,7 +87,7 @@ Value_P Z = do_CR(subfunction, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
 {
@@ -261,7 +261,7 @@ CDR_string cdr;
 Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_CR::do_CR13(const Value * B)
 {
@@ -426,7 +426,7 @@ const APL_types::Depth depth = value->compute_depth();
                                                                      PUSH_TEXT
    Workspace::pop_FC();   // restore ⎕FC
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const char *
 Quad_CR::get_legend(FunctionGroup::Legend_type lt) const
 {
@@ -679,7 +679,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                  DOMAIN_ERROR;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const char *
 Quad_CR::do_CR10_structured(UCS_string_vector & result,
                             const UCS_string & var_name,
@@ -1323,7 +1323,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_CR::do_CR33(const Value * B)
 {
@@ -1983,5 +1983,5 @@ timeval tv;
 const UTF8_string varname_utf(cc);
    return UCS_string(varname_utf);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

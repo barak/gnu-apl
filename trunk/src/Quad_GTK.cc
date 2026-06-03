@@ -43,7 +43,7 @@ bool Quad_GTK::focus_on_map = false;   // focus for new windows
 #include <poll.h>
 #include <sys/ioctl.h>
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_GTK::close_all_windows()
 {
@@ -568,7 +568,7 @@ const int fd = Quad_FIO::do_FIO_57(UTF8_string(path), envp);
    loop(c, evar_count)   delete [] envp[c];
    return fd;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_GTK::send_name_or_data(int fd, int tag, const UCS_string & name_or_data)
 {
@@ -984,6 +984,6 @@ Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    return eval_B(B);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 #endif   // apl_GTK3
 

@@ -26,6 +26,7 @@
 
 #include "UTF8_string.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// the header of a CDR record
 struct CDR_header
 {
@@ -144,5 +145,6 @@ protected:
    uint32_t get_4(unsigned int offset) const
       { return CDR_header::get_be32(utf8P(&(*this)[0] + offset)); }
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __CDR_STRING_HH_DEFINED__

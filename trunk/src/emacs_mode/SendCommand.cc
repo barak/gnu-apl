@@ -51,6 +51,7 @@ ssize_t ret = write( fd, line.c_str(), line.size() );
     else if(ret != ssize_t(line.size()))
         throw ConnectionError( "Incomplete write of buffer" );
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void SendCommand::run_command(NetworkConnection &conn,
                               const vector<string> &args )
@@ -103,3 +104,4 @@ void SendCommand::run_command(NetworkConnection &conn,
         conn.write_string_to_fd( out.str() );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

@@ -270,7 +270,7 @@ Quad_EB::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EB_B)->eval_AB(A, B);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_EC::eoc(Token & result)
 {
@@ -379,7 +379,7 @@ Value_P Z2(2, LOC);
 Token tok_Z(TOK_APL_VALUE1, Z);
    result.move_from(tok_Z, LOC);
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Quad_EC::eval_B(Value_P B) const
 {
@@ -643,7 +643,7 @@ const APL_Integer err = (B->get_cfirst().get_near_int() << 16)
 
    return ErrorCode(err);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 Quad_EX::expunge(const UCS_string & name)
 {
@@ -832,7 +832,7 @@ Token ret = Macro::get_macro(Macro::MAC_Z__Quad_INP_B)->eval_B(BB);
    Quad_INP_running = false;
    return Token(TOK_SI_PUSHED);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_INP::eval_B(Value_P B) const
 {
@@ -1376,7 +1376,7 @@ const APL_Integer b = B->get_cfirst().get_near_int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_SI::eval_B(Value_P B) const
 {
@@ -1517,7 +1517,7 @@ const ShapeItem ec = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
@@ -1533,7 +1533,7 @@ std::vector<Function_Line> lines;
 
    ufun->set_trace_stop(lines, stop);
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 const UserFunction *
 Stop_Trace::locate_fun(const Value & fun_name)
 {
@@ -1566,7 +1566,7 @@ const UserFunction * ufun = fun->get_func_ufun();
 
    return ufun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
 {

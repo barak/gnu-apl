@@ -24,7 +24,7 @@
 #include "CharCell.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 PrintBuffer
 CharCell::character_representation(const PrintContext & pctx) const
 {
@@ -233,5 +233,5 @@ CharCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 
    return E_DOMAIN_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

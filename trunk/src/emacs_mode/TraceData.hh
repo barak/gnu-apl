@@ -32,6 +32,7 @@
 #include <set>
 #include <map>
 
+//════════════════════════════════════════════════════════════════════════════
 class TraceDataEntry {
 public:
     TraceDataEntry( int cr_level_in ) : cr_level( cr_level_in ) {}
@@ -55,5 +56,6 @@ private:
     Symbol *symbol;
     map<NetworkConnection *, TraceDataEntry> active_listeners;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

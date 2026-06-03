@@ -35,6 +35,7 @@
 // entries from Help.def will be returned
 // If no entry found, "nil" is returned so it is
 // safe to "read" on Emacs Lisp side.
+//════════════════════════════════════════════════════════════════════════════
 class HelpCommand : public NetworkCommand {
 public:
     struct HelpEntry
@@ -63,5 +64,6 @@ public:
 private: // variables
     HelpEntries help_entries;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

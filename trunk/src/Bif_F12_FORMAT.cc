@@ -34,7 +34,7 @@
 
 Bif_F12_FORMAT   Bif_F12_FORMAT::fun;       // ⍕
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 Format_sub::insert_fract_commas(const UCS_string & data) const
 {
@@ -190,7 +190,7 @@ Format_sub::print(ostream & out) const
    loop(d, 32)   if (flt_mask & (1 << d))   out << char('0' + d);
    return out;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
    : exponent_char(UNI_E),
      expo_negative(false)
@@ -507,7 +507,7 @@ UCS_string ucs;
 
    return ucs << data;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_right_side(const UCS_string data_fract,
                                                 bool negative,
@@ -709,7 +709,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_FORMAT::eval_B(Value_P B) const
 {
@@ -846,7 +846,7 @@ Shape sZ;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B) const
 {
@@ -1229,10 +1229,10 @@ UCS_string ret = UCS_string::from_double_to_fixed(value, precision);
 
    return ret;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator <<(ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

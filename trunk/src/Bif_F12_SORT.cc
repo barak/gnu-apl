@@ -32,7 +32,7 @@
 Bif_F12_SORT_ASC  Bif_F12_SORT_ASC::fun;     // ⍋
 Bif_F12_SORT_DES  Bif_F12_SORT_DES::fun;     // ⍒
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** class CollatingCache is a helper that efficiently maps characters in
     vector B to an integer vector B1 (the significances of B) according to
     the collating sequence A.
@@ -42,6 +42,7 @@ Bif_F12_SORT_DES  Bif_F12_SORT_DES::fun;     // ⍒
     subsequent copies A[a+k] of some A[a] will never match and are therefore
     not stored in the CollatingCache.
  **/
+//════════════════════════════════════════════════════════════════════════════
 CollatingCache::CollatingCache(const Value & A,
                                const vector<ShapeItem> & signif,
                                ShapeItem clen)
@@ -171,7 +172,7 @@ const int qio = Workspace::get_IO();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_SORT::sort_collating(Value_P A, Value_P B, Sort_order order)
 {
@@ -221,5 +222,5 @@ Value_P Z(len_BZ, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

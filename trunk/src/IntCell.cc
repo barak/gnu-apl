@@ -31,6 +31,7 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 #include "Workspace.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 const IntCell IntCell::boolean_FALSE(0);
 const IntCell IntCell::boolean_TRUE(1);
@@ -632,8 +633,8 @@ const APL_Integer set_size = value.ival;
 const uint64_t rnd = Workspace::get_RL(set_size);
    return IntCell::zI(Z, qio + (rnd % set_size));
 }
-//────────────────────────────────────────────────────────────────────────────
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 IntCell::bif_subtract(Cell * Z, const Cell * A) const
 {
@@ -758,7 +759,7 @@ APL_Float z = value.ival - a * qf;
 
    return FloatCell::zF(Z, z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 IntCell::bif_add_inverse(Cell * Z, const Cell * A) const
 {
@@ -836,10 +837,10 @@ IntCell::get_cell_subtype() const
 
    return CellType(CT_INT | CTS_U64);
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 // throw/nothrow boundary. Functions above MUST NOT (directly or indirectly)
 // throw while funcions below MAY throw.
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 
 #include "Error.hh"
 
@@ -957,4 +958,4 @@ const APL_Integer val = get_int_value();
    if (val == 0xFFFFFFFF)     return 4;
    return 8;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

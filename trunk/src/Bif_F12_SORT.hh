@@ -31,7 +31,7 @@
 
 class Cell;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** one item of a CollatingCache. Every character in A (of A⍋B or A⍒B gets
    one CollatingCacheEntry; if the same character occurs multiple times in A,
    then only the first one (in row-major order) creates the cache entry
@@ -253,7 +253,7 @@ public:
    static Bif_F12_SORT_DES  fun;   ///< Built-in function
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 
 #endif // __COLLATING_CACHE_HH_DEFINED__

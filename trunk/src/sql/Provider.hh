@@ -27,6 +27,7 @@
 #include "apl-sqlite.hh"
 #include "Connection.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// An abstract provider for a database service
 class Provider
 {
@@ -49,5 +50,6 @@ public:
    /// library version_number
    virtual int version_number() const   = 0;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

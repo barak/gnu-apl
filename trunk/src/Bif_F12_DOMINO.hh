@@ -28,7 +28,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions matrix divide and matrix inverti (and a number
     of nonstandard GNMNU APL functions 
  */
@@ -430,8 +430,7 @@ public:
        const ShapeItem dY;
      };
 };
-
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// compute norm variants of column 1 of \b this real marix
 template<>
 inline void

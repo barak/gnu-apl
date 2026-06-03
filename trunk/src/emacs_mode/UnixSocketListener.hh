@@ -26,6 +26,7 @@
 
 #include "Listener.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class UnixSocketListener : public Listener {
 public:
     UnixSocketListener() : server_socket( 0 ), initialised( false ), closing( false ) {};
@@ -41,5 +42,6 @@ private:
     bool closing;
     int notification_fd;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

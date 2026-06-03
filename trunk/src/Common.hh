@@ -115,6 +115,7 @@ extern void init_modules2(bool log_startup);
 /// @param soft  true for a soft (non-fatal) cleanup, false for hard exit
 extern void cleanup(bool soft);
 
+//════════════════════════════════════════════════════════════════════════════
 class InterruptContext
 {
 public:
@@ -436,7 +437,7 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// Year, Month, Day, hour, minute, second, μsecond
 struct YMDhmsu
 {
@@ -455,7 +456,7 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int year;     ///< year, e.g. 2013
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)    { return common_new(size); }

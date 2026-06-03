@@ -43,13 +43,13 @@ class PrintBuffer;
 class Value_P;
 class Thread_context;
 
+//════════════════════════════════════════════════════════════════════════════
 /// a linked list of deleted values
 struct _deleted_value
 {
    /// the next deleted value
   _deleted_value * next;
 };
-
 //════════════════════════════════════════════════════════════════════════════
 /**
     An APL value. It consists of a fixed header (rank, shape) and
@@ -1221,7 +1221,7 @@ private:
    /// limit the use of & (which is frequently a mistake)
    Value * operator &()   { return this; }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 // shortcuts for frequently used APL values...
 

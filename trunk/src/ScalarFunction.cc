@@ -43,6 +43,7 @@
 Bif_F2_AND      Bif_F2_AND     ::fun;                // ∧
 Bif_F2_AND_B    Bif_F2_AND_B   ::fun;                // ∧∧
 Bif_F12_BINOM   Bif_F12_BINOM  ::fun;                // !
+//════════════════════════════════════════════════════════════════════════════
 Bif_F12_CIRCLE  Bif_F12_CIRCLE ::fun(false);         // ○
 Bif_F12_CIRCLE  Bif_F12_CIRCLE ::fun_inverse(true);  // A inverted
 Bif_F12_DIVIDE  Bif_F12_DIVIDE ::fun;                // ÷
@@ -540,7 +541,7 @@ PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 ScalarFunction::eval_scalar_AXB(Value_P A, AxesBitmap axes_X, Value_P B,
                                 prim_f2 fun, bool reversed) const
@@ -836,7 +837,7 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
 
 #endif   // PARALLEL_ENABLED
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 ScalarFunction::PF_scalar_B(Thread_context & tctx)
 {
@@ -1059,7 +1060,7 @@ const Shape weights_B = B->get_shape().get_weights();
 //════════════════════════════════════════════════════════════════════════════
 // Inverse functions...
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
@@ -1071,13 +1072,13 @@ Bif_F12_POWER::get_dyadic_inverse() const
 {
    return &Bif_F12_LOGA::fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
@@ -1091,7 +1092,7 @@ Bif_F12_MINUS::get_dyadic_inverse() const
    // - is self-inverse: B = (A-(A-B))
    return &Bif_F12_PLUS::fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_ROLL::eval_B(Value_P B) const
 {
@@ -1102,7 +1103,7 @@ Bif_F12_ROLL::eval_B(Value_P B) const
 
    return eval_scalar_B(B, &Cell::bif_roll);
 }
-//════════════════════════════════════════════════════════════════════════════
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_F12_ROLL::eval_AB(Value_P A, Value_P B) const
 {
@@ -1171,7 +1172,7 @@ const Cell * C = &B.get_cfirst();
 
    return false;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
@@ -1218,7 +1219,7 @@ ShapeItem len_Z = 0;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_WITHOUT::eval_identity_fun(Value_P B, sAxis axis) const
 {
@@ -1305,13 +1306,13 @@ Value_P Z(cells_Z.size(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
@@ -1325,7 +1326,7 @@ Bif_F12_DIVIDE::get_dyadic_inverse() const
    // ÷ is self-inverse: B = (A÷(A÷B))
    return &Bif_F12_DIVIDE::fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
@@ -1337,7 +1338,7 @@ Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 cFunction_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {

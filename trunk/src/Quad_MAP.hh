@@ -26,7 +26,7 @@
 
 #include "QuadFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// The implementation of ⎕MAP
 class Quad_MAP : public QuadFunction
 {
@@ -59,7 +59,7 @@ protected:
    static bool greater_map(const ShapeItem & a, const ShapeItem & b,
                            const void * cells);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_MAP_DEFINED__
 

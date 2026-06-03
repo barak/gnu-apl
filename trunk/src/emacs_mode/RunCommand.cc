@@ -24,6 +24,7 @@
 #include "RunCommand.hh"
 #include "emacs.hh"
 #include "NetworkConnection.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 void RunCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -52,3 +53,4 @@ void RunCommand::run_command( NetworkConnection &conn, const std::vector<std::st
 
     conn.write_string_to_fd( result_stream.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

@@ -49,7 +49,7 @@ UserPreferences UserPreferences::uprefs;
 #undef _B
 #endif
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UserPreferences::UserPreferences()
    :
      append_summary(false),
@@ -1857,5 +1857,5 @@ UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
    if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
    else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

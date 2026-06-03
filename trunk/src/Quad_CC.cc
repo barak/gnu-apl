@@ -47,7 +47,7 @@ const CC_BASE_64      CC_BASE_64::     instance;
 const CC_PRINT        CC_PRINT::       instance;
 const CC_ASCII        CC_ASCII::       instance;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 CC_base::check() const
 {
@@ -123,7 +123,7 @@ CC_base::get_instance(CharClass cls)
    MORE_ERROR() << "⎕CC B: invalid character class B (= " << cls << ")";
    DOMAIN_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 CC_SUPERSCRIPT::contains(Unicode uni) const
 {
@@ -131,7 +131,7 @@ CC_SUPERSCRIPT::contains(Unicode uni) const
    if (uni > 8319)   return false;
    return CC_base::contains(uni);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 CC_SUBSCRIPT::contains(Unicode uni) const
 {
@@ -139,7 +139,7 @@ CC_SUBSCRIPT::contains(Unicode uni) const
    if (uni > 11388)   return false;
    return CC_base::contains(uni);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 CC_LINE_DRAWING::contains(Unicode uni) const
 {
@@ -147,7 +147,7 @@ CC_LINE_DRAWING::contains(Unicode uni) const
    if (uni > 9580)   return false;
    return CC_base::contains(uni);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 CC_MATH::contains(Unicode uni) const
 {
@@ -155,7 +155,7 @@ CC_MATH::contains(Unicode uni) const
    if (uni > 9139)   return false;
    return CC_base::contains(uni);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_CC::eval_AB(Value_P A, Value_P B) const
 {
@@ -221,7 +221,7 @@ Quad_CC::contained_in(Unicode uni, CC_base::CharClass cls)
 const CC_base & inst = CC_base::get_instance(cls);
    return inst.contains(uni);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_CC::get_character_class(CC_base::CharClass cls)
 {
@@ -244,7 +244,7 @@ Value_P Z(inst.get_shape(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_CC::print_classes(ostream & out)
 {
@@ -270,4 +270,4 @@ Quad_CC::print_classes(ostream & out)
        << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
        << "      ⎕CC 128:  ASCII characters"                           << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

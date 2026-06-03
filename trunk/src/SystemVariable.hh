@@ -31,7 +31,7 @@ class RavelIterator;
 
 #include <sys/time.h>
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
     Base class for all system variables (Quad variables).
  */
@@ -214,7 +214,7 @@ public:
    /// a static ⎕AV
    static Unicode qav[Avec::MAX_AV];
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-CT (Comparison Tolerance)
  */
@@ -244,7 +244,7 @@ protected:
         Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
       }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-EM (Event Message)
  */
@@ -277,7 +277,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-FC (Format Control).
  */
@@ -342,7 +342,7 @@ protected:
         Symbol::assign(IntScalar(1, LOC), false, LOC);
       }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-L (Left Argument).
  */
@@ -367,7 +367,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-LC (Line Counter).
  */
@@ -382,7 +382,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-LX (Latent Expression).
  */
@@ -405,7 +405,7 @@ protected:
    /// @param B the APL value to assign
    virtual void assign_indexed(const Value * X, Value_P B) {}
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-PP (Printing Precision).
  */
@@ -608,7 +608,7 @@ protected:
    /// last line of output
    static UCS_string buffer;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-R (Right Argment).
  */
@@ -688,7 +688,7 @@ public:
 
 protected:
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-TC (Terminal Control Characters)
  */
@@ -713,7 +713,7 @@ public:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-TZ (Time Zone).
  */
@@ -769,7 +769,7 @@ protected:
    /// the offset from GMT of the current timezone (in seconds)
    int offset_seconds;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-UL (User Load).
  */
@@ -784,7 +784,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-X (Axis Argument).
  */
@@ -809,5 +809,5 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 #endif // __SYSTEM_VARIABLE_HH_DEFINED__

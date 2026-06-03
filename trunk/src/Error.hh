@@ -38,6 +38,7 @@
 
 class StateIndicator;
 
+//════════════════════════════════════════════════════════════════════════════
 /**
  ** The exception that is thrown when errors occur. 
  ** The primary item is the error_code; the other items are only valid if
@@ -231,4 +232,5 @@ private:
    /// constructor (not implemented): prevent construction without error code
    Error();
 };
+//════════════════════════════════════════════════════════════════════════════
 #endif // __ERROR_HH_DEFINED__

@@ -26,7 +26,7 @@
 
 #include "QuadFunction.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕JSON
  */
@@ -176,6 +176,7 @@ protected:
    /// @param b current position; advanced past the closing quote on return
    static size_t skip_string(const UCS_string & ucs_B, ShapeItem & b);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_JSON_DEFINED__
 

@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//════════════════════════════════════════════════════════════════════════════
 /** @file
 */
 
@@ -142,5 +143,6 @@ protected:
    /// the anchor for all dynamic IndexExpr instances
    static DynamicObject all_index_exprs;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __DYNAMIC_OBJECT_HH_DEFINED__

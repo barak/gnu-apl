@@ -39,7 +39,7 @@ Quad_TF   Quad_TF::fun;
 
 enum { Quad_PP_TF = 17 };
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_TF::eval_AB(Value_P A, Value_P B) const
 {
@@ -161,7 +161,7 @@ const Function * function = obj->get_function();
 
    return Str0(LOC);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_TF::tf2(const UCS_string & name)
 {
@@ -200,7 +200,7 @@ const Symbol * symbol = obj->get_symbol();
    Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << endl;
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
 {
@@ -406,7 +406,7 @@ const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
    //
    return UCS_string(*tok.get_apl_val().get());
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
                    ShapeItem nesting)
@@ -512,7 +512,7 @@ const Symbol * symbol = obj->get_symbol();
 
    return Str0(LOC);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
 {
@@ -935,7 +935,7 @@ const int data_chars = len - idx;
 
    return Value_P(name, LOC);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_TF::tf2_reduce(Token_string & tos)
 {
@@ -1485,4 +1485,4 @@ ShapeItem error_count = 0;
 
    return error_count;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

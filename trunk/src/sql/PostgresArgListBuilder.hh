@@ -28,6 +28,7 @@
 #include "PostgresConnection.hh"
 #include "ArgListBuilder.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class PostgresArg
 {
 public:
@@ -81,5 +82,6 @@ public:
 private:
     PGresult *result;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

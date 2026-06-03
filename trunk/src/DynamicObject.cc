@@ -28,9 +28,10 @@
 #include "PrintOperator.hh"
 #include "Value.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// cast DynamicObject to derived class IndexExpr.
 // This only works properly after #include IndexExpr.hh !
+//════════════════════════════════════════════════════════════════════════════
 const IndexExpr *
 DynamicObject::pIndexExpr() const
 {
@@ -115,5 +116,5 @@ DynamicObject::rValue()
 
    return *static_cast<Value *>(this);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

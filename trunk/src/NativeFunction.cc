@@ -41,7 +41,7 @@
 
 std::vector<NativeFunction *> NativeFunction::valid_functions;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 NativeFunction *
 NativeFunction::fix(const UCS_string & so_name,
                     const UCS_string & function_name)
@@ -270,7 +270,7 @@ const char * why = sym->cant_be_defined();
    valid = true;
    valid_functions.push_back(this);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 NativeFunction::~NativeFunction()
 {
   Log(LOG_UserFunction__enter_leave)
@@ -622,5 +622,5 @@ NativeFunction::destroy()
 
    delete this;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

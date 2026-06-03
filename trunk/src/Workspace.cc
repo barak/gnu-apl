@@ -54,7 +54,7 @@ using namespace std;
 #include "Workspace.hh"
 
 // first of all: inline functions...
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Error *
 Workspace::get_error()
 {
@@ -1001,7 +1001,7 @@ int variable_count = 0;
             << " VARIABLES)" << endl;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::dump_commands(ostream & out)
 {
@@ -1015,7 +1015,7 @@ const vector<Command::user_command> & cmds = get_user_commands();
 
    if (cmds.size())   out << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
 Workspace::load_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
@@ -1101,7 +1101,7 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
 
    if (Workspace::get_LX().size())  quad_lx = Workspace::get_LX();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::copy_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
@@ -1144,7 +1144,7 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
    in.read_vids();
    in.read_Workspace(false);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
 {
@@ -1195,7 +1195,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
         the_workspace.WS_id = LibRef_name(lib, arg);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// start a new )MORE error info (overriding the previous one).
 UCS_string &
 MORE_ERROR()
@@ -1203,5 +1203,5 @@ MORE_ERROR()
    Workspace::more_error().clear();
    return Workspace::more_error();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

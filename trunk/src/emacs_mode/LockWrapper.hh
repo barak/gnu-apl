@@ -26,6 +26,7 @@
 
 #include <pthread.h>
 
+//════════════════════════════════════════════════════════════════════════════
 class LockWrapper {
 public:
     LockWrapper( pthread_mutex_t *lock_in );
@@ -34,5 +35,6 @@ public:
 private:
     pthread_mutex_t *lock;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

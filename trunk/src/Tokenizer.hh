@@ -29,7 +29,7 @@
 
 class Token;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// An iterator for UCS_string
 class Unicode_source
 {
@@ -120,7 +120,7 @@ protected:
    /// the end position (excluding)
    int end;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// The converter from APL input characters to APL tokens
 class Tokenizer
 {
@@ -251,5 +251,6 @@ protected:
    /// caller of this Tokenizer
    const char * loc;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __TOKENIZER_HH_DEFINED__

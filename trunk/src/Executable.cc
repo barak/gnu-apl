@@ -33,7 +33,7 @@
 
 #include "Workspace.icc"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Executable::Executable(const UCS_string & ucs,  bool multi_line,
                        ParseMode pm, const char * loc)
    : alloc_loc(loc),
@@ -105,7 +105,7 @@ ShapeItem last_semi = -1;
         text.push_back(lambda_text);
      }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Executable::~Executable()
 {
    Log(LOG_UserFunction__fix)
@@ -131,7 +131,7 @@ StateIndicator & si = *Workspace::SI_top();
    // not reached
    FIXME;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Function_PC
 Executable::get_statement_end(Function_PC pc) const
 {

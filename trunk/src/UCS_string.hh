@@ -548,7 +548,7 @@ public:
    /// return \b tvt in a readable form (e.g. TV_NONE, TV_CHAR, ...).
    UCS_ASCII_string(TokenValueType tvt);
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __UCS_STRING_HH_DEFINED__
 

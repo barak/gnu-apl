@@ -23,6 +23,7 @@
 
 #include "Provider.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class SqliteProvider : public Provider
 {
 public:
@@ -44,3 +45,4 @@ public:
    /// overloaded Provider::version_number()
     virtual int version_number() const;
 };
+//════════════════════════════════════════════════════════════════════════════

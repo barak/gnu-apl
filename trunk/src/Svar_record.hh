@@ -109,7 +109,7 @@ enum TCP_socket
 {
    NO_TCP_SOCKET = -1
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// one of the two partners of a shared vaiable
 struct Svar_partner
 {
@@ -291,7 +291,7 @@ struct Svar_record
    /// state of this variable
    Svar_state state;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #if cfg_APSERVER_TRANSPORT == 1
    enum {  ABSTRACT_OFFSET = 1 };

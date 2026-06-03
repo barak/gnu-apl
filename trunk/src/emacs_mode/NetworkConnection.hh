@@ -31,6 +31,7 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class NetworkConnection {
 public:
     NetworkConnection( int socket_in );
@@ -76,5 +77,6 @@ class ProtocolError : public ConnectionError {
 public:
     ProtocolError( const std::string &message ) : ConnectionError( message ) {};
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

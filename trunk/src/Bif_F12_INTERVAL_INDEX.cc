@@ -26,9 +26,10 @@
 
 Bif_F12_INTERVAL_INDEX Bif_F12_INTERVAL_INDEX::fun;    // ⍳
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// search elements of B in ntervals defined by A. ⍴Z is ⍴B, and elements of Z
 /// are indices of A so that A[Z[N]] ≤ B[N] < A[Z[N] + 1]
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_F12_INTERVAL_INDEX::eval_AB(Value_P A, Value_P B) const
 {
@@ -144,7 +145,7 @@ const uRank rank = B->get_rank();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ShapeItem
 Bif_F12_INTERVAL_INDEX::find_range(const Cell & cell, const Cell * ranges,
                                    ShapeItem range_count)

@@ -28,7 +28,7 @@
 
 class BeamIterator;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// Base class for all primitive APL operators
 class PrimitiveOperator : public PrimitiveFunction
 {
@@ -48,6 +48,6 @@ public:
    /// overloaded Function::is_operator()
    virtual bool is_operator() const   { return true; }
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PRIMITIVE_OPERATOR_HH_DEFINED__

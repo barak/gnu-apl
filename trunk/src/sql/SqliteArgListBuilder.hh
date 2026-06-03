@@ -28,6 +28,7 @@
 #include "SqliteConnection.hh"
 #include "ArgListBuilder.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 class SqliteArgListBuilder : public ArgListBuilder
 {
 public:
@@ -46,5 +47,6 @@ private:
     SqliteConnection * connection;
     sqlite3_stmt * statement;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

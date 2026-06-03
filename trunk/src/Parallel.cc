@@ -102,7 +102,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
 
    return false;   // no error
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 #if PARALLEL_ENABLED
 void
 CPU_pool::init(bool logit)

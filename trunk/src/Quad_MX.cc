@@ -60,14 +60,14 @@ Quad_MX Quad_MX::fun;
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const FunctionGroup::function_info Quad_MX::subfunction_infos[] =
 {
 #define mx_def(axis, sub_name, comm_2, valence, enum) \
    { axis, #sub_name, "", comm_2, valence },
 #include "Quad_MX.def"
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
@@ -409,7 +409,7 @@ Value_P Z(rows, cols, LOC);
 
   return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_MX::printit(Value_P filename_A, Value_P B)
 {
@@ -630,7 +630,7 @@ Value_P Z(cols, LOC);
 
   return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 bool Quad_MX::rng_initialised = false;
 bool Quad_MX::rng_seed_set = false;
@@ -707,7 +707,7 @@ const bool cp_is_complex = GSL_Matrix::is_complex(cp);
   Z->check_value(LOC);
   return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
 {
@@ -773,7 +773,7 @@ Value_P Z(mtx->cols(), LOC);
 
    return Z;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_MX::vectorAngle(const Value_P A, const Value_P B)
 {
@@ -1292,7 +1292,7 @@ const char * pkgs[] = { "libgsl-dev", 0 };
 
    return missing_files("⎕MX", libs, hdrs, pkgs);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif   // (not) apl_GSL
 

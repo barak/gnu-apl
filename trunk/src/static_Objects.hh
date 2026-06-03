@@ -24,6 +24,7 @@
 #ifndef STATIC_OBJECTS_HH_DEFINED
 #define STATIC_OBJECTS_HH_DEFINED
 
+//════════════════════════════════════════════════════════════════════════════
 /// a class that triggers logging when static objects are abeing initialized
 class static_Objects
 {
@@ -48,6 +49,7 @@ public:
    /// enable debug output for destruction
    static bool show_destructors;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 
 #endif // STATIC_OBJECTS_HH_DEFINED

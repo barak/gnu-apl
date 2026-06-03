@@ -24,7 +24,7 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    An iterator for one dimension of indices. When the iterator reached its
    end, it wraps around and increments its upper IndexIterator (if any).
@@ -137,7 +137,7 @@ protected:
    /// the indices
    ShapeItem * indices;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
     a multi-dimensional index iterator, consisting of several
    one-dimensional iterators.
@@ -171,5 +171,5 @@ protected:
    /// true if one of the iterators has length 0
    bool empty;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

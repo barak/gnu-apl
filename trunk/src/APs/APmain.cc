@@ -52,7 +52,7 @@ bool LOG_Svar_DB_signals = false;
 extern const char * prog_name();
 extern bool verbose;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 bool verbose = false;
 int event_port = 0;
@@ -68,6 +68,7 @@ string error_loc = "?";
 
 /// the name of this AP (apXXX where XXX is the processor number)
 char AP_NAME[40] = "AP" STR(AP_NUM);
+//════════════════════════════════════════════════════════════════════════════
 
 AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
@@ -453,13 +454,13 @@ int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & os, Unicode uni)
 {
@@ -490,5 +491,5 @@ operator << (ostream & os, Unicode uni)
              << char(0x80 | (uni >>  6 & 0x3F))
              << char(0x80 | (uni       & 0x3F));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

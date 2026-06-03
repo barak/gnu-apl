@@ -28,6 +28,7 @@
 
 class Token;
 
+//════════════════════════════════════════════════════════════════════════════
 /**
     class Avec is a collection of static functions related to the Atomic
     Vector of the APL interpreter
@@ -253,5 +254,6 @@ protected:
                           const void *)
       { return key - map.uni; }
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __AVEC_HH_DEFINED__

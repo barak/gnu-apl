@@ -44,7 +44,7 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Symbol::Symbol(Id id)
    : NamedObject(id),
      next(0),
@@ -471,7 +471,7 @@ Value_P value = CDR::from_CDR(cdr, LOC);
    value->check_value(LOC);
    new (&tok) Token(TOK_APL_VALUE1, value);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 Symbol::show_owners(ostream & out, const Value & value) const
 {
@@ -769,7 +769,7 @@ const Cell * cB = &B->get_cfirst();
 
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 Symbol::assign_named_lambda(cFunction_P lambda, const char * loc)
 {
@@ -929,7 +929,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
    delete response;
    if (del)   delete del;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Symbol::clear_vs()
 {
@@ -1473,7 +1473,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 
    return old_coupling;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
@@ -1588,4 +1588,4 @@ const Cell * cV = &values->get_cfirst();
         cV += incr;   // scalar extend values
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

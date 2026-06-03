@@ -36,6 +36,7 @@ static void log_error( Error &error, ostream &out )
     UCS_string l3 = error.get_error_line_3();
     out << l1 << endl << l2 << endl << l3;
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -115,3 +116,4 @@ void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::st
          conn.write_string_to_fd( out.str() );
        }
 }
+//════════════════════════════════════════════════════════════════════════════

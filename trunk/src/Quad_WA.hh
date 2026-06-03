@@ -33,7 +33,7 @@ typedef uint64_t rlim_t;
 
 #include "SystemVariable.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-WA (Workspace Available).
  */
@@ -98,6 +98,6 @@ protected:
    /// \b true iff total_memory was provided by the user
    static bool total_memory_by_user;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __QUAD_WA_HH_DEFINED__

@@ -35,7 +35,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -116,7 +116,7 @@ protected:
    /// a sorted vector of all IDs. Created on demand
    static vector<ID> all_IDs;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #include "TokenEnums.hh"
 

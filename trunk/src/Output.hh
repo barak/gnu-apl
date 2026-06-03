@@ -69,6 +69,7 @@ using namespace std;
 
  */
 
+//════════════════════════════════════════════════════════════════════════════
 /** the output of the APL interpreter to cout and maybe to a test result file
  **/
 /// The class handling all output from the APL interpreter
@@ -247,6 +248,7 @@ public:
    ostream & clear_EOS()
       { return *this << Output::clear_EOS; }
 };
+//════════════════════════════════════════════════════════════════════════════
 extern CIN_ostream CIN;
 
 #endif // __OUTPUT_HH_DEFINED__

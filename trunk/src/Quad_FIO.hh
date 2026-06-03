@@ -38,8 +38,7 @@
 
 class File_or_String;
 
-//────────────────────────────────────────────────────────────────────────────
-
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function Quad-FIO (File I/O)
  */
@@ -471,6 +470,6 @@ protected:
    /// a mapping between function names and function numbers
    static const FunctionGroup::function_info subfunction_infos[];
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 #endif //  __QUAD_FIO_HH_DEFINED__
 

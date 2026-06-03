@@ -27,7 +27,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
 {
    Assert(!sub_val->is_simple_scalar());
@@ -337,5 +337,5 @@ PointerCell::deep_cell_types() const
 {
    return CellType(CT_POINTER | get_pointer_value()->deep_cell_types());
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

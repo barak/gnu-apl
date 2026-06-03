@@ -92,12 +92,12 @@ struct SVAR_context
    Svar_state state_D;
 };
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 const char * prog_name()
 {
    return "AP210";
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 set_ACK(Coupled_var & var, int exco)
 {
@@ -119,7 +119,7 @@ const CDR_string * cdr = new CDR_string(_cdr, sizeof(_cdr));
 
    return exco;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 write_fixed(FILE * file, int code, Coupled_var & var_D,
             int & filepos, int rn, int rs)
@@ -143,7 +143,7 @@ write_fixed(FILE * file, int code, Coupled_var & var_D,
 
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 seek_variable(FILE * file, int code, int rn)
 {
@@ -182,7 +182,7 @@ seek_variable(FILE * file, int code, int rn)
 
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 read_variable(FILE * file, int code, Coupled_var & var_D,
               int & filepos, int rn, int rs, bool skip_NL)
@@ -219,7 +219,7 @@ read_variable(FILE * file, int code, Coupled_var & var_D,
 
    return -31;   // invalid code, i.e. var_C domain error
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 int
 write_variable(FILE * file, int code, Coupled_var & var_D,
                int & filepos, int rn, int rs)
@@ -256,7 +256,7 @@ const CDR_string & cdr = *var_D.data;
       }
    return -31;   // invalid code, i.e. var_C domain error
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 sub_command(SVAR_context & ctx)
 {
@@ -394,7 +394,7 @@ const int nelm = cdr.header().get_nelm();
                  return;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 FILE *
 open_pipe(const char * filename, const char * mode)
 {
@@ -426,7 +426,7 @@ struct stat st;
 
    return 0;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 read_pipe(const char * filename, int code,
           Coupled_var & var_C, Coupled_var & var_D)
@@ -450,7 +450,7 @@ SVAR_context * ctx = new SVAR_context(f, code, var_C, var_D, false);
    set_ACK(var_C, 0);
    set_ACK(var_D, 0);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 write_pipe(const char * filename, int code, Coupled_var & var_C, Coupled_var & var_D)
 {
@@ -473,7 +473,7 @@ SVAR_context * ctx = new SVAR_context(f, code, var_C, var_D, true);
    set_ACK(var_C, 0);
    set_ACK(var_D, 0);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 read_file(const char * filename, int code, Coupled_var & var_C,
           Coupled_var & var_D)
@@ -504,7 +504,7 @@ SVAR_context * ctx = new SVAR_context(f, code, var_C, var_D, false);
    fseek(f, 0, SEEK_SET);
    set_ACK(var_C, 0);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 write_file(const char * filename, int code, Coupled_var & var_C, Coupled_var & var_D)
 {
@@ -532,21 +532,21 @@ SVAR_context * ctx = new SVAR_context(f, code, var_C, var_D, true);
    set_ACK(var_C, 0);
    set_ACK(var_D, ftell(f));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 delete_file(const char * filename, Coupled_var & var_C)
 {
 const int ret = unlink(filename) ? errno : 0;
    set_ACK(var_C, ret);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 rename_file(const char * from, const char * to, Coupled_var & var_C)
 {
 const int ret = rename(from, to) ? errno : 0;
    set_ACK(var_C, ret);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 parse_arg(const char * & cmd, char * arg, int arglen, int minlen)
 {
@@ -582,7 +582,7 @@ bool quoted = false;
    if (arg_chars < minlen)   error = true;
    return error;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 handle_cmd(const char * cmd, int len, Coupled_var & var_C, Coupled_var & var_D)
 {
@@ -607,7 +607,7 @@ const char c1 = arg1[1];
    else if (c0 == 'R' && c1 == 'N')   rename_file(arg2,  arg3, var_C);
    else    set_ACK(var_C, 1);   // 1 := INVALID COMMAND
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 is_valid_varname(const uint32_t * varname)
 {
@@ -618,11 +618,12 @@ is_valid_varname(const uint32_t * varname)
    if (varname[0] == 'D')   return true;
    return false;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 bool
 initialize(Coupled_var & var)
 {
    coupled_vars.push_back(var);
+//════════════════════════════════════════════════════════════════════════════
 const uint32_t * varname = Svar_DB::get_svar_name(var.key);
    if (!varname)   return true;
 
@@ -739,7 +740,7 @@ SVAR_context * ctx = var.context;
 
    error_loc = "no_error";   return E_NO_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 APL_error_code
 get_value(Coupled_var & var, string & data)
 {
@@ -749,7 +750,7 @@ get_value(Coupled_var & var, string & data)
                  var.data->size());
    error_loc = "no_error";   return E_NO_ERROR;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 retract(Coupled_var & var)
 {
@@ -766,4 +767,4 @@ SVAR_context * ctx = var.context;
       }
 
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

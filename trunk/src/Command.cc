@@ -76,7 +76,7 @@ ShapeItem Command::APL_expression_count = 0;
 
 UCS_string_vector Command::copy_once_table;
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::clear_copy_once_table()
 {
@@ -892,7 +892,7 @@ const UCS_string suffix(line, multi_pos + 3);
         process_line(content[0], 0);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_BOXING(ostream & out, const UCS_string & arg)
 {
@@ -1228,7 +1228,7 @@ const int result = unlink(filename.c_str());
         Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
@@ -1268,7 +1268,7 @@ LibRef_name wsid  = Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::dump_WS(out, wsid, html, silent);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_ERASE(ostream & out, const UCS_string_vector & args)
 {
@@ -1738,7 +1738,7 @@ FileWriter writer(filename.c_str());
 
    Workspace::write_OUT(writer.get_FILE(), args);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_OWNERS(ostream & out)
 {
@@ -1847,7 +1847,7 @@ LibRef_name wsid =  Workspace::get_WSID();
    if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
    Workspace::save_WS(out, wsid, true);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_SI(ostream & out, bool dbg)
 {
@@ -2096,7 +2096,7 @@ bool inserted = false;
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Command::cmd_VALUES(ostream & out)
 {
@@ -2336,4 +2336,4 @@ UCS_string_vector result;
         result.push_back(token_ucs);
       }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

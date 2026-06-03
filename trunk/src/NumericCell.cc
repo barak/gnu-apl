@@ -32,7 +32,7 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 NumericCell::bif_and(Cell * Z, const Cell * A) const
 {
@@ -97,7 +97,7 @@ const double qct = Workspace::get_CT();
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 {
@@ -179,7 +179,7 @@ const APL_Complex gam_1_b__a = ComplexCell::gamma(r_B__A + 1.0, i_B__A);
 
    return ComplexCell::zC(Z, gam_1_b / (gam_1_a * gam_1_b__a));
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
@@ -313,7 +313,7 @@ const double qct = Workspace::get_CT();
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 ErrorCode
 NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 {
@@ -1720,4 +1720,4 @@ Assert(found);
 
    return integer_binomial(Z, N, K, negate);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

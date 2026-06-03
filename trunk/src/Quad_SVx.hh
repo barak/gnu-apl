@@ -27,7 +27,7 @@
 #include "QuadFunction.hh"
 #include "SystemVariable.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /** some helper functions to start auxiliary processors */
 /// Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS
 class Quad_SVx
@@ -184,6 +184,6 @@ protected:
    /// @param B right-argument APL value (variable name to query)
    virtual Token eval_B(Value_P B) const;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SHARED_VARIABLES_HH_DEFINED__

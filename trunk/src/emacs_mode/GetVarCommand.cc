@@ -74,7 +74,7 @@ void scalar_value_to_el( ostream &out, Value_P value )
 
 static void apl_value_to_el( ostream &out, Value_P value );
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 static void
 output_onelevel(ostream &out, Value_P value, int level, int start, int end)
 {
@@ -145,6 +145,7 @@ static void apl_value_to_el( ostream &out, Value_P value )
         throw InvalidSymbolContent( "unknown value" );
     }
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -176,3 +177,4 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
         conn.send_reply( exception.get_message() );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

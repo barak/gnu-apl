@@ -32,6 +32,7 @@
 
 class Function;
 
+//════════════════════════════════════════════════════════════════════════════
 /** a structure that contains user preferences from different sources
     (command line arguments, config files, environment variables ...)
  */
@@ -286,5 +287,6 @@ protected:
    static const char * is_default(bool yes)
       { return yes ? " (default)" : ""; }
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

@@ -28,7 +28,7 @@
 #include "Workspace.hh"
 
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
 {
   // val is a simple text matrix with var_count rows and name_len columns.
@@ -209,7 +209,7 @@ const UCS_string frame(U"╔╤╗╚╧╝═║│");
 
    return out;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 UCS_string_vector::compute_column_width(int tab_size,
                                         std::vector<int> & result)
@@ -289,4 +289,4 @@ int max_nb = 0;
    loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
    result.push_back(max_nb);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════

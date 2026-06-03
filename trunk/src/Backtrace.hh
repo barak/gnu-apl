@@ -34,6 +34,7 @@
 /// @param bin_file  filename of the apl binary
 extern void init_DWARF(const char * bin_dir, const char * bin_file);
 
+//════════════════════════════════════════════════════════════════════════════
 /// show the current function call stack.
 class Backtrace
 {
@@ -88,6 +89,7 @@ protected:
    /// a mapping from PCs to source lines.
    static std::vector<PC_src> pc_2_src;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #define BACKTRACE Backtrace::show(__FILE__, __LINE__);
 

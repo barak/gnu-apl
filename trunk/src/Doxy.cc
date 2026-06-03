@@ -42,7 +42,7 @@ using namespace std;
 #define BRLF "<BR>\r\n"
 #define CRLF "\r\n"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    : out(cout),
      root_dir(dest_dir),
@@ -337,7 +337,7 @@ const UCS_string alias(U"all_functions");
 "</HTML>"                                                                 CRLF;
    page.close();
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Doxy::SI_table(ofstream & page)
 {
@@ -1117,4 +1117,5 @@ Doxy::fun_anchor(const UCS_string & name)
 UCS_string anchor(U"<A href=f_");
    return anchor << name << ".html>" << name << "</A>";
 }
+//════════════════════════════════════════════════════════════════════════════
 

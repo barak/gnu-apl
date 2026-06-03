@@ -122,7 +122,7 @@ static_assert(MAIN_rows == CURSOR_rows);
 
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
@@ -887,5 +887,5 @@ Cmd_KEYB::copy_text(Unicode & start, const char * text)
 Unicode * p = &start;
    while (*text)   *p++ = Unicode(*text++);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 // EOF

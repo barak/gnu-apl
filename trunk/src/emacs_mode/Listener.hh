@@ -30,6 +30,7 @@
 
 typedef void *ThreadFunction( void * );
 
+//════════════════════════════════════════════════════════════════════════════
 class Listener {
 public:
     Listener() { register_listener( this ); }
@@ -56,5 +57,6 @@ public:
 private:
     Listener *listener;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

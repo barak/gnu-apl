@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <poll.h>
+//════════════════════════════════════════════════════════════════════════════
 
 UnixSocketListener::~UnixSocketListener()
 {
@@ -182,3 +183,4 @@ void UnixSocketListener::close_connection( void )
         }
     }
 }
+//════════════════════════════════════════════════════════════════════════════

@@ -75,7 +75,7 @@ enum ExpandHint
    EH_CONFIG,         ///< config.h item (capability)
    EH_oAUTO,          ///< optional AUTO
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 /// a class for doing interactivw Tab-expansion on input lines
 class TabExpansion
 {
@@ -168,6 +168,7 @@ protected:
    /// true if the original line had a trailing blank
    const bool have_trailing_blank;
 };
+//════════════════════════════════════════════════════════════════════════════
 #define __TAB_EXPANSION_HH_DEFINED__
 #endif // __TAB_EXPANSION_HH_DEFINED__
 

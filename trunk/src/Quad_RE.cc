@@ -31,7 +31,7 @@ Quad_RE Quad_RE::fun;
 
 # include "Regexp.hh"
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -412,5 +412,6 @@ const char * pkgs[] = { "libpcre3-dev", 0 };
 
    return missing_files("⎕RE", libs, hdrs, pkgs);
 }
+//════════════════════════════════════════════════════════════════════════════
 
 #endif   // HAVE_LIBPCRE2_32

@@ -164,8 +164,9 @@ public:
    /// the items r and j in the double-loop around cover()/uncover()
    DLX_Node * item_r;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 DLX_Node::Col_Type
+//════════════════════════════════════════════════════════════════════════════
 DLX_Node::get_col_type(const Cell & cell)
 {
    if (cell.is_character_cell())
@@ -316,7 +317,7 @@ protected:
    /// the first 0 in the matrix (for figuring the format)
    const Cell * first_0;
 };
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
                              const Value & B)
    : DLX_Node(true, -1, -1, this, this, this, this),
@@ -428,7 +429,7 @@ const Cell * b = &B.get_cfirst();
 
    Log(LOG_Quad_DLX)   { loop(n, ones)   nodes[n].print(CERR); }
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 DLX_Root_Node::deep_check() const
 {
@@ -527,7 +528,7 @@ char * rows_used = rows_used_v.data();
    out << endl;
 
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 void
 DLX_Root_Node::solve()
 {
@@ -846,5 +847,5 @@ Value_P Z(root.get_solution_count(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

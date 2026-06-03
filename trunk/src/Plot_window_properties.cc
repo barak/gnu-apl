@@ -29,7 +29,7 @@
 /// a shared buffer for SPRINTF of various error texts.
 static char tmp_error[80];
 
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
@@ -643,5 +643,5 @@ Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
 
    return true;
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 

@@ -104,7 +104,7 @@ Shape shape_Z;
 
    return ravel(shape_Z, B);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Token
 Bif_COMMA::ravel(const Shape & new_shape, Value_P B)
 {
@@ -370,7 +370,7 @@ const APL_Float axis = cX.get_real_value() - qio;
        axis >= (B.get_rank() + 1.0))   AXIS_ERROR;
    return laminate(A, sAxis(axis + 1.0), B);
 }
-//────────────────────────────────────────────────────────────────────────────
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, const Value & B)
 {
