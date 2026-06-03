@@ -120,9 +120,12 @@ vector<int> chunk_lengths;
                {
                  chunk_len = chunk_lengths[brk_idx++];
 
-                 if (col)   *this << "\n      ";
                  UCS_string trow(pb.get_line(row), col, chunk_len);
+                 if (col && trow.size() && trow.back() == UNI_PAD_r_DEPTH)
+                    trow.pop_back();   // depth marker blocks remove_trailing_padchars
                  trow.remove_trailing_padchars();
+                 if (col && trow.size() == 0)   continue;   // skip empty continuation
+                 if (col)   *this << "\n      ";
                  *this << trow;
                }
        }
@@ -452,9 +455,7 @@ int pos = col + chunk_len;
    while (--pos > col)
       {
          const Unicode uni = at(pos);
-         if (uni == UNI_SPACE         ||
-             uni == UNI_PAD_r_NOTCHAR ||
-             uni == UNI_PAD_l_NOTCHAR)
+         if (uni == UNI_SPACE || is_iPAD_char(uni))
             {
                return pos - col + 1;
             }
