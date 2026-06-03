@@ -1119,7 +1119,7 @@ DEB:	DIST
            debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cd debian_tmp ; tar xf $(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cp doc/apl.1 debian_tmp/$(distdir)/debian/manpage.1
-	cd debian_tmp/$(distdir) ; MAKEFLAGS="" dpkg-buildpackage -j4
+	cd debian_tmp/$(distdir) ; MAKEFLAGS="" dpkg-buildpackage -j10
 	mkdir -p ftp-upload
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.xz  ftp-upload/
@@ -1157,11 +1157,11 @@ EXPO:
 	svn update
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
-	$(MAKE) all
-	$(MAKE) dist
-	$(MAKE) DEB
-#	$(MAKE) RPM
-	$(MAKE) SYNC
+	$(MAKE) -j10 all
+	$(MAKE) -j10 dist
+	$(MAKE) -j10 DEB
+#	$(MAKE) -j10 RPM
+	$(MAKE) -j10 SYNC
 
 # EXPO1 is EXPO without updating/committing from/to SVN
 .PHONY:	EXPO1
@@ -1169,10 +1169,10 @@ EXPO1:
 	tools/check_src
 	tools/check_command_def
 	./configure --disable-maintainer-mode
-	$(MAKE)
-	$(MAKE) dist
-	$(MAKE) DEB
-	$(MAKE) RPM
+	$(MAKE) -j10
+	$(MAKE) -j10 dist
+	$(MAKE) -j10 DEB
+	$(MAKE) -j10 RPM
 
 Makefile.dist:
 	echo "%:"		 > $@
