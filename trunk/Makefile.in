@@ -1104,7 +1104,7 @@ DOXY:
 .PHONY:	RPM
 RPM:	DIST all
 	rm -f rpm/rpm-tmp.*
-	make -C rpm $@
+	$(MAKE) -C rpm $@
 	mkdir -p ftp-upload
 	cp rpm/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-0.src.rpm  ftp-upload/
 	cp rpm/RPMS/*/$(PACKAGE)-$(PACKAGE_VERSION)-0.*.rpm   ftp-upload/
@@ -1119,7 +1119,7 @@ DEB:	DIST
            debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cd debian_tmp ; tar xf $(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cp doc/apl.1 debian_tmp/$(distdir)/debian/manpage.1
-	cd debian_tmp/$(distdir) ; dpkg-buildpackage -j4
+	cd debian_tmp/$(distdir) ; MAKEFLAGS="" dpkg-buildpackage -j4
 	mkdir -p ftp-upload
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.xz  ftp-upload/
@@ -1157,11 +1157,11 @@ EXPO:
 	svn update
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
-	make all
-	make dist
-	make DEB
-#	make RPM
-	make SYNC
+	$(MAKE) all
+	$(MAKE) dist
+	$(MAKE) DEB
+#	$(MAKE) RPM
+	$(MAKE) SYNC
 
 # EXPO1 is EXPO without updating/committing from/to SVN
 .PHONY:	EXPO1
@@ -1169,10 +1169,10 @@ EXPO1:
 	tools/check_src
 	tools/check_command_def
 	./configure --disable-maintainer-mode
-	make
-	make dist
-	make DEB
-	make RPM
+	$(MAKE)
+	$(MAKE) dist
+	$(MAKE) DEB
+	$(MAKE) RPM
 
 Makefile.dist:
 	echo "%:"		 > $@
@@ -1204,8 +1204,8 @@ am--refresh:
 
 .PHONY: git-pull
 git-pull:
-	make -C src $@
-	make -C wslib5 $@
+	$(MAKE) -C src $@
+	$(MAKE) -C wslib5 $@
 	git clone https://git.code.sf.net/p/gnu-apl-library/code /tmp/DALY
 	cp /tmp/DALY/doc/DALY/*     doc/DALY/
 	cp /tmp/DALY/wslib3/DALY/*  wslib3/DALY/
