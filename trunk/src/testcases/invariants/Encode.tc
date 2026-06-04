@@ -1,0 +1,22 @@
+⍝ Encode.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ GNU APL: ⊤ is Encode (IBM APL2 calls this ⊥)
+      ⍝ Precond: A B Z simple numeric
+      ⍝ inv: ⍴Z ←→ (⍴A),⍴B
+      A ← 2 2 2 2                             ⍝ 4-bit binary radix
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)          ⍝ 5 integers to encode
+      Z ← A⊤B
+      (⍴Z) ≡ (⍴A),⍴B
+1
+      ⍝ inv: ⍴⍴Z ←→ (⍴⍴A)+⍴⍴B
+      (⍴⍴Z) ≡ ,(⍴⍴A)+⍴⍴B
+1
+      ⍝ inv: A⊥(A⊤B) ←→ (×/A)|B   (decode of encode = residue)
+      A ← 10 10 10                            ⍝ 3-digit decimal
+      B ← 100+⎕RVAL 1 (,4) (,0 1 0 0 0)      ⍝ values 100..
+      B ← 900∣|B                              ⍝ keep < 1000
+      (A⊥(A⊤B)) ≡ (×/A)|B
+1

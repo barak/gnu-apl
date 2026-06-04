@@ -1,0 +1,14 @@
+⍝ ReverseAxis.tc
+⍝ ══════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: X∊⍳⍴⍴B; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ ⍴B
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ⌽[1]B
+      (⍴Z) ≡ ⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1

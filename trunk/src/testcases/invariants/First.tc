@@ -1,0 +1,13 @@
+⍝ First.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ inv: B ←→ ↑⊂B   (first of enclosed B is B)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ≡ ↑⊂B
+1
+      ⍝ inv: ↑B ←→ (⊂(⍴⍴B)⍴1)⊃B   (first = pick with all-1s index)
+      B ← (⎕RVAL 1 (,3) (,0 1 0 0 0))(⎕RVAL 1 (,3) (,0 1 0 0 0))
+      (↑B) ≡ (⊂(⍴⍴B)⍴1)⊃B
+1

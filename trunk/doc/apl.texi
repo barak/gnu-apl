@@ -7285,7 +7285,7 @@ useful for other purposes as well.
 @subsection General
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z,
-while dyadic A RVAL B is used to control the properties of
+while dyadic A ⎕RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
 
 The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more times to
@@ -7362,6 +7362,11 @@ be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
 change the state of the other.
 
+When setting the state, B must be an integer vector whose length is one of
+8, 16, 32, 64, 128, or 256 (the valid state sizes of the underlying
+@code{initstate}/@code{setstate} library functions). An empty B merely
+queries the current state without changing it.
+
 @node Control of the ranks: 1 ⎕RVAL B
 @subsubsection Control of the ranks: 1 ⎕RVAL B
 
@@ -7375,10 +7380,10 @@ generated random values will have the fixed rank B. MAX_RANK is a
 ./configurable constant with a default of 8.
 
 @item
-If B is a negative scalar with 0 > B > -MAX_RANK then the ranks of the
+If B is a negative scalar with 0 > B ≥ -MAX_RANK then the ranks of the
 subsequently generated random values will be chosen at random between
-0 and -B (inclusive). All possible ranks 0 ... B will have the same
-probability P = 100÷1-B %.
+0 and -B (inclusive). All possible ranks 0 ... -B will have the same
+probability P = 100÷(1-B) %.
 
 @item
 Otherwise B must be a vector of positive integers. The integers are the
@@ -7415,8 +7420,8 @@ The shapes of subsequently generated random values can be controlled with
 2 ⎕RVAL B as follows.
 
 B must be a vector of positive or negative integers. Vectors longer than
-MAX_RANK + 1 will give a LENGTH ERROR while vectors shorter than MAX_RANK + 1
-will be filled with 1 until the length of B becomes MAX_RANK + 1.
+MAX_RANK will give a LENGTH ERROR while vectors shorter than MAX_RANK
+will be prepended with 1s until the length of B becomes MAX_RANK.
 
 If an element B@sub{i} of the resulting shape B = B@sub{1} ... B@sub{MAXRANK}
 is ≥ 0 then the corresponding axis i will have a fixed length of B@sub{i}.
@@ -7437,8 +7442,7 @@ Example:
                  ⍝ the last axis of every matrix will vary between 0 and 10
 @end example
 
-This will produce scalars, vectors with a fixed length of 3 and matrices
-with 3 rows and between 0 and 10 columns.
+This will produce matrices with 3 rows and between 0 and 10 columns.
 
 @node Control of the data types: 3 ⎕RVAL B
 @subsubsection Control of the data types: 3 ⎕RVAL B
@@ -7459,8 +7463,8 @@ for type CHARACTER: a random character with ⎕UCS between 0 and $3000
 larger Unicodes, use ⎕UCS with random integers.
 
 @item
-for type INTEGER: a random integer with ⎕UCS between -$80000000 and
-$7FFFFFFF.
+for type INTEGER: a random 64-bit integer between -$8000000000000000 and
+$7FFFFFFFFFFFFFFF.
 
 @item
 for type REAL: a floating point number between 0.0 and 1.0 (exclusive)
@@ -7498,7 +7502,8 @@ system limit for the depth of the random value being produced. This can be
 prevented by setting a maximum depth for every value generated. ⎕RVAL sets
 the probability of the deepest allowed depth to 0.
 
-4 ⎕RVAL B expects B to be a positive integer which is deepest allowed depth;
+4 ⎕RVAL B expects B to be a non-negative integer which is the deepest allowed depth
+(0 suppresses nesting entirely regardless of the type distribution);
 
 An empty B, e.g. 4 ⎕RVAL ⍬, will not change anything and can be used to
 query the current setting for 4 ⎕RVAL.

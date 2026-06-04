@@ -1,0 +1,19 @@
+⍝ IndexOf.tc
+⍝ ══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A vector; Z nonneg integers; implicit ⎕IO ⎕CT
+      ⍝ inv: ⍴Z ←→ ⍴B
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      A ← ⎕RVAL 1 (,6) (,0 1 0 0 0)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← A⍳B
+      (⍴Z) ≡ ⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: A⍳B ←→ ⎕IO++/∧\∼B∘.≡A
+      B ← ⎕RVAL 1 (,4) (,0 1 0 0 0)
+      (A⍳B) ≡ ⎕IO++/∧\∼B∘.≡A
+1

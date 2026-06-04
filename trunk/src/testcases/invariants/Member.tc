@@ -1,0 +1,18 @@
+⍝ Member.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z simple Boolean; implicit ⎕CT
+      ⍝ inv: ⍴Z ←→ ⍴A
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴A
+      A ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,6) (,0 1 0 0 0)
+      Z ← A∊B
+      (⍴Z) ≡ ⍴A
+1
+      (⍴⍴Z) ≡ ⍴⍴A
+1
+      ⍝ inv: Z ←→ ∨/A∘.≡,B
+      Z ≡ ∨/A∘.≡,B
+1

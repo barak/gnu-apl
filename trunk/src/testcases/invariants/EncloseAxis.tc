@@ -1,0 +1,21 @@
+⍝ EncloseAxis.tc
+⍝ ══════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: X simple scalar or vector nonneg int; X∊⍳⍴⍴B
+      ⍝ inv: ⍴Z ←→ (⍴B)[(⍳⍴⍴B)∼X]   (axes not in X)
+      B ← ⎕RVAL 3 (2 3 4) (,0 1 0 0 0)
+      X ← 2                                  ⍝ enclose along axis 2
+      Z ← ⊂[X]B
+      (⍴Z) ≡ (⍴B)[(⍳⍴⍴B)∼X]
+1
+      ⍝ inv: ⍴⍴Z ←→ (⍴⍴B)-⍴,X
+      (⍴⍴Z) ≡ ,(⍴⍴B)-⍴,X
+1
+      ⍝ inv: B ←→ ⊃[X]⊂[X]B
+      B ≡ ⊃[X]⊂[X]B
+1
+      ⍝ inv: ⊂[⍳0]B ←→ ⊂¨B   (empty axis list)
+      (⊂[⍳0]B) ≡ ⊂¨B
+1

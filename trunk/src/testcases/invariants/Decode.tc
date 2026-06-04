@@ -1,0 +1,16 @@
+⍝ Decode.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ GNU APL: ⊥ is Decode (IBM APL2 calls this ⊤)
+      ⍝ Precond: A B Z simple numeric
+      ⍝ inv: ⍴Z ←→ (¯1↓⍴A),1↓⍴B
+      A ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)        ⍝ 3×4 radix matrix
+      B ← ⎕RVAL 2 (4 5) (,0 1 0 0 0)        ⍝ 4×5 digits matrix
+      Z ← A⊥B
+      (⍴Z) ≡ (¯1↓⍴A),1↓⍴B
+1
+      ⍝ inv: ⍴⍴Z ←→ (0⌈¯1+⍴⍴A)+(0⌈¯1+⍴⍴B)
+      (⍴⍴Z) ≡ ,(0⌈¯1+⍴⍴A)+(0⌈¯1+⍴⍴B)
+1

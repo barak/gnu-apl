@@ -1,0 +1,20 @@
+⍝ PartitionAxis.tc
+⍝ ════════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A nonneg ints; X∊⍳⍴⍴B; implicit ⎕IO
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      ⍝ inv: ≡Z ←→ 1+≡B
+      B ← ⎕RVAL 2 (3 6) (,0 1 0 0 0)
+      A ← 0 1 1 2 0 2
+      X ← 2
+      Z ← A⊂[X]B
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: B ←→ ⊃[X],/[X]A⊂[X]B
+      B ≡ ⊃[X],/[X]A⊂[X]B
+1
+      ⍝ inv: (0≠A)/[X]B ←→ ⊃[X],/[X]A⊂[X]B
+      ((0≠A)/[X]B) ≡ ⊃[X],/[X]A⊂[X]B
+1

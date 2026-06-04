@@ -1,0 +1,19 @@
+⍝ TakeAxis.tc
+⍝ ═══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar/vector integer; X∊⍳⍴⍴B; implicit ⎕IO
+      ⍝ inv: (⍴Z)[,X] ←→ |,A
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      A ← 3                                   ⍝ take 3 along axis 1
+      X ← 1
+      Z ← A↑[X]B
+      ((⍴Z)[X]) ≡ |,A
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: A↑[X]B ←→ ⊃[X](⊂A)↑¨⊂[X]B
+      (A↑[X]B) ≡ ⊃[X](⊂A)↑¨⊂[X]B
+1

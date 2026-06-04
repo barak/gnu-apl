@@ -1,0 +1,21 @@
+⍝ ReduceAxis.tc
+⍝ ═════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: LO dyadic; X∊⍳⍴⍴B; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ (⍴B)[(⍳⍴⍴B)∼X]
+      ⍝ inv: ⍴⍴Z ←→ 0⌈¯1+⍴⍴B
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      X ← 1
+      Z ← +/[X]B
+      (⍴Z) ≡ (⍴B)[(⍳⍴⍴B)∼X]
+1
+      (⍴⍴Z) ≡ ,0⌈¯1+⍴⍴B
+1
+      ⍝ inv: LO/[X]B ←→ ⊃LO/¨⊂[X]B
+      (+/[1]B) ≡ ⊃+/¨⊂[1]B
+1
+      ⍝ inv: LO/[⍴⍴B]B ←→ LO/B
+      (+/[⍴⍴B]B) ≡ +/B
+1

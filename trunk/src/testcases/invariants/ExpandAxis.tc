@@ -1,0 +1,16 @@
+⍝ ExpandAxis.tc
+⍝ ═════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: LO Boolean; X∊⍳⍴⍴B
+      ⍝ inv: (⍴Z)[,X] ←→ ⍴,LO   (expanded axis length = ⍴LO)
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      LO ← 2∣|⎕RVAL 1 (,5) (,0 1 0 0 0)
+      LO[1+3∣|⎕RVAL 0] ← 1                   ⍝ ensure at least one 1
+      Z ← LO\[1]B
+      ((⍴Z)[1]) ≡ ⍴,LO
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1

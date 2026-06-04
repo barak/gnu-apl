@@ -1,0 +1,15 @@
+⍝ Without.tc
+⍝ ══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A scalar/vector; Z vector; implicit ⎕CT
+      ⍝ inv: ⍴⍴Z ←→ ,1  (result always a vector)
+      ⍝ inv: A∼B ←→ (∼A∊B)/A
+      A ← ⎕RVAL 1 (,8) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      Z ← A∼B
+      (⍴⍴Z) ≡ ,1
+1
+      Z ≡ (∼A∊B)/A
+1

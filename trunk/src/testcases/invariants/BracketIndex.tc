@@ -1,0 +1,16 @@
+⍝ BracketIndex.tc
+⍝ ═══════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A nonscalar, I/J simple nonneg integer arrays
+      ⍝ inv: ⍴Z ←→ catenated shapes of the index arrays
+      ⍝ inv: ⍴⍴Z ←→ sum of the ranks of the index arrays
+      A ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      I ← 1+3∣|⎕RVAL 1 (,2) (,0 1 0 0 0)    ⍝ 2-element index, values 1..5
+      J ← 1+5∣|⎕RVAL 1 (,3) (,0 1 0 0 0)    ⍝ 3-element index, values 1..6
+      Z ← A[I;J]
+      (⍴Z) ≡ (⍴I),⍴J
+1
+      (⍴⍴Z) ≡ ,(⍴⍴I)+⍴⍴J
+1

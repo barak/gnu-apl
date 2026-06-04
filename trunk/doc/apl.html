@@ -73,7 +73,7 @@ Next: <a href="#Installing-and-Starting-GNU-APL" accesskey="n" rel="next">Instal
 </div>
 <span id="GNU-APL-Reference-Manual"></span><h1 class="top">GNU APL Reference Manual</h1>
 
-<p>May 20, 2026.
+<p>June 4, 2026.
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
 </p>
@@ -8512,7 +8512,7 @@ Next: <a href="#Dyadic-_2395RVAL" accesskey="n" rel="next">Dyadic ⎕RVAL</a>, U
 <span id="General-1"></span><h4 class="subsection">2.40.1 General</h4>
 
 <p>In general, monadic ⎕RVAL B, returns a single random APL value Z,
-while dyadic A RVAL B is used to control the properties of
+while dyadic A ⎕RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
 </p>
 <p>The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more times to
@@ -8603,6 +8603,11 @@ be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
 change the state of the other.
 </p>
+<p>When setting the state, B must be an integer vector whose length is one of
+8, 16, 32, 64, 128, or 256 (the valid state sizes of the underlying
+<code>initstate</code>/<code>setstate</code> library functions). An empty B merely
+queries the current state without changing it.
+</p>
 <hr>
 </div>
 <div class="subsubsection" id="Control-of-the-ranks_003a-1-_2395RVAL-B">
@@ -8620,10 +8625,10 @@ Next: <a href="#Control-of-the-shapes_003a-2-_2395RVAL-B" accesskey="n" rel="nex
 generated random values will have the fixed rank B. MAX_RANK is a 
 ./configurable constant with a default of 8.
 
-</li><li> If B is a negative scalar with 0 &gt; B &gt; -MAX_RANK then the ranks of the
+</li><li> If B is a negative scalar with 0 &gt; B ≥ -MAX_RANK then the ranks of the
 subsequently generated random values will be chosen at random between
-0 and -B (inclusive). All possible ranks 0 ... B will have the same
-probability P = 100÷1-B %.
+0 and -B (inclusive). All possible ranks 0 ... -B will have the same
+probability P = 100÷(1-B) %.
 
 </li><li> Otherwise B must be a vector of positive integers. The integers are the
 relative frequencies of the ranks 0, 1, ... MAX_RANK respectively. Too many
@@ -8662,8 +8667,8 @@ Next: <a href="#Control-of-the-data-types_003a-3-_2395RVAL-B" accesskey="n" rel=
 2 ⎕RVAL B as follows.
 </p>
 <p>B must be a vector of positive or negative integers. Vectors longer than
-MAX_RANK + 1 will give a LENGTH ERROR while vectors shorter than MAX_RANK + 1
-will be filled with 1 until the length of B becomes MAX_RANK + 1.
+MAX_RANK will give a LENGTH ERROR while vectors shorter than MAX_RANK
+will be prepended with 1s until the length of B becomes MAX_RANK.
 </p>
 <p>If an element B<sub>i</sub> of the resulting shape B = B<sub>1</sub> ... B<sub>MAXRANK</sub>
 is ≥ 0 then the corresponding axis i will have a fixed length of B<sub>i</sub>.
@@ -8684,8 +8689,7 @@ query the current setting for 2 ⎕RVAL.
                  ⍝ the last axis of every matrix will vary between 0 and 10
 </pre></div>
 
-<p>This will produce scalars, vectors with a fixed length of 3 and matrices
-with 3 rows and between 0 and 10 columns.
+<p>This will produce matrices with 3 rows and between 0 and 10 columns.
 </p>
 <hr>
 </div>
@@ -8710,8 +8714,8 @@ longer vectors will raise a LENGTH error.
 (exclusive). Larger Unicodes typically cause display problems. If you need
 larger Unicodes, use ⎕UCS with random integers.
 
-</li><li> for type INTEGER: a random integer with ⎕UCS between -$80000000 and
-$7FFFFFFF.
+</li><li> for type INTEGER: a random 64-bit integer between -$8000000000000000 and
+$7FFFFFFFFFFFFFFF.
 
 </li><li> for type REAL: a floating point number between 0.0 and 1.0 (exclusive)
 
@@ -8752,7 +8756,8 @@ system limit for the depth of the random value being produced. This can be
 prevented by setting a maximum depth for every value generated. ⎕RVAL sets
 the probability of the deepest allowed depth to 0.
 </p>
-<p>4 ⎕RVAL B expects B to be a positive integer which is deepest allowed depth;
+<p>4 ⎕RVAL B expects B to be a non-negative integer which is the deepest allowed depth
+(0 suppresses nesting entirely regardless of the type distribution);
 </p>
 <p>An empty B, e.g. 4 ⎕RVAL ⍬, will not change anything and can be used to
 query the current setting for 4 ⎕RVAL.

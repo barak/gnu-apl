@@ -1,0 +1,15 @@
+⍝ Drop.tc
+⍝ ═══════
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar or vector integer; Z nonscalar
+      ⍝ inv: ⍴Z ←→ 0⌈(⍴B)-|A
+      ⍝ inv: ⍴⍴Z ←→ (⍴,A)⌈⍴⍴B
+      B ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      A ← 2∣⎕RVAL 1 (,2) (,0 1 0 0 0)       ⍝ drop 0..1 from each axis
+      Z ← A↓B
+      (⍴Z) ≡ 0⌈(⍴B)-|A
+1
+      (⍴⍴Z) ≡ (⍴,A)⌈⍴⍴B
+1

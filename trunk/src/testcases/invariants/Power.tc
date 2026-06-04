@@ -1,0 +1,12 @@
+⍝ Power.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A B Z numeric
+      ⍝ inv: A*E1+E2 ←→ (A*E1)×A*E2   (law of exponents)
+      A ← 1+(|⎕RVAL 1 (,4) (,0 0 1 0 0))     ⍝ positive base
+      E1 ← ⎕RVAL 1 (,4) (,0 0 1 0 0)
+      E2 ← ⎕RVAL 1 (,4) (,0 0 1 0 0)
+      (A*E1+E2) ≡ (A*E1)×A*E2
+1

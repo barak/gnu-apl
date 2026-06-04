@@ -1,0 +1,15 @@
+⍝ Rotate.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple integer scalar or rank ¯1+⍴⍴B
+      ⍝ inv: ⍴Z ←→ ⍴B
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      A ← ⎕RVAL 0
+      Z ← A⌽B
+      (⍴Z) ≡ ⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1

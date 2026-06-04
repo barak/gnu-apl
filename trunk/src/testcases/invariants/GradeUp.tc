@@ -1,0 +1,14 @@
+⍝ GradeUp.tc
+⍝ ══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: B simple nonscalar numeric; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ 1↑⍴B  (result is a vector with length = first dim of B)
+      ⍝ inv: ⍴⍴Z ←→ ,1
+      B ← ⎕RVAL 2 (4 5) (,0 1 0 0 0)
+      Z ← ⍋B
+      (⍴Z) ≡ 1↑⍴B
+1
+      (⍴⍴Z) ≡ ,1
+1

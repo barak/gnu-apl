@@ -1,0 +1,13 @@
+⍝ Ceiling.tc
+⍝ ══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: B and Z numeric; implicit ⎕CT
+      ⍝ inv: ⌈B ←→ -⌊-B   (ceiling defined via floor)
+      B ← ⎕RVAL 1 (,5) (,0 0 1 0 0)
+      (⌈B) ≡ (-⌊-B)
+1
+      B ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      (⌈B) ≡ (-⌊-B)
+1

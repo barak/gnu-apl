@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Installing and Starting GNU APL,  Up: (dir)
 GNU APL Reference Manual
 ************************
 
-May 20, 2026.  This manual briefly documents GNU APL, an interpreter for
+June 4, 2026.  This manual briefly documents GNU APL, an interpreter for
 APL as described in ISO standard 13751, aka.  "Programming Language APL,
 Extended".
 
@@ -7280,7 +7280,7 @@ File: apl.info,  Node: General,  Next: Dyadic ⎕RVAL,  Up: ⎕RVAL - Random APL
 --------------
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z, while
-dyadic A RVAL B is used to control the properties of subsequently
+dyadic A ⎕RVAL B is used to control the properties of subsequently
 generated random APL values returned by monadic ⎕RVAL.
 
    The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more
@@ -7359,6 +7359,11 @@ shall be generated again.  The random number generators of ?  and ⎕RVAL
 are independent; generating a random number or random value with one
 does not change the state of the other.
 
+   When setting the state, B must be an integer vector whose length is
+one of 8, 16, 32, 64, 128, or 256 (the valid state sizes of the
+underlying ‘initstate’/‘setstate’ library functions).  An empty B merely
+queries the current state without changing it.
+
 
 File: apl.info,  Node: Control of the ranks: 1 ⎕RVAL B,  Next: Control of the shapes: 2 ⎕RVAL B,  Prev: Control of the underlying random number generator: 0 ⎕RVAL B,  Up: Dyadic ⎕RVAL
 
@@ -7372,10 +7377,10 @@ The rank of subsequently generated random values can be controlled with
      subsequently generated random values will have the fixed rank B.
      MAX_RANK is a ./configurable constant with a default of 8.
 
-   • If B is a negative scalar with 0 > B > -MAX_RANK then the ranks of
+   • If B is a negative scalar with 0 > B ≥ -MAX_RANK then the ranks of
      the subsequently generated random values will be chosen at random
-     between 0 and -B (inclusive).  All possible ranks 0 ...  B will
-     have the same probability P = 100÷1-B %.
+     between 0 and -B (inclusive).  All possible ranks 0 ...  -B will
+     have the same probability P = 100÷(1-B) %.
 
    • Otherwise B must be a vector of positive integers.  The integers
      are the relative frequencies of the ranks 0, 1, ...  MAX_RANK
@@ -7407,9 +7412,9 @@ The shapes of subsequently generated random values can be controlled
 with 2 ⎕RVAL B as follows.
 
    B must be a vector of positive or negative integers.  Vectors longer
-than MAX_RANK + 1 will give a LENGTH ERROR while vectors shorter than
-MAX_RANK + 1 will be filled with 1 until the length of B becomes
-MAX_RANK + 1.
+than MAX_RANK will give a LENGTH ERROR while vectors shorter than
+MAX_RANK will be prepended with 1s until the length of B becomes
+MAX_RANK.
 
    If an element B_{i} of the resulting shape B = B_{1} ...  B_{MAXRANK}
 is ≥ 0 then the corresponding axis i will have a fixed length of B_{i}.
@@ -7428,8 +7433,7 @@ used to query the current setting for 2 ⎕RVAL.
      2 ⎕RVAL 3 ¯10    ⍝ the first axis of every matrix will have length 3, and
                       ⍝ the last axis of every matrix will vary between 0 and 10
 
-   This will produce scalars, vectors with a fixed length of 3 and
-matrices with 3 rows and between 0 and 10 columns.
+   This will produce matrices with 3 rows and between 0 and 10 columns.
 
 
 File: apl.info,  Node: Control of the data types: 3 ⎕RVAL B,  Next: Control of a maximum depth: 4 ⎕RVAL B,  Prev: Control of the shapes: 2 ⎕RVAL B,  Up: Dyadic ⎕RVAL
@@ -7452,8 +7456,8 @@ will not occur) and longer vectors will raise a LENGTH error.
      problems.  If you need larger Unicodes, use ⎕UCS with random
      integers.
 
-   • for type INTEGER: a random integer with ⎕UCS between -$80000000 and
-     $7FFFFFFF.
+   • for type INTEGER: a random 64-bit integer between
+     -$8000000000000000 and $7FFFFFFFFFFFFFFF.
 
    • for type REAL: a floating point number between 0.0 and 1.0
      (exclusive)
@@ -7489,8 +7493,9 @@ the system limit for the depth of the random value being produced.  This
 can be prevented by setting a maximum depth for every value generated.
 ⎕RVAL sets the probability of the deepest allowed depth to 0.
 
-   4 ⎕RVAL B expects B to be a positive integer which is deepest allowed
-depth;
+   4 ⎕RVAL B expects B to be a non-negative integer which is the deepest
+allowed depth (0 suppresses nesting entirely regardless of the type
+distribution);
 
    An empty B, e.g.  4 ⎕RVAL ⍬, will not change anything and can be used
 to query the current setting for 4 ⎕RVAL.
@@ -11773,85 +11778,85 @@ Node: the ⎕RE error flag E303787
 Node: Complex Matches304691
 Node: ⎕RVAL - Random APL value309181
 Node: General310169
-Node: Dyadic ⎕RVAL311114
-Node: Control of the underlying random number generator: 0 ⎕RVAL B312057
-Node: Control of the ranks: 1 ⎕RVAL B313416
-Node: Control of the shapes: 2 ⎕RVAL B315116
-Node: Control of the data types: 3 ⎕RVAL B316613
-Node: Control of a maximum depth: 4 ⎕RVAL B318438
-Node: monadic ⎕RVAL B319252
-Node: Syntax Alternatives321218
-Node: ⎕SI - State Indicator321874
-Node: ⎕SQL - SQL Database Interface324122
-Node: ⎕SQL[0] ⍬ : display sub-function numbers325221
-Node: ⎕SQL[0] '' : display sub-function names327132
-Node: ref ← A ⎕SQL[1] B : open database329914
-Node: ⎕SQL[2] B : close database330974
-Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331531
-Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332514
-Node: ⎕SQL[5] B : start transaction333088
-Node: ⎕SQL[6] B : commit transaction333415
-Node: ⎕SQL[7] B : rollback transaction333726
-Node: Z←⎕SQL[8] B : table names334053
-Node: Z←⎕SQL[9] B : column names334383
-Node: Z ← ⎕SQL[10] B : library version number334901
-Node: Z ← ⎕SQL[11] B : library version string335497
-Node: SQLite Quickstart336063
-Node: Deleting a Database338007
-Node: Creating a new Database339417
-Node: Creating a Database Table341166
-Node: Excursus: Dynamic Query Strings344522
-Node: Writing an APL matrix into a Database Table347469
-Node: Reading a Database Table into an APL Matrix349870
-Node: Updating a Database Table351641
-Node: Deleting Rows From a Database Table354270
-Node: ⎕SYL - System limits355042
-Node: ⎕SYL[1 2 3 4 5 6;]357458
-Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]358853
-Node: ⎕SYL[24 25 26;]359337
-Node: ⎕SYL[27;]359649
-Node: ⎕XML - XML Parsing360332
-Node: Purpose360666
-Node: Some XML Terminology362242
-Node: How ⎕XML maps XML documents to APL Values365690
-Node: Monadic ⎕XML372353
-Node: Dyadic ⎕XML373166
-Node: XML Queries381459
-Node: Conditionals382329
-Node: Design considerations.382759
-Node: Syntax390157
-Node: A Possible Pitfall393310
-Node: Matrix Product397567
-Node: Monadic ≠ (Nub Sieve)400870
-Node: Limitations and Missing Features401418
-Node: System Limits401853
-Node: Shared Variables403155
-Node: Internationalization404237
-Node: Vector Notation405418
-Node: History406013
-Node: Standardization406751
-Node: Quotes from the lrm407258
-Node: Some APL2 Tests409417
-Node: Test 1: Binding strength of []409832
-Node: Test 2: Binding strength of the left operand410670
-Node: Definitions415449
-Node: Unexpected Stranding418474
-Node: GNU APL Vector Notation427240
-Node: GNU APL Project Structure433228
-Node: The sub-directory src434756
-Node: The sub-directory support-files436128
-Node: The sub-directory doc436547
-Node: The sub-directory HOWTOs436851
-Node: The sub-directories workspaces and wslib2 ... wslib5437596
-Node: The sub-directory m4438156
-Node: The sub-directories debian and debian_tmp439028
-Node: The sub-directory tools439525
-Node: Libraries Contributed by GNU APL Users439988
-Node: The GNU APL Community Webpage440465
-Node: Core Libraries441202
-Node: Licenses for this GNU APL Manual and for GNU APL442083
-Node: The GNU Free Documentation License442628
-Node: The GNU GENERAL PUBLIC LICENSE468022
+Node: Dyadic ⎕RVAL311117
+Node: Control of the underlying random number generator: 0 ⎕RVAL B312060
+Node: Control of the ranks: 1 ⎕RVAL B313683
+Node: Control of the shapes: 2 ⎕RVAL B315388
+Node: Control of the data types: 3 ⎕RVAL B316831
+Node: Control of a maximum depth: 4 ⎕RVAL B318667
+Node: monadic ⎕RVAL B319557
+Node: Syntax Alternatives321523
+Node: ⎕SI - State Indicator322179
+Node: ⎕SQL - SQL Database Interface324427
+Node: ⎕SQL[0] ⍬ : display sub-function numbers325526
+Node: ⎕SQL[0] '' : display sub-function names327437
+Node: ref ← A ⎕SQL[1] B : open database330219
+Node: ⎕SQL[2] B : close database331279
+Node: Z ← A ⎕SQL[3 ref] B : database query (with result)331836
+Node: Z ← A ⎕SQL[4 ref] B : database query (w/o result)332819
+Node: ⎕SQL[5] B : start transaction333393
+Node: ⎕SQL[6] B : commit transaction333720
+Node: ⎕SQL[7] B : rollback transaction334031
+Node: Z←⎕SQL[8] B : table names334358
+Node: Z←⎕SQL[9] B : column names334688
+Node: Z ← ⎕SQL[10] B : library version number335206
+Node: Z ← ⎕SQL[11] B : library version string335802
+Node: SQLite Quickstart336368
+Node: Deleting a Database338312
+Node: Creating a new Database339722
+Node: Creating a Database Table341471
+Node: Excursus: Dynamic Query Strings344827
+Node: Writing an APL matrix into a Database Table347774
+Node: Reading a Database Table into an APL Matrix350175
+Node: Updating a Database Table351946
+Node: Deleting Rows From a Database Table354575
+Node: ⎕SYL - System limits355347
+Node: ⎕SYL[1 2 3 4 5 6;]357763
+Node: ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]359158
+Node: ⎕SYL[24 25 26;]359642
+Node: ⎕SYL[27;]359954
+Node: ⎕XML - XML Parsing360637
+Node: Purpose360971
+Node: Some XML Terminology362547
+Node: How ⎕XML maps XML documents to APL Values365995
+Node: Monadic ⎕XML372658
+Node: Dyadic ⎕XML373471
+Node: XML Queries381764
+Node: Conditionals382634
+Node: Design considerations.383064
+Node: Syntax390462
+Node: A Possible Pitfall393615
+Node: Matrix Product397872
+Node: Monadic ≠ (Nub Sieve)401175
+Node: Limitations and Missing Features401723
+Node: System Limits402158
+Node: Shared Variables403460
+Node: Internationalization404542
+Node: Vector Notation405723
+Node: History406318
+Node: Standardization407056
+Node: Quotes from the lrm407563
+Node: Some APL2 Tests409722
+Node: Test 1: Binding strength of []410137
+Node: Test 2: Binding strength of the left operand410975
+Node: Definitions415754
+Node: Unexpected Stranding418779
+Node: GNU APL Vector Notation427545
+Node: GNU APL Project Structure433533
+Node: The sub-directory src435061
+Node: The sub-directory support-files436433
+Node: The sub-directory doc436852
+Node: The sub-directory HOWTOs437156
+Node: The sub-directories workspaces and wslib2 ... wslib5437901
+Node: The sub-directory m4438461
+Node: The sub-directories debian and debian_tmp439333
+Node: The sub-directory tools439830
+Node: Libraries Contributed by GNU APL Users440293
+Node: The GNU APL Community Webpage440770
+Node: Core Libraries441507
+Node: Licenses for this GNU APL Manual and for GNU APL442388
+Node: The GNU Free Documentation License442933
+Node: The GNU GENERAL PUBLIC LICENSE468327
 
 End Tag Table
 

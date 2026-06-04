@@ -1,0 +1,21 @@
+⍝ Take.tc
+⍝ ═══════
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar/vector integer
+      ⍝ inv: ⍴Z ←→ |,A
+      ⍝ inv: ⍴⍴Z ←→ ⍴,A
+      B ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      A ← ⎕RVAL 1 (,2) (,0 1 0 0 0)          ⍝ 2-element take vector
+      A ← 1+3∣|A                              ⍝ values 1..4 (fit within shape)
+      Z ← A↑B
+      (⍴Z) ≡ |,A
+1
+      (⍴⍴Z) ≡ ⍴,A
+1
+      ⍝ inv: A↑B ←→ A↑[⍳⍴⍴B]B
+      B ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      A ← 2 3
+      (A↑B) ≡ A↑[⍳⍴⍴B]B
+1

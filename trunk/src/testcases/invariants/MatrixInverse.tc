@@ -1,0 +1,19 @@
+⍝ MatrixInverse.tc
+⍝ ════════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: B simple numeric rank≤2; square nonsingular
+      ⍝ inv: ⍴Z ←→ ⌽⍴B
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← 0.1×⎕RVAL 2 (3 3) (,0 0 1 0 0)
+      B ← B+(3 3⍴3 0 0 0 3 0 0 0 3)         ⍝ ensure nonsingularity
+      Z ← ⌹B
+      (⍴Z) ≡ ⌽⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: B+.×⌹B ≈ identity (within ⎕CT)
+      I ← (⍳3)∘.=⍳3
+      (B+.×⌹B) ≡ I
+1

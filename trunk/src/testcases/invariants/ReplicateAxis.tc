@@ -1,0 +1,15 @@
+⍝ ReplicateAxis.tc
+⍝ ════════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: LO integer scalar/vector; X∊⍳⍴⍴B; implicit ⎕IO
+      ⍝ inv: (⍴Z)[X] ←→ +/|LO   (new axis length = sum of |LO|)
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (4 5) (,0 1 0 0 0)
+      LO ← 1+2∣|⎕RVAL 1 (,4) (,0 1 0 0 0)    ⍝ replicate along axis 1
+      Z ← LO/[1]B
+      ((⍴Z)[1]) ≡ +/|LO
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1

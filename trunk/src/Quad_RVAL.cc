@@ -28,7 +28,6 @@
 #include "Quad_RVAL.hh"
 #include "Value.hh"
 
-size_t N;
 vector<int> Quad_RVAL::desired_ranks;
 Shape       Quad_RVAL::desired_shape;
 vector<int> Quad_RVAL::desired_types;
@@ -41,7 +40,7 @@ const FunctionGroup::function_info Quad_RVAL::subfunction_infos[] =
 #define rvaldef(N, fun, comm_2) { N, #fun, "", comm_2, -1 },
   rvaldef(0, state, "get (B=⍬) or set (B≠⍬) the random number generator state" )
   rvaldef(1, rank,  "set the rank of subsequently returned random values"      )
-  rvaldef(2, shape, "set he shape of subsequently returned random values"      )
+  rvaldef(2, shape, "set the shape of subsequently returned random values"      )
   rvaldef(3, type,  "set the data type of subsequently returned random values" )
   rvaldef(4, depth, "set the depth of subsequently returned random values"     )
 };
@@ -93,7 +92,7 @@ Quad_RVAL::eval_B(Value_P B) const
    if (B->is_empty())   DOMAIN_ERROR;
    if (B->get_rank() > 1)
       {
-        MORE_ERROR() << "⎕RVAL B: expecting 1 < ⍴⍴B.";
+        MORE_ERROR() << "⎕RVAL B: rank of B must be ≤ 1.";
         RANK_ERROR;
       }
 
@@ -145,9 +144,9 @@ int         old_desired_maxdepth = desired_maxdepth;
 bool need_restore = false;
 
    try {
-         need_restore = true;   // since something was changed
+         need_restore = true;   // ensure restore on any exception below
 
-         if (len_B >= 2)   // rank: scalar or enclosed vector (distribution)
+         if (len_B >= 1)   // rank: scalar or enclosed vector (distribution)
             {
               const Cell & cell = B.get_cfirst();
               if (cell.is_pointer_cell())
@@ -176,7 +175,15 @@ bool need_restore = false;
             }
 
          if (len_B >= 3)   // type: always enclosed vector (distribution)
-            do_eval_AB(3, *B.get_cravel(2).get_pointer_value());
+            {
+              if (!B.get_cravel(2).is_pointer_cell())
+                 {
+                   MORE_ERROR() << "⎕RVAL B: B[2] (type distribution) must be "
+                                   "an enclosed vector";
+                   DOMAIN_ERROR;
+                 }
+              do_eval_AB(3, *B.get_cravel(2).get_pointer_value());
+            }
 
          if (len_B >= 4)   // maxdepth: scalar or 1-element vector
             {
@@ -291,7 +298,7 @@ const int dist_len = dist.size();
         const int desired = dist[0];
         if (desired >= 0)   return desired;   // fixed value
         const int rand = rand17();
-        return rand % (1 - desired);          // = 0... desired
+        return rand % (1 - desired);          // = 0 ... |desired|
       }
 
    // dist is a distribution...
@@ -341,8 +348,8 @@ Quad_RVAL::generator_state(const Value & B)
    if (B.get_rank() != 1)   RANK_ERROR;
 
 const ShapeItem new_N = B.element_count();
-   if (new_N !=   0 && new_N !=   8 && new_N !=  32 &&
-       new_N !=  64 && new_N != 128 && new_N != 256)
+   if (new_N !=   0 && new_N !=   8 && new_N !=  16 &&
+       new_N !=  32 && new_N !=  64 && new_N != 128 && new_N != 256)
       {
         MORE_ERROR() << "bad new_N (aka. ⍴B) in generator_state()";
         LENGTH_ERROR;
@@ -358,7 +365,7 @@ Value_P Z(N, LOC);
       {
         // make sure that all values are bytes
         //
-        loop(b, N)
+        loop(b, new_N)
             {
               const APL_Integer byte = B.get_cravel(b).get_int_value();
               if ((byte < -256) || (byte >  255))
@@ -399,6 +406,7 @@ void
 Quad_RVAL::random_character(Value & Z)
 {
 const int32_t rnd = rand17();
+   // bits 0-12: codepoint base (0..8191); bit 13 adds 0x1000 (skips C0/C1 ranges)
    Z.next_ravel_Char(Unicode((rnd & 0x1FFF) + ((rnd & 0x2000) >> 1)));
 }
 //────────────────────────────────────────────────────────────────────────────

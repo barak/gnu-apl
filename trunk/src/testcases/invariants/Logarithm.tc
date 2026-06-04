@@ -1,0 +1,11 @@
+⍝ Logarithm.tc
+⍝ ════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A and B numeric nonzero; Z numeric
+      ⍝ inv: A⍟B ←→ (⍟B)÷⍟A
+      A ← 1+(|⎕RVAL 1 (,4) (,0 0 1 0 0))     ⍝ positive reals
+      B ← 1+(|⎕RVAL 1 (,4) (,0 0 1 0 0))
+      (A⍟B) ≡ (⍟B)÷⍟A
+1

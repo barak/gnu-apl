@@ -1,0 +1,25 @@
+⍝ Partition.tc
+⍝ ════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar/vector nonneg int; B nonscalar
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      ⍝ inv: ≡Z ←→ 1+≡B
+      B ← ⎕RVAL 1 (,8) (,0 1 0 0 0)
+      A ← 0 1 1 2 0 2 3 3
+      Z ← A⊂B
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ≡Z
+2
+      ⍝ inv: B ←→ ⊃,/A⊂B   (re-assemble = original)
+      B ≡ ⊃,/A⊂B
+1
+      ⍝ inv: (0≠A)/B ←→ ⊃,/A⊂B   (non-zero selected items)
+      ((0≠A)/B) ≡ ⊃,/A⊂B
+1
+      ⍝ inv: P/B ←→ ⊃,/P⊂B  for Boolean P
+      P ← 1 0 1 1 0 1 1 0
+      (P/B) ≡ ⊃,/P⊂B
+1
