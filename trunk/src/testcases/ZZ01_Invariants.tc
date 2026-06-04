@@ -48,13 +48,13 @@ CLEAR WS
 
 ⍝ frequently used random values...
 
-      ⍝                ┌───────────────────────── rank:  random 0-3
-      ⍝                │  ┌────────────────────── shape: random 0 0 0 - 4 4 4
+      ⍝                ┌───────────────────────── rank:  random 0-2
+      ⍝                │  ┌────────────────────── shape: random 0 0 - 3 3
       ⍝                │  │   ┌──┬──┬──┬──┬────── type: (Char/Int/Real/Complex)
-      ⍝                │  │   │  │  │  │  │  ┌─── max. depth: 4
+      ⍝                │  │   │  │  │  │  │  ┌─── max. depth: 3
       ⍝                │  │   │  │  │  │  │  │
-      ANY_IRC ← ⎕RVAL ¯3 ¯4  (0 70 80 20 10) 4   ⍝ some numeric value
-      ANY_I   ← ⎕RVAL ¯3 ¯4  (0 100)             ⍝ some integer  value
+      ANY_IRC ← ⎕RVAL ¯2 ¯3  (0 70 80 20 10) 3   ⍝ some numeric value
+      ANY_I   ← ⎕RVAL ¯2 ¯3  (0 100)             ⍝ some integer  value
 
 ⍝ lrm p. 14
       1 2    INV∆EQUIV 1(2)
@@ -108,13 +108,13 @@ CLEAR WS
       ( (2 3 4) )  INV∆EQUIV  ( 2 3 4 )    ⍝ These group but do not separate.
 
 ⍝ lrm p. 74
-      A←⎕RVAL ¯3 ¯4 (50 50) 4
-      B←⎕RVAL ¯3 ¯4 (50 50) 4
-      C←⎕RVAL ¯3 ¯4 (50 50) 4
+      A←⎕RVAL ¯2 ¯3 (50 50) 4
+      B←⎕RVAL ¯2 ¯3 (50 50) 4
+      C←⎕RVAL ¯2 ¯3 (50 50) 4
       (A B C) INV∆EQUIV (⊂A),(⊂B),⊂C
 
 ⍝ lrm p. 80
-      A←⎕RVAL 3 ¯10 (0 25 25 25) 4
+      A←⎕RVAL 3 ¯4 (0 25 25 25) 4
       (I1 I2 I3)←⍳¨⍴A
       I1←(1 ⊤∧ ⎕RVAL 1 (⍴I1) (0 100) 4)/I1   ⍝ pick some indices
       I2←(1 ⊤∧ ⎕RVAL 1 (⍴I2) (0 100) 4)/I2   ⍝ pick some indices
@@ -124,12 +124,12 @@ CLEAR WS
       (⍴⍴Z) INV∆EQUIV (⍴⍴I1) + (⍴⍴I2) + ⍴⍴I3
 
 ⍝ lrm p. 83
-      ⍝        ┌─────────────────────────── rank:  random 0-3
-      ⍝        │  ┌──────────────────────── shape: random 0 0 0 - 4 4 4
+      ⍝        ┌─────────────────────────── rank:  random 0-2
+      ⍝        │  ┌──────────────────────── shape: random 0 0 - 3 3
       ⍝        │  │       ┌──┬───────────── type: (80% real, 20% complex)
       ⍝        │  │       │  │         ┌─── max. depth: 4
       ⍝        │  │       │  │         │
-      R←⎕RVAL ¯3 ¯4 (0 0 80 20) 4
+      R←⎕RVAL ¯2 ¯3 (0 0 80 20) 4
 
       ( 0○R)  INV∆EQUIV  2○¯1○R
       ( 0○R)  INV∆EQUIV  1○¯2○R
