@@ -159,8 +159,7 @@ Multi_line_SM::next(Unicode triple)
 }
 //════════════════════════════════════════════════════════════════════════════
 ErrorCode
-Parser::parse(const UCS_string & input, Token_string & tos,
-              bool optimize) const
+Parser::parse(const UCS_string & input, Token_string & tos, bool optimize) const
 {
    // convert input characters into token
    //
@@ -169,6 +168,7 @@ Token_string tos1;
    {
      Tokenizer tokenizer(pmode, LOC, macro);
      if (const ErrorCode ec = tokenizer.tokenize(input, tos1))   return ec;
+     if (const ErrorCode ec = tos1.all_brackets_closed())        return ec;
    }
 
    // special case: single token (to speed up ⍎)
@@ -390,7 +390,7 @@ std::vector<ShapeItem> stack;
                   continue;
 
              case TC_R_BRACK:
-                  ec = E_UNBALANCED_R_BRACKET;   // for empty stack below
+                  ec = E_UNBALANCED_R_BRACK;   // for empty stack below
                   tc_peer = TC_L_BRACK;
                   break;
 
@@ -428,7 +428,7 @@ std::vector<ShapeItem> stack;
    if (stack.size())
       {
         const TokenClass outer = tos[stack[0]].get_Class();
-        if (outer == TC_L_BRACK)    return E_UNBALANCED_L_BRACKET;
+        if (outer == TC_L_BRACK)    return E_UNBALANCED_L_BRACK;
         if (outer == TC_L_PARENT)   return E_UNBALANCED_L_PARENT;
         if (outer == TC_L_CURLY)    return E_UNBALANCED_L_CURLY;
         FIXME;

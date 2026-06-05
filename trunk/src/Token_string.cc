@@ -23,6 +23,38 @@
 #include "Token_string.hh"
 
 //════════════════════════════════════════════════════════════════════════════
+ErrorCode
+Token_string::all_brackets_closed() const
+{
+vector<TokenTag> expected;
+
+   loop(s, size())
+      {
+        const TokenTag tag = at(s).get_tag();
+        ErrorCode ec1, ec2;
+        #define want(x) ec1 = E_UNBALANCED_L_ ## x; ec2 = E_UNBALANCED_R_ ## x
+        switch(tag)
+           {
+             default: continue;   // not (, ), [, ], {, ot }.
+
+             case TOK_L_BRACK:  expected.push_back(TOK_R_BRACK);    continue;
+             case TOK_L_CURLY:  expected.push_back(TOK_R_CURLY);    continue;
+             case TOK_L_PARENT: expected.push_back(TOK_R_PARENT);   continue;
+
+             case TOK_R_BRACK:  want(BRACK);    break;
+             case TOK_R_CURLY:  want(CURLY);    break;
+             case TOK_R_PARENT: want(PARENT);   break;
+           }
+        #undef want
+
+        if (expected.size() == 0)     return ec1;   // error
+        if (tag != expected.back())   return ec2;   // error
+        expected.pop_back();   // level done
+      }
+
+   return E_NO_ERROR;   // OK
+}
+//────────────────────────────────────────────────────────────────────────────
 int
 Token_string::find_closing_bracket(int pos) const
 {

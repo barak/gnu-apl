@@ -81,13 +81,15 @@
            »»»
 
 ⍝-----------------------------------------------------------------------------
-∇A INV∆CHECK[X] B;I;L;R;A1;A2;Z1;Z2
+∇A INV∆CHECK[X] B;I;L;R;A1;A2;Z1;Z2;⎕CT
  ⍝
  ⍝⍝ check that the invariant A is valid for (L R Z)←B, possibly for
  ⍝⍝ multiple I as defined by X. Be quiet if so, complain if not.
  ⍝
  (R Z)←¯2↑B ◊ L←↑B
  ⍎(2≠⎕NC 'X')/"X←',0'" ◊ ⍎'X←',X          ⍝ set X ← ,0 if not provided
+
+   ⎕CT←1E¯10   ⍝ otherwise some tests fail
 
  ⍝ split string A (the invariant) into A1 left of ←→ and A2 right of ←→
  (A1 A2)←(1+∨\"←→"⍷A)⊂A ◊ A2←2↓A2

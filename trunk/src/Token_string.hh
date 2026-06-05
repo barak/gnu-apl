@@ -51,6 +51,10 @@ public:
    ShapeItem ssize() const
       { return ShapeItem(vector<Token>::size()); }
 
+   /// check that every [, (, resp. { has a matching ], ), resp. },
+   /// and no invalid combination like [ ( ] ) is present.
+   ErrorCode all_brackets_closed() const;
+
    /// find the closing bracket for \b tos[pos]; throw error if not found
    /// @param pos  position of the opening bracket token
    int find_closing_bracket(int pos) const;

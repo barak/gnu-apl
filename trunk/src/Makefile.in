@@ -6906,6 +6906,11 @@ test3: all
 	./apl --id 1010 -T testcases_3/*tc || true
 	stty sane
 
+# run only invariant testcases
+test4: all
+	./apl --id 1010 -T testcases/invariants/*tc || true
+	stty sane
+
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
 
