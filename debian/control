@@ -1,16 +1,48 @@
-Source: apl
-Section: devel
-Priority: optional
-Maintainer: Juergen Sauermann<bug-apl@gnu.org>
-Build-Depends: debhelper (>= 7), autotools-dev, libgl1-mesa-glx, mime-support, locales, libc6, gawk
-Standards-Version: 3.8.3
-Homepage: 
+Source: gnu-apl
+Section: interpreters
+Maintainer: Barak A. Pearlmutter <bap@debian.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ libfftw3-dev,
+ libgtk-3-dev,
+ libncurses-dev,
+ libpcre2-dev,
+ libsqlite3-dev,
+ libxcb1-dev,
+ pkgconf,
+Standards-Version: 4.7.4
+Homepage: https://www.gnu.org/software/apl/
+Vcs-Git: https://salsa.debian.org/debian/gnu-apl.git
+Vcs-Browser: https://salsa.debian.org/debian/gnu-apl
+
+Package: libapl-dev
+Architecture: any
+Section: libdevel
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: GNU APL interpreter - C embedding library (development files)
+ GNU APL is a free APL interpreter based on ISO/IEC Standard 13751
+ (Programming Language APL, Extended).
+ .
+ This package provides libapl, a shared library for embedding the GNU APL
+ interpreter in C or C++ applications, together with the libapl.h header
+ and the libapl Info documentation.
 
 Package: apl
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Suggests: psf-unifont
-Description: GNU APL
- GNU APL is a free APL interpreter. It (almost) fully implemented
- ISO/IEC Standard 13751, aka. Programming Language APL, Extended
-
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends:
+ fonts-unifont,
+Provides: gnu-apl
+Description: GNU APL interpreter
+ GNU APL is a free APL interpreter based on ISO/IEC Standard 13751
+ (Programming Language APL, Extended).  It runs interactively or as
+ a batch processor, and supports complex numbers, the full Unicode
+ APL character set, and co-processors for file I/O, SQL, and
+ external data exchange.
+ .
+ Included helper programs: AP100 (file I/O), AP210 (GNU plot interface),
+ APserver (shared-variable server), plus workspace libraries.

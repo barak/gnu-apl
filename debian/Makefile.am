@@ -1,14 +1,13 @@
 
 SUBDIRS    = source
 
-EXTRA_DIST =	apl-doc.docs	\
-		apl-doc.install	\
-		apl.info	\
-		changelog	\
-		compat		\
-		control		\
-		copyright	\
-		docs		\
-		info		\
+EXTRA_DIST =	apl.info		\
+		apl.install		\
+		changelog		\
+		control			\
+		copyright		\
+		docs			\
+		info			\
+		libapl-dev.install	\
 		rules
 

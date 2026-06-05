@@ -1,34 +1,59 @@
 #!/usr/bin/make -f
-# -*- makefile -*-
-# Sample debian/rules that uses debhelper.
-#
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
-#
-# Modified to make a template file for a multi-binary package with separated
-# build-arch and build-indep targets  by Bill Allombert 2001
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildopts.mk
 
-# This has to be exported to make some magic below work.
-# export DH_OPTIONS=
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+CONFIGURE_EXTRA = CXX_WERROR=no --with-sqlite3
+JOPT=$(addprefix -j,$(DEB_BUILD_OPTION_PARALLEL))
 
 %:
-	dh  $@ --parallel
+	dh $@
 
-override_dh_auto_clean:
-	[ ! -d .deps ] || dh_auto_clean
+override_dh_auto_configure::
+	dh_auto_configure --builddirectory=debian/obj/apl -- \
+		$(CONFIGURE_EXTRA)
+override_dh_auto_configure::
+	dh_auto_configure --builddirectory=debian/obj/libapl -- \
+		$(CONFIGURE_EXTRA) --with-libapl
 
-override_dh_fixperms:
-	dh_fixperms
-	# Fix lintian error by removing auto-generated file late in build
-	# E: apl: package-contains-info-dir-file usr/share/info/dir.gz
-	rm -f $(CURDIR)/debian/apl/usr/share/info/dir.gz
+execute_before_dh_auto_build:
+	@echo "src/makefile.h in source tree can override built file"
+	-rm --verbose src/makefile.h
+override_dh_auto_build::
+	dh_auto_build --builddirectory=debian/obj/apl -- $(JOPT)
+override_dh_auto_build::
+	dh_auto_build --builddirectory=debian/obj/libapl -- $(JOPT)
+
+override_dh_auto_test::
+	dh_auto_test --builddirectory=debian/obj/apl
+override_dh_auto_test::
+	dh_auto_test --builddirectory=debian/obj/libapl
+
+override_dh_auto_install::
+	dh_auto_install --builddirectory=debian/obj/apl
+override_dh_auto_install::
+	dh_auto_install --builddirectory=debian/obj/libapl
+execute_after_dh_auto_install:
+	@echo "Remove .la files; these are private plugin modules, not public libraries"
+	find debian/tmp/usr/lib -name "*.la" -delete
+	@echo "Fix shebangs: upstream uses /usr/local/bin/apl; debian uses /usr/bin/."
+	@echo 'Handle both "#!/usr/local/bin/apl" and "#! /usr/local/bin/apl" forms'
+	find debian/tmp/usr/lib -name "*.apl" | \
+	    xargs grep -lP '^#!\s*/usr/local/bin/apl' | \
+	    xargs -r sed -i 's|^#!\s*/usr/local/bin/apl|#!/usr/bin/apl|'
+	@echo "APL workspace files are library files loaded via )LOAD, not standalone scripts;"
+	@echo "ensure they are not executable"
+	find debian/tmp/usr/lib -name "*.apl" -executable -exec chmod --changes 644 {} +
+
+execute_after_dh_installinfo:
+	-rm -f --verbose debian/apl/usr/share/info/dir.gz
 
 override_dh_shlibdeps:
 	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
 
+override_dh_auto_clean::
+	dh_auto_clean --builddirectory=debian/obj/apl
+override_dh_auto_clean::
+	dh_auto_clean --builddirectory=debian/obj/libapl

@@ -1,0 +1,33 @@
+# Native function plugin libraries are loaded by apl itself via dlopen,
+# not by the dynamic linker.  They live in a private subdirectory and
+# don't need ldconfig.
+apl: package-has-unnecessary-activation-of-ldconfig-trigger
+
+# The info pages reference images stored in /usr/share/doc/apl/ — this is
+# an upstream documentation layout decision.
+apl: info-document-missing-image-file *
+
+# AP100, AP210, APserver, and Gtk_server are internal co-processor helpers
+# with no upstream man pages.
+apl: no-manual-page [usr/bin/AP100]
+apl: no-manual-page [usr/bin/AP210]
+apl: no-manual-page [usr/bin/APserver]
+apl: no-manual-page [usr/bin/Gtk_server]
+
+# national-encoding warnings are in upstream third-party workspace files
+apl: national-encoding *
+
+# APL workspace and library files carry shebang lines as a convenience for
+# interactive use, but are loaded via APL's )LOAD command, not run directly
+# as OS-level scripts.  They are deliberately installed non-executable.
+apl: script-not-executable [usr/lib/*/apl/*]
+
+# The emacs mode native function library is upstream code not built with
+# fortify; it is a private dlopen'd plugin, not a public-facing library.
+apl: hardening-no-fortify-functions [usr/lib/*/apl/libemacs.so*]
+
+# The wslib5 workspace libraries bundle upstream third-party APL library
+# packages including their own README and LICENSE files.  These are data
+# files loaded by APL's )LOAD command, not installed documentation.
+apl: extra-license-file [usr/lib/*/apl/wslib5/*]
+apl: package-contains-documentation-outside-usr-share-doc [usr/lib/*/apl/wslib5/*]

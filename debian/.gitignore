@@ -1,0 +1,20 @@
+# debhelper build state
+debhelper-build-stamp
+autoreconf.before
+autoreconf.after
+files
+*.substvars
+*.debhelper.log
+.debhelper/
+
+# Package build trees and output
+obj/
+tmp/
+apl/
+apl-dbgsym/
+libapl-dev/
+libapl-dev-dbgsym/
+
+# Autoconf/automake generated (in debian/ subtree)
+Makefile
+Makefile.in

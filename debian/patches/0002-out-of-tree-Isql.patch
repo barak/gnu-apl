@@ -1,0 +1,23 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Tue, 9 Jun 2026 14:43:42 +0100
+Subject: out-of-tree -Isql
+
+Use -I $(srcdir)/sql not -I sql so sql headers are found when building
+outside the source tree.
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 8155012..13ce97e 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -17,7 +17,7 @@ distcleancheck_listfile = buildtag
+ 
+ # common means common to the apl and libapl builds
+ #
+-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR)
++common_CXXFLAGS = -Wall -I $(srcdir)/sql $(CXX_WERROR)
+ common_LDFLAGS =
+ common_SOURCES =        buildtag		buildtag.hh		\
+ 						../config.h		\

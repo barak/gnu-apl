@@ -1,0 +1,24 @@
+From: "Barak A. Pearlmutter" <barak@pearlmutter.net>
+Date: Fri, 5 Jun 2026 23:36:49 +0100
+Subject: Do not pass null pointer to std::string::append in Backtrace::get()
+
+std::string::append has undefined behavior when its pointer argument is null.
+Remove the null argument; a subsequent push_back already appends the same
+character.  Fixes a build failure with gcc 15, which turns this UB into a
+trap.
+---
+ src/Backtrace.cc | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/Backtrace.cc b/src/Backtrace.cc
+index bee80ff..beec15b 100644
+--- a/src/Backtrace.cc
++++ b/src/Backtrace.cc
+@@ -327,7 +327,6 @@ std::string tmp;
+    tmp.reserve(result_max + 1);
+    for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
+        tmp += *b;
+-   tmp.append(0);
+ 
+ char * e = 0;
+ int status = 3;

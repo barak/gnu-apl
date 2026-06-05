@@ -1,13 +1,15 @@
-apl (1.8-1) UNRELEASED; urgency=low
+gnu-apl (1.8-1) unstable; urgency=medium
 
-  * Portability improved
-    GNU APL 1.1 now runs under GNU/Linux, CYGWIN, FreeBSD, and OS-X
+  * Package upstream release 1.8 (closes: #949948)
+  * Upstream had debian/* for 1.1. Completely overwriting, but some
+    of that was used as a basis here; changes below.
+  * Debhelper compat 13, Standards-Version 4.7.4, DEP-5 copyright.
+  * Add libapl-dev binary package for the embeddable APL library.
+    - using out-of-tree build
+    - patches to enable out-of-tree build
+    - GCC-15 patch
+  * Build with libfftw3, libxcb, libgtk-3, libpcre2, libsqlite3 support.
+  * Fiddle with debian/rules and patch #includes so broken upstream
+    src/makefile.h does not break the build.
 
-  * New memory management using smart pointers
-    GNU APL 1.2 uses a new memory management for APL values
-
-  * Native Functions
-    GNU APL 1.2 now supports user defined APL functions written in C++ 
-
- -- Jürgen Sauermann <bug-apl@gnu.org>  Tue, 04 Jan 2014 14:14:00 +0200
-
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 10 Jun 2026 16:04:48 +0100

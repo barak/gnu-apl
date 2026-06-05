@@ -1,0 +1,4 @@
+usr/include/apl/libapl.h
+usr/lib/*/apl/libapl.a
+usr/lib/*/apl/libapl.so
+usr/share/info/libapl.info

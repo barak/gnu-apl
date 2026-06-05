@@ -1,0 +1,116 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 7 Jun 2026 15:17:18 +0100
+Subject: generate HTML and info from texi in builddir doc/
+
+Replace the hand-rolled info install/uninstall targets and pre-built
+file approach with standard automake idioms.
+
+Set info_TEXINFOS to the Texinfo source files (apl.texi, libapl.texi)
+so automake handles .info generation and installation automatically.
+
+Add makeinfo --html rules controlled by
+AM_MAKEINFOHTMLFLAGS=--no-split to produce single-file HTML output.
+
+Use nodist_doc_DATA for the generated HTML files so they are installed
+to $(docdir) but not distributed in source tarballs.  Move the PNG
+images to dist_doc_DATA.  Add CLEANFILES to remove all generated files
+on make clean.
+
+Add AM_INIT_AUTOMAKE info-in-builddir option so generated .info
+files are written to the build directory rather than the source tree.
+---
+ configure.ac    |  2 +-
+ doc/Makefile.am | 67 ++++++++++++++-------------------------------------------
+ 2 files changed, 17 insertions(+), 52 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index cf8a5dd..59f1234 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,7 +35,7 @@ AC_USE_SYSTEM_EXTENSIONS
+ #
+ # enable_dependency_tracking=no
+ 
+-AM_INIT_AUTOMAKE([subdir-objects])
++AM_INIT_AUTOMAKE([subdir-objects info-in-builddir])
+ AM_MAINTAINER_MODE([disable])
+ AC_CONFIG_SRCDIR([src])
+ AC_CONFIG_MACRO_DIR([m4])
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 35afeef..8394e88 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -1,57 +1,22 @@
+-
+-# NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
+-# to be deleted on 'make clean' That is bad for people not having a
+-# $MAKEINFOHTML installed. We therefore leve info_TEXINFOS empty and instead
+-# install info stuff manually below.
+-#
+-info_TEXINFOS = 
++info_TEXINFOS = apl.texi libapl.texi
+ 
+ man1_MANS = apl.1
+ 
+-# info_TEXINFOS = fails for more than one .texi file. We therefore install
+-# libapl.info explicitly
+-#
+-install-info-am:
+-	@echo " $(MKDIR_P) $(DESTDIR)$(infodir)"
+-	@       $(MKDIR_P) "$(DESTDIR)$(infodir)" || exit 1
+-	@echo " $(INSTALL_DATA) $(srcdir)/apl.info  $(srcdir)/libapl.info $(DESTDIR)$(infodir)"
+-	@       $(INSTALL_DATA) $(srcdir)/apl.info  $(srcdir)/libapl.info $(DESTDIR)$(infodir)
+-
+-uninstall-info-am:
+-	 @echo " rm -f $(DESTDIR)$(infodir)/apl.info"
+-	 @       rm -f $(DESTDIR)$(infodir)/apl.info
+-	 @echo " rm -f $(DESTDIR)$(infodir)/libapl.info"
+-	 @       rm -f $(DESTDIR)$(infodir)/libapl.info
+-
+-# apl.texi in HTML format
+-#
+-apl.html:   apl.texi
+-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
+-
+-# apl.texi in info format
+-#
+-apl.info:   apl.texi
+-	$(MAKEINFO) $< -o $@ --no-split || touch $@
+-
+-# libapl.texi in HTML format
+-#
++AM_MAKEINFOHTMLFLAGS = --no-split
++
++apl.html: apl.texi
++	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
++
+ libapl.html: libapl.texi
+-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
+-
+-# libapl.texi in info format
+-#
+-libapl.info: libapl.texi
+-	$(MAKEINFO) $< -o $@ --no-split || touch $@
+-
+-
+-dist_doc_DATA =			\
+-	apl.1			\
+-	apl.texi		\
+-	apl.info		\
+-	apl.html		\
+-	libapl.texi		\
+-	libapl.info		\
+-	PLOT_circle.png		\
+-	PLOT_zigzag.png		\
++	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
++
++nodist_doc_DATA =	\
++	apl.html	\
+ 	libapl.html
+ 
++CLEANFILES = apl.html libapl.html apl.info libapl.info
++
++dist_doc_DATA =		\
++	PLOT_circle.png	\
++	PLOT_zigzag.png
++

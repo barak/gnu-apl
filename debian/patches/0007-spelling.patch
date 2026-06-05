@@ -1,0 +1,127 @@
+From: "Barak A. Pearlmutter" <barak@pearlmutter.net>
+Date: Sat, 6 Jun 2026 20:01:53 +0100
+Subject: correct spelling
+
+Correct misspellings in comments and strings across src/ and the
+testcases directory.
+---
+ src/Archive.cc           | 2 +-
+ src/Executable.cc        | 2 +-
+ src/Help.def             | 2 +-
+ src/QuadFunction.cc      | 2 +-
+ src/SystemVariable.def   | 2 +-
+ src/SystemVariable.hh    | 2 +-
+ src/main.cc              | 2 +-
+ src/testcases/Quad_ES.tc | 4 ++--
+ 8 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/Archive.cc b/src/Archive.cc
+index ea7db4d..7368b0d 100644
+--- a/src/Archive.cc
++++ b/src/Archive.cc
+@@ -2107,7 +2107,7 @@ const int levels = find_int_attr("levels", false, 10);
+            {
+              CERR <<
+ "\n"
+-"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
++"*** SORRY! An error occurred while reading the )SI stack of the )SAVEd\n"
+ "    workspace. The )SI stack was reconstructed to the extent possible.\n"
+ "    We stronly recommend to perform )SIC and then )DUMP the workspace under\n"
+ "    a different name.\n" << endl;
+diff --git a/src/Executable.cc b/src/Executable.cc
+index d3573af..5ff60e5 100644
+--- a/src/Executable.cc
++++ b/src/Executable.cc
+@@ -861,7 +861,7 @@ UserFunction * ufun = get_ufun();
+ ExecuteList *
+ ExecuteList::fix(const UCS_string & data, const char * loc)
+ {
+-   // clear errors that may have occured before
++   // clear errors that may have occurred before
+    if (Error * err = Workspace::get_error())   err->clear_error_code();
+ 
+ ExecuteList * fun = new ExecuteList(data, loc);
+diff --git a/src/Help.def b/src/Help.def
+index f4b6b17..be67c88 100644
+--- a/src/Help.def
++++ b/src/Help.def
+@@ -248,7 +248,7 @@ help_def(-2, "¨",  "Each",                    "Z[i] is A[i] F B[i] for all vali
+ help_def(-5, ".",  "Outer Product",           "Z[i;j] is A[i] G B[j] for all valid indices i of A and j of B\n",                                 "")
+ help_def(-4, ".",  "Inner Product",           "for matrices A and B: Z[i;j] is F/A[i;] G B[;j] (higher ranks accordingly)\n",                    "")
+ help_def(-3, "⍤",  "Rank",                    "Call F GB with each of the rank-G cells GB of B\n",                                               "")
+-help_def(-4, "⍤",  "Rank",                    "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",                   "")
++help_def(-4, "⍤",  "Rank",                    "Call GA F GB with each of the corresponding rank-G cells GA of A and GB of B\n",                  "")
+ help_def(-3, "⍣",  "Power Operator",          "repeat G times: B ← F B                       (numeric scalar G)\n",                              "")
+ help_def(-3, "⍣",  "Power Operator",          "repeat: B ← F B until (F B) G B is true       (function G)\n",                                    "")
+ help_def(-4, "⍣",  "Power Operator",          "repeat G times: B ← A F B                     (numeric scalar G)\n",                              "")
+diff --git a/src/QuadFunction.cc b/src/QuadFunction.cc
+index 293d2e3..2b34337 100644
+--- a/src/QuadFunction.cc
++++ b/src/QuadFunction.cc
+@@ -574,7 +574,7 @@ const ErrorCode ec = get_error_code(B);
+    else                                   //  ⎕ES B with unknown major/minor B
+       {
+         char cc[58];
+-        snprintf(cc, sizeof(cc), "Unkown error (major %d, minor %d) in ⎕ES B",
++        snprintf(cc, sizeof(cc), "Unknown error (major %d, minor %d) in ⎕ES B",
+                  error.get_error_code() >> 16, error.get_error_code() & 0xFFFF);
+         error.set_error_line_1(cc);
+       }
+diff --git a/src/SystemVariable.def b/src/SystemVariable.def
+index 3e911b1..409a993 100644
+--- a/src/SystemVariable.def
++++ b/src/SystemVariable.def
+@@ -35,7 +35,7 @@ rw_sv_def(Quad_PP,   "PP",    "Printing Precision"           )
+ rw_sv_def(Quad_PR,   "PR",    "Prompt Replacement"           )
+ rw_sv_def(Quad_PS,   "PS",    "Print Style"                  )
+ rw_sv_def(Quad_PW,   "PW",    "Print Width"                  )
+-rw_sv_def(Quad_R,    "R",     "Right Argment"                )
++rw_sv_def(Quad_R,    "R",     "Right Argument"               )
+ rw_sv_def(Quad_RL,   "RL",    "Random Link"                  )
+ ro_sv_def(Quad_SVE,  "SVE",   "Shared Variable Event"        )
+ rw_sv_def(Quad_SYL,  "SYL",   "SYstem Limits"                )
+diff --git a/src/SystemVariable.hh b/src/SystemVariable.hh
+index 34219fa..fb41591 100644
+--- a/src/SystemVariable.hh
++++ b/src/SystemVariable.hh
+@@ -523,7 +523,7 @@ protected:
+ };
+ //-----------------------------------------------------------------------------
+ /**
+-   System variable Quad-R (Right Argment).
++   System variable Quad-R (Right Argument).
+  */
+ /// The class implementing ⎕R
+ class Quad_R : public NL_SystemVariable
+diff --git a/src/main.cc b/src/main.cc
+index 50f2224..23ced68 100644
+--- a/src/main.cc
++++ b/src/main.cc
+@@ -230,7 +230,7 @@ const char * lines[] =
+   c2                                                                      ,
+   ""                                                                      ,
+   "This program is free software, and you are welcome to redistribute it" ,
+-  "according to the GNU Public License (GPL) version 3 or later."         ,
++  "according to the GNU General Public License (GPL) version 3 or later."         ,
+   ""                                                                      ,
+   0
+ };
+diff --git a/src/testcases/Quad_ES.tc b/src/testcases/Quad_ES.tc
+index c93fea3..95af24f 100644
+--- a/src/testcases/Quad_ES.tc
++++ b/src/testcases/Quad_ES.tc
+@@ -93,12 +93,12 @@ OK      - no duplicate parents
+ 0.3333333333
+ 
+       RECIP 0
+-Unkown error (major 13, minor 17) in ⎕ES B
++Unknown error (major 13, minor 17) in ⎕ES B
+       RECIP 0
+       ^     ^
+ 
+       ⎕EM
+-Unkown error (major 13, minor 17) in ⎕ES B
++Unknown error (major 13, minor 17) in ⎕ES B
+       RECIP 0                             
+       ^     ^                             
+ 

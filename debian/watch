@@ -1,0 +1,7 @@
+Version: 5
+
+# https://download.savannah.gnu.org/releases/apl/ is empty
+Source: https://ftp.gnu.org/gnu/apl/
+Matching-Pattern: apl-@ANY_VERSION@@ARCHIVE_EXT@
+Update-Script: debian/repack-upstream.sh
+PGP-Mode: auto

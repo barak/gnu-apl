@@ -1,0 +1,17 @@
+etc/gnu-apl.d
+usr/bin/AP100
+usr/bin/AP210
+usr/bin/APserver
+usr/bin/Gtk_server
+usr/bin/apl
+usr/lib/*/apl/libemacs.a
+usr/lib/*/apl/libemacs.so*
+usr/lib/*/apl/lib_*.a
+usr/lib/*/apl/lib_*.so*
+usr/lib/*/apl/workspaces
+usr/lib/*/apl/wslib3
+usr/lib/*/apl/wslib4
+usr/lib/*/apl/wslib5
+usr/share/doc/apl
+usr/share/info/apl.info
+usr/share/man/man1/apl.1
