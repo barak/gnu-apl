@@ -93,12 +93,12 @@ OK      - no duplicate parents
 0.3333333333
 
       RECIP 0
-Unkown error (major 13, minor 17) in ⎕ES B
+Unknown error (major 13, minor 17) in ⎕ES B
       RECIP 0
       ^     ^
 
       ⎕EM
-Unkown error (major 13, minor 17) in ⎕ES B
+Unknown error (major 13, minor 17) in ⎕ES B
       RECIP 0                             
       ^     ^                             
 

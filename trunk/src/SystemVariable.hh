@@ -610,7 +610,7 @@ protected:
 };
 //════════════════════════════════════════════════════════════════════════════
 /**
-   System variable Quad-R (Right Argment).
+   System variable Quad-R (Right Argument).
  */
 /// The class implementing ⎕R
 class Quad_R : public NL_SystemVariable

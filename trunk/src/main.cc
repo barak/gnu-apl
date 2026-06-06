@@ -268,7 +268,7 @@ const char * lines[] =
   c2                                                                      ,
   ""                                                                      ,
   "This program is free software, and you are welcome to redistribute it" ,
-  "according to the GNU Public License (GPL) version 3 or later."         ,
+  "according to the GNU General Public License (GPL) version 3 or later."         ,
   ""                                                                      ,
 };
 

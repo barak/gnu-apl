@@ -254,7 +254,7 @@ Quad_CC::print_classes(ostream & out)
        << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
        << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
        << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
-       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
+       << "      ⎕CC   7:  Line drawing characters"                    << endl
        << "      ⎕CC   8:  Octal digits 0-7"                           << endl
        << "      ⎕CC   9:  Some mathematical symbols"                  << endl
        << "      ⎕CC  10:  Decimal digits 0-9"                         << endl

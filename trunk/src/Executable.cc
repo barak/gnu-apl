@@ -1486,7 +1486,7 @@ const ShapeItem last = tos.size();
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
-   // clear any errors that may have occured before
+   // clear any errors that may have occurred before
    //
    if (Error * err = Workspace::get_error())   err->clear_error_code();
 

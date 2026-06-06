@@ -633,7 +633,7 @@ help_def(-3, "⍤",  "Rank",
          "")
 
 help_def(-4, "⍤",  "Rank",
-         "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",
+         "Call GA F GB with each of the corresponding rank-G cells GA of A and GB of B\n",
          "")
 
 help_def(-3, "⍣",  "Power Operator",
