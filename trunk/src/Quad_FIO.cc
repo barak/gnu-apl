@@ -1978,7 +1978,7 @@ const APL_Integer optname = A->get_cravel(1).get_int_value();
 const int optval          = A->get_cravel(2).get_int_value();
 const int fd = get_fd(*B.get());
    errno = 0;
-   setsockopt(fd, level, optname, charP(&optval), sizeof(optval));
+   setsockopt(fd, level, optname, &optval, sizeof(optval));
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
 //────────────────────────────────────────────────────────────────────────────

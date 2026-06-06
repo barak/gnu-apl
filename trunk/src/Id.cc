@@ -99,7 +99,7 @@ UCS_string
 ID::get_name_UCS(Id id)
 {
 const UTF8 * name = get_name(id);
-const UTF8_string utf(charP(name));
+const UTF8_string utf(name);
    return UCS_string(utf);
 }
 //────────────────────────────────────────────────────────────────────────────

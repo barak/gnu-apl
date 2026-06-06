@@ -29,40 +29,81 @@
 
 #include "UTF8_string.hh"   // charP(), utf8P(), UTF8
 
-// Thin inline wrappers around <string.h> / <stdlib.h> / <stdio.h> functions
-// that accept const UTF8 * (= const uint8_t *) in place of const char *,
-// replacing charP() casts at call sites.
-
+/// Thin inline wrappers around \<string.h\>, \<stdlib.h\>, and \<stdio.h\>
+/// that accept const UTF8 * (= const uint8_t *) instead of const char *,
+/// eliminating charP() casts at every call site.
 namespace u8
 {
 
-//════════════════════════════════════════════════════════════════════════════
-// strncmp
-//════════════════════════════════════════════════════════════════════════════
+/// convert UTF-8 string \b s to long long (like ::atoll).
+/// @param s null-terminated UTF-8 string
+/// @return  converted long long value
+inline long long
+atoll(const UTF8 * s)
+{
+   return ::atoll(charP(s));
+}
 
+/// scan \b s according to \b fmt (like ::sscanf); delegates to vsscanf.
+/// @param s   null-terminated UTF-8 input string
+/// @param fmt printf-style format string
+/// @return    number of items successfully matched and assigned
+inline int
+sscanf(const UTF8 * s, const char * fmt, ...)
+{
+   va_list ap;
+   va_start(ap, fmt);
+   const int ret = vsscanf(charP(s), fmt, ap);
+   va_end(ap);
+   return ret;
+}
+
+/// compare at most \b n bytes of UTF-8 string \b s1 with ASCII string \b s2.
+/// @param s1 UTF-8 string
+/// @param s2 ASCII string
+/// @param n  maximum number of bytes to compare
+/// @return   negative, zero, or positive (like ::strncmp)
 inline int
 strncmp(const UTF8 * s1, const char * s2, size_t n)
 {
    return ::strncmp(charP(s1), s2, n);
 }
 
+/// compare at most \b n bytes of ASCII string \b s1 with UTF-8 string \b s2.
+/// @param s1 ASCII string
+/// @param s2 UTF-8 string
+/// @param n  maximum number of bytes to compare
+/// @return   negative, zero, or positive (like ::strncmp)
 inline int
 strncmp(const char * s1, const UTF8 * s2, size_t n)
 {
    return ::strncmp(s1, charP(s2), n);
 }
 
-//════════════════════════════════════════════════════════════════════════════
-// strtod — char ** endptr variant keeps the existing call-site char * end;
-//          UTF8 ** endptr variant avoids the utf8P(end) reconversion.
-//════════════════════════════════════════════════════════════════════════════
+/// find the first occurrence of ASCII string \b needle in UTF-8 string \b haystack.
+/// @param haystack UTF-8 string to search
+/// @param needle   ASCII substring to find
+/// @return         pointer to first match, or null if not found
+inline const UTF8 *
+strstr(const UTF8 * haystack, const char * needle)
+{
+   return utf8P(::strstr(charP(haystack), needle));
+}
 
+/// convert UTF-8 string \b s to double; store end pointer as char *.
+/// @param s      null-terminated UTF-8 string
+/// @param endptr set to first character after the parsed number (as char *)
+/// @return       converted double value (like ::strtod)
 inline double
 strtod(const UTF8 * s, char ** endptr)
 {
    return ::strtod(charP(s), endptr);
 }
 
+/// convert UTF-8 string \b s to double; store end pointer as UTF8 *.
+/// @param s      null-terminated UTF-8 string
+/// @param endptr set to first character after the parsed number (as UTF8 *)
+/// @return       converted double value (like ::strtod)
 inline double
 strtod(const UTF8 * s, UTF8 ** endptr)
 {
@@ -72,22 +113,31 @@ strtod(const UTF8 * s, UTF8 ** endptr)
    return ret;
 }
 
+/// convert UTF-8 string \b s to double; discard end pointer.
+/// @param s null-terminated UTF-8 string
+/// @return  converted double value (like ::strtod)
 inline double
 strtod(const UTF8 * s, std::nullptr_t)
 {
    return ::strtod(charP(s), 0);
 }
 
-//════════════════════════════════════════════════════════════════════════════
-// strtoll — same two endptr variants as strtod
-//════════════════════════════════════════════════════════════════════════════
-
+/// convert UTF-8 string \b s to long long in base \b base; store end pointer as char *.
+/// @param s      null-terminated UTF-8 string
+/// @param endptr set to first character after the parsed number (as char *)
+/// @param base   numeric base (2–36, or 0 for auto-detect)
+/// @return       converted long long value (like ::strtoll)
 inline long long
 strtoll(const UTF8 * s, char ** endptr, int base)
 {
    return ::strtoll(charP(s), endptr, base);
 }
 
+/// convert UTF-8 string \b s to long long in base \b base; store end pointer as UTF8 *.
+/// @param s      null-terminated UTF-8 string
+/// @param endptr set to first character after the parsed number (as UTF8 *)
+/// @param base   numeric base (2–36, or 0 for auto-detect)
+/// @return       converted long long value (like ::strtoll)
 inline long long
 strtoll(const UTF8 * s, UTF8 ** endptr, int base)
 {
@@ -97,34 +147,14 @@ strtoll(const UTF8 * s, UTF8 ** endptr, int base)
    return ret;
 }
 
+/// convert UTF-8 string \b s to long long in base \b base; discard end pointer.
+/// @param s    null-terminated UTF-8 string
+/// @param base numeric base (2–36, or 0 for auto-detect)
+/// @return     converted long long value (like ::strtoll)
 inline long long
 strtoll(const UTF8 * s, std::nullptr_t, int base)
 {
    return ::strtoll(charP(s), 0, base);
-}
-
-//════════════════════════════════════════════════════════════════════════════
-// atoll
-//════════════════════════════════════════════════════════════════════════════
-
-inline long long
-atoll(const UTF8 * s)
-{
-   return ::atoll(charP(s));
-}
-
-//════════════════════════════════════════════════════════════════════════════
-// sscanf — delegates to vsscanf so the variadic args pass through cleanly
-//════════════════════════════════════════════════════════════════════════════
-
-inline int
-sscanf(const UTF8 * s, const char * fmt, ...)
-{
-   va_list ap;
-   va_start(ap, fmt);
-   const int ret = vsscanf(charP(s), fmt, ap);
-   va_end(ap);
-   return ret;
 }
 
 } // namespace u8

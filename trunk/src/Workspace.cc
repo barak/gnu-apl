@@ -1065,7 +1065,7 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
         if ((wsid_end  - wsid_start) <= 4 &&   // long enough
            !strcmp(wsid_end - 4, ".apl"))  wsid_end -= 4;
 
-        const UTF8_string wsid_utf8(utf8P(wsid_start), wsid_end - wsid_start);
+        const UTF8_string wsid_utf8(wsid_start, wsid_end - wsid_start);
         const UCS_string wsid_ucs(wsid_utf8);
         wsid(out, wsid_ucs, lib_name.get_libref(), true);
 

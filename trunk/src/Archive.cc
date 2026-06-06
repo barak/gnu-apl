@@ -1331,12 +1331,12 @@ XML_Loading_Archive::check_compatibility()
 {
    // new compatibility mechanism?
    //
-   if (const char * syntax = charP(find_optional_attr("syntax")))   // yes
+   if (const UTF8 * syntax = find_optional_attr("syntax"))   // yes
       {
         unsigned int major = 0;
         unsigned int minor = 0;
         unsigned int other  = 0;
-        sscanf(syntax, "%u.%u.%u", &major, &minor, &other);
+        u8::sscanf(syntax, "%u.%u.%u", &major, &minor, &other);
         if (major == ASX_MAJOR && minor == ASX_MINOR)   return;
         if (major == ASX_MAJOR)
            {
@@ -1413,11 +1413,10 @@ again:
    if (current_char == '?')   goto again;   // processing instruction
    if (current_char == '!')                 // comment
       {
-        const char * ctag_name = charP(tag_name);
-        const char * comment_end = strstr(ctag_name, "-->");
+        const UTF8 * comment_end = u8::strstr(tag_name, "-->");
         Assert(comment_end);
         comment_end += 3;
-        while (data < reinterpret_cast<const UTF8 *>(comment_end))
+        while (data < comment_end)
            {
              if (get_uni())   return true;   // EOF
            }

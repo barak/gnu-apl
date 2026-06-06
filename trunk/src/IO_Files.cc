@@ -442,7 +442,7 @@ IO_Files::end_of_current_file()
 
    if (InputFile::is_validating())   // running a .tc file
       {
-        const char * path = charP(summary_path.c_str());
+        const char * path = summary_path.c_str();
         ofstream summary(path, summary_flags);
         if (summary_flags == ofstream::trunc)   // first file
            {
