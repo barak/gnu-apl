@@ -85,6 +85,7 @@
 #include "Workspace.hh"
 
 #include "Workspace.icc"
+#include "u8_string.hh"
 
 using namespace std;
 
@@ -379,11 +380,11 @@ XML_Saving_Archive::save_Function(const Function & fun)
         err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
-"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+u8"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again.\n"
 "\n"
 "         As a precaution for loosing data or function definitions, please\n"
-"         also )DUMP this workspace (before )SIC or →).\n"
+u8"         also )DUMP this workspace (before )SIC or →).\n"
              << endl;
 
         const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
@@ -440,7 +441,7 @@ XML_Saving_Archive::save_Function_name(const Function & fun)
         err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
-"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+u8"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again.\n"
 "\n"
 "         As an alternative (and to be on the safe side), you should also\n"
@@ -876,7 +877,7 @@ char cc[80];
                     // a non-zero denominator indicates a rational quotient)
                     //
                     const APL_Integer numer = flt.get_numerator();
-                    SPRINTF(cc, "%lld÷%lld", long_long(numer),
+                    SPRINTF(cc, u8"%lld÷%lld", long_long(numer),
                                              long_long(denom));
                     NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                     break;
@@ -1299,9 +1300,9 @@ const int fd = open(filename, O_RDONLY);
    //
    reset();
 
-   if (!strncmp(charP(file_start), "#!", 2) ||   // )DUMP file
-       !strncmp(charP(file_start), "<!", 2) ||   // )DUMP-HTML file
-       !strncmp(charP(file_start), "⍝!", 4))     // a library
+   if (!u8::strncmp(file_start, "#!", 2) ||   // )DUMP file
+       !u8::strncmp(file_start, "<!", 2) ||   // )DUMP-HTML file
+       !u8::strncmp(file_start, u8"⍝!", 4))     // a library
       {
         // the file was either written with )DUMP or is a library.
         // Return the open file descriptor (the destructor will unmap())
@@ -1313,7 +1314,7 @@ const int fd = open(filename, O_RDONLY);
 
    close(fd);
 
-   if (strncmp(charP(file_start), "<?xml", 5))   // not an xml file
+   if (u8::strncmp(file_start, "<?xml", 5))   // not an xml file
       {
         err << "file " << filename << " does not " << endl
              << "have the format of a GNU APL .xml or .apl file" << endl;
@@ -1537,7 +1538,7 @@ bool prev_month = false;
    //
    for (const UTF8 * c = file_end - 12; (c > data) && (c > file_end - 200); --c)
        {
-         if (!strncmp(charP(c), "</Workspace>", 12))
+         if (!u8::strncmp(c, "</Workspace>", 12))
             {
               file_is_complete = true;
               break;
@@ -1679,7 +1680,7 @@ XML_Loading_Archive::expect_tag(const char * prefix, const char * loc) const
 bool
 XML_Loading_Archive::is_tag(const char * prefix) const
 {
-   return !strncmp(charP(tag_name), prefix, strlen(prefix));
+   return !u8::strncmp(tag_name, prefix, strlen(prefix));
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -1727,7 +1728,7 @@ const int att_len = strlen(att_name);
 
    for (const UTF8 * d = attributes; d < end_attr; ++d)
        {
-         if (strncmp(att_name, charP(d), att_len))   continue;
+         if (u8::strncmp(att_name, d, att_len))   continue;
          const UTF8 * dd = d + att_len;
          while (*dd <= ' ')   ++dd;   // skip whitespaces
          if (*dd++ != '=')   continue;
@@ -1755,7 +1756,7 @@ APL_Float
 XML_Loading_Archive::find_float_attr(const char * attrib)
 {
 const UTF8 * value = find_mandatory_attr(attrib);
-const APL_Float val = strtod(charP(value), 0);
+const APL_Float val = u8::strtod(value, nullptr);
    return val;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1783,7 +1784,7 @@ XML_Loading_Archive::find_int_attr(const char * attrib, bool optional, int base)
 const UTF8 * value = find_attr(attrib, optional);
    if (value == 0)   return -1;   // not found
 
-const int64_t val = strtoll(charP(value), 0, base);
+const int64_t val = u8::strtoll(value, nullptr, base);
    return val;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1920,9 +1921,8 @@ int type_len = 0;
 const Unicode type = UTF8_string::toUni(input, type_len, true);
    input += type_len;   // skip type in input
 
-   // result pointer for strtoll()
+   // result pointer for u8::strtoll() / u8::strtod()
 UTF8 * end = 0;
-char **pend = reinterpret_cast<char **>(&end);
 
    switch (type)
       {
@@ -1947,7 +1947,7 @@ char **pend = reinterpret_cast<char **>(&end);
 
         case UNI_PAD_U3: // integer,                e.g. ³
              {
-               const APL_Integer val = strtoll(charP(input), pend, 10);
+               const APL_Integer val = u8::strtoll(input, &end, 10);
                Z.next_ravel_Int(val);
                input = end;
              }
@@ -1955,7 +1955,7 @@ char **pend = reinterpret_cast<char **>(&end);
 
         case UNI_PAD_U4: // real,                   e.g. ⁴6675.79
              {
-               const APL_Float val = strtod(charP(input), pend);
+               const APL_Float val = u8::strtod(input, &end);
                Z.next_ravel_Float(val);
                input = end;
              }
@@ -1963,11 +1963,10 @@ char **pend = reinterpret_cast<char **>(&end);
 
         case UNI_PAD_U5: // complex,                e.g. ⁵
              {
-               const APL_Float real = strtod(charP(input), pend);
-               input = utf8P(end);
+               const APL_Float real = u8::strtod(input, &end);
                Assert(*end == 'J');
                ++end;
-               const APL_Float imag = strtod(*pend, pend);
+               const APL_Float imag = u8::strtod(end, &end);
                Z.next_ravel_Complex(real, imag);
                input = end;
              }
@@ -1975,7 +1974,7 @@ char **pend = reinterpret_cast<char **>(&end);
 
         case UNI_PAD_U6: // pointer,                e.g. ⁶1525 (vid)
              {
-               const int vid = strtoll(charP(input), pend, 10);
+               const int vid = u8::strtoll(input, &end, 10);
                Assert(vid >= 0);
                Assert(vid < int(values.size()));
                Z.next_ravel_Value(values[vid].get());
@@ -1991,11 +1990,11 @@ char **pend = reinterpret_cast<char **>(&end);
                 }
              else
                 {
-                  const int vid = strtoll(charP(input), pend, 16);
+                  const int vid = u8::strtoll(input, &end, 16);
                   Assert(vid >= 0);
                   Assert(vid < int(values.size()));
                   Assert(*end == '[');   ++end;
-                  const ShapeItem offset = strtoll(*pend, pend, 16);
+                  const ShapeItem offset = u8::strtoll(end, &end, 16);
                   Assert(*end == ']');   ++end;
                   Value * target = values[vid].get();
                   Z.next_ravel_Lval(&target->get_wravel(offset), target);
@@ -2009,13 +2008,12 @@ char **pend = reinterpret_cast<char **>(&end);
              // not ./configured for them.
              //
              {
-               const uint64_t numer = strtoll(charP(input), pend, 10);
-               input = utf8P(end);
+               const uint64_t numer = u8::strtoll(input, &end, 10);
 
                // skip ÷ (which is is C3 B7 in UTF8)
                Assert((*end++ & 0xFF) == 0xC3);
                Assert((*end++ & 0xFF) == 0xB7);
-               const uint64_t denom = strtoll(*pend, pend, 10);
+               const uint64_t denom = u8::strtoll(end, &end, 10);
                Assert(denom > 0);
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
                Z.next_ravel_Float(numer, denom);
@@ -2180,7 +2178,7 @@ int eprops[4] = { 0, 0, 0, 0 };
 
    if (const UTF8 * ep = find_optional_attr("exec-properties"))
       {
-        sscanf(charP(ep), "%d,%d,%d,%d",
+        u8::sscanf(ep, "%d,%d,%d,%d",
                eprops, eprops + 1, eprops + 2, eprops+ 3);
       }
 
@@ -2226,7 +2224,7 @@ UCS_string text;
         UserFunction * ufun = 0;
         if (text[0] == UNI_LAMBDA)
            {
-             const char * creator = ")LOAD λ";
+             const char * creator = u8")LOAD λ";
              ufun = UserFunction::fix_lambda(symbol, text);
              ufun->increment_refcount(LOC, creator);
            }
@@ -2245,7 +2243,7 @@ UCS_string text;
            }
         else
            {
-             err << "    ⎕FX " << symbol.get_name() << " failed: "
+             err << u8"    ⎕FX " << symbol.get_name() << " failed: "
                   << Workspace::more_error() << endl;
              symbol.push();
              add_fid_function(fid, 0, LOC);
@@ -2311,7 +2309,7 @@ UCS_string lambda = read_UCS();
 Symbol dummy(ID_No_ID);
 UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
    Assert(ufun);
-const char * creator = ")LOAD )SI λ";
+const char * creator = u8")LOAD )SI λ";
    ufun->increment_refcount(LOC, creator);
 
    next_tag(LOC);
@@ -2624,8 +2622,8 @@ UCS_string  name_UCS(name_UTF);
    // ⎕PW and ⎕TZ are session variables that must not )LOADed (but might be
    // )COPYd)
    //
-   if (!strncmp(charP(name), "⎕NLT", name_len) ||
-       !strncmp(charP(name), "⎕PT", name_len))
+   if (!u8::strncmp(name, u8"⎕NLT", name_len) ||
+       !u8::strncmp(name, u8"⎕PT", name_len))
       {
         Log(LOG_archive)   err << "        skipped at " << LOC << endl;
         skip_to_tag("/Symbol");
@@ -2867,15 +2865,15 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                        }
                     else                // value
                        {
-                         char * end = 0;
+                         UTF8 * end = 0;
                          Assert1(*vids == 'v');   ++vids;
                          Assert1(*vids == 'i');   ++vids;
                          Assert1(*vids == 'd');   ++vids;
                          Assert1(*vids == '_');   ++vids;
-                         const int vid = strtoll(charP(vids), &end, 10);
+                         const int vid = u8::strtoll(vids, &end, 10);
                          Assert(vid < int(values.size()));
                          idx.add_index(values[vid]);
-                         vids = utf8P(end);
+                         vids = end;
                        }
                   }
                new (&tloc.get_token()) Token(tag, idx);
@@ -2942,7 +2940,7 @@ Shape sh_value;
         char sh[20];
         SPRINTF(sh, "sh-%d", int(r));
         const UTF8 * sh_r = find_mandatory_attr(sh);
-        sh_value.add_shape_item(atoll(charP(sh_r)));
+        sh_value.add_shape_item(u8::atoll(sh_r));
       }
 
    /* if:
@@ -3012,7 +3010,7 @@ const int vid = find_int_attr("vid", false, 10);
    // should not be loaded...
    //
    if (symbol.is_readonly())                     return;
-   if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
+   if (symbol.get_name().starts_iwith(u8"⎕NLT"))   return;   // extinct
    if (symbol.get_Id() == ID_Quad_SVE)           return;
    if (symbol.get_Id() == ID_Quad_SYL)           return;
    if (symbol.get_Id() == ID_Quad_PS)            return;
@@ -3096,10 +3094,10 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
          if (uni == UNI_PAD_U1)   // start of hex mode
             {
               char_mode = false;
-              char * end = 0;
-              const int hex = strtoll(charP(utf), &end, 16);
+              UTF8 * end = 0;
+              const int hex = u8::strtoll(utf, &end, 16);
               ucs << Unicode(hex);
-              utf = utf8P(end);
+              utf = end;
               continue;
             }
 

@@ -860,7 +860,7 @@ Value_P Z;
    else if (A->is_int_array())    Z = format_by_specification(A, B);
    else
       {
-        MORE_ERROR() << "Bad left argument of ⍕";
+        MORE_ERROR() << u8"Bad left argument of ⍕";
         DOMAIN_ERROR;
       }
 
@@ -1124,7 +1124,7 @@ bool has_complex = false;
         if (!isfinite(value))
            {
              MORE_ERROR() << "infinite number: "
-                          << value << " in A⍕B (by specification)";
+                          << value << u8" in A⍕B (by specification)";
              DOMAIN_ERROR;
            }
 

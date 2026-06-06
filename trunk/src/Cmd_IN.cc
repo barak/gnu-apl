@@ -30,6 +30,7 @@
 #include "Token_string.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
+#include "u8_string.hh"
 
 //════════════════════════════════════════════════════════════════════════════
 void
@@ -111,7 +112,7 @@ const char sub_type = record[1];
                   case '(': {
                               stype = " timestamp";
                               YMDhmsu t(now());   // fallback if sscanf() != 7
-                              if (7 == sscanf(charP(record + 1),
+                              if (7 == u8::sscanf(record + 1,
                                               "(%d %d %d %d %d %d %d)",
                                               &t.year, &t.month, &t.day,
                                               &t.hour, &t.minute, &t.second,
@@ -139,10 +140,10 @@ const char sub_type = record[1];
 //                          " -------------------------------------";
                   switch(sub_type)
                      {
-                       case 'A': stype = " 2 ⎕TF array ";           break;
-                       case 'C': stype = " 1 ⎕TF char array ";      break;
-                       case 'F': stype = " 2 ⎕TF function ";        break;
-                       case 'N': stype = " 1 ⎕TF numeric array ";   break;
+                       case 'A': stype = u8" 2 ⎕TF array ";           break;
+                       case 'C': stype = u8" 1 ⎕TF char array ";      break;
+                       case 'F': stype = u8" 2 ⎕TF function ";        break;
+                       case 'N': stype = u8" 1 ⎕TF numeric array ";   break;
                      }
 
                   CERR << "record #" << setw(3) << recnum
@@ -350,7 +351,7 @@ UCS_string var_or_fun;
 
    if (var_or_fun.size() == 0)
       {
-        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
+        CERR << u8"ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -374,7 +375,7 @@ UCS_string statement;
 UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
    if (fun_name1.size() == 0)   // tf2_inverse() failed
       {
-        CERR << "inverse 2 ⎕TF failed for the following APL statement: "
+        CERR << u8"inverse 2 ⎕TF failed for the following APL statement: "
              << endl << "    " << statement << endl;
         return;
       }

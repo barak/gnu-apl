@@ -149,7 +149,7 @@ print_item(const LA_pack::DD & dd)
       { CERR << "  0   ";   return; }
 
    if (dd <= 1e-14 && dd >= -1e-14)   // near 0
-      { CERR << " ≈0   ";   return; }
+      { CERR << u8" ≈0   ";   return; }
 //════════════════════════════════════════════════════════════════════════════
 
 const LA_pack::DD rounded = round(dd);
@@ -163,7 +163,7 @@ const LA_pack::DD rounded = round(dd);
       }
 
 char cc[40];
-   if (dd < 0)   { SPRINTF(cc, "¯%-6.2f", -dd) }
+   if (dd < 0)   { SPRINTF(cc, u8"¯%-6.2f", -dd) }
    else          { SPRINTF(cc, "%6.3f", dd)   }
    CERR << cc;
 }
@@ -293,7 +293,7 @@ DebugMatrix<T> R("R", N, N);   // the upper triangle R of Q∘R
         if (row <= col)    R.at(row, col) = HR.at(row, col);
       }
 
-   CERR << "──────────────────────────────────────────" << endl;
+   CERR << u8"──────────────────────────────────────────" << endl;
    print_matrix("print_QR(): the laqp2() input B", B);
    ptvvy.print_pivot(CERR, N, LOC);
    print_matrix("print_QR(): the laqp2() output HR", HR);
@@ -313,17 +313,17 @@ DebugMatrix<T> QC("C", max_MN, max_MN);        // a mutable copy of HR
 
    print_matrix("print_QR(): reflectors before ung2r() = H", QC);
    LA_pack::ung2r<T>(QC, ptvvy);
-   print_matrix("print_QR(): factor Q of Q∘R after ung2r()", QC);
+   print_matrix(u8"print_QR(): factor Q of Q∘R after ung2r()", QC);
    print_vector("print_QR(): vector tau after ung2r()", ptvvy.tau, N);
-   print_product("print_QR(): Q∘⍉Q", QC, QC, ptvvy.pivot, true);
+   print_product(u8"print_QR(): Q∘⍉Q", QC, QC, ptvvy.pivot, true);
 
 // DebugMatrix<T> QB("Q", B);
 // ALL_ROWS(N)
 // ALL_COLS(N) if (row < col)   QB.at(row, col) = QB.at(col, row);
 
-   print_product("print_QR(): the product Q∘R (supposedly Q∘R=B)",
+   print_product(u8"print_QR(): the product Q∘R (supposedly Q∘R=B)",
                  QC, R, ptvvy.pivot, false);
-   CERR << "──────────────────────────────────────────" << endl;
+   CERR << u8"──────────────────────────────────────────" << endl;
 }
 //════════════════════════════════════════════════════════════════════════════
 

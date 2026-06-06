@@ -549,7 +549,7 @@ PrintBuffer::pb_empty(const Value & value, PrintContext pctx,
 
              if (value.get_cfirst().is_numeric())   // ⍬
                 {
-                  UTF8_string utf("⍬");
+                  UTF8_string utf(u8"⍬");
                   UCS_string ucs(utf);
                   ColInfo ci;
                   *this = PrintBuffer(ucs, ci);
@@ -929,7 +929,7 @@ PrintBuffer::debug(ostream & out, const char * title) const
        << " il="  << col_info.int_len
        << " fl="   << col_info.fract_len
        << " rl="   << col_info.real_len
-       << " ÷l="   << col_info.denom_len
+       << u8" ÷l="   << col_info.denom_len
        << endl << endl;
 
    return out;
@@ -1237,12 +1237,12 @@ PrintBuffer::align_dot(const ColInfo & COL_INFO)
                 "i-"  << COL_INFO.int_len
              << " f-" << COL_INFO.fract_len
              << " r-" << COL_INFO.real_len
-             << " ÷"  << COL_INFO.denom_len << endl
+             << u8" ÷"  << COL_INFO.denom_len << endl
              << "this row         = "
                 "i-"  << col_info.int_len
              << " f-" << col_info.fract_len
              << " r-" << col_info.real_len
-             << " ÷"  << col_info.denom_len << endl;
+             << u8" ÷"  << col_info.denom_len << endl;
         debug(CERR, 0);
       }
 

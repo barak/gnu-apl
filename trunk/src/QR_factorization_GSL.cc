@@ -39,7 +39,7 @@ GSL::LQ_factorize(Value & Z, int M, int N, Value_P B, bool need_complex)
 {
   if (M > N)
      {
-       MORE_ERROR() << "⌹[4] (LQ-factorization using libgsl) expects M ≤ N, "
+       MORE_ERROR() << u8"⌹[4] (LQ-factorization using libgsl) expects M ≤ N, "
                     << "but got M=" << M << " and N=" << N;
        LENGTH_ERROR;
      }
@@ -260,7 +260,7 @@ GSL::QR_factorize_DD_matrix(Value & Z, int M, int N, const Cell * cB)
 
   if (M < N)   // otherwise: "GSL error: M must be >= N in rqr.c"
      {
-       MORE_ERROR() << "⌹[2] (QR-factorization using libgsl) requires M ≥ N, "
+       MORE_ERROR() << u8"⌹[2] (QR-factorization using libgsl) requires M ≥ N, "
                     << "but got M=" << M << " and N=" << N;
        LENGTH_ERROR;
      }
@@ -340,7 +340,7 @@ GSL::QR_factorize_ZZ_matrix(Value & Z, int M, int N, const Cell * cB)
 
   if (M < N)
      {
-       MORE_ERROR() << "⌹[2] (QR-factorization using libgsl) expects M ≥ N, "
+       MORE_ERROR() << u8"⌹[2] (QR-factorization using libgsl) expects M ≥ N, "
                     << "but got M=" << M << " and N=" << N;
        LENGTH_ERROR;
      }
@@ -430,7 +430,7 @@ GSL::RQ_factorize(Value & Z, int M, int N, Value_P B)
 {
   if (M > N)
      {
-       MORE_ERROR() << "⌹[3] (RQ-factorization using libgsl) expects M ≤ N, "
+       MORE_ERROR() << u8"⌹[3] (RQ-factorization using libgsl) expects M ≤ N, "
                     << "but got M=" << M << " and N=" << N;
        LENGTH_ERROR;
      }

@@ -397,8 +397,8 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos,
                        size_t & rest_2) const
 {
    Log(LOG_tokenize)
-      CERR << "tokenize: input[" << input.size() << "] is: «"
-           << input << "»" << endl;
+      CERR << "tokenize: input[" << input.size() << u8"] is: «"
+           << input << u8"»" << endl;
 
 Unicode_source src(input);
    for(;;)
@@ -416,7 +416,7 @@ Unicode_source src(input);
            {
              Unicode_source s1(src, 0, 24);
              CERR << "  tokenize(" <<  src.rest_len() << " chars) sees [tag "
-                  << tok.tag_name() << " «" << uni << "»] " << s1;
+                  << tok.tag_name() << u8" «" << uni << u8"»] " << s1;
              if (src.rest_len() != s1.rest_len())   CERR << " ...";
              CERR << endl;
            }
@@ -712,7 +712,7 @@ Unicode_source src(input);
    Log(LOG_tokenize)
       {
         CERR << "tokenize() done (no error)." << endl
-             << "   └── tos[" << tos.size() << "] is:";
+             << u8"   └── tos[" << tos.size() << "] is:";
         loop(t, tos.size())   CERR << " " << tos[t];
         CERR << endl;
       }
@@ -913,7 +913,7 @@ bool got_end = false;
             }
          else if (uni == UNI_LEFT_DAQ)   // « another
             {
-              MORE_ERROR() << "Invalid start of « string inside a « string";
+              MORE_ERROR() << u8"Invalid start of « string inside a « string";
               Error::throw_parse_error(E_NESTED_DAQ_STRING, LOC, loc);
             }
          else
@@ -937,13 +937,13 @@ bool got_end = false;
            }
         if (first == UNI_LEFT_DAQ)
            {
-             MORE_ERROR() << "DAQ string (i.e. «...»): start « at column "
-                             "(prompt+" << pos << "), but no ending ».";
+             MORE_ERROR() << u8"DAQ string (i.e. «...»): start « at column "
+                             "(prompt+" << pos << u8"), but no ending ».";
              Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
            }
 
-        MORE_ERROR() << "DAQ string (i.e. «...»): end » at column (prompt+"
-                     << pos << "), but no starting «.";
+        MORE_ERROR() << u8"DAQ string (i.e. «...»): end » at column (prompt+"
+                     << pos << u8"), but no starting «.";
         Error::throw_parse_error(E_NO_STRING_START, LOC, loc);
       }
 

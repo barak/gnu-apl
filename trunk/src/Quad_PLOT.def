@@ -1,5 +1,5 @@
 #ifdef gdef
-gdef(String,   caption,        "⎕PLOT", "plot window caption")
+gdef(String,   caption,        u8"⎕PLOT", "plot window caption")
 gdef(String,   output_filename,     "", "output file name")
 gdef(String,   gui_driver,          "", "GUI driver (GTK, XCB, or ASCII")
 gdef(uint32_t, auto_close,           0, "= do not close X window automatically)\n"
@@ -18,9 +18,9 @@ gdef(Pixel_X,  pa_border_L,         50, "pixels left of the plotarea")
 gdef(Pixel_X,  pa_border_R,         20, "pixels right of the plotarea")
 gdef(Pixel_Y,  pa_border_T,         25, "pixels above the plotarea")
 gdef(Pixel_Y,  pa_border_B,         25, "pixels below the plotarea")
-gdef(uint32_t, gridX_style,          1, "X grid style = ──────── )\n"
-"                   (2)             (             = ╴╴╴╴╴╴╴╴ )\n"
-"                   (3)             (             = ─╴─╴─╴─╴ ")
+gdef(uint32_t, gridX_style,          1, u8"X grid style = ──────── )\n"
+u8"                   (2)             (             = ╴╴╴╴╴╴╴╴ )\n"
+u8"                   (3)             (             = ─╴─╴─╴─╴ ")
 gdef(uint32_t, axisX_arrow,          0, "X-axis arrow")
 gdef(String,   axisX_label,        "X", "X-axis label")
 gdef(uint32_t, axisY_arrow,          0, "Y-axis arrow")
@@ -74,13 +74,13 @@ ldef(Color,    line_color,    0x00FF00, "the color of plot line N")
 ldef(uint32_t, line_style,           1, "line style, see gridX_style above")
 ldef(Pixel_Y,  line_width,           3, "the thickness of plot line N")
 ldef(Color,    point_color,   0x000000, "the color of the plot points")
-ldef(uint32_t, point_style,          1, "= plot_points: ● )\n"
-"                   (2)             (= plot_points: ▲ )\n"
-"                   (3)             (= plot_points: ▼ )\n"
-"                   (4)             (= plot_points: ◆ )\n"
-"                   (5)             (= plot_points: ■ )\n"
-"                   (6)             (= plot_points: ✚   (GTK only)\n"
-"                   (7)             (= plot_points: ✖   (GTK only")
+ldef(uint32_t, point_style,          1, u8"= plot_points: ● )\n"
+u8"                   (2)             (= plot_points: ▲ )\n"
+u8"                   (3)             (= plot_points: ▼ )\n"
+u8"                   (4)             (= plot_points: ◆ )\n"
+u8"                   (5)             (= plot_points: ■ )\n"
+u8"                   (6)             (= plot_points: ✚   (GTK only)\n"
+u8"                   (7)             (= plot_points: ✖   (GTK only")
 ldef(Pixel_X,  point_size,           8, "the outer diameter of the plot points")
 ldef(Pixel_X,  point_size2,          0, "the inner diameter of the plot points")
 ldef(String,   legend_name,         "", "the name of plot line N in the legend")

@@ -353,7 +353,7 @@ int qpos = -1;   // the position of ⎕ in user_input
                  CIN << endl;
                  loop(m, matches.size())
                      {
-                        CERR << "⎕" << matches[m] << " ";
+                        CERR << u8"⎕" << matches[m] << " ";
                      }
                  CERR << endl;
                  return ER_AGAIN;

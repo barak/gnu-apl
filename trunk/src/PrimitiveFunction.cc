@@ -226,7 +226,7 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
         else
            len = result_utf8.size() - line_starts[l];
 
-        const UTF8_string line_utf8(utf8P(&result_utf8[line_starts[l]]), len);
+        const UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
         const UCS_string line_ucs(line_utf8);
         Value_P ZZ(line_ucs, LOC);
         Z->next_ravel_Pointer(ZZ.get());
@@ -323,7 +323,7 @@ Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const AxesBitmap axes_X = X->to_bitmap("⌷[X] B", B->get_rank());
+const AxesBitmap axes_X = X->to_bitmap(u8"⌷[X] B", B->get_rank());
 
 const ShapeItem ec_A = A->element_count();
    if (ec_A != X->element_count())   RANK_ERROR;
@@ -767,7 +767,7 @@ int64_t max_B = 0x8000000000000000;   // largest item in B
              const FloatCell imag_cell(cell.get_imag_value());
              if (!(real_cell.is_near_int64_t() && imag_cell.is_near_int64_t()))
                 {
-                  MORE_ERROR() << "A ⊤[X] B: complex number " << cell
+                  MORE_ERROR() << u8"A ⊤[X] B: complex number " << cell
                                << " in B is not near int.";
                   DOMAIN_ERROR;
                 }
@@ -781,7 +781,7 @@ int64_t max_B = 0x8000000000000000;   // largest item in B
            }
         else
            {
-             MORE_ERROR() << "A ⊤[X] B: invalid Cell type in B";
+             MORE_ERROR() << u8"A ⊤[X] B: invalid Cell type in B";
              DOMAIN_ERROR;
            }
       }
@@ -1117,16 +1117,16 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
    //
    if (A->get_rank() > 1)
       {
-        MORE_ERROR() << "A⍉B: A is not a vector or scalar.";
+        MORE_ERROR() << u8"A⍉B: A is not a vector or scalar.";
         RANK_ERROR;
       }
 
 const Shape shape_A(*A, Workspace::get_IO());   // rank(shape_A) = length(A)
    if (shape_A.get_rank() != B->get_rank())
       {
-        MORE_ERROR() << "A⍉B: ⍴A is " << shape_A.get_rank()
-                     << ", but ⍴⍴B is " << B->get_rank()
-                     << " (i.e. ≠ ⍴A)";
+        MORE_ERROR() << u8"A⍉B: ⍴A is " << shape_A.get_rank()
+                     << u8", but ⍴⍴B is " << B->get_rank()
+                     << u8" (i.e. ≠ ⍴A)";
         LENGTH_ERROR;
       }
 
@@ -1262,7 +1262,7 @@ ShapeItem rho[MAX_RANK];
          if (ax < 0)
             {
               UCS_string & more = MORE_ERROR();
-              more << "Axis " << ax << " is < ⎕IO (="
+              more << "Axis " << ax << u8" is < ⎕IO (="
                    << Workspace::get_IO() << ") in permutation";
               loop(a, perm.get_rank())
                   more << " " << (Workspace::get_IO() + perm.get_shape_item(a));
@@ -1389,7 +1389,7 @@ ShapeItem * weight_Z = ALLOCA(ShapeItem, rank_Z);
               if (!z_in_A)   // z is missing in A
                  {
                    const APL_Integer qio = Workspace::get_IO();
-                   MORE_ERROR() << "A⍉B: axis " << (qio + z)
+                   MORE_ERROR() << u8"A⍉B: axis " << (qio + z)
                                 << " is missing in A; "
                                    "A should contain only integers " << qio
                                 << "..." << (qio + rank_Z) << ".";
@@ -1459,7 +1459,7 @@ const ShapeItem len_Z = shape_Z.get_volume();
            return Token(TOK_APL_VALUE1, B); below will take ownership of B
            so that Prefix::reduce_A_F_B() won't erase B.
          */
-        Log(LOG_optimization) CERR << "optimizing A⍴B" << endl;
+        Log(LOG_optimization) CERR << u8"optimizing A⍴B" << endl;
 
         // release the no longer used cells of B after shape_Z.
         //
@@ -1750,7 +1750,7 @@ Value_P Z(*shape_Z, LOC);
            Z->next_ravel_Cell(B->get_cravel(z*inc_B));
         else
            {
-             MORE_ERROR() << "non-Boolean X in A⊢[X]B";
+             MORE_ERROR() << u8"non-Boolean X in A⊢[X]B";
              DOMAIN_ERROR;
            }
        }

@@ -564,9 +564,9 @@ print_fun(Fnum N,              // function number N (deprecated)
           const char * help)
 {
    cout << "| ";
-   if (Zt != gtype_V)   cout << ZAname << " ← ";
+   if (Zt != gtype_V)   cout << ZAname << u8" ← ";
    if (At != gtype_V)   cout << ZAname << " ";
-   cout << "⎕GTK[H_ID] \"" << gfun << "\"" << endl;
+   cout << u8"⎕GTK[H_ID] \"" << gfun << "\"" << endl;
 
    cout << "| NOTE" << endl;
 
@@ -584,21 +584,21 @@ print_number(Fnum N,              // function number N (deprecated)
           )
 {
 char gfname[100];   snprintf(gfname, sizeof(gfname), "%s_%s()", prefix, gfun);
-   cout << "║"  << setw(5) << N << left
-        << " │ " << setw(32) << gfun
-        << " │ " << setw(37) << gclass
-        << "║"   << right << endl;
+   cout << u8"║"  << setw(5) << N << left
+        << u8" │ " << setw(32) << gfun
+        << u8" │ " << setw(37) << gclass
+        << u8"║"   << right << endl;
 }
 //════════════════════════════════════════════════════════════════════════════
 static void
 print_numbers()
 {
    cout <<
-"╔═════════════════════════════════════════╤══════════════════════════════════════╗\n"
-"║ Argument Bi in A ⎕GTK[X]                │                                      ║\n"
-"╟──────┬──────────────────────────────────┤ GTK Class Name (XML, documentation)  ║\n"
-"║Number│ String (Function Name)           │                                      ║\n"
-"╟──────┼──────────────────────────────────┼──────────────────────────────────────╢"
+u8"╔═════════════════════════════════════════╤══════════════════════════════════════╗\n"
+u8"║ Argument Bi in A ⎕GTK[X]                │                                      ║\n"
+u8"╟──────┬──────────────────────────────────┤ GTK Class Name (XML, documentation)  ║\n"
+u8"║Number│ String (Function Name)           │                                      ║\n"
+u8"╟──────┼──────────────────────────────────┼──────────────────────────────────────╢"
         << endl;
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function,  Z, A)       \
    print_number(FNUM_ ## gtk_class ## _ ## gtk_function, #glade_ID, \
@@ -607,7 +607,7 @@ print_numbers()
 #include "Gtk_map.def"
 
    cout <<
-"╚══════╧══════════════════════════════════╧══════════════════════════════════════╝"
+u8"╚══════╧══════════════════════════════════╧══════════════════════════════════════╝"
         << endl;
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -639,7 +639,7 @@ print_ev2(const char * ev_name, int _argc, const char * signature,
           if (*s)   cout << " ";
         }
 
-    cout << ")←Event| ";
+    cout << u8")←Event| ";
     for (const char * s = signature; *s; s += 2)
         {
           cout << " +";
@@ -836,8 +836,8 @@ const int flags = fcntl(3, F_GETFD);
 ": fcntl(3, F_GETFD) failed: " << strerror(errno) << endl <<
 "    That typically happens if this program is started directly, more\n"
 "    precisely: without opening file descriptor 3 first. The anticipated\n"
-"    usage is to open this program from GNU APL using ⎕FIO[57] and then to\n"
-"    encode TLV buffers with 33 ⎕CR and send them to this program with ⎕FIO[43]"
+u8"    usage is to open this program from GNU APL using ⎕FIO[57] and then to\n"
+u8"    encode TLV buffers with 33 ⎕CR and send them to this program with ⎕FIO[43]"
    << endl;
         __sem_destroy(drawarea_sema);
         return 1;
@@ -994,7 +994,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                 default:
                     cerr << endl << argv[0]
                          << " got unexpected command " << TLV_tag
-                         << " from APL ⎕GTK" << endl;
+                         << u8" from APL ⎕GTK" << endl;
                     continue;
              }
           break;
@@ -1577,8 +1577,8 @@ const gchar * name = gtk_widget_get_name(widget);
 
 char cc[100];   // should suffice
    snprintf(cc, sizeof(cc), "%s/%s", prefix, name);
-   out << "══════════════════════════════════════"
-          "══════════════════════════════════════" << endl
+   out << u8"══════════════════════════════════════"
+          u8"══════════════════════════════════════" << endl
        << "Path: " << cc << endl;
 
    if (GtkStyleContext * style = gtk_widget_get_style_context(widget))
@@ -1604,10 +1604,10 @@ char cc[100];   // should suffice
                    GParamSpec * param = params[n];
                    assert(param);
                    if (param->name &&  param->_nick)
-                      out << "  → " << left << setw(20) << param->name << right
+                      out << u8"  → " << left << setw(20) << param->name << right
                           << "   aka: " << param->_nick << endl;
                    else if (param->name)
-                      out << "  → " << param->name << endl;
+                      out << u8"  → " << param->name << endl;
                  }
            }
       }

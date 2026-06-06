@@ -246,7 +246,7 @@ IO_Files::open_next_file()
                         InputFile::current_filename());
                 if (const char * slash = strrchr(log_file_name, '/'))
                    {
-                     summary_path = UTF8_string(utf8P(log_file_name),
+                     summary_path = UTF8_string(log_file_name,
                                                 slash + 1 - log_file_name);
                      summary_path << "summary.log";
                    }
@@ -481,7 +481,7 @@ IO_Files::end_of_current_file()
            {
              // uuu
              //
-             summary << "    " << setw(3) << duration_usec << " μs ";
+             summary << "    " << setw(3) << duration_usec << u8" μs ";
            }
         summary << setfill(' ') << " ";
 

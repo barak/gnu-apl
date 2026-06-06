@@ -471,17 +471,17 @@ Quad_L::get_apl_value() const
         if (!ret)
            {
              if (function.size())
-                MORE_ERROR() << "⎕L: no left argument of function "
+                MORE_ERROR() << u8"⎕L: no left argument of function "
                              << function;
              else
-                MORE_ERROR() << "⎕L: no function";
+                MORE_ERROR() << u8"⎕L: no function";
              VALUE_ERROR;
            }
 
         return  ret;
       }
 
-   MORE_ERROR() << "⎕L: no )SI line with a matching error";
+   MORE_ERROR() << u8"⎕L: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -590,7 +590,7 @@ APL_Integer B_style = 0;
 
    if (!B->get_cfirst().is_near_bool())
       {
-        MORE_ERROR() << "Bad quot in ⎕PS←quot style: quot is not near bool";
+        MORE_ERROR() << u8"Bad quot in ⎕PS←quot style: quot is not near bool";
         DOMAIN_ERROR;
       }
 
@@ -621,8 +621,8 @@ APL_Integer B_style = 0;
         case 29: break;   // OK
 
         default: MORE_ERROR() <<
-                 "Invalid style in ⎕PS←quot style or ⎕PS←style:\n"
-                 "style is not ± 0, 2-4, 7-9, 20-25, or 29";
+                 u8"Invalid style in ⎕PS←quot style or ⎕PS←style:\n"
+                 u8"style is not ± 0, 2-4, 7-9, 20-25, or 29";
                   DOMAIN_ERROR;
       }
 
@@ -893,17 +893,17 @@ Quad_R::get_apl_value() const
         if (!ret)
            {
              if (function.size())
-                MORE_ERROR() <<"⎕R: no right argument of function "
+                MORE_ERROR() <<u8"⎕R: no right argument of function "
                              << function;
              else
-                MORE_ERROR() << "⎕R: no function";
+                MORE_ERROR() << u8"⎕R: no function";
              VALUE_ERROR;
            }
 
         return  ret;
       }
 
-   MORE_ERROR() << "⎕R: no )SI line with a matching error";
+   MORE_ERROR() << u8"⎕R: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -965,11 +965,11 @@ const APL_Integer qio = Workspace::get_IO();
              if (CPU_pool::change_core_count(CoreCount(b), false))
                 {
                   MORE_ERROR() << "Bad core count " << b
-                               << " in ⎕SYL[" << x << "] ";
+                               << u8" in ⎕SYL[" << x << "] ";
                   DOMAIN_ERROR;
                 }
 #else
-             MORE_ERROR() << "PARALLEL_ENABLED not set in ⎕SYL[" << x << "] ";
+             MORE_ERROR() << u8"PARALLEL_ENABLED not set in ⎕SYL[" << x << "] ";
              DOMAIN_ERROR;
 #endif
            }
@@ -991,7 +991,7 @@ const APL_Integer qio = Workspace::get_IO();
            }
         else
            {
-             MORE_ERROR() << "Bad ⎕SYL index " << x;
+             MORE_ERROR() << u8"Bad ⎕SYL index " << x;
              INDEX_ERROR;
            }
       }
@@ -1242,17 +1242,17 @@ Quad_X::get_apl_value() const
         if (!ret)
            {
              if (function.size())
-                MORE_ERROR() << "⎕X: no axis argument of function "
+                MORE_ERROR() << u8"⎕X: no axis argument of function "
                              << function;
              else
-                MORE_ERROR() << "⎕X: no function";
+                MORE_ERROR() << u8"⎕X: no function";
              VALUE_ERROR;
            }
 
         return ret;
       }
 
-   MORE_ERROR() << "⎕X: no )SI line with a matching error";
+   MORE_ERROR() << u8"⎕X: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════

@@ -120,7 +120,7 @@ CC_base::get_instance(CharClass cls)
         case QCC_CHAR_128:  return CC_ASCII::instance;
       }
 
-   MORE_ERROR() << "⎕CC B: invalid character class B (= " << cls << ")";
+   MORE_ERROR() << u8"⎕CC B: invalid character class B (= " << cls << ")";
    DOMAIN_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -248,26 +248,26 @@ Value_P Z(inst.get_shape(), LOC);
 void
 Quad_CC::print_classes(ostream & out)
 {
-   out << "      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
-       << "      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
-       << "      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
-       << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
-       << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
-       << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
-       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
-       << "      ⎕CC   8:  Octal digits 0-7"                           << endl
-       << "      ⎕CC   9:  Some mathematical symbols"                  << endl
-       << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
-       << "      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
-       << "      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
-       << "      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
-       << "      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
-       << "      ⎕CC ¯26:  lowercase characters a-z"                   << endl
-       << "      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
-       << "      ⎕CC  52:  characters A-Z a-z"                         << endl
-       << "      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
-       << "      ⎕CC 128:  ASCII characters"                           << endl;
+   out << u8"      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
+       << u8"      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
+       << u8"      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
+       << u8"      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
+       << u8"      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
+       << u8"      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
+       << u8"      ⎕CC   7:  Line drawing chatacters"                    << endl
+       << u8"      ⎕CC   8:  Octal digits 0-7"                           << endl
+       << u8"      ⎕CC   9:  Some mathematical symbols"                  << endl
+       << u8"      ⎕CC  10:  Decimal digits 0-9"                         << endl
+       << u8"      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
+       << u8"      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
+       << u8"      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
+       << u8"      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
+       << u8"      ⎕CC ¯26:  lowercase characters a-z"                   << endl
+       << u8"      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
+       << u8"      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
+       << u8"      ⎕CC  52:  characters A-Z a-z"                         << endl
+       << u8"      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
+       << u8"      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
+       << u8"      ⎕CC 128:  ASCII characters"                           << endl;
 }
 //════════════════════════════════════════════════════════════════════════════

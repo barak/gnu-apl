@@ -65,8 +65,8 @@ int sigma_percent = 0;
       }
 
                  print5(out, count);
-   out << " │ "; print5(out, mu);
-   out << " │ "; print5(out, sigma_percent);
+   out << u8" │ "; print5(out, mu);
+   out << u8" │ "; print5(out, sigma_percent);
    out << " %";
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -142,17 +142,17 @@ FunctionStatistics::print(ostream & out)
 {
 UTF8_string utf(get_name());
 UCS_string uname(utf);
-   out << "║ " << utf;
+   out << u8"║ " << utf;
    loop(n, 15 - uname.size())   out << " ";
 
 const uint64_t div = vec_lengths.get_average() ? vec_lengths.get_average() : 1;
 
-   out << " ║ ";   Statistics_record::print5(out, vec_lengths.get_count());
-   out << " │ ";   Statistics_record::print5(out, vec_cycles.get_sum());
-   out << " │ ";   Statistics_record::print5(out, vec_lengths.get_average());
-   out << " │ ";   Statistics_record::print5(out, vec_cycles.get_average());
-   out << " │ ";   Statistics_record::print5(out, vec_cycles.get_average()/div);
-   out << " ║" << endl;
+   out << u8" ║ ";   Statistics_record::print5(out, vec_lengths.get_count());
+   out << u8" │ ";   Statistics_record::print5(out, vec_cycles.get_sum());
+   out << u8" │ ";   Statistics_record::print5(out, vec_lengths.get_average());
+   out << u8" │ ";   Statistics_record::print5(out, vec_cycles.get_average());
+   out << u8" │ ";   Statistics_record::print5(out, vec_cycles.get_average()/div);
+   out << u8" ║" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -170,14 +170,14 @@ CellFunctionStatistics::print(ostream & out)
 {
 UTF8_string utf(get_name());
 UCS_string uname(utf);
-   out << "║ " << uname;
+   out << u8"║ " << uname;
    loop(n, 12 - uname.size())   out << " ";
-   out << "    ║ ";
+   out << u8"    ║ ";
 
    first.print(out);
-   out << " ║ ";
+   out << u8" ║ ";
    subsequent.print(out);
-   out << " ║" << endl;
+   out << u8" ║" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -245,21 +245,21 @@ Performance::print(Pfstat_ID which, ostream & out)
          if (which < PFS_MAX2)   // cell function statistics
             {
               out <<
-"╔═════════════════╦══════════╤═════════╤════════╦══════════╤═════════╤════════╗"
+u8"╔═════════════════╦══════════╤═════════╤════════╦══════════╤═════════╤════════╗"
                   << endl;
               stat->print(out);
               out <<
-"╚═════════════════╩══════════╧═════════╧════════╩══════════╧═════════╧════════╝"
+u8"╚═════════════════╩══════════╧═════════╧════════╩══════════╧═════════╧════════╝"
                   << endl;
             }
          else
             {
               out <<
-"╔═════════════════╦════════════╤══════════╤══════════╤══════════╤══════════╗"
+u8"╔═════════════════╦════════════╤══════════╤══════════╤══════════╤══════════╗"
                   << endl;
               stat->print(out);
               out <<
-"╚═════════════════╩════════════╧══════════╧══════════╧══════════╧══════════╝"
+u8"╚═════════════════╩════════════╧══════════╧══════════╧══════════╧══════════╝"
                    << endl;
             }
          return;
@@ -277,13 +277,13 @@ uint64_t sum_subsq_N_AB      = 0;
 uint64_t sum_subsq_cycles_AB = 0;
 
 UTF8_string_vector header(
-"╔═════════════════════════════════════════════════════════════════════╗\n"
-"║         Performance Statistics (CPU cycles per vector item)         ║\n"
-"╠═════════════════╦═════════════════════════╦═════════════════════════╣\n"
-"║                 ║        first pass       ║    subsequent passes    ║\n"
-"║      Cell       ╟───────┬───────┬─────────╫───────┬───────┬─────────╢\n"
-"║    Function     ║   N   │⌀cycles│   σ÷μ % ║   N   │⌀cycles│   σ÷μ % ║\n"
-"╠═════════════════╬═══════╪═══════╪═════════╬═══════╪═══════╪═════════╣\n");
+u8"╔═════════════════════════════════════════════════════════════════════╗\n"
+u8"║         Performance Statistics (CPU cycles per vector item)         ║\n"
+u8"╠═════════════════╦═════════════════════════╦═════════════════════════╣\n"
+u8"║                 ║        first pass       ║    subsequent passes    ║\n"
+u8"║      Cell       ╟───────┬───────┬─────────╫───────┬───────┬─────────╢\n"
+u8"║    Function     ║   N   │⌀cycles│   σ÷μ % ║   N   │⌀cycles│   σ÷μ % ║\n"
+u8"╠═════════════════╬═══════╪═══════╪═════════╬═══════╪═══════╪═════════╣\n");
 
 
    loop(h, header.size())   out << header[h] << endl << flush;
@@ -312,39 +312,39 @@ const uint64_t subsq_avg_B = Statistics_record::average(sum_subsq_cycles_B,
                                                       sum_subsq_N_B);
 
    out <<
-"╟─────────────────╫───────┼───────┼─────────╫───────┼───────┼─────────╢\n"
-"║           SUM B ║ ";
+u8"╟─────────────────╫───────┼───────┼─────────╫───────┼───────┼─────────╢\n"
+u8"║           SUM B ║ ";
    Statistics_record::print5(out, sum_first_N_B);
-   out <<                 " │ ";
+   out <<                 u8" │ ";
    Statistics_record::print5(out, first_avg_B);
-   out <<                        " │         ║ ";
+   out <<                        u8" │         ║ ";
    Statistics_record::print5(out, sum_subsq_N_B);
-   out <<                                          " │ ";
+   out <<                                          u8" │ ";
    Statistics_record::print5(out, subsq_avg_B);
-   out <<                                                  " │         ║\n";
+   out <<                                                  u8" │         ║\n";
 
 const uint64_t first_avg_AB = Statistics_record::average(sum_first_cycles_AB,
                                                          sum_first_N_AB);
 const uint64_t subsq_avg_AB = Statistics_record::average(sum_subsq_cycles_AB,
                                                          sum_subsq_N_AB);
    out <<
-"║          SUM AB ║ ";
+u8"║          SUM AB ║ ";
    Statistics_record::print5(out, sum_first_N_AB);
-   out <<                 " │ ";
+   out <<                 u8" │ ";
    Statistics_record::print5(out, first_avg_AB);
-   out <<                        " │         ║ ";
+   out <<                        u8" │         ║ ";
    Statistics_record::print5(out, sum_subsq_N_AB);
-   out <<                                          " │ ";
+   out <<                                          u8" │ ";
    Statistics_record::print5(out, subsq_avg_AB);
-   out <<                                                  " │         ║\n";
+   out <<                                                  u8" │         ║\n";
 
    out <<
-"╚═════════════════╩═══════╧═══════╧═════════╩═══════╧═══════╧═════════╝\n"
-"╔═════════════════╦═══════════════╤═══════════════╤═══════╗\n"
-"║     Function    ║     Total     │    Average    │Cycles ║\n"
-"║        or       ╟───────┬───────┼───────┬───────┤  per  ║\n"
-"║    Operation    ║     N │Cycles │ Items │Cycles │ Item  ║\n"
-"╟─────────────────╫───────┼───────┼───────┼───────┼───────╢"
+u8"╚═════════════════╩═══════╧═══════╧═════════╩═══════╧═══════╧═════════╝\n"
+u8"╔═════════════════╦═══════════════╤═══════════════╤═══════╗\n"
+u8"║     Function    ║     Total     │    Average    │Cycles ║\n"
+u8"║        or       ╟───────┬───────┼───────┬───────┤  per  ║\n"
+u8"║    Operation    ║     N │Cycles │ Items │Cycles │ Item  ║\n"
+u8"╟─────────────────╫───────┼───────┼───────┼───────┼───────╢"
        << endl;
 
    // other statistics...
@@ -357,7 +357,7 @@ const uint64_t subsq_avg_AB = Statistics_record::average(sum_subsq_cycles_AB,
 #include "Performance.def"
 
    out <<
-"╚═════════════════╩═══════╧═══════╧═══════╧═══════╧═══════╝"
+u8"╚═════════════════╩═══════╧═══════╧═══════╧═══════╧═══════╝"
        << endl;
 }
 //════════════════════════════════════════════════════════════════════════════

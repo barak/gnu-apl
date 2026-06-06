@@ -1366,9 +1366,9 @@ print_db(ostream & out)
 {
   // print active processors
    //
-   out << "╔══════════════════════╤════════╤══════════════════════╗" << endl
-       << "║ Processor            │ fd fd2 │ Program              ║" << endl
-       << "╠══════════════════════╪════════╪══════════════════════╣" << endl;
+   out << u8"╔══════════════════════╤════════╤══════════════════════╗" << endl
+       << u8"║ Processor            │ fd fd2 │ Program              ║" << endl
+       << u8"╠══════════════════════╪════════╪══════════════════════╣" << endl;
    for (size_t p = 0; p < connected_procs.size(); ++p)
        {
          const AP3_fd & pro = connected_procs[p];
@@ -1388,20 +1388,20 @@ print_db(ostream & out)
                 snprintf(cc, sizeof(cc), "%u", pro.ap3.proc);
               }
          cc[sizeof(cc) - 1] = 0;
-         out << "║ "  << left  << setw(20) << cc;
+         out << u8"║ "  << left  << setw(20) << cc;
                
-         out << " │" << right << setw(3) << pro.fd << " " << setw(3) << pro.fd2
-             << " │ " << left  << setw(20) << pro.progname
-             << " ║"  << right << endl;
+         out << u8" │" << right << setw(3) << pro.fd << " " << setw(3) << pro.fd2
+             << u8" │ " << left  << setw(20) << pro.progname
+             << u8" ║"  << right << endl;
        }
-   out << "╚══════════════════════╧════════╧══════════════════════╝" << endl;
+   out << u8"╚══════════════════════╧════════╧══════════════════════╝" << endl;
 
    // print shared variables
    out <<
-"╔═════╤═╦═══════════╤═══╤══╦═══════════╤═══╤══╦════╤══════════╗\n"
-"║     │ ║ Offering  │   │  ║ Accepting │   │  ║OAOA│          ║\n"
-"║ Seq │C║ Proc,par  │Fd2│Fl║ Proc,par  │Fd2│Fl║SSUU│ Varname  ║\n"
-"╠═════╪═╬═══════════╪═══╪══╬═══════════╪═══╪══╬════╪══════════╣\n";
+u8"╔═════╤═╦═══════════╤═══╤══╦═══════════╤═══╤══╦════╤══════════╗\n"
+u8"║     │ ║ Offering  │   │  ║ Accepting │   │  ║OAOA│          ║\n"
+u8"║ Seq │C║ Proc,par  │Fd2│Fl║ Proc,par  │Fd2│Fl║SSUU│ Varname  ║\n"
+u8"╠═════╪═╬═══════════╪═══╪══╬═══════════╪═══╪══╬════╪══════════╣\n";
    for (size_t o = 0; o < db.offered_vars.size(); ++o)
        {
          const Svar_record & svar = db.offered_vars[o];
@@ -1409,7 +1409,7 @@ print_db(ostream & out)
        }
 
    out <<
-"╚═════╧═╩═══════════╧═══╧══╩═══════════╧═══╧══╩════╧══════════╝\n"
+u8"╚═════╧═╩═══════════╧═══╧══╩═══════════╧═══╧══╩════╧══════════╝\n"
        << endl;
 
 }

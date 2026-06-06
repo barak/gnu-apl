@@ -68,7 +68,7 @@ XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
   if (src_len < 3)
      {
        err_loc = LOC;
-       MORE_ERROR() << "⎕XML: Tag too short: "
+       MORE_ERROR() << u8"⎕XML: Tag too short: "
                     << UCS_string(src, src_pos, src_len);
        return;
      }
@@ -78,7 +78,7 @@ XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
    if (src[src_pos + src_len - 1] != '>')
       {
         err_loc = LOC;
-        MORE_ERROR() << "⎕XML: No tag end: "
+        MORE_ERROR() << u8"⎕XML: No tag end: "
                      << UCS_string(src, src_pos, src_len);
         return;
       }
@@ -91,7 +91,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         if (src_len < 7)   // at least <!---->
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: comment not properly terminated: "
+             MORE_ERROR() << u8"⎕XML: comment not properly terminated: "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -112,7 +112,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
             src[src_pos + 3] !='-')        // not <!--
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad comment start (expecting <!--) : "
+             MORE_ERROR() << u8"⎕XML: bad comment start (expecting <!--) : "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -121,7 +121,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
                  src[src_pos + src_len - 3] != '-')
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad comment end (expecting --> ): "
+             MORE_ERROR() << u8"⎕XML: bad comment end (expecting --> ): "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -132,7 +132,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         if (src_len < 7)   // at least <?xml?>
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: processing instruction not terminated: "
+             MORE_ERROR() << u8"⎕XML: processing instruction not terminated: "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -141,7 +141,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
                  src[src_pos + 4] !='l')   // not <?xml
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad declaration start (expecting <?xml): "
+             MORE_ERROR() << u8"⎕XML: bad declaration start (expecting <?xml): "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -149,7 +149,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         else if (src[src_pos + src_len - 2] != '?')
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad declaration end (expecting ?>): "
+             MORE_ERROR() << u8"⎕XML: bad declaration end (expecting ?>): "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -160,7 +160,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         if (!is_first_name_char(src[src_pos + 2]))
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad tag name in end tag : "
+             MORE_ERROR() << u8"⎕XML: bad tag name in end tag : "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -171,7 +171,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         if (!is_first_name_char(ucs1))
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad tag name in empty (-leaf) tag: "
+             MORE_ERROR() << u8"⎕XML: bad tag name in empty (-leaf) tag: "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -182,7 +182,7 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
         if (!is_first_name_char(ucs1))
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: bad tag name in start tag: "
+             MORE_ERROR() << u8"⎕XML: bad tag name in start tag: "
                           << UCS_string(src, src_pos, src_len);
              return;
            }
@@ -221,7 +221,7 @@ size_t end = start;
 
    if (start == end)   // no valid tag name
       {
-        MORE_ERROR() << "⎕XML: Bad tag name in: " << get_item();
+        MORE_ERROR() << u8"⎕XML: Bad tag name in: " << get_item();
         DOMAIN_ERROR;
       }
 
@@ -422,7 +422,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    if (stack.size())   // only allowed at top-level
                       {
                         MORE_ERROR() <<
-                        "⎕XML: XML declaration below top-level: "
+                        u8"⎕XML: XML declaration below top-level: "
                         << node->get_item();
                         return true;
                       }
@@ -437,7 +437,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    if (stack.size())   // only allowed at top-level
                       {
                         MORE_ERROR() <<
-                        "⎕XML: !DOCTYPE below top-level: "
+                        u8"⎕XML: !DOCTYPE below top-level: "
                         << node->get_item();
                         return true;
                       }
@@ -470,7 +470,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                      if (root == 0)   root = node;   // remember the root
                      else if (stack.size() == 0)   // subsequent root
                         {
-                          MORE_ERROR() << "⎕XML: more than one root";
+                          MORE_ERROR() << u8"⎕XML: more than one root";
                           return true;
                         }
                      Assert(stack.size() == size_t(node->level));
@@ -484,7 +484,7 @@ vector<size_t> pos_stack;   // a stack of node positions
                    {
                      if (stack.size() == 0)   // no start tag
                         {
-                          MORE_ERROR() << "⎕XML: end tag " << node->get_item()
+                          MORE_ERROR() << u8"⎕XML: end tag " << node->get_item()
                                        << " without start tag";
                           return true;
                         }
@@ -493,7 +493,7 @@ vector<size_t> pos_stack;   // a stack of node positions
 
                      if (!start->matches(node))
                         {
-                          MORE_ERROR() << "⎕XML: end tag " << node->get_item()
+                          MORE_ERROR() << u8"⎕XML: end tag " << node->get_item()
                                        << " does not match start tag "
                                        << start->get_item();
                           return true;
@@ -522,7 +522,7 @@ vector<size_t> pos_stack;   // a stack of node positions
       }
    else
       {
-        MORE_ERROR() << "⎕XML B: no XML root element in B";
+        MORE_ERROR() << u8"⎕XML B: no XML root element in B";
         return true;
       }
 
@@ -689,10 +689,10 @@ bool inside_sq  = false;   // inside '...'
          else if (uni == '<')   // invalid tag start inside tag attribute
             {
               if (inside_sq || inside_dq)   MORE_ERROR() <<
-                 "⎕XML B: Unescaped '<' in attribute value: '"
+                 u8"⎕XML B: Unescaped '<' in attribute value: '"
                  << UCS_string(string_B, offset, 20) << "'...";
               else                          MORE_ERROR() <<
-                 "⎕XML B: Unescaped '<' in attribute name: '"
+                 u8"⎕XML B: Unescaped '<' in attribute name: '"
                  << UCS_string(string_B, offset, 20) << "'...";
               return -1;
             }
@@ -801,7 +801,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
 
               if (bad_char)
                  {
-                   MORE_ERROR() << "⎕XML: bad character '"
+                   MORE_ERROR() << u8"⎕XML: bad character '"
                                 << UCS_string(1, bad_char)
                                 << "' in attribute value '" << attval << "'";
                    return true;
@@ -931,9 +931,9 @@ int ret = -1;
    else if (val0 == UNI_UNDERSCORE)       ret = 2;
    else
       {
-        MORE_ERROR() << "⎕XML: bad name '" << UCS_string() << "'; "
-                        "it shall begin with ⍙ (name inside an XML tag),\n"
-                        "    ∆ (synthetic name), or _ (tag name)";
+        MORE_ERROR() << u8"⎕XML: bad name '" << UCS_string() << "'; "
+                        u8"it shall begin with ⍙ (name inside an XML tag),\n"
+                        u8"    ∆ (synthetic name), or _ (tag name)";
         DOMAIN_ERROR;
       }
 
@@ -1054,7 +1054,7 @@ const int function_number = A->get_cfirst().get_int_value();
 
       }
 
-   MORE_ERROR() << "A ⎕XML B: Bad function number A=" << function_number;
+   MORE_ERROR() << u8"A ⎕XML B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1232,7 +1232,7 @@ ShapeItem dest_B = 0;
            {
              char uni_cc[20];
              SPRINTF(uni_cc, "U+%4.4X", uni);
-             MORE_ERROR() << "⎕XML B: Invalid XML character " << uni_cc
+             MORE_ERROR() << u8"⎕XML B: Invalid XML character " << uni_cc
                           << " at B[" << (src_B + Workspace::get_IO()) << "]";
              DOMAIN_ERROR;
            }
@@ -1308,7 +1308,7 @@ Quad_XML::convert_file(const Value & B) const
    //
    if (B.is_structured())
       {
-        MORE_ERROR() << "Bad B in 1 ⎕XML B (expecting filename)";
+        MORE_ERROR() << u8"Bad B in 1 ⎕XML B (expecting filename)";
         DOMAIN_ERROR;
       }
 
@@ -1319,7 +1319,7 @@ const UTF8_string filename_utf(filename_ucs);
 const int fd = open(filename_utf.c_str(), O_RDONLY);
    if (fd == -1)
       {
-        MORE_ERROR() << "1 ⎕XML B: error reading " << B
+        MORE_ERROR() << u8"1 ⎕XML B: error reading " << B
                      << ": " << strerror(errno);
        DOMAIN_ERROR;
       }
@@ -1327,7 +1327,7 @@ const int fd = open(filename_utf.c_str(), O_RDONLY);
 struct stat st;
    if (fstat(fd, &st))
       {
-        MORE_ERROR() << "1 ⎕XML B: error in fstat(" << B
+        MORE_ERROR() << u8"1 ⎕XML B: error in fstat(" << B
                      << "): " << strerror(errno);
         ::close(fd);
         DOMAIN_ERROR;
@@ -1343,7 +1343,7 @@ UTF8 * buffer = new UTF8[st.st_size];
 const ssize_t bytes_read = read(fd, buffer, st.st_size);
    if (bytes_read != st.st_size)
       {
-        MORE_ERROR() << "1 ⎕XML B: error in reading " << B
+        MORE_ERROR() << u8"1 ⎕XML B: error in reading " << B
                      << "): " << strerror(errno);
         ::close(fd);
         DOMAIN_ERROR;
@@ -1392,7 +1392,7 @@ ShapeItem from = 0;
                  {
                    while (Z->more())  Z->next_ravel_0();
                    Z->check_value(LOC);
-                   MORE_ERROR() << "Empty member name in 2 ⎕XML";
+                   MORE_ERROR() << u8"Empty member name in 2 ⎕XML";
                    LENGTH_ERROR;
                  }
 
@@ -1449,7 +1449,7 @@ const Cell & b2 =  B.get_cravel(2);
 const APL_Integer position = b1.get_int_value();
    if (position < Workspace::get_IO())
       {
-         MORE_ERROR() << "¯3 ⎕XML B←NS POS NAME: POS is < ⎕IO";
+         MORE_ERROR() << u8"¯3 ⎕XML B←NS POS NAME: POS is < ⎕IO";
          DOMAIN_ERROR;
       }
 
@@ -1466,7 +1466,7 @@ UCS_string UCS_Z;
         const Value * B2 = b2.get_pointer_value().get();
         if (B2->get_rank() > 1)
            {
-             MORE_ERROR() << "¯3 ⎕XML B←NS POS NAME: NAME has bad rank "
+             MORE_ERROR() << u8"¯3 ⎕XML B←NS POS NAME: NAME has bad rank "
                           << B2->get_rank() << " (expected  1)";
              RANK_ERROR;
            }
@@ -1484,7 +1484,7 @@ Quad_XML::all_members(const Value & B, int flags)
 {
    if (!B.is_structured())
       {
-        MORE_ERROR() << "Non-structured B in A ⎕XML B";
+        MORE_ERROR() << u8"Non-structured B in A ⎕XML B";
         DOMAIN_ERROR;
       }
 
@@ -1513,7 +1513,7 @@ Quad_XML::next_member(const Value & A, const Value & B)
    //
    if (!B.is_structured())
       {
-        MORE_ERROR() << "Non-structured B in 14 ⎕XML B";
+        MORE_ERROR() << u8"Non-structured B in 14 ⎕XML B";
         DOMAIN_ERROR;
       }
 
@@ -1523,9 +1523,9 @@ const ShapeItem B_total = B.get_all_members_count();
    if (A.element_count() != 2)
       {
         if (A.element_count() < 2)
-           MORE_ERROR() << "too few items in left argument of (14 A) ⎕XML B";
+           MORE_ERROR() << u8"too few items in left argument of (14 A) ⎕XML B";
         else
-           MORE_ERROR() << "too many items in left argument of (14 A) ⎕XML B";
+           MORE_ERROR() << u8"too many items in left argument of (14 A) ⎕XML B";
         LENGTH_ERROR; 
       }
 
@@ -1546,7 +1546,7 @@ Value_P path = path_split(A1);
 const ShapeItem path_length = path->element_count();
    if (path_length < 1)
       {
-        MORE_ERROR() << "(14 A) ⎕XML B: too few path elements in A";
+        MORE_ERROR() << u8"(14 A) ⎕XML B: too few path elements in A";
         LENGTH_ERROR; 
       }
 
@@ -1561,7 +1561,7 @@ const Value * container = &B;
          const Cell * data_cell = container->get_member_data(member);
          if (data_cell == 0)
             {
-              MORE_ERROR() << "(14 PATH) ⎕XML: could not find the "
+              MORE_ERROR() << u8"(14 PATH) ⎕XML: could not find the "
                            << int(path_idx+1) << ". member '" << member
                            << "' of PATH (= '" << UCS_string(A1) << "')";
               DOMAIN_ERROR;
@@ -1570,7 +1570,7 @@ const Value * container = &B;
          container = data_cell->get_pointer_value().get();
          if (!container->is_structured())
             {
-              MORE_ERROR() << "(14 A) ⎕XML: member " << member
+              MORE_ERROR() << u8"(14 A) ⎕XML: member " << member
                            << " of path A (" << UCS_string(A1)
                            << " exists, but is not a structured value)";
               DOMAIN_ERROR;
@@ -1613,7 +1613,7 @@ Quad_XML::tree(const Value & B, int flags)
 {
    if (!B.is_structured())
       {
-        MORE_ERROR() << "Non-structured B in A ⎕XML B";
+        MORE_ERROR() << u8"Non-structured B in A ⎕XML B";
         DOMAIN_ERROR;
       }
 

@@ -189,13 +189,13 @@ Quad_PNG::eval_AB(Value_P A, Value_P B) const
            }
         else
            {
-             MORE_ERROR() << "A1 is not a string (filename) in A1 A2 ⎕PNG B";
+             MORE_ERROR() << u8"A1 is not a string (filename) in A1 A2 ⎕PNG B";
              DOMAIN_ERROR;
            }
       }
    else   // A is not a file name
       {
-        MORE_ERROR() << "A is not a filename in A ⎕PNG B";
+        MORE_ERROR() << u8"A is not a filename in A ⎕PNG B";
         LENGTH_ERROR;
       }
 }
@@ -242,7 +242,7 @@ Quad_PNG::eval_B(Value_P B) const
       }
 #endif   // PNG_GTK
 
-   MORE_ERROR() << "Bad B in ⎕PNG B";
+   MORE_ERROR() << u8"Bad B in ⎕PNG B";
    VALENCE_ERROR;
 }
 #else   // not PNG_LIBS
@@ -253,7 +253,7 @@ const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
 const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
 const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
 
-   return missing_files("⎕PNG", libs, hdrs, pkgs);
+   return missing_files(u8"⎕PNG", libs, hdrs, pkgs);
 }
 #endif   // PNG_LIBS
 //────────────────────────────────────────────────────────────────────────────
@@ -263,21 +263,21 @@ Quad_PNG::window_control(APL_Integer B0) const
    if (B0 == 0)                 // reset plot verbosity
        {
          verbosity = 0;
-         CERR << "⎕PNG verbosity turned off" << endl;
+         CERR << u8"⎕PNG verbosity turned off" << endl;
          return Idx0_0(LOC);
        }
 
     if (B0 == -1)                // enable SHOW_EVENTS
        {
          verbosity |= SHOW_EVENTS;
-         CERR << "⎕PNG will show X events " << endl;
+         CERR << u8"⎕PNG will show X events " << endl;
          return Idx0_0(LOC);
        }
 
     if (B0 == -2)                // enable SHOW_DATA
        {
          verbosity |= SHOW_DATA;
-         CERR << "⎕PNG will  show APL data " << endl;
+         CERR << u8"⎕PNG will  show APL data " << endl;
          return Idx0_0(LOC);
        }
 
@@ -300,14 +300,14 @@ Quad_PNG::window_control(APL_Integer B0) const
     if (B0 == -4)                // enable SHOW_DRAW
        {
          verbosity |= SHOW_DRAW;
-         CERR << "⎕PNG will show rendering details " << endl;
+         CERR << u8"⎕PNG will show rendering details " << endl;
          return Idx0_0(LOC);
        }
 
     if (B0 == -5)                // enable SHOW_FUNS
        {
          verbosity |= SHOW_FUNS;
-         CERR << "⎕PNG will show function calls " << endl;
+         CERR << u8"⎕PNG will show function calls " << endl;
          return Idx0_0(LOC);
        }
 
@@ -396,7 +396,7 @@ FileReader reader(filename1.c_str());
    if (!reader)   // neither filename nor filename.png couldbe opened
       {
         MORE_ERROR() << "Cannot open file '" << filename1.c_str()
-                     << "' in ⎕PNG B: " << strerror(errno1);
+                     << u8"' in ⎕PNG B: " << strerror(errno1);
         DOMAIN_ERROR;
       }
 
@@ -439,9 +439,9 @@ const int bytes_per_pixel = planes * bytes_per_color;
         CERR << "width:         " << width  << " pixels"           << endl
              << "height:        " << height << " pixels"           << endl
              << "color_type:    " << color_type                    << endl
-             << " ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
-             << " ├─── color:   " << (color_used ? "yes" : "no")   << endl
-             << " └─── palette: " << (palette_used ? "yes" : "no") << endl
+             << u8" ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
+             << u8" ├─── color:   " << (color_used ? "yes" : "no")   << endl
+             << u8" └─── palette: " << (palette_used ? "yes" : "no") << endl
              << "bit_depth:     " << bit_depth << " bits/color"    << endl
              << "planes:        " << planes                        << endl;
       }
@@ -518,7 +518,7 @@ Value_P Z(shape_Z, LOC);
                else
                   {
                     MORE_ERROR() << "Illegal bitdepth " << bit_depth
-                                 << " in ⎕PNG B (file: " << filename1 << ")";
+                                 << u8" in ⎕PNG B (file: " << filename1 << ")";
                     DOMAIN_ERROR;
                   }
              }
@@ -581,7 +581,7 @@ int color_type;
    else if (planes == 4)   color_type = PNG_COLOR_TYPE_RGB_ALPHA;
    else
       {
-        MORE_ERROR() << "A ⎕PNG B: bad number of planes (" << planes
+        MORE_ERROR() << u8"A ⎕PNG B: bad number of planes (" << planes
                      << ") in B.";
         DOMAIN_ERROR;
       }
@@ -591,7 +591,7 @@ const bool color_used   = color_type & PNG_COLOR_MASK_COLOR;     // 0x02
 const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
    if (!valid_type_and_bits(color_type, bit_depth))
       {
-        MORE_ERROR() << "A ⎕PNG B: bad/unsupported combination of color type "
+        MORE_ERROR() << u8"A ⎕PNG B: bad/unsupported combination of color type "
                      << color_type << " and bit depth " << bit_depth
                      << ".";
         DOMAIN_ERROR;
@@ -600,7 +600,7 @@ const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
 FileWriter writer(filename);
    if (!writer)
        {
-          MORE_ERROR() << "A ⎕PNG B: cannot open PNG output file " << filename
+          MORE_ERROR() << u8"A ⎕PNG B: cannot open PNG output file " << filename
                        << ": " << strerror(errno);
           DOMAIN_ERROR;
        }
@@ -620,7 +620,7 @@ png_text text_ptr[1];
    memset(text_ptr, 0, sizeof(text_ptr));
    text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
    text_ptr[0].key  = const_cast<char *>("Software");
-   text_ptr[0].text = const_cast<char *>("GNU APL, ⎕PNG");
+   text_ptr[0].text = const_cast<char *>(u8"GNU APL, ⎕PNG");
    text_ptr[0].text_length = strlen(text_ptr[0].text);
    text_ptr[0].lang = const_cast<char *>("EN");
 
@@ -631,9 +631,9 @@ png_text text_ptr[1];
         CERR << "width:         " << width  << " pixels"           << endl
              << "height:        " << height << " pixels"           << endl
              << "color_type:    " << color_type                    << endl
-             << " ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
-             << " ├─── color:   " << (color_used ? "yes" : "no")   << endl
-             << " └─── palette: " << (palette_used ? "yes" : "no") << endl
+             << u8" ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
+             << u8" ├─── color:   " << (color_used ? "yes" : "no")   << endl
+             << u8" └─── palette: " << (palette_used ? "yes" : "no") << endl
              << "bit_depth:     " << bit_depth << " bits/color"    << endl
              << "planes:        " << planes                        << endl;
       }
@@ -654,14 +654,14 @@ UTF8 * scanline = RGB;
                if (val < 0.0)
                   {
                     MORE_ERROR() << "negative color component " << val
-                                 << " in A ⎕PNG B";
+                                 << u8" in A ⎕PNG B";
                     DOMAIN_ERROR;
                   }
 
                if (val > 1.0)
                   {
                     MORE_ERROR() << " color component " << val
-                                 << " too large in A ⎕PNG B";
+                                 << u8" too large in A ⎕PNG B";
                     DOMAIN_ERROR;
                   }
 
@@ -701,7 +701,7 @@ UTF8 * scanline = RGB;
                else
                   {
                     MORE_ERROR() << "Illegal bitdepth " << bit_depth
-                                 << " in ⎕PNG B (file: " << filename << ")";
+                                 << u8" in ⎕PNG B (file: " << filename << ")";
                     DOMAIN_ERROR;
                   }
              }
@@ -912,9 +912,9 @@ PNG_context * pctx = new PNG_context(B);
      const int width  = B->get_shape_item(2);
      char cc[50];
      if (width < 500)   // small
-        SPRINTF(cc, "⎕PNG %d", pctx->handle)
+        SPRINTF(cc, u8"⎕PNG %d", pctx->handle)
      else
-        SPRINTF(cc, "⎕PNG %d×%d", height, width)
+        SPRINTF(cc, u8"⎕PNG %d×%d", height, width)
      gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
    }
    gtk_window_set_resizable(GTK_WINDOW(pctx->window), false);

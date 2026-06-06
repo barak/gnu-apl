@@ -163,7 +163,7 @@ Prefix::syntax_error(const char * loc)
         if (at(s).get_Class() == TC_VOID)
            {
              MORE_ERROR() << "No assignment to result variable Z"
-                             " in e.g. ∇Z←... ?";
+                             u8" in e.g. ∇Z←... ?";
              throw_apl_error(E_VALUE_ERROR, loc);
            }
       }
@@ -585,7 +585,7 @@ const bool reverse  = which & 4;   // print ahead in APL order
         else if (Nval >  2)   V = ARB;
 
         int sepa = 0;
-        out << "«";
+        out << u8"«";
         loop (s, ssize())
              {
                if (sepa++)   out << " ";
@@ -593,8 +593,8 @@ const bool reverse  = which & 4;   // print ahead in APL order
                const Token & tok = at(s).get_token();
                switch(const TokenClass tc = tok.get_Class())
                   {
-                    case TC_ASSIGN:    out << "←";          break;
-                    case TC_R_ARROW:   out << "→";          break;
+                    case TC_ASSIGN:    out << u8"←";          break;
+                    case TC_R_ARROW:   out << u8"→";          break;
                     case TC_L_BRACK:   out << "[";          break;
                     case TC_R_BRACK:   out << "]";          break;
                     case TC_END:       out << "END";        break;
@@ -613,7 +613,7 @@ const bool reverse  = which & 4;   // print ahead in APL order
                     default:           out << "-TC_" << int(tc);
                   }
              }
-        out << "»";
+        out << u8"»";
       }
 
    if (on_stack && ahead)   out << " ";   // both
@@ -690,11 +690,11 @@ const TokenClass tc = tok.get_Class();
    if (tc == TC_END)
       {
         const TokenTag tag = tok.get_tag();
-        if (tag == TOK_END)       return out << "◊";
+        if (tag == TOK_END)       return out << u8"◊";
         if (tag == TOK_ENDL)      return out << "ENDL";
-        if (tag == TOK_IF_THEN)   return out << "→→";
-        if (tag == TOK_IF_ELSE)   return out << "←→";
-        if (tag == TOK_IF_END)    return out << "←←";
+        if (tag == TOK_IF_THEN)   return out << u8"→→";
+        if (tag == TOK_IF_ELSE)   return out << u8"←→";
+        if (tag == TOK_IF_END)    return out << u8"←←";
       }
 
    return out << (Token::class_name(tok.get_tag()) + 3);
@@ -1061,7 +1061,7 @@ const TokenClass tcl = tok.get_Class();
       {
         CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
              << "] Read token[" << ssize()
-             << "] (←" << get_assign_state() << "←) " << tok << " "
+             << u8"] (←" << get_assign_state() << u8"←) " << tok << " "
              << Token::class_name(tok.get_tag()) << endl;
       }
 
@@ -1375,7 +1375,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
                 {
                   MORE_ERROR() << "Assignment to symbol " << symbol->get_name()
                                << " which (currently) is a named lambda.\n"
-                  "    You may want to ⎕EX '" << symbol->get_name() << "' first.";
+                  u8"    You may want to ⎕EX '" << symbol->get_name() << "' first.";
                 }
              else
                 {
@@ -2130,7 +2130,7 @@ Value_P top_val = top_sym->get_var_value();
              UCS_string & more = MORE_ERROR() <<
                           "member access: cannot override non-leaf member ";
              more.append_members(members, 0);
-             more << "\n      )ERASE or ⎕EX that member first.";
+             more << u8"\n      )ERASE or ⎕EX that member first.";
              DOMAIN_ERROR;
            }
 
@@ -2159,7 +2159,7 @@ Value_P top_val = top_sym->get_var_value();
                           "member access: cannot use non-leaf member ";
              more.append_members(members, 0);
              more << " in selective specification.\n"
-                     "      )ERASE or ⎕EX that member first.";
+                     u8"      )ERASE or ⎕EX that member first.";
              DOMAIN_ERROR;
            }
         else if (member_cell->is_pointer_cell())
@@ -3150,13 +3150,13 @@ const Cell & B0 = at2().get_apl_val()->get_cfirst();   // the condition
 
    if (!A0.is_near_int())
       {
-        MORE_ERROR() << "A → B: bad (non-Integer) ↑A ";
+        MORE_ERROR() << u8"A → B: bad (non-Integer) ↑A ";
         DOMAIN_ERROR;
       }
 
    if (!B0.is_near_int())
       {
-        MORE_ERROR() << "A → B: bad (non-Integer) ↑B ";
+        MORE_ERROR() << u8"A → B: bad (non-Integer) ↑B ";
         DOMAIN_ERROR;
       }
 
@@ -3201,7 +3201,7 @@ const APL_Integer jump_offset = A0.get_near_int();
         //
         if (jump_offset)   // function_line is 0 in ⍎ or ◊ contexts
            {
-             MORE_ERROR() << "A → B with non-zero A is only permitted "
+             MORE_ERROR() << u8"A → B with non-zero A is only permitted "
                              "inside a defined function";
              DOMAIN_ERROR;
            }
@@ -3236,21 +3236,21 @@ Prefix::reduce_RETC___()
       {
         case TOK_RETURN_EXEC:   // immediate execution context
              Log(LOG_prefix_parser)
-                CERR << "- end of ⍎ context (no result)" << endl;
+                CERR << u8"- end of ⍎ context (no result)" << endl;
              at0().clear(LOC);
              set_action(RA_RETURN);            // return from context;
              return;
 
         case TOK_RETURN_STATS:   // immediate execution context
              Log(LOG_prefix_parser)
-                CERR << "- end of ◊ context" << endl;
+                CERR << u8"- end of ◊ context" << endl;
              at0().clear(LOC);
              set_action(RA_RETURN);            // return from context;
              return;
 
         case TOK_RETURN_VOID:   // user-defined function not returning a value
              Log(LOG_prefix_parser)
-                CERR << "- end of ∇ context (function has no result)" << endl;
+                CERR << u8"- end of ∇ context (function has no result)" << endl;
 
              {
                const UserFunction * ufun = si.get_executable()->get_exec_ufun();
@@ -3271,14 +3271,14 @@ Prefix::reduce_RETC___()
                if (!Z)
                   {
                     Log(LOG_prefix_parser)
-                       CERR << "- end of ∇ context (MISSING function result)."
+                       CERR << u8"- end of ∇ context (MISSING function result)."
                             << endl;
                     at0().clear(LOC);
                   }
                else
                   {
                     Log(LOG_prefix_parser)
-                       CERR << "- end of ∇ context (function result is: "
+                       CERR << u8"- end of ∇ context (function result is: "
                             << *Z << ")" << endl;
                     new (&at0()) Token(TOK_APL_VALUE1, Z);
                   }
@@ -3328,7 +3328,7 @@ Prefix::reduce_RETC_A__()
    // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
    // discarded and no reset() of it is required.
 
-   Log(LOG_prefix_parser)   CERR << "- end of ⍎ context.";
+   Log(LOG_prefix_parser)   CERR << u8"- end of ⍎ context.";
 
 Token B = at1();
    pop_args_push_result(B);

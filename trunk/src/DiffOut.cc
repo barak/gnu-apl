@@ -199,9 +199,9 @@ size_t diff_pos = 0;                 // the first mismatch
    else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
-        report << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
-            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
-            << " ∆ : ⋅⋅⋅";
+        report << u8"apl: ⋅⋅⋅" << apl << u8"⋅⋅⋅" << endl
+            << u8"ref: ⋅⋅⋅" << ref.c_str() << u8"⋅⋅⋅" << endl
+            << u8" ∆ : ⋅⋅⋅";
         loop(p, diff_pos)   report << " ";
         report << "^" << endl;
       }

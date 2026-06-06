@@ -315,7 +315,7 @@ const bool es = ! (point_style & 1);   // even style
         case 7: draw_cross( cr, P, es, outer_color, outer_dia,
                                                     inner_dia);   return; // ×
 
-        default: cerr << "⎕PLOT: Invalid point style: "
+        default: cerr << u8"⎕PLOT: Invalid point style: "
                       << point_style << endl;                     return;
       }
 
@@ -396,7 +396,7 @@ static char cc[100] = "";   // should suffice
               const char * tick_end = strchr(tick_text + 1, '%');
               if (tick_end == 0)   // no more '%'
                  {
-                   CERR << "⎕PLOT: too few tick texts in " << percent
+                   CERR << u8"⎕PLOT: too few tick texts in " << percent
                                 << " (at tick " << tidx << ")";
                    SPRINTF(cc, "Tick-%d", tidx);
                    return cc;
@@ -412,7 +412,7 @@ static char cc[100] = "";   // should suffice
 
         if (tick_len >= (sizeof(cc) - 1))
            {
-             CERR << "⎕PLOT: tick text too long";
+             CERR << u8"⎕PLOT: tick text too long";
              SPRINTF(cc, "Tick-%d", tidx);
              return cc;
            }
@@ -429,7 +429,7 @@ static char cc[100] = "";   // should suffice
         const tm * tm = localtime(&when);
         if (tm == 0)   // error in localtime()
            {
-             cerr << "bad value in formatted ⎕PLOT tick";
+             cerr << u8"bad value in formatted ⎕PLOT tick";
              return format;
            }
         const int year    = tm->tm_year + 1900;   // tm 0-100 → APL
@@ -505,7 +505,7 @@ format_tick(double val, double dV, int idx, const char * format)
         if (const char * percent = strchr(format, '%'))
            return format_user_tick(val, idx, format, percent);
 
-        cerr << "⎕PLOT: no % in user-defined format string" << endl;
+        cerr << u8"⎕PLOT: no % in user-defined format string" << endl;
         return format;
       }
 
@@ -813,7 +813,7 @@ draw_triangle(cairo_t * cr, const GTK_context & pctx, int verbosity,
    Assert(H12 >= 0.0);   Assert(H12 <= 1.0);
 
    if (verbosity & SHOW_DRAW)
-      CERR <<   " ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
+      CERR <<   u8" ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
            << "     P1(" << P1.x << ":" << P1.y << ") @H12=" << H12
            << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << endl;
 
@@ -852,7 +852,7 @@ draw_triangle(cairo_t * cr, const GTK_context & pctx, int verbosity,
    Assert(H2 >= 0);   Assert(H2 <= 1.0);
 
    if (verbosity & SHOW_DRAW)
-      CERR << "\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
+      CERR << u8"\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
            << "      P1(" << P1.x << ":" << P1.y << ")@H=" << H1
            << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << endl;
 
@@ -1093,7 +1093,7 @@ const int grid_style = w_props.get_gridY_style();
 
            if (int16_t(cc_pos.x) < 0)
               {
-                CERR << "⎕PLOT warning: pa_border_L="
+                CERR << u8"⎕PLOT warning: pa_border_L="
                      << int(w_props.get_pa_border_L())
                      << " is too small to print all Y-axis ticks (add "
                      << -int16_t(cc_pos.x) << ").";

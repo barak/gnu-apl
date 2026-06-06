@@ -161,7 +161,7 @@ Nabla::edit()
            {
              if (Workspace::more_error().size() == 0)
                 {
-                  UERR << "Bad ∇-open '" << first_command
+                  UERR << u8"Bad ∇-open '" << first_command
                        << "' : '" << error << "'" << endl;
                 }
            }
@@ -211,7 +211,7 @@ try_again:
             {
               if (const char * loc = execute_oper())
                  {
-                   UERR << "∇-command failed: " << loc << endl;
+                   UERR << u8"∇-command failed: " << loc << endl;
                    Output::set_color_mode(Output::COLM_INPUT);
                  }
             }
@@ -314,7 +314,7 @@ UserFunction * ufun;
              MORE << 
 "\nFatal error in defined function.\n"
 "    You may want to change faulty line(s)\n"
-"    or cancel editing entirely with:   [→]∇\n";
+u8"    or cancel editing entirely with:   [→]∇\n";
            }
         else
            {
@@ -323,9 +323,9 @@ UserFunction * ufun;
                   << "]. To fix this you may want to:\n"
                      "    change the faulty line with:    ["
                   << error_line << "] ..., or \n"
-                     "    delete the faulty line with:    [∆"
+                     u8"    delete the faulty line with:    [∆"
                   << error_line << "], or\n"
-                     "    cancel editing entirely with:   [→]∇.\n";
+                     u8"    cancel editing entirely with:   [→]∇.\n";
            }
         do_close = false;
         goto try_again;
@@ -412,7 +412,7 @@ UCS_string::iterator c(first_command);
 
    // skip the leading nabla. This should always succeed.
    //
-   if (c.has_more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
+   if (c.has_more() && c.next() != UNI_NABLA)   return u8"Bad ∇-command (no ∇)";
 
    // skip leading spaces
    //
@@ -504,7 +504,7 @@ bool hdr_has_vars;
         Unicode cc;
         do
           {
-            if (!c.has_more())   return "no ] in ∇-command";
+            if (!c.has_more())   return u8"no ] in ∇-command";
             oper << (cc = c.next());
           } while (cc != UNI_R_BRACK);
 
@@ -521,7 +521,7 @@ bool hdr_has_vars;
              {
                // a new function must not have a command
                //
-               if (ecmd != ECMD_NOP)   return "∇-command in new function";
+               if (ecmd != ECMD_NOP)   return u8"∇-command in new function";
 
                // case 1b.
                if (const char * loc = open_new_function())   return loc;
@@ -549,14 +549,14 @@ bool hdr_has_vars;
                   // an existing function was opened with a header that
                   // contains more than the function name.
                   //
-                  return "attempt to ∇-open existing function with "
+                  return u8"attempt to ∇-open existing function with "
                               "a new function header";
                 }
 
              break;
 
         default:
-             return "attempt to ∇-open a non-function at " LOC;
+             return u8"attempt to ∇-open a non-function at " LOC;
       }
 
    // at this point the (new or existing) function was successfully opened.
@@ -581,7 +581,7 @@ bool hdr_has_vars;
    if (c.has_more())
       {
         if (ecmd == ECMD_NOP)    return 0;
-        if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
+        if (ecmd != ECMD_SHOW)   return u8"illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
            UERR << "execute_oper() failed at " << loc << endl;
         return 0;   // OK
@@ -672,7 +672,7 @@ command_loop:
    // [∆   delete
    // [→   abandon
    //
-   if (!c.has_more())   return "Bad ∇-command";
+   if (!c.has_more())   return u8"Bad ∇-command";
    switch (c.lookup())
       {
         case UNI_Quad_Quad:
@@ -683,13 +683,13 @@ command_loop:
 
         default: UERR << "Bad edit op '" << c.lookup() << "'"
                       << " in line " << current_line << endl;
-                 return "Bad ∇-command";
+                 return u8"Bad ∇-command";
       }
 
    // don't allow escape in the first command
    if (initial)
       {
-        if (ecmd == ECMD_ESCAPE)   return "Bad initial ∇-command →";
+        if (ecmd == ECMD_ESCAPE)   return u8"Bad initial ∇-command →";
       }
 
 again:
@@ -699,14 +699,14 @@ again:
 
    if (c.has_more() && c.lookup() == UNI_MINUS)   // range
       {
-        if (got_minus)   return "error: second -  in ∇-range";
+        if (got_minus)   return u8"error: second -  in ∇-range";
         got_minus = true;
         edit_from = edit_to;   // shift
         c.next();   // consume the -
         goto again;
       }
 
-   if (c.has_more() && c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
+   if (c.has_more() && c.next() != UNI_R_BRACK)   return u8"missing ] in ∇-range";
 
    // at this point we have parsed an editor command, like:
    //
@@ -844,10 +844,10 @@ const LineLabel user_edit_to = edit_to;
            << edit_from << " to " << edit_to << endl;
 
    if (idx_from == 0)                     // then print header line
-      COUT << "    ∇" << endl;
+      COUT << u8"    ∇" << endl;
    for (int e = idx_from; e <= idx_to; ++e)   lines[e].print(COUT);
    if (idx_to == int(lines.size() - 1))   // then print last line
-      COUT << "    ∇" << endl;
+      COUT << u8"    ∇" << endl;
 
    if (user_edit_to.valid())   // eg. [⎕42] or [2⎕42]
       {
@@ -881,7 +881,7 @@ Nabla::execute_delete()
    // for delete we want exact numbers.
    //
 const int idx_to = find_line(LineLabel(edit_to));
-   if (idx_to == -1)   return "Bad line number N in [M∆N] ";
+   if (idx_to == -1)   return u8"Bad line number N in [M∆N] ";
 
    modified = true;
 
@@ -894,8 +894,8 @@ const int idx_to = find_line(LineLabel(edit_to));
    // [N∆M] : delete multiple lines
    //
 const int idx_from = find_line(LineLabel(edit_from));
-   if (idx_from == -1)       return "Bad line number M in [M∆N] ";
-   if (idx_from >= idx_to)   return "M ≥ N in [M∆N] ";
+   if (idx_from == -1)       return u8"Bad line number M in [M∆N] ";
+   if (idx_from >= idx_to)   return u8"M ≥ N in [M∆N] ";
 
    loop(j, 1 + idx_to - idx_from)   lines.erase(lines.begin() + idx_from);
    current_line = lines.back().label;
@@ -1133,7 +1133,7 @@ Nabla::open_existing_function(const UCS_string & name)
    // this function must only be called when editing functions interactively
    //
    if (InputFile::running_script())
-      return "∇-edit existing function from a script";
+      return u8"∇-edit existing function from a script";
 
 cFunction_P function = fun_symbol->get_function();
    Assert(function);

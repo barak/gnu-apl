@@ -496,7 +496,7 @@ public:
   max_pos(const APL_Float * vec, ShapeItem len)
      {
        Ccol imax = 0;                 // start with index 0
-       APL_Float vec_max = vec[0];   // and its value
+       APL_Float vec_max = abs(vec[0]);   // and its value
        for (Ccol j = 1; j < len; ++j)
            {
              const APL_Float vec_j = abs(vec[j]);

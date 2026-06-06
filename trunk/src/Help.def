@@ -55,11 +55,11 @@
 
 // APL primitive functions...
 //
-help_def(0, "⍬", "Zilde",
-         "Zilde is the empty numeric vector (aka. ⍳0)",
+help_def(0, u8"⍬", "Zilde",
+         u8"Zilde is the empty numeric vector (aka. ⍳0)",
          "Not a function but rather an alias for the empty\n"
          "vector:\n"
-         "      ⍬≡⍳0\n"
+         u8"      ⍬≡⍳0\n"
          "1")
 
 // scalar functions...
@@ -71,16 +71,16 @@ help_def(1, "+", "Conjugate",
          "      +100\n"
          "100\n"
          "      +1J2\n"
-         "1J¯2\n"
-         "      +1J2 2J¯3 ¯3J4\n"
-         "1J¯2 2J3 ¯3J¯4")
+         u8"1J¯2\n"
+         u8"      +1J2 2J¯3 ¯3J4\n"
+         u8"1J¯2 2J3 ¯3J¯4")
 
 help_def(2, "+", "Addition",
          "Add A and B",
          "A and B must be numeric. Examples:\n"
          "      1+1\n"
          "2\n"
-         "      1 2 3 + ¯1 ¯2 ¯3\n"
+         u8"      1 2 3 + ¯1 ¯2 ¯3\n"
          "0 0 0\n"
          "      1 2 3 + 10\n"
          "11 12 13")
@@ -88,49 +88,49 @@ help_def(2, "+", "Addition",
 help_def(1, "-", "Negation",
          "Negate B",
          "B must be a number [array]. Example:\n"
-         "      - 1 2 ¯3\n"
-         "¯1 ¯2 3")
+         u8"      - 1 2 ¯3\n"
+         u8"¯1 ¯2 3")
 
 help_def(2, "-", "Subtraction",
          "Subtract B from A",
          "B and A must be numbers. Example:\n"
          "      1 2 3 - 10\n"
-         "¯9 ¯8 ¯7\n"
-         "      (2 2⍴⍳4) - 10\n"
-         "¯9 ¯8\n"
-         "¯7 ¯6")
+         u8"¯9 ¯8 ¯7\n"
+         u8"      (2 2⍴⍳4) - 10\n"
+         u8"¯9 ¯8\n"
+         u8"¯7 ¯6")
 
-help_def(1, "×", "Signum(Direction)",
-         "¯1 if B<0; 0 if B=0; 1 if B>0",
+help_def(1, u8"×", "Signum(Direction)",
+         u8"¯1 if B<0; 0 if B=0; 1 if B>0",
          "For B = 0: 0\n"
          "Otherwise: B divided by Magnitude of B\n"
          "Example:\n"
-         "      × 10 ¯10 0 3J¯2\n"
-         "1 ¯1 0 0.8320502943J¯0.5547001962")
+         u8"      × 10 ¯10 0 3J¯2\n"
+         u8"1 ¯1 0 0.8320502943J¯0.5547001962")
 
-help_def(2, "×", "Multiplication",
+help_def(2, u8"×", "Multiplication",
          "A multiplied by B",
          "A and B must be numbers. Return A times B. Example:\n"
-         "      1 2 3 × ¯1\n"
-         "¯1 ¯2 ¯3\n"
-         "      0J¯1 × 0J¯1\n"
-         "¯1")
+         u8"      1 2 3 × ¯1\n"
+         u8"¯1 ¯2 ¯3\n"
+         u8"      0J¯1 × 0J¯1\n"
+         u8"¯1")
 
-help_def(1, "÷", "Reciprocal",
+help_def(1, u8"÷", "Reciprocal",
          "1 divided by B",
          "B must be nonzero number. Example:\n"
-         "      ÷ 10 ¯10 2 3J¯2\n"
-         "0.1 ¯0.1 0.5 0.2307692308J0.1538461538")
+         u8"      ÷ 10 ¯10 2 3J¯2\n"
+         u8"0.1 ¯0.1 0.5 0.2307692308J0.1538461538")
 
-help_def(2, "÷", "Division",
+help_def(2, u8"÷", "Division",
          "A divided by B",
          "A and B must be numbers.\n"
          "Signals the error if If B is 0 and A is not 0.\n"
          "If B is 0 and A is 0 returns 1. Example:\n"
-         "      1 2 0 1J2 ÷ 2 2 0 1J1\n"
+         u8"      1 2 0 1J2 ÷ 2 2 0 1J1\n"
          "0.5 1 1 1.5J0.5")
 
-help_def(1, "⋆", "Exponential",
+help_def(1, u8"⋆", "Exponential",
          "e to the Bth power",
          "B must be a number.\n"
          "Raise the base of the natural logarithm e (2.718281...) to the power of B\n"
@@ -140,11 +140,11 @@ help_def(1, "⋆", "Exponential",
          "      *0 0J1\n"
          "1 0.5403023059J0.8414709848")
 
-help_def(2, "⋆", "Power",
+help_def(2, u8"⋆", "Power",
          "A raised to the Bth power",
          "Raise the A to the power of B. A and B must be numbers.\n"
          "Example:\n"
-         "      2*3 ¯2 1j2\n"
+         u8"      2*3 ¯2 1j2\n"
          "8 0.25 0.3669139495J1.966055481")
 
 help_def(1, "*", "Exponential",
@@ -161,46 +161,46 @@ help_def(2, "*", "Power",
          "A raised to the Bth power",
          "Raise the A to the power of B. A and B must be numbers.\n"
          "Example:\n"
-         "      2*3 ¯2 1j2\n"
+         u8"      2*3 ¯2 1j2\n"
          "8 0.25 0.3669139495J1.966055481")
 
-help_def(1, "⍟", "Logarithm",
+help_def(1, u8"⍟", "Logarithm",
          "Natural logarithm of B",
          "")
 
-help_def(2, "⍟", "Logarithm",
+help_def(2, u8"⍟", "Logarithm",
          "Logarithm of B to base A",
          "")
 
 
-help_def(1, "⌈", "Ceiling",
+help_def(1, u8"⌈", "Ceiling",
          "Least integer greater than or equal to B",
          "")
 
-help_def(2, "⌈", "Maximum",
+help_def(2, u8"⌈", "Maximum",
          "The greater value of A or B",
          "")
 
-help_def(1, "⌊", "Floor",
+help_def(1, u8"⌊", "Floor",
          "Greatest integer less than or equal to B",
          "")
 
-help_def(2, "⌊", "Minimum",
+help_def(2, u8"⌊", "Minimum",
          "The smaller value of A or B",
          "")
-help_def(1, "∣", "Absolute value",
+help_def(1, u8"∣", "Absolute value",
          "Magnitude of B",
          "")
 
-help_def(2, "∣", "Modulo",
+help_def(2, u8"∣", "Modulo",
          "B modulo A",
           "")   // APL ∣
 
-help_def(1, "∼", "Not",
+help_def(1, u8"∼", "Not",
          "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",
          "")
 
-help_def(2, "∼", "Without",
+help_def(2, u8"∼", "Without",
          "Z is A with the values from B removed.",
          "")
 
@@ -216,7 +216,7 @@ help_def(2, "<", "Less than",
          "1 if A is less than B, 0 if not",
          "")
 
-help_def(2, "≤", "Less than or equal",
+help_def(2, u8"≤", "Less than or equal",
          "1 if A is less than or equal to B, 0 if not",
          "")
 
@@ -224,7 +224,7 @@ help_def(2, "=", "Equality",
          "Comparison: 1 if A and B are equal, 0 if not",
          "")
 
-help_def(2, "≥", "Greater than or equal",
+help_def(2, u8"≥", "Greater than or equal",
          "1 if A is greater than or equal to B, 0 if not",
          "")
 
@@ -232,95 +232,95 @@ help_def(2, ">", "Greater than",
          "1 if A is greater than B, 0 if not",
          "")
 
-help_def(2, "≠", "Not equal",
+help_def(2, u8"≠", "Not equal",
          "1 if A is different than B, 0 if not",
          "")
 
-help_def(2, "∨", "Logical disjunction",
+help_def(2, u8"∨", "Logical disjunction",
          "Boolean arguments: 0 if A and B are 0; 1 if not",
          "")
 
-help_def(2, "∨", "GCD",
+help_def(2, u8"∨", "GCD",
          "non-Boolean arguments: greatest common divisor",
          "")
 
-help_def(2, "∧", "Logical conjunction",
+help_def(2, u8"∧", "Logical conjunction",
          "Boolean arguments: 1 if A and B are 1; 0 if not",
          "")
 
-help_def(2, "∧", "LCM",
+help_def(2, u8"∧", "LCM",
          "non-Boolean arguments: Numeric arguments: least common multiple",
          "")
 
-help_def(2, "⍱", "Logical Nor",
+help_def(2, u8"⍱", "Logical Nor",
          "Logic: 1 if both A and B are 0; if not 0",
          "")
 
-help_def(2, "⍲", "Logical Nand",
+help_def(2, u8"⍲", "Logical Nand",
          "Logic: 0 if both A and B are 1; if not 1",
          "")
 
-help_def(1, "○", "Pi times",
-         "Multiply by π",
+help_def(1, u8"○", "Pi times",
+         u8"Multiply by π",
          "")
 
-help_def(2, "○", "Circle Functions",
+help_def(2, u8"○", "Circle Functions",
          "Trigonometric functions of B selected by A",
          "The value of A selects one of the following functions:\n\n"
-"    A=  0:   Z ← (1-B×B)⋆0.5\n"
-"    A= ¯1:   Z ← arcsin B               A= 1:   Z ← sin B\n"
-"    A= ¯2:   Z ← arccos B               A= 2:   Z ← cos B\n"
-"    A= ¯3:   Z ← arctan B               A= 3:   Z ← tan B\n"
-"    A= ¯4:   Z ← sqrt(¯1+B×B)           A= 4:   Z ← sqrt(1+B×B)\n"
-"    A= ¯5:   Z ← arcsinh B              A= 5:   Z ← sinh B\n"
-"    A= ¯6:   Z ← arccosh B              A= 6:   Z ← cosh B\n"
-"    A= ¯7:   Z ← arctanh B              A= 7:   Z ← tanh B\n"
-"    A= ¯8:   Z ← -(8○B)                 A= 8:   Z ← -sqrt(¯1+B×B) if B ≥ 0\n"
-"                                                Z ←  sqrt(¯1+B×B) if B < 0\n"
-"    A= ¯9:   Z ← B                      A= 9:   Z ← Real part of B\n"
-"    A=¯10:   Z ← +B                     A=10:   Z ← ∣B\n"
-"    A=¯11:   Z ← 0J1×B                  A=11:   Z ← Imaginary part of B\n"
-"    A=¯12:   Z ← ⋆0J1×B                 A=12:   Z ← Arc B")
+u8"    A=  0:   Z ← (1-B×B)⋆0.5\n"
+u8"    A= ¯1:   Z ← arcsin B               A= 1:   Z ← sin B\n"
+u8"    A= ¯2:   Z ← arccos B               A= 2:   Z ← cos B\n"
+u8"    A= ¯3:   Z ← arctan B               A= 3:   Z ← tan B\n"
+u8"    A= ¯4:   Z ← sqrt(¯1+B×B)           A= 4:   Z ← sqrt(1+B×B)\n"
+u8"    A= ¯5:   Z ← arcsinh B              A= 5:   Z ← sinh B\n"
+u8"    A= ¯6:   Z ← arccosh B              A= 6:   Z ← cosh B\n"
+u8"    A= ¯7:   Z ← arctanh B              A= 7:   Z ← tanh B\n"
+u8"    A= ¯8:   Z ← -(8○B)                 A= 8:   Z ← -sqrt(¯1+B×B) if B ≥ 0\n"
+u8"                                                Z ←  sqrt(¯1+B×B) if B < 0\n"
+u8"    A= ¯9:   Z ← B                      A= 9:   Z ← Real part of B\n"
+u8"    A=¯10:   Z ← +B                     A=10:   Z ← ∣B\n"
+u8"    A=¯11:   Z ← 0J1×B                  A=11:   Z ← Imaginary part of B\n"
+u8"    A=¯12:   Z ← ⋆0J1×B                 A=12:   Z ← Arc B")
 
 
 help_def(1, "?", "Roll",
-         "integer selected randomly from ⍳B",
+         u8"integer selected randomly from ⍳B",
          "")
 
 help_def(2, "?", "Deal",
-         "A distinct integers selected randomly from ⍳B",
+         u8"A distinct integers selected randomly from ⍳B",
          "")
 
-help_def(1, "ϵ", "Enlist",
+help_def(1, u8"ϵ", "Enlist",
          "Create a vector containing all scalars in B",
          "")
 
-help_def(2, "ϵ", "Membership",
+help_def(2, u8"ϵ", "Membership",
          "1 for elements of A present in B; 0 where not.",
          "")
 
-help_def(2, "⍷", "Find",
+help_def(2, u8"⍷", "Find",
          "Find subsequence A in array B. 1 for each position that contains the array A in B",
          "")
 
-help_def(1, "⍴", "Shape",
+help_def(1, u8"⍴", "Shape",
          "Length of each axis of B",
          "")
 
-help_def(2, "⍴", "Reshape",
+help_def(2, u8"⍴", "Reshape",
          "Array of shape A with data B",
          "")
 
-help_def(1, "↑", "First",
+help_def(1, u8"↑", "First",
          "Select the first element of B",
          "")
 
-help_def(2, "↑", "Take",
-         "Z is the first (A ≥ 0) or last (A < 0) A elements of B (along each axis)",
+help_def(2, u8"↑", "Take",
+         u8"Z is the first (A ≥ 0) or last (A < 0) A elements of B (along each axis)",
          "")
 
-help_def(2, "↓", "Drop ",
-         "Z is B with the first (A ≥ 0) or last (A < 0) A elements (along each axis) removed",
+help_def(2, u8"↓", "Drop ",
+         u8"Z is B with the first (A ≥ 0) or last (A < 0) A elements (along each axis) removed",
          "")
 
 help_def(1, ",", "Ravel",
@@ -339,11 +339,11 @@ help_def(-1, "\\", "Scan",
          "Reduce of all prefixes of B along the last axis with function F",
          "")
 
-help_def(2, "⍀", "Expand",
+help_def(2, u8"⍀", "Expand",
          "Insert zeros (or blanks) in B corresponding to zeros in A",
          "")
 
-help_def(-1, "⍀",  "Scan",
+help_def(-1, u8"⍀",  "Scan",
          "Reduce of all prefixes of B along the first axis with function F",
          "")
 
@@ -355,264 +355,264 @@ help_def(-1, "/",  "Reduce",
          "Reduce B along the last axis with function F",
          "")
 
-help_def(2, "⌿", "Compress",
+help_def(2, u8"⌿", "Compress",
          "Select elements in B corresponding to ones in A",
          "")
 
-help_def(-1, "⌿",  "Reduce",
+help_def(-1, u8"⌿",  "Reduce",
          "Reduce B along the first axis with function F",
          "")
 
-help_def(1, "⍳", "Index generator",
-         "Vector of the first B integers (starting from ⎕IO)",
+help_def(1, u8"⍳", "Index generator",
+         u8"Vector of the first B integers (starting from ⎕IO)",
          "")
 
-help_def(2, "⍳", "Index of",
-         "The location (index) of B in A if B∈,A, or 1+¯1↑⍳⍴D if 1≥⍴A, or else ⊂⍬",
+help_def(2, u8"⍳", "Index of",
+         u8"The location (index) of B in A if B∈,A, or 1+¯1↑⍳⍴D if 1≥⍴A, or else ⊂⍬",
          "")
 
-help_def(1, "⍸", "Where",
-         "same as { (,⍵) / ,⍳⍴⍵ }.",
+help_def(1, u8"⍸", "Where",
+         u8"same as { (,⍵) / ,⍳⍴⍵ }.",
          "")
 
-help_def(2, "⍸", "Interval Index",
+help_def(2, u8"⍸", "Interval Index",
          "The location (index) of B in interval defined by A",
          "")
 
-help_def(1, "⌹", "Matrix inverse",
+help_def(1, u8"⌹", "Matrix inverse",
          "Z is the inverse of matrix B",
          "")
 
-help_def(2, "⌹", "Matrix divide",
-         "Z is a minimal (least square) solution of the system of linear equations A = B +.× Z",
+help_def(2, u8"⌹", "Matrix divide",
+         u8"Z is a minimal (least square) solution of the system of linear equations A = B +.× Z",
          "")
 
-help_def(3, "⌹", "Factorizations",
-         "Z←⌹[X] B computes a factorization of the real or complex matrix B.\n",
+help_def(3, u8"⌹", "Factorizations",
+         u8"Z←⌹[X] B computes a factorization of the real or complex matrix B.\n",
          "      The axis argument X selects the algorithm to be used:\n"
-         "          ⌹[1] B: Garry Helzer's algorithm (APL Quote Wuad 1990)\n"
-         "          ⌹[2] B: LApack based algorithm.\n"
-         "      Z is (Q R I) where: B ≡ Q∘R, Q is orthogonal,\n"
-        "       R is upper triangular, and I is R⁻¹.\n"
+         u8"          ⌹[1] B: Garry Helzer's algorithm (APL Quote Wuad 1990)\n"
+         u8"          ⌹[2] B: LApack based algorithm.\n"
+         u8"      Z is (Q R I) where: B ≡ Q∘R, Q is orthogonal,\n"
+        u8"       R is upper triangular, and I is R⁻¹.\n"
          "      For more information run 'info apl' or visit\n"
          "      https://www.gnu.org/software/apl/apl.html#Section-2_002e20\n")
 
-help_def(1, "⌽", "Reversal",
+help_def(1, u8"⌽", "Reversal",
          "Reverse elements of B along last axis",
          "")
 
-help_def(2, "⌽", "Rotation",
+help_def(2, u8"⌽", "Rotation",
          "The elements of B are rotated A positions along the last axis",
          "")
 
-help_def(1, "⊖", "Reversal",
+help_def(1, u8"⊖", "Reversal",
          "Reverse elements of B along first axis",
          "")
 
-help_def(2, "⊖", "Rotation",
+help_def(2, u8"⊖", "Rotation",
          "The elements of B are rotated A positions along the first axis",
          "")
 
-help_def(2, "⌷", "Index",
-        "Let A=A1 A2 ... An, n ≥ 0. Then (A ⌷ B) is B[A1;A2;...An]",
+help_def(2, u8"⌷", "Index",
+        u8"Let A=A1 A2 ... An, n ≥ 0. Then (A ⌷ B) is B[A1;A2;...An]",
          "")
 
-help_def(1, "⍕", "Format",
+help_def(1, u8"⍕", "Format",
          "A character representation of B",
          "")
 
-help_def(2, "⍕", "Format",
+help_def(2, u8"⍕", "Format",
          "Format B into a character matrix according to A",
          "")
 
-help_def(1, "⍉", "Transpose",
+help_def(1, u8"⍉", "Transpose",
          "Reverse the axes of B",
          "")
 
-help_def(2, "⍉", "Transpose",
+help_def(2, u8"⍉", "Transpose",
          "The axes of B are ordered by A",
          "")
 
-help_def(1, "⍋", "Grade up",
+help_def(1, u8"⍋", "Grade up",
          "Indices of B so that B[Z] is sorted ascendingly",
          "")
 
-help_def(2, "⍋", "Grade up with collating sequence",
-         "⍋B with sorting order defined by collating sequence A",
+help_def(2, u8"⍋", "Grade up with collating sequence",
+         u8"⍋B with sorting order defined by collating sequence A",
          "")
 
-help_def(1, "⍒", "Grade down",
+help_def(1, u8"⍒", "Grade down",
          "Indices of B so that B[Z] is sorted descendingly",
          "")
 
-help_def(2, "⍒", "Grade down with collating sequence",
-         "⍒B with sorting order defined by collating sequence A",
+help_def(2, u8"⍒", "Grade down with collating sequence",
+         u8"⍒B with sorting order defined by collating sequence A",
          "")
 
-help_def(1, "⍎", "Execute",
+help_def(1, u8"⍎", "Execute",
          "Execute an APL expression",
          "")
 
-help_def(1, "⊂", "Enclose",
+help_def(1, u8"⊂", "Enclose",
          "Produce a scalar from B",
          "")
 
-help_def(2, "⊂", "Partition",
+help_def(2, u8"⊂", "Partition",
          "Divide B into vectors based on A",
          "")
 
-help_def(1, "⊃", "Disclose",
+help_def(1, u8"⊃", "Disclose",
          "Produce an array from B",
          "")
 
-help_def(2, "⊃", "Pick",
+help_def(2, u8"⊃", "Pick",
          "Select a value from B based on A",
          "")
 
-help_def(2, "∩", "Intersection",
+help_def(2, u8"∩", "Intersection",
          "Return all elements contained in A and in B",
          "")
 
-help_def(1, "∪", "Unique",
+help_def(1, u8"∪", "Unique",
          "Return all unique elements in B",
          "")
 
-help_def(2, "∪", "Union",
+help_def(2, u8"∪", "Union",
         "Return an array of all elements contained in A or in B",
          "")
 
-help_def(1, "≡", "Depth",
+help_def(1, u8"≡", "Depth",
          "Return the levels of nesting in B",
          "")
 
-help_def(2, "≡", "Match",
+help_def(2, u8"≡", "Match",
          "Returns 1 if A has the same shape and ravel as B",
          "")
 
-help_def(1, "≢", "Tally",
+help_def(1, u8"≢", "Tally",
          "Returns the number of elements in the first dimension of B.",
          "")
 
-help_def(2, "≢", "Not match",
+help_def(2, u8"≢", "Not match",
          "Returns 1 if A has not the same shape and ravel as B.",
          "")
 
-help_def(2, "⊥", "Decode",
+help_def(2, u8"⊥", "Decode",
          "Z is the values of array B evaluated in a number system with radices A",
          "")
 
-help_def(2, "⊤", "Encode",
+help_def(2, u8"⊤", "Encode",
          "Z is the representation of B in the number system whose radices are A",
          "")
 
-help_def(2, "⊤∧", "Bitwise AND",
+help_def(2, u8"⊤∧", "Bitwise AND",
          "Z is the result of a bitwise AND of B with A (GNU APL extension)",
-         "     A  ⊤∧  B   ←→  2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B\n"
-         "    'A' ⊤∧ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∧ (32⍴2)⊤⎕AV⍳'B']\n")
+         u8"     A  ⊤∧  B   ←→  2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B\n"
+         u8"    'A' ⊤∧ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∧ (32⍴2)⊤⎕AV⍳'B']\n")
 
-help_def(1, "⊤∨", "Real B to Nearby Integer",
+help_def(1, u8"⊤∨", "Real B to Nearby Integer",
          "Z is the nearest integer to B after conversion from Real (GNU APL extension)",
          "")
 
-help_def(2, "⊤∨", "Bitwise OR",
+help_def(2, u8"⊤∨", "Bitwise OR",
          "Z is the result of a bitwise OR of B with A (GNU APL extension)",
-         "     A  ⊤∨  B   ←→  2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B\n"
-         "    'A' ⊤∨ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∨ (32⍴2)⊤⎕AV⍳'B']\n")
+         u8"     A  ⊤∨  B   ←→  2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B\n"
+         u8"    'A' ⊤∨ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∨ (32⍴2)⊤⎕AV⍳'B']\n")
 
-help_def(2, "⊤⍲", "Bitwise NAND",
+help_def(2, u8"⊤⍲", "Bitwise NAND",
          "Z is the result of a bitwise NAND of B with A (GNU APL extension)",
-         "    A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B\n")
+         u8"    A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B\n")
 
-help_def(1, "⊤⍱", "Bitwise NOT",
+help_def(1, u8"⊤⍱", "Bitwise NOT",
          "Z is the bitwise negation of B (B can be int or char) (GNU APL extension)",
          "")
 
-help_def(2, "⊤⍱", "Bitwise NOR",
+help_def(2, u8"⊤⍱", "Bitwise NOR",
          "Z is the result of a bitwise NOR of B with A (GNU APL extension)",
-         "    A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B")
+         u8"    A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B")
 
-help_def(2, "⊤≠", "Bitwise XOR",
+help_def(2, u8"⊤≠", "Bitwise XOR",
          "Z is the result of a bitwise XOR of B with A (GNU APL extension)",
-         "    A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B")
+         u8"    A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B")
 
-help_def(2, "⊤=", "Bitwise XNOR",
+help_def(2, u8"⊤=", "Bitwise XNOR",
          "Z is the result of a bitwise XNOR of B with A (GNU APL extension)",
-         "    A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B")
+         u8"    A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B")
 
 
-help_def(1, "⊢", "Identity",
+help_def(1, u8"⊢", "Identity",
          "Return B as non-committed value (e.g. to display it)",
          "")
 
-help_def(2, "⊢", "Right",
+help_def(2, u8"⊢", "Right",
          "Return B.",
          "")
 
-help_def(4, "⊢", "Select",
+help_def(4, u8"⊢", "Select",
          "Return A for X=1 or B for X=0.",
          "    After scalar extension of A, B, and X:"
-         "    ⍴Z ←→ ⍴A ←→ ⍴B ←→ ⍴X.\n    Example:\n"
-         "      'abcdef' ⊢[1 1 0 0 1 0] 1 2 3 4 5 6\n"
+         u8"    ⍴Z ←→ ⍴A ←→ ⍴B ←→ ⍴X.\n    Example:\n"
+         u8"      'abcdef' ⊢[1 1 0 0 1 0] 1 2 3 4 5 6\n"
          "1 2 cd 5 f\n")
 
-help_def(1, "⊣", "Hide",
+help_def(1, u8"⊣", "Hide",
          "Return committed 0 (as to prevent display of B)",
          "")
 
-help_def(2, "⊣", "Left",
+help_def(2, u8"⊣", "Left",
          "Return A.",
          "")
 
-help_def(1, "⍪", "Table",
+help_def(1, u8"⍪", "Table",
          "Return a matrix by ravelling the subarrays of B",
          "")
 
-help_def(2, "⍪", "Catenate",
+help_def(2, u8"⍪", "Catenate",
          "Append A and B along first axis",
          "")
 
-help_def(2, "←", "Assignment",
+help_def(2, u8"←", "Assignment",
          "Assign the value of B to A",
          "")
 
-help_def(2, "←", "I-Beam",
+help_def(2, u8"←", "I-Beam",
          "Not used in GNU APL",
          "")
 
-help_def(1, "→", "Goto",
+help_def(1, u8"→", "Goto",
          "Go to line B",
          "")
 
-help_def(-6, "∇", "Defined Function editor",
-       "\n      ∇{A} FUN {B}         Create and edit function FUN\n"
-         "      ∇{A} (LOP OP1) B     Create and edit monadic operator OP1\n"
-         "      ∇{A} (LO OP2 RO) B   Create and edit dyadic doperator OP2\n"
-         "      ∇FUN                 Edit existing function FUN\n"
-         "      ∇FUN[⎕]∇             Display existing function FUN\n"
-         "      ∇                    End of editing\n"
-         "      ⍫                    End of editing (and lock the function).",
+help_def(-6, u8"∇", "Defined Function editor",
+       u8"\n      ∇{A} FUN {B}         Create and edit function FUN\n"
+         u8"      ∇{A} (LOP OP1) B     Create and edit monadic operator OP1\n"
+         u8"      ∇{A} (LO OP2 RO) B   Create and edit dyadic doperator OP2\n"
+         u8"      ∇FUN                 Edit existing function FUN\n"
+         u8"      ∇FUN[⎕]∇             Display existing function FUN\n"
+         u8"      ∇                    End of editing\n"
+         u8"      ⍫                    End of editing (and lock the function).",
          "")
 
 // APL primitive operators (except those that are also functions)
 //
 
-help_def(-1, "⍨",  "Duplicate",
-         "(F ⍨) B is (B F B).\n",
+help_def(-1, u8"⍨",  "Duplicate",
+         u8"(F ⍨) B is (B F B).\n",
          "")
 
-help_def(-2, "⍨",  "Commute",
-         "A (F ⍨) B is (B F A).\n",
+help_def(-2, u8"⍨",  "Commute",
+         u8"A (F ⍨) B is (B F A).\n",
          "")
 
-help_def(-1, "¨",  "Each",
+help_def(-1, u8"¨",  "Each",
          "Z[i] is F B[i] for all valid indices i\n",
          "")
 
-help_def(-2, "¨",  "Each",
+help_def(-2, u8"¨",  "Each",
          "Z[i] is A[i] F B[i] for all valid indices i (with scalar extended A or B)\n",
          "")
 
-help_def(-5, "∘",  "Outer Product",
+help_def(-5, u8"∘",  "Outer Product",
          "Z[i;j] is A[i] G B[j] for all valid indices i of A and j of B\n",
          "")
 
@@ -620,84 +620,84 @@ help_def(-5, ".",  "Outer Product",
          "Z[i;j] is A[i] G B[j] for all valid indices i of A and j of B\n",
          "")
 
-help_def(2, "∘",  "Matrix multiplication",
-         "A∘B is essentially A +.× B optimized for space and speed.\n",
+help_def(2, u8"∘",  "Matrix multiplication",
+         u8"A∘B is essentially A +.× B optimized for space and speed.\n",
          "")
 
 help_def(-4, ".",  "Inner Product",
          "for matrices A and B: Z[i;j] is F/A[i;] G B[;j] (higher ranks accordingly)\n",
          "")
 
-help_def(-3, "⍤",  "Rank",
+help_def(-3, u8"⍤",  "Rank",
          "Call F GB with each of the rank-G cells GB of B\n",
          "")
 
-help_def(-4, "⍤",  "Rank",
+help_def(-4, u8"⍤",  "Rank",
          "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",
          "")
 
-help_def(-3, "⍣",  "Power Operator",
-         "repeat G times: B ← F B                       (numeric scalar G)\n",
+help_def(-3, u8"⍣",  "Power Operator",
+         u8"repeat G times: B ← F B                       (numeric scalar G)\n",
          "")
 
-help_def(-3, "⍣",  "Power Operator",
-         "repeat: B ← F B until (F B) G B is true       (with function G)\n",
+help_def(-3, u8"⍣",  "Power Operator",
+         u8"repeat: B ← F B until (F B) G B is true       (with function G)\n",
          "")
 
-help_def(-4, "⍣", "Power Operator",
-         "repeat G times: B ← A F B                     (with numeric scalar G)\n",
+help_def(-4, u8"⍣", "Power Operator",
+         u8"repeat G times: B ← A F B                     (with numeric scalar G)\n",
          "")
 
-help_def(-4, "⍣", "Power Operator",
-         "repeat: B ← A F B until (A F B) G B is true   (with function G)\n",
+help_def(-4, u8"⍣", "Power Operator",
+         u8"repeat: B ← A F B until (A F B) G B is true   (with function G)\n",
          "")
 
-help_def(-6, "◊", "statement separator",
-         "S₁ ◊ S₂ ◊ ... ◊ Sₙ",
-         "perform statement S₁, then S₂, ..., then Sₙ \n")
+help_def(-6, u8"◊", "statement separator",
+         u8"S₁ ◊ S₂ ◊ ... ◊ Sₙ",
+         u8"perform statement S₁, then S₂, ..., then Sₙ \n")
 
 help_def(-6, ";", "index separator (in bracket index A[...])",
-         "A[I₁; I₂; ... ; Iₙ]",
-         "Iₖ is the index along axis k of A (with n = ⍴⍴A, uses ⎕IO)\n")
+         u8"A[I₁; I₂; ... ; Iₙ]",
+         u8"Iₖ is the index along axis k of A (with n = ⍴⍴A, uses ⎕IO)\n")
 
-help_def(-6, "⍞", "character output",
-         "⍞ ← B   (assignment to ⍞)",
+help_def(-6, u8"⍞", "character output",
+         u8"⍞ ← B   (assignment to ⍞)",
          "prints value B\n")
 
-help_def(-6, "⍞", "character input",
-         "Z ← ⍞   (referencing ⍞)",
+help_def(-6, u8"⍞", "character input",
+         u8"Z ← ⍞   (referencing ⍞)",
          "return the next input line entered by the user (assigning it to Z)\n")
 
-help_def(-6, "⍞", "character input with prompt",
-         "⍞ ← B ◊ Z ← ⍞ (assignment, then referencing)",
+help_def(-6, u8"⍞", "character input with prompt",
+         u8"⍞ ← B ◊ Z ← ⍞ (assignment, then referencing)",
          "print B, then get the next line (on the same line). Example:\n"
-         "      ⍞←'Prompt: ' ◊ Z←⍞\n"
+         u8"      ⍞←'Prompt: ' ◊ Z←⍞\n"
          "Prompt: --user-input--\n"
-         "      Z      ⍝ display the result Z of Z←⍞\n"
+         u8"      Z      ⍝ display the result Z of Z←⍞\n"
          "      --user-input--\n")
 
-help_def(-6, "⎕", "evaluated output",
-         "⎕ ← B   (assignment to ⎕)",
+help_def(-6, u8"⎕", "evaluated output",
+         u8"⎕ ← B   (assignment to ⎕)",
          "prints value B\n")
 
-help_def(-6, "⎕", "evaluated input",
-         "Z ← ⎕   (referencing ⎕)",
-         "print a prompt line ⎕: and then read the "
+help_def(-6, u8"⎕", "evaluated input",
+         u8"Z ← ⎕   (referencing ⎕)",
+         u8"print a prompt line ⎕: and then read the "
          "next line entered by the user.\n"
          "    return the line entered and evaluated as an APL expression."
          " Example:\n"
-         "      Z←⎕   ⍝ read next line\n"
-         "⎕:\n"
-         "      2 + 5   ⍝ the user enters '2 + 5'\n"
-         "      Z       ⍝ show the result of Z←⎕\n"
+         u8"      Z←⎕   ⍝ read next line\n"
+         u8"⎕:\n"
+         u8"      2 + 5   ⍝ the user enters '2 + 5'\n"
+         u8"      Z       ⍝ show the result of Z←⎕\n"
          "7\n")
 
-help_def(-6, "⍝", "(start of) comment",
-         "⍝ ... (end-of-line)",
+help_def(-6, u8"⍝", "(start of) comment",
+         u8"⍝ ... (end-of-line)",
          "does nothing (other than documenting the code)\n")
 
-help_def(-6, "⍝⍝", "(start of) ]DOXY command comment",
-         "⍝⍝ ... (end-of-line)",
+help_def(-6, u8"⍝⍝", "(start of) ]DOXY command comment",
+         u8"⍝⍝ ... (end-of-line)",
          "does nothing, but is considered by the ]DOXY command\n")
 
 #undef help_def

@@ -47,7 +47,7 @@ Quad_CR::Quad_CR()
    // and once in Workspace::Workspace() fotr macro support
    //
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⎕CR");
+   init_function_group(subfunction_infos, count, u8"⎕CR");
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -115,7 +115,7 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -39: a = 38;   break;
         case -40: a = 41;   break;
         case -41: a = 40;   break;
-        default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
+        default: MORE_ERROR() << u8"A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
 
@@ -188,7 +188,7 @@ bool extra_frame = false;
         case 46: FRAME(PR_BOXED_GRAPHIC4)
         case 47: FRAME(PR_BOXED_GRAPHIC5)
 
-        default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
+        default: MORE_ERROR() << u8"A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
 #undef FRAME
       }
@@ -368,8 +368,8 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
 not_structured:
 
 #define PUSH_TEXT result.push_back(text);   text.clear();
-#define TMP_VAR_PREFIX "⍙¯_"
-#define TMP_VAR_SUFFIX "_∆¯"
+#define TMP_VAR_PREFIX u8"⍙¯_"
+#define TMP_VAR_SUFFIX u8"_∆¯"
 #define TMP_VAR(d)   TMP_VAR_PREFIX << int(d) << TMP_VAR_SUFFIX
 
 UCS_string text;
@@ -379,7 +379,7 @@ const ShapeItem ec = value->element_count();
    //
    if (ec < 60 && is_plain_string(value))
       {
-        text << var_name << "←\"";
+        text << var_name << u8"←\"";
         loop(e, ec)   text << value->get_cravel(e).get_char_value();
         text << "\"";
         PUSH_TEXT
@@ -392,7 +392,7 @@ const APL_types::Depth depth = value->compute_depth();
    //
    if (depth <= 1 && value->get_rank() <= 1 && ec < 20)   // short simple vector
       {
-        text << var_name << "←";
+        text << var_name << u8"←";
         if (value->element_count())   // non-empty value
            {
              loop(e, value->element_count())
@@ -406,7 +406,7 @@ const APL_types::Depth depth = value->compute_depth();
         else                         // empty vector
            {
              if (value->get_cfirst().is_character_cell())   text << "''";
-             else                                           text << "⍬";
+             else                                           text << u8"⍬";
            }
         PUSH_TEXT
         Workspace::pop_FC();   // restore ⎕FC
@@ -416,12 +416,12 @@ const APL_types::Depth depth = value->compute_depth();
    // VAR ← (depth+1)⍴0. The first depth items are used as temporary values
    // for the different depths, while the last item is for saving ⎕IO.
    //
-   text << TMP_VAR(depth) "←⎕IO ◊ ⎕IO←0   ⍝ " << var_name << "←";    PUSH_TEXT
+   text << TMP_VAR(depth) u8"←⎕IO ◊ ⎕IO←0   ⍝ " << var_name << u8"←";    PUSH_TEXT
 
    do_CR10_level(result, 0, *value);
-   text << "⎕IO←" TMP_VAR(depth) << " ◊ "
-        << var_name << "←⍙¯_0_∆¯";                                   PUSH_TEXT
-   text << "⊣⎕EX ⊃";
+   text << u8"⎕IO←" TMP_VAR(depth) << u8" ◊ "
+        << var_name << u8"←⍙¯_0_∆¯";                                   PUSH_TEXT
+   text << u8"⊣⎕EX ⊃";
    loop(d, depth + 1)   text << " '" << TMP_VAR(d) << "'";
                                                                      PUSH_TEXT
    Workspace::pop_FC();   // restore ⎕FC
@@ -435,23 +435,23 @@ Quad_CR::get_legend(FunctionGroup::Legend_type lt) const
         default: return "";
 
         case LET_FUN_PREFIX: return
-"   ┌─── Legend:───────────────────────────────────────────────────┐\n"
-"   │    b - byte vector (vector of integers between -128 and 255) │\n"
-"   │    h - hex string (characters 0-9 or A-F resp. a-f)          │\n"
-"   │    i - integer vector                                        │\n"
-"   │    l - string of (\\n-terminated) lines                       │\n"
-"   │    m - character matrix                                      │\n"
-"   │    n - nested vector of strings                              │\n"
-"   │    r - base64 string according to RFC 4648                   │\n"
-"   │    s - string                                                │\n"
-"   │    t - token                                                 │\n"
-"   │    v - T,V (integer tag T and byte vector V)                 │\n"
-"   └──────────────────────────────────────────────────────────────┘\n"
+u8"   ┌─── Legend:───────────────────────────────────────────────────┐\n"
+u8"   │    b - byte vector (vector of integers between -128 and 255) │\n"
+u8"   │    h - hex string (characters 0-9 or A-F resp. a-f)          │\n"
+u8"   │    i - integer vector                                        │\n"
+u8"   │    l - string of (\\n-terminated) lines                       │\n"
+u8"   │    m - character matrix                                      │\n"
+u8"   │    n - nested vector of strings                              │\n"
+u8"   │    r - base64 string according to RFC 4648                   │\n"
+u8"   │    s - string                                                │\n"
+u8"   │    t - token                                                 │\n"
+u8"   │    v - T,V (integer tag T and byte vector V)                 │\n"
+u8"   └──────────────────────────────────────────────────────────────┘\n"
 "\n";
 
    case LET_MAP_SUFFIX: return
 "\n"
-"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M.\n";
+u8"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M.\n";
       }
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -468,9 +468,9 @@ Quad_CR::print_map_syntax(ostream & out,
 {
 char NN[10];   SPRINTF(NN, "%2d", int(info.axis));
 const char * name = info.function_name;
-   out << "      " << NN << " ⎕CR  ←→"
+   out << "      " << NN << u8" ⎕CR  ←→"
        << UCS_string(24 - strlen(name), UNI_SPACE)
-       << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
+       << "'" << name << u8"' ⎕CR  ←→  ⎕CR." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -610,7 +610,7 @@ const UCS_string symbol_name(*B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
    if (symbol == 0)
       {
-        MORE_ERROR() << "10⎕CR: bad Symbol in do_CR10()";
+        MORE_ERROR() << u8"10⎕CR: bad Symbol in do_CR10()";
         DOMAIN_ERROR;
       }
 
@@ -675,7 +675,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                return;
              }
 
-        default: MORE_ERROR() << "⎕RVAL: bad symbol->get_NC() in do_CR10()";
+        default: MORE_ERROR() << u8"⎕RVAL: bad symbol->get_NC() in do_CR10()";
                  DOMAIN_ERROR;
       }
 }
@@ -729,7 +729,7 @@ UCS_string indent(2*(level + 1), UNI_SPACE);
 UCS_string var_level;   var_level << TMP_VAR(level); 
 UCS_string ind_var_level = indent;   ind_var_level << var_level;
 
-   text << ind_var_level << "←";
+   text << ind_var_level << u8"←";
 
    // important special case: string
    //
@@ -743,7 +743,7 @@ UCS_string ind_var_level = indent;   ind_var_level << var_level;
       }
 
    text << value.nz_element_count()
-        << "⍴0   ⍝ L" << int(level) << " zeroes";                         PUSH_TEXT
+        << u8"⍴0   ⍝ L" << int(level) << " zeroes";                         PUSH_TEXT
 
 int nested_count = 0;
 int simple_count = 0;
@@ -772,7 +772,7 @@ int zero_count  = 0;
         // as item separator. Otherwise we need commas (which is less
         // efficient)
         //
-        text << indent << "⍝ L" << int(level) << ": ";
+        text << indent << u8"⍝ L" << int(level) << ": ";
         if (zero_count)   text << zero_count << "+";
         text << simple_count << " simple item(s)...";                PUSH_TEXT
         const ShapeItem ec = value.nz_element_count();
@@ -794,7 +794,7 @@ int zero_count  = 0;
               //
               U1 << var_level << "[";
               U2 << e;
-              U3 << "]←";
+              U3 << u8"]←";
               U4 << do_CR10_simple_cell(cell);
               ++e;
 
@@ -840,7 +840,7 @@ int zero_count  = 0;
               if (count > 3 && count == (e - e_from))   // consecutive indices
                  {
                    U2.clear();
-                   U2 << e_from << "+⍳" << count;
+                   U2 << e_from << u8"+⍳" << count;
                  }
 
               text << indent << U1 << U2 << U3 << U4;                PUSH_TEXT
@@ -849,7 +849,7 @@ int zero_count  = 0;
 
    if (nested_count)
       {
-        text << indent << "⍝ L" << int(level) << ": " << nested_count
+        text << indent << u8"⍝ L" << int(level) << ": " << nested_count
              << " nested item(s)...";                                PUSH_TEXT
         loop(v, value.nz_element_count())
             {
@@ -858,7 +858,7 @@ int zero_count  = 0;
               const Value & sub_val = *cell.get_pointer_value();
               do_CR10_level(result, level + 1, sub_val);
 
-              text << indent << var_level << "[" << v << "]←⊂"
+              text << indent << var_level << "[" << v << u8"]←⊂"
                    << TMP_VAR(level + 1);                            PUSH_TEXT
             }
       }
@@ -868,13 +868,13 @@ int zero_count  = 0;
 const Shape & shape = value.get_shape();
    if (shape.get_rank() != 1 || shape.get_volume() == 0)
       {
-        text << ind_var_level << "←" <<  do_CR10_shape(shape)
-             << "⍴" << var_level
-             << "   ⍝ L" << int(level) << " final reshape";          PUSH_TEXT
+        text << ind_var_level << u8"←" <<  do_CR10_shape(shape)
+             << u8"⍴" << var_level
+             << u8"   ⍝ L" << int(level) << " final reshape";          PUSH_TEXT
       }
    else
       {
-        text << indent << "⍝ no (need for) L" << int(level)
+        text << indent << u8"⍝ no (need for) L" << int(level)
              << " final reshape";                                    PUSH_TEXT
       }
 }
@@ -890,7 +890,7 @@ UCS_string text;
         const Unicode uni = cell.get_char_value();
         if (uni < ' ' || uni == 127)
            {
-             return text << "(⎕UCS " << int(uni) << UNI_R_PARENT;
+             return text << u8"(⎕UCS " << int(uni) << UNI_R_PARENT;
            }
         if (uni == UNI_SINGLE_QUOTE)   return text << "''''";
         return text << "'" << uni << "'";
@@ -1589,7 +1589,7 @@ Quad_CR::do_CR41(const Value * B)
 {
    if (!(B->get_flags() & VF_packed))
       {
-        MORE_ERROR() << "B is not packed in 41 ⎕CR B";
+        MORE_ERROR() << u8"B is not packed in 41 ⎕CR B";
         DOMAIN_ERROR;
       }
 
@@ -1806,7 +1806,7 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
    else
       {
         MORE_ERROR() <<
-        "Invalid item in 44 ⎕CR B. Expect integer (tag) or (tag value) (token)";
+        u8"Invalid item in 44 ⎕CR B. Expect integer (tag) or (tag value) (token)";
         DOMAIN_ERROR;
       }
 }
@@ -1860,7 +1860,7 @@ const ShapeItem ec = value.element_count();
              }
           else if (cell.is_lval_cell())
              {
-               result << "(...)←";
+               result << u8"(...)←";
              }
           else
              {
@@ -1877,7 +1877,7 @@ const ShapeItem ec = value.element_count();
 void
 Quad_CR::do_CR45(const Value * B)
 {
-UCS_string prefix;   prefix << "├───";
+UCS_string prefix;   prefix << u8"├───";
    do_CR45_value(prefix, B);
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1885,7 +1885,7 @@ void
 Quad_CR::do_CR45_value(const UCS_string prefix, const Value * B)
 {
 ostream & out = CERR;
-UCS_string sub_prefix = prefix;   sub_prefix << "────";
+UCS_string sub_prefix = prefix;   sub_prefix << u8"────";
 
    out << prefix << " " << voidP(B) << endl;
    loop(b, B->nz_element_count())
@@ -1966,7 +1966,7 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
         close_mode(line, from_mode);
         if (from_mode != Vm_NONE)   line << UNI_COMMA;
 
-        if      (to_mode == Vm_UCS)    line << "(,⎕UCS ";
+        if      (to_mode == Vm_UCS)    line << u8"(,⎕UCS ";
         else if (to_mode == Vm_QUOT)   line << UNI_SINGLE_QUOTE;
       }
 }
@@ -1977,7 +1977,7 @@ Quad_CR::temp_varname()
 char cc[40];
 timeval tv;
    gettimeofday(&tv, 0);
-   SPRINTF(cc, "⍙¯%X¯%X", uint32_t(tv.tv_sec), uint32_t(tv.tv_usec));
+   SPRINTF(cc, u8"⍙¯%X¯%X", uint32_t(tv.tv_sec), uint32_t(tv.tv_usec));
    usleep(1000);   // to make the timestamp unique;
 
 const UTF8_string varname_utf(cc);

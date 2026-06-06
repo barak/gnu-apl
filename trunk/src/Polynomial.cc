@@ -50,7 +50,7 @@ Complex coeff = coefficient;
       {
         if (coeff.real() < 0)
            {
-             out << "¯";
+             out << u8"¯";
              coeff = - coeff;
            }
       }
@@ -129,12 +129,12 @@ Monomial::scan_indeterminants(const UCS_string_vector & vars,
 {
    if (!Avec::is_symbol_char(*src))   // expected: indeterminant & power
       {
-        MORE_ERROR() << "⌹[11] B: Invalid character '"
+        MORE_ERROR() << u8"⌹[11] B: Invalid character '"
                      << *src << "' in polynomial B.";
         DOMAIN_ERROR;
       }
 
-const UTF8_string expo_digits_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
+const UTF8_string expo_digits_utf(u8"⁰¹²³⁴⁵⁶⁷⁸⁹");
 const UCS_string expo_digits(expo_digits_utf);
 
    // extract the indeterminant name(s). Could be more
@@ -166,7 +166,7 @@ size_t found_len = 0;
 
    if (found == -1)
       {
-        MORE_ERROR() << "A ⌹[11] B: no prefix of '"
+        MORE_ERROR() << u8"A ⌹[11] B: no prefix of '"
                      << indeterminants << "' in A.";
         DOMAIN_ERROR;
       }
@@ -177,7 +177,7 @@ size_t found_len = 0;
    if (expos[found])   // duplicate
       {
               MORE_ERROR() <<
-              "⌹[11] B: duplicate indeterminant '"
+              u8"⌹[11] B: duplicate indeterminant '"
                << vars[found] << "' in term.";
               DOMAIN_ERROR;
       }

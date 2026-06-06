@@ -52,7 +52,7 @@ Bif_JOT::eval_AB(Value_P A, Value_P B) const
        {
          if (!A->get_cravel(a).is_numeric())
             {
-              MORE_ERROR() << "A∘B: non-numeric item in A";
+              MORE_ERROR() << u8"A∘B: non-numeric item in A";
               DOMAIN_ERROR;
             }
        }
@@ -61,7 +61,7 @@ Bif_JOT::eval_AB(Value_P A, Value_P B) const
        {
          if (!B->get_cravel(b).is_numeric())
             {
-              MORE_ERROR() << "A∘B: non-numeric item in B";
+              MORE_ERROR() << u8"A∘B: non-numeric item in B";
               DOMAIN_ERROR;
             }
        }

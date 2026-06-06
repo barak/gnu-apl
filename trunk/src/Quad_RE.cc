@@ -40,7 +40,7 @@ Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 
    if (!A->is_char_string())
       {
-        MORE_ERROR() << "left ⎕RE arguments must be a string value";
+        MORE_ERROR() << u8"left ⎕RE arguments must be a string value";
         DOMAIN_ERROR;
       }
 
@@ -101,16 +101,16 @@ int ofcnt = 0;
              case UNI_s:          flags |= PCRE2_DOTALL;                 break;
              case UNI_x:          flags |= PCRE2_EXTENDED;               break;
              default:
-                  MORE_ERROR() << "Unknown ⎕RE flag: '" << UCS_string(1, uni)
-                               << "'. Valid flags are: Eimsx⊂↓/";
+                  MORE_ERROR() << u8"Unknown ⎕RE flag: '" << UCS_string(1, uni)
+                               << u8"'. Valid flags are: Eimsx⊂↓/";
                 DOMAIN_ERROR;
            }
      }
 
    if (ofcnt > 1)
       {
-        MORE_ERROR() << "Multiple ⎕RE output flags: '" << flags_string
-                     << "'. The ⎕RE output flags are: ⊂↓/";
+        MORE_ERROR() << u8"Multiple ⎕RE output flags: '" << flags_string
+                     << u8"'. The ⎕RE output flags are: ⊂↓/";
         DOMAIN_ERROR;
       }
 }
@@ -410,7 +410,7 @@ const char * libs[] = { "libpcre.so",   0 };
 const char * hdrs[] = { "pcre2.h",      0 };
 const char * pkgs[] = { "libpcre3-dev", 0 };
 
-   return missing_files("⎕RE", libs, hdrs, pkgs);
+   return missing_files(u8"⎕RE", libs, hdrs, pkgs);
 }
 //════════════════════════════════════════════════════════════════════════════
 

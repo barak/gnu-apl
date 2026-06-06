@@ -176,7 +176,7 @@ public:
 
 protected:
    virtual Shape get_shape() const          { return Shape(21); }
-   virtual const char * get_ravel() const   { return "²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ"; }
+   virtual const char * get_ravel() const   { return u8"²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ"; }
    virtual bool contains(Unicode uni) const;
 };
 //────────────────────────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ public:
 
 protected:
    virtual Shape get_shape() const          { return Shape(20); }
-   virtual const char * get_ravel() const   { return "ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ"; }
+   virtual const char * get_ravel() const   { return u8"ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ"; }
    virtual bool contains(Unicode uni) const;
 };
 //────────────────────────────────────────────────────────────────────────────
@@ -240,10 +240,10 @@ public:
 
 protected:
    virtual Shape get_shape() const          { return Shape(48); }
-   virtual const char * get_ravel() const   { return "ΑΒΓΔΕΖΗΘΙΚΛΜ"
-                                                     "ΝΞΟΠΡΣΤΥΦΧΨΩ"
-                                                     "αβγδεζηθικλμ"
-                                                     "νξοπρστυφχψω"; }
+   virtual const char * get_ravel() const   { return u8"ΑΒΓΔΕΖΗΘΙΚΛΜ"
+                                                     u8"ΝΞΟΠΡΣΤΥΦΧΨΩ"
+                                                     u8"αβγδεζηθικλμ"
+                                                     u8"νξοπρστυφχψω"; }
    virtual bool contains(Unicode uni) const
       { return (0x0391 <= uni && uni <= 0x03A9 && uni != 0x03A2) ||
                (0x03B1 <= uni && uni <= 0x03C9 && uni != 0x03C2); }
@@ -296,12 +296,12 @@ public:
 
 protected:
    virtual Shape get_shape() const          { return Shape(6, 10); }
-   virtual const char * get_ravel() const { return "┌─┬─┐╒═╤═╕"
-                                                   "├─┼─┤╞═╪═╡"
-                                                   "└─┴─┘╘═╧═╛"
-                                                   "╓─╥─╖╔═╦═╗"
-                                                   "╟─╫─╢╠═╬═╣"
-                                                   "╙─╨─╜╚═╩═╝"
+   virtual const char * get_ravel() const { return u8"┌─┬─┐╒═╤═╕"
+                                                   u8"├─┼─┤╞═╪═╡"
+                                                   u8"└─┴─┘╘═╧═╛"
+                                                   u8"╓─╥─╖╔═╦═╗"
+                                                   u8"╟─╫─╢╠═╬═╣"
+                                                   u8"╙─╨─╜╚═╩═╝"
 ; }
    virtual bool contains(Unicode uni) const;
 };
@@ -317,10 +317,10 @@ public:
 
 protected:
    virtual Shape get_shape() const          { return Shape(4, 7); }
-   virtual const char * get_ravel() const   { return "⎲⎛⎞⎡⎤⎧⎫"
-                                                     "⎳⎜⎟⎢⎥⎨⎬"
-                                                     "↔⎝⎠⎣⎦⎮⎮"
-                                                      "ℕℤℚℝℂ⎩⎭"; }
+   virtual const char * get_ravel() const   { return u8"⎲⎛⎞⎡⎤⎧⎫"
+                                                     u8"⎳⎜⎟⎢⎥⎨⎬"
+                                                     u8"↔⎝⎠⎣⎦⎮⎮"
+                                                      u8"ℕℤℚℝℂ⎩⎭"; }
    virtual bool contains(Unicode uni) const;
 };
 //────────────────────────────────────────────────────────────────────────────

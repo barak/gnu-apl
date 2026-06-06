@@ -61,7 +61,7 @@ const FunctionGroup::function_info Quad_SQL::subfunction_infos[] =
 {
 #define sql_def(N, name, map_comm, fun_comm) \
    { N, #name, map_comm, fun_comm, -1 },
-   sql_def(  0, list     , "⎕SQL function names/numbers", "")
+   sql_def(  0, list     , u8"⎕SQL function names/numbers", "")
    sql_def(  1, open     , "open database file"         , "")
    sql_def(  2, close    , "close a database handle"    , "")
    sql_def(  3, query    , "SQL database query"         , "")
@@ -79,7 +79,7 @@ Quad_SQL::Quad_SQL()
    : QuadFunction(TOK_Quad_SQL)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⎕SQL");
+   init_function_group(subfunction_infos, count, u8"⎕SQL");
 
    init_provider_map();
 }
@@ -98,7 +98,7 @@ Quad_SQL::close_all_connections()
         conn_file slot = SQL_connections[c];
         if (Connection * conn = slot.connection)
            {
-             CERR << "*** WARNING: ⎕SQL handle " << c
+             CERR << u8"*** WARNING: ⎕SQL handle " << c
                   << " (file " << slot.filename
                   << ") is still open. Closing it," << endl;
              delete conn;
@@ -137,7 +137,7 @@ const APL_Integer function_number = X->get_cfirst().get_near_int();
         case 11: VALENCE_ERROR;
       }
 
-   MORE_ERROR() << "A ⎕SQL[X] B: Illegal function number X="
+   MORE_ERROR() << u8"A ⎕SQL[X] B: Illegal function number X="
                 << function_number;
    DOMAIN_ERROR;
 }
@@ -230,62 +230,62 @@ const char * name = info.function_name;
 
    // print axis number syntax
    //
-   out << "    ⎕SQL[" << axis;
+   out << u8"    ⎕SQL[" << axis;
    if (axis == 3 || axis == 4)   out << ", Db] Pv"; 
    else                          out << "]       ";
 
    // print member name syntax
    //
-   out << "  ←→  ⎕SQL." << name;
+   out << u8"  ←→  ⎕SQL." << name;
 
    if (axis == 3 || axis == 4)   out << " Db Pv";
    while (Output::get_column() < 44)    out << UNI_SPACE;
 
    // comment
-   out << "⍝ " << info.comment_map << endl;   // comment
+   out << u8"⍝ " << info.comment_map << endl;   // comment
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
 Quad_SQL::list_functions(ostream & out) const
 {
    out << "\n"
-          "⎕SQL is a function group. It is comprised of "
+          u8"⎕SQL is a function group. It is comprised of "
                 "the following (sub-)functions:\n"
           "\n"
        << get_legend(LET_FUN_PREFIX)
-       << "    ⎕SQL ''   ⍝ display this list\n"
-          "    ⎕SQL ⍬    ⍝ display syntax alternatives for ⎕SQL\n"
+       << u8"    ⎕SQL ''   ⍝ display this list\n"
+          u8"    ⎕SQL ⍬    ⍝ display syntax alternatives for ⎕SQL\n"
           "\n";
 
 const char * funs[] =
 {
-   "        ⎕SQL[ 0] ''    ", "display the ⎕SQL (sub-)function names"      ,
-   "        ⎕SQL[ 0] ⍬     ", "display the ⎕SQL (sub-)function numbers"    ,
-   "Db ← Ty ⎕SQL[ 1] Fs    ", "open database Fs & return a handle for it"  ,
-   "        ⎕SQL[ 2] Db    ", "close database handle Db"                   ,
-   "     Qs ⎕SQL[ 3, Db] Pv", "perform SQL query Qs"                       ,
-   "     Qs ⎕SQL[ 4, Db] Pv", "perform SQL update Qs"                      ,
-   "        ⎕SQL[ 5] Db    ", "begin a transaction"                        ,
-   "        ⎕SQL[ 6] Db    ", "commit the current transaction"             ,
-   "        ⎕SQL[ 7] Db    ", "roll the current transaction back"          ,
-   "Z  ←    ⎕SQL[ 8] Db    ", "the tables in database Db"                  ,
-   "Z  ← Db ⎕SQL[ 9] Ts    ", "the column names and types of table Ts"     ,
-   "Vi ←    ⎕SQL[10] Ty   ", "the provider version number for DB type Ty" ,
-   "Vs ←    ⎕SQL[11] Ty   ", "the provider version string for DB type Ty" ,
+   u8"        ⎕SQL[ 0] ''    ", u8"display the ⎕SQL (sub-)function names"      ,
+   u8"        ⎕SQL[ 0] ⍬     ", u8"display the ⎕SQL (sub-)function numbers"    ,
+   u8"Db ← Ty ⎕SQL[ 1] Fs    ", "open database Fs & return a handle for it"  ,
+   u8"        ⎕SQL[ 2] Db    ", "close database handle Db"                   ,
+   u8"     Qs ⎕SQL[ 3, Db] Pv", "perform SQL query Qs"                       ,
+   u8"     Qs ⎕SQL[ 4, Db] Pv", "perform SQL update Qs"                      ,
+   u8"        ⎕SQL[ 5] Db    ", "begin a transaction"                        ,
+   u8"        ⎕SQL[ 6] Db    ", "commit the current transaction"             ,
+   u8"        ⎕SQL[ 7] Db    ", "roll the current transaction back"          ,
+   u8"Z  ←    ⎕SQL[ 8] Db    ", "the tables in database Db"                  ,
+   u8"Z  ← Db ⎕SQL[ 9] Ts    ", "the column names and types of table Ts"     ,
+   u8"Vi ←    ⎕SQL[10] Ty   ", "the provider version number for DB type Ty" ,
+   u8"Vs ←    ⎕SQL[11] Ty   ", "the provider version string for DB type Ty" ,
    0                       , 0
  };
 
    for (const char ** f = funs; *f; )
        {
          out << " " << *f++;
-         out << "   ⍝ " << *f++ << endl;
+         out << u8"   ⍝ " << *f++ << endl;
        }
 
-   out << "\nThe functions of ⎕SQL"
+   out << u8"\nThe functions of ⎕SQL"
           " can be called with one of several syntax alternatives.\n"
-          "The syntax alternatives for ⎕SQL can be displayed with:\n\n";
+          u8"The syntax alternatives for ⎕SQL can be displayed with:\n\n";
 
-   COUT << "      ⎕SQL ⍬   ⍝ display the syntax alternatives for ⎕SQL\n\n";
+   COUT << u8"      ⎕SQL ⍬   ⍝ display the syntax alternatives for ⎕SQL\n\n";
 
    return Token();
 }
@@ -297,16 +297,16 @@ const char * Quad_SQL::get_legend(Legend_type lt) const
         default:             return "";
         case LET_FUN_PREFIX:
         case LET_MAP_PREFIX: return
-"    ┌─── Legend ────────────────────────────────────────────────┐\n"
-"    │    Db - database handle (small integer)                   │\n"
-"    │    Fs - database file name (path)                         │\n"
-"    │    Pv - query parameters (APL values, to be bound to Qs)  │\n"
-"    │    Qs - SQL query string                                  │\n"
-"    │    Ts - name of a table in the database (string)          │\n"
-"    │    Ty - database type ('sqlite' or 'postgres')            │\n"
-"    │    Vi - DB provider (library) version (integer)           │\n"
-"    │    Vs - DB provider (library) version (string)            │\n"
-"    └───────────────────────────────────────────────────────────┘\n"
+u8"    ┌─── Legend ────────────────────────────────────────────────┐\n"
+u8"    │    Db - database handle (small integer)                   │\n"
+u8"    │    Fs - database file name (path)                         │\n"
+u8"    │    Pv - query parameters (APL values, to be bound to Qs)  │\n"
+u8"    │    Qs - SQL query string                                  │\n"
+u8"    │    Ts - name of a table in the database (string)          │\n"
+u8"    │    Ty - database type ('sqlite' or 'postgres')            │\n"
+u8"    │    Vi - DB provider (library) version (integer)           │\n"
+u8"    │    Vs - DB provider (library) version (string)            │\n"
+u8"    └───────────────────────────────────────────────────────────┘\n"
 "\n";
       }
 }
@@ -319,14 +319,14 @@ Quad_SQL::open_database(const Value & A, const Value & B)
     if (!A.is_apl_char_vector())
        {
          MORE_ERROR() <<
-              "A ⎕SQL[1] B: Illegal database type A (string expected).";
+              u8"A ⎕SQL[1] B: Illegal database type A (string expected).";
          DOMAIN_ERROR;
       }
 
     if (!B.is_apl_char_vector() )
        {
          MORE_ERROR() <<
-              "A ⎕SQL[1] B: Illegal database file name B (string expected).";
+              u8"A ⎕SQL[1] B: Illegal database file name B (string expected).";
          DOMAIN_ERROR;
       }
 
@@ -346,7 +346,7 @@ const UTF8_string file_utf(B.get_UCS_ravel());
        }
 
 UCS_string & more = MORE_ERROR();
-   more << "⎕SQL: Unknown database provider type: " << type_utf.c_str() << "\n"
+   more << u8"⎕SQL: Unknown database provider type: " << type_utf.c_str() << "\n"
            "      Supported providers are:";
    loop(p, SQL_providers.size())
        {
@@ -409,7 +409,7 @@ Quad_SQL::run_generic(Connection * conn, const Value & A, const Value & B,
    if (!A.is_char_string())
       {
         MORE_ERROR() <<
-       "A ⎕SQL B: Illegal query string A (string expected)";
+       u8"A ⎕SQL B: Illegal query string A (string expected)";
         DOMAIN_ERROR;
       }
 
@@ -417,7 +417,7 @@ const sRank rank_B = B.get_rank();
     if (rank_B > 2)
        {
          MORE_ERROR() <<
-         "A ⎕SQL B: Bind parameters B have illegal rank " << rank_B << " > 2";
+         u8"A ⎕SQL B: Bind parameters B have illegal rank " << rank_B << " > 2";
          RANK_ERROR;
        }
 
@@ -586,8 +586,8 @@ Quad_SQL::find_free_connection(const UTF8_string & filename)
 void
 Quad_SQL::throw_illegal_db_handle(int handle)
 {
-   if (handle == -1)  MORE_ERROR() << "⎕SQL: Illegal database handle type" ;
-   else  MORE_ERROR() << "⎕SQL: Illegal database handle " << handle;
+   if (handle == -1)  MORE_ERROR() << u8"⎕SQL: Illegal database handle type" ;
+   else  MORE_ERROR() << u8"⎕SQL: Illegal database handle " << handle;
     DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -608,13 +608,13 @@ Quad_SQL::value_to_db_id(const Value & B)
 {
    if (!B.is_scalar())
       {
-        MORE_ERROR() << "⎕SQL: non-scalar database handle";
+        MORE_ERROR() << u8"⎕SQL: non-scalar database handle";
         RANK_ERROR;
       }
 
    if (!B.is_int_scalar())
       {
-        MORE_ERROR() << "⎕SQL: non-integer database handle";
+        MORE_ERROR() << u8"⎕SQL: non-integer database handle";
         DOMAIN_ERROR;
       }
 
@@ -708,7 +708,7 @@ Quad_SQL::param_to_db(const Value & X)
 const Shape & shape = X.get_shape();
    if (shape.get_volume() != 2 )
       {
-        MORE_ERROR() << "⎕SQL: Database id missing from axis parameter";
+        MORE_ERROR() << u8"⎕SQL: Database id missing from axis parameter";
         RANK_ERROR;
       }
 

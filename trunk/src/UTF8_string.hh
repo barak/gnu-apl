@@ -65,12 +65,28 @@ public:
    UTF8_string()
    {}
 
-   /// constructor: UTF8_string from 0-terminated C string.
+   /// constructor: UTF8_string from 0-terminated ASCII string.
    /// @param str null-terminated ASCII source string
    UTF8_string(const ASCII * str)
       { while (const ASCII cc = *str++)   *this += cc; }
 
-   /// constructor: copy of C string, at most len bytes, possibly less if
+   /// constructor: UTF8_string from 0-terminated UTF-8 string.
+   /// @param str null-terminated UTF-8 source string
+   UTF8_string(const UTF8 * str)
+      { while (const UTF8 cc = *str++)   *this += cc; }
+
+   /// constructor: copy of ASCII string, at most len bytes, possibly less if
+   /// \b str is 0-terminated.
+   /// @param str source ASCII byte array
+   /// @param len maximum number of bytes to copy
+   UTF8_string(const ASCII * str, size_t len)
+      {
+        loop(l, len)
+            if (const ASCII cc = *str++)   *this += cc;
+            else        break;
+      }
+
+   /// constructor: copy of UTF-8 string, at most len bytes, possibly less if
    /// \b str is 0-terminated.
    /// @param str source UTF-8 byte array
    /// @param len maximum number of bytes to copy

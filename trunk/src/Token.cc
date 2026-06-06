@@ -130,8 +130,8 @@ operator << (ostream & out, const Token & token)
 const TokenTag tag = token.get_tag();
    switch(tag)
       {
-        case TOK_CHARACTER: return out << "CHAR«" << token.get_char_val()
-                                       << "»";
+        case TOK_CHARACTER: return out << u8"CHAR«" << token.get_char_val()
+                                       << u8"»";
 
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE2:
@@ -144,8 +144,8 @@ const TokenTag tag = token.get_tag();
                Value_P value = token.get_apl_val();
                Assert(+value);
                const APL_types::Depth depth = value->compute_depth();
-               out << "«";
-               for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
+               out << u8"«";
+               for (APL_types::Depth d = 0; d < depth; ++d)   out << u8"≡";
 
                if (value->get_rank())   out << value->get_shape();
 
@@ -163,7 +163,7 @@ const TokenTag tag = token.get_tag();
                     out << ucs;
                   }
                if (more)   out << "...";
-               return out << "»";
+               return out << u8"»";
              }
 
         case TOK_ERROR:
@@ -173,7 +173,7 @@ const TokenTag tag = token.get_tag();
              return out << token.get_Id() << token.get_int_val();
 
         case  TOK_GOTO_PC:
-              return out << "→PC=" << token.get_int_val();
+              return out << u8"→PC=" << token.get_int_val();
 
         case TOK_NOBRANCH:
              return out << token.get_Id() << token.get_int_val();
@@ -188,15 +188,15 @@ const TokenTag tag = token.get_tag();
                return out << "RETURN_SYMBOL(" << symbol->get_name() << ")";
              }
 
-        case TOK_DIAMOND:      return out << "◊";
+        case TOK_DIAMOND:      return out << u8"◊";
         case TOK_ENDL:         return out << "ENDL";
-        case TOK_IF_THEN:      return out << "→→";
-        case TOK_IF_ELSE:      return out << "←→";
-        case TOK_IF_END:       return out << "←←";
+        case TOK_IF_THEN:      return out << u8"→→";
+        case TOK_IF_ELSE:      return out << u8"←→";
+        case TOK_IF_END:       return out << u8"←←";
 
-        case TOK_RETURN_EXEC:  return out << "RETURN ⍎";
-        case TOK_RETURN_STATS: return out << "RETURN ◊";
-        case TOK_RETURN_VOID:  return out << "RETURN ∇FUN";
+        case TOK_RETURN_EXEC:  return out << u8"RETURN ⍎";
+        case TOK_RETURN_STATS: return out << u8"RETURN ◊";
+        case TOK_RETURN_VOID:  return out << u8"RETURN ∇FUN";
 
          default: break;
       }
@@ -238,7 +238,7 @@ const TokenTag tag = token.get_tag();
              else if (tag == TOK_LSYMB2)
                 {
                   token.get_sym_ptr()->print(out << "'(... ");
-                  out << ")←";
+                  out << u8")←";
                 }
              else
                 {
@@ -630,15 +630,15 @@ UCS_string fn = fun_name;
              break;   // continue below
 
         case TOK_BRANCH:
-             out << "→" << get_int_val() << endl;
+             out << u8"→" << get_int_val() << endl;
              return;
 
         case TOK_NOBRANCH:
-             out << "→⍬" << endl;
+             out << u8"→⍬" << endl;
              return;
 
         case TOK_ESCAPE:
-             out << "→" << endl;
+             out << u8"→" << endl;
              return;
 
         case TOK_VOID:
@@ -791,16 +791,16 @@ Token::short_class_name(TokenTag tag)
 const TokenClass tc = TokenClass(tag & TC_MASK);
    switch(tc)
       {
-        case TC_ASSIGN:    return "←";
-        case TC_R_ARROW:   return "→";
+        case TC_ASSIGN:    return u8"←";
+        case TC_R_ARROW:   return u8"→";
         case TC_L_BRACK:   return "[";
         case TC_R_BRACK:   return "]";
         case TC_END:
-             if (tag == TOK_DIAMOND)   return "◊";
+             if (tag == TOK_DIAMOND)   return u8"◊";
              if (tag == TOK_ENDL)      return "ENDL";
-             if (tag == TOK_IF_THEN)   return "→→";
-             if (tag == TOK_IF_ELSE)   return "←→";
-             if (tag == TOK_IF_END)    return "←←";
+             if (tag == TOK_IF_THEN)   return u8"→→";
+             if (tag == TOK_IF_ELSE)   return u8"←→";
+             if (tag == TOK_IF_END)    return u8"←←";
              return "END";
 
         case TC_FUN0:      return "F0";

@@ -60,12 +60,12 @@ IndexExpr::check_index_range(const Shape & shape) const
                      {
                        UCS_string & ucs = MORE_ERROR();
                        ucs << "Offending index: " << idx
-                           << " (with ⎕IO: " << quad_io << ")\n"
+                           << u8" (with ⎕IO: " << quad_io << ")\n"
                            << "offending axis:  " << (r + quad_io)
                            << " of some";
                        loop(s, shape.get_rank())
                            ucs << " " << shape.get_shape_item(s);
-                       ucs << "⍴...";
+                       ucs << u8"⍴...";
                        if (idx >= max_idx)
                           ucs << "\nthe max index for axis "
                               << (r + quad_io)<< " is: "

@@ -53,9 +53,9 @@ public:
    /// @param loc  caller location for diagnostics
    ostream & dump(ostream & out, const char * loc) const
       {
-        out << "────────  " << loc << "  ──────── " << endl;
+        out << u8"────────  " << loc << u8"  ──────── " << endl;
         loop(c, size())   out << "[" << c << "]  '" << at(c) << "'" << endl;
-        return out << "═══════════════════════════════" << endl;
+        return out << u8"═══════════════════════════════" << endl;
       }
 
    /// overload vector<UCS_string>::size() so that it returns a signed length

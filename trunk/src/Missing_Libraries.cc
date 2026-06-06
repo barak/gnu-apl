@@ -44,9 +44,9 @@ UCS_string & more = MORE_ERROR() <<
 "syntax used was correct. The real reason for the SYNTAX ERROR was that\n"
 "one or more library and/or header files on which " << qfun << " depends:\n"
 "\n"
-" ⋆ could not be found by ./configure, and/or\n"
-" ⋆ was explicitly disabled by a ./configure argument, and/or\n"
-" ⋆ had the wrong (typically too old) version.\n"
+u8" ⋆ could not be found by ./configure, and/or\n"
+u8" ⋆ was explicitly disabled by a ./configure argument, and/or\n"
+u8" ⋆ had the wrong (typically too old) version.\n"
 "\n"
 "just before GNU APL was compiled.\n";
 

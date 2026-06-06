@@ -40,14 +40,14 @@ const FunctionGroup::function_info Quad_FFT::subfunction_infos[] =
 {
 #define fftdef(N, fun, comm) { N, #fun, "", comm, -1 },
 
-  fftdef(-15,flat_top_window       ,"no FFT; Z is B × flat-top window"        )
-  fftdef(-14,blackman_nuttal_window,"no FFT; Z is B × Blackman-Nuttal window" )
-  fftdef(-13,blackman_harris_window, "no FFT; Z is B × Blackman-Harris window" )
-  fftdef(-12,blackman_window       ,"no FFT; Z is B × Blackman window"        )
-  fftdef(-11,hamming_window        ,"no FFT; Z is B × Hamming window"         )
-  fftdef(-10,hann_window           ,"no FFT; Z is B × Hann window"            )
+  fftdef(-15,flat_top_window       ,u8"no FFT; Z is B × flat-top window"        )
+  fftdef(-14,blackman_nuttal_window,u8"no FFT; Z is B × Blackman-Nuttal window" )
+  fftdef(-13,blackman_harris_window, u8"no FFT; Z is B × Blackman-Harris window" )
+  fftdef(-12,blackman_window       ,u8"no FFT; Z is B × Blackman window"        )
+  fftdef(-11,hamming_window        ,u8"no FFT; Z is B × Hamming window"         )
+  fftdef(-10,hann_window           ,u8"no FFT; Z is B × Hann window"            )
   fftdef( -1,inverse_fft           ,"Z is the inverse FFT of B"               )
-  fftdef(  0,fft                   ,"Z is FFT without window; same as ⎕FFT B" )
+  fftdef(  0,fft                   ,u8"Z is FFT without window; same as ⎕FFT B" )
   fftdef( 10,fft_hann              ,"Z is FFT with Hann window"               )
   fftdef( 11,fft_hamming           ,"Z is FFT with Hamming window"            )
   fftdef( 12,fft_blackman          ,"Z is FFT with Blackman window"           )
@@ -61,7 +61,7 @@ Quad_FFT::Quad_FFT()
       : QuadFunction(TOK_Quad_FFT)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⎕FFT");
+   init_function_group(subfunction_infos, count, u8"⎕FFT");
 
    system_wisdom_loaded = false;
 }
@@ -92,12 +92,12 @@ Quad_FFT::print_fun_syntax(ostream & out,
                            const function_info & info) const
 {
 const sRank axis = info.axis;
-   out << "    Z ← ";
-   if      (axis < -9)   out << "¯"  << -axis;
-   else if (axis <  0)   out << " ¯" << -axis;
+   out << u8"    Z ← ";
+   if      (axis < -9)   out << u8"¯"  << -axis;
+   else if (axis <  0)   out << u8" ¯" << -axis;
    else if (axis < 10)   out << "  " <<   axis;
    else                  out << " "  <<   axis;
-   out<< " ⎕FFT B   ⍝ " << info.comment_fun << endl;
+   out<< u8" ⎕FFT B   ⍝ " << info.comment_fun << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -108,8 +108,8 @@ char NN[10];   SPRINTF(NN, "%3d", int(info.axis));
 const char * name = info.function_name;
 const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
-   out << "    " << NN << " ⎕FFT  ←→  ⎕FFT['" << name << "']"
-       << blanks << "  ←→  ⎕FFT." << name << endl;
+   out << "    " << NN << u8" ⎕FFT  ←→  ⎕FFT['" << name << "']"
+       << blanks << u8"  ←→  ⎕FFT." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -375,7 +375,7 @@ const char * libs[] = { "libfftw3.so",   0 };
 const char * hdrs[] = { "fftw3.h",      0 };
 const char * pkgs[] = { "libfftw3-dev", 0 };
 
-   return missing_files("⎕FFT", libs, hdrs, pkgs);
+   return missing_files(u8"⎕FFT", libs, hdrs, pkgs);
 }
 
 //────────────────────────────────────────────────────────────────────────────

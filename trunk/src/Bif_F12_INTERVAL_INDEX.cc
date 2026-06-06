@@ -39,7 +39,7 @@ Bif_F12_INTERVAL_INDEX::eval_AB(Value_P A, Value_P B) const
 const ShapeItem ec_A = A->element_count();
    if (ec_A < 1)
       {
-        MORE_ERROR() << "the left argument of A ⍸ B is empty";
+        MORE_ERROR() << u8"the left argument of A ⍸ B is empty";
         LENGTH_ERROR;
       }
 
@@ -50,7 +50,7 @@ const ShapeItem ec_A = A->element_count();
          const Comp_result c1_c2 = c1.compare(c2);
          if (c1_c2 != COMP_LT)
             {
-              MORE_ERROR() << "the left argument of A ⍸ B "
+              MORE_ERROR() << u8"the left argument of A ⍸ B "
                               "is not sorted ascendingly";
               DOMAIN_ERROR;
             }
@@ -95,14 +95,14 @@ ShapeItem count = 0;
          const Cell & cell = B->get_cravel(b);
          if (!cell.is_near_int())
             {
-              MORE_ERROR() << "non-integer item in the argument of monadic ⍸";
+              MORE_ERROR() << u8"non-integer item in the argument of monadic ⍸";
               DOMAIN_ERROR;
             }
 
           const APL_Integer Bi = B->get_cravel(b).get_near_int();
           if (Bi < 0)
             {
-              MORE_ERROR() << "negative item in the argument of monadic ⍸";
+              MORE_ERROR() << u8"negative item in the argument of monadic ⍸";
               DOMAIN_ERROR;
             }
 

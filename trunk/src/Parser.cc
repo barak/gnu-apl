@@ -1611,7 +1611,7 @@ bool progress = false;
 
          if (len_y > 3)   // ISO p. 124
             {
-              MORE_ERROR() << "⍤ y B: j too long (⍴j = " << len_y << ")";
+              MORE_ERROR() << u8"⍤ y B: j too long (⍴j = " << len_y << ")";
               LENGTH_ERROR;
             }
 
@@ -1762,7 +1762,7 @@ bool progress = false;
                         const bool SQL_query = axis == 3;   // else: update
                         if ((t + 4) >= tos.size())   // too few token
                            {
-                             MORE_ERROR() << "*** Too few arguments for ⎕SQL."
+                             MORE_ERROR() << u8"*** Too few arguments for ⎕SQL."
                                           << (SQL_query ? "query" : "update");
                              SYNTAX_ERROR;
                            }
@@ -1828,7 +1828,7 @@ Parser::mark_lsymb(Token_string & tos)
              if (is_selective_spec == is_vector_spec)   // none or both
                 {
                   MORE_ERROR() <<
-                      "Left of )← seems to be neither a vector "
+                      u8"Left of )← seems to be neither a vector "
                       "specification nor a selective specvification";
                   LEFT_SYNTAX_ERROR;
                 }

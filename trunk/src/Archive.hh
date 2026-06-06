@@ -76,7 +76,7 @@ protected:
       {
         ASX_MAJOR =  1,   ///< ++ if incompatible XML file format change
         ASX_MINOR = 11,  ///< ++ if backward compatible XML file format change
-        ASX_OTHER =  5,   ///< ++ if no XML file format change (code cleanup)
+        ASX_OTHER =  6,   ///< ++ if no XML file format change (code cleanup)
       };
 
    /// where to send error messages

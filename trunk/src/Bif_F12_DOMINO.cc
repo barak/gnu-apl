@@ -52,11 +52,11 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def( 5, ql_fact        , "QL factorization of B (libgsl algorithm)"  )
   domino_def( 6, lu_fact        , "LU factorization of B (libgsl algorithm)"  )
   domino_def( 7, poly_print     , "print polynomial B"                        )
-  domino_def( 8, poly_multiply  , "polynomial A × polynomial B"               )
-  domino_def( 9, poly_divide    , "polynomial A ÷ polynomial B"               )
-  domino_def(10, poly_divideN   , "polynomial A ÷ polynomial B (multivariate)")
+  domino_def( 8, poly_multiply  , u8"polynomial A × polynomial B"               )
+  domino_def( 9, poly_divide    , u8"polynomial A ÷ polynomial B"               )
+  domino_def(10, poly_divideN   , u8"polynomial A ÷ polynomial B (multivariate)")
   domino_def(11, poly_scan      , "string B to polynomial"                    )
-  domino_def(12, poly_divideNO  , "polynomial A ÷ polynomial B (with order)"  )
+  domino_def(12, poly_divideNO  , u8"polynomial A ÷ polynomial B (with order)"  )
   domino_def(20, integral       , "compute integral for B"                    )
 #undef domino_def
 };
@@ -65,7 +65,7 @@ Bif_F12_DOMINO::Bif_F12_DOMINO()
    : NonscalarFunction_default_identity(TOK_F12_DOMINO)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⌹");
+   init_function_group(subfunction_infos, count, u8"⌹");
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -134,7 +134,7 @@ const ShapeItem cols = B->get_shape_item(1);
    if (cols > rows)
       {
         MORE_ERROR() <<
-        "⌹B : B is under-specified (B has more columns than rows)";
+        u8"⌹B : B is under-specified (B has more columns than rows)";
         LENGTH_ERROR;
       }
 
@@ -197,7 +197,7 @@ double EPS = Workspace::get_CT();
 
    if (algo == ALGO_BAD)   // none of the above
       {
-        MORE_ERROR() << "⌹[X]B: Invalid algorithm X";
+        MORE_ERROR() << u8"⌹[X]B: Invalid algorithm X";
         DOMAIN_ERROR;
       }
 
@@ -298,7 +298,7 @@ const APL_Integer X0 = X->get_sole_integer();
         case 20: return Token(TOK_APL_VALUE1, integral(A.get(), *B));
       }
 
-   MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
+   MORE_ERROR() << u8"A ⌹[X] B: invalid function number X (=" << X0 << ").";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -347,13 +347,13 @@ Shape shape_Z;   // ⍴Z ←→ (¯1↓⍴A), (1↓⍴B)
    if (rows_B < cols_B)
       {
         MORE_ERROR() <<
-        "A⌹B : B is under-specified (B has more columns than rows)";
+        u8"A⌹B : B is under-specified (B has more columns than rows)";
         LENGTH_ERROR;
        }
 
    if (rows_A != rows_B)
       {
-        MORE_ERROR() << "A÷B : number of rows in A ≠ number of rows in B";
+        MORE_ERROR() << u8"A÷B : number of rows in A ≠ number of rows in B";
         LENGTH_ERROR;
       }
 
@@ -369,11 +369,11 @@ const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
    if (rank < cols_B)
       {
         const char * type = need_complex ? "complex" : "real";
-        MORE_ERROR() << "A⌹B : linearly dependent (" << type << ") B?"
-                        " ⍴B is " << rows_A << " " << cols_B
+        MORE_ERROR() << u8"A⌹B : linearly dependent (" << type << ") B?"
+                        u8" ⍴B is " << rows_A << " " << cols_B
                      << ", but the estimated rank is " << rank << ".\n"
                      << "      NOTE that the estimated rank "
-                        "is controlled by ⎕CT.";
+                        u8"is controlled by ⎕CT.";
         DOMAIN_ERROR;
       }
 
@@ -421,14 +421,14 @@ const char * Z = "";   // result
         case 12: Z = "       Zpoly";   break;   // 
       }
 
-const char * A = "←   ";   // left arg
+const char * A = u8"←   ";   // left arg
 
-   if (axis >= 8 && axis <= 10)   A = "← A ";   // dyadic
+   if (axis >= 8 && axis <= 10)   A = u8"← A ";   // dyadic
 
-   out << Z << "   " << A << "⌹[" << setw(2) << axis << "] B   ⍝ "
+   out << Z << "   " << A << u8"⌹[" << setw(2) << axis << u8"] B   ⍝ "
        << info.comment_fun << endl;
    if (axis == 10)
-   out << Z << A << "LO ⌹[" << setw(2) << axis << "] B   ⍝ "
+   out << Z << A << u8"LO ⌹[" << setw(2) << axis << u8"] B   ⍝ "
        << "dito with optional monomial order LO" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -438,8 +438,8 @@ Bif_F12_DOMINO::print_map_syntax(ostream & out,
 {
 const char * name = info.function_name;
 const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
-   out << "    ⌹[" << setw(2) << info.axis << "]  ←→  ⌹['" << name << "']"
-       << blanks << "  ←→  ⌹." << name << endl;
+   out << u8"    ⌹[" << setw(2) << info.axis << u8"]  ←→  ⌹['" << name << "']"
+       << blanks << u8"  ←→  ⌹." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 /// print debug infos for \b this real matrix
@@ -840,15 +840,15 @@ mCOL1.debug("[8] COL1");
 mQi.debug("[11] QI");
 mS .debug("[11] S");
 
-mQ.debug("[12] Q before Q←Q+.×QI");
+mQ.debug(u8"[12] Q before Q←Q+.×QI");
    // [12]   Q←Q+.×QI ◊ Debug 'Q'
 
    // use mT as temporary buffer for mB, so that init_inner_product() works
    mT.resize(mQ.M, mQ.N);   mT = mQ;
 
-mT.debug("[12] T←Q before Q←Q+.×QI");
+mT.debug(u8"[12] T←Q before Q←Q+.×QI");
    mQ.init_inner_product(mT, mQi);
-mQ.debug("[12] Q after Q←Q+.×QI");
+mQ.debug(u8"[12] Q after Q←Q+.×QI");
 
    // since we are only interested in Q we can skip the final B←1 1↓S+.×B
    //
@@ -922,7 +922,7 @@ UCS_string_vector vars;
               const Value & x = *cell.get_pointer_value();
               if (!x.is_char_array())
                  {
-                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
+                    MORE_ERROR() << u8"A ⌹.print_poly B: Bad variable name A["
                                  << a << "]";
                     DOMAIN_ERROR;
                  }
@@ -939,7 +939,7 @@ UCS_string
 Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
                                  const Value & B)
 {
-const UTF8_string expo_digits_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
+const UTF8_string expo_digits_utf(u8"⁰¹²³⁴⁵⁶⁷⁸⁹");
 const UCS_string expo_digits(expo_digits_utf);
 
 const sRank rank_B = B.get_rank();
@@ -966,7 +966,7 @@ int term = 0;
            {
              if (subsequent_term && b)   poly << " - ";
              else if (subsequent_term)   poly << " - 1";
-             else if (b == 0)            poly << "¨1";
+             else if (b == 0)            poly << u8"¨1";
              else                        poly << "-";
            }
         else if (coeff.is_integer_cell())   // integer coefficient
@@ -975,7 +975,7 @@ int term = 0;
              if (value < 0)
                 {
                   if (subsequent_term)   poly << " - " << - value;
-                  else                   poly << "¯"   << - value;
+                  else                   poly << u8"¯"   << - value;
                 }
              else
                 {
@@ -989,7 +989,7 @@ int term = 0;
              if (value < 0)
                 {
                    if (subsequent_term)   poly << " - " << - value;
-                   else                   poly << "¯"   << - value;
+                   else                   poly << u8"¯"   << - value;
                 }
              else
                 {
@@ -1006,19 +1006,19 @@ int term = 0;
                   if (subsequent_term)
                      poly << " - " << (-c_real) << (-c_imag);
                   else
-                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
+                     poly << u8"¯" << (-c_real) << u8"J¯" << (-c_imag);
                 }
              else if (c_real < 0)   // and c_imag > 0
                 {
                   if (subsequent_term)
                      poly << " - " << (-c_real) << "J" << c_imag;
                   else
-                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
+                     poly << u8"¯" << (-c_real) << u8"J¯" << (-c_imag);
                 }
              else if (c_imag < 0)   // and c_real > 0
                {
                   if (subsequent_term)   poly << " + ";
-                  poly << c_real << "J¯" << (-c_imag);
+                  poly << c_real << u8"J¯" << (-c_imag);
                }
              else   // both positive
                 {
@@ -1028,7 +1028,7 @@ int term = 0;
            }
         else
            {
-             MORE_ERROR() << "A ⌹.poly_print B: non-numeric coefficient in B";
+             MORE_ERROR() << u8"A ⌹.poly_print B: non-numeric coefficient in B";
              DOMAIN_ERROR;
            }
 
@@ -1419,8 +1419,8 @@ const int rank = A.get_rank();
    if (rank != sRank(B.get_rank()))
       {
         const char * sub_fun = order_A ? "poly_divideNO" : "poly_divideN";
-        MORE_ERROR() << "A ⌹." << sub_fun << " B: ⍴⍴A="
-                     << rank << " (= number of indeterminants in A; ⍴⍴B="
+        MORE_ERROR() << u8"A ⌹." << sub_fun << u8" B: ⍴⍴A="
+                     << rank << u8" (= number of indeterminants in A; ⍴⍴B="
                      << B.get_rank() << " (= number of\n"
                         "    indeterminants in B. Omitted indeterminants "
                         "count.";
@@ -1509,7 +1509,7 @@ Bif_F12_DOMINO::poly_quotient_N(const Value & A, const Value & B)
 
    if (A.get_shape_item(0) != 2)
       {
-        MORE_ERROR() << "A ⌹.poly_divideNO B: ↑⍴A must be 2 (polynomial "
+        MORE_ERROR() << u8"A ⌹.poly_divideNO B: ↑⍴A must be 2 (polynomial "
                         "A[1;...] and\nmonomial order A[2;...])";
         LENGTH_ERROR;
       }
@@ -1523,8 +1523,8 @@ Value_P order_A(shape_A, LOC);  // A[2;...]
      const Cell & order0 = A.get_cravel(len);
      if (!order0.is_near_zero())
         {
-          MORE_ERROR() << "A ⌹.poly_divideNO B: the order value ("
-                       << order0 << ") of the constant term is ≠ 0.";
+          MORE_ERROR() << u8"A ⌹.poly_divideNO B: the order value ("
+                       << order0 << u8") of the constant term is ≠ 0.";
           DOMAIN_ERROR;
         }
 
@@ -1546,8 +1546,8 @@ Value_P order_B(shape_B, LOC);  // B[2;...]
      const Cell & order0 = B.get_cravel(len);
      if (!order0.is_near_zero())
         {
-          MORE_ERROR() << "B ⌹.poly_divideNO B: the order value ("
-                       << order0 << ") of the constant term is ≠ 0.";
+          MORE_ERROR() << u8"B ⌹.poly_divideNO B: the order value ("
+                       << order0 << u8") of the constant term is ≠ 0.";
           DOMAIN_ERROR;
         }
 
@@ -1609,7 +1609,7 @@ UCS_string_vector vars;
               const Value & x = *cell.get_pointer_value();
               if (!x.is_char_array())
                  {
-                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
+                    MORE_ERROR() << u8"A ⌹.print_poly B: Bad variable name A["
                                  << a << "]";
                     DOMAIN_ERROR;
                  }
@@ -1703,7 +1703,7 @@ Monomial T;
          const Monomial & term = terms[t1];
 
          UCS_string & more = MORE_ERROR();
-         more << "⌹[11] B: duplicate term: ";
+         more << u8"⌹[11] B: duplicate term: ";
          loop(var, term.expos.size())
              {
                if (const int expo = term.expos[var])
@@ -1831,7 +1831,7 @@ PipeReader reader;
 
    if (!reader)
       {
-        MORE_ERROR() << "A ⌹.poly_quotient2 B: Could not start python.";
+        MORE_ERROR() << u8"A ⌹.poly_quotient2 B: Could not start python.";
         DOMAIN_ERROR;
       }
 
@@ -1889,8 +1889,8 @@ PythonPipe p(script);
      // a successfully started python script should print the following
      // messages when started.
      //
-     const char * start_up[] = { "<→WRAPPER-STARTED→>.",
-                                 "<→MODULES-IMPORTED→>."
+     const char * start_up[] = { u8"<→WRAPPER-STARTED→>.",
+                                 u8"<→MODULES-IMPORTED→>."
                                };
      loop(m, sizeof(start_up) / sizeof(const char *))
          {
@@ -1913,7 +1913,7 @@ PythonPipe p(script);
 
    UCS_string BB(B);
    p.write(UCS_string(B));
-   const UTF8_string DONE_utf("<→DONE→>.");
+   const UTF8_string DONE_utf(u8"<→DONE→>.");
    const UCS_string DONE(DONE_utf);
 
 UCS_string_vector result;

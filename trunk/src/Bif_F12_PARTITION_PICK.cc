@@ -160,7 +160,7 @@ const ShapeItem len_A = A->element_count();
    //
    if (len_A != 1 && len_A != B->get_shape_item(axis))
       {
-        MORE_ERROR() << "In A ⊂ B: partition length ⍴A is " << len_A
+        MORE_ERROR() << u8"In A ⊂ B: partition length ⍴A is " << len_A
                      << ", which does not match the B axis length "
                      << B->get_shape_item(axis);
         LENGTH_ERROR;
@@ -411,7 +411,7 @@ AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
           const ShapeItem ax = sh_X.get_shape_item(x);
           if (axes_X & 1 << ax)
              {
-               MORE_ERROR() << "⊃[X]B: duplicated axis "
+               MORE_ERROR() << u8"⊃[X]B: duplicated axis "
                             << (ax + Workspace::get_IO())
                             << " in X";
                 AXIS_ERROR;
@@ -439,11 +439,11 @@ Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
 
    if (perm_cB.get_rank() != cB->get_rank())
       {
-        MORE_ERROR() << "⊃[X] B: the number of disclosed axes ("
+        MORE_ERROR() << u8"⊃[X] B: the number of disclosed axes ("
                      << perm_cB.get_rank()
                      << ") in X does not match the number of\n"
                         " axes (" << cB->get_rank() << ") in B. That is, "
-                        "⍴⍴X ≠ ⌈/∈⍴¨⍴¨⍴¨B";
+                        u8"⍴⍴X ≠ ⌈/∈⍴¨⍴¨⍴¨B";
         RANK_ERROR;
       }
 
@@ -650,7 +650,7 @@ const Cell & cA = A0[idx_A];
            {
              if (!A.is_char_string())
                 {
-                  MORE_ERROR() << "member name expected for A⊃B (nested A["
+                  MORE_ERROR() << u8"member name expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   DOMAIN_ERROR;
                 }
@@ -667,7 +667,7 @@ const Cell & cA = A0[idx_A];
            {
              if (A.get_rank() > 1)
                 {
-                  MORE_ERROR() << "rank A ≤ 1 expected for A⊃B (nested A["
+                  MORE_ERROR() << u8"rank A ≤ 1 expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   RANK_ERROR;
                 }
@@ -675,9 +675,9 @@ const Cell & cA = A0[idx_A];
              const ShapeItem len_A = A.element_count();
              if (B->get_rank() != len_A)
                 {
-                  MORE_ERROR() << "⍴⍴B (" << B->get_rank()
-                               << ") = ⍴,A (" << len_A
-                               << ") expected for A⊃B (nested A["
+                  MORE_ERROR() << u8"⍴⍴B (" << B->get_rank()
+                               << u8") = ⍴,A (" << len_A
+                               << u8") expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   RANK_ERROR;
                 }
@@ -700,8 +700,8 @@ const Cell & cA = A0[idx_A];
       {
         if (B->get_rank() != 1)
            {
-             MORE_ERROR() << "⍴⍴B (" << B->get_rank()
-                          << ") = 1 expected for A⊃B (with scalar A)";
+             MORE_ERROR() << u8"⍴⍴B (" << B->get_rank()
+                          << u8") = 1 expected for A⊃B (with scalar A)";
              RANK_ERROR;
            }
         const APL_Integer a = cA.get_near_int() - qio;

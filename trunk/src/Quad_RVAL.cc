@@ -38,7 +38,7 @@ size_t      Quad_RVAL::N = 256;
 const FunctionGroup::function_info Quad_RVAL::subfunction_infos[] =
 {
 #define rvaldef(N, fun, comm_2) { N, #fun, "", comm_2, -1 },
-  rvaldef(0, state, "get (B=⍬) or set (B≠⍬) the random number generator state" )
+  rvaldef(0, state, u8"get (B=⍬) or set (B≠⍬) the random number generator state" )
   rvaldef(1, rank,  "set the rank of subsequently returned random values"      )
   rvaldef(2, shape, "set the shape of subsequently returned random values"      )
   rvaldef(3, type,  "set the data type of subsequently returned random values" )
@@ -54,7 +54,7 @@ Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, "⎕RVAL");
+   init_function_group(subfunction_infos, count, u8"⎕RVAL");
 
    N = 8;
    desired_maxdepth = 4;
@@ -92,7 +92,7 @@ Quad_RVAL::eval_B(Value_P B) const
    if (B->is_empty())   DOMAIN_ERROR;
    if (B->get_rank() > 1)
       {
-        MORE_ERROR() << "⎕RVAL B: rank of B must be ≤ 1.";
+        MORE_ERROR() << u8"⎕RVAL B: rank of B must be ≤ 1.";
         RANK_ERROR;
       }
 
@@ -108,7 +108,7 @@ Quad_RVAL::eval_XB(Value_P X, Value_P B) const
 void Quad_RVAL::print_fun_syntax(ostream & out,
                                  const function_info & info) const
 {
-   out << "    ⎕RVAL[" << info.axis << "] B   ⍝ " << info.comment_fun << endl;
+   out << u8"    ⎕RVAL[" << info.axis << u8"] B   ⍝ " << info.comment_fun << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void Quad_RVAL::print_map_syntax(ostream & out,
@@ -117,8 +117,8 @@ void Quad_RVAL::print_map_syntax(ostream & out,
 const char * name = info.function_name;
 const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
-   out << "   ⎕RVAL[" << info.axis << "]  ←→  ⎕RVAL['" << name << "']"
-       << blanks << "  ←→  ⎕RVAL." << name << endl;
+   out << u8"   ⎕RVAL[" << info.axis << u8"]  ←→  ⎕RVAL['" << name << "']"
+       << blanks << u8"  ←→  ⎕RVAL." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P
@@ -128,7 +128,7 @@ ShapeItem len_B = B.element_count();
 
    if (len_B > 4)
       {
-        MORE_ERROR() << "monadic ⎕RVAL B expects at most 4 properties B←"
+        MORE_ERROR() << u8"monadic ⎕RVAL B expects at most 4 properties B←"
                         "(rank, (shape), (type), and maxdepth)";
         LENGTH_ERROR;
       }
@@ -178,7 +178,7 @@ bool need_restore = false;
             {
               if (!B.get_cravel(2).is_pointer_cell())
                  {
-                   MORE_ERROR() << "⎕RVAL B: B[2] (type distribution) must be "
+                   MORE_ERROR() << u8"⎕RVAL B: B[2] (type distribution) must be "
                                    "an enclosed vector";
                    DOMAIN_ERROR;
                  }
@@ -220,7 +220,7 @@ bool need_restore = false;
 
    Log(LOG_Quad_RVAL)
       {
-        CERR << "⎕RVAL B:" << endl << "desired_ranks:   ";
+        CERR << u8"⎕RVAL B:" << endl << "desired_ranks:   ";
         loop(r, desired_ranks.size())   CERR << " " << desired_ranks[r];
         CERR << endl << "desired_shape:    " << desired_shape << endl;
         CERR << "desired_types:   ";
@@ -351,7 +351,7 @@ const ShapeItem new_N = B.element_count();
    if (new_N !=   0 && new_N !=   8 && new_N !=  16 &&
        new_N !=  32 && new_N !=  64 && new_N != 128 && new_N != 256)
       {
-        MORE_ERROR() << "bad new_N (aka. ⍴B) in generator_state()";
+        MORE_ERROR() << u8"bad new_N (aka. ⍴B) in generator_state()";
         LENGTH_ERROR;
       }
 
@@ -370,7 +370,7 @@ Value_P Z(N, LOC);
               const APL_Integer byte = B.get_cravel(b).get_int_value();
               if ((byte < -256) || (byte >  255))
                  {
-                   MORE_ERROR() << "Bad right argument B in 0 ⎕RVAL B,"
+                   MORE_ERROR() << u8"Bad right argument B in 0 ⎕RVAL B,"
                                    "expecting bytes (integers -256...255)";
                    DOMAIN_ERROR;
                  }
@@ -513,8 +513,8 @@ Value_P Z(desired_ranks.size(), LOC);
 
         if ((rk < -MAX_RANK) || (rk > MAX_RANK))
            {
-             MORE_ERROR() << "a scalar right argument B of 1 ⎕RVAL B should "
-                             "be an integer from ¯" << MAX_RANK << " to "
+             MORE_ERROR() << u8"a scalar right argument B of 1 ⎕RVAL B should "
+                             u8"be an integer from ¯" << MAX_RANK << " to "
                           << MAX_RANK;
              DOMAIN_ERROR;
            }
@@ -530,8 +530,8 @@ Value_P Z(desired_ranks.size(), LOC);
               const int rank_b = B.get_cravel(b).get_int_value();
               if (rank_b < 0)
                  {
-                   MORE_ERROR() << "a vector right argument B of 1 ⎕RVAL B "
-                              "should be a distribution (integers ≥ 0)";
+                   MORE_ERROR() << u8"a vector right argument B of 1 ⎕RVAL B "
+                              u8"should be a distribution (integers ≥ 0)";
                    DOMAIN_ERROR;
                  }
               new_ranks.push_back(rank_b);
@@ -609,7 +609,7 @@ Quad_RVAL::result_type(const Value & B)
 
    if (!B.is_vector())
       {
-        MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
+        MORE_ERROR() << u8"the right argument B of 3 ⎕RVAL B "
         "should be a vector of up to 5 integers (the\nrelative "
         "probabilities for types CHAR INT REAL COMPLEX or NESTED respectively)";
           RANK_ERROR;
@@ -618,7 +618,7 @@ Quad_RVAL::result_type(const Value & B)
 const ShapeItem len_B = B.element_count();
    if (len_B > 5)
       {
-        MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
+        MORE_ERROR() << u8"the right argument B of 3 ⎕RVAL B "
         "should be a vector of up to 5 integers (the\nrelative "
         "probabilities for types CHAR INT REAL COMPLEX or NESTED respectively)";
           LENGTH_ERROR;
@@ -639,8 +639,8 @@ Value_P Z(desired_types.size(), LOC);
               const int type_b = B.get_cravel(b).get_int_value();
               if (type_b < 0)
                  {
-                   MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
-                   "should be a distribution (vector of integers ≥ 0)";
+                   MORE_ERROR() << u8"the right argument B of 3 ⎕RVAL B "
+                   u8"should be a distribution (vector of integers ≥ 0)";
                    DOMAIN_ERROR;
                  }
               if (type_b && b < 4)   B_has_simple = true;
@@ -652,7 +652,7 @@ Value_P Z(desired_types.size(), LOC);
         //
         if (!B_has_simple)
            {
-             MORE_ERROR() << "the right argument B of 3 ⎕RVAL B should contain "
+             MORE_ERROR() << u8"the right argument B of 3 ⎕RVAL B should contain "
                    "at least one simple type with a non-zero probability";
              DOMAIN_ERROR;
            }

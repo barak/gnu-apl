@@ -686,7 +686,7 @@ vector<conditional> conditionals;
             {
               case TOK_IF_THEN:   // →→ (always allowed).
                    Log(LOG_IfElse)
-                      CERR << "SEE →→ (then)  at [" << pc << "]" << endl;
+                      CERR << u8"SEE →→ (then)  at [" << pc << "]" << endl;
           
                    {
                      const conditional cond(pc);
@@ -705,12 +705,12 @@ vector<conditional> conditionals;
               case TOK_IF_ELSE:   // ←→
                    Log(LOG_IfElse)
                       {
-                        CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+                        CERR << u8"SEE ←→ (else)  at [PC=" << pc << "]" << endl;
                       }
           
                    if (conditionals.size() == 0)
                       {
-                        cause = "←→ without →→ (aka. ELSE without IF)";
+                        cause = u8"←→ without →→ (aka. ELSE without IF)";
                         cause_line = get_line(pc);
                         cause_PC.low = pc;
                         goto error;
@@ -718,7 +718,7 @@ vector<conditional> conditionals;
 
                    if (conditionals.back().if_ELSE >= 0)
                       {
-                        cause = "duplicate ←→ (aka. duplicate ELSE)";
+                        cause = u8"duplicate ←→ (aka. duplicate ELSE)";
                         cause_line = get_line(pc);
                         cause_PC.low = conditionals.back().if_ELSE;
                         cause_PC.high = pc;
@@ -739,12 +739,12 @@ vector<conditional> conditionals;
               case TOK_IF_END:    // ←←
                    Log(LOG_IfElse)
                       {
-                        CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+                        CERR << u8"SEE ←← (endif) at [" << pc << "]" << endl;
                       }
           
                    if (conditionals.size() == 0)
                       {
-                        cause = "←← without →→ (aka. ENDIF without IF)";
+                        cause = u8"←← without →→ (aka. ENDIF without IF)";
                         cause_line = get_line(pc);
                         cause_PC.low = pc;
                         goto error;
@@ -755,14 +755,14 @@ vector<conditional> conditionals;
                     
                      Log(LOG_IfElse)
                        CERR << "cond[" << conditionals.size() << "]:"
-                               "\n ├── then:  " << cond.if_THEN
-                            << "\n ├── else:  " << cond.if_ELSE
-                            << "\n └── endif: " << pc
+                               u8"\n ├── then:  " << cond.if_THEN
+                            << u8"\n ├── else:  " << cond.if_ELSE
+                            << u8"\n └── endif: " << pc
                             << endl;
           
                      if (cond.if_ELSE == (cond.if_THEN + 1))   // empty THEN
                         {
-                          cause = "empty →→ ... ←→ (aka. empty THEN)";
+                          cause = u8"empty →→ ... ←→ (aka. empty THEN)";
                           cause_line = get_line(pc);
                           cause_PC.low = pc - 1;
                           cause_PC.high = pc;
@@ -771,7 +771,7 @@ vector<conditional> conditionals;
           
                      if (pc == (cond.if_ELSE + 1))   // empty ELSE
                         {
-                          cause = "empty ←→ ... ←← (aka. empty ELSE)";
+                          cause = u8"empty ←→ ... ←← (aka. empty ELSE)";
                           cause_line = get_line(pc);
                           cause_PC.low = pc - 1;
                           cause_PC.low = pc - 1;
@@ -817,7 +817,7 @@ vector<conditional> conditionals;
    //
    if (conditionals.size())
       {
-        cause = "→→ without ←← (aka. IF without ENDIF)";
+        cause = u8"→→ without ←← (aka. IF without ENDIF)";
         cause_line = get_line(conditionals.back().if_THEN);
         cause_PC.low = conditionals.back().if_THEN;
         goto error;
@@ -1080,19 +1080,19 @@ ShapeItem insertion_point = b;
               case TOK_ALPHA_U: if (!level)   signature |= SIG_LO;        break;
 
               case TOK_DIAMOND:
-                   MORE_ERROR() << "◊ is not allowed in λ expression ";
+                   MORE_ERROR() << u8"◊ is not allowed in λ expression ";
                    DEFN_ERROR;
 
               case TOK_BRANCH:
-                   MORE_ERROR() << "→ is not allowed in λ expression ";
+                   MORE_ERROR() << u8"→ is not allowed in λ expression ";
                    DEFN_ERROR;
 
               case TOK_ESCAPE:
               case TOK_IF_THEN:
               case TOK_IF_ELSE:
               case TOK_IF_END:
-                   MORE_ERROR() << "conditionals (i.e. ←←, ←→, or →→)"
-                                   " are not allowed in λ expressions";
+                   MORE_ERROR() << u8"conditionals (i.e. ←←, ←→, or →→)"
+                                   u8" are not allowed in λ expressions";
                    DEFN_ERROR;
 
               case TOK_L_CURLY: ++level;   break;
@@ -1437,7 +1437,7 @@ const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
 UserFunction * ufun = new UserFunction(signature, lambda_num,
                                        lambda_text, lambda_body, local_vars);
 
-   ufun->increment_refcount(LOC, "λ" );
+   ufun->increment_refcount(LOC, u8"λ" );
 
    // put a token for the lambda at the place where the { was.
    // That replaces, for example, (in forward notation):
@@ -1584,7 +1584,7 @@ StatementList * fun = new StatementList(data, loc);
                        }
                     else if (uni == UNI_COMMENT)
                       {
-                        MORE_ERROR() << "Invalid comment (⍝) in { ... }";
+                        MORE_ERROR() << u8"Invalid comment (⍝) in { ... }";
                       }
                     else if (uni == UNI_NUMBER_SIGN)
                       {

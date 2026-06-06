@@ -178,7 +178,7 @@ ostream &
 operator << (ostream & out, const Token_string & tos)
 {
    out << "[" << tos.size() << " token]: ";
-   loop(t, tos.size())   CERR << "⏩" << tos[t] << "  ";
+   loop(t, tos.size())   CERR << u8"⏩" << tos[t] << "  ";
    out << endl;
    return out << endl;
 }
@@ -193,7 +193,7 @@ const bool VAL = details & 2;
        {
          const Token & tok = at(pc);
          if (PC)   out << "    [PC=" << setw(2) << pc << "] ";
-         out << "⏩" << tok;
+         out << u8"⏩" << tok;
          if (VAL)
             {
               switch(tok.get_ValueType())

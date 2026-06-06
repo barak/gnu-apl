@@ -200,7 +200,7 @@ const string driver_attr = w_props->get_gui_driver();
    else if (driver_attr == "ASCII")   driver = PltDrv_ASCII;
    else
            {
-             MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver '"
+             MORE_ERROR() << u8"A ⎕PLOT B: invalid gui_driver '"
                           << driver_attr.c_str() << "'";
              DOMAIN_ERROR;
            }
@@ -219,7 +219,7 @@ const string driver_attr = w_props->get_gui_driver();
         return;
 #else   // not apl_GTK3
 
-   MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK requested, "
+   MORE_ERROR() << u8"A ⎕PLOT B: gui_driver=GTK requested, "
                    "but GTK was not completely installed.\n"
                    "Missing: " MISSING_X11 MISSING_GTK;
    DOMAIN_ERROR;
@@ -239,7 +239,7 @@ const string driver_attr = w_props->get_gui_driver();
         Log(LOG_Quad_PLOT)   CERR << "Plot driver XCB loaded." << endl;
         return;
 #else   // not apl_XCB
-   MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB requested, "
+   MORE_ERROR() << u8"A ⎕PLOT B: gui_driver=XCB requested, "
                    "but XCB was not completely installed.\n"
                    "Missing: " MISSING_X11 MISSING_XCB;
    DOMAIN_ERROR;
@@ -292,7 +292,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    if (w_props->get_gui_driver() == "GTK")    // GTK requested
       {
 #if not apl_GTK3
-        MORE_ERROR() << "A ⎕PLOT B: gui_driver=GTK, but GTK was "
+        MORE_ERROR() << u8"A ⎕PLOT B: gui_driver=GTK, but GTK was "
                         "not (completely) installed.\nMissing:"
                         MISSING_X11 MISSING_GTK;
         DOMAIN_ERROR;
@@ -301,7 +301,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    else if (w_props->get_gui_driver() == "XCB")    // XCB requested
       {
 #if not apl_XCB
-        MORE_ERROR() << "A ⎕PLOT B: gui_driver=XCB, but XCB was "
+        MORE_ERROR() << u8"A ⎕PLOT B: gui_driver=XCB, but XCB was "
                         "not (completely) installed.\nMissing:"
                         MISSING_X11 MISSING_XCB;
         DOMAIN_ERROR;
@@ -315,7 +315,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
       }
    else
       {
-        MORE_ERROR() << "A ⎕PLOT B: invalid gui_driver "
+        MORE_ERROR() << u8"A ⎕PLOT B: invalid gui_driver "
                      << w_props->get_gui_driver().c_str();
         DOMAIN_ERROR;
       }
@@ -380,21 +380,21 @@ Quad_PLOT::window_control(APL_Integer B0) const
    if (B0 == 0)                 // reset plot verbosity
       {
         verbosity = 0;
-        CERR << "⎕PLOT verbosity turned off" << endl;
+        CERR << u8"⎕PLOT verbosity turned off" << endl;
         return Idx0(LOC);
       }
 
    if (B0 == -1)                // enable SHOW_EVENTS
       {
         verbosity |= SHOW_EVENTS;
-        CERR << "⎕PLOT will show X events " << endl;
+        CERR << u8"⎕PLOT will show X events " << endl;
         return Idx0(LOC);
       }
 
    if (B0 == -2)                // enable SHOW_DATA
       {
         verbosity |= SHOW_DATA;
-        CERR << "⎕PLOT will  show APL data (and debug infos)" << endl;
+        CERR << u8"⎕PLOT will  show APL data (and debug infos)" << endl;
         return Idx0(LOC);
       }
 
@@ -416,7 +416,7 @@ Quad_PLOT::window_control(APL_Integer B0) const
     if (B0 == -4)                // enable SHOW_DRAW
        {
          verbosity |= SHOW_DRAW;
-         CERR << "⎕PLOT will  show rendering details " << endl;
+         CERR << u8"⎕PLOT will  show rendering details " << endl;
          return Idx0(LOC);
        }
 
@@ -478,24 +478,24 @@ Quad_PLOT::help()
 {
    CERR <<
 "\n"
-"   ⎕PLOT Usage:\n"
+u8"   ⎕PLOT Usage:\n"
 "\n"
-"   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values\n"
-"   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions\n"
-"   A ⎕PLOT B   plot B with attribute overrides specified by A\n"
-"           ├────────  0: verbosity OFF\n"
-"           ├──────── ¯1: show X events\n"
-"           ├──────── ¯2: show data\n"
-"           ├──────── ¯3: close all ⎕PLOT windows\n"
-"           ├──────── ¯4: show rendering\n"
-"           ├──────── ¯6: show open ⎕PLOT windows\n"
-"           └───── N > 0: close ⎕PLOT window N\n"
+u8"   ⎕PLOT B     with ⍴⍴B > 0: plot B with default attribute values\n"
+u8"   ⎕PLOT B     with integer scalar B: special ⎕PLOT functions\n"
+u8"   A ⎕PLOT B   plot B with attribute overrides specified by A\n"
+u8"           ├────────  0: verbosity OFF\n"
+u8"           ├──────── ¯1: show X events\n"
+u8"           ├──────── ¯2: show data\n"
+u8"           ├──────── ¯3: close all ⎕PLOT windows\n"
+u8"           ├──────── ¯4: show rendering\n"
+u8"           ├──────── ¯6: show open ⎕PLOT windows\n"
+u8"           └───── N > 0: close ⎕PLOT window N\n"
 "\n"
 "   A is a nested vector of strings.\n"
 "   Each string A[i] has the form \"Attribute: Value\"\n"
 "   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)\n"
 "\n"
-"   The attributes understood by ⎕PLOT and their default values are:\n"
+u8"   The attributes understood by ⎕PLOT and their default values are:\n"
 "\n"
 "   1. Global (plot window) Attributes:\n"
 "\n";
@@ -536,18 +536,18 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
    //
    if (w_props->get_min_X() >= w_props->get_max_X())
       {
-        MORE_ERROR() << "A ⎕PLOT B: empty X range in A.";
+        MORE_ERROR() << u8"A ⎕PLOT B: empty X range in A.";
         DOMAIN_ERROR;
       }
    if (w_props->get_min_Y() >= w_props->get_max_Y())
       {
-        MORE_ERROR() << "A ⎕PLOT B: empty Y range in A.";
+        MORE_ERROR() << u8"A ⎕PLOT B: empty Y range in A.";
         DOMAIN_ERROR;
       }
 
    if (w_props->get_min_Z() >= w_props->get_max_Z())
       {
-        MORE_ERROR() << "A ⎕PLOT B: eZ range in A.";
+        MORE_ERROR() << u8"A ⎕PLOT B: eZ range in A.";
         DOMAIN_ERROR;
       }
 
@@ -892,7 +892,7 @@ Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
                                                  ->get_UCS_ravel();
                    if (const char * error = w_props->set_attribute(ucs, att_val))
                       {
-                        MORE_ERROR() << "A ⎕PLOT B: " << error
+                        MORE_ERROR() << u8"A ⎕PLOT B: " << error
                                      << " in attribute A." << ucs;
                         return E_DOMAIN_ERROR;
                       }
@@ -916,7 +916,7 @@ const APL_Integer qio = Workspace::get_IO();
          if (!cell_A.is_pointer_cell())
             {
                MORE_ERROR() << "A[" << (a + qio)
-                            << "] is not a string in A ⎕PLOT B";
+                            << u8"] is not a string in A ⎕PLOT B";
                return E_DOMAIN_ERROR;
             }
 
@@ -924,7 +924,7 @@ const APL_Integer qio = Workspace::get_IO();
          if (!attr->is_char_string())
             {
                MORE_ERROR() << "A[" << (a + qio)
-                            << "] is not a string in A ⎕PLOT B";
+                            << u8"] is not a string in A ⎕PLOT B";
                return E_DOMAIN_ERROR;
             }
 
@@ -935,7 +935,7 @@ const APL_Integer qio = Workspace::get_IO();
          UTF8_string utf(ucs);
          if (const char * error = w_props->set_attribute(utf.c_str()))
             {
-              MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
+              MORE_ERROR() << error << u8" in ⎕PLOT attribute '" << ucs << "'";
               return E_DOMAIN_ERROR;
             }
        }

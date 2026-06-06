@@ -290,7 +290,7 @@ print_matrix("  QUTM before invert_QUTM()", QUTM);
          const T diag = QUTM.diag(row);
          if (diag == 0.0)
             {
-              MORE_ERROR() << "⌹[X]B: 0 on the main diagonal of R";
+              MORE_ERROR() << u8"⌹[X]B: 0 on the main diagonal of R";
               DOMAIN_ERROR;
             }
 
@@ -426,7 +426,7 @@ const Crow M = A.get_row_count();
         //
         A.diag(k) = T(1.0);          // set ⍺ to 1.0
         fMatrix<T> SUB = A.sub_matrix(k, s_X);
-        larf<T>(&A.diag(k), conjugated(ptvvy.tau[k]), SUB, ptvvy.y);
+        larf<T>(&A.diag(k), ptvvy.tau[k], SUB, ptvvy.y);
 
         /*
            Update the entire column k of A as follows:
@@ -969,7 +969,7 @@ PTVVy<T> ptvvy(max(NRHS, N), true);
 #if LA_DEBUG
 DebugMatrix B_before("B_before laqp2()", B);
    laqp2<T>(B, ptvvy);
-   print_QR("Q∘R after laqp2() at " LOC, B_before, B, ptvvy);
+   print_QR(u8"Q∘R after laqp2() at " LOC, B_before, B, ptvvy);
 #else
    laqp2<T>(B, ptvvy);
 #endif
@@ -1433,7 +1433,7 @@ const APL_Float abs_SEST  = abs(SEST);
         return;
       }
 
-   if (abs_GAMMA <= dlamch_E * abs_SEST)
+   if (abs_GAMMA <= dlamch_E * abs_ALPHA)
       {
         SIN = T(0.0);   // 0°
         COS = T(1.0);   // 0°

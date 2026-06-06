@@ -330,7 +330,7 @@ Svar_DB::DB_tcp_error(const char * op, int got, int expected)
    //
    if (op)
       {
-        get_CERR() << "⋆⋆⋆ " << op << " failed: got " << got
+        get_CERR() << u8"⋆⋆⋆ " << op << " failed: got " << got
                    << " when expecting " << expected
                    << " (" << strerror(errno) << ")" << endl;
       }

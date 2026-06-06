@@ -541,7 +541,7 @@ const UCS_string two_lamps(U"⍝⍝");
             }
        }
 
-   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
+   if (!got_lamps)   CERR << u8"    (no ⍝⍝ or ⍝. comment lines)" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Function_PC
@@ -607,7 +607,7 @@ UserFunction::print_properties(ostream & out, int indent) const
 UCS_string ind(indent, UNI_SPACE);
    out << ind << "Body Lines:     " << (line_starts.size() - 1) << "+[0]" << endl
        << ind << "Creator:        " << get_creator()      << endl
-       << ind << "Body[" << body.ssize() << "⏩]: ";
+       << ind << "Body[" << body.ssize() << u8"⏩]: ";
 
    loop(b, body.ssize())
        {
@@ -632,7 +632,7 @@ UCS_string ind(indent, UNI_SPACE);
                  }
             }
 
-         out << " ⏩" << body[b];
+         out << u8" ⏩" << body[b];
        }
    out << endl;
 }
@@ -1212,7 +1212,7 @@ const UTF8 * start = Sys::mmap(fd, len);
         throw_apl_error(E_WS_MMAP, LOC);
       }
 
-UTF8_string utf(utf8P(start), len);
+UTF8_string utf(start, len);
 
    // skip trailing \r and \n.
    //
@@ -1309,7 +1309,7 @@ const Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
         if (old_function->is_native())
            {
              MORE_ERROR() << "Attempt to re-define native function '"
-                          << old_function->get_name() << "'. ⎕EX it first.";
+                          << old_function->get_name() << u8"'. ⎕EX it first.";
              DEFN_ERROR;
            }
 

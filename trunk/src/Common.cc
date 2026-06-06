@@ -90,7 +90,7 @@ init_modules(const char * argv0, bool log_startup)
            << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << endl
            << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << endl
            << endl
-           << "⎕WA total memory is       " << Quad_WA::total_memory
+           << u8"⎕WA total memory is       " << Quad_WA::total_memory
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
            << hex << Quad_WA::total_memory << ")" << dec                << endl
                                                                         << endl

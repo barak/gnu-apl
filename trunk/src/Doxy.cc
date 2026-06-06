@@ -207,7 +207,7 @@ Doxy::functions_table_entry(const Symbol * fun_sym, ofstream & page,
 "      <TD class=doxy_comment>";
          if (fun->is_lambda())
             {
-              page << "(named λ)"                                         CRLF;
+              page << u8"(named λ)"                                         CRLF;
             }
          else if (ufun && !fun->is_native())
             {
@@ -454,11 +454,11 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 "      <TH>Variable"                                                      CRLF
 "      <TH>L"                                                             CRLF
 "      <TH>SI"                                                            CRLF
-"      <TH>⍴⍴"                                                            CRLF
-"      <TH>⍴"                                                             CRLF
-"      <TH>≡"                                                             CRLF
+u8"      <TH>⍴⍴"                                                            CRLF
+u8"      <TH>⍴"                                                             CRLF
+u8"      <TH>≡"                                                             CRLF
 "      <TH>Type"                                                          CRLF
-"      <TH>↑ϵ"                                                            CRLF;
+u8"      <TH>↑ϵ"                                                            CRLF;
    loop(v, variables.size())
       {
         const Symbol & var_sym = *variables[v];
@@ -489,7 +489,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
                  }
               else
                  {
-                  page << "⍬"                                             CRLF;
+                  page << u8"⍬"                                             CRLF;
                  }
 
               page <<                                                     CRLF
@@ -517,7 +517,7 @@ Doxy::bold_name(ostream & of, const UserFunction * ufun) const
 const UserFunction_header & header = ufun->get_header();
 const char * bold = "<span style='font-weight: bold'>";
 
-   if (header.Z())   of << header.Z()->get_name() << "←";
+   if (header.Z())   of << header.Z()->get_name() << u8"←";
    if (header.A())   of << header.A()->get_name() << " ";
    if (header.LO())   // operator
       {
@@ -619,7 +619,7 @@ ofstream page(fun_filename.c_str());
 " </HEAD>"                                                                CRLF
 " <BODY>"                                                                 CRLF
 "  <TABLE class=h1tab><TR>"                                               CRLF
-"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
+u8"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
 "   <TD class=h1tab width=80%><H1>Function " << alias << "</H1>"          CRLF
 "   <TD class=h1tab width=10%>"                                           CRLF
 "  </TABLE><HR>"                                                          CRLF;
@@ -627,7 +627,7 @@ ofstream page(fun_filename.c_str());
    page <<
 "   <H3>Definition</H3>"                                                  CRLF
 "   <TABLE class=onefuntab><TR><TD><PRE>"                                 CRLF
-"    ∇ ";
+u8"    ∇ ";
    loop(l, ufun->get_text_size())
        {
          const UCS_string & line(ufun->get_text(l));
@@ -637,7 +637,7 @@ ofstream page(fun_filename.c_str());
          page << line.to_HTML(0, false) <<                                CRLF;
        }
    page <<
-"    ∇</PRE>"                                                             CRLF
+u8"    ∇</PRE>"                                                             CRLF
 "  </TABLE>"                                                              CRLF;
 
    set_call_graph_root(ufun);
@@ -800,7 +800,7 @@ ofstream page(fun_filename.c_str());
 " </HEAD>"                                                                CRLF
 " <BODY>"                                                                 CRLF
 "  <TABLE class=h1tab><TR>"                                               CRLF
-"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
+u8"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
 "   <TD class=h1tab width=80%><H1>Native Function " << alias << "</H1>"   CRLF
 "   <TD class=h1tab width=10%>"                                           CRLF
 "  </TABLE><HR>"                                                          CRLF
@@ -938,7 +938,7 @@ bool progress = true;
             const fcall_edge & edge = call_graph[e];
             if (edge.value == MAX)   continue;   // not reachable
 
-            out << "edge " << edge.caller->get_name() << " → "
+            out << "edge " << edge.caller->get_name() << u8" → "
                 << edge.callee->get_name()
                 << " has distance " << edge.value
                 << " from " << root_name << endl;

@@ -547,7 +547,7 @@ const ErrorCode ec = get_error_code(B);
 
    if (error.get_error_code() == E_ASSERTION_FAILED)   // B = 0 ASSERTION_FAILED
       {
-        Assert(0 && "simulated ASSERTION_FAILED in ⎕ES");
+        Assert(0 && u8"simulated ASSERTION_FAILED in ⎕ES");
       }
 
    // at this point we shall throw the error. Add some error details.
@@ -574,7 +574,7 @@ const ErrorCode ec = get_error_code(B);
    else                                   //  ⎕ES B with unknown major/minor B
       {
         char cc[58];
-        SPRINTF(cc, "Unkown error (major %d, minor %d) in ⎕ES B",
+        SPRINTF(cc, u8"Unkown error (major %d, minor %d) in ⎕ES B",
                     error.get_error_code() >> 16,
                     error.get_error_code() & 0xFFFF);
         error.set_error_line_1(cc);
@@ -710,7 +710,7 @@ Quad_EX::eval_B(Value_P B) const
          const Cell & cell = B->get_cravel(b);
          if (!cell.is_character_cell())
             {
-              MORE_ERROR() << "⎕EX B: non-character in list B "
+              MORE_ERROR() << u8"⎕EX B: non-character in list B "
                               "(of symbol names)";
               break;
             }
@@ -720,7 +720,7 @@ Quad_EX::eval_B(Value_P B) const
                Avec::is_white(uni)       ||
                (uni == UNI_FULLSTOP)))
            {
-              MORE_ERROR() << "⎕EX B: invalid character "
+              MORE_ERROR() << u8"⎕EX B: invalid character "
                            << uni << " in list B (of symbol names)";
               break;
            }
@@ -759,7 +759,7 @@ Quad_INP::eval_AB(Value_P A, Value_P B) const
 {
    if (Quad_INP_running)
       {
-        MORE_ERROR() << "⎕INP called recursively";
+        MORE_ERROR() << u8"⎕INP called recursively";
         SYNTAX_ERROR;
       }
 
@@ -838,7 +838,7 @@ Quad_INP::eval_B(Value_P B) const
 {
    if (Quad_INP_running)
       {
-        MORE_ERROR() << "⎕INP called recursively";
+        MORE_ERROR() << u8"⎕INP called recursively";
         SYNTAX_ERROR;
       }
 
@@ -1249,7 +1249,7 @@ const bool funs = requested_NCs & 1 << 6;
         names.push_back(symbol->get_name()); }
 
 #define sf_def(_x, str, _txt)                               \
-   { if (funs)   names.push_back(UCS_ASCII_string("⎕" str)); }
+   { if (funs)   names.push_back(UCS_ASCII_string(u8"⎕" str)); }
 #include "SystemVariable.def"
       }
 
@@ -1508,7 +1508,7 @@ const ShapeItem ec = B->element_count();
               continue;
             }
 
-         MORE_ERROR() << "⎕UCS got unexpected Cell type "
+         MORE_ERROR() << u8"⎕UCS got unexpected Cell type "
                       << cell_B.get_classname()
                       << ". Expecting int or character";
          DOMAIN_ERROR;

@@ -531,7 +531,7 @@ check_EOC:
               if (si == 0)
                  {
                     MORE_ERROR() <<
-                    "branch back into function (→N) without suspended function";
+                    u8"branch back into function (→N) without suspended function";
                     SYNTAX_ERROR;   // →N without function,
                  }
 
@@ -869,12 +869,12 @@ const UCS_string suffix(line, multi_pos + 3);
         //
         if (content.size() == 2)        // special case:  ««« »»»
            {
-             const UTF8_string empty(" (0⍴⊂\"\")");   // 0⍴⊂""
+             const UTF8_string empty(u8" (0⍴⊂\"\")");   // 0⍴⊂""
              content[0] << UCS_string(empty);
            }
         else if (content.size() == 3)   // special case: ««« string »»»
           {
-            const UTF8_string encl("(,⊂\"");  // enclose content...
+            const UTF8_string encl(u8"(,⊂\"");  // enclose content...
             content[0] << UCS_string(encl) << content[1] << "\")";
           }
         else                            // general case: ««« string ... »»»
@@ -928,7 +928,7 @@ int format = arg.atoi();
    out << "BAD ]BOXING PARAMETER+" << endl;
    MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
       "  Valid parameters are OFF, N, and -N with\n"
-      "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
+      u8"  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
 //────────────────────────────────────────────────────────────────────────────
 bool
@@ -1467,8 +1467,8 @@ bool left_col = true;
 
    out << endl << "System variables:" << endl
        << "      " << setw(COL2)
-       << "⍞       Character Input/Output"
-       << "⎕       Evaluated Input/Output" << endl;
+       << u8"⍞       Character Input/Output"
+       << u8"⎕       Evaluated Input/Output" << endl;
    left_col = true;
 
 #define ro_sv_def(x, _str, txt)                                            \
@@ -1488,9 +1488,9 @@ bool left_col = true;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
 #define sf_def(_q, str, txt)                                              \
-   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30 +        \
+   if (left_col)   out << u8"      ⎕" << setw(7) << str << setw(30 +        \
                                         len_diff(txt)) << txt;            \
-   else            out << "⎕" << setw(7) << str << txt << endl;           \
+   else            out << u8"⎕" << setw(7) << str << txt << endl;           \
    left_col = !left_col;
 #include "SystemVariable.def"
 }
@@ -1517,7 +1517,7 @@ Command::cmd_HOST(ostream & out, const UCS_string & arg)
       {
         out << 
 "This interpreter was started in \"safe mode\" (command line option --safe,\n"
-"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << endl;
+u8"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << endl;
         return;
       }
 
@@ -1911,7 +1911,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                 {
                   const user_command & ucmd =
                                        Workspace::get_user_commands()[--u];
-                  out << setw(12) << ucmd.prefix << " → ";
+                  out << setw(12) << ucmd.prefix << u8" → ";
                   if (ucmd.mode)   out << "A ";   // if dyadic
                   out << ucmd.apl_function << " B"
                       << " (mode " << ucmd.mode << ")" << endl;
@@ -2291,25 +2291,25 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
    switch(arity)
       {
         case -5: out << "quasi-dyadic operator:\n"
-                        "   Z ← A (∘ . G) B";               break;
+                        u8"   Z ← A (∘ . G) B";               break;
         case -4: out << "dyadic primitive operator:\n"
-                        "   Z ← A (F . G) B";               break;
+                        u8"   Z ← A (F . G) B";               break;
         case -3: out << "dyadic primitive operator:\n"
-                        "   Z ← (F " << prim << " G) B";    break;
+                        u8"   Z ← (F " << prim << " G) B";    break;
         case -2: out << "monadic primitive operator:\n"
-                        "   Z ← A (F " << prim << ") B";     break;
+                        u8"   Z ← A (F " << prim << ") B";     break;
         case -1: out << "monadic primitive operator:\n"
-                        "   Z ← (F " << prim << ") B";       break;
+                        u8"   Z ← (F " << prim << ") B";       break;
         case  0: out << "niladic primitive function:\n"
-                        "   Z ← " << prim;                    break;
+                        u8"   Z ← " << prim;                    break;
         case  1: out << "monadic primitive function:\n"
-                        "   Z ← " << prim << " B";            break;
+                        u8"   Z ← " << prim << " B";            break;
         case  2: out << "dyadic primitive function:\n"
-                        "   Z ← A " << prim << " B";         break;
+                        u8"   Z ← A " << prim << " B";         break;
         case  3: out << "monadic primitive function (with axis):\n"
-                        "   Z ← " << prim << "[X] B";      break;
+                        u8"   Z ← " << prim << "[X] B";      break;
         case  4: out << "dyadic primitive function (with axis):\n"
-                        "   Z ← A " << prim << "[X] B";      break;
+                        u8"   Z ← A " << prim << "[X] B";      break;
 
         default: FIXME;   // error in Help.def
       }

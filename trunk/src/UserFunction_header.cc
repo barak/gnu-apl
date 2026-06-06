@@ -235,15 +235,15 @@ UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
 UCS_string ucs;
 
-   if (sig & SIG_Z)      ucs << "λ←";
-   if (sig & SIG_A)      ucs << "⍺ ";
+   if (sig & SIG_Z)      ucs << u8"λ←";
+   if (sig & SIG_A)      ucs << u8"⍺ ";
    if (sig & SIG_LORO)   ucs << "(";
-   if (sig & SIG_LO)     ucs << "⍶ ";
+   if (sig & SIG_LO)     ucs << u8"⍶ ";
    ucs << UNI_LAMBDA << lambda_num;
-   if (sig & SIG_RO)     ucs << " ⍹ ";
+   if (sig & SIG_RO)     ucs << u8" ⍹ ";
    if (sig & SIG_LORO)   ucs << ")";
-   if (sig & SIG_X)      ucs << "[χ]";
-   if (sig & SIG_B)      ucs << " ⍵";
+   if (sig & SIG_X)      ucs << u8"[χ]";
+   if (sig & SIG_B)      ucs << u8" ⍵";
 
    return ucs;
 }
@@ -281,7 +281,7 @@ size_t len   = tos.size();
 
    if (len >= 2 && tos[1].get_Class() == TC_ASSIGN)   // expect Z ← ...
       {
-        if (tos[0].get_Class() != TC_SYMBOL)   return "Bad Z in Z ←";
+        if (tos[0].get_Class() != TC_SYMBOL)   return u8"Bad Z in Z ←";
 
         sym_Z = tos[0].get_sym_ptr();   // Z ← or λ ←
         start = 2;
@@ -291,7 +291,7 @@ size_t len   = tos.size();
    if (len <= 3)   // F0, F1 B, or A F2 B
       {
         if (len == 0)   // error: empty signature
-           return sym_Z ? "Empty header (after Z ←)" : "Empty header";
+           return sym_Z ? u8"Empty header (after Z ←)" : "Empty header";
 
         if (len == 1)   // F0
            {

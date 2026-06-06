@@ -159,8 +159,8 @@ FunctionGroup::list_functions(ostream & out) const
                         "the following (sub-)functions:\n"
           "\n"
        << get_legend(LET_FUN_PREFIX)
-       << "    " << group_name << " ''   ⍝ display this list\n"
-       << "    " << group_name << " ⍬    ⍝ display syntax alternatives for "
+       << "    " << group_name << u8" ''   ⍝ display this list\n"
+       << "    " << group_name << u8" ⍬    ⍝ display syntax alternatives for "
        << group_name << "\n\n";
 
 
@@ -177,7 +177,7 @@ FunctionGroup::list_functions(ostream & out) const
           "The syntax alternatives for " << group_name
        << " can be displayed with:\n\n";
 
-   COUT << "      " << group_name << " ⍬   ⍝ display the "
+   COUT << "      " << group_name << u8" ⍬   ⍝ display the "
         << " syntax alternatives for " << group_name << "\n\n";
 
    return Token();
@@ -201,7 +201,7 @@ FunctionGroup::list_mappings(ostream & out) const
    out << get_legend(LET_MAP_SUFFIX);
 
    out  << "\nTo display a brief description of the functions:\n\n";
-   COUT << "      " << group_name << " ⍬   ⍝ display function descriptions\n\n";
+   COUT << "      " << group_name << u8" ⍬   ⍝ display function descriptions\n\n";
 
    return Token();
 }
@@ -211,7 +211,7 @@ FunctionGroup::bad_subfun_name_ERROR(const UCS_string sub_name) const
 {
    MORE_ERROR() << sub_name << " is not a valid subfunction of " << group_name
                 << ".\nSee: " << group_name << " '' "
-                   "or: " << group_name << " ⍬ for a list of valid names.";
+                   "or: " << group_name << u8" ⍬ for a list of valid names.";
    SYNTAX_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -224,7 +224,7 @@ const char * AX = signature & SIG_X ? "X" : "A";
    MORE_ERROR() << get_signature_string(signature)
                 << ": invalid subfunction number " << AX << " (= " << number
                 << ").\nSee: " << group_name << " '' or: " << group_name
-                << " ⍬ for a list of valid numbers.";
+                << u8" ⍬ for a list of valid numbers.";
    DOMAIN_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -271,7 +271,7 @@ FunctionGroup::get_signature_string(Fun_signature sig) const
 {
 UCS_string ret;
 
-   if (sig & SIG_Z)        ret << "Z←";
+   if (sig & SIG_Z)        ret << u8"Z←";
    if (sig & SIG_A)        ret << "A ";
    if (sig & SIG_LORO)   // operator
       {

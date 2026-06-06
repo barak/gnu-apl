@@ -178,6 +178,7 @@ common_SOURCES += Token.cc			Token.def			Token.hh
 common_SOURCES += Token_string.cc						Token_string.hh
 common_SOURCES += 						        		TokenEnums.hh
 common_SOURCES += Tokenizer.cc							Tokenizer.hh
+common_SOURCES += 						        		u8_string.hh
 common_SOURCES += UCS_string.cc							UCS_string.hh
 common_SOURCES += UCS_string_vector.cc					UCS_string_vector.hh
 common_SOURCES += 						        		Unicode.hh
