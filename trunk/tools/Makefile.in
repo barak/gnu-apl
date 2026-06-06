@@ -94,7 +94,7 @@ noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
 	check_command_def$(EXEEXT) filter_apl_lines$(EXEEXT) \
 	filter_apl_lines2$(EXEEXT) lines$(EXEEXT) \
 	ncurses_emul$(EXEEXT) phrase_gen$(EXEEXT) sockconst$(EXEEXT) \
-	TLV_server$(EXEEXT)
+	TLV_server$(EXEEXT) unicodes_used$(EXEEXT)
 subdir = tools
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
@@ -153,13 +153,16 @@ lines_OBJECTS = $(am_lines_OBJECTS)
 lines_LDADD = $(LDADD)
 am_ncurses_emul_OBJECTS = ncurses_emul.$(OBJEXT)
 ncurses_emul_OBJECTS = $(am_ncurses_emul_OBJECTS)
-ncurses_emul_LDADD = $(LDADD)
+ncurses_emul_DEPENDENCIES =
 am_phrase_gen_OBJECTS = phrase_gen.$(OBJEXT)
 phrase_gen_OBJECTS = $(am_phrase_gen_OBJECTS)
 phrase_gen_LDADD = $(LDADD)
 sockconst_SOURCES = sockconst.c
 sockconst_OBJECTS = sockconst.$(OBJEXT)
 sockconst_LDADD = $(LDADD)
+am_unicodes_used_OBJECTS = unicodes_used.$(OBJEXT)
+unicodes_used_OBJECTS = $(am_unicodes_used_OBJECTS)
+unicodes_used_LDADD = $(LDADD)
 SCRIPTS = $(dist_noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -183,7 +186,7 @@ am__depfiles_remade = ./$(DEPDIR)/APL_keyboard.Po \
 	./$(DEPDIR)/filter_apl_lines.Po \
 	./$(DEPDIR)/filter_apl_lines2.Po ./$(DEPDIR)/lines.Po \
 	./$(DEPDIR)/ncurses_emul.Po ./$(DEPDIR)/phrase_gen.Po \
-	./$(DEPDIR)/sockconst.Po
+	./$(DEPDIR)/sockconst.Po ./$(DEPDIR)/unicodes_used.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -226,13 +229,13 @@ SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(apl2html_SOURCES) $(check_command_def_SOURCES) \
 	$(filter_apl_lines_SOURCES) $(filter_apl_lines2_SOURCES) \
 	$(lines_SOURCES) $(ncurses_emul_SOURCES) $(phrase_gen_SOURCES) \
-	sockconst.c
+	sockconst.c $(unicodes_used_SOURCES)
 DIST_SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
 	$(apl2html_SOURCES) $(check_command_def_SOURCES) \
 	$(filter_apl_lines_SOURCES) $(filter_apl_lines2_SOURCES) \
 	$(lines_SOURCES) $(ncurses_emul_SOURCES) $(phrase_gen_SOURCES) \
-	sockconst.c
+	sockconst.c $(unicodes_used_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -439,9 +442,9 @@ filter_apl_lines_SOURCES = filter_apl_lines.cc
 filter_apl_lines2_SOURCES = filter_apl_lines2.cc
 lines_SOURCES = lines.cc
 ncurses_emul_SOURCES = ncurses_emul.cc
-ncurses_emul_LIBS = -lncurses -ltinfo
+ncurses_emul_LDADD = -lncurses -ltinfo
 TLV_server_SOURCES = TLV_server.c
-unicodes_used_DOURCES = unicodes_used.cc
+unicodes_used_SOURCES = unicodes_used.cc
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 all: all-am
 
@@ -534,6 +537,10 @@ sockconst$(EXEEXT): $(sockconst_OBJECTS) $(sockconst_DEPENDENCIES) $(EXTRA_sockc
 	@rm -f sockconst$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sockconst_OBJECTS) $(sockconst_LDADD) $(LIBS)
 
+unicodes_used$(EXEEXT): $(unicodes_used_OBJECTS) $(unicodes_used_DEPENDENCIES) $(EXTRA_unicodes_used_DEPENDENCIES) 
+	@rm -f unicodes_used$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(unicodes_used_OBJECTS) $(unicodes_used_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -552,6 +559,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncurses_emul.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phrase_gen.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockconst.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicodes_used.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -749,6 +757,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
 	-rm -f ./$(DEPDIR)/sockconst.Po
+	-rm -f ./$(DEPDIR)/unicodes_used.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -806,6 +815,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
 	-rm -f ./$(DEPDIR)/sockconst.Po
+	-rm -f ./$(DEPDIR)/unicodes_used.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

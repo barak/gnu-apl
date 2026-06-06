@@ -55,8 +55,8 @@
 0
 
 
-      ⍝ two complex numbers close to 1.
-      ⍝ They are equal because ⎕CT is scaled to 1*⎕CT
+      ⍝ two complex numbers near 1: equal because ⎕CT is scaled to the
+      ⍝ largest component (~1), making the imaginary difference (9E¯15) tolerant
       ⍝
       1J1E¯15 = 1J1E¯14
 1

@@ -21,7 +21,7 @@ dist_doc_DALY_DATA =    apl_kbd.texi            \
 
 doc_DALYdir = $(pkglibdir)/doc/DALY
 
- NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
+# NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
 # to be deleted on 'make clean' That is bad for people not having a
 # $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
 # install info stuff manually below.

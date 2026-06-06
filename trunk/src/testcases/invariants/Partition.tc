@@ -13,8 +13,9 @@
 1
       ≡Z
 2
-      ⍝ inv: B ←→ ⊃,/A⊂B   (re-assemble = original)
-      B ≡ ⊃,/A⊂B
+      ⍝ inv: B ←→ ⊃,/A2⊂B   (re-assemble = original; A2 has no zeros)
+      A2 ← 1 1 2 2 3 3 4 4
+      B ≡ ⊃,/A2⊂B
 1
       ⍝ inv: (0≠A)/B ←→ ⊃,/A⊂B   (non-zero selected items)
       ((0≠A)/B) ≡ ⊃,/A⊂B

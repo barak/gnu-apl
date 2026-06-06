@@ -13,7 +13,8 @@ noinst_PROGRAMS = APL_keyboard       \
                   ncurses_emul       \
                   phrase_gen         \
                   sockconst          \
-                  TLV_server
+                  TLV_server         \
+                  unicodes_used
 
 
 # fails on cygwin, therefore moved to dist_noinst_SCRIPTS
@@ -38,9 +39,9 @@ filter_apl_lines_SOURCES   = filter_apl_lines.cc
 filter_apl_lines2_SOURCES  = filter_apl_lines2.cc
 lines_SOURCES              = lines.cc
 ncurses_emul_SOURCES       = ncurses_emul.cc
-ncurses_emul_LIBS          = -lncurses -ltinfo
+ncurses_emul_LDADD         = -lncurses -ltinfo
 TLV_server_SOURCES         = TLV_server.c
-unicodes_used_DOURCES      = unicodes_used.cc
+unicodes_used_SOURCES      = unicodes_used.cc
 
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 

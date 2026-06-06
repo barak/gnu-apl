@@ -21537,7 +21537,7 @@ printf "%s\n" "no" >&6; }
     # ./configure --with-postgresql=yes    →    $with_postgresql: "yes"
     # ./configure --with-postgresql=path   →    $with_postgresql: "path"
     #
-test "x$with_postgresql" = "xno" && return   # the user rejects POSTSCRIPT
+test "x$with_postgresql" = "xno" && return   # the user rejects POSTGRESQL
 
 if test "x$postgresql_given" = "xyes"; then
 
@@ -21545,7 +21545,7 @@ printf "%s\n" "#define cfg_USER_WANTS_POSTGRES 1" >>confdefs.h
 
 fi
 
-test "x$found_postgresql" != "xyes" && return   # no POSTSCRIPT
+test "x$found_postgresql" != "xyes" && return   # no POSTGRESQL
 
     # POSTGRES is present. Check if it is usable (which is the final verdict).
     #
@@ -22735,7 +22735,7 @@ printf "%s\n" "no" >&6; }
 fi
 
   # locate pkg-config
-    if test "x$PKG_CONFIG" = "xyes"; then             # we have pkg-config
+    if test "x$PKG_CONFIG" != "xno"; then             # we have pkg-config
        if $PKG_CONFIG --exists python3; then   # and pkg-config knows python3
             PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
        fi

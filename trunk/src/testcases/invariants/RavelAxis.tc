@@ -12,6 +12,6 @@
       ⍝ inv: ,B ←→ ,[⍳⍴⍴B]B   (ravel all axes = ravel)
       (,B) ≡ ,[⍳⍴⍴B]B
 1
-      ⍝ inv: ,[⍳0]B ←→ ,[1.1]B  (ravel no axes = add new last axis)
-      (,[⍳0]B) ≡ ,[1.5]B
+      ⍝ inv: ,[⍳0]B ←→ ,[2.5]B  (ravel no axes = add new last axis)
+      (,[⍳0]B) ≡ ,[2.5]B
 1

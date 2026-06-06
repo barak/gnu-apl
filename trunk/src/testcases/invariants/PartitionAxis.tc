@@ -12,8 +12,9 @@
       Z ← A⊂[X]B
       (⍴⍴Z) ≡ ⍴⍴B
 1
-      ⍝ inv: B ←→ ⊃[X],/[X]A⊂[X]B
-      B ≡ ⊃[X],/[X]A⊂[X]B
+      ⍝ inv: B ←→ ⊃[X],/[X]A2⊂[X]B   (A2 has no zeros)
+      A2 ← 1 1 2 2 3 3
+      B ≡ ⊃[X],/[X]A2⊂[X]B
 1
       ⍝ inv: (0≠A)/[X]B ←→ ⊃[X],/[X]A⊂[X]B
       ((0≠A)/[X]B) ≡ ⊃[X],/[X]A⊂[X]B

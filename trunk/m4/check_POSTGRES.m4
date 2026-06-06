@@ -18,14 +18,14 @@ AX_LIB_POSTGRESQL([])                   # call AX_LIB_POSTGRESQL()
     # ./configure --with-postgresql=yes    →    $with_postgresql: "yes"
     # ./configure --with-postgresql=path   →    $with_postgresql: "path"
     #
-apl_NO($with_postgresql) && return   # the user rejects POSTSCRIPT
+apl_NO($with_postgresql) && return   # the user rejects POSTGRESQL
 
 if apl_YES($postgresql_given); then
    AC_DEFINE_UNQUOTED(cfg_USER_WANTS_POSTGRES, 1,
                       [./configure with --with-postgresql])
 fi
 
-apl_NYES($found_postgresql) && return   # no POSTSCRIPT
+apl_NYES($found_postgresql) && return   # no POSTGRESQL
 
     # POSTGRES is present. Check if it is usable (which is the final verdict).
     #

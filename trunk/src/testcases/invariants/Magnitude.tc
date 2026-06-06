@@ -11,9 +11,9 @@
       ⍝ inv: ∣B ←→ (B×+B)*.5   (for all B: sqrt of B times conjugate)
       (|B) ≡ (B×+B)*.5
 1
-      ⍝ inv: ∣B ←→ (+/RE IM*2)*.5  for complex B=RE+0J1×IM
+      ⍝ inv: ∣B ←→ ((RE*2)+IM*2)*.5  for complex B=RE+0J1×IM
       RE ← ⎕RVAL 1 (,4) (,0 0 1 0 0)
       IM ← ⎕RVAL 1 (,4) (,0 0 1 0 0)
       B ← RE+0J1×IM
-      (|B) ≡ (+/RE IM*2)*.5
+      (|B) ≡ ((RE*2)+IM*2)*.5
 1

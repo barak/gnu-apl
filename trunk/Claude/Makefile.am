@@ -1,6 +1,6 @@
 
 MD = CLAUDE.md
 
-dist_doc_DATA = $(CLAUDE)
+dist_doc_DATA = $(MD)
 
 

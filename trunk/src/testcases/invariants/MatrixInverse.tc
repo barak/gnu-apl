@@ -14,6 +14,7 @@
       (⍴⍴Z) ≡ ⍴⍴B
 1
       ⍝ inv: B+.×⌹B ≈ identity (within ⎕CT)
+      ⍝ use absolute error: relative ⎕CT collapses when comparing to 0
       I ← (⍳3)∘.=⍳3
-      (B+.×⌹B) ≡ I
+      (⌈/,|(B+.×⌹B) - I) ≤ 1E¯10
 1

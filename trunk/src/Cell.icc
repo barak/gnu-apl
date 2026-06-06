@@ -60,42 +60,31 @@ Cell::same_half_plane(APL_Complex A, APL_Complex B)
 inline bool
 Cell::tolerantly_equal(APL_Complex A, APL_Complex B, double C)
 {
-   // if A equals B, return true
-   //
-   if (A == B) return true;
+   if (A == B)   return true;
 
-   // ISO: if A and B are not in the same half-plane, return false.
+   // Component-wise using the largest absolute component as common scale.
+   // This avoids both Euclidean sqrt and squaring small ⎕CT values, while
+   // keeping near-zero components tolerant (a near-zero component is scaled
+   // by the dominant component rather than collapsing to zero threshold).
    //
-   // Note: this leads to problems with complex modulo of Gaussian integers, so
-   //       we do not do it.
-   //
-   // if (!same_half_plane(A, B))   return false;
+const APL_Float aR = A.real() < 0.0 ? -A.real() : A.real();
+const APL_Float aI = A.imag() < 0.0 ? -A.imag() : A.imag();
+const APL_Float bR = B.real() < 0.0 ? -B.real() : B.real();
+const APL_Float bI = B.imag() < 0.0 ? -B.imag() : B.imag();
+const APL_Float mAB = aR > aI ? aR : aI;
+const APL_Float mAB2 = bR > bI ? bR : bI;
+const APL_Float scale = mAB > mAB2 ? mAB : mAB2;
+const APL_Float threshold = C * scale;
 
-   // If the distance-between A and B is ≤ C times the larger-magnitude
-   // of A and B, return true
-   //
-   // Implementation: Instead of mag(A-B)  ≤ C × max(mag(A),   mag(B))
-   // we compute:                mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
-   //                                      == max(mag²(C×A), mag²(C×B))
-   //
-   // that avoids unneccessary computations of sqrt().
-   //
+const APL_Float dR = A.real() - B.real();
+   if (dR >  threshold)   return false;
+   if (dR < -threshold)   return false;
 
-   // 1. compute left side: mag²(A-B)
-   //
-const APL_Complex A_B = A - B;
-const APL_Float dist2_A_B = A_B.real() * A_B.real()
-                          + A_B.imag() * A_B.imag();
+const APL_Float dI = A.imag() - B.imag();
+   if (dI >  threshold)   return false;
+   if (dI < -threshold)   return false;
 
-   // 2. compute right side: max(mag²C×A, mag²C×B)
-   //
-const APL_Float Cmag2_A   = C * ComplexCell::mag2(A);
-const APL_Float Cmag2_B   = C * ComplexCell::mag2(B);
-const APL_Float mag2_max = Cmag2_A > Cmag2_B ? Cmag2_A : Cmag2_B;
-
-   // compare
-   //
-   return dist2_A_B <= mag2_max;
+   return true;
 }
 //════════════════════════════════════════════════════════════════════════════
 inline bool

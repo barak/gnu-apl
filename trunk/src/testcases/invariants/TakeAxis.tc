@@ -10,7 +10,7 @@
       A ← 3                                   ⍝ take 3 along axis 1
       X ← 1
       Z ← A↑[X]B
-      ((⍴Z)[X]) ≡ |,A
+      ((⍴Z)[X]) = ⊃|,A
 1
       (⍴⍴Z) ≡ ⍴⍴B
 1

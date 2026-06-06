@@ -242,29 +242,10 @@ ComplexCell::bif_divide(Cell * Z, const Cell * A) const
 ErrorCode
 ComplexCell::bif_equal(Cell * Z, const Cell * A) const
 {
-const double qct = Workspace::get_CT();
-   if (A->is_complex_cell())
-      {
-        const APL_Complex diff = A->get_complex_value() - get_complex_value();
-        if (diff.real() >  qct)   return IntCell::z0(Z);   // not equal
-        if (diff.real() < -qct)   return IntCell::z0(Z);   // not equal
-        if (diff.imag() >  qct)   return IntCell::z0(Z);   // not equal
-        if (diff.imag() < -qct)   return IntCell::z0(Z);   // not equal
-        return IntCell::z1(Z);                             // equal
-      }
-
-   if (A->is_numeric())
-      {
-        if (get_imag_value() >  qct)   return IntCell::z0(Z);
-        if (get_imag_value() < -qct)   return IntCell::z0(Z);
-
-        const APL_Float diff = A->get_real_value() - get_real_value();
-        if (diff >  qct)   return IntCell::z0(Z);
-        if (diff < -qct)   return IntCell::z0(Z);
-        return IntCell::z1(Z);
-      }
-
-   return IntCell::z1(Z);
+   if (!A->is_numeric())   return IntCell::z0(Z);
+   return IntCell::zI(Z, tolerantly_equal(A->get_complex_value(),
+                                          get_complex_value(),
+                                          Workspace::get_CT()));
 }
 //════════════════════════════════════════════════════════════════════════════
 ErrorCode
