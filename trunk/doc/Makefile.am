@@ -7,59 +7,22 @@ SUBDIRS = DALY
 # $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
 # install info stuff manually below.
 #
-info_TEXINFOS = 
+info_TEXINFOS = apl.texi libapl.texi
 
 man1_MANS = apl.1
+HTMLFILES = apl.html libapl.html
+MAKEINFOFLAGS = --no-split
 
-# info_TEXINFOS = fails for more than one .info file. We therefore install
-# libapl.info explicitly
-#
-install-info-am:
-	@echo " $(MKDIR_P) $(DESTDIR)$(infodir)"
-	@       $(MKDIR_P) "$(DESTDIR)$(infodir)" || exit 1
-	@echo " $(INSTALL_DATA) $(srcdir)/apl.info  $(srcdir)/libapl.info $(DESTDIR)$(infodir)"
-	@       $(INSTALL_DATA) $(srcdir)/apl.info  $(srcdir)/libapl.info $(DESTDIR)$(infodir)
+apl.html: apl.texi apl-info.css
+	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
+libapl.html: libapl.texi apl-info.css
+	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
 
-uninstall-info-am:
-	 @echo " rm -f $(DESTDIR)$(infodir)/apl.info"
-	 @       rm -f $(DESTDIR)$(infodir)/apl.info
-	 @echo " rm -f $(DESTDIR)$(infodir)/libapl.info"
-	 @       rm -f $(DESTDIR)$(infodir)/libapl.info
+CLEANFILES = $(HTMLFILES) apl.info libapl.info
 
-# apl.texi in HTML format
-#
-apl.html:   apl.texi apl-info.css
-	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
+nodist_doc_DATA = $(HTMLFILES)
 
-# apl.texi in info format
-#
-apl.info:   apl.texi
-	@$(MAKEINFO) $< -o $@ --no-split || touch $@
-
-# libapl.texi in HTML format
-#
-libapl.html: libapl.texi
-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
-
-# libapl.texi in info format
-#
-libapl.info: libapl.texi
-	$(MAKEINFO) $< -o $@ --no-split || touch $@
-
-
-# NOTE that the .html version of aspl.text refers
-# to some of the files in dist_doc_DATA.
-#
-dist_doc_DATA =				\
-	apl.1					\
-	apl.texi				\
-	apl.info				\
-	apl-info.css			\
-	apl.html				\
-	libapl.texi				\
-	libapl.info				\
-	PLOT_circle.png			\
-	PLOT_zigzag.png			\
-    MX_distributions.png	\
-	libapl.html
-
+dist_doc_DATA =		\
+	PLOT_circle.png	\
+	PLOT_zigzag.png	\
+	MX_distributions.png
