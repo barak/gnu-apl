@@ -684,11 +684,11 @@ public:
    /// @param other cell whose type determines the prototype cell
    inline void next_ravel_Proto(const Cell & other);
 
-   /// initialize the next ravel cell with a floating point value
+   /// initialize the next ravel cell with a complex value
    /// @param cpx complex value to store
    inline void next_ravel_Complex(APL_Complex cpx);
 
-   /// initialize the next ravel cell with a floating point value
+   /// initialize the next ravel cell with a complex value
    /// @param real real part of the complex value
    /// @param imag imaginary part of the complex value
    inline void next_ravel_Complex(APL_Float real, APL_Float imag);

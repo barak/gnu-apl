@@ -87,7 +87,7 @@ public:
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const;
 
-   /// overloaded Cell::_is_member_anchor()
+   /// overloaded Cell::is_member_anchor()
    virtual bool is_member_anchor() const;
 
    /// isolate this value and all of its sub values
@@ -109,10 +109,10 @@ protected:
    /// overloaded Cell::get_classname()
    virtual const char * get_classname() const   { return "PointerCell"; }
 
-   ///  overloaded Cell::deep_cell_subtypes()
+   /// return the deep cell subtypes of the nested value, OR'd with CT_POINTER
    CellType deep_cell_subtypes() const;
 
-   ///  overloaded Cell::deep_cell_types()
+   /// return the deep cell types of the nested value, OR'd with CT_POINTER
    CellType deep_cell_types() const;
 };
 //════════════════════════════════════════════════════════════════════════════

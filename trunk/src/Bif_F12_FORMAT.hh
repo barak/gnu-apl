@@ -144,7 +144,7 @@ public:
                                     bool & overflow);
 
         /// format the fract part, exponent, and right decorator (everything
-        /// left of the decimal dot)
+        /// right of the decimal dot)
         /// @param data_fract digit string for the fractional part
         /// @param negative true if the value is negative
         /// @param data_expo digit string for the exponent part

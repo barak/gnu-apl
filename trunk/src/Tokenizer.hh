@@ -42,7 +42,7 @@ public:
    end(s.size())
    {}
 
-   /// constructor: iterate from \b from to \b to
+   /// constructor: iterate from \b from for \b to characters
    /// @param src parent Unicode_source providing the underlying string
    /// @param from start offset relative to src's current position
    /// @param to number of characters to expose from \b from

@@ -170,7 +170,7 @@ public:
    : NonscalarFunction(tag)
    {}
 
-   /// sort integer vector B
+   /// sort vector B
    /// @param B right-argument APL value to sort
    /// @param order ascending or descending sort direction
    static Token sort(Value_P B, Sort_order order);

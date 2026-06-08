@@ -96,7 +96,7 @@ public:
    /// return the Symbol for the function name (0 for lambdas)
    Symbol * FUN()   const   { return sym_FUN; }
 
-   /// return the Symbol for the right argument
+   /// return the Symbol for the axis specifier
    Symbol * X()   const   { return sym_X; }
 
    /// return the Symbol for the right function argument
