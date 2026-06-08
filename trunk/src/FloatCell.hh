@@ -369,7 +369,7 @@ protected:
    virtual bool is_near_int() const
       { return Cell::is_near_int(dfval()); }
 
-   /// overloaded Cell::bif_near_int()
+   /// overloaded Cell::bif_near_int64_t()
    /// @param Z result cell to initialize
    virtual ErrorCode bif_near_int64_t(Cell * Z) const;
 

@@ -137,7 +137,7 @@ protected:
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const = 0;
 
-   /// return the conforming shape of sh_A and sh_A, or set ec and return 0
+   /// return the conforming shape of sh_A and sh_B, or set ec and return 0
    /// if shapes cannot be conformed.
    /// RANK ERROR or LENGTH ERROR if the dont.
    /// @param ec receives the error code if shapes cannot be conformed

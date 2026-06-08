@@ -200,7 +200,7 @@ public:
    virtual ErrorCode bif_multiply(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-   /// the inverse of bif_bif_multiply
+   /// the inverse of bif_multiply
    /// @param Z  destination cell for the result
    /// @param A  left operand cell
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const

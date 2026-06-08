@@ -117,7 +117,7 @@ public:
    static UCS_string get_LX()
       { return UCS_string(*the_workspace.v_Quad_LX.get_apl_value()); }
 
-   /// return the current ⎕PW
+   /// return the current ⎕PP
    static int get_PP()
       { return the_workspace.v_Quad_PP.current(); }
 

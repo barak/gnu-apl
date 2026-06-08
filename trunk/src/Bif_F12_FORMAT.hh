@@ -156,7 +156,7 @@ public:
         Format_sub fract_part;   ///< the fractional part
         Format_sub expo_deco;    ///< the exponent decorator
         Format_sub exponent;     ///< the exponent
-        Format_sub right_deco;   ///< the left decorator
+        Format_sub right_deco;   ///< the right decorator
 
         /// the exponent char to be used
         Unicode exponent_char;

@@ -236,7 +236,7 @@ public:
    ShapeItem get_shape_item(sRank r) const
       { return shape.get_shape_item(r); }
 
-   /// return the length of the last dimension of \b this value, i.e. ↑⍴this
+   /// return the length of the first dimension of \b this value, i.e. ↑⍴this
    ShapeItem get_first_shape_item() const
       { return shape.get_first_shape_item(); }
 

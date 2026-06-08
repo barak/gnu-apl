@@ -93,7 +93,7 @@ public:
    /// return the Symbol for the left function argument
    Symbol * LO()   const   { return sym_LO; }
 
-   /// return the Symbol for the left function argument
+   /// return the Symbol for the function name (0 for lambdas)
    Symbol * FUN()   const   { return sym_FUN; }
 
    /// return the Symbol for the right argument

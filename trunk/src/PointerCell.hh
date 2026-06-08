@@ -109,7 +109,7 @@ protected:
    /// overloaded Cell::get_classname()
    virtual const char * get_classname() const   { return "PointerCell"; }
 
-   ///  overloaded Cell::deep_cell_types()
+   ///  overloaded Cell::deep_cell_subtypes()
    CellType deep_cell_subtypes() const;
 
    ///  overloaded Cell::deep_cell_types()

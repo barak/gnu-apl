@@ -128,7 +128,7 @@ public:
 
    /// overloaded Cell::bif_power()
    /// @param Z result cell
-   /// @param A left argument cell (the exponent)
+   /// @param A left argument cell (the base)
    virtual ErrorCode bif_power(Cell * Z, const Cell * A) const;
 
    /// overloaded from the corresponding Cell:: function (see class Cell)

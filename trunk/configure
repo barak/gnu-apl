@@ -729,6 +729,8 @@ apl_XCB_TRUE
 apl_X11_FALSE
 apl_X11_TRUE
 XMKMF
+BUILD_NCURSES_EMUL_FALSE
+BUILD_NCURSES_EMUL_TRUE
 POW_LIB
 LIBOBJS
 CXXCPP
@@ -20255,6 +20257,15 @@ then :
 
 fi
 
+ if test "x$ac_cv_lib_tinfo_tparm" = "xyes" ||
+    test "x$ac_cv_lib_ncurses_setupterm" = "xyes"; then
+  BUILD_NCURSES_EMUL_TRUE=
+  BUILD_NCURSES_EMUL_FALSE='#'
+else
+  BUILD_NCURSES_EMUL_TRUE='#'
+  BUILD_NCURSES_EMUL_FALSE=
+fi
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for acosh in -lm" >&5
 printf %s "checking for acosh in -lm... " >&6; }
 if test ${ac_cv_lib_m_acosh+y}
@@ -23491,6 +23502,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_NCURSES_EMUL_TRUE}" && test -z "${BUILD_NCURSES_EMUL_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_NCURSES_EMUL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${apl_X11_TRUE}" && test -z "${apl_X11_FALSE}"; then

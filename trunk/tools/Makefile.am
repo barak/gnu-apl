@@ -10,11 +10,14 @@ noinst_PROGRAMS = APL_keyboard       \
                   filter_apl_lines   \
                   filter_apl_lines2  \
                   lines              \
-                  ncurses_emul       \
                   phrase_gen         \
                   sockconst          \
                   TLV_server         \
                   unicodes_used
+
+if BUILD_NCURSES_EMUL
+noinst_PROGRAMS += ncurses_emul
+endif
 
 
 # fails on cygwin, therefore moved to dist_noinst_SCRIPTS

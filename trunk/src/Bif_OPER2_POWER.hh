@@ -69,7 +69,7 @@ protected:
    /// @param B right APL value argument
    static Token eval_form_1(Value_P A, Token & LO, Value_P N, Value_P B);
 
-   /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
+   /// eval_ALRB() or eval_LRB() for condition-function RO (aka. Form 2)
    /// @param A left APL value argument (may be empty)
    /// @param LO left operand token
    /// @param RO right operand (condition function) token

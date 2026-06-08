@@ -92,9 +92,10 @@ host_triplet = @host@
 noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
 	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) \
 	check_command_def$(EXEEXT) filter_apl_lines$(EXEEXT) \
-	filter_apl_lines2$(EXEEXT) lines$(EXEEXT) \
-	ncurses_emul$(EXEEXT) phrase_gen$(EXEEXT) sockconst$(EXEEXT) \
-	TLV_server$(EXEEXT) unicodes_used$(EXEEXT)
+	filter_apl_lines2$(EXEEXT) lines$(EXEEXT) phrase_gen$(EXEEXT) \
+	sockconst$(EXEEXT) TLV_server$(EXEEXT) unicodes_used$(EXEEXT) \
+	$(am__EXEEXT_1)
+@BUILD_NCURSES_EMUL_TRUE@am__append_1 = ncurses_emul
 subdir = tools
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
@@ -119,6 +120,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@BUILD_NCURSES_EMUL_TRUE@am__EXEEXT_1 = ncurses_emul$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_APL_keyboard_OBJECTS = APL_keyboard.$(OBJEXT)
 APL_keyboard_OBJECTS = $(am_APL_keyboard_OBJECTS)

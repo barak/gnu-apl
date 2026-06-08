@@ -275,6 +275,9 @@ AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
 AC_CHECK_LIB([curses],    [setupterm])
 AC_CHECK_LIB([ncurses],   [setupterm])
+AM_CONDITIONAL([BUILD_NCURSES_EMUL],
+   [test "x$ac_cv_lib_tinfo_tparm" = "xyes" ||
+    test "x$ac_cv_lib_ncurses_setupterm" = "xyes"])
 AC_CHECK_LIB([m],         [acosh])
 AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([c],         [initstate_r])
