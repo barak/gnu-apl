@@ -44,7 +44,7 @@ host_os = @host_os@
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
+common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I $(srcdir)/sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
 common_LDFLAGS  = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS)
