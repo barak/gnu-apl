@@ -76,7 +76,7 @@ Svar_partner::print(ostream & out) const
    if (id.parent)   out << "," << left << setw(5) << id.parent << right;
    else             out << "      ";
 
-   out << u8"│" << setw(3) << tcp_fd << u8"│"
+   out << "│" << setw(3) << tcp_fd << "│"
        << hex << uppercase << setfill('0') << setw(2) << flags
        << dec << nouppercase << setfill(' ');
 
@@ -366,14 +366,14 @@ void
 Svar_record::print(ostream & out) const
 {
 const Svar_state st = get_state();
-   out << u8"║" << setw(5) << (key & 0xFFFF) << u8"│" << get_coupling() << u8"║";
-   offering.print(out)  << u8"║";
-   accepting.print(out) << u8"║";
+   out << "║" << setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
+   offering.print(out)  << "║";
+   accepting.print(out) << "║";
    if (st & SET_BY_OFF)   out << "1";    else   out << "0";
    if (st & SET_BY_ACC)   out << "1";    else   out << "0";
    if (st & USE_BY_OFF)   out << "1";    else   out << "0";
-   if (st & USE_BY_ACC)   out << u8"1│";   else   out << u8"0│";
-   print_name(out, varname, 10) << u8"║" << endl;
+   if (st & USE_BY_ACC)   out << "1│";   else   out << "0│";
+   print_name(out, varname, 10) << "║" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 ostream &

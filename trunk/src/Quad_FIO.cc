@@ -126,7 +126,7 @@ Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, u8"⎕FIO");
+   init_function_group(subfunction_infos, count, "⎕FIO");
 
    // init stdin, stdout, stderr, and maybe fd 3 
    //
@@ -307,11 +307,11 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
              return eval_B___18(B);
 
         case -17: // emulate Assert1()
-             Assert1(0 && u8"Simulated Assert1() (aka. ⎕FIO ¯17)");
+             Assert1(0 && "Simulated Assert1() (aka. ⎕FIO ¯17)");
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         case -16: // emulate Assert()
-             Assert(0 && u8"Simulated Assert() (aka. ⎕FIO ¯16)");
+             Assert(0 && "Simulated Assert() (aka. ⎕FIO ¯16)");
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         case -15: // print performance IDs and names...
@@ -577,7 +577,7 @@ Quad_FIO::close_handle(int fd)
         return 0;   // OK
       }
 
-   MORE_ERROR() << u8"Invalid ⎕FIO handle " << fd;
+   MORE_ERROR() << "Invalid ⎕FIO handle " << fd;
    return -EBADF;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -588,14 +588,14 @@ NOT_MINGW(
 int spair[2];
    if (socketpair(AF_UNIX, SOCK_STREAM, 0, spair))
       {
-        MORE_ERROR() << u8"⎕FIO[49]: socketpair() failed: " << strerror(errno);
+        MORE_ERROR() << "⎕FIO[49]: socketpair() failed: " << strerror(errno);
         DOMAIN_ERROR;
       }
 
 const pid_t child = fork();
    if (child == -1)
       {
-        MORE_ERROR() << u8"⎕FIO[49]: fork() failed: " << strerror(errno);
+        MORE_ERROR() << "⎕FIO[49]: fork() failed: " << strerror(errno);
         DOMAIN_ERROR;
       }
 
@@ -657,7 +657,7 @@ char * from = filename;
    ::close(3);
 
    usleep(100000);
-   CERR << u8"*** execve() failed in 57 ⎕CR: " << strerror(errno);
+   CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
          ) // NOT_MINGW
    exit(-1);
 }
@@ -703,7 +703,7 @@ const APL_Integer function_number = X->get_cfirst().get_int_value();
              return eval_ALXB___1(A, LO, B);
       }
 
-   MORE_ERROR() << u8"Bad function number (axis X) in operator A LO ⎕FIO[X] B";
+   MORE_ERROR() << "Bad function number (axis X) in operator A LO ⎕FIO[X] B";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -740,9 +740,9 @@ const APL_Integer function_number = X->get_cfirst().get_int_value();
       }
 
    MORE_ERROR() <<
-"Bad function number (axis X) " << function_number << u8" in LO ⎕FIO[X] B.\n"
-u8"Chances are that you meant to use ⎕FIO[X] B and not LO ⎕FIO[X] B. In that\n"
-u8"case use (⎕FIO[X]) or H←⎕FIO[X]";
+"Bad function number (axis X) " << function_number << " in LO ⎕FIO[X] B.\n"
+"Chances are that you meant to use ⎕FIO[X] B and not LO ⎕FIO[X] B. In that\n"
+"case use (⎕FIO[X]) or H←⎕FIO[X]";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -750,129 +750,129 @@ Token
 Quad_FIO::list_functions(ostream & out) const
 {
    out << "\n"
-       << u8"⎕FIO is a function group. It is comprised of "
+       << "⎕FIO is a function group. It is comprised of "
                         "the following (sub-)functions:\n"
 "\n"
-u8"   ┌─── Legend:────────────────────────────────────────────────────┐\n"
-u8"   │    a - address family, IPv4 address, port (or errno)          │\n"
-u8"   │    b - byte(s) (Integer(s) in the range [0-255])              │\n"
-u8"   │    d - table of dirent structs                                │\n"
-u8"   │    e - error code (integer as per errno.h)                    │\n"
-u8"   │    f - format string (printf(), scanf())                      │\n"
-u8"   │    h - file handle (small integer)                            │\n"
-u8"   │    i - integer                                                │\n"
-u8"   │    n - names (nested vector of strings)                       │\n"
-u8"   │    p - path (filename string)                                 │\n"
-u8"   │    s - string                                                 │\n"
-u8"   │    u - time divisor: 1       - second                         │\n"
-u8"   │                      1000    - milli second                   │\n"
-u8"   │                      1000000 - micro second                   │\n"
-u8"   │    y4 - seconds, wday, yday, dst (daylight saving time)       │\n"
-u8"   │    y67- year, mon, day, hour, minute, second, [dst]           │\n"
-u8"   │    y9 - year, mon, day, hour, minute, second, wday, yday, dst │\n"
-u8"   │    A1, A2, ...  nested vector with elements A1, A2, ...       │\n"
-u8"   └───────────────────────────────────────────────────────────────┘\n"
+"   ┌─── Legend:────────────────────────────────────────────────────┐\n"
+"   │    a - address family, IPv4 address, port (or errno)          │\n"
+"   │    b - byte(s) (Integer(s) in the range [0-255])              │\n"
+"   │    d - table of dirent structs                                │\n"
+"   │    e - error code (integer as per errno.h)                    │\n"
+"   │    f - format string (printf(), scanf())                      │\n"
+"   │    h - file handle (small integer)                            │\n"
+"   │    i - integer                                                │\n"
+"   │    n - names (nested vector of strings)                       │\n"
+"   │    p - path (filename string)                                 │\n"
+"   │    s - string                                                 │\n"
+"   │    u - time divisor: 1       - second                         │\n"
+"   │                      1000    - milli second                   │\n"
+"   │                      1000000 - micro second                   │\n"
+"   │    y4 - seconds, wday, yday, dst (daylight saving time)       │\n"
+"   │    y67- year, mon, day, hour, minute, second, [dst]           │\n"
+"   │    y9 - year, mon, day, hour, minute, second, wday, yday, dst │\n"
+"   │    A1, A2, ...  nested vector with elements A1, A2, ...       │\n"
+"   └───────────────────────────────────────────────────────────────┘\n"
 "\n"
-u8"           ⎕FIO      ⍬   ⍝ print this text on stderr\n"
-u8"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stderr\n"
-u8"           ⎕FIO      0   ⍝ return a list of open file descriptors\n"
-u8"        '' ⎕FIO      ⍬   ⍝ print this text on stdout\n"
-u8"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stdout\n"
-u8"           ⎕FIO[ 0] ''   ⍝ print this text on stderr\n"
-u8"        '' ⎕FIO[ 0] ''   ⍝ print this text on stdout\n"
+"           ⎕FIO      ⍬   ⍝ print this text on stderr\n"
+"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stderr\n"
+"           ⎕FIO      0   ⍝ return a list of open file descriptors\n"
+"        '' ⎕FIO      ⍬   ⍝ print this text on stdout\n"
+"           ⎕FIO     ''   ⍝ print function-number to -name mapping on stdout\n"
+"           ⎕FIO[ 0] ''   ⍝ print this text on stderr\n"
+"        '' ⎕FIO[ 0] ''   ⍝ print this text on stdout\n"
 "\n"
-u8"   Zi ←    ⎕FIO[ 1] ''   ⍝ errno (of last call)\n"
-u8"   Zs ←    ⎕FIO[ 2] Be   ⍝ strerror(Be)\n"
-u8"   Zh ← As ⎕FIO[ 3] Bp   ⍝ fopen(Bs, As) filename Bp mode As\n"
-u8"   Zh ←    ⎕FIO[ 3] Bp   ⍝ fopen(Bs, \"r\") filename Bp\n"
+"   Zi ←    ⎕FIO[ 1] ''   ⍝ errno (of last call)\n"
+"   Zs ←    ⎕FIO[ 2] Be   ⍝ strerror(Be)\n"
+"   Zh ← As ⎕FIO[ 3] Bp   ⍝ fopen(Bs, As) filename Bp mode As\n"
+"   Zh ←    ⎕FIO[ 3] Bp   ⍝ fopen(Bs, \"r\") filename Bp\n"
 "\n"
 "File I/O functions:\n"
 "\n"
-u8"   Ze ←    ⎕FIO[ 4] Bh   ⍝ fclose(Bh)\n"
-u8"   Ze ←    ⎕FIO[ 5] Bh   ⍝ errno (of the last call using Bh)\n"
-u8"   Zb ←    ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, " << SMALL_BUF
+"   Ze ←    ⎕FIO[ 4] Bh   ⍝ fclose(Bh)\n"
+"   Ze ←    ⎕FIO[ 5] Bh   ⍝ errno (of the last call using Bh)\n"
+"   Zb ←    ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, " << SMALL_BUF
                                           << ", Bh) 1 byte per Zb\n"
-u8"   Zb ← Ai ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
-u8"   Zi ← Ab ⎕FIO[ 7] Bh   ⍝ fwrite(Ab, 1, ⍴Ab, Bh) 1 byte per Ab\n"
-u8"   Zb ←    ⎕FIO[ 8] Bh   ⍝ fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
-u8"   Zb ← Ai ⎕FIO[ 8] Bh   ⍝ fgets(Zb, Ai, Bh) 1 byte per Zb\n"
-u8"   Zb ←    ⎕FIO[ 9] Bh   ⍝ fgetc(Zb, Bh) 1 byte\n"
-u8"   Zi ←    ⎕FIO[10] Bh   ⍝ feof(Bh)\n"
-u8"   Ze ←    ⎕FIO[11] Bh   ⍝ ferror(Bh)\n"
-u8"   Zi ←    ⎕FIO[12] Bh   ⍝ ftell(Bh)\n"
-u8"   Zi ← Ai ⎕FIO[13] Bh   ⍝ fseek(Bh, Ai, SEEK_SET)\n"
-u8"   Zi ← Ai ⎕FIO[14] Bh   ⍝ fseek(Bh, Ai, SEEK_CUR)\n"
-u8"   Zi ← Ai ⎕FIO[15] Bh   ⍝ fseek(Bh, Ai, SEEK_END)\n"
-u8"   Zi ←    ⎕FIO[16] Bh   ⍝ fflush(Bh)\n"
-u8"   Zi ←    ⎕FIO[17] Bh   ⍝ fsync(Bh)\n"
-u8"   Zi ←    ⎕FIO[18] Bh   ⍝ fstat(Bh)\n"
-u8"   Zi ←    ⎕FIO[19] Bh   ⍝ unlink(Bc)\n"
-u8"   Zi ←    ⎕FIO[20] Bh   ⍝ mkdir(Bc, 0777)\n"
-u8"   Zi ← Ai ⎕FIO[20] Bh   ⍝ mkdir(Bc, AI)\n"
-u8"   Zi ←    ⎕FIO[21] Bh   ⍝ rmdir(Bc)\n"
-u8"   Zi ← A  ⎕FIO[22] 1    ⍝ printf(         A1, A2...) format A1\n"
-u8"   Zi ← A  ⎕FIO[22] 2    ⍝ fprintf(stderr, A1, A2...) format A1\n"
-u8"   Zi ← A  ⎕FIO[22] Bh   ⍝ fprintf(Bh,     A1, A2...) format A1\n"
-u8"   Zi ← Ac ⎕FIO[23] Bh   ⍝ fwrite(Ac, 1, ⍴Ac, Bh) 1 Unicode per Ac, Output UTF8\n"
-u8"   Zh ← As ⎕FIO[24] Bs   ⍝ popen(Bs, As) command Bs mode As\n"
-u8"   Zh ←    ⎕FIO[24] Bs   ⍝ popen(Bs, \"r\") command Bs\n"
-u8"   Ze ←    ⎕FIO[25] Bh   ⍝ pclose(Bh)\n"
-u8"   Zb ←    ⎕FIO[26] Bp   ⍝ return entire file Bp as byte vector\n"
-u8"   Zs ← Ap ⎕FIO[27] Bp   ⍝ rename file Ap to Bp\n"
-u8"   Zd ←    ⎕FIO[28] Bp   ⍝ return content of directory Bp\n"
-u8"   Zn ←    ⎕FIO[29] Bp   ⍝ return file names in directory Bp\n"
-u8"   Zs ←    ⎕FIO 30       ⍝ getcwd()\n"
-u8"   Zn ← As ⎕FIO[31] Bs   ⍝ access(As, Bp) As ϵ 'RWXF'\n"
-u8"   Zh ←    ⎕FIO[32] Bi   ⍝ socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
-u8"   Ze ← Aa ⎕FIO[33] Bh   ⍝ bind(Bh, Aa)\n"
-u8"   Ze ←    ⎕FIO[34] Bh   ⍝ listen(Bh, 10)\n"
-u8"   Ze ← Ai ⎕FIO[34] Bh   ⍝ listen(Bh, Ai)\n"
-u8"   Za ←    ⎕FIO[35] Bh   ⍝ accept(Bh)\n"
-u8"   Ze ← Aa ⎕FIO[36] Bh   ⍝ connect(Bh, Aa)\n"
-u8"   Zb ←    ⎕FIO[37] Bh   ⍝ recv(Bh, Zb, " << SMALL_BUF << ", 0) 1 byte per Zb\n"
-u8"   Zb ← Ai ⎕FIO[37] Bh   ⍝ recv(Bb, Zi, Ai, 0) 1 byte per Zb\n"
-u8"   Zi ← Ab ⎕FIO[38] Bh   ⍝ send(Bh, Ab, ⍴Ab, 0) 1 byte per Ab\n"
-u8"   Zi ← Ac ⎕FIO[39] Bh   ⍝ send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8\n"
-u8"   Zi ←    ⎕FIO[40] B    ⍝ select(B_read, B_write, B_exception, B_timeout)\n"
-u8"   Zi ←    ⎕FIO[41] Bh   ⍝ read(Bh, Zi, " << SMALL_BUF << ") 1 byte per Zi\n"
-u8"   Zb ← Ai ⎕FIO[41] Bh   ⍝ read(Bh, Zb, Ai) 1 byte per Zb\n"
-u8"   Zi ← Ab ⎕FIO[42] Bh   ⍝ write(Bh, Ab, ⍴Ab) 1 byte per Ab\n"
-u8"   Zi ← Ac ⎕FIO[43] Bh   ⍝ write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8\n"
-u8"   Za ←    ⎕FIO[44] Bh   ⍝ getsockname(Bh)\n"
-u8"   Za ←    ⎕FIO[45] Bh   ⍝ getpeername(Bh)\n"
-u8"   Zi ← Ai ⎕FIO[46] Bh   ⍝ getsockopt(Bh, A_level, A_optname, Zi)\n"
-u8"   Ze ← Ai ⎕FIO[47] Bh   ⍝ setsockopt(Bh, A_level, A_optname, A_optval)\n"
-u8"   Ze ← As ⎕FIO[48] Bh   ⍝ fscanf(Bh, As)\n"
-u8"   Zs ←    ⎕FIO[49] Bp   ⍝ return entire file Bp as nested lines\n"
-u8"   Zs ← LO ⎕FIO[49] Bp   ⍝ ⎕FIO[49] Bp and pipe each line through LO.\n"
-u8"   Zi ←    ⎕FIO[50] Bu   ⍝ gettimeofday()\n"
-u8"   Zy4←    ⎕FIO[51] By67 ⍝ mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-u8"   Zy9←    ⎕FIO[52] Bi   ⍝ localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-u8"   Zy9←    ⎕FIO[53] Bi   ⍝ gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
-u8"   Zi ←    ⎕FIO[54] Bs   ⍝ chdir(Bs)\n"
-u8"   Ze ← Af ⎕FIO[55] Bs   ⍝ sscanf(Bs, Af) Af is the format string\n"
-u8"   Zs ← As ⎕FIO[56] Bp   ⍝ write nested lines As to file named Bp\n"
-u8"   Zh ←    ⎕FIO[57] Bs   ⍝ fork() and execve(Bs, { Bs, 0}, {0})\n"
-u8"   Zs ← Af ⎕FIO[58] B    ⍝ snprintf(Af, B...) As is the format string\n"
-u8"   Zi ← Ai ⎕FIO[59] Bh   ⍝ fcntl(Bh, Ai...) file control\n"
-u8"   Zi ←    ⎕FIO[60] Bi   ⍝ return a Bi-byte random integer (for setting ⎕RL)\n"
-u8"   Zi ← 0  ⎕FIO[60] Bi   ⍝ same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
-u8"   Zb ← 1  ⎕FIO[60] Bi   ⍝ return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
-u8"   Zi ←    ⎕FIO[61] Bv   ⍝ seconds since 1/1/1970; Bv←YYYY [MM DD [HH MM SS]]\n"
+"   Zb ← Ai ⎕FIO[ 6] Bh   ⍝ fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[ 7] Bh   ⍝ fwrite(Ab, 1, ⍴Ab, Bh) 1 byte per Ab\n"
+"   Zb ←    ⎕FIO[ 8] Bh   ⍝ fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[ 8] Bh   ⍝ fgets(Zb, Ai, Bh) 1 byte per Zb\n"
+"   Zb ←    ⎕FIO[ 9] Bh   ⍝ fgetc(Zb, Bh) 1 byte\n"
+"   Zi ←    ⎕FIO[10] Bh   ⍝ feof(Bh)\n"
+"   Ze ←    ⎕FIO[11] Bh   ⍝ ferror(Bh)\n"
+"   Zi ←    ⎕FIO[12] Bh   ⍝ ftell(Bh)\n"
+"   Zi ← Ai ⎕FIO[13] Bh   ⍝ fseek(Bh, Ai, SEEK_SET)\n"
+"   Zi ← Ai ⎕FIO[14] Bh   ⍝ fseek(Bh, Ai, SEEK_CUR)\n"
+"   Zi ← Ai ⎕FIO[15] Bh   ⍝ fseek(Bh, Ai, SEEK_END)\n"
+"   Zi ←    ⎕FIO[16] Bh   ⍝ fflush(Bh)\n"
+"   Zi ←    ⎕FIO[17] Bh   ⍝ fsync(Bh)\n"
+"   Zi ←    ⎕FIO[18] Bh   ⍝ fstat(Bh)\n"
+"   Zi ←    ⎕FIO[19] Bh   ⍝ unlink(Bc)\n"
+"   Zi ←    ⎕FIO[20] Bh   ⍝ mkdir(Bc, 0777)\n"
+"   Zi ← Ai ⎕FIO[20] Bh   ⍝ mkdir(Bc, AI)\n"
+"   Zi ←    ⎕FIO[21] Bh   ⍝ rmdir(Bc)\n"
+"   Zi ← A  ⎕FIO[22] 1    ⍝ printf(         A1, A2...) format A1\n"
+"   Zi ← A  ⎕FIO[22] 2    ⍝ fprintf(stderr, A1, A2...) format A1\n"
+"   Zi ← A  ⎕FIO[22] Bh   ⍝ fprintf(Bh,     A1, A2...) format A1\n"
+"   Zi ← Ac ⎕FIO[23] Bh   ⍝ fwrite(Ac, 1, ⍴Ac, Bh) 1 Unicode per Ac, Output UTF8\n"
+"   Zh ← As ⎕FIO[24] Bs   ⍝ popen(Bs, As) command Bs mode As\n"
+"   Zh ←    ⎕FIO[24] Bs   ⍝ popen(Bs, \"r\") command Bs\n"
+"   Ze ←    ⎕FIO[25] Bh   ⍝ pclose(Bh)\n"
+"   Zb ←    ⎕FIO[26] Bp   ⍝ return entire file Bp as byte vector\n"
+"   Zs ← Ap ⎕FIO[27] Bp   ⍝ rename file Ap to Bp\n"
+"   Zd ←    ⎕FIO[28] Bp   ⍝ return content of directory Bp\n"
+"   Zn ←    ⎕FIO[29] Bp   ⍝ return file names in directory Bp\n"
+"   Zs ←    ⎕FIO 30       ⍝ getcwd()\n"
+"   Zn ← As ⎕FIO[31] Bs   ⍝ access(As, Bp) As ϵ 'RWXF'\n"
+"   Zh ←    ⎕FIO[32] Bi   ⍝ socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
+"   Ze ← Aa ⎕FIO[33] Bh   ⍝ bind(Bh, Aa)\n"
+"   Ze ←    ⎕FIO[34] Bh   ⍝ listen(Bh, 10)\n"
+"   Ze ← Ai ⎕FIO[34] Bh   ⍝ listen(Bh, Ai)\n"
+"   Za ←    ⎕FIO[35] Bh   ⍝ accept(Bh)\n"
+"   Ze ← Aa ⎕FIO[36] Bh   ⍝ connect(Bh, Aa)\n"
+"   Zb ←    ⎕FIO[37] Bh   ⍝ recv(Bh, Zb, " << SMALL_BUF << ", 0) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[37] Bh   ⍝ recv(Bb, Zi, Ai, 0) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[38] Bh   ⍝ send(Bh, Ab, ⍴Ab, 0) 1 byte per Ab\n"
+"   Zi ← Ac ⎕FIO[39] Bh   ⍝ send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8\n"
+"   Zi ←    ⎕FIO[40] B    ⍝ select(B_read, B_write, B_exception, B_timeout)\n"
+"   Zi ←    ⎕FIO[41] Bh   ⍝ read(Bh, Zi, " << SMALL_BUF << ") 1 byte per Zi\n"
+"   Zb ← Ai ⎕FIO[41] Bh   ⍝ read(Bh, Zb, Ai) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[42] Bh   ⍝ write(Bh, Ab, ⍴Ab) 1 byte per Ab\n"
+"   Zi ← Ac ⎕FIO[43] Bh   ⍝ write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8\n"
+"   Za ←    ⎕FIO[44] Bh   ⍝ getsockname(Bh)\n"
+"   Za ←    ⎕FIO[45] Bh   ⍝ getpeername(Bh)\n"
+"   Zi ← Ai ⎕FIO[46] Bh   ⍝ getsockopt(Bh, A_level, A_optname, Zi)\n"
+"   Ze ← Ai ⎕FIO[47] Bh   ⍝ setsockopt(Bh, A_level, A_optname, A_optval)\n"
+"   Ze ← As ⎕FIO[48] Bh   ⍝ fscanf(Bh, As)\n"
+"   Zs ←    ⎕FIO[49] Bp   ⍝ return entire file Bp as nested lines\n"
+"   Zs ← LO ⎕FIO[49] Bp   ⍝ ⎕FIO[49] Bp and pipe each line through LO.\n"
+"   Zi ←    ⎕FIO[50] Bu   ⍝ gettimeofday()\n"
+"   Zy4←    ⎕FIO[51] By67 ⍝ mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[52] Bi   ⍝ localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[53] Bi   ⍝ gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zi ←    ⎕FIO[54] Bs   ⍝ chdir(Bs)\n"
+"   Ze ← Af ⎕FIO[55] Bs   ⍝ sscanf(Bs, Af) Af is the format string\n"
+"   Zs ← As ⎕FIO[56] Bp   ⍝ write nested lines As to file named Bp\n"
+"   Zh ←    ⎕FIO[57] Bs   ⍝ fork() and execve(Bs, { Bs, 0}, {0})\n"
+"   Zs ← Af ⎕FIO[58] B    ⍝ snprintf(Af, B...) As is the format string\n"
+"   Zi ← Ai ⎕FIO[59] Bh   ⍝ fcntl(Bh, Ai...) file control\n"
+"   Zi ←    ⎕FIO[60] Bi   ⍝ return a Bi-byte random integer (for setting ⎕RL)\n"
+"   Zi ← 0  ⎕FIO[60] Bi   ⍝ same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
+"   Zb ← 1  ⎕FIO[60] Bi   ⍝ return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
+"   Zi ←    ⎕FIO[61] Bv   ⍝ seconds since 1/1/1970; Bv←YYYY [MM DD [HH MM SS]]\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
-u8"           ⎕FIO[200] Bi   ⍝ clear statistics with ID Bi\n"
-u8"   Zn ←    ⎕FIO[201] Bi   ⍝ get statistics with ID Bi\n"
-u8"           ⎕FIO[202] Bs   ⍝ get monadic parallel threshold for primitive Bs\n"
-u8"        Ai ⎕FIO[202] Bs   ⍝ set monadic parallel threshold for primitive Bs\n"
-u8"           ⎕FIO[203] Bs   ⍝ get dyadic parallel threshold for primitive Bs\n"
-u8"        Ai ⎕FIO[203] Bs   ⍝ set dyadic parallel threshold for primitive Bs\n"
+"           ⎕FIO[200] Bi   ⍝ clear statistics with ID Bi\n"
+"   Zn ←    ⎕FIO[201] Bi   ⍝ get statistics with ID Bi\n"
+"           ⎕FIO[202] Bs   ⍝ get monadic parallel threshold for primitive Bs\n"
+"        Ai ⎕FIO[202] Bs   ⍝ set monadic parallel threshold for primitive Bs\n"
+"           ⎕FIO[203] Bs   ⍝ get dyadic parallel threshold for primitive Bs\n"
+"        Ai ⎕FIO[203] Bs   ⍝ set dyadic parallel threshold for primitive Bs\n"
 "\n"
-u8"The functions of ⎕FIO can be called with one of several syntax alternatives.\n"
-u8"The syntax alternatives for ⎕FIO can be displayed with:\n\n";
+"The functions of ⎕FIO can be called with one of several syntax alternatives.\n"
+"The syntax alternatives for ⎕FIO can be displayed with:\n\n";
 
-   COUT <<"      " << group_name << u8" ⍬   ⍝ display the "
+   COUT <<"      " << group_name << " ⍬   ⍝ display the "
         << " syntax alternatives for " << group_name << "\n\n";
 
    return Token();
@@ -884,8 +884,8 @@ Quad_FIO::print_map_syntax(ostream & out, const function_info & info) const
 const char * name = info.function_name;
 const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
-   out << u8"    ⎕FIO[" << info.axis << u8"]  ←→  ⎕FIO['" << name << "']"
-       << blanks << u8"←→  ⎕FIO." << name << endl;
+   out << "    ⎕FIO[" << info.axis << "]  ←→  ⎕FIO['" << name << "']"
+       << blanks << "←→  ⎕FIO." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -900,7 +900,7 @@ Quad_FIO::do_fprintf(FILE * outf, Value_P A)
 UCS_string UZ;
 const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
-   do_snprintf(UZ, A_format, A.get(), 1, u8"⎕FIO.fprintf B");
+   do_snprintf(UZ, A_format, A.get(), 1, "⎕FIO.fprintf B");
 UTF8_string utf(UZ);
    if (fwrite(utf.c_str(), 1, utf.size(), outf) != utf.size())   SYSTEM_ERROR;
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
@@ -1267,7 +1267,7 @@ Unicode lookahead = input.get_next();
                 {
                  if (f == format.ssize())   // end of format string
                     {
-                      MORE_ERROR() << u8"No ] in character range A of A ⎕FIO["
+                      MORE_ERROR() << "No ] in character range A of A ⎕FIO["
                                    << function_number << "] B";
                       DOMAIN_ERROR;
                     }
@@ -2021,8 +2021,8 @@ const ShapeItem line_count = A->element_count();
          if (!cA.is_pointer_cell())
             {
                MORE_ERROR() <<
-u8"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
-u8"first non-nested element is A[⎕IO+" << a << "].";
+"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
+"first non-nested element is A[⎕IO+" << a << "].";
                DOMAIN_ERROR;
             }
 
@@ -2030,8 +2030,8 @@ u8"first non-nested element is A[⎕IO+" << a << "].";
          if (!Ai->is_char_vector())
             {
                MORE_ERROR() <<
-u8"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
-u8"first non-string element is A[⎕IO+" << a << "].";
+"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
+"first non-string element is A[⎕IO+" << a << "].";
                DOMAIN_ERROR;
             }
        }
@@ -2065,7 +2065,7 @@ Quad_FIO::eval_AXB__58(Value_P A, Value_P B)
 {
 const UCS_string A_format(*A);
 UCS_string UZ;
-   do_snprintf(UZ, A_format, B.get(), 0, u8"A ⎕FIO.snprintf B");
+   do_snprintf(UZ, A_format, B.get(), 0, "A ⎕FIO.snprintf B");
 Value_P Z(UZ, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -3017,7 +3017,7 @@ APL_Integer z = 0;
    else
       {
         MORE_ERROR() <<
-  u8"Invalid time unit (use 1 for seconds, 1000 for ms, or 1000000 for μs)";
+  "Invalid time unit (use 1 for seconds, 1000 for ms, or 1000000 for μs)";
         DOMAIN_ERROR;
       }
    return Token(TOK_APL_VALUE1, IntScalar(z, LOC));
@@ -3180,7 +3180,7 @@ Quad_FIO::get_file_entry(int handle)
       }
 
    MORE_ERROR() << handle
-                << u8" is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
+                << " is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -3190,7 +3190,7 @@ Quad_FIO::get_random(APL_Integer mode, APL_Integer len)
 const int device = open("/dev/urandom", O_RDONLY);
    if (device == -1)
       {
-        MORE_ERROR() << u8"⎕FIO[60] failed when trying to open /dev/urandom: "
+        MORE_ERROR() << "⎕FIO[60] failed when trying to open /dev/urandom: "
                      << strerror(errno);
         DOMAIN_ERROR;
       }
@@ -3201,7 +3201,7 @@ const ssize_t bytes = read(device, buffer, len);
 
    if (bytes == -1)
       {
-        MORE_ERROR() << u8"⎕FIO[60] failed when trying to read /dev/urandom: "
+        MORE_ERROR() << "⎕FIO[60] failed when trying to read /dev/urandom: "
                      << strerror(errno);
         DOMAIN_ERROR;
       }
@@ -3219,7 +3219,7 @@ const ssize_t bytes = read(device, buffer, len);
          return Z;
       }
 
-   MORE_ERROR() << u8"Invalid mode A in A ⎕FIO[60] B";
+   MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -3288,7 +3288,7 @@ int Bv[6];  // values as provided in B
          else              Bv[b] = B.get_cravel(b).get_int_value();
          if (Bv[b] < range[b].min_val)
             {
-              MORE_ERROR() << u8"In ⎕FX.secs_epoch : B["
+              MORE_ERROR() << "In ⎕FX.secs_epoch : B["
                            << (b + Workspace::get_IO())
                            <<  "] (aka. " << range[b].name
                            << ") is too small (the valid range is "
@@ -3298,7 +3298,7 @@ int Bv[6];  // values as provided in B
             }
          else if (Bv[b] > range[b].max_val)
             {
-              MORE_ERROR() << u8"In ⎕FX.secs_epoch : B["
+              MORE_ERROR() << "In ⎕FX.secs_epoch : B["
                            << (b + Workspace::get_IO())
                            <<  "] (aka. " << range[b].name
                            << ") is too large (the valid range is "
@@ -3323,7 +3323,7 @@ tm tm;
 const time_t z = mktime(&tm);
    if (z != time_t(-1))   return APL_Integer(z);
 
-   MORE_ERROR() << u8"⎕FIO B: bad B";
+   MORE_ERROR() << "⎕FIO B: bad B";
    DOMAIN_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════

@@ -235,7 +235,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              break;
 
         case PM_STATEMENT_LIST:
-             out << u8"⋆";
+             out << "⋆";
              if (mode & SIM_statements)   // )SIS
                 {
                   if (!executable)      break;
@@ -249,7 +249,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              break;
 
         case PM_EXECUTE:
-             out << u8"⋆⋆  ";
+             out << "⋆⋆  ";
              if (mode & SIM_statements)   // )SIS
                 {
                   if (!executable)   break;
@@ -293,7 +293,7 @@ std::vector<const StateIndicator *> stack;
          if (0 == --from_tos)   return si->get_level();
        }
 
-   MORE_ERROR() << u8"Invalid ⎕STACK index";
+   MORE_ERROR() << "Invalid ⎕STACK index";
    INDEX_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -309,16 +309,16 @@ StateIndicator::print(ostream & out) const
    switch(get_parse_mode())
       {
         case PM_FUNCTION:
-             out << u8"Pmode:      ∇ "
+             out << "Pmode:      ∇ "
                  << executable->get_exec_ufun()->get_name_and_line(get_PC());
              break;
 
         case PM_STATEMENT_LIST:
-             out << u8"Pmode:      ◊ " << " " << executable->get_text(0);
+             out << "Pmode:      ◊ " << " " << executable->get_text(0);
              break;
 
         case PM_EXECUTE:
-             out << u8"Pmode:      ⍎ " << " " << executable->get_text(0);
+             out << "Pmode:      ⍎ " << " " << executable->get_text(0);
              break;
 
         default:
@@ -618,7 +618,7 @@ const int boxing_format = Command::get_boxing_format();
              B1->print(COUT);
 
              CERR << "      *** display of value was truncated (limit "
-                     u8"⎕SYL[⎕IO + " << Quad_SYL::SYL_PRINT_LIMIT
+                     "⎕SYL[⎕IO + " << Quad_SYL::SYL_PRINT_LIMIT
                   << "] reached)  ***" << endl;
            }
         else   // no print length limit or small B

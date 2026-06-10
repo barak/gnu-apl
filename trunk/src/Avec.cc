@@ -229,7 +229,7 @@ const CHT_Index idx = map_alternative_char(uni);
    Log(LOG_verbose_error)
       {
         CERR << endl << "Avec::uni_to_token() : Char " << UNI(uni)
-             << " (" << uni << u8") not found in ⎕AV! (called from "
+             << " (" << uni << ") not found in ⎕AV! (called from "
              << loc << ")" << endl;
 
          BACKTRACE

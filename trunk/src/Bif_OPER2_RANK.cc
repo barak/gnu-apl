@@ -133,15 +133,15 @@ Bif_OPER2_RANK::unstrand_RO_B(Value_P y123_B, Value_P & y123, Value_P & B)
    //
    if (y123_B->get_rank() > 1)
       {
-        MORE_ERROR() << u8"f⍤y B: ⍴⍴B = " << y123_B->get_rank()
-                     << u8" (expecting ⍴⍴y = 1)";
+        MORE_ERROR() << "f⍤y B: ⍴⍴B = " << y123_B->get_rank()
+                     << " (expecting ⍴⍴y = 1)";
         RANK_ERROR;
       }
 
 const ShapeItem length = y123_B->element_count();
    if (length == 0)
       {
-        MORE_ERROR() << u8"f⍤y B: invalid empth y (⍴y = 0)";
+        MORE_ERROR() << "f⍤y B: invalid empth y (⍴y = 0)";
         LENGTH_ERROR;
       }
 
@@ -281,7 +281,7 @@ cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())
       {
-        MORE_ERROR() << u8"A f ⍤ y B: function f returns no result";
+        MORE_ERROR() << "A f ⍤ y B: function f returns no result";
         DOMAIN_ERROR;
       }
 
@@ -313,16 +313,16 @@ const Shape shape_Z = frame_B_rank ? B->get_shape().frame_shape(frame_B_rank)
               const APL_Integer axis = X->get_cravel(x).get_int_value();
               if (axis != B->get_rank())
                  {
-                   MORE_ERROR() << u8"A f ⍤[X] B: invalid axis " << axis
-                                << u8" of B (with ⍴⍴B = " << B->get_rank()
+                   MORE_ERROR() << "A f ⍤[X] B: invalid axis " << axis
+                                << " of B (with ⍴⍴B = " << B->get_rank()
                                 << ") in X.";
                    RANK_ERROR;
                  }
 
               if (axis != A->get_rank())
                  {
-                   MORE_ERROR() << u8"A f ⍤[X] B: invalid axis " << axis
-                                << u8" of A (with ⍴⍴A = " << A->get_rank()
+                   MORE_ERROR() << "A f ⍤[X] B: invalid axis " << axis
+                                << " of A (with ⍴⍴A = " << A->get_rank()
                                 << ") in X.";
                    RANK_ERROR;
                  }
@@ -402,7 +402,7 @@ cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())
       {
-        MORE_ERROR() << u8"f ⍤ y B: function f returns no result";
+        MORE_ERROR() << "f ⍤ y B: function f returns no result";
         DOMAIN_ERROR;
       }
 
@@ -427,8 +427,8 @@ const Shape shape_Z = B->get_shape().frame_shape(frame_B_rank);
               const APL_Integer axis = X->get_cravel(x).get_int_value();
               if (axis != B->get_rank())
                  {
-                   MORE_ERROR() << u8"f ⍤[X] B: invalid axis " << axis
-                                << u8" of B (with ⍴⍴B = " << B->get_rank()
+                   MORE_ERROR() << "f ⍤[X] B: invalid axis " << axis
+                                << " of B (with ⍴⍴B = " << B->get_rank()
                                 << ") in X.";
                    RANK_ERROR;
                  }
@@ -489,14 +489,14 @@ Bif_OPER2_RANK::y123_to_chunk_B_rank(Value_P y123, sRank rank_B)
 
    if (!y123)
       {
-        MORE_ERROR() << u8"(A) f ∘ y B without y ";
+        MORE_ERROR() << "(A) f ∘ y B without y ";
         VALUE_ERROR;
       }
 
    if ( y123->get_rank() > 1)
       {
-        MORE_ERROR() << u8"(A) f ∘ y B with ⍴⍴y = " << y123->get_rank()
-                     << u8" (expecting 1 ≥ ⍴⍴y 1).";
+        MORE_ERROR() << "(A) f ∘ y B with ⍴⍴y = " << y123->get_rank()
+                     << " (expecting 1 ≥ ⍴⍴y 1).";
         RANK_ERROR;
       }
 
@@ -537,7 +537,7 @@ sRank y3;
                       break;
 
         default: // ISO p. 124 (monadic) p. 125 (dyadic)
-                 MORE_ERROR() << u8"(A) f ∘ y B with ⍴y = "
+                 MORE_ERROR() << "(A) f ∘ y B with ⍴y = "
                               << y123->element_count() << " (not 1, 2, or 3)";
                  LENGTH_ERROR;
       }

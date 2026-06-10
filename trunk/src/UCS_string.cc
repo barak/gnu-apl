@@ -160,8 +160,8 @@ int expo = 0;
            {
             if (isnormal(value) || isinf(value))   // rather large
                {
-                 if (negative)   *this << u8"¯∞";
-                 else            *this << u8"∞";
+                 if (negative)   *this << "¯∞";
+                 else            *this << "∞";
                  FloatCell::map_FC(*this);
                }
            else

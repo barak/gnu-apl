@@ -521,8 +521,8 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         // NOTE:  M←3 2ρι6 ◊ (1 0/M) ← 'abc' succeeds in IBM APL2, even
         //        though the shapes of 1 0/M and 'abc' differ. We therefore
         //
-        MORE_ERROR() << u8"in (f Z)←B: length(X⊃F Z) is " << dest_count
-                     << u8", but length(X⊃V) is " << new_value_count
+        MORE_ERROR() << "in (f Z)←B: length(X⊃F Z) is " << dest_count
+                     << ", but length(X⊃V) is " << new_value_count
                      << " (for some X)";
         LENGTH_ERROR;
       }
@@ -665,7 +665,7 @@ Value::get_member(const vector<const UCS_string *> & members,
               UCS_string & more = MORE_ERROR() << "member access: the rank of ";
               more.append_members(members, m);
               more << " is not 2.\n"
-                      u8"Expecting an N×2 matrix of member,value pairs.";
+                      "Expecting an N×2 matrix of member,value pairs.";
               RANK_ERROR;
             }
 
@@ -676,7 +676,7 @@ Value::get_member(const vector<const UCS_string *> & members,
                  << "member access: the number of columns of ";
               more.append_members(members, m);
               more << " is not 2.\n"
-                      u8"Expecting an N×2 matrix of member,value pairs.";
+                      "Expecting an N×2 matrix of member,value pairs.";
               LENGTH_ERROR;
             }
 
@@ -749,7 +749,7 @@ const Value * parent = this;
               UCS_string & more = MORE_ERROR() << "member access: the rank of ";
               more.append_members(members, m);
               more << " is not 2.\n"
-                      u8"Expecting an N×2 matrix of member,value pairs.";
+                      "Expecting an N×2 matrix of member,value pairs.";
               RANK_ERROR;
             }
 
@@ -759,7 +759,7 @@ const Value * parent = this;
                  << "member access: the number of columns of ";
               more.append_members(members, m);
               more << " is not 2.\n"
-                      u8"Expecting an N×2 matrix of member,value pairs.";
+                      "Expecting an N×2 matrix of member,value pairs.";
               LENGTH_ERROR;
             }
 
@@ -1327,7 +1327,7 @@ Value::print_brief(ostream & out) const
 {
    // shape
    //
-   out << u8"⍴";
+   out << "⍴";
    loop(r, shape.get_rank())
        {
          r && out << ";";
@@ -1336,12 +1336,12 @@ Value::print_brief(ostream & out) const
 
    // depth
    //
-   out << u8"≡" << compute_depth() << " ";
+   out << "≡" << compute_depth() << " ";
 
    // ravel
    //
 const int count = min(3, int(element_count()));
-   if (count == 0)   out << u8"⌽";   // empty
+   if (count == 0)   out << "⌽";   // empty
    loop(c, count)
       {
         if (c)    out << " ";
@@ -1349,7 +1349,7 @@ const int count = min(3, int(element_count()));
         if (cell.is_integer_cell())        out << cell.get_int_value();
         else if (cell.is_float_cell())     out << "FLT";
         else if (cell.is_complex_cell())   out << "CPLX";
-        else if (cell.is_pointer_cell())   out << u8"⊂";
+        else if (cell.is_pointer_cell())   out << "⊂";
         if (element_count() > count)       out << "...";
       }
 
@@ -1403,7 +1403,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
               Value_P sub = cell->get_pointer_value();
               if (sub->is_member())
                  {
-                   out << u8"□" << endl;
+                   out << "□" << endl;
                    sub->print_member(out, member);
                    printed = true;
                  }
@@ -1657,7 +1657,7 @@ AxesBitmap ret = 0;
    if (get_rank() > 1)
       {
          MORE_ERROR() << "In " << where
-                      << u8": invalid ⍴⍴X ( = " << get_rank() << ")";
+                      << ": invalid ⍴⍴X ( = " << get_rank() << ")";
          AXIS_ERROR;
       }
 
@@ -1679,7 +1679,7 @@ AxesBitmap ret = 0;
             {
               MORE_ERROR() << "In " << where << " : X[" << (e + qio)
                            << "] = " << (axis + qio)
-                           << u8" is too small (note: ⎕IO is " << qio << ").";
+                           << " is too small (note: ⎕IO is " << qio << ").";
               AXIS_ERROR;
             }
 
@@ -1687,7 +1687,7 @@ AxesBitmap ret = 0;
             {
               MORE_ERROR() << "In " << where << " : X[" << (e + qio)
                            << "] = " << (axis + qio)
-                           << u8" is too large (note: ⍴⍴B is " << rank_B << ").";
+                           << " is too large (note: ⍴⍴B is " << rank_B << ").";
               AXIS_ERROR;
             }
 
@@ -1779,9 +1779,9 @@ const Cell * cI = &X->get_cfirst();
          const ShapeItem idx0 = cI++->get_near_int() - qio;
          if (idx0 < 0 || idx0 >= max_idx)
             {
-              MORE_ERROR() << u8"min index=⎕IO (=" << qio
+              MORE_ERROR() << "min index=⎕IO (=" << qio
                            <<  "), offending index=" << (idx0 + qio)
-                           << u8", max index=⎕IO+" << (max_idx - 1)
+                           << ", max index=⎕IO+" << (max_idx - 1)
                            << " (=" << (max_idx + qio - 1) << ")";
               Z->rollback(Z->valid_ravel_items, LOC);
               INDEX_ERROR;
@@ -2135,7 +2135,7 @@ Value::list_one(ostream & out, bool show_owners) const
         out << "   Flags = NONE";
       }
 
-   out << u8", ⍴" << get_shape() << u8" ≡" << compute_depth() << ":" << endl;
+   out << ", ⍴" << get_shape() << " ≡" << compute_depth() << ":" << endl;
    print(out);
    out << endl;
 
@@ -2477,8 +2477,8 @@ Value::print_structure(ostream & out, int indent, ShapeItem idx) const
    loop(i, indent)   out << "    ";
    if (indent)   out << "[" << idx << "] ";
    out << "addr=" << voidP(this)
-       << u8" ≡" << compute_depth()
-       << u8" ⍴" << get_shape()
+       << " ≡" << compute_depth()
+       << " ⍴" << get_shape()
        << " flags: " << HEX4(get_flags()) << "   "
        << get_flags()
        << " " << where_allocated()
@@ -2949,8 +2949,8 @@ const int64_t used_memory
    << "    new cell_count:    " << requested_cell_count    << " cells" << endl
    << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << endl
    << "    used_memory:       " << used_memory             << " bytes" << endl
-   << u8"    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
-   << u8"    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
+   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
+   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
 
            << " at " << LOC << endl;
    return true;
@@ -3015,10 +3015,10 @@ Value::init_ravel()
        Quad_SYL::value_count_limit < APL_Integer(value_count))
       {
         MORE_ERROR() <<
-u8"the system limit on the APL value count (as set in ⎕SYL["
+"the system limit on the APL value count (as set in ⎕SYL["
 << (Quad_SYL::SYL_VALUE_COUNT_LIMIT + Workspace::get_IO())
 << ";2]) was reached\n"
-u8"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
 
         // reset the limit so that we don't get stuck here.
         //
@@ -3057,10 +3057,10 @@ CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
         IntCell::zI(ravel, 42);
 
         MORE_ERROR() <<
-u8"the system limit on the total ravel size (as set in ⎕SYL["
+"the system limit on the total ravel size (as set in ⎕SYL["
 << (Quad_SYL::SYL_RAVEL_BYTES_LIMIT + Workspace::get_IO())
 << ";2]) was reached\n"
-u8"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::ravel_count_limit = 0;

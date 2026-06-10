@@ -47,7 +47,7 @@ const UTF8_string filename_utf(filename_ucs);
 const int fd = open(filename_utf.c_str(), O_RDONLY);
   if (fd == -1)
       {
-        MORE_ERROR() << u8"1 ⎕JSON B: error reading " << B
+        MORE_ERROR() << "1 ⎕JSON B: error reading " << B
                      << ": " << strerror(errno);
        DOMAIN_ERROR;
       }
@@ -55,7 +55,7 @@ const int fd = open(filename_utf.c_str(), O_RDONLY);
 struct stat st;
    if (fstat(fd, &st))
       {
-        MORE_ERROR() << u8"1 ⎕JSON B: error in fstat(" << B
+        MORE_ERROR() << "1 ⎕JSON B: error in fstat(" << B
                      << "): " << strerror(errno);
         ::close(fd);
         DOMAIN_ERROR;
@@ -73,7 +73,7 @@ const ssize_t bytes_read = read(fd, buffer, st.st_size);
       {
         ::close(fd);
         delete [] buffer;
-        MORE_ERROR() << u8"1 ⎕JSON B: error in reading " << B
+        MORE_ERROR() << "1 ⎕JSON B: error in reading " << B
                      << "): " << strerror(errno);
         DOMAIN_ERROR;
       }
@@ -117,7 +117,7 @@ const int function_number = A->get_cfirst().get_int_value();
 
       }
 
-   MORE_ERROR() << u8"A ⎕JSON B: Bad function number A=" << function_number;
+   MORE_ERROR() << "A ⎕JSON B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -272,7 +272,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 
    // unexpected rank for a JSON value
    //
-   MORE_ERROR() << u8"⎕JSON B: bad rank " << B.get_rank();
+   MORE_ERROR() << "⎕JSON B: bad rank " << B.get_rank();
    result.clear();   // indicate error
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -306,7 +306,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
 
    if (!cell.is_pointer_cell())
       {
-        MORE_ERROR() << u8"2 ⎕JSON B: Unexpected/unsupported Celltype "
+        MORE_ERROR() << "2 ⎕JSON B: Unexpected/unsupported Celltype "
                      << Cell::get_cell_type_name(cell.get_cell_type());
         DOMAIN_ERROR;
       }
@@ -335,8 +335,8 @@ const UCS_string lit_ucs(*Z);
         return;
       }
 
-   MORE_ERROR() << u8"2 ⎕JSON B: bad JSON literal ⊂'" << lit_ucs
-                << u8"'. Expecting ⊂'true', ⊂'false', or ⊂'null'";
+   MORE_ERROR() << "2 ⎕JSON B: bad JSON literal ⊂'" << lit_ucs
+                << "'. Expecting ⊂'true', ⊂'false', or ⊂'null'";
    result.clear();   // indicate error
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -378,8 +378,8 @@ bool expect_colon = true;
                       if (stack.size() > 1)   continue;
                       if (!expect_comma)
                          {
-                           MORE_ERROR() << u8"⎕JSON B: Got unexpected ',' at "
-                                        <<  tokens_B[token0] << u8"↓B";
+                           MORE_ERROR() << "⎕JSON B: Got unexpected ',' at "
+                                        <<  tokens_B[token0] << "↓B";
                            DOMAIN_ERROR;
                          }
 
@@ -392,17 +392,17 @@ bool expect_colon = true;
                       if (stack.size() > 1)   continue;
                       if (!expect_comma)
                          {
-                           MORE_ERROR() << u8"⎕JSON B: Got unexpected ':' at "
-                                        <<  tokens_B[token0] << u8"↓B";
+                           MORE_ERROR() << "⎕JSON B: Got unexpected ':' at "
+                                        <<  tokens_B[token0] << "↓B";
                            DOMAIN_ERROR;
                          }
 
                       expect_comma = false;
                       if (!expect_colon)
                          {
-                           MORE_ERROR() << u8"⎕JSON B: Got ':' "
+                           MORE_ERROR() << "⎕JSON B: Got ':' "
                                            "instead of ',' at "
-                                        <<  tokens_B[token0] << u8"↓B";
+                                        <<  tokens_B[token0] << "↓B";
                            DOMAIN_ERROR;
                          }
                       expect_colon = false;
@@ -440,9 +440,9 @@ bool expect_colon = true;
                       if (stack.size() > 1)   continue;   // not of interest
                       if (expect_comma)
                          {
-                           MORE_ERROR() << u8"⎕JSON B: Got '" << uni
+                           MORE_ERROR() << "⎕JSON B: Got '" << uni
                                         << "' when expecting ',' at "
-                                        <<  tokens_B[token0] << u8"↓B";
+                                        <<  tokens_B[token0] << "↓B";
                            DOMAIN_ERROR;
                          }
                       expect_comma = true;
@@ -450,8 +450,8 @@ bool expect_colon = true;
 
        }
 
-   MORE_ERROR() << u8"⎕JSON B: No matching " << end << " for " << start
-                << " at " << tokens_B[token0] << u8"↓B ";
+   MORE_ERROR() << "⎕JSON B: No matching " << end << " for " << start
+                << " at " << tokens_B[token0] << "↓B ";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -518,11 +518,11 @@ std::vector<ShapeItem> tokens_B;
                    continue;
 
               default:
-                   MORE_ERROR() << u8"⎕JSON B: Got '" << uni <<
-                   "' when expecting a JSON token at " << b << u8"↓B";
+                   MORE_ERROR() << "⎕JSON B: Got '" << uni <<
+                   "' when expecting a JSON token at " << b << "↓B";
                    DOMAIN_ERROR;
-                   MORE_ERROR() << u8"⎕JSON B: Got '" << uni <<
-                   "' when expecting a JSON token at " << b << u8"↓B";
+                   MORE_ERROR() << "⎕JSON B: Got '" << uni <<
+                   "' when expecting a JSON token at " << b << "↓B";
                    DOMAIN_ERROR;
             }
        }
@@ -535,7 +535,7 @@ size_t token0 = 0;
    if (token0 != tokens_B.size())
       {
         MORE_ERROR() <<
-        u8"⎕JSON B: there were extra tokens in B (tokenized: "
+        "⎕JSON B: there were extra tokens in B (tokenized: "
         << int(tokens_B.size()) << ", but processed: " << int(token0) <<
         ").\n    The JSON string must be one serialized value.";
         LENGTH_ERROR;
@@ -596,9 +596,9 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
               else if (uni == UNI_R_BRACK)    ++token_from;
               else
                  {
-                   MORE_ERROR() << u8"⎕JSON B: Got '" << uni
+                   MORE_ERROR() << "⎕JSON B: Got '" << uni
                                 << "' when expecting ',' or ']' at "
-                                <<  int(token_from) << u8"↓B";
+                                <<  int(token_from) << "↓B";
                    DOMAIN_ERROR;
                  }
             }
@@ -619,9 +619,9 @@ const size_t len = strlen(expected_literal);
        {
          if (ucs_B[b + l] != expected_literal[l])
             {
-              MORE_ERROR() << u8"⎕JSON B: misspelled JSON literal "
+              MORE_ERROR() << "⎕JSON B: misspelled JSON literal "
                            << UCS_string(ucs_B, b, len) << " at " << b
-                           << u8"↓B (expecting " << expected_literal << ")";
+                           << "↓B (expecting " << expected_literal << ")";
               DOMAIN_ERROR;
             }
        }
@@ -719,8 +719,8 @@ double dval = 0;
       }
 
 number_too_long:
-   MORE_ERROR() << u8"⎕JSON B: number too long at " << b
-                << u8"↓B (max. length is " << MAX_NUMLEN << ")";
+   MORE_ERROR() << "⎕JSON B: number too long at " << b
+                << "↓B (max. length is " << MAX_NUMLEN << ")";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -775,9 +775,9 @@ Quad_JSON::parse_object_member(Value & Z, const UCS_string & ucs_B,
 const size_t B_start =  tokens_B[token_from];
    if (ucs_B[B_start] != UNI_DOUBLE_QUOTE)
       {
-        MORE_ERROR() << u8"⎕JSON B: Got '" << ucs_B[B_start] <<
+        MORE_ERROR() << "⎕JSON B: Got '" << ucs_B[B_start] <<
         "' when expecting (double-quoted) object member name at " <<
-        int(B_start) << u8"↓B";
+        int(B_start) << "↓B";
         DOMAIN_ERROR;
       }
    ++token_from;   // skip "
@@ -792,9 +792,9 @@ UCS_string member_name;
      if (ucs_B[ucs_B_colon] != UNI_COLON)
         {
           MORE_ERROR() <<
-          u8"⎕JSON B: Got '" << ucs_B[ucs_B_colon] <<
+          "⎕JSON B: Got '" << ucs_B[ucs_B_colon] <<
           "' when expecting ':' after object member name at " <<
-          int(B_start) << u8"↓B";
+          int(B_start) << "↓B";
           DOMAIN_ERROR;
         }
      ++token_from;   // skip :
@@ -819,8 +819,8 @@ UCS_string member_name;
       {
         // member name exists already
         //
-        MORE_ERROR() << u8"⎕JSON: duplicate member name '" << member_name
-                     << "' at " << int(B_start) << u8"↓B";
+        MORE_ERROR() << "⎕JSON: duplicate member name '" << member_name
+                     << "' at " << int(B_start) << "↓B";
         DOMAIN_ERROR;
       }
 
@@ -840,9 +840,9 @@ UCS_string member_name;
      const Unicode sepa = ucs_B[ucs_B_sepa];
      if (sepa != UNI_COMMA && sepa != UNI_R_CURLY)
         {
-          MORE_ERROR() << u8"⎕JSON B: Got '" << sepa <<
+          MORE_ERROR() << "⎕JSON B: Got '" << sepa <<
                "' when expecting ',' or '}' after \"" << member_name
-               << "\" : at " << int(B_start) << u8"↓B";
+               << "\" : at " << int(B_start) << "↓B";
           DOMAIN_ERROR;
         }
    }
@@ -882,7 +882,7 @@ Value_P Zsub(content_len, LOC);
                         else if (is_high_surrogate(uni))
                            {
                              MORE_ERROR() <<
-                             u8"⎕JSON B: No low surrogate at " << bb << u8"↓B";
+                             "⎕JSON B: No low surrogate at " << bb << "↓B";
                              DOMAIN_ERROR;
                            }
                         else if (uni == Unicode_0)   // decode_UUUU() failed
@@ -916,19 +916,19 @@ const ShapeItem b = tokens_B.at(token0);
         // unexpected token...
         //
         case UNI_COMMA:
-             MORE_ERROR() << u8"⎕JSON: Got ',' when expecting a value";
+             MORE_ERROR() << "⎕JSON: Got ',' when expecting a value";
              DOMAIN_ERROR;
 
         case UNI_COLON:
-             MORE_ERROR() << u8"⎕JSON: Got ':' when expecting a value";
+             MORE_ERROR() << "⎕JSON: Got ':' when expecting a value";
              DOMAIN_ERROR;
 
         case UNI_R_BRACK:
-             MORE_ERROR() << u8"⎕JSON: Got ']' when expecting a value";
+             MORE_ERROR() << "⎕JSON: Got ']' when expecting a value";
              DOMAIN_ERROR;
 
         case UNI_R_CURLY:
-             MORE_ERROR() << u8"⎕JSON: Got '}' when expecting a value";
+             MORE_ERROR() << "⎕JSON: Got '}' when expecting a value";
              DOMAIN_ERROR;
 
         // single token (we increment token0)...
@@ -971,11 +971,11 @@ ShapeItem content_len = 0;
                   const Unicode u1 = decode_UUUU(ucs_B, b);
                   if (u1 == Unicode_0)   // decode_UUUU() failed
                      {
-                       MORE_ERROR() << u8"⎕JSON B: bad escape sequence "
+                       MORE_ERROR() << "⎕JSON B: bad escape sequence "
                                     << ucs_B[b    ] << ucs_B[b + 1]
                                     << ucs_B[b + 2] << ucs_B[b + 3]
                                     << ucs_B[b + 4] << ucs_B[b + 5]
-                                    << " at " << b << u8"↓B";
+                                    << " at " << b << "↓B";
                        DOMAIN_ERROR;
                      }
 
@@ -984,11 +984,11 @@ ShapeItem content_len = 0;
                        const Unicode u2 = decode_UUUU(ucs_B, b + 6);
                        if (u2 == Unicode_0)   // decode_UUUU() failed
                           {
-                            MORE_ERROR() << u8"⎕JSON B: bad escape sequence "
+                            MORE_ERROR() << "⎕JSON B: bad escape sequence "
                                          << ucs_B[b +  6] << ucs_B[b +  7]
                                          << ucs_B[b +  8] << ucs_B[b +  9]
                                          << ucs_B[b + 10] << ucs_B[b + 11]
-                                         << " at " << (b + 6) << u8"↓B";
+                                         << " at " << (b + 6) << "↓B";
                             DOMAIN_ERROR;
                           }
                        b += 11;
@@ -1008,7 +1008,7 @@ ShapeItem content_len = 0;
    // end of string reached without seeing "
    //
    MORE_ERROR() <<
-   u8"⎕JSON B: No string end for string starting at " << B0 << u8"↓B";
+   "⎕JSON B: No string end for string starting at " << B0 << "↓B";
    DOMAIN_ERROR;
 }
 //════════════════════════════════════════════════════════════════════════════

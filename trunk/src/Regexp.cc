@@ -106,11 +106,11 @@ PCRE2_SIZE error_offset = -1;
    if (code)   return;   // OK
 
    MORE_ERROR() << 
-u8"in (say) Z←A ⎕RE B: error when compiling the regular expression A.\n"
+"in (say) Z←A ⎕RE B: error when compiling the regular expression A.\n"
 "    The cause of the error was: " << pcre_error(error_code) << ".\n"
 "    The regular expression A was: '" << pattern << "'\n"
-"    The error was detected at " << error_offset << u8"↓A.\n"
-"    the offending rest (" << error_offset << u8"↓A) of A was: '"
+"    The error was detected at " << error_offset << "↓A.\n"
+"    the offending rest (" << error_offset << "↓A) of A was: '"
    << UCS_string(pattern, error_offset) << "'";
 
    DOMAIN_ERROR;

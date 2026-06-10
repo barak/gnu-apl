@@ -228,13 +228,13 @@ Shape::expand(const Shape & B)
 ostream &
 operator <<(ostream & out, const Shape & shape)
 {
-   out << u8"⊏";
+   out << "⊏";
    loop(r, shape.get_rank())
        {
          if (r)   out << ":";
          out << shape.get_shape_item(r);
        }
-   out << u8"⊐";
+   out << "⊐";
    return out;
 }
 //════════════════════════════════════════════════════════════════════════════

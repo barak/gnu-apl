@@ -88,48 +88,48 @@ const bool query = args.size() &&
 "\n"
 "Library reference number (Ref) to (absolute) path mapping:\n"
 "\n"
-u8"╔═══╤═════╤═════════════╤══════════════════════════════════════════════════════╗\n"
-u8"║Ref│Conf │State (errno)│ Path to the directory containing the workspace files ║\n"
-u8"╟───┼─────┼─────────────┼──────────────────────────────────────────────────────╢\n";
+"╔═══╤═════╤═════════════╤══════════════════════════════════════════════════════╗\n"
+"║Ref│Conf │State (errno)│ Path to the directory containing the workspace files ║\n"
+"╟───┼─────┼─────────────┼──────────────────────────────────────────────────────╢\n";
 
    loop(d, 10)
        {
-          out << u8"║ " << d << u8" │";
+          out << "║ " << d << " │";
           UTF8_string path = LibPaths::get_lib_dir(LibRef(d));
           switch(LibPaths::get_cfg_src(LibRef(d)))
              {
-                case LibPaths::LibDir::CSRC_NONE:      out << u8"NONE │" << endl;
+                case LibPaths::LibDir::CSRC_NONE:      out << "NONE │" << endl;
                                                        continue;
-                case LibPaths::LibDir::CSRC_ENV:       out << u8"ENV  │";   break;
-                case LibPaths::LibDir::CSRC_PWD:       out << u8"PWD  │";   break;
-                case LibPaths::LibDir::CSRC_PREF_SYS:  out << u8"PSYS │";   break;
-                case LibPaths::LibDir::CSRC_PREF_HOME: out << u8"PUSER│";   break;
-                case LibPaths::LibDir::CSRC_CMD:       out << u8"CMD  │";   break;
+                case LibPaths::LibDir::CSRC_ENV:       out << "ENV  │";   break;
+                case LibPaths::LibDir::CSRC_PWD:       out << "PWD  │";   break;
+                case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS │";   break;
+                case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER│";   break;
+                case LibPaths::LibDir::CSRC_CMD:       out << "CMD  │";   break;
              }
 
         if (DIR * dir = opendir(path.c_str()))
-           { out << u8" present     │ ";   closedir(dir); }
+           { out << " present     │ ";   closedir(dir); }
         else
            {
              char cc[10];
              SPRINTF(cc, "(%u)", errno);
-             out << " missing " << setw(4) << cc << u8"│ ";
+             out << " missing " << setw(4) << cc << "│ ";
            }
 
-        out << left << setw(53) << path.c_str() << u8"║\n";
+        out << left << setw(53) << path.c_str() << "║\n";
       }
 
    out <<
-u8"╚═══╧══╤══╧═════════════╧══════════════════════════════════════════════════════╝\n"
-u8"       │\n"
-u8"       ├── NONE:  found no method to compute the library path\n"
-u8"       ├── CMD:   the path was set with )LIBS N path\n"
-u8"       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
-u8"       ├── PSYS:  the path came from the system preferences in file\n"
-u8"       │                   " << apl_DIR__sysconf << "/gnu-apl.d/preferences\n"
-u8"       ├── PUSER: the path came from user preferences in file\n"
-u8"       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
-u8"       └── PWD:   the path is relative to current directory $PWD (last resort)"
+"╚═══╧══╤══╧═════════════╧══════════════════════════════════════════════════════╝\n"
+"       │\n"
+"       ├── NONE:  found no method to compute the library path\n"
+"       ├── CMD:   the path was set with )LIBS N path\n"
+"       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
+"       ├── PSYS:  the path came from the system preferences in file\n"
+"       │                   " << apl_DIR__sysconf << "/gnu-apl.d/preferences\n"
+"       ├── PUSER: the path came from user preferences in file\n"
+"       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
+"       └── PWD:   the path is relative to current directory $PWD (last resort)"
        << endl;
 
    out << right;   // restore the default

@@ -216,7 +216,7 @@ bool in_UCS = false;
          if (in_UCS != need_UCS)   // mode changed
             {
               if (in_UCS)   ucs << "),'";       // UCS() → 'xxx'
-              else          ucs << u8"',(⎕UCS";   // 'xxx' → UCS()
+              else          ucs << "',(⎕UCS";   // 'xxx' → UCS()
               in_UCS = need_UCS;
             }
 
@@ -248,7 +248,7 @@ const UCS_string text = fun.canonical(false);
              << "   .atf output file incompatible with other APL interpreters."
              << endl;
 
-        ucs << UNI_SINGLE_QUOTE << fun_name << u8"' ⎕FX '" << text
+        ucs << UNI_SINGLE_QUOTE << fun_name << "' ⎕FX '" << text
             << UNI_SINGLE_QUOTE;;
         return;
       }
@@ -256,7 +256,7 @@ const UCS_string text = fun.canonical(false);
 UCS_string_vector lines;
    text.to_vector(lines);
 
-   ucs << u8"⎕FX";
+   ucs << "⎕FX";
 
    loop(l, lines.size())
       {
@@ -271,7 +271,7 @@ Quad_TF::tf2_inverse(const UCS_string & ravel)
 Token_string tos;
    tos.push_back(Token(TOK_L_PARENT, int64_t(0)));
 
-   Log(LOG_Quad_TF)   CERR << u8"inverse ⎕TF2: " << ravel << endl;
+   Log(LOG_Quad_TF)   CERR << "inverse ⎕TF2: " << ravel << endl;
 
    try
       {
@@ -312,7 +312,7 @@ Token_string tos;
 
    Log(LOG_Quad_TF)
       {
-        CERR << u8"inverse ⎕TF2: tos[" << tos.size() << "] after reduce() is: ";
+        CERR << "inverse ⎕TF2: tos[" << tos.size() << "] after reduce() is: ";
         tos.print(CERR, false);
         CERR << endl;
       }
@@ -332,8 +332,8 @@ Token_string tos;
        tos[1].get_Class() == TC_SYMBOL)
       {
         UCS_string new_var_or_fun = tos[1].get_sym_ptr()->get_name();
-        CERR << u8"*** Unknown system variable ⎕" << new_var_or_fun
-             << u8" in 2⎕TF / )IN (assignment ignored)" << endl;
+        CERR << "*** Unknown system variable ⎕" << new_var_or_fun
+             << " in 2⎕TF / )IN (assignment ignored)" << endl;
         return new_var_or_fun;
       }
 
@@ -350,7 +350,7 @@ Token_string tos;
         if (tos[2].get_Class() != TC_VALUE)   return UCS_string();
 
          tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
-         Log(LOG_Quad_TF)   CERR << u8"valid inverse 2 ⎕TF" << endl;
+         Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << endl;
          return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
       }
 
@@ -371,12 +371,12 @@ Token_string tos;
            {
              Value_P val = tok.get_apl_val();
         Log(LOG_Quad_TF)
-           CERR << u8"valid inverse 2 ⎕TF (native function):" << endl;
+           CERR << "valid inverse 2 ⎕TF (native function):" << endl;
              return UCS_string(*val.get());
            }
 
         Log(LOG_Quad_TF)
-           CERR << u8"invalid inverse 2 ⎕TF (native function):" << endl;
+           CERR << "invalid inverse 2 ⎕TF (native function):" << endl;
         return UCS_string();
       }
 
@@ -386,14 +386,14 @@ Token_string tos;
     */
 
    Log(LOG_Quad_TF)
-      CERR << u8"inverse 2 ⎕TF (monadic ⎕FX):" << endl;
+      CERR << "inverse 2 ⎕TF (monadic ⎕FX):" << endl;
    if (tos.size() != 4)                   return UCS_string();
    if (tos[1].get_tag() != TOK_Quad_FX)   return UCS_string();
    if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
 
 static const int eprops[] = { 0, 0, 0, 0 };
 const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
-                                      UTF8_string(u8"2 ⎕TF"));
+                                      UTF8_string("2 ⎕TF"));
 
    if (tok.get_Class() != TC_VALUE)
       {
@@ -606,7 +606,7 @@ const ShapeItem ec = value.nz_element_count();
 
    if (use_UCS)
       {
-        ucs << u8"⎕UCS";
+        ucs << "⎕UCS";
         loop(e, ec)
             {
               ucs << UNI_SPACE << int(value.get_cravel(e).get_char_value());
@@ -689,7 +689,7 @@ const ShapeItem ec = val->element_count();
                 }
              else
                 {
-                  MORE_ERROR() << u8"Non-number in 1 ⎕TF N record";
+                  MORE_ERROR() << "Non-number in 1 ⎕TF N record";
                   return Value_P();
                 }
            }
@@ -728,7 +728,7 @@ const int len = ravel.size();
 
    if (len < 2)
       {
-        MORE_ERROR() << u8"1 ⎕TF record too short";
+        MORE_ERROR() << "1 ⎕TF record too short";
         return Value_P();
       }
 
@@ -736,14 +736,14 @@ const int len = ravel.size();
 const Unicode mode = ravel[0];
    if (mode != 'C' && mode != 'F' && mode != 'N')
       {
-        MORE_ERROR() << u8"1 ⎕TF record type not F, N, or C";
+        MORE_ERROR() << "1 ⎕TF record type not F, N, or C";
         return Value_P();
       }
 
 UCS_string name(ravel[1]);
    if (!Avec::is_quad(name[0]) && !Avec::is_first_symbol_char(name[0]))
       {
-        MORE_ERROR() << u8"Bad variable name in 1 ⎕TF record";
+        MORE_ERROR() << "Bad variable name in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -753,13 +753,13 @@ ShapeItem idx = 2;
 
    if (Avec::is_quad(name[0]) && name.size() == 1)
       {
-        MORE_ERROR() << u8"Bad variable name in 1 ⎕TF record";
+        MORE_ERROR() << "Bad variable name in 1 ⎕TF record";
         return Value_P();
       }
 
    if (ravel[idx++] != UNI_SPACE)
       {
-        MORE_ERROR() << u8"missing space (before rank) in 1 ⎕TF record";
+        MORE_ERROR() << "missing space (before rank) in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -770,19 +770,19 @@ sRank rank = 0;
 
    if (rank == 0 && idx0 == idx)
       {
-        MORE_ERROR() << u8"missing rank in 1 ⎕TF record";
+        MORE_ERROR() << "missing rank in 1 ⎕TF record";
         return Value_P();
       }
 
    if (ravel[idx++] != UNI_SPACE)
       {
-        MORE_ERROR() << u8"missing space (after rank) in 1 ⎕TF record";
+        MORE_ERROR() << "missing space (after rank) in 1 ⎕TF record";
         return Value_P();
       }
 
    if (rank > MAX_RANK)
       {
-        MORE_ERROR() << u8"max. rank exceeded in 1 ⎕TF record";
+        MORE_ERROR() << "max. rank exceeded in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -795,13 +795,13 @@ Shape shape;
            sh = 10 * sh + ravel[idx++] - UNI_0;
         if (sh == 0 && idx0 == idx)   // no shape
            {
-             MORE_ERROR() << u8"too few shape items in 1 ⎕TF record";
+             MORE_ERROR() << "too few shape items in 1 ⎕TF record";
              return Value_P();
            }
 
         if (ravel[idx++] != UNI_SPACE)
            {
-             MORE_ERROR() << u8"missing space (in shape) in 1 ⎕TF record";
+             MORE_ERROR() << "missing space (in shape) in 1 ⎕TF record";
              return Value_P();
            }
         shape.add_shape_item(sh);
@@ -816,7 +816,7 @@ const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
         nc = sym_or_fun->get_NC();
         if (symbol && symbol->is_readonly())
            {
-             MORE_ERROR() << u8"symbol cannot be modified in 1 ⎕TF record";
+             MORE_ERROR() << "symbol cannot be modified in 1 ⎕TF record";
              return Value_P();
            }
      }
@@ -827,7 +827,7 @@ const int data_chars = len - idx;
       {
         if (rank != 2)
            {
-             MORE_ERROR() << u8"function text is not a matrix in 1 ⎕TF record";
+             MORE_ERROR() << "function text is not a matrix in 1 ⎕TF record";
              return Value_P();
            }
 
@@ -835,13 +835,13 @@ const int data_chars = len - idx;
             nc != NC_FUNCTION         &&
             nc != NC_OPERATOR)
            {
-             MORE_ERROR() << u8"symbol is an existing variable in 1 ⎕TF F record";
+             MORE_ERROR() << "symbol is an existing variable in 1 ⎕TF F record";
              return Value_P();
            }
 
         if (data_chars != shape.get_volume())
            {
-             MORE_ERROR() << u8"item count mismatch in 1 ⎕TF N record";
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -855,13 +855,13 @@ const int data_chars = len - idx;
       {
         if (data_chars != shape.get_volume())
            {
-             MORE_ERROR() << u8"item count mismatch in 1 ⎕TF C record";
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF C record";
              return Value_P();
            }
         if (nc != NC_UNUSED_USER_NAME && nc != NC_VARIABLE)
            {
              MORE_ERROR() <<
-             u8"symbol is existing and not a variable in 1 ⎕TF C record";
+             "symbol is existing and not a variable in 1 ⎕TF C record";
              return Value_P();
            }
 
@@ -877,7 +877,7 @@ const int data_chars = len - idx;
       {
         if (nc != NC_UNUSED_USER_NAME && nc != NC_VARIABLE)
            {
-             MORE_ERROR() << u8"symbol cannot be assigned in 1 ⎕TF N record";
+             MORE_ERROR() << "symbol cannot be assigned in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -886,12 +886,12 @@ const int data_chars = len - idx;
         Token_string tos;
         if (tokenizer.tokenize(data, tos) != E_NO_ERROR)
            {
-             MORE_ERROR() << u8"tokenization failed in 1 ⎕TF N record";
+             MORE_ERROR() << "tokenization failed in 1 ⎕TF N record";
              return Value_P();
            }
         if (size_t(tos.size()) != size_t(shape.get_volume()))
            {
-             MORE_ERROR() << u8"item count mismatch in 1 ⎕TF N record";
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -903,7 +903,7 @@ const int data_chars = len - idx;
              if (tag == TOK_INTEGER)   continue;
              if (tag == TOK_REAL)      continue;
              if (tag == TOK_COMPLEX)   continue;
-             MORE_ERROR() <<  u8"Non-number in 1 ⎕TF N record";
+             MORE_ERROR() <<  "Non-number in 1 ⎕TF N record";
              return Value_P();
            }
 

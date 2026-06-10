@@ -58,7 +58,7 @@ public:
    /// @param B right argument APL value
    virtual Token eval_XB(Value_P X, Value_P B) const
       {
-        X->to_bitmap(u8"⊂[X] B", B->get_rank());   // check X
+        X->to_bitmap("⊂[X] B", B->get_rank());   // check X
         const Shape shape_X = Value::to_shape(X.get());
         return Token(TOK_APL_VALUE1, enclose_with_axes(shape_X, B));
       }

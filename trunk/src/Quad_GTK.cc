@@ -71,7 +71,7 @@ Quad_GTK::eval_AB(Value_P A, Value_P B) const
    if (!B->is_int_scalar())
       {
         MORE_ERROR() <<
-u8"A ⎕GTK B expects an integer scalar B (function number)\n"
+"A ⎕GTK B expects an integer scalar B (function number)\n"
 "      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
@@ -90,7 +90,7 @@ int fd = -1;
              fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 7))
                 {
-                  CERR << u8"write(Tag 7) failed in Ah ⎕GTK 3" << endl;
+                  CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-3, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -100,7 +100,7 @@ int fd = -1;
              fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 8))
                 {
-                  CERR << u8"write(Tag 8) failed in Ah ⎕GTK 4" << endl;
+                  CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-4, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -118,15 +118,15 @@ int fd = -1;
              RANK_ERROR;
 
         default: MORE_ERROR() << "Invalid function number Bi=" << function
-                              << u8" in A ⎕GTK Bi";
+                              << " in A ⎕GTK Bi";
                  DOMAIN_ERROR;
       }
 
-   MORE_ERROR() << u8"Unexpected A or B in A ⎕GTK B";
+   MORE_ERROR() << "Unexpected A or B in A ⎕GTK B";
    DOMAIN_ERROR;
 
 bad_fd:
-   MORE_ERROR() << u8"Ah ⎕GTK " << function
+   MORE_ERROR() << "Ah ⎕GTK " << function
                 << " expects a handle (i.e. an integer scalar) Ah";
    DOMAIN_ERROR;
 }
@@ -173,7 +173,7 @@ Fnum fun = FNUM_INVALID;
    else
       {
         MORE_ERROR() <<
-u8"A ⎕GTK B expects an integer scalar B (function number)\n"
+"A ⎕GTK B expects an integer scalar B (function number)\n"
 "      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
@@ -199,7 +199,7 @@ Gtype Atype = gtype_V;   // assume void
 #include "Gtk/Gtk_map.def"
 
         default:
-             MORE_ERROR() << u8"Bad function B in A ⎕GTK B (B='"
+             MORE_ERROR() << "Bad function B in A ⎕GTK B (B='"
                           << *B << ", fun=" << fun;
              DOMAIN_ERROR;
       }
@@ -215,7 +215,7 @@ UCS_string ucs_A;
               const Cell & cell = A->get_cravel(a);
               if (!cell.is_pointer_cell())
                  {
-                    MORE_ERROR() << u8"A ⎕GTK " << fun
+                    MORE_ERROR() << "A ⎕GTK " << fun
                                  << " expects A to be a vector of "
                                     "draw commands (strings)";
                     DOMAIN_ERROR;
@@ -229,7 +229,7 @@ UCS_string ucs_A;
       {
         if (!A->is_char_string())
            {
-             MORE_ERROR() << u8"A ⎕GTK[X] B expects A to be a text vector";
+             MORE_ERROR() << "A ⎕GTK[X] B expects A to be a text vector";
              DOMAIN_ERROR;
            }
 
@@ -250,21 +250,21 @@ Quad_GTK::eval_B(Value_P B) const
    if (B->element_count() == 0)   // empty B: print GTK help
       {
         COUT <<
-u8"   ⎕GTK Usage:\n"
+"   ⎕GTK Usage:\n"
 "\n"
-u8"   H←    ⎕GTK XML   ⍝ with string XML (filename or content): open window\n"
-u8"   H←CSS ⎕GTK XML   ⍝ with strings CSS and XML: open window with styles CSS\n"
-u8"       H ⎕GTK 0     ⍝ close the ⎕GTK window with handle H\n"
-u8"       H ⎕GTK 3     ⍝ increase the (debug-) verbosity for window handle H\n"
-u8"       H ⎕GTK 4     ⍝ decrease the (debug-) verbosity for window handle H\n"
-u8"   Z←  A ⎕GTK 5     ⍝ Z is the function name for function number A\n"
-u8"   Z←  A ⎕GTK 6     ⍝ Z is the widget class for function number A\n"
-u8"   Z←    ⎕GTK 0     ⍝ list Z of open ⎕GTK handles\n"
-u8"   E←    ⎕GTK 1     ⍝ wait for next GTK Event E (blocking)\n"
-u8"   E←    ⎕GTK 2     ⍝ poll for next GTK Event E (non-blocking)\n"
-u8"         ⎕GTK 3     ⍝ close all open ⎕GTK windows"
-u8"         ⎕GTK 4     ⍝ focus_on_map (subsequent windows will grab the focus)\n"
-u8"         ⎕GTK 5     ⍝ clear focus_on_map (APL will remain focused)\n"
+"   H←    ⎕GTK XML   ⍝ with string XML (filename or content): open window\n"
+"   H←CSS ⎕GTK XML   ⍝ with strings CSS and XML: open window with styles CSS\n"
+"       H ⎕GTK 0     ⍝ close the ⎕GTK window with handle H\n"
+"       H ⎕GTK 3     ⍝ increase the (debug-) verbosity for window handle H\n"
+"       H ⎕GTK 4     ⍝ decrease the (debug-) verbosity for window handle H\n"
+"   Z←  A ⎕GTK 5     ⍝ Z is the function name for function number A\n"
+"   Z←  A ⎕GTK 6     ⍝ Z is the widget class for function number A\n"
+"   Z←    ⎕GTK 0     ⍝ list Z of open ⎕GTK handles\n"
+"   E←    ⎕GTK 1     ⍝ wait for next GTK Event E (blocking)\n"
+"   E←    ⎕GTK 2     ⍝ poll for next GTK Event E (non-blocking)\n"
+"         ⎕GTK 3     ⍝ close all open ⎕GTK windows"
+"         ⎕GTK 4     ⍝ focus_on_map (subsequent windows will grab the focus)\n"
+"         ⎕GTK 5     ⍝ clear focus_on_map (APL will remain focused)\n"
              ;
 
         return Token(TOK_APL_VALUE1, Idx0(LOC));
@@ -280,7 +280,7 @@ u8"         ⎕GTK 5     ⍝ clear focus_on_map (APL will remain focused)\n"
    if (!B->is_int_scalar())
       {
         MORE_ERROR() <<
-u8"⎕GTK B expects an integer scalar B (function number)\n"
+"⎕GTK B expects an integer scalar B (function number)\n"
 "      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
@@ -370,11 +370,11 @@ const int function = B->get_cfirst().get_int_value();
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         default: MORE_ERROR() << "Invalid function number Bi=" << function
-                              << u8" in ⎕GTK Bi";
+                              << " in ⎕GTK Bi";
                  DOMAIN_ERROR;
       }
 
-   MORE_ERROR() << u8"Unexpected B in ⎕GTK B";
+   MORE_ERROR() << "Unexpected B in ⎕GTK B";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -469,7 +469,7 @@ const char * fun_name = utf_B.c_str();        // gtk_widget_get_state_flags
 
 #include "Gtk/Gtk_map.def"
 
-   MORE_ERROR() << u8"⎕GTK: function string class=" << wid_class
+   MORE_ERROR() << "⎕GTK: function string class=" << wid_class
         << ", function=" << fun_name << " could not be resolved";
    return FNUM_INVALID;
 }
@@ -488,7 +488,7 @@ unsigned char TLV[8];
 const size_t tx_len = write(fd, TLV, 8);
     if (tx_len != 8)
        {
-         CERR << "write(Tag = " << tag << u8") failed in ⎕GTK::write_TL0()"
+         CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TL0()"
               << endl << "   tx_len = " << tx_len << endl
               << "   errno says: " << strerror(errno) << endl;
          return -1;
@@ -514,7 +514,7 @@ unsigned char TLV[TLV_len];
 
     if (write(fd, TLV, TLV_len) != TLV_len)
        {
-         CERR << "write(Tag = " << tag << u8") failed in ⎕GTK::write_TLV()";
+         CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TLV()";
          return -1;
        }
 
@@ -598,7 +598,7 @@ const size_t wlen = write(fd, path, TLV_len);
       {
          delete del;
          Quad_FIO::close_handle(fd);
-         MORE_ERROR() << "write(Tag " << tag << u8") failed in ⎕GTK";
+         MORE_ERROR() << "write(Tag " << tag << ") failed in ⎕GTK";
          DOMAIN_ERROR;
       }
 
@@ -631,7 +631,7 @@ const int fd = start_Gtk_server();
    if (write_TL0(fd, 3))
       {
          Quad_FIO::close_handle(fd);
-         MORE_ERROR() << u8"write(Tag 3) failed in ⎕GTK";
+         MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
 
@@ -652,14 +652,14 @@ Quad_GTK::close_window(int fd)
              open_windows.pop_back();
              if (write_TL0(fd, 5))
                 {
-                  CERR << u8"write(close Tag) failed in ⎕GTK::close_window()";
+                  CERR << "write(close Tag) failed in ⎕GTK::close_window()";
                 }
              const int err = Quad_FIO::close_handle(fd);
              return IntScalar(err, LOC);
            }
       }
 
-   MORE_ERROR() << u8"Invalid ⎕GTK handle " << fd;
+   MORE_ERROR() << "Invalid ⎕GTK handle " << fd;
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -837,7 +837,7 @@ char * V = TLV + 8;
    if (expected_tag == -1)   // not waiting for a specific tag (function result)
       {
         // unexpected, so we complain unconditionally.
-        CERR << u8"*** ⎕GTK: ignoring event: " << V << endl;
+        CERR << "*** ⎕GTK: ignoring event: " << V << endl;
         return Value_P();   // i.e. NULL
       }
 
@@ -916,7 +916,7 @@ const char * fname = 0;
         return Z;
       }
 
-   MORE_ERROR() << u8"A ⎕GTK 5: Invalid function number A=" << fnum;
+   MORE_ERROR() << "A ⎕GTK 5: Invalid function number A=" << fnum;
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -944,7 +944,7 @@ const char * cname = 0;
         return Z;
       }
 
-   MORE_ERROR() << u8"A ⎕GTK 6: Invalid function number A=" << fnum;
+   MORE_ERROR() << "A ⎕GTK 6: Invalid function number A=" << fnum;
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -976,7 +976,7 @@ const char * libs[] = { "libgtk-3.so",  0 };
 const char * hdrs[] = { "gtk/gtk.h",    0 };
 const char * pkgs[] = { "libgtk-3-dev", 0 };
 
-   return missing_files(u8"⎕GTK", libs, hdrs, pkgs);
+   return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
 //────────────────────────────────────────────────────────────────────────────
 Token

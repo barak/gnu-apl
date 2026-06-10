@@ -92,8 +92,8 @@ extern const int libapl_version;
 extern int64_t get_main();
 
 /// interpreter capabilities (for ]NEXTFILE)
-#define  apl_CAPABILITIES  u8"⎕FFT", "GTK",  "GUI", u8"⎕PNG", "POSTGRES", u8"⎕PLOT", \
- u8"⎕RE", u8"⎕SQL", "SQLITE3", "X11",  "XCB",
+#define  apl_CAPABILITIES  "⎕FFT", "GTK",  "GUI", "⎕PNG", "POSTGRES", "⎕PLOT", \
+ "⎕RE", "⎕SQL", "SQLITE3", "X11",  "XCB",
 
 /// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
 extern bool gtk_init_done;
@@ -481,8 +481,8 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
                         << " '" << x << "' at " LOC << endl;
-#define Qn(n) get_CERR() << std::left << u8"══════════ " << #n << "=" << int(n) \
-                         << u8" ══════════" << "' at " LOC << endl;
+#define Qn(n) get_CERR() << std::left << "══════════ " << #n << "=" << int(n) \
+                         << " ══════════" << "' at " LOC << endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
 /// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.

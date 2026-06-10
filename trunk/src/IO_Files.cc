@@ -481,7 +481,7 @@ IO_Files::end_of_current_file()
            {
              // uuu
              //
-             summary << "    " << setw(3) << duration_usec << u8" μs ";
+             summary << "    " << setw(3) << duration_usec << " μs ";
            }
         summary << setfill(' ') << " ";
 

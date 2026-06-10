@@ -98,7 +98,7 @@ const ValueStackItem & vs = value_stack[0];
         Quad_CR::do_CR10_variable(CR10, get_name(), value);
 
         if (value->is_member())
-           out << u8"⍝ structured variable " << get_name() << endl;
+           out << "⍝ structured variable " << get_name() << endl;
 
         loop(l, CR10.size())
            {
@@ -107,14 +107,14 @@ const ValueStackItem & vs = value_stack[0];
            }
 
         if (value->is_member())
-           out << u8"⍝ end of structured variable " << get_name() << endl;
+           out << "⍝ end of structured variable " << get_name() << endl;
       }
    else if (vs.get_NC() & NC_FUN_OPER)
       {
         cFunction_P fun = vs.get_function();
         if (fun == 0)
            {
-             out << u8"⍝ function " << get_name() << " has function pointer 0!"
+             out << "⍝ function " << get_name() << " has function pointer 0!"
                  << endl << endl;
              return;
            }
@@ -122,7 +122,7 @@ const ValueStackItem & vs = value_stack[0];
         const UserFunction * ufun = fun->get_func_ufun();
         if (ufun == 0)
            {
-             out << u8"⍝ function " << get_name() << " has ufun1 pointer 0!"
+             out << "⍝ function " << get_name() << " has ufun1 pointer 0!"
                  << endl << endl;
              return;
            }
@@ -131,7 +131,7 @@ const ValueStackItem & vs = value_stack[0];
         if (ufun->is_lambda())
            {
              out << get_name();
-             out << u8"←{";
+             out << "←{";
              int t = 0;
              while (t < text.ssize())   // skip λ header
                 {
@@ -167,7 +167,7 @@ const ValueStackItem & vs = value_stack[0];
            {
              UCS_string_vector lines;
              text.to_vector(lines);
-             out << u8"∇";
+             out << "∇";
              loop(l, lines.size())
                 {
                   UCS_string & line = lines[l];
@@ -176,8 +176,8 @@ const ValueStackItem & vs = value_stack[0];
                   out << line << endl;
                 }
 
-             if (ufun->get_exec_properties()[0])   out << u8"⍫";
-             else                                  out << u8"∇";
+             if (ufun->get_exec_properties()[0])   out << "⍫";
+             else                                  out << "∇";
              out << endl;
            }
       }
@@ -702,7 +702,7 @@ Value_P Z = get_apl_value();  // the current APL value of this Symbol
                   MORE_ERROR()
                      << "member access: cannot override non-leaf member "
                      << name << " of variable " << get_name()
-                     << u8".\n      )ERASE or ⎕EX that member first.";
+                     << ".\n      )ERASE or ⎕EX that member first.";
                   DOMAIN_ERROR;
                 }
              data->release(LOC);   // release old content
@@ -808,7 +808,7 @@ ValueStackItem & vs = value_stack.back();
                const UserFunction * ufun = lambda->get_func_ufun();
                Assert(ufun);
                UTF8_string creator;
-               creator << ufun->get_name() << u8"←λ";
+               creator << ufun->get_name() << "←λ";
                
  
                vs.set_function(lambda);
@@ -1193,7 +1193,7 @@ Symbol::print_verbose(ostream & out) const
                      Assert(fun);
 
                      fun->print_properties(out, 4);
-                     out << u8"    ⎕NC:            " << item.get_NC() << endl
+                     out << "    ⎕NC:            " << item.get_NC() << endl
                          << "    addr:           " << voidP(fun)    << endl;
 
                      out << endl;

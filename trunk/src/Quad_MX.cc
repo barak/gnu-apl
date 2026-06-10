@@ -71,7 +71,7 @@ const FunctionGroup::function_info Quad_MX::subfunction_infos[] =
 Quad_MX::Quad_MX() : QuadFunction(TOK_Quad_MX)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
-   init_function_group(subfunction_infos, count, u8"⎕MX");
+   init_function_group(subfunction_infos, count, "⎕MX");
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -86,7 +86,7 @@ Quad_MX::print_fun_syntax(ostream & out,
        case 3:  out << "{A} ";   break;
        default: FIXME;
      }
-  out << u8"⎕MX[" << setw(3) << info.axis << u8"]    ⍝ ";
+  out << "⎕MX[" << setw(3) << info.axis << "]    ⍝ ";
   switch(info.valence)
      {
        case 1:  out << "(monadic) ";   break;
@@ -105,8 +105,8 @@ Quad_MX::print_map_syntax(ostream & out,
 const char * name = info.function_name;
 const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
 
-   out << u8"    ⎕MX[" << setw(3) << info.axis << u8"]  ←→  ⎕MX['" << name << "']"
-       << blanks << u8"  ←→  ⎕MX." << name << endl;
+   out << "    ⎕MX[" << setw(3) << info.axis << "]  ←→  ⎕MX['" << name << "']"
+       << blanks << "  ←→  ⎕MX." << name << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -132,7 +132,7 @@ int modifier = 0;
       }
    else
       {
-        MORE_ERROR() << u8"A ⎕MX[X] B: integer or string X expected.";
+        MORE_ERROR() << "A ⎕MX[X] B: integer or string X expected.";
         DOMAIN_ERROR;
       }
   
@@ -155,7 +155,7 @@ Value_P Z;
       case OP_RANDOMS:            Z = randoms(A, B, modifier);    break;
       case OP_PRINT:              Z = printit(A, B);              break;
 
-      default: MORE_ERROR() << u8"⎕MX[" << op << "] B is monadic.";
+      default: MORE_ERROR() << "⎕MX[" << op << "] B is monadic.";
                VALENCE_ERROR;
     }
 
@@ -181,7 +181,7 @@ int modifier = 0;
       }
    else
       {
-        MORE_ERROR() << u8"⎕MX[X] B: integer or string X expected.";
+        MORE_ERROR() << "⎕MX[X] B: integer or string X expected.";
         SYNTAX_ERROR;
       }
 
@@ -207,7 +207,7 @@ Value_P Z = Idx0_0(LOC);
         case OP_IDENT:              Z = ident(B);                        break;
         case OP_ROTATION_MATRIX:    Z = monadicRotation(B);              break;
         case OP_SET_RNG_SEED:       Z = set_rng_seed(B);                 break;
-        default:   MORE_ERROR() << u8"A ⎕MX[" << op << "] B is dyadic.";
+        default:   MORE_ERROR() << "A ⎕MX[" << op << "] B is dyadic.";
                    VALENCE_ERROR;
       }
 
@@ -352,7 +352,7 @@ Quad_MX::eigenvectors(Value_P B)
 {
    if (B->get_rank() != 2)
       {
-        MORE_ERROR() << u8"⎕MX.eigenvector B: matrix B expected.";
+        MORE_ERROR() << "⎕MX.eigenvector B: matrix B expected.";
         RANK_ERROR;
       }
 
@@ -361,7 +361,7 @@ const ShapeItem cols = B->get_cols();
     
    if (rows != cols)
       {
-        MORE_ERROR() << u8"⎕MX.eigenvector B: square matrix B expected.";
+        MORE_ERROR() << "⎕MX.eigenvector B: square matrix B expected.";
         LENGTH_ERROR;
       }
 
@@ -431,7 +431,7 @@ const CellType B_celltype = B->deep_cell_types();
 
    if (!(B_celltype & CT_NUMERIC))
       {
-        MORE_ERROR() << u8"A ⎕MX.print B: B is nut numeric.";
+        MORE_ERROR() << "A ⎕MX.print B: B is nut numeric.";
         DOMAIN_ERROR;
       }
 
@@ -548,7 +548,7 @@ Quad_MX::open_file(const Value & filename, bool & close_file)
    //
    if (!filename.is_char_string())
       {
-        MORE_ERROR() << u8"A ⎕MX.print B: bad filename A (string expected)";
+        MORE_ERROR() << "A ⎕MX.print B: bad filename A (string expected)";
         DOMAIN_ERROR;
       }
 
@@ -573,7 +573,7 @@ Quad_MX::eigenvalues(Value_P B)
 {
    if (B->get_rank() != 2) 
       {
-        MORE_ERROR() << u8"⎕MX.eigenvalue B: matrix B expected.";
+        MORE_ERROR() << "⎕MX.eigenvalue B: matrix B expected.";
         RANK_ERROR;
       }
     
@@ -582,7 +582,7 @@ const ShapeItem cols = B->get_cols();
     
    if (rows != cols)
       {
-        MORE_ERROR() << u8"⎕MX.eigenvalue B: square matrix B expected.";
+        MORE_ERROR() << "⎕MX.eigenvalue B: square matrix B expected.";
         LENGTH_ERROR;
       }
 
@@ -643,7 +643,7 @@ Quad_MX::set_rng_seed(Value_P B)
 {
    if (!B->is_int_scalar())
       {
-        MORE_ERROR() << u8"⎕MX.set_rng_seed B: integer scalar B expected.";
+        MORE_ERROR() << "⎕MX.set_rng_seed B: integer scalar B expected.";
         DOMAIN_ERROR;
       }
 
@@ -658,13 +658,13 @@ Quad_MX::determinant(Value_P B)
 {
    if (B->get_rank() != 2)
       {
-        MORE_ERROR() << u8"⎕MX.determinant B: matrix B expected.";
+        MORE_ERROR() << "⎕MX.determinant B: matrix B expected.";
         RANK_ERROR;
       }
   
    if (B->get_rows() != B->get_cols())
       {
-        MORE_ERROR() << u8"⎕MX.determinant B: square matrix B expected.";
+        MORE_ERROR() << "⎕MX.determinant B: square matrix B expected.";
         LENGTH_ERROR;
       }
 
@@ -681,7 +681,7 @@ Quad_MX::monadicCrossProduct(Value_P B)
 {
    if (B->get_rank() != 2)
       {
-        MORE_ERROR() << u8"⎕MX.cross_product B: Matrix B expected.";
+        MORE_ERROR() << "⎕MX.cross_product B: Matrix B expected.";
         RANK_ERROR;
       }
 
@@ -690,7 +690,7 @@ const ShapeItem cols = B->get_cols();
    if (rows >= cols)
       {
         MORE_ERROR() << "too many vectors in cross product. "
-                         u8"Max. is n-1 vectors in ℝⁿ resp. ℂⁿ ";
+                         "Max. is n-1 vectors in ℝⁿ resp. ℂⁿ ";
         LENGTH_ERROR;
       }
      
@@ -715,20 +715,20 @@ Quad_MX::dyadicCrossProduct(Value_P A, Value_P B)
    //
    if (!A->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.cross_product B: vector A expected.";
+        MORE_ERROR() << "A ⎕MX.cross_product B: vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.cross_product B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.cross_product B: vector B expected.";
         RANK_ERROR;
       }
 
 const ShapeItem A_count = A->element_count();
    if (A_count != B->element_count())
       {
-        MORE_ERROR() << u8"A ⎕MX.cross_product B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << "A ⎕MX.cross_product B: ⍴A ≠ ⍴B.";
         LENGTH_ERROR;
       }
 
@@ -781,20 +781,20 @@ const ShapeItem A_count = A->element_count();
 
    if (!A->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.vector_angle B: vector A expected.";
+        MORE_ERROR() << "A ⎕MX.vector_angle B: vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.vector_angle B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.vector_angle B: vector B expected.";
         RANK_ERROR;
       }
 
 
    if (A_count != B->element_count())
       {
-        MORE_ERROR() << u8"A ⎕MX.vector_angle B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << "A ⎕MX.vector_angle B: ⍴A ≠ ⍴B.";
         LENGTH_ERROR;
       }
 
@@ -819,7 +819,7 @@ const Dcomplex mag = Amag * Bmag;
         return ComplexScalar(an.real(), an.imag(), LOC);
      }
 
-   MORE_ERROR() << u8"Invalid vector(s) in ⎕MX.vector_angle.";
+   MORE_ERROR() << "Invalid vector(s) in ⎕MX.vector_angle.";
    DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -828,7 +828,7 @@ Quad_MX::ident(const Value_P B)
 {
    if (!B->is_scalar())
       {
-        MORE_ERROR() << u8"⎕MX.ident B: scalar B expected.";
+        MORE_ERROR() << "⎕MX.ident B: scalar B expected.";
         RANK_ERROR;
       }
 
@@ -848,7 +848,7 @@ Quad_MX::monadicCovariance(const Value_P B)
 {
    if (B->get_rank() != 2)
       {
-        MORE_ERROR() << u8"⎕MX.covariance B: maxtrix B expected.";
+        MORE_ERROR() << "⎕MX.covariance B: maxtrix B expected.";
         RANK_ERROR;
       }
 
@@ -915,20 +915,20 @@ const ShapeItem B_count = B->element_count();
 
    if (!A->is_scalar())
       {
-        MORE_ERROR() << u8"A ⎕MX.histogram B: scalar A expected.";
+        MORE_ERROR() << "A ⎕MX.histogram B: scalar A expected.";
         RANK_ERROR;
       }
 
 const int nr_buckets = A->get_sole_integer();
    if (nr_buckets < 2)
       {
-        MORE_ERROR() << u8"A ⎕MX.histogram B: too few buckets.";
+        MORE_ERROR() << "A ⎕MX.histogram B: too few buckets.";
         DOMAIN_ERROR;
       }
 
    if (B->get_rank() != 1)
       {
-        MORE_ERROR() << u8"A ⎕MX.histogram B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.histogram B: vector B expected.";
         RANK_ERROR;
       }
 
@@ -977,20 +977,20 @@ Quad_MX::dyadicCovariance(const Value_P A, const Value_P B)
 {
    if (!A->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.covariance B: vector A expected.";
+        MORE_ERROR() << "A ⎕MX.covariance B: vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.covariance B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.covariance B: vector B expected.";
         RANK_ERROR;
       }
 
 const ShapeItem AB_count = A->element_count();
    if (AB_count != B->element_count())
       {
-        MORE_ERROR() << u8"A ⎕MX.covariance B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << "A ⎕MX.covariance B: ⍴A ≠ ⍴B.";
         LENGTH_ERROR;
       }
 
@@ -1093,7 +1093,7 @@ Value_P Z(shape_Z, LOC);
                         }
                         break;
 
-              default: MORE_ERROR() << u8"⎕MX[10, D] B: invalid distribution D";
+              default: MORE_ERROR() << "⎕MX[10, D] B: invalid distribution D";
                        DOMAIN_ERROR;
 
             }
@@ -1136,7 +1136,7 @@ Quad_MX::monadicRotation(Value_P B)
 {
    if (!B->is_scalar())
       {
-        MORE_ERROR() << u8"⎕MX.rotation_matrix B: scalar B expected.";
+        MORE_ERROR() << "⎕MX.rotation_matrix B: scalar B expected.";
         RANK_ERROR;
       }
 
@@ -1164,19 +1164,19 @@ const ShapeItem B_count   = B->element_count();
     
    if (!A->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.rotation_matrix B: vector A expected.";
+        MORE_ERROR() << "A ⎕MX.rotation_matrix B: vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << u8"A ⎕MX.rotation_matrix B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.rotation_matrix B: vector B expected.";
         RANK_ERROR;
       }
 
    if (A_count != 3 || B_count != 3)
       {
-        MORE_ERROR() << u8"A ⎕MX.rotation_matrix B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << "A ⎕MX.rotation_matrix B: ⍴A ≠ ⍴B.";
         LENGTH_ERROR;
       }
 
@@ -1290,7 +1290,7 @@ const char * libs[] = { "libgsl.so", "libgslcblas.so", 0 };
 const char * hdrs[] = { "gsl_statistics.h", "gsl_math.h", "gsl_eigen.h", 0 };
 const char * pkgs[] = { "libgsl-dev", 0 };
 
-   return missing_files(u8"⎕MX", libs, hdrs, pkgs);
+   return missing_files("⎕MX", libs, hdrs, pkgs);
 }
 //════════════════════════════════════════════════════════════════════════════
 

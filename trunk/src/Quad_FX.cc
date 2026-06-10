@@ -71,7 +71,7 @@ Quad_FX::do_eval_AB(const Value * A, const Value * B)
       return Token(TOK_APL_VALUE1, do_native_FX(A, -1, B));
 
 int eprops[4];
-UTF8_string creator(u8"⎕FX");
+UTF8_string creator("⎕FX");
 
    switch(A->element_count())
       {
@@ -117,7 +117,7 @@ Quad_FX::do_eval_B(const Value * B)
    // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
    //
 static const int default_eprops[] = { 0, 0, 0, 0 };
-   return do_quad_FX(default_eprops, B, UTF8_string(u8"⎕FX"));
+   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"));
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -159,7 +159,7 @@ const bool keep_indent = !UserPreferences::uprefs.discard_indentation;
              // row has more than 1 character, so it must be nested
              if (!cell.is_pointer_cell())
                 {
-                  MORE_ERROR() << u8"⎕FX: Function line " << row
+                  MORE_ERROR() << "⎕FX: Function line " << row
                                << " is not a string";
                   DOMAIN_ERROR;
                 }
@@ -267,7 +267,7 @@ UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator);
 
    if (text[0] == UNI_LAMBDA)
       {
-        const char * creator = u8"⎕FX";
+        const char * creator = "⎕FX";
         fun->increment_refcount(LOC, creator);
       }
 

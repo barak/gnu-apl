@@ -72,7 +72,7 @@ const ShapeItem len_X = X->element_count();
    // then replace corresponding shape items with A[X[x]].
    //
 const APL_Integer qio = Workspace::get_IO();
-const AxesBitmap axes_X = X->to_bitmap(u8"A ↑[X] B", B->get_rank());
+const AxesBitmap axes_X = X->to_bitmap("A ↑[X] B", B->get_rank());
 Shape sh_take = B->get_shape();   // start with ⍴B
    loop(x, len_X)                 // for exery axis X[x] in X
       {
@@ -90,7 +90,7 @@ Bif_F12_TAKE::eval_XB(Value_P X, Value_P B) const
    // ↑[X] B    ←→ ((⍴X)⍴1)↑[X] B   (GNU APL only)
    if (X->get_rank() > 1)   AXIS_ERROR;
 
-const AxesBitmap axes_X = X->to_bitmap(u8"↑[X] B", B->get_rank());
+const AxesBitmap axes_X = X->to_bitmap("↑[X] B", B->get_rank());
 
    // construct the left argument of Bif_F12_TAKE::fill(). Start with ⍴B and
    // then replace corresponding shape items with 1.

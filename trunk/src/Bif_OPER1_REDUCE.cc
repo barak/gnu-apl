@@ -119,7 +119,7 @@ Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
    if (!tok_LO.is_function())
       {
         MORE_ERROR()
-        << u8"The left argument of operator / resp. ⌿ is not a function";
+        << "The left argument of operator / resp. ⌿ is not a function";
         DOMAIN_ERROR;
       }
 
@@ -127,14 +127,14 @@ cFunction_P LO = tok_LO.get_function();
    Assert1(LO);
    if (!LO->has_result())
       {
-        MORE_ERROR() << u8"The left argument of operator / resp. ⌿"
+        MORE_ERROR() << "The left argument of operator / resp. ⌿"
                         " is a function that returns no result";
         DOMAIN_ERROR;
       }
 
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << u8"The left argument of operator / resp. ⌿"
+        MORE_ERROR() << "The left argument of operator / resp. ⌿"
                      << " is a function that is not dyadic";
         SYNTAX_ERROR;
       }
@@ -184,7 +184,7 @@ Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO,
    if (!tok_LO.is_function())
       {
         MORE_ERROR() << "Function argument f of monadic operator A f/ B"
-                        u8" resp. A f⌿ B is not a function";
+                        " resp. A f⌿ B is not a function";
         DOMAIN_ERROR;
       }
 

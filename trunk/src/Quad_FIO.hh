@@ -144,8 +144,8 @@ protected:
       {
         if (UserPreferences::uprefs.safe_mode)
            {
-             MORE_ERROR() << u8"⎕FIO[" << funnum
-                          << u8" is not permitted in safe mode (see ⎕ARG)";
+             MORE_ERROR() << "⎕FIO[" << funnum
+                          << " is not permitted in safe mode (see ⎕ARG)";
              DOMAIN_ERROR;
            }
       }

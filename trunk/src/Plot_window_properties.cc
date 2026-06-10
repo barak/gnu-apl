@@ -150,21 +150,21 @@ Plot_window_properties::update(int verbosity)
    if (min_X >= max_X)
       {
         MORE_ERROR() << "empty X range [" << min_X << ":" << max_X
-                     << u8"] in data B of A ⎕PLOT B";
+                     << "] in data B of A ⎕PLOT B";
         return true;   // error
       }
 
    if (min_Y >= max_Y)
       {
         MORE_ERROR() << "empty Y range [" << min_Y << ":" << max_Y
-                     << u8"] in data B of A ⎕PLOT B";
+                     << "] in data B of A ⎕PLOT B";
         return true;   // error
       }
 
    if (min_Z >= max_Z)
       {
         MORE_ERROR() << "empty Z range [" << min_Z << ":" << max_Z
-                     << u8"] in data B of A ⎕PLOT B";
+                     << "] in data B of A ⎕PLOT B";
         return true;   // error
       }
 
@@ -193,11 +193,11 @@ const double tile_Z_raw = gridZ_pixels / scale_Z;
 
   if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "tile_X_raw: " << tile_X_raw
-                                         << u8"(∆X between grid lines)" << endl
+                                         << "(∆X between grid lines)" << endl
            << setw(20) << "tile_Y_raw: " << tile_Y_raw
-                                         << u8"(∆Y between grid lines)" << endl
+                                         << "(∆Y between grid lines)" << endl
            << setw(20) << "tile_Z_raw: " << tile_Z_raw
-                                         << u8"(∆Z between grid lines)" << endl;
+                                         << "(∆Z between grid lines)" << endl;
 
    tile_X = round_up_1_2_5(tile_X_raw);   // assume neither time nor var. grid
    if (gridX_variable)  // maybe there is a time item in format_X
@@ -254,11 +254,11 @@ const int max_Zi = ceil(max_Z / tile_Z);
            << setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << endl
            << setw(20) << "scale_Z (2): " << scale_Z << " pixels/Z" << endl
            << setw(20) << "tile_X  (2): " << tile_X
-                                          << u8"(∆X between grid lines)" << endl
+                                          << "(∆X between grid lines)" << endl
            << setw(20) << "tile_Y  (2): " << tile_Y
-                                          << u8"(∆Y between grid lines)" << endl
+                                          << "(∆Y between grid lines)" << endl
            << setw(20) << "tile_Z  (2): " << tile_Z
-                                          << u8"(∆Z between grid lines)" << endl;
+                                          << "(∆Z between grid lines)" << endl;
 
    return false;   // OK
 }
@@ -393,7 +393,7 @@ int line_number = -1;
         const int line0 = line1 - Workspace::get_IO();   // 0..line_count - 1
         if (line0 < 0)
            {
-             SPRINTF(tmp_error, u8"invalid line number (=%d) < ⎕IO(=%d)",
+             SPRINTF(tmp_error, "invalid line number (=%d) < ⎕IO(=%d)",
                      line1, line1 - line0);
              return tmp_error;
            }

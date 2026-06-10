@@ -114,10 +114,10 @@ Workspace::push_SI(const Executable * fun, const char * loc)
        Quad_SYL::si_depth_limit <= SI_top()->get_level())
       {
         MORE_ERROR() <<
-u8"the system limit on SI depth (as set in ⎕SYL["
+"the system limit on SI depth (as set in ⎕SYL["
 << (Quad_SYL::SYL_SI_DEPTH_LIMIT + Workspace::get_IO())
 << ";2]) was reached\n"
-u8"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
 
 
         Quad_SYL::si_depth_limit = 0;
@@ -146,7 +146,7 @@ u8"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared)
          if (the_workspace.top_SI == 0)
             {
               MORE_ERROR() <<
-              u8"malloc() → 0 when calling a defined function";
+              "malloc() → 0 when calling a defined function";
               the_workspace.top_SI = old_top;
               WS_FULL;
             }
@@ -543,7 +543,7 @@ int count = 0;
        {
          char cc[100];
          const long long lf(f);
-         SPRINTF(cc, u8"    ⎕EX[%lld] ", lf);
+         SPRINTF(cc, "    ⎕EX[%lld] ", lf);
          count += the_workspace.expunged_functions[f]
                                ->show_owners(cc, out, value);
        }
@@ -559,7 +559,7 @@ const int ret = the_workspace.expunged_functions.size();
    if (SI_entry_count() > 0)
       {
         out << "SI not cleared (size " << SI_entry_count()
-            << u8"): not deleting ⎕EX'ed functions (try )SIC first)" << endl;
+            << "): not deleting ⎕EX'ed functions (try )SIC first)" << endl;
         erased = false;
         return ret;
       }
@@ -938,22 +938,22 @@ const YMDhmsu time(gmt + 1000000*offset);
 "          content=\"??????, APL, GNU\">"                           << endl <<
 " </head>"                                                          << endl <<
 " <body><pre>"                                                      << endl <<
-u8"⍝"                                                                 << endl <<
-u8"⍝ Author:      ??????"                                             << endl <<
-u8"⍝ Date:        " << time.year << "-"
+"⍝"                                                                 << endl <<
+"⍝ Author:      ??????"                                             << endl <<
+"⍝ Date:        " << time.year << "-"
                   << time.month << "-"
                   << time.day                                       << endl <<
-u8"⍝ Copyright:   Copyright © " << time.year << " by ??????"        << endl <<
-u8"⍝ License:     GPL see http://www.gnu.org/licenses/gpl-3.0.en.html"<< endl <<
-u8"⍝ Support email: ??????@??????"                                    << endl <<
-u8"⍝ Portability:   L3 (GNU APL)"                                     << endl <<
-u8"⍝"                                                                 << endl <<
-u8"⍝ Purpose:"                                                        << endl <<
-u8"⍝ ??????"                                                          << endl <<
-u8"⍝"                                                                 << endl <<
-u8"⍝ Description:"                                                    << endl <<
-u8"⍝ ??????"                                                          << endl <<
-u8"⍝"                                                                 << endl <<
+"⍝ Copyright:   Copyright © " << time.year << " by ??????"        << endl <<
+"⍝ License:     GPL see http://www.gnu.org/licenses/gpl-3.0.en.html"<< endl <<
+"⍝ Support email: ??????@??????"                                    << endl <<
+"⍝ Portability:   L3 (GNU APL)"                                     << endl <<
+"⍝"                                                                 << endl <<
+"⍝ Purpose:"                                                        << endl <<
+"⍝ ??????"                                                          << endl <<
+"⍝"                                                                 << endl <<
+"⍝ Description:"                                                    << endl <<
+"⍝ ??????"                                                          << endl <<
+"⍝"                                                                 << endl <<
                                                                        endl;
         }
      else   // .apl
@@ -964,12 +964,12 @@ u8"⍝"                                                                 << endl 
         }
 
      *sout <<
-u8" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
-u8"⍝                                                                    ⍝\n"
-u8"⍝ " << setw(36) << lib_name.get_name() << " ";
-     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << u8" ⍝\n"
-u8"⍝                                                                    ⍝\n"
-u8" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
+"⍝                                                                    ⍝\n"
+"⍝ " << setw(36) << lib_name.get_name() << " ";
+     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝\n"
+"⍝                                                                    ⍝\n"
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
            << endl;
    }
 
@@ -987,7 +987,7 @@ int variable_count = 0;
    { get_v_ ## x().dump(*sout);   ++variable_count; }
 #include "SystemVariable.def"
 
-   if (html)   outf << endl << u8"⍝ EOF </pre></body></html>" << endl;
+   if (html)   outf << endl << "⍝ EOF </pre></body></html>" << endl;
 
    if (silent)
       {

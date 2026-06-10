@@ -82,7 +82,7 @@ Quad_SVx::start_AP(AP_num ap)
            {
              CERR << "*** Not starting AP " << ap
                   << " because --noSV (or equivalent) was given." << endl
-                  << u8" That conflicts with the use of ⎕SVxxx functions "
+                  << " That conflicts with the use of ⎕SVxxx functions "
                      "and variables." << endl;
            }
         ATTENTION;

@@ -184,7 +184,7 @@ UserPreferences::usage(const char * prog)
 
 #ifdef cfg_DYNAMIC_LOG_WANTED
    CERR <<
-u8"    -l num               turn logging facility num ON (1 ≤ num ≤ "
+"    -l num               turn logging facility num ON (1 ≤ num ≤ "
                              << (LID_MAX - 1) << ")\n";
 #else
    CERR <<
@@ -219,7 +219,7 @@ u8"    -l num               turn logging facility num ON (1 ≤ num ≤ "
 "    --OFF                automatically )OFF after last input file\n"
 "    -p N                 use profile N in preferences files\n"
 "    --par proc           use processor parent ID proc (default: no parent)\n"
-u8"    --PW value           initial value of ⎕PW\n"
+"    --PW value           initial value of ⎕PW\n"
 "    -q, --silent         do not print the welcome banner\n"
 "    -s, --script         shortcut for --silent --noCIN --noCONT --noColor\n"
 "    --safe               safe mode (no shared vars, no native functions)\n"
@@ -263,7 +263,7 @@ UserPreferences::show_GPL(ostream & out)
 "    This program is GNU APL, a free implementation of the\n"
 "    ISO/IEC Standard 13751, \"Programming Language APL, Extended\"\n"
 "\n"
-u8"    Copyright © 2008-2025  Dr. Jürgen Sauermann\n"
+"    Copyright © 2008-2025  Dr. Jürgen Sauermann\n"
 "\n"
 "    This program is free software: you can redistribute it and/or modify\n"
 "    it under the terms of the GNU General Public License as published by\n"
@@ -280,8 +280,8 @@ u8"    Copyright © 2008-2025  Dr. Jürgen Sauermann\n"
 "\n"
 "    ------------------------------------------------------------------------\n"
 "\n"
-u8"    The implementation of the APL matrix division functions (i.e. ⌹B, A⌹B,\n"
-u8"    and A⌹[X]B) are based on a manual translation of some FORTRAN source\n"
+"    The implementation of the APL matrix division functions (i.e. ⌹B, A⌹B,\n"
+"    and A⌹[X]B) are based on a manual translation of some FORTRAN source\n"
 "    code and comments from the LApack library (aka. liblapack, see GNU APL\n"
 "    source files LApack.hh and LApack.cc for details).\n"
 "\n"
@@ -1187,7 +1187,7 @@ UserPreferences::show_configure_options()
 
    "    CORE_COUNT_WANTED=" << cfg_CORE_COUNT_WANTED <<
 #if   cfg_CORE_COUNT_WANTED == -3
-   u8"  (= ⎕SYL)"
+   "  (= ⎕SYL)"
 #elif cfg_CORE_COUNT_WANTED == -2
    "  (= argv (--cc))"
 #elif cfg_CORE_COUNT_WANTED == -1
@@ -1660,12 +1660,12 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               control_Ds_to_exit = atoi(arg);
             }
-         else if (!strcasecmp(opt, u8"INITIAL-⎕PW"))
+         else if (!strcasecmp(opt, "INITIAL-⎕PW"))
             {
               initial_PW = atoi(arg);
               if (initial_PW < MIN_Quad_PW || initial_PW > MAX_Quad_PW)
                  {
-                   CERR << "bad value " << arg << u8" for INITIAL-⎕PW (ignored)"
+                   CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
                         << endl;
                    initial_PW_by_user = false;
                    initial_PW = 80;
@@ -1693,7 +1693,7 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               multi_line_literals = yes;
             }
-         else if (!strcasecmp(opt, u8"WINCH-SETS-⎕PW"))
+         else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {
               WINCH_sets_pw = yes;
             }

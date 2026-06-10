@@ -380,11 +380,11 @@ XML_Saving_Archive::save_Function(const Function & fun)
         err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
-u8"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again.\n"
 "\n"
 "         As a precaution for loosing data or function definitions, please\n"
-u8"         also )DUMP this workspace (before )SIC or →).\n"
+"         also )DUMP this workspace (before )SIC or →).\n"
              << endl;
 
         const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
@@ -441,7 +441,7 @@ XML_Saving_Archive::save_Function_name(const Function & fun)
         err << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
-u8"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again.\n"
 "\n"
 "         As an alternative (and to be on the safe side), you should also\n"
@@ -877,7 +877,7 @@ char cc[80];
                     // a non-zero denominator indicates a rational quotient)
                     //
                     const APL_Integer numer = flt.get_numerator();
-                    SPRINTF(cc, u8"%lld÷%lld", long_long(numer),
+                    SPRINTF(cc, "%lld÷%lld", long_long(numer),
                                              long_long(denom));
                     NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                     break;
@@ -1302,7 +1302,7 @@ const int fd = open(filename, O_RDONLY);
 
    if (!u8::strncmp(file_start, "#!", 2) ||   // )DUMP file
        !u8::strncmp(file_start, "<!", 2) ||   // )DUMP-HTML file
-       !u8::strncmp(file_start, u8"⍝!", 4))     // a library
+       !u8::strncmp(file_start, "⍝!", 4))     // a library
       {
         // the file was either written with )DUMP or is a library.
         // Return the open file descriptor (the destructor will unmap())
@@ -2223,7 +2223,7 @@ UCS_string text;
         UserFunction * ufun = 0;
         if (text[0] == UNI_LAMBDA)
            {
-             const char * creator = u8")LOAD λ";
+             const char * creator = ")LOAD λ";
              ufun = UserFunction::fix_lambda(symbol, text);
              ufun->increment_refcount(LOC, creator);
            }
@@ -2242,7 +2242,7 @@ UCS_string text;
            }
         else
            {
-             err << u8"    ⎕FX " << symbol.get_name() << " failed: "
+             err << "    ⎕FX " << symbol.get_name() << " failed: "
                   << Workspace::more_error() << endl;
              symbol.push();
              add_fid_function(fid, 0, LOC);
@@ -2308,7 +2308,7 @@ UCS_string lambda = read_UCS();
 Symbol dummy(ID_No_ID);
 UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
    Assert(ufun);
-const char * creator = u8")LOAD )SI λ";
+const char * creator = ")LOAD )SI λ";
    ufun->increment_refcount(LOC, creator);
 
    next_tag(LOC);
@@ -2621,8 +2621,8 @@ UCS_string  name_UCS(name_UTF);
    // ⎕PW and ⎕TZ are session variables that must not )LOADed (but might be
    // )COPYd)
    //
-   if (!u8::strncmp(name, u8"⎕NLT", name_len) ||
-       !u8::strncmp(name, u8"⎕PT", name_len))
+   if (!u8::strncmp(name, "⎕NLT", name_len) ||
+       !u8::strncmp(name, "⎕PT", name_len))
       {
         Log(LOG_archive)   err << "        skipped at " << LOC << endl;
         skip_to_tag("/Symbol");
@@ -3009,7 +3009,7 @@ const int vid = find_int_attr("vid", false, 10);
    // should not be loaded...
    //
    if (symbol.is_readonly())                     return;
-   if (symbol.get_name().starts_iwith(u8"⎕NLT"))   return;   // extinct
+   if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
    if (symbol.get_Id() == ID_Quad_SVE)           return;
    if (symbol.get_Id() == ID_Quad_SYL)           return;
    if (symbol.get_Id() == ID_Quad_PS)            return;

@@ -345,7 +345,7 @@ const char * unit = 0;
 
         if (val >= 1e0)    { unit = "";                  }
         else if (val >= 1e-3)   { unit = "m";   val *= 1e3;   }
-        else if (val >= 1e-6)   { unit = u8"μ";   val *= 1e6;   }
+        else if (val >= 1e-6)   { unit = "μ";   val *= 1e6;   }
         else if (val >= 1e-9)   { unit = "n";   val *= 1e9;   }
         else if (val >= 1e-12)  { unit = "p";   val *= 1e12;  }
       }
@@ -435,7 +435,7 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
       {
         Ax += Cx;   Bx += Cx;   Dx += Cx;
         Ay += Cy;   By += Cy;   Dy += Cy;
-        MORE_ERROR() << u8"⎕PLOT: one of the X-Z squares has bad coordinates:"
+        MORE_ERROR() << "⎕PLOT: one of the X-Z squares has bad coordinates:"
                      << "P1=(" << Ax << ":" << Ay << "), "
                         "P2=(" << Bx << ":" << By << "), "
                         "P3=(" << Cx << ":" << Cy << ") "
@@ -479,7 +479,7 @@ draw_triangle(const XCB_context & pctx, int verbosity,
    Assert(H12 >= 0.0);   Assert(H12 <= 1.0);
 
    if (verbosity & SHOW_DRAW)
-      CERR <<   u8" ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
+      CERR <<   " ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
            << "     P1(" << P1.x << ":" << P1.y << ") @H12=" << H12
            << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << endl;
 
@@ -514,7 +514,7 @@ draw_triangle(const XCB_context & pctx, int verbosity, Pixel_XY P0, double H0,
    Assert(H2 >= 0);   Assert(H2 <= 1.0);
 
    if (verbosity & SHOW_DRAW)
-      CERR << u8"\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
+      CERR << "\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
            << "      P1(" << P1.x << ":" << P1.y << ")@H=" << H1
            << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << endl;
 
@@ -1226,7 +1226,7 @@ UTF8_string outfile_utf8(outfile);
 
    // writing the file takes a while, so let the user know.
    //
-   CERR << u8"writing ⎕PLOT output file " << outfile_utf8 << "..." << endl;
+   CERR << "writing ⎕PLOT output file " << outfile_utf8 << "..." << endl;
 
    errno = 0;
 FileWriter writer(outfile_utf8.c_str());

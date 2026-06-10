@@ -334,8 +334,8 @@ public:
 #define rw_sv_def(x, _str, _txt) /** return ## x **/ static x& get_v_ ## x() \
    { return the_workspace.v_ ## x; }
 
-   rw_sv_def(Quad_Quad,  "", u8"⎕")   /**< ⎕ (Quad) */
-   rw_sv_def(Quad_QUOTE, "", u8"⍞")   /**< ⍞⎕ (QuoteQuad) */
+   rw_sv_def(Quad_Quad,  "", "⎕")   /**< ⎕ (Quad) */
+   rw_sv_def(Quad_QUOTE, "", "⍞")   /**< ⍞⎕ (QuoteQuad) */
 #include "SystemVariable.def"
 
 protected:
@@ -363,8 +363,8 @@ protected:
 #define ro_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
 /// read/write system variable
 #define rw_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
-   rw_sv_def(Quad_Quad,  "", u8"⎕")
-   rw_sv_def(Quad_QUOTE, "", u8"⍞")
+   rw_sv_def(Quad_Quad,  "", "⎕")
+   rw_sv_def(Quad_QUOTE, "", "⍞")
 #include "SystemVariable.def"
 
    /// Optional library reference, mandatory workspace name

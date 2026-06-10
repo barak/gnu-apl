@@ -228,7 +228,7 @@ const int64_t loaded_main = get_main();
    cerr << hex << setfill(' ')
         << "      main() in apl.lines: " << setw(16) << backtrace_main << endl
         << "    + main_offset_0:       " << setw(16) << main_offset_0  << endl
-        << u8"    ───────────────────────────────────────"               << endl
+        << "    ───────────────────────────────────────"               << endl
         << "    = loaded main():       " << setw(16) << loaded_main    << endl
         << dec;
 }
@@ -394,7 +394,7 @@ main():
 
    cerr << "\n      assembler lines in apl.lines: " << asm_lines
         << "\n    + source line numbers found:    " << (file_lines - asm_lines)
-        << u8"\n    ──────────────────────────────────────"
+        << "\n    ──────────────────────────────────────"
         << "\n    = total_lines in apl.lines:     " << file_lines
         << endl;
    lines_status = LINES_valid;
@@ -726,7 +726,7 @@ Dwarf_Bool hasform = false;
                     decode_ranges(ctx, attribute);
                     break;
 
-               default: cerr << u8"\n\n════ TODO: form " << HEX2(form) << endl;
+               default: cerr << "\n\n════ TODO: form " << HEX2(form) << endl;
                         Assert(0 && "TODO");
              }
       }
@@ -928,7 +928,7 @@ if (!strcmp(CU_name, "main.cc"))
       {
         // all CU dies have a low PC of 0.
         //
-        *ctx.out << u8"\n════════ CU " << ctx.attr_name << "..." << endl;
+        *ctx.out << "\n════════ CU " << ctx.attr_name << "..." << endl;
       }
 
    // decode children
@@ -1231,12 +1231,12 @@ const int64_t dwarf_PC = PC - adjust;
    cerr << right
         << "\n      main() in program: " << HEX16s(main_in_program)
         << "\n    - main() in dwarf:   " << HEX16s(main_in_dwarf)
-        << u8"\n    ─────────────────────────────────────"
-        << u8"\n    = ∆                  " << HEX16s(adjust)
+        << "\n    ─────────────────────────────────────"
+        << "\n    = ∆                  " << HEX16s(adjust)
         << "\n"
         << "\n      PC in program:     " << HEX16s(PC)
-        << u8"\n    - ∆:                 " << HEX16s(adjust)
-        << u8"\n    ─────────────────────────────────────"
+        << "\n    - ∆:                 " << HEX16s(adjust)
+        << "\n    ─────────────────────────────────────"
         << "\n    = PC in dwarf:       " << HEX16s(dwarf_PC)
         << left << endl << endl;
 

@@ -60,7 +60,7 @@ ShapeItem map_len = A->get_rows();               // the number of mappings
         map_len = A->element_count();
         if (map_len & 1)
            {
-             MORE_ERROR() << u8"Odd length of A in A ⎕MAP B";
+             MORE_ERROR() << "Odd length of A in A ⎕MAP B";
              LENGTH_ERROR;
            }
         map_len = map_len >> 1;
@@ -69,7 +69,7 @@ ShapeItem map_len = A->get_rows();               // the number of mappings
 
    if (map_len == 0)
            {
-             MORE_ERROR() << u8"A with length 0 in A ⎕MAP B";
+             MORE_ERROR() << "A with length 0 in A ⎕MAP B";
              LENGTH_ERROR;
            }
 
@@ -95,7 +95,7 @@ const double qct = Workspace::get_CT();
                const int qio = Workspace::get_IO();
                MORE_ERROR() << "Duplicate keys (e.g. A["
                             << (qio + indices[m - 1]) << "] and A["
-                            << (qio + indices[m]) << u8"]) in 'A ⎕MAP B'";
+                            << (qio + indices[m]) << "]) in 'A ⎕MAP B'";
                DOMAIN_ERROR;
              }
        }

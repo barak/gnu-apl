@@ -95,10 +95,10 @@ public:
    void print(ostream & out) const
       {
         print_RC(out);
-        up->print_RC(out << u8" ↑");
-        down->print_RC(out << u8" ↓");
-        left->print_RC(out << u8" ←");
-        right->print_RC(out << u8" →");
+        up->print_RC(out << " ↑");
+        down->print_RC(out << " ↓");
+        left->print_RC(out << " ←");
+        right->print_RC(out << " →");
         out << endl;
         check();
       }
@@ -354,7 +354,7 @@ const Cell * b = &B.get_cfirst();
                 more << "'" << cell.get_char_value() << "'";
              else
                 more << "neither integer nor character";
-             more << u8" in ⎕DLX B";
+             more << " in ⎕DLX B";
              DOMAIN_ERROR;
            }
         if (ct != Col_UNKNOWN)   ++ones;
@@ -401,7 +401,7 @@ const Cell * b = &B.get_cfirst();
              else if (ct != hdr.col_type)       // col type mismatch
                 {
                   MORE_ERROR() <<
-                  u8"the columns of B in ⎕DLX B must either be primary ("
+                  "the columns of B in ⎕DLX B must either be primary ("
                   "containing 1s) or secondary (containing  2s), but not both";
                   DOMAIN_ERROR;
                 }
@@ -421,7 +421,7 @@ const Cell * b = &B.get_cfirst();
       {
         if (headers[c].col_type == Col_UNKNOWN)
            {
-             MORE_ERROR() << u8"⎕DLX B with empty column B[;"
+             MORE_ERROR() << "⎕DLX B with empty column B[;"
                           << (c + qio) << "]";
              DOMAIN_ERROR;
            }
@@ -539,7 +539,7 @@ new_level:
 
    if (LOG_Quad_DLX || InterruptContext::attention_is_raised())
       {
-        CERR << u8"⎕DLX[" << level << "]";
+        CERR << "⎕DLX[" << level << "]";
         loop(s, level)
             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
         CERR << endl;
@@ -610,7 +610,7 @@ rloop:   // running ↓
    {
      DLX_Node * r = headers[level].item_r->down;
 
-     Log(LOG_Quad_DLX)   r->print_RC(indent(CERR) << u8"rloop ↓ at r= ") << endl;
+     Log(LOG_Quad_DLX)   r->print_RC(indent(CERR) << "rloop ↓ at r= ") << endl;
 
      for (DLX_Node * j = r->right; j != r; j = j->right)
          {
