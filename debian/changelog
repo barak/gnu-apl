@@ -1,3 +1,10 @@
+gnu-apl (1.8-2) UNRELEASED; urgency=medium
+
+  * Remove more derived files from source tree for safety, and search
+    build tree before source tree for generated include files
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 10 Jun 2026 21:53:59 +0100
+
 gnu-apl (1.8-1) unstable; urgency=medium
 
   * Package upstream release 1.8 (closes: #949948)
