@@ -18,19 +18,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "PostgresProvider.hh"
 #include "PostgresConnection.hh"
 
-static PostgresConnection *create_postgres_connection( Value_P B )
+//-----------------------------------------------------------------------------
+static PostgresConnection *
+create_postgres_connection(Value_P B)
 {
     if( !B->is_char_string() ) {
-        Workspace::more_error() = "Argument must be a single string";
+        MORE_ERROR() << "Argument must be a single string";
         DOMAIN_ERROR;
     }
 
-    string connect_args = to_string( B->get_UCS_ravel() );
+     const UTF8_string B_utf(B->get_UCS_ravel());
+    string connect_args = B_utf.c_str();
 
-    const char *keywords[] = { "dbname", NULL };
+    const char * keywords[] = { "dbname", NULL };
     const char *values[] = { connect_args.c_str(), NULL };
     PGconn *db = PQconnectdbParams( keywords, values, 1 );
 
@@ -38,7 +44,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
     if( status != CONNECTION_OK ) {
         stringstream out;
         out << "Error connecting to Postgres database: " << PQerrorMessage( db );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         PQfinish( db );
         DOMAIN_ERROR;
     }
@@ -47,16 +53,37 @@ static PostgresConnection *create_postgres_connection( Value_P B )
     if( result != 0 ) {
         stringstream out;
         out << "Unable to set encoding to UTF-8: " << PQerrorMessage( db );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         PQfinish( db );
         DOMAIN_ERROR;
     }
 
-    return new PostgresConnection( db );
+   return new PostgresConnection(db);
 }
-
-Connection *PostgresProvider::open_database( Value_P B )
+//-----------------------------------------------------------------------------
+Connection *
+PostgresProvider::open_database( Value_P B )
 {
     Connection *connection = create_postgres_connection( B );
     return connection;
 }
+//-----------------------------------------------------------------------------
+const char *
+PostgresProvider::version_string() const
+{
+const int version_number = PQlibVersion();
+static char version[100];
+   snprintf(version, sizeof(version), "PostgreSQL-%u.%u.%u",
+            version_number/10000,
+            version_number/100 %100,
+            version_number%100);
+   return version;
+}
+//-----------------------------------------------------------------------------
+int
+PostgresProvider::version_number() const
+{
+   return PQlibVersion();
+}
+//-----------------------------------------------------------------------------
+

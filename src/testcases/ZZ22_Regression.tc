@@ -24,7 +24,7 @@ unbox   ∆  ∆1  ∆2  ∆3  ∆4  ∆DT ∆DT2    ∆LLP    ∆LP ∆LPH    �
       L←1++\FUNS=' '     ◊ FUNS←L⊂FUNS
       L←∼(⊂,' ')≡¨FUNS   ◊ FUNS←L/FUNS
       FUNS←{(⍵≠' ')/⍵} ¨ FUNS
-      { 0 0⍴⎕FX ⍵ } ¨ FUNS
+      ⊣{ 0 0⍴⎕FX ⍵ } ¨ FUNS
 
       )FNS
 Add             Add∆days        Ail         Aln             CAL

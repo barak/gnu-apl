@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "apl-sqlite.hh"
 #include "SqliteConnection.hh"
 #include "SqliteResultValue.hh"
@@ -27,7 +30,7 @@ void SqliteConnection::raise_sqlite_error( const string &message )
 {
     stringstream out;
     out << message << ": " << sqlite3_errmsg( db );
-    Workspace::more_error() = out.str().c_str();
+    MORE_ERROR() << out.str().c_str();
     DOMAIN_ERROR;
 }
 
@@ -42,66 +45,78 @@ SqliteConnection::~SqliteConnection()
         raise_sqlite_error( "Error closing database" );
     }
 }
-
-ArgListBuilder *SqliteConnection::make_prepared_query( const string &sql )
+//-----------------------------------------------------------------------------
+ArgListBuilder *
+SqliteConnection::make_prepared_query(const string & sql)
+{
+SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
+   return builder;
+}
+//-----------------------------------------------------------------------------
+ArgListBuilder *
+SqliteConnection::make_prepared_update(const string & sql)
 {
     SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
     return builder;
 }
-
-ArgListBuilder *SqliteConnection::make_prepared_update( const string &sql )
+//-----------------------------------------------------------------------------
+void
+SqliteConnection::run_simple(const string & sql)
 {
-    SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
-    return builder;
+SqliteArgListBuilder builder(this, sql);
+   builder.run_query(false);
 }
-
-void SqliteConnection::run_simple( const string &sql )
+//-----------------------------------------------------------------------------
+void
+SqliteConnection::transaction_begin()
 {
-    SqliteArgListBuilder builder( this, sql );
-    builder.run_query( false );
+  run_simple("begin");
 }
-
-void SqliteConnection::transaction_begin()
+//-----------------------------------------------------------------------------
+void
+SqliteConnection::transaction_commit()
 {
-    run_simple( "begin" );
+  run_simple("commit");
 }
-
-void SqliteConnection::transaction_commit()
+//-----------------------------------------------------------------------------
+void
+SqliteConnection::transaction_rollback()
 {
-    run_simple( "commit" );
+  run_simple("rollback");
 }
-
-void SqliteConnection::transaction_rollback()
-{
-    run_simple( "rollback" );
-}
-
+//-----------------------------------------------------------------------------
 void
 SqliteConnection::fill_tables(vector<string> & tables)
 {
-    sqlite3_stmt *statement;
-    if( sqlite3_prepare_v2( get_db(), "select name from sqlite_master where type = 'table'", -1,
-                            &statement, NULL ) != SQLITE_OK ) {
-        raise_sqlite_error( "Error getting table names" );
-    }
+sqlite3_stmt * statement;
+const char * SELECT = "select name from sqlite_master where type = 'table'";
+   if (SQLITE_OK != sqlite3_prepare_v2(get_db(), SELECT, -1, &statement, NULL))
+      {
+        raise_sqlite_error("Error getting table names");
+      }
 
-    SqliteStmtWrapper statement_wrapper( statement );
-    int result;
-    while( (result = sqlite3_step( statement_wrapper.get_statement() )) != SQLITE_DONE ) {
-        if( result != SQLITE_ROW ) {
-            raise_sqlite_error( "Error getting next table name" );
-        }
+SqliteStmtWrapper statement_wrapper(statement);
+   for (;;)
+       {
+         const int result = sqlite3_step(statement_wrapper.get_statement());
+         if (result == SQLITE_DONE)   break;
 
-        int type = sqlite3_column_type( statement, 0 );
-        if( type != SQLITE_TEXT ) {
-            raise_sqlite_error( "Table name is not a text column" );
-        }
+         if (result != SQLITE_ROW)
+            {
+              raise_sqlite_error( "Error getting next table name" );
+            }
 
-        tables.push_back(reinterpret_cast<const char *>
-                                          (sqlite3_column_text(statement, 0)));
-    }
+         const int type = sqlite3_column_type(statement, 0);
+         if (type != SQLITE_TEXT )
+            {
+              raise_sqlite_error( "Table name is not a text column");
+            }
+
+         tables.push_back(reinterpret_cast<const char *>
+                          (sqlite3_column_text(statement, 0)));
+       }
 }
-
+//-----------------------------------------------------------------------------
 void
 SqliteConnection::fill_cols(const string &table,
                             vector<ColumnDescriptor> & cols)

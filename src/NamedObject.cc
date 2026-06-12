@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 
 #include "Assert.hh"
 #include "NamedObject.hh"
 #include "Token.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 NameClass
-NamedObject::get_nc() const
+NamedObject::get_NC() const
 {
    if (id == ID_USER_SYMBOL ||   // this named object is a user defined object
        id == ID_ALPHA       ||   // ⍺
@@ -36,11 +39,10 @@ NamedObject::get_nc() const
        id == ID_OMEGA_U     ||   // ⍹
        id == ID_CHI)             // χ
       {
-        const Symbol * sym = get_symbol();
-        if (sym)
+        if (const Symbol * sym = get_symbol())
            {
-             const ValueStackItem * tos = sym->top_of_stack();
-             if (tos)   return tos->name_class;
+             if (const ValueStackItem * tos = sym->top_of_stack())
+                return tos->get_NC();
            }
 
         return NC_UNUSED_USER_NAME;
@@ -48,7 +50,7 @@ NamedObject::get_nc() const
 
    // Distinguished name.
    //
-   Assert(Avec::is_quad(get_name()[0]));
+   Assert(Avec::is_quad(get_name()[0]) || get_name()[0] == UNI_QUOTE_Quad);
 
 int len;
 Token tok = Workspace::get_quad(get_name(), len);
@@ -61,4 +63,4 @@ Token tok = Workspace::get_quad(get_name(), len);
 
    return NC_INVALID;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

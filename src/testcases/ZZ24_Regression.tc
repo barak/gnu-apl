@@ -11,8 +11,8 @@ CLEAR WS
 ∇
 
 ⎕CR 'TEST'
-TEST                    
- '⎕ES "HELLO"' ⎕EA '3÷0'
+TEST                   
+'⎕ES "HELLO"' ⎕EA '3÷0'
 
 
       TEST

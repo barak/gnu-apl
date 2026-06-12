@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __CDR_STRING_HH_DEFINED__
 #define __CDR_STRING_HH_DEFINED__
-
-#include <vector>
 
 #include "UTF8_string.hh"
 
@@ -60,7 +61,7 @@ struct CDR_header
 };
 
 /// a string containing a CDR record
-class CDR_string : public std::vector<uint8_t>
+class CDR_string : public UTF8_string
 {
 public:
    /// Constructor: An uninitialized CDR structure
@@ -70,6 +71,10 @@ public:
    /// Constructor: CDR structure from uint8_t * and length
    CDR_string(const uint8_t * data, int len)
       { loop(l, len)   push_back(*data++); }
+
+  /// overload basic_string::size() so that it returns a signed length
+   ShapeItem size() const
+      { return  UTF8_string::size(); }
 
    /// return the bytes of this CDR
    const uint8_t * get_items() const

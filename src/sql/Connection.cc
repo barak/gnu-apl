@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Connection.hh"
 
 const string Connection::replace_bind_args( const string &sql )

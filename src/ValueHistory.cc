@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
+/** @file
+*/
 
 #include <iomanip>
 
@@ -48,30 +49,28 @@ VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
 void
 VH_entry::init()
 {
-   memset(history, 0, sizeof(history));
+void * h = history;
+   memset(h, 0, sizeof(history));
 }
 //----------------------------------------------------------------------------
+/// add event \b ev with event argumant \b ia to the history of \b val
 void
 add_event(const Value * val, VH_event ev, int ia, const char * loc)
 {
-   if (loc == 0)
-      {
-        if (val)   loc = val->where_allocated();
-        else       loc = LOC;
-      }
+   Assert(loc);
 
 VH_entry * entry = VH_entry::history + VH_entry::idx++;
    if (VH_entry::idx >= VALUEHISTORY_SIZE)   VH_entry::idx = 0;
 
-   new(entry) VH_entry(val, ev, ia, loc);
+   new (entry) VH_entry(val, ev, ia, loc);
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print_history(ostream & out, const Value * val, const char * loc)
+VH_entry::print_history(ostream & out, const Value & val, const char * loc)
 {
    // search backwards for events of val.
    //
-std::vector<const VH_entry *> var_events;
+std::basic_string<const VH_entry *> var_events;
 int cidx = VH_entry::idx;
 
    loop(e, VALUEHISTORY_SIZE)
@@ -91,7 +90,7 @@ int cidx = VH_entry::idx;
               continue;
             }
 
-          if (entry->val != val)            continue;   // some other var
+          if (entry->val != &val)           continue;   // some other var
 
           var_events.push_back(entry);
 
@@ -104,7 +103,7 @@ int cidx = VH_entry::idx;
       }
     else
       {
-        out << endl << "value " << voidP(val)
+        out << endl << "value " << voidP(&val)
             << " has " << var_events.size()
             << " events in its history";
         if (loc)   out << " (at " << loc << ")";
@@ -122,20 +121,23 @@ const VH_entry * previous = 0;
    out << endl;
 }
 //----------------------------------------------------------------------------
+/// return the letters of some \b flags set
 static UCS_string
 flags_name(ValueFlags flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)   ret.append(UNI_ASCII_M);
-  if (flags & VF_complete) ret.append(UNI_ASCII_C);
+  if (flags & VF_marked)     ret.append(UNI_M);
+  if (flags & VF_complete)   ret.append(UNI_C);
+  if (flags & VF_packed)     ret.append(UNI_P);
+  if (flags & VF_member)     ret.append(UNI_m);
 
-   while (ret.size() < 4)   ret.append(UNI_ASCII_SPACE);
+   while (ret.size() < 4)   ret.append(UNI_SPACE);
    return ret;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print(int & flags, ostream & out, const Value * val,
+VH_entry::print(int & flags, ostream & out, const Value & val,
                const VH_entry * previous) const
 {
 const ValueFlags flags_before = ValueFlags(flags);
@@ -208,12 +210,8 @@ const ValueFlags flags_before = ValueFlags(flags);
              out << "  VHE_PtrNew0  " << setw(26) << iarg;
              break;
 
-        case VHE_PtrCopy1:
-             out << "  VHE_PtrCopy1 " << setw(26) << iarg;
-             break;
-
-        case VHE_PtrCopy2:
-             out << "  VHE_PtrCopy2 " << setw(26) << iarg;
+        case VHE_PtrCopy:
+             out << "  VHE_PtrCopy " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy3:
@@ -232,16 +230,12 @@ const ValueFlags flags_before = ValueFlags(flags);
              out << "  VHE_PtrDel0  " << setw(26) << iarg;
              break;
 
-        case VHE_TokCopy1:
-             out << "  VHE_TokCopy1 " << setw(26) << iarg;
+        case VHE_TokCopy:
+             out << "  VHE_TokCopy " << setw(26) << iarg;
              break;
 
-        case VHE_TokMove1:
-             out << "  VHE_TokMove1 " << setw(26) << iarg;
-             break;
-
-        case VHE_TokMove2:
-             out << "  VHE_TokMove2 " << setw(26) << iarg;
+        case VHE_TokMove:
+             out << "  VHE_TokMove " << setw(26) << iarg;
              break;
 
         case VHE_Completed:

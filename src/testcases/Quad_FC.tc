@@ -27,7 +27,7 @@ pqrstu
       ⎕FC←1 2 3
 DOMAIN ERROR
       ⎕FC←1 2 3
-      ^  ^
+          ^
 
       →
 

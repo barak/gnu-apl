@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __APL_TYPES_HH_DEFINED__
 #define __APL_TYPES_HH_DEFINED__
 
@@ -31,7 +34,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "../config.h"
+#include "Common.hh"
 #include "Unicode.hh"
 
 using namespace std;
@@ -42,19 +45,31 @@ using namespace std;
 // A. typedefs                                              //
 //////////////////////////////////////////////////////////////
 
-/// The rank of an APL value.
-typedef int32_t Rank;
-typedef Rank Axis;
+/// The (signed) rank or axis of an APL value.
+typedef int16_t sRank;
+typedef sRank sAxis;
 
+/// The (unsigned) rank or axis of an APL value.
 typedef uint32_t uRank;
 typedef uRank uAxis;
 
-typedef int32_t Depth;
+/// A bitmap for axes (in fun[X] arguments) normalized to ⎕IO←0.
+typedef uint16_t AxesBitmap;
 
-/// The dimensions of an APL value.
+/// The length of one dimension (axis) of an APL shape.
 typedef int64_t ShapeItem;
 
-/// The SI level, 0 = global (oldest), caller at level N called function at N+1
+/// for ulong(x) instead of  static_cast<unsigned long>(x)
+typedef unsigned long ulong;
+
+/// for long_long(x) instead of  static_cast<long long>(x)
+typedef long long long_long;
+
+/// for ulong_long(x) instead of  static_cast<unsigned long long>(x)
+typedef unsigned long long ulong_long;   // dito.
+
+/// The SI level, 0 = global (oldest), the caller at SI level N calls the
+/// functions at SI level N+1
 typedef int SI_level;
 
 /// One APL character value.
@@ -63,11 +78,8 @@ typedef Unicode APL_Char;
 /// One APL integer value.
 typedef int64_t APL_Integer;
 
-/// long long for sprintf() and friends
-typedef long long long_long;
-
-/// unsigned long for sprintf() and friends
-typedef unsigned long unsigned_long;
+class Function;
+typedef const Function * cFunction_P;
 
 inline void
 Hswap(APL_Integer & i1, APL_Integer & i2)
@@ -80,7 +92,7 @@ Hswap(APL_Integer & i1, APL_Integer & i2)
 
 inline void release_APL_Float(APL_Float * x)   { x->~APL_Float(); }
 
-#else   // APL_Float is a POD (double)
+#else                  // APL_Float is a POD (double)
 
 typedef double APL_Float_Base;
 typedef APL_Float_Base APL_Float;
@@ -92,15 +104,16 @@ typedef APL_Float_Base APL_Float;
 
 #endif // APL_Float is class vs. POD
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// One APL complex value.
 typedef complex<APL_Float> APL_Complex;
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// APL time = microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;
 
 class Symbol;
 class Value;
+class Cell;
 
 //////////////////////////////////////////////////////////////
 // B. enums            i                                    //
@@ -163,7 +176,7 @@ enum ListCategory
                | LIST_OPERS,
   LIST_ALL     = 0xFFFFFFFF   ///< list everything
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// possible properties of a Value.
 enum ValueFlags
 {
@@ -171,11 +184,13 @@ enum ValueFlags
   VF_complete = 0x0400,   ///< CHECK called
   VF_marked   = 0x0800,   ///< marked to detect stale
   VF_temp     = 0x1000,   ///< computed value
+  VF_member   = 0x2000,   ///< used for member access
+  VF_packed   = 0x4000,   ///< packed homogenious ravel
 };
 
 extern ostream & print_flags(ostream & out, ValueFlags flags);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// events for APL values
 enum VH_event
 {
@@ -190,20 +205,18 @@ enum VH_event
   VHE_Error,       ///< some APL error has occurred
   VHE_PtrNew,      ///< new Value_P created
   VHE_PtrNew0,     ///< new Value_P with 0-pointer created
-  VHE_PtrCopy1,    ///< Value_P copied with constructor(Value_P)
-  VHE_PtrCopy2,    ///< Value_P copied with constructor(Value_P, loc)
+  VHE_PtrCopy,     ///< Value_P copied with constructor(Value_P)
   VHE_PtrCopy3,    ///< Value_P copied with operator =()
   VHE_PtrClr,      ///< Value_P cleared
   VHE_PtrDel,      ///< Value_P deleted
   VHE_PtrDel0,     ///< Value_P deleted (with 0 pointer)
-  VHE_TokCopy1,    ///< token with Value_P copied
-  VHE_TokMove1,    ///< token with Value_P moved
-  VHE_TokMove2,    ///< token with Value_P moved
+  VHE_TokCopy,     ///< token with Value_P copied
+  VHE_TokMove,     ///< token with Value_P moved
   VHE_Completed,   ///< incomplete ravel set to 42424242
   VHE_Stale,       ///< stale value erased
   VHE_Visit,       ///< test point
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The bits in an int
 enum Bitmask
 {
@@ -240,25 +253,28 @@ enum Bitmask
    BIT_30 = 1 << 30,   ///<< dito.
    BIT_31 = 1 << 31    ///<< dito.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the line number of an APL function line (0 being the line to
 /// return from the function).
 enum Function_Line
 {
+   Function_Invalid = -3,   // invalid function line (in →N optimization)
    Function_Retry   = -2,   // →'' in immediate execution
+   Function_Return  = -1,   // →N with N≤0 or large
    Function_Line_0  =  0,
    Function_Line_1  =  1,
    Function_Line_10 = 10,
 };
-//-----------------------------------------------------------------------------
-///  What is being parsed (function, immediate execution statements, or ⍎expr)
+//----------------------------------------------------------------------------
+///  What is being parsed (defined function, immediate execution statements,
+/// or ⍎expr)
 enum ParseMode
 {
-   PM_FUNCTION       = 0,   ///< function execution
+   PM_FUNCTION       = 0,   ///< defined function
    PM_STATEMENT_LIST = 1,   ///< immediate execution
    PM_EXECUTE        = 2,   ///< execute (⍎)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Different ways of printing APL values.
 enum PrintStyle
 {
@@ -318,7 +334,7 @@ enum PrintStyle
    PR_NARS1          = PR_BOXED_GRAPHIC1 | PST_NARS,  ///< NARS APL style,
    PR_NARS2          = PR_BOXED_GRAPHIC2 | PST_NARS,  ///< NARS APL style,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an offset into the body of a user-defined function. If we consider the APL
 /// interpreter as a high-level machine that executes token in user defined
 /// functions then this offset is the "program counter" of the high-level
@@ -326,14 +342,14 @@ enum PrintStyle
 enum Function_PC
 {
    Function_PC_0       =  0,   ///< the first token in a function
-   Function_PC_done    = -1,   ///< goto 0
+   Function_PC_done    = -1,   ///< goto 0 (leave function)
    Function_PC_invalid = -1    ///< dito
 };
-//-----------------------------------------------------------------------------
-/// signature of a user defined function
+//----------------------------------------------------------------------------
+/// signature of a defined function
 enum Fun_signature
 {
-   // atoms
+   // signature atoms
    //
    SIG_NONE            = 0,      ///< 
    SIG_Z               = 0x01,   ///< function has a result
@@ -394,7 +410,7 @@ enum Fun_signature
    SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
    SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {
@@ -408,7 +424,7 @@ enum SI_mode
    SIM_SI_dbg     = SIM_debug,
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the number of cores/tasks to be used
 enum CoreCount
 {
@@ -416,7 +432,7 @@ enum CoreCount
   CCNT_0       = 0,    ///<< no core
   CCNT_1       = 1,    ///< one core ...
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the cores/tasks to be used
 enum CoreNumber
 {
@@ -424,27 +440,28 @@ enum CoreNumber
   CNUM_MASTER  = 0,   ///< the interpreter core
   CNUM_WORKER1 = 1,   ///< the first worker core ...
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the CPUs reported by the OS
 enum CPU_Number
 {
    CPU_0 = 0   ///< the first (only) CPU
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the number of CPUs available
 enum CPU_count
 {
    CPU_CNT_1 = 1   ///< one CPU
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the state of an assignment
 enum Assign_state
 {
    ASS_none       = 0,   ///< no assignment (right of ←)
    ASS_arrow_seen = 1,   ///< ← seen but no variable yet
    ASS_var_seen   = 2,   ///< var and ← seen
+   ASS_unknown    = 3,   ///< not known (too much effort to figure it)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the cause for something
 enum Cause
 {
@@ -452,7 +469,7 @@ enum Cause
    CAUSE_SHUTDOWN = 1,
    CAUSE_ERASED   = 2,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the CDR data types
 enum CDR_type
 {
@@ -465,22 +482,22 @@ enum CDR_type
    CDR_PROG64  = 6,   ///< 2*32 bit progression vector
    CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
-//-----------------------------------------------------------------------------
-/// the result of a comparison
+//----------------------------------------------------------------------------
+/// the result of a comparison cell_1.compare(cell_2)
 enum Comp_result
 {
-  COMP_LT = -1,   ///< less than
-  COMP_EQ =  0,   ///< equal
-  COMP_GT =  1,   ///< greter than
+  COMP_LT = -1,   ///< less than:     cell_1 < cell_2
+  COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
+  COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the order of a comparison
 enum Sort_order
 {
    SORT_DESCENDING = 0,   ///< sort descending
    SORT_ASCENDING  = 1,   ///< sort asscending
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// events for a symbol
 enum Symbol_Event
 {
@@ -490,7 +507,7 @@ enum Symbol_Event
    SEV_ASSIGNED = 4,
    SEV_ERASED   = 5,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Auxiliary processor numbers
 enum AP_num
 {
@@ -500,21 +517,27 @@ enum AP_num
   AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
   AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
-//-----------------------------------------------------------------------------
-/// longest filename
+//----------------------------------------------------------------------------
+/// supposedly the longest possible filename
 enum {  APL_PATH_MAX = 4096 };
-//-----------------------------------------------------------------------------
-/// an ID. Every internal object known to APL (primitive, ⎕xx, ...) has one
-enum Id
+//----------------------------------------------------------------------------
+enum TimeScale
 {
-#define pp(i, _u, v) ID_ ##   i v,
-#define qf(i, _u, v) ID_Quad_ ## i v,
-#define qv(i, _u, v) ID_Quad_ ## i v,
-#define sf(i, _u, v) ID_ ##   i v,
-#define st(i, _u, v) ID_ ##   i v,
-
-#include "Id.def"
+  SECONDS_PER_MINUTE  =     60 * 1,                      ///<         60
+  SECONDS_PER_HOUR    =     60 * SECONDS_PER_MINUTE,     ///<      3,600
+  SECONDS_PER_DAY     =     24 * SECONDS_PER_HOUR,       ///<     86,400
+  SECONDS_PER_WEEK    =      7 * SECONDS_PER_DAY,        ///<    604,800
+  SECONDS_PER_MONTH   =     30 * SECONDS_PER_DAY,        ///<  2,592,000
+  SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
+  SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
 };
+//----------------------------------------------------------------------------
+/// the number of TOK_VOID removed from the body of an \b Executable
+enum VoidCount
+{
+  NO_VOID_TOKEN_REMOVED = 0
+};
+//----------------------------------------------------------------------------
 
 //////////////////////////////////////////////////////////////
 // C. structs                                               //
@@ -548,8 +571,9 @@ struct AP_num3
    AP_num parent;   ///< the parent of the processor
    AP_num grand;    ///< the parent of the parent
 };
-//-----------------------------------------------------------------------------
-/// two Function_PCs indication a token range in a user defined function body
+//----------------------------------------------------------------------------
+/// two Function_PCs that indicate a token range in the body of a defined
+//  function body
 struct Function_PC2
 {
    /// a PC range
@@ -561,7 +585,7 @@ struct Function_PC2
    Function_PC low;    ///< low PC  (including)
    Function_PC high;   ///< high PC (including)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A single label. A label is a local variable (sym) with an integer function
     line (in which \b sym: was specified as the first 2 tokens in the line)
  */
@@ -571,7 +595,7 @@ struct labVal
    Symbol      * sym;    ///< The symbol for the label variable.
    Function_Line line;   ///< The line number of the label.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The end and the state of an abstract iterator along one axis
 /// (to / weight / current)
 struct _twc
@@ -586,7 +610,7 @@ struct _twc
    /// the current index
    ShapeItem current;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The range and the state of an abstract iterator along one axis
 /// (from / to / weight / current)
 struct _ftwc : public _twc
@@ -595,6 +619,32 @@ struct _ftwc : public _twc
    /// over-Take from the end.
    ShapeItem from;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// the ravel (of an APL value) and a comparison lenght (= number of
+/// consecutive cells to be compared)
+struct ravel_comp_len
+{
+   /// the ravel (first Cell of some Value)
+   const Cell * ravel;
+
+   /// the number of consecutive Cells to be compared
+   ShapeItem comp_len;
+};
+//----------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////////
+// D. Namespace APL_types
+//////////////////////////////////////////////////////////////
+
+/*
+  instead of putting everything into a namespace (which makes the code
+  rather unreadable, we put only those types into a namesapce that were
+  observed to conflict with other libraries.
+ */
+
+namespace APL_types
+{
+  typedef int32_t Depth;
+}
 
 #endif // __APL_TYPES_HH_DEFINED__

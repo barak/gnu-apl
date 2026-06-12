@@ -194,7 +194,7 @@ All functions were faster when executed parallel. The per-item cost were
 considerably higher (in part due to the 32-bit linux) but the parallel
 start-up penalty (2340 - 2027) = 313 was smaller.
 
-Note that the start up cost vary considerably between different runs of
+Note that the start up cost varies considerably between different runs of
 the same benchmark on the same machine. Therefore you should run several
 measurements before trusting the result.
 
@@ -229,8 +229,8 @@ scalar APL functions. However the speedup is not as significant as a naive
 observer might expect (i.e. B0÷Bc = c) and varies considerably between OS
 variants and hardware platforms.
 
-While the start-up cost of the current implementation in GNU APL look good
-compared to other approaches, the per-item cost are somewhat disappointing
+While the start-up costs of the current implementation in GNU APL look good
+compared to other approaches, the per-item costs are somewhat disappointing
 on some machines (and this is due to effects outside GNU APL). A corollary
 of this could be that APL operations with little computational complexity
 (such as A⍴B) will suffer as well and will not show good speedups when

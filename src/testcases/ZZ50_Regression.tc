@@ -1,0 +1,58 @@
+⍝ ZZ50_Regression.tc
+⍝ ------------------
+
+      ⍝ Kacpar Gutowski, Jan. 2020
+      ⍝
+      )CLEAR
+CLEAR WS
+
+∪'abbbbbbbbbbbaaaaaaa'
+ab
+
+∪'abbbbbbbbbbbaaaaaaaa'
+ab
+
+⎕←(A B C)←1+¯1 0 1×(⎕CT←1E¯9)÷2
+0.9999999995 1 1.000000001
+
+⍝ NOTE: A=B B=C but A≠C !!!
+∪A B C
+0.9999999995 1.000000001
+
+∪19↑B A B C
+1 0
+
+∪19⍴B A B C
+1
+
+∪20↑B A B C
+1 0
+
+∪20⍴B A B C
+1
+
+⍝ a case with many close items...
+⍝
+⎕PP←12 ◊ ⎕RL←42 ◊ N←500
+X←⍳N                   ⍝ 1 2 3 ...
+X←X, 1+X×⎕CT÷NN←2×N    ⍝ 1 2 3 ... 1.000...00001 1.000...00002 1.000...00003 
+X←X[NN?NN]             ⍝ in random order
+U←∪X                   ⍝ U is unique X (the function under test)
+
+
+0ϵ+⌿U∘.=X              ⍝ check that every item in X is also in U
+0
+
+UU←U∘.=U               ⍝ check that all items in U are different
+(1 1⍉UU)←0             ⍝ outside the diagonal
+1ϵ,UU
+0
+
+)SI
+
+)CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

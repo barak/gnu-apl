@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,38 +18,52 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __COMMON_HH_DEFINED__
 #define __COMMON_HH_DEFINED__
 
-#include "../config.h"   // for xxx_WANTED and other macros from ./configure
+// NOTE: the path to config.h is set as -I $(pwd) in ./configure, so we do not
+// need ../config.h
+//
+#include "config.h"   // for xxx_WANTED and other macros from ./configure
 
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <sys/stat.h>
-#include <sys/fcntl.h>
+/// stringify x
+#define STR(x) #x
 
-#ifdef ENABLE_NLS
-#include <libintl.h>
+// #include some notoriously needed include files, but only if they
+// exist on the platform
+
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
 #endif
 
-#ifndef MAX_RANK_WANTED
-#define MAX_RANK_WANTED 6
+#ifdef HAVE_DIRENT_H
+# include <dirent.h>   // typedefs DIR as struct __dirstream
+#else
+  typedef struct __dirstream DIR;
 #endif
 
-enum { MAX_RANK = MAX_RANK_WANTED };
+#include <string.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/resource.h>
-#include <sys/time.h>
+#include <sys/time.h>   // for gettimeofday()
 
 #ifndef RLIM_INFINITY   // Raspberry
 #define RLIM_INFINITY (~rlim_t(0))
 #endif
 
+#ifndef cfg_MAX_RANK_WANTED
+# define cfg_MAX_RANK_WANTED 8
+#endif
+
+enum { MAX_RANK = cfg_MAX_RANK_WANTED };
+
 // if someone (like curses on Solaris) has #defined erase() then
-// #undef it because vector would not be happy with it
+// #undef it because class vector<> would complain about it
 #ifdef erase
 #undef erase
 #endif
@@ -68,6 +82,20 @@ using namespace std;
 
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
+
+/// libapl_version > 0, or 0 if not using libapl
+extern const int libapl_version;
+
+/// return the address of main(int argc, char * argv[]) if preset (apl binary)
+/// or 0 (for shared libraries) as to avoid that the main symbol is undefined.
+extern int64_t get_main();
+
+/// interpreter capabilities (for ]NEXTFILE)
+#define  apl_CAPABILITIES  "⎕FFT", "GTK",  "GUI", "⎕PNG", "POSTGRES", "⎕PLOT", \
+ "⎕RE", "⎕SQL", "SQLITE3", "X11",  "XCB",
+
+/// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
+extern bool gtk_init_done;
 
 /// initialize
 extern void init_1(const char * argv0, bool log_startup);
@@ -113,9 +141,13 @@ extern ostream CERR;
 extern ostream UERR;
 
 class UCS_string;
-extern UCS_string & MORE_ERROR();
+extern UCS_string & MORE_ERROR();   // in Workspace.cc; clears MORE info.
 
-#define loop(v, e) for (ShapeItem v = 0; v < ShapeItem(e); ++v)
+/// loop from (including) 0 up to (excluding) e
+#define loop(v, e)       for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
+
+/// loop from (excluding) e down to (including) 0
+#define rev_loop(v, e)   for (ShapeItem v = e; --v >= 0;)
 
 // #define TROUBLESHOOT_NEW_DELETE
 
@@ -134,7 +166,7 @@ uint32_t lo, hi;
    return uint64_t(hi) << 32 | lo;
 }
 
-#else // not HAVE_RDTSC
+#elif HAVE_GETTIMEOFDAY
 
 inline uint64_t cycle_counter()
 {
@@ -142,9 +174,11 @@ timeval tv;
    gettimeofday(&tv, 0);
    return tv.tv_sec * 1000000ULL + tv.tv_usec;
 }
+#else // neither HAVE_RDTSC nor HAVE_GETTIMEOFDAY
+#define cycle_counter() 0
 #endif // HAVE_RDTSC
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if HAVE_SEM_INIT
 
 # define __sem_destroy(sem) sem_destroy(sem)
@@ -166,7 +200,7 @@ char sname[100];                                           \
    sem = sem_open(sname, O_CREAT, mode, value);            \
 }
 #endif // HAVE_SEM_INIT
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
@@ -316,8 +350,8 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//-----------------------------------------------------------------------------
-/// Year, Month, Day, hour, minute, second, millisecond
+//----------------------------------------------------------------------------
+/// Year, Month, Day, hour, minute, second, μsecond
 struct YMDhmsu
 {
    /// construct YMDhmsu from usec since Jan. 1. 1970 00:00:00
@@ -334,14 +368,14 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// whether ⎕LX shall be executed at the end of the file
 enum LX_mode
 {
    no_LX = 0,     ///< no
    do_LX = 1      ///< yes
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)   { return common_new(size); }
@@ -350,34 +384,35 @@ inline void   operator delete(void * p)   { common_delete(p); }
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// return true iff \b uni is a padding character (used internally).
 inline bool is_iPAD_char(Unicode uni)
-   { return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1)) ||
-            ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9)); }
+{
+   return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
+       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
+}
+//----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
+extern std::ostream & get_CERR();
 
-/// Stringify x.
-#define STR(x) #x
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)
 /// The location line l in file f.
 #define Loc(f, l) f ":" STR(l)
 
-extern ostream & get_CERR();
+/// print x and its source code location
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
+                        << " '" << x << "' at " LOC << endl;
 
-/// print something and the source code location
-#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+/// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
+/// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
+#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" \
+                         << " '" << x << "' at " LOC << endl;
 
-/// same as Q1 (for printouts guarded by Log macros). Unlike Q() which should
-/// NOT remain in the code Q1 should remain in the code.
-#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+//----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-
-#ifdef VALUE_HISTORY_WANTED
+#ifdef cfg_VALUE_HISTORY_WANTED
 
    enum { VALUEHISTORY_SIZE = 100000 };
    extern void add_event(const Value * val, VH_event ev, int ia,
@@ -391,41 +426,41 @@ extern ostream & get_CERR();
 
 #endif
 
-//=============================================================================
+//============================================================================
 /// Function_Line ++ (post increment)
-inline int operator ++(Function_Line & fl, int)
+inline Function_Line operator ++(Function_Line & fl, int)
 {
-Function_Line ret = fl;
+const Function_Line before_increment = fl;
    fl = Function_Line(fl + 1);
-   return ret;
+   return before_increment;
 }
-//=============================================================================
+//============================================================================
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
-//=============================================================================
+//============================================================================
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) - offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (post increment)
 inline Function_PC
 operator ++(Function_PC & pc, int)
 {
-const Function_PC before = pc; 
+const Function_PC before_increment = pc; 
    pc = pc + 1;
-   return before;
+   return before_increment;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (pre increment)
 inline Function_PC &
 operator ++(Function_PC & pc)
@@ -433,7 +468,7 @@ operator ++(Function_PC & pc)
    pc = pc + 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC -- (pre decrement)
 inline Function_PC &
 operator --(Function_PC & pc)
@@ -441,16 +476,17 @@ operator --(Function_PC & pc)
    pc = pc - 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to const char *
 inline const char *
 charP(const void * vp)
 {
   return reinterpret_cast<const char *>(vp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #define uhex  std::hex << uppercase << setfill('0')
+#define uhexs  std::hex << uppercase
 #define lhex  std::hex << nouppercase << setfill('0')
 #define nohex std::dec << nouppercase << setfill(' ')
 
@@ -460,25 +496,22 @@ charP(const void * vp)
                            setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
                            setw(4) << int(x) << std::left << nohex
+#define HEX8(x)    "0x" << uhex << std::right << \
+                           setw(8) << int32_t(x) << std::left << nohex
+#define HEX16(x)   "0x" << uhex << std::right << \
+                           setw(16) << int64_t(x) << std::left << nohex
+#define HEX16s(x)          uhexs << std::right << \
+                           setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 
 /// cast to a const void *
 inline const void * voidP(const void * addr) { return addr; }
 
-//-----------------------------------------------------------------------------
-/// A union holding a sockaddr and a sockaddr_in as to avoid casting
-/// between sockaddr and a sockaddr_in
-union SockAddr
-{
-  /// an arbitrary socket address
-  sockaddr    addr;
+/// set the last byte in buffer to 0 (so that string functions won't fail
+/// even if the  buffer was not 0-terminated for some reason.
+#define NULL_TERMINATE(buffer)   { buffer[sizeof(buffer) - 1] = 0; }
 
-  /// an AF_INET socket address
-  sockaddr_in inet;
-
-  ///  an AF_UNIX socket address
-  sockaddr_un uNix;
-};
-//-----------------------------------------------------------------------------
+#define SPRINTF(buffer, ...) \
+{ snprintf(buffer, sizeof(buffer), __VA_ARGS__); NULL_TERMINATE(buffer) }
 
 #endif // __COMMON_HH_DEFINED__

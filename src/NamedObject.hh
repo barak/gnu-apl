@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __NAMED_OBJECT_HH_DEFINED__
 #define __NAMED_OBJECT_HH_DEFINED__
 
@@ -29,19 +32,46 @@ class Symbol;
 class UCS_string;
 class Value;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The possible values returned by \b ⎕NC.
 enum NameClass
 {
-  NC_INVALID          = -1,   ///< invalid name class.
-  NC_UNUSED_USER_NAME =  0,   ///< unused user name eg. pushed but not assigned
-  NC_LABEL            =  1,   ///< Label.
-  NC_VARIABLE         =  2,   ///< (assigned) variable.
-  NC_FUNCTION         =  3,   ///< (user defined) function.
-  NC_OPERATOR         =  4,   ///< (user defined) operator.
-  NC_SHARED_VAR       =  5,   ///< shared variable.
+  NC_INVALID          =  0x0100,   ///< invalid name class.
+  NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
+  NC_LABEL            =  0x0401,   ///< Label.
+  NC_VARIABLE         =  0x0802,   ///< (assigned) variable.
+  NC_FUNCTION         =  0x1003,   ///< (defined) function.
+  NC_OPERATOR         =  0x2004,   ///< (defined) operator.
+  NC_SYSTEM_VAR       =  0x4005,   ///< system variable.
+  NC_SYSTEM_FUN       =  0x8006,   ///< system function.
+  NC_case_mask        =  0x00FF,   ///< almost ⎕NC
+  NC_bool_mask        =  0xFF00,   ///< for fast selection
+
+  /// name of a function or operator
+  NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
+
+   // NC class bitmaps...
+
+  /// name allowed left of ←
+  NC_left             = (NC_VARIABLE         |
+                         NC_UNUSED_USER_NAME |
+                         NC_SYSTEM_VAR       |
+                         NC_INVALID          //  ⎕, ⍞, ⎕xx
+                        ) & NC_bool_mask,
+
+  /// name of a variable
+  NC_variables        = (NC_VARIABLE | NC_SYSTEM_VAR)       & NC_bool_mask,
+
+  /// name that has a value
+  NC_values           = (NC_LABEL    | NC_variables)        & NC_bool_mask,
+
+  /// name of a function
+  NC_functions        = (NC_FUNCTION | NC_SYSTEM_FUN)       & NC_bool_mask,
+
+  /// name whose class may be changed
+  NC_unknown          = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  A named object is something with a name.
  The name can be user defined or system defined.
@@ -72,10 +102,6 @@ public:
    /// (currently) represent a function.
    virtual const Function * get_function() const  { return 0; }
 
-   /// return the variable value for this Id (if any) or 0 if this Id does
-   /// not (currently) represent a variable.
-   virtual Value_P get_value()     { return Value_P(); }
-
    /// return the symbol for this user defined symbol (if any) or 0 if this Id
    /// refers to a system name
    virtual Symbol * get_symbol()   { return 0; }
@@ -93,7 +119,7 @@ public:
       { return id == ID_USER_SYMBOL; }
 
    /// Get current \b NameClass of \b this name.
-   NameClass get_nc() const;
+   NameClass get_NC() const;
 
    /// the object's id
    const Id id;

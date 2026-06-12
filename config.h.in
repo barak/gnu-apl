@@ -1,37 +1,28 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* APserver listen port name */
-#undef APSERVER_PATH
+/* the SVN version of Archive.cc */
+#undef ARCHIVE_SVN
 
-/* APserver TCP listen port */
-#undef APSERVER_PORT
-
-/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
-#undef APSERVER_TRANSPORT
-
-/* assert level */
-#undef ASSERT_LEVEL_WANTED
-
-/* core count */
-#undef CORE_COUNT_WANTED
-
-/* define to set options typical for software development */
-#undef DEVELOP_WANTED
-
-/* define to enable dynamic logging */
-#undef DYNAMIC_LOG_WANTED
-
-/* define to enable gprof profiling */
-#undef GPROF_WANTED
+/* How and when GNU APL was configured */
+#undef BUILDTAG
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #undef HAVE_AFFINITY_NP
 
+/* Define to 1 if you have the `alarm' function. */
+#undef HAVE_ALARM
+
 /* Define to 1 iff <curses.h> is present */
 #undef HAVE_CURSES_H
 
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the `dup2' function. */
+#undef HAVE_DUP2
 
 /* Define to 1 if you have the <execinfo.h> header file. */
 #undef HAVE_EXECINFO_H
@@ -42,35 +33,62 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the <fenv.h> header file. */
+#undef HAVE_FENV_H
+
 /* Define to 1 if you have the <fftw3.h> header file. */
 #undef HAVE_FFTW3_H
 
 /* Define to 1 if you have the `floor' function. */
 #undef HAVE_FLOOR
 
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `getcwd' function. */
+#undef HAVE_GETCWD
+
+/* Define to 1 if you have the `gethostbyname' function. */
+#undef HAVE_GETHOSTBYNAME
+
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
-/* GTK+ version 3 NOT installed */
-#undef HAVE_GTK3
+/* Define to 1 iff the OS has gettimeofday() */
+#undef HAVE_GETTIMEOFDAY
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 iff lib(n)curses is available */
+/* Define to 1 if you have the `atomicity' library (-latomicity). */
+#undef HAVE_LIBATOMICITY
+
+/* Define to 1 if you have the `c' library (-lc). */
+#undef HAVE_LIBC
+
+/* Define to 1 if you have the `cairo' library (-lcairo). */
+#undef HAVE_LIBCAIRO
+
+/* Define to 1 if you have the `curses' library (-lcurses). */
 #undef HAVE_LIBCURSES
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define to 1 if you have the `execinfo' library (-lexecinfo). */
-#undef HAVE_LIBEXECINFO
-
 /* Define to 1 if you have the `fftw3' library (-lfftw3). */
 #undef HAVE_LIBFFTW3
 
+/* Define to 1 if you have the `gdk-3' library (-lgdk-3). */
+#undef HAVE_LIBGDK_3
+
+/* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
+#undef HAVE_LIBGTK_3
+
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
+
+/* Define to 1 if you have the `ncurses' library (-lncurses). */
+#undef HAVE_LIBNCURSES
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
@@ -78,29 +96,72 @@
 /* Define to 1 if you have the `pcre2-32' library (-lpcre2-32). */
 #undef HAVE_LIBPCRE2_32
 
+/* Define to 1 if you have the `png' library (-lpng). */
+#undef HAVE_LIBPNG
+
+/* Define to 1 if you have the <libpng16/png.h> header file. */
+#undef HAVE_LIBPNG16_PNG_H
+
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Define to 1 if you have the `tinfo' library (-ltinfo). */
+#undef HAVE_LIBTINFO
+
+/* Define to 1 if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
+/* Define to 1 if you have the `X11-xcb' library (-lX11-xcb). */
+#undef HAVE_LIBX11_XCB
+
 /* Define to 1 if you have the `xcb' library (-lxcb). */
 #undef HAVE_LIBXCB
 
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#undef HAVE_MALLOC
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
 
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
+/* Define to 1 if you have the <minix/config.h> header file. */
+#undef HAVE_MINIX_CONFIG_H
+
+/* Define to 1 if you have the `mkdir' function. */
+#undef HAVE_MKDIR
+
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
+
+/* Define to 1 if you have the `modf' function. */
+#undef HAVE_MODF
 
 /* Define to 1 if you have the `munmap' function. */
 #undef HAVE_MUNMAP
 
 /* Define to 1 iff <ncurses.h> is present */
 #undef HAVE_NCURSES_H
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
 
 /* Define to 1 iff OSAtomicAdd32Barrier() is available */
 #undef HAVE_OSX_ATOMIC
@@ -111,20 +172,47 @@
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
 
+/* Define to 1 iff pthread_setname_np() is available */
+#undef HAVE_PTHREAD_SETNAME_NP
+
 /* Define to 1 iff the CPU has rdtsc opcode */
 #undef HAVE_RDTSC
+
+/* Define to 1 if you have the `realpath' function. */
+#undef HAVE_REALPATH
+
+/* Define to 1 if you have the `rint' function. */
+#undef HAVE_RINT
+
+/* Define to 1 if you have the `rmdir' function. */
+#undef HAVE_RMDIR
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
 
 /* Define to 1 iff sem_init() works */
 #undef HAVE_SEM_INIT
 
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `setlocale' function. */
+#undef HAVE_SETLOCALE
+
+/* Define to 1 if you have the `socket' function. */
+#undef HAVE_SOCKET
+
 /* Define to 1 iff atomic_add_32_nv() is available */
 #undef HAVE_SOLARIS_ATOMIC
 
-/* Have the SQLITE3 library */
+/* Define to 1 if libsqlite3 library is available */
 #undef HAVE_SQLITE3
 
 /* Define to 1 if you have the `sqrt' function. */
 #undef HAVE_SQRT
+
+/* Define to 1 if `st_blksize stat.st_rdev' is a member of `stat'. */
+#undef HAVE_STAT_ST_BLKSIZE_STAT_ST_RDEV
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #undef HAVE_STDBOOL_H
@@ -132,11 +220,20 @@
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
 /* Define to 1 if you have the `strchr' function. */
 #undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
 
 /* Define to 1 if you have the `strerror' function. */
 #undef HAVE_STRERROR
@@ -147,11 +244,36 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
+/* Define to 1 if you have the `strncasecmp' function. */
+#undef HAVE_STRNCASECMP
+
+/* Define to 1 if you have the `strndup' function. */
+#undef HAVE_STRNDUP
+
+/* Define to 1 if you have the `strrchr' function. */
+#undef HAVE_STRRCHR
+
+/* Define to 1 if you have the `strstr' function. */
+#undef HAVE_STRSTR
+
+/* Define to 1 if you have the `strtol' function. */
+#undef HAVE_STRTOL
+
+/* Define to 1 if `st_blocks' is a member of `struct stat'. */
+#undef HAVE_STRUCT_STAT_ST_BLOCKS
+
+/* Define to 1 if your `struct stat' has `st_blocks'. Deprecated, use
+   `HAVE_STRUCT_STAT_ST_BLOCKS' instead. */
+#undef HAVE_ST_BLOCKS
+
 /* Define to 1 if you have the <sys/param.h> header file. */
 #undef HAVE_SYS_PARAM_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
@@ -159,8 +281,14 @@
 /* Define to 1 if you have the <sys/un.h> header file. */
 #undef HAVE_SYS_UN_H
 
+/* Define to 1 if you have the <termios.h> header file. */
+#undef HAVE_TERMIOS_H
+
 /* Define to 1 iff <term.h> is present */
 #undef HAVE_TERM_H
+
+/* Define to 1 if you have the `uname' function. */
+#undef HAVE_UNAME
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
@@ -168,18 +296,44 @@
 /* Define to 1 if you have the <utmpx.h> header file. */
 #undef HAVE_UTMPX_H
 
+/* Define to 1 if you have the <vector> header file. */
+#undef HAVE_VECTOR
+
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#undef HAVE_VFORK_H
+
+/* Define to 1 if you have the <wchar.h> header file. */
+#undef HAVE_WCHAR_H
+
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
+
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
+
+/* Define to 1 if you have the <X11/Xlib.h> header file. */
+#undef HAVE_X11_XLIB_H
+
+/* Define to 1 if you have the <X11/Xlib-xcb.h> header file. */
+#undef HAVE_X11_XLIB_XCB_H
+
+/* Define to 1 if you have the <X11/Xutil.h> header file. */
+#undef HAVE_X11_XUTIL_H
+
 /* Define to 1 if you have the <xcb/xcb.h> header file. */
 #undef HAVE_XCB_XCB_H
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
-
-/* max. rank of APL values */
-#undef MAX_RANK_WANTED
 
 /* Name of package */
 #undef PACKAGE
@@ -202,88 +356,101 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* define to enable performance counters */
-#undef PERFORMANCE_COUNTERS_WANTED
-
-/* define to have support for rational numbers (EXPERIMENTAL!) */
-#undef RATIONAL_NUMBERS_WANTED
-
-/* ./configure with --with-postgresql */
-#undef REALLY_WANT_PostgreSQL
-
-/* ./configure with --with-sqlite3 */
-#undef REALLY_WANT_SQLITE3
-
-/* security level */
-#undef SECURITY_LEVEL_WANTED
-
-/* short value cellcount */
-#undef SHORT_VALUE_LENGTH_WANTED
-
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
-
-/* PostgreSQL code compiles */
-#undef USABLE_PostgreSQL
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
 # undef _ALL_SOURCE
 #endif
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# undef _GNU_SOURCE
-#endif
-/* Enable threading extensions on Solaris.  */
-#ifndef _POSIX_PTHREAD_SEMANTICS
-# undef _POSIX_PTHREAD_SEMANTICS
-#endif
-/* Enable extensions on HP NonStop.  */
-#ifndef _TANDEM_SOURCE
-# undef _TANDEM_SOURCE
+/* Enable general extensions on macOS.  */
+#ifndef _DARWIN_C_SOURCE
+# undef _DARWIN_C_SOURCE
 #endif
 /* Enable general extensions on Solaris.  */
 #ifndef __EXTENSIONS__
 # undef __EXTENSIONS__
 #endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# undef _GNU_SOURCE
+#endif
+/* Enable X/Open compliant socket functions that do not require linking
+   with -lxnet on HP-UX 11.11.  */
+#ifndef _HPUX_ALT_XOPEN_SOCKET_API
+# undef _HPUX_ALT_XOPEN_SOCKET_API
+#endif
+/* Identify the host operating system as Minix.
+   This macro does not affect the system headers' behavior.
+   A future release of Autoconf may stop defining this macro.  */
+#ifndef _MINIX
+# undef _MINIX
+#endif
+/* Enable general extensions on NetBSD.
+   Enable NetBSD compatibility extensions on Minix.  */
+#ifndef _NETBSD_SOURCE
+# undef _NETBSD_SOURCE
+#endif
+/* Enable OpenBSD compatibility extensions on NetBSD.
+   Oddly enough, this does nothing on OpenBSD.  */
+#ifndef _OPENBSD_SOURCE
+# undef _OPENBSD_SOURCE
+#endif
+/* Define to 1 if needed for POSIX-compatible behavior.  */
+#ifndef _POSIX_SOURCE
+# undef _POSIX_SOURCE
+#endif
+/* Define to 2 if needed for POSIX-compatible behavior.  */
+#ifndef _POSIX_1_SOURCE
+# undef _POSIX_1_SOURCE
+#endif
+/* Enable POSIX-compatible threading on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# undef _POSIX_PTHREAD_SEMANTICS
+#endif
+/* Enable extensions specified by ISO/IEC TS 18661-5:2014.  */
+#ifndef __STDC_WANT_IEC_60559_ATTRIBS_EXT__
+# undef __STDC_WANT_IEC_60559_ATTRIBS_EXT__
+#endif
+/* Enable extensions specified by ISO/IEC TS 18661-1:2014.  */
+#ifndef __STDC_WANT_IEC_60559_BFP_EXT__
+# undef __STDC_WANT_IEC_60559_BFP_EXT__
+#endif
+/* Enable extensions specified by ISO/IEC TS 18661-2:2015.  */
+#ifndef __STDC_WANT_IEC_60559_DFP_EXT__
+# undef __STDC_WANT_IEC_60559_DFP_EXT__
+#endif
+/* Enable extensions specified by ISO/IEC TS 18661-4:2015.  */
+#ifndef __STDC_WANT_IEC_60559_FUNCS_EXT__
+# undef __STDC_WANT_IEC_60559_FUNCS_EXT__
+#endif
+/* Enable extensions specified by ISO/IEC TS 18661-3:2015.  */
+#ifndef __STDC_WANT_IEC_60559_TYPES_EXT__
+# undef __STDC_WANT_IEC_60559_TYPES_EXT__
+#endif
+/* Enable extensions specified by ISO/IEC TR 24731-2:2010.  */
+#ifndef __STDC_WANT_LIB_EXT2__
+# undef __STDC_WANT_LIB_EXT2__
+#endif
+/* Enable extensions specified by ISO/IEC 24747:2009.  */
+#ifndef __STDC_WANT_MATH_SPEC_FUNCS__
+# undef __STDC_WANT_MATH_SPEC_FUNCS__
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# undef _TANDEM_SOURCE
+#endif
+/* Enable X/Open extensions.  Define to 500 only if necessary
+   to make mbstate_t available.  */
+#ifndef _XOPEN_SOURCE
+# undef _XOPEN_SOURCE
+#endif
 
-
-/* define to enable CHECK macro */
-#undef VALUE_CHECK_WANTED
-
-/* define to enable value events */
-#undef VALUE_HISTORY_WANTED
 
 /* Version number of package */
 #undef VERSION
-
-/* define to enable tracing of value flags */
-#undef VF_TRACING_WANTED
-
-/* define to have visible markers (DONT!) */
-#undef VISIBLE_MARKERS_WANTED
-
-/* Define if compiling for Android */
-#undef WANT_ANDROID
-
-/* Define if building the Erlang interface */
-#undef WANT_ERLANG
-
-/* Define if building libapl.so */
-#undef WANT_LIBAPL
-
-/* Define if building lib_gnu_apl.so */
-#undef WANT_PYTHON
-
-/* Define to 1 if on MINIX. */
-#undef _MINIX
-
-/* Define to 2 if the system does not provide POSIX.1 features except with
-   this defined. */
-#undef _POSIX_1_SOURCE
-
-/* Define to 1 if you need to in order for `stat' and other things to work. */
-#undef _POSIX_SOURCE
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
@@ -300,11 +467,141 @@
    #define below would cause a syntax error. */
 #undef _UINT8_T
 
+/* --bindir */
+#undef apl_DIR__bin
+
+/* --datarootdir */
+#undef apl_DIR__datarootdir
+
+/* --docdir */
+#undef apl_DIR__doc
+
+/* --exec_prefix */
+#undef apl_DIR__exec_prefix
+
+/* --libdir */
+#undef apl_DIR__lib
+
+/* --localedir */
+#undef apl_DIR__locale
+
+/* installation directory for GNU APL libraries */
+#undef apl_DIR__pkglib
+
+/* --prefix */
+#undef apl_DIR__prefix
+
+/* top-level GNU APL source directory */
+#undef apl_DIR__src
+
+/* --sysconfdir */
+#undef apl_DIR__sysconf
+
+/* FFT available ? */
+#undef apl_FFT
+
+/* GTK+ version 3 installed ? */
+#undef apl_GTK3
+
+/* GUI (GTK or XCB) available ? */
+#undef apl_GUI
+
+/* PCRE available ? */
+#undef apl_PCRE
+
+/* PNG available ? */
+#undef apl_PNG
+
+/* PostgreSQL code did not compile */
+#undef apl_POSTGRES
+
+/* SQLite code did not compile */
+#undef apl_SQLITE3
+
+/* Define if compiling for Android */
+#undef apl_TARGET_ANDROID
+
+/* Define if building the Erlang interface */
+#undef apl_TARGET_ERLANG
+
+/* Define if building libapl.so */
+#undef apl_TARGET_LIBAPL
+
+/* Define if building lib_gnu_apl.so */
+#undef apl_TARGET_PYTHON
+
+/* X11 is available ? */
+#undef apl_X11
+
+/* APserver listen port name */
+#undef cfg_APSERVER_PATH
+
+/* APserver TCP listen port */
+#undef cfg_APSERVER_PORT
+
+/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
+#undef cfg_APSERVER_TRANSPORT
+
+/* the desired ASSERT() level (0=no, 1=some, 2=all assertions) */
+#undef cfg_ASSERT_LEVEL_WANTED
+
+/* how ./configure was called */
+#undef cfg_CONFIGURE_ARGS
+
+/* core count */
+#undef cfg_CORE_COUNT_WANTED
+
+/* Define to set options typical for software development */
+#undef cfg_DEVELOP_WANTED
+
+/* Define to enable dynamic logging */
+#undef cfg_DYNAMIC_LOG_WANTED
+
+/* max. rank of APL values */
+#undef cfg_MAX_RANK_WANTED
+
+/* Define to enable performance counters */
+#undef cfg_PERFORMANCE_COUNTERS_WANTED
+
+/* Define to have support for rational numbers (EXPERIMENTAL!) */
+#undef cfg_RATIONAL_NUMBERS_WANTED
+
+/* security level */
+#undef cfg_SECURITY_LEVEL_WANTED
+
+/* short value cellcount */
+#undef cfg_SHORT_VALUE_LENGTH_WANTED
+
+/* ./configure with --with-postgresql */
+#undef cfg_USER_WANTS_POSTGRES
+
+/* ./configure with --with-sqlite3 */
+#undef cfg_USER_WANTS_SQLITE3
+
+/* Define to enable internal value checks */
+#undef cfg_VALUE_CHECK_WANTED
+
+/* Define to enable value events */
+#undef cfg_VALUE_HISTORY_WANTED
+
+/* Define to enable tracing of value flags */
+#undef cfg_VF_TRACING_WANTED
+
+/* Define to have visible markers (DONT!) */
+#undef cfg_VISIBLE_MARKERS_WANTED
+
+/* Define to make ^D a del-char and ^Z be EOF */
+#undef cfg_WANT_CTRLD_DEL
+
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 #undef inline
 #endif
+
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int16_t
 
 /* Define to the type of a signed integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
@@ -314,11 +611,24 @@
    such a type exists and the standard includes do not define it. */
 #undef int64_t
 
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
 /* Define to `long int' if <sys/types.h> does not define. */
 #undef off_t
 
+/* Define as a signed integer type capable of holding a process identifier. */
+#undef pid_t
+
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef ssize_t
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
 
 /* Define to the type of an unsigned integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
@@ -331,3 +641,6 @@
 /* Define to the type of an unsigned integer type of width exactly 8 bits if
    such a type exists and the standard includes do not define it. */
 #undef uint8_t
+
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork

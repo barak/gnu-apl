@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __TOKEN_HH_DEFINED__
 #define __TOKEN_HH_DEFINED__
 
 #include <ostream>
-#include <vector>
 
 #include "Avec.hh"
 #include "Common.hh"
@@ -50,29 +52,78 @@ public:
    /// parsing, and (2) as return values of user defined functions that
    /// do not return values.
    Token()
-   : tag(TOK_VOID) { value.int_vals[0] = 0; }
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting of an un-initialized pointer
+        value.apl_val.init_pointer();
+      }
 
-   /// copy constructor
-   Token(const Token & other);
+   /// copy constructor without location
+   Token(const Token & other)
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting an un-initialized pointer
+        value.apl_val.init_pointer();
+        copy(other, "Token::Token(const Token & other)");
+      }
 
-   /// copy \b src into \b this token. leaving APL value pointer in
-   /// src (if any) and add events as needed
-   void copy_1(const Token & src, const char * loc);
+   /// copy constructor with location
+   Token(const Token & other, const char * loc)
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting of an un-initialized pointer
+        value.apl_val.init_pointer();
+        copy(other, loc);
+      }
 
-   /// move mutable \b src into \b this token. clears APL value pointer in
-   /// src (if any) and add events as needed
-   void move_1(Token & src, const char * loc);
+   /// copy Token \b src into \b this token.
+   void copy(const Token & src, const char * loc)
+      {
+         clear(loc);   // clear our Value_P
 
-   /// move const \b src into \b this token. clears APL value pointer in
-   /// src (if any) and add events as needed
-   void move_2(const Token & src, const char * loc);
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
+            {
+              int use_count = -1;   // assume this token has no Value *
+              const Value * valp = src.value.apl_val.get();
+              if (valp)   use_count = valp->get_owner_count();
+              ADD_EVENT(valp, VHE_TokCopy, use_count, loc);
+            }
+
+#endif
+         copy_N(src);
+      }
+
+   /// move the mutable (!) \b src into \b this token. If \b src is an APL
+   /// value, then it is properly cleared. and an event is added.
+   void move(Token & src, const char * loc)
+      {
+         clear(loc);   // clear our Value_P
+         copy_N(src);
+
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
+            {
+              const Value * valp = src.value.apl_val.get();
+              const int use_count = valp ? valp->get_owner_count() - 1 : -1;
+              ADD_EVENT(valp, VHE_TokMove, use_count, loc);
+            }
+
+#endif
+         src.clear(loc);
+      }
 
    /// Construct a token without a value
    Token(TokenTag tg)
    : tag(tg) { Assert(get_ValueType() == TV_NONE);   value.int_vals[0] = 0; }
 
    /// Construct a token for a \b Function.
-   Token(TokenTag tg, Function * fun)
+   Token(TokenTag tg, cFunction_P fun)
    : tag(tg) { Assert(get_ValueType() == TV_FUN);   value.function = fun; }
 
    /// Construct a token for a \b line number
@@ -121,13 +172,13 @@ public:
 
    /// destructor
    ~Token()
-     { extract_apl_val("~Token()");  }
+     { release_apl_val("~Token()");  }
 
    /// swap this and \b other
-   inline void Hswap(Token & other)
-      { ::Hswap(tag, other.tag);
-        ::Hswap(value.int_vals[0], other.value.int_vals[0]);
-        ::Hswap(value.int_vals[1], other.value.int_vals[1]);
+   inline void swap_token(Token & other)
+      { swap(tag, other.tag);
+        swap(value.int_vals[0], other.value.int_vals[0]);
+        swap(value.int_vals[1], other.value.int_vals[1]);
       }
 
    /// return the TokenValueType of this token.
@@ -143,7 +194,8 @@ public:
       { return Id(tag >> 16); }
 
    /// return the tag of this token
-   const TokenTag get_tag() const   { return tag; }
+   const TokenTag get_tag() const
+      { return tag; }
 
    /// return the Unicode value of this token
    Unicode get_char_val() const
@@ -217,12 +269,12 @@ public:
 
    /// return the axis specification of this token (expect non-zero axes)
    Value_P get_nonzero_axes() const
-      { Assert1(!!value.apl_val && (get_tag() == TOK_AXES));
+      { Assert1(!!value.apl_val && (get_tag() == TOK_AXIS));
         return value._apl_val(); }
 
    /// return the axis specification of this token
    Value_P get_axes() const
-      { Assert1(get_tag() == TOK_AXES);  return value._apl_val(); }
+      { Assert1(get_tag() == TOK_AXIS);  return value._apl_val(); }
 
    /// set the Value_P value of this token
    void set_apl_val(Value_P val)
@@ -232,24 +284,37 @@ public:
    IndexExpr & get_index_val() const
       { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
 
-   /// return true if \b this token is a function (or operator)
+   /// return b true iff \b this token is a function (or operator)
    bool is_function() const
       { return (get_ValueType() == TV_FUN); }
 
-   /// return the Function * value of this token
-   Function * get_function() const
+   /// return \b true iff \b this token is END or ENDL
+   bool is_ENDx() const
+      { return tag == TOK_END || tag == TOK_ENDL; }
+
+   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
+   bool is_COND() const
+      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
+
+   /// return the cFunction_P value of this token
+   cFunction_P get_function() const
       { if (!is_function())   SYNTAX_ERROR;   return value.function; }
 
    /// return value usage counter
    int value_use_count() const;
 
-   /// clear the Value_P value (if any) of this token, updating
-   /// its refcount as needed
+  /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed. Left-over in libapl?
    void extract_apl_val(const char * loc);
 
    /// clear the Value_P (if any) without updating its refcount. Return 
-   /// the old Value * that was overridden
+   /// the old Value * that was overridden. Left-over in libapl?
    Value * extract_and_keep(const char * loc);
+
+
+   /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed
+   void release_apl_val(const char * loc);
 
    /// change the tag (within the same TokenValueType)
    void ChangeTag(TokenTag new_tag);
@@ -275,7 +340,7 @@ public:
    int error_info(UCS_string & out) const;
 
    /// copy src to \b this token, updating ref counts for APL values
-   void copy_N(const Token & src);
+   inline void copy_N(const Token & src);
 
    /// return a brief token class name for debugging purposes
    static const char * short_class_name(TokenClass cls);
@@ -289,7 +354,7 @@ public:
         Symbol        * sym_ptr;         ///< the symbol for TV_SYM
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
-        Function      * function;        ///< the function for TV_FUN
+        cFunction_P      function;       ///< the function for TV_FUN
         Value_P_Base    apl_val;         ///< the APL value for TV_VAL
 
         /// a shortcut for accessing apl_val
@@ -311,13 +376,40 @@ protected:
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+inline void
+Token::copy_N(const Token & src)
+{
+   tag = src.tag;
+   switch(src.get_ValueType())
+      {
+        case TV_NONE:  value.int_vals[0]   = 0;
+                       value.int_vals[1]   = 0;                         break;
+        case TV_CHAR:  value.char_val      = src.value.char_val;        break;
+        case TV_INT:   value.int_vals[0]   = src.value.int_vals[0];
+                       value.int_vals[1]   = src.value.int_vals[1];     break;
+        case TV_FLT:   value.float_vals[0] = src.value.float_vals[0];   break;
+        case TV_CPX:   value.float_vals[0] = src.value.float_vals[0];
+                       value.float_vals[1] = src.value.float_vals[1];   break;
+        case TV_SYM:   value.sym_ptr       = src.value.sym_ptr;         break;
+        case TV_LIN:   value.fun_line      = src.value.fun_line;        break;
+        case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
+        case TV_INDEX: value.index_val     = src.value.index_val;       break;
+        case TV_FUN:   value.function      = src.value.function;        break;
+        default:       FIXME;
+      }
+}
+//----------------------------------------------------------------------------
 /// A sequence of Token
 class Token_string : public  std::vector<Token>
 {
 public:
    /// construct an empty string
    Token_string()   {}
+
+   /// make size() signed
+   ShapeItem size() const
+      { return ShapeItem(std::vector<Token>::size()); }
 
    /// construct a string of \b len Token, starting at \b data.
    Token_string(const Token * data, ShapeItem len)
@@ -327,17 +419,21 @@ public:
    Token_string(const Token_string & other, uint32_t pos, uint32_t len)
       { loop(l, len)   push_back(other[pos++]); }
 
-   /// reversde the token order from \b from to \b to (including)
+   /// reverse the token order from \b from to \b to (including)
    void reverse_from_to(ShapeItem from, ShapeItem to);
 
+   /// replace the segment starting a \b pos with \b src. Return the new pos.
+   //
+   ShapeItem replace_segment(const Token_string & src, ShapeItem pos);
+
    /// print this token string
-   void print(ostream & out, bool details) const;
+   void print(ostream & out, int details) const;
 
 private:
    /// prevent accidental copying
    Token_string & operator =(const Token_string & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location
     of the first token and high is the high of the last token of the token
@@ -345,8 +441,10 @@ private:
     A Token and its position (in a Token_string)
  */
 /// A Token and its location information (position in a Token_string)
-struct Token_loc
+class Token_loc
 {
+public:
+
    /// constructor: invalid Token_loc
    Token_loc()
    : pc(Function_PC_invalid)
@@ -359,23 +457,55 @@ struct Token_loc
 
    /// constructor: valid Token with valid loc
    Token_loc(const Token & t, Function_PC _pc)
-   : tok(t),
+   : token(t),
      pc(_pc)
    {}
 
-   /// copy this Token_loc to \b other
+   /// return the position of token in the body that contains it
+   const Function_PC get_PC() const
+      { return pc; }
+
+   /// set the position of token in the body that contains it
+   void set_PC(Function_PC new_pc)
+      { pc = new_pc; }
+
+   /// return the token
+   const Token & get_token() const
+      { return token; }
+
+   /// return the token
+   Token & get_token()
+      { return token; }
+
+   /// return the tag of the token
+   TokenTag get_tag() const
+      { return token.get_tag(); }
+
+   /// return the class of the token
+   TokenClass get_Class() const
+      { return token.get_Class(); }
+
+   cFunction_P get_function() const
+      { return token.get_function(); }
+
+   /// return the token value type of token
+   TokenValueType get_ValueType() const
+      { return token.get_ValueType(); }
+
+   /// copy \b other to this Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;
-        tok.copy_1(other.tok, loc);
+        token.copy(other.token, loc);
       }
 
+protected:
    /// the token
-   Token tok;
+   Token token;
 
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __TOKEN_HH_DEFINED__

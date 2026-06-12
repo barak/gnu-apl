@@ -1,0 +1,12 @@
+⍝ Quad_PLOT.tc
+⍝ ----------------------------------
+
+      ]NEXTFILE no-GUI   ⍝ done if neither GTK nor XCB is available
+
+      ⍝ only checks that ⎕PLOT was compiled
+      ⍝
+      ⎕PLOT 0
+
+      )MORE
+NO )MORE ERROR INFO
+

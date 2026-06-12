@@ -1,0 +1,2101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
+<title>LA_pack primer</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overridden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install(4);
+/*]]>*/
+</script>
+</head>
+<body class="book">
+<div id="header">
+<h1>LA_pack primer</h1>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>GNU APL implements the APL functions monadic ⌹ (aka. <strong>Matrix Inverse</strong>) and
+dyadic ⌹ (aka. <strong>Matrix Divide</strong>) by means of <em>LApack functions</em>. These LApack
+functions were originally written in FORTRAN, but then manually translated
+from FORTRAN to C++ by the author. In this translation, features of the
+LApack functions that were not needed for ⌹ were removed to simplify the C++
+code as much as possible.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_monadic_matrix_inverse">Monadic ⌹: Matrix Inverse</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Monadic <strong>⌹</strong> is the special case of dyadic <strong>A⌹B</strong> where A is the unit matrix:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      Let A←(↑⍴B) ∘.= (↑⍴B). Then ⌹B ←→ A⍴B.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>Bif_F12_DOMINO::eval_B(Value_P B) const</strong>, implements
+monadic <strong>⌹</strong>. It simply constructs a unit matrix <strong>I</strong> of proper
+size and then returns <strong>Bif_F12_DOMINO::eval_AB(I, B)</strong>, i.e. the result of
+the implementation of dyadic <strong>A⌹B</strong>. See below.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dyadic_a_b_matrix_divide">Dyadic A⌹B: Matrix Divide</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>In APL, <strong>A⌹B</strong> for an N-column matrix <strong>A</strong> is defined in terms of each column
+of <strong>A</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      Let  X←A⌹B. Then  X[;J] ←→ A[;J]⌹B for all (scalar) columns J∈⍳¯1↑⍴A.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In other words, computing <strong>A⌹B</strong> for a matrix <strong>A</strong> boils down to computing
+<strong>A⌹B</strong> for (column-) vectors (which are the columns of <strong>A</strong>). For every such
+column vector a of <strong>A</strong>, the result is a column vector <strong>x</strong> of <strong>X</strong>:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre>
+
+<code>B ∘ x ≡ a   ←→   x ≡ a ⌹ B   ←→   x ≡ a ∘ B⁻¹</code>
+
+</pre>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">GNU APL has a dyadic function <strong>A∘B</strong> ←→ <strong>A +.× B</strong>. Usage statistics of
+APL show that the vast majority of inner products is the matrix multiplication
+aka. <strong>A +.× B</strong>. The GNU APL function <strong>A∘B</strong> is an optimized version of this
+important special case <strong>A +.× B</strong> of the more general inner product <strong>A f.g B</strong>.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Because <strong>B</strong> is the same for all columns a of <strong>A</strong> (and their corresponding
+result columns <strong>x</strong> of <strong>X</strong>), the result <strong>X</strong> of <strong>X←A⌹B</strong> is computed in two steps:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+compute <strong>B⁻¹</strong>
+</p>
+</li>
+<li>
+<p>
+compute <strong>X←A∘B⁻¹</strong>
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The second step <strong>X←A∘B⁻¹</strong> is simple, therefore only the first step,
+the computation of <strong>B⁻¹</strong> is of concern here.</p></div>
+<div class="paragraph"><p>BTW, the iteration over the columns of <strong>A</strong> in the second step above occurs
+near the end of function <strong>LA_pack::gelsy()</strong> in function <strong>trsm()</strong>.</p></div>
+<div class="paragraph"><p>To compute <strong>B⁻¹</strong>, matrix <strong>B</strong> is factorized into two matrices <strong>Q</strong> and <strong>R</strong>
+which have the following properties:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Q</strong> is orthogonal (Hermitian for complex <strong>B</strong>). That is: <strong>Q⁻¹ ≡ ⍉+Q</strong>,
+</p>
+</li>
+<li>
+<p>
+<strong>R</strong> is upper triangular, i.e. <strong>Rᵢⱼ = 0</strong> for all <strong>i &gt; j</strong>,
+</p>
+</li>
+<li>
+<p>
+<strong>B = Q∘R</strong>,
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Once <strong>Q</strong> and <strong>R</strong> are found, <strong>B⁻¹</strong> can be computed easily with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      B⁻¹ = (Q∘R)⁻¹ = R⁻¹∘Q⁻¹ = R⁻¹∘⍉+Q.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The inverse of an upper triangular matrix (such as <strong>R⁻¹</strong>) is far easier
+to compute than the inverse of a general matrix (such as <strong>B⁻¹</strong>). See below.
+What remains is therefore the computation of a QR factorization of an
+arbitrary matrix <strong>B</strong>.</p></div>
+<div class="sect2">
+<h3 id="_inversion_of_an_orthogonal_q">Inversion of an orthogonal Q</h3>
+<div class="paragraph"><p>The inversion of an orthogonal matrix <strong>Q</strong> means transposition of <strong>Q</strong> (and,
+in the complex case, conjugation of the complex items).
+However, unlike in APL where <strong>⍉Q</strong> is a new value computed from <strong>Q</strong>, this
+transposition is never computed in C++ or in FORTRAN. Instead, where <strong>⍉Q</strong> is
+needed, the items of matrix <strong>Q</strong> are simply accessed with the row and column
+interchanged. IOW, with a little bit of care regarding what are rows and what
+are columns <strong>⍉Q</strong> is no-op. In GNU APL three typedefs are used to distinguish
+rows and columns throughout the code:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   In LApack.hh:
+
+   typedef int Crow;   // row number
+   typedef int Ccol;   // column number
+   typedef int Cdia;   // diagonal item (row == column)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The translation from FORTRAN to C++ is somewhat tricky for two reasons:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+FORTRAN indices run from 1..N while C++ indices run from 0..N-1
+</p>
+</li>
+<li>
+<p>
+FORTRAN matrices are stored in column-major order (i.e. adjacent items
+  in memory belong to the same column) while C++ matrices are stored in
+  row-major order (i.e. adjacent items in memory belong to the same row).
+</p>
+</li>
+</ol></div>
+</div>
+<div class="sect2">
+<h3 id="_inverting_an_upper_triangular_matrix_r">Inverting an upper triangular matrix R</h3>
+<div class="paragraph"><p>Suppose <strong>R = op₁ ∘ op₂ ∘ &#8230; ∘ opₙ ∘ ID</strong> where every <strong>opₖ</strong> adds a multiple
+of some row of R to some other row of R. Then, as we learn in school,
+<strong>R⁻¹ = ID ∘ op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong>. In other words, if the operations
+<strong>op₁</strong>, <strong>op₂</strong>, &#8230;, <strong>opₙ</strong> turn a matrix <strong>R</strong> into the identity matrix, then
+the same operations (in the same order) turn the identity matrix into
+the inverse <strong>R⁻¹</strong> of <strong>R</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>    ┬ ╔═════R═════╤════AUG════╗     ╔════ID═════╤═══R⁻¹═════╗ ┬
+    │ ║           │ 1         ║     ║ 1         │           ║ │
+    │ ║           │   1   0   ║     ║   1   0   │           ║ │
+    N ║           │     1     ║  →  ║     1     │           ║ N
+    │ ║           │   0   1   ║     ║   0   1   │           ║ │
+    │ ║           │         1 ║     ║         1 │           ║ │
+    ┴ ╚═══════════╧═══════════╝     ╚═══════════╧═══════════╝ ┴
+    ├ ─────N─────┼─────N─────┤     ├─────N─────┼─────N─────┤</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The operations that turn an upper triangular matrix <strong>R</strong> into the identity
+matrix ID are fairly simple:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>R</strong> is upper triangular. Therefore the last row of <strong>R</strong>, say row <strong>n</strong>,
+  has only one nonzero element <strong>rₙₙ</strong> on its diagonal. For every row above
+  that last row, say row <strong>k</strong> (i.e. with k &lt; n), do:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Let <strong>rₖₙ</strong> be the last element in row <strong>k</strong>. Subtract a multiple of the last
+   row from row <strong>k</strong> so that rₖₙ becomes <strong>0</strong>.
+</p>
+</li>
+<li>
+<p>
+That multiple is <strong>rₖₙ÷rₙₙ</strong>.
+</p>
+</li>
+<li>
+<p>
+Since all other elements of the last row are <strong>0</strong>, this only sets <strong>rₖₙ</strong> to
+   <strong>0</strong> but does not change any other element of row <strong>k</strong>.
+</p>
+</li>
+<li>
+<p>
+After repeating this step for every k &lt; n the entire last column of the
+   matrix <strong>R</strong> is <strong>0</strong>, except for the element <strong>rₙₙ</strong> on the diagonal.
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Repeat the same step for the second-last, third-last, &#8230; first column of
+  the matrix. In every iteration one column of <strong>R</strong> is set to 0 above the
+  diagonal. After the last <strong>k=1</strong> the matrix is diagonal (i.e. all elements
+  above <strong>and</strong> below the diagonal are <strong>0</strong>).
+</p>
+</li>
+<li>
+<p>
+Finally, subtract a multiple of every row from itself so that the
+  diagonal item becomes <strong>1.0</strong>.
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+That multiple for diagonal element rₖₖ of row k is (1-rₖₖ)÷rₖₖ.
+</p>
+</li>
+<li>
+<p>
+After repeating that step for every <strong>k ≤ n</strong> <strong>R</strong> is the unit matrix.
+</p>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Notice that every operation above subtracts a multiple of some row from some
+  other (or the same) row.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The algorithm above defines the sequence <strong>op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong> above,
+where <strong>n</strong> is the number of columns in <strong>R</strong>. In practice (in LApack and
+consequently also in GNU APL) these operations are not performed on <strong>R</strong> first
+and then on the identity matrix afterwords but rather in parallel:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Start with a matrix <strong>R, AUG</strong> where <strong>AUG←(⍴R)↑(⍳↑⍴R)∘.=⍳↑⍴R)</strong>. That is, <strong>AUG</strong>
+  is initially the unit matrix with the same shape as <strong>R</strong>. The matrix <strong>AUG</strong>
+  (or sometimes the matrix <strong>R,AUG</strong>) is commonly known as the <em>augmented matrix</em>.
+</p>
+</li>
+<li>
+<p>
+The operations described above are then simultaneously applied to the
+  left half (i.e. to <strong>R</strong>) and to the right half (i.e. to <strong>AUG</strong>) until the left
+  half <strong>R</strong> of <strong>R,AUG</strong> has become the unit matrix. At that point, the right
+  half <strong>AUG</strong> has become the desired inverse <strong>R⁻¹</strong> of <strong>R</strong>.
+</p>
+</li>
+<li>
+<p>
+All this happens in functions <strong>LA_pack::invert_UTM()</strong> and
+  <strong>LA_pack::invert_QUTM()</strong>. The term <strong>QUTM</strong> stands for <strong>Q</strong>uadratic <strong>U</strong>pper
+  <strong>T</strong>riangular <strong>M</strong>atrix and takes advantage of the fact that the inversion
+  of a non-quadratic upper triangular M×N matrix is essentially the inversion
+  of its upper N×N sub-matrix. The rows N+1..M are all zero and become zero
+  columns in the inverse.
+</p>
+</li>
+</ol></div>
+</div>
+<div class="sect2">
+<h3 id="_qr_factorization">QR factorization</h3>
+<div class="sect3">
+<h4 id="_householder_matrix">Householder matrix</h4>
+<div class="paragraph"><p>For the moment we consider only real matrices; the complex case is almost
+identical, except that <strong>⍉X</strong> becomes <strong>⍉+X</strong> in the complex case. <strong>⍉+X</strong> is
+called the <em>conjugate transpose</em> of <strong>X</strong> which is the same as the "normal"
+transpose if <strong>X</strong> is real.</p></div>
+<div class="paragraph"><p>Let <strong>B</strong> be an arbitrary M×N matrix.</p></div>
+<div class="paragraph"><p>Let <strong>V←1↓B[;1]</strong>, i.e. V is the first column of <strong>B</strong> except the
+diagonal item <strong>B[1;1]</strong>.</p></div>
+<div class="paragraph"><p>Let <strong>L←+/V×V</strong>, i.e. <strong>L</strong> is (the square of) the Euclidean length of <strong>V</strong>.</p></div>
+<div class="paragraph"><p>The Householder matrix <strong>H=H(B)</strong> for matrix <strong>B</strong> is then defined as:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>              2
+      H = I - ─ × V ∘.× V.
+              L</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>That is:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>             ⎧ 1.0 - 2×V[i]×V[i]÷L     if i=j, and
+H = (H)ᵢⱼ =  ⎨
+             ⎩ - 2×V[i]×V[j]÷L         otherwise.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>It follows immediately that:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>H</strong> is <em>Hermitian</em> (aka. <em>symmetric</em> if <strong>H</strong> is real). I.e. <strong>H = ⍉+H</strong>,
+</p>
+</li>
+<li>
+<p>
+<strong>H</strong> is <em>unitary</em> (aka. <em>orthogonal</em> if <strong>H</strong> is real). I.e. <strong>H⁻¹ = ⍉+H</strong>, and
+</p>
+</li>
+<li>
+<p>
+<strong>H</strong> is <em>involutary</em>. I.e. <strong>H</strong> = <strong>H⁻¹</strong>
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>These really nice properties of <strong>H</strong>:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+make the computation of the transposition <strong>⍉H</strong> essentially a no-op, and
+</p>
+</li>
+<li>
+<p>
+ensures that the composition <strong>H = H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> of several Householder
+  matrices is also Hermitian (complex case) or orthogonal (real case).
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>In the following let:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>B</strong> be an arbitrary real or complex matrix,
+</p>
+</li>
+<li>
+<p>
+vector <strong>B1</strong> be the first column of <strong>B</strong>, and
+</p>
+</li>
+<li>
+<p>
+scalar <strong>B11</strong> be the first item of column vector <strong>B1</strong> (= the first item
+  on the diagonal of B).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In the LApack code <strong>B1</strong> is usually a variable named (lowercase) <strong>x</strong> and <strong>B11</strong>
+a scalar variable named (uppercase) <strong>ALPHA</strong> (or <strong>⍺</strong> in comments).
+That is, matrix B looks like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      LApack matrix B        APL matrix B
+      ╔═══╤═════════╗      ╔═════╤═════════╗
+      ║ ⍺ │         ║      ║ B11 │         ║
+      ╟───┤         ║      ╟─────┤         ║
+      ║   │         ║      ║     │         ║
+      ║   │         ║  ←→  ║     │         ║
+      ║ x │         ║      ║ B1  │         ║
+      ║   │         ║      ║     │         ║
+      ║   │         ║      ║     │         ║
+      ╚═══╧═════════╝      ╚═════╧═════════╝</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>There are subtle but noteworthy differences between the APL code discussed
+below and the LApack FORTRAN or C++ code:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+In the original FORTRAN code of LApack, the vector <strong>x</strong> <em>excludes</em> the
+  diagonal element <strong>⍺</strong> and <strong>⍺</strong> is passed as a separate function argument or
+  result.
+</p>
+</li>
+<li>
+<p>
+In the GNU APL C++ translation of that code, the vector <strong>x</strong> also
+ <em>excludes</em> the diagonal element <strong>⍺</strong>. However, <strong>⍺</strong> is not passed as a separate
+  function argument like in FORTRAN. Instead C++ takes advantage of the fact
+  that our matrices are stored in FORTRAN order which makes <strong>⍺ ←→ x[-1]</strong> and
+  therefore a function that already knows <strong>x</strong> can easily recover <strong>⍺</strong> from <strong>x</strong>.
+</p>
+</li>
+<li>
+<p>
+In the APL code below, the vector <strong>B1</strong> (which corresponds to <strong>x</strong>)
+  <em>includes</em> the scalar <strong>B11</strong> (which corresponds to <strong>⍺</strong>).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Instead of a strict mathematical proof we use APL as a tool of thought.</p></div>
+<div class="paragraph"><p>Let <strong>V</strong> be a real or complex vector. The following APL function named
+<strong>Householder</strong> simply implements the definition of a Householder matrix
+given above:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>∇H←Householder V;I;L
+ ⍝
+ ⍝⍝ return the Householder matrix (aka. elementary reflector) for vector V
+ ⍝
+ I←I∘.=I←⍳⍴V        ⍝ I:  the (⍴V)×(⍴V) identity matrix,
+ L←+/V×+V           ⍝ L:  ║V║² i.e. the square of the norm of vector V
+ H←I-(2÷L)×V∘.×+V   ⍝ H:  the Householder matrix for vector V
+∇</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Next we define a somewhat random matrix <strong>B</strong> that shall prove our claims
+by example (aka. <em>incomplete induction</em>):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      MN←(M N)←4 3                 ⍝ choose a matrix size (M≥N)
+      ⎕RL←+/⎕TS ◊ B←?(2, MN)⍴18    ⍝ prepare for random B
+      B←+⌿9 0J9×[1]B               ⍝ some complex M×N random matrix B
+      B11←↑B1←B[;1]                ⍝ vector B1 is column 1 of matrix B, and scalar B11 its first item</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>With these prerequisites we can "prove" the following:</p></div>
+<div class="paragraph"><p><strong>Proposition:</strong> Let</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      L11←×B11             ⍝ B11 normalized to length 1 (= ±1 for real B11)
+      LB1←(+/B1×+B1)⋆0.5   ⍝ scalar LB1 is ║B1║ i.e. the length of B1
+
+      H1←Householder V1←1↓B1 + L11×M↑LB1  ⍝ a Householder matrix (from V1)
+      H2←Householder V2←1↓B1 - L11×M↑LB1  ⍝ another Householder matrix (from V2)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Then the first columns of matrices <strong>B∘H1</strong> and of <strong>B∘H2</strong> are 0 below the
+top-left item <strong>B11</strong> of <strong>B</strong>.</p></div>
+<div class="paragraph"><p><strong>Proofs</strong> (by APL examples <strong>B</strong>):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>     ∇
+[0]   H←Householder V;I;L
+[1]   ⍝
+[2]   ⍝⍝ return the Householder matrix (aka. elementary reflector) for vector V
+[3]   ⍝
+[4]   I←I∘.=I←⍳⍴V        ⍝ I: the (⍴V)×(⍴V) identity matrix,
+[5]   L←+/V×+V           ⍝ L: ║V║² i.e. the square of the norm of vector V
+[6]   H←I-(2÷L)×V∘.×+V   ⍝ H: the Householder matrix for vector V
+     ∇
+
+      LB1←(+/B1×+B1)⋆0.5   ⍝ scalar LB1 is ║B1║ i.e. the length of B1
+      L11←×B11             ⍝ B11 normalized to length 1 (= ±1 for real B11)
+      H1←Householder 1↓B1+L11×M↑LB1
+      H2←Householder 1↓B1-L11×M↑LB1
+
+      H1 = ⍉+H1             ⍝ H1 is Hermitian
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+      (⌹H1) = ⍉+H1           ⍝ H1 is Unitary
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+      H1 = ⌹H1              ⍝ H1 is Involutary
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+      B
+ 27J117  54J72   18J27
+ 81J117  18J117 126J144
+117J81  117J108   9J54
+135J27  117J18  117J90
+
+      2⍕H1 ∘ B   ⍝ notice the zeros in first column
+ ¯61.12J¯264.83 ¯33.28J¯233.03  ¯8.67J¯203.23
+    .00J.00     ¯52.41J25.80    86.09J69.90
+    .00J.00      19.00J47.42   ¯54.44J¯1.31
+    .00J.00       6.71J1.84     39.43J65.25
+
+      2⍕H2 ∘ B   ⍝ notice zeros in the first column
+ 61.12J264.83  33.28J233.03   8.67J203.23
+   .00J.00    ¯19.79J¯30.51  73.02J¯12.81
+   .00J.00     29.70J¯16.77 ¯95.79J¯74.13
+   .00J.00     ¯8.43J¯59.27 ¯25.25J16.46</code>
+
+</pre>
+</div></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repeated_application_of_reflectors">Repeated Application of Reflectors</h3>
+<div class="paragraph"><p>Once we know how to set the first column of some arbitrary matrix <strong>B</strong>
+to <strong>0</strong> (below the diagonal) we can now turn the entire matrix into an
+upper triangular form:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Set <strong>B₁ = B</strong> and find a reflector <strong>H₁</strong> that sets the items below the first
+  column of <strong>B₁</strong> to <strong>0</strong>.
+</p>
+</li>
+<li>
+<p>
+Repeat that step for <strong>B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, &#8230; Bₙ = 1 1↓Bₙ₋₁</strong> which,
+  in the end, computes a sequence of reflectors <strong>H₁, H₂, &#8230; Hₙ</strong>.
+  In this process:
+</p>
+<div class="olist lowerroman"><ol class="lowerroman">
+<li>
+<p>
+the matrices Bₖ become smaller and smaller,
+</p>
+</li>
+<li>
+<p>
+the reflectors Hₖ become shorter and shorter, and
+</p>
+</li>
+<li>
+<p>
+the upper triangular result matrix result becomes more and more complete.
+</p>
+</li>
+</ol></div>
+</li>
+</ol></div>
+<div class="paragraph"><p>After all, say <strong>n</strong>, steps matrix <strong>B</strong> looks like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>     Initial B         B after 1 step     B after 2 steps      B after n steps
+     ╔═════════════╗   ╔══╤═══════════╗   ╔══╤═══════════╗     ╔══╤═══════════╗
+     ║             ║   ║⍺₁│    R1     ║   ║⍺₁│    R1     ║     ║⍺₁│    R1     ║
+     ║             ║   ╟──┤           ║   ╟──┼──┐  R2    ║     ╟──┼──┐  R2    ║
+     ║             ║   ║  │           ║   ║  │⍺₂│        ║     ║  │⍺₂│   ...  ║
+     ║     B=B₁    ║ → ║  │           ║ → ║  ├──┤        ║ ... ║  ├──┤        ║
+     ║             ║   ║H₁│           ║   ║H₁│  │        ║     ║H₁│  │ ...    ║
+     ║             ║   ║  │           ║   ║  │H₂│        ║     ║  │H₂│     ┌──╢
+     ║             ║   ║  │           ║   ║  │  │        ║     ║  │  │     │⍺ₙ║
+     ╚═════════════╝   ╚══╧═══════════╝   ╚══╧══╧════════╝     ╚══╧══╧═════╧══╝</code>
+
+</pre>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">For lack of space we show <strong>⍺₁ &#8230; ⍺ₙ</strong> on the diagonal above, but in
+reality the diagonal is <strong>R₁₁, R₂₂, &#8230; Rₙₙ</strong>. The sequence <strong>⍺₁ &#8230; ⍺ₙ</strong>  is
+stored in <strong>tau</strong> as will be explained below.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Now:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>R</strong> is upper triangular (where the items below the diagonal are <strong>0</strong> by
+  definition and therefore need not be stored in <strong>B</strong>)
+</p>
+</li>
+<li>
+<p>
+<strong>H ← H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> is unitary or orthogonal since it is the
+  product of <strong>n</strong> unitary or orthogonal matrices <strong>Hₖ</strong> respectively.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The iteration above takes place in function <strong>LA_pack::laqp2()</strong> which starts
+with matrix <strong>B</strong> and ends with <strong>R</strong> in the upper half (including the diagonal),
+<strong>Q</strong> in the lower half, and the diagonal factors <strong>⍺₁ &#8230; ⍺ₙ</strong> stored in
+variable <strong>tau</strong>.</p></div>
+<div class="paragraph"><p>At this point the lower half and <strong>tau</strong> are not the matrix <strong>Q</strong> itself but the
+reflectors that turn the identity matrix into <strong>Q</strong>. For this reason we usually
+refer to lower half as <strong>HR</strong> and not as <strong>QR</strong> in the GNU APL C++ code.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_numerical_considerations">Numerical considerations</h3>
+<div class="paragraph"><p>In mathematics we compute with exact numbers and would be finished at this
+point. On real computers we work with approximations of exact numbers which
+may cause problems with the accuracy of the result.</p></div>
+<div class="paragraph"><p>Let <strong>⍺</strong> and <strong>β</strong> be numbers. For the sake of explanation assume <strong>⍺&gt;0</strong> and <strong>β&gt;0</strong>.
+Due to rounding, <strong>⍺</strong> and <strong>β</strong> only determine two ranges in which the exact
+⍺ and <strong>β</strong> lie:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⍺ - e₁ ≤ exact ⍺ ≤ ⍺ + e₁ and
+      β - e₂ ≤ exact β ≤ β + e₂</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The (usually small) numbers <strong>e₁</strong> and <strong>e₂</strong> define the <em>absolute error</em> of <strong>⍺</strong>
+and <strong>β</strong> while the quotients <strong>e₁÷⍺</strong> and <strong>e₂÷β</strong> define the <em>relative_error</em>
+of <strong>⍺</strong> and <strong>β</strong> respectively.</p></div>
+<div class="paragraph"><p>Now, adding or subtracting the inequalities above gives:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>               ⍺ - e₁ ≤ exact ⍺ ≤ ⍺ + e₁
+            ±  β - e₂ ≤ exact β ≤ β + e₂
+      ═════════════════════════════════════════════
+      (⍺±β) - (e₁+e₂) ≤ exact ⍺±β ≤ (⍺±β) + (e₁+e₂)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>This means that the absolute error of the sum or difference <strong>(⍺±β)</strong> is the
+sum of the absolute errors of <strong>⍺</strong> and <strong>β</strong>. This is no problem as long as
+<strong>(⍺±β)</strong> does not come too close to <strong>0</strong>. If it does, however, then the
+absolute error remains small, but the relative error is now:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      e₁ + e₂
+      ─────── → ∞  as (⍺ ± β) → 0
+       ⍺ ± β</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>That is, for <strong>(⍺-β)</strong> the relative error can become huge if <strong>⍺</strong>≈<strong>β</strong>.
+In LApack these issues are addressed in 3 ways:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+If the input matrices are very large or very small (in terms of their norm)
+  then they (and their result) are scaled up or down so that their
+  coefficients land in a range that is not subject to major rounding error.
+  See function <strong>LA_pack::gelsy()</strong> vs. <strong>LA_pack::scaled_gelsy()</strong>.
+</p>
+</li>
+<li>
+<p>
+As we have seen above, for any matrix <strong>B</strong> there are actually two reflectors
+  <strong>H1</strong> and <strong>H2</strong> each of which bring the first column off <strong>B</strong> below the
+  diagonal to <strong>0). LA_pack then chooses the one that produces the largest
+  difference *V1</strong> or <strong>V2</strong> above.
+</p>
+</li>
+<li>
+<p>
+Some functions, in particular <strong>LA_pack::larfg()</strong> take additional measures
+  to minimize the errors caused by too small arguments.
+</p>
+</li>
+<li>
+<p>
+Column pivoting, instead of processing the columns in normal order (different
+  from B[;1], B[;2], &#8230; B[N]) to avoid small coefficients in the subsequent
+  matrices.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Column pivoting works like this:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+In every iteration above:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+Compute the norms of the columns,
+</p>
+</li>
+<li>
+<p>
+Find the column <strong>k</strong> with the largest norm (called "the pivot")
+</p>
+</li>
+<li>
+<p>
+If <strong>k≠1</strong> (i.e. the first column does not have the largest norm already)
+   then exchange columns <strong>1</strong> and <strong>k</strong> before proceeding.
+</p>
+</li>
+<li>
+<p>
+In the context of solving equations, the pivoting is essentially a renaming
+   of the variables <strong>x₁, x₂, &#8230;, xₙ</strong>. This renaming is later undone (see the
+   end of <strong>scaled_gelsy()</strong>) before the result is returned to APL.
+</p>
+</li>
+</ol></div>
+</li>
+</ol></div>
+</div>
+<div class="sect2">
+<h3 id="_memory_layout">Memory Layout</h3>
+<div class="paragraph"><p>At the time when FORTRAN was popular, memories were small. The LApack FORTRAN
+code addressed this in two ways:</p></div>
+</div>
+<div class="sect2">
+<h3 id="_blocked_execution">Blocked execution</h3>
+<div class="paragraph"><p>Blocked operation means that the processing of matrices that may not fit
+into the core memory of a computer were processed in chunks. Some FORTRAN
+functions therefore had a "blocked" version (for large matrices) and an
+"unblocked" version (for small matrices and for the chunks of large matrices).</p></div>
+<div class="paragraph"><p>These days memory is large and therefore blocking was removed entirely. Only
+the unblocked FORTRAN functions survived in the GNU APL code.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_in_place_computation">In-place computation</h3>
+<div class="paragraph"><p>Another heavily used trick to reduce memory consumption is in-place
+computation. Instead of passing the argument of a function in one variable and
+storing the result in a another variable, the same variable was used for the
+largest input variable and the result. For example, function <strong>laqp2()</strong>
+computes the QR factorization of an arbitrary matrix <strong>B</strong> and the result is
+stored at the same memory location. However, the result <strong>QR</strong> is split in two
+pieces along the diagonal, taking advantage of the fact that <strong>Q</strong> is symmetric
+(so its upper half can be derived directly from its lower half, and that <strong>R</strong>
+is upper triangular (so its lower half is implicitly <strong>0</strong> and therefore
+not of interest):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      Input matrix B       Results Q and R
+      ╔══════════════╗     ╔════╤═══════════╗
+      ║              ║     ║R₁₁ │           ║
+      ║              ║     ╟────┼───┐       ║
+      ║              ║     ║    │R₂₂│  Rᵢⱼ  ║
+      ║     Bᵢⱼ      ║  →  ║    └───┘       ║
+      ║              ║     ║         ...    ║
+      ║              ║     ║  Q         ┌───╢
+      ║              ║     ║            │Rₙₙ║
+      ╚══════════════╝     ╚════════════╧═══╝</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Unfortunately in this scheme the matrices of <strong>Q</strong> and <strong>R</strong> now compete for the
+former diagonal of input <strong>B</strong>. This is solved by storing in the diagonal of <strong>Q</strong>
+in a separate vector (named <strong>tau</strong> in the LApack code):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ╔══════════════╗           ╔══════════════╗
+      ║              ║           ║              ║
+      ╙───┐     Rᵢⱼ  ║           ╟───┐     Rᵢⱼ  ║
+          │          ║           ║   │          ║
+          └───┐      ║           ║   └───┐      ║
+      ╔═══╕   │      ║     →     ║       │      ║
+      ║⍺₁ │   └───┐  ║           ║ Hᵢⱼ   └───┐  ║
+      ╟───┼───┐   │  ║           ║           │  ║
+      ║   │⍺₂ │   ╘══╝           ╚═══════════╧══╝
+      ║   └───┼───┐
+      ║       │...│
+      ║  Hᵢⱼ  └───┼──╖          ╔═══╤═══╤═══╤═══╗
+      ║           │⍺ₙ║     tau: ║⍺₁ │⍺₂ │...│⍺ₙ ║
+      ╚═══════════╧══╝          ╚═══╧═══╧═══╧═══╝</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Another issue to understand LApack is that functions <strong>laqp2()</strong> and friends
+do <strong>not</strong> return the matrices <strong>Q</strong> and <strong>R</strong> of the factorization <strong>B = Q∘R</strong>
+directly. Instead of <strong>Q</strong> it returns a matrix <strong>H</strong> with the Householder
+reflectors for the different columns. The matrix <strong>Q</strong> can then be obtained
+by applying these reflectors to the <strong>n×n</strong> unit matrix <strong>ID(n)</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      Q ←→ H∘ID(n)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>This avoids one intermediate matrix multiplication. Instead of <strong>Q←H∘I</strong>
+followed by some other <strong>Z←Q∘R</strong>, LApack leaves <strong>H</strong> for the moment and later
+computes <strong>Z←H∘R</strong> directly. In addition LApack avoids the computation of
+the Householder matrices used in the APL examples above for demonstration
+purposes. Instead of full k×k reflector matrices it uses the reflector
+vectors, typically called <strong>v</strong>, and computes the elements <strong>Hᵢⱼ</strong> of each
+reflector as needed. The lifetime of each <strong>Hᵢⱼ</strong> is usually short,
+therefore it makes little sense to store it in a large matrix.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_lapack_function_names">LApack function names</h3>
+<div class="paragraph"><p>The names of LApack functions look somewhat scary at first glance. For example
+the name of function <strong>zungqr()</strong> may not be too obvious. However these names
+follow a naming scheme that roughly looks as follows:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   ┌───────── data type (i←→integer, d←→double, z←→complex)
+   │┌┬─────── matrix type (un ←→ unitary, or ←→ orthogonal, ge ←→ general, etc.)
+   │││┌┬┬──── function type (gqr ←→ generate QR factorization)
+   ││││││     function variant (blocked/unblocked, etc.
+   ││││││
+   zungqr()</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>With this naming scheme function <strong>zungqr()</strong> for complex matrices becomes
+<strong>dorqr2()</strong> for real matrices.</p></div>
+<div class="paragraph"><p>In FORTRAN every complex function (like <strong>zungqr()</strong> has a real counterpart
+<strong>dorqr2()</strong> for real matrices. In fact there are even more variants because
+there are different precisions (like 32-bit <strong>float</strong> and 64-bit <strong>double</strong>
+in C++) and each has its own FORTRAN function. That made a lot of sense
+in the FORTRAN days where it made a considerable difference in performance.</p></div>
+<div class="paragraph"><p>A closer look at these functions revealed, however, that the difference
+between data types are actually rather small. The GNU APL version of these
+functions make the data type a template parameter so that every group of
+FORTRAN functions becomes a single template function in C++. In our example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      FORTRAN:
+
+          dorgqr   QR-factorize real matrix
+          zungqr   QR-factorize complex matrix
+
+      becomes C++
+
+          template&lt;T&gt;  ungqr()</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>where the template argument <strong>&lt;T&gt;</strong> is either <strong>&lt;DD&gt;</strong> for real or <strong>&lt;ZZ&gt;</strong> for
+complex numbers. The use of C++ templates cuts the number of functions
+needed roughly in half,</p></div>
+</div>
+<div class="sect2">
+<h3 id="_call_tree">Call Tree</h3>
+<div class="paragraph"><p>With all this in mind, <strong>A⌹B</strong> aka. <strong>Bif_F12_DOMINO::eval_AB</strong> becomes simple.
+We look at its call tree, which is roughly this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   Bif_F12_DOMINO::eval_AB()
+   │
+   └─── LA_pack::divide_matrix()
+        │
+        └─── LA_pack::gelsy&lt;T&gt;()
+             │
+             └─── LA_pack::scaled_gelsy()
+                  │
+                  ├─── LA_pack::laqp2&lt;T&gt;()
+                  │    │
+                  │    ├─── LA_pack::larfg&lt;T&gt;()
+                  │    └─── LA_pack::larf&lt;T&gt;()
+                  │
+                  ├─── LA_pack::estimate_rank()
+                  │
+                  ├─── LA_pack::trsm&lt;T&gt;()
+                  │
+                  └─── LA_pack::unm2r&lt;T&gt;()
+                       │
+                       ├─── LA_pack::larf&lt;T&gt;()
+                       ├─── ...
+                       └─── LA_pack::larf&lt;T&gt;()</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In this call tree:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>eval_AB()</strong> performs the APL argument checking (matching shapes of <strong>A</strong>
+  and <strong>B</strong>) and determines if <strong>A</strong> or <strong>B</strong> contain complex items. It also converts
+  scalars and vectors <strong>A</strong> and <strong>B</strong> into 1×1 and 1×N matrices respectively;
+</p>
+</li>
+<li>
+<p>
+<strong>divide_matrix()</strong> translates the ravels of APL matrices <strong>A</strong> and <strong>B</strong> into
+  (transposed) FORTRAN matrices;
+</p>
+</li>
+<li>
+<p>
+<strong>gelsy&lt;T&gt;()</strong> scales (and later unscales) FORTRAN matrices <strong>A</strong> and <strong>B</strong> with
+   very small or very large items so that subsequent operations are
+   safe in regard to rounding errors. In almost all real life cases
+   <strong>A</strong> and <strong>B</strong> will not need any scaling.
+</p>
+</li>
+<li>
+<p>
+<strong>scaled_gelsy()</strong> computes <strong>Z←A⌹B</strong> for the now properly scaled <strong>A</strong> and <strong>B</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>laqp2()</strong> computes a QR factorization <strong>B=Q∘R</strong> of <strong>B</strong>. In the result:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Q</strong> is orthogonal (for real <strong>A</strong> and <strong>B</strong>) or Hermitian (for complex
+   <strong>A</strong> or <strong>B</strong>). <strong>Q</strong> is easy to invert since <strong>Q⁻¹ ←→ ⍉+Q</strong>, and
+</p>
+</li>
+<li>
+<p>
+<strong>R</strong> is upper triangular (so that <strong>R∘X=C</strong> is simple to solve).
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+In the QR factorization: for every column of <strong>B</strong>:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>larfg&lt;T&gt;()</strong> generates one reflector (i.e. for one column of <strong>B</strong>)
+</p>
+</li>
+<li>
+<p>
+<strong>larf&lt;T&gt;()</strong> applies that reflector to a sub-matrix of <strong>B</strong>;
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>estimate_rank()</strong> checks that the system <strong>A=B∘X</strong> of linear equations is
+   not under-determined and raises a DOMAIN ERROR if it is. In contrast,
+   over-determination (more equations than variables) is accepted and
+   produces a least-square solution for <strong>A=X=B∘X</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>trsm&lt;T&gt;()</strong> computes <strong>R⁻¹</strong> for the upper triangular factor <strong>R</strong>
+  of <strong>B=Q∘R</strong> that was computed above
+</p>
+</li>
+<li>
+<p>
+<strong>unm2r&lt;T&gt;()</strong> applies <strong>R⁻¹</strong> to <strong>A</strong>
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_with_axis_qr_factorization">⌹ with axis: QR factorization</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The first non-trivial computation in monadic <strong>⌹B</strong> and in dyadic <strong>A⌹B</strong>
+is a <em>QR-factorization</em> of matrix <strong>B</strong>. A QR factorization of a matrix B is
+a pair <strong>(Q R)</strong> of matrices with the following properties:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Q</strong> is orthogonal (Hermitian if B is complex),
+</p>
+</li>
+<li>
+<p>
+<strong>R</strong> is upper triangular, and
+</p>
+</li>
+<li>
+<p>
+<strong>B ≡ Q ∘ R</strong> within the limits of ⎕CT.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The same matrix <strong>B</strong> may have different QR factorizations with the above
+properties. And different factorization algorithms may produce different
+pairs <strong>(Q R)</strong> for the same matrix <strong>B</strong>.</p></div>
+<div class="paragraph"><p>Often the orthogonal <strong>Q</strong> and/or the upper triangular <strong>R</strong> of a factorization
+<strong>B=Q∘R</strong> is more valuable than the final result <strong>B⁻¹=R⁻¹∘Q⁻¹</strong> of <strong>⌹B</strong> or
+<strong>A⌹B</strong>. For this reason GNU APL provides <strong>⌹[X]</strong> which returns the matrices
+<strong>Q</strong> and <strong>R</strong> before applying them (i.e. to solve <strong>A∘X=B</strong>). As a matter of
+convenience for the programmer, GNU APL not only computes the pair <strong>(Q R)</strong>,
+but a triple <strong>(Q R Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>.</p></div>
+<div class="paragraph"><p>One could, of course, compute <strong>Rinv</strong> from <strong>R</strong> in APL with <strong>Rinv←⌹R</strong>.
+However, <strong>⌹R</strong> in APL cannot easily take advantage of the fact that <strong>⌹R</strong> is
+upper triangular, which makes it more efficient to use an inversion algorithm
+that is tailored to the upper triangular case of <strong>⌹R</strong> as opposed to the
+general <strong>B</strong> case. Also, computing <strong>Rinv←⌹R</strong> after returning <strong>(Q R)</strong> would
+factorize R a second time for no reason.</p></div>
+<div class="paragraph"><p>GNU APL has implemented two different algorithms for the QR-factorization
+of a matrix <strong>B</strong>, which produce slightly different results.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The first algorithm is based on a factorization algorithm published by
+  <strong>Garry Helzer</strong> in <strong>APL Quote Quad, Volume 9, Issue 3, 1979</strong>, and
+</p>
+</li>
+<li>
+<p>
+the second algorithm is, like monadic and dyadic <strong>⌹</strong>, based on LApack
+  function <strong>laqp2()</strong> but with column pivoting disabled.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The algorithm to be used is selected with axis argument <strong>X</strong> as follows:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Integer scalar 1 selects Garry Helzer&#8217;s algorithm,
+</p>
+</li>
+<li>
+<p>
+Integer scalar 2 selects the <strong>laqp2()</strong> algorithm, and
+</p>
+</li>
+<li>
+<p>
+(obsolete) a small real scalar like ⎕CT also selects Garry Helzer&#8217;s
+  algorithm. This is for backward compatibility with older GNU APL
+  versions (that always used Garry Helzer&#8217;s algorithm).
+</p>
+</li>
+</ol></div>
+<div class="sect2">
+<h3 id="_quadratic_b">Quadratic B</h3>
+<div class="paragraph"><p>The simplest cases are those where <strong>B</strong> is quadratic, i.e. <strong>⍴B ←→ N N</strong>. In
+those cases <strong>Q</strong>, <strong>R</strong>, and <strong>Ri</strong> have the same shape as <strong>B</strong>. The same <strong>B</strong> can
+have different QR factorizations, therefore the ravels of the results
+usually differ between different algorithms. For example,</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      MN←4 4 ◊ B←?MN⍴9                 ⍝ B quadratic (M=N)
+      Q_R_Ri←(Q R Ri)← ⌹[1]B           ⍝ Helzer algorithm
+      ⍝ 8 ⎕CR¨(⊂B), 2⍕¨Q R Ri          ⍝ Argument B and results Q R Ri
+      ⍝ or alternatively from the nested variable
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ Argument B and results Q R Ri
+ ┌→──────┐  ┌→──────────────────┐  ┌→──────────────────────┐  ┌→──────────────────┐
+ ↓4 4 9 5│  ↓ .34  .19 ¯.68  .62│  ↓ 11.70 9.23 11.36 13.50│  ↓ .09 ¯.17  .17  .59│
+ │6 1 6 7│  │ .51 ¯.82  .20  .18│  │   .00 4.57 ¯2.16 ¯1.00│  │ .00  .22 ¯.06 ¯.05│
+ │7 8 1 6│  │ .60  .54  .57  .14│  │   .00  .00 ¯8.08 ¯2.29│  │ .00  .00 ¯.12  .18│
+ │6 5 9 9│  │ .51  .06 ¯.41 ¯.75│  │   .00  .00   .00 ¯1.60│  │ .00  .00  .00 ¯.62│
+ └───────┘  └───────────────────┘  └───────────────────────┘  └───────────────────┘
+
+      8 ⎕CR¨ ⍴¨B Q R Ri                ⍝ Shapes of argument B and results
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+└───────┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+
+      8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+
+
+      MN←4 4 ◊ B←?MN⍴9                 ⍝ B quadratic (M=N)
+      Q_R_Ri←(Q R Ri) ← ⌹[2]B          ⍝ LApack algorithm
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ Argument B and results Q R Ri
+ ┌→──────┐  ┌→───────────────────┐  ┌→─────────────────────────┐  ┌→───────────────────┐
+ ↓2 5 5 7│  ↓ ¯.22  .41  .64  .61│  ↓ ¯9.22 ¯12.91 ¯5.10 ¯11.50│  ↓ ¯.11 ¯.26  .16  .22│
+ │8 9 2 8│  │ ¯.87 ¯.41 ¯.21  .18│  │   .00   5.33  4.17   7.24│  │  .00  .19 ¯.23 ¯.43│
+ │4 8 5 5│  │ ¯.43  .45  .27 ¯.73│  │   .00    .00  3.41  ¯1.40│  │  .00  .00  .29  .10│
+ │1 5 1 8│  │ ¯.11  .68 ¯.69  .23│  │   .00    .00   .00   3.92│  │  .00  .00  .00  .25│
+ └───────┘  └────────────────────┘  └──────────────────────────┘  └────────────────────┘
+
+      8 ⎕CR¨ ⍴¨B Q R Ri                ⍝ Shapes of argument B and results
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+└───────┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+
+      8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Notice the differences between the Helzer and the LAack algorithm
+in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_under_determined_b">Under-determined B</h3>
+<div class="paragraph"><p>If <strong>B</strong> is under-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &lt; N</strong>,
+then matters become a little more complicated. Due to conformity
+constraints (LENGTH ERROR), only <strong>(MM←⍴Ri)↑R</strong> can be multiplied
+from the left or from the right, but not <strong>R</strong> itself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⎕LC
+      MM←2/↑(M N)←MN←2 4 ◊ B←?MN⍴9     ⍝ Helzer, B under-determined (M&lt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[1]B          ⍝ Helzer algorithm
+
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ Argument B and results Q R Ri
+ ┌→──────┐  ┌→────────┐  ┌→────────────────────┐  ┌→─────────┐
+ ↓2 5 3 5│  ↓ .89  .45│  ↓ 2.24 5.81  4.02 4.92│  ↓ .45  5.81│
+ │1 3 3 1│  │ .45 ¯.89│  │  .00 ¯.45 ¯1.34 1.34│  │ .00 ¯2.24│
+ └───────┘  └─────────┘  └─────────────────────┘  └──────────┘
+
+      8 ⎕CR¨ ⍴¨B Q R Ri                ⍝ Shapes of argument B and results
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │2 4│  │2 2│  │2 4│  │2 2│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+└───────┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘
+
+      8 ⎕CR¨ ((MM↑R)∘Ri) (Ri∘(MM↑R))   ⍝ Ri is the inverse of R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_over_determined_b">Over-determined B</h3>
+<div class="paragraph"><p>The most complicated cases are those where <strong>B</strong> is over-determined,
+i.e. <strong>⍴B ←→ M N</strong> with <strong>M &gt; N</strong>. The conformity constraints are similar
+to those of the under-determined cases.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      NN←2/1↓(M N)←MN←4 2 ◊ B←?MN⍴9    ⍝ B over-determined (M&gt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[1]B          ⍝ Helzer algorithm
+
+      8 ⎕CR¨(⊂B), 2⍕¨Q R Ri            ⍝ Argument B and results Q R Ri
+ ┌→──┐  ┌→──────────────────┐  ┌→───────────┐  ┌→────────┐
+ ↓9 3│  ↓ .65  .31 ¯.54  .44│  ↓ 13.82  6.51│  ↓ .07  .12│
+ │7 3│  │ .51  .08 ¯.04 ¯.86│  │   .00 ¯3.95│  │ .00 ¯.25│
+ │6 2│  │ .43  .21  .84  .24│  │   .00   .00│  └─────────┘
+ │5 6│  │ .36 ¯.92  .01  .13│  │   .00   .00│
+ └───┘  └───────────────────┘  └────────────┘
+
+      8 ⎕CR¨ ⍴¨B Q R Ri                ⍝ Shapes of argument B and results
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 2│  │4 4│  │4 2│  │2 2│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──┐
+↓1 1│
+│1 1│
+│1 1│
+│1 1│
+└───┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+
+      8 ⎕CR¨ ((NN↑R)∘Ri) (Ri∘(NN↑R))   ⍝ Ri is the inverse of R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘
+
+
+      NN←2/1↓(M N)←MN←4 2 ◊ B←?MN⍴9    ⍝ B over-determined (M&gt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[2]B          ⍝ LApack algorithm
+
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ Argument B and results Q R Ri
+ ┌→──┐  ┌→─────────┐  ┌→────────────┐  ┌→─────────┐
+ ↓5 3│  ↓ ¯.48  .09│  ↓ ¯10.34 ¯5.51│  ↓ ¯.10 ¯.14│
+ │8 3│  │ ¯.77 ¯.34│  │    .00  3.69│  │  .00  .27│
+ │3 1│  │ ¯.29 ¯.16│  └─────────────┘  └──────────┘
+ │3 5│  │ ¯.29  .92│
+ └───┘  └──────────┘
+
+      8 ⎕CR¨ ⍴¨B Q R Ri                ⍝ Shapes of argument B and results
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 2│  │4 2│  │2 2│  │2 2│
+ └───┘  └───┘  └───┘  └───┘
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──┐
+↓1 1│
+│1 1│
+│1 1│
+│1 1│
+└───┘
+
+      8 ⎕CR¨ (2⍕Q∘⍉Q) ((⍉Q)∘Q)         ⍝ Q is orthogonal ?
+ ┌→──────────────────┐  ┌→──┐
+ ↓ .24  .34  .13  .22│  ↓1 0│
+ │ .34  .71  .28 ¯.09│  │0 1│
+ │ .13  .28  .11 ¯.07│  └───┘
+ │ .22 ¯.09 ¯.07  .93│
+ └───────────────────┘
+
+      8 ⎕CR¨ ((NN↑R)∘Ri) (Ri∘(NN↑R))   ⍝ Ri is the inverse of NN↑R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Note that above <strong>Q</strong> is orthogonal in the Helzer case but not in the LApack
+case. This is most likely caused by the fact that in an over-determined <strong>B</strong>
+the LApack functions compute a least-square solution instead of an exact one.
+Note also the different <strong>⍴Q</strong> in both cases.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_impact_of_ct">Impact of ⎕CT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>All ⌹-functions use <strong>⎕CT</strong> although in different ways.</p></div>
+<div class="sect2">
+<h3 id="_ct_in_the_helzer_algorithm">⎕CT in the Helzer Algorithm</h3>
+<div class="paragraph"><p>To quote Garry Helzer:</p></div>
+<div class="paragraph"><p><em>For this reason, whenever it is necessary to check an array for zeros below,
+the check is always made relative to another array and with a specified
+tolerance.</em></p></div>
+<div class="paragraph"><p>In GNU APL this comparison of small items with exact 0.0 can be
+controlled with ⎕CT. The original Helzer algorithm used two APL functions
+<strong>CPR</strong> (for compare) and <strong>TOL</strong> (tolerance) to check for zeros:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      O ^.= (I+V) CPR L TOL DCT</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which have been inlined in GNU APL, see <strong>Bif_F12_DOMINO::significant()</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">the Helzer Algorithm in GNU APL, i.e. <strong>⌹[1]B</strong>, does not use any
+of the LApack functions.</td>
+</tr></table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ct_in_the_lapack_functions">⎕CT in the LApack functions</h3>
+<div class="paragraph"><p>The LApack based functions <strong>A⌹B</strong> and <strong>⌹B</strong> in GNU APL use the C++ function
+<strong>LApack::estimate_rank()</strong> to compute the effective rank of the right
+argument <strong>B</strong>. Matrices with fewer rows than columns are <em>under-determined</em>
+and always yield a RANK ERROR. However a matrix can be under-determined even
+if the number of rows is suffiently large. This is the case if the rows are
+not linearly independent. Put differently, a large number of rows alone
+does not guarantee a sufficient matrix rank because a linear dependent row
+is as good as no row.</p></div>
+<div class="paragraph"><p>Function <strong>estimate_rank()</strong> has no corresponding FORTRAN function in LApack,
+but used to be a somewhat lengthy section of <strong>LApack::gelsy()</strong>. That section
+was modularized into <strong>estimate_rank()</strong> in order to improve the readability
+of the GNU APL C++ code.</p></div>
+<div class="paragraph"><p>Function <strong>estimate_rank()</strong> iteratively computes two values <strong>smin</strong> (an upper
+bound for the smallest singular value of <strong>B</strong>) and <strong>smax</strong> (a lower bound for
+the largest singular value of <strong>B</strong>), and considers matrix <strong>B</strong> as rank-deficient
+if:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      smax * ⎕CT &gt; smin</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If that happens then GNU APL raises a <strong>DOMAIN ERROR</strong>. It means that the
+matrix <strong>B</strong> (i.e. of <strong>A⌹B</strong>, <strong>⌹B</strong>) is either truly rank-deficient,
+or at least close to a rank-deficient matrix. Decreasing <strong>⎕CT</strong> may
+or may not solve that problem.</p></div>
+<div class="paragraph"><p>In such cases the precision of the result is rather questionable and
+the DOMAIN ERROR indicates that problem rather than continuing with
+the computation and producing an unreliable result.</p></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2024-03-14 14:48:59 CET
+</div>
+</div>
+</body>
+</html>

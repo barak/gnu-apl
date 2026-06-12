@@ -93,6 +93,9 @@ AEI
       D[3;]
 IJKL
 
+      1 2 3[]
+1 2 3
+
 ⍝ repeated index values ----------------------------------
 
       H←2 4ρ3 4 1 2 2 3 4 1
@@ -180,7 +183,7 @@ B
       ⍝ Regression
       ⍝
       (1 1⍴0)[0;]
-INDEX ERROR
+INDEX ERROR+
       (1 1⍴0)[0;]
       ^      ^
 
@@ -189,10 +192,21 @@ INDEX ERROR
       ⍝ Regression
       ⍝
       A ← 'ZIPPITY' 'DOO' 'DAH'
-      (∊A[2]) ← 0
+      (ϵA[2]) ← 0
       A
  ZIPPITY  0 0 0  DAH 
 
+      A ← 3 4⍴'ZIPPITY' 'DOO' 'DAH'
+      (ϵA[1 2;2 3])←1
+      A
+ ZIPPITY  1 1 1    1 1 1          ZIPPITY 
+ DOO      1 1 1    1 1 1 1 1 1 1  DOO     
+ DAH      ZIPPITY  DOO            DAH     
+      (ϵA[1 2;2 3])←⍳16
+      A
+ ZIPPITY  1 2 3    4 5 6                 ZIPPITY 
+ DOO      7 8 9    10 11 12 13 14 15 16  DOO     
+ DAH      ZIPPITY  DOO                   DAH     
 
       )CHECK
 OK      - no stale functions

@@ -1,8 +1,6 @@
 ⍝ Each_monadic.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
-
       Z←ρ¨'TOM' 'DICK'
       Z
  3  4 
@@ -17,3 +15,29 @@
 4
       ≡W
 2
+
+⍝ regression ----------------------------------
+
+∇Z←depth B
+ Z←≡B
+∇
+
+∇Z←A depth_dya B
+ Z←≡B
+∇
+
+      BB←B B←0⍴('foo' 'bar')
+      ≡B
+2
+      ≡BB
+3
+      ≡¨BB
+2 2
+
+      depth¨BB
+2 2
+
+      ⍝ dyadic defined functions should make no difference
+      ⍝
+  ((⍴BB)⍴'x') depth_dya¨BB
+2 2

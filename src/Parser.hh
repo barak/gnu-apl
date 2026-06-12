@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __PARSER_HH_DEFINED__
 #define __PARSER_HH_DEFINED__
 
 #include "Token.hh"
+
+class Executable;
 
 /*!
      Functions related to parsing of input lines and defined functions.
@@ -38,20 +43,34 @@ public:
    {}
 
    /// Parse UCS_string \b input into token string \b tos.
-   ErrorCode parse(const UCS_string & input, Token_string & tos) const;
+   ErrorCode parse(const UCS_string & input, Token_string & tos,
+                   bool optimize) const;
 
    /// Parse token string \b input into token string \b tos.
-   ErrorCode parse(const Token_string & input, Token_string & tos) const;
+   ErrorCode parse(const Token_string & input, Token_string & tos,
+                   bool optimize) const;
 
-   /// remove VOID token from \b tos (compacting \b tos)
-   static void remove_void_token(Token_string & tos);
+   /// quick (!) decision if tos[pos] is right of ←
+   static Assign_state get_assign_state(Token_string & tos, ShapeItem pos);
+
+   /// substitute literal axes like [ VAL ] with their reduction (i.e.
+   /// TOK_AXIS or TOK_INDEX, depending on VAL. Return \b true if so.
+   static bool optimize_literal_axes(Token_string & tos);
+
+   /// substitute some primitives with short arguments and short result,
+   /// like 4⍴0 in place.
+   static bool optimize_short_primitives(Token_string & tos);
+
+   /// remove all TOK_VOID token from \b tos (compacting \b tos).
+   /// @return the number of tpkens removed (and adjust the size of \b tos)/
+   static VoidCount remove_TOK_VOID(Token_string & tos);
 
    /// compute distances between matching (), [], and {}
    static ErrorCode match_par_bra(Token_string & tos, bool backwards);
 
 protected:
    /// Parse token string \b tos (a statement without diamonds).
-   static ErrorCode parse_statement(Token_string & tos);
+   static ErrorCode parse_statement(Token_string & tos, bool optimize);
 
    /// find opening bracket; throw error if not found
    static int find_opening_bracket(const Token_string & tos, int pos);
@@ -66,7 +85,7 @@ protected:
    static int find_closing_parent(const Token_string & tos, int pos);
 
    /// Collect consecutive smaller APL values or value token into vectors
-   static void collect_constants(Token_string & tos);
+   static bool collect_constants(Token_string & tos);
 
    /// mark next symbol left of ← on the same level as LSYMB
    static void mark_lsymb(Token_string & tos);
@@ -77,8 +96,12 @@ protected:
    /// Replace (X) by X and ((..) by (..) in \b string. (X is a single token)
    static void remove_nongrouping_parantheses(Token_string & tos);
 
-   /// Replace ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant
-   static void replace_bitwise_functions(Token_string & tos);
+   /** Replace:
+
+       ∧∧, ∨∨, ⍲⍲, and ⍱⍱    with their bitwise variant,
+       ⎕FIO.function_name    with ⎕FIO[X] (via subfun_to_axis(function_name))
+    */
+   static void optimize_static_patterns(Token_string & tos);
 
    /// check if tos[pos] is the end of a value or of a function
    static bool check_if_value(const Token_string & tos, int pos);

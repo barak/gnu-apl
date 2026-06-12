@@ -1,0 +1,28 @@
+⍝ Optimization.tc
+⍝ ════════════════
+
+      ]log 38 ON
+
+      )ERASE FOO
+
+∇FOO B
+ →(B=1 2 3) / L1 L2 L3 ◊ →0
+
+L1: "L1" ◊ →0
+L2: "L2" ◊ →0
+L3: "L3" ◊ →0
+∇
+
+      FOO 1
+L1
+      FOO 2
+L2
+      FOO 3
+L3
+
+      ]log 38 OFF
+
+)ERASE FOO
+
+)CHECK BRIEF
+

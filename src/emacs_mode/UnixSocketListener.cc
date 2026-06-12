@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "emacs.hh"
 #include "network.hh"
 #include "UnixSocketListener.hh"
@@ -45,7 +48,7 @@ std::string UnixSocketListener::start( void )
     if( server_socket == -1 ) {
         stringstream errmsg;
         errmsg << "Error creating unix domain socket: " << strerror( errno ) << endl;
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -58,11 +61,11 @@ std::string UnixSocketListener::start( void )
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
     strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) );
-    if( bind( server_socket, (struct sockaddr *)&addr, sizeof( addr ) ) == -1 ) {
+    if( ::bind( server_socket, (struct sockaddr *)&addr, sizeof( addr ) ) == -1 ) {
         stringstream errmsg;
         errmsg << "Error binding unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -72,7 +75,7 @@ std::string UnixSocketListener::start( void )
         stringstream errmsg;
         errmsg << "Error setting permissions: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -80,7 +83,7 @@ std::string UnixSocketListener::start( void )
         stringstream errmsg;
         errmsg << "Error starting listener on unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() <<  errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 

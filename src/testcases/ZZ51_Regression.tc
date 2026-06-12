@@ -1,0 +1,26 @@
+⍝ ZZ51_Regression.tc
+⍝ ------------------
+
+      )SIC
+      )ERASE A C
+
+      ⍝ was bad syntax error at second time
+      ⍝
+      A.B←2 ◊ C.D←3
+
+
+
+      A.B←2 ◊ C.D←3
+      A.B←2 ◊ C.D←3
+
+
+      )ERASE A C
+
+)SI
+
+)CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

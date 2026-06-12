@@ -10,6 +10,7 @@
 #include "LineInput.hh"
 #include "Macro.hh"
 #include "PointerCell.hh"
+#include "StateIndicator.hh"
 #include "Tokenizer.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
@@ -18,7 +19,7 @@ using namespace std;
 
 static int display_mode = 1;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // initialization...
 
 extern void init_1(const char * argv0, bool log_startup);
@@ -29,15 +30,18 @@ do_init()
 {
 const bool log_startup = false;
 
-//      uprefs.safe_mode = true;
-   uprefs.user_do_svars = false;
-   uprefs.system_do_svars = false;
-   uprefs.requested_id = 3000;
+//      UserPreferences::uprefs.safe_mode = true;
+   UserPreferences::uprefs.user_do_svars = false;
+   UserPreferences::uprefs.system_do_svars = false;
+   UserPreferences::uprefs.requested_id = 3000;
 
    init_1("apl", log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
-   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
+   // /etc/gnu-apl.d/preferences or /usr/local/etc/gnu-apl.d/preferences
+   UserPreferences::uprefs.read_config_file(true, log_startup);
+
+   // in $HOME/.config/gnu_apl/preferences
+   UserPreferences::uprefs.read_config_file(false, log_startup);
 
    init_2(log_startup);
 }
@@ -48,7 +52,7 @@ init_if_necessary()
 static bool init_done = false;
    if (!init_done) { do_init(); init_done = true; }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_command(PyObject * self, PyObject * args)
 {
@@ -69,7 +73,7 @@ ostringstream out;
 
   return PyUnicode_DecodeUTF8(out.str().data(), out.str().size(), 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_to_python(const Value * value)
 {
@@ -81,7 +85,7 @@ const ShapeItem ravel_len = value->nz_element_count();
 PyObject * ravel = PyList_New(ravel_len);
    loop(i, ravel_len)
        {
-         const Cell & cell = value->get_ravel(i);
+         const Cell & cell = value->get_cravel(i);
          if (cell.is_integer_cell())
             PyList_SetItem(ravel, i, PyLong_FromLong(cell.get_int_value()));
          else if (cell.is_float_cell())
@@ -111,7 +115,7 @@ PyObject * ravel = PyList_New(ravel_len);
 
    return PyTuple_Pack(2, shape, ravel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject * exec_result = 0;
 
 bool
@@ -120,18 +124,18 @@ python_result_callback(Token & result)
 const TokenTag tag = result.get_tag();
 bool do_display = false;
 
-   if (tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3)   // non-committed value
+   if (tag == TOK_APL_VALUE2)                       // committed value
+      {
+        do_display = display_mode > 1;
+        exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
+                                   apl_to_python(result.get_apl_val().get()));
+      }
+   else if (result.get_Class() == TC_VALUE)   // non-committed value
       {
         do_display = display_mode > 0;
         exec_result = PyTuple_Pack(2, PyLong_FromLong(1),
                                    apl_to_python(result.get_apl_val().get()));
 
-      }
-   else if (tag == TOK_APL_VALUE2)                       // committed value
-      {
-        do_display = display_mode > 1;
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
-                                   apl_to_python(result.get_apl_val().get()));
       }
    else if (tag == TOK_VOID)                            // void
       {
@@ -159,7 +163,7 @@ bool do_display = false;
 
    return do_display;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_exec(PyObject * self, PyObject * args)
 {
@@ -176,7 +180,7 @@ UTF8_string line_utf8(line);
 UCS_string line_ucs(line_utf8);
 
    exec_result = 0;
-   try { Command::process_line(line_ucs); }
+   try { Command::process_line(line_ucs, &COUT); }
    catch (const Error & error)
       {
         CERR << "cought Error" << endl;
@@ -195,7 +199,7 @@ UCS_string line_ucs(line_utf8);
 
    if (exec_result == 0)   // error or defined function without return value
       {
-        if (const StateIndicator * si = Workspace::SI_top_error())
+        if (const StateIndicator * si = Workspace::SI_top_error(false))
            {
              const Error & err = StateIndicator::get_error(si);
              const ErrorCode ec = err.get_error_code();
@@ -211,7 +215,7 @@ PyObject * ret = exec_result;
    exec_result = 0;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static const Value *
 apl_get_var_value(PyObject * args)
 {
@@ -234,15 +238,15 @@ Symbol * sym = Workspace::lookup_existing_symbol(varname_ucs);
       }
 
 const ValueStackItem * top = sym->top_of_stack();
-   if (top == 0 || top->name_class != NC_VARIABLE)
+   if (top == 0 || top->get_NC() != NC_VARIABLE)
       {
         CERR << "*** " << varname_ucs << "is not an APL variable." << endl;
         return 0;
       }
 
-   return top->apl_val.get();
+   return top->get_val_cptr();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 make_shape(const Shape & shape)
 {
@@ -252,7 +256,7 @@ PyObject * result = PyList_New(shape.get_rank());
 
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_shape(PyObject * self, PyObject * args)
 {
@@ -261,7 +265,7 @@ const Value * value = apl_get_var_value(args);
 
    return make_shape(value->get_shape());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 make_ravel(const Value * value)
 {
@@ -270,7 +274,7 @@ PyObject * result = PyList_New(len);
 
    loop(l, len)
       {
-        const Cell & cell = value->get_ravel(l);
+        const Cell & cell = value->get_cravel(l);
         PyObject * item = Py_None;
         if (cell.is_integer_cell())
            {
@@ -289,7 +293,7 @@ PyObject * result = PyList_New(len);
 
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_ravel(PyObject * self, PyObject * args)
 {
@@ -297,7 +301,7 @@ const Value * value = apl_get_var_value(args);
    if (value == 0)   return 0;
    return make_ravel(value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_value(PyObject * self, PyObject * args)
 {
@@ -308,7 +312,7 @@ PyObject * shape = make_shape(value->get_shape());
 PyObject * ravel = make_ravel(value);
    return PyTuple_Pack(2, shape, ravel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Shape
 list_to_shape(PyObject * shape)
 {
@@ -319,7 +323,7 @@ Shape ret;
         return ret;
       }
 
-const Rank rank = PyList_Size(shape);
+const uRank rank = PyList_Size(shape);
    loop(r, rank)
        {
          PyObject * axis = PyList_GetItem(shape, r);
@@ -327,7 +331,7 @@ const Rank rank = PyList_Size(shape);
        }
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 shape_for_item(PyObject * item)
 {
@@ -348,7 +352,7 @@ shape_for_item(PyObject * item)
 PyObject * shape = PyTuple_GetItem(item, 1);
    return list_to_shape(shape);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P python_to_apl(PyObject * ravel, PyObject * shape);
 
 static Value_P
@@ -361,17 +365,17 @@ const ShapeItem len_Z = Z->nz_element_count();
       {
         const double real = PyComplex_RealAsDouble(ravel);
         const double imag = PyComplex_ImagAsDouble(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   ComplexCell(real, imag);
+        loop(z, len_Z)   Z->next_ravel_Complex(real, imag);
       }
    else if (PyFloat_Check(ravel))   // ravel is a floating point scalar
       {
         const double real = PyFloat_AsDouble(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   FloatCell(real);
+        loop(z, len_Z)   Z->next_ravel_Float(real);
       }
    else if (PyLong_Check(ravel))   // ravel is an integer scalar
       {
         const APL_Integer ival = PyLong_AsLong(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   IntCell(ival);
+        loop(z, len_Z)   Z->next_ravel_Int(ival);
       }
    else if (PyUnicode_Check(ravel))   // ravel is a char scalar or a string
       {
@@ -380,15 +384,14 @@ const ShapeItem len_Z = Z->nz_element_count();
                                 (PyUnicode_AsUTF8AndSize(ravel, &len));
         UTF8_string utf(data, len);
         UCS_string ucs(utf);
-        loop(z, len_Z)   new (Z->next_ravel())   CharCell(ucs[z % ucs.size()]);
+        loop(z, len_Z)   Z->next_ravel_Char(ucs[z % ucs.size()]);
       }
    else if (PyTuple_Check(ravel))   // item is a tuple (val, shape)
       {
         PyObject * sub_shape = PyTuple_GetItem(ravel, 1);
         PyObject * sub_ravel = PyTuple_GetItem(ravel, 0);
         Value_P sub = python_to_apl(sub_ravel, sub_shape);
-        loop(z, len_Z)
-            new (Z->next_ravel()) PointerCell(sub.get(), Z.getref());
+        loop(z, len_Z)   Z->next_ravel_Pointer(sub.get());
       }
    else if (PyList_Check(ravel))   // ravel is a list
       {
@@ -397,7 +400,7 @@ const ShapeItem len_Z = Z->nz_element_count();
             {
               PyObject * src = PyList_GetItem(ravel, z % src_len);
               Value_P sub = python_to_apl(src, 0);
-              Z->next_ravel()->init_from_value(sub.get(), Z.getref(), LOC);
+              Z->next_ravel_Value(sub.get());
             }
       }
    else
@@ -409,14 +412,14 @@ const ShapeItem len_Z = Z->nz_element_count();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P
 python_to_apl(PyObject * ravel, PyObject * shape)
 {
    if (shape)   return python_to_apl(ravel, list_to_shape(shape));
    else         return python_to_apl(ravel, shape_for_item(ravel));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_set_value(PyObject * self, PyObject * args)
 {
@@ -479,7 +482,7 @@ Value_P value = python_to_apl(ravel, shape);
    sym->assign(value, true, LOC);
    return Py_None;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_fix_function(PyObject * self, PyObject * args)
 {
@@ -507,7 +510,7 @@ UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
 
    return PyLong_FromLong(error_line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_set_display(PyObject * self, PyObject * args)
 {
@@ -529,7 +532,7 @@ const int oldmode = display_mode;
    display_mode = mode;
    return PyLong_FromLong(oldmode);
 }
-//=============================================================================
+//============================================================================
 const char * DESCR_help =
 "gnu_apl.help() : print help for a topic.\n"
 "\n"
@@ -605,9 +608,9 @@ const char * DESCR_fix_function =
 ;
 
 const char * DESCR_get_ravel =
-"gnu_apl.get_ravel() : get the ravel of an APL variable.\n"
+"gnu_apl.get_cravel() : get the ravel of an APL variable.\n"
 "\n"
-"Synopsis: Result = gnu_apl.get_ravel(text)\n"
+"Synopsis: Result = gnu_apl.get_cravel(text)\n"
 "    varname is a string containing the name of an APL variable.\n"
 "\n"
 "Result:\n"
@@ -626,7 +629,7 @@ const char * DESCR_get_ravel =
 "Example:\n"
 "    gnu_apl.exec('Var←4 4⍴⍳16')\n"
 "(2, ([4, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]))\n"
-"    gnu_apl.get_ravel('Var')\n"
+"    gnu_apl.get_cravel('Var')\n"
 "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]\n"
 ;
 
@@ -656,7 +659,7 @@ const char * DESCR_get_value =
 "    varname is a string containing the name of an APL variable.\n"
 "\n"
 "Result:\n"
-"    on sucess:   tuple( get_ravel(varname), get_shape(varname) )\n"
+"    on sucess:   tuple( get_cravel(varname), get_shape(varname) )\n"
 "    otherwise:   int(error_code)\n"
 "\n"
 "Example:\n"
@@ -737,7 +740,7 @@ const char * DESCR_set_value =
 "    gnu_apl.set_value('Var', [1, [2, 3], 4])    # Var ← 1 (2 3) 4\n"
 ;
 
-//=============================================================================
+//============================================================================
 static PyObject *
 apl_help(PyObject * self, PyObject * args)
 {
@@ -788,7 +791,7 @@ const char * topic = 0;
 
    return Py_None;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyMethodDef AplMethods[] =
 {
   { "help",         apl_help,         METH_VARARGS, DESCR_help         },
@@ -802,7 +805,7 @@ static PyMethodDef AplMethods[] =
   { "set_display",  apl_set_display,  METH_VARARGS, DESCR_set_display  },
   { NULL,           0,                0,            0 }   /* Sentinel */
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static struct PyModuleDef apl_module =
 {
   PyModuleDef_HEAD_INIT,
@@ -812,10 +815,17 @@ static struct PyModuleDef apl_module =
                   -1 if the module keeps state in global variables. */
   AplMethods
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PyMODINIT_FUNC
 PyInit_gnu_apl(void)
 {
     return PyModule_Create(&apl_module);
 }
-//=============================================================================
+//----------------------------------------------------------------------------
+int64_t
+get_main()
+{
+   return 0;
+}
+
+//============================================================================

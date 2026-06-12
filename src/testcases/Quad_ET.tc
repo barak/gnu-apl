@@ -4,7 +4,7 @@
       (A←1)←2
 SYNTAX ERROR
       (A←1)←2
-        ^  ^
+         ^ ^
 
       ⎕ET
 2 4

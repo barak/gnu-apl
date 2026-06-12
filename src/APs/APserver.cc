@@ -37,7 +37,8 @@
 # include <sys/select.h>
 #endif
 
-#include "config.h"   // for HAVE_ macros
+#include "config.h"   // for HAVE_SYS_UN_H
+
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>
 #endif
@@ -49,6 +50,13 @@
 
 #define __COMMON_HH_DEFINED__ // to avoid #error in APL_types.hh
 #define AP_NUM /* simple AP_NUM */
+
+/// Stringify x.
+#define STR(x) #x
+/// The current location in the source file.
+#define LOC Loc(__FILE__, __LINE__)
+/// The location line l in file f.
+#define Loc(f, l) f ":" STR(l)
 
 #include "APL_types.hh"
 #include "ProcessorID.hh"
@@ -65,13 +73,6 @@ ostream * debug = 0;
 #define Log(x) if (verbosity > 0)
 bool LOG_shared_variables = false;
 
-/// Stringify x.
-#define STR(x) #x
-/// The current location in the source file.
-#define LOC Loc(__FILE__, __LINE__)
-/// The location line l in file f.
-#define Loc(f, l) f ":" STR(l)
-
 AP_num3 ProcessorID::id;
 
 //-----------------------------------------------------------------------------
@@ -87,11 +88,12 @@ vector<AP3_fd> connected_procs;
 //-----------------------------------------------------------------------------
 struct key_value
 {
+   /// constructor
    key_value(SV_key k)
    : key(k)
    {}
 
-   /// the key for the variable
+   /// the key that identifies the variable
   SV_key key;
 
    /// the value of the variable
@@ -728,7 +730,7 @@ AP3_fd * ap_fd = 0;
              return;
 
         case sid_ASSIGN_VALUE:     // Svar←X for APs
-	     {
+             {
                const SV_key key = request->get__ASSIGN_VALUE__key();
                const TCP_socket ap_sock = get_peer_fd2(key, fd);
                if (ap_sock == NO_TCP_SOCKET)
@@ -811,8 +813,9 @@ AP3_fd * ap_fd = 0;
 
                char * del = 0;
                char buffer[2*MAX_SIGNAL_CLASS_SIZE + 40000];
+               const char * loc = 0;
                Signal_base * response = Signal_base::recv_TCP(ap_sock, buffer,
-                                                  sizeof(buffer), del, debug);
+                                    sizeof(buffer), del, debug, &loc);
                VALUE_IS_c vis(fd, response->get__VALUE_IS__key(),
                                   response->get__VALUE_IS__error(),
                                   response->get__VALUE_IS__error_loc(),
@@ -858,12 +861,17 @@ connection_readable(TCP_socket fd)
 char buffer[50000];
 char * del = 0;
 ostream * debug = verbosity ? &cerr : 0;
+const char * loc = 0;
 Signal_base * request = Signal_base::recv_TCP(fd, buffer, sizeof(buffer),
-                                              del, debug);
+                                              del, debug, &loc);
    if (request == 0)
       {
-         (verbosity > 0) && cerr << prog << ": connection[" << fd
-                                 << "] closed by peer" << endl;
+        if (verbosity > 0)
+           {
+             cerr << prog << ": connection[" << fd
+                  << "] closed by peer: errno=" << errno
+                  << ", loc=" << loc << endl;
+           }
          close_fd(fd);
          return;
       }
@@ -973,8 +981,8 @@ main(int argc, char * argv[])
 {
    prog = argv[0];
 
-int listen_port = APSERVER_PORT;
-const char * listen_name = APSERVER_PATH;
+int listen_port = cfg_APSERVER_PORT;
+const char * listen_name = cfg_APSERVER_PATH;
 bool got_path = false;
 bool got_port = false;
 bool auto_start = false;
@@ -1006,14 +1014,15 @@ bool auto_start = false;
             }
          else if (!strcmp(opt, "-d"))
             {
-              cerr << "APSERVER_TRANSPORT is: " << APSERVER_TRANSPORT << endl;
+              cerr << "APSERVER_TRANSPORT is: "
+                   << cfg_APSERVER_TRANSPORT << endl;
 
-#if APSERVER_TRANSPORT == 0   // TCP
-              cerr << "APSERVER_PORT is: " << APSERVER_PORT << endl;
-               got_port = true;
+#if cfg_APSERVER_TRANSPORT == 0   // TCP
+              cerr << "APSERVER_PORT is: " << cfg_APSERVER_PORT << endl;
+              got_port = true;
 #else                         // AF_UNIX
-              cerr << "APSERVER_PATH is: " << APSERVER_PATH << endl;
-               got_path = true;
+              cerr << "APSERVER_PATH is: " << cfg_APSERVER_PATH << endl;
+              got_path = true;
 #endif
               ++verbosity;
               debug = &cerr;
@@ -1091,9 +1100,24 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    fclose(stdout);                 // cause getc() of caller to return EOF !
 
-   if (auto_start && fork())   return 0;         // parent returns (daemonize)
+   if (auto_start && fork())
+      {
+        // if we return too quickly (a race condition) then the pclose() of
+        // our parent process will fail with ECHILD. We therefore wait a
+        // second before returning.
+        //
+        // Our fclose(stdout) above will break the getc(fp) loop in Svar_DB.cc
+        // around line 132, and while we are waiting, the pclose(fp) in
+        // Svar_DB.cc line 137 should succeed without ECHILD.
+        //
+        // At leat that is the plan.
+        //
+        usleep(200000);
 
-   memset(&db, 0, sizeof(db));
+        return 0;         // parent returns (daemonize)
+      }
+
+   memset(reinterpret_cast<void *>(&db), 0, sizeof(db));
 
    (verbosity > 0) && cerr << prog << ": entering main loop..." << endl;
    for (;;)
@@ -1227,7 +1251,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
-             
+
              continue;
            }
 #endif

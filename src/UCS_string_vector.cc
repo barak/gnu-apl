@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
+/** @file
+*/
 
 #include "Avec.hh"
 #include "UCS_string_vector.hh"
@@ -39,7 +40,7 @@ const ShapeItem name_len = val.get_cols();
         UCS_string name;
         loop(n, name_len)
            {
-             const Unicode uni = val.get_ravel(nidx++).get_char_value();
+             const Unicode uni = val.get_cravel(nidx++).get_char_value();
 
              if (n == 0 && Avec::is_quad(uni))   // leading ⎕
                 {
@@ -47,15 +48,17 @@ const ShapeItem name_len = val.get_cols();
                   continue;
                 }
 
-             if (Avec::is_symbol_char(uni))   // valid symbol char
+             if (Avec::is_symbol_char(uni)      // valid symbol char
+                || uni == UNI_FULLSTOP)   // .member dot
                 {
                   name.append(uni);
                   continue;
                 }
+
              // end of (first) name reached. At this point we expect either
              // spaces until 'end' or some spaces and another name.
              //
-             if (uni != UNI_ASCII_SPACE)
+             if (uni != UNI_SPACE)
                 {
                   name.clear();
                   break;
@@ -70,7 +73,7 @@ const ShapeItem name_len = val.get_cols();
              // skip spaces from nidx and subsequent spaces
              //
              while (nidx < end &&
-                    val.get_ravel(nidx).get_char_value() == UNI_ASCII_SPACE)
+                    val.get_cravel(nidx).get_char_value() == UNI_SPACE)
                    ++nidx;
 
 
@@ -90,12 +93,12 @@ const ShapeItem name_len = val.get_cols();
              surrogate = false;
              while (nidx < end)
                 {
-                  const Unicode uni = val.get_ravel(nidx++).get_char_value();
+                  const Unicode uni = val.get_cravel(nidx++).get_char_value();
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
                        name.append(uni);
                      }
-                  else if (uni == UNI_ASCII_SPACE)
+                  else if (uni == UNI_SPACE)
                      {
                        break;
                      }
@@ -112,7 +115,8 @@ const ShapeItem name_len = val.get_cols();
 }
 //----------------------------------------------------------------------------
 void
-UCS_string_vector::compute_column_width(int tab_size, std::vector<int> & result)
+UCS_string_vector::compute_column_width(int tab_size,
+                                        std::basic_string<int> & result)
 {
 const int quad_PW = Workspace::get_PW();
 
@@ -128,7 +132,7 @@ const int quad_PW = Workspace::get_PW();
    // compute block counts (one block having tab_size characters)
    //
 const int max_blocks = (quad_PW + 1) / tab_size;
-std::vector<int> name_blocks;
+std::basic_string<int> name_blocks;
    loop(n, size())   name_blocks.push_back(1 + (1 + at(n).size()) / tab_size);
 
    // compute max number of column blocks based on first line blocks
@@ -188,5 +192,79 @@ int max_col = -1;
 int max_nb = 0;
    loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
    result.push_back(max_nb);
+}
+//----------------------------------------------------------------------------
+ShapeItem
+UCS_string_vector::max_width(size_t col, size_t column_count) const
+{
+ShapeItem ret = 0;
+
+   for (ShapeItem s = col; s < size(); s += column_count)
+       {
+          const ShapeItem len_s = at(s).size();
+          if (ret < len_s)   ret = len_s;
+       }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+std::ostream & 
+UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
+{
+const ShapeItem column_count1 = column_count - 1;
+ShapeItem column_widths[column_count];
+   loop(col, column_count)   column_widths[col] = max_width(col, column_count);
+
+const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
+
+   // top row
+   //
+   out << frame[0];                                  // ╔
+   loop(col, column_count)
+       {
+         const ShapeItem width = column_widths[col];
+         loop(w, width)   out << frame[6];           // ═
+         if (col < column_count1)   out << frame[1];   // ╤
+         else                       out << frame[2];   // ╗
+       }
+   out << std::endl;
+
+   // data rows
+   //
+   for (ShapeItem d = 0; d < size();)
+       {
+         out << frame[7];                                  // ║
+         loop(col, column_count)
+             {
+               const ShapeItem width = column_widths[col];
+               if (d < size())   // valid data available
+                  {
+                    const UCS_string & data = (*this)[d++];
+                    loop(j, data.size())             out << data[j];
+                    loop(l, (width - data.size()))   out << UNI_SPACE;
+                   }
+               else              // no more data: fill with blanks
+                   {
+                    loop(j, width)                   out << UNI_SPACE;
+                   }
+               if (col < column_count1)   out << frame[8];   // │
+               else                       out << frame[7];   // ║
+             }
+         out << std::endl;
+       }
+
+   // bottom row
+   //
+   out << frame[3];                                  // ╚
+   loop(col, column_count)
+       {
+         const ShapeItem width = column_widths[col];
+         loop(w, width)   out << frame[6];           // ═
+         if (col < column_count1)   out << frame[4];   // ╧
+         else                       out << frame[5];   // ╝
+       }
+   out << std::endl;
+
+   return out;
 }
 //----------------------------------------------------------------------------

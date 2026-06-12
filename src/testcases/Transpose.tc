@@ -1,6 +1,10 @@
 ⍝ Transpose.tc
 ⍝ ----------------------------------
 
+)COPY_ONCE 3 INVARIANTS.apl   ⍝ defines INV∆CHECK
+³   ⍝ e.g. NEW )COPY_ONCE workspace: 3 INVARIANTS.apl
+³   ⍝ e.g. DUMPED 2023-03-22  20:07:13 (GMT+1) 
+
    ⎕IO←1   ⍝ for proper axis
 
 
@@ -69,8 +73,7 @@ KN
 
 ⍝ diagonal cross section of B ----------------------------------
 
-      B←4 4ρι16
-      B
+      ⊢B←4 4ρι16
  1  2  3  4
  5  6  7  8
  9 10 11 12
@@ -80,8 +83,7 @@ KN
 1 6 11 16
 
 
-      C←3 4ρι12
-      C
+      ⊢C←3 4ρι12
 1  2  3  4
 5  6  7  8
 9 10 11 12
@@ -90,15 +92,12 @@ KN
 1 6 11
 
 
-      D←'ONE' 'FOR' 'ALL' 'HEAD' 'TO'
-      D←3 3ρD,'TOE' 'READY' 'SET' 'GO'
-      D
+      ⊢D←3 3⍴'ONE' 'FOR' 'ALL' 'HEAD' 'TO' 'TOE' 'READY' 'SET' 'GO'
  ONE   FOR ALL 
  HEAD  TO  TOE 
  READY SET GO  
 
-      V←1 1⍉D
-      V
+      ⊢V←1 1⍉D
  ONE TO GO 
 
       ρV
@@ -109,8 +108,7 @@ KN
 
 ⍝ higher rank arrays ----------------------------------
 
-      H←2 3 4ρ'ABCDEFGHIJKL',ι12
-      H
+      ⊢H←2 3 4ρ'ABCDEFGHIJKL',ι12
 A  B  C  D
 E  F  G  H
 I  J  K  L
@@ -119,36 +117,70 @@ I  J  K  L
 5  6  7  8
 9 10 11 12
 
-      1 1 1⍉H
+      ⍝ lrm p, 251 Case 2 (repeated items in A)...
+      ⍝
+      INV1 ← "I⊃ρZ ←→ ⌊/(L=I)/ρR"              ⍝ invariant 1
+      ITER ← "⍴⍴L"                             ⍝ iterator for invariant 1
+      INV2 ← "⍴⍴Z  ←→ ,+/(L⍳L) = ⍳⍴L"          ⍝ invariant 2 (without iterator)
+
+      A←1 1 1 ◊ ⊢Z←A⍉H
 A 6
 
-      1 1 2⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+      A←1 1 2 ◊ ⊢Z←A⍉H
 A B C D
 5 6 7 8
 
-      2 2 1⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+      A←2 2 1 ◊ ⊢Z←A⍉H
 A 5
 B 6
 C 7
 D 8
 
-      1 2 1⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+     A←1 2 1 ◊ ⊢Z←A⍉H
 A E  I
 2 6 10
 
-      2 1 2⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+     A←2 1 2 ◊ ⊢Z←A⍉H
 A  2
 E  6
 I 10
 
-      1 2 2⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+     A←1 2 2 ◊ ⊢Z←A⍉H
 A F  K
 1 6 11
 
-      2 1 1⍉H
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
+
+     A←2 1 1 ◊ ⊢Z←A⍉H
 A  1
 F  6
 K 11
+
+      INV1  INV∆CHECK[ITER]  A H Z     ⍝ test invariant #1
+      INV2  INV∆CHECK        A H Z     ⍝ test invariant #2
+
 
 ⍝ effect of ⎕IO ----------------------------------
 

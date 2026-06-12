@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef FN_TAG_COMMAND_HH
 #define FN_TAG_COMMAND_HH
 

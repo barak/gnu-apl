@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __PRINT_BUFFER_HH__DEFINED__
 #define __PRINT_BUFFER_HH__DEFINED__
-
-#include <vector>
 
 #include "Avec.hh"
 #include "Common.hh"
@@ -33,7 +34,7 @@
 class Value;
 class Cell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// some information about a column to be printed.
 class ColInfo
@@ -81,7 +82,7 @@ public:
    /// the length of the denominator (for rational numbers)
    int denom_len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A two-dimensional Unicode character buffer
 class PrintBuffer
 {
@@ -111,24 +112,28 @@ public:
                         PrintStyle outer_style);
 
    /// return the number of rows
-   int get_height() const
+   int get_row_count() const
       { return buffer.size(); }
 
    /// return the first (and only) line
    UCS_string l1() const
-      { Assert (get_height() == 1);   return buffer[0]; }
+      { Assert(get_row_count() == 1);   return buffer[0]; }
 
    /// return line y
    UCS_string get_line(int y) const
-      { Assert (y < get_height());   return buffer[y]; }
+      { Assert(y < get_row_count());   return buffer[y]; }
 
    /// print this buffer, interruptible with ^C
-   void print_interruptible(ostream & out, Rank rank, int quad_pw);
+   void print_interruptible(ostream & out, sRank rank, int quad_pw);
 
-   /// return the number of columns.
-   int get_width(int y) const
-      { if (get_height() == 0)   return 0;
-        Assert(y < get_height());   return buffer[y].size(); }
+   /// return the number of columns
+   int get_column_count() const
+      { return get_column_count(0); }
+
+   /// return the number of columns in row y
+   int get_column_count(int y) const
+      { if (get_row_count() == 0)   return 0;   // no rows
+        Assert(y < get_row_count());   return buffer[y].size(); }
 
    /// Set the char in column x and row y to uc.
    void set_char(int x, int y, Unicode uc);
@@ -166,7 +171,7 @@ public:
    /// append UCS_string \b ucs to \b this PrintBuffer
    void append_ucs(const UCS_string & ucs);
 
-   /// append ucs, aligne at char \b align.
+   /// append ucs, aligned at char \b align.
    void append_aligned(const UCS_string & ucs, Unicode align);
 
    /// add padding and a column \b pb to \b this PrintBuffer
@@ -213,10 +218,10 @@ protected:
    /// pad the fraction part to \b wanted_fract_len with '0'
    void pad_fraction(int wanted_fract_len, bool want_expo);
 
-   /// return the number of separator rows before row =b y in a value with
+   /// return the number of separator rows before row \b y in a value with
    /// shape \b shape
    static ShapeItem separator_rows(ShapeItem y, const Value & value,
-                                   bool nested, Rank rk1, Rank rk2);
+                                   bool nested, sRank rk1, sRank rk2);
 
    /// the character buffer.
    UCS_string_vector buffer;

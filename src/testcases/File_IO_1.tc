@@ -1,7 +1,10 @@
 ⍝ File_IO_1.tc
 ⍝ ----------------------------------
 
-      ⍝ same as File_IO.tc but WITHOUT using FILE_IO.apl library
+      ⍝ same as File_IO.tc but WITHOUT using FILE_IO.apl wrapper library
+      ⍝ Instead, lib_file_io.so is used directly (not recommended)
+      ⍝
+      ⍝ NOTE: Both FILE_IO.apl and lib_file_io.so are obsolete
       ⍝
       ⍝ This is NOT the recommeded way to use file_io.so but a way to
       ⍝ separate faults in file_io.cc from faults in FILE_IO.apl
@@ -160,7 +163,7 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       ⍝ read entire file
       ⍝
       ⎕UCS FILE_IO[26] Filename
-72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32 
+72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32
       226 141 181
 
 

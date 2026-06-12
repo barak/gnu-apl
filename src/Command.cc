@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <dirent.h>
+/** @file
+*/
+
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
+
+#include "Common.hh"
 
 #include "CharCell.hh"
 #include "ComplexCell.hh"
@@ -30,9 +35,10 @@
 #include "Doxy.hh"
 #include "Executable.hh"
 #include "FloatCell.hh"
-#include "IndexExpr.hh"
-#include "IntCell.hh"
 #include "IO_Files.hh"
+#include "IndexExpr.hh"
+#include "InputFile.hh"
+#include "IntCell.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
 #include "NativeFunction.hh"
@@ -41,6 +47,8 @@
 #include "Prefix.hh"
 #include "Quad_FX.hh"
 #include "Quad_TF.hh"
+#include "Security.hh"
+#include <signal.h>
 #include "StateIndicator.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -48,19 +56,27 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
+#include "Value.hh"
 #include "Workspace.hh"
 
-#include "Value.hh"
+#include "Workspace.icc"
+
+bool Command::auto_MORE = false;
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
 
-//-----------------------------------------------------------------------------
+UCS_string_vector Command::copy_once_table;
+
+//----------------------------------------------------------------------------
 void
 Command::process_line()
 {
-UCS_string accu;   // for new-style multiline strings
+UCS_string prefix;   // for new-style multiline strings
+UCS_string accu;     // for new-style multiline strings
 UCS_string prompt = Workspace::get_prompt();
+bool multiline = false;
+int count = 0;
    for (;;)
        {
          UCS_string line;
@@ -70,51 +86,76 @@ UCS_string prompt = Workspace::get_prompt();
 
          if (eof) CERR << "EOF at " << LOC << endl;
 
-         if (line.ends_with("\"\"\""))   /// start or end of multi-line
+         const ShapeItem multi = line.multi_pos(multiline);
+         if (multi != -1)   /// line is START or END of multi-line string
             {
-               if (accu.size() == 0)    // start of multi-line
+              multiline = ! multiline;
+              if (multiline)    // START of multi-line string
                   {
-                    accu = line;
+                    count = 0;
+                    prefix = line;
+                    prefix.resize(multi);   // discard trailing """ ff.
+
                     prompt.prepend(UNI_RIGHT_ARROW);
-                    accu.resize(line.size() - 3);   // discard """
-                    accu.append(UNI_ASCII_SPACE);
+                    accu.append(UNI_SPACE);
                   }
-               else                     // end of multi-line
+              else              // END of multi-line string
                   {
                     accu.pop_back();   // trailing " "
-                    process_line(accu);
+                    if (accu.size() == 1)   accu.append_ASCII(" \"\"");
+
+                    if (count == 0)        // no string
+                       {
+                         const UTF8_string empty("0⍴⊂\"\"");   // 0⍴⊂""
+                         prefix << UCS_string(empty);
+                         process_line(prefix, 0);
+                       }
+                    else if (count == 1)   // a single "string" would not nest
+                       {
+                         const UTF8_string encl("(,⊂");  // enclose accu...
+                         prefix << UCS_string(encl) << accu << ")";
+                         process_line(prefix, 0);
+                       }
+                    else                   // true multi-string
+                       {
+                         prefix << accu;
+                         process_line(prefix, 0);
+                       }
                     return;
                   }
             }
-         else if (accu.size())   // inside multi-line
+         else if (multiline)   // inside multi-line
             {
+              ++count;
               accu.append_ASCII("\"");
               accu.append(line.do_escape(true));
               accu.append_ASCII("\" ");
             }
          else                   // normal input line
             {
-              process_line(line);
+              process_line(line, 0);
               return;
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Command::process_line(UCS_string & line)
+Command::process_line(UCS_string & line, ostream * out)
 {
    line.remove_leading_whitespaces();
-   if (line.size() == 0)   return;   // empty input line
+   if (line.size() == 0)           return;   // empty input line
 
    switch(line[0])
       {
-         case UNI_ASCII_R_PARENT:      // regular command, e.g. )SI
-              do_APL_command(COUT, line);
+         case UNI_R_PARENT:      // regular command, e.g. )SI
+              if (out == 0)   out = &COUT;
+              do_APL_command(*out, line);
               if (line.size())   break;
               return;
 
-         case UNI_ASCII_R_BRACK:       // debug command, e.g. ]LOG
-              do_APL_command(CERR, line);
+         case UNI_R_BRACK:       // debug command, e.g. ]LOG
+              if (out == 0)   out = &CERR;
+              do_APL_command(*out, line);
               if (line.size())   break;
               return;
 
@@ -122,34 +163,49 @@ Command::process_line(UCS_string & line)
               Nabla::edit_function(line);
               return;
 
-         case UNI_ASCII_NUMBER_SIGN:   // e.g. # comment
+         case UNI_NUMBER_SIGN:   // e.g. # comment
          case UNI_COMMENT:             // e.g. ⍝ comment
               return;
 
-        default: ;
+        default: break;
       }
 
    ++APL_expression_count;
    do_APL_expression(line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
-const UCS_string line1(line);   // the original line
+   if (line.contains(UNI_COMMENT))   // unlikely, but valid
+      {
+        loop(l, line.size())   // find ⍝
+            {
+              if (line[l] == UNI_COMMENT)   // found ⍝
+                 {
+                   line.resize(l);
+                   line.remove_trailing_whitespaces();
+                   break;
+                 }
+            }
+      }
 
-   // split line into command and arguments
+const UCS_string orig_line(line);   // the original line
+
+   // split line into command and command arguments
    //
 UCS_string cmd;   // the command without arguments
-int len = 0;
-   line.copy_black(cmd, len);
+const size_t len = line.copy_black(cmd, 0);   // line w/o leading/trailing ws
 
 UCS_string arg(line, len, line.size() - len);
 UCS_string_vector args = split_arg(arg);
    line.clear();
-   if (!cmd.starts_iwith(")MORE")) 
+
+   // clear the )MORE info, unless the command itself is )MORE
+   //
+   if (!cmd.starts_iwith(")MORE"))   // command is not )MORE.
       {
-        // clear )MORE info unless command is )MORE
+        // clear )MORE info unless cmd itself is )MORE
         //
         Workspace::more_error().clear();
       }
@@ -166,7 +222,7 @@ UCS_string_vector args = split_arg(arg);
        {
          if (cmd.starts_iwith(Workspace::get_user_commands()[u].prefix))
             {
-              do_USERCMD(out, line, line1, cmd, args, u);
+              do_USERCMD(out, line, orig_line, cmd, args, u);
               return true;
             }
        }
@@ -174,7 +230,7 @@ UCS_string_vector args = split_arg(arg);
      out << "BAD COMMAND" << endl;
      return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_params(ostream & out, const char * command, int argc,
                       const char * args)
@@ -191,7 +247,8 @@ int brackets = 0;
 bool in_param = false;
 bool many = false;
 
-UCS_string args_ucs(args);
+UTF8_string args_utf(args);
+UCS_string args_ucs(args_utf);
    loop (a, args_ucs.size())   switch(args_ucs[a])
        {
          case '[': ++brackets;   in_param = false;   continue;
@@ -222,7 +279,7 @@ UCS_string args_ucs(args);
          case ' ': in_param = false;
               continue;
 
-         default: Q(args_ucs[a])   Q(int(args_ucs[a]))
+         default: Q1(args_ucs[a])   Q1(int(args_ucs[a]))
        }
 
    if (argc < mandatory_args)   // too few parameters
@@ -239,7 +296,7 @@ UCS_string args_ucs(args);
    if (argc > (mandatory_args + opt_args))   // too many parameters
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many (" << argc<< ") parameter(s) in command "
+        MORE_ERROR() << "too many (" << argc << ") parameter(s) in command "
                      << command << ". Usage:\n"
                      << "      " << command << " " << args;
         return true;
@@ -247,7 +304,7 @@ UCS_string args_ucs(args);
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::do_APL_expression(UCS_string & line)
 {
@@ -260,10 +317,17 @@ Executable * statements = 0;
       }
    catch (Error err)
       {
-        UERR << Error::error_name(err.get_error_code());
-        if (Workspace::more_error().size())   UERR << UNI_ASCII_PLUS;
+        bool plus = Workspace::more_error().size();   // assume + needed
+        const char * error_name = Error::error_name(err.get_error_code());
+        if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
+        if (Workspace::more_error().size() &&
+               Workspace::more_error().back() == UNI_PLUS)
+           plus = false; // dito.
+
+        UERR << error_name;
+        if (plus)   UERR << UNI_PLUS;
         UERR << endl;
-        if (*err.get_error_line_2())
+        if (err.get_error_line_2().size())
            {
              COUT << "      " << err.get_error_line_2() << endl
                   << "      " << err.get_error_line_3() << endl;
@@ -281,9 +345,12 @@ Executable * statements = 0;
         cmd_OFF(0);
       }
 
-   if (statements == 0)
+   if (statements == 0)   // StatementList::fix() failed
       {
-        COUT << "main: Parse error." << endl;
+        COUT << "main: Parse error";
+        if (Workspace::more_error().size())   COUT << "+";
+        else                                  COUT << ".";
+        COUT << endl;
         return;
       }
 
@@ -322,7 +389,7 @@ Executable * statements = 0;
    Workspace::push_SI(statements, LOC);
    finish_context();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::finish_context()
 {
@@ -334,16 +401,52 @@ Command::finish_context()
          //
          Token token = Workspace::SI_top()->get_executable()->execute_body();
 
-// Q(token)
+// Q1(token)
 
          // start over if execution has pushed a new SI entry
          //
          if (token.get_tag() == TOK_SI_PUSHED)   continue;
 
 check_EOC:
-         if (Workspace::SI_top()->is_safe_execution_start())
+         if (Quad_FIO::benchmark_cycles_from)   // a benchmark is ongoing
             {
-              Quad_EC::eoc(token);
+              if (StateIndicator * si = Workspace::SI_top()->get_parent())
+                 {
+                   if (si->is_safe_execution_start())
+                      {
+                        // at this point token is the result of a defined
+                        // function which is being benchmarked. Replace the
+                        // result by the number of CPU cycles executed since
+                        // the start of the benchmark.
+                        //
+                        const uint64_t to = cycle_counter();
+                        const uint64_t from = Quad_FIO::benchmark_cycles_from;
+                        const uint64_t diff = to - from;
+                        Value_P val = IntScalar(diff, LOC);
+                        token.~Token();   // free the value (if any)
+                        new (&token) Token(TOK_APL_VALUE1, val);
+                        si->clear_safe_execution();
+                      }
+                 }
+            }
+         else if (Workspace::SI_top()->is_safe_execution_start())
+            {
+              if (Quad_FIO::benchmark_cycles_from)
+                 {
+                   // ⎕FIO[-1] has started a cycle measurement. Read the CPU
+                   // cycle counter, compute the cycle difference, stop the
+                   // measurement, and return the the cycle difference as int
+                   // scalar...
+                   //
+                   const uint64_t to = cycle_counter();
+                   const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
+                   token = Token(TOK_APL_VALUE1, IntScalar(diff, LOC));
+                   Quad_FIO::benchmark_cycles_from = 0;
+                 }
+              else
+                 {
+                   Quad_EC::eoc(token);
+                 }
             }
 
          // the far most frequent cases are TC_VALUE and TOK_VOID
@@ -374,7 +477,7 @@ check_EOC:
                          Workspace::SI_top()->get_prefix();
                 Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
 
-                new (&prefix.tos().tok) Token(token);
+                new (&prefix.tos().get_token()) Token(token);
               }
               if (attention_is_raised())
                  {
@@ -438,7 +541,7 @@ check_EOC:
                  {
                    Workspace::pop_SI(LOC);
                    UCS_string pushed_command = Workspace::get_pushed_Command();
-                   process_line(pushed_command);
+                   process_line(pushed_command, 0);
                    pushed_command.clear();
                    Workspace::push_Command(pushed_command);   // clear in
                    return;
@@ -453,11 +556,19 @@ check_EOC:
               // have the same safe_execution_count, except the last
               // unroll the SI stack.
               //
-              if (Workspace::SI_top()->get_safe_execution())
+              if (Workspace::SI_top()->get_safe_execution_count())
                  {
-                  StateIndicator * si = Workspace::SI_top();
-                   while (si->get_parent() && si->get_safe_execution() ==
-                          si->get_parent()->get_safe_execution())
+                   // SI_top() is in save execution mode. Pop it and all
+                   // callers with the same get_safe_execution_count().
+                   //
+                   // after pop'ing the SI entries only the original SI
+                   // (which has set the save execution mode) shall remain
+                   // the SI stack.
+                   //
+                   StateIndicator * si = Workspace::SI_top();
+                   const int sex_level = si->get_safe_execution_count();
+                   while (si->get_parent() && sex_level ==
+                          si->get_parent()->get_safe_execution_count())
                       {
                         si = si->get_parent();
                         Workspace::pop_SI(LOC);
@@ -510,8 +621,8 @@ check_EOC:
    //
    Workspace::pop_SI(LOC);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_XTERM(ostream & out, const UCS_string & arg)
 {
 const char * term = getenv("TERM");
@@ -535,22 +646,22 @@ const char * term = getenv("TERM");
         return;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
 UCS_string_vector result;
-   for (int idx = 0; ; )
+   for (size_t idx = 0; ; )
       {
-        UCS_string next;
-        arg.copy_black(next, idx);
-        if (next.size() == 0)   return result;
+        UCS_string token;
+        idx = arg.copy_black(token, idx);
+        if (token.size() == 0)   return result;
 
-        result.push_back(next);
+        result.push_back(token);
       }
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_BOXING(ostream & out, const UCS_string & arg)
 {
 int format = arg.atoi();
@@ -585,143 +696,181 @@ int format = arg.atoi();
    out << "BAD ]BOXING PARAMETER+" << endl;
    MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
       "  Valid parameters are OFF, N, and -N with\n"
-      "  N ∈ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
+      "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::val_val::compare_val_val(const val_val & A,
                                   const val_val & B, const void *)
 {
    return A.child > B.child;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Command::val_val::compare_val_val1(const void * key, const void * B)
 {
 const void * Bv = reinterpret_cast<const val_val *>(B)->child;
    return charP(key) - charP(Bv);
 }
-//-----------------------------------------------------------------------------
-void 
-Command::cmd_CHECK(ostream & out)
+//----------------------------------------------------------------------------
+void
+Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
-   // erase stale functions from failed ⎕EX
+bool show_OK = true;   // assume more verbose output
+   if (arg.size())   // check with argument (supposedly BRIEF).
+      {
+        UCS_string arg0(arg);
+        arg0.remove_leading_and_trailing_whitespaces();
+        const UCS_string brief(UTF8_string("BRIEF"));
+        show_OK = arg0.compare(brief) != COMP_EQ;   // not BRIEF
+        if (show_OK)   // still show_OK
+           {
+             out << arg << "? Expecting BRIEF." << endl;
+             return;
+
+           }
+      }
+   // 1. erase stale functions from failed ⎕EX
    //
    {
      bool erased = false;
-     int stale = Workspace::cleanup_expunged(CERR, erased);
-     if (stale)
+     if (const int stale = Workspace::cleanup_expunged(CERR, erased))
         {
           out << "WARNING - " << stale << " stale functions ("
                << (erased ? "" : "not ") << "erased)" << endl;
         }
-     else out << "OK      - no stale functions" << endl;
+     else if (show_OK)
+        {
+          out << "OK      - no stale functions" << endl;
+        }
    }
 
+   // 2. print stale values (if any)
+   //
    {
-     const int stale = Value::print_stale(CERR);
-     if (stale)
+     if (const int stale = Value::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale values" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale values" << endl;
+     else if (show_OK)
+        {
+          out << "OK      - no stale values" << endl;
+        }
    }
+
+   // 3. print stale index expressions (if any)
    {
-     const int stale = IndexExpr::print_stale(CERR);
-     if (stale)
+     if (const int stale = IndexExpr::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale indices" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale indices" << endl;
+     else if (show_OK)
+        {
+          out << "OK      - no stale indices" << endl;
+        }
    }
 
-   // discover duplicate parents
+   // 4. discover duplicate parents. In the old clone() scheme every nested
+   //    value has (at most) one parent. In the new clone() scheme, however,
+   //    a nested value can be reused and have multiple parents.
+   {
+#ifndef NEW_CLONE   // old clone
+     // 4a. create a { parent = 0, value } vector<val_val> of all values
+     //
+     std::vector<val_val> val_vals;
+     ShapeItem duplicate_parents = 0;
+     for (const DynamicObject * obj =
+                DynamicObject::get_all_values()->get_next();
+          obj != DynamicObject::get_all_values(); obj = obj->get_next())
+         {
+           const Value * val = static_cast<const Value *>(obj);
+
+           val_val vv = { 0, val };   // no parent
+           val_vals.push_back(vv);
+         }
+
+     // 4b. sort vector<val_val> val_vals by address so we can bsearch it.
+     //
+     Heapsort<val_val>::sort(&val_vals.front(), val_vals.size(), 0,
+                             &val_val::compare_val_val);
+     loop(v, (val_vals.size() - 1))
+         Assert(&val_vals[v].child < &val_vals[v + 1].child);
+
+      // 4c. set parents of pointer cells
+      //
+      loop(v, val_vals.size())   // for every .child (acting as parent here)
+          {
+            const Value * val = val_vals[v].child;
+            const ShapeItem ec = val->nz_element_count();
+            loop(e, ec)   // for every ravel cell of the (parent-) value
+                {
+                  const Cell & cP = val->get_cravel(e);
+                  if (!cP.is_pointer_cell())   continue;   // not a parent
+
+                  const Value * sub = cP.get_pointer_value().get();
+                  Assert1(sub);
+
+                  val_val * vvp = reinterpret_cast<val_val *>
+                       (bsearch(sub, &val_vals.front(), val_vals.size(),
+                                sizeof(val_val), val_val::compare_val_val1));
+                  Assert(vvp);
+                  if (vvp->parent == 0)   // child has no parent (OK)
+                     {
+                       vvp->parent = val;
+                       continue;
+                     }
+
+                  // the child already has a parent (which is bad).
+                  // print its history to help figuring why.
+                  //
+                  ++duplicate_parents;
+                  out << "Value * vvp=" << voidP(vvp) << " already has parent "
+                      << voidP(vvp->parent) << " when checking Value * val="
+                      << voidP(vvp) << endl;
+
+                  out << "History of the child:" << endl;
+                  VH_entry::print_history(out, *vvp->child, LOC);
+                  out << "History of the first parent:" << endl;
+                  VH_entry::print_history(out, *vvp->parent, LOC);
+                  out << "History of the second parent:" << endl;
+                  VH_entry::print_history(out, *val, LOC);
+                  out << endl;
+               }
+          }
+
+     if (duplicate_parents)
+          {
+            out << "ERROR   - " << duplicate_parents
+                << " duplicate parents" << endl;
+            IO_Files::apl_error(LOC);
+          }
+#endif
+          {
+            if (show_OK)
+               out << "OK      - no duplicate parents" << endl;
+          }
+   }
+
+   // 5. discover strange Cells and counters.
    //
-std::vector<val_val> values;
-ShapeItem duplicate_parents = 0;
-   for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
-        obj != DynamicObject::get_all_values(); obj = obj->get_next())
-       {
-         const Value * val = static_cast<const Value *>(obj);
-
-         val_val vv = { 0, val };   // no parent
-         values.push_back(vv);
-       }
-
-   Heapsort<val_val>::sort(&values[0], values.size(), 0,
-                           &val_val::compare_val_val);
-   loop(v, (values.size() - 1))
-       Assert(&values[v].child < &values[v + 1].child);
-
-   /// set parents
-   loop(v, values.size())   // for every .child (acting as parent here)
-      {
-        const Value * val = values[v].child;
-        const ShapeItem ec = val->nz_element_count();
-        loop(e, ec)   // for every ravel cell of the (parent-) value
-            {
-              const Cell & cP = val->get_ravel(e);
-              if (!cP.is_pointer_cell())   continue;   // not a parent
-
-              const Value * sub = cP.get_pointer_value().get();
-              Assert1(sub);
-
-              val_val * vvp = reinterpret_cast<val_val *>
-                    (bsearch(sub, &values[0], values.size(), sizeof(val_val),
-                            val_val::compare_val_val1));
-              Assert(vvp);
-              if (vvp->parent == 0)   // child has no parent
-                 {
-                   vvp->parent = val;
-                 }
-              else
-                 {
-                   ++duplicate_parents;
-                   out << "Value * vvp=" << voidP(vvp) << " already has parent "
-                       << voidP(vvp->parent) << " when checking Value * val="
-                       << voidP(vvp) << endl;
-
-                   out << "History of the child:" << endl;
-                   VH_entry::print_history(out, vvp->child, LOC);
-                   out << "History of the first parent:" << endl;
-                   VH_entry::print_history(out, vvp->parent, LOC);
-                   out << "History of the second parent:" << endl;
-                   VH_entry::print_history(out, val, LOC);
-                   out << endl;
-                 }
-           }
-      }
-
-   if (duplicate_parents)
-        {
-          out << "ERROR   - " << duplicate_parents
-              << " duplicate parents" << endl;
-          IO_Files::apl_error(LOC);
-        }
-   else out << "OK      - no duplicate parents" << endl;
+   Value::check_all_Cells(out);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_CONTINUE(ostream & out)
 {
-UCS_string wsname("CONTINUE");
+UCS_string wsname(UTF8_string("CONTINUE"));
    Workspace::wsid(out, wsname, LIB0, false);     // )WSID CONTINUE
    Workspace::save_WS(out, LIB0, wsname, true);   // )SAVE
    cmd_OFF(0);                                    // )OFF
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
-LibRef libref = LIB0;
-const Unicode l = args[0][0];
-      if (Avec::is_digit(l))
-      {
-        libref = LibRef(l - '0');
-        args.erase(args.begin());
-      }
+LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
    if (args.size() == 0)   // at least workspace name is required
       {
@@ -730,16 +879,108 @@ const Unicode l = args[0][0];
         return;
       }
 
-UCS_string wsname = args[0];
-   args.erase(args.begin());
+   // process and skip the optional library number
+   {
+     const Unicode l = args.front()[0];
+     if (Avec::is_digit(l))
+        {
+          libref = LibRef(l - '0');
+          args.erase(0);
+        }
+   }
+
+UCS_string wsname = args.front();
+   args.erase(0);
    Workspace::copy_WS(out, libref, wsname, args, protection);
 }
-//-----------------------------------------------------------------------------
-void 
-Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
+//----------------------------------------------------------------------------
+void
+Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
+{
+   if (args.size() > 2)   // too many arguments
+      {
+        MORE_ERROR() << "too many parameters in command ]COPY_ONCE";
+        return;
+      }
+
+LibRef libref = LIB0;   // library reference number to copy from, default is 0
+   if (args.size() == 0)   // no argument means: display current table
+      {
+        if (copy_once_table.size() == 0)
+           {
+             out << "There were no )COPY_ONCE workspaces copied." << endl;
+             return;
+           }
+
+        out << "There were " << copy_once_table.size()
+            << " )COPY_ONCE workspaces copied:" << endl;
+        UCS_string_vector usv;
+        loop(row, copy_once_table.size())
+            {
+              const UCS_string & src = copy_once_table[row];
+              UCS_string ws(UNI_SPACE);
+              ws += src.front();      // wsname
+              ws += UNI_SPACE;
+              ws.append(UCS_string(src, 2, src.size() - 2));
+              ws += UNI_SPACE;
+              usv.push_back(ws);
+            }
+        usv.print_table(out, 1);
+        return;
+      }
+
+   // process and skip the optional library number
+   //
+   if (args.size() == 2)
+      {
+        const UCS_string & arg0 = args.front();   // first argument
+        const Unicode l = arg0.front();           // first character
+        if (Avec::is_digit(l))
+           {
+             libref = LibRef(l - '0');
+             args.erase(0);
+           }
+      }
+
+   Assert(args.size() == 1);   // only wsname left
+const UCS_string wsname(args.front());
+   args.erase(0);
+
+   // lib_wsname is the name in the copy_once_table
+   //
+UCS_string lib_wsname(Unicode(libref + UNI_0));
+   lib_wsname += UNI_UNDERSCORE;
+   lib_wsname.append(wsname);
+
+   // silently return if wsname is already contained in the copy_once_table
+   //
+   if (copy_once_table.contains(lib_wsname))   return;
+
+   // add it to the table;
+   //
+   out << "NEW )COPY_ONCE workspace: ";
+   if (libref)   out << libref << " ";
+   out << wsname << endl;
+
+   copy_once_table.push_back(lib_wsname);
+   Workspace::copy_WS(out, libref, wsname, args, false);
+}
+//----------------------------------------------------------------------------
+void
+Command::clear_copy_once_table()
+{
+   if (const size_t count = copy_once_table.size())
+      {
+        copy_once_table.clear();
+        CERR << ")COPY_ONCE table cleared (" << count << " entries)" << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_DOXY(ostream & out, const UCS_string_vector & args)
 {
 UTF8_string root("/tmp");
-   if (args.size())   root = UTF8_string(args[0]);
+   if (args.size())   root = UTF8_string(args.front());
 
    try
      {
@@ -753,14 +994,14 @@ UTF8_string root("/tmp");
          out << "Command ]DOXY finished successfully." << endl
              << "    The generated documentation was stored in directory "
              << doxy.get_root_dir() << endl
-             << "    You may want to browse it from file://"
+             << "    You may now browse it from file://"
              << doxy.get_root_dir()
              << "/index.html" << endl;
      }
    catch (...) {}
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
    // Command is:
@@ -772,7 +1013,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = LibRef(lib_ws[0][0] - '0');
+   if (lib_ws.size() == 2)   libref = LibRef(lib_ws.front()[0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -788,11 +1029,13 @@ const int result = unlink(filename.c_str());
         Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
       }
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // Command is:
    //
    // )DUMP
@@ -808,19 +1051,21 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
         return;
       }
 
-   // )DUMP: use )WSID unless CLEAR WS
+   // )DUMP: use )WSID unless it is CLEAR WS
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
       {
-        wsid_lib = LibRef(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name.front() - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't dump CLEAR WS
-      {
+   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+      { 
+        // don't dump CLEAR WS
+        //
         COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
@@ -831,24 +1076,26 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    Workspace::dump_WS(out, wsid_lib, wsid_name, html, silent);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_KEYB(ostream & out)
 {
    // maybe print user-supplied keyboard layout file
    //
-   if (uprefs.keyboard_layout_file.size())
+   if (UserPreferences::uprefs.keyboard_layout_file.size())
       {
-        FILE * layout = fopen(uprefs.keyboard_layout_file.c_str(), "r");
+        FILE * layout =
+               fopen(UserPreferences::uprefs.keyboard_layout_file.c_str(), "r");
         if (layout == 0)
            {
-             out << "Could not open " << uprefs.keyboard_layout_file
+             out << "Could not open "
+                 << UserPreferences::uprefs.keyboard_layout_file
                  << ": " << strerror(errno) << endl
                  << "Showing default layout instead" << endl;
            }
@@ -872,22 +1119,22 @@ Command::cmd_KEYB(ostream & out)
 "║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║\n"
 "║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║\n"
 "╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣\n"
-"║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║\n"
-"║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \\⊢  ║\n"
+"║       ║ Q  ║ W⍹ ║ E⍷ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║\n"
+"║  TAB  ║ q? ║ w⍵ ║ eϵ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \\⊢  ║\n"
 "╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣\n"
-"║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ \"≢ ║         ║\n"
-"║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║\n"
+"║ (CAPS   ║ A⍶ ║ S« ║ D» ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ \"≢ ║         ║\n"
+"║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║\n"
 "╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣\n"
-"║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║\n"
+"║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?  ║          ║\n"
 "║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║\n"
 "╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝\n"
    << endl;
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 {
-#ifndef PERFORMANCE_COUNTERS_WANTED
+#ifndef cfg_PERFORMANCE_COUNTERS_WANTED
    out << "\n"
 << "Command ]PSTAT is not available, since performance counters were not\n"
 "configured for this APL interpreter. To enable performance counters (which\n"
@@ -898,7 +1145,7 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 << "other configure options"
 << ")\n"
 "   make\n"
-"   make install (or try: src/apl)\n"
+"   make install (or try: src/apl to test without installing)\n"
 "\n"
 
 << "above the src directory."
@@ -935,40 +1182,50 @@ Pfstat_ID iarg = PFS_ALL;
 
    Performance::print(iarg, out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::primitive_help(ostream & out, const char * arg, int arity,
-                        const char * prim, const char * name,
+                        const char * prim,  const char * name,
                         const char * brief, const char * descr)
 {
    if (strcmp(arg, prim))   return;
 
    switch(arity)
       {
-        case -5: out << "   quasi-dyadic operator:   Z ← A (∘ "
-                     << prim << " G) B";                                  break;
-        case -4: out << "   dyadic operator:   Z ← A (F "
-                     << prim << " G) B";                                  break;
-        case -3: out << "   dyadic operator:   Z ← (F "
-                     << prim << " G) B";                                  break;
-        case -2: out << "   monadic operator:  Z ← A (F "
-                     << prim << ") B";                                    break;
-        case -1: out << "   monadic operator:  Z ← (F "
-                     << prim << ") B";                                    break;
-        case 0:  out << "    niladic function: Z ← " << prim;             break;
-        case 1:  out << "    monadic function: Z ← " << prim << " B";     break;
-        case 2:  out << "    dyadic function:  Z ← A " << prim << " B";   break;
+        case -6: out << "   " << name << ":   " << brief << endl
+                     << "    " << descr << endl;            return;
+
+        case -5: out << "   quasi-dyadic operator:"
+                        "   Z ← A (∘ . G) B";               break;
+        case -4: out << "   dyadic primitive operator:"
+                        "   Z ← A (F . G) B";               break;
+        case -3: out << "   dyadic primitive operator:"
+                        "   Z ← (F " << prim << " G) B";    break;
+        case -2: out << "   monadic primitive operator:"
+                        "  Z ← A (F " << prim << ") B";     break;
+        case -1: out << "   monadic primitive operator:"
+                        "  Z ← (F " << prim << ") B";       break;
+        case  0: out << "   niladic primitive function:"
+                        " Z ← " << prim;                    break;
+        case  1: out << "   monadic primitive function:"
+                        " Z ← " << prim << " B";            break;
+        case  2: out << "   dyadic primitive function:"
+                        "  Z ← A " << prim << " B";         break;
+        case  3: out << "   monadic primitive function (with axis):"
+                        "  Z ← " << prim << "[X] B";      break;
+
         default: FIXME;
       }
 
-   out << "  (" << name  <<  ")" << endl
-       << "    " << brief << endl;
+   if (*name)   out << "  ("  << name  <<  ")";
+   out << endl;
+   if (*brief)  out << "    " << brief << endl;
 
    if (descr)   out << descr << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
-/// return the lengt differece between a UCS_string and its UTF8 encoding
+/// return the length differece between a UCS_string and its UTF8 encoding
 static inline int
 len_diff(const char * txt)
 {
@@ -977,18 +1234,23 @@ int ret = 0;
    return ret;
 }
 
-void 
-Command::cmd_HELP(ostream & out, const UCS_string & arg)
+void
+Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 {
-   if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
+   // map alternate APL characters to standard ones
+   //
+UCS_string arg;
+   loop(a, _arg.size())   arg += Avec::make_standard(_arg[a]);
+
+   if (arg.size() > 0 && Avec::is_first_symbol_char(arg.front()))
       {
         // help for a user defined name
         //
-        CERR << "symbol " << arg << " ";
+        CERR << "symbol '" << arg << "' ";
         Symbol * sym = Workspace::lookup_existing_symbol(arg);
         if (sym == 0)
            {
-             CERR << "does not exist" << endl;
+             CERR << "does not exist in the current workspace" << endl;
              return;
            }
 
@@ -1005,7 +1267,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
              return;
            }
 
-        switch(vs->name_class)
+        switch(vs->get_NC())
            {
              case NC_INVALID:
                   CERR << "has no valid name class" << endl;
@@ -1016,25 +1278,22 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   return;
 
              case NC_LABEL:
-                  CERR << "is a label (line " << vs->sym_val.label
+                  CERR << "is a label (line " << vs->get_label()
                        << ")" << endl;
                   return;
 
              case NC_VARIABLE:
                   {
                     CERR << "is a variable:" << endl;
-                    Value_P val = sym->get_value();
-                    if (!!val)
-                       {
-                         val->print_properties(CERR, 4, true);
-                       }
+                    Value_P val = sym->get_apl_value();
+                    if (+val)   val->print_properties(CERR, 4, true);
                   }
                   CERR << endl;
                   return;
 
              case NC_FUNCTION:
                   {
-                    Function * fun = sym->get_function();
+                    cFunction_P fun = sym->get_function();
                     Assert(fun);
                     if (fun->is_native())
                        {
@@ -1053,7 +1312,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     else                                    CERR << "niladic";
                     CERR << " defined function:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }
@@ -1061,39 +1320,48 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
 
              case NC_OPERATOR:
                   {
-                    Function * fun = sym->get_function();
+                    cFunction_P fun = sym->get_function();
                     Assert(fun);
                     CERR << "is a ";
-                    if      (fun->get_oper_valence() == 2)   CERR << "dyadic";
-                    else                                    CERR << "monadic";
+                    if (fun->get_oper_valence() == 2)   CERR << "dyadic";
+                    else                                CERR << "monadic";
                     CERR << " defined operator:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }
                   return;
 
-             case NC_SHARED_VAR:
+             case NC_SYSTEM_VAR:
                   CERR << "is a shared variable" << endl;
                   return;
 
+             default:
+                  FIXME;
            }
 
         return;
       }
 
-   if (arg.size() == 1)   // help for an APL primitive
-      {
-        UTF8_string arg_utf(arg);
-        const char * arg_cp = arg_utf.c_str();
+   {
+     bool prim = arg.size() == 1;   // standard (1-character) APL primitive
+     if (arg.size() == 2)
+        prim = arg.front() == UNI_DOWN_TACK ||
+              (arg.front() == UNI_COMMENT && arg[1] == UNI_COMMENT);
+
+     if (prim)
+        {
+          UTF8_string arg_utf(arg);
+          const char * arg_cp = arg_utf.c_str();
 
 #define help_def(ar, prim, name, title, descr)              \
    primitive_help(out, arg_cp, ar, prim, name, title, descr);
 #include "Help.def"
 
          return;
-      }
+        }
+   }
 
    enum { COL2 = 40 };   ///< where the second column starts
 
@@ -1102,7 +1370,7 @@ UCS_string_vector commands;
 
    out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
-   { UCS_string c(cmd_str " " arg);   commands.push_back(c); }
+   { UCS_string c(UTF8_string(cmd_str " " arg));   commands.push_back(c); }
 #include "Command.def"
 
 bool left_col = true;
@@ -1141,12 +1409,17 @@ bool left_col = true;
        << "⍞       Character Input/Output"
        << "⎕       Evaluated Input/Output" << endl;
    left_col = true;
+
 #define ro_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
      if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
      else            out << setw(8) << ucs << txt << endl;                 \
         left_col = !left_col; }
-#define rw_sv_def(x, str, txt) ro_sv_def(x, str, txt)
+#define rw_sv_def(x, _str, txt)                                            \
+   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
+     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
+     else            out << setw(8) << ucs << txt << endl;                 \
+        left_col = !left_col; }
 #include "SystemVariable.def"
 
    out << endl << "System functions:" << endl;
@@ -1160,19 +1433,26 @@ bool left_col = true;
    left_col = !left_col;
 #include "SystemVariable.def"
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
-   if (arg.size() == 0)                  LineInput::print_history(out);
-   else if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
-   else                                  out << "BAD COMMAND" << endl;
+   if (arg.size())   // )HISTORY  CLEAR (or else line filter)
+      {
+        if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
+        else                             LineInput::print_history(out, arg);
+      }
+   else              // )HISTORY (with no argument/filter)
+      {
+        UCS_string no_filter;
+        LineInput::print_history(out, no_filter);
+      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_HOST(ostream & out, const UCS_string & arg)
 {
-   if (uprefs.safe_mode)
+   if (UserPreferences::uprefs.safe_mode)
       {
         out << 
 "This interpreter was started in \"safe mode\" (command line option --safe,\n"
@@ -1188,6 +1468,9 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
         return;
       }
 
+   // reset SIGCHLD to its default so that pclose() works as expected
+   //
+   signal(SIGCHLD, SIG_DFL);
    for (;;)
        {
          const int cc = fgetc(pipe);
@@ -1195,15 +1478,18 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
          out << char(cc);
        }
 
-int result = pclose(pipe);
+   errno = 0;
+const int result = pclose(pipe);
    Log(LOG_verbose_error)
       {
-        if (result)   CERR << "pclose(" << arg << ") says: "
-                           << strerror(errno) << endl;
+        if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
+                           << errno << " (" << strerror(errno) << ")" << endl;
       }
-   out << endl << IntCell(result) << endl;
+
+   out << endl << result << ' ' << endl;
+   signal(SIGCHLD, SIG_IGN);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -1211,8 +1497,8 @@ Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
    //
    // IN filename [objects...]
 
-UCS_string fname = args[0];
-   args[0] = args.back();
+UCS_string fname = args.front();
+   args.front() = args.back();
    args.pop_back();
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, true,
@@ -1226,9 +1512,8 @@ FILE * in = fopen(filename.c_str(), "r");
              << " failed: " << strerror(errno) << endl;
 
         char cc[200];
-        snprintf(cc, sizeof(cc),
-                 "command )IN: could not open file %s for reading: %s",
-                 fname_utf8.c_str(), strerror(errno));
+        SPRINTF(cc, "command )IN: could not open file %s for reading: %s",
+                    fname_utf8.c_str(), strerror(errno));
         Workspace::more_error() << cc;
         return;
       }
@@ -1271,8 +1556,8 @@ transfer_context tctx(protection);
 
    fclose(in);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
@@ -1287,8 +1572,8 @@ UCS_string wsname;
 
    Workspace::load_WS(out, lib, wsname, quad_lx, silent);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
@@ -1299,8 +1584,8 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
    //
    if (args.size() == 2)   // set individual dir
       {
-        const UCS_string & libref_ucs = args[0];
-        const int libref = libref_ucs[0] - '0';
+        const UCS_string & libref_ucs = args.front();
+        const int libref = libref_ucs.front() - '0';
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
              CERR << "Invalid library reference " << libref_ucs << "'" << endl;
@@ -1316,47 +1601,62 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 
    if (args.size() == 1)   // set root
       {
-        UTF8_string utf(args[0]);
+        UTF8_string utf(args.front());
         LibPaths::set_APL_lib_root(utf.c_str());
-        out << "LIBRARY ROOT SET TO " << args[0] << endl;
+        out << "LIBRARY ROOT SET TO " << args.front() << endl;
         return;
       }
 
    out << "Library root: " << LibPaths::get_APL_lib_root() << 
 "\n"
 "\n"
-"Library reference number mapping:\n"
+"Library reference number to (absolute) path mapping:\n"
 "\n"
-"---------------------------------------------------------------------------\n"
-"Ref Conf  Path                                                State   Err\n"
-"---------------------------------------------------------------------------\n";
-         
+"╔═══╤═════╤═════════════╤══════════════════════════════════════════════════════╗\n"
+"║Ref│Conf │State (errno)│ Path to the directory containing the workspace files ║\n"
+"╟───┼─────┼─────────────┼──────────────────────────────────────────────────────╢\n";
 
    loop(d, 10)
        {
+          out << "║ " << d << " │";
           UTF8_string path = LibPaths::get_lib_dir(LibRef(d));
-          out << " " << d << " ";
           switch(LibPaths::get_cfg_src(LibRef(d)))
              {
-                case LibPaths::LibDir::CSRC_NONE:      out << "NONE" << endl;
-                                                     continue;
-                case LibPaths::LibDir::CSRC_ENV:       out << "ENV   ";   break;
-                case LibPaths::LibDir::CSRC_PWD:       out << "PWD   ";   break;
-                case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS  ";   break;
-                case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER ";   break;
-                case LibPaths::LibDir::CSRC_CMD:       out << "CMD   ";   break;
+                case LibPaths::LibDir::CSRC_NONE:      out << "NONE │" << endl;
+                                                       continue;
+                case LibPaths::LibDir::CSRC_ENV:       out << "ENV  │";   break;
+                case LibPaths::LibDir::CSRC_PWD:       out << "PWD  │";   break;
+                case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS │";   break;
+                case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER│";   break;
+                case LibPaths::LibDir::CSRC_CMD:       out << "CMD  │";   break;
              }
 
-        out << left << setw(52) << path.c_str();
-        DIR * dir = opendir(path.c_str());
-        if (dir)   { out << " present" << endl;   closedir(dir); }
-        else       { out << " missing (" << errno << ")" << endl; }
+        if (DIR * dir = opendir(path.c_str()))
+           { out << " present     │ ";   closedir(dir); }
+        else
+           {
+             char cc[10];
+             SPRINTF(cc, "(%u)", errno);
+             out << " missing " << setw(4) << cc << "│ ";
+           }
+
+        out << left << setw(53) << path.c_str() << "║\n";
       }
 
    out <<
-"===========================================================================\n" << endl;
+"╚═══╧══╤══╧═════════════╧══════════════════════════════════════════════════════╝\n"
+"       │\n"
+"       ├── NONE:  found no method to compute the library path\n"
+"       ├── CMD:   the path was set with )LIBS N path\n"
+"       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
+"       ├── PSYS:  the path came from the system preferences in file\n"
+"       │                   " << apl_DIR__sysconf << "/gnu-apl.d/preferences\n"
+"       ├── PUSER: the path came from user preferences in file\n"
+"       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
+"       └── PWD:   the path is relative to current directory $PWD (last resort)"
+       << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DIR *
 Command::open_LIB_dir(UTF8_string & path, ostream & out,
                       const UCS_string_vector & args)
@@ -1368,17 +1668,17 @@ Command::open_LIB_dir(UTF8_string & path, ostream & out,
    // 3.  )LIB directory-name      )LIB /usr/lib/...
    //
 
-UCS_string arg("0");
-   if (args.size())   arg = args[0];
+UCS_string arg(UNI_0);
+   if (args.size())   arg = args.front();
 
    if (args.size() == 0)                       // case 1.
       {
         path = LibPaths::get_lib_dir(LIB0);
       }
    else if (arg.size() == 1 &&
-            Avec::is_digit(Unicode(arg[0])))   // case 2.
+            Avec::is_digit(Unicode(arg.front())))   // case 2.
       {
-        path = LibPaths::get_lib_dir(LibRef(arg[0] - '0'));
+        path = LibPaths::get_lib_dir(LibRef(arg.front() - '0'));
       }
    else                                        // case 3.
       {
@@ -1420,9 +1720,9 @@ DIR * dir = opendir(path.c_str());
 
    return dir;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
-Command::is_directory(dirent * entry, const UTF8_string & path)
+Command::is_directory(const dirent * entry, const UTF8_string & path)
 {
 #ifdef _DIRENT_HAVE_D_TYPE
    return entry->d_type == DT_DIR;
@@ -1437,26 +1737,41 @@ DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
    return dir != 0;
 }
-//-----------------------------------------------------------------------------
-void 
-Command::lib_common(ostream & out, const UCS_string_vector & args_range,
-                    int variant)
+//----------------------------------------------------------------------------
+void
+Command::LIB_common(ostream & out, const UCS_string_vector & cmd_args, bool dbg)
 {
-   // 1. check for (and then extract) an optional range parameter...
+   // check for (and then extract) optional range and sort parameters...
    //
 UCS_string_vector args;
 const UCS_string * range = 0;
-   loop(a, args_range.size())
+SORT_ORDER sort = SORT_NONE;
+   loop(a, cmd_args.size())
       {
-        const UCS_string & arg = args_range[a];
+        const UCS_string & arg = cmd_args[a];
+        if (arg.size() == 5 && arg.starts_iwith("-size"))
+           {
+             sort = SORT_SIZE;
+             continue;
+           }
+
+        if (arg.size() == 5 && arg.starts_iwith("-time"))
+           {
+             sort = SORT_TIME;
+             continue;
+           }
+
+        // at this point, arg could be a range (e.g. A-F), or a
+        // path (e.g. ./file.apl), or simply a WSID. Assume a WSID,
+        //
         bool is_range = false;
         bool is_path = false;
         loop(aa, arg.size())
             {
               const Unicode uni = arg[aa];
-              if (uni == UNI_ASCII_MINUS)
+              if (uni == UNI_MINUS)
                  {
-                   is_range = true;
+                   if (!is_path)   is_range = true;
                    break;
                  }
 
@@ -1467,11 +1782,11 @@ const UCS_string * range = 0;
                  }
             }
 
-         if (is_path)   // normal (non-range) arg
+         if (is_path)   // arg is a filename
             {
               args.push_back(arg);
             }
-         else if (!is_range)   // normal (non-range) arg
+         else if (!is_range)   // arg is a WSID
             {
               args.push_back(arg);
             }
@@ -1507,87 +1822,106 @@ UTF8_string path;
 DIR * dir = open_LIB_dir(path, out, args);
    if (dir == 0)   return;
 
-   // 3. collect files and directories
+   // 3. collect the WS files and sub-directories in the )LIBS N directory
    //
 UCS_string_vector files;
 UCS_string_vector directories;
 
    for (;;)
        {
-         dirent * entry = readdir(dir);
-         if (entry == 0)   break;   // directory done
+         const dirent * entry = readdir(dir);
+         if (entry == 0)   break;   // directory loop done
+         const size_t dlen = strlen(entry->d_name);
+         if (entry->d_name[0] == '.')   continue;   // ignore hidden files
 
-         UTF8_string filename_utf8(entry->d_name);
+         const UTF8_string filename_utf8(entry->d_name);
          UCS_string filename(filename_utf8);
 
-         // check range (if any)...
+         // check the range of the name (if any)...
          //
          if (from.size() && filename.lexical_before(from))   continue;
          if (to.size() && to.lexical_before(filename))       continue;
 
          if (is_directory(entry, path))
             {
-              if (filename_utf8[0] == '.')   continue;
-              filename.append(UNI_ASCII_SLASH);
+              filename.append(UNI_SLASH);
               directories.push_back(filename);
               continue;
             }
 
-         const int dlen = strlen(entry->d_name);
-         if (variant == 1)
+         if (filename[dlen - 1] == '~')   continue;  // editor backup
+
+         if (dbg)
+            {
+              files.push_back(filename);
+            }
+         else
             {
               if (filename_utf8.ends_with(".apl"))
                  {
-                   filename.resize(filename.size() - 4);   // skip extension
                    files.push_back(filename);
                  }
               else if (filename_utf8.ends_with(".xml"))
                  {
-                   filename.resize(filename.size() - 4);   // skip extension
                    files.push_back(filename);
                  }
-            }
-         else
-            {
-              if (filename[0] == '.')          continue;  // skip dot files
-              if (filename[dlen - 1] == '~')   continue;  // and editor backups
-              files.push_back(filename);
             }
        }
    closedir(dir);
 
-   // 4. sort directories and filenames alphabetically and append files
-   //    to directories
+   // 4. sort dirctories and files alphabetically
    //
-   directories.sort();
-   files.sort();
+   directories.sort();   // sort directories alphabetically
+   files.sort();         // sort files alphabetically
+
+   // 5. print the directories, then the files
+   //
+   if (sort)   LIB_print_12(out, path, directories, files, sort);
+   else        LIB_print_0(out, path, directories, files);
+}
+//----------------------------------------------------------------------------
+void
+Command::LIB_print_0(ostream & out, const UTF8_string lib_path,
+                     const UCS_string_vector & directories,
+                     const UCS_string_vector & files)
+{
+   // 1. start with directories and append files, removing duplicates
+   //    file names (caused by .apl and .xml extensions). After that
+   //    all names are in directories with the extensions removed.
+   //
+UCS_string_vector all_names;
+   loop(d, directories.size())   all_names.push_back(directories[d]);
    loop(f, files.size())
       {
-        if (directories.size()  && directories.back() == files[f])
+        const UCS_string filename(files[f], 0, files[f].size() - 4);
+        if (all_names.size() && all_names.back() == filename)
            {
-             // there were some file.apl and file.xml. Skip the second
+             // this happens when thetre is both an .apl and an .xml file.
+             // Skip the second // to avoid duplicate file names. Otherwise
+             // append the name to all.
              //
              continue;
            }
-        directories.push_back(files[f]);
+        all_names.push_back(filename);
       }
 
-   // 5. list directories first, then files
+   // At this point, all_names contains all names, with directories
+   // before files and duplicate names removed.
    //
         
    // figure column widths
    //
    enum { tabsize = 4 };
 
-std::vector<int> col_widths;
-   directories.compute_column_width(tabsize, col_widths);
+std::basic_string<int> col_widths;
+   all_names.compute_column_width(tabsize, col_widths);
 
-   loop(c, directories.size())
+   loop(c, all_names.size())
       {
         const size_t col = c % col_widths.size();
-        out << directories[c];
+        out << all_names[c];
         if (col == size_t(col_widths.size() - 1) ||
-              c == ShapeItem(directories.size() - 1))
+              c == ShapeItem(all_names.size() - 1))
            {
              // last column or last item: print newline
              //
@@ -1597,43 +1931,154 @@ std::vector<int> col_widths;
            {
              // intermediate column: print spaces
              //
-             const int len = tabsize*col_widths[col] - directories[c].size();
+             const int len = tabsize*col_widths[col] - all_names[c].size();
              Assert(len > 0);
              loop(l, len)   out << " ";
            }
       }
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
+Command::LIB_print_12(ostream & out, const UTF8_string lib_path,
+                      const UCS_string_vector & directories,
+                      const UCS_string_vector & files, SORT_ORDER sort)
+{
+const size_t max_dir = directories.max_width(1, 1);
+const size_t max_file = files.max_width(1, 1);
+const size_t max_name = max_dir > max_file ? max_dir : max_file;
+
+   // print directories
+   //
+   loop(d, directories.size())
+       {
+         const size_t fill = max_name - directories[d].size() + 9;
+         out << directories[d] << string(fill, ' ') << "(DIR)" << endl;
+       }
+
+   if (files.size() == 0)   return;
+
+   // re-sort files by size or by time
+   //
+UCS_string_vector sorted_files;
+vector<size_t> sorted_props;
+vector<int> file_properties;   // the properties for sorting
+vector<bool> appended;         // appended[f] is true if file[f] was appended
+   loop(f, files.size())
+       {
+         const size_t property = sort_property(sort, lib_path, files[f]);
+         file_properties.push_back(property);
+         appended.push_back(false);
+       }
+
+   // find the index of the smallest sort_property and append its
+   // corresponding name
+   //
+   Assert(file_properties.size() == size_t(files.size()));
+   while (sorted_files.size() < files.size())   // until done
+      {
+        int smallest_unused = -1;
+        loop(f, files.size())
+            {
+              if (appended[f])   continue;   // already appended
+              if (smallest_unused == -1 ||
+                  file_properties[f] < file_properties[smallest_unused])
+                 {
+                  smallest_unused = f;
+                 }
+            }
+
+        // at this point the smallest not yet appended index was found
+        //
+        sorted_files.push_back(files[smallest_unused]);
+        sorted_props.push_back(file_properties[smallest_unused]);
+        appended[smallest_unused] = true;   // mark it as appended
+      }
+
+   loop(f, sorted_files.size())
+       {
+         out << sorted_files[f];
+         for (size_t j = sorted_files[f].size() ; j < max_name; ++j)
+             out << " ";
+
+         if (sort == SORT_SIZE)
+            {
+               out << setw(8) << sorted_props[f] << " bytes" << endl;
+            }
+         else if (sort == SORT_TIME)
+            {
+               const time_t when = sorted_props[f];
+               out << "  " << ctime(&when);   // ctime() does '\n'
+            }
+         else FIXME;
+       }
+}
+//----------------------------------------------------------------------------
+size_t
+Command::sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
+                       const UCS_string & wsid)
+{
+   Assert(sort != SORT_NONE);   // 1 or 2
+
+UTF8_string wsid_utf8(wsid);
+UTF8_string name(lib_path);   // e.g. /home/workspaces
+   name += '/';               //      /home/workspaces/
+   name.append(wsid_utf8);    //      /home/workspaces/wsid
+
+   if (access(name.c_str(), R_OK) == 0)   // file is readable
+      {
+        struct stat st;
+        if (stat(name.c_str(), &st) == 0)   // got stat
+           {
+             if (sort == SORT_SIZE)   return st.st_size;
+             if (sort == SORT_TIME)   return st.st_mtime;
+             else                          FIXME;
+           }
+      }
+
+   return 0;   // invalid
+}
+//----------------------------------------------------------------------------
+void
 Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
-   // Command is:
-   //
-   // )LIB                (same as )LIB 0)
-   // )LIB N              (show workspaces in library N without extensions)
-   // )LIB from-to        (show workspaces named from-to in library 0
-   // )LIB N from-to      (show workspaces named from-to in library N
+   /* Command is:
 
-   Command::lib_common(out, args, 1);
+    )LIB [N] [RANGE] [sort]
+   
+    where:
+
+    N is an optional library number (0-9, default 0)
+    RANGE is a range for the file names (two ASCII characters A-Z)
+    sort is a sorting order: -T (sort by time) or -S (sort by size)
+    */
+
+   Command::LIB_common(out, args, false);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
-   // Command is:
-   //
-   // ]LIB                (same as )LIB 0)
-   // ]LIB N              (show workspaces in library N with extensions)
-   // ]LIB from-to        (show workspaces named from-to in library 0
-   // ]LIB N from-to      (show workspaces named from-to in library N
+   /* Command is:
 
-   Command::lib_common(out, args, 2);
+    ]LIB [N] [RANGE] [sort]
+   
+    where:
+
+    N is an optional library number (0-9, default 0)
+    RANGE is a range for the file names (two ASCII characters A-Z)
+    sort is a sorting order: -sT (sort by time) or -sS (sort by size)
+    */
+
+   // The difference between cmd_LIB2 and cmd_LIB2 is the output
+   // channel, i.e. )LIB vs. ]LIB.
+
+   Command::LIB_common(out, args, true);
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_LOG(ostream & out, const UCS_string & arg)
 {
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 
    log_control(arg);
 
@@ -1647,45 +2092,78 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 "\n"
 "   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)\n"
 "   make\n"
-"   make install (or try: src/apl)\n"
+"   make install (or try: src/apl to test without installing)\n"
 "\n"
 "above the src directory."
 "\n";
 
 #endif
 }
-//-----------------------------------------------------------------------------
-void 
-Command::cmd_MORE(ostream & out)
+//----------------------------------------------------------------------------
+void
+Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
 {
+   if (args.size() > 0)   // optional AUTO ?
+      {
+        if (!args.front().starts_iwith("AUTO"))   // no
+           {
+             CERR << "BAD COMMAND+" << endl;
+             MORE_ERROR() << "Bad )MORE argument: " << args.front()
+                          << ". Use none or AUTO.";
+             return;
+           }
+
+        // )MORE AUTO...
+        //
+        if (args.size() > 1)   // optional ON/OFF ?
+           {
+             if      (args[1].starts_iwith("ON"))    auto_MORE = true;
+             else if (args[1].starts_iwith("OFF"))   auto_MORE = false;
+             else
+                {
+                  CERR << "BAD COMMAND+" << endl;
+                  MORE_ERROR() << "Bad )MORE AUTO argument: " << args[1]
+                               << ". Use none, ON, or OFF.";
+                  return;
+                }
+           }
+        else                   // no ON or OFF:
+           {
+             auto_MORE = ! auto_MORE;   // toggle
+           }
+        out << "Automatic )MORE is now: "
+            << (auto_MORE ? "ON" : "OFF") << endl;
+        return;
+      }
+
    if (Workspace::more_error().size() == 0)
       {
-        out << "NO MORE ERROR INFO" << endl;
+        out << "NO )MORE ERROR INFO" << endl;
         return;
       }
 
    out << Workspace::more_error() << endl;
    return;
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_OFF(int exit_val)
 {
-   cleanup(true);
    COUT << endl;
-   if (!uprefs.silent)
+   if (!UserPreferences::uprefs.silent)
       {
 
         timeval end;
         gettimeofday(&end, 0);
-        end.tv_sec -= uprefs.session_start.tv_sec;
-        end.tv_usec -= uprefs.session_start.tv_usec;
+        end.tv_sec -= UserPreferences::uprefs.session_start.tv_sec;
+        end.tv_usec -= UserPreferences::uprefs.session_start.tv_usec;
         if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
         COUT << "Goodbye." << endl
              << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
              << " seconds " << endl;
-
       }
+
+   cleanup(true);
 
    // restore the initial memory rlimit
    //
@@ -1700,12 +2178,101 @@ rlimit rl;
 
    exit(exit_val);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void
+Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
+{
+   if (arg.starts_iwith("CLEAR"))
+      {
+        out << "Optimization counters cleared" << endl;
+        OptmizationStatistics::reset_all();
+        return;
+      }
+
+int ulen;
+#define optim(ena, opt, text) ulen = 40 + UTF8_string::bytes_chars(text);   \
+   out << left << setw(ulen) << text << right << " : ";                     \
+   if (ena) out << setw(6) << OptmizationStatistics::get(OPTI_ ## opt);     \
+   else     out << "disabled";                                              \
+   out << endl;
+#include "Performance.def"
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
+{
+   loop(a, args.size())
+       {
+         const UCS_string & arg = args[a];
+
+         // figure HAVE- or NO- prefix and capability
+         //
+         if (arg.starts_iwith("HAVE-"))
+            {
+              if (! have_capability(arg.drop(5)))   return;
+            }
+         else if (arg.starts_iwith("NO-"))
+            {
+              if (have_capability(arg.drop(3)))   return;
+            }
+         else
+            {
+              CERR << "]NEXTFILE: unknown capability '" << arg
+                   << "' (ignored).\n"
+                      "Capabilities start with HAVE- or with NO- "
+                      "(try TAB expansion)."
+                   << endl;
+              continue;   // next arg
+            }
+       }
+
+   IO_Files::next_file();
+}
+//----------------------------------------------------------------------------
+bool
+Command::have_capability(const UCS_string & capa)
+{
+const int len = capa.size();
+   if (capa.front() == UNI_Quad_Quad)   // ⎕xxx
+      {
+        const UCS_string capa1 = capa.drop(1);
+        if (len == 4 && capa1.starts_iwith("FFT"))       return apl_FFT;
+        if (len == 4 && capa1.starts_iwith("PNG"))       return apl_PNG;
+        if (len == 3 && capa1.starts_iwith("RE"))        return apl_PCRE;
+      }
+   else
+      {
+        if (len == 3 && capa.starts_iwith("GTK"))        return apl_GTK3;
+        if (len == 3 && capa.starts_iwith("GUI"))        return apl_GUI;
+        if (len == 8 && capa.starts_iwith("POSTGRES"))   return apl_POSTGRES;
+        if (len == 7 && capa.starts_iwith("SQLITE3"))    return apl_SQLITE3;
+        if (len == 3 && capa.starts_iwith("X11"))        return apl_X11;
+      }
+
+   CERR << "]NEXTFILE: Unknown capability '" << capa << "'" << endl;
+   return false;
+}
+//----------------------------------------------------------------------------
+void
+Command::cmd_PUSHFILE()
+{
+   CERR <<
+"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
+        << endl;
+
+   if (InputFile::files_todo.size())
+      InputFile::files_todo.front().set_pushed_pending(true);
+
+InputFile fam("stdin", stdin, false, true, true, no_LX);
+   fam.set_pushed_IE();
+   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
+}
+//----------------------------------------------------------------------------
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
-UCS_string fname = args[0];
-   args.erase(args.begin());
+UCS_string fname = args.front();
+   args.erase(0);
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
                                                   ".atf", 0);
@@ -1725,7 +2292,7 @@ uint64_t seq = 1;   // sequence number for records written
 
    fclose(atf);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_name_conflict(ostream & out, const UCS_string & cnew,
                              const UCS_string cold)
@@ -1747,7 +2314,7 @@ int len = cnew.size();
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_redefinition(ostream & out, const UCS_string & cnew,
                             const UCS_string fnew, const int mnew)
@@ -1772,10 +2339,12 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 
    return false;
 }
-//-----------------------------------------------------------------------------
-void 
+//----------------------------------------------------------------------------
+void
 Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // )SAVE
    // )SAVE workspace
    // )SAVE lib workspace
@@ -1793,15 +2362,16 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
-   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+   if (Avec::is_digit(wsid_name.front()))   // wsid contains a libnum
       {
-        wsid_lib = LibRef(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name.front() - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
+   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
+        // don't save CLEAR WS
         COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
         "the workspace was not saved because 'CLEAR WS' is a special\n"
@@ -1812,7 +2382,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    Workspace::save_WS(out, wsid_lib, wsid_name, true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
                             LibRef &lib, UCS_string & wsname)
@@ -1821,22 +2391,22 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
    if (args.size() == 1)   // name without libnum
       {
         lib = LIB0;
-        wsname = args[0];
+        wsname = args.front();
         return false;   // OK
       }
 
-   if (!(args[0].size() == 1 && Avec::is_digit(args[0][0])))
+   if (!(args.front().size() == 1 && Avec::is_digit(args.front()[0])))
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "invalid library reference '" << args[0] << "'";
+        MORE_ERROR() << "invalid library reference '" << args.front() << "'";
         return true;   // error
       }
 
-   lib = LibRef(args[0][0] - '0');
+   lib = LibRef(args.front()[0] - '0');
    wsname = args[1];
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                      UCS_string_vector & args)
@@ -1864,14 +2434,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         return;
       }
 
-  if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
+  if (args.size() == 1 && args.front().starts_iwith("REMOVE-ALL"))
      {
        Workspace::get_user_commands().clear();
        out << "    All user-defined commands removed." << endl;
        return;
      }
 
-  if (args.size() == 2 && args[0].starts_iwith("REMOVE"))
+  if (args.size() == 2 && args.front().starts_iwith("REMOVE"))
      {
        loop(u, Workspace::get_user_commands().size())
            {
@@ -1892,7 +2462,8 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
            }
 
        out << "BAD COMMAND+" << endl;
-       MORE_ERROR() << "user command in command ]USERCMD REMOVE does not exist";
+       MORE_ERROR() << "user command in command"
+                       " ]USERCMD REMOVE does not exist";
        return;
      }
 
@@ -1905,18 +2476,18 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         return;
      }
 
-   UCS_string command_name = args[0];
-   UCS_string apl_fun = args[1];
-   int mode = 0;
+UCS_string command_name = args.front();
+UCS_string apl_fun = args[1];
+int mode = 0;
 
    // check if lambda
    bool is_lambda = false;
-   if (apl_fun[0] == '{')
+   if (apl_fun.front() == '{')
       {
          // looks like the user command is a lambda function.
          UCS_string result;
          // lambdas could contain spaces, collect all arguments in one string
-         for (size_t i = 1; i < args.size(); ++i)
+         for (ShapeItem i = 1; i < args.size(); ++i)
             {
                result << args[i];
             }
@@ -1960,8 +2531,16 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    loop(c, command_name.size())
       {
         bool error = false;
-        if (c == 0)   error = error || command_name[c] != ']';
-        else          error = error || !Avec::is_symbol_char(command_name[c]);
+        if (c == 0)   // command must start with ] or )
+           {
+             if (command_name[c] != ']' && command_name[c] != ')')
+                error = true;
+           }
+        else // and continue with symbol characters
+           {
+             error = error || !Avec::is_symbol_char(command_name[c]);
+           }
+
         if (error)
            {
              out << "BAD COMMAND+" << endl;
@@ -1973,7 +2552,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    // check conflicts with existing commands
    //
 #define cmd_def(cmd_str, _cod, _arg, _hint) \
-   if (check_name_conflict(out, cmd_str, command_name))   return;
+   if (check_name_conflict(out, UTF8_string(cmd_str), command_name))   return;
 #include "Command.def"
    if (check_redefinition(out, command_name, apl_fun, mode))
      {
@@ -2004,7 +2583,7 @@ user_command new_user_command = { command_name, apl_fun, mode };
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
@@ -2013,26 +2592,26 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
   if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
      {
         apl_cmd.append_quoted(cmd);
-        apl_cmd.append(UNI_ASCII_SPACE);
+        apl_cmd.append(UNI_SPACE);
         loop(a, args.size())
            {
              apl_cmd.append_quoted(args[a]);
-             apl_cmd.append(UNI_ASCII_SPACE);
+             apl_cmd.append(UNI_SPACE);
            }
      }
 
    apl_cmd.append(Workspace::get_user_commands()[uidx].apl_function);
-   apl_cmd.append(UNI_ASCII_SPACE);
+   apl_cmd.append(UNI_SPACE);
    apl_cmd.append_quoted(line);
 }
-//-----------------------------------------------------------------------------
-#ifdef DYNAMIC_LOG_WANTED
+//----------------------------------------------------------------------------
+#ifdef cfg_DYNAMIC_LOG_WANTED
 void
 Command::log_control(const UCS_string & arg)
 {
 UCS_string_vector args = split_arg(arg);
 
-   if (args.size() == 0 || arg[0] == UNI_ASCII_QUESTION)  // no arg or '?'
+   if (args.size() == 0 || arg.front() == UNI_QUESTION)  // no arg or '?'
       {
         for (LogId l = LID_MIN; l < LID_MAX; l = LogId(l + 1))
             {
@@ -2047,26 +2626,46 @@ UCS_string_vector args = split_arg(arg);
         return;
       }
 
-const LogId val = LogId(args[0].atoi());
-int on_off = -1;
-   if      (args.size() > 1 && args[1].starts_iwith("ON"))    on_off = 1;
-   else if (args.size() > 1 && args[1].starts_iwith("OFf"))   on_off = 0;
+   // at this point args is a sequence of numbers (LIDs) and actions (ON or
+   // OFF). We parse args back to front. to acreate a vector of actions
+   // which is then executed from front to back.
+   //
+vector<struct lid_OOT> lid_OOTs;
+OOT action = Toggle;
+   loop(a, args.size())
+       {
+         const UCS_string & ucs = args[args.size() - a - 1];
+         if      (ucs.starts_iwith("ON"))    action = On;
+         else if (ucs.starts_iwith("OFF"))   action = Off;
+         else   // remember the LogId and its action and
+            {
+              const LogId lid = LogId(ucs.atoi());
+              const lid_OOT lo = { lid, action };
+              if (lid >= LID_MIN && lid <= LID_MAX)
+                 lid_OOTs.push_back(lo);
+              else
+                 CERR << "    Invalid logging facility " << lid
+                      << " ignored. Valid logging facilities are: "
+                      << LID_MIN << ".." << (LID_MAX - 1) << endl;
+            }
+       }
 
-   if (val >= LID_MIN && val <= LID_MAX)
-      {
-        const char * info = Log_info(val);
-        Assert(info);
-        bool new_status = !Log_status(val);   // toggle
-        if (on_off == 0)        new_status = false;
-        else if (on_off == 1)   new_status = true;
+   loop(a, lid_OOTs.size())
+       {
+         const lid_OOT lo = lid_OOTs[lid_OOTs.size() - a - 1];
+         const LogId lid = lo.lid;
+         const char * info = Log_info(lid);
+         bool new_status = !Log_status(lid);   // assume toggle
+         if      (lo.on_off_toggle == On)   new_status = true;
+         else if (lo.on_off_toggle == Off)  new_status = false;
+         Log_control(lid, new_status);
 
-        Log_control(val, new_status);
-        CERR << "    Log facility '" << info << "' is now "
-             << (new_status ? "ON " : "OFF") << endl;
-      }
+         CERR << "    Logging facility " << lid << ": " << info
+              << " is now " << (new_status ? "ON " : "OFF") << endl;
+       }
 }
 #endif
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::process_record(const UTF8 * record,
                                           const UCS_string_vector & objects)
@@ -2145,7 +2744,7 @@ const char sub_type = record[1];
              << "*** bad record type '" << rec_type << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t
 Command::transfer_context::get_nrs(UCS_string & name, Shape & shape) const
 {
@@ -2153,17 +2752,17 @@ int idx = 1;
 
    // data + 1 is: NAME RK SHAPE RAVEL...
    //
-   while (idx < data.size() && data[idx] != UNI_ASCII_SPACE)
+   while (idx < data.size() && data[idx] != UNI_SPACE)
          name.append(data[idx++]);
    ++idx;   // skip space after the name
 
 int rank = 0;
    while (idx < data.size() &&
-          data[idx] >= UNI_ASCII_0 &&
-          data[idx] <= UNI_ASCII_9)
+          data[idx] >= UNI_0 &&
+          data[idx] <= UNI_9)
       {
         rank *= 10;
-        rank += data[idx++] - UNI_ASCII_0;
+        rank += data[idx++] - UNI_0;
       }
    ++idx;   // skip space after the rank
 
@@ -2171,11 +2770,11 @@ int rank = 0;
       {
         ShapeItem s = 0;
         while (idx < data.size() &&
-               data[idx] >= UNI_ASCII_0 &&
-               data[idx] <= UNI_ASCII_9)
+               data[idx] >= UNI_0 &&
+               data[idx] <= UNI_9)
            {
              s *= 10;
-             s += data[idx++] - UNI_ASCII_0;
+             s += data[idx++] - UNI_0;
            }
         shape.add_shape_item(s);
         ++idx;   // skip space after shape[r]
@@ -2183,7 +2782,7 @@ int rank = 0;
   
    return idx;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::numeric_1TF(const UCS_string_vector & objects) const
 {
@@ -2194,7 +2793,7 @@ int idx = get_nrs(var_name, shape);
    if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
-   if (Avec::is_quad(var_name[0]))   // system variable.
+   if (Avec::is_quad(var_name.front()))   // system variable.
       {
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
@@ -2221,30 +2820,28 @@ Token_string tos;
      if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
    }
  
-   if (tos.size() != size_t(shape.get_volume()))   return;
+   if (tos.size() != shape.get_volume())   return;
 
-Value_P val(shape, LOC);
-   new (&val->get_ravel(0)) IntCell(0);   // prototype
+Value_P Z(shape, LOC);
+   Z->set_proto_Int();   // prototype
 
-const ShapeItem ec = val->element_count();
+const ShapeItem ec = Z->element_count();
    loop(e, ec)
       {
-        const TokenTag tag = tos[e].get_tag();
-        Cell * C = val->next_ravel();
-        if      (tag == TOK_INTEGER)  new (C) IntCell(tos[e].get_int_val());
-        else if (tag == TOK_REAL)     new (C) FloatCell(tos[e].get_flt_val());
-        else if (tag == TOK_COMPLEX)  new (C)
-                                          ComplexCell(tos[e].get_cpx_real(),
-                                                      tos[e].get_cpx_imag());
+        const Token & tok = tos[e];
+        const TokenTag tag = tok.get_tag();
+        if      (tag == TOK_INTEGER)  Z->next_ravel_Int(tok.get_int_val());
+        else if (tag == TOK_REAL)     Z->next_ravel_Float(tok.get_flt_val());
+        else if (tag == TOK_COMPLEX)  Z->next_ravel_Complex(tok.get_cpx_real(),
+                                                            tok.get_cpx_imag());
         else FIXME;
       }
-
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::chars_1TF(const UCS_string_vector & objects) const
 {
@@ -2255,7 +2852,7 @@ int idx = get_nrs(var_name, shape);
    if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
-   if (Avec::is_quad(var_name[0]))   // system variable.
+   if (Avec::is_quad(var_name.front()))   // system variable.
       {
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
@@ -2267,7 +2864,7 @@ Symbol * sym = 0;
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
-   
+
    Log(LOG_command_IN)
       {
         CERR << endl << var_name << " shape " << shape << " IS: '";
@@ -2275,17 +2872,17 @@ Symbol * sym = 0;
         CERR << "'" << endl;
       }
 
-Value_P val(shape, LOC);
-const ShapeItem ec = val->element_count();
-   new (&val->get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+Value_P Z(shape, LOC);
+const ShapeItem ec = Z->element_count();
+   Z->set_proto_Spc();   // prototype
 
 ShapeItem padded = 0;
    loop(e, ec)
       {
-        Unicode uni = UNI_ASCII_SPACE;
+        Unicode uni = UNI_SPACE;
         if (e < (data.size() - idx))   uni = data[e + idx];
         else                           ++padded;
-         new (&val->get_ravel(e)) CharCell(uni);
+        Z->next_ravel_Char(uni);
       }
 
    if (padded)
@@ -2294,12 +2891,12 @@ ShapeItem padded = 0;
              << padded << " spaces added)" << endl;
       }
 
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
@@ -2323,14 +2920,14 @@ UCS_string var_or_fun;
         if (!objects.contains(var_name))   return;
       }
 
-   var_or_fun = Quad_TF::tf2_inv(data1);
+   var_or_fun = Quad_TF::tf2_inverse(data1);
 
    if (var_or_fun.size() == 0)
       {
-        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << ";" << endl;
+        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::function_2TF(const UCS_string_vector & objects)const
 {
@@ -2338,7 +2935,7 @@ int idx = 1;
 UCS_string fun_name;
 
    /// chars 1...' ' are the function name
-   while ((idx < data.size()) && (data[idx] != UNI_ASCII_SPACE))
+   while ((idx < data.size()) && (data[idx] != UNI_SPACE))
         fun_name.append(data[idx++]);
    ++idx;
 
@@ -2346,10 +2943,10 @@ UCS_string fun_name;
 
 UCS_string statement;
    while (idx < data.size())   statement.append(data[idx++]);
-   statement.append(UNI_ASCII_LF);
+   statement.append(UNI_LF);
 
-UCS_string fun_name1 = Quad_TF::tf2_inv(statement);
-   if (fun_name1.size() == 0)   // tf2_inv() failed
+UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
+   if (fun_name1.size() == 0)   // tf2_inverse() failed
       {
         CERR << "inverse 2 ⎕TF failed for the following APL statement: "
              << endl << "    " << statement << endl;
@@ -2358,9 +2955,11 @@ UCS_string fun_name1 = Quad_TF::tf2_inv(statement);
 
 Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
    Assert(sym1);
-Function * fun1 = sym1->get_function();
-   Assert(fun1);
-   fun1->set_creation_time(timestamp);
+   {
+     Function * fun1 = const_cast<Function *>(sym1->get_function());
+     Assert(fun1);
+     fun1->set_creation_time(timestamp);
+   }
 
    Log(LOG_command_IN)
       {
@@ -2372,13 +2971,14 @@ Function * fun1 = sym1->get_function();
             << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::add(const UTF8 * str, int len)
 {
 
 #if 0
-   // helper to print the uni_to_cp_map when given a cp_to_uni_map.
+   // helper function to print the uni_to_cp_map table when given the inverse
+   // cp_to_uni_map. Before that the IBM ⎕AV is printed
    //
    Avec::print_inverse_IBM_quad_AV();
    DOMAIN_ERROR;
@@ -2393,12 +2993,11 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
              case '^': data.append(UNI_AND);              break;   // ~ → ∼
              case '*': data.append(UNI_STAR_OPERATOR);    break;   // * → ⋆
              case '~': data.append(UNI_TILDE_OPERATOR);   break;   // ~ → ∼
-             
              default:  data.append(Unicode(cp_to_uni_map[utf]));
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::parse_from_to(UCS_string & from, UCS_string & to,
                        const UCS_string & user_arg)
@@ -2459,24 +3058,24 @@ bool got_minus = false;
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::is_lib_ref(const UCS_string & lib)
 {
    if (lib.size() == 1)   // single char: lib number
       {
-        if (Avec::is_digit(lib[0]))   return true;
+        if (Avec::is_digit(lib.front()))   return true;
       }
 
-   if (lib[0] == UNI_ASCII_FULLSTOP)   return true;
+   if (lib.front() == UNI_FULLSTOP)   return true;
 
    loop(l, lib.size())
       {
         const Unicode uni = lib[l];
-        if (uni == UNI_ASCII_SLASH)       return true;
-        if (uni == UNI_ASCII_BACKSLASH)   return true;
+        if (uni == UNI_SLASH)       return true;
+        if (uni == UNI_BACKSLASH)   return true;
       }
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

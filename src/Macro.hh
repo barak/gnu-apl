@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,26 +18,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __MACRO_HH_DEFINED__
 #define __MACRO_HH_DEFINED__
 
 #include "UserFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a system function or operator implemented as an internal defined function
 class Macro : public UserFunction
 {
 public:
-   /// the unique number of a macros
+   /// the unique number of a macro
    enum Macro_num
       {
-#define mac_def(name, _txt) MAC_ ## name,
+#define mac_def(name, _txt) MAC_ ## name,   ///< a Macro_num
 #include "Macro.def"
-        MAC_COUNT
+        MAC_COUNT,
+        MAC_NONE = -1
       };
 
    /// constructor
-   Macro(Macro_num num, const char * text);
+   Macro(Macro_num num, const UTF8_string & text);
 
    /// overloaded Function::is_macro()
    virtual bool is_macro() const   { return true; }
@@ -66,7 +70,7 @@ private:
    /// destructor (not supposed to be called)
    ~Macro();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __MACRO_HH_DEFINED__
 

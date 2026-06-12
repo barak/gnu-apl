@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __BIF_F12_FORMAT_HH_DEFINED__
 #define __BIF_F12_FORMAT_HH_DEFINED__
-
-#include <vector>
 
 #include "PrimitiveFunction.hh"
 
@@ -44,7 +45,7 @@ struct Format_sub
    int             min_len;        ///< the minimum length in the output
 
    /// return the number of characters in \b format
-   int size() const
+   size_t size() const
       { return format.size(); }
 
    /// set flt_mask according to the digits in member \b format
@@ -71,7 +72,7 @@ struct Format_sub
 
    /// return the pad character (default: space, otherwise controlled by ⎕FC)
    Unicode pad_char(Unicode qfc) const
-      { return flt_mask & BIT_8 ? qfc : UNI_ASCII_SPACE; }
+      { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
 
    /// Fill buf at position x,y with data according to fmt
    UCS_string insert_int_commas(const UCS_string & data,
@@ -80,7 +81,7 @@ struct Format_sub
    /// Fill buf at position x,y with data according to fmt
    UCS_string insert_fract_commas(const UCS_string & data) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function format
  */
 /// The class implementing ⍕
@@ -92,8 +93,10 @@ public:
    : NonscalarFunction(TOK_F12_FORMAT)
    {}
 
-   static Bif_F12_FORMAT * fun;   ///< Built-in function
-   static Bif_F12_FORMAT  _fun;   ///< Built-in function
+   /// A character array with B formatted by specification
+   static Value_P format_by_specification(Value_P A, Value_P B);
+
+   static Bif_F12_FORMAT  fun;   ///< Built-in function
 
    /// Return true iff uni is '0' .. '9', comma, or full-stop
    static bool is_control_char(Unicode uni);
@@ -108,12 +111,12 @@ public:
         Format_LIFER(UCS_string fmt);
 
         /// return the size of the format
-        int format_size() const
+        size_t format_size() const
            { return left_deco.size() + int_part.size() + fract_part.size()
                   + expo_deco.size() + exponent.size() + right_deco.size(); }
 
         /// return the size of the output
-        int out_size() const
+        size_t out_size() const
            { return left_deco.out_len + int_part.out_len + fract_part.out_len
                   + expo_deco.out_len + exponent.out_len + right_deco.out_len; }
 
@@ -154,32 +157,30 @@ public:
 
 protected:
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// A character array with B formatted by example
-   Value_P format_by_example(Value_P A, Value_P B);
+   static Value_P format_by_example(Value_P A, Value_P B);
 
    /// split entire format string string into \b column format strings
-   void split_example_into_columns(const UCS_string & format,
-                                   std::vector<UCS_string> & col_formats);
+   static void split_example_into_columns(const UCS_string & format,
+                                   UCS_string_vector & col_formats);
 
-   /// A character array with  a columns of B formatted by specification
-   PrintBuffer format_col_spec(int width, int precision, const Cell * cB,
-                               int cols, int rows);
+   /// A character array with one column of B formatted by specification
+   static PrintBuffer format_one_col_by_spec(int width, int precision,
+                                             const Cell * cB, ShapeItem cols,
+                                             ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
-   void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
+   static void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
 
-   /// A character array with B formatted by specification
-   Value_P format_by_specification(Value_P A, Value_P B);
-
    /// format value with \b precision mantissa digits (floating format)
-   static UCS_string format_spec_float(APL_Float value, int precision);
+   static UCS_string format_float_by_spec(APL_Float value, int precision);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_F12_FORMAT_HH_DEFINED__

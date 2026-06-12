@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,8 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Avec.hh"
+#include "Bif_F12_COMMA.hh"
+#include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
+#include "Bif_F12_INDEX_OF.hh"
+#include "Bif_F12_INTERVAL_INDEX.hh"
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "Bif_F12_SORT.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER1_COMMUTE.hh"
@@ -40,16 +48,21 @@
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_GTK.hh"
+#include "Quad_JSON.hh"
+#include "Quad_MAP.hh"
 #include "Quad_PLOT.hh"
+#include "Quad_PNG.hh"
 #include "Quad_RE.hh"
+#include "Quad_RVAL.hh"
 #include "Quad_SQL.hh"
 #include "Quad_SVx.hh"
 #include "Quad_TF.hh"
+#include "Quad_XML.hh"
 #include "ScalarFunction.hh"
 #include "UCS_string.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an Id and how it looks like in APL
 struct Id_name
 {
@@ -78,19 +91,19 @@ static Id_name id2ucs[] =
 #include "Id.def"
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 ID::get_name_UCS(Id id)
 {
 UTF8_string utf(reinterpret_cast<const char *>(get_name(id)));
    return UCS_string(utf);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ID::cleanup()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const UTF8 *
 ID::get_name(Id id)
 {
@@ -118,22 +131,22 @@ const char * name = "unknown ID";
 
    return reinterpret_cast<const UTF8 *>(name);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
 }
-//-----------------------------------------------------------------------------
-Function *
+//----------------------------------------------------------------------------
+cFunction_P
 ID::get_system_function(Id id)
 {
    switch(id)
       {
 #define pp(i, _u, _v)
-#define qf(i, _u, _v) case ID_Quad_ ## i:   return Quad_ ## i::fun;
+#define qf(i, _u, _v) case ID_Quad_ ## i:   return &Quad_ ## i::fun;
 #define qv(i, _u, _v)
-#define sf(i, _u, _v) case ID_ ## i:        return Bif_ ## i::fun;
+#define sf(i, _u, _v) case ID_ ## i:        return &Bif_ ## i::fun;
 #define st(i, _u, _v)
 
 #include "Id.def"
@@ -143,7 +156,7 @@ ID::get_system_function(Id id)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol *
 ID::get_system_variable(Id id)
 {
@@ -163,8 +176,8 @@ ID::get_system_variable(Id id)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
-int
+//----------------------------------------------------------------------------
+TokenTag
 ID::get_token_tag(Id id)
 {
    switch(id)
@@ -180,6 +193,6 @@ ID::get_token_tag(Id id)
         default: break;
       }
 
-   return 0;
+   return TOK_INVALID;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

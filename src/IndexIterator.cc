@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Error.hh"
 #include "IndexExpr.hh"
 #include "IndexIterator.hh"
 #include "Output.hh"
 #include "PrintOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IndexIterator::operator ++()
 {
@@ -38,26 +41,26 @@ IndexIterator::operator ++()
             }
          else
             {
-              pos = get_index_count();   // so that more() works
+              pos = get_index_count();   // so that has_more() works
             }
       }
 
    // print(CERR);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 IndexIterator::print(ostream & out) const
 {
    out << "Iterator "     << voidP(this) << ":"  << endl
        << "   upper:       " << voidP(upper)     << endl
-       << "   value:       " << get_value()      << endl
+       << "   value:       " << get_ivalue()     << endl
        << "   indices[" << get_index_count()     << "] :";
 
    loop(i, get_index_count())   out << " " << get_pos(i);
 
    return out << endl;
 }
-//=============================================================================
+//============================================================================
 TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
                                      uint32_t qio, ShapeItem max_idx)
    : IndexIterator(w, value->element_count())
@@ -68,7 +71,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
    indices = new ShapeItem[count];
    loop(v, count)
       {
-        const ShapeItem idx = value->get_ravel(v).get_near_int() - qio;
+        const ShapeItem idx = value->get_cravel(v).get_near_int() - qio;
 
         // instead of testing signed < 0 and >= max, we test unsigned >= max.
         //
@@ -77,7 +80,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
         indices[v] = idx * w;
       }
 }
-//=============================================================================
+//============================================================================
 MultiIndexIterator::MultiIndexIterator(const Shape & shape,
                                        const IndexExpr & IDX)
    : highest_it(0),
@@ -97,14 +100,14 @@ MultiIndexIterator::MultiIndexIterator(const Shape & shape,
    // ---------------
    //
 
-   if (shape.get_rank() != uRank(IDX.value_count()))
+   if (shape.get_rank() != IDX.get_rank())
       {
         Log(LOG_error_throw)
            {
              Q1(shape.get_rank())
              Q1(shape)
              Q1(IDX)
-             Q1(IDX.value_count())
+             Q1(IDX.get_rank())
            }
         INDEX_ERROR;
       }
@@ -112,8 +115,8 @@ MultiIndexIterator::MultiIndexIterator(const Shape & shape,
 ShapeItem weight = 1;
    loop(idx_r, shape.get_rank())
        {
-         const Rank val_r = shape.get_rank() - idx_r - 1;  // see comment above.
-         const ShapeItem  sh_r = shape.get_shape_item(val_r);
+         const sAxis ax_r = shape.get_rank() - idx_r - 1;  // see comment above.
+         const ShapeItem  sh_r = shape.get_shape_item(ax_r);
          Value_P I = IDX.values[idx_r];
          IndexIterator * new_it;
          if (!I)   // elided index
@@ -137,7 +140,7 @@ ShapeItem weight = 1;
          highest_it = new_it;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 MultiIndexIterator::~MultiIndexIterator()
 {
    for (IndexIterator * it = lowest_it; it;)
@@ -150,18 +153,18 @@ MultiIndexIterator::~MultiIndexIterator()
          delete del;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 MultiIndexIterator::operator ++(int)
 {
-   Assert(!lowest_it || more());
+   Assert(!lowest_it || has_more());
 
 ShapeItem ret = 0;
    for (IndexIterator * it = lowest_it; it; it = it->get_upper())
-            ret += it->get_value();
+            ret += it->get_ivalue();
 
    if (lowest_it)   ++*lowest_it;
    return ret;
 }
-//=============================================================================
+//============================================================================
 

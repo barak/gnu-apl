@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "emacs.hh"
 #include "NetworkConnection.hh"
 #include "Listener.hh"
@@ -31,7 +34,7 @@ static pthread_cond_t registered_listeners_cond = PTHREAD_COND_INITIALIZER;
 
 void *connection_loop( void *arg )
 {
-    std::auto_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
+    std::unique_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
     try {
         connection->run();
     }
@@ -57,23 +60,24 @@ static void *listener_loop( void *arg )
     return NULL;
 }
 
-void start_listener( int port )
+void start_listener(int port)
 {
-    pthread_t thread_id;
+pthread_t thread_id;
 
-    auto_ptr<Listener> listener( Listener::create_listener( port ) );
+unique_ptr<Listener> listener( Listener::create_listener( port ) );
 
-    string conninfo = listener->start();
+string conninfo = listener->start();
     
-    int res = pthread_create( &thread_id, NULL, listener_loop, listener.get() );
-    if( res != 0 ) {
-        throw InitProtocolError( "Unable to start network connection thread" );
-    }
+   if (int res = pthread_create(&thread_id, 0, listener_loop, listener.get()))
+      {
+        throw InitProtocolError("Unable to start network connection thread");
+      }
 
-    listener->set_thread( thread_id );
-    listener.release();
+   listener->set_thread( thread_id );
+   listener.release();
 
-    COUT << "Network listener started. Connection information: " << conninfo << endl;
+   COUT << "Network listener started. Connection information: "
+        << conninfo << endl;
 }
 
 void register_listener( Listener *listener )

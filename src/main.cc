@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
+#include <pthread.h>
+
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -25,24 +34,28 @@
 #include <string.h>
 #include <termios.h>
 
+#include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 
-#include "buildtag.hh"
+#include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
 #include "Common.hh"
 #include "IO_Files.hh"
 #include "LibPaths.hh"
+#include "LineInput.hh"
 #include "Macro.hh"
-#include "makefile.h"
-#include "Output.hh"
 #include "NativeFunction.hh"
+#include "Output.hh"
 #include "Workspace.hh"
 #include "UserPreferences.hh"
 
-/** @file **/
+#if HAVE_LIBELFIN_ELF_ELF___HH
+# include <libelfin/elf/elf++.hh>
+#endif
 
 /** \mainpage GNU APL
 
@@ -51,14 +64,15 @@
    GNU APL tries to be compatible with both the \b ISO \b standard \b 13751
    (aka. Programming Language APL, Extended) and to \b IBM \b APL2.
 
-   It is \b NOT meant to be a vehicle for implementing new features to the
-   APL language.
+   It is \b NOT meant to be a vehicle for adding new features to the
+   APL language. Its primary focus is on compatibility with APL2 and the
+   ISO standard and on the portability to different platforms.
  **/
 
 /// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// old sigaction argument for ^C
 static struct sigaction old_control_C_action;
@@ -66,7 +80,7 @@ static struct sigaction old_control_C_action;
 /// new sigaction argument for ^C
 static struct sigaction new_control_C_action;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for segfaults
 static struct sigaction old_SEGV_action;
 
@@ -77,7 +91,7 @@ static struct sigaction new_SEGV_action;
 static void
 signal_SEGV_handler(int)
 {
-   CERR << "\n\n====================================================\n"
+   CERR << "\n\n===================================================\n"
            "SEGMENTATION FAULT" << endl;
 
 #if PARALLEL_ENABLED
@@ -85,16 +99,19 @@ signal_SEGV_handler(int)
    Thread_context::print_all(CERR);
 #endif // PARALLEL_ENABLED
 
-   Backtrace::show(__FILE__, __LINE__);
+   BACKTRACE
 
    CERR << "====================================================\n";
 
    // count errors
    IO_Files::assert_error();
 
+   // restore terminal setting and
+   LineInput::restore_termios();
+
    Command::cmd_OFF(3);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGWINCH
 static struct sigaction old_WINCH_action;
 
@@ -120,8 +137,7 @@ struct winsize wsize;
 
    Workspace::set_PW(wsize.ws_col, LOC);
 }
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
 static struct sigaction old_USR1_action;
 
@@ -134,7 +150,7 @@ signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGTERM
 static struct sigaction old_TERM_action;
 
@@ -149,7 +165,7 @@ signal_TERM_handler(int)
    sigaction(SIGTERM, &old_TERM_action, 0);
    raise(SIGTERM);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
 /// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
@@ -165,7 +181,7 @@ control_BSL(int sig)
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGHUP
 static struct sigaction old_HUP_action;
 
@@ -180,7 +196,7 @@ signal_HUP_handler(int)
    sigaction(SIGHUP, &old_HUP_action, 0);
    raise(SIGHUP);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print argc and argv[]
 static void
 show_argv(int argc, const char ** argv)
@@ -202,15 +218,15 @@ show_argv(int argc, const char ** argv)
    else
       CERR << "fd 3 is:  OPEN" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0)
 {
 char c1[200];
 char c2[200];
-   snprintf(c1, sizeof(c1), "Welcome to GNU APL version %s", build_tag[1]);
-   snprintf(c2, sizeof(c2), "for details run: %s --gpl.", argv0);
+   SPRINTF(c1, "Welcome to GNU APL version %s", build_tag[1]);
+   SPRINTF(c2, "for details run: %s --gpl.", argv0);
 
 const char * lines[] =
 {
@@ -223,7 +239,7 @@ const char * lines[] =
   ""                                                                      ,
   c1                                                                      ,
   ""                                                                      ,
-  "Copyright (C) 2008-2019  Dr. Jürgen Sauermann"                         ,
+  "Copyright © 2008-2023  Dr. Jürgen Sauermann"                         ,
   "Banner by FIGlet: www.figlet.org"                                      ,
   ""                                                                      ,
   "This program comes with ABSOLUTELY NO WARRANTY;"                       ,
@@ -250,13 +266,111 @@ const int left_pad = (80 - len)/2;
    for (const char ** l = lines; *l; ++l)
        {
          const char * cl = *l;
-         const int clen = strlen(cl);
-         const int pad = left_pad + (len - clen)/2;
-         loop(p, pad)   out << " ";
-         out << cl << endl;
+         if (const int clen = strlen(cl))   // unless empty line
+            {
+              const int pad = left_pad + (len - clen)/2;
+              loop(p, pad)   out << " ";
+              out << cl;
+            }
+         out<< endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
+/// port UserPreferences::uprefs.tcp_port on localhost
+void
+remap_stdio()
+{
+   if (UserPreferences::uprefs.tcp_port <= 0)   return;
+
+const int listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+   if (listen_socket == -1)
+      {
+        perror("socket() failed");
+        exit(1);
+      }
+
+sockaddr_in local;
+   memset(&local, 0, sizeof(local));
+   local.sin_family = AF_INET;
+   local.sin_addr.s_addr = htonl(0x7F000001);   // localhost (127.0.0.1)
+   local.sin_port = htons(UserPreferences::uprefs.tcp_port);
+
+   // fix bind() error when listening socket is openend too quickly
+   {
+     const int yes = 1;
+     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
+                     &yes, sizeof(yes)) < 0)
+        {
+          perror("setsockopt(SO_REUSEADDR) failed");
+        }
+
+      // continue, since a failed setsockopt() is sort of OK here.
+   }
+
+   if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+      {
+        perror("bind() failed");
+        exit(1);
+      }
+
+   if (listen(listen_socket, 10))
+      {
+        perror("listen() failed");
+        exit(1);
+      }
+
+   0 && CERR << "The GNU APL server is listening on TCP port "
+             << UserPreferences::uprefs.tcp_port << endl;
+
+   for (;;)   // connection server loop
+       {
+         sockaddr_in remote;
+         socklen_t remote_len = sizeof(remote);
+         const int connection = ::accept(listen_socket,
+                                       reinterpret_cast<sockaddr *>(&remote),
+                                       &remote_len);
+         if (connection == -1)
+            {
+              perror("accept() failed");
+              exit(1);
+            }
+
+         0 && CERR << "GNU APL server got TCP connction from "
+                   << (ntohl(remote.sin_addr.s_addr) >> 24 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >> 16 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  8 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  0 & 0xFF) << " port "
+                   << ntohs(remote.sin_port)                       << endl;
+
+         // fork() and let the client return while the server remains in this
+         // server loop for the next connection.
+         //
+         const pid_t fork_result = fork();
+         if (fork_result == -1)   // fork() failed
+            {
+              close(connection);
+              perror("fork() failed");
+              exit(1);
+            }
+
+         if (fork_result)   // parent (server)
+            {
+              close(connection);
+              continue;
+            }
+
+         // child (client)
+         //
+         close(listen_socket);
+         dup2(connection, STDIN_FILENO);
+         dup2(connection, STDOUT_FILENO);
+         dup2(connection, STDERR_FILENO);
+         close(connection);
+         return;
+       }
+}
+//----------------------------------------------------------------------------
 /// initialize the interpreter
 int
 init_apl(int argc, const char * argv[])
@@ -268,22 +382,44 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
-   uprefs.expand_argv(argc, argv);
-const bool log_startup = uprefs.parse_argv_1();
+const bool log_startup0 = UserPreferences::uprefs.parse_argv_0(argc, argv);
+   if (LOG_argc_argv || log_startup0)
+      {
+         CERR << "argc/argv before expansion:\n";
+         show_argv(argc, argv);
+      }
 
-#ifdef DYNAMIC_LOG_WANTED
+   UserPreferences::uprefs.expand_argv(argc, argv);
+
+const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
+   if (LOG_argc_argv || log_startup)
+      {
+         CERR << "argc/argv after expansion:\n";
+         show_argv(UserPreferences::uprefs.expanded_argv.size(),
+                  &UserPreferences::uprefs.expanded_argv[0]);
+      }
+
+#ifdef cfg_DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
-#endif // DYNAMIC_LOG_WANTED
+#endif // cfg_DYNAMIC_LOG_WANTED
 
    init_1(argv[0], log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
-   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
-   uprefs.read_threshold_file(true,  log_startup);  // dito parallel_thresholds
-   uprefs.read_threshold_file(false, log_startup);  // dito parallel_thresholds
+   // read /etc/gnu-apl.d/preferences
+   UserPreferences::uprefs.read_config_file(true,  log_startup);
 
-   // struct sigaction differs between GNU/Linux and other systems, which causes
-   // compile errors for direct curly bracket assignment on some systems
+   // read $HOME/.config/gnu_apl/preferences
+   UserPreferences::uprefs.read_config_file(false, log_startup);
+
+  // read /etc/gnu-apl.d/parallel_thresholds
+   UserPreferences::uprefs.read_threshold_file(true, log_startup);
+
+  // read $HOME/.config/gnu_apl/parallel_thresholds
+   UserPreferences::uprefs.read_threshold_file(false, log_startup);
+
+   // NOTE: struct sigaction differs between GNU/Linux and other systems,
+   // which causes compile errors for direct curly bracket assignment on
+   // some systems.
    //
    // We therefore memset everything to 0 and then set the handler (which
    // should compile on GNU/Linux and also on other systems.
@@ -307,14 +443,15 @@ const bool log_startup = uprefs.parse_argv_1();
    sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
-   if (uprefs.WINCH_sets_pw)
+   signal(SIGCHLD, SIG_IGN);   // do not create zombies
+   if (UserPreferences::uprefs.WINCH_sets_pw)
       {
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
         signal_WINCH_handler(0);   // pretend window size change
       }
    else
       {
-        Workspace::set_PW(uprefs.initial_pw, LOC);
+        Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
       }
 
 #if PARALLEL_ENABLED
@@ -323,22 +460,27 @@ const bool log_startup = uprefs.parse_argv_1();
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
 #endif
 
-   uprefs.parse_argv_2(log_startup);
+   UserPreferences::uprefs.parse_argv_2(log_startup);
 
-   if (uprefs.CPU_limit_secs)
+   // maybe use TCP connection instead of stdin/stderr. This function blocks
+   // until a TCP connections was received.
+   //
+   remap_stdio();
+
+   if (UserPreferences::uprefs.CPU_limit_secs)
       {
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
-        rl.rlim_cur = uprefs.CPU_limit_secs;
+        rl.rlim_cur = UserPreferences::uprefs.CPU_limit_secs;
         setrlimit(RLIMIT_CPU, &rl);
       }
 
-   if (uprefs.emacs_mode)
+   if (UserPreferences::uprefs.emacs_mode)
       {
         UCS_string info;
-        if (uprefs.emacs_arg)
+        if (const char * emacs_arg = UserPreferences::uprefs.emacs_arg)
            {
-             info = NativeFunction::load_emacs_library(uprefs.emacs_arg);
+             info = NativeFunction::load_emacs_library(emacs_arg);
            }
 
         if (info.size())   // problems loading library
@@ -377,12 +519,10 @@ const bool log_startup = uprefs.parse_argv_1();
 
              // no clear_EOL
              Output::clear_EOL[0] = 0;
-
-             Output::use_curses = false;
            }
       }
 
-   if (uprefs.daemon)
+   if (UserPreferences::uprefs.daemon)
       {
         const pid_t pid = fork();
         if (pid)   // parent
@@ -398,11 +538,11 @@ const bool log_startup = uprefs.parse_argv_1();
            CERR << "child forked (pid" << getpid() << ")" << endl;
       }
 
-   if (uprefs.wait_ms)   usleep(1000*uprefs.wait_ms);
+   if (const int wait = UserPreferences::uprefs.wait_ms)   usleep(1000*wait);
 
    init_2(log_startup);
 
-   if (!uprefs.silent)   show_welcome(cout, argv[0]);
+   if (!UserPreferences::uprefs.silent)   show_welcome(cout, argv[0]);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
    Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);
@@ -413,18 +553,19 @@ const bool log_startup = uprefs.parse_argv_1();
         return 8;
       }
 
-   if (uprefs.do_Color)   Output::toggle_color("ON");
+   if (UserPreferences::uprefs.do_Color)
+      Output::toggle_color(UTF8_string("ON"));
 
-   if (uprefs.latent_expression.size())
+   if (UserPreferences::uprefs.latent_expression.size())
       {
         // there was a --LX expression on the command line
         //
-        UCS_string lx(uprefs.latent_expression);
+        UCS_string lx(UserPreferences::uprefs.latent_expression);
 
         if (log_startup)
            CERR << "executing --LX '" << lx << "'" << endl;
 
-        Command::process_line(lx);
+        Command::process_line(lx, 0);
       }
 
    // maybe )LOAD the CONTINUE or SETUP workspace. Do that unless the user 
@@ -434,9 +575,10 @@ const bool log_startup = uprefs.parse_argv_1();
    // (2) --script (which implies --noCONT), or
    // (3)  -L wsname
    //
-   if (uprefs.do_CONT && !uprefs.initial_workspace.size())
+   if (UserPreferences::uprefs.do_CONT &&
+       !UserPreferences::uprefs.initial_workspace.size())
       {
-         UCS_string cont("CONTINUE");
+         UCS_string cont(UTF8_string("CONTINUE"));
          UTF8_string filename =
             LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
 
@@ -444,14 +586,14 @@ const bool log_startup = uprefs.parse_argv_1();
             {
               // CONTINUE workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(")LOAD CONTINUE");
-              Command::process_line(load_cmd);
+              UCS_string load_cmd(UTF8_string(")LOAD CONTINUE"));
+              Command::process_line(load_cmd, 0);
               return 0;
             }
 
          // no CONTINUE workspace but maybe SETUP
          //
-         cont = UCS_string("SETUP");
+         cont = UCS_ASCII_string("SETUP");
          filename =
             LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
 
@@ -459,41 +601,70 @@ const bool log_startup = uprefs.parse_argv_1();
             {
               // SETUP workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(")LOAD SETUP");
-              Command::process_line(load_cmd);
+              UCS_string load_cmd(UTF8_string(")LOAD SETUP"));
+              Command::process_line(load_cmd, 0);
               return 0;
             }
       }
 
-   if (uprefs.initial_workspace.size())
+   if (UserPreferences::uprefs.initial_workspace.size())
       {
          // the user has provided a workspace name via -L
          //
-         UCS_string init_ws(uprefs.initial_workspace);
-         const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
-         UCS_string load_cmd(cmd);
+         UCS_string init_ws(UserPreferences::uprefs.initial_workspace);
+         const char * cmd = UserPreferences::uprefs.silent
+                          ? ")QLOAD " : ")LOAD ";
+         const UTF8_string utf(cmd);
+         UCS_string load_cmd(utf);
          load_cmd.append(init_ws);
-         Command::process_line(load_cmd);
+         Command::process_line(load_cmd, 0);
       }
 
    Quad_TZ::compute_offset();
-   return 0;
+
+   // we allocate a mmap'ed dwarf object beforhand so that we do not need
+   // to create one when, as often, a WS_FULL is thrown.
+   //
+   init_DWARF(LibPaths::get_APL_bin_path(), LibPaths::get_APL_bin_name());
+
+   return 0;   // OK.
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// dito.
 int
 main(int argc, const char *argv[])
 {
-const int ret = init_apl(argc, argv);
-   if (ret)   return ret;
+   if (const int ret = init_apl(argc, argv))   return ret;
 
-   for (;;)
+   if (UserPreferences::uprefs.eval_exprs.size())
+      {
+         loop(e, UserPreferences::uprefs.eval_exprs.size())
+            {
+              const char * expr = UserPreferences::uprefs.eval_exprs[e];
+              const UTF8_string expr_utf(expr);
+              UCS_string expr_ucs(expr_utf);
+              Command::process_line(expr_ucs, 0);
+            }
+        Command::cmd_OFF(0);
+        return 0;
+      }
+
+#if HAVE_PTHREAD_SETNAME_NP
+         pthread_setname_np(pthread_self(), "apl/main");
+#endif
+
+   for (const bool exit_on_error = IO_Files::exit_on_error();;)
        {
-         Token t = Workspace::immediate_execution(
-                       IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_ERROR);
-         if (t.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
+         const Token tok = Workspace::immediate_execution(exit_on_error);
+         if (tok.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
        }
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+
+const int libapl_version = 0;
+int64_t get_main()
+{
+   return reinterpret_cast<int64_t>(&main);
+}
+//----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __OUTPUT_HH_DEFINED__
@@ -38,31 +41,31 @@ using namespace std;
  testcase execution. It works like this:
 
        (cin)
-         |
-         |
+         │
+         │
          V
-     +---+---+             +-------------------+
-     | Input | <--------   | testcase files(s) |
-     +---+---+             +---------+---------+
-         |                           |
-         |                           |
+     ┌───────┐             ┌───────────────────┐
+     │ Input │ <────────   │ testcase files(s) │
+     └───┬───┘             └───────────────────┘
+         │                           |
+         │                           |
          V                           |
-      +--+--+                        |
-      | APL |                        |
-      +--+--+                        |
-         |                           |
-         |                           |
-         +-----------------------+   |
-         |                       |   |
-         |                       V   V
-         |                    +--+---+--+
-         |                    | compare |
-         |                    +----+----+
-         |                         |
-         |                         |
+      ┌─────┐                        |
+      │ APL │                        |
+      └──┬──┘                        |
+         │                           |
+         │                           |
+         ├───────────────────────┐   |
+         │                       │   |
+         │                       V   V
+         │                    ┌─────────┐
+         │                    │ compare │
+         │                    └────┬────┘
+         │                         │
+         │                         │
          V                         V
        (cout)                (test results)
- 
+
  */
 
 /** the output of the APL interpreter to cout and maybe to a test result file
@@ -191,19 +194,6 @@ public:
 
    /// default ESC sequence for Delete key with SHIFT and/or CTRL
    static char ESC_Delete_1[MAX_ESC_LEN];
-
-   /// escape sequence for exiting attribute mode
-   static char exit_attr_mode[MAX_ESC_LEN];
-
-   /// true if curses shall be used for output ESC sequences
-   static bool use_curses;
-
-   /// true if curses shall be used for input ESC sequences
-   static bool keys_curses;
-
-   /// read/append an ESC sequence in str and store it in \b dest
-   static int read_ESC_sequence(char * dest, int destlen, int append,
-                                const char * capname, char * str, int p1);
 
    /// true if xterm/color is on
    static bool color_enabled();

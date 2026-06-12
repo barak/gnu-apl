@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __ERROR_HH_DEFINED__
 #define __ERROR_HH_DEFINED__
 
@@ -25,6 +28,7 @@
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "UCS_string.hh"
+#include <cstring>
 
 #ifdef __GNUC__
     #define GNUC__noreturn __attribute__ ((noreturn))
@@ -60,8 +64,8 @@ public:
    /// return ⎕EM[1;]. This is the first of 3 error lines. It contains the
    /// error name (like SYNTAX ERROR, DOMAIN ERROR, etc) and is subject
    /// to translation
-   const char * get_error_line_1() const
-      { return error_message_1; }
+   UCS_string get_error_line_1() const
+      { return UCS_string(UTF8_string(error_message_1)); }
 
    /// clear error line 1
    void clear_error_line_1()
@@ -69,8 +73,8 @@ public:
 
    /// return error_message_2. This is the second of 3 error lines.
    /// It contains the failed statement and is NOT subject to translation.
-   const char * get_error_line_2() const
-      { return error_message_2; }
+   UCS_string get_error_line_2() const
+      { return UCS_string(UTF8_string(error_message_2)); }
 
    /// return the major class (⎕ET) of the error
    static int error_major(ErrorCode err)
@@ -83,11 +87,6 @@ public:
    /// return source file location where this error was printed (0 if not)
    const char * get_print_loc() const
       { return print_loc; }
-
-   /// compute the caret line. This is the third of the 3 error lines.
-   /// It contains the failure position the statement and is NOT subject
-   /// to translation.
-   UCS_string get_error_line_3() const;
 
    /// return the source code location where the error was thrown
    const char * get_throw_loc() const
@@ -109,14 +108,19 @@ public:
    void print(ostream & out, const char * loc) const;
 
    /// set the first error line
-   void set_error_line_1(const char * msg_1)
-      { strncpy(error_message_1, msg_1, sizeof(error_message_1) - 1);
-        error_message_1[sizeof(error_message_1) - 1] = 0; }
+   void set_error_line_1(const char * msg_1);
 
-   /// set the second error line
-   void set_error_line_2(const char * msg_2)
-      { strncpy(error_message_2, msg_2, sizeof(error_message_2) - 1);
-        error_message_2[sizeof(error_message_2) - 1] = 0; }
+   /// add a '+' to error_message_1 unless it hast one already. The caller
+   /// has checked that 
+   void add_MORE_indicator(bool have_more);
+
+   /// compute the caret line. This is the third of the 3 error lines.
+   /// It contains the failure position the statement and is NOT subject
+   /// to translation.
+   UCS_string get_error_line_3() const;
+
+   /// set the second error line to \b msg_2
+   void set_error_line_2(const char * msg_2);
 
    /// set error line 2, left caret, and right caret
    void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
@@ -178,21 +182,21 @@ protected:
 
    /// an optional error text. this text is provided for non-APL errors,
    // for example in ⎕ES
-   char error_message_1[60];
+   char error_message_1[200];
 
    /// second line of error message (only valid if error_code != _NO_ERROR)
-   char error_message_2[60];
+   char error_message_2[200];
 
    /// display user function and line rather than ⎕ES instruction
    bool show_locked;
 
-   /// the left caret position (-1 if none) for the error display
+   /// the left caret position (-1 if none) for the error line 3
    int left_caret;
 
-   /// the right caret position (-1 if none) for the error display
+   /// the right caret position (-1 if none) for the error line 3
    int right_caret;
 
-   /// where this error was printed (0 if not)
+   /// where this error was printed (0 if not yet printed)
    const char * print_loc;
 
 private:

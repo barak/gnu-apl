@@ -3,23 +3,22 @@ About APL
 
 In addition to ASCII characters found on most keyboards,
 APL needs additional "APL characters". This README file
-explains how GNU APL works and how to enable APL characters on
-a number of different machines.
-
+explains how GNU APL works and how to enable APL characters
+on a number of different machines.
 
 1. How GNU APL works
 ====================
 
 The GNU APL binary is a standard process that receives its input (normally,
-but not necessarily from what you type on your keyboard). It reads a file descriptor
-called "standard input (stdin) and prints its output on two other file
-descriptors called standard output (stdout) for normal APL output, and
+but not necessarily from what you type on your keyboard). It reads a file
+descriptor called standard input (stdin) and prints its output on two other
+file descriptors called standard output (stdout) for normal APL output, and
 standard error (stderr) for additional diagnostic output.
 
 This means that the GNU APL binary has no concept of what a keyboard is, 
-nor, on output is it concerned with fonts and the like. All the binary sees is a byte
-stream on input and all it produces is a bytes stream out its output
-channels stdout and stderr.
+nor, on output is it concerned with fonts and the like. All the binary sees
+is a byte stream on input and all it produces is a byte stream on its
+output channels stdout and stderr.
 
 GNU APL expects that the byte sequences on stdin, stdout, and stderr are
 "UTF8-encoded". UTF8-encoding is an extension of ASCII encoding that is used
@@ -29,8 +28,8 @@ and is supported on most operating systems.
 
 A second standard - Unicode - describes how characters will appear on the
 terminal.  This standard includes all the APL characters used by GNU APL. 
-Normally Unicode  characters are UTF8 encoded when transmitted over serial lines,
-file descriptors, in IP packets, or when displayed on web pages.
+Normally Unicode characters are UTF8 encoded when transmitted over serial
+lines, file descriptors, in IP packets, or when displayed on web pages.
 
 There are many advantages to using UTF8-encoded Unicodes for APL:
 
@@ -42,22 +41,23 @@ There are many advantages to using UTF8-encoded Unicodes for APL:
 - You can exchange such files with APL users using APL interpreters from other
   vendors, or copy APL code snippets into documents.
 
-The downside of UTF8-encoded Unicodes is that GNU APL can not (and will not)
+The downside of UTF8-encoded Unicodes is that GNU APL cannot (and will not)
 take care of how your keyboard, screen, and printers work. You have to set that
 up yourself and outside GNU APL.
 
 There is no single standard way of setting things up for GNU APL. The rest of 
-this README file describes a number of different methods to enable APL characters 
-on your machine. The information that follows has made GNU APL work on most 
-(but nor all) machines and operating systems around. As different approaches were
-used these methods may conflict with each other. Use only one of them at a time.
+this README file describes a number of different methods to enable APL
+characters on your machine. The information that follows has made GNU APL work
+on most (but not all) machines and operating systems around. As different
+approaches were used these methods may conflict with each other. Use only one
+of them at a time.
 
 GNU APL includes a directory called "support-files". This directory
 contains various configuration files needed by the methods described below.
 
-Most of the problems in getting UTF8-encoded Unicodes working with the APL interpretor
-is with the input side (from the keyboard to GNU APL). The output side from APL 
-is most often already working (thanks to Unicode).
+Most of the problems in getting UTF8-encoded Unicodes working with the APL
+interpretor is with the input side (from the keyboard to GNU APL). The output
+side from APL is most often already working (thanks to Unicode).
 
 
 2. Structure of the support-files directory
@@ -75,6 +75,7 @@ option, currently:
     support-files/Dirk,
     support-files/Dyalog-Keyboard,
     support-files/Jürgen-Mint-19,
+    support-files/Jürgen-Mint-21,
     support-files/old-Keyboard,
     support-files/OS-X-Keyboard,
     support-files/Unicomp-Keyboard, and
@@ -92,12 +93,13 @@ layouts.
 
 If no support file exists for your actual combination of keyboard layout
 and method, then usually the support file of some other layout works or
-can be made working easily. If you adapt support files, feel free
+can be easily made to work. If you adapt support files, feel free
 to mail the changed file to bug-apl@gnu.org so that we can include it.
 
-Note: Not all support files are fully tested - they should work. The layouts 
+Note: Not all support files are fully tested but they should work. The layouts 
 change from time to time and given the number of methods and the number 
-of layouts there is no easy way to track these changes for all methods and layout
+of layouts there is no easy way to track these changes for all methods and
+layouts.
 
 The standard layout assumed for GNU APL is that of the APL keyboards shipped
 by Dyalog. The standard method assumed for GNU APL is xmodmap.
@@ -110,7 +112,6 @@ If your operating system runs X (which is the case for most "Desktop"
 variants of GNU/Linux) then it is quite simple to make your keyboard produce
 APL characters.
 
-
 The program xmodmap comes with X, and is already installed on your machine. 
 It defines a mapping between the keys you type and the character
 that is being produced (taking into account modifiers like Shift or Alt).
@@ -119,16 +120,16 @@ There are two common physical hardware keyboards in common use. One is titled
 pc104 and the other, pc105. The pc104 is the standard USA keyboard.
 The pc105 has two additional keys and may contain more characters than are
 found on the pc104 keyboard.The pc105 has a font selection key.  
-The APL character placement for the respective keyboard is shown below. 
+The APL character placement for the respective keyboards is shown below. 
 
 There are four character cases with your X system. Lower case, Upper case,
-alt (ALT) case and shift-alt (shift-ALT) case. Usually the alt key is the one
-to the right of the space bar. However, depending on the keyboard 
+alt (ALT) case and shift-alt (shift-ALT) case. Usually the alt key is the
+one to the right of the space bar. However, depending on the keyboard 
 xmod interface, the alt key may be the one to the left of the space bar.
 
 The file "support-files/Dyalog-Keyboard/apl.xmodmap" (that comes with GNU APL) 
-provides such a mapping; the normal keys produce ASCII characters while the ALT
-(and Shift-ALT) cases contains all APL character used by GNU APL. The
+provides such a mapping; the normal keys produce ASCII characters while the
+ALT (and Shift-ALT) cases contains all APL characters used by GNU APL. The
 mapping is enabled with the following command (we use "$ " to indicate the
 prompt of your shell):
 
@@ -147,10 +148,10 @@ PC104 USA Domestic APL Keyboard Layout
 ║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║
 ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \⊢  ║
 ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
-║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H⍙ ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
-║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
+║ (CAPS   ║ A⍶ ║ S« ║ D» ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
 ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
-║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?  ║          ║
 ║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║
 ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
 
@@ -163,16 +164,17 @@ PC105 USA and International Keyboards
 ║       ║ Q  ║ W⍹ ║ E⍷ ║ R  ║ T⍨ ║ Y¥ ║ U€ ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║         ║
 ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║ RETURN  ║
 ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╗       ║
-║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H  ║ J⍤ ║ K⌸ ║ L⌷ ║ :≡ ║ "≢ ║ |⊣ ║       ║
-║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ \⊢ ║       ║
+║ (CAPS   ║ A⍶ ║ S« ║ D» ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║ |⊣ ║       ║
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ \⊢ ║       ║
 ╠════════╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩════╩═══════╣
-║        ║ < ¦║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║             ║
+║        ║ < ¦║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?  ║             ║
 ║  SHIFT ║ > °║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT      ║
 ╚════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩═════════════╝
 
-Three files within "support-files/Dyalog-Keyboard/", keyboard.txt, keyboard1.txt
-and pc105.txt contain the above images. If you want to print it 
-(keyboard1 is < 80 characters wide).
+Three files within "support-files/Dyalog-Keyboard/", keyboard.txt,
+keyboard1.txt and "support-files/105-key-International-Keyboard/keyboard1.txt"
+contain the above images. If you want to print it (keyboard1 is < 80
+characters wide).
 
 If you don't like this particular layout, then you can modify "apl.xmodmap"
 to fit your preferences.
@@ -187,6 +189,9 @@ a 1:1 replacement based on setxkbmap exists, see file README in directory
 support-files/Jürgen-Mint-19. This file is a hack that is somewhat easier
 to use than "proper" setxkbmap/xkbcomp setup explained in the next section.
 
+EVEN LATER NEWS: as of Mint-21 xmodmap is working again (at least with the
+GNOME desktop). See file support-files/Jürgen-Mint-21.
+
 4. setxkbmap/xkbcomp
 ====================
 
@@ -195,7 +200,7 @@ characters is setxkbmap. Like xmodmap it requires that you are running X,
 and setxkbmap should not be mixed with xmodmap.
 
 setxkbmap is more modern and more powerful than xmodmap, but we had some
-problems with older GNU/Linux versions (an setxkbmap config file produced
+problems with older GNU/Linux versions (a setxkbmap config file produced
 on a newer GNU/Linux did fix these problems).
 
 The file support-files/old-Keyboard/apl.xkm provides such a mapping (the 
@@ -210,8 +215,8 @@ Unlike the xmodmap approach, the APL characters are now produced with
 the AltGr modifier key but not with the Alt modifier key. This was to
 better support emacs which uses the Alt keys for other purposes.
 
-on those systems one of the following command may do (the syntax and file names
-of setxkbmap appear to have changed over time):
+On those systems one of the following commands may do (the syntax and file
+names of setxkbmap appear to have changed over time):
 
     $ setxkbmap -layout "apl(sax)"
     $ setxkbmap -layout "apl" -variant ",sax"
@@ -221,7 +226,7 @@ The file support-files/apl.xkb is the text file from which apl.xkm was
 generated. If you modify apl.xkb according to your preferences then you
 can generate your own apl.xkm file (see man pages for setxkbmap and xkbcomp).
 
-See also Blake's notes in support-files/Unicomp-Keyboard/apl.unicomp.xkb.txt
+See also Blake's notes in support-files/Unicomp-Keyboard/apl.xkb.txt
 
 Another description (also using setxkbmap) and files supporting it was kindly
 provided by Dirk Laurie and is contained in directory support-files/Dirk.
@@ -229,7 +234,7 @@ provided by Dirk Laurie and is contained in directory support-files/Dirk.
 WARNING: the description above is merely the "Theory of Operation" for
 setxkbmap and friends (according to their man pages). Over the years, window
 managers have become increasingly intrusive (some call it "convenient")
-into the keyboard setup. There exist a number of description below the
+into the keyboard setup. There exist a number of descriptions below the
 directory support-files/ that may look contradictory and/or may not work on
 a given platform. These descriptions were, to the best of our knowledge,
 valid and working at the time when they were contributed, but may have stopped
@@ -260,7 +265,7 @@ be downloaded from:
 
 Instead of using APL interactively, you may, like the author, find it more
 convenient to write a text file (an APL script) with all APL function
-definitions and variable assignments and to then run "apl -f" or "apl -s"
+definitions and variable assignments and then run "apl -f" or "apl -s"
 with that file.
 
 The editor of choice for editing such files is vi (actually, vim). Recent
@@ -302,11 +307,11 @@ pick APL characters from a menu inside vim. It is here:
 =====================================
 
 David Lamkins has written a keyboard translator called akt. You can
-use it for generating APL characters with your keyboard. In contrast to e,g.
+use it for generating APL characters with your keyboard. In contrast to e.g.
 the xmodmap method, the mapping is on a per program basis so that other
 programs are not affected. Obtain a copy from:
 
-    https://github.com/TieDyedDevil/akt
+    https://github.com/blakemcbride/akt
 
 David's akt program is simple to use. In its most useful form the line is
 
@@ -321,7 +326,6 @@ The left alt key is used to provide the apl characters.
 
 Certain older terminal emulators may offer an "Alt sets MSB" option. This
 is incompatible with `akt`.
-
 
 
 10. Keyboard Wrapper
@@ -340,11 +344,11 @@ subdirectory.
 =============================================
 When you wish to use APL with your own keyboard and/or keyboard arrangement.
 
-Use these programs as in succession as follows:
+Use these programs in succession as follows:
 
-o   APL_keyboard_show   to  display the keycodes
+o   APL_keyboard_show   to display the keycodes
 
-o  APL_keyboard_learn   to   create a file with the keycodes
+o  APL_keyboard_learn   to create a file with the keycodes
 
 o  APL_keyboard         to use the file from APL_keyboard_learn
 
@@ -398,7 +402,6 @@ key_seq_3(0xE2, 0x86, 0x91))
 The alert reader will have noticed that in both cases UTF8 encoded characters
 were sent; they were different and just wrong for APL before running xmodmap.
 
-
 10.3 APL_keyboard_learn
 -----------------------
 
@@ -436,24 +439,22 @@ After running APL_keyboard_learn, you should do 'make' in the tools directory,
 in order incorporate the newly created APL_keyboard.def into the program
 APL_keyboard.
 
-
 10.4 APL_keyboard
 -----------------
 
 The keyboard wrapper itself is APL_keyboard. The file APL_keyboard.def is
-#included by APL_keyboard.cc and defines the mapping from bytes sequences
-produced by you keyboard to UTF8 sequenced to be fed into GNU APL.
+#included by APL_keyboard.cc and defines the mapping from byte sequences
+produced by your keyboard to UTF8 sequenced to be fed into GNU APL.
 
 Once APL_keyboard is made, you can start GNU APL like this:
 
 $ APL_keyboard | apl
 
 
-
 11. aplwrap
 ===========
 
-There  is a cool GTK-based keyboard wrapper written by Chris Moller.
+There is a cool GTK-based keyboard wrapper written by Chris Moller.
 You can reach it via the GNU APL Community web page:
 
      http://www.gnu.org/software/apl/Community.html
@@ -466,7 +467,7 @@ is used to provide the apl characters.
 
 Suppose GNU APL is started on machine A and you connect to it by means 
 of ssh or telnet from machine B. In that case the keyboard setup 
-discussed above is only needed on machine B,  and not on machine A.
+discussed above is only needed on machine B, and not on machine A.
 
 The same applies if machine A is a web server using APL for CGI scripting;
 in this case machine B does not normally need the above setup because these
@@ -491,7 +492,7 @@ example is "locales" that can change the encoding of the byte streams involved.
 Locales interfere with APL characters in multiple ways: they can install new
 keyboard mappings, change encoding to something other than UTF8, and currently
 also impact the file format of saved workspaces, for example by changing the
-decimal point from . to , in the printf() functions. One thing to avoid the
+decimal point from . to , in the printf() functions. One way to avoid the
 latter is to run ./configure with --disable-nls.
 
 If you need to troubleshoot APL characters, proceed as follows:
@@ -518,7 +519,7 @@ If you need to troubleshoot APL characters, proceed as follows:
 14. APL Keyboards
 =================
 
-If you are new to APL or use it only infrequently, then you may have
+If you are new to APL or infrequently use it, then you may have
 problems remembering the locations of all the APL characters on your
 keyboard. In that situation an APL keyboard may be a great help.
 
@@ -543,15 +544,16 @@ directory.
 
 Stickers
 ==========
-Stickers may be created by printing the keyboard1.txt onto a 
-gummed paper, and subsequently cutting the sticker and peeling it
-to the keytop. This is not a durable solution, but would help you
-to remember the APL key locations.
+Stickers may be created by printing the keyboard1.txt file onto gummed
+paper, and subsequently cutting the stickers and peeling them onto the
+keytop.  This is not a durable solution, but would help you to remember
+the APL key locations (adding clear tape to the stickers may improve
+their durability).
 
 Another help for those that keep forgetting the APL key locations of their
 keyboard is the ]KEYB command of GNU APL. It displays the layout of a standard
 US keyboard with APL characters. Under X, if your keyboard is not yet up
-and running properly got APL, you can run the ]KEYB command in one window and
+and running properly in APL, you can run the ]KEYB command in one window and
 then copy-and-paste APL characters from that window to another one running APL
 with your mouse.  This approach is not useful for normal programming work, but
 can be handy in special situations.  

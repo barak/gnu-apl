@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
-#include <vector>
+#include <signal.h>
 
 #include "Error_macros.hh"
 #include "PrimitiveOperator.hh"
@@ -30,7 +33,7 @@
 
 class File_or_String;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /**
    The system function Quad-FIO (File I/O)
@@ -39,52 +42,80 @@ class File_or_String;
 class Quad_FIO : public QuadFunction
 {
 public:
-   /// overloaded Function::is_operator()
-   virtual bool is_operator() const   { return true; }
+   /// Constructor.
+   Quad_FIO();
 
    /// the default buffer size if the user does not provide one
    enum { SMALL_BUF = 5000 };
 
-   /// Constructor.
-   Quad_FIO();
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
-
-   /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
-
-   /// overloaded Function::eval_AXB().
-   virtual Token eval_XB(Value_P X, Value_P B);
-
-   /// overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
-
-   /// overloaded Function::eval_AXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
-
-   /// close all open files
-   void clear();
-
-   /// fork(), execve(), and return a connection to fd 3 of forked process
-   int do_FIO_57(const UCS_string & B);
+   virtual Token eval_B(Value_P B) const;
 
    /// close a file descriptor (and its FILE * if any)
-   int close_handle(int handle);
+   static int close_handle(int handle);
+
+   /// fork(), execve(), and return a connection to fd 3 of forked process
+   static int do_FIO_57(const UCS_string & B, char * const * envp);
+
+   static Quad_FIO  fun;   ///< Built-in function.
 
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
-   /// return one mor more random values
+   /// close all open files
+   static void clear();
+
+   /// cycle counter at start of a benchmark (⎕FIO[-1])
+   static uint64_t benchmark_cycles_from;
+
+protected:
+   /// overloaded Function::is_operator()
+   virtual bool is_operator() const   { return true; }
+
+   /// overloaded Function::get_fun_valence()
+   virtual int get_fun_valence() const   { return 2; }
+
+   /// overloaded Function::get_oper_valence().
+   virtual int get_oper_valence() const   { return 1; }
+
+   /// overloaded Function::eval_ALXB().
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_LXB().
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+
+   /// overloaded Function::has_subfuns()
+   virtual bool has_subfuns() const
+      { return true; }
+
+   /// overloaded Function::subfun_to_axis
+   virtual sAxis subfun_to_axis(const UCS_string & name) const;
+
+   /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);
 
    /// return the open FILE * for (APL integer) \b handle
-   FILE * get_FILE(int handle);
+   static FILE * get_FILE(int handle);
 
-   static Quad_FIO * fun;   ///< Built-in function.
-   static Quad_FIO  _fun;   ///< Built-in function.
+   /// a mapping between function names and function numbers
+   struct _sub_fun
+      {
+        unsigned int val;   ///< the function number
+        const char * key;   ///< the name for it
+      };
 
-protected:
+   /// a mapping between function names and function numbers
+   static _sub_fun sub_functions[];
+
    /// one file (openend with open(), fopen(), or fdopen()).
    /// : handle == fd, and FILE * may or may not exist for fd
    struct file_entry
@@ -121,27 +152,31 @@ protected:
       };
 
    /// return the open file for (APL integer) \b handle
-   file_entry & get_file_entry(int handle);
+   static file_entry & get_file_entry(int handle);
 
    /// return the open file for (APL integer) \b handle
-   file_entry & get_file_entry(const Value & handle)
-      { return get_file_entry(handle.get_ravel(0).get_near_int()); }
+   static file_entry & get_file_entry(const Value & handle)
+      { return get_file_entry(handle.get_cscalar().get_near_int()); }
 
    /// return the open FILE * (APL integer) \b handle
-   FILE * get_FILE(const Value & handle)
-      { return get_FILE(handle.get_ravel(0).get_near_int()); }
+   static FILE * get_FILE(const Value & handle)
+      { return get_FILE(handle.get_cscalar().get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
-   int get_fd(const Value & value)
+   static int get_fd(const Value & value)
        {
          file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
          return fe.fe_fd;
        }
 
+   /// append ASCII-buffer \b buffer to dest, inserting thousands' separators.
+   /// Note: \b buffer may be modified.
+   static void group_thousands(UCS_string & dest, char * buffer, bool flt);
+
    /// throw a DOMAIN error if the interpreter runs in safe mode.
-   void UNSAFE(const char * funname, int funnum)
+   static void UNSAFE(const char * funname, int funnum)
       {
-        if (uprefs.safe_mode)
+        if (UserPreferences::uprefs.safe_mode)
            {
              MORE_ERROR() << "⎕FIO[" << funnum
                           << " is not permitted in safe mode (see ⎕ARGi)";
@@ -150,24 +185,34 @@ protected:
       }
 
    /// list all ⎕IO functions to \b out
-   Token list_functions(ostream & out);
+   static Token list_functions(ostream & out, bool mapping);
 
    /// convert bits set in \b fds to an APL integer vector
-   Value_P fds_to_val(fd_set * fds, int max_fd);
+   static Value_P fds_to_val(fd_set * fds, int max_fd);
 
-   /// printf A to \b out
-   Token do_printf(FILE * out, Value_P A);
+   /// fprintf A to file \b out
+   static Token do_fprintf(FILE * out, Value_P A);
 
-   /// sprintf with format string A and Data items B
-   void do_sprintf(UCS_string & UZ, const UCS_string & A_format,
-                   const Value * B, int B_start);
+   /// snprintf with format string A and Data items B
+   static void do_snprintf(UCS_string & UZ, const UCS_string & A_format,
+                   const Value * B, int B_start, const char * funname);
 
    /// perform an fscanf() from file
-   Token do_scanf(File_or_String & input, const UCS_string & format);
+   static Token do_scanf(File_or_String & input, const UCS_string & format,
+                         int function_number);
+
+   /// compare two axis strings (function names)
+   static int axis_compare(const void * key, const void * sf);
+
+   /// find function number for function name, -1 if not found
+   static int function_name_to_int(const char * function_name);
+
+   /// for Date/Time Bv. return its seconds since midnight Jan 1, 1970
+   static APL_Integer secs_epoch(const Value & B);
 
    /// the open files
-   std::vector<file_entry> open_files;
+   static std::vector<file_entry> open_files;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Common.hh"
 #include "DerivedFunction.hh"
 #include "Id.hh"
@@ -26,11 +29,11 @@
 #include "StateIndicator.hh"
 #include "Workspace.hh"
 
-//=============================================================================
-DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Token & rfun,
+//============================================================================
+DerivedFunction::DerivedFunction(Token & larg, cFunction_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(larg),
      oper(dyop),
      right_fun(rfun),
      axis(Value_P())
@@ -43,21 +46,21 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Token & rfun,
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Value_P X,
-                                 Token & rval, const char * loc)
+//----------------------------------------------------------------------------
+DerivedFunction::DerivedFunction(Token & lfun, cFunction_P dyop, Value_P X,
+                                 Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(lfun, loc),
      oper(dyop),
-     right_fun(rval),
-     axis(X)
+     right_fun(rfun),
+     axis(X, loc)
 {
 }
-//-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
+//----------------------------------------------------------------------------
+DerivedFunction::DerivedFunction(Token & LO, cFunction_P monop,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(LO, loc),
      oper(monop),
      right_fun(TOK_VOID),
      axis(Value_P())
@@ -70,27 +73,27 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
+//----------------------------------------------------------------------------
+DerivedFunction::DerivedFunction(Token & lfun, cFunction_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(lfun, loc),
      oper(monop),
      right_fun(TOK_VOID),
-     axis(X)
+     axis(X, loc)
 {
    Assert1(oper);
 
    Log(LOG_FunOperX)
       {
-        print(CERR<< "DerivedFunction(monadic with axis)");
+        print(CERR << "DerivedFunction(monadic with axis)");
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Function * fun, Value_P X, const char * loc)
+//----------------------------------------------------------------------------
+DerivedFunction::DerivedFunction(cFunction_P fun, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(TOK_VOID),
+     left_arg(TOK_VOID),
      oper(fun),
      right_fun(TOK_VOID),
      axis(X)
@@ -103,9 +106,31 @@ DerivedFunction::DerivedFunction(Function * fun, Value_P X, const char * loc)
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+DerivedFunction::~DerivedFunction()
+{
+   Log(LOG_FunOperX)
+      {
+        CERR << "~DerivedFunction()" << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
+DerivedFunction::destroy_derived(const char * loc)
+{
+   Log(LOG_FunOperX)
+      {
+        CERR << "DerivedFunction::destroy_derived("
+             << get_name() << ")" << endl;
+      }
+
+   left_arg.clear(loc);
+   right_fun.clear(loc);
+   axis.clear(loc);
+}
+//----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_B(Value_P B)
+DerivedFunction::eval_B(Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -114,24 +139,36 @@ DerivedFunction::eval_B(Value_P B)
              << voidP(this) << endl;
       }
 
-   if (left_fun.get_tag() == TOK_VOID)   // function bound to axis
+   if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
       {
         return oper->eval_XB(axis, B);
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_LRB(left_fun, right_fun, B);
+        Token & left  = const_cast<Token &>(left_arg);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_LRB(left, right, B);
       }
    else                                   // monadic operator
       {
-        if (!!axis)   return oper->eval_LXB(left_fun, axis, B);
-        else          return oper->eval_LB(left_fun, B);
+        if (left_arg.is_function())   // normal operator
+           {
+             Token & left = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_LB(left, B);
+             else         return oper->eval_LXB(left, axis, B);
+           }
+        else                         // operator with left value operand
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_XB(Value_P X, Value_P B)
+DerivedFunction::eval_XB(Value_P X, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -142,16 +179,29 @@ DerivedFunction::eval_XB(Value_P X, Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_LRXB(left_fun, right_fun, X, B);
+        Token & left  = const_cast<Token &>(left_arg);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_LRXB(left, right, X, B);
       }
    else                                   // monadic operator
       {
-        return oper->eval_LXB(left_fun, X, B);
+        if (left_arg.is_function())   // normal operator
+           {
+             Token & left = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_LB(left, B);
+             else         return oper->eval_LXB(left, axis, B);
+           }
+        else                         // operator with left value operand
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_AB(Value_P A, Value_P B)
+DerivedFunction::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -159,25 +209,37 @@ DerivedFunction::eval_AB(Value_P A, Value_P B)
         CERR << "::eval_AB()" << endl;
       }
 
-   if (left_fun.get_tag() == TOK_VOID)   // function bound to axis
+   if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
       {
         return oper->eval_AXB(A, axis, B);
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        if (!axis)   return oper->eval_ALRB(A, left_fun, right_fun, B);
-        else         return oper->eval_ALRXB(A, left_fun, right_fun, axis, B);
+        Token & left  = const_cast<Token &>(left_arg);
+        Token & right = const_cast<Token &>(right_fun);
+        if (!axis)   return oper->eval_ALRB(A, left, right, B);
+        else         return oper->eval_ALRXB(A, left, right, axis, B);
       }
    else                                   // monadic operator
       {
-        if (!axis)   return oper->eval_ALB(A, left_fun, B);
-        else         return oper->eval_ALXB(A, left_fun, axis, B);
+        if (left_arg.is_function())
+           {
+             Token & left  = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_ALB(A, left, B);
+             else         return oper->eval_ALXB(A, left, axis, B);
+           }
+        else
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
+DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -187,46 +249,69 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_ALRXB(A, left_fun, right_fun, X, B);
+        Token & left  = const_cast<Token &>(left_arg);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_ALRXB(A, left, right, X, B);
       }
    else                                   // monadic operator
       {
-        return oper->eval_ALXB(A, left_fun, X, B);
+        Token & left  = const_cast<Token &>(left_arg);
+        return oper->eval_ALXB(A, left, X, B);
       }
 }
-//-----------------------------------------------------------------------------
-ostream &
-DerivedFunction::print(ostream & out) const
+//----------------------------------------------------------------------------
+UCS_string
+DerivedFunction::get_name() const
 {
-   out << "(";
-   if (left_fun.is_function())   left_fun.get_function()->print(out);
-   else                          out << "VAL";
-   out << " ";
+UCS_string name;
+   name << "(";
 
-   oper->print(out);
-   if (!!axis)   out << "[]";
+   if (left_arg.is_function())   name << left_arg.get_function()->get_name();
+   else                          name << "VAL";
+   name << " ";
+
+   name << oper->get_name();
+   if (+axis)   name << "[]";
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        out << " ";
-        if (right_fun.is_function())   right_fun.get_function()->print(out);
-        else                           out << "VAL";
+        name << " ";
+        if (right_fun.is_function())
+           name << right_fun.get_function()->get_name();
+        else
+           name << "VAL";
       }
 
-   return out << ")";
+   name << ")";
+   return name;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool
+DerivedFunction::has_result() const
+{
+   if (!oper->has_result())   return false;   // unlikely
+   if (left_arg.is_function())   return left_arg.get_function()->has_result();
+   return true;   // operator bound to left value
+}
+//----------------------------------------------------------------------------
+void
+DerivedFunction::unmark_all_values() const
+{
+   if (+axis)   axis->unmark();
+   if (left_arg.is_apl_val())   left_arg.get_apl_val()->unmark();
+}
+//----------------------------------------------------------------------------
 void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "Function derived from operator" << endl
        << ind << "Left Function: ";
-   if (left_fun.is_function())   left_fun.get_function()->print(out);
+   if (left_arg.is_function())   left_arg.get_function()->print(out);
    else                          out << "VAL";
    out << endl << ind << "Operator:  ";
    oper->print(out);
-   if (!!axis)   out << "Axis: " << *axis << endl;
+   if (+axis)   out << "Axis: " << *axis << endl;
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
@@ -237,7 +322,7 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
 
    out << endl;
 }
-//=============================================================================
+//============================================================================
 DerivedFunctionCache::DerivedFunctionCache()
    : idx(0)
 {
@@ -249,9 +334,10 @@ DerivedFunctionCache::DerivedFunctionCache()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunctionCache::~DerivedFunctionCache()
 {
+   reset();
    Log(LOG_FunOperX)
       {
          CERR << "DerivedFunctionCache deleted, cache at "
@@ -260,11 +346,16 @@ DerivedFunctionCache::~DerivedFunctionCache()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DerivedFunctionCache::reset()
 {
-   idx = 0;
+   while (idx)
+       {
+         --idx;   // back to last item
+         get(LOC)->destroy_derived(LOC);
+         --idx;   // undo idx++ by get(LOC)
+       }
 
    Log(LOG_FunOperX)
       {
@@ -274,7 +365,7 @@ DerivedFunctionCache::reset()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction *
 DerivedFunctionCache::get(const char * loc)
 {
@@ -288,7 +379,8 @@ DerivedFunctionCache::get(const char * loc)
               << " at " << loc << endl;
       }
 
-   return cache + idx++;
+   return reinterpret_cast<DerivedFunction *>
+                          (cache + idx++*sizeof(DerivedFunction));
 }
-//=============================================================================
+//============================================================================
 

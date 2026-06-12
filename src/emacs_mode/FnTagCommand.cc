@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "NetworkConnection.hh"
 #include "FnTagCommand.hh"
 #include "emacs.hh"
@@ -32,8 +35,8 @@ void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::
 
     std::stringstream out;
 
-    UCS_string ucs_name = ucs_string_from_string( name );
-    NamedObject *obj = Workspace::lookup_existing_name( ucs_name );
+    UCS_string ucs_name = ucs_string_from_string(name);
+    const NamedObject * obj = Workspace::lookup_existing_name(ucs_name);
     if( obj == NULL ) {
         out << "undefined\n";
     }
@@ -49,7 +52,7 @@ void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::
             out << "function is not executable\n";
         }
         else {
-            const UserFunction *ufun = function->get_ufun1();
+            const UserFunction *ufun = function->get_func_ufun();
             if( ufun == NULL ) {
                 out << "not a user function";
             }

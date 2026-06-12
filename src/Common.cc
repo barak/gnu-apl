@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <time.h>
 
 #include "Common.hh"
 #include "LineInput.hh"
@@ -32,6 +36,7 @@
 #include "Output.hh"
 #include "Parallel.hh"
 #include "ProcessorID.hh"
+#include "Quad_GTK.hh"
 #include "Quad_WA.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -45,7 +50,9 @@
 
 bool got_WINCH = false;
 
-//-----------------------------------------------------------------------------
+bool gtk_init_done = false;
+
+//----------------------------------------------------------------------------
 static bool attention_raised = false;
 static uint64_t attention_count = 0;
 
@@ -61,7 +68,7 @@ bool attention_is_raised()
 {
    return attention_raised;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us interrupt_when = 0;
 uint64_t interrupt_count = 0;
 static bool interrupt_raised = false;
@@ -77,13 +84,18 @@ bool interrupt_is_raised()
 {
    return interrupt_raised;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 init_1(const char * argv0, bool log_startup)
 {
    // init the workspace memory limits
    //
    Quad_WA::init(log_startup);
+
+   enum { VALUE_HEADER = sizeof(Value)
+                       - sizeof(Shape)
+                       - cfg_SHORT_VALUE_LENGTH_WANTED * sizeof(Cell)
+        };
 
    if (log_startup)
       CERR << endl
@@ -98,14 +110,19 @@ init_1(const char * argv0, bool log_startup)
            << "sizeof(Symbol) is         " << sizeof(Symbol)            << endl
            << "sizeof(Token) is          " << sizeof(Token)             << endl
            << "sizeof(Value) is          " << sizeof(Value)
-           << " (including " << SHORT_VALUE_LENGTH_WANTED << " Cells)"  << endl
+           << " (" << VALUE_HEADER << " byte header + "
+                   << sizeof(Shape) << " byte shape + "
+                   << cfg_SHORT_VALUE_LENGTH_WANTED << " Cells)"        << endl
            << "sizeof(ValueStackItem) is " << sizeof(ValueStackItem)    << endl
            << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << endl
            << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << endl
            << endl
            << "⎕WA total memory is       " << Quad_WA::total_memory
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
-           << hex << Quad_WA::total_memory << ")" << dec << endl;
+           << hex << Quad_WA::total_memory << ")" << dec                << endl
+                                                                        << endl
+           << "configure command: " << cfg_CONFIGURE_ARGS               << endl
+                                                                        << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //
@@ -121,7 +138,7 @@ rlimit rl;
    rl.rlim_cur = RLIM_INFINITY;
    setrlimit(RLIMIT_NPROC, &rl);
 
-   // limit the virtual memory size to avoid new() problem with large values
+   // limit the virtual memory size to avoid new() problems with large values
    //
 #endif
 
@@ -130,22 +147,25 @@ rlimit rl;
    Value::init();
    VH_entry::init();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize subsystems that depend on argv[]
 void
 init_2(bool log_startup)
 {
-const int retry_max = uprefs.emacs_mode ? 15 : 5;
+const int retry_max = UserPreferences::uprefs.emacs_mode ? 15 : 5;
 
    Output::init(log_startup);
-   Svar_DB::init(LibPaths::get_APL_bin_path(), LibPaths::get_APL_bin_name(),
-                 retry_max, log_startup, uprefs.system_do_svars);
+   Svar_DB::init(LibPaths::get_APL_bin_path(),
+                 LibPaths::get_APL_bin_name(),
+                 retry_max,
+                 log_startup,
+                 UserPreferences::uprefs.system_do_svars);
 
    LineInput::init(true);
 
    Parallel::init(log_startup || LOG_Parallel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the opposite of init()
 void
 cleanup(bool soft)
@@ -165,6 +185,8 @@ cleanup(bool soft)
         Thread_context::cleanup();
 
         ID::cleanup();
+
+        Quad_GTK::close_all_windows();
       }
    else        // minimal clean-up
       {
@@ -172,7 +194,7 @@ cleanup(bool soft)
         Output::reset_colors();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 control_C(int)
 {
@@ -190,7 +212,7 @@ APL_time_us when = now();
 
    interrupt_when = when;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 // Probes...
 
@@ -204,7 +226,7 @@ Probe & Probe::P_3 = probes[Probe::PROBE_COUNT - 3];
 Probe & Probe::P_4 = probes[Probe::PROBE_COUNT - 4];
 Probe & Probe::P_5 = probes[Probe::PROBE_COUNT - 5];
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 common_new(size_t size)
 {
@@ -214,14 +236,14 @@ const uint64_t iret = uint64_t(ret);
         << "  (" << HEX(size) << ")" << endl;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 common_delete(void * p)
 {
    CERR << "DEL " << HEX(uint64_t(p)) << endl;
    free(p);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us
 now()
 {
@@ -233,22 +255,21 @@ APL_time_us ret = tv_now.tv_sec;
    ret += tv_now.tv_usec;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 YMDhmsu::YMDhmsu(APL_time_us at)
    : micro(at % 1000000)
 {
 const time_t secs = at/1000000;
-tm t;
-   gmtime_r(&secs, &t);
+struct tm * t = gmtime(&secs);
 
-   year   = t.tm_year + 1900;
-   month  = t.tm_mon  + 1;
-   day    = t.tm_mday;
-   hour   = t.tm_hour;
-   minute = t.tm_min;
-   second = t.tm_sec;
+   year   = t->tm_year + 1900;
+   month  = t->tm_mon  + 1;
+   day    = t->tm_mday;
+   hour   = t->tm_hour;
+   minute = t->tm_min;
+   second = t->tm_sec;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us
 YMDhmsu::get() const
 {
@@ -266,54 +287,54 @@ APL_time_us ret =  mktime(&t);
    ret += micro;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Function_PC2 & ft)
 {
    return out << ft.low << ":" << ft.high;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 print_flags(ostream & out, ValueFlags flags)
 {
    return out << ((flags & VF_marked)   ?  "M" : "-")
               << ((flags & VF_complete) ?  "C" : "-");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 nibble(Unicode uni)
 {
    switch(uni)
       {
-        case UNI_ASCII_0 ... UNI_ASCII_9:   return      (uni - UNI_ASCII_0);
-        case UNI_ASCII_A ... UNI_ASCII_F:   return 10 + (uni - UNI_ASCII_A);
-        case UNI_ASCII_a ... UNI_ASCII_f:   return 10 + (uni - UNI_ASCII_a);
+        case UNI_0 ... UNI_9:   return      (uni - UNI_0);
+        case UNI_A ... UNI_F:   return 10 + (uni - UNI_A);
+        case UNI_a ... UNI_f:   return 10 + (uni - UNI_a);
         default: break;
       }
 
    return -1;   // uni is not a hex digit
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 sixbit(Unicode uni)
 {
    switch(uni)
       {
-        case UNI_ASCII_A ... UNI_ASCII_Z:   return      (uni - UNI_ASCII_A);
-        case UNI_ASCII_a ... UNI_ASCII_z:   return 26 + (uni - UNI_ASCII_a);
-        case UNI_ASCII_0 ... UNI_ASCII_9:   return 52 + (uni - UNI_ASCII_0);
+        case UNI_A ... UNI_Z:   return      (uni - UNI_A);
+        case UNI_a ... UNI_z:   return 26 + (uni - UNI_a);
+        case UNI_0 ... UNI_9:   return 52 + (uni - UNI_0);
 
-        case UNI_ASCII_PLUS:                             // standard    62
-        case UNI_ASCII_MINUS:               return 62;   // alternative 62
+        case UNI_PLUS:                             // standard    62
+        case UNI_MINUS:               return 62;   // alternative 62
 
-        case UNI_ASCII_SLASH:                            // standard    63
-        case UNI_ASCII_UNDERSCORE:          return 63;   // alternative 63
+        case UNI_SLASH:                            // standard    63
+        case UNI_UNDERSCORE:          return 63;   // alternative 63
 
-        case UNI_ASCII_EQUAL:               return 64;   // fill character
+        case UNI_EQUAL:               return 64;   // fill character
 
         default: break;
       }
 
    return -1;   // uni is not a hex digit
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

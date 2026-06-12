@@ -1,0 +1,29 @@
+@node apl-pkg-mgr
+@chapter apl-pkg-mgr, Integrating with apl package manager.
+@cindex APL Package Manager
+
+One may integrate the workspaces in APL Library with APL Package
+Manger by David B. Lamkins. Most workspaces in the library can be
+imported into the package manager as a package. The script
+ancillary/install_packages.apl will do the heavy lifting.
+
+Packages are first apl workspaces that use the same prefix in the name
+of all workspace symbols, second are utf8 files that one may )COPY
+into one's workspaces and third, stateless.
+
+The package manger must be installed before calling
+ancillary/install_packages.apl. Download the manager at
+https://github.com/TieDyedDevil/apl-pkg and then execute script
+install.sh.
+
+Test the installation by )load pkg; ]pkg packages.  Read the manager's
+tutorial with ]pkg read apl-packager 2.
+
+Install the library's workspaces by executing the script
+ancillary/install_packages.apl.
+
+Confirm the installation by )load pkg and ]pkg packages.
+
+Test the installation by )load pkg, ]pkg load unit_test, and test∆menu
+test∆menu∆items
+

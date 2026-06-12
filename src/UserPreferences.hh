@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __USER_PREFERENCES_HH_DEFINED__
@@ -32,43 +35,49 @@ class Function;
 /** a structure that contains user preferences from different sources
     (command line arguments, config files, environment variables ...)
  */
-/// Various preferences of the user
+/// Various preferences of the user (sorted alphabetically)
 struct UserPreferences
 {
    UserPreferences()
-   : silent(false),
-     emacs_mode(false),
-     emacs_arg(0),
-     do_not_echo(false),
-     echo_CIN(false),
-     safe_mode(false),
-     user_do_svars(true),
-     system_do_svars(true),
+   :
+     append_summary(false),
+     auto_OFF(false),
+     backup_before_save(false),
+     control_Ds_to_exit(0),
+     CPU_limit_secs(0),
+     daemon(false),
+     discard_indentation(false),
+#define sec_def(X) X(false),
+#include "Security.def"   // all start with disable_
      do_CONT(true),
      do_Color(true),
-     requested_id(0),
-     requested_par(0),
-     requested_cc(CCNT_UNKNOWN),
-     daemon(false),
-     append_summary(false),
-     wait_ms(0),
-     randomize_testfiles(false),
-     user_profile(0),
-     backup_before_save(false),
-     script_argc(0),
-     line_history_path(".apl.history"),
-     line_history_len(500),
-     nabla_to_history(1),   // if function was modified
-     control_Ds_to_exit(0),
-     raw_cin(false),
+     do_not_echo(false),
+     echo_CIN(false),
+     emacs_arg(0),
+     emacs_mode(false),
      initial_pw(DEFAULT_Quad_PW),
-#define sec_def(X) X(false),
-#include "Security.def"
+     line_history_len(500),
+     line_history_path(".apl.history"),
+     mem_arg(0),
      multi_line_strings(true),
      multi_line_strings_3(true),
-     WINCH_sets_pw(false),
-     auto_OFF(false),
-     CPU_limit_secs(0)
+     nabla_to_history(1),   // if function was modified
+     output_to_cout(false),
+     randomize_testfiles(false),
+     raw_cin(false),
+     requested_cc(CCNT_UNKNOWN),
+     requested_id(0),
+     requested_par(0),
+     safe_mode(false),
+     script_argc(0),
+     silent(false),
+     system_do_svars(true),
+     tcp_port(0),
+     tcp_websocket(false),
+     user_do_svars(true),
+     user_profile(0),
+     wait_ms(0),
+     WINCH_sets_pw(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -93,48 +102,50 @@ struct UserPreferences
    /// show version information
    static void show_version(ostream & out);
 
-   /// parse command line parameters (before reading preference files)
+   /// parse the original command line parameters to figure start-up Logging
+   /// (BEFORe any expansions). Parses (only) the -l option. Return true
+   /// iff startup-logging is requested.
+   bool parse_argv_0(int argc, const char * argv[]);
+
+   /// parse command line parameters (BEFORE reading preference files).
+   /// Parses the -l, -p, -C, and -u options. Return true iff startup-logging
+   /// is requested.
    bool parse_argv_1();
 
-   /// parse command line parameters (after reading preference files)
+   /// parse command line parameters (AFTER reading preference files)
+   /// Parses all valid options.
    void parse_argv_2(bool logit);
 
-   /// expand lumped arguments
-   void expand_argv(int argc, const char ** argv);
+   /// argv/argc at startup before expand_argv()
+   std::basic_string<const char *> original_argv;
 
-   /// argv/argc at startup
-   std::vector<const char *> original_argv;
+   /// argv/argc after expand_argv()
+   std::basic_string<const char *> expanded_argv;
 
-   /// argv/argc after expand_argv
-   std::vector<const char *> expanded_argv;
+   /// append test results to summary.log rather than overriding it
+   bool append_summary;
 
-   /// when apl was started
-   timeval session_start;
+   /// true if the interpreter shall )OFF on EOF of the last input file
+   bool auto_OFF;
 
-   /// true if no banner/Goodbye is wanted.
-   bool silent;
+   /// backup on )SAVE
+   bool backup_before_save;
 
-   /// true if emacs mode is wanted
-   bool emacs_mode;
+   /// number of control-Ds to exit (0 = never)
+   int control_Ds_to_exit;
 
-   /// an argument for emacs mode
-   const char * emacs_arg;
+   /// limit (seconds) on the CPU time
+   int CPU_limit_secs;
 
-   /// true if no input echo is wanted.
-   bool do_not_echo;
+   /// run as deamon
+   bool daemon;
 
-   /// true to echo input (after editing)
-   bool echo_CIN;
+   /// true if leading spaces in the ∇-editor shall be dropped
+   bool discard_indentation;
 
-   /// true if --safe command line option was given
-   bool safe_mode;
-
-   /// true if shared variables are wanted by the user
-   bool user_do_svars;
-
-   /// true if shared variables are enabled by the system. This is initially
-   /// the same as user_do_svars, but can become false if something goes wrong
-   bool system_do_svars;
+#define sec_def(X) \
+   bool X;   ///< true if X is disabled for security reasons
+#include "Security.def"
 
    /// load workspace CONTINUE on start-up
    bool do_CONT;
@@ -142,102 +153,130 @@ struct UserPreferences
   /// output coloring enabled
    bool do_Color;
 
+   /// true if no input echo is wanted.
+   bool do_not_echo;
+
+   /// true to echo input (after editing)
+   bool echo_CIN;
+
+   /// an argument for emacs mode
+   const char * emacs_arg;
+
+   /// true if emacs mode is wanted
+   bool emacs_mode;
+
+   /// expand lumped arguments
+   void expand_argv(int argc, const char ** argv);
+
+   /// --eval expressions
+   std::basic_string<const char *> eval_exprs;
+
+   /// initial value of ⎕PW
+   int initial_pw;
+
+   /// a workspace to be loaded at startup
+   UTF8_string initial_workspace;
+
+   /// something to be executed at startup (--LX)
+   UTF8_string latent_expression;
+
+   /// number of lines in the input line history
+   int line_history_len;
+
+   /// name of a user-provided keyboard layout file
+   UTF8_string keyboard_layout_file;
+
+   /// location of the input line history
+   UTF8_string line_history_path;
+
+   /// argument of --mem (if any: 0 if not given, "" if given but empty)
+   const char * mem_arg;
+
+   /// true if old-style multi-line strings are allowed (in ∇-defined
+   /// functions)
+   bool multi_line_strings;
+
+   /// true if new-style multi-line strings are allowed
+   bool multi_line_strings_3;
+
+   /// when function body shall go into the history
+   int nabla_to_history;
+
+   /// true if output shall go to cout, otherwise to cerr
+   bool output_to_cout;
+
+   /// randomize the order of testfiles
+   bool randomize_testfiles;
+
+   /// send no ESC sequences on stderr
+   bool raw_cin;
+
+   /// desired core count
+   CoreCount requested_cc;
+
    /// desired --id (⎕AI[1] and shared variable functions)
    int requested_id;
 
    /// desired --par (⎕AI[1] and shared variable functions)
    int requested_par;
 
-   /// desired core count
-   CoreCount requested_cc;
-
-   /// run as deamon
-   bool daemon;
-
-   /// append test results to summary.log rather than overriding it
-   bool append_summary;
-
-   /// wait at start-up
-   int wait_ms;
-
-   /// randomize the order of testfiles
-   bool randomize_testfiles;
-
-   /// the profile to be used (in the preferences file)
-   int user_profile;
-
-   /// something to be executed at startup (--LX)
-   UTF8_string latent_expression;
-
-   /// a workspace to be loaded at startup
-   UTF8_string initial_workspace;
-
-   /// backup on )SAVE
-   bool backup_before_save;
+   /// true if --safe command line option was given
+   bool safe_mode;
 
    /// the argument number of the APL script name (if run from a script)
    /// in expanded_argv, or 0 if apl is started directly.
    size_t script_argc;
 
-   /// location of the input line history
-   UTF8_string line_history_path;
+   /// when apl was started
+   timeval session_start;
 
-   /// number of lines in the input line history
-   int line_history_len;
+   /// true if no banner/Goodbye is wanted.
+   bool silent;
 
-   /// when function body shall go into the history
-   int nabla_to_history;
+   /// true if shared variables are enabled by the system. This is initially
+   /// the same as user_do_svars, but can become false if something goes wrong
+   bool system_do_svars;
 
-   /// name of a user-provided keyboard layout file
-   UTF8_string keyboard_layout_file;
+   /// TCP port to be used (instead of stdin/stderr)
+   int tcp_port;
 
-   /// number of control-Ds to exit (0 = never)
-   int control_Ds_to_exit;
+   /// enable websocket protocol on the TCP port
+   bool tcp_websocket;
 
-   /// send no ESC sequences on stderr
-   bool raw_cin;
+   /// true if shared variables are wanted by the user
+   bool user_do_svars;
 
-   /// initial value of ⎕PW
-   int initial_pw;
+   /// the profile to be used (in the preferences file)
+   int user_profile;
 
-#define sec_def(X) \
-   bool X;   ///< true if X is disabled dor security reasons
-#include "Security.def"
-
-   /// true if old-style multi-line strings are allowed (in ∇-defined functions)
-   bool multi_line_strings;
-
-   /// true if new-style multi-line strings are allowed
-   bool multi_line_strings_3;
+   /// wait at start-up
+   int wait_ms;
 
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
 
-   /// true if the interpreter shall )OFF on EOF of the last input file
-   bool auto_OFF;
+   /// the combined user preferences (from command line arguments and from
+   /// \b preferences files) for the APL interpreter instance
+   static UserPreferences uprefs;
 
-   /// limit (seconds) on the CPU time
-   int CPU_limit_secs;
 protected:
-   /// open a user-supplied config file (in $HOME or gnu-apl.d)
-   FILE * open_user_file(const char * fname, char * opened_filename,
-                         bool sys, bool log_startup);
-
-   /// set the parallel threshold of function \b fun to \b threshold
-   static void set_threshold(Function * fun, int padic, int macn,
-                             ShapeItem threshold);
-
-   /// return true if file \b filename is an APL script (has execute permission
-   /// and starts with #!
-   static bool is_APL_script(const char * filename);
-
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
    /// itself), or 2 2-character hex value
    /// 
    static int decode_ASCII(const char * strg);
-};
 
-extern UserPreferences uprefs;
+   /// return true if file \b filename is an APL script (has execute permission
+   /// and starts with #!
+   static bool is_APL_script(const char * filename);
+
+   /// open a user-supplied config file (in $HOME or gnu-apl.d)
+   FILE * open_user_file(const char * fname, char * opened_filename,
+                         bool sys, bool log_startup);
+
+   /// set the parallel threshold of function \b fun to \b threshold
+   static void set_threshold(cFunction_P fun, int padic, int macn,
+                             ShapeItem threshold);
+};
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

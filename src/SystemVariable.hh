@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,16 +18,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __SYSTEM_VARIABLE_HH_DEFINED__
 #define __SYSTEM_VARIABLE_HH_DEFINED__
 
 #include "Id.hh"
 #include "Parallel.hh"
+class RavelIterator;
 #include "Symbol.hh"
 
 #include <sys/time.h>
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     Base class for all system variables (Quad variables).
  */
@@ -42,19 +46,19 @@ public:
 
    /// return the TokenTag for this system variable
    Token get_token()
-      { return Token(TokenTag(ID::get_token_tag(get_Id())), this); }
+      { return Token(ID::get_token_tag(get_Id()), this); }
 
    /// overloaded Symbol::print().
    virtual ostream & print(ostream & out) const;
 
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(Value_P X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::get_attributes().
-   virtual void get_attributes(int mode, Cell * dest) const;
+   virtual void get_attributes(int mode, Value & Z) const;
 
    /// system vars cannot be expunged.
    virtual int expunge() { return 0; }
@@ -63,7 +67,7 @@ public:
    virtual Token resolve_lv(const char * loc)
       { SYNTAX_ERROR; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     A system variable that cannot be localized (push and pop have no effect).
  */
@@ -84,15 +88,15 @@ protected:
    virtual void push_label(Function_Line label) {}
 
    /// overloaded Symbol::push_function()
-   virtual void push_function(Function * function) {}
+   virtual void push_function(cFunction_P function) {}
 
    /// overloaded Symbol::push_value()
-   virtual void push_value(Value_P value) {}
+   virtual void push_value(Value_P B) {}
 
    /// overloaded Symbol::pop()
    virtual void pop() { }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     A read-only system variable (push, pop, and assign are ignored).
  */
@@ -107,20 +111,27 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc) {}
+   virtual void assign(Value_P B, bool clone, const char * loc) {}
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(Value_P X, Value_P value) {}
+   virtual void assign_indexed(const Value * X, Value_P B) {}
 
    /// overloaded Symbol::is_readonly()
    virtual bool is_readonly() const   { return true; }
 
-   /// overloaded Symbol::resolve(). Since push(), pop(), and assign()
-   /// do nothing, we can call get_apl_value() directly.
-   virtual void resolve(Token & token, bool left)
-      { if (!left)   new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
+   /// overloaded Symbol:resolve_left(). Invalid for read-only variables
+   virtual void resolve_left(Token & token, Function_PC & PC) const
+      { MORE_ERROR() << "Assignment to read-only system variable "
+                     << get_name();
+        SYNTAX_ERROR; }
+
+   /// overloaded Symbol::resolve_right(). Since this variable is read-only,
+   /// push(), pop(), and assign() do nothing, and therefore we may call
+   /// get_apl_value() directly.
+   virtual void resolve_right(Token & token, Function_PC & PC) const
+      { new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-AI (Account Information)
  */
@@ -145,7 +156,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-ARG (command line arguments of the interpreter)
  */
@@ -160,7 +171,7 @@ protected:
    /// overloaded Symbol::get_apl_value()
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-AV (Atomic Vector)
  */
@@ -175,9 +186,9 @@ public:
    static Unicode indexed_at(uint32_t pos);
 
    /// a static ⎕AV
-   static Unicode qav[MAX_AV];
+   static Unicode qav[Avec::MAX_AV];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-CT (Comparison Tolerance)
  */
@@ -195,7 +206,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -204,7 +215,7 @@ protected:
         Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-EM (Event Message)
  */
@@ -221,7 +232,7 @@ protected:
    /// overloaded Symbol::get_apl_value()
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-ET (Event Type).
  */
@@ -237,7 +248,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-FC (Format Control).
  */
@@ -252,20 +263,20 @@ public:
    const UCS_string current() const
       { return UCS_string(*get_apl_value()); }
 
-protected:
-   /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
-
-   /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(Value_P X, Value_P value);
-
-   /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(IndexExpr & IX, Value_P value);
-
    // overloaded Symbol::push()
    virtual void push();
+
+protected:
+   /// overloaded Symbol::assign().
+   virtual void assign(Value_P B, bool clone, const char * loc);
+
+   /// overloaded Symbol::assign_indexed().
+   virtual void assign_indexed(const Value * X, Value_P B);
+
+   /// overloaded Symbol::assign_indexed().
+   virtual void assign_indexed(const IndexExpr & IX, Value_P B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-IO (Index Origin).
  */
@@ -283,7 +294,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -292,7 +303,7 @@ protected:
         Symbol::assign(IntScalar(1, LOC), false, LOC);
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-L (Left Argument).
  */
@@ -308,12 +319,12 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-LC (Line Counter).
  */
@@ -328,7 +339,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-LX (Latent Expression).
  */
@@ -341,13 +352,12 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(Value_P X, Value_P value) {}
-
+   virtual void assign_indexed(const Value * X, Value_P B) {}
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-PP (Printing Precision).
  */
@@ -365,7 +375,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -374,7 +384,7 @@ protected:
         Symbol::assign(IntScalar(DEFAULT_Quad_PP, LOC), false, LOC);
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-PR (Prompt Replacement).
  */
@@ -385,22 +395,22 @@ public:
    /// Constructor.
    Quad_PR();
 
-   /// Return the current prompt replacement.
+   /// Return the current prompt replacement, aka. ⎕PR.
    const UCS_string current() const
       { return  UCS_string(*get_apl_value()); }
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), false, LOC);
+        Symbol::assign(CharScalar(UNI_SPACE, LOC), false, LOC);
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-PS (Print Style). This variable controls the formatting
    of APL values (classical APL or DISPLAY style).
@@ -431,10 +441,10 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(Value_P X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::push()
    virtual void push()
@@ -449,7 +459,7 @@ protected:
    /// the current style
    int style;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-PW (Print Width).
  */
@@ -466,7 +476,7 @@ public:
       { return get_first_cell()->get_int_value(); }
 
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
 protected:
    // overloaded Symbol::push()
@@ -476,9 +486,9 @@ protected:
         Symbol::assign(IntScalar(DEFAULT_Quad_PW, LOC), false, LOC);
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
-   System variable Quad-Quad (Evaluated Input/Output).
+   System variable Quad-Quad (Evaluated Input/Output aka. ⎕).
  */
 /// The class implementing ⎕
 class Quad_Quad : public SystemVariable
@@ -487,21 +497,24 @@ public:
    /// Constructor.
    Quad_Quad();
 
-   /// overloaded Symbol::resolve().
-   virtual void resolve(Token & token, bool left);
+   /// overloaded Symbol::resolve_left().
+   virtual void resolve_left(Token & token, Function_PC & PC) const   { }   // ⎕←xxx
+
+   /// overloaded Symbol::resolve_right().
+   virtual void resolve_right(Token & token, Function_PC & PC) const;
 
 protected:
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // should never be called due to overloaded resolve()
    virtual Value_P get_apl_value() const
       { Assert(0);   /* not reached */ return Value_P(); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
-   System variable Quote-Quad (Evaluated Input/Output).
+   System variable Quote-Quad (Character Input/Output aka. ⍞).
  */
-/// The class implementing ⍞
+/// The class that implements ⍞
 class Quad_QUOTE : public SystemVariable
 {
 public:
@@ -513,15 +526,15 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 
    /// last line of output
-   static UCS_string prompt;
+   static UCS_string buffer;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-R (Right Argment).
  */
@@ -537,12 +550,12 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-SYL (System Limits).
  */
@@ -555,13 +568,13 @@ public:
       { assign(Value_P(), false, LOC); }
 
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(Value_P X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(IndexExpr & IDX, Value_P value);
+   virtual void assign_indexed(const IndexExpr & IDX, Value_P B);
 
    virtual Value_P get_apl_value() const;
 
@@ -590,7 +603,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-TC (Terminal Control Characters)
  */
@@ -601,7 +614,7 @@ public:
    /// Constructor.
    Quad_TC();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-TS (Time Stamp).
  */
@@ -615,7 +628,7 @@ public:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-TZ (Time Zone).
  */
@@ -643,7 +656,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -659,13 +672,13 @@ protected:
    virtual void pop()
       {
         Symbol::pop();
-        offset_seconds = 3600 * get_apl_value()->get_ravel(0).get_int_value();
+        offset_seconds = 3600 * get_apl_value()->get_cscalar().get_int_value();
       }
 
    /// the offset from GMT of the current timezone (in seconds)
    int offset_seconds;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-UL (User Load).
  */
@@ -680,7 +693,7 @@ protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-X (Axis Argument).
  */
@@ -696,10 +709,10 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __SYSTEM_VARIABLE_HH_DEFINED__

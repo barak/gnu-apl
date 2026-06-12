@@ -1,0 +1,62 @@
+@ifplaintext
+\input texinfo
+@settitle import
+@setfilename import.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title import
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node import
+@end ifnotplaintext
+
+@chapter import
+@cindex import
+@cindex delimited files
+@cindex csv
+
+Import is an apl workspace to import arrays from text files.
+
+@deffn ∇ array ← import∆file name
+
+Import∆file reads a file from disk and returns an array of rank 2,
+that is, rows and columns. It will determine whether the file is tab
+or comma delimited and will determine which columns contain numeric
+data and covert those strings to numbers.
+@end deffn
+
+@deffn ∇ array ← import∆table import_array
+
+Import∆table examines the array returned by import∆file.  It will
+remove blank columns, heading rows at the begining of the file and
+footer rows at the end.  It will also replace blank cells in numeric
+columns with zeros.
+
+@end deffn

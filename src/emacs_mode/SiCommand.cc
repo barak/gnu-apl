@@ -18,9 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
+#include "emacs.hh"
 #include "NetworkConnection.hh"
 #include "SiCommand.hh"
-#include "emacs.hh"
+#include "../StateIndicator.hh"
 
 #include <sstream>
 

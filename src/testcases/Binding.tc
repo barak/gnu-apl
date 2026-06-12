@@ -90,9 +90,16 @@ Dyadic
       ≡(⊂⍣4)⍣6⊢'hello'
 25
       ≡⊂⍣(4⍣6)⊢'hello'
-DOMAIN ERROR
+SYNTAX ERROR+
       ≡⊂⍣(4⍣6)⊢'hello'
-       ^      ^
+          ^^
+
+      →
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
 
       ⎕FX'R←(F L G)Y' 'R←F Y'
 L
@@ -110,4 +117,10 @@ R
 ⍝ ==================================
 
       )ERASE A B C D
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __LVALCELL_HH_DEFINED__
 #define __LVALCELL_HH_DEFINED__
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     A cell pointing to another cell.
     This is used for selective assignments.
@@ -32,12 +35,15 @@
 class LvalCell : public Cell
 {
 public:
-   /// Construct an cell pointing to another cell
+   /// Constructor: a cell pointing to another cell
    LvalCell(Cell * cell, Value * cell_owner);
 
+   /// Constructor: copy from other LvalCell
+   LvalCell(const LvalCell & other);
+
    /// overloaded Cell::init_other
-   virtual void init_other(void * other, Value & cell_owner, const char * loc)
-      const { new (other)   LvalCell(get_lval_value(), &cell_owner); }
+   virtual void init_other(void * other, Value & cell_owner,
+                           const char * loc) const;
 
    /// Overloaded Cell::is_lval_cell()
    virtual bool is_lval_cell()  const   { return true; }
@@ -51,6 +57,9 @@ public:
    /// return the owner of the cell pointed to
    Value * get_cell_owner() const
       { return value.pval.owner; }
+
+   /// make sure that owner (if any) owns this Cell
+   void check_consistency() const;
 
 protected:
    ///  Overloaded Cell::get_cell_type()
@@ -74,20 +83,6 @@ protected:
    /// downcast to LvalCell
    virtual LvalCell & vLvalCell()   { return *this; }
 };
-
-/// a compatibility Cell for fixing a bug in ⊃. Will be removed 
-class LvalCell_picked : public LvalCell
-{
-public:
-   /// Construct an cell pointing to another cell
-   LvalCell_picked(Cell * cell, Value * cell_owner)
-   : LvalCell(cell, cell_owner)
-   {}
-
-protected:
-   virtual bool is_picked_lval_cell() const
-      { return true; }
-};
-//=============================================================================
+//============================================================================
 
 #endif // __LVALCELL_HH_DEFINED__

@@ -2,7 +2,7 @@
 GNU APL can be compiled as a Python module.
 The basic build procedure is this:
 
-    configure --with-libpython_apl [ other ./configure optionsi ...]
+    ./configure --with-python [ other ./configure options ...]
     make
     sudo make install
 
@@ -17,6 +17,15 @@ your Python version is 3.4, and NOTICE THE DIFFERENT NAME OF THE .so FILE):
     sudo cp /usr/local/lib/apl/lib_gnu_apl.so \
             /usr/lib/python3.4/lib-dynload/gnu_apl.cpython-34m.so
 
+NOTA BENE: The python3.4 directory in the example above could either be
+/usr/lib/python3.4 or else /usr/local/lib/python3.4. The rules as to whether
+libgnu_apl.so shall live below /usr/lib or below /usr/local/lib are somewhat
+dubious. If you get ai error like:
+
+ModuleNotFoundError: No module named 'gnu_apl'
+
+in Python then you have picked the wrong one.
+
 After that, one can import GNU APL in Python and call Python functions
 provided by gnu_apl:
 
@@ -30,12 +39,11 @@ provided by gnu_apl:
 >>> gnu_apl.command(")WSID")
 'IS CLEAR WS\n'
 
-
 The output above is a mix of APL output and Python output, which is more often
-than not a bad idea. A better approach is to generate no APL output (i,e, the
-results of APL computations should be assigned to variables and variables ⎕
+than not a bad idea. A better approach is to generate no APL output (i.e. the
+results of APL expressions should be assigned to variables and the variables ⎕
 and ⍞ should not be used). Alternatively, you can change the default print
-behaviour in Python with gnu_apl.set_display(mode). See, for example,
+behavior in Python with gnu_apl.set_display(mode). See, for example,
 gnu_apl.help('set_display').
 
 After a sucessful installation you can display the documentation of all Python

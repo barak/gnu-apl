@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,19 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __CELL_HH_DEFINED__
 #define __CELL_HH_DEFINED__
 
 #include <complex>
-
-#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
 
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "PrintBuffer.hh"
 #include "Value_P.hh"
 
-class Value;
 class CharCell;
 class ComplexCell;
 class FloatCell;
@@ -38,7 +38,7 @@ class IntCell;
 class LvalCell;
 class PointerCell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  **   Base class for one item of an APL ravel. The item is one of the following:
  **
@@ -57,12 +57,12 @@ public:
    /// Construct an un-initialized Cell
    Cell() {}
 
-   /// deep copy of cell \b other into \b this cell
-   void init(const Cell & other, Value & cell_owner, const char * loc)
-      { other.init_other(this, cell_owner, loc); }
+   /// init \b this Cell from a (possibly deep) copy of \b other
+   void init(const Cell & other, Value & this_owner, const char * loc)
+      { other.init_other(this, this_owner, loc); }
 
-   /// init \b other from \b this cell
-   virtual void init_other(void * other, Value & cell_owner,
+   /// init (uninitialized) Cell \b other from \b this initialized cell
+   virtual void init_other(void * other, Value & other_owner,
                            const char * loc) const
       { Assert(0 && "Cell::init_other() called on base class"); }
 
@@ -76,6 +76,10 @@ public:
    /// 2b. CharCells sorted by get_char_value()
    /// 2c. PointerCells sorted by rank, then by shape, then by ravel
    virtual bool greater(const Cell & other) const;
+
+   /// like greater() but static
+   static bool A_greater_B(const Cell * const & A, const Cell * const & B,
+                           const void * unused_comp_arg);
 
    /// return \b true if \b this cell is equal to \b other
    virtual bool equal(const Cell & other, double qct) const;
@@ -101,7 +105,7 @@ public:
    static bool integral_within(APL_Float A, double qct);
 
    /// Return the character value of a cell
-   virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
+   virtual Unicode get_char_value() const;
 
    /// Return the byte value (-128..255 incl) of a cell
    virtual int get_byte_value() const   { DOMAIN_ERROR; }
@@ -119,7 +123,7 @@ public:
    virtual APL_Complex get_complex_value() const   { DOMAIN_ERROR; }
 
    /// Return the APL value of a cell (Asserts for non-pointer cells)
-   virtual Value_P get_pointer_value()  const   { DOMAIN_ERROR; }
+   virtual Value_P get_pointer_value()  const;
 
    /// Return the APL value of a cell (Asserts for non-lval cells)
    virtual Cell * get_lval_value() const   { LEFT_SYNTAX_ERROR; }
@@ -217,7 +221,7 @@ public:
    virtual bool is_real_cell() const   // int or flt
       { return false; }
 
-   /// return \b true unless \b this cell contains infinity or NaN
+   /// Return \b true unless \b this cell contains infinity or NaN
    virtual bool is_finite() const
       { return true; }
 
@@ -225,9 +229,9 @@ public:
    virtual bool is_example_field() const
       { return false; }
 
-   /// convert this cell to its type
-   virtual void to_type()
-      { DOMAIN_ERROR; }
+   /// Return true iff this is a PointerCell which pouints to a member value
+   virtual bool is_member_anchor() const
+      { return false; }
 
    /// A union containing all possible cell values for the different Cell types
    union SomeValue
@@ -236,6 +240,7 @@ public:
         APL_Float_Base cval[2];   ///< for ComplexCell
         ErrorCode      eval;      ///< an error code
         APL_Integer    ival;      ///< for IntCell
+
         struct _fval              ///< for FloatCell
            {
              /// either a floating point value, or the denominator of a quotient
@@ -448,7 +453,7 @@ public:
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// return the numerator of a quotient
    virtual APL_Integer get_numerator() const   { FIXME }
 
@@ -463,42 +468,6 @@ public:
    /// the inverse of bif_bif_multiply
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
-
-   /// downcast to const CharCell
-   virtual const CharCell & cCharCell() const  { DOMAIN_ERROR; }
-
-   /// downcast to CharCell
-   virtual CharCell & vCharCell()         { DOMAIN_ERROR; }
-
-   /// downcast to const ComplexCell
-   virtual const ComplexCell & cComplexCell()   { DOMAIN_ERROR; }
-
-   /// downcast to ComplexCell
-   virtual ComplexCell & vComplexCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to const FloatCell
-   virtual const FloatCell & cFloatCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to FloatCell
-   virtual FloatCell & vFloatCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const IntCell
-   virtual const IntCell & cIntCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to IntCell
-   virtual IntCell & vIntCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const LvalCell
-   virtual const LvalCell & cLvalCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to LvalCell
-   virtual LvalCell & vLvalCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const PointerCell
-   virtual const PointerCell & cPointerCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to PointerCell
-   virtual PointerCell & vPointerCell()   { DOMAIN_ERROR; }
 
    /// return \b true if z = a + b had an overflow.
    static bool sum_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
@@ -548,16 +517,13 @@ public:
    /// return value if it is close to int, or else throw DOMAIN_ERROR
    static APL_Integer near_int(APL_Float value);
 
-   /// return \b ascending iff a > b
-   typedef bool (*greater_fun)(const Cell * a, const Cell * b,
-                               const void * comp_arg);
-   /// compare comp_len items ascendingly
-   static bool greater_vec(const IntCell & a, const IntCell & b,
-                           const void * arg);
+   /// compare cells[a] and cells[b] ascendingly
+   static bool greater_cp(const ShapeItem & a, const ShapeItem & b,
+                           const void * cells);
 
-   /// compare comp_len items descendingly
-   static bool smaller_vec(const IntCell & a, const IntCell & b,
-                           const void * arg);
+   /// compare cells[a] and cells[b] descendingly
+   static bool smaller_cp(const ShapeItem & a, const ShapeItem & b,
+                          const void * cells);
 
    /// raw pointer to the primary value (for 27 ⎕CR)
    const void * get_u0() const   { return &value.cval[0]; }
@@ -566,39 +532,59 @@ public:
    const void * get_u1() const   { return &value.cval[1]; }
 
    /// a stable compare function to be used with Heapsort. Equal cells
-   /// are compared by their address
+   /// are compared by their address. Return true iff A > B or A = B
+   /// and &A > &B.
    static bool compare_stable(const Cell * const & A, const Cell * const & B,
                        const void * comp_arg);
 
-   /// a stable compare function to be used with Heapsort. The cell content
-   /// is ignore and only the cell addresses are being compared
+   /// a stable compare function to be used with Heapsort. The cell contents
+   /// are ignored and only the cell addresses are being compared. Return
+   /// true iff &A > &B.
    static bool compare_ptr(const Cell * const & A, const Cell * const & B,
-                       const void * comp_arg);
+                          const void * comp_arg);
+
+   /// return 0-based indices i1, i2, ... iN so that
+   /// value[i1] < value[i2] < ... < value[iN].
+   static ErrorCode sorted_indices(vector<ShapeItem> & indices,
+                                     const Value & value, Sort_order order,
+                                     ShapeItem comp_len);
+
+   /// the name of \b ct
+   static const char * get_cell_type_name(CellType ct);
 
 protected:
    /// the primary value of \b this cell
    SomeValue value;
 
 private:
-   /// Cells that are allocated with new() shall always be contained in
-   /// APL values (using placement new() on the ravel of the value.
-   /// We prevent the accidental use of non-placement new() by defining
-   /// it but not implementing it.
+   /** Cells that are allocated with new() shall always be contained in
+       APL values (using placement new() on the ravel of the value.
+       We prevent the accidental use of non-placement new() by defining
+       it but not implementing it.
+    **/
    void * operator new(std::size_t);
+
+   /** Cells shalle never be overriden with other Cells since they may
+       require their desctuctor to be called (e.g. PointerCell)
+       We prevent the accidental use of non-placement new() by defining
+       it but not implementing it.
+    **/
+
+   Cell & operator =(const Cell & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(const Cell * & c1, const Cell * & c2)
 {
 const Cell * tmp = c1;   c1 = c2;   c2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(Cell * & c1, Cell * & c2)
 {
 Cell * tmp = c1;   c1 = c2;   c2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 typedef ErrorCode (Cell::*prim_f1)(Cell *) const;
 typedef ErrorCode (Cell::*prim_f2)(Cell *, const Cell *) const;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,21 +18,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdint.h>
 
 #include <fstream>
 #include <string.h>
-#include <vector>
-#include <vector>
 
-#include <vector>
-
+#include "DerivedFunction.hh"
 #include "SystemLimits.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
-#include "Workspace.hh"
-
 #include "Value.hh"
+#include "Workspace.hh"
 
 class Cell;
 class Function;
@@ -42,27 +41,52 @@ class Symbol;
 class StateIndicator;
 class SymbolTable;
 class Token;
-struct Token_loc;
+class Token_loc;
 class Value;
 class ValueStackItem;
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+/// class for )SAVEing and )LOADing APL Workspaces in an XML file format
+class XML_Archive
+{
+protected:
+   /** archive syntax version, hopefully stepped up after Archive.hh or
+      Archive.cc were changed:
+
+      ASX_OTHER: increment to indicate change in Archive.hh/cc that DOES NOT
+                 change the XML file format,
+
+      ASX_MINOR: increment to indicate a backward-compatible change in the XML
+                 file format, i.e. older Archive.hh/hh versions can still read
+                 it but may not benefit from the change,
+
+      ASX_MAJOR: increment to indicate an incompatible change in the XML file
+                 format
+    **/
+   enum ArchiveSyntax
+      {
+        ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible)
+        ASX_MINOR = 3,   ///< ++ if XML file format change (backward compatible)
+        ASX_OTHER = 7,   ///< ++ XML file format not changed (e.g. code cleanup)
+      };
+};
+//----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
-class XML_Saving_Archive
+class XML_Saving_Archive: public XML_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
    XML_Saving_Archive(ofstream & of)
    : indent(0),
      out(of),
+     val_pars(0),
      value_count(0),
      char_mode(false)
    {}
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close();  delete [] values; }
+   ~XML_Saving_Archive()   { out.close();  delete [] val_pars; }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
@@ -72,14 +96,19 @@ public:
 
    /// write either the name and SI-level of user-defined function or the
    /// id of a system function. Return number of attribute= items written
-   int save_Function_name(const char * ufun_prefix, const char * level_prefix,
-                          const char * id_prefix, const Function & fun);
+   int save_Function_name(const Function & fun);
 
-   /// write Prefix \b pfp
-   void save_Parser(const Prefix & pfp);
+   /// write the Prefix parser of \b si (and its derived functions)
+   void save_Parser(const StateIndicator & si);
+
+   /// write derived functions cache
+   void save_Derived(const DerivedFunctionCache & fns);
 
    /// write Symbol \b sym
    void save_Symbol(const Symbol & sym);
+
+   /// write all function
+   void save_functions();
 
    /// write all user defined commands
    void save_user_commands(const std::vector<Command::user_command> & cmds);
@@ -182,30 +211,39 @@ protected:
    /// output XML file
    std::ofstream & out;
 
-   /// a value and the Vid of its parent (if value is a sub-value of a 
-   /// nested parent)
+   /// an array of values and the Vid of its parent (if value is a
+   ///sub-value of a nested parent). The top-level of an APL value has
+   /// has no parents (i.e. INVALID_VID).
    /// all values in the workspace
-   _val_par * values;
+   _val_par * val_pars;
 
    /// the number of (non-stale) values
    ShapeItem value_count;
 
    /// true iff ² is pending
    bool char_mode;
+
+   /// functions saved so far
+   basic_string<const Function *> saved_Functions;
+
+   /// return true iff (the definition of) \b fun was already saved.
+   bool is_saved(const Function * fun) const;
 };
-//-----------------------------------------------------------------------------
-inline void Hswap(XML_Saving_Archive::_val_par & vp1,
-                  XML_Saving_Archive::_val_par & vp2)
+//----------------------------------------------------------------------------
+inline void
+Hswap(XML_Saving_Archive::_val_par & vp1, XML_Saving_Archive::_val_par & vp2)
 {
-const XML_Saving_Archive::_val_par tmp = vp1;   vp1 = vp2;   vp2 = tmp;
+const XML_Saving_Archive::_val_par tmp = vp1;
+   vp1 = vp2;
+   vp2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
-class XML_Loading_Archive
+class XML_Loading_Archive: public XML_Archive
 {
 public:
    /// constructor: remember file name and workspace
-   XML_Loading_Archive(const char * _filename, int & dump_fd);
+   XML_Loading_Archive(ostream & _out, const char * _filename, int & dump_fd);
 
    /// destructor (unmap()s file).
    ~XML_Loading_Archive();
@@ -215,6 +253,10 @@ public:
 
    /// read an entire workspace, throw DOMAIN_ERROR on failure
    void read_Workspace(bool silent);
+
+   /// check compatibility information in the workspace and maybe warn the
+   /// user
+   void check_compatibility();
 
    /// set copying and maybe set protection
    void set_protection(bool prot, const UCS_string_vector & allowed)
@@ -230,19 +272,31 @@ public:
    /// read vids of top-level variables
    void read_vids();
 
-protected:
    /// move to next tag, return true if EOF
    bool next_tag(const char * loc);
 
-   /// read next Value element, return true on success
+protected:
+   /// where to send the "SAVED..." message
+   ostream & out;
+
+   /// a value ID in a )SAVEd workspace
+   enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
+
+   /// the address of a function in a )SAVEd workspace
+   enum Fid { NO_FID = int(-1) };   ///< no (invalid) function ID
+
+   /// read next Value element
    void read_Value();
 
-   /// read cell(s) starting at \b cell from string starting at \b first
-   /// to number of cells read
-   void read_Cells(Cell * & cell, Value & cell_owner, const UTF8 * & first);
+   /// read one or more Cell(s) from input into the ravel of Z;
+   /// return the  UTF8 * after the cells.
+   const UTF8 * read_Cells(Value & Z, const UTF8 * input);
 
-   /// read characters tagged with INI_PAD_U1 and INI_PAD_U2, until end of line
-   void read_chars(UCS_string & ucs, const UTF8 * & first);
+   /// input is a UTF8-encoded sequence of bytes, terminated with ".
+   /// UTF8-decode the sequence, thereby removing the escape tagging
+   /// with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and \n.
+   /// return the  UTF8 * pointing to the terminating ".
+   const UTF8 * read_XML_string(UCS_string & ucs, const UTF8 * input);
 
    /// read next Ravel element
    void read_Ravel();
@@ -254,7 +308,13 @@ protected:
    void read_Variable(int d, Symbol & symbol);
 
    /// read next Function element
+   void read_Function();
+
+   /// read next Function element
    void read_Function(int d, Symbol & symbol);
+
+   /// read next derived function
+   void read_Derived(StateIndicator & si, int lev);
 
    /// read next Label element
    void read_Label(int d, Symbol & symbol);
@@ -284,13 +344,13 @@ protected:
    void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
-   Executable * read_Execute();
+   const Executable * read_Execute();
 
    /// read ◊ Executable
-   Executable * read_Statement();
+   const Executable * read_Statement();
 
    /// read a user defined Executable
-   Executable * read_UserFunction();
+   const Executable * read_UserFunction();
 
    /// read a lambda
    Executable * read_lambda(const UTF8 * lambda_name);
@@ -303,11 +363,10 @@ protected:
 
    /// read a system function with attribute id_prefix-id or a user defined
    /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
-   Function * read_Function_name(const char * ufun_name, const char * si_level,
-                                 const char * sysfun_id);
+   cFunction_P read_Function_name();
 
    /// find a lambda in the current SI entry
-   Function * find_lambda(const UCS_string & lambda);
+   cFunction_P find_lambda(const UCS_string & lambda);
 
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
@@ -330,11 +389,30 @@ protected:
    /// print current tag
    void print_tag(ostream & out) const;
 
-   /// find attribute \b att_name and return a pointer to its value if found)
+   /// find attribute \b att_name and return: a pointer to its value if found,
+   /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
    const UTF8 * find_attr(const char * att_name, bool optional);
+
+   /// find mandatory attribute \b att_name. Return a pointer to its value
+   ///  if found and throw DOMAIN ERROR if not.
+   const UTF8 * find_mandatory_attr(const char * att_name)
+      { return find_attr(att_name, false); }
+
+   /// find optional attribute \b att_name. Return a pointer to its value
+   /// if found and 0 if not.
+   const UTF8 * find_optional_attr(const char * att_name)
+      { return find_attr(att_name, true); }
 
    /// return integer value of attribute \b att_name
    int64_t find_int_attr(const char * att_name, bool optional, int base);
+
+   /// return Fid value of attribute \b att_name
+   Fid find_Fid_attr(const char * att_name, bool optional, int base)
+      { return Fid(find_int_attr(att_name, optional, base)); }
+
+   /// return Fid value of attribute \b att_name
+   Vid find_Vid_attr(const char * att_name, bool optional, int base)
+      { return Vid(find_int_attr(att_name, optional, base)); }
 
    /// return floating point value of attribute \b att_name
    APL_Float find_float_attr(const char * att_name);
@@ -388,7 +466,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   std::vector<int> vids_COPY;
+   std::basic_string<Vid> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -399,18 +477,59 @@ protected:
    /// a value ID and the ID of its parent
    struct _vid_pvid
      {
-       int vid;    ///< value ID
-       int pvid;   ///< parent's value ID
+       Vid vid;    ///< value ID
+       Vid pvid;   ///< parent's value ID
      };
 
-   /// parents[vid] os the parent of vid, or -1 if vid is a top-level value
-   std::vector<int> parents;
+   /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
+   std::basic_string<Vid> parents;
 
    /// the file name from which this archive was read
    const char * filename;
 
    /// true if file contains a <\/Workspace> tag at the end
    bool file_is_complete;
+
+   /// one mapping from an fid in the old (SAVEed) workspace to the function
+   /// address in the new (LOADing) workspace
+   struct fun_map
+      {
+        Fid old_fid;           ///< the fid in the )SAVEed workspace
+        cFunction_P new_fun;   ///< address in the )LOADing workspace
+        const char * loc;      ///< where allocated
+      };
+
+   /// all mappings from fids to functions
+   std::vector<fun_map> fid_to_function;
+
+   /// return fun_map for fid, or 0 if not found.
+   fun_map * find_fun_map(Fid fid);
+
+   /// return function for fid, or 0 if not found.
+   cFunction_P find_function(Fid fid);
+
+   /// add fid and function to find_fun_map. Either fid must be new, or else
+   /// an existing fid must have its new_fun == 0 (forward declaration).
+   void add_fid_function(Fid fid, cFunction_P new_fun, const char * loc);
+
+   /// properties of a derived function
+   struct _derived_todo
+      {
+        Function * cache;       ///< the new()-address of the function
+        cFunction_P * symptr;   ///< the address of a function * to be set
+        Fid fid;                ///< the address of \b this derived function
+        Fid LO_fid;             ///< the address of \b LO of this function
+        Fid OPER_fid;           ///< the address of \b OPER of this function
+        Fid RO_fid;             ///< the address of \b RO of this function
+        Vid AXIS_vid;           ///< the AXIS of \b this function
+        const char * loc;       ///< where \b this was initialized
+      };
+
+      /// derived functions that need to be instantiated
+      vector<_derived_todo> derived_todos;
+
+   /// instantiate the derived functions in \b derived_todos
+   void instantiate_derived_functions(bool allocate);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

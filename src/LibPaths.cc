@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2013-2015  Dr. Jürgen Sauermann
+    Copyright © 2013-2015  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <dirent.h>
+/** @file
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include <string>
 
@@ -41,7 +42,7 @@ LibPaths::LibDir LibPaths::lib_dirs[LIB_MAX];
 
 const void * unused = 0;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::init(const char * argv0, bool logit)
 {
@@ -57,7 +58,7 @@ LibPaths::init(const char * argv0, bool logit)
         else                      lib_dirs[d].cfg_src = LibDir::CSRC_NONE;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::compute_bin_path(const char * argv0, bool logit)
 {
@@ -152,21 +153,21 @@ done:
    logit && CERR << "APL_bin_path is: " << APL_bin_path << endl
                  << "APL_bin_name is: " << APL_bin_name << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 LibPaths::is_lib_root(const char * dir)
 {
-char filename[APL_PATH_MAX + 1];
+char filename[APL_PATH_MAX];
 
-   snprintf(filename, sizeof(filename), "%s/workspaces", dir);
+   SPRINTF(filename, "%s/workspaces", dir);
    if (access(filename, F_OK))   return false;
 
-   snprintf(filename, sizeof(filename), "%s/wslib1", dir);
+   SPRINTF(filename, "%s/wslib1", dir);
    if (access(filename, F_OK))   return false;
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::search_APL_lib_root()
 {
@@ -200,20 +201,20 @@ const char * path = getenv("APL_LIB_ROOT");
 
    unused = realpath(".", APL_lib_root);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::set_APL_lib_root(const char * new_root)
 {
    unused = realpath(new_root, APL_lib_root);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::set_lib_dir(LibRef libref, const char * path, LibDir::CfgSrc src)
 {
    lib_dirs[libref].dir_path = UTF8_string(path);
    lib_dirs[libref].cfg_src = src;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UTF8_string
 LibPaths::get_lib_dir(LibRef libref)
 {
@@ -244,7 +245,7 @@ UTF8_string ret(APL_lib_root);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LibPaths::maybe_warn_ambiguous(int name_has_extension, const UTF8_string name,
                                const char * ext1, const char * ext2)
@@ -260,9 +261,9 @@ UTF8_string filename_ext2 = name;
         << "WARNING: filename " << name << endl
         << "    is ambiguous because another file" << endl << "    "
         << filename_ext2 << endl
-        << "    exists as well. Using the first." << endl << endl;
+        << "    exists as well. Using the first (.xml) file." << endl << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UTF8_string
 LibPaths::get_lib_filename(LibRef lib, const UTF8_string & name, 
                            bool existing, const char * ext1, const char * ext2)
@@ -360,7 +361,7 @@ UTF8_string filename = get_lib_dir(lib);
         return filename;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 LibPaths::is_present(LibRef lib)
 {
@@ -373,5 +374,5 @@ DIR * dir = opendir(path.c_str());
    closedir(dir);
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

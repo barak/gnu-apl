@@ -1,0 +1,63 @@
+⍝ Branch.tc
+⍝ ----------------------------------
+
+      ⍝ monadic → as expression (GNU APL extension).
+      ⍝
+)ERASE FOO
+
+∇FOO
+ N←4
+L: (N⍴'-'),'yes', →(0=N←N-1)/0 ◊ →L
+∇
+      FOO
+---yes
+--yes
+-yes
+
+
+      ⍝ dyadic → in immediate execution
+      ⍝
+      N←3
+      'DONE',0→0<N←⎕←N-1
+2
+1
+0
+DONE
+
+      ⍝ dyadic → in niladic lambda
+      ⍝
+      N←3
+      { 'DONE',0→0<N←⎕←N-1 }
+2
+1
+0
+DONE
+
+      ⍝ dyadic → in monadic lambda
+      ⍝
+      { 'DONE',0→0<⍵←⎕←⍵-1 } 3
+2
+1
+0
+DONE
+
+      )ERASE N
+      )CHECK BRIEF
+
+      ⍝ regression
+      ⍝
+
+      ⍝ exectute (⍎) branch with branch not taken
+      ⍝
+      )ERASE FOO
+∇FOO
+1
+2 ◊ ⍎"→⍬"
+3
+∇
+
+FOO
+1
+2
+3
+

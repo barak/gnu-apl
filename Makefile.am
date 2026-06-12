@@ -1,6 +1,5 @@
 
 ACLOCAL_AMFLAGS = -I m4
-DISTCHECK_CONFIGURE_FLAGS =--enable-maintainer-mode=no
 
 APL_DIRS	= workspaces wslib3 wslib4 wslib5
 SUBDIRS		= $(APL_DIRS)
@@ -8,31 +7,39 @@ SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
 SUBDIRS		+= src support-files tools websock
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
-dist_doc_DATA = README			   \
-		README-1-prerequisites	   \
-		README-2-configure	   \
-		README-3-keyboard	   \
-		README-4-compliance	   \
-		README-5-WINDOWS	   \
-                README-6-porting	   \
-		README-7-more-info	   \
-		README-8-parallel          \
-                README-9-post-installation \
-                README-10-python
+dist_doc_DATA = README					\
+		README-1-prerequisites			\
+		README-2-configure			\
+		README-3-keyboard			\
+		README-4-compliance			\
+		README-5-WINDOWS			\
+		README-6-porting			\
+		README-7-more-info			\
+		README-8-parallel			\
+		README-9-post-installation		\
+		README-10-python			\
+		README-11-bogus-compiler-warnings	\
+		README-12-vpath-builds			\
+		README-13-build-pitfalls
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
-dist_noinst_DATA = Doxyfile Makefile.incl
+dist_noinst_DATA = Doxyfile Makefile.incl config.h
 
 include Makefile.incl
 
-# doxygen documentation
+.PHONY: check_sources
+check_sources: tools/check_src tools/check_command_def
+	tools/check_src
+	tools/check_command_def
+
+# produce doxygen documentation
 #
 .PHONY:	DOXY
 DOXY:
 	doxygen
 
-# source and binary RPMs
+# build source and binary RPMs
 #
 .PHONY:	RPM
 RPM:	DIST all
@@ -42,7 +49,7 @@ RPM:	DIST all
 	cp rpm/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-0.src.rpm  ftp-upload/
 	cp rpm/RPMS/*/$(PACKAGE)-$(PACKAGE_VERSION)-0.*.rpm   ftp-upload/
 
-# source and binary Debian packages
+# build source and binary Debian packages
 #
 .PHONY:	DEB
 DEB:	DIST
@@ -55,7 +62,7 @@ DEB:	DIST
 	cd debian_tmp/$(distdir) ; dpkg-buildpackage -j4
 	mkdir -p ftp-upload
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
-	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.gz  ftp-upload/
+	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.xz  ftp-upload/
 
 # update from SVN repository and ./configure
 #
@@ -72,23 +79,22 @@ SVNUP:
 SYNC:	DIST
 	rm -Rf apl-$(VERSION)
 	tar xvzf apl-$(VERSION).tar.gz
-	rm -f apl-$(VERSION)/src/makefile.h
-	rm -f apl-$(VERSION)/src/buildtag.hh
-	rm -f apl-$(VERSION)/src/configure_args.cc
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from
 	rm -Rf apl-$(VERSION)
-	cd ../savannah-repo-apl ; svn add . --force -q
+	cd ../savannah-repo-apl ; svn add . --force -q 
+	cd ../savannah-repo-apl ; git add .
+	cd ../savannah-repo-apl ; git commit -m "sync from SVN"
 
-# build all packages and SYNC
+# build all packages and SYNC the repos
 #
 .PHONY:	EXPO
 EXPO:
 	tools/check_src
+	tools/check_command_def
 	svn -m "auto-commit by make EXPO, local SVN: `svnversion`" commit
 	svn update
-	cd src; source buildtag
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
 	make all
@@ -101,7 +107,7 @@ EXPO:
 .PHONY:	EXPO1
 EXPO1:
 	tools/check_src
-	cd src; source buildtag
+	tools/check_command_def
 	./configure --disable-maintainer-mode
 	make
 	make dist
@@ -131,6 +137,8 @@ DIST:	dist Makefile.dist
 	tar czf ../apl-$(VERSION).tar.gz apl-$(VERSION)
 	rm -Rf tmp
 
+DIST: check_sources
+
 am--refresh:
 	echo "making am--refresh"
 
@@ -140,4 +148,9 @@ EXTRA_DIST = config.rpath m4/ChangeLog
 git-pull:
 	make -C src $@
 	make -C wslib5 $@
+	git clone https://git.code.sf.net/p/gnu-apl-library/code /tmp/DALY
+	cp /tmp/DALY/doc/DALY/*     doc/DALY/
+	cp /tmp/DALY/wslib3/DALY/*  wslib3/DALY/
+	cp /tmp/DALY/wslib5/DALY/*  wslib5/DALY/
+ 
 

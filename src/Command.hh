@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __COMMAND_HH_DEFINED__
 #define __COMMAND_HH_DEFINED__
-
-#include <dirent.h>
 
 #include "Common.hh"
 #include "LibPaths.hh"
@@ -30,8 +31,9 @@
 #include "UTF8_string.hh"
 
 class Workspace;
+struct dirent;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     Some command related functions, including the main input loop
     of the APL interpreter.
@@ -44,7 +46,7 @@ public:
    static void process_line();
 
    /// process \b line which contains a command or statements
-   static void process_line(UCS_string & line);
+   static void process_line(UCS_string & line, ostream * out);
 
    /// process \b line which contains an APL command. Return true iff the
    /// command was user-defined (and then the function for that command is
@@ -66,8 +68,17 @@ public:
    /// or a path containing . or / chars
    static bool is_lib_ref(const UCS_string & lib);
 
+   /// continue with (jump to) next input file.
+   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
+
    /// clean-up and exit from APL interpreter
    static void cmd_OFF(int exit_val);
+
+   /// show or clear optimizarion counters
+   static void cmd_OPTIM(ostream & out, const UCS_string & lib);
+
+   /// clean-up and exit from APL interpreter
+   static void cmd_PUSHFILE();
 
    /// return the current boxing format
    static int get_boxing_format()
@@ -86,12 +97,12 @@ public:
       };
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
-   static void cmd_CHECK(ostream & out);
+   static void cmd_CHECK(ostream & out, const UCS_string & arg);
 
    /// a helper for finding sub-values with two parents
    struct val_val
       {
-        /// the parent (0 unless child is a sub-value
+        /// the parent (0 unless \b this is a sub-value
         const Value * parent;
 
         /// the value (always valid)
@@ -99,19 +110,48 @@ public:
 
         /// compare function for Heapsort::sort()
         static bool compare_val_val(const val_val & A, const val_val & B,
-                                     const void *);
+                                    const void * /* not used */);
 
         /// compare function for bsearch()
         static int compare_val_val1(const void * key, const void * B);
       };
 
    /// return true if entry is a directory
-   static bool is_directory(dirent * entry, const UTF8_string & path);
+   static bool is_directory(const dirent * entry, const UTF8_string & path);
+
+   /// clear the copy_once_table.
+   static void clear_copy_once_table();
 
    /// format for ]BOXING
    static int boxing_format;
 
+   /// automatically display )MORE info after errors
+   static bool auto_MORE;
+
 protected:
+   /// sort order
+   enum SORT_ORDER
+      {
+        SORT_NONE = 0,
+        SORT_SIZE = 1,
+        SORT_TIME = 2,
+      };
+
+   /// On, Off, or Toggle
+   enum OOT
+      {
+        Off    = 0,   ///< Off
+        On     = 1,   ///< On
+        Toggle = 2,   ///< Toggle
+      };
+
+   /// a logging ID and an action (On/Off/Toggle) to be performed with it
+   struct lid_OOT
+      {
+        LogId lid;           ///< the logging ID
+        OOT on_off_toggle;   ///< turn lid On, Off, or Toggle it
+      };
+
    /// )BOXING command
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 
@@ -122,8 +162,11 @@ protected:
    static void cmd_COPY(ostream & out, UCS_string_vector & args,
                         bool protection);
 
+   /// )COPY_ONCE: copy a workspace file, nut at most once
+   static void cmd_COPY_ONCE(ostream & out, UCS_string_vector & args);
+
    /// ]DOXY: create doxygen-like documentation of the current workspace
-   static void cmd_DOXY(ostream & out, UCS_string_vector & args);
+   static void cmd_DOXY(ostream & out, const UCS_string_vector & args);
 
    /// )DROP: delete a workspace file
    static void cmd_DROP(ostream & out, const UCS_string_vector & args);
@@ -166,10 +209,24 @@ protected:
    static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
                             const UCS_string_vector & args);
 
-   /// list library: common helper
-   static void lib_common(ostream & out, const UCS_string_vector & args,
-                          int variant);
+   /// list library: common helper. variant tells apart )LIB and ]LIB.
+   static void LIB_common(ostream & out, const UCS_string_vector & args,
+                          bool dbg);
 
+   /// print the workspace names in the LIB directory w/o sorting
+   static void LIB_print_0(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files);
+
+   /// print the workspace names in the LIB directory with sorting
+   static void LIB_print_12(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files, SORT_ORDER sort);
+
+   /// return the property by which file names shall be sorted
+   static size_t sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
+                               const UCS_string & filename);
+                               
    /// list content of workspace and wslib directories: )LIB [N]
    static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
 
@@ -183,7 +240,7 @@ protected:
    static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
 
    /// print more error info
-   static void cmd_MORE(ostream & out);
+   static void cmd_MORE(ostream & out, const UCS_string_vector & args);
 
    /// )OUT: export a workspace file
    static void cmd_OUT(ostream & out, UCS_string_vector & args);
@@ -219,7 +276,8 @@ protected:
                             const char * args);
 
    /// resolve an optional lib followed by a WS name
-   static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+   static bool resolve_lib_wsname(ostream & out,
+                                  const UCS_string_vector & args,
                                   LibRef &lib, UCS_string & wsname);
 
    /// a helper struct for the )IN command
@@ -282,11 +340,17 @@ protected:
 
    /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;
+
+   /// workspaces that shall not be copied twice
+   static UCS_string_vector copy_once_table;
+
+   /// return true iff, according to config.h, capability \b capa is available
+   static bool have_capability(const UCS_string & capa);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
 {
 const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __COMMAND_HH_DEFINED__

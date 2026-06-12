@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdlib.h>
 #include <string.h>
-#include <netdb.h>
+#include <netdb.h>   // gethostbyname() etc.
 
 #include "Common.hh"
 #include "LibPaths.hh"
@@ -36,23 +39,28 @@ AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
 Network_Profile ProcessorID::network_profile;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 ProcessorID::init(bool log_startup)
 {
    if (log_startup)
       {
-        CERR << "uprefs.user_do_svars:   " << uprefs.user_do_svars   << endl
-             << "uprefs.system_do_svars: " << uprefs.system_do_svars << endl
-             << "uprefs.requested_id:    " << uprefs.requested_id    << endl
-             << "uprefs.requested_par:   " << uprefs.requested_par   << endl;
+        CERR << "UserPreferences::uprefs.user_do_svars:   "
+             << UserPreferences::uprefs.user_do_svars << endl
+             << "UserPreferences::uprefs.system_do_svars: "
+             << UserPreferences::uprefs.system_do_svars << endl
+             << "UserPreferences::uprefs.requested_id:    "
+             << UserPreferences::uprefs.requested_id    << endl
+             << "UserPreferences::uprefs.requested_par:   "
+             << UserPreferences::uprefs.requested_par   << endl;
       }
 
-   id.proc = AP_num(uprefs.requested_id);
-   id.parent = uprefs.requested_par ? AP_num(uprefs.requested_par) : AP_NULL;
+   id.proc = AP_num(UserPreferences::uprefs.requested_id);
+   id.parent = UserPreferences::uprefs.requested_par
+             ? AP_num(UserPreferences::uprefs.requested_par) : AP_NULL;
    id.grand = AP_NULL;
 
-   if (!uprefs.system_do_svars)
+   if (!UserPreferences::uprefs.system_do_svars)
       {
         // shared variables are disabled, so Svar_DB is unavailable,
         // we use id.proc of 1000 if no ID is provided and otherwise
@@ -84,7 +92,7 @@ ProcessorID::init(bool log_startup)
            {
              CERR << "*** Another APL interpreter with --id "
                   << id.proc <<  " is already running" << endl;
- 
+
              return true;
            }
       }
@@ -93,7 +101,8 @@ ProcessorID::init(bool log_startup)
       {
         CERR << "Processor ID was completely initialized: "
              << id.proc << ":" << id.parent << ":" << id.grand << endl
-             << "system_do_svars is: " << uprefs.system_do_svars << endl;
+             << "system_do_svars is: "
+             << UserPreferences::uprefs.system_do_svars << endl;
 
       }
 
@@ -109,7 +118,7 @@ const TCP_socket sock = Svar_DB::get_DB_tcp();
 
    return false;   // no error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
 {
@@ -197,7 +206,7 @@ const char * loc = 0;
 
    return loc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 ProcessorID::read_procauth(FILE * file, ProcAuth & procauth, int & line)
 {
@@ -227,15 +236,14 @@ const char * loc = 0;
               char * e = s + strlen(s);
               while (e > s && *e > 0 && *e < ' ')   *--e = 0;
 
-              for (unsigned int id; s;)
+              for (errno = 0; s && !errno; s = strchr(s, ','))
                   {
                     ++s;   // skip comma
-                    if (1 != sscanf(s, "%u", &id))   break;
+                    const unsigned int id = strtoll(s, 0, 10);
 
                     procauth.rsvopid.push_back(id);
-                    s = strchr(s, ',');
                   }
-              continue;
+              continue;   // for (line = 1;; ++line)
             }
 
          // invalid tag (probably next entry). restore file position
@@ -246,7 +254,7 @@ const char * loc = 0;
 
    return loc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 ProcessorID::read_network_profile()
 {
@@ -263,7 +271,7 @@ const char * filename = getenv("APL2SVPPRF");
         return read_network_profile(fname.c_str());
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 ProcessorID::read_network_profile(const char * filename)
 {
@@ -342,10 +350,10 @@ const char * loc = 0;
 
    return line;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ProcessorID::disconnect()
 {
    Svar_DB::DB_tcp_error(0, 0, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

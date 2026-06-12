@@ -2,7 +2,7 @@
 AM_MAKEFLAGS = -j $(MAKE_J)
 
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
-if DEVELOP
+if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif
 
@@ -19,7 +19,7 @@ pkglib_LTLIBRARIES =	lib_file_io.la		\
 common_LDFLAGS = -avoid-version
 # common_LDFLAGS += -module
 # common_LDFLAGS += -shared
-# common_LDFLAGS += -export-dynamic
+common_LDFLAGS += -export-dynamic
 
 lib_file_io_la_SOURCES = file_io.cc
 lib_file_io_la_CXXFLAGS = $(AM_CXXFLAGS)

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,13 +42,15 @@
 
 using namespace std;
 
-static int verbosity = 2;
+static int  verbosity = 0;
+static bool focus_on_map = false;   // whether the GUI shall grab the focus
 static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
 static bool verbose__do_draw   = false;
 static bool verbose__draw_cmd  = false;
 static bool verbose__reads     = false;
 static bool verbose__writes    = false;
+static bool verbose__dump      = false;
 
 static sem_t __drawarea_sema;
 static sem_t * drawarea_sema = &__drawarea_sema;
@@ -57,6 +59,11 @@ static cairo_surface_t * surface = 0;
 
 static const char * drawarea_data = 0;
 static int drawarea_dlen = 0;
+
+static void dump_all();
+static void adjust_object(GObject * obj);
+
+ostream & get_CERR() { return std::cerr; }
 
 //-----------------------------------------------------------------------------
 static GtkBuilder * builder = 0;
@@ -73,7 +80,11 @@ static struct _ID_DB
     xml_id(strdup(id)),
     widget_name(strdup(wn)),
     obj(0)
-    {}
+    {
+       if (verbosity > 2)
+          cerr << "Add class='" << cls << "' id='" << id
+                   << "' wname ='" << wn << "' to DB" << endl;
+    }
 
   /// the next _ID_DB entry
   _ID_DB * next;
@@ -145,14 +156,30 @@ static struct _draw_param
 } draw_param;
 
 //-----------------------------------------------------------------------------
-static bool
-init_id_db(const char * filename)
+static void
+indent(int level)
 {
-FILE * f = fopen(filename, "r");
-   if (f == 0)   return true;   // error
+   for (int l = 0; l < level; ++l)   cerr << "  ";
+}
+//-----------------------------------------------------------------------------
+static const char *
+init_id_db(const char * gui, bool from_file)
+{
+FILE * file = 0;
+const char * strg = 0;
+
+   if (from_file)
+      {
+        file = fopen(gui, "r");
+        if (file == 0)   return "No/bad .ui file";   // error
+      }
+   else
+      {
+        strg = gui;
+      }
 
 enum { MAX_level = 10 };
-char class_buf      [100*MAX_level];
+char class_buf[100*MAX_level];
    memset(class_buf, 0, sizeof(class_buf));
 char id_buf[100*MAX_level];
    memset(id_buf, 0, sizeof(id_buf));
@@ -161,13 +188,37 @@ char widget_name_buf[100*MAX_level];
 int level = -1;
 char line[200];
 
-   for (;;)
+   for (bool more = true; more;)   // more is only used for input strings
        {
-         const char * s = fgets(line, sizeof(line) - 1, f);
-         line[sizeof(line) - 1] = 0;
-         if (s == 0)   break;
+         if (from_file)   // read input from file
+            {
+              const char * s = fgets(line, sizeof(line) - 1, file);
+              line[sizeof(line) - 1] = 0;   // so strXXX() works
+              if (s == 0)   break;
+            }
+         else        // read input from string
+            {
+              if (const char * LF = strchr(strg, UNI_LF))
+                 {
+                   const size_t strg_len = LF - strg;   // \n in strg
+                   if (strg_len >= sizeof(line) -1)
+                      return "UI string too long";
+                   memcpy(line, strg, strg_len);
+                   line[strg_len] = 0;
+                   strg = LF + 1;
+                 }
+              else                                      // no \n in strg
+                 {
+                   more = false;
+                   const size_t strg_len = strlen(strg);
+                   if (strg_len >= sizeof(line))   return ".ui string too long";
+                   memcpy(line, strg, strg_len);
+                   line[strg_len] = 0;
+                 }
+            }
 
-         while (*s == ' ')   ++s;
+         const char * s = line;
+         while (*s == ' ')   ++s;   // skip leading whilespace
          if (!strncmp(s, "<object", 7))   ++level;
 
          char * cb = class_buf       + 100*level;
@@ -185,21 +236,31 @@ char line[200];
                                           << top_level_widget << endl;
                  }
 
-              verbosity > 1 && cerr <<
-                 "See class='" << cb << "' and id='"  << ib << "'" << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "See class='" << cb << "' and id='"  << ib << "'"
+                         << endl;
+                 }
             }
          else if (1 == sscanf(line, " <property name=\"name\">%s", wb))
             {
               if (char * ob = strchr(wb, '<'))   *ob = 0;
 
-              verbosity > 1 && cerr << "See widget name='" << wb << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "property name='" << wb << endl;
+                 }
             }
-         else if (strstr(line, "</object"))
+         else if (strstr(line, "</object>"))
             {
-              verbosity > 1 && cerr << "End of object class="
-                                    << class_buf << " id="
-                                    << id_buf << " widget-name="
-                                    << widget_name_buf << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "End of object class=" << cb << " id="
+                        << ib << " widget-name=" << wb << endl;
+                 }
 
               if (*cb || *ib || *wb )
                  {
@@ -220,58 +281,71 @@ char line[200];
             }
        }
 
-   fclose(f);
-   return false;   // OK
+   if (file)   fclose(file);
+   return 0;   // OK
 }
 //-----------------------------------------------------------------------------
 static void
-cmd_1_load_GUI(const char * filename)
+cmd_1_load_GUI(const char * gui)
 {
-   verbosity > 0 && cerr << "Loading GUI: " << filename << endl;
+const bool from_file = !strchr(gui, UNI_LF);
 
-   if (init_id_db(filename))
+   verbosity > 0 && cerr << "Loading GUI... " << endl;
+
+   if (const char * why = init_id_db(gui, from_file))
       {
-        cerr << "*** reading " << filename << " failed: "
-          << strerror(errno) << endl;
+        if (from_file)
+           cerr << "*** reading " << gui << " failed: "
+                << strerror(errno) << endl;
+        else
+           cerr << "*** reading .ui from string failed: " << why << endl;
+        return;
       }
 
-   builder = gtk_builder_new_from_file(filename);
+   if (from_file)   builder = gtk_builder_new_from_file(gui);
+   else             builder = gtk_builder_new_from_string(gui, strlen(gui));
    assert(builder);
 
    // insert objects into id_db...
    //
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
-          const GObject * obj =
-                G_OBJECT(gtk_builder_get_object(builder, id_db->xml_id));
-          if (obj)
-             {
-               verbosity > 0 && cerr <<
-                  "glade name '" << entry->xml_id << "' mapped to GObject "
+         const char * id = entry->xml_id;
+
+         // the id= attribute of an object is optional (e.g. not needed for
+         // read-only labels). Ignore such objects.
+         //
+         if (!*id)                             continue;   // ignore
+
+         if (GObject * obj = gtk_builder_get_object(builder, id))
+            {
+              // Ignore non-widgets
+              //
+              if (!GTK_IS_WIDGET(obj))        continue;   // ignore
+
+              // enable mouse click events (they wont do anything unless
+              // connected with <signal ...> in XML
+              //
+              gtk_widget_add_events(GTK_WIDGET(obj), GDK_BUTTON_PRESS_MASK);
+
+              verbosity > 0 && cerr <<
+                  "map glade id= '" << id << "' to GObject "
                                  << reinterpret_cast<const void *>(obj) << endl;
-               id_db->obj = obj;
-             }
-           else cerr << "object '" << entry->xml_id << "' not found" << endl;
+              entry->obj = obj;
+              adjust_object(obj);
+            }
+         else
+            {
+              cerr << "Gtk_server: object '" << id
+                   << "' not found (by gtk_builder)" << endl;
+            }
        }
 
+   // connect the <signal ...>  in .ui
+   //
+   gtk_builder_connect_signals(builder, /* user_data */ NULL);
 
-   gtk_builder_connect_signals(builder, NULL);
    verbosity > 0 && cerr << "GUI signals connected.\n";
-
-   if (verbosity > 2)
-      {
-        for (GSList * objects = gtk_builder_get_objects(builder);
-             objects; objects = objects->next)
-            {
-               GObject * obj = G_OBJECT(objects->data);
-               if (obj)
-                  {
-                    char * name = 0;
-                    g_object_get (obj, "name\0", &name, NULL);
-                    name && cerr << "NAME=" << name << endl;
-                  }
-            }
-      }
 }
 //-----------------------------------------------------------------------------
 void *
@@ -328,27 +402,67 @@ gtk_drawingarea_set_Y_origin(GtkDrawingArea * widget, int data)
    return 0;
 }
 //-----------------------------------------------------------------------------
-static void
-cmd_2_load_CSS(const char * filename)
+void *
+gtk_text_view_add_row(GtkTextView * view, const char * text)
 {
-   verbosity > 0 && cerr << "Loading CSS: " << filename << endl;
+size_t text_len = strlen(text);
+char cc[text_len + 10];
+GtkTextBuffer * buffer = gtk_text_view_get_buffer(view);
+   if (gtk_text_buffer_get_char_count(buffer))   // subsequent line
+       { snprintf(cc, sizeof(cc), "\n%s", text);   ++text_len; }
+   else                                          // first line
+       { snprintf(cc, sizeof(cc), "%s", text); }
 
-GtkCssProvider * css_provider = gtk_css_provider_get_default();
-   assert(css_provider);
+
+GtkTextIter end;   gtk_text_buffer_get_end_iter(buffer, &end);
+   gtk_text_buffer_insert(buffer, &end, cc, text_len);
+   return 0;
+}
+//-----------------------------------------------------------------------------
+static void
+cmd_2_load_CSS(const char * css)
+{
 
 GError * err = 0;
-   gtk_css_provider_load_from_path(css_provider, filename, &err);
-   if (err)
+GtkCssProvider * css_provider = gtk_css_provider_new();
+   assert(css_provider);
+
+   if (strchr(css, UNI_LF))   // css is direct string
       {
-        cerr << "error " << err->code << " when parsing stylesheet file '"
-             << filename << "':\n    " << err->message << endl;
+        const size_t css_len = strlen(css);
+        verbosity > 0 && cerr << "Loading CSS freom string["
+                              << css_len << "]: " << css << endl;
+        gtk_css_provider_load_from_data(css_provider, css, css_len, &err);
+        if (err)
+           {
+             cerr << "error " << err->code
+                  << " when parsing stylesheet string[ '" << css_len
+                  << "]:\n    " << err->message << endl;
+           }
+        else
+           {
+             GtkStyleProvider * style = GTK_STYLE_PROVIDER(css_provider);
+             GdkScreen * screen = gdk_screen_get_default();
+             gtk_style_context_add_provider_for_screen(
+                         screen, style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+           }
       }
-   else
+   else                       // css is a filname containing the CSS
       {
-        GtkStyleProvider * style_provider = GTK_STYLE_PROVIDER(css_provider);
-        GdkScreen * screen = gdk_screen_get_default();
-        gtk_style_context_add_provider_for_screen(
-                    screen, style_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+        verbosity > 0 && cerr << "Loading CSS file: " << css << endl;
+        gtk_css_provider_load_from_path(css_provider, css, &err);
+        if (err)
+           {
+             cerr << "error " << err->code << " when parsing stylesheet file '"
+                  << css << "':\n    " << err->message << endl;
+           }
+        else
+           {
+             GtkStyleProvider * style = GTK_STYLE_PROVIDER(css_provider);
+             GdkScreen * screen = gdk_screen_get_default();
+             gtk_style_context_add_provider_for_screen(
+                         screen, style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -367,14 +481,38 @@ const int height = data & 0xFFFF;
 void
 static cmd_3_show_GUI()
 {
-  assert(builder);
-   if (top_level_widget)
-      window = gtk_builder_get_object(builder, top_level_widget);
-   else
-      window = gtk_builder_get_object(builder, "window1");
+   assert(builder);
+const char * top_level_id = "window1";
+   if (top_level_widget)   top_level_id = top_level_widget;
+   window = gtk_builder_get_object(builder, top_level_id);
+   if (window == 0)   // not found
+      {
+        cerr << "*** Could not find the top-level widget (window) '"
+             << top_level_id <<  "' in the GTK\n"
+   "      GUI specification. Check your XML string or .ui file "
+          "for a line like:\n\n"
+   "      <object class=\"GtkWindow\" id=\"window1\">" << endl;
+        return;
+      }
 
-  assert(window);
-  gtk_widget_show_all(GTK_WIDGET(window));
+   gtk_window_set_type_hint(GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG);
+   gtk_window_set_deletable(GTK_WINDOW(window), false);
+   gtk_window_set_resizable(GTK_WINDOW(window), false);
+
+   gtk_widget_show_all(GTK_WIDGET(window));
+
+   // prevent the new pctx->window window from obtaining the focus (must
+   // only be called AFTER gtk_widget_show_all(), since otherwise gdk_win
+   // below would be 0.
+   if (focus_on_map)
+      {
+        GdkWindow * gdk_win = gtk_widget_get_window(GTK_WIDGET(window));
+        assert(gdk_win);
+        gdk_window_set_focus_on_map(gdk_win, focus_on_map);
+      }
+
+
+   dump_all();
 
 pthread_t thread = 0;
    pthread_create(&thread, 0, reinterpret_cast<void *(*)(void *)>(gtk_main), 0);
@@ -396,72 +534,115 @@ static cmd_6_select_widget(const char * id)
 {
   assert(builder);
   selected = gtk_builder_get_object(builder, id);
-   if (!selected)
-      cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
+  if (!selected)
+     cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
 }
 //-----------------------------------------------------------------------------
 enum Gtype
 {
-  gtype_V = 0,   // void
-  gtype_S = 1,   // string
-  gtype_I = 2,   // integer
-  gtype_F = 3,   // float
+  gtype_V = 0,   // Void
+  gtype_S = 1,   // String
+  gtype_I = 2,   // Integer
+  gtype_F = 3,   // Float
 };
 //-----------------------------------------------------------------------------
 static void
-print_fun(Fnum N, const char * gid, const char * gclass, const char * gfun,
-            const char * ZAname, Gtype Zt, Gtype At, const char * help)
+print_fun(Fnum N,              // function number N (deprecated)
+          const char * gfun,   // widget prefix, e.g. entry, text_view, ...
+          const char * ZAname, // name of ← or A in APL
+          Gtype Zt,            // type of Z (V, I, F, S)
+          Gtype At,            // type of A (V, I, F, S)
+          const char * help)
 {
    cout << "| ";
    if (Zt != gtype_V)   cout << ZAname << " ← ";
    if (At != gtype_V)   cout << ZAname << " ";
-   cout << "⎕GTK[H_ID] " << N;
-   cout << "     *--or--* +" << endl << " ";
-   if (Zt != gtype_V)   cout << ZAname << " ← ";
-   if (At != gtype_V)   cout << ZAname << " ";
-   cout << "⎕GTK[H_ID] \"" << gfun << "\"";
-   cout << endl;
+   cout << "⎕GTK[H_ID] \"" << gfun << "\"" << endl;
 
-   cout << "| " << N << endl;
+   cout << "| NOTE" << endl;
 
    cout << "| " << help << endl;
 }
 //-----------------------------------------------------------------------------
 static void
+print_number(Fnum N,              // function number N (deprecated)
+          const char * prefix,    // widget prefix, e.g. entry, text_view, ...
+          const char * gclass,    // Gtk class
+          const char * gfun,      // Gtk class
+          Gtype Zt,               // type of Z (V, I, F, S)
+          const char * At         // type of A (V, I, F, S)
+  //      Gtype At                // type of A (V, I, F, S)
+          )
+{
+char gfname[100];   snprintf(gfname, sizeof(gfname), "%s_%s()", prefix, gfun);
+   cout << "║"  << setw(5) << N << left
+        << " │ " << setw(32) << gfun
+        << " │ " << setw(37) << gclass
+        << "║"   << right << endl;
+}
+//-----------------------------------------------------------------------------
+static void
+print_numbers()
+{
+   cout <<
+"╔═════════════════════════════════════════╤══════════════════════════════════════╗\n"
+"║ Argument Bi in A ⎕GTK[X]                │                                      ║\n"
+"╟──────┬──────────────────────────────────┤ GTK Class Name (XML, documentation)  ║\n"
+"║Number│ String (Function Name)           │                                      ║\n"
+"╟──────┼──────────────────────────────────┼──────────────────────────────────────╢"
+        << endl;
+#define gtk_fun_def(glade_ID, gtk_class, gtk_function,  Z, A)       \
+   print_number(FNUM_ ## gtk_class ## _ ## gtk_function, #glade_ID, \
+             #gtk_class, #gtk_function, gtype_ ## Z, #A);
+
+#include "Gtk_map.def"
+
+   cout <<
+"╚══════╧══════════════════════════════════╧══════════════════════════════════════╝"
+        << endl;
+}
+//-----------------------------------------------------------------------------
+static void
 print_funs()
 {
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, ZAname, Z, A, help) \
-   print_fun(FNUM_ ## gtk_class ## _ ## gtk_function, #glade_ID, \
-   #gtk_class, #gtk_function, #ZAname, gtype_ ## Z, gtype_ ## A, #help);
+#define gtk_fun_doc(glade_ID, gtk_class, gtk_function, ZAname, Z, A, help) \
+   print_fun(FNUM_ ## gtk_class ## _ ## gtk_function, #glade_ID,           \
+             #ZAname, gtype_ ## Z, gtype_ ## A, #help);
 
 #include "Gtk_map.def"
 }
 //-----------------------------------------------------------------------------
 static void
-print_ev2(const char * ev_name, int argc, const char * sig,
+print_ev2(const char * ev_name, int _argc, const char * signature,
           const char * wid_name, const char * wid_id, const char *  wid_class)
 {
-   cout << "| +*" << ev_name
-        << "*+ | " << argc
-        << "| ";
+   if (0 == strcmp(wid_name, "-"))   return;
 
-const char * end = sig + strlen(sig);
-    for (const char * s = sig; s < end;)
+   // signature defines the (uppercase) Fields and (lowercase) types of an
+   // event vector, for example: HiNsEsIsCs or HiNsEsXiYiBiLi
+
+   cout << "| +*" << ev_name << "*+ | (";
+
+    for (const char * s = signature; *s;)
         {
           cout << *s++;
           cout << *s++;
-          if (s < end)   cout << ", ";
+          if (*s)   cout << " ";
         }
 
-    cout << " | ";
-    for (const char * s = sig; s < end; s += 2)
+    cout << ")←Event| ";
+    for (const char * s = signature; *s; s += 2)
         {
           cout << " +";
-          if      (!strncmp(s, "Gi", 2))   cout << "6";
+          if      (!strncmp(s, "Hi", 2))   cout << "6";
           else if (!strncmp(s, "Ns", 2))   cout << "\\'" << wid_name << "'";
+          else if (!strncmp(s, "Es", 2))   cout << "\\'" << ev_name << "'";
           else if (!strncmp(s, "Is", 2))   cout << "\\'" << wid_id << "1\\'";
           else if (!strncmp(s, "Cs", 2))   cout << "\\'" << wid_class << "'";
-          else if (!strncmp(s, "Es", 2))   cout << "\\'" << ev_name << "'";
+          else if (!strncmp(s, "Xi", 2))   ;
+          else if (!strncmp(s, "Yi", 2))   ;
+          else if (!strncmp(s, "Bi", 2))   ;
+          else if (!strncmp(s, "Li", 2))   ;
           else assert(0 && "Bad signature");
           cout << "+ ";
         }
@@ -469,20 +650,20 @@ const char * end = sig + strlen(sig);
 }
 //-----------------------------------------------------------------------------
 void
-static print_evs(int which)
+static print_events(int how)
 {
-   if (which == 1)   // names
+   if (how == 1)   // list of names (for asciidoc)
       {
 #define gtk_event_def(ev_name, ...)   cout << "** " << #ev_name << endl;
 #include "Gtk_map.def"
       }
-   else if (which == 2)   // details
+   else if (how == 2)   // table row with details (for asciidoc)
       {
 #define gtk_event_def(ev_name, argc, _opt, sig, wid_name, wid_id, wid_class) \
         print_ev2(#ev_name, argc, #sig, #wid_name, #wid_id, #wid_class);
 #include "Gtk_map.def"
       }
-   else assert(0 && "bad which");
+   else assert(0 && "internal error: bad how");
 }
 //-----------------------------------------------------------------------------
 static void
@@ -531,66 +712,100 @@ char TLV[TLV_len + 1];
 inline gdouble S2F(const gchar * s) { return strtod(s, 0); }
 inline long    S2I(const gchar * s) { return strtol(s, 0, 10); }
 
-static gchar * F2S(gdouble d)
+//-----------------------------------------------------------------------------
+static const gchar *
+S2S(const gchar * str)
+{
+static gchar buffer[100];
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "s%s", str);
+   buffer[len] = 0;   // just in case
+   return buffer;
+}
+static const gchar *
+F2S(gdouble d)
 {
 static gchar buffer[40];
-unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%lf", d);
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%lf", d);
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] = 0;
+   buffer[len] = 0;   // just in case
 
  return buffer;
 }
 
-static gchar * I2S(gint i)
+static const gchar *
+I2S(gint i)
 {
 static gchar buffer[40];
-unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%ld",
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld",
                             static_cast<long>(i));
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] = 0;
+   buffer[len] = 0;   // just in case
 
  return buffer;
 }
-
+//-----------------------------------------------------------------------------
 // APL string → Gtk type
 #define arg_V(X)
 #define arg_S(X) , X
 #define arg_F(X) , S2F(X)
 #define arg_I(X) , S2I(X)
 
+// GTK enums (#lso defines arg_XXX for every enum XXXX
+#include "Gtk_enum_map.def"
+
+/// macros to convert string argument declarations in macro gtk_fun_def()
+/// into C function call arguments
 #define TLV_arg_V , ""
 #define TLV_arg_S , res
 #define TLV_arg_F , res
 #define TLV_arg_I , res
 
+/// macros to convert C function results in macro gtk_fun_def() into string
 #define result_V(fcall) fcall;
-#define result_S(fcall) const gchar * res = fcall;
+#define result_S(fcall) const gchar * res = S2S(fcall);
 #define result_F(fcall) const gchar * res = F2S(fcall);
 #define result_I(fcall) const gchar * res = I2S(fcall);
 
+//-----------------------------------------------------------------------------
 int
 main(int argc, char * argv[])
 {
    __sem_init(drawarea_sema, /* pshared */ 0, 1);
 
-bool do_funs = false;
-bool do_ev1 = false;
-bool do_ev2 = false;
+bool do_ev1     = false;
+bool do_ev2     = false;
+bool do_funs    = false;
+bool do_numbers = false;
    for (int a = 1; a < argc; ++a)
        {
-          if      (!strcmp(argv[a], "--funs"))   do_funs = true;
-          else if (!strcmp(argv[a], "--ev1"))    do_ev1 = true;
-          else if (!strcmp(argv[a], "--ev2"))    do_ev2 = true;
-          else if (!strcmp(argv[a], "-v"))       ++verbosity;
+          if      (!strcmp(argv[a], "--ev1"))       do_ev1 = true;
+          else if (!strcmp(argv[a], "--ev2"))       do_ev2 = true;
+          else if (!strcmp(argv[a], "-v"))          ++verbosity;
+          else if (!strcmp(argv[a], "--funs"))      do_funs = true;
+          else if (!strcmp(argv[a], "--numbers"))   do_numbers = true;
           else
              {
                cerr << argv[0] << ": invalid option '"
                     << argv[a] << "'" << endl
-                    << "try: --funs, --ev1, --ev2, or -v" << endl;
+                    << "try: --numbers, --funs, --ev1, --ev2, or -v" << endl;
                __sem_destroy(drawarea_sema);
                return a;
              }
        }
+
+   if (do_ev1)
+      {
+        print_events(1);
+        __sem_destroy(drawarea_sema);
+        return 0;
+      }
+
+   if (do_ev2)
+      {
+         print_events(2);
+        __sem_destroy(drawarea_sema);
+         return 0;
+      }
 
    if (do_funs)
       {
@@ -599,17 +814,10 @@ bool do_ev2 = false;
          return 0;
       }
 
-   if (do_ev1)
+   if (do_numbers)
       {
-        print_evs(1);
-        __sem_destroy(drawarea_sema);
-        return 0;
-      }
-
-   if (do_ev2)
-      {
-         print_evs(2);
-        __sem_destroy(drawarea_sema);
+         print_numbers();
+         __sem_destroy(drawarea_sema);
          return 0;
       }
 
@@ -629,7 +837,9 @@ const int flags = fcntl(3, F_GETFD);
 
 // cerr << "Flags = " << hex << flags << endl;
 
-  setenv("DISPLAY", ":0", true);
+   if (getenv("DISPLAY") == 0)   // DISPLAY not set
+      setenv("DISPLAY", ":0", true);
+
   gtk_init(&argc, &argv);
 
 enum { TLV_socket     = 3,
@@ -645,12 +855,28 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
    for (;;)
        {
+          // wait for activity
+          //
+          fd_set readfds;
+          FD_ZERO(&readfds);
+          FD_SET(3, &readfds);
+          timeval timeout = { 1, 0 };   // once a second
+          if (0 == select(3+1, &readfds, 0, 0, &timeout))
+             {
+               if (kill(getppid(), /* check parent existence */0))
+                  {
+                    return 0;
+                  }
+               continue;
+             }
+
           // expand buffer if needed
           {
+            errno = 0;
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
             if (len != 8)
                {
-                 cerr << "TLV socked closed (1): " << strerror(errno) << endl;
+                 cerr << "TLV socket closed (1): " << strerror(errno) << endl;
                  close(3);
                  __sem_destroy(drawarea_sema);
                  return 0;
@@ -671,10 +897,10 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                }
           }
 
-          const ssize_t rx_len = read(3, TLV, TLV_buflen);
+          const ssize_t rx_len = recv(3, TLV, TLV_buflen, 0);
           if (rx_len < 8)
              {
-               cerr << "TLV socked closed (2): " << strerror(errno) << endl;
+               cerr << "TLV socket closed (2): " << strerror(errno) << endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
@@ -692,18 +918,19 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
           if (rx_len != V_len + 8)
              {
-               cerr << "TLV socked closed (3): "
+
+               cerr << "TLV socket closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
              }
+          V[V_len] = 0;
           if (V_len)
              {
-               V[V_len] = 0;
                verbose__reads && cerr << ", Val[" << V_len
-                                     << "]=\"" << V << "\"" << endl;
+                                      << "]=\"" << V << "\"" << endl;
              }
           else
              {
@@ -723,13 +950,34 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                                                         continue;
                 case 8: cerr << "decreased verbosity to: "
                              << --verbosity << endl;    continue;
+                case 9: focus_on_map = true;            continue;
+                /***
 
-                // widget functions...
-                //
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, Z, A, _help)  \
+    cases for widget functions. In macro gtk_fun_def() below:
+
+    glade_ID:   entry, label, ...             (in XML string or glade .ui file)
+    gtk_class:  GtkEntry, GtkLabel, ...       (in /usr/include/gtk-3.0/gtk/)
+    gtk_function: set_text, get_text, ...     (in /usr/include/gtk-3.0/gtk/)
+    _ZAname: Text, Fraction, ...              (in asciidoc, not used here)
+    Z: V S F I  aka. void/string/float/int:   function result type
+    _help                                     (in asciidoc, not used here)
+                ***/
+
+/*
+  #define one switch case, e.g.
+
+  gtk_fun_def(button, GtkButton, get_label, S, V)
+
+  case Command_GtkButton_get_label:
+       { GtkButton * widget = reinterpret_cast<GtkButton *>(selected);
+         result_S(gtk_ button_get_label(widget arg_V));
+         send_TLV(response_tag TLV_arg_S);
+       } continue;
+*/
+#define gtk_fun_def(ID_prefix, gtk_class, gtk_function,  Z, A)                 \
          case Command_ ## gtk_class ## _ ## gtk_function:                     \
 { gtk_class * widget = reinterpret_cast<gtk_class *>(selected);               \
-  result_ ## Z(gtk_ ## glade_ID ## _ ## gtk_function(widget arg_ ## A(V)));   \
+  result_ ## Z(gtk_ ## ID_prefix ## _ ## gtk_function(widget arg_ ## A(V)));   \
   send_TLV(response_tag TLV_arg_ ## Z);                                       \
 }               continue;
 
@@ -737,16 +985,24 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
                 default:
                     cerr << endl << argv[0]
-                         << " got unexpected command " << TLV_tag << endl;
+                         << " got unexpected command " << TLV_tag
+                         << " from APL ⎕GTK" << endl;
                     continue;
              }
           break;
        }
 
-   cerr << endl << "Gtk_server closed from client" << endl;
+   verbosity > 0 && cerr << endl
+                         << "Gtk_server closed from client (APL)" << endl;
    close(3);
    __sem_destroy(drawarea_sema);
    return 0;
+}
+
+int64_t get_main()
+{
+   return reinterpret_cast<int64_t>(&main);
+
 }
 //-----------------------------------------------------------------------------
 static void
@@ -769,14 +1025,15 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
                              entry->xml_id, entry->xml_class);
               send_TLV(Event_widget_fun_id_class, data);
               verbosity > 0 &&
-                  cerr << "callback " << callback << "(1) done" << endl;
+                  cerr << "callback " << callback << "(new-style) done" << endl;
               return;
             }
        }
 
    // fallback: old-style
    //
-gchar * widget_name = 0;
+char none[] = { 0 };
+gchar * widget_name = none;
    g_object_get(widget, "name", &widget_name, NULL);
    verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
                          << "    callback is: " << callback << endl;
@@ -785,7 +1042,8 @@ char data[strlen(callback) + strlen(widget_name) + 10];
    sprintf(data, "H%s:%s", widget_name, callback);
    send_TLV(Event_widget_fun, data);
 
-   verbosity > 0 && cerr << "callback " << callback << "(2) done" << endl;
+   if (verbosity > 0)
+      cerr << "callback " << callback << "(old-style) done" << endl;
 }
 //-----------------------------------------------------------------------------
 inline void
@@ -1170,11 +1428,11 @@ const int cmd_len = cmd_end - cmd;
 //-----------------------------------------------------------------------------
 
 
-// callbacks that glade can connect to
+// declare all callbacks that the XML .ui <signal...>  can connect to
 //
 extern "C"
 {
-#define gtk_event_def(ev_name, _argc, opt, sig, _wid_name, _wid_id,_wid_class) \
+#define gtk_event_def(ev_name, _argc, opt, sig, _wid_name,_wid_id,_wid_class) \
 void ev_name(GtkWidget * widget opt , gpointer user_data = 0) \
 { generic_callback(widget, #ev_name, #sig); }
 
@@ -1188,6 +1446,54 @@ clicked_0(GtkWidget * button, gpointer user_data = 0)
 }
  */
 
+//-----------------------------------------------------------------------------
+gboolean
+mouse_press(GtkTextView * tview, GdkEventButton * ev)
+{
+   /* NOTE: we must propagate this event (by returning TRUE) since
+            otherwise any selections set below would not persist.
+    */
+   enum { RET = TRUE };   // keep selections
+
+    // /usr/include/gtk-3.0/gdk/gdkevents.h    for GdkEventButton,
+    // /usr/include/gtk-3.0/gtk/gtktextview.h  for GtkTextView,
+    //
+    if (ev->type != GDK_BUTTON_PRESS)   return RET;
+
+   // X and Y are the "visible" coordinates and run from
+   // 0:0 to gtk_widget_get_allocated_width:gtk_widget_get_allocated_height,
+   // i.e. regardless of the text buffer size or scrolling.
+   //
+   // buffer_Y runs from 0 to line height×number-of-lines. For small buffers
+   // buffer_Y == Y, but in general buffer_Y ≥ Y (if the GtkTextView was
+   // scrolled (by amount buffer_Y-Y)).
+   //
+const int X(ev->x);   // from visible LEFT edge
+const int Y(ev->y);   // from visible TOP edge (regardless of scrolling)
+
+gint buffer_Y;         // from start of buffer (considers scrolling)
+   gtk_text_view_window_to_buffer_coords(tview, GTK_TEXT_WINDOW_TEXT,
+                                         0, Y, 0, &buffer_Y);
+
+GtkTextBuffer * buffer = gtk_text_view_get_buffer(tview);
+GtkTextIter iter_buffer_Y, iter_buffer_Y1;
+     gtk_text_view_get_line_at_y(tview, &iter_buffer_Y, buffer_Y, 0);
+const int line = gtk_text_iter_get_line(&iter_buffer_Y);
+
+   gtk_text_buffer_get_iter_at_line(buffer, &iter_buffer_Y1, line + 1);
+   gtk_text_buffer_select_range(buffer, &iter_buffer_Y, &iter_buffer_Y1);
+
+   // send the event to APL... Receiver is Quad_GTK::read_fd()
+   //
+char data[100];
+const char * name = gtk_widget_get_name(GTK_WIDGET(tview));
+   snprintf(data, sizeof(data),
+            "H%s:%s:%d:%d:%d:%d", name, __FUNCTION__, X, Y, ev->button, line);
+   data[sizeof(data) - 1] = 0;   // just in case, never needed.
+
+   send_TLV(Event_widget_ev_X_Y_B_L, data);
+   return RET;
+}
 //-----------------------------------------------------------------------------
 gboolean
 do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
@@ -1233,7 +1539,6 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 
    return false;   // propagate the event further
 }
-
 //-----------------------------------------------------------------------------
 gboolean
 top_level_done(GtkWidget * window, gpointer user_data)
@@ -1247,11 +1552,87 @@ const unsigned int slen = snprintf(data, sizeof(data),
    if (slen >= sizeof(data))   data[sizeof(data) - 1] = 0;
 
    generic_callback(window, "destroy", __FUNCTION__);
-   // send_TLV(Event_widget_fun, data);
+   send_TLV(Event_widget_fun, data);
    close(3);
    exit(0);
    return false;   // propagate the event further
 }
 
 }   // extern "C"
+//-----------------------------------------------------------------------------
+void
+dump_widget(ostream & out, const char * prefix, GtkWidget * widget)
+{
+  assert(widget);
+
+const gchar * name = gtk_widget_get_name(widget);
+   if (name == 0)   name = "?name?";
+
+char cc[100];   // should suffice
+   snprintf(cc, sizeof(cc), "%s/%s", prefix, name);
+   out << "══════════════════════════════════════"
+          "══════════════════════════════════════" << endl
+       << "Path: " << cc << endl;
+
+   if (GtkStyleContext * style = gtk_widget_get_style_context(widget))
+      {
+        enum { flags = GTK_STYLE_CONTEXT_PRINT_NONE
+                     | GTK_STYLE_CONTEXT_PRINT_RECURSE
+                     | GTK_STYLE_CONTEXT_PRINT_SHOW_STYLE
+             };
+        const char * styles =
+        gtk_style_context_to_string(style, GtkStyleContextPrintFlags(flags));
+        out << "Style Context:" << endl << "    " << styles;
+      }
+
+   if (GtkWidgetClass * klass = GTK_WIDGET_GET_CLASS(widget))
+      {
+        guint N = 0;
+        if (GParamSpec ** params =
+           gtk_widget_class_list_style_properties(klass, &N))
+           {
+             out << "Style Properties:" << endl;
+             for (guint n = 0; n < N; ++n)
+                 {
+                   GParamSpec * param = params[n];
+                   assert(param);
+                   if (param->name &&  param->_nick)
+                      out << "  → " << left << setw(20) << param->name << right
+                          << "   aka: " << param->_nick << endl;
+                   else if (param->name)
+                      out << "  → " << param->name << endl;
+                 }
+           }
+      }
+
+   // recurse into children...
+   //
+   if (GTK_IS_CONTAINER(widget))
+      {
+        for (GList * child = gtk_container_get_children(GTK_CONTAINER(widget));
+                     child; child = child->next)
+            {
+              dump_widget(out, cc, GTK_WIDGET(child->data));
+            }
+       }
+
+   out << endl;
+}
+//-----------------------------------------------------------------------------
+void
+dump_all()
+{
+  if (verbose__dump)   dump_widget(cerr, "", GTK_WIDGET(window));
+};
+//-----------------------------------------------------------------------------
+void
+adjust_object(GObject * obj)
+{
+   assert(obj);
+   if (!GTK_IS_WIDGET(obj))   return;
+GtkWidget * widget = GTK_WIDGET(obj);
+
+const gchar * widget_name = gtk_widget_get_name(widget);
+   if (!widget_name)   return;
+}
 //-----------------------------------------------------------------------------

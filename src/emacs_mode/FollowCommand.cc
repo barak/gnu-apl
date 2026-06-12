@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "emacs.hh"
 #include "NetworkConnection.hh"
 #include "FollowCommand.hh"
@@ -86,7 +89,7 @@ static void enable_trace( NetworkConnection &conn, Symbol *symbol, int cr_level 
 
     stringstream out;
     out << "enabled" << endl;
-    Value_P v = symbol->get_value();
+    Value_P v = symbol->get_apl_value();
     TraceData::display_value_for_trace( out, v, cr_level );
     conn.send_reply( out.str() );
 }
@@ -114,7 +117,7 @@ void FollowCommand::run_command( NetworkConnection &conn, const std::vector<std:
         conn.send_reply( "undefined" );
         return;
     }
-    if( symbol->get_nc() != NC_VARIABLE ) {
+    if( symbol->get_NC() != NC_VARIABLE ) {
         conn.send_reply( "wrong type" );
         return;
     }

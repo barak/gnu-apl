@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __NATIVE_FUNCTION_HH_DEFINED__
 #define __NATIVE_FUNCTION_HH_DEFINED__
 
@@ -27,13 +30,15 @@
 #include "Function.hh"
 #include "Error.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
-    A user-defined function.
+    A defined function written in C++.
  */
-/// A user-defined function written in C++.
+/// A defined function written in C++.
 class NativeFunction : public Function
 {
+   friend class Doxy;
+
 public:
    /// return the name of the .so library that implements this function
    const UCS_string & get_so_path() const
@@ -76,6 +81,9 @@ protected:
    /// try to open one .so file
    static void * try_one_file(const char * filename, UCS_string & t4);
 
+   /// overloaded Function::is_defined()
+   virtual bool is_defined() const   { return true; }
+
    /// overloaded Function::is_native()
    virtual bool is_native() const   { return true; }
 
@@ -95,53 +103,53 @@ protected:
    virtual UCS_string canonical(bool with_lines) const;
 
    /// Overloaded Function::eval_()
-   virtual Token eval_();
+   virtual Token eval_() const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_LB()
-   virtual Token eval_LB(Token & LO, Value_P B);
+   virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALB()
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B);
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LXB()
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB()
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B);
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
-                            Value_P B);
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                            Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B);
+   virtual Token eval_fill_B(Value_P B) const;
 
    /// Overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B);
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_identity_fun()
-   virtual Token eval_identity_fun(Value_P B, Axis axis);
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Overloaded Function::destroy()
    virtual void destroy();
@@ -168,11 +176,11 @@ protected:
    Fun_signature signature;
 
    /// all native functions currently active
-   static std::vector<NativeFunction *> valid_functions;
+   static std::basic_string<NativeFunction *> valid_functions;
 
    typedef Value_P Vr;   ///< shortcut for Value_P
 
-   typedef Function & Fr;   ///< shortcut for Function &
+   typedef const Function & Fr;   ///< shortcut for const Function &
 
 #define Th const NativeFunction *
 
@@ -223,12 +231,12 @@ protected:
    Token (*f_eval_fill_AB) (Vr A,                     Vr B, Th);
 
    /// pointer to function eval_identity_fun() in shared library
-   Token (*f_eval_ident_Bx)(Vr B,                   Axis x, Th);
+   Token (*f_eval_ident_Bx)(Vr B,                  sAxis x, Th);
 #undef Th
 
    /// callback before library is closed
    bool (*close_fun)(Cause cause, const NativeFunction * caller);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __NATIVE_FUNCTION_HH_DEFINED__

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <errno.h>
 #include <fenv.h>
 #include <math.h>
@@ -29,27 +32,27 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_not(Cell * Z) const
 {
    if (!is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (get_near_bool())   new (Z) IntCell(0);
-   else                   new (Z) IntCell(1);
+   if (get_near_bool())   IntCell::z0(Z);
+   else                   IntCell::z1(Z);
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_not_bitwise(Cell * Z) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(~get_near_int());
-   return E_NO_ERROR;
+   return IntCell::zI(Z, ~get_near_int());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
+/// lookup table for N over 8 with integer result
 const uint64_t N_choose_8[] = { (887), 1, 9, 45, 165, 495, 1287, 3003, 6435,
  12870, 24310, 43758, 75582, 0x1EC12, 0x31AE2, 0x4E11A, 0x77B4A, 0xB38EF,
  0x1080E7, 0x17D6A3, 0x21E02B, 0x2F6D09, 0x417E31, 0x594EFD, 0x785F55,
@@ -319,6 +322,8 @@ const uint64_t N_choose_8[] = { (887), 1, 9, 45, 165, 495, 1287, 3003, 6435,
  0x7B37D896A8B0CD62ULL, 0x7C57EAEE898026EEULL, 0x7D7A49E67F14261EULL,
  0x7E9EF9844BC0F166ULL, 0x7FC5FDD38D63C136ULL,
 };
+
+/// lookup table for N over 9 with integer result
 const uint64_t N_choose_9[] = { (534), 1, 10, 55, 220, 715, 2002, 5005,
  11440, 24310, 48620, 92378, 0x29018, 0x47C2A, 0x7970C, 0xC7826, 0x13F370,
  0x1F2C5F, 0x2FAD46, 0x4783E9, 0x696414, 0x98D11D, 0xDA4F4E, 0x1339E4B,
@@ -477,6 +482,8 @@ const uint64_t N_choose_9[] = { (534), 1, 10, 55, 220, 715, 2002, 5005,
  0x73DCDA5654FDCAB6ULL, 0x75DD3A7C2F26896CULL, 0x77E574DF6DC1AF1AULL,
  0x79F5A467EC76B318ULL, 0x7C0DE44C6549D66AULL, 0x7E2E501330E62A8CULL,
 };
+
+/// lookup table for N over 10 with integer result
 const uint64_t N_choose_10[] = { (361), 1, 11, 66, 286, 1001, 3003, 8008,
  19448, 43758, 92378, 0x2D1B4, 0x561CC, 0x9DDF6, 0x117502, 0x1DED28,
  0x31E098, 0x510CF7, 0x80BA3D, 0xC83E26, 0x131A23A, 0x1CA7357, 0x2A4C2A5,
@@ -582,6 +589,8 @@ const uint64_t N_choose_10[] = { (361), 1, 11, 66, 286, 1001, 3003, 8008,
  0x713DBB782FA4C088ULL, 0x747EC54533F48554ULL, 0x77D54A8E5673D33CULL,
  0x7B41C9076EDD88D0ULL, 0x7EC4C0E6185084B0ULL,
 };
+
+/// lookup table for N over 11 with integer result
 const uint64_t N_choose_11[] = { (265), 1, 12, 78, 364, 1365, 4368, 12376,
  31824, 75582, 0x29018, 0x561CC, 0xAC398, 0x14A18E, 0x261690, 0x4403B8,
  0x75E450, 0xC6F147, 0x147AB84, 0x20FE9AA, 0x3418BE4, 0x50BFF3B, 0x7B0C1E0,
@@ -657,6 +666,8 @@ const uint64_t N_choose_11[] = { (265), 1, 12, 78, 364, 1365, 4368, 12376,
  0x6B81F96A1BED18C0ULL, 0x70381DD7CFA2D580ULL, 0x751E1F254B7E4260ULL,
  0x7A35B1320BFE2F00ULL, 0x7F809597FE66EC80ULL,
 };
+
+/// lookup table for N over 12 with integer result
 const uint64_t N_choose_12[] = { (206), 1, 13, 91, 455, 1820, 6188, 18564,
  50388, 0x1EC12, 0x47C2A, 0x9DDF6, 0x14A18E, 0x29431C, 0x4F59AC, 0x935D64,
  0x10941B4, 0x1D032FB, 0x317DE7F, 0x527C829, 0x869540D, 0xD755348,
@@ -714,6 +725,8 @@ const uint64_t N_choose_12[] = { (206), 1, 13, 91, 455, 1820, 6188, 18564,
  0x65DB785BDF262290ULL, 0x6C392FE19D1884B9ULL, 0x72F3CA1220E4FC65ULL,
  0x7A1010A1C3EB3B83ULL,
 };
+
+/// lookup table for N over 13 with integer result
 const uint64_t N_choose_13[] = { (169), 1, 14, 105, 560, 2380, 8568, 27132,
  77520, 0x31AE2, 0x7970C, 0x117502, 0x261690, 0x4F59AC, 0x9EB358, 0x13210BC,
  0x23B5270, 0x40B856B, 0x72363EA, 0xC4B2C13, 0x14B48020, 0x2229D368,
@@ -760,6 +773,8 @@ const uint64_t N_choose_13[] = { (169), 1, 14, 105, 560, 2380, 8568, 27132,
  0x64034082D8E09BF8ULL, 0x6C7490C31667EEF4ULL, 0x758D34DA0E602260ULL,
  0x7F58F9418F92CFE8ULL,
 };
+
+/// lookup table for N over 14 with integer result
 const uint64_t N_choose_14[] = { (143), 1, 15, 120, 680, 3060, 11628, 38760,
  0x1C638, 0x4E11A, 0xC7826, 0x1DED28, 0x4403B8, 0x935D64, 0x13210BC,
  0x2642178, 0x49F73E8, 0x8AAF953, 0xFCE5D3D, 0x1C198950, 0x30CE0970,
@@ -798,6 +813,8 @@ const uint64_t N_choose_14[] = { (143), 1, 15, 120, 680, 3060, 11628, 38760,
  0x5A56CB65F914CF40ULL, 0x644C347742E6B9C0ULL, 0x6F448A344E37F611ULL,
  0x7B57E2A12D0873FFULL,
 };
+
+/// lookup table for N over 15 with integer result
 const uint64_t N_choose_15[] = { (125), 1, 16, 136, 816, 3876, 15504, 54264,
  0x29A30, 0x77B4A, 0x13F370, 0x31E098, 0x75E450, 0x10941B4, 0x23B5270,
  0x49F73E8, 0x93EE7D0, 0x11E9E123, 0x21B83E60, 0x3DD1C7B0, 0x6E9FD120,
@@ -830,6 +847,8 @@ const uint64_t N_choose_15[] = { (125), 1, 16, 136, 816, 3876, 15504, 54264,
  0x5571D5DA1E3610F0ULL, 0x614FDE386984AFBCULL, 0x6EB41B55501CD150ULL,
  0x7DCCAAB266AC6238ULL,
 };
+
+/// lookup table for N over 16 with integer result
 const uint64_t N_choose_16[] = { (111), 1, 17, 153, 969, 4845, 20349, 74613,
  0x3BDA5, 0xB38EF, 0x1F2C5F, 0x510CF7, 0xC6F147, 0x1D032FB, 0x40B856B,
  0x8AAF953, 0x11E9E123, 0x23D3C246, 0x458C00A6, 0x835DC856, 0xF1FD9976,
@@ -857,6 +876,8 @@ const uint64_t N_choose_16[] = { (111), 1, 17, 153, 969, 4845, 20349, 74613,
  0x332CBCDCFB6AD476ULL, 0x3C2C2A06A6374896ULL, 0x46A3263453D197FEULL,
  0x52CA3A8A67BE995EULL, 0x60E1C1C8175C516EULL, 0x7132E51CFDA7268EULL,
 };
+
+/// lookup table for N over 17 with integer result
 const uint64_t N_choose_17[] = { (101), 1, 18, 171, 1140, 5985, 26334,
  0x18A53, 0x547F8, 0x1080E7, 0x2FAD46, 0x80BA3D, 0x147AB84, 0x317DE7F,
  0x72363EA, 0xFCE5D3D, 0x21B83E60, 0x458C00A6, 0x8B18014C, 0x10E75C9A2ULL,
@@ -881,6 +902,8 @@ const uint64_t N_choose_17[] = { (101), 1, 18, 171, 1140, 5985, 26334,
  0x2B3FF668CBF52EA0ULL, 0x3470C12BDDB2E222ULL, 0x3F724BB054EB63C4ULL,
  0x4C9999D1C42EEBF6ULL, 0x5C4A066ED9DC0088ULL, 0x6EF77B8B6160E842ULL,
 };
+
+/// lookup table for N over 18 with integer result
 const uint64_t N_choose_18[] = { (94), 1, 19, 190, 1330, 7315, 33649,
  0x20DC4, 0x755BC, 0x17D6A3, 0x4783E9, 0xC83E26, 0x20FE9AA, 0x527C829,
  0xC4B2C13, 0x1C198950, 0x3DD1C7B0, 0x835DC856, 0x10E75C9A2ULL,
@@ -903,6 +926,8 @@ const uint64_t N_choose_18[] = { (94), 1, 19, 190, 1330, 7315, 33649,
  0x2A12D3ED07E4532CULL, 0x349788E849DD67F7ULL, 0x418F4F7CBE451865ULL,
  0x5181BCC4998655AEULL, 0x651183AC1A87DAE2ULL, 0x7D0173B32E49B725ULL,
 };
+
+/// lookup table for N over 19 with integer result
 const uint64_t N_choose_19[] = { (88), 1, 20, 210, 1540, 8855, 42504,
  0x2B3CC, 0xA0988, 0x21E02B, 0x696414, 0x131A23A, 0x3418BE4, 0x869540D,
  0x14B48020, 0x30CE0970, 0x6E9FD120, 0xF1FD9976, 0x200736318ULL,
@@ -923,6 +948,8 @@ const uint64_t N_choose_19[] = { (88), 1, 20, 210, 1540, 8855, 42504,
  0x2DD7FA7ED38DBD44ULL, 0x3B0A848C10749A8AULL, 0x4BC8B96B2FDE4474ULL,
  0x60F583D0AA6B6E2BULL, 0x7BA86CBFEBE5C428ULL,
 };
+
+/// lookup table for N over 20 with integer result
 const uint64_t N_choose_20[] = { (83), 1, 21, 231, 1771, 10626, 53130,
  0x38356, 0xD8CDE, 0x2F6D09, 0x98D11D, 0x1CA7357, 0x50BFF3B, 0xD755348,
  0x2229D368, 0x52F7DCD8, 0xC197ADF8, 0x1B395476EULL, 0x3B408AA86ULL,
@@ -941,6 +968,8 @@ const uint64_t N_choose_20[] = { (83), 1, 21, 231, 1771, 10626, 53130,
  0x1B7B2BBC17B80F84ULL, 0x24CBF979AEF21D74ULL, 0x310FF74CE942D1F0ULL,
  0x4125FCD7707E7FB0ULL, 0x5629FBD29D0A66D0ULL, 0x718484A7C2B44E90ULL,
 };
+
+/// lookup table for N over 21 with integer result
 const uint64_t N_choose_21[] = { (79), 1, 22, 253, 2024, 12650, 65780,
  0x4844A, 0x121128, 0x417E31, 0xDA4F4E, 0x2A4C2A5, 0x7B0C1E0, 0x15261528,
  0x374FE890, 0x8A47C568, 0x14BDF7360ULL, 0x2FF74BACEULL, 0x6B37D6554ULL,
@@ -958,6 +987,8 @@ const uint64_t N_choose_21[] = { (79), 1, 22, 253, 2024, 12650, 65780,
  0x1D3142268418DB08ULL, 0x2856AF30914C3CA0ULL, 0x377730E2C7C8D35CULL,
  0x4BE678CA8AA70648ULL, 0x6761A486A25F15CCULL,
 };
+
+/// lookup table for N over 22 with integer result
 const uint64_t N_choose_22[] = { (76), 1, 23, 276, 2300, 14950, 80730,
  0x5BFA4, 0x17D0CC, 0x594EFD, 0x1339E4B, 0x3D860F0, 0xB8922D0, 0x20AF37F8,
  0x57FF2088, 0xE246E5F0, 0x22E265950ULL, 0x52D9B141EULL, 0xBE1187972ULL,
@@ -974,6 +1005,8 @@ const uint64_t N_choose_22[] = { (76), 1, 23, 276, 2300, 14950, 80730,
  0x2394EDC6BC07DA70ULL, 0x32A2B4D5E4328F78ULL, 0x47A773D2E725BC88ULL,
  0x64D8B5F96B3E9790ULL,
 };
+
+/// lookup table for N over 23 with integer result
 const uint64_t N_choose_23[] = { (74), 1, 24, 300, 2600, 17550, 98280,
  0x73F8C, 0x1F1058, 0x785F55, 0x1ABFDA0, 0x5845E90, 0x110D8160, 0x31BCB958,
  0x89BBD9E0, 0x16C02BFD0ULL, 0x39A291920ULL, 0x8C7C42D3EULL, 0x14A8DCA6B0ULL,
@@ -989,6 +1022,8 @@ const uint64_t N_choose_23[] = { (74), 1, 24, 300, 2600, 17550, 98280,
  0x24C70049556860ACULL, 0x360A499053B37E60ULL, 0x4EE60F3E3CC38030ULL,
  0x727AFD04F8CB5AA0ULL,
 };
+
+/// lookup table for N over 24 with integer result
 const uint64_t N_choose_24[] = { (72), 1, 25, 325, 2925, 20475, 0x1CFE3,
  0x90F6F, 0x281FC7, 0xA07F1C, 0x24C7CBC, 0x7D0DB4C, 0x18DE5CAC, 0x4A9B1604,
  0xD456EFE4, 0x24059AFB4ULL, 0x5DA82C8D4ULL, 0xEA246F612ULL, 0x234B239CC2ULL,
@@ -1003,6 +1038,8 @@ const uint64_t N_choose_24[] = { (72), 1, 25, 325, 2925, 20475, 0x1CFE3,
  0x14DE1D01F2A65CF8ULL, 0x1FFF3D8B85213938ULL, 0x30B0EE59E0D98398ULL,
  0x498E0092AAD0C158ULL, 0x6E5500DC00392204ULL,
 };
+
+/// lookup table for N over 25 with integer result
 const uint64_t N_choose_25[] = { (70), 1, 26, 351, 3276, 23751, 0x22CAA,
  0xB3C19, 0x335BE0, 0xD3DAFC, 0x32057B8, 0xAF13304, 0x23CF8FB0, 0x6E6AA5B4,
  0x142C19598ULL, 0x3831B454CULL, 0x95D9E0E20ULL, 0x17FFE50432ULL,
@@ -1016,6 +1053,8 @@ const uint64_t N_choose_25[] = { (70), 1, 26, 351, 3276, 23751, 0x22CAA,
  0x90B427CA6737888ULL, 0xE8F00E1A1CC9C90ULL, 0x173975372CC66778ULL,
  0x24BA1E92C9C8A3A0ULL, 0x39983B94BC6F0098ULL, 0x59977920419039D0ULL,
 };
+
+/// lookup table for N over 26 with integer result
 const uint64_t N_choose_26[] = { (69), 1, 27, 378, 3654, 27405, 0x297B7,
  0xDD3D0, 0x412FB0, 0x1150AAC, 0x4356264, 0xF269568, 0x32F62518, 0xA160CACC,
  0x1E4226064ULL, 0x5673DA5B0ULL, 0xEC4DBB3D0ULL, 0x26C4C0B802ULL,
@@ -1029,6 +1068,8 @@ const uint64_t N_choose_26[] = { (69), 1, 27, 378, 3654, 27405, 0x297B7,
  0x16F5329EE19B45A8ULL, 0x258433808367E238ULL, 0x3CBDA8B7B02E49B0ULL,
  0x6177C74A79F6ED50ULL,
 };
+
+/// lookup table for N over 27 with integer result
 const uint64_t N_choose_27[] = { (68), 1, 28, 406, 4060, 31465, 0x312A0,
  0x10E670, 0x521620, 0x16720CC, 0x59C8330, 0x14C31898, 0x47B93DB0,
  0xE91A087C, 0x2CD3C68E0ULL, 0x8347A0E90ULL, 0x16F955C260ULL,
@@ -1041,6 +1082,8 @@ const uint64_t N_choose_27[] = { (68), 1, 28, 406, 4060, 31465, 0x312A0,
  0x6CAEB193EA83B13ULL, 0xBBFDBD8A3BB35C0ULL, 0x14190586C7397DA0ULL,
  0x2202F5A902614AC0ULL, 0x38F82847E3FC9068ULL, 0x5E7C5BC8676472A0ULL,
 };
+
+/// lookup table for N over 28 with integer result
 const uint64_t N_choose_28[] = { (67), 1, 29, 435, 4495, 35960, 0x39F18,
  0x148588, 0x669BA8, 0x1CDBC74, 0x76A3FA4, 0x1C2D583C, 0x63E695EC,
  0x14D009E68ULL, 0x41A3D0748ULL, 0xC4EB715D8ULL, 0x23480CD838ULL,
@@ -1053,6 +1096,8 @@ const uint64_t N_choose_28[] = { (67), 1, 29, 435, 4495, 35960, 0x39F18,
  0xF86ABA76AA51950ULL, 0x1B4687800E604F10ULL, 0x2F5F8D06D599CCB0ULL,
  0x516282AFD7FB1770ULL,
 };
+
+/// lookup table for N over 29 with integer result
 const uint64_t N_choose_29[] = { (67), 1, 30, 465, 4960, 40920, 0x43EF0,
  0x18C478, 0x7F6020, 0x24D1C94, 0x9B75C38, 0x25E4B474, 0x89CB4A60,
  0x1D6CBE8C8ULL, 0x5F108F010ULL, 0x123FC005E8ULL, 0x3587CCDE20ULL,
@@ -1064,6 +1109,8 @@ const uint64_t N_choose_29[] = { (67), 1, 30, 465, 4960, 40920, 0x43EF0,
  0x5B03CAEFE3EB21AULL, 0xA8A52534F924A03ULL, 0x134612E17B8F2840ULL,
  0x22CCBE88E6344190ULL, 0x3E134608F49490A0ULL, 0x6D72D30FCA2E5D50ULL,
 };
+
+/// lookup table for N over 30 with integer result
 const uint64_t N_choose_30[] = { (66), 1, 31, 496, 5456, 46376, 0x4F418,
  0x1DB890, 0x9D18B0, 0x2EA3544, 0xCA1917C, 0x328645F0, 0xBC519050,
  0x2931D7918ULL, 0x884266928ULL, 0x1AC3E66F10ULL, 0x504BB34D30ULL,
@@ -1075,6 +1122,8 @@ const uint64_t N_choose_30[] = { (66), 1, 31, 496, 5456, 46376, 0x4F418,
  0xBF2190915EA0F9DULL, 0x167C6B5C657C59A0ULL, 0x29C27E3DE10B81E0ULL,
  0x4C8F3CC6C73FC370ULL,
 };
+
+/// lookup table for N over 31 with integer result
 const uint64_t N_choose_31[] = { (66), 1, 32, 528, 5984, 52360, 0x5C0A0,
  0x237930, 0xC091E0, 0x3AAC724, 0x104C58A0, 0x42D29E90, 0xFF242EE0,
  0x39241A7F8ULL, 0xC16681120ULL, 0x26DA4E8030ULL, 0x772601CD60ULL,
@@ -1086,6 +1135,8 @@ const uint64_t N_choose_31[] = { (66), 1, 32, 528, 5984, 52360, 0x5C0A0,
  0xCB764F927D82123ULL, 0x18A97E023DC230C0ULL, 0x2F25E95EA33E8A60ULL,
  0x58E8679C844A0C40ULL,
 };
+
+/// lookup table for N over 32 with integer result
 const uint64_t N_choose_32[] = { (66), 1, 33, 561, 6545, 58905, 0x6A6B9,
  0x2A1FE9, 0xEAB1C9, 0x49578ED, 0x14E1D18D, 0x57B4701D, 0x156D89EFDULL,
  0x4E91A46F5ULL, 0x10FF825815ULL, 0x37D9D0D845ULL, 0xAEFFD2A5A5ULL,
@@ -1096,6 +1147,8 @@ const uint64_t N_choose_32[] = { (66), 1, 33, 561, 6545, 58905, 0x6A6B9,
  0x307180A8F94FBB3ULL, 0x641DC5A17AB5D83ULL, 0xCB764F927D82123ULL,
  0x196EC9F24FB04246ULL, 0x321847F48D727306ULL, 0x613E315330B0FD66ULL,
 };
+
+/// lookup table for N over 33 with integer result
 const uint64_t N_choose_33[] = { (66), 1, 34, 595, 7140, 66045, 0x7A8B6,
  0x31C89F, 0x11C7A68, 0x5B1F355, 0x1A93C4E2, 0x724834FF, 0x1C920D3FCULL,
  0x6B23B1AF1ULL, 0x17B1BD7306ULL, 0x4F8B8E4B4BULL, 0xFE8B60F0F0ULL,
@@ -1107,15 +1160,22 @@ const uint64_t N_choose_33[] = { (66), 1, 34, 595, 7140, 66045, 0x7A8B6,
  0x321847F48D727306ULL, 0x64308FE91AE4E60CULL,
 };
 
+/** a vector of lookup tables. The cases K = 1...7 are handled explicitly below,
+    therefore no table is provided (such a table would be rather large).
+
+    The tables below handle all cases where 8 ≤ K ≤ 33 and the result is small
+    enough to fit into an APL integer.
+ **/
 static const uint64_t * N_choose_K[] = { 0, 0, 0, 0, 0, 0, 0, 0,
  N_choose_8,  N_choose_9,  N_choose_10, N_choose_11, N_choose_12, N_choose_13, 
  N_choose_14, N_choose_15, N_choose_16, N_choose_17, N_choose_18, N_choose_19, 
  N_choose_20, N_choose_21, N_choose_22, N_choose_23, N_choose_24, N_choose_25, 
  N_choose_26, N_choose_27, N_choose_28, N_choose_29, N_choose_30, N_choose_31, 
- N_choose_32, N_choose_33, 
+ N_choose_32, N_choose_33
 };
-void
-NumericCell::do_binomial(Cell * Z, APL_Integer K, APL_Integer N, bool negate)
+
+ErrorCode
+NumericCell::K33_binomial(Cell * Z, APL_Integer N, APL_Integer K, bool negate)
 {
    Assert(N >= K);
    Assert(K >= 0);
@@ -1124,201 +1184,68 @@ NumericCell::do_binomial(Cell * Z, APL_Integer K, APL_Integer N, bool negate)
    //
    if (K > (N - K))   K = N - K;
 
-   // for small K, the max N gets very large. We handle these cases
-   // separately in order to have a small max_N for integer results.
-   //
+   /* for small K, the largest N (for which the result fits into a uint64_t)
+      gets very large, resulting in an equally large lookup table. We handle
+      these cases (i.e. K ≤ 7) separately in order to limit the table sizes.
+
+      The trick is that:
+
+      ⎛N⎞   N0 × N1 × N2 × ... × Nk-1
+      ⎜ ⎟ = ───────────────────────    where Nk = N-k
+      ⎝k⎠    ( 1 × )   2 × ...  × k
+
+      so we only need to find (for every i ≤ K) the Ni that can be evenly
+      divided by i, divide Ni by i, and multiply the results.
+   */
    if (K <= 7)
       {
-        APL_Integer z = 0;
-        if (K == 0)
-           {
-             z = 1;
-           }
-        else if (K == 1)
-           {
-             z = N;
-           }
-        else if (K == 2)   // K == 2 or N-2
-           {
-             if (N > 4294967296LL)   goto non_integer;   // K!N too large
+        if (K == 0)                             // N over 0 is 1 (0! ÷ 0!)
+           return IntCell::zI(Z, negate ? -1 : 1);
 
-             // either N or N-1 must be even
-             //
-             if (N & 1)   // N-1 even: divide N-1
-                {
-                  z = N * ((N-1)/2);
-                }
-             else         // N even: divide N-1
-                {
-                  z = (N - 1) * (N/2);
-                }
-           }
-        else if (K == 3)   // K == 3 or N-3
-           {
-             if (N > 3810779)   goto non_integer;   // K!N too large
+        if (K == 1)                             // N over 1 is N (N  ÷ 1)
+           return IntCell::zI(Z, negate ? -N : N);
 
-             APL_Integer N0 = N;
-             APL_Integer N1 = N - 1;
-             APL_Integer N2 = N - 2;
+        {
+           // max_N is the maximum N for which N!K is so large that it
+           // does not fit into an APL integer.
+           //
+           const int64_t max_N[] = { 4294967296LL,   // K = 2
+                                        3810779LL,   // K = 3
+                                           121977,   // K = 4
+                                            16175,   // K = 5
+                                             4337,   // K = 6
+                                             1733    // K = 7
+                                   };
 
-             if (N0 & 1)   N1 = N1/2;
-             else          N0 = N0/2;
+          if (N > max_N[K - 2])   return integer_binomial(Z, N, K, negate);
+        }
 
-             if      ((N0 % 3) == 0)   N0 = N0/3;
-             else if ((N1 % 3) == 0)   N1 = N1/3;
-             else                      N2 = N2/3;
-             z = N0 * N1 * N2;
-           }
-        else if (K == 4)   // K == 4 or N-4
-           {
-             if (N > 121977)   goto non_integer;   // K!N too large
+        uint64_t numer[7] = { 0, 0, 0, 0, 0, 0, 0 };   // numerator N! ÷ (N-K)!
+        loop(n, K)   numer[n] = N - n;
 
-             APL_Integer N0 = N;
-             APL_Integer N1 = N - 1;
-             APL_Integer N2 = N - 2;
-             APL_Integer N3 = N - 3;
+        size_t denom[] = { 2, 3,  2,2,  5,  2,3, 7 };
+        size_t denom_count = K - 1;   // drop factor 1
+        if (K >= 4)   ++denom_count;   // 4 is 2×2
+        if (K >= 6)   ++denom_count;   // 6 is 2×3
 
-             for (int j = 0; j < 3; ++j)
-                 {
-                   if      ((N0 & 1) == 0)   N0 = N0/2;
-                   else if ((N1 & 1) == 0)   N1 = N1/2;
-                   else if ((N2 & 1) == 0)   N2 = N2/2;
-                   else                      N3 = N3/2;
-                 }
-
-             if      ((N0 % 3) == 0)   N0 = N0/3;
-             else if ((N1 % 3) == 0)   N1 = N1/3;
-             else                      N2 = N2/3;
-
-             z = N0 * N1 * N2 * N3;
-           }
-        else if (K == 5)   // K == 5 or N-5
-           {
-             if (N > 16175)   goto non_integer;   // K!N too large
-
-             APL_Integer N0 = N;
-             APL_Integer N1 = N - 1;
-             APL_Integer N2 = N - 2;
-             APL_Integer N3 = N - 3;
-             APL_Integer N4 = N - 4;
-
-             for (int j = 0; j < 3; ++j)
-                 {
-                   if      ((N0 & 1) == 0)   N0 = N0/2;
-                   else if ((N1 & 1) == 0)   N1 = N1/2;
-                   else if ((N2 & 1) == 0)   N2 = N2/2;
-                   else if ((N3 & 1) == 0)   N3 = N3/2;
-                   else                      N4 = N4/2;
-                 }
-
-             if      ((N0 % 3) == 0)   N0 = N0/3;
-             else if ((N1 % 3) == 0)   N1 = N1/3;
-             else                      N2 = N2/3;
-
-             if      ((N0 % 5) == 0)   N0 = N0/5;
-             else if ((N1 % 5) == 0)   N1 = N1/5;
-             else if ((N2 % 5) == 0)   N2 = N2/5;
-             else if ((N3 % 5) == 0)   N3 = N3/5;
-             else                      N4 = N4/5;
-
-             z = N0 * N1 * N2 * N3 * N4;
-           }
-        else if (K == 6)   // K == 6 or N-6
-           {
-             if (N > 4337)   goto non_integer;   // K!N too large
-
-             APL_Integer N0 = N;
-             APL_Integer N1 = N - 1;
-             APL_Integer N2 = N - 2;
-             APL_Integer N3 = N - 3;
-             APL_Integer N4 = N - 4;
-             APL_Integer N5 = N - 5;
-
-             for (int j = 0; j < 4; ++j)
-                 {
-                   if      ((N0 & 1) == 0)   N0 = N0/2;
-                   else if ((N1 & 1) == 0)   N1 = N1/2;
-                   else if ((N2 & 1) == 0)   N2 = N2/2;
-                   else if ((N3 & 1) == 0)   N3 = N3/2;
-                   else if ((N4 & 1) == 0)   N4 = N4/2;
-                   else                      N5 = N5/2;
-                 }
-
-             for (int j = 0; j < 2; ++j)
-                 {
-                   if      ((N0 % 3) == 0)   N0 = N0/3;
-                   else if ((N1 % 3) == 0)   N1 = N1/3;
-                   else if ((N2 % 3) == 0)   N2 = N2/3;
-                   else if ((N3 % 3) == 0)   N3 = N3/3;
-                   else if ((N4 % 3) == 0)   N4 = N4/3;
-                   else                      N5 = N5/3;
-                 }
-
-             if      ((N0 % 5) == 0)   N0 = N0/5;
-             else if ((N1 % 5) == 0)   N1 = N1/5;
-             else if ((N2 % 5) == 0)   N2 = N2/5;
-             else if ((N3 % 5) == 0)   N3 = N3/5;
-             else if ((N4 % 5) == 0)   N4 = N4/5;
-             else                      N5 = N5/5;
-
-             z = N0 * N1 * N2 * N3 * N4 * N5;
-           }
-        else if (K == 7)   // K == 7 or N-7
-           {
-             if (N > 1733)   goto non_integer;   // K!N too large
-
-             APL_Integer N0 = N;
-             APL_Integer N1 = N - 1;
-             APL_Integer N2 = N - 2;
-             APL_Integer N3 = N - 3;
-             APL_Integer N4 = N - 4;
-             APL_Integer N5 = N - 5;
-             APL_Integer N6 = N - 6;
-
-             for (int j = 0; j < 4; ++j)
-                 {
-                   if      ((N0 & 1) == 0)   N0 = N0/2;
-                   else if ((N1 & 1) == 0)   N1 = N1/2;
-                   else if ((N2 & 1) == 0)   N2 = N2/2;
-                   else if ((N3 & 1) == 0)   N3 = N3/2;
-                   else if ((N4 & 1) == 0)   N4 = N4/2;
-                   else if ((N5 & 1) == 0)   N5 = N5/2;
-                   else                      N6 = N6/2;
-                 }
-
-             for (int j = 0; j < 2; ++j)
-                 {
-                   if      ((N0 % 3) == 0)   N0 = N0/3;
-                   else if ((N1 % 3) == 0)   N1 = N1/3;
-                   else if ((N2 % 3) == 0)   N2 = N2/3;
-                   else if ((N3 % 3) == 0)   N3 = N3/3;
-                   else if ((N4 % 3) == 0)   N4 = N4/3;
-                   else if ((N5 % 3) == 0)   N5 = N5/3;
-                   else                      N6 = N6/3;
-                 }
-
-             if      ((N0 % 5) == 0)   N0 = N0/5;
-             else if ((N1 % 5) == 0)   N1 = N1/5;
-             else if ((N2 % 5) == 0)   N2 = N2/5;
-             else if ((N3 % 5) == 0)   N3 = N3/5;
-             else if ((N4 % 5) == 0)   N4 = N4/5;
-             else if ((N5 % 5) == 0)   N5 = N5/5;
-             else                      N6 = N6/5;
-
-             if      ((N0 % 7) == 0)   N0 = N0/7;
-             else if ((N1 % 7) == 0)   N1 = N1/7;
-             else if ((N2 % 7) == 0)   N2 = N2/7;
-             else if ((N3 % 7) == 0)   N3 = N3/7;
-             else if ((N4 % 7) == 0)   N4 = N4/7;
-             else if ((N5 % 7) == 0)   N5 = N5/7;
-             else                      N6 = N6/7;
-
-             z = N0 * N1 * N2 * N3 * N4 * N5 *N6;
-           }
-
-        if (negate)   new (Z) IntCell(-z);
-        else          new (Z) IntCell( z);
-        return;
+        loop(d, denom_count)   // one factor of the denominator (= K!)
+            {
+bool found = false;
+              loop(n, K)
+                  {
+                    if ((numer[n] % denom[d]) == 0)
+                       {
+                          numer[n] /= denom[d];
+found = true;
+                          break;
+                       }
+                  }
+Assert(found);
+            }
+        APL_Integer z = 1;
+        loop(n, K)   z *= numer[n];
+        if (negate)   z = -z;
+        return IntCell::zI(Z, z);
       }
 
    // at this point, K >= 8. If K ≤ 33 then we try a table lookup.
@@ -1334,100 +1261,156 @@ NumericCell::do_binomial(Cell * Z, APL_Integer K, APL_Integer N, bool negate)
         if (uint64_t(N) <= table_K[0])
            {
              const APL_Integer z = table_K[1 + (N - K)];
-             if (negate)   new (Z) IntCell(-z);
-             else          new (Z) IntCell( z);
-             return;
+             if (negate)   IntCell::zI(Z, -z);
+             else          IntCell::zI(Z,  z);
+             return E_NO_ERROR;
            }
       }
 
-non_integer:
-
-   // at this point, the result is too large for an APL_Integer
-   // N! fits into double for N ≤ 170
-   //
-   if (N > 170)   DOMAIN_ERROR;
-
-APL_Float z  = tgamma(N + 1);            // N!
-          z = z / tgamma(K + 1);         // ÷ K!
-          z = z / tgamma((N - K) + 1);   // ÷ (N-K)!
-
-   new (Z) FloatCell(z);
+   return integer_binomial(Z, N, K, negate);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 {
-   if (!A->is_numeric())              return E_DOMAIN_ERROR;
-   if (A->get_real_value() > 170.0)   return E_DOMAIN_ERROR;
+   /*
+          compute N over K, i.e.
 
-   if (!is_near_real() || !A->is_near_real())   // complex result
+              ⎛B⎞   ⎛N⎞      N!
+          Z ← ⎜ ⎟ = ⎜ ⎟ = ─────────   for integer K and N, K ≤ N, or
+              ⎝A⎠   ⎝K⎠   K!·(N-K)!
+
+          Z ← gamma(1+B) ÷ ( gamma(1+A) × gamma(1+B-A))  for non-integer K or N
+    */
+
+   if (!A->is_numeric())     return E_DOMAIN_ERROR;
+
+   if (!   is_near_real())   return complex_binomial(Z, A);
+   if (!A->is_near_real())   return complex_binomial(Z, A);
+
+   // at this point both A and B are real (and maybe integer).
+   // Compute 'row' which is the row in the case table in
+   // chapter "7.2.10 Binomial" of ISO/IEC 13751 : 2000 (E) on page 90.
+   //
+const APL_Float r_A = A->get_real_value();
+const APL_Float r_B =    get_real_value();
+const int row = (r_A < 0   ? 4 : 0)
+              | (r_B < 0   ? 2 : 0)
+              | (r_B < r_A ? 1 : 0);
+
+   // handle the 0 and the impossible (e.g. A≥0, B<0, but B-A≥0) cases.
+   // ISO wants DOMAIN ERROR for the impossible cases but they cannot occur
+   // anyway.
+   //
+const char * how = "-0?-0?-0";   // '?' means case cannot occur
+const char chow = how[row];
+   if (chow == '0')   return IntCell::z0(Z);   // cases 1, 4, and 7
+   Assert(chow == '-');                        // cases 0, 3, and 6
+
+   if (!   is_near_int())   return real_binomial(Z, A);
+   if (!A->is_near_int())   return real_binomial(Z, A);
+
+   // at this point both A and B are integer (possibly negative)
+   //
+const APL_Integer K = A->get_checked_near_int();
+const APL_Integer N =    get_checked_near_int();
+   switch(row)
       {
-        const APL_Float r_1_a    = A->get_real_value();
-        const APL_Float r_1_b    = get_real_value();
-        const APL_Float r_1_b__a = r_1_b - A->get_real_value();
-
-        const APL_Float i_a   = A->get_imag_value();
-        const APL_Float i_b   = get_imag_value();
-        const APL_Float i_b_a = i_b - i_a;
-
-        const APL_Complex gam_1_a    = ComplexCell::gamma(r_1_a + 1.0,   i_a);
-        const APL_Complex gam_1_b    = ComplexCell::gamma(r_1_b + 1.0,   i_b);
-        const APL_Complex gam_1_b__a = ComplexCell::gamma(r_1_b__a + 1.0,i_b_a);
-
-        new (Z) ComplexCell(gam_1_b / (gam_1_a * gam_1_b__a));
-        return E_NO_ERROR;
+        case 0:  return K33_binomial(Z, N,           K,         false);
+        case 3:  return K33_binomial(Z, K - (N + 1), K,         K & 1);
+        case 6:  return K33_binomial(Z, -(K + 1),    -(N + 1),  (N - K) & 1);
       }
 
-   if (!is_near_int() || !A->is_near_int())   // non-integer result
-      {
-        const APL_Float r_1_a    = 1.0 + A->get_real_value();
-        const APL_Float r_1_b    = 1.0 + get_real_value();
-        const APL_Float r_1_b__a = r_1_b - A->get_real_value();
-
-        if (r_1_a < 0.0    && is_near_int(r_1_a))      return E_DOMAIN_ERROR;
-        if (r_1_b < 0.0    && is_near_int(r_1_b))      return E_DOMAIN_ERROR;
-        if (r_1_b__a < 0.0 && is_near_int(r_1_b__a))   return E_DOMAIN_ERROR;
-
-        const APL_Float rb = tgamma(r_1_b);
-        if (!isfinite(rb))   return E_DOMAIN_ERROR;
-
-        const APL_Float ra = tgamma(r_1_a);
-        if (!isfinite(ra))   return E_DOMAIN_ERROR;
-
-        const APL_Float r_b__a = tgamma(r_1_b__a);
-        if (!isfinite(r_b__a))   return E_DOMAIN_ERROR;
-
-        return FloatCell::zv(Z, (rb / ra) / r_b__a);
-      }
-
-   if (!A->is_near_int())   return E_DOMAIN_ERROR;
-   if (!is_near_int())      return E_DOMAIN_ERROR;
-   if (is_float_cell() && 0x7FFFFFFFFFFFFFFFLL < get_real_value())
-      return E_DOMAIN_ERROR;
-
-const APL_Integer a = A->get_checked_near_int();
-const APL_Integer b = get_checked_near_int();
-
-int how = 0;
-   if (a < 0)    how |= 4;
-   if (b < 0)    how |= 2;
-   if (b < a)    how |= 1;
-
-   switch(how)
-      {
-        case 0: do_binomial(Z, a, b, false);                       break;
-        case 1: new (Z) IntCell(0);                                break;
-        case 2: Assert(0 && "Impossible case 2");                  break;
-        case 3: do_binomial(Z, a, a - (b + 1), a & 1);             break;
-        case 4: new (Z) IntCell(0);                                break;
-        case 5: Assert(0 && "Impossible case 5");                  break;
-        case 6: do_binomial(Z, -(b + 1), -(a + 1), (b - a) & 1);   break;
-        case 7: new (Z) IntCell(0);                                break;
-      }
-
+   FIXME;
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+ErrorCode
+NumericCell::complex_binomial(Cell * Z, const Cell * A) const
+{
+const APL_Float r_A = A->get_real_value();
+const APL_Float r_B =    get_real_value();
+const APL_Float r_B__A = r_B - r_A;
+
+const APL_Float i_A    = A->get_imag_value();
+const APL_Float i_B    = get_imag_value();
+const APL_Float i_B__A = i_B - i_A;
+
+const APL_Complex gam_1_a    = ComplexCell::gamma(r_A +    1.0, i_A);
+const APL_Complex gam_1_b    = ComplexCell::gamma(r_B +    1.0, i_B);
+const APL_Complex gam_1_b__a = ComplexCell::gamma(r_B__A + 1.0, i_B__A);
+
+   return ComplexCell::zC(Z, gam_1_b / (gam_1_a * gam_1_b__a));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+NumericCell::real_binomial(Cell * Z, const Cell * A) const
+{
+const APL_Float r_1_A    = 1.0 + A->get_real_value();
+const APL_Float r_1_B    = 1.0 +    get_real_value();
+const APL_Float r_1_B__A = r_1_B - A->get_real_value();
+
+   if (r_1_A    < 0.0 && is_near_int(r_1_A))      return E_DOMAIN_ERROR;
+   if (r_1_B    < 0.0 && is_near_int(r_1_B))      return E_DOMAIN_ERROR;
+   if (r_1_B__A < 0.0 && is_near_int(r_1_B__A))   return E_DOMAIN_ERROR;
+
+const APL_Float gam_r_1_B = tgamma(r_1_B);
+   if (!isfinite(gam_r_1_B))   return E_DOMAIN_ERROR;
+
+const APL_Float gam_r_1_A = tgamma(r_1_A);
+   if (!isfinite(gam_r_1_A))   return E_DOMAIN_ERROR;
+
+const APL_Float gam_r_1_B__A = tgamma(r_1_B__A);
+   if (!isfinite(gam_r_1_B__A))   return E_DOMAIN_ERROR;
+
+const APL_Float z = (gam_r_1_B / gam_r_1_A) / gam_r_1_B__A;
+   if (!isfinite(z))   return E_DOMAIN_ERROR;
+
+   return FloatCell::zF(Z, z);
+}
+//----------------------------------------------------------------------------
+ErrorCode
+NumericCell::integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
+                              bool negate)
+{
+   // N over K is 0 for all K > N
+   //
+   if (K > N)   return IntCell::z0(Z);
+
+   // N over N is 1
+   if (K == N)   return IntCell::zI(Z, negate ? -1 : 1);
+
+   // symmetry: N over K == N over (N-K). We want K to be as small
+   // as possible, therefore:
+   //
+   if (K > (N - K))   K = N - K;
+
+   /* at this point, K < N÷2 and Z is Pn ÷ (Pd × Pe) where:
+
+      Pn = 1 × 2 × 3 × ... × N      ⍝ all N factors of the numerator
+      Pd = 1 × 2 × 3 × ... × K      ⍝ the first K factors of the denominator
+      Pe = 1 × 2 × 3 × ... × N-K    ⍝ the last N-K factors of the denominator
+
+      Let Pf = N-K+1 × N-K+2 × ... × N.   ⍝ the last K factors of the numerator
+      Then:
+
+      Z = Pf ÷ Pd  (proof: by reducing Pn by the (identical) factors of Pe
+   */
+APL_Integer Pf = N;   // counting down to  N - K + 1
+APL_Integer Pd = 1;   // counting up to K
+APL_Float Q = 1.0;
+
+   loop(k, K)
+       {
+          if (Q >= (1E307 / Pf))   DOMAIN_ERROR;   // Q*Pf-- close to overflow
+          Q = (Q*Pf--) / Pd++;
+       }
+
+   if (negate)   Q = -Q;
+   if (is_near_int64_t(Q))   return IntCell::zI(Z, near_int(Q));
+   else                      return FloatCell::zF(Z, Q);
+}
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_and(Cell * Z, const Cell * A) const
 {
@@ -1435,19 +1418,11 @@ const double qct = Workspace::get_CT();
 
    // if either value is 0 then return 0
    //
-   if (A->is_near_zero() || is_near_zero())
-      {
-        new (Z) IntCell(0);
-        return E_NO_ERROR;
-      }
+   if (A->is_near_zero() || is_near_zero())   return IntCell::z0(Z);
 
    // if both args are 1 then return the classical A ∧ B
    //
-   if (A->is_near_one() && is_near_one())
-      {
-        new (Z) IntCell(1);
-        return E_NO_ERROR;
-      }
+   if (A->is_near_one() && is_near_one())   return IntCell::z1(Z);
 
    // handle the complex case before the int case because
    // is_near_int() can be true for complex numbers.
@@ -1461,8 +1436,8 @@ const double qct = Workspace::get_CT();
                                            get_complex_value(), qct);
         if (err)   return err;
 
-        new (Z) ComplexCell(A->get_complex_value() * (get_complex_value()/gcd));
-        return E_NO_ERROR;
+        return ComplexCell::zC(Z, A->get_complex_value() *
+                                  (get_complex_value()/gcd));
       }
 
    // if both args are int then return the least common multiple of them
@@ -1478,17 +1453,11 @@ const double qct = Workspace::get_CT();
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
         const APL_Float lcm_double = 1.0 * a * b / gcd;
-        if (lcm_double > LARGE_INT ||
-            lcm_double < SMALL_INT)
+        if (lcm_double > LARGE_INT || lcm_double < SMALL_INT)
            {
-             new (Z) FloatCell(lcm_double);
+             return FloatCell::zF(Z, lcm_double);
            }
-        else
-           {
-             new (Z) IntCell(a * (b / gcd));
-           }
-
-        return E_NO_ERROR;
+        return IntCell::zI(Z, a * (b / gcd));
       }
 
    // if both args are real then return the (real) least common multiple of them
@@ -1501,85 +1470,77 @@ const double qct = Workspace::get_CT();
         const ErrorCode err = flt_gcd(gcd, a, b, qct);
         if (err)   return err;
         const APL_Float b_gcd = b / gcd;
-        new (Z) FloatCell(a * b_gcd);
-        return E_NO_ERROR;
+        return FloatCell::zF(Z, a * b_gcd);
       }
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(A->get_near_int() & get_near_int());
-   return E_NO_ERROR;
+   return IntCell::zI(Z, A->get_near_int() & get_near_int());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(~(A->get_near_int() ^ get_near_int()));
-   return E_NO_ERROR;
+   return IntCell::zI(Z, ~(A->get_near_int() ^ get_near_int()));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(A->get_near_int() ^ get_near_int());
-   return E_NO_ERROR;
+   return IntCell::zI(Z, A->get_near_int() ^ get_near_int());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_nand(Cell * Z, const Cell * A) const
 {
    if (!is_near_bool())      return E_DOMAIN_ERROR;
    if (!A->is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (A->get_near_bool() && get_near_bool())   new (Z) IntCell(0);
-   else                                         new (Z) IntCell(1);
-   return E_NO_ERROR;
+   if (A->get_near_bool() && get_near_bool())   return IntCell::z0(Z);
+   else                                         return IntCell::z1(Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_nand_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(~(A->get_near_int() & get_near_int()));
-   return E_NO_ERROR;
+   return IntCell::zI(Z, ~(A->get_near_int() & get_near_int()));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_nor(Cell * Z, const Cell * A) const
 {
    if (!is_near_bool())      return E_DOMAIN_ERROR;
    if (!A->is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (A->get_near_bool() || get_near_bool())   new (Z) IntCell(0);
-   else                                         new (Z) IntCell(1);
-   return E_NO_ERROR;
+   if (A->get_near_bool() || get_near_bool())   return IntCell::z0(Z);
+   else                                         return IntCell::z1(Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_nor_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(~(A->get_near_int() | get_near_int()));
-   return E_NO_ERROR;
+   return IntCell::zI(Z, ~(A->get_near_int() | get_near_int()));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_or(Cell * Z, const Cell * A) const
 {
@@ -1589,23 +1550,20 @@ const double qct = Workspace::get_CT();
    //
    if (A->is_near_bool() && is_near_bool())
       {
-        if ( A->get_near_bool() || get_near_bool())   new (Z) IntCell(1);
-        else                                          new (Z) IntCell(0);
-        return E_NO_ERROR;
+        if ( A->get_near_bool() || get_near_bool())   return IntCell::z1(Z);
+        else                                          return IntCell::z0(Z);
       }
 
    if (!A->is_near_real() || !is_near_real())   // complex
       {
         if (A->is_near_zero())
            {
-             new (Z) ComplexCell(get_complex_value());
-             return E_NO_ERROR;
+             return ComplexCell::zC(Z, get_complex_value());
            }
 
         if (is_near_zero())
            {
-             new (Z) ComplexCell(A->get_complex_value());
-             return E_NO_ERROR;
+             return ComplexCell::zC(Z, A->get_complex_value());
            }
 
         // a or b is complex; we assume (require) Gaussian integers.
@@ -1614,9 +1572,7 @@ const double qct = Workspace::get_CT();
         const ErrorCode err = cpx_gcd(gcd, A->get_complex_value(),
                                            get_complex_value(), qct);
         if (err)   return err;
-
-        new (Z) ComplexCell(gcd);
-        return E_NO_ERROR;
+        return ComplexCell::zC(Z, gcd);
       }
 
    // if both args are int then return the greatest common divisor of them
@@ -1628,8 +1584,7 @@ const double qct = Workspace::get_CT();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
-        new (Z) IntCell(gcd);
-        return E_NO_ERROR;
+        return IntCell::zI(Z, gcd);
       }
 
    // if both args are real then return the (real) greatest common divisor
@@ -1639,25 +1594,23 @@ const double qct = Workspace::get_CT();
         const APL_Float a = A->get_real_value();
         const APL_Float b =    get_real_value();
         APL_Float gcd;
-        const ErrorCode err = flt_gcd(gcd, a, b, qct);
-        if (err)   return err;
-        new (Z) FloatCell(gcd);
-        return E_NO_ERROR;
+        if (const ErrorCode err = flt_gcd(gcd, a, b, qct))   return err;
+        return FloatCell::zF(Z, gcd);
       }
 
    return E_DOMAIN_ERROR;   // char ?
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   new (Z) IntCell(A->get_near_int() | get_near_int());
+   IntCell::zI(Z, A->get_near_int() | get_near_int());
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_Complex
 NumericCell::cpx_max_real(APL_Complex a)
 {
@@ -1681,7 +1634,7 @@ APL_Complex z;
 
    return z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b)
 {
@@ -1690,7 +1643,7 @@ NumericCell::int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b)
    z = FloatCell::gcd(a, b);
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, double qct)
 {
@@ -1713,7 +1666,7 @@ NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, double qct)
          a = r;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b, double qct)
 {
@@ -1767,4 +1720,4 @@ NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b, double qct)
          a = r;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

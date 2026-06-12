@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __IO_FILES_HH_DEFINED__
@@ -35,28 +38,28 @@ using namespace std;
  testcase execution. It works like this:
 
        (cin)
-         |
-         |
+         │
+         │
          V
-     +---+---+             +-------------------+
-     | Input | <--------   | testcase files(s) |
-     +---+---+             +---------+---------+
-         |                           |
-         |                           |
-         V                           |
-      +--+--+                        |
-      | APL |                        |
-      +--+--+                        |
-         |                           |
-         |                           |
-         +-----------------------+   |
-         |                       |   |
-         |                       V   V
-         |                    +--+---+--+
-         |                    | compare |
-         |                    +----+----+
-         |                         |
-         |                         |
+     ╔═══════╗             ╔═══════════════════╗
+     ║ Input ║ <────────── ║ testcase files(s) ║
+     ╚═══════╝             ╚═══════════════════╝
+         │                           │
+         │                           │
+         V                           │
+      ╔═════╗                        │
+      ║ APL ║                        │
+      ╚═════╝                        │
+         │                           │
+         │                           │
+         ├───────────────────────┐   │
+         │                       │   │
+         │                       V   V
+         │                    ╔═════════╗
+         │                    ║ compare ║
+         │                    ╚═════════╝
+         │                         │
+         │                         │
          V                         V
        (cout)                (test results)
  
@@ -85,6 +88,10 @@ public:
    /// return the total number of errors
    static int error_count()
       { return apl_errors + assert_errors + diff_errors + parse_errors; }
+
+   /// return \b true iff the interpreter shall exit after a file I/O error
+   static bool exit_on_error()
+      { return test_mode == TM_EXIT_AFTER_FILE_ERROR; }
 
    /// count and report a parse error
    static void syntax_error();
@@ -124,20 +131,33 @@ protected:
    /// how to handle test results
    static enum TestMode
       {
-        /// exit() after last testcase file
-        TM_EXIT_AFTER_LAST       = 0,
+        /// exit() after the last testcase file was processed.
+        TM_EXIT_AFTER_LAST_FILE       = 1 << 0,
 
-        /// exit() after last testcase file if no error
-        TM_EXIT_AFTER_LAST_IF_OK = 1,
+        /// exit() after the last testcase file was processed and no error
+        /// was detected.
+        TM_EXIT_AFTER_LAST_FILE_IF_OK = 1 << 1,
 
-        /// continue in APL interpreter after last testcase file
-        TM_STAY_AFTER_LAST       = 2,
+        /// remain in APL interpreter after the last testcase
+        /// file was processed.
+        TM_STAY_AFTER_LAST_FILE       = 1 << 2,
 
-        /// stop test execution after the first error (stay in APL interpreter)
-        TM_STOP_AFTER_ERROR      = 3,
+        /// stop test execution after the first testcase file failed (but
+        /// remain in the APL interpreter)
+        TM_STOP_AFTER_FILE_ERROR      = 1 << 3,
 
-        /// exit() after the first error
-        TM_EXIT_AFTER_ERROR      = 4,
+        /// exit() after the first testcase file failed
+        TM_EXIT_AFTER_FILE_ERROR      = 1 << 4,
+
+        /// exit() after the first comparison (= testcase file line) failed
+        TM_EXIT_AFTER_LINE_ERROR      = 1 << 5,
+
+        /// stop test execution after the first testcase line failed (but
+        TM_STOP_AFTER_LINE_ERROR      = 1 << 6,
+
+        /// done if the first testcase line has failed
+        TM_DONE_AFTER_LINE_ERROR = TM_STOP_AFTER_LINE_ERROR
+                                 | TM_EXIT_AFTER_LINE_ERROR,
       } test_mode;   ///< the desired test mode as per --TM n
 
    /// write testcases summary file
@@ -175,6 +195,12 @@ protected:
 
    /// the current test report
    static ofstream current_testreport;
+
+   /// name of the summary file (same directory as first testcase).
+   static UTF8_string summary_path;
+
+   /// when a .tc file was started
+   static APL_time_us start_usecs;
 };
 
 #endif // __IO_FILES_HH_DEFINED__

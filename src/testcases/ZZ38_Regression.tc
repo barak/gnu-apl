@@ -13,10 +13,10 @@ CLEAR WS
 1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵}2⍵}2
 
       ⍎ 1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵}2⍵}2
-DOMAIN ERROR
+DOMAIN ERROR+
       ⍎1 λ1 2
       ^
 
       ⍎ 1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵
-Unbalanced curly bracket+
+Unbalanced left curly bracket+
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,17 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __SYMBOLTABLE_HH_DEFINED__
 #define __SYMBOLTABLE_HH_DEFINED__
 
 #include <stdint.h>
-#include <vector>
 
 #include "UCS_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// common part of user-defined names and distinguished names
-template <typename T, int SYMBOL_COUNT>
+template <typename T, size_t SYMBOL_COUNT>
 class SymbolTableBase
 {
 public:
@@ -104,16 +106,7 @@ public:
    /// compute a 16-bit hash for \b name
    static uint32_t compute_hash(const UCS_string & name)
       {
-        // Parameters for the FNV-1 hash.
-        enum {
-               FNV_Offset_32 = 0x811C9DC5,
-               FNV_Prime_32  = 16777619
-             };
-
-        uint32_t hash = FNV_Offset_32;
-        for (int s = 0; s < name.size(); ++s)
-            hash = (hash * FNV_Prime_32) ^ name[s];
-
+        uint32_t hash = name.FNV_hash();
         hash = (((hash >> 16) ^ hash) & 0x0000FFFF) % SYMBOL_COUNT;
 
         Log(LOG_SYMBOL_lookup_symbol)
@@ -133,7 +126,7 @@ protected:
 
 class Symbol;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The table containing all user defined symbols.
 class SymbolTable : public SymbolTableBase<Symbol, SYMBOL_HASH_TABLE_SIZE>
 {
@@ -169,7 +162,7 @@ public:
    void write_all_symbols(FILE * out, uint64_t & seq) const;
 
    /// return all symbols  (including erased symbols)
-   std::vector<const Symbol *> get_all_symbols() const;
+   std::basic_string<const Symbol *> get_all_symbols() const;
 
    /// dump symbols to out
    void dump(ostream & out, int & fcount, int & vcount) const;
@@ -178,7 +171,7 @@ protected:
    /// erase one symbol, return \b true on error, \b false on success
    bool erase_one_symbol(const UCS_string & sym);
 };
-//=============================================================================
+//============================================================================
 class QuadFunction;
 class SystemVariable;
 
@@ -234,7 +227,7 @@ protected:
    /// the variable if the name refers to a system variable, or 0 if not
    SystemVariable * sysvar;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The table containing all system defined symbols (aka. distinguished names)
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {
@@ -271,6 +264,6 @@ protected:
    /// the length of the longest name
    int max_name_len;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __SYMBOLTABLE_HH_DEFINED__

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <string.h>
 #include <stdio.h>
 
@@ -29,12 +32,11 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-Bif_F12_FORMAT   Bif_F12_FORMAT::_fun;       // ⍕
-Bif_F12_FORMAT * Bif_F12_FORMAT::fun = &Bif_F12_FORMAT::_fun;
+Bif_F12_FORMAT   Bif_F12_FORMAT::fun;       // ⍕
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_F12_FORMAT::eval_B(Value_P B)
+Bif_F12_FORMAT::eval_B(Value_P B) const
 {
    // ISO and lrm: If B is a character array, then Z is B
    //
@@ -44,6 +46,7 @@ Bif_F12_FORMAT::eval_B(Value_P B)
       {
         Value_P Z(B->get_shape(), LOC);
         Z->set_proto_Spc();
+        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -51,41 +54,57 @@ Bif_F12_FORMAT::eval_B(Value_P B)
       {
         PrintBuffer pb(*B, Workspace::get_PrintContext(PR_APL), 0);
         Assert(pb.is_rectangular());
-        const ShapeItem cols = pb.get_width(0);
-        const ShapeItem rows = pb.get_height();
+        const ShapeItem cols = pb.get_column_count();
+        const ShapeItem rows = pb.get_row_count();
         Shape shape_Z(rows, cols);
         Value_P Z(shape_Z, LOC);
         loop(y, rows)
             {
               UCS_string row = pb.get_line(y);
               row.map_pad();
-              loop(x, cols)   new (Z->next_ravel()) CharCell(row[x]);
+              loop(x, cols)   Z->next_ravel_Char(row[x]);
             }
 
+        Z->check_value(LOC);
+
+        // turn 1-line matrices into vectors
+        //
         if (Z->get_rank() == 2 && Z->get_shape().get_shape_item(0) == 1)
            {
              Shape sh(Z->get_shape().get_shape_item(1));
              Z->set_shape(sh);
            }
 
-        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
 Value_P Z;
    if (B->get_rank() > 2)
       {
-        // reduce N>2 dimensions to 2 dimensions
+        // temporarily reduce the N > 2 dimensions of B
+        // to N = 2 dimensions of B1 (with the same ravel).
         //
+        const Shape shape_B = B->get_shape();
         const Shape shape_B1(B->get_rows(), B->get_cols());
-        Value_P B1 = B->clone(LOC);
-        B1->set_shape(shape_B1);
 
-        Z = monadic_format(B1);
+        try
+           {
+             B->set_shape(shape_B1);
+             Z = monadic_format(B);
+             B->set_shape(shape_B);
+           }
+        catch (...)
+           {
+             B->set_shape(shape_B);
+             throw;   // rethrow error
+           }
 
-        Shape shape_Z(B->get_shape());
-        shape_Z.set_last_shape_item(Z->get_last_shape_item());
-        Assert(shape_Z.get_volume() == Z->element_count());
+        // ¯1↓⍴B ←→ ¯1↓⍴Z i.e. the leading axes of B have the same lengths as
+        // the leading axes of Z. monadic ⍕ changes (increases) only the length
+        // of the last axis. We reshape Z to ¯1↓⍴B , ¯1⍴⍴Z.
+        //
+        Shape shape_Z = B->get_shape().without_last_axis();   // ¯1↓⍴B
+        shape_Z.add_shape_item(Z->get_last_shape_item());     // ¯1↓⍴B , ¯1↑⍴Z
         Z->set_shape(shape_Z);
       }
    else   // B->get_rank() is 0, 1, or 2
@@ -97,19 +116,19 @@ Value_P Z;
    // ρρZ ←→ ,1⌈⍴ρB     if B is simple
    // ρρZ ←→ ,1 or ,2   if B is nested
    //
-const Depth depth = B->compute_depth();
+const APL_types::Depth depth = B->compute_depth();
 Shape sZ;
-   if (depth > 1)   // B is nested ⊢ ⍴⍴R is 1 or 2
+   if (depth > 1)   // B is nested, therefore ⍴⍴R is 1 or 2
       {
         // the  examples in lrm contradict the text in lrm.
         //
         // Page 136 shows: R←2 3ρ'ONE' 1 1 'TWO' 2 22 which contains only
         // scalar and vector items (R itself being a matrix) and therefore
-        // ⍕R shoule be a vector according to page 137:
+        // ⍕R should be a vector according to page 137:
         //
         // "Nested Arrays: When R is a nested array, Z is a vector if all"
         // items of R at any depth are scalars or vectors."
-        // 
+        //
         // lrm also contradicts the ISO standard regarding the rank of Z.
         //
         // We try our best...
@@ -145,31 +164,29 @@ Shape sZ;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B)
+Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B) const
 {
 Value_P Z;
 
-   if (A->is_char_vector() || A->is_char_scalar())
-      {
-        Z = format_by_example(A, B);
-      }
-   else if (A->is_int_vector() || A->is_int_scalar())
-      {
-        Z = format_by_specification(A, B);
-      }
+   // any A should be a scalar or a vcector
+   //
+   if (A->get_rank() > 1)   RANK_ERROR;
+
+   if      (A->is_char_array())   Z = format_by_example(A, B);
+   else if (A->is_int_array())    Z = format_by_specification(A, B);
    else
       {
-        MORE_ERROR() = "Bad left argument of ⍕";
+        MORE_ERROR() << "Bad left argument of ⍕";
         DOMAIN_ERROR;
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::monadic_format(Value_P B)
 {
@@ -180,8 +197,8 @@ const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
 
-const ShapeItem width  = pb.get_width(0);
-const ShapeItem height = pb.get_height();
+const ShapeItem width  = pb.get_column_count();
+const ShapeItem height = pb.get_row_count();
 
    // monadic_format() returns the Value with rank 1 or 2 which may be changed
    // in Bif_F12_FORMAT::eval_B() later on to match the rather arbitrary rules
@@ -195,39 +212,37 @@ Value_P Z;
    loop(w, width)
       {
         const Unicode uni = pb.get_char(w, h);
-        if (is_iPAD_char(uni))  new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
-        else                    new (Z->next_ravel()) CharCell(uni);
+        if (is_iPAD_char(uni))  Z->next_ravel_Char(UNI_SPACE);
+        else                    Z->next_ravel_Char(uni);
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::format_by_example(Value_P A, Value_P B)
 {
-   if (A->get_rank() != 1)   RANK_ERROR;
-
-   // convert the ravel of char vector A into an UCS_string.
+   // convert the ravel of char vector A into UCS_string 'format'.
    //
-UCS_string format = A->get_UCS_ravel();
-   if (format.size() == 0)   LENGTH_ERROR;
+UCS_string all_formats = A->get_UCS_ravel();
+   if (all_formats.size() == 0)   LENGTH_ERROR;
 
 const ShapeItem cols = B->get_cols();
 const ShapeItem rows = B->get_rows();
 
-   // split format into format fields, one per column.
+   // split string all_formats into individual format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
-vector<UCS_string> col_formats;
-   split_example_into_columns(format, col_formats);
+UCS_string_vector col_formats;
+   split_example_into_columns(all_formats, col_formats);
    if (col_formats. size() == 1)
       {
-        const UCS_string f = format;
+        const UCS_string f = all_formats;
         const UCS_string col0 = col_formats[0];   // keep it out of loop!
         loop(c, cols - 1)
            {
-             format.append(f);
+             all_formats.append(f);
              col_formats.push_back(col0);
            }
       }
@@ -242,27 +257,31 @@ vector<Format_LIFER> col_items;
 
    Log(LOG_Bif_F12_FORMAT)
       {
-        Q1(format)
-        Q1(format.size())
+        Q1(all_formats)
+        Q1(all_formats.size())
         Q1(col_formats.size())
 
         loop(c, col_items.size())
             {
-              Q1(col_formats[c])
-
-              Q1(col_items[c].left_deco)
-              Q1(col_items[c].int_part)
-              Q1(col_items[c].fract_part)
-              Q1(col_items[c].expo_deco)
-              Q1(col_items[c].exponent)
-              Q1(col_items[c].expo_negative)
-              Q1(col_items[c].right_deco)
+              CERR << "At " LOC " in format_by_example()" << endl
+                   << "    col_items[c].left_deco:     '"
+                   << col_items[c].left_deco << "'"      << endl
+                   << "    col_items[c].int_part:      '"
+                   << col_items[c].int_part << "'"       << endl
+                   << "    col_items[c].fract_part:    '"
+                   << col_items[c].fract_part << "'"     << endl
+                   << "    col_items[c].expo_deco:     '"
+                   << col_items[c].expo_deco << "'"      << endl
+                   << "    col_items[c].expo_negative: "
+                   << col_items[c].expo_negative         << endl
+                   << "    col_items[c].right_deco:    '"
+                   << col_items[c].right_deco << "'"     << endl;
             }
       }
 
 Shape shape_Z(B->get_shape());
    if (B->is_scalar())   shape_Z.add_shape_item(1);
-   shape_Z.set_last_shape_item(format.size());
+   shape_Z.set_last_shape_item(all_formats.size());
 
 Value_P Z(shape_Z, LOC);
 
@@ -273,7 +292,7 @@ Value_P Z(shape_Z, LOC);
              UCS_string row;
              loop(c, cols)
                 {
-                  const Cell & cB = B->get_ravel(c + r*cols);
+                  const Cell & cB = B->get_cravel(c + r*cols);
                   if (!cB.is_real_cell())   DOMAIN_ERROR;
 
                   const APL_Float value = cB.get_real_value();
@@ -283,11 +302,11 @@ Value_P Z(shape_Z, LOC);
                   row.append(item);
                 }
 
-             Log(LOG_Bif_F12_FORMAT)   { Q1(row) Q1(format) }
+             Log(LOG_Bif_F12_FORMAT)   { Q1(row) Q1(all_formats) }
 
-             Assert(row.size() == format.size());
+             Assert(row.size() == all_formats.size());
              loop(c, row.size())
-                new (&Z->get_ravel(r*format.size() + c))  CharCell(row[c]);
+                Z->set_ravel_Char(r*all_formats.size() + c, row[c]);
            }
       }
    catch (Error err)
@@ -300,51 +319,55 @@ Value_P Z(shape_Z, LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Bif_F12_FORMAT::split_example_into_columns(const UCS_string & format,
-                                   vector<UCS_string> & col_formats)
+Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
+                                   UCS_string_vector & col_formats)
 {
-bool fmt_seen = false;
-UCS_string fmt;
-   loop(f, format.size())
+   // split string 'all_formats' into fields, where:
+   //
+   // 1.   a field contains at least one digit and is delimited by either
+   // 1a.  a space (which belongs to the next field),  or
+   // 1b.  digit '6' (which belongs to the field).
+   //
+bool digit_seen = false;
+UCS_string current_format;
+   loop(f, all_formats.size())
        {
-         const Unicode cc = format[f];
-         fmt.append(cc);
+         const Unicode cc = all_formats[f];
+         current_format.append(cc);
 
-         const bool is_fmt_char = is_control_char(cc);
-         if (is_fmt_char)   fmt_seen = true;
+         if (Avec::is_digit(cc))   digit_seen = true;
 
-         if ((cc == UNI_ASCII_SPACE) && fmt_seen)   // end of field
+         if ((cc == UNI_SPACE) && digit_seen)   // end of field, case 1a.
             {
-              col_formats.push_back(fmt);
-              fmt.clear();    // start a new field;
-              fmt_seen = false;
-              continue;   // next char
+              col_formats.push_back(current_format);
+              current_format.clear();    // start a new field;
+              digit_seen = false;
             }
-
-         if (cc == UNI_ASCII_6)   // end of field after next char
+         else if (cc == UNI_6)                  // end of field, case 1b.
             {
               ++f;   // next char is right decorator (and end of field)
-              if (f < format.size())   fmt.append(format[f]);
+              if (f < all_formats.size())
+                 current_format.append(all_formats[f]);
 
-              col_formats.push_back(fmt);
-              fmt.clear();    // start a new field;
-              fmt_seen = false;
+              col_formats.push_back(current_format);
+              current_format.clear();    // start a new field;
+              digit_seen = false;
               continue;   // next char
             }
        }
 
-   if ((!fmt_seen) && (col_formats.size() > 0))
+   if (col_formats.size() && !digit_seen)
       {
-        col_formats.back().append(fmt);
+        col_formats.back().append(current_format);
       }
    else
       {
-        col_formats.push_back(fmt);
+        col_formats.push_back(current_format);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_example(APL_Float value)
 {
@@ -374,7 +397,7 @@ const UCS_string right = format_right_side(data_fract, value < 0.0, data_expo);
 
    return left + right;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_left_side(const UCS_string data_int,
                                                bool negative, bool & overflow)
@@ -383,7 +406,7 @@ const UCS_string data = int_part.insert_int_commas(data_int, overflow);
 
    if (overflow)   return UCS_string();
 
-   Assert(int_part.size() >= data.size());
+   Assert(int_part.size() >= size_t(data.size()));
 const Unicode pad_char = int_part.pad_char(Workspace::get_FC(2));
 const UCS_string pad(int_part.size() - data.size(), pad_char);
 
@@ -401,13 +424,13 @@ UCS_string ucs;
    else                                     // floating enabled, deco hidden
       {
         ucs.append(pad);
-        ucs.append(UCS_string(left_deco.size(), UNI_ASCII_SPACE));
+        ucs.append(UCS_string(left_deco.size(), UNI_SPACE));
       }
 
    ucs.append(data);
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_right_side(const UCS_string data_fract,
                                                 bool negative,
@@ -419,21 +442,20 @@ UCS_string ucs;
    if (fract_part.out_len)
       {
         const UCS_string data = fract_part.insert_fract_commas(data_fract);
-        Assert(fract_part.size() >= data.size());
+        Assert(fract_part.size() >= size_t(data.size()));
         pad_count += fract_part.size() - data.size();
 
         // print nothing instead of .
         if (data.size() == 0)   ++pad_count;
-        else                    ucs.append(Workspace::get_FC(0)); 
+        else                    ucs.append(Workspace::get_FC(0));
         ucs.append(data);
       }
 
    if (exponent.size())
       {
-        UCS_string data(1, exponent_char);
+        UCS_string data(1, exponent_char);   // the 'E'
 
         const Unicode pad_char = exponent.pad_char(Workspace::get_FC(2));
-
         if (exponent.no_float())              // floating disabled.
            {
              data.append(expo_deco.format);
@@ -478,15 +500,16 @@ UCS_string ucs;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
-   : exponent_char(UNI_ASCII_E),
+   : exponent_char(UNI_E),
      expo_negative(false)
 {
-   // we split format into our format chunks...
+   // split one column format into sub-format chunks...
    //
 int f = 0;
 bool exponent_pending = false;
+bool have_decimal_point = false;
 
 // left_decorator:
    while (f < format.size())
@@ -501,12 +524,16 @@ integral_part:
       {
         const Unicode cc = format[f++];
 
-        if (cc == UNI_ASCII_FULLSTOP)   goto fractional_part;
-        if (cc == UNI_ASCII_E)          goto exponent_part;
+        if (cc == UNI_FULLSTOP)
+           {
+             have_decimal_point = true;
+             goto fractional_part;
+           }
+        if (cc == UNI_E)          goto exponent_part;
         if (is_control_char(cc))
            {
              int_part.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -520,12 +547,12 @@ fractional_part:
    while (f < format.size())
       {
         const Unicode cc = format[f++];
-        if (cc == UNI_ASCII_7)          exponent_pending = true;
+        if (cc == UNI_7)          exponent_pending = true;
 
         if (is_control_char(cc))
            {
              fract_part.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -533,7 +560,7 @@ fractional_part:
              goto exponent_decorator;
            }
       }
-   goto fields_done;
+   goto right_decorator;
 
 exponent_decorator:
    if (!exponent_pending)   { --f;   goto right_decorator; }
@@ -561,7 +588,7 @@ exponent_part:
         if (is_control_char(cc))
            {
              exponent.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -571,23 +598,35 @@ exponent_part:
       }
 
 right_decorator:   /// the right decorator
+
+   if (have_decimal_point &&
+       exponent.format.size() == 0 &&
+       fract_part.format.size() == 0)   // quirk!
+      {
+        // this is ambiguous as to whether the decimal point belongs to
+        // the number or to the right decorator. lrm says all non-digits
+        // are decorators but that seems to be wrong anyhow. (e.g. ',').
+        //
+        // we put a trailing decimat point into the right decorator.
+        //
+        right_deco.format.append(UNI_FULLSTOP);
+      }
+
    while (f < format.size())
       right_deco.format.append(format[f++]);
 
 fields_done:
+   left_deco.out_len = left_deco .format.size();
 
-int sum = 0;
-   sum += left_deco.out_len = left_deco .format.size();
-
-   sum += int_part  .out_len = int_part  .format.size();
+   int_part  .out_len = int_part  .format.size();
 
    if (fract_part.format.size())
-      sum += fract_part.out_len = fract_part.format.size() + 1;
+      fract_part.out_len = fract_part.format.size() + 1;
 
    if (exponent.size())
       {
-        sum += expo_deco.out_len = expo_deco.size();
-        sum += exponent.out_len = exponent.format.size() + 1;
+        expo_deco.out_len = expo_deco.size();
+        exponent.out_len = exponent.format.size() + 1;
       }
 
    right_deco.out_len = right_deco.format.size();
@@ -607,7 +646,7 @@ int sum = 0;
      exponent.map_field(2);
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Format_sub::map_field(int type)
 {
@@ -617,16 +656,16 @@ int flt_cnt = 0;
       {
         switch(format[f])
            {
-             case UNI_ASCII_0:              flt_mask |= BIT_0;   break; 
-             case UNI_ASCII_1: ++flt_cnt;   flt_mask |= BIT_1;   break; 
-             case UNI_ASCII_2: ++flt_cnt;   flt_mask |= BIT_2;   break; 
-             case UNI_ASCII_3: ++flt_cnt;   flt_mask |= BIT_3;   break; 
-             case UNI_ASCII_4: ++flt_cnt;   flt_mask |= BIT_4;   break; 
-             case UNI_ASCII_5:              flt_mask |= BIT_5;   break; 
-             case UNI_ASCII_6:              flt_mask |= BIT_6;   break; 
-             case UNI_ASCII_7:              flt_mask |= BIT_7;   break; 
-             case UNI_ASCII_8:              flt_mask |= BIT_8;   break; 
-             case UNI_ASCII_9:              flt_mask |= BIT_9;   break;
+             case UNI_0:              flt_mask |= BIT_0;   break;
+             case UNI_1: ++flt_cnt;   flt_mask |= BIT_1;   break;
+             case UNI_2: ++flt_cnt;   flt_mask |= BIT_2;   break;
+             case UNI_3: ++flt_cnt;   flt_mask |= BIT_3;   break;
+             case UNI_4: ++flt_cnt;   flt_mask |= BIT_4;   break;
+             case UNI_5:              flt_mask |= BIT_5;   break;
+             case UNI_6:              flt_mask |= BIT_6;   break;
+             case UNI_7:              flt_mask |= BIT_7;   break;
+             case UNI_8:              flt_mask |= BIT_8;   break;
+             case UNI_9:              flt_mask |= BIT_9;   break;
              default:                                            break;
            }
       }
@@ -638,24 +677,24 @@ int flt_cnt = 0;
             {
               const size_t pos = (type == 1) ? format.size() - f - 1 : f;
               const Unicode uni = format[pos];
-              if (uni == UNI_ASCII_0)   break;
-              if (uni == UNI_ASCII_9)   break;
+              if (uni == UNI_0)   break;
+              if (uni == UNI_9)   break;
               --min_len;
             }
       }
 
    return flt_cnt;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Format_sub::print(ostream & out) const
 {
-   out << "format '" << format << "'"
-          " min " << min_len << ", out_len " << out_len << ", flags: ";
+   out << "format: '" << format << "',"
+          " min: " << min_len << ", out_len " << out_len << ", flags: ";
    loop(d, 32)   if (flt_mask & (1 << d))   out << char('0' + d);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::Format_LIFER::fill_data_fields(APL_Float value,
                 UCS_string & data_int, UCS_string & data_fract,
@@ -671,48 +710,47 @@ const int data_buf_len = int_part.out_len + 1        // 123.
 char data_buf[101];
 char * fract_end = 0;
 
-   if (exponent.size())
+   if (exponent.size())   // E in format string
       {
         // create a format like %.5E (if fract_part has 5 digits)
         //
-        const int flen = snprintf(format, sizeof(format), "%%.%luE",
-                                unsigned_long(fract_part.size()));
-        Assert(flen < int(sizeof(format)));   // format was big enough.
-
-        const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
-        Assert(dlen < data_buf_len);
+        SPRINTF(format, "%%.%luE", ulong(fract_part.size()));
+        SPRINTF(data_buf, format, value);
 
         char * ep = strchr(&data_buf[0], 'E');
         Assert(ep);
         fract_end = ep++;
-        if      (*ep == '+')   ++ep;
-        else if (*ep == '-')   { expo_negative = true;   ++ep; }
+        if      (*ep == '+')   ++ep;                               // skip +
+        else if (*ep == '-')   { expo_negative = true;   ++ep; }   // skip -
+        if (*ep == '0' && ep[1])   ++ep;          // skip leading 0 in exponent
 
         int elen = strlen(ep);
 
         // insert leading zeros until we have at least min_len digits.
         //
-        for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_ASCII_0);
+        for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_0);
 
-        data_expo.append(UCS_string(UTF8_string(ep)));
+        const UTF8_string ep_utf(ep);
+        data_expo.append((UCS_string(ep_utf)));
       }
    else   // no exponent in format string.
       {
-        const int flen = snprintf(format, sizeof(format), "%%.%luf",
-                                  unsigned_long(fract_part.size()));
-        Assert(flen < int(sizeof(format)));   // assume no snprintf() overflow
+        SPRINTF(format, "%%.%luf", ulong(fract_part.size()));
 
-        const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
-        data_buf[data_buf_len - 1] = 0;
+        const int dlen = snprintf(data_buf, data_buf_len, format, value);
+        NULL_TERMINATE(data_buf)
 
-        // the int part could be longer than allowed by the exaple string.
+        // the int part could be longer than allowed by the example string.
         //
         const char * dot = strchr(data_buf, '.');
-        const int ilen = dot ? (dot - data_buf)
-                             : strlen(data_buf);
+        const int ilen = dot ? (dot - data_buf) : strlen(data_buf);
         if (ilen > int_part.out_len)
            {
-             if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+             if (Workspace::get_FC(3) == UNI_0)
+                {
+                  MORE_ERROR() << "Overflow in integer part";
+                  DOMAIN_ERROR;
+                }
              overflow = true;
              return ;
            }
@@ -721,7 +759,7 @@ char * fract_end = 0;
         fract_end = &data_buf[dlen];
       }
 
-char * int_end = strchr(&data_buf[0], '.');
+char * int_end = strchr(data_buf, '.');
    if (fract_part.size() == 0)
       {
         Assert(int_end == 0);
@@ -729,12 +767,13 @@ char * int_end = strchr(&data_buf[0], '.');
       }
    else
       {
-        char * fract_digits = int_end + 1;
         Assert(int_end);
+        char * fract_digits = int_end + 1;
 
         int flen = fract_end - fract_digits;
 
         // remove trailing zeros, but leave at least min_len chars.
+        //
         while (fract_digits[flen - 1] == '0' && flen > fract_part.min_len)
                fract_digits[--flen] = 0;
 
@@ -746,46 +785,50 @@ const int ilen = int_end - &data_buf[0];
    // insert leading zeros so that we will have at least min_len digits
    // after appending the integer data.
    //
-   loop(d, int_part.min_len - ilen)   data_int.append(UNI_ASCII_0);
+   loop(d, int_part.min_len - ilen)   data_int.append(UNI_0);
 
    loop(i, ilen)   data_int.append(Unicode(data_buf[i]));
 
    // convert 0.xxx to .xxx
    //
    if (  data_int.size() == 1
-      && data_int[0] == UNI_ASCII_0
+      && data_int[0] == UNI_0
       && int_part.min_len == 0
       && fract_part.size())   data_int.clear();
 
    Log(LOG_Bif_F12_FORMAT)
       {
-        Q1(format)
-        Q1(value)
-        Q1(data_int)
-        Q1(data_fract)
-        Q1(data_expo)
+        CERR << "At " LOC " in Format_LIFER::fill_data_fields()" << endl
+             << "    format:     '" << format << "'"     << endl
+             << "    value:      "  << value             << endl
+             << "    data_int:   '" << data_int << "'"   << endl
+             << "    data_fract: '" << data_fract << "'" << endl
+             << "    data_expo:  '" << data_expo << "'"  << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
 {
 size_t fill_pos = -1;
-Unicode fill_char = UNI_ASCII_SPACE;
+Unicode fill_char = UNI_SPACE;
 
+   // BIT_0: pad with 0
+   // BIT_8: fille with ⎕FC[3] (* by default)
+   // BIT_9: pad with 0
    if (flt_mask & (BIT_0 | BIT_8 | BIT_9))   // format has a '0', '8', or '9'
       {
         loop(f, format.size())
            {
              const Unicode format_char = format[f];
-              if (format_char == UNI_ASCII_0 || format_char == UNI_ASCII_9)
+              if (format_char == UNI_0 || format_char == UNI_9)
                  {
                    fill_pos = f;
-                   fill_char = UNI_ASCII_0;
+                   fill_char = UNI_0;
                    break;
                  }
 
-              if (format_char == UNI_ASCII_8)
+              if (format_char == UNI_8)
                  {
                    fill_pos = f;
                    fill_char = Workspace::get_FC(2);
@@ -808,11 +851,11 @@ size_t d = data.size();
       {
         const size_t f = format.size() - f1 - 1;
         const Unicode format_char = format[f];
-         if (format_char == UNI_ASCII_COMMA)
+         if (format_char == UNI_COMMA)
             {
               // Workspace::get_FC(1) is ⎕FC[2] when ⎕IO is 1
               //
-              if (d)   ucs.append(Workspace::get_FC(1));
+              if (d)                    ucs.append(Workspace::get_FC(1));
               else if (f >= fill_pos)   ucs.append(fill_char);
               else                      break;
             }
@@ -832,7 +875,7 @@ size_t d = data.size();
 
    if (d)   // format too short
       {
-         if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+         if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
          else                             overflow = true;
       }
 
@@ -840,7 +883,7 @@ size_t d = data.size();
 
    return ucs.reverse();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Format_sub::insert_fract_commas(const UCS_string & data) const
 {
@@ -850,7 +893,7 @@ int d = 0;
    loop(f, format.size())
       {
         const Unicode format_char = format[f];
-         if (format_char == UNI_ASCII_COMMA)
+         if (format_char == UNI_COMMA)
             {
               ucs.append(Workspace::get_FC(1));
             }
@@ -870,52 +913,51 @@ int d = 0;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Bif_F12_FORMAT::is_control_char(Unicode uni)
 {
    return Avec::is_digit(uni)      ||
-          (uni == UNI_ASCII_COMMA) ||
-          (uni == UNI_ASCII_FULLSTOP);
+          (uni == UNI_COMMA) ||
+          (uni == UNI_FULLSTOP);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::format_by_specification(Value_P A, Value_P B)
 {
+   // A is a near-int scalar or vector.
+
 const Shape shape_1(1);
 const Shape & shape_B = B->get_rank() ? B->get_shape() : shape_1;
 
 const ShapeItem rows_B = shape_B.get_rows();
 const ShapeItem cols_B = shape_B.get_cols();
 
-   if (A->get_rank() > 1)   RANK_ERROR;
-const ShapeItem len_A = A->is_scalar() ? 1 : A->get_shape_item(0);
+const ShapeItem len_A = A->element_count();
 
-   if (len_A != 1 && len_A != 2 && len_A != 2*cols_B)
-      LENGTH_ERROR;
+   if (len_A != 1 && len_A != 2 && len_A != 2*cols_B)   LENGTH_ERROR;
 
    if (shape_B.get_volume() == 0)   // empty B
       {
         ShapeItem W = 0;
         loop(c, cols_B)
            {
-             if (len_A <= 2)   W += A->get_ravel(0).get_near_int();
-             else              W += A->get_ravel(2*c).get_near_int();
+             if (len_A <= 2)   W += A->get_cfirst().get_near_int();
+             else              W += A->get_cravel(2*c).get_near_int();
            }
 
-        Shape shape_Z = shape_B.without_axis(shape_B.get_rank() - 1);
+        Shape shape_Z = shape_B.without_last_axis();
         shape_Z.add_shape_item(W);
         const ShapeItem ec_Z = shape_Z.get_volume();
 
         Value_P Z(shape_Z, LOC);
-        loop(z, ec_Z)   new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+        loop(z, ec_Z)   Z->next_ravel_Char(UNI_SPACE);
 
-        Z->set_default_Spc();
+        Z->set_proto_Spc();
         return Z;
       }
 
 PrintBuffer pb;
-
    loop(col, cols_B)
        {
          APL_Integer col_width;
@@ -924,57 +966,130 @@ PrintBuffer pb;
          if (len_A == 1)
             {
               col_width = 0;
-              precision = A->get_ravel(0).get_near_int();
+              precision = A->get_cfirst().get_near_int();
             }
          else if (len_A == 2)
             {
-              col_width = A->get_ravel(0).get_near_int();
-              precision = A->get_ravel(1).get_near_int();
+              col_width = A->get_cfirst().get_near_int();
+              precision = A->get_cravel(1).get_near_int();
             }
          else
             {
-              col_width = A->get_ravel(2*col)    .get_near_int();
-              precision = A->get_ravel(2*col + 1).get_near_int();
+              col_width = A->get_cravel(2*col)    .get_near_int();
+              precision = A->get_cravel(2*col + 1).get_near_int();
             }
 
-         PrintBuffer pb_col(format_col_spec(col_width, precision,
-                                         &B->get_ravel(col), cols_B, rows_B));
+         // pb_col is the PrintBuffer for one numeric column.
+         //
+         PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
+                                                   &B->get_cravel(col),
+                                                   cols_B, rows_B));
 
-         if (col_width == 0)   pb_col.pad_l(UNI_ASCII_SPACE, 1);
+         bool insert_space_left = col_width == 0;   // automatic col width
+
+         if (col)   // subsequent column: insert space if needed
+            {
+              loop(y, pb_col.get_row_count())
+                  {
+                    if (pb_col.get_char(0, y) != UNI_SPACE)
+                       {
+                         insert_space_left = true;
+                         break;
+                       }
+                  }
+            }
+
+         if (insert_space_left)   pb_col.pad_l(UNI_SPACE, 1);
 
          if (col)   pb.append_col(pb_col);
          else       pb = pb_col;
        }
 
-const ShapeItem pb_w = pb.get_width(0);
-const ShapeItem pb_h = pb.get_height();
+const ShapeItem pb_w = pb.get_column_count();
+const ShapeItem pb_h = pb.get_row_count();
 Shape shape_Z(shape_B);
    shape_Z.set_last_shape_item(pb_w);
 
 Value_P Z(shape_Z, LOC);
 
    loop(h, pb_h)
-   loop(w, pb_w)   new (Z->next_ravel()) CharCell(pb.get_char(w, h));
+   loop(w, pb_w)   Z->next_ravel_Char(pb.get_char(w, h));
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
-Bif_F12_FORMAT::format_col_spec(int width, int precision, const Cell * cB,
-                                int cols, int rows)
+Bif_F12_FORMAT::format_one_col_by_spec(int width, int precision,
+                                       const Cell * cB, ShapeItem cols,
+                                       ShapeItem rows)
 {
 PrintBuffer ret;
 
-bool has_char = false;
-bool has_num = false;
+bool has_char    = false;
+bool has_num     = false;
+bool has_complex = false;
 
+   // determine the data types (character/numbers/complex) in B
    loop(r, rows)
       {
         const Cell & cell = cB[r*cols];
-        if (cell.is_numeric())   has_num = true;
-        else                     has_char = true;
+        if (cell.is_numeric())
+           {
+             has_num = true;
+             if (cell.is_complex_cell())   has_complex = true;
+           }
+        else
+           {
+             has_char = true;
+           }
       }
 
+   if (has_complex)
+      {
+         // split cB into vectors real and imag...
+         Value_P real(rows, LOC);
+         Value_P imag(rows, LOC);
+         loop(r, rows)
+            {
+              const Cell & cell = cB[r*cols];
+              if (cell.is_complex_cell())
+                 {
+                   real->next_ravel_Float(cell.get_real_value());
+                   imag->next_ravel_Float(cell.get_imag_value());
+                 }
+              else
+                 {
+                   real->next_ravel_Cell(cell);
+                   imag->next_ravel_Char(UNI_SPACE);
+                 }
+            }
+
+         PrintBuffer pb_real = format_one_col_by_spec(width, precision,
+                                                      &real->get_cfirst(), 1,
+                                                      rows);
+         PrintBuffer pb_imag = format_one_col_by_spec(width, precision,
+                                                      &imag->get_cfirst(), 1,
+                                                      rows);
+
+         PrintBuffer pb_real_imag;
+         loop(r,rows)
+             {
+               UCS_string real_imag = pb_real.get_line(r);
+               UCS_string imag = pb_imag.get_line(r);
+               imag.remove_leading_whitespaces();
+               if (imag.size())
+                  {
+                    real_imag += UNI_J;
+                    real_imag.append(imag);
+                  }
+               pb_real_imag.append_ucs(real_imag);
+             }
+         return pb_real_imag;
+      }
+
+   // real B. (if B was initially complex then we arrive here twice: once
+   // for the real parts and once for the imag parts).
+   //
    loop(r, rows)
       {
         const Cell & cell = cB[r*cols];
@@ -982,7 +1097,7 @@ bool has_num = false;
            {
              UCS_string data = UCS_string(cell.get_char_value());
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
              continue;
            }
 
@@ -993,43 +1108,64 @@ bool has_num = false;
 
              if (width && data.size() > width)   // overflow
                 {
-                  if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+                  if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
 
                   data = UCS_string(width, Workspace::get_FC(3));
                 }
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
              continue;
            }
 
         if (!cell.is_real_cell())   DOMAIN_ERROR;
 
-        const APL_Float value = cB[r*cols].get_real_value();
-        if (precision >= 0)   // floating format
+        APL_Float value = cB[r*cols].get_real_value();
+        if (!isfinite(value))
            {
-             UCS_string data = format_spec_float(value, precision);
+             MORE_ERROR() << "infinite number: "
+                          << value << " in A⍕B (by specification)";
+             DOMAIN_ERROR;
+           }
+
+        if (precision >= 0)   // integer or floating format
+          {
+            // precision == 0 means integer;
+            // precision  > 0 is the number of digits AFTER the decimal point
+
+            // fix values close to 0 as 0 so that, for example, we never
+            // see ¯.0000 in the formatted output.
+            //
+            double minval = 0.01;
+            loop(p,  precision)   minval /= 10;
+            if (value < minval && value > -minval)   value = 0.0;
+
+             UCS_string data = format_float_by_spec(value, precision);
              if (width && data.size() > width)   // overflow
                 {
-                  if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+                  if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
                   data = UCS_string(width, Workspace::get_FC(3));
                 }
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
            }
         else                  // exponential format
            {
-             UCS_string data = UCS_string::from_double_expo_prec(value,
-                                            -precision - 1);
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             // precision < 0 is the TOTAL (!) number of digits, which is
+             // one more than the digits AFTER the decimal point.
+             //
+             const int fract_digits = (-precision) - 1;
+             UCS_string data = UCS_string::from_double_to_expo(value,
+                                                               fract_digits);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
           }
       }
 
-   if (width && ret.get_width(0) < width)
-      ret.pad_l(UNI_ASCII_SPACE, width - ret.get_width(0));
+   if (width && ret.get_column_count() < width)
+      ret.pad_l(UNI_SPACE, width - ret.get_column_count());
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
                         bool has_num, Unicode align_char, UCS_string & data)
@@ -1044,24 +1180,24 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
       }
    else if (!has_num)    // only chars: align left
       {
-        const int d = ret.get_width(0) - data.size();
-        if      (d < 0)   ret.pad_r(UNI_ASCII_SPACE, -d);
-        else if (d > 0)   data.append(UCS_string(d, UNI_ASCII_SPACE));
+        const int d = ret.get_column_count() - data.size();
+        if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
+        else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
         ret.append_ucs(data);
       }
    else                 // chars and numbers: align right
       {
-        const int d = ret.get_width(0) - data.size();
-        if      (d < 0)   ret.pad_l(UNI_ASCII_SPACE, -d);
-        else if (d > 0)   data = UCS_string(d, UNI_ASCII_SPACE) + data;
+        const int d = ret.get_column_count() - data.size();
+        if      (d < 0)   ret.pad_l(UNI_SPACE, -d);
+        else if (d > 0)   data = UCS_string(d, UNI_SPACE) + data;
         ret.append_ucs(data);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
-Bif_F12_FORMAT::format_spec_float(APL_Float value, int precision)
+Bif_F12_FORMAT::format_float_by_spec(APL_Float value, int precision)
 {
-UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
+UCS_string ret = UCS_string::from_double_to_fixed(value, precision);
 
    // Note: the examples in the apl standard use a leading 0 (like  0.00)
    // while lrm shows .00 instead. We follow lrm and remove a leading 0.
@@ -1070,32 +1206,32 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
    //
    if (precision)   // we have a '.'
       {
-        if (ret[0] == UNI_ASCII_0    &&
-            ret[1] == UNI_ASCII_FULLSTOP)        // 0.xxx → .xxx
+        if (ret[0] == UNI_0    &&
+            ret[1] == UNI_FULLSTOP)        // 0.xxx → .xxx
            {
              ret.erase(0);
            }
         else if (ret[0] == UNI_OVERBAR     &&
-                 ret[1] == UNI_ASCII_0     &&
-                 ret[2] == UNI_ASCII_FULLSTOP)   //  ¯0.x → ¯.x
+                 ret[1] == UNI_0     &&
+                 ret[2] == UNI_FULLSTOP)   //  ¯0.x → ¯.x
            {
              ret[1] = UNI_OVERBAR;
              ret.erase(0);
            }
       }
-   else if (ret.size() == 2       && 
+   else if (ret.size() == 2       &&
             ret[0] == UNI_OVERBAR &&
-            ret[1] == UNI_ASCII_0)               // ¯0 → 0
+            ret[1] == UNI_0)               // ¯0 → 0
            {
              ret.erase(0);
            }
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
-operator<<(ostream & out, const Format_sub & fmt)
+operator <<(ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

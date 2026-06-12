@@ -18,11 +18,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Provider.hh"
 
-class SqliteProvider : public Provider {
+class SqliteProvider : public Provider
+{
 public:
-    virtual ~SqliteProvider() {}
-    virtual const string get_name( void ) { return "sqlite"; }
-    virtual Connection *open_database( Value_P B );
+   /// destructor
+    ~SqliteProvider();
+
+   /// overloaded Provider::get_provider_name()
+    virtual const char * get_provider_name() const  { return "SQLite"; }
+
+   /// overloaded Provider::get_provider_type()
+    virtual const char * get_provider_type() const  { return "sqlite"; }
+
+   /// overloaded Provider::open_database()
+   virtual Connection * open_database(Value_P B);
+
+   /// overloaded Provider::version_string()
+    virtual const char * version_string() const;  
+
+   /// overloaded Provider::version_number()
+    virtual int version_number() const;
 };

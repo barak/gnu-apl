@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Macro.hh"
@@ -25,23 +28,29 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-Bif_OPER1_EACH Bif_OPER1_EACH::_fun;
+Bif_OPER1_EACH Bif_OPER1_EACH::fun;
 
-Bif_OPER1_EACH * Bif_OPER1_EACH::fun = &Bif_OPER1_EACH::_fun;
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
+Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B) const
 {
    // dyadic EACH: call _LO for corresponding items of A and B
 
-   if (!(A->is_scalar() || B->is_scalar() || A->same_shape(*B)))
+   if (!A->same_shape(*B))
       {
-        if (A->same_rank(*B))   LENGTH_ERROR;
-        else                    RANK_ERROR;
+        // if the shapes differ then either A or B must be a scalar or
+        // 1-element vector.
+        //
+        if (A->get_rank() != B->get_rank())
+           {
+             if      (A->is_scalar_or_len1_vector())    ;   // OK
+             else if (B->is_scalar_or_len1_vector())    ;   // OK
+             else if (A->get_rank() != B->get_rank())   RANK_ERROR;
+             else                                       LENGTH_ERROR;
+           }
       }
 
-Function * LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert1(LO);
 
    // for the ambiguous operators /. ⌿, \, and ⍀ is_operator() returns true,
@@ -53,9 +62,9 @@ Function * LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
-        Shape shape_Z;
+        Value_P proto_A = Bif_F12_TAKE::first(*A);
+        Value_P proto_B = Bif_F12_TAKE::first(*B);
+        Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
         else if (!A->is_scalar())   DOMAIN_ERROR;
@@ -63,85 +72,142 @@ Function * LO = _LO.get_function();
         if (B->is_empty())          shape_Z = B->get_shape();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
-        Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
-        if (Z1->is_simple_scalar())   return Token(TOK_APL_VALUE1, Z1);
+        Token tZ1 = LO->eval_fill_AB(proto_A, proto_B);
+        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
 
+        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(shape_Z, LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+
+        // Z1 is the prototype of the empty Z
+        //
+        if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
+           Z->set_ravel_Cell(0, Z1->get_cscalar());
+        else   // need to encose Z1
+           Z->set_ravel_Pointer(0, Z1.get());
+
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
    if (LO->may_push_SI())   // user defined LO
       {
-         // remember scalarity of A and B BEFORE disclosing them
-         //
-         const bool scalar_A = A->is_scalar();
-         const bool scalar_B = B->is_scalar();
+         const bool extend_A = A->is_scalar_or_len1_vector() && !B->is_scalar();
+         const bool extend_B = B->is_scalar_or_len1_vector();
 
-        // we will call a macro, so disclose nested scalars (if any) here...
-        //
-        if (scalar_A && A->get_ravel(0).is_pointer_cell())
-           A = A->get_ravel(0).get_pointer_value();
+         Macro * macro = 0;
+         if (LO->has_result())
+            {
+              if (extend_A)
+                 {
+                   macro = Macro::get_macro(extend_B
+                                          ? Macro::MAC_Z__sA_LO_EACH_sB
+                                          : Macro::MAC_Z__sA_LO_EACH_vB);
+                }
+             else
+                {
+                  macro = Macro::get_macro(extend_B
+                                         ? Macro::MAC_Z__vA_LO_EACH_sB
+                                         : Macro::MAC_Z__vA_LO_EACH_vB);
+                }
+            }
+         else   // LO has no result, so we can ignore the shape of the result
+            {
+              if (extend_A && extend_B)
+                 {
+                   macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_sB);
+                 }
 
-        if (scalar_B && B->get_ravel(0).is_pointer_cell())
-           B = B->get_ravel(0).get_pointer_value();
+              if (extend_B)
+                 {
+                   macro = Macro::get_macro(Macro::MAC_vA_LO_EACH_sB);
+                 }
+              else if (extend_A)
+                 {
+                   macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_vB);
+                 }
+               else
+                 {
+                   macro = Macro::get_macro(Macro::MAC_vA_LO_EACH_vB);
+                 }
+            }
 
-        Macro * macro = 0;
-        if (LO->has_result())
-           if (scalar_A)
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_Z__sA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_Z__sA_LO_EACH_vB);
-           else
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_Z__vA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_Z__vA_LO_EACH_vB);
+        if (extend_A && !A->is_scalar())        // 1-element non-scalar A
+           {
+             if (extend_B && !B->is_scalar())   // 1-element non-scalar B
+                {
+                  Value_P A1(LOC);   // A1 ← , A
+                  A1->get_wscalar().init(A->get_cscalar(), *A1, LOC);
+                  A1->check_value(LOC);
+
+                  Value_P B1(LOC);   // B1 ← , B
+                  B1->get_wscalar().init(B->get_cscalar(), *B1, LOC);
+                  B1->check_value(LOC);
+
+                  return macro->eval_ALB(A1, _LO, B1);
+                }
+             else
+                {
+                  Value_P A1(LOC);
+                  A1->get_wscalar().init(A->get_cfirst(), *A1, LOC);
+                  A1->check_value(LOC);
+
+                  return macro->eval_ALB(A1, _LO, B);
+                }
+           }
+        else if (extend_B && !B->is_scalar())   // 1-element non-scalar B
+           {
+             Value_P B1(LOC);
+             B1->get_wscalar().init(B->get_cfirst(), *B1, LOC);
+             B1->check_value(LOC);
+
+             return macro->eval_ALB(A, _LO, B1);
+           }
         else
-           if (scalar_A)
-              if (scalar_B)   LO->eval_ALB(A, _LO, B);
-              else                  macro = Macro::get_macro(
-                                            Macro::MAC_sA_LO_EACH_vB);
-           else
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_vA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_vA_LO_EACH_vB);
-
-        return macro->eval_ALB(A, _LO, B);
+           {
+             return macro->eval_ALB(A, _LO, B);
+           }
       }
 
+
+   // use the same scheme as ScalarFunction::do_scalar_AB() to determine
+   // the shape of the result. In order to detect conformity errors we compute
+   // shape_Z even if no result is returned.
+   //
+const int inc_A = A->get_increment();
+const int inc_B = B->get_increment();
+
+const Shape * shape_Z = 0;
+   if      (A->is_scalar())      shape_Z = &B->get_shape();
+   else if (B->is_scalar())      shape_Z = &A->get_shape();
+   else if (inc_A == 0)          shape_Z = &B->get_shape();
+   else if (inc_B == 0)          shape_Z = &A->get_shape();
+   else if (A->same_shape(*B))   shape_Z = &B->get_shape();
+   else   // error
+      {
+        if (!A->same_rank(*B))   RANK_ERROR;
+        else                     LENGTH_ERROR;
+      }
+
+const ShapeItem len_Z = shape_Z->get_volume();
 Value_P Z;
-int dA = 1;
-int dB = 1;
-ShapeItem len_Z = 0;
-
-   if (A->is_scalar())
-      {
-        len_Z = B->element_count();
-        dA = 0;
-        if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
-      }
-   else if (B->is_scalar())
-      {
-        dB = 0;
-        len_Z = A->element_count();
-        if (LO->has_result())   Z = Value_P(A->get_shape(), LOC);
-      }
-   else
-      {
-        len_Z = B->element_count();
-        if (LO->has_result())   Z = Value_P(A->get_shape(), LOC);
-      }
+   if (LO->has_result())   Z = Value_P(*shape_Z, LOC);
 
    loop(z, len_Z)
       {
-        const Cell * cA = &A->get_ravel(dA * z);
-        const Cell * cB = &B->get_ravel(dB * z);
+        const Cell * cA = &A->get_cravel(inc_A * z);
+        const Cell * cB = &B->get_cravel(inc_B * z);
+        const bool left_val = cB->is_lval_cell();
         Value_P LO_A = cA->to_value(LOC);     // left argument of LO
         Value_P LO_B = cB->to_value(LOC);     // right argument of LO;
+        if (left_val)
+           {
+             Cell * dest = cB->get_lval_value();
+             if (dest->is_pointer_cell())
+                {
+                  Value_P sub = dest->get_pointer_value();
+                  LO_B = sub->get_cellrefs(LOC);
+                }
+           }
 
         Token result = LO->eval_AB(LO_A, LO_B);
 
@@ -153,13 +219,12 @@ ShapeItem len_Z = 0;
            {
              Value_P vZ = result.get_apl_val();
 
-             Cell * cZ = Z->next_ravel();
-             if (vZ->is_simple_scalar())
-                cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+             if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
+                Z->next_ravel_Cell(vZ->get_cfirst());
              else
-                new (cZ)   PointerCell(vZ.get(), Z.getref());
+                Z->next_ravel_Pointer(vZ.get());
 
-            continue;   // next z
+             continue;   // next z
            }
 
         if (result.get_tag() == TOK_ERROR)   return result;
@@ -173,33 +238,37 @@ ShapeItem len_Z = 0;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B)
+Bif_OPER1_EACH::do_eval_LB(Token & _LO, Value_P B)
 {
    // monadic EACH: call _LO for every item of B
 
-Function * LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert1(LO);
-   if (LO->is_operator())                SYNTAX_ERROR;
-   if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
+
+   if (LO->is_operator() &&
+       !is_SLASH_or_BACKSLASH(_LO.get_tag()))   SYNTAX_ERROR;
+   if (!(LO->get_signature() & SIG_B))          VALENCE_ERROR;
 
    if (B->is_empty())
       {
-        if (!LO->has_result())   return Token(TOK_VOID);
+        if (!LO->has_result())   return Token(TOK_VOID);    // no-op
 
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
-        Token tZ = LO->eval_fill_B(Fill_B);
-        Value_P Z1 = tZ.get_apl_val();
+        Value_P proto_B = Bif_F12_TAKE::first(*B);
+        Token tZ1 = LO->eval_fill_B(proto_B);
+        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
 
-        if (Z1->is_simple_scalar())
-           {
-             Z1->set_shape(B->get_shape());
-             return Token(TOK_APL_VALUE1, Z1);
-           }
-
+        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(B->get_shape(), LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+
+        // Z1 is the prototype of the empty Z
+        //
+        if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
+           Z->set_ravel_Cell(0, Z1->get_cscalar());
+        else   // need to encose Z1
+           Z->set_ravel_Pointer(0, Z1.get());
+
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -209,7 +278,7 @@ Function * LO = _LO.get_function();
         if (!LO->has_result())
            return Macro::get_macro(Macro::MAC_LO_EACH_B)->eval_LB(_LO, B);
 
-        if (LO == Bif_F1_EXECUTE::fun)
+        if (LO == &Bif_F1_EXECUTE::fun)
            return Macro::get_macro(Macro::MAC_Z__EXEC_EACH_B)->eval_B(B);
 
         return Macro::get_macro(Macro::MAC_Z__LO_EACH_B)->eval_LB(_LO, B);
@@ -231,12 +300,10 @@ Value_P Z;
              if (result.get_Class() == TC_VALUE)
                 {
                   Value_P vZ = result.get_apl_val();
-
-                  Cell * cZ = Z->next_ravel();
                   if (vZ->is_simple_scalar())
-                     cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+                     Z->next_ravel_Cell(vZ->get_cfirst());
                   else
-                     new (cZ)  PointerCell(vZ.get(), Z.getref());
+                     Z->next_ravel_Pointer(vZ.get());
 
                   continue;   // next z
            }
@@ -249,19 +316,18 @@ Value_P Z;
            }
         else
            {
-             Value_P LO_B;         // right argument of LO;
-             const Cell * cB = &B->get_ravel(z);
+             const Cell * cB = &B->get_cravel(z);
+             const bool left_val = cB->is_lval_cell();
+             Value_P LO_B = cB->to_value(LOC);      // right argument of LO
 
-             if (cB->is_pointer_cell())
+             if (left_val)
                 {
-                  LO_B = cB->get_pointer_value();
-                }
-             else
-                {
-                  LO_B = Value_P(LOC);
-
-                  LO_B->get_ravel(0).init(*cB, LO_B.getref(), LOC);
-                  LO_B->set_complete();
+                  Cell * dest = cB->get_lval_value();
+                  if (dest->is_pointer_cell())
+                     {
+                       Value_P sub = dest->get_pointer_value();
+                       LO_B = sub->get_cellrefs(LOC);
+                     }
                 }
 
              Token result = LO->eval_B(LO_B);
@@ -269,13 +335,10 @@ Value_P Z;
                 {
                   Value * vZ = result.get_apl_val().get();
 
-                  Cell * cZ = Z->next_ravel();
-                  if (0)
-                     cZ->init_from_value(vZ, Z.getref(), LOC);
-                  else if (vZ->is_simple_scalar())
-                     cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+                  if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
+                     Z->next_ravel_Cell(vZ->get_cfirst());
                   else
-                     new (cZ)   PointerCell(vZ, Z.getref());
+                     Z->next_ravel_Pointer(vZ);
 
                   continue;   // next z
                 }
@@ -294,5 +357,5 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __STATE_INDICATOR_HH_DEFINED__
 #define __STATE_INDICATOR_HH_DEFINED__
 
@@ -30,7 +33,7 @@
 #include "Prefix.hh"
 #include "PrintOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     One entry of the state indicator (SI) of the APL interpreter.
     Compared to e.g.  C++, the state indicator is (one element of) the
@@ -44,7 +47,7 @@ class StateIndicator
 
 public:
    /// constructor
-   StateIndicator(Executable * exec, StateIndicator * _par);
+   StateIndicator(const Executable * exec, StateIndicator * _par);
 
    /// destructor
    ~StateIndicator();
@@ -73,10 +76,6 @@ public:
    ostream & indent(ostream & out) const;
 
    /// return pointer to the current user function, statements, or execute
-   Executable * get_executable()
-      { return executable; }
-
-   /// return pointer to the current user function, statements, or execute
    const Executable * get_executable() const
       { return executable; }
 
@@ -87,16 +86,15 @@ public:
    Function_PC get_PC() const
       { return current_stack.get_PC(); }
 
-   /// set the current PC
-   void set_PC(Function_PC new_pc)
-      { current_stack.set_PC(new_pc); }
-
    /// return the mode of this entry
    ParseMode get_parse_mode() const
       { return executable->get_parse_mode(); }
 
-   /// evaluate a →N statement. Update pc, return true iff context has changed
-   Token jump(Value_P val);
+   /// evaluate a →B statement. Update PC if needed, maybe do nothing (→'')
+   Token jump(const Value * B);
+
+   /// do a jump to function line \b line
+   Token jump_to_line(Function_Line line);
 
    /// return the nesting level (oldest SI has level 0, next has level 1, ...)
    SI_level get_level() const   { return level; };
@@ -114,7 +112,8 @@ public:
    /// execute token in body...
    Token run();
 
-   /// clear the marked bit in all parsers
+   /// clear the marked bit in the executable, in the fun_oper_cache, and
+   /// in all parsers
    void unmark_all_values() const;
 
    /// print all owners of \b value
@@ -131,36 +130,37 @@ public:
    static const Error & get_error(const StateIndicator * si)
        { return si ? si->error : top_level_error; }
 
-   /// return left arg
-   Value_P get_L();
+   /// return left arg (and set \b function)
+   Value_P get_L(UCS_string & function) const;
 
-   /// change left arg
+   /// change the left argument (if any) of a failed primitive
    void set_L(Value_P value);
 
-   /// return right arg
-   Value_P get_R();
+   /// return the right arg (and set \b function)
+   Value_P get_R(UCS_string & function) const;
 
-   /// change right arg
+   /// change right argument of a failed primitive
    void set_R(Value_P value);
 
-   /// return axis arg
-   Value_P get_X();
+   /// return axis arg (and set \b function)
+   Value_P get_X(UCS_string & function) const;
 
-   /// change axis arg
+   /// change the axis left argument (if any) of a failed primitive
    void set_X(Value_P value);
 
-   /// return true if this SI entry has entered safe execution mode (via ⎕EC)
+   /// return true if \b this )SI entry has entered safe execution mode.
+   /// That is, \b this )SI entry has initiated  ⎕EC)
    bool is_safe_execution_start() const
       { if (!parent)   return safe_execution_count > 0;
         return safe_execution_count > parent->safe_execution_count;
       }
 
    /// return the number of pending ⎕ECs (or other safe execution contexts)
-   int get_safe_execution() const
+   int get_safe_execution_count() const
       { return safe_execution_count; }
 
    /// set safe_execution mode
-   void set_safe_execution()
+   void set_safe_execution_count()
       {
         if (parent)  safe_execution_count = parent->safe_execution_count + 1;
         else         safe_execution_count = 1;
@@ -181,9 +181,12 @@ public:
    const Prefix & get_prefix() const
       { return current_stack; }
 
-   /// return the SI that has called this one
+   /// return the SI entry that has called \b this one
    StateIndicator * get_parent() const
       { return parent; }
+
+   /// return the immediate child SI (if any) of \b this )SI entry
+   const StateIndicator * find_child() const;
 
    /// return the level at which sym is pushed for the nth. time
    SI_level nth_push(const Symbol * sym, int from_tos) const;
@@ -196,9 +199,16 @@ public:
 
 protected:
    /// the user function that is being executed
-   Executable * executable;
+   const Executable * executable;
 
-   /// the number of pending ⎕EC calles
+   /** track ⎕EC calls. The first )SI entry that calls ⎕ES sets
+       \b safe_execution_count to 1 and every child )SI increments it.
+       Therefore:
+
+       1. safe_execution_count != 0 tells if ⎕ES is in effect, and the
+       2. the parent with safe_execution_count == 1 is the one that has
+          initiated ⎕ES (and to which the )SI stack shall be popped on error.
+    */
    int safe_execution_count;
 
    /// The nesting level (of sub-executions)
@@ -211,8 +221,8 @@ protected:
    Prefix current_stack;
 
    /// the StateIndicator that has called this one
-   StateIndicator * parent;
+   StateIndicator * const parent;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __STATE_INDICATOR_HH_DEFINED__

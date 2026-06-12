@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef LOCK_WRAPPER_HH
 #define LOCK_WRAPPER_HH
 

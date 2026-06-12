@@ -36,7 +36,7 @@ NEG_LAMBDA ← { -⍵ }
 ¯10 ¯11 ¯12
 
    NEG_ERR5 ¨ 4 3⍴⍳99
-SYNTAX ERROR
+SYNTAX ERROR+
 NEG_ERR5[2]  ←
              ^
       )SI
@@ -94,7 +94,7 @@ NEG_ERR5[2]
 WAS CLEAR WS
 
       )save
-20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)  test
 
       )SIC
       )CHECK

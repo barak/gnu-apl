@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2015  Dr. Jürgen Sauermann
+    Copyright © 2015  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __LIBPATHS_HH_DEFINED__
 #define __LIBPATHS_HH_DEFINED__
 
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// a library reference number for commands )LOAD, )SAVE, and )COPY.
 /// No library reference number is the same as LIB0.
@@ -43,7 +46,7 @@ enum LibRef
    LIB_WSNAME,       ///< WS name may start with a library reference
    LIB_NONE = LIB0   ///< no library reference specified.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class mapping library reference numbers to directories
 class LibPaths
 {
@@ -140,5 +143,5 @@ protected:
    /// true if APL_lib_root was not found ("." taken)
    static bool root_from_pwd;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __LIBPATHS_HH_DEFINED__

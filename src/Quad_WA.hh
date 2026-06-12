@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __QUAD_WA_HH_DEFINED__
 #define __QUAD_WA_HH_DEFINED__
 
+#include <sys/resource.h>   // for rlim_t
+
 #include "SystemVariable.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    System variable Quad-WA (Workspace Available).
  */
@@ -36,6 +41,9 @@ public:
 
    /// initialize total_memory
    static void init(bool log_startup);
+
+   /// parse a -mem command line option
+   static void parse_mem(bool log_startup);
 
    /// the estimated (!) the amount of free memory
    static uint64_t total_memory;
@@ -53,12 +61,32 @@ public:
    static unsigned long long initial_sbrk;
 
 protected:
+   /// some relevant values in /proc/meminfo
+   static struct _mem_info
+      {
+        _mem_info()
+        : Available(0),   ///< bytes available
+          Cached(0),      ///< bytes cached
+          MemFree(0)      ///< bytes free
+          {}
+
+        uint64_t Available;   ///< kilobytes available
+        uint64_t Cached;      ///< kilobytes cached
+        uint64_t MemFree;     ///< kilobytes free
+      } meminfo;              ///< values read from /proc/meminfo
+
+   /// read /proc/meminfo, return the number of items found
+   static int read_meminfo();
+
+   /// read a (supposedly short) file in /proc
+   static int64_t read_procfile(const char * filename);
+
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
    /// estimate (!) the amount of free memory
    static uint64_t get_free_memory();
 
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __QUAD_WA_HH_DEFINED__

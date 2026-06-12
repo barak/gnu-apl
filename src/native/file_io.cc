@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
    //
    // the file_io native function is now obsolete. It has been replaced by ⎕FIO
    // and the native function has become a wrapper to ⎕FIO
@@ -174,28 +177,28 @@ eval_B(Value_P B, const NativeFunction * caller)
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
+   if (!B->get_cravel(0).is_integer_cell())     return list_functions(COUT);
 
-   return Quad_FIO::fun->eval_B(B);
+   return Quad_FIO::fun.eval_B(B);
 }
 //-----------------------------------------------------------------------------
 Token
 eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
-   return Quad_FIO::fun->eval_AB(A, B);
+   return Quad_FIO::fun.eval_AB(A, B);
 }
 //-----------------------------------------------------------------------------
 Token
 eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
-   return Quad_FIO::fun->eval_XB(X, B);
+   return Quad_FIO::fun.eval_XB(X, B);
 }
 //-----------------------------------------------------------------------------
 Token
 eval_AXB(const Value_P A, const Value_P X, const Value_P B,
          const NativeFunction * caller)
 {
-   return Quad_FIO::fun->eval_AXB(A, X, B);
+   return Quad_FIO::fun.eval_AXB(A, X, B);
 }
 //-----------------------------------------------------------------------------
 
