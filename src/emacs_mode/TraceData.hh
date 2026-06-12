@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef TRACE_DATA_HH
 #define TRACE_DATA_HH
 
@@ -45,7 +48,8 @@ public:
     void add_listener( NetworkConnection *connection, int cr_level = -1 );
     void remove_listener( NetworkConnection *connection );
     void send_update( Symbol_Event ev );
-    static void display_value_for_trace( ostream &out, const Value_P &value, int cr_level );
+    static void display_value_for_trace(ostream & out, Value_P value,
+                                        int cr_level );
 
 private:
     Symbol *symbol;

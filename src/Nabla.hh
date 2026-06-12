@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __NABLA_HH_DEFINED__
 #define __NABLA_HH_DEFINED__
 
-#include <vector>
 #include "UCS_string.hh"
 
 class Symbol;
 
-/// a line number like 1.2 while editing
+/// a line number like 1.2 while editing it
 struct LineLabel
 {
    /// empty constuctor
@@ -83,8 +85,9 @@ public:
    /// edit the function specified in \b cmd (e.g. cmd = "∇FUN")
    static void edit_function(const UCS_string & cmd);
 
-   /// return the line label (sucah as [1]) and the line text, Set is_current
-   /// iff \b line is the current line of the editor.
+   /// Return the line label (sucah as [1]) and the line text.
+   /// Set is_current iff \b line is the current line of the editor.
+   /// Return 0 if line > lines.size().
    UCS_string get_label_and_text(int line, bool & is_current) const;
 
    /// return the number of lines
@@ -180,7 +183,8 @@ protected:
    bool line_exists(const LineLabel & lab) const
       { return find_line(lab) != -1; }
 
-   /// the line number (in a .apl script file) of the ∇ that started the editor
+   /// source the line number (in a .apl script file) of the ∇ that
+   /// started the ∇-editor
    const int defn_line_no;
 
    /// the header of the function being edited
@@ -189,21 +193,18 @@ protected:
    /// the symbol for the function being edited
    Symbol * fun_symbol;
 
-   /// the lines of the function.
+   /// the lines of the function (aka. function texts).
    vector<FunLine> lines;
 
    /// editor commands
    enum Ecmd
       {
-        ECMD_NOP,    ///< do nothing
-        ECMD_SHOW,   ///< show function line(s) idx_from ... idx_to
-        ECMD_EDIT,   ///< edit function line edit_from
+        ECMD_NOP,      ///< do nothing
+        ECMD_SHOW,     ///< show function line(s) idx_from ... idx_to
+        ECMD_EDIT,     ///< edit function line edit_from
         ECMD_DELETE,   ///< delete function line(s) edit_from ... idx_to
         ECMD_ESCAPE,   ///< abort editing (discard changes made so far)
-      };
-
-   /// the current editor command
-   Ecmd ecmd;
+      } ecmd;          ///< the current editor command
 
    /// optional start of a range for an editor command
    LineLabel edit_from;
@@ -211,8 +212,8 @@ protected:
    /// optional end of a range for an editor command
    LineLabel edit_to;
 
-   /// true if user has entered a range, i.e. edit_from - edit_to, - edit_to,
-   ///  edit_from -
+   /// true if user has entered a range, i.e. [edit_from - edit_to],
+   /// [ - edit_to], or [ edit_from - ]
    bool got_minus;
 
    /// true iff this function existed before opening it
@@ -226,6 +227,11 @@ protected:
 
    /// true iff this function shall be locked
    bool locked;
+
+   /// \b true if the user has (most likely interactively) entered a line
+   /// number (so that the input lines are out of order, as opposed to
+   /// scripts where the lines are usually entered in order)
+   bool out_of_order;
 
    /// the line number for the currently edited line
    LineLabel current_line;

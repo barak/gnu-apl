@@ -23,7 +23,7 @@ LIMITATIONS: backtraces (Stack dumps after fatal errors) may not work
 because they use a GNU extension that may or may not be supported on CYGWIN.
 
 NOTE: The procedure described in README-3-keyboard uses the program xmodmap,
- which only works when xmodmap and GNU APL are started under X (which is
+which only works when xmodmap and GNU APL are started under X (which is
 normally the case for Desktop GNU/Linux distributions). In CYGWIN you can
 start a "Cygwin Terminal" which does NOT run under X. If you run xmodmap
 in the Cygwin Terminal then it complains like this:
@@ -40,14 +40,16 @@ not read input from the keyboard, so it does not matter that the keyboard
 setup is wrong.
 
 Another case is a remote login from machine A to machine B using ssh. In this
-case X should run on machine A (so that the keyboard on A works), but a GNU
+case X should run on machine A (so that the keyboard on A works), but GNU
 APL on machine B can run without X.
-
 
 Yet another possibility for Windows users is to install some GNU/Linux
 distribution, for example Ubuntu or Linux Mint, in a virtual machine.
 Installing virtual machines as well as installing GNU/Linux on a virtual
 machine has become rather simple these days. Needless to say that the
-WARNING above also applies in thius case!
+WARNING above also applies in this case!
 
+LATEST NEWS: GNU APL 1.8 no longer compiles under my CYGWIN version (for
+Windows XP) and Windows XP seems not to be supported by CYGWIN anymore.
+Therefore GNU APL 1.7 is the last version with WINDOWS support.
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2017 Elias Mårtenson
+    Copyright © 2017 Elias Mårtenson
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,23 +18,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Workspace.hh"
 #include "Regexp.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static const PCRE2_UCHAR32 *
-ucs_to_codepoints(const UCS_string &string)
+ucs_to_codepoints(const UCS_string & string)
 {
-    int size = string.size();
-    PCRE2_UCHAR32 *buf = new PCRE2_UCHAR32[size];
-    PCRE2_UCHAR32 *p = buf;
-    UCS_string::iterator i = string.begin();
-    while(i.more()) {
-        *p++ = i.next();
-    }
+int size = string.size();
+PCRE2_UCHAR32 * buf = new PCRE2_UCHAR32[size];
+    loop(i, size)   buf[i] = string[i];
     return buf;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 RegexpMatch::RegexpMatch(pcre2_code * code, const UCS_string & B,
                          PCRE2_SIZE start)
    : matched_B(B)
@@ -60,18 +59,18 @@ RegexpMatch::RegexpMatch(pcre2_code * code, const UCS_string & B,
         ovector = 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 RegexpMatch::~RegexpMatch()
 {
    pcre2_match_data_free(match_data);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 RegexpMatch::is_match() const
 {
    return match_result > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 RegexpMatch::num_matches() const
 {
@@ -83,7 +82,7 @@ RegexpMatch::num_matches() const
 
     return match_result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 RegexpMatch::matched_string() const
 {
@@ -91,7 +90,7 @@ const PCRE2_SIZE * ovector = get_ovector();
 UCS_string result(matched_B, ovector[0], ovector[1] - ovector[0]);
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Regexp::Regexp(const UCS_string & pattern, int flags)
 {
 const PCRE2_UCHAR32 * pattern_ucs = ucs_to_codepoints(pattern);
@@ -116,18 +115,18 @@ PCRE2_SIZE error_offset = -1;
 
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Regexp::~Regexp()
 {
    pcre2_code_free(code);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const RegexpMatch *
 Regexp::match(const UCS_string &match, PCRE2_SIZE size) const
 {
    return new RegexpMatch(code, match, size);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Regexp::expression_count() const
 {
@@ -136,7 +135,7 @@ uint32_t result;
 
     return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Regexp::pcre_error(int ec)
 {
@@ -148,8 +147,8 @@ union _u_pcre
 const int len = pcre2_get_error_message_32(ec, buffer.pbuff, 256);
    if (len > 0)   return UCS_string(buffer.ubuff, len);
 
-UCS_string ret("Unknown libpcre error ");
+UCS_string ret(UTF8_string("Unknown libpcre error "));
    ret.append_number(ec);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

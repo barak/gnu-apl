@@ -1,0 +1,210 @@
+⍝ Quad_JSON
+
+      ⍝ error cases...
+
+      ⍝ extra token
+      ⎕JSON ' 33 44 '
+LENGTH ERROR+
+      ⎕JSON ' 33 44 '
+      ^
+      )MORE
+⎕JSON B: there were extra token in B (tokenized: 2, but processed: 1).
+    The JSON string must be one serialized value.
+
+      ⍝ missing array separator
+      ⍝/
+      ⎕JSON '[42 52]'
+DOMAIN ERROR+
+      ⎕JSON '[42 52]'
+      ^
+      )MORE
+⎕JSON B: Got '5' when expecting ',' at 4↓B
+
+)SIC
+
+      ⍝ number
+      ⎕JSON '33'
+33
+
+      ⎕JSON '33.3 '
+33.3
+
+      ⍝ string
+      ⎕JSON ' "hello"'
+hello
+
+      ⎕JSON ' "he\"lo"'
+he"lo
+
+      ⎕UCS ⎕JSON ' "he\u0007lo"'
+104 101 7 108 111
+
+      ⍝ example from JSON RFC 8259
+      ⎕JSON '"\uD834\uDD1E"'
+𝄞
+
+      ⎕JSON '"a\uD834\uDD1Eb"'
+a𝄞b
+
+   ⍝ JSON array
+      ⎕JSON '[1, 2, .3, 3E4, 5.6E¯7, -1 ]'
+1 2 0.3 30000 5.6E¯7 ¯1
+
+
+   ⍝ JSON object
+   ⎕JSON 36 ⎕CR """
+{ "a": 1,
+  "b": 2,
+  "c": "ccc",
+  "dd" : 3,
+  "Ee" : 3E4,
+  "f" : 5.6E¯7,
+  "G:" :  -1
+}
+"""
+.dd: 3
+
+.f:  5.6E¯7
+
+.G:: ¯1
+
+.Ee: 30000
+
+.c:  ┌→──┐
+     │ccc│
+     └───┘
+
+.b:  2
+
+.a:  1
+
+      ⍝ JSON literals
+      ⍝
+      8 ⎕CR ⎕JSON '[42, "s", "string", null, true, false ]'
+┌→──────────────────────────────────────────┐
+│42 ┌→┐ ┌→─────┐ ┌──────┐ ┌──────┐ ┌───────┐│
+│   │s│ │string│ │┌→───┐│ │┌→───┐│ │┌→────┐││
+│   └─┘ └──────┘ ││null││ ││true││ ││false│││
+│                │└────┘│ │└────┘│ │└─────┘││
+│                └ϵ─────┘ └ϵ─────┘ └ϵ──────┘│
+└ϵϵ─────────────────────────────────────────┘
+
+      8 ⎕CR ⎕JSON '[null, "null"]'
+┌→──────────────┐
+│┌──────┐ ┌→───┐│
+││┌→───┐│ │null││
+│││null││ └────┘│
+││└────┘│       │
+│└ϵ─────┘       │
+└ϵϵ─────────────┘
+
+      8 ⎕CR ⎕JSON '[true, "true"]'
+┌→──────────────┐
+│┌──────┐ ┌→───┐│
+││┌→───┐│ │true││
+│││true││ └────┘│
+││└────┘│       │
+│└ϵ─────┘       │
+└ϵϵ─────────────┘
+
+      8 ⎕CR ⎕JSON '[false, "false"]'
+┌→────────────────┐
+│┌───────┐ ┌→────┐│
+││┌→────┐│ │false││
+│││false││ └─────┘│
+││└─────┘│        │
+│└ϵ──────┘        │
+└ϵϵ───────────────┘
+
+      ⍝ dyadic ⎕JSON
+      ⍝
+      2 ⎕JSON ⎕JSON '[false, "false"]'
+[ false, "false" ]
+
+      J←'{ "a": 1,"b": 2,"c": "ccc","dd": 3, "Ee": 3E4, "f": 5.6E¯7, "G": -1 }'
+      ⊃35 ⎕CR 2 ⎕JSON ⎕JSON J
+{ "dd": 3,     
+  "G": -1,     
+  "f": 5.6e-07,
+  "Ee": 30000, 
+  "c": "ccc",  
+  "b": 2,      
+  "a": 1 }     
+
+      ⍝ same with sorted members
+      ⍝
+      ⊃35 ⎕CR 3 ⎕JSON ⎕JSON J
+{ "G": -1,     
+  "a": 1,      
+  "b": 2,      
+  "c": "ccc",  
+  "f": 5.6e-07,
+  "Ee": 30000, 
+  "dd": 3 }    
+
+      ⍝ inverses of more examples above...
+      ⍝
+      2 ⎕JSON ⎕JSON '33'
+33
+
+      2 ⎕JSON ⎕JSON '33.300'
+33.3
+
+      2 ⎕JSON ⎕JSON ' "hello"'
+"hello"
+
+      2 ⎕JSON ⎕JSON ' "he\"lo"'
+"he\"lo"
+
+      2 ⎕JSON ⎕JSON ' "he\u0007lo"'
+"he\u0007lo"
+
+      2 ⎕JSON ⎕JSON ' "he\tlo"'
+"he\tlo"
+
+      ⊃35 ⎕CR 2 ⎕JSON ⎕JSON '"\uD834\uDD1E"'
+"𝄞"
+
+      ⊃35 ⎕CR 2 ⎕JSON ⎕JSON '[1, 2, .3, 3E4, 5.6E¯7, -1 ]'
+[ 1, 2, 0.3, 30000, 5.6e-07, -1 ]
+
+      ⊃35 ⎕CR 2 ⎕JSON ⎕JSON 36 ⎕CR """
+{ "a": 1,
+  "b": 2,
+  "c": "ccc",
+  "dd" : 3,
+  "Ee" : 3E4,
+  "f" : 5.6E¯7,
+  "G:" :  -1
+}
+"""
+{ "dd": 3,     
+  "f": 5.6e-07,
+  "G:": -1,    
+  "Ee": 30000, 
+  "c": "ccc",  
+  "b": 2,      
+  "a": 1 }     
+
+      ⍝ regression
+      ⍝
+      8 ⎕CR A ← (1 2) (3 4)
+┌→──────────┐
+│┌→──┐ ┌→──┐│
+││1 2│ │3 4││
+│└───┘ └───┘│
+└ϵ──────────┘
+
+      A ≡ ⎕JSON 2 ⎕JSON A
+1
+
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+

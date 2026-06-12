@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __ERROR_MACROS_HH_DEFINED__
@@ -49,8 +52,7 @@ void throw_apl_error(ErrorCode code, const char * loc)
 #define LEFT_SYNTAX_ERROR   throw_apl_error(E_LEFT_SYNTAX_ERROR,    LOC)
 #define SYSTEM_ERROR        throw_apl_error(E_SYSTEM_ERROR,         LOC)
 #define TODO                throw_apl_error(E_NOT_YET_IMPLEMENTED,  LOC)
-#define FIXME               {  Backtrace::show(__FILE__, __LINE__); \
-                               cleanup(false);   exit(0);           \
+#define FIXME               {  BACKTRACE; cleanup(false); exit(0);        \
                                throw_apl_error(E_THIS_IS_A_BUG,     LOC); }
 #define VALUE_ERROR         throw_apl_error(E_VALUE_ERROR,          LOC)
 #define VALENCE_ERROR       throw_apl_error(E_VALENCE_ERROR,        LOC)

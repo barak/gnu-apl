@@ -25,7 +25,6 @@
 
 #include <vector>
 
-#include "config.h"   // for HAVE_ macros
 #include "Svar_record.hh"
 
 //-----------------------------------------------------------------------------

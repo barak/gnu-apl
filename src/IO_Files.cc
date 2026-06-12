@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdlib.h>
 
 #include "Common.hh"
@@ -30,6 +33,8 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 int IO_Files::testcase_count = 0;
 int IO_Files::testcases_done = 0;
 int IO_Files::total_errors = 0;
@@ -39,11 +44,15 @@ int IO_Files::last_apl_error_line = -1;
 int IO_Files::assert_errors = 0;
 int IO_Files::diff_errors = 0;
 int IO_Files::parse_errors = 0;
-IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST;
+IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST_FILE;
 bool IO_Files::need_total = false;
 ofstream IO_Files::current_testreport;
+UTF8_string IO_Files::summary_path("testcases/summary.log");
+APL_time_us IO_Files::start_usecs = 0;
 
-//-----------------------------------------------------------------------------
+static  ios_base::openmode summary_flags = ofstream::trunc;
+
+//----------------------------------------------------------------------------
 void
 IO_Files::get_file_line(UTF8_string & line, bool & eof)
 {
@@ -70,7 +79,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
                   UCS_string LX = Workspace::get_LX();
                   if (LX.size())   // ⎕LX pending
                      {
-                       Command::process_line(LX);
+                       Command::process_line(LX, 0);
                        eof = false;
                        return;
                      }
@@ -91,8 +100,8 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         print_summary();
         need_total = false;   // forget the -T option
 
-        if ((test_mode == TM_EXIT_AFTER_LAST) ||
-            (test_mode == TM_EXIT_AFTER_LAST_IF_OK && !error_count()))
+        if ((test_mode == TM_EXIT_AFTER_LAST_FILE) ||
+            (test_mode == TM_EXIT_AFTER_LAST_FILE_IF_OK && !error_count()))
           {
             CERR << "Exiting (test_mode " << test_mode << ")" << endl;
             cleanup(true);
@@ -103,7 +112,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
 
    eof = true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::read_file_line(UTF8_string & file_line, bool & eof)
 {
@@ -156,7 +165,7 @@ InputFile * input = InputFile::current_file();
    Log(LOG_test_execution)
       CERR << "read_file_line() -> " << file_line << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::next_file()
 {
@@ -167,11 +176,11 @@ IO_Files::next_file()
       }
    else
       {
-        CERR << "]NEXTFILE: no file" << endl;
+        CERR << "]NEXTFILE: no current file" << endl;
       }
    open_next_file();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 IO_Files::end_of_current_file()
 {
@@ -241,8 +250,46 @@ IO_Files::end_of_current_file()
 
    if (InputFile::is_validating())   // running a .tc file
       {
-        ofstream summary("testcases/summary.log", ios_base::app);
-        summary << error_count() << " ";
+        const char * path = charP(summary_path.c_str());
+        ofstream summary(path, summary_flags);
+        if (summary_flags == ofstream::trunc)   // first file
+           {
+             summary << "Errors   Time File\n-------------------------"
+                        "---------------------------------------------" << endl;
+             summary_flags = ofstream::app;
+           }
+        if (error_count())   summary << endl;   // to find it quickly
+        summary << setw(3) << error_count();
+
+        // cannot use SRINTF's ' flag uses locales (which suck).
+        const long long duration      = now() - start_usecs;
+        const long long duration_usec = duration % 1000;
+        const long long duration_msec = duration / 1000 % 1000;
+        const long long duration_secs = duration  / 1000000 % 1000;
+
+        // print seconds if nonzero, else blanks
+        //
+        if (duration >= 1000000)     // ≥ 1 second
+           {
+             // sss.mmm
+             // 
+             summary << setw(3) << duration_secs << "."
+                     << setfill('0') << setw(3) << duration_msec << " s  ";
+           }
+        else if (duration >= 1000)   // ≥ 1 milli second
+           {
+             // mmm.uuu
+             //
+             summary << setw(3) << duration_msec << "."
+                     << setfill('0') << setw(3) << duration_usec << " ms ";
+           }
+        else
+           {
+             // uuu
+             //
+             summary << "    " << setw(3) << duration_usec << " μs ";
+           }
+        summary << setfill(' ');   // restore fill
 
         if (error_count())
            {
@@ -260,8 +307,8 @@ IO_Files::end_of_current_file()
 
         summary << InputFile::current_filename() << endl;
 
-        if ((test_mode == TM_STOP_AFTER_ERROR ||
-             test_mode == TM_EXIT_AFTER_ERROR) && error_count())
+        if ((test_mode == TM_STOP_AFTER_FILE_ERROR ||
+             test_mode == TM_EXIT_AFTER_FILE_ERROR) && error_count())
            {
              CERR << endl
                   << "Stopping test execution since an error has occurred"
@@ -278,17 +325,19 @@ IO_Files::end_of_current_file()
 
    InputFile::files_todo.erase(InputFile::files_todo.begin());
 
-   if (uprefs.auto_OFF && !InputFile::files_todo.size())   Command::cmd_OFF(0);
+   if (UserPreferences::uprefs.auto_OFF &&
+       ! InputFile::files_todo.size())   Command::cmd_OFF(0);
 
    Output::reset_dout();
    reset_errors();
    return true;   // continue processing
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::print_summary()
 {
-ofstream summary("testcases/summary.log", ios_base::app);
+const char * path = charP(summary_path.c_str());
+ofstream summary(path, ios_base::app);
 
 int done = testcases_done;
    if (done > testcase_count)   done = testcase_count;
@@ -306,7 +355,7 @@ int done = testcases_done;
            << "(" << testcase_count << ")"
            << " testcase files" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::open_next_file()
 {
@@ -318,27 +367,42 @@ IO_Files::open_next_file()
 
    if (InputFile::current_file()->file)
       {
-        CERR << "IO_Files::open_next_file(): already open" << endl;
+        if (InputFile::current_file()->is_pushed_pending())
+           {
+             InputFile::current_file()->set_pushed_pending(false);
+             CERR << "*** Leaving the pushed immediate execution context"
+                  << endl;
+           }
+        else
+           {
+             CERR << "IO_Files::open_next_file(): already open" << endl;
+           }
         return;
       }
 
-     for (;;)
+     while (InputFile::current_file())
          {
-           if (!InputFile::current_file())   break;   // no more files
-
-           char log_name[FILENAME_MAX];
-           snprintf(log_name, sizeof(log_name) - 1,  "%s.log",
-                    InputFile::current_filename());
+           char log_file_name[FILENAME_MAX] = "";
 
            if (InputFile::current_file()->test)
               {
+                SPRINTF(log_file_name, "%s.log",
+                        InputFile::current_filename());
+                if (const char * slash = strrchr(log_file_name, '/'))
+                   {
+                     summary_path = UTF8_string(utf8P(log_file_name),
+                                                slash + 1 - log_file_name);
+                     summary_path.append_ASCII("summary.log");
+                   }
+
                 CERR << "  #######################################"
                         "#####################################\n"
                      << " ########################################"
                         "######################################\n"
                      << " ##    Testfile: " << left << setw(60)
                      << InputFile::current_filename() << "##\n"
-                     << " ##    Log file: " << setw(60) << log_name << "##\n"
+                     << " ##    Log file: " << setw(60) << log_file_name
+                     << "##\n"
                      << " ########################################"
                         "######################################" << endl
                      << "  #######################################"
@@ -366,19 +430,24 @@ IO_Files::open_next_file()
 
            if (InputFile::current_file()->test)
               {
-                current_testreport.open(log_name,
+                // open a testcase file
+                //
+                current_testreport.open(log_file_name,
                                         ofstream::out | ofstream::trunc);
                 if (!current_testreport.is_open())
                    {
-                     CERR << "could not open testcase log file " << log_name
+                     CERR << "could not open testcase log file "
+                          << log_file_name
                           << "; producing no .log file" << endl;
                    }
               }
 
+           // remember when test execution was started
+           start_usecs = now();
            return;
          }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::expect_apl_errors(const UCS_string & arg)
 {
@@ -399,7 +468,7 @@ const int cnt = arg.atoi();
                 << " expecing " << cnt << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::syntax_error()
 {
@@ -413,7 +482,7 @@ IO_Files::syntax_error()
 
    current_testreport << "**\n** Parse Error ********\n**" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::apl_error(const char * loc)
 {
@@ -427,7 +496,7 @@ IO_Files::apl_error(const char * loc)
    Log(LOG_test_execution)
       CERR << "APL errors incremented to " << apl_errors << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::assert_error()
 {
@@ -438,7 +507,7 @@ IO_Files::assert_error()
    Log(LOG_test_execution)
       CERR << "Assert errors incremented to " << assert_errors << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::diff_error()
 {
@@ -448,5 +517,14 @@ IO_Files::diff_error()
    ++diff_errors;
    Log(LOG_test_execution)
       CERR << "Diff errors incremented to " << diff_errors << endl;
+
+   if (test_mode & TM_DONE_AFTER_LINE_ERROR)
+      {
+        ++total_errors;
+        ++testcases_done;
+        InputFile::close_current_file();
+        InputFile::files_todo.clear();
+        if (test_mode == TM_EXIT_AFTER_LINE_ERROR)   Command::cmd_OFF(1);
+      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

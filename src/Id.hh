@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __ID_HH_DEFINED__
 #define __ID_HH_DEFINED__
 
 #include <iostream>
 
+#include "IdEnums.hh"
+#include "TokenEnums.hh"
 #include "UTF8_string.hh"
 #include "UCS_string.hh"
 
@@ -30,7 +35,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -54,19 +59,24 @@ public:
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
-   static Function * get_system_function(Id id);
+   static cFunction_P get_system_function(Id id);
+
+   /// If \b tag is the tag of primitive function, primitive operator, or
+   /// quad function, then return a pointer to it. Otherwise return 0.
+   static cFunction_P get_system_function(TokenTag tag)
+      { return get_system_function(Id(tag >> 16)); }
 
    /// If \b id is the ID of a quad variable, then return a pointer to its
    /// symbol. Otherwise return 0.
    static Symbol * get_system_variable(Id id);
 
    /// return the TokenTag for \b id
-   static int get_token_tag(Id id);
+   static TokenTag get_token_tag(Id id);
 
    /// release UCS_strings with ID names
    static void cleanup();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #include "TokenEnums.hh"
 

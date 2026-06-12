@@ -186,6 +186,12 @@ following; these options are ignored by the APL interpreter, but
 are visible in the APL system variable ⎕ARG (which plays the role
 of arguments argc/argv in main(int argc, char * argv[]) in C/C++). 
 
+.TP
+.B  +APPOPT, ++APPOPT ARG1, +++APPOPT ARG1 ARG2, ...
+ignored by the interpreter, but copied to ⎕ARG, along with their argument(s)
+(if any). The number of + indicates the number of option arguments (including
+the name of the option itself).
+
 .SH REPORTING BUGS
 
 Report bugs to bug-apl@gnu.org

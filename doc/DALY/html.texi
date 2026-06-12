@@ -1,0 +1,64 @@
+@ifplaintext
+\input texinfo
+@settitle html
+@setfilename html.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title html
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node html
+@end ifnotplaintext
+
+@chapter html
+@cindex html
+							
+This is a workspace to create html files. html is a text markup scheme
+used by the world wide web.  At its most basic level html is a
+collection of tags, that is a word enclosed in angle brackets, which
+instruct a web browser how to display the text.
+
+The html workspace is an implementation of the xml workspace. html
+creates a set of functions that return marked up text for inclusion in
+an html document. It creates a function for each html tag that takes
+as its optional, left argument a lexicon of attributes (see workspace
+lex)and as its right argument the text to be marked up.
+
+A Hello World html document might be coded like this:
+
+@verbatim
+      head←html∆head html∆title 'Hello World'
+      html∆html head  , html∆body html∆h1 'Hello World'
+ 
+<html><head><title>Hello World</title></head>
+<body><h1>Hello World</h1></body></html>
+@end verbatim
+
+

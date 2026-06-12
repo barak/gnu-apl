@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __EXECUTABLE_HH_DEFINED__
 #define __EXECUTABLE_HH_DEFINED__
 
@@ -29,7 +32,7 @@ class Error;
 class UCS_string;
 class UserFunction;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
      A sequence of APL token. An executable is created for one of 3 purposes:
      - an APL expression for execute (⍎), or
@@ -71,7 +74,7 @@ public:
       { return 0; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual const UserFunction * get_ufun() const
+   virtual const UserFunction * get_exec_ufun() const
       { return 0; }
 
    /// return true if this Executable localizes Symbol \b sym
@@ -79,7 +82,7 @@ public:
       { return false; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual UserFunction * get_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return 0; }
 
    /// get the line number for pc
@@ -88,10 +91,13 @@ public:
 
    /// print this user defined executable to \b out
    virtual ostream & print(ostream & out) const
-      { print_token(out);   return out; }
+      { print_token(out, false);   return out; }
+
+   /// print a body range (in APL order)
+   ostream & print_range(ostream & out, Function_PC2 from_to) const;
 
    /// print this user defined executable to \b out
-   void print_token(ostream & out) const;
+   void print_token(ostream & out, int details) const;
 
    /// print the text of this user defined executable to \b out
    void print_text(ostream & out) const;
@@ -126,14 +132,25 @@ public:
    virtual Function_PC line_start(Function_Line line) const
       { return Function_PC_0; }
 
-   /// adjust line starts before calling Parser::remove_void_token(body)
-   virtual void adjust_line_starts() {}
+   /// remove all TOK_VOID token from the body.
+   /// Return the number of tokens removed
+   virtual VoidCount remove_TOK_VOID();
 
-   /// compute lines 2 and 3 in \b error
+   /// compute error lines 2 and 3 in \b error
    void set_error_info(Error & error, Function_PC2 range) const;
 
+   /// helper for set_error_info(Error & error, Function_PC2 range).
+   void set_error_info(Error & error, const Token_string & failed_statement,
+                       Function_PC2 range) const;
+
+   /// restore the original (un-optimized) tokens for a failed statement
+   void reparse(Token_string & original, Function_PC low_PC) const;
+
+   /// return the end of the statement (excluding) to which pc belongs
+   Function_PC get_statement_end(Function_PC pc) const;
+
    /// return the start of the statement to which pc belongs
-   Function_PC get_statement_start(int pc) const;
+   Function_PC get_statement_start(Function_PC pc) const;
 
    /// clear marked flag in all body token
    void unmark_all_values() const;
@@ -153,17 +170,41 @@ public:
    void decrement_refcount(const char * loc);
 
 protected:
-   /// extract all lambda expressions from body and store them in lambdas
+   /// the body positions of the ←← and ←→ tokens of a congitional
+   struct conditional
+      {
+        Function_PC if_THEN;   ///< position of the ←← token (end of condition)
+        Function_PC if_ELSE;   ///< position of the ←→ token (before else)
+      };
+
+
+   /// return true if the body contains { ... }. The parser has already
+   /// complained if the curly brackets do not match, therefore we only check
+   /// for } (which comes  last in APL, but first in the (reversed) body.
+   inline bool body_has_curly() const
+      {
+        loop(b, body.size())
+           {
+             if (body[b].get_tag() == TOK_R_CURLY)   return true;
+           }
+        return false;
+      }
+
+   /// recursively extract all lambda expressions from body and store
+   /// them in lambdas
    void setup_lambdas();
 
-   /// reverse the token order in every statement of tos
-  static void reverse_statement_token(Token_string & tos);
+   /// reverse the token order in each statement of tos (statement by
+   /// statement reversal). The order pf statements is not changed).
+  static void reverse_each_statement(Token_string & tos);
 
-   /// reverse the token order of the entire Token_string
+   /// reverse the token order of the entire Token_string (i.e. not statement
+   /// by statement)
   static void reverse_all_token(Token_string & tos);
 
    /// extract one lambda expressions from body and store it in lambdas
-   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem end, int lambda_num);
+   /// body[b] is { and body[bend] is }.
+   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend, int lambda_num);
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.
@@ -185,6 +226,10 @@ protected:
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              bool trace, bool tolerant, const char * loc);
 
+   /// compute the targets for if/else aka →→ ←→ and ←←.
+   /// Maybe set MORE() info and return true on error.
+   bool compute_if_else_targets();
+
    /// the mode \b this Executable
    const ParseMode pmode;
 
@@ -199,7 +244,7 @@ protected:
    /// reference counter (for lambdas)
    int refcount;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The token of an execute expression (⍎'...')
  **/
@@ -222,7 +267,7 @@ protected:
    virtual UCS_string get_name() const
       { return UCS_string(UNI_EXECUTE); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The token of an statement list (cmd ◊ cmd ... ◊ cmd)
  **/
@@ -245,6 +290,6 @@ protected:
    virtual UCS_string get_name() const
       { return UCS_string(UNI_DIAMOND); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __EXECUTABLE_HH_DEFINED__

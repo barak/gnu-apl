@@ -11,11 +11,13 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+      ]OPTIM
+
       )CLEAR
 CLEAR WS
       )HISTORY CLEAR
 "UCS strings:" (⎕FIO ¯13)
- UCS strings: 372 
+ UCS strings: 384 
 
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
           ⍝⍝                               ⍝⍝
@@ -27,4 +29,5 @@ CLEAR WS
           ⍝⍝                               ⍝⍝
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 
+⊣ ⍎ ')HOST killall APserver'
 

@@ -16,6 +16,12 @@ function now()
      return `${YY}-${MM}-${DD} ${hh}:${mm}:${ss}`
    }
 
+function apl_done(sub)
+   {
+     sub.stdin.destroy();
+     sub.kill('SIGKILL');
+   }
+
 var server = http.createServer(
    function(request, response)
       {
@@ -69,10 +75,7 @@ wsServer.on('request', function(request)
      apl.stdout.on('data', (data) =>
         {
           // console.log("stdout:\n'" + data + "'\n-o-");
-          if (connection_closed)
-             {
-               apl.kill('SIGKILL');
-             }
+          if (connection_closed)   apl_done(apl);
           else                     connection.sendUTF(data);
         }         );
 
@@ -80,10 +83,7 @@ wsServer.on('request', function(request)
      apl.stderr.on('data', (data) =>
         {
           // console.log("stderr:\n'" + data + "'\n-e-");
-          if (connection_closed)
-             {
-               apl.kill('SIGKILL');
-             }
+          if (connection_closed)   apl_done(apl);
           else                     connection.sendUTF(data);
         }         );
 
@@ -107,7 +107,7 @@ wsServer.on('request', function(request)
             console.log(now() + ' Peer ' + connection.remoteAddress +
                         ' disconnected.');
             connection_closed = true;
-            apl.kill('SIGKILL');
+            apl_done(apl);
           }      );
 
     connection.on('error',

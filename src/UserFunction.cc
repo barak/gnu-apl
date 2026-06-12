@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <errno.h>
-
-#include <vector>
 
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Error.hh"
@@ -39,7 +39,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction::UserFunction(const UCS_string txt, const char * loc,
                            const UTF8_string & _creator, bool tolerant,
                            bool macro)
@@ -86,12 +86,23 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
         return;
       }
 
+   if (UserPreferences::uprefs.discard_indentation)   // really ?
+      {
+        loop(l, get_text_size())
+            {
+              UCS_string line = get_text(l);
+              line.remove_leading_and_trailing_whitespaces();
+              set_text(l, line);
+            }
+      }
+
    error_line = -1;   // no error
    error_info = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction::UserFunction(Fun_signature sig, int lambda_num,
-                           const UCS_string & text, Token_string & lambda_body)
+                           const UCS_string & text, Token_string & lambda_body,
+                           const basic_string<Symbol *> & lvars)
   : Function(ID_USER_SYMBOL, TOK_FUN0),
     Executable(sig, lambda_num, text, LOC),
     header(sig, lambda_num),
@@ -118,14 +129,7 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    else if (header.B())    tag = TOK_FUN1;
    else                    tag = TOK_FUN0;
 
-   while (lambda_body.size() > 2 &&
-          lambda_body.back().get_tag() == TOK_SYMBOL &&
-          lambda_body[lambda_body.size() - 2].get_tag() == TOK_SEMICOL)
-      {
-        header.add_local_var(lambda_body.back().get_sym_ptr());
-        lambda_body.pop_back();   // varname
-        lambda_body.pop_back();   // semicolon
-      }
+   loop(lv, lvars.size())   header.add_local_var(lvars[lv]);
 
    // order of local vars is reversed. Fix that.
    //
@@ -138,15 +142,15 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    error_line = -1;   // no error
    error_info = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction::~UserFunction()
 {
    Log(LOG_UserFunction__enter_leave)
       CERR << "Function " << get_name() << " deleted." << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_()
+UserFunction::eval_() const
 {
    Log(LOG_UserFunction__enter_leave)
       CERR << "Function " << get_name() << " calls eval_()" << endl;
@@ -160,9 +164,9 @@ UserFunction::eval_()
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_B(Value_P B)
+UserFunction::eval_B(Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -183,9 +187,9 @@ UserFunction::eval_B(Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_XB(Value_P X, Value_P B)
+UserFunction::eval_XB(Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -207,9 +211,9 @@ UserFunction::eval_XB(Value_P X, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_AB(Value_P A, Value_P B)
+UserFunction::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -232,9 +236,9 @@ UserFunction::eval_AB(Value_P A, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
+UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -258,9 +262,9 @@ UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_LB(Token & LO, Value_P B)
+UserFunction::eval_LB(Token & LO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -284,9 +288,9 @@ UserFunction::eval_LB(Token & LO, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
+UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -312,9 +316,9 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
+UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -341,9 +345,9 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -371,9 +375,9 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
+UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -401,9 +405,9 @@ UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
+UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -432,9 +436,9 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
+UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -464,10 +468,10 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                         Value_P X, Value_P B)
+                         Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -498,40 +502,40 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_B(Value_P B)
+UserFunction::eval_fill_B(Value_P B) const
 {
-Value_P Z = B->clone(LOC);
+Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_AB(Value_P A, Value_P B)
+UserFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
-Value_P Z = B->clone(LOC);
+Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction::set_locked_error_info(Error & error) const
 {
-UCS_string message_2(UTF8_string(error.get_error_line_2()));
+UCS_string message_2(error.get_error_line_2());
 
 #define SHORT 0
    if (header.A())
       {
 #if SHORT
         message_2.append(header.A()->get_name());
-        message_2.append(UNI_ASCII_SPACE);
+        message_2.append(UNI_SPACE);
 #else
-        Value_P val_A = header.A()->get_value();
-        if (!!val_A)
+        Value_P val_A = header.A()->get_apl_value();
+        if (+val_A)
            {
              PrintContext pctx(PR_BOXED_GRAPHIC);
              PrintBuffer pb(*val_A, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
-             message_2.append(UNI_ASCII_SPACE);
+             message_2.append(UNI_SPACE);
            }
 #endif
       }
@@ -541,13 +545,13 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
    if (header.B())
       {
 #if SHORT
-        message_2.append(UNI_ASCII_SPACE);
+        message_2.append(UNI_SPACE);
         message_2.append(header.B()->get_name());
 #else
-        Value_P val_B = header.B()->get_value();
-        if (!!val_B)
+        Value_P val_B = header.B()->get_apl_value();
+        if (+val_B)
            {
-             message_2.append(UNI_ASCII_SPACE);
+             message_2.append(UNI_SPACE);
              PrintContext pctx(PR_APL_FUN);
              PrintBuffer pb(*val_B, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
@@ -562,48 +566,50 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
 
    error.set_right_caret(error.get_left_caret() + message_2.size() - 7);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(std::vector<Function_Line> & lines, bool stop)
+UserFunction::set_trace_stop(std::basic_string<Function_Line> & B, bool stop)
 {
-   // Sort lines
+   // Sort B, so that stop_lines resp. trace_lines will be sorted.
    //
 std::vector<bool> ts_lines;
 
+   // clear all bits in ts_lines
    loop(ts, line_starts.size())   ts_lines.push_back(false);
-   loop(ll, lines.size())
+
+   // set all bits in B, ignorin invalid ones.
+   loop(b, B.size())
       {
-        Function_Line line = lines[ll];
-        if (line >= 1 && line < int(line_starts.size()))
-           ts_lines[line] = true;
+        const Function_Line Bb = B[b];
+        if (Bb < 1)                          continue;   // not valid
+        if (Bb >= int(line_starts.size()))   continue;   // not valid
+        ts_lines[Bb] = true;
       }
 
-   if (stop)
+   if (stop)   // ⎕STOP or S∆
       {
         stop_lines.clear();
-        loop(ts, line_starts.size())
+        loop(ts, ts_lines.size())
            {
-             if (ts_lines[ts])
-                stop_lines.push_back(Function_Line(ts));
+             if (ts_lines[ts])   stop_lines.push_back(Function_Line(ts));
            }
       }
-   else
+   else        // ⎕TRACE or T∆
       {
         trace_lines.clear();
-        loop(ts, line_starts.size())
+        loop(ts, ts_lines.size())
            {
-             if (ts_lines[ts])
-                trace_lines.push_back(Function_Line(ts));
+             if (ts_lines[ts])   trace_lines.push_back(Function_Line(ts));
            }
       }
 
    parse_body(LOC, false, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
-UserFunction::transform_multi_line_strings()
+UserFunction::transform_old_multi_lines()
 {
-  /* convert a set of lines like
+  /* old-style multi-line strings. convert sets of lines like
 
      [k+1] PREFIX "L1
      [k+2] L2 ...
@@ -689,11 +695,11 @@ Line_status current = APL_text;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
-UserFunction::transform_multi_line_strings_3()
+UserFunction::transform_new_multi_lines()
 {
-  /* convert a set of lines like
+  /* new-style multi-line strings. convert sets of lines like
 
      [k+1] PREFIX """
      [k+2] L2 ...
@@ -727,7 +733,7 @@ Line_status current = APL_text;
        {
          const UCS_string & line = get_text(l);
          const ShapeItem len = line.size();
-         if (line.ends_with("\"\"\""))
+         if (-1 != line.multi_pos(current == Inside_string))
             {
               if (current == APL_text)   // start of multi-line string
                  {
@@ -739,8 +745,8 @@ Line_status current = APL_text;
                    bool blanks_only = true;
                    for (ShapeItem c = 0; c < (len - 3); ++c)
                        {
-                          if (line[c] != UNI_ASCII_SPACE &&
-                              line[c] != UNI_ASCII_HT)   blanks_only = false;
+                          if (line[c] != UNI_SPACE &&
+                              line[c] != UNI_HT)   blanks_only = false;
                        }
 
                     if (blanks_only)
@@ -750,7 +756,7 @@ Line_status current = APL_text;
                        }
                  }
             }
-         else              // no status change
+         else                            // no status change
             {
               status[l] = current;
             }
@@ -760,27 +766,51 @@ Line_status current = APL_text;
       {
          // multi-line string started but not ended.
          //
+         MORE_ERROR() << "No end of multi-line string found.";
          return E_DEFN_ERROR;
       }
 
    // modify lines...
    //
-   for (int l = 1; l < get_text_size(); )
+   for (int li = 1; li < get_text_size(); )
        {
-         if (status[l] == APL_text)   { ++l;   continue; }
-         const int start = l;
-         Assert1(status[l] == Start_of_string);
-         UCS_string accu = get_text(l++);
-         accu.resize(accu.size() - 3);   // remove trailing """
-         accu << " ";
-         while (status[l] == Inside_string)
+         if (status[li] == APL_text)   { ++li;   continue; }
+
+         // a multi-line string starts at line li...
+         //
+         const int start = li;
+         Assert1(status[li] == Start_of_string);
+         UCS_string prefix = get_text(li++);
+         prefix.resize(int(prefix.size() - 3));   // remove the trailing """
+         UCS_string accu;
+         int count = 0;
+         while (status[li] == Inside_string)
                {
-                 accu << " \"" << get_text(l).do_escape(true) << "\"";
-                 clear_text(l++);
+                 ++count;
+                 accu << " \"" << get_text(li).do_escape(true) << "\"";
+                 clear_text(li++);
                }
-         Assert(status[l] == End_of_string);
-         set_text(start, accu);
-         clear_text(l++);
+
+         Assert(status[li] == End_of_string);
+
+         if (count == 0)        // nothing
+            {
+              const UTF8_string utf("0⍴⊂\"\"");   // 0⍴⊂""
+              prefix << UCS_string(utf);
+              set_text(start, prefix);
+            }
+         else if (count == 1)   // a single "string" would not nest
+            {
+              const UTF8_string utf("(,⊂");   // enclose the accu...)
+              UCS_string ucs(utf);
+              prefix << UCS_string(utf) << accu << ")";
+              set_text(start, prefix);
+            }
+         else
+            {
+              set_text(start, prefix + accu);
+            }
+         clear_text(li++);
        }
 
    // remove trailing empty lines...
@@ -793,7 +823,7 @@ Line_status current = APL_text;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
@@ -802,55 +832,49 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 
 UCS_string_vector original_text;
    //
-   // The text is modified for parsing but restored afterwards so that e,g,
-   // ∇FUN[⎕]∇ shows the text enterd by the user.
+   // The function text is modified for parsing but restored afterwards
+   // so that e.g. ∇FUN[⎕]∇ shows the text entered by the user.
    //
    // original_text is only set if text was modified.
    //
    clear_body();
 
-   if (uprefs.multi_line_strings_3)   // new-style multi-line strings allowed
+   if (UserPreferences::uprefs.multi_line_strings_3)   // new-style multi-line
       {
-        for (int l = 1; l < get_text_size(); ++l)
+        for (int li = 1; li < get_text_size(); ++li)
             {
-              const UCS_string & line = get_text(l);
-              const ShapeItem len = line.size();
-              if (len >= 3 &&
-                  line[len - 1] == UNI_ASCII_DOUBLE_QUOTE &&
-                  line[len - 2] == UNI_ASCII_DOUBLE_QUOTE &&
-                  line[len - 3] == UNI_ASCII_DOUBLE_QUOTE)
-                 {
-                   original_text = text;
-                   const ErrorCode ec = transform_multi_line_strings_3();
-                   if (ec)
-                      {
-                        text = original_text;   // restore function text
-                        error_line = l;
-                        return;
-                      }
+              const UCS_string & line = get_text(li);
+              const ShapeItem multi = line.multi_pos(false);
+              if (multi == -1)   continue;   // line contains no """
 
-                   break;
+              original_text = text;   // precaution for errors
+              if (const ErrorCode ec = transform_new_multi_lines())
+                 {
+                   text = original_text;   // restore function text
+                   error_line = li;
+                   return;
                  }
+
+              break;   // transform_new_multi_lines() does all
             }
       }
 
-   if (uprefs.multi_line_strings)   // old-style multi-line strings allowed
+   if (UserPreferences::uprefs.multi_line_strings)     // old-style multi-line
       {
-        for (int l = 1; l < get_text_size(); ++l)
+        for (int li = 1; li < get_text_size(); ++li)
             {
-              if (get_text(l).double_quote_count(false) & 1)
-                 {
-                   original_text = text;
-                   const ErrorCode ec = transform_multi_line_strings();
-                   if (ec)
-                      {
-                        text = original_text;   // restore function text
-                        error_line = l;
-                        return;
-                      }
+              const UCS_string & line = get_text(li);
+              if (!(line.double_quote_count(false) & 1))   continue;
 
-                   break;
+              original_text = text;   // precaution for errors.
+              if (const ErrorCode ec = transform_old_multi_lines())
+                 {
+                   text = original_text;   // restore function text
+                   error_line = li;
+                   return;
                  }
+
+              break;   // transform_old_multi_lines() does all
             }
       }
 
@@ -894,7 +918,7 @@ UCS_string_vector original_text;
 
               if (tolerant && ec != E_NO_ERROR)
                  {
-                   UCS_string new_line = "## ";
+                   UCS_string new_line(UTF8_string("## "));
                    new_line.append(line);
                    text[l] = new_line;
                    CERR << "WARNING: SYNTAX ERROR in function "
@@ -922,10 +946,13 @@ UCS_string_vector original_text;
    if (header.Z())   body.push_back(Token(TOK_RETURN_SYMBOL, header.Z()));
    else              body.push_back(Token(TOK_RETURN_VOID));
 
-   // restore the original text (before multi-line expansion)
+   // restore the original text (before any multi-line expansion)
    if (original_text.size())   text = original_text;
+
+   // recompute the →→ ←→ ←← jump PCs
+   compute_if_else_targets();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction *
 UserFunction::load(const char * workspace, const char * function)
 {
@@ -944,20 +971,211 @@ UserFunction * fun = 0;
    catch (...)
       {
         delete fun;
-        CERR << "Caught some exception\n";
+        CERR << "Caught unexpected exception at " << LOC << endl;
         return 0;
       }
 
    return fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool
+UserFunction::resolve_labels()
+{
+   if (DONT_FT_LABEL_LITERAL)   return false;
+
+const int labels_declared = header.get_label_count();
+   if (labels_declared == 0)   return false;   // no labels defined
+
+int labels_seen = 0;
+
+   // pass 1: replace all labels in the body with integers. At this point
+   //         the parser has removed all TOK_INTEGER, so we can temporarily
+   //         use them as markers.
+   //
+   loop(pc, body.size())
+       {
+         const Token & tok = body[pc];
+         if (tok.get_tag() != TOK_SYMBOL)   continue;
+         const Symbol * symbol = tok.get_sym_ptr();
+         loop(idx, labels_declared)
+             {
+               const labVal & label = header.get_label(idx);
+               if (symbol == label.sym)
+                  {
+                    // do not (yet) create a Value since we may need to
+                    // collect several labels below.
+                    //
+                    body[pc] = Token(TOK_INTEGER, int64_t(label.line));
+                    OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
+
+                    ++labels_seen;
+                  }
+             }
+       }
+
+   if (labels_seen == 0)   return false;   // no labels in body
+
+   // pass 2: optimize frequent branch cases.
+   //
+   //         The typical branch cases are:
+   //
+   // case 1:   → N                 branch to single label
+   // case 2:   → SEL/N1 N2 N3...   switch with strand notation
+   // case 3:   → SEL/N1,N2,N3...   switch with comma separated labels
+   // case 4:   a mix of cases 2 and 3
+   //
+bool VOID_inserted = false;
+int line = 1;
+   loop(pc, body.size())
+       {
+         if (body[pc].get_tag() == TOK_ENDL)   { ++line; continue; }
+         if (body[pc].get_tag() != TOK_INTEGER)          continue;
+
+         // collect multiple labels (if any), starting at pc. Remember that
+         // the labels run backwards (i.e. start with the rightmost label).
+
+         // at this point, pc is the first label (of one or more).
+         // Collect all of them and invalidate their token.
+
+         basic_string<int> labels_in_statement;
+         labels_in_statement.push_back(body[pc].get_int_val());
+         body[pc] = Token();
+         for (int pc_1 = pc + 1; pc_1 < body.size(); ++pc_1)
+             {
+               const int pc_2 = pc_1 + 1;
+
+               const Token & tok_1 = body[pc_1];
+               if (tok_1.get_Class() == TC_END)   break;   // end of statement
+
+               const TokenTag tag_1 = tok_1.get_tag();
+               const TokenTag tag_2 = pc_2 < body.size()
+                                    ? body[pc_2].get_tag() : TOK_INVALID;
+
+
+               if (tag_1 == TOK_INTEGER)   // former label (set above)
+                  {
+                    // case 2. : INT INT
+                    labels_in_statement.push_back(body[pc_1].get_int_val());
+                    body[pc_1] = Token();
+                    VOID_inserted = true;
+                    continue;   // next pc_1
+                  }
+               else if (tag_1 == TOK_F12_COMMA && tag_2 == TOK_INTEGER)
+                  {
+                    // case 3. : INT , INT
+                    labels_in_statement.push_back(body[pc_2].get_int_val());
+                    body[pc_1] = Token();
+                    body[pc_2] = Token();
+                    VOID_inserted = true;
+                    continue;   // next pc_1
+                  }
+               else   // end of label vector
+                  {
+                    break;
+                  }
+             }
+
+         const int label_count = labels_in_statement.size();
+         Assert(label_count);   // since body[tok_1] is one
+
+         if (label_count == 1)   // single label (case 1 above)
+            {
+              Value_P single = IntScalar(labels_in_statement[0], LOC);
+              Token tok(TOK_APL_VALUE1, single);
+              body[pc].move(tok, LOC);
+              Log(LOG_optimization) CERR << "optimizing scalar label"
+                                         << " on line [" << line << "]"
+                                         << endl;
+            }
+         else                    // multiple labels (cases 2 and 3 above)
+            {
+              Value_P value(label_count, LOC);
+              loop(l, label_count)
+                  value->next_ravel_Int(labels_in_statement[l]);
+              value->check_value(LOC);
+              Token tok(TOK_APL_VALUE1, value);
+              body[pc].move(tok, LOC);
+              Log(LOG_optimization)
+                 {
+                   CERR << "optimizing label vector["
+                        << label_count << "] =";
+                   loop(l, label_count)
+                       CERR << " ["
+                            << labels_in_statement[label_count - l - 1]
+                            << "]" << " on line [" << line << "]" << endl;
+                 }
+            }
+       }
+
+   if (VOID_inserted)   remove_TOK_VOID();
+
+   return VOID_inserted;
+}
+//----------------------------------------------------------------------------
+bool
+UserFunction::optimize_unconditional_branches()
+{
+   if (DONT_FT_DIRECT_BRANCHES)   return false;
+
+   /* check for: VALUE → ENDL      e.g. → 4
+      or:        SYMBOL → ENDL     e.g. → LABEL
+
+      but rule out expressions:   e.g. → 4 + 5
+
+      ⎕FX "FOO" "X←2" "→2" "Y←5"
+      ⎕FX "FOO" "X←2" "→0" "'NOT REACHED'"
+      ⎕FX "FOO" "X←2" "LABEL: Z←3 ◊ →LABEL" "Y←5"
+
+    */
+bool VOID_inserted = false;
+   for (Function_PC pc = Function_PC_0; pc < body.size() - 3; ++pc)
+      {
+        /*
+           1.  look for (and noting that body is in inverse order)
+  
+                PC  +3  +2 +1 +0
+                    ↓   ↓  ↓  ↓
+                   END  →  N END
+         */
+        if (body[pc    ].get_Class() != TC_END)       continue;
+        if (body[pc + 1].get_Class() != TC_VALUE)     continue;
+        if (body[pc + 2].get_Class() != TC_R_ARROW)   continue;
+        if (body[pc + 3].get_Class() != TC_END)       continue;
+
+        // at this point we have →VALUE.
+        // figure the function line (which may be impossibe)
+        //
+        const Value & v_line = *body[pc + 1].get_apl_val();
+        if (!v_line.is_int_scalar())                  continue;
+
+        const APL_Integer line_number = v_line.get_cscalar().get_int_value();
+        if (line_number < Function_Line_1)            continue;   // e.g. →0
+        if (line_number >= int(line_starts.size()))   continue;
+
+        const int64_t target_PC = line_starts[line_number];
+
+        // maybe do it. This optimization does not work well with
+        // conditonals,so we don't if we see one.
+        //
+        body[pc + 1].clear(LOC);   // release N
+        body[pc + 1] = Token(TOK_GOTO_PC, target_PC);   // B with →PC
+        body[pc + 2].copy_N(body[pc + 3]);              // → with ENDL
+        body[pc + 3] = Token();
+        VOID_inserted = true;
+        OptmizationStatistics::count(OPTI_FT_DIRECT_BRANCHES);
+      }
+
+   if (VOID_inserted)   remove_TOK_VOID();
+
+   return VOID_inserted;
+}
+//----------------------------------------------------------------------------
 void
 UserFunction::load(const char * workspace, const char * function,
                    UserFunction * & fun)
 {
-char filename[FILENAME_MAX + 10];
-   snprintf(filename, FILENAME_MAX + 5,
-            "workspaces/%s/%s.fun", workspace, function);
+char filename[FILENAME_MAX + 1];
+   SPRINTF(filename, "workspaces/%s/%s.fun", workspace, function);
 
    if (strlen(filename) > FILENAME_MAX)
       {
@@ -1007,16 +1225,16 @@ UCS_string ucs(utf);
 int error_line = -1;
    fun = fix(ucs, error_line, false, LOC, filename, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_PC
 UserFunction::pc_for_line(Function_Line line) const
 {
-   if (line < 1 || line >= int(line_starts.size()))
+   if (line <= Function_Line_0 || line >= Function_Line(line_starts.size()))
       return Function_PC(body.size() - 1);
 
    return line_starts[line];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction *
 UserFunction::fix(const UCS_string & text, int & err_line,
                   bool keep_existing, const char * loc,
@@ -1044,7 +1262,7 @@ const bool bad_function = info || err_line != -1;
 
          if (err_line == 0)
            {
-             MORE_ERROR() << info << "in function header";
+             MORE_ERROR() << info << " in function header";
              Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  endl;
            }
          else if (err_line > 0)
@@ -1063,57 +1281,91 @@ const bool bad_function = info || err_line != -1;
       }
 
 Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
-Function * old_function = symbol->get_function();
+cFunction_P old_function = symbol->get_function();
    if (old_function && keep_existing)
       {
+        Log(LOG_UserFunction__fix)
+           {
+             CERR << "not fixing '" << ufun->header.get_name()
+                  << "' (function already exists, and keep_existing set)"
+                  << endl;
+           }
         err_line = 0;
         delete ufun;
         return 0;
       }
 
    // check that the function can be defined (e.g. is not on the )SI stack)
+   // and is not native
    //
-   if (old_function && symbol->cant_be_defined())
-      {
-        err_line = 0;
-        delete ufun;
-        return 0;
-      }
-
    if (old_function)
       {
-        const UserFunction * old_ufun = old_function->get_ufun1();
+        if (const char * reason = symbol->cant_be_defined())
+           {
+             Log(LOG_UserFunction__fix)
+                {
+                  CERR << "not fixing '" << ufun->header.get_name()
+                       << "' (function already exists, and " << reason << endl;
+                }
+             err_line = 0;
+             delete ufun;
+             return 0;
+           }
+
+        if (old_function->is_native())
+           {
+             MORE_ERROR() << "Attempt to re-define native function '"
+                          << old_function->get_name() << "'. ⎕EX it first.";
+             DEFN_ERROR;
+           }
+
+        const UserFunction * old_ufun = old_function->get_func_ufun();
         Assert(old_ufun);
         delete old_ufun;
       }
 
    // bind function to symbol
    //
-   if (ufun->header.LO())   ufun->header.FUN()->set_nc(NC_OPERATOR, ufun);
-   else                     ufun->header.FUN()->set_nc(NC_FUNCTION, ufun);
+   if (ufun->header.LO())   ufun->header.FUN()->set_NC(NC_OPERATOR, ufun);
+   else                     ufun->header.FUN()->set_NC(NC_FUNCTION, ufun);
 
    Log(LOG_UserFunction__fix)
       {
         CERR << " addr " << voidP(ufun) << endl;
         ufun->print(CERR);
+        CERR <<  "------------------- UserFunction::fix() OK --" << endl;
+      }
+
+   ufun->resolve_labels();
+   ufun->optimize_unconditional_branches();
+   if (ufun->compute_if_else_targets())
+      {
+        // must NOT: delete ufun;
+
+        if (tolerant)   return 0;   // caller checks result
+        DEFN_ERROR;
       }
 
    return ufun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UserFunction *
 UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 {
+   // NOTE: only called from Archive::read_Function to adjust the different
+   // texts of normal defined functions (where local vars are in the header)
+   // and lambdas (where the local vars are at the end of the lambda).
+
    /* Example: consider {⍺+⍵;LOCAL}
 
-      text a normal (non-lambda) function like:
+      the )SAVE'd function body is:
 
       λ←⍺ λ1 ⍵;LOCAL
       λ← ⍺+⍵
 
-       which has a slightly different lambda body like:
+      this function restores it to:
 
-       λ← ⍺+⍵;LOCAL
+      λ← ⍺+⍵;LOCAL
 
     */
 int signature = SIG_FUN | SIG_Z;
@@ -1124,17 +1376,17 @@ ShapeItem semi = -1;
        {
          switch(text[t++])
             {
-              case UNI_CHI:             signature |= SIG_X;    continue;
-              case UNI_OMEGA:           signature |= SIG_B;    continue;
-              case UNI_ALPHA_UNDERBAR:  signature |= SIG_LO;   continue;
-              case UNI_OMEGA_UNDERBAR:  signature |= SIG_RO;   continue;
-              case UNI_ALPHA:           signature |= SIG_A;    continue;
+              case UNI_CHI:            signature |= SIG_X;    continue;
+              case UNI_OMEGA:          signature |= SIG_B;    continue;
+              case UNI_ALPHA_UNDERBAR: signature |= SIG_LO;   continue;
+              case UNI_OMEGA_UNDERBAR: signature |= SIG_RO;   continue;
+              case UNI_ALPHA:          signature |= SIG_A;    continue;
 
-              case UNI_ASCII_SEMICOLON: if (semi == -1)   semi = t - 1;
-                                        continue;
+              case UNI_SEMICOLON:      if (semi == -1)   semi = t - 1;
+                                       continue;
 
-              case UNI_ASCII_LF:        break;   // header done
-              default:                  continue;
+              case UNI_LF:             break;   // header line done
+              default:                 continue;
             }
 
          break;   // header done
@@ -1142,12 +1394,12 @@ ShapeItem semi = -1;
 
    // discard leading spaces
    //
-   while (t < text.size() && text[t] == UNI_ASCII_SPACE)   ++t;
+   while (t < text.size() && text[t] == UNI_SPACE)   ++t;
 
 UCS_string body_text;
    for (; t < text.size(); ++t)   body_text.append(text[t]);
 
-   while (body_text.back() == UNI_ASCII_LF)  body_text.pop_back();
+   while (body_text.back() == UNI_LF)  body_text.pop_back();
 
 Token_string body;
    {
@@ -1160,25 +1412,34 @@ Token_string body;
 
    if (semi != -1)
       {
-        for (ShapeItem s = semi; text[s] != UNI_ASCII_LF; ++s)
+        for (ShapeItem s = semi; text[s] != UNI_LF; ++s)
            {
              body_text.append(text[s]);
            }
       }
 
 const Parser parser(PM_FUNCTION, LOC, false);
-const ErrorCode ec = parser.parse(body_text, body);
-   if (ec)
+   if (const ErrorCode ec = parser.parse(body_text, body, true))
       {
         CERR << "Parsing '" << body_text << "' failed" << endl;
         return 0;
       }
 
+basic_string<Symbol *> local_vars;
+   while (body.size() >= 2)
+      {
+        const size_t semi = body.size() - 2;
+        if (body[semi]    .get_tag() != TOK_SEMICOL)   break;
+        if (body[semi + 1].get_Class() != TC_SYMBOL)   break;
+        local_vars.push_back(body[semi + 1].get_sym_ptr());
+        body.resize(semi);   // leave ENDL and RETURN_SYMBOL
+      }
+
 UserFunction * ufun = new UserFunction(Fun_signature(signature), 0,
-                                       body_text, body);
+                                       body_text, body, local_vars);
    return ufun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction::destroy()
 {
@@ -1187,7 +1448,7 @@ UserFunction::destroy()
    if (is_lambda())   decrement_refcount(LOC);
    else               delete this;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UserFunction::pushes_sym(const Symbol * sym) const
 {
@@ -1205,7 +1466,7 @@ UserFunction::pushes_sym(const Symbol * sym) const
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void 
 UserFunction::help(ostream & out) const
 {
@@ -1240,7 +1501,7 @@ const UCS_string two_lamps(UTF8_string("⍝⍝"));
             }
 
          const bool double_lamps = line[1] == UNI_COMMENT;   // ⍝⍝ line
-         if (line[1] == UNI_ASCII_FULLSTOP)                  // ⍝. line
+         if (line[1] == UNI_FULLSTOP)                  // ⍝. line
             {
               toronto = true;
             }
@@ -1254,7 +1515,7 @@ const UCS_string two_lamps(UTF8_string("⍝⍝"));
 
    if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 UserFunction::print(ostream & out) const
 {
@@ -1272,17 +1533,17 @@ UserFunction::print(ostream & out) const
    return Executable::print(out);
 */
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction::print_properties(ostream & out, int indent) const
 {
    header.print_properties(out, indent);
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "Body Lines:      " << line_starts.size() << endl
        << ind << "Creator:         " << get_creator()      << endl
        << ind << "Body: " << body << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UserFunction::get_name_and_line(Function_PC pc) const
 {
@@ -1292,7 +1553,7 @@ UCS_string ret = header.get_name();
         UCS_string name = Workspace::find_lambda_name(this);
         if (name.size())   ret = name;
       }
-   ret.append(UNI_ASCII_L_BRACK);
+   ret.append(UNI_L_BRACK);
 
    // pc may point to the next token already. If that is the case then
    // we go back one token.
@@ -1301,10 +1562,10 @@ UCS_string ret = header.get_name();
 
 const Function_Line line = get_line(pc);
    ret.append_number(line);
-   ret.append(UNI_ASCII_R_BRACK);
+   ret.append(UNI_R_BRACK);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_Line
 UserFunction::get_line(Function_PC pc) const
 {
@@ -1320,7 +1581,7 @@ UserFunction::get_line(Function_PC pc) const
 
    return Function_Line_1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UserFunction::canonical(bool with_lines) const
 {
@@ -1329,44 +1590,85 @@ UCS_string ucs;
       {
         if (with_lines)   ucs.append(line_prefix(Function_Line(t)));
         ucs.append(text[t]);
-        ucs.append(UNI_ASCII_LF);
+        ucs.append(UNI_LF);
       }
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-UserFunction::adjust_line_starts()
+UserFunction::print_body_by_line(const char * where) const
 {
-   // this function is called from Executable::setup_lambdas() just before
-   // Parser::remove_void_token(body) in order to adjust line_starts
-   //
-std::vector<ShapeItem> gaps;
-   gaps.reserve(line_starts.size());   // count TOK_VOID in every line
-   loop(ls, line_starts.size())
+   CERR << where << endl;
+   loop(line, line_starts.size())
       {
-         gaps.push_back(0);
-         if (ls == 0)   continue;   // function header (has no TOK_VOID)
-
-         const ShapeItem from = line_starts[ls];
-         ShapeItem to = body.size();    // end of function (for last line)
-         if (ls < (ShapeItem(line_starts.size()) - 1))
-            to = line_starts[ls + 1];
-
-        for (ShapeItem b = from; b < to; ++b)
-            {
-             if (body[b].get_tag() == TOK_VOID)   ++gaps.back();
-            }
+        CERR << "[" << line << "]:";
+        ShapeItem next = body.size();   // assume last line
+        if ((line + 1) < int(line_starts.size()))
+           next = line_starts[line + 1];
+        loop(offset, next - line_starts[line])
+            CERR << " " << body[int(line_starts[line]) + offset].get_Class();
+        CERR << endl;
       }
-
-int total_gaps = 0;
-   loop(ls, line_starts.size())
+}
+//----------------------------------------------------------------------------
+void
+UserFunction::print_line_PCs(const char * loc) const
+{
+   CERR << "At " << loc << ":" << endl;
+   for (size_t j = 1; j < line_starts.size(); ++j)
        {
-          line_starts[ls] = Function_PC(line_starts[ls] - total_gaps);
-          total_gaps += gaps[ls];
+         CERR << "   " << get_name() << "[" << j << "]: PC= ";
+         const Function_PC PC_from = line_starts[j];
+
+         // Note: line_starts[0] is the end of the function
+         const int next = j < (line_starts.size() - 1) ? j + 1 : 0;
+         const Function_PC PC_to = line_starts[next];
+         CERR << PC_from << "..." << (PC_to - 1) << endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+VoidCount
+UserFunction::remove_TOK_VOID()
+{
+   // if line_starts is empty (= not yet initialized )then line_starts need
+   // not be updated. Only the TOK_VOID need to be removed, and we pretend
+   // that no token were removed (so the caller needs not care),
+   //
+   if (line_starts.size() == 0)
+      {
+        Parser::remove_TOK_VOID(body);
+        return NO_VOID_TOKEN_REMOVED;
+      }
+
+   // line_starts was initialized.
+   // 
+size_t src_line    = Function_Line_1;
+Function_PC dst_PC = Function_PC_0;
+
+   // be careful not to increment src_PC if a line is empty!
+
+   loop(src_PC, body.size())
+      {
+        while (src_PC == line_starts[src_line + 1])
+           {
+             // src_PC is the first token of the next line
+             ++src_line;
+             line_starts[src_line] = Function_PC(dst_PC);
+           }
+
+        if (body[src_PC].get_tag() == TOK_VOID)   continue;   // ignore (skip)
+        if (src_PC != dst_PC)   body[dst_PC].move(body[src_PC], LOC);
+         ++dst_PC;
+      }
+
+const VoidCount ret = VoidCount(body.size() - dst_PC);
+   body.resize(dst_PC);
+   line_starts[0] = dst_PC;   // convention: line_starts[0] is the end of body
+
+   return ret;
+}
+//----------------------------------------------------------------------------
 Function_PC
 UserFunction::line_start(Function_Line line) const
 {
@@ -1379,7 +1681,7 @@ UserFunction::line_start(Function_Line line) const
 
    return line_starts[line];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 UserFunction::print_val_or_fun(ostream & out, Token & tok)
 {
@@ -1390,14 +1692,14 @@ UserFunction::print_val_or_fun(ostream & out, Token & tok)
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UserFunction::line_prefix(Function_Line l) const
 {
 char cc[40];
-   if      (text.size() > 100)   snprintf(cc, sizeof(cc), "[%3d] ", l);
-   else if (text.size() > 10)    snprintf(cc, sizeof(cc), "[%2d] ", l);
-   else                          snprintf(cc, sizeof(cc), "[%d] ",  l);
-   return UCS_string(cc);
+   if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
+   else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
+   else                          SPRINTF(cc, "[%d] ",  l)
+   return UCS_ASCII_string(cc);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

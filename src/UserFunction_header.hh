@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __USERFUNCTION__HEADER_HH_DEFINED__
 #define __USERFUNCTION__HEADER_HH_DEFINED__
 
 #include <sys/types.h>
-#include <vector>
 
 #include "Error.hh"
 #include "Executable.hh"
@@ -30,12 +32,12 @@
 #include "Symbol.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The (symbols in the) header of a defined function
 class UserFunction_header
 {
 public:
-   /// constructor from first line in \b txt (for normal defined functions)
+   /// constructor from first line in \b txt (for proper defined functions)
    UserFunction_header(const UCS_string & txt, bool macro);
 
    /// constructor from signature (for lambdas)
@@ -102,11 +104,15 @@ public:
    /// return error if header was not parsed successfully
    ErrorCode get_error() const   { return error; }
 
+   /// return \b true if this function localizes \b sym
+   bool localizes(const Symbol * sym) const;
+
    /// print local vars etc.
    void print_properties(ostream & out, int indent) const;
 
    /// add a local variable
-   void add_local_var(Symbol * sym);
+   void add_local_var(Symbol * sym)
+      { local_vars.push_back(sym); }
 
    /// pop all local vars, labels, and parameters
    void pop_local_vars() const;
@@ -131,7 +137,7 @@ public:
    static UCS_string lambda_header(Fun_signature sig, int lambda_num);
 
    /// push Z (if defined), local variables, and labels.
-   void eval_common();
+   void eval_common() const;
 
    /// return the number of local variables
    ShapeItem local_var_count() const
@@ -141,7 +147,28 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return local_vars[idx]; }
 
+   /// return the number fof labels (in the function body).
+   const size_t get_label_count() const
+      { return label_values.size(); }
+
+   /// return the \b idx'th label (not the label of line idx!).
+   const labVal & get_label(int idx) const
+      { return label_values[idx]; }
+
+   /// clear the function symbol (e.g. after a DEFN_ERROR)
+   void clear_FUN()
+      { sym_FUN = 0; }
+
 protected:
+   /// init the signature from text
+   const char * init_signature(const UCS_string & text, bool macro);
+
+   /// init the local variables from text
+   const char * init_local_vars(const UCS_string & text, bool macro);
+
+   /// return true iff bitmap \b sig is a valid funvtion signature
+   static bool signature_is_valid(Fun_signature sig);
+
    /// remove \b sym from local_vars if it occurs at pos or above
    void remove_duplicate_local_var(const Symbol * sym, size_t pos);
 
@@ -151,7 +178,8 @@ protected:
    /// source location where error was detected
    const char * error_info;
 
-   /// the name of this function
+   /// the name of this function. In most cases
+   /// function_name is sym_FUN->get_name(), but for  lambdas it is not.
    UCS_string function_name;
 
    /// optional result
@@ -176,11 +204,11 @@ protected:
    Symbol * sym_B;
 
    /// The local variables of \b this function.
-   std::vector<Symbol *> local_vars;
+   std::basic_string<Symbol *> local_vars;
 
    /// The labels of \b this function.
    std::vector<labVal> label_values;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __USERFUNCTION__HEADER_HH_DEFINED__

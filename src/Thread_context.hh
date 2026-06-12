@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __THREAD_CONTEXT_HH_DEFINED__
 #define __THREAD_CONTEXT_HH_DEFINED__
 
+#include <pthread.h>
+
 #include "PJob.hh"
 
-//=============================================================================
+//============================================================================
 /**
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1
 
@@ -57,7 +62,7 @@
   sufficiently long).
 
  **/
-//=============================================================================
+//============================================================================
 /// the context for one parallel execution thread
 class Thread_context
 {
@@ -68,6 +73,9 @@ public:
 
    /// constructor
    Thread_context();
+
+   /// destructor
+   ~Thread_context();
 
    /// return the number of the core executing \b this context
    CoreNumber get_N() const
@@ -152,8 +160,7 @@ public:
       { return active_core_count; }
 
    /// set the number of currently used cores
-   static void set_active_core_count(CoreCount new_count)
-      { active_core_count = new_count; }
+   static void set_active_core_count(CoreCount new_count);
 
 protected:
    /// thread number (0 = interpreter, 1... worker threads
@@ -179,7 +186,7 @@ public:
    bool do_join;
 
    /// a semaphore to block this context
-   sem_t * pool_sema;
+   sem_t pool_sema;
 
    /// true if blocked on pool_sema
    bool blocked;
@@ -191,8 +198,21 @@ public:
    Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
 
    /// remove all thread contexts (when the APL interpreter exits)
-   static void cleanup()
-      { delete [] thread_contexts;   thread_contexts = 0; }
+   static void cleanup();
+
+   /// cancel all monadic jobs in all thread contexts
+   static void cancel_all_monadic_jobs()
+      {
+        loop(a, get_active_core_count())
+             get_context(CoreNumber(a))->joblist_B.cancel_jobs();
+      }
+
+   /// cancel all dyadic jobs in all thread contexts
+   static void cancel_all_dyadic_jobs()
+      {
+        loop(a, get_active_core_count())
+             get_context(CoreNumber(a))->joblist_AB.cancel_jobs();
+      }
 
 protected:
    /// all thread contexts
@@ -207,6 +227,6 @@ protected:
    /// the number of cores currently used
    static CoreCount active_core_count;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __THREAD_CONTEXT_HH_DEFINED__

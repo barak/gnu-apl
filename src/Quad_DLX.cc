@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
+/** @file
+*/
 
 #include "Logging.hh"
 #include "PointerCell.hh"
@@ -27,33 +28,34 @@
 #include "Token.hh"
 #include "Workspace.hh"
 
-Quad_DLX  Quad_DLX::_fun;
-Quad_DLX * Quad_DLX::fun = &Quad_DLX::_fun;
+Quad_DLX  Quad_DLX::fun;
 
-//=============================================================================
+//============================================================================
 /// one '1' in a sparse constraint matrix
 class DLX_Node
 {
 public:
    /// default constructor for node allocation
-   DLX_Node()
+   DLX_Node(bool hdr)
    : row(-1),
      col(-1),
      up(this),
      down(this),
      left(this),
-     right(this)
+     right(this),
+     is_header(hdr)
    {}
 
    /// normal constructor
-   DLX_Node(ShapeItem R, ShapeItem C,
+   DLX_Node(bool hdr, ShapeItem R, ShapeItem C,
             DLX_Node * u, DLX_Node * d, DLX_Node * l, DLX_Node * r)
    : row(R),
      col(C),
      up(u),
      down(d),
      left(l),
-      right(r)
+      right(r),
+     is_header(hdr)
    { insert_lr();   insert_ud(); }
 
    /// assignment
@@ -130,19 +132,23 @@ public:
 
    /// link to the next node on the right
    DLX_Node * right;
+
+   /// true if ths node is a header node (containing no data)
+   const bool is_header;
 };
-//=============================================================================
+//============================================================================
 /// A (column-) header node
 class DLX_Header_Node : public DLX_Node
 {
 public:
    /// constructor for empty header array
    DLX_Header_Node()
+   : DLX_Node(true)
    {}
 
    /// constructor for memory allocation
    DLX_Header_Node(ShapeItem C, DLX_Node * l, DLX_Node * r)
-   : DLX_Node(-1, C, this, this, l, r),
+   : DLX_Node(true, -1, C, this, this, l, r),
      count(0),
      col_type(Col_UNKNOWN),
      item_r(0)
@@ -157,7 +163,7 @@ public:
    /// the items r and j in the double-loop around cover()/uncover()
    DLX_Node * item_r;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DLX_Node::Col_Type
 DLX_Node::get_col_type(const Cell & cell)
 {
@@ -187,7 +193,7 @@ DLX_Node::get_col_type(const Cell & cell)
 
    return Col_INVALID;
 }
-//=============================================================================
+//============================================================================
 /// The root node of the constraints matrix
 class DLX_Root_Node : public DLX_Node
 {
@@ -248,6 +254,9 @@ public:
        c.check();
      }
 
+   /// return the (decreasing) number of columns
+   ShapeItem get_column_count() const;
+
    /// display the matrix
    void display(ostream & out) const;
 
@@ -267,7 +276,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   std::vector<ShapeItem> all_solutions;
+   std::basic_string<ShapeItem> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all
@@ -306,10 +315,10 @@ protected:
    /// the first 0 in the matrix (for figuring the format)
    const Cell * first_0;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
                              const Value & B)
-   : DLX_Node(-1, -1, this, this, this, this),
+   : DLX_Node(true, -1, -1, this, this, this, this),
      max_solutions(max_sol),
      rows(rs),
      cols(cs),
@@ -326,7 +335,7 @@ DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
 const ShapeItem ec_B = B.element_count();
 const int qio = Workspace::get_IO();
 ShapeItem ones = 0;
-const Cell * b = &B.get_ravel(0);
+const Cell * b = &B.get_cfirst();
    loop(e, ec_B)
       {
         const Cell & cell = *b++;
@@ -366,9 +375,9 @@ const Cell * b = &B.get_ravel(0);
    // set up non-header nodes. std::vector.push_back() may move the headers so
    // we first append all nodes and initialize then.
    //
-   b = &B.get_ravel(0);
+   b = &B.get_cfirst();
    nodes.reserve(ones);
-   loop(o, ones)   nodes.push_back(DLX_Node());
+   loop(o, ones)   nodes.push_back(DLX_Node(false));
 
    DLX_Node * n = &nodes[0];
    loop (r, rows)
@@ -397,9 +406,9 @@ const Cell * b = &B.get_ravel(0);
 
 
              if (rm == n)
-                rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
+                rm = new (n++)   DLX_Node(false, r, c, hdr.up, &hdr, rm, lm);
              else
-                rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
+                rm = new (n++)   DLX_Node(false, r, c, hdr.up, &hdr, rm, lm);
              ++headers[c].count;
            }
       }
@@ -418,7 +427,7 @@ const Cell * b = &B.get_ravel(0);
 
    Log(LOG_Quad_DLX)   { loop(n, ones)   nodes[n].print(CERR); }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DLX_Root_Node::display(ostream & out) const
 {
@@ -490,7 +499,7 @@ char rows_used[rows];
    out << endl;
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DLX_Root_Node::deep_check() const
 {
@@ -509,7 +518,7 @@ DLX_Root_Node::deep_check() const
          Assert(ones == hdr.count);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DLX_Root_Node::solve()
 {
@@ -645,7 +654,15 @@ level_done:
         goto rloop;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+ShapeItem
+DLX_Root_Node::get_column_count() const
+{
+ShapeItem cols_Z = 0;
+   for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
+   return cols_Z;
+}
+//----------------------------------------------------------------------------
 Token
 DLX_Root_Node::preset(const Cell * steps, ShapeItem step_count, const Cell * cB)
 {
@@ -691,66 +708,72 @@ const int qio = Workspace::get_IO();
 
    // construct return value
    //
-ShapeItem cols_Z = 0;
-   for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
+const ShapeItem cols_Z = get_column_count();
 
-   // set al matrix elements to 0
-   //
 const Shape shape_Z(rows, cols_Z);
 Value_P Z(shape_Z, LOC);
+
+   // first init all cells in Z to whatever  means 0
+   //
    loop(z, (rows*cols_Z))
       {
-        if (first_0)   Z->next_ravel()->init(*first_0, Z.getref(), LOC);
-        else if (cB->is_integer_cell())   new (Z->next_ravel()) IntCell(0);
-        else                       new (Z->next_ravel()) CharCell(UNI_ASCII_0);
+        if (first_0)                      Z->next_ravel_Cell(*first_0);
+        else if (cB->is_integer_cell())   Z->next_ravel_0();
+        else                              Z->next_ravel_Char(UNI_0);
       }
 
-ShapeItem c = 0;   // the column in the reduced matrix
-   for (DLX_Node * h = right; h != this; h = h->right)
+   // then override those cells in the linked structure to whatever means 1
+   //
+   Assert(is_header);
+
+DLX_Node * h = right;
+   loop(col, cols_Z)
        {
-         for (DLX_Node * j = h->down; j != h; j = j->down)
+         Assert(h->is_header);   // therefore for (v...) stops
+         for (DLX_Node * v = h->down; !v->is_header; v = v->down)
              {
-               Assert(h->col == j->col);
-               const Cell & src = cB[h->col + cols*j->row];
-               Z->get_ravel(c + cols_Z*j->row).init(src, Z.getref(), LOC);
+               Assert(!v->is_header);
+               Assert(h->col == v->col);
+               const Cell & src = cB[h->col + cols*v->row];
+               Z->get_wravel(col + cols_Z*v->row).init(src, *Z, LOC);
              }
-         ++c;
+         h = h->right;
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
-Quad_DLX::eval_AB(Value_P A, Value_P B)
+Quad_DLX::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (A->element_count() < 1)   LENGTH_ERROR;
 
    if (B->get_rank() != 2)   RANK_ERROR;
-const APL_Integer a0 = A->get_ravel(0).get_int_value();
+const APL_Integer a0 = A->get_cfirst().get_int_value();
 
    if (a0 < -4)   DOMAIN_ERROR;
    if (a0 == -4)   // perform some dance steps with the constraints matrix
       {
         const ShapeItem rows = B->get_rows();
         const ShapeItem cols = B->get_cols();
-        DLX_Root_Node root(rows, cols, 0, B.getref());
-        return root.preset(&A->get_ravel(1), A->element_count() - 1,
-                           &B->get_ravel(0));
+        DLX_Root_Node root(rows, cols, 0, *B);
+        return root.preset(&A->get_cravel(1), A->element_count() - 1,
+                           &B->get_cfirst());
       }
 
    if (A->element_count() != 1)   LENGTH_ERROR;
-   return do_DLX(a0, B.getref());
+   return do_DLX(a0, *B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Quad_DLX::eval_B(Value_P B)
+Quad_DLX::eval_B(Value_P B) const
 {
    if (B->get_rank() != 2)   RANK_ERROR;
-   return do_DLX(0, B.getref());
+   return do_DLX(0, *B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_DLX::do_DLX(ShapeItem how, const Value & B)
 {
@@ -770,9 +793,9 @@ DLX_Root_Node root(rows, cols, result_count, B);
    if (how <= -2)   // return statistics
       {
        Value_P Z(3, LOC);
-       new (Z->next_ravel())   IntCell(root.get_solution_count());
-       new (Z->next_ravel())   IntCell(root.get_pick_count());
-       new (Z->next_ravel())   IntCell(root.get_cover_count());
+       Z->next_ravel_Int(root.get_solution_count());
+       Z->next_ravel_Int(root.get_pick_count());
+       Z->next_ravel_Int(root.get_cover_count());
        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -789,7 +812,7 @@ const APL_Integer qio = Workspace::get_IO();
        Value_P Z(len, LOC);
        loop(z, len)
          {
-           new (Z->next_ravel()) IntCell(qio + root.all_solutions[z + 1]);
+           Z->next_ravel_Int(qio + root.all_solutions[z + 1]);
          }
        Z->check_value(LOC);
        return Token(TOK_APL_VALUE1, Z);
@@ -800,8 +823,8 @@ const APL_Integer qio = Workspace::get_IO();
 Value_P Z(root.get_solution_count(), LOC);
    if (root.get_solution_count() == 0)   // empty result
       {
-        Value_P Z1 = Idx0(LOC);   // Z1 is ⍬
-        new (&Z->get_ravel(0))   PointerCell(Z1.get(), Z.getref());
+        Value_P Z1 = Idx0(LOC);   // Z1 ← ⍬
+        new (&Z->get_wproto())   PointerCell(Z1.get(), *Z);
       }
    else
       {
@@ -812,15 +835,15 @@ Value_P Z(root.get_solution_count(), LOC);
              Value_P Zs(len, LOC);
              loop(z, len)
                 {
-                  new (Zs->next_ravel()) IntCell(qio + root.all_solutions[a++]);
+                  Zs->next_ravel_Int(qio + root.all_solutions[a++]);
                 }
              Zs->check_value(LOC);
-             new (Z->next_ravel())   PointerCell(Zs.get(), Z.getref());
+             Z->next_ravel_Pointer(Zs.get());
            }
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

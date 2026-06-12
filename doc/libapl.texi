@@ -16,8 +16,8 @@
 @node Top
 @top libAPL
 
-libapl is a C library, kindly contributed to the GNU APL project by Dr. Dirk
-Laurie, that gives C programs access to GNU APL.
+libapl is a C library, kindly contributed to the GNU APL project by
+@b{Dr. Dirk Laurie}, that gives C programs access to GNU APL.
 
 Almost everything that a user can do interactively with GNU APL can also be
 done programmatically with libapl. You can )LOAD and )SAVE workspaces,
@@ -69,6 +69,34 @@ APL_function is a convenience typedef for a pointer to an opaque structure Funct
 @item @code{eval__L_oper_R_X_B(APL_function L, APL_function fun, APL_function R, APL_value X, APL_value B)}
 These are the possible eval functions. The APL_value returned by an eval__XXX() function shall be released with release_value() by the caller.
 
+@item @code{fix_function(const char ** function_lines_utf8)}
+@item @code{fix_function_NL(const char * function_lines_utf8)}
+These functions create a new defined APL function in the workspace, which
+can then be called in APL, or with suitable eval_XXX() functions in C/C++.
+fix_function() expects an array of strings, one string per APL line, and
+terminated with NULL. fix_function() is a front-end for fix_function_NL().
+fix_function_NL() expects a signle string with function lines separated by
+newline (line feed, 0x0A). In both cases the first line becomes the function
+header and the subsequent lines become the function body. Existing functions
+with the same name in the function header will be replaced without warning.
+Examples:
+
+@verbatim
+const char * foo[] = { "Z←A FOO B",     // function header
+                       "Z←A ⍴ B",       // one body line
+                       NULL             // sentinel
+                     };
+  fix_function(foo);
+
+const char * bar = "Z←A BAR B\n"        // function header
+                   "Z←A ≠ B\n";         // one body line
+  fix_function_NL(bar);
+@end verbatim
+
+should create dyadic defined functions FOO and BAR. fix_function_NL() is
+easier to use with e.g. C string literals, while fix_function() is more
+convenient if (some of) the function lines are being computed.
+
 @item @code{get_var_value(const char * var_name_utf8, const char * loc)}
 return an APL value pointing to the contents of a variable in the current workspace.
 
@@ -77,6 +105,9 @@ set the contents of a variable in the workspace to that of the given APL value.
 
 @item @code{expand_LF_to_CRLF}
 this function controls whether linefeed (LF) characters shall be expanded to CR/LF on output. The default is no expansion. Please note that LF expansion may be triggered in other places, therefore expand_LF_to_CRLF(0) alone does not guarantee that no CR characters are being printed.
+
+@item @code{SYNC_APL_SCRIPTS} and @code{repl}
+See @ref{#non-atomic-operations, Non-atomic Operations}
 
 @end table
 
@@ -293,11 +324,138 @@ cc myprog.c -lapl -lstdc++ -o myprog
 
 @menu
 * The loc parameter and LOC macro::
+* Non-atomic Operations::
 @end menu
 
 @node The loc parameter and LOC macro
 @section The @code{loc} parameter and @code{LOC} macro
 @anchor{#the-loc-parameter-and-loc-macro}
 All the functions that return APL values, as well as @code{release_value} and @code{set_var_value}, contain a parameter @code{const char* loc}. This parameter is used to keep track of changes to a Value and may be displayed by certain debugging services. You can put in anything you like, but most convenient is @code{LOC}, a macro that expands to the file name and line number.
+
+@node Non-atomic Operations
+@section Non-atomic Operations
+@anchor{#non-atomic-operations}
+@subsection Architecture of the GNU APL interpreter
+
+The "normal" GNU APL interpreter has, simplified, the following architecture:
+
+@verbatim
+              ╔═══════════╗               ╔════════════════╗
+              ║ Frontend  ║               ║    File-I/O    ║
+              ║           ║    .apl       ║                ║
+  stdin  ─────╢  ┌────┐   ╠═══════════════╣ .apl Scripts   ║ 
+  stdout ─────╢  │REPL│   ║               ║ .xml Snapshots ║
+              ║  └────┘   ║               ║                ║
+              ╚═════╤═════╝               ╚═══════╦════════╝
+                    │                             ║
+              ╔═════╧═════╗                       ║
+              ║  Backend  ║    .xml               ║
+              ║───────────╠═══════════════════════╝
+              ║ (APL Core)║
+              ╚═══════════╝
+@end verbatim
+
+The @b{backend} handles most of the APL commands and the interpretation of APL programs. By definition (e.g. in the ISO APL standard) the backend works in a strict line-by-line fashion. @b{REPL} is an abbreviation for @b{R}ead/@b{E}valuate/@b{P}rint/@b{L}oop, a construct present in almost every interactive interpreter.
+
+The @b{frontend} is responsible for:
+
+@itemize
+@item pushing individual lines from @b{stdin} into the backend, and/or
+@item chopping .apl scripts into individual lines and pushing them, line-by-line,  into the backend, and after that
+@item displaying the output from the backend (if any) on @b{stdout}.
+@end itemize
+
+In the special case of a @b{)COPY} command of an .apl file (as opposed to an .xml file) the backend opens the .apl file whereas the frontend then pushes the content of the file into the backend. For that reason, )COPY of an .xml files is atomic in the sense defined below, while )COPY of an .apl file is not. @i{This subtle difference is sometimes missed by libapl users}.
+
+@subsection Architecture of the libapl library
+
+@b{libapl} is a thin API towards the backend. It can be used by applications written in other languages (primarily C/C++) to obtain services from the backend. Every such application replaces the frontend and must therefore follow the same as the (now removed) frontend:
+
+@verbatim
+              ╔═════════════╗               ╔════════════════╗
+              ║ Application ║      ← ←      ║    File-I/O    ║
+              ║──────┬──────║     .apl      ║                ║
+              ║      │      ╠═══════════════╣ .apl Scripts   ║ 
+              ║  ┌───┴──┐   ║               ║ .xml Snapshots ║
+              ║  │libapl│   ║               ║                ║
+              ╚══╧═══╤══╧═══╝               ╚═══════╦════════╝
+                     │                              ║
+              ╔══════╧══════╗     ← →     → →       ║
+              ║   Backend   ║    .xml    .apl       ║
+              ║─────────────╠═══════════════════════╝
+              ║  (APL Core) ║
+              ╚═════════════╝
+@end verbatim
+
+In particular, every application may or may not need to provide its own REPL loop. This may be tricky for programmers that are not entirely familiar with the internals of the GNU APL code. Therefore libapl also provides functions that simplify the construction of a suitable REPL loop.
+
+@subsection Atomic vs. Non-Atomic Operations
+
+The vast majority of GNU APL commands are @b{atomic}, which shall mean that the command is a single line passed to the APL core (by means of the libapl functions @b{apl_command()} or @b{apl_command_ucs()}) and the result is a (typically short) response string. An atomic command ends before any other command or APL code is being executed.
+
+Also, lines entered in immediate execution mode are atomic (unless, of course,  they execute (⍎) a non-atomic GNU APL command). Note that ⍎ of commands is a non-standard GNU APL feature.
+
+Some commands, most importantly )COPY of .apl files, are not atomic since the (top-level) )COPY command may invoke other commands before it completes. That is:
+
+@itemize
+@item )COPY of .apl files is non-atomic,
+@item )COPY of .xml files is atomic,
+@item The ∇-editor is is non-atomic,
+@item ⎕FX is atomic, and
+@item )SAVE, )DUMP, and )DUMP-HTML are atomic.
+@end itemize
+
+As the list above shows, every non-atomic operation has an atomic alternative.
+
+It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the backend. The REPL loop of a "normal" GNU APL interpreter pushes the lines of .apl files into the backeend and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that uses libapl.
+
+First of all, libapl.h @b{#define}s the convenience macro @b{SYNC_APL_SCRIPTS} which is a loop around the more fine-grained libapl function @b{repl()}:
+
+@verbatim
+#define SYNC_APL_SCRIPTS   { do ; while(repl(0, 0, 0, 0, 0)); }
+@end verbatim
+
+The libapl function @b{repl()} fetches one line of APL and passes it to the APL core. It returns non-zero as long as there are more APL lines available. The caller of @b{repl()} may, primarily for debugging purposes, provide buffers into which @b{repl()} will store the input to and the output of the APL core.
+
+Normally REPL loops are flat (non-recursive) and run forever. In contrast, SYNC_APL_SCRIPTS is a per file REPL loop that is recursive. If, for example, a )COPY opens an .apl  file that contains another )COPY command, then SYNC_APL_SCRIPTS returns only after both files were processed) and stops at the end of the first (top-level) .apl file.
+
+The overall purpose and effect of @b{SYNC_APL_SCRIPTS} is that all open APL
+scripts are being executed line-by-line.
+
+The rules for @b{SYNC_APL_SCRIPTS} and @b{repl()} are:
+
+@itemize
+@item every non-atomic operation requires SYNC_APL_SCRIPTS immediatly after it. For example:
+@verbatim
+  apl_command(")COPY ./foo.apl");   /* open the script foo.apl  */
+  SYNC_APL_SCRIPTS                  /* execute lines in foo.apl */
+@end verbatim
+
+@item @b{SYNC_APL_SCRIPTS} does no harm; using it after an atomic command is far better than not using it after a non-atomic command.
+@item @b{repl()} essentially performs one iteration of a REPL loop and therefore
+SYNC_APL_SCRIPTS is an entire REPL loop.
+@item @b{repl()} returns 0 if there are no more .apl files to process and otherwise an identifier > 0 that identifies an .apl file (in the order discovered).
+@item the libapl can avoid the need for @b{SYNC_APL_SCRIPTS} entirely by using only .xml workspaces instead of .apl scripts.
+@item the )LOAD command is essentially )CLEAR followed by )COPY, therefore the difference between .apl and .xml files applies as well.
+@end itemize
+
+The declaration of function @b{repl()} is:
+
+@verbatim
+extern long repl(char * input_buffer,  int * input_bufsize,
+                 char * output_buffer, int * output_bufsize,
+                 LIBAPL_error * error);
+@end verbatim
+
+and the following rules apply:
+
+@itemize
+@item a non-zero @b{input_buffer} causes @b{repl()} to copy the input line that is passed to the APL core into @b{input_buffer}. In that case @b{input_bufsize} must also be non-zero and point to an integer that is the size of the @b{input_buffer}. Many programmers follow the @b{GNU APL Coding Standard} which suggests that source code lines should not have more than 79 characters. In that case an input_buffer of 400 bytes should suffice (considering that the input buffer is UTF8-encoded so that an 80-character line may require more than 80 bytes).
+@item @b{input_bufsize} is initially the size of the @b{input_buffer}. Calling @b{repl()} will update it to the size of the line that was read from some .apl file and passed to the APL core.
+@item a non-zero @b{output_buffer} causes @b{repl()} to copy the output line(s) of the APL core into @b{output_buffer}. In that case @b{output_bufsize} must also be non-zero and point to an integer that is the size of the @b{output_buffer}. If @b{⎕PW} is known beforehand then @b{4×⎕PW} might be a proper value for the size of the @b{output_buffer} (considering that the output buffer is UTF8-encoded).
+@item after @b{repl()} returns, the input and output buffers are 0-terminated and the sizes are the numbers of valid bytes (not characters!) in the respective buffer.
+@item a non-zero @b{LIBAPL_error * error} causes @b{repl()} to store an error code in that location. The error (if any) refers to @b{repl()} itself (possibly LAE_IN_BUFFER_OVERFLOW or LAE_OUT_BUFFER_OVERFLOW if the buffers were truncated). In that case @b{input_bufsize} and @b{output_bufsize} are the sizes that, similar to @b{snprinf()}, @i{would have been} returned if the buffers were large enough.
+@item Errors detected by the APL core are NOT set in @b{*error}; the caller may decode @b{output_buffer} in order to detect them.
+@end itemize
 
 @bye

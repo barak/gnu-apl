@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __SYSTEM_LIMITS_HH_DEFINED__
 #define __SYSTEM_LIMITS_HH_DEFINED__
 
@@ -25,9 +28,9 @@
 
 enum
 {
-#define syl1(_n, e, v) e = v,
-#define syl2(_n, e, v)
-#define syl3(_n, e, v)
+#define syl1(_n, e, v) e = v,   /** < constant ( ./configure'able ) */
+#define syl2(_n, e, v)          /** < variable */
+#define syl3(_n, e, v)          /** < constant ( not ./configure'able ) */
 #include "SystemLimits.def"
 
    DEFAULT_Quad_PP = 10,
@@ -47,6 +50,6 @@ enum
 #define INTEGER_TOLERANCE (1.0e-10)   // system tolerance, lrm p. 59
 
 #define BIG_INT64_F 9223372036854775807.0
-#define BIG_FLOAT   1.79769313486231470e308
+#define BIG_FLOAT   1.7976e308
 
 #endif // __SYSTEM_LIMITS_HH_DEFINED__

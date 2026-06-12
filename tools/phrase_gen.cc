@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,21 +28,43 @@
 
 #include "../src/Id.hh"
 
+typedef int TableIndex;
+
 using namespace std;
 
 enum { MAX_PHRASE_LEN = 4 };
 
 struct _phrase
 {
-   TokenClass phrase[MAX_PHRASE_LEN];
-   const char * rn1;   // name of first token for reduce function
+   TokenClass classes[MAX_PHRASE_LEN];
+   const char * rn0;   // real name of first token for reduce function
    const char * names[MAX_PHRASE_LEN];
    int          prio;
    int          misc;
    int          len;
    int          hash;
    const char * alias;
-} phrase_tab[] =
+
+   string get_suffix() const
+      {
+        char buffer[40];
+        char * b = buffer;
+        const char * end = buffer + sizeof(buffer) - 1;
+        loop(l, len)   b += snprintf(b, end - b, "_%s", names[l]);
+        snprintf(b, end - b, "[%d]", len);
+        return string(buffer);
+      }
+
+   /// return the table index of the child with class tc, or 0 if none.
+   TableIndex get_child_idx(TokenClass tc) const;
+
+   /// return the table index of the parent, or 0 if none.
+   TableIndex get_parent_idx() const;
+
+   /// return true if \b child is a child of \b this
+   bool is_child(const _phrase & child) const;
+
+} phrase_table[] =
 {
 #define sn(x) SN_ ## x
 #define tn(x) # x
@@ -74,24 +96,67 @@ phrase(0,                     ,      ,      ,    , "")
 #include "phrase_gen.def"
 };
 
-enum { PHRASE_COUNT = sizeof(phrase_tab) / sizeof(*phrase_tab) };
+// like phrase_table, but including internal nodes (sub_phrases).
+vector<_phrase> expanded_table;
 
+
+enum { PHRASE_COUNT = sizeof(phrase_table) / sizeof(*phrase_table) };
+
+/// return the index of child this→tc (if any), otherwise 0.
+TableIndex
+_phrase::get_child_idx(TokenClass tc) const
+{
+   loop(idx, expanded_table.size())
+       {
+         const _phrase & child = expanded_table[idx];
+         if (is_child(child) && child.classes[len] == tc)   return idx;
+       }
+
+   return 0;   // none
+}
+
+/// return the index of the parent of \b this.
+// Fails if the parent is an internal node that does not (yet) exist.
+
+TableIndex
+_phrase::get_parent_idx() const
+{
+   loop(parent_idx, expanded_table.size())
+       {
+         const _phrase & parent = expanded_table[parent_idx];
+         if (parent.is_child(*this))    return parent_idx;
+       }
+
+   return 0;   // none
+}
+
+bool
+_phrase::is_child(const _phrase & child) const
+{
+   // this is the parent, child may be a child of it.
+   //
+   if (child.len != (len + 1))                          return false;
+   loop(t, len) { if (child.classes[t] != classes[t])   return false; }
+   return true;
+}
+//-----------------------------------------------------------------------------
+ostream & get_CERR() { return std::cerr; }
 //-----------------------------------------------------------------------------
 /// a function that prints one phrase in the large comment at the start of
 /// the output file (i.e. Prefix.def)
 void
 print_phrase(FILE * out, int ph)
 {
-const _phrase & e = phrase_tab[ph];
-int len = fprintf(out, "   phrase %2d: ", ph);
+const _phrase & e = phrase_table[ph];
+int len = fprintf(out, "   ║  %2d  │ ", ph);
 int hash_len = 0;
 
    for (int ll = 0; ll < MAX_PHRASE_LEN; ++ll)
        {
-         if (e.phrase[ll] == TC_INVALID /* == SN_ */)   break;
+         if (e.classes[ll] == TC_INVALID /* == SN_ */)   break;
 
          ++hash_len;
-         switch(e.phrase[ll])
+         switch(e.classes[ll])
             {
               case TC_ASSIGN:   len += fprintf(out, " ←   ") - 2;   break;
               case TC_R_ARROW:  len += fprintf(out, " →   ") - 2;   break;
@@ -117,10 +182,10 @@ int hash_len = 0;
             }
        }
 
-   while (len < 40)   len += fprintf(out, " ");
-   fprintf(out, "%d", hash_len);
-   if (*e.alias)   fprintf(out, " %s", e.alias);
-   fprintf(out, "\n");
+   while (len < 36)   len += fprintf(out, " ");
+   fprintf(out, " │ %d │", hash_len);
+   fprintf(out, " %-14s", e.alias);
+   fprintf(out, "║\n");
 }
 //-----------------------------------------------------------------------------
 /// a function that prints the entire large comment at the start of
@@ -128,16 +193,27 @@ int hash_len = 0;
 void
 print_phrases(FILE * out)
 {
-   fprintf(out, "\n   /*** phrase table ***\n"
-                "\n"
-                "   phrase ##:  phrase              length alias\n"
-                "   ---------------------------------------------\n");
+   fprintf(out,
+"\n"
+"/* WARNING: this file is generated:\n"
+"\n"
+"   Generator:       tools/phrase_gen\n"
+"   Generator input: tools/phrase_gen.def\n"
+"\n"
+"   USAGE: cd tools ; make gen    # hash table\n"
+"      OR: cd tools ; make gen2   # search tree\n"
+"\n"
+"   ╔══════╤═════ PHRASE TABLE ═══╤═══╤═══════════════╗\n"
+"   ║number│ phrase               │len│ alias         ║\n"
+"   ╟──────┼──────────────────────┼───┼───────────────╢\n"
+          );
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)   print_phrase(out, ph);
 
-   fprintf(out, "   ---------------------------------------------\n"
-                "\n"
-                "   *** phrase table ***/\n\n");
+   fprintf(out,
+"   ╚══════╧══════════════════════╧═══╧═══════════════╝\n"
+" */\n"
+"\n"      );
 }
 //-----------------------------------------------------------------------------
 int
@@ -149,7 +225,7 @@ int * tab = new int[modu];
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)
        {
-         const _phrase & e = phrase_tab[ph];
+         const _phrase & e = phrase_table[ph];
          const int idx = e.hash % modu;
          if (tab[idx] == -1)   // free entry
             {
@@ -166,46 +242,161 @@ int * tab = new int[modu];
    return true;
 }
 //-----------------------------------------------------------------------------
-/// write the declaration of a reduce_ function to out
+/// write the declaration of one reduce_ function to file \b out
 void
-print_entry_decl(FILE * out, const _phrase & e)
+print_entry_decl(FILE * out, const _phrase & e, TableIndex ph)
 {
+   // if phrase \b e is an alias then do nothing. For example, A D G is an alias
+   // for F D B because reduce_F_D_G_() would do the same as reduce_A_D_G_()).
+   //
    if (*e.alias)   return;
 
-   // declare reduce_MISC_xxx only once (for ASS variant)
+const char * rn0   = e.rn0;        // e.g. A F ... MISC MISC
+const char * name0 = e.names[0];   // e.g. A F ... ASS  GOTO
+   assert(rn0);
+   assert(name0);
+
+   // all MISC_xxx phrases with the same suffix xxx have the same reduce function
+   // reduce_MISC_xxx(). We declare reduce_MISC_xxx() only once when we are
+   // called for the first MISC item (ASS).
    //
-   if (strcmp(e.rn1, e.names[0]) && e.phrase[0] != SN_ASS)   return;
+   if (!strcmp(rn0, "MISC"))                   // e is a MISC_xxx phrase
+      if (e.classes[0] != SN_ASS)   return;     // but is not MISC_ASS
 
-char nam[100];
-int nam_len = snprintf(nam, sizeof(nam), "%s %s %s %s", 
-                       e.names[0], e.names[1], e.names[2], e.names[3]);
-   while (nam_len && nam[nam_len - 1] == ' ')   nam[--nam_len] = 0;
+   // phrase_name is the first argument of the emitted PH() macro. It is a
+   // blank separated list of abbreviated token classes, for example:
+   // "F D G" or "V ASS B"
+   //
+char phrase_name[100];
+int name_len = snprintf(phrase_name, sizeof(phrase_name), "%s %s %s %s", 
+                        name0, e.names[1], e.names[2], e.names[3]);
 
-char fun[100];   snprintf(fun, sizeof(fun), "%s_%s_%s_%s();", 
-                          e.rn1, e.names[1], e.names[2], e.names[3]);
+   // remove trailing whitespace from unused token classes
+   while (name_len && phrase_name[name_len - 1] == ' ')
+         phrase_name[--name_len] = 0;
 
-   fprintf(out, "   void reduce_%-20s  ///< reduce phrase %s\n", fun, nam);
+   // suffix is the suffix XXX of the reduce_XXX() function. Similar to
+   // phrase_name, but the token classes are separated by '_' rather than ' '.
+   //
+char suffix[100];   snprintf(suffix, sizeof(suffix), "%s_%s_%s_%s();", 
+                             rn0, e.names[1], e.names[2], e.names[3]);
+
+   // member function declaration (Prefix.hh)
+   fprintf(out, "   void reduce_%-20s  ///< reduce phrase %s\n",
+           suffix, phrase_name);
 }
 //-----------------------------------------------------------------------------
-void
-print_entry_macro(FILE * out, const _phrase & e)
+static void
+print_PH_macro(FILE * out, TableIndex e_idx, const _phrase & e, bool hash)
 {
-char nam[100];   snprintf(nam, sizeof(nam), "%s %s %s %s", 
+   // the first argument (phrase name) of the PH() macro in Prefix.def
+   //
+char phrase_name[100];
+   snprintf(phrase_name, sizeof(phrase_name), "%s %s %s %s", 
                  e.names[0], e.names[1], e.names[2], e.names[3]);
 
-char fun[100];   snprintf(fun, sizeof(fun), "%s_%s_%s_%s", 
-                          e.rn1, e.names[1], e.names[2], e.names[3]);
+   // the reduce_XXX argument of the PH() macro in Prefix.def
+   //
+char suffix[100];   snprintf(suffix, sizeof(suffix), "%s_%s_%s_%s", 
+                             e.rn0, e.names[1], e.names[2], e.names[3]);
 
-   if (*e.alias)   snprintf(fun, sizeof(fun), "%s", e.alias);
+   if (*e.alias)   snprintf(suffix, sizeof(suffix), "%s", e.alias);
 
-   fprintf(out, "  PH( %-14s , 0x%5.5X,   %2d,   %d,  %d, %-12s )\n",
-                nam, e.hash, e.prio, e.misc, e.len, fun);
+const char * macro = "PH";
+   if (!hash)   // parse tree
+      {
+        if (e_idx == 0)              macro = "P0";
+        if (e_idx >= PHRASE_COUNT)   macro = "P0";
+      }
+
+      if (strcmp(e.rn0, "none"))   // node with reduce function
+         fprintf(out, "  %s( %-14s , %-14s, 0x%5.5X ,  %2d  ,  %2d  ,  %1d",
+                   macro, phrase_name, suffix, e.hash, e.prio, e.misc, e.len);
+      else                         // internal node without reduce function
+         fprintf(out, "  %s( %-14s , %-14s, 0x%5.5X ,  %2d  ,  %2d  ,  %1d",
+                   macro, phrase_name, "none", e.hash, e.prio, e.misc, e.len);
+
+   if (!hash)   // tree: print sub tree indices
+      {
+        loop(tc, TC_MAX_PHRASE)   // for every phrase class
+            {
+              // set child_idx to the phrase_table index for which
+              // phrase_table[child_idx] has a final token tc and the
+              // other token are the same as the parent e (if any), or
+              // 0 if no such child exists.
+              
+              int child_idx = 0;
+              if (e.len < 4)    // since level 4 can not have children
+                 {
+                   child_idx = e.get_child_idx(TokenClass(tc));
+                 }
+              if (tc)   fprintf(out, ",%2.2X", child_idx);
+              else      fprintf(out, ", %2.2X", child_idx);
+            }
+      }
+
+   fprintf(out, "),  // [%2.2X]\n", e_idx);
 }
 //-----------------------------------------------------------------------------
 void
-print_table(FILE * out)
+expand_table()
 {
-   // find smallest modulus for wrapping hash_table.
+bool V = false;  // verbosity
+
+   // copy phrase_table into expanded_table
+   //
+   loop(ph, PHRASE_COUNT)   // for all parents
+       {
+         _phrase phrase = phrase_table[ph];
+         expanded_table.push_back(phrase);
+       }
+
+   // add internal nodes
+   //
+   loop(ph, expanded_table.size())   // for all existing phrases
+       {
+         if (ph == 0)   continue;   // the tree root has no parent
+         const _phrase * child = &phrase_table[ph];
+V && fprintf(stderr, "visit #%2.2X child %s\n", int(ph),
+            child->get_suffix().c_str());
+
+         for (int ch_len = child->len; ch_len; --ch_len)
+            {
+              if (const TableIndex parent = child->get_parent_idx())
+                 {
+                   // child already has a parent
+
+V && fprintf(stderr, " child %s already has parent %s\n",
+     child->get_suffix().c_str(),
+     expanded_table[parent].get_suffix().c_str());
+                   continue;
+                 }
+              assert(child->len <= 4);
+
+V && fprintf(stderr, "  ├── %s has no parent\n", child->get_suffix().c_str());
+
+              _phrase new_parent = *child;
+              --new_parent.len;
+              new_parent.names[new_parent.len] = "";   // clear last child token
+              new_parent.hash = 0;                 // not used (since tree)
+              new_parent.rn0 = "none";
+V && fprintf(stderr, "  ├── inserted new %s at [%2.2X]\n",
+     new_parent.get_suffix().c_str(), int(expanded_table.size()));
+
+              expanded_table.push_back(new_parent);
+              child = &expanded_table.back();
+
+V && fprintf(stderr, "  └── add new parent %s of child %s\n",
+     new_parent.get_suffix().c_str(),
+     child->get_suffix().c_str());
+            }
+       }
+}
+//-----------------------------------------------------------------------------
+static void
+print_table(FILE * out, bool hash)
+{
+   // find the smallest modulus for a collision-free hash_table of all prefixes
    //
 int MODU = TC_MAX_PHRASE;
    for (;; ++MODU)
@@ -215,13 +406,15 @@ int MODU = TC_MAX_PHRASE;
 
    fprintf(out,
 "\n"
-"#ifndef PH\n"
-"\n");
+"#ifndef PH   // declarations (in Prefix.hh)\n");
+
+   if (hash)   fprintf(out, "\n# define PREFIX_HASH\n\n");
+   else        fprintf(out, "\n# define PREFIX_TREE\n\n");
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)
        {
-         const _phrase & e = phrase_tab[ph];
-         print_entry_decl(out, e);
+         const _phrase & e = phrase_table[ph];
+         print_entry_decl(out, e, ph);
        }
 
    fprintf(out,
@@ -233,52 +426,59 @@ int MODU = TC_MAX_PHRASE;
 
    fprintf(out,
 "\n"
-"   /// one phrase in the phrase table\n"
-"   struct Phrase\n"
-"      {\n"
-"        const char *   phrase_name;     ///< phrase name\n"
-"        int            phrase_hash;     ///< phrase hash\n"
-"        int            prio;            ///< phrase priority\n"
-"        int            misc;            ///< 1 if MISC phrase\n"
-"        int            phrase_len;      ///< phrase length\n"
-"        void (Prefix::*reduce_fun)();   ///< reduce function\n"
-"        const char *   reduce_name;     ///< reduce function name\n"
-"      };\n"
-"\n"
 "      /// a hash table with all valid phrases (and many invalid entries)\n"
 "      static const Phrase hash_table[PHRASE_MODU];\n"
 "\n"
-"#else  // PH defined\n"
-"\n"
-"const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =\n"
-"{\n"
-"  //  phrase_name      hash     prio misc len  reduce_XXX()\n"
-"  //  -----------------------------------------------------\n");
+"#else  // PH(...) defined: table instantiation (in Prefix.cc)\n\n");
 
-   {
-     const _phrase ** table = new const _phrase *[MODU];
-     for (int i = 0; i < MODU; ++i)   table[i] = phrase_tab;
+      if (hash)   fprintf(out,
 
-     for (int i = 0; i < PHRASE_COUNT; ++i)
-         {
-           _phrase & e = phrase_tab[i];
-           table[e.hash % MODU] = phrase_tab + i;
-         }
+"//PH( phrase_name    , reduce_XXX()  ,   hash  , prio , misc , len)\n"
+"//═════════════════════════════════════════════════════════════════\n");
 
-     for (int i = 0; i < MODU; ++i)
-         {
-           print_entry_macro(out, *table[i]);
-         }
-      delete [] table;
-   }
+      else        fprintf(out,
 
+"//                                                                  "
+"                    F  I  O  O        R  S  V  P  V\n"
+"//                                                                  "
+"                 F  1  D  P  P        E  Y  A  [  O\n"
+"//PH( phrase_name    , reduce_XXX()  ,   hash  , prio , misc , len) "
+"  ←  →  [  ]  ◊  0  2  X  1  2  (  )  T  M  L  ]  I\n"
+"//═════════════════════════════════════════════════════════════════"
+  "00══════════04══════════08══════════0C══════════10═════\n");
 
+   if (hash)   // hash table
+      {
+        const _phrase ** table = new const _phrase *[MODU];
+        for (int i = 0; i < MODU; ++i)   table[i] = phrase_table;
+     
+        for (int i = 0; i < PHRASE_COUNT; ++i)
+            {
+              _phrase & e = phrase_table[i];
+              table[e.hash % MODU] = phrase_table + i;
+            }
+     
+        loop(ph, MODU)
+            {
+              print_PH_macro(out, ph, *table[ph], true);
+            }
+         delete [] table;
+      }
+   else        // search tree
+      {
+        expand_table();   // add internal nodes
+        loop (ph, expanded_table.size())   // for all parents
+            {
+              const _phrase & e_par = expanded_table[ph];
+              print_PH_macro(out, ph, e_par, false);
+            }
+      }
+
+   if (!hash)   fprintf(out, "#undef P0\n");  // parse tree
    fprintf(out,
-"};\n"
-"\n"
 "#undef PH\n"
 "\n"
-"#endif   // PH defined\n"
+"#endif   // PH(...) defined/not defined\n"
 "\n");
 }
 //-----------------------------------------------------------------------------
@@ -293,7 +493,7 @@ check_phrases()
          bool same = true;
          for (int l = 0; l < MAX_PHRASE_LEN; ++l)
              {
-               if (phrase_tab[ph].phrase[l] != phrase_tab[ph1].phrase[l])
+               if (phrase_table[ph].classes[l] != phrase_table[ph1].classes[l])
                   {
                     same = false;
                     break;
@@ -302,21 +502,22 @@ check_phrases()
 
          if (same)
             {
-              fprintf(stderr, "phrases %d and %d are the same\n", ph, ph1);
+              fprintf(stderr, "phrases %d (%s) and %d (%s) are the same\n",
+              ph, phrase_table[ph].get_suffix().c_str(),
+              ph1, phrase_table[ph1].get_suffix().c_str());
               assert(0);
-
             }
        }
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)
        {
-         const _phrase & e = phrase_tab[ph];
+         const _phrase & e = phrase_table[ph];
 
          // checks on all token classes
          //
          for (int l = 0; l < MAX_PHRASE_LEN; ++l)
              {
-               const TokenClass tc = e.phrase[l];
+               const TokenClass tc = e.classes[l];
                if (tc == TC_INVALID)   continue;
 
                if (tc >= TC_MAX_PHRASE)
@@ -332,9 +533,14 @@ check_phrases()
 int
 main(int argc, char * argv[])
 {
+FILE * out = stdout;
+bool hash = argc != 2 || strcmp(argv[1], "-t");
+
+// hash = false;   // OVERRIDE !!!!!!!!!!!!!!!!!!!!!
+
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)
        {
-         _phrase & e = phrase_tab[ph];
+         _phrase & e = phrase_table[ph];
 
          assert(e.len == 0);
          assert(e.hash == 0);
@@ -342,16 +548,16 @@ main(int argc, char * argv[])
 
          for (int l = 0; l < MAX_PHRASE_LEN; ++l)
              {
-               if (e.phrase[l] == SN_)   break;
+               if (e.classes[l] == SN_)   break;
                ++e.len;
-               e.hash += e.phrase[l] << power;
+               e.hash += e.classes[l] << power;
                power += 5;
              }
        }
 
    check_phrases();
-   print_phrases(stdout);
-   print_table(stdout);
+   print_phrases(out);
+   print_table(out, hash);
 
    return 0;
 }

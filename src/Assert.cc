@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <string.h>
 
 #include "Assert.hh"
@@ -27,54 +30,54 @@
 #include "IO_Files.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 /// prevent recursive do_Assert() calls.
 static bool asserting = false;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 do_Assert(const char * cond, const char * fun, const char * file, int line)
 {
-const int loc_len = strlen(file) + 40;
-char * loc = new char[loc_len + 1];
+char loc[FILENAME_MAX + 20];
 
    Log(LOG_delete)
-      CERR << "new    " << voidP(loc) << " at " LOC << endl;
+      get_CERR() << "new    " << voidP(loc) << " at " LOC << endl;
 
-   snprintf(loc, loc_len, "%s:%d", file, line);
-   loc[loc_len] = 0;
+   SPRINTF(loc, "%s:%d", file, line);
 
-   CERR << endl
+   get_CERR() << endl
         << "======================================="
            "=======================================" << endl;
 
 
    if (cond)       // normal assert()
       {
-        CERR << "Assertion failed: " << cond << endl
+        get_CERR() << "Assertion failed: " << cond << endl
              << "in Function:      " << fun  << endl
              << "in file:          " << loc  << endl << endl;
       }
    else if (fun)   // segfault etc.
       {
-        CERR << "\n\n================ " << fun <<  " ================\n";
+        get_CERR() << "\n\n================ " << fun <<  " ================\n";
       }
 
-   CERR << "Call stack:" << endl;
+   get_CERR() << "C/C++ call stack:" << endl;
 
    if (asserting)
       {
-        CERR << "*** do_Assert() called recursively ***" << endl;
+        get_CERR() << "*** do_Assert() called recursively ***" << endl;
       }
    else
       {
         asserting = true;
 
-        Backtrace::show(file, line);
+        BACKTRACE
 
-        CERR << endl << "SI stack:" << endl << endl;
-        Workspace::list_SI(CERR, SIM_SIS_dbg);
+        get_CERR() << endl << "SI stack:" << endl << endl;
+        Workspace::list_SI(get_CERR(), SIM_SIS_dbg);
       }
-   CERR << "======================================="
+   get_CERR() << "======================================="
            "=======================================" << endl;
 
    // count errors
@@ -87,5 +90,5 @@ char * loc = new char[loc_len + 1];
 
    throw E_ASSERTION_FAILED;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

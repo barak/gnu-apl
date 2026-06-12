@@ -50,24 +50,32 @@ enum C_CellType
    CCT_NUMERIC = CCT_INT | CCT_FLOAT | CCT_COMPLEX,
 };
 
-#ifdef __cplusplus
+// errors codes
+enum LIBAPL_error
+{
+#define err_def(c, _txt, major, minor)   LAE_ ## c = (major << 16 | minor),
+#include "Error.def"
+};
+
+#ifdef __cplusplus   // libapl used from C++
 
 class Value;
 typedef Value * APL_value;
 
 class Function;
-typedef Function * APL_function;
+typedef Function const * APL_function;
 extern "C" {
 
-#else   // C
+#else                // libapl used from C
 
 struct Value;
 typedef struct Value * APL_value;
+typedef enum LIBAPL_error LIBAPL_error;
 
 struct Function;
-typedef struct Function * APL_function;
+typedef struct Function const * APL_function;
 
-#endif
+#endif               // C++ vs. C
 
 /* Application Program Interface for GNU APL...
    See
@@ -98,19 +106,59 @@ extern void init_libapl(const char * progname, int log_startup);
 extern int expand_LF_to_CRLF(int on);
 
 /// Pass `line` to the interpreter for immediate execution as APL code.
-extern int apl_exec(const char * line_utf8);
+extern LIBAPL_error apl_exec(const char * line_utf8);
 
 /// Pass `line` to the interpreter for immediate execution as APL code.
 /// line_ucs is a 0-terminated string of unicode integers
-extern int apl_exec_ucs(const unsigned int * line_ucs);
+extern LIBAPL_error apl_exec_ucs(const unsigned int * line_ucs);
 
-/// Pass `command` to the command processor and return its output.
+/// Pass `command` to the command processor and return its output. The result
+/// was allocated with strndup(), therefore the caller must free() it.
 extern const char * apl_command(const char * command_utf8);
+
+/** perform one step (line) of a REPL loop. Return the file sequence
+    number > 0 from where the line was read, or 0 if all files in
+    InputFile::files_todo were read. Called with:
+
+    input_buffer:  a buffer allocated by the caller, or NULL if the
+                   APL input is not of interest
+    input_bufsize" size of the \b input_buffer
+    output_buffer: a buffer allocated by the caller, or NULL if the
+                    APL output is not of interest.
+    output_bufsize" size of the \b output_buffer
+
+   On return:
+
+    input_buffer:  APL input passed to APL. Always 0-terminated, but possibly
+                   truncted to fit the input_bufsize
+    input_bufsize: size of the \b input_buffer (before being truncated)
+    output_buffer: APL output from APL. Always 0-terminated, but possibly
+                   truncted to fit the output_bufsize
+    output_bufsize: size of the \b input_buffer (before being truncated)
+    error:         an error (typically IN/OUT_BUFFER_OVERFLOW).
+
+ **/
+extern long repl(char * input_buffer, int * input_bufsize,
+                 char * output_buffer, int * output_bufsize,
+                 LIBAPL_error * error);
+
+/// call repl() until all scripts were processed.
+#define SYNC_APL_SCRIPTS   { do ; while(repl(0, 0, 0, 0, 0)); }
 
 /// Pass `command` to the command processor and return its output. line_ucs
 /// is a 0-terminated string of unicode integers (and so is the result)
 /// caller shall free() the returned unsigned int *.
 extern const unsigned int * apl_command_ucs(const unsigned int * command_ucs);
+
+/// define an APL function with header function_lines[0] and body
+/// function_lines[1...N]. function_lines must be 0-terminated, i.e.
+/// function_lines[N+1] == NULL. fix_function() is a front-end for
+/// fix_function_NL() which is ofter more convenient to use.
+extern LIBAPL_error fix_function(const char ** function_lines_utf8);
+
+/// define an APL function with \b function_lines_utf8 being the header and
+/// function lines, separated by UNI_LF (= 0x0A).
+extern LIBAPL_error fix_function_NL(const char * function_lines_utf8);
 
 /// print \b string_ucs to \b out (for debugging purposes)
 extern void print_ucs(FILE * out, const unsigned int * string_ucs);
@@ -143,7 +191,8 @@ extern APL_value int_scalar(int64_t val, const char * loc);
 extern APL_value double_scalar(APL_Float val, const char * loc);
 
 /// A new complex scalar.
-extern APL_value complex_scalar(APL_Float real, APL_Float imag, const char * loc);
+extern APL_value complex_scalar(APL_Float real, APL_Float imag,
+                                const char * loc);
 
 /// A new character scalar.
 extern APL_value char_scalar(int unicode, const char * loc);
@@ -258,7 +307,8 @@ extern void set_int(int64_t new_double, APL_value val, uint64_t idx);
 extern void set_double(APL_Float new_real, APL_value val, uint64_t idx);
 
 /// val[idx]←new_real J new_imag
-extern void set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx);
+extern void set_complex(APL_Float new_real, APL_Float new_imag,
+                        APL_value val, uint64_t idx);
 
 /// val[idx]←new_value
 extern void set_value(APL_value new_value, APL_value val, uint64_t idx);
@@ -357,6 +407,11 @@ extern APL_value eval__L_oper_X_B(APL_function L, APL_function fun,
 /// dyadic operator oper with functions L and R, axis X, and argument B
 extern APL_value eval__L_oper_R_X_B(APL_function L, APL_function fun,
                                     APL_function R, APL_value X, APL_value B);
+
+/// lib APL is, by default, started in safe_mode (which disables some
+/// potentially dangerous functions and commands. disable_safe_mode() undoes
+/// that.
+extern void disable_safe_mode();
 
 #ifdef __cplusplus
 }

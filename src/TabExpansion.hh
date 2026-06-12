@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 
 #ifndef __TAB_EXPANSION_HH_DEFINED__
 
@@ -27,13 +30,16 @@
 /// result of a tab expansion
 enum ExpandResult
 {
-   /// no extension found: ignore the TAB
+   /// no extension found: ignore the TAB entered by the user.
    ER_IGNORE  = 0,
 
-   /// something has matched: replace the user string
+   /// something has matched: replace the user string. Returned if there
+   /// is a unique expansion of the string entered by the user.
    ER_REPLACE = 1,
 
-   /// some extensions have been shown, but the user string was not updated
+   /// some epansions have been displayed, but the user string was not
+   /// updated because the was no unique expansion.
+   /// because the
    ER_AGAIN = 2,
 };
 
@@ -64,9 +70,11 @@ enum ExpandHint
    EH_UCOMMAND,       ///< user-defined command
    EH_COUNT,          ///< count
    EH_BOXING,         ///< boxing parameter
-   EH_PRIMITIVE       ///< apl primitive
+   EH_PRIMITIVE,      ///< apl primitive
+   EH_CONFIG,         ///< config.h item (capability)
+   EH_oAUTO,          ///< optional AUTO
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class for doing interactivw Tab-expansion on input lines
 class TabExpansion
 {
@@ -74,39 +82,43 @@ public:
    /// constructor
    TabExpansion(UCS_string & line);
 
-   /// perform tab expansion
+   /// perform tab expansion of the user input \b line. ExpandResult says how
+   /// \b line was excapnded and line MAY have become longer.
    ExpandResult expand_tab(UCS_string & line);
 
 protected:
-   /// tab-expand a user-defined name
-   ExpandResult expand_user_name(UCS_string & user);
+   /// tab-expand a user-defined name (variable or defined function).
+   ExpandResult expand_user_name(UCS_string & user_input);
 
    /// tab-expand an APL command
-   ExpandResult expand_APL_command(UCS_string & user);
+   ExpandResult expand_APL_command(UCS_string & user_input);
 
    /// tab-expand a system-defined name (⎕xxx)
-   ExpandResult expand_distinguished_name(UCS_string & user);
+   ExpandResult expand_distinguished_name(UCS_string & user_input);
+
+   /// show the names of all APL capabilities (in config.h)
+   ExpandResult expand_capability(UCS_string & user);
 
    /// show the names of all APL primitives and user defined functions
    ExpandResult expand_help_topics();
 
    /// tab-expand or show help for user defined functions
-   ExpandResult expand_help_topics(UCS_string & user);
+   ExpandResult expand_help_topics(UCS_string & user_input);
 
    /// perform tab expansion for command arguments
-   ExpandResult expand_command_arg(UCS_string & user,
+   ExpandResult expand_command_arg(UCS_string & user_input,
                                    ExpandHint ehint,
                                    const char * shint,
                                    const UCS_string cmd,
                                    const UCS_string arg);
 
    /// perform tab expansion for a filename
-   ExpandResult expand_filename(UCS_string & user,
+   ExpandResult expand_filename(UCS_string & user_input,
                                 ExpandHint ehint, const char * shint,
                                 const UCS_string cmd, UCS_string arg);
 
    /// perform tab expansion for a workspace name
-   ExpandResult expand_wsname(UCS_string & line, const UCS_string cmd,
+   ExpandResult expand_wsname(UCS_string & user_input, const UCS_string cmd,
                               LibRef lib, const UCS_string filename);
 
    /// compute the lenght of the common part in all matches

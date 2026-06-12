@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <errno.h>
 #include <fcntl.h>           /* For O_* constants */
 #include <signal.h>
@@ -26,7 +29,6 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <unistd.h>
 
 #include <iomanip>
 
@@ -37,9 +39,14 @@
 #include "Svar_record.hh"
 #include "Svar_signals.hh"
 
+// get_CERR() is used inside and outside APL (and may be defined differently
+// outside APL). Inside APL get_CERR() is declared in Common.hh, but 
+// this file (Svar_record.cc) is also used outside APL where Common.hh can
+// not be #included.
+
 extern ostream & get_CERR();
 
-//=============================================================================
+//============================================================================
 const char *
 event_name(Svar_event ev)
 {
@@ -62,7 +69,7 @@ event_name(Svar_event ev)
 
    return "(unknown event)";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Svar_partner::print(ostream & out) const
 {
@@ -76,13 +83,13 @@ Svar_partner::print(ostream & out) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::remove_accepting()
 {
    accepting.clear();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::remove_offering()
 {
@@ -92,7 +99,7 @@ const AP_num3 offered_to = offering.id;
    accepting.clear();
    accepting.id = offered_to;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_Coupling
 Svar_record::retract()
 {
@@ -116,7 +123,7 @@ const SV_Coupling old_coupling = get_coupling();
 
    return old_coupling;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_record::is_ws_to_ws()   const
 {
@@ -125,7 +132,7 @@ Svar_record::is_ws_to_ws()   const
    return offering.id.proc  >= AP_FIRST_USER &&
           accepting.id.proc >= AP_FIRST_USER;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_record::match_name(const uint32_t * UCS_other) const
 {
@@ -145,7 +152,7 @@ Svar_record::match_name(const uint32_t * UCS_other) const
 
    return true;                                           // long name
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Svar_Control
 mirror(int flags)
 {
@@ -156,7 +163,7 @@ int ret = 0;
    if (flags & USE_BY_ACC)   ret |= USE_BY_OFF;
    return Svar_Control(ret);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Svar_Control
 Svar_record::get_control() const
 {
@@ -165,7 +172,7 @@ int ctl = offering.get_control() | accepting.get_control();
    if (ProcessorID::get_id() == accepting.id)   ctl = mirror(ctl);
    return Svar_Control(ctl);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::set_control(Svar_Control ctl)
 {
@@ -195,13 +202,13 @@ Svar_record::set_control(Svar_Control ctl)
         bad_proc(__FUNCTION__, ProcessorID::get_id());
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Svar_state
 Svar_record::get_state() const
 {
    return state;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::set_state(bool used, const char * loc)
 {
@@ -275,7 +282,7 @@ Svar_partner * peer = 0;
         peer->events = Svar_event(peer->events | event);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_record::may_use(int attempt)
 {
@@ -300,7 +307,7 @@ const int restriction = control & state;
       {
         if ((restriction & USE_BY_ACC) == 0)   return true;   // no restriction
 
-        if (offering.is_active() && (attempt == 0))   // maybe send event to peer
+        if (offering.is_active() && !attempt)   // maybe send event to peer
            {
              offering.events = Svar_event(offering.events |
                                           SVE_USE_BY_ACC_FAILED);
@@ -311,7 +318,7 @@ const int restriction = control & state;
    bad_proc(__FUNCTION__, ProcessorID::get_id());
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_record::may_set(int attempt)
 {
@@ -324,7 +331,7 @@ const int restriction = control & state;
       {
         if ((restriction & SET_BY_OFF) == 0)   return true;   // no restriction
 
-        if (accepting.is_active() && (attempt == 0))   // maybe send event to peer
+        if (accepting.is_active() && !attempt)   // maybe send event to peer
            {
              accepting.events = Svar_event(accepting.events |
                                            SVE_SET_BY_OFF_FAILED);
@@ -336,7 +343,7 @@ const int restriction = control & state;
       {
         if ((restriction & SET_BY_ACC) == 0)   return true;   // no restriction
 
-        if (offering.is_active() && (attempt == 0))   // maybe send event to peer
+        if (offering.is_active() && !attempt)   // maybe send event to peer
            {
              offering.events = Svar_event(offering.events |
                                           SVE_SET_BY_ACC_FAILED);
@@ -347,7 +354,7 @@ const int restriction = control & state;
    bad_proc(__FUNCTION__, ProcessorID::get_id());
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::bad_proc(const char * function, const AP_num3 & id) const
 {
@@ -355,7 +362,7 @@ Svar_record::bad_proc(const char * function, const AP_num3 & id) const
         << " does not match offering proc " << offering.id.proc
         << " nor accepting proc " << accepting.id.proc << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_record::print(ostream & out) const
 {
@@ -369,7 +376,7 @@ const Svar_state st = get_state();
    if (st & USE_BY_ACC)   out << "1│";   else   out << "0│";
    print_name(out, varname, 10) << "║" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Svar_record::print_name(ostream & out, const uint32_t * name, int len)
 {
@@ -412,4 +419,4 @@ Svar_record::print_name(ostream & out, const uint32_t * name, int len)
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

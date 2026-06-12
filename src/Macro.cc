@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdlib.h>
 
 #include "Assert.hh"
@@ -25,11 +28,10 @@
 
 Macro * Macro::all_macros[MAC_COUNT];
 
-//-----------------------------------------------------------------------------
-Macro::Macro(Macro_num num, const char * text)
-   : UserFunction(UCS_string(UTF8_string(text)), LOC, "Macro::Macro()",
-                  false, true),
-     macro_number(num)
+//----------------------------------------------------------------------------
+Macro::Macro(Macro_num num, const UTF8_string & text)
+   : UserFunction(UCS_string(text), LOC, "Macro::Macro()",
+                  false, true), macro_number(num)
 {
 // CERR << "MACRO: " << endl << text;
 
@@ -43,11 +45,11 @@ Macro::Macro(Macro_num num, const char * text)
         exit(1);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Macro::~Macro()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Macro *
 Macro::get_macro(Macro_num num)
 {
@@ -55,12 +57,12 @@ Macro::get_macro(Macro_num num)
    Assert(num < MAC_COUNT);
    return all_macros[num];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Macro::unmark_all_macros()
 {
 #define mac_def(name, _txt) get_macro(MAC_ ## name)->unmark_all_values();
 #include "Macro.def"
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

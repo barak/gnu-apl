@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __BIF_OPER2_INNER_HH_DEFINED__
 #define __BIF_OPER2_INNER_HH_DEFINED__
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator inner product.
  */
 /// The class implementing f.g
@@ -34,15 +37,14 @@ public:
    Bif_OPER2_INNER() : PrimitiveOperator(TOK_OPER2_INNER) {}
 
    /// Overloaded Function::eval_ALRB().
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
-   static Bif_OPER2_INNER * fun;   ///< Built-in function.
-   static Bif_OPER2_INNER  _fun;   ///< Built-in function.
+   static Bif_OPER2_INNER  fun;   ///< Built-in function.
 
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
-      { return true; }
+      { return false; }
 
    /// the context for an inner product
    struct PJob_product
@@ -69,7 +71,11 @@ protected:
 
    /// the main loop for an inner product with scalar functions
    static void PF_scalar_inner_product(Thread_context & tctx);
+
+   /// evaluate the fill function with arguments A and B
+   static Token fill(const Shape shape_Z, Value_P A, cFunction_P fun,
+                     Value_P B, const char * loc);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_INNER_HH_DEFINED__

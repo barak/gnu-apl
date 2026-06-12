@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ID_HH_DEFINED__
-# error This file shall NOT be #included directly, but by #including Id.hh
-#endif
+/** @file
+*/
 
 #ifndef __TOKENENUMS_HH_DEFINED__
 #define __TOKENENUMS_HH_DEFINED__
 
+#include "IdEnums.hh"
 /**
     The class tag of a token. Token classes < TC_MAX_PERM are permanent
     (e.g. used in user defined functions) while higher classes are
@@ -35,7 +35,7 @@ enum TokenClass
    // token classes.
    //
 
-   // permanent token classes. Token of these classes can appear in
+   // permanent token classes. Only Token of these classes can appear in
    // the body of a defined function.
    //
    TC_ASSIGN        = 0x01,   ///< ←
@@ -56,11 +56,14 @@ enum TokenClass
 
    TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
 
+   // token class aliases. We sometimes want to use TC_FUN1 or TC_FUN2
+   // for clarification, but both are TC_FUN12.
+   //
    TC_FUN1          = TC_FUN12,   ///< monadic function
    TC_FUN2          = TC_FUN12,   ///< dyadic function
 
-   // temporary token classes. Token of these classes can appear as
-   // intermediate results during tokenization and execution
+   // temporary Token classes. Token of these classes only appear as
+   // intermediate results during tokenization and prefix parsing
    //
    TC_PINDEX        = 0x10,   ///< partial index
    TC_VOID          = 0x11,
@@ -84,7 +87,7 @@ enum TokenClass
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
 
-   // short token class names for phrase table
+   // shorter token class aliases for the phrase table
    //
    SN_A             = TC_VALUE,
    SN_ASS           = TC_ASSIGN,
@@ -108,6 +111,35 @@ enum TokenClass
    SN_              = TC_INVALID
 };
 
+   /// return true if \b tcl is a niladic, monadic or dyadic function
+   inline bool is_function_class(TokenClass tcl)
+      {
+        enum { BITS = 1 << TC_FUN0 | 1 << TC_FUN1 | 1 << TC_FUN2 };
+        return BITS & 1 << tcl;
+      }
+
+   /// return true if \b tcl is a monadic or dyadic operator
+   inline bool is_operator_class(TokenClass tcl)
+      {
+        enum { BITS = 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
+      }
+
+   inline bool is_function_or_operator_class(TokenClass tcl)
+      {
+        enum { BITS = 1 << TC_FUN0  | 1 << TC_FUN1 | 1 << TC_FUN2
+                    | 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
+      }
+
+   /// return if tcl is a token class that needs a right argument
+   inline bool needs_B(TokenClass tcl)
+      {
+        enum { BITS = 1 << TC_FUN1  | 1 << TC_FUN2
+                    | 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
+      }
+
    /// binding strengths between token classes
 enum Binding_Strength
 {
@@ -122,9 +154,35 @@ enum Binding_Strength
    BS_ANY_BRA = 80    ///< ANY []  : [] to what is on its left
 };
 
-/**
-    The value type of a token
- **/
+   /// token class groups (class bitmaps)
+enum TokenClassGroup
+{
+   /// function with arguments
+   TCG_FUN12_OPER12 = 1 << TC_FUN12
+                    | 1 << TC_OPER1
+                    | 1 << TC_OPER2,
+
+   ///  something that has (or may produce) a value
+   TCG_MAY_GLUE     = 1 << TC_SYMBOL   // variable
+                    | 1 << TC_FUN0     // niladic function
+                    | 1 << TC_VALUE,   // value
+
+   /// ) or ]
+   TCG_R_PAR_BRA    = 1 << TC_R_PARENT
+                    | 1 << TC_R_BRACK,
+
+   /// classes X for which FUN in "X FUN B" can only be monadic.
+   TCG_NO_A         = 1 << TC_ASSIGN            //  ← FUN B
+                    | 1 << TC_R_ARROW           //  → FUN B
+                    | 1 << TC_L_BRACK           //  [ FUN B
+                    | 1 << TC_END               //  ◊ FUN B
+                    | 1 << TC_FUN12             //  + FUN B
+                    | 1 << TC_OPER1             // f/ FUN B
+                    | 1 << TC_L_PARENT,         // ( FUN B
+};
+   
+/// The value type of a token
+
 enum TokenValueType
 {
    // token value types. The token value type defines the type of the
@@ -140,17 +198,17 @@ enum TokenValueType
    TV_LIN           = 0x0600,   // Function_Line      .fun_line;
    TV_VAL           = 0x0700,   // Value_P            .apl_val;
    TV_INDEX         = 0x0800,   // IndexExpr *        .index_val;
-   TV_FUN           = 0x0900,   // Function *         .function;
+   TV_FUN           = 0x0900,   // Function_P         .function;
 };
 
 /**
      A token tag. It is comprised of 3 fields: a 16 bit Id, an 8 bit
      TokenValueType, and an 8 bit Token class.
 
-     Bit:  31............................16 15.............8 7-..............0
-          --------------------------------------------------------------------
-          |               Id               | TokenValueType |   TokenClass   |
-          --------------------------------------------------------------------
+     Bit:  31............................16 15.............8 7..............0
+          ├────────────────────────────────┼────────────────┼────────────────┤
+          │               Id               │ TokenValueType │   TokenClass   │
+          └────────────────────────────────┴────────────────┴────────────────┘
  **/
 enum TokenTag
 {
@@ -159,11 +217,23 @@ enum TokenTag
 #include "Token.def"
 
    TOK_FUN1 = TOK_FUN2,
-
+   TOK_NONE = -1,         // invalid tag
 };
 
+/// exchange TokenTags \b t1 and \b t2
 inline void
-Hswap(TokenTag & t1, TokenTag & t2)
-{ const TokenTag tmp = t1;   t1 = t2;   t2 = tmp; }
+swap(TokenTag & tag1, TokenTag & tag2)
+{ const TokenTag tmp = tag1;
+   tag1 = tag2;
+   tag2 = tmp;
+}
+
+/// return true for / ⌿ \ and ⍀
+inline bool
+is_SLASH_or_BACKSLASH(TokenTag tag)
+{
+   return tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+          tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1;
+}
 
 #endif // __TOKENENUMS_HH_DEFINED__

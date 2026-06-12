@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "NetworkConnection.hh"
 #include "SystemVariableCommand.hh"
 #include "emacs.hh"

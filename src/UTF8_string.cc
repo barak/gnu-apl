@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #include <string.h>
@@ -52,7 +55,7 @@
    6-byte encodings
 */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const UCS_string & ucs)
 {
    Log(LOG_char_conversion)
@@ -130,15 +133,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
-//-----------------------------------------------------------------------------
-UTF8_string::UTF8_string(const Value & value)
-{
-   loop(v, value.element_count())
-       {
-         *this += value.get_ravel(v).get_char_value() & 0xFF;
-       }
-}
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 UTF8_string::dump_hex(ostream & out, int max_bytes) const
 {
@@ -152,7 +147,7 @@ UTF8_string::dump_hex(ostream & out, int max_bytes) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 UTF8_string::toUni(const UTF8 * string, int & len, bool verbose)
 {
@@ -162,9 +157,9 @@ const uint32_t b0 = *string++;
 uint32_t bx = b0;   // the "significant" bits in b0
    if      ((b0 & 0xE0) == 0xC0)   { len = 2;   bx &= 0x1F; }
    else if ((b0 & 0xF0) == 0xE0)   { len = 3;   bx &= 0x0F; }
-   else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x0E; }
-   else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x0E; }
-   else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x0E; }
+   else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x07; }
+   else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x03; }
+   else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x01; }
    else if (verbose)
       {
         CERR << "Bad UTF8 sequence: " << HEX(b0);
@@ -203,7 +198,17 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+int
+UTF8_string::bytes_chars(const void * string)
+{
+const UTF8 * str = utf8P(string);
+int ret = 0;
+
+   while (*str)   { if (0x80 == (0xC0 & *str++))   ++ret; }
+   return ret;
+}
+//----------------------------------------------------------------------------
 Unicode
 UTF8_string::getc(istream & in)
 {
@@ -245,7 +250,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UTF8_string::starts_with(const char * path) const
 {
@@ -259,7 +264,7 @@ const size_t path_len = strlen(path);
    loop(p, path_len)   if (at(p) != path[p])   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UTF8_string::ends_with(const char * ext) const
 {
@@ -273,7 +278,7 @@ const size_t ext_len = strlen(ext);
    loop(e, ext_len)   if (at(size() - ext_len + e) != ext[e])   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UTF8_string::un_HTML(int in_HTML)
 {
@@ -282,7 +287,7 @@ bool got_tag = false;
    loop(src, size())
       {
         const char cc = at(src);
-        if (in_HTML == 2)   // in HTML header, i.e. < seen
+        if (in_HTML == 2)   // inside HTML tag, i.e. < seen
            {
              if (cc == '>')   in_HTML = 1;   // in HTML but not in HTML tag
              continue;
@@ -290,7 +295,7 @@ bool got_tag = false;
 
         if (cc == '<')   // start of HTML tag
            {
-             in_HTML = 2;   // in HTML tag
+             in_HTML = 2;   // now inside HTML tag
              got_tag = true;
              continue;
            }
@@ -301,26 +306,59 @@ bool got_tag = false;
              continue;
            }
 
+        // at this point cc == '&' which is the start of an HTML-escaped
+        // character. This can be:
+        //
+        // &NN;  with decimal digits NN...,        or
+        // &#XX;  with hexadecimal digits XX...,   or (incomplete list)
+        // &gt;   for >,                           or
+        // &lt;   for <
+        //
+        // There exist more HTML escapes, but the function producing them
+        // (i.e. UCS_string::to_HTML()) does not emit them.
+        //
         const int rest = size() - src;
-        if (rest > 5 && at(src + 1) == '#' && at(src + 4) == ';')
+        if (rest > 3 && at(src + 1) == '#' &&
+            strchr("0123456789", at(src + 2)))
            {
-             const long val = strtol(charP(&at(src + 2)), 0, 10);
+             src += 2;   // skip "&#"
+             int val = 0;
+             char * end = 0;
+             if (at(src) == 'x')   // hex value
+                {
+                  ++src;   // skip "x"
+                  val = strtoll(c_str() + src, &end, 16);
+                }
+             else                 // decimal
+                {
+                  val = strtoll(c_str() + src, &end, 10);
+                }
              at(dest++) = val;
-             src += 4;
+             src = end - c_str();   // skip hex or decimal digits
+             // ";" skipped by loop()
            }
-        else if (rest > 4 && at(src + 1) == 'g' &&
+        else if (rest > 3 && at(src + 1) == 'g' &&
                              at(src + 2) == 't' &&
                              at(src + 3) == ';')
            {
              at(dest++) = '>';
-             src += 3;   // skip gt;
+             src += 3;   // skip "gt;"
            }
-        else if (rest > 4 && at(src + 1) == 'l' &&
+        else if (rest > 3 && at(src + 1) == 'l' &&
                              at(src + 2) == 't' &&
                              at(src + 3) == ';')
            {
              at(dest++) = '<';
-             src += 3;   // skip gt;
+             src += 3;   // skip "lt;"
+           }
+        else if (rest > 4 && at(src + 1) == 'n' &&
+                             at(src + 2) == 'b' &&
+                             at(src + 3) == 's' &&
+                             at(src + 4) == 'p' &&
+                             at(src + 5) == ';')
+           {
+             at(dest++) = ' ';
+             src += 5;   // skip "nbsp;"
            }
         else
            {
@@ -332,7 +370,15 @@ bool got_tag = false;
    resize(dest);
    return in_HTML;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+uint64_t
+UTF8_string::long_value() const
+{
+uint64_t ret = 0;
+   loop(j, size())   ret = 10*ret + (at(j) - UNI_0);
+   return ret;
+}
+//----------------------------------------------------------------------------
 bool
 UTF8_string::round_0_1()
 {
@@ -363,18 +409,19 @@ UTF8_string::round_0_1()
    pop_back();
    return true;   // 1.0 → 0.1
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// declared in PrintOperator.hh
 ostream &
-operator<<(ostream & os, const UTF8_string & utf)
+operator <<(ostream & os, const UTF8_string & utf)
 {
    loop(c, utf.size())   os << utf[c];
    return os;
 }
-//=============================================================================
+//============================================================================
 int
 UTF8_filebuf::overflow(int c)
 {
    data += c;
    return 0;
 }
-//=============================================================================
+//============================================================================

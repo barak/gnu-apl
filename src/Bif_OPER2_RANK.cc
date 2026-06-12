@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER2_RANK.hh"
 #include "IntCell.hh"
@@ -25,43 +28,42 @@
 #include "PointerCell.hh"
 #include "Workspace.hh"
 
-Bif_OPER2_RANK   Bif_OPER2_RANK::_fun;
-Bif_OPER2_RANK * Bif_OPER2_RANK::fun = &Bif_OPER2_RANK::_fun;
+Bif_OPER2_RANK   Bif_OPER2_RANK::fun;
 
 /* general comment: we use the term 'chunk' instead of 'p-rank' to avoid
  * confusion with the rank of a value
  */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B)
+Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B) const
 {
-   if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
-      B = B->get_ravel(0).get_pointer_value();
+   if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
+      B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_B = B->get_rank();
    y123_to_B(y.get_apl_val(), rank_chunk_B);
 
    return do_LyXB(LO, Value_P(), B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B)
+Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B) const
 {
-   if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
-      B = B->get_ravel(0).get_pointer_value();
+   if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
+      B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_B = B->get_rank();
 
    y123_to_B(y.get_apl_val(), rank_chunk_B);
 
    return do_LyXB(LO, X, B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, Rank rank_chunk_B)
+Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, sRank rank_chunk_B)
 {
-Function * LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
@@ -70,7 +72,7 @@ Function * LO = _LO.get_function();
 const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
    if (shape_Z.is_empty())
       {
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
         Token tZ = LO->eval_fill_B(Fill_B);
         Value_P Z = tZ.get_apl_val();
         Z->set_shape(B->get_shape());
@@ -81,66 +83,67 @@ const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
 const Shape shape_B = B->get_shape().low_shape(rank_chunk_B);
 
 Value_P vsh_B(shape_B.get_rank(), LOC);
-   new (&vsh_B->get_ravel(0)) IntCell(0);   // prototype
+   vsh_B->set_proto_Int();   // prototype
    loop(sh, shape_B.get_rank())
-            new (vsh_B->next_ravel()) IntCell(shape_B.get_shape_item(sh));
+       vsh_B->next_ravel_Int(shape_B.get_shape_item(sh));
    vsh_B->check_value(LOC);
 
 Value_P vsh_Z(shape_Z.get_rank(), LOC);
    loop(sh, shape_Z.get_rank())
-            new (vsh_Z->next_ravel()) IntCell(shape_Z.get_shape_item(sh));
+       vsh_Z->next_ravel_Int(shape_Z.get_shape_item(sh));
    vsh_Z->check_value(LOC);
 
 Value_P X5(5, LOC);
-   if (!X)   new (X5->next_ravel())   IntCell(-1);                // no X
-   else      new (X5->next_ravel())   PointerCell(X.get(), X5.getref());   // X
+   if (!X)   X5->next_ravel_Int(-1);            // ¯1 means no X
+   else      X5->next_ravel_Pointer(X.get());
 
-   new (X5->next_ravel())   IntCell(shape_B.get_volume());        // LB
-   new (X5->next_ravel())   PointerCell(vsh_B.get(), X5.getref());      // rho_B
-   new (X5->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
-   new (X5->next_ravel())   PointerCell(vsh_Z.get(), X5.getref());      // rho_Z
+   X5->next_ravel_Int(shape_B.get_volume());    // LB
+   X5->next_ravel_Pointer(vsh_B.get());         // rho_B
+   X5->next_ravel_Int(shape_Z.get_volume());    // N_max
+   X5->next_ravel_Pointer(vsh_Z.get());         // rho_Z
    X5->check_value(LOC);
+
    return Macro::get_macro(Macro::MAC_Z__LO_RANK_X5_B)->eval_LXB(_LO, X5, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B)
+Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B) const
 {
-   if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
-      B = B->get_ravel(0).get_pointer_value();
+   if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
+      B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_A = A->get_rank();
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_A = A->get_rank();
+sRank rank_chunk_B = B->get_rank();
    y123_to_AB(y.get_apl_val(), rank_chunk_A, rank_chunk_B);
 
    return do_ALyXB(A, rank_chunk_A, LO, Value_P(), B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y,
-                           Value_P X, Value_P B)
+                           Value_P X, Value_P B) const
 {
-   if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
-      B = B->get_ravel(0).get_pointer_value();
+   if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
+      B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_A = A->get_rank();
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_A = A->get_rank();
+sRank rank_chunk_B = B->get_rank();
 
    y123_to_AB(y.get_apl_val(), rank_chunk_A, rank_chunk_B);
 
    return do_ALyXB(A, rank_chunk_A, LO, X, B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::do_ALyXB(Value_P A, Rank rank_chunk_A, Token & _LO,
-                         Value_P X, Value_P B, Rank rank_chunk_B)
+Bif_OPER2_RANK::do_ALyXB(Value_P A, sRank rank_chunk_A, Token & _LO,
+                         Value_P X, Value_P B, sRank rank_chunk_B)
 {
-Function * LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
-Rank rk_A_frame = A->get_rank() - rank_chunk_A;   // rk_A_frame is y8
-Rank rk_B_frame = B->get_rank() - rank_chunk_B;   // rk_B_frame is y9
+sRank rk_A_frame = A->get_rank() - rank_chunk_A;   // rk_A_frame is y8
+sRank rk_B_frame = B->get_rank() - rank_chunk_B;   // rk_B_frame is y9
 
    // if both high-ranks are 0, then return A LO B.
    //
@@ -161,8 +164,8 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
 
    if (shape_Z.is_empty())
       {
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P Fill_A = Bif_F12_TAKE::first(*A);
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -174,7 +177,7 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
         Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
 
         Value_P Z(shape_Z, LOC);
-        Z->get_ravel(0).init_from_value(Z1.get(), Z.getref(), LOC);
+        Z->set_ravel_Value(0, Z1.get());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -187,28 +190,22 @@ Value_P vsh_B(LOC, &low_B);
 Value_P vsh_Z(LOC, &shape_Z);
 
 Value_P X7(7, LOC);
-   if (!X)   new (X7->next_ravel())   IntCell(-1);              // no X
-   else      X7->next_ravel()->init_from_value(X.get(), X7.getref(), LOC);
+   if (!X)   X7->next_ravel_Int(-1);                    // no X
+   else      X7->next_ravel_Value(X.get());
 
-   new (X7->next_ravel())   IntCell(low_A.get_volume());        // LA
-
-   X7->next_ravel()->init_from_value(vsh_A.get(), X7.getref(), LOC);
-
-   new (X7->next_ravel())   IntCell(low_B.get_volume());        // LB
-
-   X7->next_ravel()->init_from_value(vsh_B.get(), X7.getref(), LOC);
-
-   new (X7->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
-
-   X7->next_ravel()->init_from_value(vsh_Z.get(), X7.getref(), LOC);
-
+   X7->next_ravel_Int(low_A.get_volume());           // LA
+   X7->next_ravel_Value(vsh_A.get());
+   X7->next_ravel_Int(low_B.get_volume());           // LB
+   X7->next_ravel_Value(vsh_B.get());
+   X7->next_ravel_Int(shape_Z.get_volume());         // N_max
+   X7->next_ravel_Value(vsh_Z.get());
    X7->check_value(LOC);
    return Macro::get_macro(Macro::MAC_Z__A_LO_RANK_X7_B)
-               ->eval_ALXB(A, _LO, X7, B);
+                           ->eval_ALXB(A, _LO, X7, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::y123_to_B(Value_P y123, Rank & rank_B)
+Bif_OPER2_RANK::y123_to_B(Value_P y123, sRank & rank_B)
 {
    // y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
    // "frame" and a (lower-dimensions) "chunk" as specified by y123.
@@ -218,7 +215,7 @@ Bif_OPER2_RANK::y123_to_B(Value_P y123, Rank & rank_B)
    //    Remember the rank of B to limit rank_B
    //    if values in y123 should exceed them.
    //
-const Rank rk_B = rank_B;
+const sRank rk_B = rank_B;
 
    if (!y123)                   VALUE_ERROR;
    if ( y123->get_rank() > 1)   DOMAIN_ERROR;
@@ -235,14 +232,14 @@ const Rank rk_B = rank_B;
 
    switch(y123->element_count())
       {
-        case 1: rank_B = y123->get_ravel(0).get_near_int();   break;
+        case 1: rank_B = y123->get_cfirst().get_near_int();   break;
 
-        case 2:          y123->get_ravel(0).get_near_int();
-                rank_B = y123->get_ravel(1).get_near_int();   break;
+        case 2:          y123->get_cfirst().get_near_int();
+                rank_B = y123->get_cravel(1).get_near_int();   break;
 
-        case 3: rank_B = y123->get_ravel(0).get_near_int();
-                         y123->get_ravel(1).get_near_int();
-                         y123->get_ravel(2).get_near_int();   break;
+        case 3: rank_B = y123->get_cfirst().get_near_int();
+                         y123->get_cravel(1).get_near_int();
+                         y123->get_cravel(2).get_near_int();   break;
 
         default: LENGTH_ERROR;
       }
@@ -254,9 +251,9 @@ const Rank rk_B = rank_B;
    if (rank_B < 0)      rank_B += rk_B;
    if (rank_B < 0)      rank_B = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::y123_to_AB(Value_P y123, Rank & rank_A, Rank & rank_B)
+Bif_OPER2_RANK::y123_to_AB(Value_P y123, sRank & rank_A, sRank & rank_B)
 {
    // y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
    // "frame" and a (lower-dimensions) "chunk" as specified by y123.
@@ -266,8 +263,8 @@ Bif_OPER2_RANK::y123_to_AB(Value_P y123, Rank & rank_A, Rank & rank_B)
    //    Remember the ranks of A and B to limit rank_A and rank_B
    //    if values in y123 should exceed them.
    //
-const Rank rk_A = rank_A;
-const Rank rk_B = rank_B;
+const sRank rk_A = rank_A;
+const sRank rk_B = rank_B;
 
    if (!y123)                   VALUE_ERROR;
    if ( y123->get_rank() > 1)   DOMAIN_ERROR;
@@ -285,15 +282,15 @@ const Rank rk_B = rank_B;
 
    switch(y123->element_count())
       {
-        case 1:  rank_A = y123->get_ravel(0).get_near_int();
+        case 1:  rank_A = y123->get_cfirst().get_near_int();
                  rank_B = rank_A;                            break;
 
-        case 2:  rank_A = y123->get_ravel(0).get_near_int();
-                 rank_B = y123->get_ravel(1).get_near_int();  break;
+        case 2:  rank_A = y123->get_cfirst().get_near_int();
+                 rank_B = y123->get_cravel(1).get_near_int();  break;
 
-        case 3:           y123->get_ravel(0).get_near_int();
-                 rank_A = y123->get_ravel(1).get_near_int();
-                 rank_B = y123->get_ravel(2).get_near_int();  break;
+        case 3:           y123->get_cfirst().get_near_int();
+                 rank_A = y123->get_cravel(1).get_near_int();
+                 rank_B = y123->get_cravel(2).get_near_int();  break;
 
         default: LENGTH_ERROR;
       }
@@ -309,7 +306,7 @@ const Rank rk_B = rank_B;
    if (rank_B < 0)      rank_B += rk_B;
    if (rank_B < 0)      rank_B = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_RANK::split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B)
 {
@@ -343,15 +340,15 @@ const ShapeItem length = y123_B->element_count();
 
    // check for case 1 (the only one with nested first element)
    //
-   if (y123_B->get_ravel(0).is_pointer_cell())   // (y123)
+   if (y123_B->get_cfirst().is_pointer_cell())   // (y123)
       {
-         y123 = y123_B->get_ravel(0).get_pointer_value();
+         y123 = y123_B->get_cfirst().get_pointer_value();
          if (length == 1)        // empty B
             {
             }
          else if (length == 2)   // skalar B
             {
-              const Cell & B0 = y123_B->get_ravel(1);
+              const Cell & B0 = y123_B->get_cravel(1);
               if (B0.is_pointer_cell())   // (B)
                  {
                    B = B0.get_pointer_value();
@@ -359,15 +356,14 @@ const ShapeItem length = y123_B->element_count();
               else
                  {
                    B = Value_P(LOC);
-                   B->next_ravel()->init(B0, B.getref(), LOC);
+                   B->next_ravel_Cell(B0);
                  }
             }
          else                    // vector B
             {
               B = Value_P(length - 1, LOC);
               loop(l, length - 1)
-                  B->next_ravel()->init(y123_B->get_ravel(l + 1),
-                                        B.getref(), LOC);
+                  B->next_ravel_Cell(y123_B->get_cravel(l + 1));
             }
          y123->check_value(LOC);
          B->check_value(LOC);
@@ -381,7 +377,7 @@ int y123_len = 0;
    loop(yy, 3)
       {
         if (yy >= length)   break;
-        const Cell & cy = y123_B->get_ravel(yy);
+        const Cell & cy = y123_B->get_cravel(yy);
         if (cy.is_near_int())   ++y123_len;
         else                                          break;
       }
@@ -400,12 +396,11 @@ int y123_len = 0;
       }
 
    if (length == (y123_len + 1) &&
-       y123_B->get_ravel(y123_len).is_pointer_cell())   // case 3. y123:⊂B
+       y123_B->get_cravel(y123_len).is_pointer_cell())   // case 3. y123:⊂B
       {
         y123 = Value_P(y123_len, LOC);
-        loop(yy, y123_len)
-            y123->next_ravel()->init(y123_B->get_ravel(yy), y123.getref(), LOC);
-        B = y123_B->get_ravel(y123_len).get_pointer_value();
+        loop(yy, y123_len)   y123->next_ravel_Cell(y123_B->get_cravel(yy));
+        B = y123_B->get_cravel(y123_len).get_pointer_value();
         y123->check_value(LOC);
         B->check_value(LOC);
         return;
@@ -414,13 +409,11 @@ int y123_len = 0;
    // case 4: y123:B...
    //
    y123 = Value_P(y123_len, LOC);
-   loop(yy, y123_len)
-       y123->next_ravel()->init(y123_B->get_ravel(yy), y123.getref(), LOC);
+   loop(yy, y123_len)   y123->next_ravel_Cell(y123_B->get_cravel(yy));
 
 const ShapeItem B_len = length - y123_len;
    B = Value_P(B_len, LOC);
-   loop(bb, B_len)
-       B->next_ravel()->init(y123_B->get_ravel(bb + y123_len), B.getref(), LOC);
+   loop(bb, B_len)   B->next_ravel_Cell(y123_B->get_cravel(bb + y123_len));
    B->check_value(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

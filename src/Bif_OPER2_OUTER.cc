@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,27 +18,134 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Bif_OPER1_REDUCE.hh"
 #include "Bif_OPER2_OUTER.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Macro.hh"
 #include "Workspace.hh"
 
-Bif_JOT          Bif_JOT        ::_fun;
-Bif_OPER2_OUTER  Bif_OPER2_OUTER::_fun;
-
-Bif_JOT         * Bif_JOT        ::fun = &Bif_JOT        ::_fun;
-Bif_OPER2_OUTER * Bif_OPER2_OUTER::fun = &Bif_OPER2_OUTER::_fun;
+Bif_JOT          Bif_JOT        ::fun;
+Bif_OPER2_OUTER  Bif_OPER2_OUTER::fun;
 
 Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+Token Bif_JOT::eval_AB(Value_P A, Value_P B) const
+{
+   // compute A∘B ←→ A +.× B
+   //
+   if (A->get_rank() > 2)   RANK_ERROR;
+   if (B->get_rank() > 2)   RANK_ERROR;
+
+   // ranks are valid. check that A and B are numeric (so that we can depend
+   // on it below instead of testing it multiple times.
+   //
+   loop(a, A->nz_element_count())
+       {
+         if (!A->get_cravel(a).is_numeric())   DOMAIN_ERROR;
+       }
+
+   loop(b, B->nz_element_count())
+       {
+         if (!B->get_cravel(b).is_numeric())   DOMAIN_ERROR;
+       }
+
+ShapeItem rows_A;
+ShapeItem cols_A;
+ShapeItem rows_B;
+ShapeItem cols_B;
+   if (A->get_rank() == 1)   // (row-)vector A ∘ matrix B
+      {
+        rows_A = 1;
+        cols_A = A->element_count();
+        rows_B = B->get_rows();
+        cols_B = B->get_cols();
+      }
+   else if (B->get_rank() == 1)   // matrix A ∘ (column-)vector B
+      {
+        rows_A = A->get_rows();
+        cols_A = A->get_cols();
+        rows_B = B->element_count();
+        cols_B = 1;
+      }
+   else
+      {
+        rows_A = A->get_rows();
+        cols_A = A->get_cols();
+        rows_B = B->get_rows();
+        cols_B = B->get_cols();
+      }
+
+   if (cols_A != rows_B &&
+       !(A->is_scalar_or_len1_vector() || B->is_scalar_or_len1_vector()))
+      {
+        MORE_ERROR() << "A∘B: A has " << cols_A <<
+                        " rows, but B has " << rows_B << " rows";
+        LENGTH_ERROR;
+      }
+
+const ShapeItem len_AB = cols_A;
+
+Shape shape_Z(rows_A, cols_B);
+Value_P Z(shape_Z, LOC);
+
+   loop(a, rows_A)
+       {
+         const Cell * cA = &A->get_cravel(a * cols_A);   // start of row A[a;]
+         loop(b, cols_B)
+             {
+               const Cell * cB = &B->get_cravel(b);   // start of column B];b]
+               APL_Float real = 0;
+               APL_Float imag = 0;
+               bool need_complex = false;
+               loop(ab, len_AB)   // column of A × row of B
+                  {
+                    const Cell & aa = *(cA + ab);
+                    const Cell & bb = *(cB + ab*cols_B);
+                    real += aa.get_real_value() * bb.get_real_value();
+                    if (aa.is_complex_cell())   // complex aa and any b
+                       {
+                         need_complex = true;
+                         if (bb.is_complex_cell())   // complex aa and bb
+                            {
+                              real -= aa.get_imag_value() *
+                                      bb.get_imag_value();
+                              imag += aa.get_real_value() *
+                                      bb.get_imag_value();
+                              imag += aa.get_imag_value() *
+                                      bb.get_real_value();
+                            }
+                         else                        // complex aa and real bb
+                            {
+                              imag += aa.get_imag_value() *
+                                      bb.get_real_value();
+                            }
+                       }
+                    else if (bb.is_complex_cell())   // real aa and complex bb
+                       {
+                         need_complex = true;
+                         imag += aa.get_real_value() * bb.get_imag_value();
+                       }
+                  }
+               if (need_complex)   Z->next_ravel_Complex(real, imag);
+               else                Z->next_ravel_Number(real);
+             }
+       }
+
+   Z->set_default(*B.get(), LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
 Token
-Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B)
+Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {
    if (!_RO.is_function())    SYNTAX_ERROR;
 
-Function * RO = _RO.get_function();
+cFunction_P RO = _RO.get_function();
    Assert(RO);
 
    if (!RO->has_result())   DOMAIN_ERROR;
@@ -51,11 +158,11 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
    //
    if (RO->get_scalar_f2() && A->is_simple() && B->is_simple())
       {
-        job.cZ     = &Z->get_ravel(0);
-        job.cA     = &A->get_ravel(0);
+        job.cZ     = &Z->get_wfirst();
+        job.cA     = &A->get_cfirst();
         job.ZAh    = A->element_count();
         job.RO     = RO->get_scalar_f2();
-        job.cB     = &B->get_ravel(0);
+        job.cB     = &B->get_cfirst();
         job.ZBl    = B->element_count();
         job.ec     = E_NO_ERROR;
 
@@ -70,11 +177,11 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
 
    if (Z->is_empty())
       {
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P Fill_A = Bif_F12_TAKE::first(*A);
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
 
         Value_P Z1 = RO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
-        Z->get_ravel(0).init(Z1->get_ravel(0), Z.getref(), LOC);
+        Z->set_ravel_Cell(0, Z1->get_cfirst());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -93,8 +200,8 @@ Value_P RO_B;
 
    loop(z, len_Z)
       {
-        const Cell * cA = &A->get_ravel(z / len_B);
-        const Cell * cB = &B->get_ravel(z % len_B);
+        const Cell * cA = &A->get_cravel(z / len_B);
+        const Cell * cB = &B->get_cravel(z % len_B);
 
         if (cA->is_pointer_cell())
            {
@@ -102,8 +209,8 @@ Value_P RO_B;
            }
         else
            {
-             RO_A = Value_P(LOC);
-             RO_A->get_ravel(0).init(*cA, RO_A.getref(), LOC);
+             RO_A = Value_P(LOC);   // scalar RO_A
+             RO_A->set_ravel_Cell(0, *cA);
            }
 
         if (cB->is_pointer_cell())
@@ -112,8 +219,8 @@ Value_P RO_B;
            }
         else
            {
-             RO_B = Value_P(LOC);
-             RO_B->get_ravel(0).init(*cB, RO_B.getref(), LOC);
+             RO_B = Value_P(LOC);   // scalar RO_B
+             RO_B->set_ravel_Cell(0, *cB);
            }
 
         Token result = RO->eval_AB(RO_A, RO_B);
@@ -125,7 +232,7 @@ Value_P RO_B;
       if (result.get_Class() == TC_VALUE)
          {
            Value_P ZZ = result.get_apl_val();
-           Z->next_ravel()->init_from_value(ZZ.get(), Z.getref(), LOC);
+           Z->next_ravel_Value(ZZ.get());
            continue;
          }
 
@@ -139,11 +246,11 @@ Value_P RO_B;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
 #endif
 
@@ -169,13 +276,13 @@ const uint64_t start_1 = cycle_counter();
         PF_scalar_outer_product(Thread_context::get_master());
       }
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_OUTER_AB.add_sample(end_1 - start_1,
                                              job.ZAh * job.ZBl);
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::PF_scalar_outer_product(Thread_context & tctx)
 {
@@ -194,4 +301,4 @@ ShapeItem end_z = z + slice_len;
         if (job.ec != E_NO_ERROR)   return;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

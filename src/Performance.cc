@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <iomanip>
 
 #include <math.h>
@@ -30,8 +33,9 @@
 /* Note:
    perfo_1: monadic cell statistics
    perfo_2: dyadic cell statistics
-   perfo_3: monadic function statistics
-   perfo_4: dyadic function statistics
+   perfo_3: APL statistics
+   perfo_4: misc other statistics
+   optim:   optimization counters
  */
 
 #define perfo_1(id, ab, _name, _thr) \
@@ -43,6 +47,8 @@
 #define perfo_4(id, ab, _name, _thr) \
    FunctionStatistics Performance::fs_ ## id ## ab (PFS_ ## id ## ab);
 #include "Performance.def"
+
+int64_t OptmizationStatistics::optimization_counters[OPT_COUNTER_COUNT];
 
 //----------------------------------------------------------------------------
 Statistics::~Statistics()
@@ -295,7 +301,7 @@ Statistics_record::print5(ostream & out, uint64_t num)
 char cc[40];
    if (num < 100000)   // special case: no multiplier
       {
-        snprintf(cc, sizeof(cc), "%5u", uint32_t(num));
+        SPRINTF(cc, "%5u", uint32_t(num));
         out << cc;
         return;
       }
@@ -312,7 +318,7 @@ double fnum = num;
         fnum = fnum / 1000.0;
       }
 
-   snprintf(cc, sizeof(cc), "%f", fnum);
+   SPRINTF(cc, "%f", fnum);
    if (cc[3] == '.')    { cc[3] = 0;   out << " " << cc << *units; }
    else                 { cc[4] = 0;   out << cc << *units;        }
 }
@@ -339,7 +345,7 @@ void
 FunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
-   snprintf(cc, sizeof(cc), "%s,", perf_name);
+   SPRINTF(cc, "%s,", perf_name);
    outf << "prf_3 (PFS_" << left << setw(12) << cc << right;
    vec_cycles.save_record(outf);
    outf << ")" << endl;
@@ -364,7 +370,7 @@ void
 CellFunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
-   snprintf(cc, sizeof(cc), "%s,", perf_name);
+   SPRINTF(cc, "%s,", perf_name);
    outf << "prf_12(PFS_" << left << setw(12) << cc << right;
    first.save_record(outf);
    outf << ",";

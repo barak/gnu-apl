@@ -15,7 +15,7 @@ The ISO standard implemented by GNU APL can be found here:
 
     www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
 
-Note that this file is, despite of its .pdf extension, a gzip compressed
+Note that this file is, despite its .pdf extension, a gzip compressed
 PDF file. You have to fetch it, rename it, and then gunzip it:
 
     wget www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
@@ -29,15 +29,15 @@ IBM Documentation
 In cases where the ISO 13751 standard was not clear, the IBM documents
 for APL2 were consulted as a second opinion:
 
-    www.catpad.net/michael/apl/ibmapl2/apl2lrm.pdf
+    www.ibm.com/downloads/cas/ZOKMYKOY
 
 
 Dyalog APL Manual
 -----------------
 
-Dyalog Ltd. a commercial APL vendor, has published a book describing
-their APL in great detail. Not all features described there are implemented
-in GNU APL, but this book is a good starting point for beginners.
+Dyalog Ltd. a commercial APL vendor, has published a book describing their
+APL in great detail. Not all features described there are implemented in
+GNU APL, but this book is a good starting point for beginners.
 
     www.dyalog.com/mastering-dyalog-apl.htm
 
@@ -63,7 +63,7 @@ The doc directory in the GNU APL package
 ----------------------------------------
 The doc directory contains some more files in different formats. Most of them
 are installed in other places, for example in the info system, or (in HTML) at:
-https://www.gnu.org/software/apl/apl.html.  Some of the filesin the doc
+https://www.gnu.org/software/apl/apl.html.  Some of the files in the doc
 directory are targeting specific platforms, for example the file
 APL-on-Macintosh.pdf written by Peter Teeson.
 

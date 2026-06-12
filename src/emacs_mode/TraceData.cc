@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "TraceData.hh"
 #include "LockWrapper.hh"
 #include "FollowCommand.hh"
@@ -50,27 +53,32 @@ void TraceData::remove_listener( NetworkConnection *connection )
     }
 }
 
-void TraceData::display_value_for_trace( ostream &out, const Value_P &value, int cr_level )
+void
+TraceData::display_value_for_trace( ostream &out, Value_P value, int cr_level)
 {
-    if( cr_level < 0 ) {
+   if (cr_level < 0)
+      {
         PrintContext context( PST_NONE, Workspace::get_PP(), 100000 );
         value->print1( out, context );
-    }
-    else {
-        if( cr_level < 1 || cr_level > 9 ) {
-            throw ConnectionError( "Illegal CR level" );
-        }
-        PrintContext context( PST_NONE, Workspace::get_PP(), 100000 );
-        Value_P cr_formatted = Quad_CR::do_CR( cr_level, value.get(), context);
+       }
+    else
+       {
+         if (cr_level < 1 || cr_level > 9 )
+            {
+              throw ConnectionError( "Illegal CR level" );
+            }
 
-        PrintContext context2( PST_NONE, Workspace::get_PP(), 100000 );
-        cr_formatted->print1( out, context2 );
-    }
+         PrintContext context(PST_NONE, Workspace::get_PP(), 100000);
+         Value_P cr_formatted = Quad_CR::do_CR(cr_level, value.get(), context);
+
+         PrintContext context2(PST_NONE, Workspace::get_PP(), 100000);
+         cr_formatted->print1(out, context2);
+      }
 }
-
+//----------------------------------------------------------------------------
 void TraceData::send_update( Symbol_Event ev )
 {
-    const Value_P v = symbol->get_value();
+    const Value_P v = symbol->get_apl_value();
 
     for( map<NetworkConnection *, TraceDataEntry>::iterator it = active_listeners.begin()
              ; it != active_listeners.end()

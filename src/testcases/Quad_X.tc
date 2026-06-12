@@ -8,16 +8,16 @@
 ∇
 
 
-   AVG[1] 5 6⍴⍳30
+      AVG[1] 5 6⍴⍳30
 13 14 15 16 17 18
 
-   AVG[2] 5 6⍴⍳30
+      AVG[2] 5 6⍴⍳30
 3.5 9.5 15.5 21.5 27.5
 
 
       ⍝ R is used twice in AVG[1] so we get two errors...
       ⍝
-   AVG[3] 5 6⍴⍳30
+      AVG[3] 5 6⍴⍳30   ⍝ → index error for [3]
 INDEX ERROR+
 AVG[1]  Z←+/[X]R÷(⍴R)[X]
                  ^   ^
@@ -25,8 +25,11 @@ AVG[1]  Z←+/[X]R÷(⍴R)[X]
       ⎕X
 3
 
+      ⎕L
+5 6
+
       ⎕X←1
-      →⍬
+      →⍬   ⍝ → axis error for [3]
 AXIS ERROR
 AVG[1]  Z←+/[X]R÷(⍴R)[X]
           ^    ^

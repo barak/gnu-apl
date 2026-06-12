@@ -1,0 +1,33 @@
+received by email to bug-apl@gnu.org on June 12, 2020...
+--------------------------------------------------------
+
+I've been working on apl code that will reset the X windows keyboard so that
+one may use the 'Windows' key as an additional shift key for the Functions an
+operators.
+
+I've tested the attached workspace on Debian and Ubuntu with success. I'm
+hoping that some one will test other distributions. The code calls  setxkbmap
+so the first test is at the command line:
+
+dalyw@andelot:~$ setxkbmap -query
+rules:      evdev
+model:      pc105
+layout:     us
+
+An example session:
+
+      kbd_on
+0
+      '∘∘∘∆∆∆∇∇∇'        ⍝ To test the windows key
+∘∘∘∆∆∆∇∇∇
+      kbd_off
+      'jjjhhhggg'        ⍝ To test the windows key
+jjjhhhggg
+
+This change survives the current session so )off has no effect nor does
+logging out.  Rebooting will reset X winodows and your keyboard mapping.
+
+Please send me your results.
+
+w
+

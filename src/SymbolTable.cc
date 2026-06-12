@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #include <string.h>
@@ -36,7 +39,9 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+#include "Workspace.icc"
+
+//----------------------------------------------------------------------------
 Symbol *
 SymbolTable::lookup_symbol(const UCS_string & sym_name)
 {
@@ -83,7 +88,7 @@ Symbol * sym = new Symbol(sym_name, ID_USER_SYMBOL);
    add_symbol(sym);
    return sym;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 SymbolTable::find_lambda_name(const UserFunction * lambda)
 {
@@ -92,13 +97,14 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
          for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
                if (sym->is_erased())   continue;
-               if (sym->get_ufun_depth(lambda) != -1)   return sym->get_name();
+               if (sym->get_exec_ufun_depth(lambda) != -1)
+                  return sym->get_name();
              }
        }
 
    return UCS_string();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
 {
@@ -125,7 +131,7 @@ const Symbol * sym = Workspace::lookup_existing_symbol(buf);
 
    return out << "no symbol '" << buf1 << "'" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
 {
@@ -144,7 +150,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-std::vector<Symbol *> list;
+std::basic_string<Symbol *> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -176,7 +182,7 @@ int symbol_count = 0;
 
                if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
-               const NameClass nc = sym->value_stack.back().name_class;
+               const NameClass nc = sym->value_stack.back().get_NC();
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
                    ((nc == NC_FUNCTION)         && (which & LIST_FUNS))    ||
                    ((nc == NC_OPERATOR)         && (which & LIST_OPERS))   ||
@@ -209,8 +215,8 @@ UCS_string_vector names;
         UCS_string name = list[l]->get_name();
         if (which == LIST_NAMES)   // append .NC
            {
-             name.append(UNI_ASCII_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().name_class);
+             name.append(UNI_FULLSTOP);
+             name.append_number(list[l]->value_stack.back().get_NC());
            }
         names.push_back(name);
       }
@@ -220,7 +226,7 @@ UCS_string_vector names;
    // figure column widths
    //
    enum { tabsize = 4 };
-std::vector<int> col_widths;
+std::basic_string<int> col_widths;
    names.compute_column_width(tabsize, col_widths);
 
    loop(c, count)
@@ -243,7 +249,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::unmark_all_values() const
 {
@@ -255,7 +261,7 @@ SymbolTable::unmark_all_values() const
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 SymbolTable::show_owners(ostream & out, const Value & value) const
 {
@@ -269,7 +275,7 @@ int count = 0;
        }
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 {
@@ -281,26 +287,24 @@ SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
 {
-int error_count = 0;
+size_t error_count = 0;
    loop(s, symbols.size())
        {
-         const bool error = erase_one_symbol(symbols[s]);
-         if (error)
+         if (erase_one_symbol(symbols[s]))
             {
+              if (error_count == 0)   out << "NOT ERASED:";
               ++error_count;
-              if (error_count == 1)   // first error
-                 out << "NOT ERASED:";
               out << " " << symbols[s];
             }
        }
 
    if (error_count)   out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::clear(ostream & out)
 {
@@ -310,7 +314,7 @@ SymbolTable::clear(ostream & out)
 
    loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::clear_slot(ostream & out, int hash)
 {
@@ -338,10 +342,16 @@ Symbol * next;   // the symbol after sym
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 SymbolTable::erase_one_symbol(const UCS_string & sym)
 {
+   if (sym.contains(UNI_FULLSTOP))   // member access
+      {
+         const int result = Quad_EX::expunge(sym);
+         return result != 1;
+      }
+
 Symbol * symbol = lookup_existing_symbol(sym);
 
    if (symbol == 0)
@@ -350,25 +360,25 @@ Symbol * symbol = lookup_existing_symbol(sym);
         return true;
       }
 
-      if (symbol->is_erased())
-         {
-           if (symbol->value_stack.size() == 1)
-              {
-                MORE_ERROR() << "Can't )ERASE symbol '"
-                             << sym << "': already erased";
-                return true;
-              }
-           else   // still holding a value
-              {
-                symbol->clear_vs();
-                return false;
-              }
-         }
+   if (symbol->is_erased())
+      {
+        if (symbol->value_stack.size() == 1)
+           {
+             MORE_ERROR() << "Can't )ERASE symbol '"
+                          << sym << "': already erased";
+             return true;
+           }
+        else   // still holding a value
+           {
+             symbol->clear_vs();
+             return false;
+           }
+      }
 
    if (symbol->value_stack.size() != 1)
       {
         MORE_ERROR() << "Can't )ERASE symbol '" << sym
-                     << "': symbol is pushed (localized)";
+                     << "': symbol is localized";
         return true;
       }
 
@@ -379,9 +389,9 @@ Symbol * symbol = lookup_existing_symbol(sym);
         return true;
       }
 
-ValueStackItem & tos = symbol->value_stack[0];
+ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
 
-   switch(tos.name_class)
+   switch(tos.get_NC())
       {
         case NC_LABEL:
              Assert(0 && "should not happen since stack height == 1");
@@ -396,21 +406,21 @@ ValueStackItem & tos = symbol->value_stack[0];
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             Assert(tos.sym_val.function);
-             if (tos.sym_val.function->is_native())
+             Assert(tos.get_function());
+             if (tos.get_function()->is_native())
                 {
                   symbol->expunge();
                   return false;
                 }
 
-             if (tos.sym_val.function->is_lambda())
+             if (tos.get_function()->is_lambda())
                 {
                   symbol->expunge();
                   return false;
                 }
 
              {
-               const UserFunction * ufun = tos.sym_val.function->get_ufun1();
+               const UserFunction * ufun = tos.get_function()->get_func_ufun();
                Assert(ufun);
                if (Workspace::oldest_exec(ufun))
                   {
@@ -420,9 +430,8 @@ ValueStackItem & tos = symbol->value_stack[0];
                   }
              }
 
-             delete tos.sym_val.function;
-             tos.sym_val.function = 0;
-             tos.name_class = NC_UNUSED_USER_NAME;
+             delete tos.get_function();
+             tos.clear_function();
              return false;
 
         default: break;
@@ -431,11 +440,11 @@ ValueStackItem & tos = symbol->value_stack[0];
     Assert(0 && "Bad name_class in SymbolTable::erase_one_symbol()");
    return true;
 }
-//-----------------------------------------------------------------------------
-std::vector<const Symbol *>
+//----------------------------------------------------------------------------
+std::basic_string<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
-std::vector<const Symbol *> ret;
+std::basic_string<const Symbol *> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -448,11 +457,11 @@ std::vector<const Symbol *> ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-std::vector<const Symbol *> symbols;
+std::basic_string<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
@@ -484,8 +493,8 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-         if      (vs.name_class == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
-         else if (vs.name_class == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
+         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
+         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
       }
 
    // pass 2: variables
@@ -494,10 +503,10 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-        if (vs.name_class == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
+        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
       }
 }
-//=============================================================================
+//============================================================================
 void
 SystemSymTab::clear(ostream & out)
 {
@@ -507,7 +516,7 @@ SystemSymTab::clear(ostream & out)
 
    loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemSymTab::clear_slot(ostream & out, int hash)
 {
@@ -524,7 +533,7 @@ SystemName * sym = symbol_table[hash];
          sym = next;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
                        QuadFunction * function, SystemVariable * variable)
@@ -540,4 +549,4 @@ SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
    if (max_name_len < name.size())   max_name_len = name.size();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

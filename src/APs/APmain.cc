@@ -40,7 +40,7 @@
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 extern bool LOG_startup;
 extern bool LOG_shared_variables;
 extern bool LOG_Svar_DB_signals;
@@ -51,6 +51,7 @@ bool LOG_Svar_DB_signals = false;
 #endif
 
 extern const char * prog_name();
+extern bool verbose;
 
 //-----------------------------------------------------------------------------
 
@@ -66,8 +67,8 @@ vector<Coupled_var> coupled_vars;
 /// the place where the AP specific part has detected an error
 string error_loc = "?";
 
-/// the name of this AP (aplXXX where XXX is the processor number)
-char AP_NAME[40] = "ap" STR(AP_NUM);
+/// the name of this AP (apXXX where XXX is the processor number)
+char AP_NAME[40] = "AP" STR(AP_NUM);
 
 AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
@@ -186,7 +187,7 @@ bool auto_started = false;
 
    prog = argv[0];
 char bin_path[FILENAME_MAX];
-   strncpy(bin_path, prog, sizeof(bin_path));
+   strncpy(bin_path, prog, sizeof(bin_path) - 1);
 
 char * slash = strrchr(bin_path, '/');
    if (slash)
@@ -229,7 +230,7 @@ char * slash = strrchr(bin_path, '/');
 
    if (need_help)   return usage();
 
-   snprintf(AP_NAME, sizeof(AP_NAME), "apl%u", ProcessorID::get_id().proc);
+   snprintf(AP_NAME, sizeof(AP_NAME), "AP%u", ProcessorID::get_id().proc);
 
    // serious attempt to run: run in the background
    //
@@ -284,8 +285,10 @@ string progname(prog_name());
        {
          uint8_t buff[MAX_SIGNAL_CLASS_SIZE + 40000];
          char * del = 0;
-         const Signal_base * signal = Signal_base::recv_TCP(tcp2, (char *)buff,
-                                                         sizeof(buff), del, 0);
+         const char * err_loc = 0;
+         const Signal_base * signal =
+               Signal_base::recv_TCP(tcp2, (char *)buff, sizeof(buff),
+                                     del, 0, &err_loc);
 
          if (signal == 0)   // no signal for 10 seconds
             {
@@ -352,7 +355,7 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
 
                               if (coupled_vars.size() == 0 && auto_started)
                                  {
-                                   if (verbose)      get_CERR() << AP_NAME << " done"
+                                   verbose && get_CERR() << AP_NAME << " done"
                                       " (last variable retracted)" << endl;
                                    goon  = false;
                                    break;
@@ -409,8 +412,9 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
                          if (key == cv.key)
                             {
                               found = true;
-                              error_loc = LOC;   error = assign_value(cv,
-                                         signal->get__ASSIGN_VALUE__cdr_value());
+                              error_loc = LOC;
+                              error = assign_value(cv,
+                                      signal->get__ASSIGN_VALUE__cdr_value());
                               break;
                            }
                        }
@@ -437,6 +441,11 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
        }
 
    return 0;
+}
+
+int64_t get_main()
+{
+   return reinterpret_cast<int64_t>(&main);
 }
 //-----------------------------------------------------------------------------
 ostream & operator << (ostream & out, const AP_num3 & ap3)

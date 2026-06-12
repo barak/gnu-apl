@@ -1,0 +1,45 @@
+⍝ Quad_PNG.tc
+⍝ ----------------------------------
+
+       ]NEXTFILE no-⎕PNG        ⍝ done if ⎕PNG is not available
+       ]NEXTFILE no-GTK3        ⍝ done if GTK is not available
+
+      ⍝ create a 4×5  random image, RGB, 16-bit precision
+      ⍝
+      IMAGE←(1.0× ? 3 100 200⍴$10000)÷$10000
+
+      HANDLE←⎕PNG IMAGE        ⍝ display IMAGE
+
+      HANDLE = ⎕PNG HANDLE     ⍝ close the display windows
+1
+
+      '/tmp/xxx' ⎕PNG IMAGE    ⍝ write IMAGE to file /tmp/xxx
+
+      IMAGE1←⎕PNG '/tmp/xxx'   ⍝ read file back
+
+      (⍴IMAGE) ≡ ⍴IMAGE1
+1
+
+      ⍝ GNU APL uses floating point pixels in the range [0.0 - 1.0]. PNG uses
+      ⍝ integer values instead. Converting APL pixels to PNG pixels will
+      ⍝ therefore cause small rounding errors. For that reason we cannot
+      ⍝ IMAGE ≡ IMAGE1 but instead use the maximum difference between
+      ⍝ IMAGE and IMAGE1
+      ⍝
+      ⊢MAX_DIFF←⌈/∣,IMAGE-IMAGE1   ⍝ max. pixel difference
+²
+      MAX_DIFF<0.1
+1
+
+      )ERASE IMAGE IMAGE1 HANDLE MAX_DIFF
+
+      )HOST rm /tmp/xxx
+
+0 
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

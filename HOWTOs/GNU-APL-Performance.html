@@ -1,0 +1,1097 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
+<title>Performance Measurement in GNU APL</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overridden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Performance Measurement in GNU APL</h1>
+<span id="author">Jürgen Sauermann, GNU APL</span><br />
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This document describes two methods for measuring the performance of GNU APL.
+The purpose of such measurements is to find locations in the source code that
+perform poorly.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_methods">Methods</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_gprof_profiling">gprof profiling</h3>
+<div class="paragraph"><p><strong>gprof</strong> is a command line tool that measures how the CPU time of an APL
+session is distributed over the different GNU APL source files.</p></div>
+<div class="sect3">
+<h4 id="_preparation">Preparation</h4>
+<div class="paragraph"><p>Profiling with <strong>gprof</strong> requires that the enire GNU APL code is compiled
+with specific compiler flags. The GNU APL build system sets these flags
+if <strong>gprof</strong> is desired. The simplest way to set these flags is to simply run:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>make gprof   # set proper compiler flags in make
+make -C src clean all</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>in the top-level GNU APL directory.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_measurement">Measurement</h4>
+<div class="paragraph"><p>For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>cd src
+./apl -T testcases_3/*tc   # produce file gmon.out
+gprof ./apl gmon.out &gt; profile   # produce file 'profile' from file gmon.out</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The example above profiles GNU APL over all testcases in directory
+<strong>src/testcases_3</strong>. It is up to the user to determine what is being profiled (a
+somewhat broad profile over all GNU APL primitives in the example above. To
+obtain a more narrow profile, say for specific APL primitives, you should:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Write an APL workspace (or a testcase file) that executes the function of
+interest in a narrow APL loop, then
+</p>
+</li>
+<li>
+<p>
+Run apl with that workspace, and finally
+</p>
+</li>
+<li>
+<p>
+run gprof with the output file created by step 2. above (by convention this
+file is named <strong>gprof.out</strong>).
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>As another, more detailed, example, say we want to profile the APL matrix
+division, i.e. the APL code <strong>A ⌹ B</strong>. The workspace in step 1. above could
+then be this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>#!./apl --script
+
+∇LOOP COUNT
+L: ⊣A⌹B ◊ →(0 &lt; COUNT←COUNT-1)⍴L
+∇
+
+      loop_count←1000000         ⍝ keep APL busy with A ⌹ B
+      N←10
+
+      A←⎕RVAL 1 (,N) (0 0 0 1)    ⍝ a random 10 element complex vector
+      B←⎕RVAL 2 (N,N) (0 0 0 1)   ⍝ a random 10×10 complex matrix
+
+
+      LOOP loop_count   ⍝ run the loop loop_count times</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In step 2. we run the workpace (in directory src):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>./apl -f workspaces/GPROF_LOOP.apl # invoke apl with the above script file</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In step 3. we analyze the result <strong>gmon.out</strong> of step 2. The file <strong>gmon.out</strong> is
+a hard to read binary file with the measurement results. Step 3 converts this
+binary file into a human-readable statistics file named <strong>profile</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>gprof ./apl gmon.out &gt; profile</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The text file <strong>profile</strong> then contains a breakdown of the CPU time spent in
+different source code functions. Some notes may help to achieve a meaningful
+profile:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+make sure that the APL code focuses on the function(s) of interest,
+</p>
+</li>
+<li>
+<p>
+avoid producing any output (the interpreter blocks on output, which may
+  obfuscate the profile).
+</p>
+</li>
+<li>
+<p>
+make the loop run long enough; particularly when the profiled footprint is
+  small. Otherwise some small function may be missing entirely in the profile.
+  The longer the loop runs the more reliable is the result. An execution time
+  of one minute is a good starting point for a simple APL primitive.
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cpu_cycle_counters">CPU cycle counters</h3>
+<div class="paragraph"><p>GNU APL has a number of built-in CPU cycle counters that are spread over
+some GNU APL source files of interest. The existing counters are defined
+in <strong>src/Performance.def</strong>. The counters generate a small runtime overhead
+and therefore have to be enabled explicitly. For example with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>./configure PERFORMANCE_COUNTERS_WANTED=yes ,,,</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The <strong>./configure</strong> option <strong>DEVELOP_WANTED=yes</strong> automatically sets
+<strong>PERFORMANCE_COUNTERS_WANTED=yes</strong>, but also other debug features that may
+have performance impacts.</p></div>
+<div class="paragraph"><p>The counters are mananged from APL via <strong>⎕FIO</strong>. Every counter has a unique
+ID and can be cleared (before a measurement is started) and read (after a
+measurement). For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>    ⊣ ⎕FIO[200] 16            ⍝ clear CPU cycle counter for dyadic A ÷ B
+    ⊣ 42.1 ÷ ⍳ 1000           ⍝ perform 1000 divisions
+      8 ⎕CR (⎕FIO[201] 16)    ⍝ read counter for dyadic A ÷ B
+┌→────────────────────────────────────────────┐
+│2 ┌→────┐ 1 3087 9529569 999 370713 182857673│
+│  │A ÷ B│                                    │
+│  └─────┘                                    │
+└ϵ────────────────────────────────────────────┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The result <strong>Z</strong> of <strong>Z←⎕FIO[201]</strong> is an 8 item vector:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Z[1]</strong> statistics type. The statistics types are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+1 for the Cell operations of a monadic scalar APL function. That is, the
+   time for <em>one vector item</em>,
+</p>
+</li>
+<li>
+<p>
+2 for the Cell operations of a dyadic scalar APL function. That is, the
+   time for <em>one vector item</em>,
+</p>
+</li>
+<li>
+<p>
+3 for a monadic APL primitive. That is, the time for <em>one vector</em>, or
+</p>
+</li>
+<li>
+<p>
+4  for a dyadic APL primitive. That is, the time for <em>one vector</em>.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>Z[2]</strong> statistics name (the APL operation that was measured),
+</p>
+</li>
+<li>
+<p>
+<strong>Z[3]</strong> the number of executions of the first APL vector item. <strong>Z[3]</strong> is <strong>N</strong>
+   if, e.g. <strong>N</strong> vectors were measured in a loop, and is 1 if no loop is used
+   (like in the example above).
+</p>
+</li>
+<li>
+<p>
+<strong>Z[4]</strong> the (sum of) CPU cycles of the first APL vector item. Therefore
+  <strong>Z[4] ÷ Z[3]</strong> is the average number of CPU cycles
+</p>
+</li>
+<li>
+<p>
+<strong>Z[5]</strong> the (sum of) the squares of the CPU cycles of all the first APL vector
+  items. (To compute the variance). If <strong>Z[3] ←→ 1</strong> (one vectror measured) then
+  <strong>Z[4]×Z[4] ←→ Z[5]</strong>,
+</p>
+</li>
+<li>
+<p>
+<strong>Z[6]</strong> number of executions of all subsequent APL vector items
+</p>
+</li>
+<li>
+<p>
+<strong>Z[7]</strong> the (sum of) CPU cycles of all subsequent APL vector items,
+</p>
+</li>
+<li>
+<p>
+<strong>Z[8]</strong> the (sum of) the squares of the CPU cycles of the all subsequent APL
+       vector items. (To compute the variance),
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In 1990 a particular APL operation, when executed again and again, would have
+always used the same number of CPU cycles in every pass. These days, modern
+CPUs feature a number of optimizations (caching, branch prediction, etc.)
+that cause the number of CPU cycles for the same APL operations to differ
+considerably. To get a better understanding of the varying CPU cycles:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Z[2 3 4] are the CPU cycles for the first item of every APL vector while
+</p>
+</li>
+<li>
+<p>
+Z[5 6 7] are the CPU cycles for all subsequent vector items. The former is
+  normally considerably larger due to the instruction and data caches of the
+  CPU,
+</p>
+</li>
+<li>
+<p>
+<strong>Z[3] ÷ Z[2]</strong> and <strong>Z[6] ÷ Z[5]</strong> are the <strong>average number</strong> of CPU cycles for
+  the respective (i.e. first vs. subsequent) measurements, and
+</p>
+</li>
+<li>
+<p>
+<strong>(Z[4]⋆0.5) ÷ Z[2]</strong> and <strong>Z[7] ÷ Z[5]</strong> are the statistical <strong>variances</strong> of the
+first and subsequent CPU cycles respectively.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The output above, i.e.:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>┌→────────────────────────────────────────────┐
+│2 ┌→────┐ 1 3087 9529569 999 370713 182857673│
+│  │A ÷ B│                                    │
+│  └─────┘                                    │
+└ϵ────────────────────────────────────────────┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>tells us: The statistics type <strong>Z[1]</strong> was <strong>2</strong> (which, BTW, corresponds to macro
+<strong>perfo_2()</strong> in <strong>Performance.def</strong>. The operation <strong>Z[2]</strong> measured by that
+statistics was <strong>A ÷ B</strong>. The first division, i.e. <strong>42.1 ÷ ↑⍳1000 ←→ 42.1 ÷ 1</strong>,
+took Z[4] ←→ 3087 CPU cycles. The Z[6] ←→ 999 subsequent divisions,
+i.e. <strong>42.1 ÷ 1↓⍳1000 ←→ 42.1 ÷ 2 3 4 &#8230; 1000</strong> took 370713 CPU cycles total,
+or 370713 ÷ 999 ←→ 371 CPU cycles per division. The comparison between the
+first division (3087 CPU cycles) and the average of the subsequent
+divisions (371 CPU cycles) demonstarates the effect of caching, etc. Since
+there was only one first vector item, the variance is the square of that item,
+i.e. Z[5] ←→ 9529569 ←→ 3087×3087 ←→ Z[4]×Z[4] (a single item always has a
+variance of 0). If we had run <strong>A ÷ B</strong> in a loop, say N times, then:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Z[3] ←→ N,
+</p>
+</li>
+<li>
+<p>
+Z[4] ÷ N ←→ the average CPU cycles for the first item,
+</p>
+</li>
+<li>
+<p>
+Z[6] ÷ (N×999) ←→ the average CPU cycles for subsequent items,
+</p>
+</li>
+<li>
+<p>
+usually Z[5] ≠ Z[4]×Z[4] because the CPU cycles for the first element (in
+  each of the N iterations) vary.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In statistics we learn that:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Variance(X) ←→ ExpectationX - Expectation(X²), and
+</p>
+</li>
+<li>
+<p>
+StandardDeviation(X) ←→ Variance(X) ⋆ 0.5.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The triples <strong>Z[3 4 5]</strong> and <strong>Z[6 7 8]</strong> therefore provide all the information
+that is needed to compute the Expectation and the Variance of the first and
+of all subsequent vector items. GNU APL ships with a handful of workspaces
+(search for <strong>get_statistics</strong> in the <strong>.apl</strong> files) that measure and plot the
+benchmarking of some scalar APL functions.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_parallel_tuning">Parallel Tuning</h3>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2024-03-14 14:48:59 CET
+</div>
+</div>
+</body>
+</html>

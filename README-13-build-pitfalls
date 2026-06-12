@@ -1,0 +1,30 @@
+
+The following is a collection of pitfalls that were observed when
+building GNU APL:
+
+
+1. libapl with ⎕FFT support (thanks to Chris Moller)
+----------------------------------------------------
+
+If you build libapl, i.e. you ./configure GNU APL like:
+
+    ./configure --with-libapl ...
+
+and build libfftw3 from source (e.g. from fftw-3.3.10.tar.gz),
+
+then you need to make sure that not only the static library (i.e.
+/usr/local/lib/libfftw3.a) but also the shared libraries (i.e.
+libfftw3.so are being built and installed. The default ./configure
+of libfftw3 seems to only build the static libraries on some platforms.
+
+To do so, ./configure libfftw3 (not GNU APL!) like:
+
+    ./configure --enable-shared
+
+When libfftw3 is installed from a Debian package (as opposed to building
+from source) then the shared libraries will most likely be installed and
+no further action is required.
+
+The advice above is supposedly also valid for other libraries that augment
+the functionality of GNU APL.
+

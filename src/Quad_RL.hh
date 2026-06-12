@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __QUAD_RL_HH_DEFINED__
 #define __QUAD_RL_HH_DEFINED__
 
 #include "SystemVariable.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System variable Quad-RL (Random Link).  */
 class Quad_RL : public SystemVariable
 {
@@ -57,6 +60,6 @@ protected:
    /// state of the random number generator
    static uint64_t state;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif //  __QUAD_RL_HH_DEFINED__
 

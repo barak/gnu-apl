@@ -1,0 +1,24 @@
+⍝ ZZ56_Regression.tc
+⍝ ------------------
+
+      )CLEAR
+CLEAR WS
+
+      data←1 2 3 ('ABCDE' (10 20 30 40 50 60 70))
+      save←data
+      ⊃data save
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+      ⍴⊂data
+
+      ⊃data save
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+
+      Q← 0⍴⊂data
+
+      ⊃data save
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+ 1 2 3   ABCDE  10 20 30 40 50 60 70  
+
+

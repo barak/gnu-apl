@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef SQLITE_ARG_LIST_BUILDER_HH
 #define SQLITE_ARG_LIST_BUILDER_HH
 
@@ -25,7 +28,8 @@
 #include "SqliteConnection.hh"
 #include "ArgListBuilder.hh"
 
-class SqliteArgListBuilder : public ArgListBuilder {
+class SqliteArgListBuilder : public ArgListBuilder
+{
 public:
     SqliteArgListBuilder( SqliteConnection *connection_in, const string &sql );
     virtual ~SqliteArgListBuilder();
@@ -37,10 +41,10 @@ public:
     virtual void clear_args( void );
 
 private:
-    void init_sql( void );
+    void init_sql();
     string sql;
-    SqliteConnection *connection;
-    sqlite3_stmt *statement;
+    SqliteConnection * connection;
+    sqlite3_stmt * statement;
 };
 
 #endif

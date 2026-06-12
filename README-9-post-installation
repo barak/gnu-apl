@@ -10,11 +10,11 @@ performed by a system administrator with access permissions to directories like
 /etc or /usr/), some additional setup activities by the user are normally
 required. The user can try out GNU APL before this additional setup, but some
 APL commands such as )SAVE will not work because the creation and specification
-of directories that are used for storing for files created by the user are the
+of directories that are used for storing files created by the user are the
 responsibility of the user and not of the system administrator. 
 
-The description below assume that ./configure of GNU APL was executed without a 
-prefix= option. If the prefix option was used then some of the paths further
+The description below assumes that ./configure of GNU APL was executed without
+a prefix= option. If the prefix option was used then some of the paths further
 down in this document may differ accordingly.
 
 The "make install" procedure should have created a directory
@@ -29,19 +29,18 @@ The "make install" procedure should have created a directory
 This directory contains:
 
         keyboard1.txt           a default USA PC104 keyboard layout
-        keyboard2.txt           a default International PC105 layout
         parallel_thresholds     a presentation settings for apl  multitasking 
         preferences             a file to tailor apl for your system
 
 This next section describes configuring GNU-APL using the preferences file.
 The preference file comes pre-configured, but in some instances, the 
-global contents may not suit your requirements. One example, is that 
-you need to maintain a private copy of some workspaces, or modify apl actions.
+global contents may not suit your requirements. Examples include the need to
+maintain a private copy of some workspaces or modify some apl actions.
 
-In this situation you may choose to create a directory with a copy of above
-directory contents below your home directory. If so, then the name of that
-directory should be $(HOME)/.config/gnu-apl/. The easiest way of creating
-this directory and its initial content is the shell command:
+In this situation you may choose to create a sub-directory with a copy of the
+above directory contents in your home directory. If so, then the name of that
+directory should be $(HOME)/.config/gnu-apl/. The easiest way to create
+this sub-directory and its initial content is the shell command:
 
     cp -dR /etc/gnu-apl.d $HOME/.config/gnu-apl
 
@@ -52,7 +51,7 @@ directories in your ./configure command.
 1.1   KEYBOARDS
 ===============
 There are two physical keyboards predominately in use. One is the popular
-American  keyboard layout, model pc104, shown below as Keyboard1.txt:
+American keyboard layout, model pc104, shown below as Keyboard1.txt:
 
 PC104 USA Standard Keyboard:
 ===========================
@@ -63,10 +62,10 @@ PC104 USA Standard Keyboard:
 ║       ║ Q  ║ W⍹ ║ E⍷ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║
 ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \⊢  ║
 ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣
-║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
-║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
+║ (CAPS   ║ A⍶ ║ S« ║ D» ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║         ║
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║
 ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═════════╣
-║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
+║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║
 ║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║
 ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝
 
@@ -89,7 +88,7 @@ PC105 International standard Keyboard
 ║  SHIFT ║ > °║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT      ║
 ╚════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩═════════════╝
 
-The 'preference' file will have a parameter setting to select one or other
+The 'preference' file will have a parameter setting to select one or the other
 layout. More about this later.  
 
 
@@ -98,8 +97,8 @@ layout. More about this later.
 
 2.1  Introduction
 =================
-The 'preferences' files contain parameters settings that control the behavior
-of the GNU APL interpreter. Most of the setting can also be controlled by
+The 'preferences' file contains parameter settings that control the behavior
+of the GNU APL interpreter. Most of the settings can also be controlled by
 corresponding command line options, but for most settings it is more convenient
 to specify them once in one of the preferences files than by command line
 options in every invocation of GNU APL.
@@ -114,41 +113,42 @@ The settings will allow you to:
 
 The 'preferences' file should reside:
 
- (1) in directory GNU-APL.d of the system configuration directory. or
- (2) in directory .GNU-APL in the user's home directory.
+ (1) in directory gnu-apl.d of the system configuration directory. or
+ (2) in directory .config/gnu-apl in the user's home directory.
  (3) in both mentioned directories (see below)
 
- In both cases the configuration file name within each must be 'preferences'
+In both cases the configuration file name within each must be 'preferences'
 
-The system configuration directory is usually for GNU/Linux is /usr/local/etc/ 
-or  /etc. During the setup of GNU-APL (refer to README-2-configuration) you have
-the  opportunity to choose a different location. It can be overridden at compile
-time by  
+The system configuration directory for GNU/Linux is usually /usr/local/etc/ 
+or /etc. During the setup of GNU-APL (refer to README-2-configuration) you
+have the opportunity to choose a different location. It can be overridden
+at compile time by:
 
   (a)  ./configure --sysconfdir=somewhere-else
-  (b)  ./configure --sysconfdir=/home(yourlogon)/.GNU-APL 
+  (b)  ./configure --sysconfdir=/home/(your_username)/.config/gnu-apl 
 
 
 2.2 Local version of preferences.
 =================================
 To create your own preference file, create the following directory.
 
-     /home(yourlogon)/.gnu-apl 
+     /home/(your_username)/.config/gnu-apl 
 
-copy the system installed /usr/local/etc/gnu-apl.d  to
+copy the system installed /usr/local/etc/gnu-apl.d to
 
-     /home(yourlogon)/.gnu-apl 
+     /home/your_username)/.config/gnu-apl 
 
 
-If both your own preference file and the "gnu-apl.d" are present 
-in their respective directories then the local copy overrides  
-the settings common to both files.
+If both your own preferences file and the "gnu-apl.d" are present in their
+respective directories then the local copy overrides the settings common
+to both files.
  
-Command line options take precedence over settings made in any of these files.
+Command line options take precedence over settings made in either of these
+files.
 
-The initial content of this 'preference. file contains a commented list of all 
-possible settings. You should not remove parameter setting lines but rather
-comment or uncomment them.
+The initial content of this 'preferences' file contains a commented list of
+all possible settings. You should not remove parameter setting lines but
+rather comment or uncomment them.
 
 The balance of this README-9 file describes the parameter setting for GNU-APL.
 
@@ -163,27 +163,27 @@ The default setting in the preferences file(s) is:
 #
   Welcome       Yes     (default)
 # Welcome       No      
-#  
+#
 
 
 3.1   OUTPUT COLORING
 ======================
 The default GNU-APL configuration as delivered, is tailored for terminals
 displaying a white background. The background colors that APL will use can be
-overwritten. 
+overridden. 
 
 There are options to switch to black background, to no colors, 
-or to even allow coloring of GNU-APL displayed output.
+or even to allow coloring of GNU-APL displayed output.
 
 Output coloring will cause problems when, for example:
 
- (a) you run GNU APL as script
+ (a) you run GNU-APL as script
  (b) you use a black background
- (c) you run GNU APL from emacs
- (d) you run GNU APL from a different terminal than color xterm
+ (c) you run GNU-APL from emacs
+ (d) you run GNU-APL from a different terminal than color xterm
 
 In case (a) you should use the --script command line option and
-leave the Color setting as defaulted (see #2 below).
+leave the default Color setting (see #2 below).
 
 In cases (b), (c), and (d) you can uncomment the 'Color No' line below.
 This only affects the initial state of output coloring; you can
@@ -191,12 +191,12 @@ re-enable colors later with APL command ]XTERM ON.
 
 The corresponding command line options are --Color and --noColor
 
-If your terminal does not understand the ANSI escape sequences,
-or if you prefer not to provide escape sequences, then you can set the 
-color parameter to CURSES. and set color numbers to escape sequences as shown
-below.  This setting  requires that certain environment variables (e.g. TERM)
+If your terminal does not understand the ANSI escape sequences, or if you
+prefer not to provide escape sequences, then you can set the color
+parameter to CURSES and set color numbers to escape sequences as shown
+below. This setting requires that certain environment variables (e.g. TERM)
 are set properly and that your system's terminfo database contains correct
-terminal type definitions for  your choice.
+terminal type definitions for your choice.
 
 The default setting in the preferences file(s) is:
 #
@@ -207,7 +207,7 @@ The default setting in the preferences file(s) is:
 
  
 After starting APL you may want to disable coloring initially, but switch 
-to curses the command ]COLOR  can be given later on. you can enter the 
+to curses (the command ]COLOR can be given later on). You can enter the 
 color command twice: 
 
         ]color
@@ -233,7 +233,7 @@ of CERR redirection is:
 
            apl 2>MyErrorLog.txt 
 
-    
+
 When the interpreter changes from one output channel to another, for
 instance from CIN to COUT after the user has entered a line, then an
 escape sequence (actually, any short sequence of characters) is sent
@@ -246,12 +246,11 @@ determines which sequence is sent:
  - UCERR:  UERR-SEQUENCE CLEAR-EOL
 
 
-
 3.3   OUTPUT COLOR ESCAPE SEQUENCES FOR ANSI TERMINALS
 ======================================================
 
 Output coloring is implemented as described below, 
-When the interpreter exists, then the sequence
+When the interpreter exits, then the sequence
 
         RESET-SEQUENCE CLEAR-EOL
 
@@ -270,14 +269,13 @@ Color xterm is a VT100 (or ANSI) compatible terminal emulation.
 If this assumption is correct, then everything should be fine. Otherwise
 you may want to change the escape sequence sent to the terminal. 
 
-The numbers below are the hexadecimal values of the bytes sent to the terminal;
-27 (hexadecimal 1b) is the escape character, for example. In order to 
-change some or all sequences, uncomment the corresponding line 
-and change the hex numbers (most likely the columns background 
-and foreground).  Each sequence can be up to 20 characters long.
-By the way  // refers to the start of comments placed to the right
-of the terminal control sequence. The octothorpe (#) is the 
-character placed at the left margin.
+The numbers below are the hexadecimal values of the bytes sent to the
+terminal; 27 (hexadecimal 1b) is the escape character, for example. To
+change some or all sequences, uncomment the corresponding line and change
+the hex numbers (most likely the columns background and foreground).
+Each sequence can be up to 20 characters long. By the way // refers to
+the start of comments placed to the right of the terminal control
+sequence. The octothorpe (#) is the character placed at the left margin.
 
 The default setting in the preferences file(s) is:
 #
@@ -302,10 +300,10 @@ The default setting in the preferences file(s) is:
 # UERR-SEQUENCE          1b 5b 30 3b 33 31 3b 34 30 6d    // ESC [0;31;40m
 # RESET-SEQUENCE         1b 5b 30 3b 33 37 3b 34 30 6d    // ESC [0;37;48m
 #
-#
+
 Since all lines are commented out, the ESC sequences assumed by the interpreter
-are used. The lines are only shown as template the ESC sequences of the actual
-terminal.
+are used. The lines are only shown as a template for the ESC sequences of the
+actual terminal.
 
 
 3.4   OUTPUT COLOR NUMBER FOR CURSES
@@ -359,8 +357,8 @@ in each method.
 3.5   INPUT ESC SEQUENCES
 =========================
 
-Below is a brief explanation of how you can configure the ESC (escape or other) 
-sequence sent by the terminal's  cursor-up,  cursor-down, cursor-left,
+Below is a brief explanation of how you can configure the ESC (escape or
+other) sequence sent by the terminal's cursor-up, cursor-down, cursor-left,
 cursor-right, Home, End, Ins, and Del keys. 
 
 The sequences can be set explicitly (in the following) or via CURSES
@@ -391,18 +389,18 @@ must follow a discipline. The variables involved with this discipline are
 listed below.
 
 Shared variables are represented by: 
-offer to share          (⎕SVO), 
-share var retraction    (⎕SVR),
-shared variable Control (⎕SVC),
-shared variable Query   (⎕SVQ),    
-shared variable State   (⎕SVS) 
+Offer to share var.    (⎕SVO), 
+shared var. Retraction (⎕SVR),
+shared var. Control    (⎕SVC),
+shared var. Query      (⎕SVQ),    
+shared var. State      (⎕SVS) 
 
-Using 'Shared variables' starts (forks) an independent helper process (APserver)
-to communicate with other APL processors. 
+Using 'Shared variables' starts (forks) an independent helper process
+(APserver) to communicate with other APL processors. 
 
 If you do not need all the above functions then you can (and should) prevent
 accidental starting of the APserver by setting SharedVars to Disabled. If
-SharedVars are disabled  then GNU APL starts a little faster and, of course,
+SharedVars are disabled then GNU APL starts a little faster and, of course,
 ⎕SVO and friends won't work.
 
 The default setting in the preferences file(s) is:
@@ -410,7 +408,6 @@ The default setting in the preferences file(s) is:
 #
   SharedVars    Enabled     (default)
 # SharedVars    Disabled
-
 
 
 3.7   LOGGING FACILITIES
@@ -421,12 +418,12 @@ effect.
 Logging is a facility that is occasionally used for debugging purposes. As
 a regular user, you should have no requirement to make use of dynamic logging.
 
-To enable dynamic logging, you must recompile the interpreter,specifying
+To enable dynamic logging, you must recompile the interpreter, specifying
 dynamic logging. The following three steps are required. 
 
   ./configure DYNAMIC_LOG_WANTED=yes <... other configure options>
-   make
-   make install (or try: src/apl)
+  make
+  make install (or try: src/apl)
 
 Otherwise you can specify the Logging facilities (numbered 1-43 or more)
 that can be enabled when the APL interpreter starts, This option can
@@ -456,23 +453,23 @@ example 1:
 
 example 2:
   Interpreter commands )IN and )OUT use library number 0 implicitly;
-  )LOAD, )SAVE, and )COPY use  library number 0 implicitly when no
+  )LOAD, )SAVE, and )COPY use library number 0 implicitly when no
   library number is given.
 
-WARNING: Each library(directory) assigned to LIBREF-0 must be unshared and
+WARNING: Each library (directory) assigned to LIBREF-0 must be unshared and
 unique. 
 
-For example, issuing the  ")CONTINUE" command, results in storing the CONTINUE 
-workspace therein. Storing CONTINUE will overwrite the previously one. Sharing 
-the default LIBREF-0 library among different users will likely to have 
+For example, issuing the ")CONTINUE" command, results in storing the CONTINUE 
+workspace therein. Storing CONTINUE will overwrite the previous one. Sharing 
+the default LIBREF-0 library among different users will be likely to have 
 very undesirable effects. 
 
-Within the preferences file, the directories corresponding to the 
-library numbers can be configured as shown below.
+Within the preferences file, the directories corresponding to the library
+numbers can be configured as shown below.
 
-Library numbers 3, 4, and 5 are used (and often overridden!) to store libraries
-that are shipped with GNU APL. )SAVEing or )DUMPing workspaces into these
-directories is therefore a bad idea.
+Library numbers 3, 4, and 5 are used (and often overwritten!) to store
+libraries that are shipped with GNU APL. )SAVEing or )DUMPing workspaces into
+these directories is therefore a bad idea.
 
 If GNU APL is used by different programmers on the same machine, then the
 following scheme for library reference numbers is recommended:
@@ -487,9 +484,9 @@ following scheme for library reference numbers is recommended:
 2  for workspaces that are readable by every user on the machine.
 
 In other words: the library numbers 0, 1, and 2 correspond to the 'owner',
-'group', and 'all' permissions of the files respectively. However,
-GNU APL does not set these permissions based on the library numbers (because
-all this is only a recommended convention), and the users or group members
+'group', and 'all' permissions of the files respectively. However, GNU-APL
+does not set these permissions based on the library numbers (because all
+this is only a recommended convention) and the users or group members
 are responsible for setting permissions on workspace files or directories.
 
 For GNU/Linux machines that are only used by a single user, the user may
@@ -522,22 +519,22 @@ As shown below, the number of history lines and the location of the history
 file can be configured. Some users prefer to have only one history file (and
 in that case $HOME/.config/gnu-apl/apl.history might be a suitable file name).
 
-Other users prefer to have a history file in the current directory so that they
-can work in different APL projects in parallel and have separate histories,
-one for each project. In that case, .apl.history is a better choice for the
-file name, because the file is hidden and relative. This is also the
-default in the poreference file(s):
+Other users prefer to have a history file in the current directory so that
+they can work in different APL projects in parallel and have separate
+histories, one for each project. In that case, .apl.history is a better
+choice for the file name, because the file is hidden and relative. This is
+also the default in the preferences file(s):
 
 READLINE_HISTORY_LEN  500
 READLINE_HISTORY_PATH .apl.history
 
-
 The history can serve two purposes: to recall lines that were previously
 entered and to list what was recently done (with the apl )HISTORY command).
 For the latter purpose it is normally convenient to show the new ⎕CR of a
-function  that was edited instead of the command that started the editor.
-The following  parameter controls whether the editor command (like ∇foo )
+function that was edited instead of the command that started the editor.
+The following parameter controls whether the editor command (like ∇foo )
 or the new ⎕CR of the function shall be inserted into the history.
+
 
 3.9   EDITOR OPTIONS
 ====================
@@ -545,15 +542,15 @@ GNU-APL comes with a built-in editor. The following setting controls which
 of the lines that were entered in function editing mode are being inserted
 into the history.
 
-The default ('Modified') line setting causes only modified lines to be inserted.
-With that setting, one can cut-and-paste from a history file into an
-interactive session in order to 'redo' a function modification. The 'Always'
-setting restores the edited function regardless of its current state. The
-'Never' setting is useful for automated test scripts because it avoids
-redundancy in the log files produced.
+The 'Always' setting restores the edited function regardless of its current
+state. The 'Never' setting is useful for automated test scripts because it
+avoids redundancy in the log files produced.
 
-was opened for editing, but not changed and the new ⎕CR if the function was 
-changed.
+The default (modified) is a compromise that inserts only the editor
+command if the function was opened but not changed (e.g. ∇FOO[⎕]∇ )
+and the entire new ⎕CR if the function was changed or (newly created).
+With that setting, one can cut-and-paste from a history file into an
+interactive session to 'redo' a function modification. 
 
 The default setting in the preferences file(s) is:
 #
@@ -567,24 +564,24 @@ The default setting in the preferences file(s) is:
 ========================
 In general, if one is modifying a workspace, it is best to load it and
 immediately resave it under a new name. The GNU-APL options available are to
-create a backup before a )SAVE or )DUMP WORKSPACE command.
-The workspace created by )CONTINUE is saved, but not backed up.
+create a backup before a )SAVE or )DUMP WORKSPACE command. The workspace
+created by )CONTINUE is saved, but not backed up.
 
 The default setting in the preferences file(s) is:
 #
 BACKUP_BEFORE_SAVE  yes
 #
 
-To recover a backup workspace, refer to the LIBREF-0 option chosen
-Change to the directory indicated. Therein you will see the workspace
-you were using and the same workspace with a .bak  appended
-example: consider a recovery action for the 'meta' workspace
-In the directory referred to by LIBREF-0 you would note
+To recover a backup workspace (refer to the LIBREF-0 option chosen),
+change to the directory indicated. Therein you will see the workspace
+you were using and the same workspace with a .bak appended. Example:
+consider a recovery action for the 'meta' workspace In the directory
+referred to by LIBREF-0 you would note:
 
     meta.xml   meta.xml.bak
 
-For example,  delete the meta.xml or rename it to something else. 
-Restore the original  meta.xml  rename the meta.xml.bak to meta.xml
+For example, delete the meta.xml or rename it to something else. 
+Restore the original meta.xml (rename the meta.xml.bak to meta.xml).
 
 
 3.11    KEYBOARD LAYOUT 
@@ -597,12 +594,13 @@ If your physical keyboard layout differs from the assumed keyboard for some
 reason, then the ]KEYB command will show the wrong layout. You can correct
 this difference providing your own keyboard file which (when specified) is
 shown by the
-  
+
      ]KEYB command instead of the assumed layout.
 
-You can choose between one of the files called 'keyboard1.txt' or keyboard2.txt.
-If your computer has a different keyboard layout, you may create your own
-version as keyboard.txt and revise the parameter as shown in the following:
+You can choose between one of the files called 'keyboard1.txt' or
+keyboard2.txt. If your computer has a different keyboard layout, you may
+create your own version as keyboard.txt and revise the parameter as shown in
+the following:
 
 #
 # KEYBOARD_LAYOUT_FILE  /etc/gnu-apl.d/keyboard1.txt
@@ -615,11 +613,11 @@ Normally you exit GNU APL by issuing the command )OFF. Hitting ^D
 (aka. end-of-input) once can be used to end the execution of most other
 programs, but has no effect in GNU APL.
 
-You can make GNU APL exit after a number of consecutive ^Ds  by specifying
-a (small) positive number as shown below Note that the interpreter will always
-exit if a large number of ^Ds (or EOFs) are read-in in rapid succession.
-NB: ^Ds may exist within a script and need not be entered via the keyboard.
-Setting the value to zero establishes the system default. 
+You can make GNU APL exit after a number of consecutive ^Ds by specifying
+a (small) positive number as shown below: Note that the interpreter will
+always exit if a large number of ^Ds (or EOFs) are read-in in rapid
+succession. NB: ^Ds may exist within a script and need not be entered via
+the keyboard. Setting the value to zero establishes the system default. 
 
 #CONTROL-Ds-TO-EXIT 7
  CONTROL-Ds-TO-EXIT 0
@@ -634,16 +632,15 @@ may want to specify a different initial value for ⎕PW below. A further option
 is the Windows Change (WINCH setting).
 
 With the WINCH-Setting option, on startup you can cause the Window Change
-(WINCH) signal (which is sent, for example, if the size of a window is
-changed) to set ⎕PW to the terminal width setting contained in the WINCH signal.
+(WINCH) signal (which is sent, for example, if the size of a window is changed)
+to set ⎕PW to the terminal width setting contained in the WINCH signal.
 
 The intended effect is that re-sizing of the terminal window will cause GNU-APL
-to adapt itself to the new window size. This appears to work on  GNU/Linux but
+to adapt itself to the new window size. This appears to work on GNU/Linux but
 may not work on other platforms! USE AT YOUR OWN RISK.
 
 # INITIAL-⎕PW 80
 # WINCH-SETS-⎕PW  Yes
-
 
 
 14.0  Security Settings

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __Quad_SQL_HH_DEFINED__
 #define __Quad_SQL_HH_DEFINED__
 
 #include "QuadFunction.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+class Connection;
+
+//----------------------------------------------------------------------------
 /**
    The system function ⎕SQL
  */
@@ -38,26 +43,50 @@ public:
    /// Destructor
    ~Quad_SQL();
 
-   static Quad_SQL * fun;          ///< Built-in function.
-   static Quad_SQL  _fun;          ///< Built-in function.
+   static Quad_SQL  fun;          ///< Built-in function.
+
+   /// close all open connections
+   static void close_all_connections();
 
 protected:
    /// overloaded Function::eval_AB().
-   Token eval_AB(const Value_P A, const Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AXB().
-   Token eval_AXB(const Value_P A, const Value_P X, const Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_B().
-   Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_XB().
-   Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
-// virtual Token eval_AB(Value_P A, Value_P B);
+   /// list ⎕SQL functions
+   static Value_P list_functions(ostream & out);
 
+   /// open a database, return its handle
+   static Value_P open_database(Value_P A, Value_P B);
+
+   /// run a (read-only) database query
+   static Value_P run_query(Connection * conn, Value_P A, Value_P B);
+
+   /// run a (read/write) database update
+   static Value_P run_update(Connection * conn, Value_P A, Value_P B);
+
+   /// return the names of the database columns
+   static Value_P column_names(Value_P A, Value_P B);
+
+   /// perform a generic query
+   static Value_P run_generic(Connection * conn, Value_P A, Value_P B,
+                              bool query);
+
+   /// return the version number of the SQL provider named B
+   static Value_P get_version_number(const UCS_string & ucs_B);
+
+   /// return the version string of the SQL provider (synthesized as needed).
+   static Value_P get_version_string(const UCS_string & ucs_B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Quad_SQL_HH_DEFINED__
 

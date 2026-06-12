@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef PJOB_HH_DEFINED
 #define PJOB_HH_DEFINED
 
 class PrimitiveFunction;
 
-#include <vector>
-
+#include "Assert.hh"
+#include "ConstCell_P.hh"
 #include "PrimitiveFunction.hh"
 
 /**
@@ -36,47 +39,41 @@ class PrimitiveFunction;
  ravels of the result Z, the right argument B, and possibly (for dyadic Cell
  functions) the left argument A.
  **/
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one monadic scalar job
 class PJob_scalar_B
 {
 public:
    /// default constructor
    PJob_scalar_B()
-   : value_Z(0),
-     len_Z(0),
+   : len_Z(0),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0),
-     cB(0),
-     cZ(0)
+     fun1(0)
    {}
 
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_B & other)
-      {
-        value_Z = other.value_Z;
-        len_Z = other.len_Z;
-        error = other.error;
-        fun = other.fun;
-        fun1 = other.fun1;
-        cB = other.cB;
-        cZ = other.cZ;
-      }
-
    /// constructor
-   PJob_scalar_B(Value * Z, const Value & B)
-   : value_Z(Z),
+   PJob_scalar_B(Value_P Z, Value_P B)
+   : value_B(B, LOC),
+     value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0),
-     cB(&B.get_ravel(0)),
-     cZ(&Z->get_ravel(0))
+     fun1(0)
    {}
 
+   /// destructor
+   ~PJob_scalar_B()
+      {
+        value_Z.clear(LOC);
+        value_B.clear(LOC);
+      }
+
+   /// the left argument for the value being computed
+   Value_P value_B;
+
    /// the value being computed
-   Value * value_Z;
+   Value_P value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -84,78 +81,64 @@ public:
    /// an error detected during computation of, eg. fun1 or fun2
    ErrorCode error;
 
-   /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
+   /// the APL (not Cell !) function being computed
+   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the monadic cell function to be computed
    prim_f1 fun1;   // not initialized by constructor!
 
-   /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z]; }
+   /// return Bbz]
+   const Cell & B_at(ShapeItem b) const
+      { return value_B->get_cravel(b); }
 
    /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
-
-protected:
-   /// ravel of the right argument
-   const Cell * cB;
-
-   /// ravel of the result
-   Cell * cZ;
+   Cell & Z_at(ShapeItem z)
+      { return value_Z->get_wravel(z); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one dyadic scalar job
 class PJob_scalar_AB
 {
 public:
    /// default constructor
    PJob_scalar_AB()
-   : value_Z(0),
-     len_Z(0),
+   : len_Z(0),
      inc_A(0),
      inc_B(0),
      error(E_NO_ERROR),
      fun(0),
-     fun2(0),
-     cA(0),
-     cB(0),
-     cZ(0)
+     fun2(0)
    {}
-
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_AB & other)
-      {
-        value_Z = other.value_Z;
-        len_Z   = other.len_Z;
-        inc_A   = other.inc_A;
-        inc_B   = other.inc_B;
-        error   = other.error;
-        fun     = other.fun;
-        fun2    = other.fun2;
-        cA      = other.cA;
-        cB      = other.cB;
-        cZ      = other.cZ;
-        Assert(cB);
-      }
 
    /// constructor
-   PJob_scalar_AB(Value * Z, const Cell * _cA, int iA, const Cell * _cB, int iB)
-   : value_Z(Z),
+   PJob_scalar_AB(Value_P Z, Value_P A, Value_P B)
+   : value_A(A, LOC),
+     value_B(B, LOC),
+     value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
-     inc_A(iA),
-     inc_B(iB),
+     inc_A(A->get_increment()),
+     inc_B(B->get_increment()),
      error(E_NO_ERROR),
      fun(0),
-     fun2(0),
-     cA(_cA),
-     cB(_cB),
-     cZ(&Z->get_ravel(0))
+     fun2(0)
    {}
 
-   /// A value (e.g parallel ~Value())
-   Value * value_Z;
+   /// destructor
+   ~PJob_scalar_AB()
+      {
+        value_Z.clear(LOC);
+        value_B.clear(LOC);
+        value_A.clear(LOC);
+      }
+
+   /// the left argument for the value being computed
+   Value_P value_A;
+
+   /// the right argument for the value being computed
+   Value_P value_B;
+
+   /// the value being computed
+   Value_P value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -169,33 +152,23 @@ public:
    /// an error detected during computation of, eg. fun1 or fun2
    ErrorCode error;
 
-   /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
+   /// the APL (not Cell !) function being computed
+   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the dyadic cell function to be computed
    prim_f2 fun2;   // not initialized by constructor!
 
    /// return A[z]
-   const Cell & A_at(ShapeItem z) const
-      { return cA[z * inc_A]; }
+   const Cell & A_at(ShapeItem a) const
+      { return value_A->get_cravel(a * inc_A); }
 
    /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z * inc_B]; }
+   const Cell & B_at(ShapeItem b) const
+      { return value_B->get_cravel(b * inc_B); }
 
    /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
-
-protected:
-   /// ravel of the left argument
-   const Cell * cA;
-
-   /// ravel of the right argument
-   const Cell * cB;
-
-   /// ravel of the result
-   Cell * cZ;
+   Cell & Z_at(ShapeItem z)
+      { return value_Z->get_wravel(z); }
 };
 // ============================================================================
 /// a number of jobs, where each job can be executed in parallel
@@ -230,7 +203,7 @@ public:
               CERR << endl << "*** Attempt to start a new joblist at " << loc
                    << " while joblist from " << started_loc
                    << " is not finished" << endl;
-              Backtrace::show(__FILE__, __LINE__))
+              BACKTRACE
             }
 #endif
 
@@ -250,7 +223,8 @@ public:
    /// execution of current_job. Therefore we copy current_job from
    /// jobs (and can then safely use current_job *).
    T * next_job()
-      { if (jobs.size() == 0)
+      {
+        if (jobs.size() == 0)   // joblist done
            {
              started_loc = 0;
              return 0;
@@ -270,7 +244,7 @@ public:
       { return jobs.size(); }
 
    /// add \b job to \b jobs
-   void add_job(T & job)
+   void add_job(const T & job)
       { jobs.push_back(job); }
 
    /// return true if not all jobs are done yet
@@ -288,5 +262,5 @@ protected:
    /// the currently executed worklist item
    T current_job;
 };
-//=============================================================================
+//============================================================================
 #endif // PJOB_HH_DEFINED

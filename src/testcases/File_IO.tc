@@ -4,6 +4,8 @@
       ⍝ same as File_IO_1.tc but using FILE_IO.apl library
       ⍝ This is the recommeded way to use file_io.so
       ⍝
+      ⍝ However: FILE_IO.apl is obsolete, use ⎕FIO instead!
+      ⍝
       ⍝ This file demonstrates the use of the FILE_IO.apl library
       ⍝ and checks that the wrapper functions in FILE_IO.apl are working
       ⍝
@@ -157,7 +159,7 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       ⍝ read entire file
       ⍝
       ⎕UCS FIO∆read_file Filename
-72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32 
+72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32
       226 141 181
 
 

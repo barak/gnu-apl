@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __SECURITY_HH_DEFINED__
 #define __SECURITY_HH_DEFINED__
 
@@ -26,19 +29,19 @@
 
 extern void not_allowed(const char * what);
 
-#ifndef SECURITY_LEVEL_WANTED
+#ifndef cfg_SECURITY_LEVEL_WANTED
 
-#error "SECURITY_LEVEL_WANTED not defined"
+#error "cfg_SECURITY_LEVEL_WANTED not defined"
 
-#elif SECURITY_LEVEL_WANTED == 0
+#elif cfg_SECURITY_LEVEL_WANTED == 0
 
 #define CHECK_SECURITY(X)
 
-#elif SECURITY_LEVEL_WANTED == 1
+#elif cfg_SECURITY_LEVEL_WANTED == 1
 
 #define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
 
-#elif SECURITY_LEVEL_WANTED == 2
+#elif cfg_SECURITY_LEVEL_WANTED == 2
 
 #define CHECK_SECURITY(X)  not_allowed(#X);
 

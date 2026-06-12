@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __VALUE_P_HH_DEFINED__
@@ -33,9 +36,7 @@ class UTF8_string;
 class UCS_string;
 class PrintBuffer;
 
-#define ptr_clear(p, l) p.reset()
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A Value smart * and access functions (except constructors)
 class Value_P_Base
 {
@@ -48,19 +49,15 @@ public:
    /// reset and add value event
    inline void clear(const char * loc);
 
+   /// return true if the pointer is valid
+   bool operator+() const
+      { return value_p != 0; }
+
    /// return true if the pointer is invalid
    bool operator!() const
       { return value_p == 0; }
 
-   /// return true if this Value_P points to the same Value as \b other
-   bool operator ==(const Value_P_Base & other) const
-      { return value_p == other.value_p; }
-
-   /// return true if this Value_P points to a different Value than \b other
-   bool operator !=(const Value_P_Base & other) const
-      { return value_p != other.value_p; }
-
-   /// return a const pointer to the Value (overloaded ->)
+   /// return a const pointer to the Value (overloaded *)
    const Value * operator->()  const
       { return value_p; }
 
@@ -72,6 +69,10 @@ public:
    const Value & operator*() const
       { return *value_p; }
 
+   /// return a reference to the Value
+   Value & operator*()
+      { return *value_p; }
+
    /// return a const pointer to the Value
    const Value * get() const
       { return value_p; }
@@ -80,30 +81,26 @@ public:
    Value * get()
       { return value_p; }
 
-   /// return a const reference of the Value
-   const Value & getref() const
-      { return *value_p; }
-
-   /// return a reference of the Value
-   Value & getref()
-      { return *value_p; }
+   /// init the pointer (without adding an event)
+   inline void init_pointer()
+      {
+         value_p = 0;
+      }
 
    /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 
-   /// decrement the owner count of \b val. The function bidy requires Value.hh
-   /// and is therefore implemented in Value.icc.
-   static inline void decrement_owner_count(Value * & val, const char * loc);
+   /// clone value if more than one Value_P points to it
+   inline void isolate(const char * loc);
 
-   /// increment the owner count of \b val. The function body requires Value.hh
-   /// and is therefore implemented in Value.icc.
-   static inline void increment_owner_count(Value * val, const char * loc);
+   /// move the Value * from \b other to \b this.
+   inline void move(Value_P_Base & other, const char * loc);
 
 protected:
    /// pointer to the value
    Value * value_p;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A Value smart * (constructors)
 class Value_P : public Value_P_Base
 {
@@ -123,6 +120,9 @@ public:
 
    /// a new value with shape sh and un-initialized ravel
    inline Value_P(const Shape & sh, const char * loc);
+
+   /// constructor: a packed array with shape \b sh
+   inline Value_P(const Shape & sh, uint64_t * bits, const char * loc);
 
    /// a new vector value from a UCS string
    inline Value_P(const UCS_string & ucs, const char * loc);
@@ -154,6 +154,6 @@ public:
    /// Destructor
    inline ~Value_P();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __INPUT_FILE_HH_DEFINED__
 #define __INPUT_FILE_HH_DEFINED__
-
-#include <vector>
 
 #include "UTF8_string.hh"
 #include "UCS_string_vector.hh"
@@ -35,15 +36,17 @@ struct InputFile
 {
    friend class IO_Files;
 
-   /// empty constructor
+   /// default constructor (for vector<InputFile>).
    InputFile() {}
 
    /// Normal constructor
    InputFile(const UTF8_string & _filename, FILE * _file,
-                     bool _test, bool _echo, bool _is_script, LX_mode LX)
+             bool _test, bool _echo, bool _is_script, LX_mode LX)
    : file     (_file),
-     filename (&_filename[0], _filename.size()),
+     filename (_filename),
      test     (_test),
+     pushed_IE(false),
+     pushed_pending(false),
      echo     (_echo),
      is_script(_is_script),
      with_LX  (LX),
@@ -52,12 +55,21 @@ struct InputFile
      in_function(false),
      in_variable(false),
      in_matched(false),
-     from_COPY(false)
+     from_COPY(false),
+     file_seq(++next_file_seq)
    {}
 
    /// set the from_COPY flag
    void set_COPY()
       { from_COPY = true; }
+
+   /// set the pushed_IE flag
+   void set_pushed_IE()
+      { pushed_IE = true; }
+
+   /// set the pushed_pending flag
+   void set_pushed_pending(bool on_off)
+      { pushed_pending = on_off; }
 
    /// set the current line number
    void set_line_no(int num)
@@ -70,6 +82,10 @@ struct InputFile
    /// return the current HTML mode
    int get_html() const
       { return in_html; }
+
+   /// return the sequence number of the current file (if any), 0 if not.
+   static int32_t get_file_seq()
+      { return files_todo.size() ? files_todo[0].file_seq : 0; }
 
    /// the current file
    static InputFile * current_file()
@@ -90,11 +106,21 @@ struct InputFile
    /// return true iff input comes from a script (as opposed to running
    /// interactively)
    static bool running_script()
-      { return files_todo.size() > 0 && files_todo[0].is_script; }
+      { return files_todo.size() && files_todo[0].is_script; }
 
    /// return true iff the current input file exists and is a test file
    static bool is_validating()
-      { return files_todo.size() > 0 && files_todo[0].test; }
+      { return files_todo.size() && files_todo[0].test; }
+
+   /// return true iff the current input file exists and is a pushed
+   /// immediate execution
+   static bool pushed_file()
+      { return files_todo.size() && files_todo[0].pushed_IE; }
+
+   /// return true iff the current input file exists and is a pushed
+   /// immediate execution
+   static bool is_pushed_pending()
+      { return files_todo.size() && files_todo[0].pushed_pending; }
 
    /// the number of testcase (.tc) files
    static int testcase_file_count()
@@ -147,13 +173,14 @@ struct InputFile
    UTF8_string  filename;
 
 protected:
-
-   bool test;         ///< true for -T testfile, false for -f APL file
-   bool echo;         ///< echo stdin
-   bool is_script;    ///< script (override existing functions)
-   LX_mode with_LX;   ///< execute ⎕LX at the end
-   int  line_no;      ///< line number in file
-   int  in_html;      ///< 0: no HTML, 1: in HTML file 2: in HTML header
+   bool test;            ///< true for -T testfile, false for -f APL file
+   bool pushed_IE;       ///< true for ]PUSHFILE child
+   bool pushed_pending;  ///< true for ]PUSHFILE parent
+   bool echo;            ///< echo stdin
+   bool is_script;       ///< script (override existing functions)
+   LX_mode with_LX;      ///< execute ⎕LX at the end
+   int  line_no;         ///< line number in file
+   int  in_html;         ///< 0: no HTML, 1: in HTML file 2: in HTML header
 
    /// functions and vars that shoule be )COPIED
    UCS_string_vector object_filter;
@@ -170,8 +197,14 @@ protected:
    /// true if this file comes from a )COPY XXX.apl (but not XXX.xml
    bool from_COPY;
 
+   /// a unique number for this (instance of) file.
+   int64_t file_seq;
+
    /// line number in stdin
    static int stdin_line_no;
+
+   /// the next unique file number
+   static int64_t next_file_seq;
 };
 
 #endif // __INPUT_FILE_HH_DEFINED__

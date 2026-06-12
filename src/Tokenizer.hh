@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __TOKENIZER_HH_DEFINED__
 #define __TOKENIZER_HH_DEFINED__
 
@@ -26,7 +29,7 @@
 
 class Token;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// An iterator for UCS_string
 class Unicode_source
 {
@@ -39,7 +42,7 @@ public:
    {}
 
    /// constructor: iterate from \b from to \b to
-   Unicode_source(const Unicode_source & src, int32_t from, int32_t to)
+   Unicode_source(const Unicode_source & src, int from, int to)
    : str(src.str),
      idx(src.idx + from),
      end(src.idx + from + to)
@@ -49,12 +52,23 @@ public:
    }
 
    /// return the number of remaining items
-   int32_t rest() const
+   int rest_len() const
       { return end - idx; }
 
+   /// return true iff there arer any remaining items
+   bool has_more() const
+      { return idx < end; }
+
+   /// if the next char is \b uni then skip it and return true, otherwise false.
+   bool skip_if(Unicode uni)
+      {
+        if (!has_more() || str[idx] != uni)   return false;
+        ++idx;   return true;
+      }
+
    /// lookup next item
-   const Unicode & operator[](int32_t i) const
-      { i += idx;   Assert(uint32_t(i) < uint32_t(end));   return str[i]; }
+   const Unicode & operator[](int i) const
+      { i += idx;   Assert(i < end);   return str[i]; }
 
    /// get next item
    const Unicode & get()
@@ -73,11 +87,11 @@ public:
       { Assert(idx > 0);   --idx; }
 
    /// shrink the source to rest \b new_rest
-   void set_rest(int32_t new_rest)
-      { Assert(new_rest <= rest());   end = idx + new_rest; }
+   void set_rest(int new_rest)
+      { Assert(new_rest <= rest_len());   end = idx + new_rest; }
 
    /// skip \b count elements
-   void skip(int32_t count)
+   void skip(int count)
       { idx += count;   if (idx > end)   idx = end; }
 
 protected:
@@ -85,12 +99,12 @@ protected:
    const UCS_string & str;
 
    /// the current position
-   int32_t idx;
+   int idx;
 
    /// the end position (excluding)
-   int32_t end;
+   int end;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The converter from APL input characters to APL tokens
 class Tokenizer
 {
@@ -99,46 +113,86 @@ public:
    Tokenizer(ParseMode pm, const char * _loc, bool mac)
    : pmode(pm),
      macro(mac),
-     loc(_loc),
-     rest_1(0),
-     rest_2(0)
+     loc(_loc)
    {}
 
+   /// an APL_Integer or a APL_Float.
+   struct Int_or_Double
+      {
+         /// default constructor for uninitialized Int_or_Double
+         Int_or_Double()
+            : is_double(false),
+              is_valid(false)
+            {   value.APL_int = 0; }
+
+         /// constructor for integer
+         Int_or_Double(APL_Integer aint)
+            : is_double(false),
+              is_valid(true)
+            {   value.APL_int = aint; }
+
+         /// constructor for double
+         Int_or_Double(APL_Float aflt)
+            : is_double(true),
+              is_valid(true)
+            {   value.APL_flt = aflt; }
+
+         const bool is_double;   ///< true if so.
+         const bool is_valid;    ///< true if so.
+
+        /// return value as APL_Float
+        double get_double() const
+           { return is_double ? value.APL_flt : value.APL_int; }
+
+         /// an APL_Float or an APL_Float
+         union
+            {
+              APL_Integer APL_int;
+              APL_Float   APL_flt;
+            } value;
+      };
+
    /// tokenize UTF-8 string \b input into token string \b tos.
-   ErrorCode tokenize(const UCS_string & input, Token_string & tos);
+   ErrorCode tokenize(const UCS_string & input, Token_string & tos) const;
 
    /// tokenize a primitive (1-character) function
    static Token tokenize_function(Unicode uni);
 
 protected:
    /// tokenize UCS string \b input into token string \b tos.
-   void do_tokenize(const UCS_string & input, Token_string & tos);
+   void do_tokenize(const UCS_string & input, Token_string & tos,
+                    size_t & rest_2) const;
 
    /// tokenize a function
-   void tokenize_function(Unicode_source & src, Token_string & tos);
+   void tokenize_function(Unicode_source & src, Token_string & tos) const;
 
    /// tokenize a Quad function or variable
-   void tokenize_quad(Unicode_source & src, Token_string & tos);
+   void tokenize_quad(Unicode_source & src, Token_string & tos) const;
 
-   /// tokenize a single quoted string
-   void tokenize_string1(Unicode_source & src, Token_string & tos);
+   /// tokenize a single quoted 'string'
+   void tokenize_string1(Unicode_source & src, Token_string & tos,
+                         size_t & rest_2) const;
 
-   /// tokenize a double quoted string
-   void tokenize_string2(Unicode_source & src, Token_string & tos);
+   /// tokenize a double quoted "string"
+   void tokenize_string2(Unicode_source & src, Token_string & tos,
+                         size_t & rest_2) const;
 
    /// tokenize a number (integer, floating point, or complex).
-   void tokenize_number(Unicode_source & src, Token_string & tos);
+   void tokenize_number(Unicode_source & src, Token_string & tos,
+                        size_t & rest_2) const;
+
+   /// tokenize a hex number (integer).
+   static Int_or_Double tokenize_hex(Unicode_source &src);
 
    /// tokenize a real number (integer or floating point).
-   bool tokenize_real(Unicode_source &src, bool & need_float,
-                      APL_Float & flt_val, APL_Integer & int_val);
+   static Int_or_Double tokenize_real(Unicode_source &src);
 
    /// a locale-independent sscanf()
    static int scan_real(const char * strg, APL_Float & result, 
                         int E_pos, int minus_pos);
 
    /// tokenize a symbol
-   void tokenize_symbol(Unicode_source & src, Token_string & tos);
+   void tokenize_symbol(Unicode_source & src, Token_string & tos) const;
 
    /// the parsing mode of this parser
    const ParseMode pmode;
@@ -148,12 +202,6 @@ protected:
 
    /// caller of this Tokenizer
    const char * loc;
-
-   /// the characters afer caret 1
-   int rest_1;
-
-   /// the characters afer caret 2
-   int rest_2;
 };
 
 #endif // __TOKENIZER_HH_DEFINED__

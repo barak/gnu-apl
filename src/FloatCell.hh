@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,14 +18,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __FLOATCELL_HH_DEFINED__
 #define __FLOATCELL_HH_DEFINED__
 
-#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
+#include "Common.hh"   // for cfg_RATIONAL_NUMBERS_WANTED
 #include "IntCell.hh"
 #include "RealCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  A cell containing a single APL floating point value.  This class overloads
  certain functions in class Cell with floating point number specific
@@ -38,16 +41,26 @@
 /// A Cell containing a single floating point (or rational) value
 class FloatCell : public RealCell
 {
+   friend class ComplexCell;   // for zF() and zR()
+   friend class IntCell;       // for zF() and zR()
+   friend class NumericCell;   // for zF() and zR()
+   friend class RealCell;      // for zF() and zR()
+   friend class Value;         // for zF() and zR()
+
 public:
    /// Construct an floating point cell from a double \b r.
    FloatCell(APL_Float r)
       { value.fval.u1.flt = r;   value.fval.denominator = 0; }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// Construct an floating point cell from a quotient of integers. The caller
-   /// must ensure that denom > 0 and common divisors have been removed!
+   /// must ensure that denom > 0 and that common divisors have been removed!
    FloatCell(APL_Integer numer, APL_Integer denom)
-      { value.fval.u1.num = numer;   value.fval.denominator = denom; }
+      {
+        Assert1(denom > 0);
+        value.fval.u1.num = numer;
+        value.fval.denominator = denom;
+      }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner,
@@ -76,20 +89,6 @@ public:
         return value.fval.u1.flt;
       }
 
-   /// initialize Z to quotient numer÷denom
-   static ErrorCode zv(Cell * Z, APL_Integer numer, APL_Integer denom)
-      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
-
-   /// initialize Z with the value of \b this FloatCell
-   ErrorCode zv(Cell * Z) const
-      {
-        if (const APL_Integer denom = get_denominator())
-           new (Z) FloatCell(get_numerator(), denom);
-        else
-           new (Z) FloatCell(dfval());
-        return E_NO_ERROR;
-      }
-
 # if APL_Float_is_class
    /// overloaded Cell::release()
    virtual void release(const char * loc)
@@ -99,7 +98,7 @@ public:
       }
 # endif
 
-#else // no RATIONAL_NUMBERS_WANTED
+#else // not cfg_RATIONAL_NUMBERS_WANTED
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   FloatCell(dfval()); }
@@ -108,12 +107,6 @@ public:
    /// rational)
    APL_Float dfval() const
       { return value.fval.u1.flt; }
-
-   /// construct a new FloatCell a address Z
-   ErrorCode zv(Cell * Z) const
-      {
-        new (Z) FloatCell(dfval());   return E_NO_ERROR;
-      }
 
 # if APL_Float_is_class
    /// overloaded Cell::release()
@@ -225,10 +218,6 @@ public:
    /// replace normal chars by special chars specified in ⎕FC
    static void map_FC(UCS_string & ucs);
 
-   /// initialize Z to APL_Float v
-   static ErrorCode zv(Cell * Z, APL_Float v)
-      { new (Z) FloatCell(v);   return E_NO_ERROR; }
-
    /// greatest common divisor, Knuth Vol. 1 p. 14
    static APL_Integer gcd(APL_Integer m, APL_Integer n)
       {
@@ -266,7 +255,22 @@ public:
              b  = tb_ - q*b;
            }
       }
+
+#ifndef __LIBAPL__
+ protected:   // public: in libapl.cc
+#endif
+
+   /// initialize the (un-initialized) Cell *Z to APL_Float flt
+   static ErrorCode zF(Cell * Z, APL_Float flt)
+      { new (Z) FloatCell(flt);   return E_NO_ERROR; }
+
 protected:
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
+   /// initialize the (un-initialized) Cell *Z to APL_Float numer ÷ denom)
+   static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
+      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
+#endif
+
    ///  Overloaded Cell::get_cell_type().
    virtual CellType get_cell_type() const
       { return CT_FLOAT; }
@@ -292,7 +296,7 @@ protected:
    virtual APL_Integer get_checked_near_int()  const
       { 
         if (dfval() < 0.0)   return APL_Integer(dfval() - 0.3);
-        else                return APL_Integer(dfval() + 0.3);
+        else                 return APL_Integer(dfval() + 0.3);
       }
 
    /// Overloaded Cell::is_near_int().
@@ -329,18 +333,12 @@ protected:
    /// Overloaded Cell::CDR_size()
    virtual int CDR_size() const { return 8; }
 
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { new(this)   IntCell(0); }
-
    /// downcast to const FloatCell
    virtual const FloatCell & cFloatCell() const   { return *this; }
 
    /// downcast to FloatCell
    virtual FloatCell & vFloatCell()   { return *this; }
-
-
 };
-//=============================================================================
+//============================================================================
 
 #endif // __FLOATCELL_HH_DEFINED__

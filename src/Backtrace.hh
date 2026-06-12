@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,14 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __BACKTRACE_HH_DEFINED__
 #define __BACKTRACE_HH_DEFINED__
 
 #include <stdint.h>
-#include <vector>
 
 #include "Common.hh"
 #include "PrintOperator.hh"
+
+/// (maybe) init a dwarf object for the apl binary
+extern void init_DWARF(const char * bin_dir, const char * bin_file);
 
 /// show the current function call stack.
 class Backtrace
@@ -44,22 +49,15 @@ protected:
    /// find the source for PC \b pc
    static const char * find_src(int64_t pc);
 
-   /// open file apl.lines
-   static void open_lines_file();
+   /// read the file apl.lines (if present) and set main_offset from the
+   /// address of main() in apl.lines.
+   static void read_apl_lines_file();
 
-   /// show one item in the backtrace
+   /// print one item in the backtrace to cerr. NOTE: modifies s.
    static void show_item(int idx, char * s);
 
-   /// the status of file apl.lines
-   enum _lines_status
-      {
-        LINES_not_checked,   ///< status is unknown
-        LINES_outdated,      ///< file is outdated
-        LINES_valid          ///< file is up-to-date
-      };
-
-   /// the status of file apl.lines
-   static _lines_status lines_status;
+   /// print the dwarf info of one item in the backtrace to cerr.
+   static void show_dwarf(int idx, const char * s);
 
    /// a mapping from PCs to source lines.
    struct PC_src
@@ -70,6 +68,10 @@ protected:
 
    /// a mapping from PCs to source lines.
    static std::vector<PC_src> pc_2_src;
+
+   /// compare PCs (helper for binary search)
+   static int pc_cmp(const int64_t & key,
+                     const Backtrace::PC_src & pc2, const void *);
 };
 
 #define BACKTRACE Backtrace::show(__FILE__, __LINE__);

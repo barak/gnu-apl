@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __BIF_OPER2_OUTER_HH_DEFINED__
 #define __BIF_OPER2_OUTER_HH_DEFINED__
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    A dummy function for the product operator.
  **/
@@ -34,19 +37,17 @@ public:
    /// Constructor.
    Bif_JOT() : PrimitiveFunction(TOK_JOT) {}
  
-   virtual int get_oper_valence() const   { return 2; }
- 
-   static Bif_JOT * fun;             ///< Built-in function.
-   static Bif_JOT  _fun;             ///< Built-in function.
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   static Bif_JOT  fun;             ///< Built-in function.
  
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
-      { return true; }
-
-
+      { return false; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator outer product.
  */
 /// The class implementing ∘.g
@@ -57,10 +58,9 @@ public:
    Bif_OPER2_OUTER() : PrimitiveOperator(TOK_OPER2_OUTER) {}
 
    /// Overloaded Function::eval_ALRB().
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
-   static Bif_OPER2_OUTER * fun;   ///< Built-in function.
-   static Bif_OPER2_OUTER  _fun;   ///< Built-in function.
+   static Bif_OPER2_OUTER  fun;   ///< Built-in function.
 
 protected:
    /// the context for an outer product
@@ -87,6 +87,6 @@ protected:
    /// the main loop for an outer product with scalar functions
    static void PF_scalar_outer_product(Thread_context & tctx);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_OUTER_HH_DEFINED__

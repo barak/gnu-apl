@@ -655,7 +655,7 @@ public:
    /// receive a signal (TCP)
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
-                                        ostream * debug);
+                                        ostream * debug, const char ** loc);
 
 protected:
 
@@ -666,7 +666,7 @@ protected:
          store(buffer);
 
          uint32_t ll = htonl(buffer.size());
-         send(tcp_sock, &ll, 4, 0);
+         send(tcp_sock, reinterpret_cast<const char *>(&ll), 4, 0);
          ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
          return sent;
        }
@@ -2829,7 +2829,8 @@ enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 //----------------------------------------------------------------------------
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
-                                 char * & del, ostream * debug)
+                      char * & del, ostream * debug,
+                      const char ** loc)
 {
    if (bufsize < 2*MAX_SIGNAL_CLASS_SIZE)
       {
@@ -2839,21 +2840,42 @@ Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
               << " in recv_TCP() !!!" << endl;
 
+         *loc = LOC;
          return 0;
       }
 ssize_t siglen = 0;
    for (;;)
        {
-         errno = 0;
-         const ssize_t rx_bytes = ::recv(tcp_sock, buffer,
-                                     sizeof(uint32_t), MSG_WAITALL);
+         fd_set readfds;
+         FD_ZERO(&readfds);
+         FD_SET(tcp_sock, &readfds);
 
-         if (errno == EINTR)   continue;
+         errno = 0;
+         const int select__result = select(tcp_sock + 1, &readfds, 0, 0, 0);
+         if (select__result == -1)   // select() error with errno set
+            {
+              if (errno == EINTR)   continue;   // start over
+
+              *loc = LOC;
+              return 0;   // most likely: connection was closed by the peer
+            }
+
+         if (!FD_ISSET(tcp_sock, &readfds))
+            {
+              *loc = LOC;
+              return 0;   // never happens
+            }
+
+         // read 4 byte signal length
+         const ssize_t rx_bytes = ::recv(tcp_sock, buffer,
+                                         sizeof(uint32_t), 0);
 
          if (rx_bytes != sizeof(uint32_t))
             {
-                 // connection was closed by the peer
-                 return 0;
+              // connection was closed by the peer
+              //
+              *loc = LOC;
+              return 0;
             }
 
          break;   // got  sizeof(uint32_t) length bytes
@@ -2862,7 +2884,11 @@ ssize_t siglen = 0;
 //                    << " when reading siglen in in recv_TCP()" << endl;
 
    siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
-   if (siglen == 0)   return 0;   // close
+   if (siglen == 0)
+      {
+        *loc = LOC;
+        return 0;   // close
+      }
 
 // debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
 
@@ -2879,6 +2905,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         if (del == 0)
            {
              cerr << "*** new(" << siglen <<") failed in recv_TCP()" << endl;
+             *loc = LOC;
              return 0;
            }
         rx_buf = del;
@@ -2896,6 +2923,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
              {
                cerr << "*** got " << rx_bytes
                     << " when expecting " << siglen << endl;
+               *loc = LOC;
                return 0;
              }
 
@@ -3024,11 +3052,13 @@ Signal_base * ret = 0;
         default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
                       << signal_id.get_value() << endl;
                  errno = EINVAL;
+                 *loc = LOC;
                  return 0;
       }
 
    debug && ret->print(*debug << "<-- ");
 
+   *loc = LOC;
    return ret;   // invalid id
 }
 //----------------------------------------------------------------------------

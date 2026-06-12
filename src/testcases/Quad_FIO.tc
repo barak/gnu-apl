@@ -129,6 +129,10 @@ World
       FIO∆strerror Error
 No such file or directory
 
+      ⎕FIO['strerror'] Error   ⍝ monadic with axis string
+No such file or directory
+
+
       ⍝ printf
       ⍝
       )ERASE FORMAT
@@ -164,7 +168,7 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       ⍝ read entire file
       ⍝
       ⎕UCS FIO∆read_file 'FILE_IO.test1'
-72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32 
+72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32
       226 141 181
 
 
@@ -262,7 +266,6 @@ World!
       FIO∆fclose Handle ⍝ close file
 0
 
-
       ⍝ sscanf
       ⍝
       ⍴DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
@@ -271,10 +274,20 @@ World!
       FMT FIO∆sscanf DATA
  22 3.14 C DEFGH st⍴ing 57 
 
+      FMT ⎕FIO['sscanf'] DATA   ⍝ dyadic with axis string
+ 22 3.14 C DEFGH st⍴ing 57 
+
+      FMT←"Hello %[Hal]" ◊ DATA←"Hello Halloween"
+      FMT ⎕FIO['sscanf'] DATA
+ Hall 
+      FMT←"Hello %[^wen]" ◊ DATA←"Hello Halloween"
+      FMT ⎕FIO['sscanf'] DATA
+ Hallo 
 
       ⍝ execve
       ⍝
-      Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
+      ⍝Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
+      Filename←'../tools/TLV_server'
       Handle ← FIO∆execve Filename        ⍝ start & connect TLV_server
       TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer, Tag 42
       ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
@@ -286,9 +299,76 @@ World!
       ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
       ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops TLV_server)
 
+      FIO∆mkdir_777 FIO∆getcwd,'/test_data'
+0
+      DATA←'Kiss,n. A word invented by poets as a rhyme for bliss.'
+      DATA FIO∆pipeto 'wc>test_data/wc.txt'
+0
+      FIO∆read_file 'test_data/wc.txt'
+      0      11      54
+
+      FIO∆pipefrom 'ls test_data'
+wc.txt
+
+      FIO∆unlink 'test_data/wc.txt'
+0
+      FIO∆rmdir 'test_data'
+0
+
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM
       )ERASE Error FSTAT Filename LOCALHOST Port Z Server IPPROTO_IP
       )ERASE FMT DATA TL TLV Value
+
+      ⍝ regression
+
+      ⍝ ' flag
+      ⍝
+      "Hello %'d world" ⎕FIO.sprintf 123456
+Hello 123,456 world
+      "Hello %'d world" ⎕FIO.sprintf 12345
+Hello 12,345 world
+      "Hello %'d world" ⎕FIO.sprintf 1234
+Hello 1,234 world
+      "Hello %'d world" ⎕FIO.sprintf 123
+Hello 123 world
+      "Hello %'d world" ⎕FIO.sprintf 12
+Hello 12 world
+      "Hello %'d world" ⎕FIO.sprintf 1
+Hello 1 world
+
+      "Hello %'d world" ⎕FIO.sprintf 0
+Hello 0 world
+
+      "Hello %'d world" ⎕FIO.sprintf ¯1
+Hello -1 world
+      "Hello %'d world" ⎕FIO.sprintf ¯12
+Hello -12 world
+      "Hello %'d world" ⎕FIO.sprintf ¯123
+Hello -123 world
+      "Hello %'d world" ⎕FIO.sprintf ¯1234
+Hello -1,234 world
+      "Hello %'d world" ⎕FIO.sprintf ¯12345
+Hello -12,345 world
+      "Hello %'d world" ⎕FIO.sprintf ¯123456
+Hello -123,456 world
+
+      "Hello %'.2f world" ⎕FIO.sprintf 123456.77
+Hello 123,456.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 12345.77
+Hello 12,345.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 1234.77
+Hello 1,234.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 123.77
+Hello 123.77 world
+
+      "Hello %'.2f world" ⎕FIO.sprintf ¯123456.77
+Hello -123,456.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯12345.77
+Hello -12,345.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯1234.77
+Hello -1,234.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯123.77
+Hello -123.77 world
 
 ⍝     )VARS
 

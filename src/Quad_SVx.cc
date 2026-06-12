@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <dirent.h>
+/** @file
+*/
+
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "CDR.hh"
 #include "CharCell.hh"
@@ -41,23 +42,15 @@ extern char **environ;
 
 // shared variable function instances
 //
-Quad_SVC Quad_SVC::_fun;
-Quad_SVO Quad_SVO::_fun;
-Quad_SVQ Quad_SVQ::_fun;
-Quad_SVR Quad_SVR::_fun;
-Quad_SVS Quad_SVS::_fun;
-
-// shared variable function pointers
-//
-Quad_SVC * Quad_SVC::fun = & Quad_SVC::_fun;
-Quad_SVO * Quad_SVO::fun = & Quad_SVO::_fun;
-Quad_SVQ * Quad_SVQ::fun = & Quad_SVQ::_fun;
-Quad_SVR * Quad_SVR::fun = & Quad_SVR::_fun;
-Quad_SVS * Quad_SVS::fun = & Quad_SVS::_fun;
+Quad_SVC Quad_SVC::fun;
+Quad_SVO Quad_SVO::fun;
+Quad_SVQ Quad_SVQ::fun;
+Quad_SVR Quad_SVR::fun;
+Quad_SVS Quad_SVS::fun;
 
 APL_time_us Quad_SVE::timer_end = 0;
 
-//=============================================================================
+//============================================================================
 // there is a different prog_name() function around (in APserver) so we
 // declare the one for the APL interpreter here
 const char *
@@ -66,12 +59,12 @@ prog_name()
    return "apl";
 }
 
-//=============================================================================
+//============================================================================
 TCP_socket get_TCP_for_key(SV_key key)
 {
    return Svar_DB::get_DB_tcp();
 }
-//=============================================================================
+//============================================================================
 /**
     return true iff \b filename is an executable file
  **/
@@ -84,13 +77,13 @@ const char * end = strchr(file_and_args, ' ');
 
    return access(filename.c_str(), X_OK) == 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_SVx::start_AP(AP_num ap)
 {
-   if (!uprefs.system_do_svars)   // something went wrong
+   if (!UserPreferences::uprefs.system_do_svars)   // something went wrong
       {
-        if (uprefs.user_do_svars)   // user wanted APs
+        if (UserPreferences::uprefs.user_do_svars)   // user wanted APs
            {
              // user wanted APs, but something went wrong
              //
@@ -121,11 +114,10 @@ char filename[APL_PATH_MAX + 1];
 bool found_executable = false;
    for (int d = 0; d < dircount; ++d)
        {
-         const int slen = snprintf(filename, APL_PATH_MAX,
+         SPRINTF(filename,
                   "%s%s/AP%u --id %u --par %u --gra %u --auto%s",
                   LibPaths::get_APL_bin_path(), dirs[d], ap, ap,
                   own_ID, par_ID, verbose);
-         if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
 
          found_executable = is_executable(filename);
          if (found_executable)   break;
@@ -153,9 +145,9 @@ FILE * fp = popen(filename, "r");
 
    usleep(100000);   // give new AP time to register with APserver
 }
-//=============================================================================
+//============================================================================
 Token
-Quad_SVC::eval_AB(Value_P A, Value_P B)
+Quad_SVC::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 2)   RANK_ERROR;
    if (B->get_rank() > 2)   RANK_ERROR;
@@ -163,9 +155,9 @@ Quad_SVC::eval_AB(Value_P A, Value_P B)
 const ShapeItem var_count = B->get_rows();
    if (A->get_rows() != var_count)               LENGTH_ERROR;
    if (A->get_rank() > 0 && A->get_cols() != 4)   LENGTH_ERROR;
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
-const Cell * cA = &A->get_ravel(0);
+const Cell * cA = &A->get_cfirst();
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -179,15 +171,15 @@ Value_P Z(sh_Z, LOC);
         int ctl = 0;
         if (A->is_scalar())
            {
-             const bool val = A->get_ravel(0).get_near_bool();
+             const bool val = A->get_cfirst().get_near_bool();
               ctl = val ? ALL_SVAR_CONTROLS : NO_SVAR_CONTROL;
            }
         else if (A->is_vector())
            {
-             if (A->get_ravel(0).get_near_bool())   ctl |= SET_BY_1;
-             if (A->get_ravel(1).get_near_bool())   ctl |= SET_BY_2;
-             if (A->get_ravel(2).get_near_bool())   ctl |= USE_BY_1;
-             if (A->get_ravel(3).get_near_bool())   ctl |= USE_BY_2;
+             if (A->get_cfirst().get_near_bool())   ctl |= SET_BY_1;
+             if (A->get_cravel(1).get_near_bool())   ctl |= SET_BY_2;
+             if (A->get_cravel(2).get_near_bool())   ctl |= USE_BY_1;
+             if (A->get_cravel(3).get_near_bool())   ctl |= USE_BY_2;
            }
         else // matrix
            {
@@ -206,23 +198,23 @@ Value_P Z(sh_Z, LOC);
         Svar_DB::set_control(key, Svar_Control(ctl));
         ctl = Svar_DB::get_control(key);
 
-        new (Z->next_ravel())   IntCell(ctl & SET_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(ctl & SET_BY_2 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(ctl & USE_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(ctl & USE_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(ctl & SET_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(ctl & SET_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(ctl & USE_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(ctl & USE_BY_2 ? 1 : 0);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Quad_SVC::eval_B(Value_P B)
+Quad_SVC::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -237,22 +229,22 @@ Value_P Z(sh_Z, LOC);
         const SV_key key = sym->get_SV_key();
         const Svar_Control control = Svar_DB::get_control(key);
 
-        new (Z->next_ravel())   IntCell(control & SET_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(control & SET_BY_2 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(control & USE_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(control & USE_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(control & SET_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(control & SET_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(control & USE_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(control & USE_BY_2 ? 1 : 0);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Quad_SVE::Quad_SVE()
    : NL_SystemVariable(ID_Quad_SVE)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_SVE::assign(Value_P value, bool clone, const char * loc)
 {
@@ -261,7 +253,7 @@ Quad_SVE::assign(Value_P value, bool clone, const char * loc)
    //
    if (!value->is_scalar())   RANK_ERROR;
 
-const APL_time_us duration = 1000000 * value->get_ravel(0).get_real_value();
+const APL_time_us duration = 1000000 * value->get_cfirst().get_real_value();
    if (duration < 0)   DOMAIN_ERROR;
 
    if (duration == 0.0)
@@ -277,7 +269,7 @@ const APL_time_us duration = 1000000 * value->get_ravel(0).get_real_value();
    //
    timer_end = now() + duration;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_SVE::get_apl_value() const
 {
@@ -307,16 +299,14 @@ const APL_Float remaining = timer_end - now();
 
    if (remaining < 0.0)   return IntScalar(0, LOC);
 
-Value_P Z(LOC);
-   new (Z->next_ravel())   FloatCell(0.000001 * remaining);
-   return Z;
+   return FloatScalar(0.000001 * remaining, LOC);
 }
-//=============================================================================
+//============================================================================
 /**
  ** Offer variables in B to corresponding processors in A
  **/
 Token
-Quad_SVO::eval_AB(Value_P A, Value_P B)
+Quad_SVO::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 2)   RANK_ERROR;
@@ -324,9 +314,8 @@ Quad_SVO::eval_AB(Value_P A, Value_P B)
 const ShapeItem var_count = B->get_rows();
    if (A->get_rank() == 1 && A->element_count() != var_count)   LENGTH_ERROR;
 
-const UCS_string_vector apl_vars(B.getref(), false);
-const UCS_string_vector surrogates(B.getref(), true);
-
+const UCS_string_vector apl_vars(*B, false);
+const UCS_string_vector surrogates(*B, true);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -350,7 +339,7 @@ Value_P Z(sh_Z, LOC);
 
         if (bad_name || vlen == 0)
            {
-             new (Z->next_ravel()) IntCell(NO_COUPLING);
+             Z->next_ravel_Int(NO_COUPLING);
              continue;
            }
 
@@ -359,29 +348,29 @@ Value_P Z(sh_Z, LOC);
         Symbol * sym = Workspace::lookup_symbol(apl_vars[z]);
         assert(sym);
 
-        const AP_num proc = AP_num(A->get_ravel(a).get_int_value());
+        const AP_num proc = AP_num(A->get_cravel(a).get_int_value());
 
         ValueStackItem * vsp = sym->top_of_stack();
         Assert(vsp);
 
-        switch(sym->get_nc())
+        switch(sym->get_NC())
            {
              case NC_UNUSED_USER_NAME:
              case NC_VARIABLE:
                   break;
 
-             case NC_SHARED_VAR:
+             case NC_SYSTEM_VAR:
                   {
                     // CERR << "Shared variable " << apl_vars[z]
                     //      << " is already shared" << endl;
 
                     const SV_key key = sym->get_SV_key();
-                    new (Z->next_ravel()) IntCell(Svar_DB::get_coupling(key));
+                    Z->next_ravel_Int(Svar_DB::get_coupling(key));
                   }
                   continue;   // next z
 
              default: // function etc.
-                  Q1(sym->get_nc())   DOMAIN_ERROR;
+                  Q1(sym->get_NC())   DOMAIN_ERROR;
            }
 
         SV_Coupling coupling = NO_COUPLING;
@@ -391,13 +380,13 @@ Value_P Z(sh_Z, LOC);
              sym->share_var(key);
            }
 
-        new (Z->next_ravel()) IntCell(coupling);
+        Z->next_ravel_Int(coupling);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_key
 Quad_SVO::share_one_variable(AP_num to_ap, const uint32_t * vname,
                              SV_Coupling & coupling)
@@ -433,7 +422,7 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
         // APs always return SV_OFFERED
         //
         if (auto_started)   coupling = SV_OFFERED;
-        
+
         return key;
       }
 
@@ -450,17 +439,17 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
 
    return key;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  ** Return degree of coupling for variables in B
  **/
 Token
-Quad_SVO::eval_B(Value_P B)
+Quad_SVO::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -471,29 +460,29 @@ Value_P Z(sh_Z, LOC);
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
         if (sym == 0)   // variable does not exist
            {
-             new (Z->next_ravel()) IntCell(0);
+             Z->next_ravel_0();
              continue;
            }
 
         // the coupling of a non-shared variables has coupling 0
         //
-        if (sym->get_nc() != NC_SHARED_VAR)
+        if (sym->get_NC() != NC_SYSTEM_VAR)
            {
-             new (Z->next_ravel()) IntCell(0);
+             Z->next_ravel_0();
              continue;
            }
 
         const SV_key key = sym->get_SV_key();
         const SV_Coupling coupling = Svar_DB::get_coupling(key);
-         new (Z->next_ravel()) IntCell(coupling);
+         Z->next_ravel_Int(coupling);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
-Quad_SVQ::eval_B(Value_P B)
+Quad_SVQ::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)        RANK_ERROR;
    if (B->element_count() > 1)   LENGTH_ERROR;
@@ -508,14 +497,14 @@ Value_P Z;
       }
    else                            // return variables offered by processor ↑B
       {
-        const AP_num proc = AP_num(B->get_ravel(0).get_int_value());
+        const AP_num proc = AP_num(B->get_cfirst().get_int_value());
         Z = get_variables(proc);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_SVQ::get_processors()
 {
@@ -527,7 +516,7 @@ Quad_SVQ::get_processors()
    //
    // 2. running processors that have offered variables in Svar_DB.
    //
-std::vector<AP_num> processors;
+std::basic_string<AP_num> processors;
 
    // case 1...
    //
@@ -537,9 +526,7 @@ const char * dirs[] = { "", "/APs" };
    for (int d = 0; d < dircount; ++d)
        {
          char dirname[APL_PATH_MAX + 1];
-         int slen = snprintf(dirname, APL_PATH_MAX, "%s%s", LibPaths::get_APL_bin_path(),
-                  dirs[d]);
-         if (slen >= APL_PATH_MAX)   dirname[APL_PATH_MAX] = 0;
+         SPRINTF(dirname, "%s%s", LibPaths::get_APL_bin_path(), dirs[d]);
 
          dirname[APL_PATH_MAX] = 0;
          DIR * dir = opendir(dirname);
@@ -567,10 +554,8 @@ const char * dirs[] = { "", "/APs" };
                 if (entry->d_type != DT_REG)   continue; // not a regular file
 #endif
 
-                char filename[APL_PATH_MAX + 1];
-                int slen = snprintf(filename, APL_PATH_MAX, "%s/%s",
-                                    dirname, entry->d_name);
-                if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
+                char filename[2*APL_PATH_MAX + 1];   // to avoid bogus warning
+                SPRINTF(filename, "%s/%s", dirname, entry->d_name);
 
                 if (!is_executable(filename))   continue;
 
@@ -578,8 +563,7 @@ const char * dirs[] = { "", "/APs" };
                 if (sscanf(entry->d_name, "AP%u", &apnum) != 1)   continue;
 
                 char expected[APL_PATH_MAX + 1];
-                slen = snprintf(expected, sizeof(expected), "AP%u", apnum);
-                if (slen >= APL_PATH_MAX)   expected[APL_PATH_MAX] = 0;
+                SPRINTF(expected, "AP%u", apnum);
                 if (strcmp(entry->d_name, expected))   continue;
 
                 processors.push_back(AP_num(apnum));
@@ -594,7 +578,7 @@ const char * dirs[] = { "", "/APs" };
 
    // sort and remove duplicates
    //
-std::vector<int32_t> sorted;
+std::basic_string<int32_t> sorted;
    while (processors.size())
       {
         // find smallest
@@ -624,19 +608,19 @@ std::vector<int32_t> sorted;
       }
 
 Value_P Z(sorted.size(), LOC);
-   loop(z, sorted.size())   new (Z->next_ravel()) IntCell(sorted[z]);
+   loop(z, sorted.size())   Z->next_ravel_Int(sorted[z]);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
-std::vector<uint32_t> varnames;
+std::basic_string<uint32_t> varnames;
    Svar_DB::get_offered_variables(ProcessorID::get_own_ID(), proc, varnames);
 
    // varnames is a sequence of 0-terminated Unicodes
    //
-std::vector<int> var_lengths;   // including terminating 0
+std::basic_string<int> var_lengths;   // including terminating 0
 int last_zero = -1;
    loop(v, varnames.size())
       {
@@ -662,25 +646,25 @@ int v = 0;
         if (c < var_lengths[z])
            {
              if (varnames[v] == 0)   ++v;
-             new (Z->next_ravel()) CharCell(Unicode(varnames[v++]));
+             Z->next_ravel_Char(Unicode(varnames[v++]));
            }
         else
            {
-             new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+             Z->next_ravel_Char(UNI_SPACE);
            }
       }
 
-   Z->set_default_Spc();   // prototype: character
+   Z->set_proto_Spc();   // prototype: character
    return Z;
 }
-//=============================================================================
+//============================================================================
 Token
-Quad_SVR::eval_B(Value_P B)
+Quad_SVR::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -692,25 +676,25 @@ Value_P Z(sh_Z, LOC);
         if (sym)
            {
              const SV_Coupling coupling = sym->unshare_var();
-             new (Z->next_ravel()) IntCell(coupling);
+             Z->next_ravel_Int(coupling);
            }
          else
            {
-             new (Z->next_ravel()) IntCell(0);
+             Z->next_ravel_0();
            }
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
-Quad_SVS::eval_B(Value_P B)
+Quad_SVS::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -725,13 +709,13 @@ Value_P Z(sh_Z, LOC);
         const SV_key key = sym->get_SV_key();
         const Svar_state state = Svar_DB::get_state(key);
 
-        new (Z->next_ravel())   IntCell(state & SET_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(state & SET_BY_2 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(state & USE_BY_1 ? 1 : 0);
-        new (Z->next_ravel())   IntCell(state & USE_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(state & SET_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(state & SET_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(state & USE_BY_1 ? 1 : 0);
+        Z->next_ravel_Int(state & USE_BY_2 ? 1 : 0);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================

@@ -1,6 +1,9 @@
 ⍝ Quad_SYL
 ⍝ ----------------------------------
 
+      )CLEAR
+CLEAR WS
+
       ⎕IO←1
 
 ⍝ SI limit ----------------------------------
@@ -45,37 +48,55 @@ OK      - no duplicate parents
       ⍝
       )ERASE FOO
 ∇A FOO B;C;D;E;F;G;H;I;J;K;L
+ 'A FOO B with B:' B
  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
  A FOO B+1
 ∇
 
       0 FOO 0
+ A FOO B with B: 0 
+ A FOO B with B: 1 
+ A FOO B with B: 2 
+ A FOO B with B: 3 
+ A FOO B with B: 4 
+ A FOO B with B: 5 
+ A FOO B with B: 6 
+ A FOO B with B: 7 
+ A FOO B with B: 8 
+ A FOO B with B: 9 
+ A FOO B with B: 10 
+ A FOO B with B: 11 
+ A FOO B with B: 12 
 INTERRUPT+
-FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
-³
+FOO[1]  'A FOO B with B:' B
+        ^
 
+      )MORE
+the system limit on SI depth (as set in ⎕SYL[1;2]) was reached
+(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).
 
+      ⍝ when ⎕SYL[1] triggers then it shall clear itself.
       ⎕SYL[1;2]
 0
 
       )SI
 FOO[1]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
-FOO[2]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
+FOO[3]
 ⋆
 
       )MORE
-NO MORE ERROR INFO
+NO )MORE ERROR INFO
 
       )SIC
       )SI
@@ -94,22 +115,41 @@ OK      - no duplicate parents
 
       ⍝ system limit on value count
       ⍝
+      )SIC
+
       ⎕SYL[2;2]←300
       ⎕SYL[2;2]
 300
 
-      ⎕SYL[2]←400
+      ⎕SYL[2]←200
       ⎕SYL[2;2]
-400
+200
 
       0 FOO 0
+ A FOO B with B: 0 
+ A FOO B with B: 1 
+ A FOO B with B: 2 
+ A FOO B with B: 3 
+ A FOO B with B: 4 
+ A FOO B with B: 5 
+ A FOO B with B: 6 
+ A FOO B with B: 7 
+ A FOO B with B: 8 
+ A FOO B with B: 9 
+ A FOO B with B: 10 
+ A FOO B with B: 11 
+ A FOO B with B: 12 
+ A FOO B with B: 13 
+ A FOO B with B: 14 
+ A FOO B with B: 15 
+ A FOO B with B: 16 
 INTERRUPT+
-FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
-³
+FOO[1]  'A FOO B with B:' B
+        ^
 
       )MORE
-the system limit on the APL value count (as set in ⎕SYL) was reached
-(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).
+the system limit on the APL value count (as set in ⎕SYL[2;2]) was reached
+(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).
 
       ⎕SYL[2;2]
 0
@@ -128,14 +168,16 @@ the system limit on the APL value count (as set in ⎕SYL) was reached
       ⎕SYL[3;2]
 3000000
 
-      ⎕SYL[3]←3600000
+      ⎕SYL[3]←349992
       ⎕SYL[3;2]
-3600000
+349992
 
       100 FOO 0
+ A FOO B with B: 0 
+ A FOO B with B: 1 
 INTERRUPT+
-FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
-³
+FOO[2]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+        ^
 
       ⎕SYL[3;2]
 0

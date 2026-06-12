@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Elias Mårtenson
+    Copyright © 2008-2016  Elias Mårtenson
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
 */
 
 #ifndef __Quad_RE_DEFINED__
@@ -34,8 +37,7 @@ public:
    Quad_RE() : QuadFunction(TOK_Quad_RE)
    {}
 
-   static Quad_RE * fun;          ///< Built-in function.
-   static Quad_RE  _fun;          ///< Built-in function.
+   static Quad_RE  fun;          ///< Built-in function.
 
 protected:
    /// the type of result
@@ -48,18 +50,18 @@ protected:
       } result_type;    ///< the type of result
 
    /// overloaded Function::eval_AB().
-   Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_AXB(A, Str0(LOC), B); }
 
    /// overloaded Function::eval_AXB().
-   Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_B().
-   Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { VALENCE_ERROR; }
 
    /// overloaded Function::eval_XB().
-   Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { VALENCE_ERROR; }
 
 #ifdef HAVE_LIBPCRE2_32
@@ -79,7 +81,7 @@ protected:
            bool get_error_on_no_match() const
               { return error_on_no_match; }
 
-           /// return global
+           /// return global (return all matches and not only first match)
            bool get_global() const
               { return global; }
 

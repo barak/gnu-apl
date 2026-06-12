@@ -15,7 +15,7 @@ APserver_SOURCES = APserver.cc				\
 		../Svar_record.cc ../Svar_record.hh
 
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
-if DEVELOP
+if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif
 

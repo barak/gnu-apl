@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "PostgresArgListBuilder.hh"
 
 #include <string.h>
@@ -126,114 +129,139 @@ void PostgresArgListBuilder::append_null( int pos )
     args.push_back( new PostgresNullArg() );
 }
 
-static void update_int_cell( Cell *cell, char *content )
+static void
+update_int_cell(Value & Z, char * content)
 {
-    if( *content == 0 ) {
-        Workspace::more_error() = "Numeric content from database was empty";
-        DOMAIN_ERROR;
-    }
+    if (*content == 0)
+       {
+         MORE_ERROR() << "Numeric content from database was empty";
+         DOMAIN_ERROR;
+       }
 
     char *endptr;
-    long n = strtol( content, &endptr, 10 );
-    if( *endptr != 0 ) {
-        Workspace::more_error() = "Error parsing values returned from database";
-        DOMAIN_ERROR;
-    }
+    const APL_Integer N = strtol(content, &endptr, 10);
+    if (*endptr != 0)   // some rest after number (if any)
+       {
+         MORE_ERROR() <<
+                     "Error parsing values returned from database";
+         DOMAIN_ERROR;
+       }
 
-    new (cell) IntCell( n );
+    Z.next_ravel_Int(N);
 }
 
-static void update_double_cell( Cell *cell, char *content )
+static void
+update_double_cell(Value & Z, char * content )
 {
-    char *endptr;
-    double n = strtod( content, &endptr );
-    if( *endptr != 0 ) {
-        Workspace::more_error() = "Error parsing decimal numbers returned from database";
-        DOMAIN_ERROR;
-    }
+char *endptr = 0;
+const double D = strtod(content, &endptr);
+    if (endptr == content)   // strtod failed
+       {
+         MORE_ERROR() << "Error parsing decimal numbers returned from database";
+         DOMAIN_ERROR;
+       }
 
-    new (cell) FloatCell( n );
+    Z.next_ravel_Float(D);
 }
 
-Value_P PostgresArgListBuilder::run_query( bool ignore_result )
+Value_P
+PostgresArgListBuilder::run_query( bool ignore_result )
 {
-    const int n = args.size();
-    const int array_len = n == 0 ? 1 : n;
-    const char * cp_null = 0;
-    vector<Oid>          types  (array_len, 0);
-    vector<const char *> values (array_len, cp_null);
-    vector<int>          lengths(array_len, 0);
-    vector<int>          formats(array_len, 0);
+const int n = args.size();
+const int array_len = n == 0 ? 1 : n;
+const char * cp_null = 0;
+vector<Oid>          types  (array_len, 0);
+vector<const char *> values (array_len, cp_null);
+vector<int>          lengths(array_len, 0);
+vector<int>          formats(array_len, 0);
 
-    for( int i = 0 ; i < n ; i++ ) {
-        PostgresArg *arg = args[i];
-        arg->update( &types[0], &values[0], &lengths[0], &formats[0], i );
-    }
+    loop(i, n)
+        {
+          PostgresArg *arg = args[i];
+          arg->update(&types[0], &values[0], &lengths[0], &formats[0], i);
+        }
 
-    PostgresResultWrapper result( PQexecParams( connection->get_db(),
-                                                sql.c_str(), n, NULL,
-                                                &values[0], &lengths[0],
-                                                &formats[0], 0 ) );
+    PostgresResultWrapper result(PQexecParams(connection->get_db(),
+                                              sql.c_str(), n, NULL,
+                                              &values[0], &lengths[0],
+                                              &formats[0], 0));
+
     ExecStatusType status = PQresultStatus( result.get_result() );
     Value_P db_result_value;
-    if( status == PGRES_COMMAND_OK ) {
-        db_result_value = Str0( LOC );
-    }
-    else if( status == PGRES_TUPLES_OK ) {
-        int rows = PQntuples( result.get_result() );
-        if( rows == 0 ) {
-            db_result_value = Idx0( LOC );
-        }
-        else {
-            int cols = PQnfields( result.get_result() );
-            Shape shape( rows, cols );
-            db_result_value = Value_P( shape, LOC );
-            for( int row = 0 ; row < rows ; row++ ) {
-                for( int col = 0 ; col < cols ; col++ ) {
-                    if( PQgetisnull( result.get_result(), row, col ) ) {
-                        new (db_result_value->next_ravel())
-                            PointerCell( Idx0(LOC).get(), db_result_value.getref());
-                    }
-                    else {
-                        Oid col_type = PQftype( result.get_result(), col );
-                        char *value = PQgetvalue( result.get_result(), row, col );
-                        if( col_type == 23 // INT4OID
-                            || col_type == 20 // INT8OID
-                            ) {
-                            update_int_cell( db_result_value->next_ravel(), value );
-                        }
-                        else if( col_type == 1700 ) { // NUMERICOID
-                            if( strchr( value, '.' ) == NULL ) {
-                                update_int_cell( db_result_value->next_ravel(), value );
-                            }
-                            else {
-                                update_double_cell( db_result_value->next_ravel(), value );
-                            }
-                        }
-                        else {
-                            if( *value == 0 ) {
-                                new (db_result_value->next_ravel())
-                                    PointerCell( Str0( LOC ).get(),
-                                                 db_result_value.getref() );
-                            }
-                            else {
-                                new (db_result_value->next_ravel())
-                                    PointerCell( make_string_cell( value, LOC ).get(),
-                                                 db_result_value.getref() );
-                            }
-                        }
-                    }
-                }
+
+    if (status == PGRES_COMMAND_OK)
+       {
+         db_result_value = Str0( LOC );
+       }
+    else if(status == PGRES_TUPLES_OK)
+       {
+         int rows = PQntuples( result.get_result() );
+         if (rows == 0)
+            {
+              db_result_value = Idx0( LOC );
             }
-        }
-    }
-    else {
-        stringstream out;
-        out << "Error executing query: " << PQresStatus( status ) << endl
-            << "Message: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
-        DOMAIN_ERROR;
-    }
+         else
+            {
+              int cols = PQnfields( result.get_result() );
+              Shape shape( rows, cols );
+              db_result_value = Value_P( shape, LOC );
+
+             loop(row,  rows)
+                 {
+                for (int col = 0 ; col < cols ; col++)
+                    {
+                      if (PQgetisnull(result.get_result(), row, col))
+                         {
+                           db_result_value->next_ravel_Pointer(Idx0(LOC).get());
+                         }
+                      else
+                         {
+                           Oid col_type = PQftype(result.get_result(), col);
+                           char * value = PQgetvalue(result.get_result(),
+                                                     row, col);
+
+                           //  INT4OID        or INT8OID
+                           if (col_type == 23 || col_type == 20)
+                              {
+                                update_int_cell(*db_result_value, value);
+                              }
+                        else if (col_type == 1700)   // NUMERICOID
+                              {
+                                if (strchr(value, '.' ) == NULL)
+                                   {
+                                     update_int_cell(*db_result_value, value);
+                                   }
+                                else
+                                   {
+                                     update_double_cell(*db_result_value, value);
+                                   }
+                              }
+                           else
+                              {
+                                if (*value == 0)
+                                   {
+                                     db_result_value->next_ravel_Pointer(
+                                                 Str0(LOC).get());
+                                   }
+                                else
+                                   {
+                                     db_result_value->next_ravel_Pointer(
+                                          make_string_cell(value, LOC).get());
+                                  }
+                              }
+                         }
+                    }
+                 }
+            }
+       }
+    else
+       {
+         ostringstream out;
+         out << "Error executing query: " << PQresStatus( status ) << endl
+             << "Message: " << PQresultErrorMessage(result.get_result());
+         MORE_ERROR() << out.str().c_str();
+         DOMAIN_ERROR;
+       }
 
     db_result_value->check_value( LOC );
     return db_result_value;

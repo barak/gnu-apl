@@ -1,0 +1,25 @@
+⍝ ZZ48_Regression.tc
+⍝ ------------------
+
+      ⍝ H-P Sorge, Nov. 2018
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      4 ⎕CR  ' '=⊂⊂'yy'
+┏━━━━━━━┓
+┃┏━━━━━┓┃
+┃┃┏→━━┓┃┃
+┃┃┃0 0┃┃┃
+┃┃┗━━━┛┃┃
+┃┗ϵ━━━━┛┃
+┗ϵϵ━━━━━┛
+
+
+⍝ sometimes WS FULL comes twice. Fix it!
+⍝      ⍴10000000⍴⊂'0123456789abcdef'
+⍝WS FULL
+⍝      ⍴10000000⍴⊂'0123456789abcdef'
+⍝       ^        ^
+
+

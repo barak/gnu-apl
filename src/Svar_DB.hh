@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __SVAR_DB_HH_DEFINED__
 #define __SVAR_DB_HH_DEFINED__
 
-#include <stdint.h>
-#include <unistd.h>
-
 #include <iostream>
-#include <vector>
 
 #include "Common.hh"
 #include "ProcessorID.hh"
@@ -33,13 +32,13 @@
 
 using namespace std;
 
-#if APSERVER_TRANSPORT == 1
+#if cfg_APSERVER_TRANSPORT == 1
 # define ABSTRACT_OFFSET 1
 #else
 # define ABSTRACT_OFFSET 0
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a pointer to one record (one shared variable) of the shared Svar_DB_memory
 class Svar_record_P
 {
@@ -62,7 +61,7 @@ private:
    /// don't copy...
    Svar_record_P & operator =(const Svar_record_P & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 # define READ_RECORD(key, open_act, closed_act)		\
     if (Svar_DB::APserver_available())			\
          { const Svar_record_P svar(key); open_act }	\
@@ -107,11 +106,11 @@ public:
    /// add processors with pending offers to \b to_proc. Duplicates
    /// are OK and will be removed later
    static void get_offering_processors(AP_num to_proc,
-                                       std::vector<AP_num> & processors);
+                                       std::basic_string<AP_num> & processors);
 
    /// return all variables shared between \b to_proc and \b from_proc
    static void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                     std::vector<uint32_t> & varnames);
+                                     std::basic_string<uint32_t> & varnames);
 
    /// return coupling of \b entry with \b key.
    static SV_Coupling get_coupling(SV_key key)
@@ -175,7 +174,7 @@ public:
    static void disconnect()
       {
         if (DB_tcp != NO_TCP_SOCKET)
-           { ::close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
+           { close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
       }
 
    /// return true if the connection to APserver is up

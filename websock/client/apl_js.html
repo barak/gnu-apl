@@ -25,7 +25,7 @@
   .e   { background-color: #FFF; color: #F00 }
  </style>
 
-  <script type='text/javascript'>
+  <script>
 
     function init()
     {
@@ -33,6 +33,7 @@
       host = window.location.hostname;
       var address = "ws://" + host + ":42424";
       var protocol = "apl-protocol";
+      // document.getElementById("location").innerHTML = address;
       web_socket = new WebSocket(address, protocol);
       web_socket.onmessage = function(e)
          {
@@ -136,7 +137,7 @@
 
  <body onload="init()">
 
-  <H1>Welcome to try-GNU-APL</H1>
+  <H1>Welcome to try-GNU-APL (version 1)</H1>
   <HR>
   <TABLE>
    <TR>
@@ -173,12 +174,14 @@
          onclick='window.open("APL_keyboard.html", "APL Keyboard", "width=930,height=500"); return false;'>
   </form>
   <HR>
-  <div class=footer>
+  <div class="footer">
       This page is fed from GNU APL,
       <A href=http://www.gnu.org/software/apl>
-              http://www.gnu.org/software/apl</A>,
-      contact: <A href=mailto:bug-apl@gnu.org>
-              mailto:bug-apl@gnu.org</A>.
+              http://www.gnu.org/software/apl</A>,<br>
+      Contact: <A href=mailto:bug-apl@gnu.org>
+              mailto:bug-apl@gnu.org</A>.<br>
+  </div>
+  <div class="footer" id="location">
   </div>
  </body>
 </html>

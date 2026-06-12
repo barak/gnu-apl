@@ -64,6 +64,7 @@ xDESCRIPTION←'Welcome to GNU APL'
 ⍝ some URIs used in the BODY
 ⍝
 xHTTP_GNU←"http://www.gnu.org/"
+xHTTP_DOXY←"http://svn.savannah.gnu.org/viewvc/*checkout*/apl/trunk/html/index.html"
 xHTTP_JSA←"http://192.168.0.110/apl/"
 xFTP_GNU←"ftp://ftp.gnu.org"
 xFTP_APL←xFTP_GNU,"/gnu/apl"
@@ -74,7 +75,7 @@ xGNU_PIC←HTML∆__src xHTTP_GNU, "graphics/gnu-head-sm.jpg"
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ some file names used in the BODY
 ⍝
-xAPL_VERSION←'apl-1.8'
+xAPL_VERSION←'apl-1.9'
 xTARFILE←xAPL_VERSION,  '.tar.gz'
 xRPMFILE←xAPL_VERSION,  '-0.i386.rpm'
 xSRPMFILE←xAPL_VERSION, '-0.src.rpm'
@@ -86,9 +87,8 @@ xMAIL_WEB←'bug-apl@gnu.org'
 xMAIL_APL←'bug-apl@gnu.org'
 xMAIL_APL_ARCHIVE←'http://lists.gnu.org/archive/html/bug-apl/'
 xMAIL_APL_SUBSCRIBE←'https://lists.gnu.org/mailman/listinfo/bug-apl'
-xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
-xDocker_GNU_APL←'https://hub.docker.com/r/juergensauermann/gnu-apl'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
+xGIT_APL←'https://savannah.gnu.org/git/?group=apl'
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ some features of GNU APL
@@ -101,7 +101,7 @@ yFEATURES←HTML∆Ul yFEATURES
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ Installation instructios
 ⍝
-∇yZ←INSTALL;I1;I2;I3;I4
+∇yZ←INSTALL;I1;I2;I3;I4;I5
 I1←      'Visit one of the ', xMIRRORS HTML∆A 'GNU mirrors'
 I1←  I1, ' and download the tar file <B>', xTARFILE,'</B> in directory'
 I1←⊂ I1, ' <B>apl</B>.'
@@ -109,7 +109,11 @@ I2←⊂     'Unpack the tar file: <B>tar xzf ', xTARFILE, '</B>'
 I3←⊂     'Change to the newly created directory: <B>cd ', xAPL_VERSION, '</B>'
 I4←      'Read (and follow) the instructions in files <B>INSTALL</B>'
 I4←⊂ I4, ' and <B>README-*</B>'
-yZ←⊃ HTML∆Ol I1, I2, I3, I4
+I5←      '<B>Caveat:</B> GNU APL creates full releases only every 1-2 years. Therefore an interpreter'
+I5←I5,   ' downloaded from a GNU mirror is inevitably outdated and likely contains errors that were fixed already.'
+I5←⊂I5,  ' Consider using <B>git</B> or <B>SVN</B> (see below) instead.'
+
+yZ←⊃ HTML∆Ol I1, I2, I3, I4, I5
 ∇
 
       ⍝ ⎕INP acts like a HERE document in bash. The monadic form ⎕INP B
@@ -158,13 +162,13 @@ The APL interpreter is an (almost) complete implementation of
 The APL interpreter has implemented:
 <?apl ⊃ yFEATURES ?>
 
-In addition, <B>GNU APL</B> can be scripted. For example,
-<?apl HTML∆x2y 'APL_demo.html' HTML∆A "<B>this HTML page</B>" ?>
-is the output of a CGI script written in APL.
+In addition, <B>GNU APL</B> can be scripted. For example, this
+GNU APL home page was produced by a CGI script written in APL (see
+<?apl HTML∆x2y 'APL_demo.html' HTML∆A "<B>APL demo</B>" ?>).
 <BR>
 <BR>
 GNU APL was written and is being maintained by Jürgen Sauermann.
-</DIV>
+<A href="http://xn--jrgen-sauermann-zvb.de"></A></DIV>
 <DIV class="c3">
 
 <?apl HTML∆H2[''] 'Downloading and Installing GNU APL' ?>
@@ -173,8 +177,8 @@ GNU APL should be available on every
 (in directory <B>apl</B>) and at
 <?apl  xFTP_APL HTML∆A xFTP_GNU ?>.
 
-<?apl HTML∆H4[''] 'Normal Installation of GNU APL' ?>
-The normal (and fully supported) way to install GNU APL is this:
+<?apl HTML∆H4[''] 'Simple Installation of GNU APL' ?>
+The <B>simplest</B> (though not necessarily best) way to install GNU APL is this:
 
 <?apl ⊃ INSTALL ?>
 
@@ -183,20 +187,35 @@ The normal (and fully supported) way to install GNU APL is this:
 GNU APL compiles under CYGWIN, (see
 <?apl  ('http://',xCYGWIN) HTML∆A xCYGWIN ?>),
 provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
-that may run under CYGWIN lives in the download area. Use at your own risk and
-see <B>README-5-WINDOWS</B> for further information.
+that should run under CYGWIN lives in the download area. Use at your own risk
+and see <B>README-5-WINDOWS</B> for further information. Building GNU APL under
+cygwin is the method of choice if you need some of the special purpose system
+functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries.
 
-<?apl HTML∆H4[''] 'Subversion (SVN) repository for GNU APL' ?>
+A compiled 64-bit version of GNU APL (briefly tested under Windows 10)
+which was built under cygwin, but runs without cygwin being installed,
+is contained in file <B>apl-1.9-windows.zip</B>. This zip file also contains
+an installer for an APL keyboard layout.
 
-You can also check out the latest version of GNU APL from its subversion
-repository on Savannah. The subversion command to do that is:
+<?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
+
+The best supported way of installing GNU APL is to check out its latest version from either its Subversion (preferred)
+or Git repository on Savannah. The subversion command to do that is:
 <BR>
 <BR>
-<B>svn co http://svn.savannah.gnu.org/svn/apl/trunk</B>
+<B>svn checkout http://svn.savannah.gnu.org/svn/apl/trunk</B>
 <BR>
 <BR>
 Here is <?apl HTML∆x2y xSVN_APL HTML∆A "<EM>more information</EM>" ?>
-about using Subversion with GNU APL.
+about using Subversion with GNU APL. Likewise, the command for a Git
+checkout is:
+<BR>
+<BR>
+<B>git clone https://git.savannah.gnu.org/git/apl.git</B>
+<BR>
+<BR>
+and here is <?apl HTML∆x2y xGIT_APL HTML∆A "<EM>more information</EM>" ?>
+about using Git with GNU APL.
 
 <?apl HTML∆H4[''] 'RPMs for GNU APL' ?>
 
@@ -217,34 +236,21 @@ distribution with a different package manager.
 
 <?apl HTML∆H4[''] 'GNU APL Binary' ?>
 
-If you just want to quickly give GNU APL a try, and if you are very lucky
+If you just want to quickly give GNU APL a try, and if you are very lucky,
 then you may be able to start the compiled
-GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than 
+GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than
 installing the entire packet . The binary MAY run on a 32-bit i686 Ubuntu.
 Chances are, however, that it does NOT work, Please DO NOT report any
-problems if the binary does not run on your machine. Instead use the standard
-installation method above.
+problems if the binary does not run on your machine. Instead please use a better
+supported installation method above.
 <BR><BR>
-<B>Note:</B> The program <B>APnnn</B> (a support program for shared variables)
-is not provided in binary form, so you should start the <B>apl</B> binary with
-command line option --noSV. Note as well that the binary <B>apl</B> will not
-be updated with every GNU APL release. Therefore it will contain errors that
-have been corrected already.
-
-<?apl HTML∆H4[''] 'GNU APL Online' ?>
-
-As of recently, there is an (experimental) online version of GNU APL. It is
-intended to give you an idea of how GNU APL will look like if you install it
-on your computer. See
-<?apl HTML∆x2y xTRY_GNU_APL HTML∆A, "<B>", xTRY_GNU_APL, "</B>" ?>.
-
-<?apl HTML∆H4[''] 'GNU APL on Docker' ?>
-
-For those who live in the cloud there is a small Docker container with Alpine
-GNU/Linux, GNU APL, and the optional libraries (SQLite, Postgres, FFT). See
-<?apl HTML∆x2y xDocker_GNU_APL HTML∆A, "<B>", xDocker_GNU_APL, "</B>" ?>.
-
+<B>Note:</B> The programs <B>APxxx</B> and <B>APserver</B> (support programs for
+shared APL variables) are not provided in binary form. Therefore you should
+start the <B>apl</B> binary with command line option <B>--noSV</B>. Note as
+well that the binary <B>apl</B> will not be updated with every GNU APL release.
+Therefore it will contain errors that have been corrected already.
 </DIV>
+
 <DIV class="c4">
 <?apl HTML∆H2[''] 'Reporting Bugs' ?>
 
@@ -260,27 +266,35 @@ The emails that we like the most are those that include a small example of
 list at 
 <?apl HTML∆x2y xMAIL_APL_ARCHIVE HTML∆A "<B>", xMAIL_APL_ARCHIVE,"</B>" ?>
 or subscribe to it at 
-<?apl HTML∆x2y xMAIL_APL_SUBSCRIBE HTML∆A "<B>", xMAIL_APL_SUBSCRIBE,"</B>" ?>
+<?apl HTML∆x2y xMAIL_APL_SUBSCRIBE HTML∆A "<B>", xMAIL_APL_SUBSCRIBE,"</B>" ?>.
 </DIV>
 <DIV class="c5">
 <?apl HTML∆H2[''] 'Documentation' ?>
-We have an <?apl HTML∆x2y 'apl.html' HTML∆A "<B>info manual</B>" ?> for GNU APL.
-
-We are also looking for <B>free</B> documentation on APL in general
-(volunteers welcome) that can be published here. A "Quick start" document
-for APL is planned but the work has not started yet.
+GNU APL comes with two documents:
+<?apl HTML∆x2y 'apl-intro.html' HTML∆A "<B>A Quick Tour of GNU APL</B>"?>,
+which was primarily written for newcomers to APL in general or to GNU APL in
+particular. It contains a brief introduction by examples into the APL
+language, followed by s short description of almost all GNU APL features.
 <BR><BR>
-The C++ source files for GNU APL are Doxygen documented. You can generate
-this documentation by running <B>make DOXY</B> in the top level directory
-of the GNU APL package.
+And, for those already familiar with APL, there is a slightly more detailed
+<?apl HTML∆x2y 'apl.html' HTML∆A "<B>info manual</B>" ?> for GNU APL whose
+focus is more on the non-standard GNU APL features than on the APL
+language itself.
+<BR><BR>
+Finally, all GNU APL source code files are Doxygen documented.
+You can locally generate this documentation by running <B>make DOXY</B> in
+the top level directory of the GNU APL package. Or browse a (not entirely
+up-to-date)
+<?apl HTML∆x2y 'http://jürgen-sauermann.de/gnu_APL_doxygen/index.html' HTML∆A "<B>online version</B>" ?> of the Doxygen documentation.
 </DIV>
 <DIV class="c6">
 <?apl HTML∆H2[''] 'GNU APL Community' ?>
-There is a growing group of people that are using GNU APL and that have made
-their own developments related to APL available to the public.
+There is a growing group of people that are using GNU APL and that would like
+to share their APL code with other APL programmers.
 We have created a
 <?apl  'Community.html' HTML∆A '<b>GNU APL Community Web page</b>' ?>
-that collects <B>links</B> to those developments to avoid that they get lost.
+that aims at collecting and preserving <B>links</B> to the code provided
+by GNU APL users as to avoid that it gets lost.
 <BR><BR>
 In addition, we maintain a 
 <?apl  'Bits_and_Pieces/' HTML∆A '<b>Bits-and-Pieces</b>' ?> directory

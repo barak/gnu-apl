@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef VERSION_COMMAND_HH
 #define VERSION_COMMAND_HH
 

@@ -1,17 +1,17 @@
 /*
-    This file is a port of the 'dgelsy' and 'zgelsy' functions (and the
-    functions that they call) from liblapack to C++.
+    This file is a port of the LApack 'dgelsy' and 'zgelsy' functions
+    (and of the functions that they call) from liblapack to C++.
 
-    liblapack has the following license/copyright notice,
-    see http://www.netlib.org/lapack/LICENSE:
+    liblapack has the following license/copyright notices,
+    see also http://www.netlib.org/lapack/LICENSE:
 
     Copyright (c) 1992-2011 The University of Tennessee and The University
-                            of Tennessee Research Foundation.  All rights
-                            reserved.
-    Copyright (c) 2000-2011 The University of California Berkeley. All
-                            rights reserved.
-    Copyright (c) 2006-2011 The University of Colorado Denver.  All rights
-                            reserved.
+                            of Tennessee Research Foundation.
+                            All rights reserved.
+    Copyright (c) 2000-2011 The University of California Berkeley.
+                            All rights reserved.
+    Copyright (c) 2006-2011 The University of Colorado Denver.
+                            All rights reserved.
 
 
     Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,1293 +61,698 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** @file
  */
 
-#ifndef __GELSY_HH_DEFINED__
-#define __GELSY_HH_DEFINED__
+#define LA_DEBUG     0   /* LApack.cc */
+#define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
-#ifndef assert
-# define assert(x)
-#endif
+typedef int Crow;   ///< a row number:      0..M (excluding M)
+typedef int Ccol;   ///< a column number:   0..N (excluding N)
+typedef int Cdia;   ///< a diagonal (row == col) number:   0..N (excluding N)
 
-#include <stdio.h>
-#include <stdlib.h>
+#define ALL_ROWS(M)   for (Crow row = 0; row < (M); ++row)
+#define ALL_COLS(N)   for (Ccol col = 0; col < (N); ++col)
+#define ALL_DIAS(N)   for (Cdia dia = 0; dia < (N); ++dia)
 
-using namespace std;
-/// a real number
-typedef APL_Float DD;
+#define REV_ROWS(M)   for (Crow j = (M); j--;)
+#define REV_COLS(N)   for (Ccol k = (N); k--;)
+#define REV_DIAG(N)   for (Cdia d = (N); d--;)
 
-/// a complex number
-class ZZ
-{
-public:
-   /// 0J0
-   ZZ()
-   : _r(0),
-     _i(0)
-   {}
+/** A class that implements Dgelsy() and Zgelsy(), bundled with the helper
+    functions that the implementation needs. Class LA_pack uses the following
+    sub-classes:
 
-   /// rJ0
-   ZZ(APL_Float r)
-   : _r(r),
-     _i(0)
-   {}
+   DD:   a single real number
+   ZZ:   a single complex number
+   fMatrix<T> a matrix of T (where T is DD or ZZ)
 
-   /// rJi
-   ZZ(APL_Float r, APL_Float i)
-   : _r(r),
-     _i(i)
-   {}
+   fMatrix<T> is actually a view of an underlying T* so that makes it possible
+   to access sub-matrices without copying them (in-place modification).
 
-   /// return the real part of \b this
-   APL_Float real() const       { return _r; }
+   In FORTRAN, every fMatrix A, B, C... is accompanied by an integer LDA, LDB,
+   LDC ... (aka. the Leading Dimension of A, B, C, ..., which is the number of
+   rows in the matrix.
 
-   /// set the real part of \b this
-   void set_real(APL_Float x)   { _r = x; }
-
-   /// return the imag part of \b this
-   APL_Float imag() const    { return _i; }
-
-   /// set the imag part of \b this
-   void set_imag(APL_Float x)   { _i = x; }
-
-   /// conjugate \b this
-   void conjugate()   { _i = - _i; }
-
-   /// return true if \b this is real and not equal to \b dd
-   bool operator != (APL_Float dd) const   { return _r != dd || _i != 0.0; }
-
-   /// return true if \b this is real and equal to \b dd
-   bool operator == (APL_Float dd) const   { return _r == dd && _i == 0.0; }
-
-   /// add \b r zz to \b this
-   ZZ operator +(const ZZ & zz) const
-      { return ZZ(_r + zz._r, _i + zz._i); }
-
-   /// subtract \b zz from \b this
-   ZZ operator -(const ZZ & zz) const
-      { return ZZ(_r - zz._r, _i - zz._i); }
-
-   /// negate \b this
-   ZZ operator -() const
-      { return ZZ(-_r, -_i); }
-
-   /// multiply \b zz and \b this
-   ZZ operator *(const ZZ & zz) const
-      { return ZZ(_r * zz._r - _i * zz._i,
-                  _i * zz._r + _r * zz._i); }
-
-   /// divide \b this by \b d
-   ZZ operator /(APL_Float d) const
-      { return ZZ(_r/d, _i/d); }
-
-   /// divide \b this by \b zz
-   ZZ operator /(const ZZ & zz) const
-      { 
-        const APL_Float denom = zz._r * zz._r + zz._i * zz._i;
-         return ZZ((_r * zz._r + _i * zz._i) / denom,
-                   (_i * zz._r - _r * zz._i) / denom);
-      }
-
-protected:
-   /// the real part
-  APL_Float _r;
-
-   /// the imaginary part
-  APL_Float _i;
-};
-
-/// the maximum of \b x and \b y
-#define MAX(x, y) ((x) >= (y) ? (x) : (y))
-
-/// the minimum of \b x and \b y
-#define MIN(x, y) ((x) <= (y) ? (x) : (y))
-
-/** a single double or complex number. This class contains wrappers to
-    double or complex numbers so that they can be used in templates.
+   In C/C++ the FORTRAN LDA, LDB, LDC, ... are the member 'dx' of the
+   corresponding fMatrix<T> classes A, B, C, ....
  */
-/// A single double or complex number
-class DZ
+class LA_pack
 {
 public:
-   /// return true if the template argument (DD or ZZ) is complex (i.e. ZZ)
-   static bool is_ZZ(DD x)   { return false; }
-   /// return true if the template argument (DD or ZZ) is complex (i.e. ZZ)
-   static bool is_ZZ(ZZ z)   { return true;  }
+  /// a real number
+  typedef APL_Float DD;
 
-   /// return the real part of \b x
-   static APL_Float get_real(DD x)   { return x;   }
+#if 1
 
-   /// return the imaginary part of \b x
-   static APL_Float get_imag(DD x)   { return 0.0; }
-
-   /// return the real part of \b x
-   static APL_Float get_real(ZZ z)   { return z.real(); }
-
-   /// return the imaginary part of \b x
-   static APL_Float get_imag(ZZ z)   { return z.imag(); }
-
-   /// set the real part of \b x
-   static void set_real(DD & y, DD x)   { y = x; }
-
-   /// set the imaginary part of \b x
-   static void set_imag(DD & y, DD x)   { assert(x == 0.0); }
-
-   /// set the real part of \b x
-   static void set_real(ZZ & y, DD x)   { y.set_real(x); }
-
-   /// set the imaginary part of \b x
-   static void set_imag(ZZ & y, DD x)   { y.set_imag(x); }
-
-   /// conjugate \b x
-   static void conjugate(DD x)     { }
-
-   /// conjugate \b z
-   static void conjugate(ZZ & z)   { z.conjugate(); }
-
-   /// return \b x conjugated
-   static DD CONJ(DD x)           { return x; }
-
-   /// return \b z conjugated
-   static ZZ CONJ(const ZZ & z)   { return ZZ(z.real(), -z.imag()); }
-
-   /// return the inverse of \b dd
-   static DD inv(DD dd)           { return 1.0 / dd; }
-
-   /// return the inverse of \b zz
-   static inline ZZ inv(const ZZ & zz)
-      {
-        const APL_Float denom = zz.real() * zz.real() + zz.imag() * zz.imag();
-        return ZZ(zz.real()/denom, - zz.imag()/denom);
-      }
-};
-
-/// return the real part of \b x
-template<typename T> APL_Float REAL(T x)        { return DZ::get_real(x);    }
-
-/// return the imaginary part of \b x
-template<typename T> APL_Float IMAG(T x)        { return DZ::get_imag(x);    }
-
-/// set the real part of \b x
-template<typename T> void  SREAL(T & y, APL_Float x)   { DZ::set_real(y, x); }
-
-/// set the imaginary part of \b x
-template<typename T> void  SIMAG(T & y, APL_Float x)   { DZ::set_imag(y, x); }
-
-/// set the real and imaginary parts of \b y
-template<typename T> void Sri(T & y, APL_Float xr, APL_Float xi)
-   { SREAL<T>(y, xr);   SIMAG<T>(y, xi); }
-
-/// set the real part of \b y and clear its imaginary part
-template<typename T> void Sri(T & y, APL_Float xr)
-   { SREAL<T>(y, xr);   SIMAG<T>(y, 0); }
-
-/// return the absolute value of a
-inline DD ABS(DD a) { return a < 0.0 ? DD(-a) : a; }
-
-/// return the square of the absolute value of a
-inline DD ABS_2(DD a) { return a*a; }
-
-/// return the absolute value of z
-inline DD ABS(ZZ z) { return sqrt(z.real()*z.real() + z.imag()*z.imag()); }
-
-/// return the square of the absolute value of z
-inline DD ABS_2(ZZ z) { return z.real()*z.real() + z.imag()*z.imag(); }
-
-/// return abs(a) with the sign of b
-inline APL_Float SIGN(APL_Float a, APL_Float b)
-{
-   if (b < 0.0)  return -ABS(a);
-   else        return  ABS(a);
-}
-
-/// swap x and y
-template<typename T>
-inline void exchange(T & x, T & y)
-{
-const T tmp = x;
-  x = y;
-  y = tmp;
-}
-//-----------------------------------------------------------------------------
-/// A vector of real numbers or a vector of complex numbers
-template<typename T>
-class Vector
-{
-public:
-   /// constructor: vector of length _len, with values _data
-   /// _data must outlive \b this!
-   Vector(T * _data, ShapeItem _len)
-     : data(_data),
-       len (_len)
-   {}
-
-   /// the first \b new_len elements of \b this
-   Vector sub_len(ShapeItem new_len) const
-      { assert(new_len <= len);   return Vector(data, new_len); }
-
-   /// the rest of \b this, starting at \b off
-   Vector sub_off(ShapeItem off) const
-      { assert(off <= len);   return Vector(data + off, len - off); }
-
-   /// \b new_len elements of \b this, starting at \b off
-   Vector sub_off_len(ShapeItem off, ShapeItem new_len) const
-      { assert((off + new_len) <= len);
-        return Vector(data + off, new_len); }
-
-   /// return the number of elements
-   const ShapeItem get_length() const { return len; }
-
-   /// return true if \b this is a vector of complex numbers (and not a vector
-   /// of real numbers
-   bool is_ZZ() const   { return DZ::is_ZZ(*data); }
-
-   /// the norm of \b this
-   APL_Float norm() const
-      {
-//     if (len < 1)   return 0.0;
-//     APL_Float scale = 0.0;
-//     APL_Float ssq = 1.0;
-
-        APL_Float ret = 0.0;
-        const T * dj = data;
-        loop(j, len)
-           {
-             const APL_Float re = REAL(*dj);
-             if (re != 0.0)
-                {
-/***
-                  const APL_Float temp = ABS(re);
-                  if (scale < temp)
-                     {
-                       const APL_Float scale_temp = scale/temp;
-                       ssq = 1.0 + ssq*scale_temp*scale_temp;
-                       scale = temp;
-                     }
-                  else
-                     {
-                       const APL_Float temp_scale = temp/scale;
-                       ssq += temp_scale*temp_scale;
-                     }
-***/
-                  ret += re*re;
-                }
-
-             const APL_Float im = IMAG(*dj);
-             if (im != 0.0)
-                {
-/***
-                  const APL_Float temp = ABS(im);
-                  if (scale < temp)
-                     {
-                       const APL_Float scale_temp = scale/temp;
-                       ssq = 1.0 + ssq*scale_temp*scale_temp;
-                       scale = temp;
-                     }
-                  else
-                     {
-                       const APL_Float temp_scale = temp/scale;
-                       ssq += temp_scale*temp_scale;
-                     }
-***/
-                  ret += im*im;
-                }
-             ++dj;
-           }
-        return sqrt(ret);
-//      return scale*sqrt(ssq);
-      }
-
-   /// multiply \b this by \b factor
-   void scale(T factor)
-      {
-        T * dj = data;
-        loop(j, len)
-            {
-              *dj = *dj * factor;
-              ++dj;
-            }
-      }
-
-   /// set all elemens of \b this to 0
-   void clear()
-      {
-        T * dj = data;
-        loop(j, len)   *dj++ = 0.0;
-      }
-
-   /// return true if \b this is 0
-   bool is_zero(ShapeItem count) const
-      {
-        const T * dj = data;
-        loop(j, count)
-           {
-             if (IMAG(*dj) != 0.0)     return false;
-             if (REAL(*dj++) != 0.0)   return false;
-           }
-        return true;
-      }
- 
-   /// conjugate \b this
-   void conjugate()
-      {
-        if (!is_ZZ())   return;
-        T * dj = data;
-        loop(j, len)   DZ::conjugate(*dj++);
-      }
-
-   /// add \b other to \b this
-   void add(const Vector & other)
-      {
-        assert(len == other.len);
-        T * dj = data;
-        T * sj = other.data;
-        loop(j, len)   *dj++ += *sj++;
-      }
-
-   /// return \b this[i]
-   T & at(ShapeItem i)
-      { assert(i < len);  return *(data + i); }
-
-   /// return \b this[i]
-   const T & at(ShapeItem i) const
-      { assert(i < len);  return *(data + i); }
-
-protected:
-   /// the elements of \b this vector
-   T * const data;
-
-   ///  the length of this vector
-   const ShapeItem len;
-};
-//-----------------------------------------------------------------------------
-/// A double or complex matrix
-template<typename T>
-class Matrix
-{
-public:
-   /// constructor: _rows by _cols matrix values from _data
-   /// _data must outlive \b this!
-   Matrix(T * _data, ShapeItem _rows, ShapeItem _cols, ShapeItem _dx)
-     : data(_data),
-       rows(_rows),
-       cols(_cols),
-       dx(_dx)
-   {}
-
-   /// constructor: sub-matrix of \b other with \b new_col_count columns
-   /// other must outlive \b this!
-   Matrix(const Matrix & other, ShapeItem new_col_count)
-     : data(other.data),
-       rows(other.rows),
-       cols(new_col_count),
-       dx(other.dx)
-   { assert(new_col_count <= other.cols); }
-
-   /// return the sub-matrix starting at row y and column x
-   Matrix sub_yx(ShapeItem row, ShapeItem col)
-      {
-        assert(col <= cols && row <= rows);
-        return Matrix(&at(row, col), rows - row, cols - col, dx);
-      }
-
-   /// return the sub-matrix of size new_len_y: new_len_x
-   /// starting at row 0 and column 0
-   Matrix sub_len(ShapeItem new_rows, ShapeItem new_cols)
-      {
-        assert(new_rows <= rows);
-        assert(new_cols <= cols);
-        return Matrix(data, new_rows, new_cols, dx);
-      }
-
-   /// return true if \b this is a matrix of complex numbers (and not a matrix
-   /// of real numbers
-   bool is_ZZ() const   { return DZ::is_ZZ(*data); }
-
-   /// return the number of rows
-   const ShapeItem get_row_count() const
-      { return rows; }
-
-   /// return the number of columns
-   const ShapeItem get_column_count() const
-      { return cols; }
-
-   /// return column \b c
-   Vector<T> get_column(ShapeItem c) 
-      {
-        return Vector<T>(data + c*dx, rows);
-      }
-
-   /// return column \b c
-   const Vector<T> get_column(ShapeItem c) const
-      {
-        return Vector<T>(data + c*dx, rows);
-      }
-
-   /// return \b this[i, j]
-   T & at(ShapeItem i, ShapeItem j)
-      { assert(i < rows);   assert(j < cols); return *(data + i + j*dx); }
-
-   /// return \b this[i, j]
-   const T & at(ShapeItem i, ShapeItem j) const
-      { assert(i < rows);   assert(j < cols); return *(data + i + j*dx); }
-
-   /// return \b this[i, i]
-   T & diag(ShapeItem i) const
-      { assert(i < rows);   assert(i < cols); return *(data + i*(1 + dx)); }
-
-   /// swap columns c1 and c2
-   void exchange_columns(ShapeItem c1, ShapeItem c2)
-      {
-        assert(c1 < cols);
-        assert(c2 < cols);
-        T * p1 = data + c1*dx;
-        T * p2 = data + c2*dx;
-        loop(r, rows)   exchange(*p1++, *p2++);
-      }
-
-   /// return the distance between two adjacent columns in \b data
-   ShapeItem get_dx() const   { return dx; }
-
-   /// return the length of the largest element
-   APL_Float max_norm() const
-      {
-        const ShapeItem len = rows * cols;
-        if (is_ZZ())   // complex max. norm
-           {
-             APL_Float ret2 = 0;
-             loop(l, len)
-                {
-                  const APL_Float a2 = ABS_2(data[l]);
-                  if (ret2 < a2)   ret2 = a2;
-                }
-             return sqrt(ret2);
-           }
-        else           // real max norm
-           {
-             APL_Float ret = 0;
-             loop(l, len)
-                {
-                  const APL_Float a = DZ::get_real(data[l]);
-                  if (ret < a)         ret = a;
-                  else if (ret < -a)   ret = -a;
-                }
-             return ret;
-           }
-      }
-
-   /// multiply \b this by \b factor
-   void scale(T factor)
-      {
-        T * dj = data;
-        const ShapeItem len = rows*cols;
-        loop(j, len)
-            {
-               *dj = *dj * factor;
-               ++dj;
-            }
-      }
-
-protected:
-   /// the elements of \b this matrix
-   T * const data;
-
-   /// the number of rows of \b this matrix
-   const ShapeItem rows;
-
-   /// the number of columns of \b this matrix
-   const ShapeItem cols;
-
-   /// return the distance between two adjacent columns in \b data
-   const ShapeItem dx;
-};
-//=============================================================================
-
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-
-//=============================================================================
-
-   // numerical limits
-   //
-#define dlamch_E 1.11022e-16
-#define dlamch_S 2.22507e-308
-#define dlamch_P 2.22045e-16
-static const APL_Float small_number = dlamch_S / dlamch_P;
-static const APL_Float big_number   = 1.0 / small_number;
-static const APL_Float safe_min     =  dlamch_S / dlamch_E;
-static const APL_Float inv_safe_min = 1.0 / safe_min;
-static const APL_Float tol3z        = sqrt(dlamch_E);
-
-//-----------------------------------------------------------------------------
-/// return the offset of the largest element in vec
-inline ShapeItem
-max_pos(const APL_Float * vec, ShapeItem len)
-{
-ShapeItem imax = 0;
-APL_Float dmax = ABS(vec[0]); 
-   for (ShapeItem j = 1; j < len; ++j)
-       {
-         const APL_Float dj = ABS(vec[j]);
-         if (dmax < dj )   { dmax = dj;   imax = j; }
-       }
-
-   return imax;
-}
-//-----------------------------------------------------------------------------
-/// LApack function larfg
-template<typename T> T larfg(ShapeItem N, T & ALPHA, Vector<T> &x)
-{
-   assert(N > 0);
-
-   if (N == 1)   return T(0.0);
-
-APL_Float xnorm = x.norm();
-APL_Float alpha_r = REAL(ALPHA);
-APL_Float alpha_i = IMAG(ALPHA);
-
-   if (xnorm == 0.0 && alpha_i == 0.0)   return T(0.0);
-
-APL_Float beta = -SIGN(sqrt(alpha_r*alpha_r + alpha_i*alpha_i + xnorm*xnorm),
-                    alpha_r);
-
-int kcnt = 0;
-   if (ABS(beta) < safe_min)
-       {
-         while (ABS(beta) < safe_min)
-            {
-              ++kcnt;
-              x.scale(inv_safe_min);
-              beta = beta * inv_safe_min;
-              alpha_r = alpha_r * inv_safe_min;
-              alpha_i = alpha_i * inv_safe_min;
-            }
-
-         xnorm = x.norm();
-         Sri<T>(ALPHA, alpha_r, alpha_i);
-         beta = -SIGN(sqrt(alpha_r*alpha_r +
-                           alpha_i*alpha_i +
-                           xnorm*xnorm), alpha_r);
-       }
-
-T tau;
-   Sri<T>(tau, (beta - alpha_r)/beta, -alpha_i/beta);
-const T factor = DZ::inv(ALPHA - beta);
-   x.scale(factor);
-
-   loop(k, kcnt)   beta = beta * safe_min;
-   Sri<T>(ALPHA, beta);
-
-   return tau;
-}
-//-----------------------------------------------------------------------------
-/// LApack function trsm
-template<typename T>
-void trsm(int M, int N, const Matrix<T> & A, Matrix<T> & B)
-{
-   // only: SIDE   = 'Left'              - lside == true
-   //       UPLO   = 'Upper'             - upper = true
-   //       TRANSA = 'No transpose'      - 
-   //       DIAG   = 'Non-unit' and      - nounit = true
-   //       ALPHA  = 1.0 is implemented!
-   //
-   loop(j_0, N)
-       {
-         for (ShapeItem k_0 = M - 1; k_0 >= 0; --k_0)
-             {
-               T & B_kj = B.at(k_0, j_0);
-               if (B_kj != 0.0)
-                  {
-                    B_kj = B_kj / A.diag(k_0);
-                    loop(i_0, k_0)
-                        B.at(i_0, j_0) = B.at(i_0, j_0) - B_kj * A.at(i_0, k_0);
-                  }
-             }
-       }
-}
-//-----------------------------------------------------------------------------
-/// LApack function ila_lc
-template<typename T>
-int ila_lc(ShapeItem M, ShapeItem N, const Matrix<T> & A)
-{
-   for (ShapeItem col = N - 1; col > 0; --col)
-       {
-         const Vector<T> column = A.get_column(col);
-         if (!column.is_zero(M))   return col + 1;
-
-         /* the above is the same as:
-
-         for (ShapeItem row = 0; row < M; ++row)
-             {
-               if (REAL(A[row + col*LDA]) != 0)   return col + 1;
-               if (IMAG(A[row + col*LDA]) != 0)   return col + 1;
-             }
-
-          */
-       }
-
-   return 1;
-}
-//-----------------------------------------------------------------------------
-/// LApack function gemv
-template<typename T>
-inline void gemv(int M, int N, const Matrix<T> & A, const Vector<T> &x,
-                 Vector<T> &y)
-{
-   loop(j, N)
-       {
-         T temp(0.0);
-         loop(i, M)   temp = temp + DZ::CONJ(A.at(i, j)) * x.at(i);
-         y.at(j) = temp;
-       }
-}
-//-----------------------------------------------------------------------------
-/// LApack function gerc
-template<typename T>
-void gerc(int M, int N, T ALPHA, const Vector<T> &x, const Vector<T> &y,
-          Matrix<T> & A)
-{
-   if (M == 0 || N == 0 || ALPHA == 0.0)   return;
-
-   loop(j, N)
-      {
-        T Y_j = y.at(j);
-        if (Y_j != 0.0)
-           {
-             DZ::conjugate(Y_j);
-             Y_j = Y_j * ALPHA;
-             loop(i, M)   A.at(i, j) = A.at(i, j) + Y_j * x.at(i);
-           }
-      }
-}
-//-----------------------------------------------------------------------------
-/// LApack function larf
-template<typename T>
-void larf(Vector<T> & v, T tau, Matrix<T> & c)
-{
-const ShapeItem M = c.get_row_count();
-const ShapeItem N = c.get_column_count();
-
-   // only SIDE == "Left" is implemented
-   //
-ShapeItem  lastv = 0;
-ShapeItem  lastc = 0;
-
-   if (tau != 0.0)
+#include <complex>
+  /// a complex number
+  class ZZ: public std::complex<APL_Float>
      {
-       // Look for the last non-zero row in V
-       //
-       lastv = M;
-       while (lastv > 0 && v.at(lastv - 1) == 0.0)   --lastv;
+     public:
+       ZZ()
+          { real(0.0); imag(0.0); }
 
-       // Scan for the last non-zero column in C(1:lastv,:)
-       //
-       lastc = ila_lc<T>(lastv, N, c);
+       ZZ(APL_Float re, APL_Float im)
+          { real(re); imag(im); }
+
+       ZZ(APL_Float re)
+          { real(re); imag(0.0); }
+
+       ZZ(const std::complex<APL_Float> & cpx)
+          { real(cpx.real()); imag(cpx.imag()); }
+
+#else
+
+  /// a complex number
+  class ZZ
+     {
+     protected:
+       /// the real part
+       APL_Float _r;
+     
+       /// the imaginary part
+       APL_Float _i;
+
+     public:
+       /// constructor: 0.0J0.0   (real 0.0)
+       ZZ() : _r(0.0), _i(0.0) {}
+     
+       /// constructor: reJ0.0   (real re)
+       ZZ(APL_Float re) : _r(re), _i(0) {}
+     
+       /// constructor: reJim   (complex r re + I×im)
+       ZZ(APL_Float re, APL_Float im) : _r(re), _i(im) {}
+     
+       /// return the real part of \b this ZZ
+       APL_Float real() const
+          { return _r; }
+     
+       /// return the imag part of \b this ZZ
+       APL_Float imag() const
+          { return _i; }
+     
+       /// set the real part of \b this ZZ
+       void real(APL_Float value)
+          { _r = value; }
+     
+       /// set the imag part of \b this ZZ
+       void imag(APL_Float value)
+          { _i = value; }
+     
+       /// add complex \b this and complex \b zz
+       ZZ operator +(const ZZ & zz) const
+          { return ZZ(_r + zz._r, _i + zz._i); }
+
+       /// add complex \b zz to \b this
+       void operator += (const ZZ & zz)
+          { _r += zz._r; _i += zz._i; }
+
+       /// negative of \b this ZZ
+       ZZ operator -() const
+          { return ZZ(-_r, -_i); }
+
+       /// subtract complex \b z2 from complex \b this
+       ZZ operator -(const ZZ & zz) const
+          { return ZZ(_r - zz._r, _i - zz._i); }
+
+       /// subtract complex \b zz from \b this
+       void operator -=(const ZZ & zz)
+          { _r -= zz._r; _i -= zz._i; }
+
+       /// multiply complex \b z1 with complex \b zz
+       ZZ operator *(const ZZ & zz) const
+          { return ZZ(_r*zz._r - _i*zz._i,
+                      _i*zz._r + _r*zz._i); }
+
+       /// multiply *this with real \b dd
+       void operator *=(const ZZ & zz)
+          { *this = *this * zz; }
+
+       /// divide complex \b this by complex \b zz
+       ZZ operator /(const ZZ & zz) const
+          { 
+            const APL_Float denominator = square(zz);
+            return ZZ((_r*zz._r + _i*zz._i) / denominator,
+                      (_i*zz._r - _r*zz._i) / denominator);
+          }
+
+       /// divide *this by complex \b zz
+       void operator /=(const ZZ & zz)
+          { *this = *this / zz; }
+
+       /// divide complex \b this by real \b z2
+       ZZ operator /(const APL_Float & dd) const
+          { return ZZ(_r/dd, _i/dd); }
+
+#endif   // std::complex vs. class ZZ
+
+       /// the square of the hypotenuse 
+       APL_Float hypo_2() const
+          { return real()*real() + imag()*imag(); }
+     };   // class ZZ
+ 
+  //----------------------------------------------------------------------------
+  /// A double or complex matrix. Actually a matrix view of some data (where
+  /// data is similar to an APL ravel)
+  template<typename T>
+  class fMatrix
+     {
+     public:
+        /// constructor: _rows × _cols matrix with values vdata.
+         /// Unlike e.g. std::vector<T> (which copies \b data), \b vdata must
+         /// outlive \b this, and modifying items also modifies \b vdata!
+         //
+        fMatrix(void * vdata, Crow M, Ccol N, ShapeItem _dx)
+          : data(reinterpret_cast<T *>(vdata)),
+            rows(M),
+            cols(N),
+            transpose(false),
+            dx(_dx)
+        {}
+     
+        /// constructor: sub-matrix of \b other with \b new_col_count columns
+        /// CAUTION: other must outlive \b this!
+        fMatrix(const fMatrix & other, ShapeItem new_col_count)
+          : data(other.data),
+            rows(other.rows),
+            cols(new_col_count),
+            transpose(other.transpose),
+            dx(other.dx)
+        { Assert(new_col_count <= other.cols); }
+
+        /// copy from \b other
+        void operator =(const fMatrix & other)
+           {
+             transpose = other.transpose;
+             Assert(rows*cols == other.rows*other.cols);
+             ALL_ROWS(rows)
+             ALL_COLS(cols)   at(row, col) = other.at(row, col);
+           }
+
+        /// return the sub-matrix starting at row and col.
+        /// I.e. \b row col↓this
+        fMatrix sub_matrix(Crow row, Crow col)
+           {
+             Assert(col <= cols && row <= rows);
+             return fMatrix(&at(row, col), rows - row, cols - col, dx);
+           }
+
+        void set_rows(Ccol new_rows)
+           {
+             const_cast<ShapeItem &>(dx) = dx + new_rows - rows;
+             const_cast<Crow &>(rows) = new_rows;
+           }
+
+        void set_columns(Ccol new_cols)
+           { const_cast<Ccol &>(cols) = new_cols; }
+
+        void set_transpose()
+           { transpose = true; }
+
+        /// return the sub-matrix of size new_len_y: new_len_x.
+        /// I.e. \b new_rows new_rows↑this
+        /// starting at row 0 and column 0
+        fMatrix take(ShapeItem new_rows, ShapeItem new_cols)
+           {
+             Assert(new_rows <= rows);
+             Assert(new_cols <= cols);
+             return fMatrix(data, new_rows, new_cols, dx);
+           }
+     
+        /// return the number of rows of \b this Matrox
+        const ShapeItem get_row_count() const
+           { return rows; }
+     
+        /// return the number of columns of \b this fMatrix
+        const ShapeItem get_column_count() const
+           { return cols; }
+     
+        /// return the number of items of \b this fMatrix
+        const ShapeItem get_item_count() const
+           { return rows * cols; }
+     
+        /// return the distance between 2 adjacent columns (of the same row)
+        /// in FORTRAN this is LDA (aka. the Leading Dimension) of matrix A
+        const ShapeItem get_dx() const
+           { return dx; }
+     
+        /// return const \b this[row, col]
+        const T & at(Crow row, Ccol col) const
+           { Assert(row < rows);
+             Assert(col < cols);
+             return data[row + col*dx]; }
+     
+        /// return \b this[row, col]
+        T & at(Crow row, Ccol col)
+           { Assert(row < rows);
+             Assert(col < cols);
+             return data[row + col*dx]; }
+     
+        /// return \b this[row, col] or this[col, row]
+        const T & AT(Crow row, Ccol col) const
+           { Assert(row < rows);   Assert(col < cols);
+             return transpose ? data[col + row*dx] : data[row + col*dx];
+           }
+     
+        /// return \b this[row, col] or this[col, row]
+        T & AT(Crow row, Ccol col)
+           { Assert(row < rows);   Assert(col < cols);
+             return transpose ? data[col + row*dx] : data[row + col*dx];
+           }
+     
+        /// return \b this[i, i]
+        T & diag(ShapeItem i)
+           { Assert(i < rows);
+             Assert(i < cols);
+             return data[i*(1 + dx)]; }
+     
+        /// return \b this[i, i]
+        const T & diag(ShapeItem i) const
+           { Assert(i < rows);
+             Assert(i < cols);
+             return data[i*(1 + dx)]; }
+
+        /// exchange columns \b c1 and \b c2
+        void exchange_columns(ShapeItem c1, ShapeItem c2)
+           {
+             Assert(c1 < cols);
+             Assert(c2 < cols);
+             T * p1 = data + c1*dx;
+             T * p2 = data + c2*dx;
+             loop(r, rows)   exchange(*p1++, *p2++);
+           }
+
+     protected:                        // fMatrix<T>
+        /// the elements of \b this matrix
+        T * const data;
+     
+        /// the number of rows of \b this matrix
+        const Crow rows;
+     
+        /// the number of columns of \b this matrix
+        const Ccol cols;
+     
+        /// whether AT() shall transpose
+        bool transpose;
+
+        /// return the distance between two adjacent columns in \b data.
+        /// this distance is usually called LDx (Leading Dimension of x)
+        /// in FORTRAN, e.g. LDA for a FORTRAN matrix A with LDA rows.
+        const ShapeItem dx;
+     };                                // class fMatrix<T>
+
+  /// a clone of matrix that destroys itself (used for debugging purpoases)
+  template<typename T>
+  class TempMatrix : public fMatrix<T>
+     {
+     public:
+        TempMatrix(const fMatrix<T> & other)
+          : fMatrix<T>(allocate(&other.diag(0),   // = other.data()
+                                other.get_item_count()),
+                      other.get_row_count(),
+                      other.get_column_count(),
+                      other.get_dx())
+           {
+           }
+       
+        ~TempMatrix()
+           {
+             delete[] fMatrix<T>::data;
+           }
+
+         static T * const allocate(const T * src, int item_count)
+            {
+             const int bytes = item_count * sizeof(T);
+             char * dest = new char[bytes];
+             memcpy(dest, src, bytes);
+             return reinterpret_cast<T *>(dest);
+            }
+     };                                // class TempMatrix<T>
+
+   /// FORTRAN work memories
+   template<typename T>
+   struct PTVVy
+      {
+        /// constructor for N column matrices
+        PTVVy(Ccol N, bool with_pivot);
+        ~PTVVy();                 ///< destructor
+        Ccol *      pivot;        ///< column pivot
+        T *         tau;          ///< diagonal elements
+        APL_Float * vn1;          ///< column norms 1
+        APL_Float * vn2;          ///< column norms 2
+        T *         y;            ///< y for larf()
+        T *         work_min;     ///< work_min
+        T *         work_max;     ///< work_max
+
+        /// print the column permutation, Returns \b len
+        int print_pivot(ostream & out, Ccol len, const char * loc) const;
+
+        /// print the diagonal factors, Returns \b len
+        int print_tau(ostream & out, Ccol len, const char * loc) const;
+      };                               // struct PTVVy<T>
+
+  //==========================================================================
+
+  // static real and complex functions. Most functions exist in 2 variants:
+  // one for real (DD) and one for complex (ZZ) argumments.
+  // The template<typename T> expansion of type T will later pick the
+  // appropriate variant.
+
+  /// the maximum of \b x and \b y
+  static DD max(DD x, DD y)
+     { return  x < y ? y : x; }
+  
+  /// return the absolute value (=length) of real dd
+  static DD abs(DD dd)
+     { return dd < 0.0 ? -dd : dd; }
+  
+  /// return the absolute value (= length) of complex zz
+  static DD abs(ZZ zz)
+     { return sqrt(square(zz)); }
+  
+  /// swap x and y
+  template<typename T>
+  static void exchange(T & x, T & y)
+     {
+       const T tmp = x;
+       x = y;
+       y = tmp;
      }
 
-   if (lastv)
-      {
-        APL_Float * gemv_data = new APL_Float[2*N];   // N double or N complex
-        Vector<T> gemv_result(reinterpret_cast<T *>(gemv_data), N);
+  /// return the square of the real dd
+  static DD square(DD dd)
+     { return dd * dd; }
+  
+  /// return the square of the absolute value of complex zz
+  static DD square(ZZ zz)
+     { return square(zz.real()) + square(zz.imag()); }
+  
+  /// A² + B² = C²
+  template<typename T1, typename T2>
+  static APL_Float hypotenuse(const T1 & kath_A, const T2 & kath_B)
+     { return sqrt(square(kath_A) + square(kath_B)); }
 
-        gemv<T>(lastv, lastc, c, v, gemv_result);
-        gerc<T>(lastv, lastc, -tau, v, gemv_result, c);
-        delete[] gemv_data;
-      }
-}
-//-----------------------------------------------------------------------------
-/// LApack function laqp2
-template<typename T>
-void laqp2(Matrix<T> & A, ShapeItem * pivot, T * tau, APL_Float * vn1)
-{
-const ShapeItem M = A.get_row_count();
-const ShapeItem N = A.get_column_count();
-
-APL_Float * vn2 = vn1 + N;
-
-   loop(i_0, N)
-      {
-        T & tau_i = tau[i_0];
-
-        // Determine the i'th pivot column and swap if necessary.
-        //
-        const int pvt_0 = i_0 + max_pos(vn1 + i_0, N - i_0);
-
-        if (pvt_0 != i_0)
+  /// scale SIN and COS so that SIN² + COS² = 1.0
+  template<typename T>
+  static APL_Float normalize(T & SIN, T & COS)
+     {
+        const APL_Float hypo = hypotenuse(SIN, COS);
+        SIN /= hypo;
+        COS /= hypo;
+        return hypo;
+     }
+ 
+  /// return the offset of the (absolute) largest element in vec
+  static Ccol
+  max_pos(const APL_Float * vec, ShapeItem len)
+     {
+       Ccol imax = 0;                 // start with index 0
+       APL_Float vec_max = vec[0];   // and its value
+       for (Ccol j = 1; j < len; ++j)
            {
-             A.exchange_columns(pvt_0, i_0);
-             exchange(pivot[pvt_0], pivot[i_0]);
-             vn1[pvt_0] = vn1[i_0];
-             vn2[pvt_0] = vn2[i_0];
+             const APL_Float vec_j = abs(vec[j]);
+             if (vec_max < vec_j)   { vec_max = vec_j;   imax = j; }
            }
+     
+        return imax;
+     }
 
-        // Generate elementary reflector H(i).
-        //
+   /// return (the length of) the largest item in data. Always ≥ 0.
+   static APL_Float max_item(const DD * data, size_t len)
+      {
+        APL_Float ret = 0;
+        loop(l, len)
+            {
+              const APL_Float a = get_real(data[l]);
+              if      (ret < a)   ret = a;    // larger a ≥ 0
+              else if (ret < -a)  ret = -a;   // larger a < 0
+            }
+        return ret;
+      }
+
+   /// return (the length of) the largest item in data. Always ≥ 0.
+   static APL_Float max_item(const ZZ * data, size_t len)
+      {
+        APL_Float ret_2 = 0;
+        loop(l, len)
+            {
+              const APL_Float c_2 = data++->hypo_2();
+              if (ret_2 < c_2)   ret_2 = c_2;
+            }
+        return sqrt(ret_2);
+      }
+
+  static void scale(DD * data, size_t len, APL_Float factor)
+     { loop(l, len)   data[l] *= factor; }
+
+  static void scale(ZZ * data, size_t len, APL_Float factor)
+     { loop(l, len)   data[l] *= factor; }
+
+  static void scale(ZZ * data, size_t len, const ZZ & factor)
+     { loop(l, len)   data[l] *= factor; }
+
+  //============================================================================
+  // (static) functions ported from LAPACK (FORTRAN) .f files...
+public:
+  /// return ║ vec ║²
+  static APL_Float norm_2(const DD * vec, size_t len)
+     {
+        APL_Float norm = 0.0;
+        loop(j, len)   norm += square(get_real(*vec++));
+        return norm;
+     }
+
+     /// return ║ vec ║²
+  static APL_Float norm_2(const ZZ * vec, size_t len)
         {
-          if (i_0 < (M - 1))
+          APL_Float norm = 0.0;
+          loop(j, len)
              {
-               Vector<T> x(&A.at(i_0 + 1, i_0), M - i_0 - 1);
-               T & alpha = *(&x.at(0) - 1);   // one before x
-               tau_i = larfg<T>(M - i_0, alpha, x);
+               norm += square(get_real(*vec));
+               norm += square(get_imag(*vec++));
              }
-          else
-             {
-               Vector<T> x(&A.at(M - 1, i_0), 1);
-               T & alpha = x.at(0);           // at x
-               tau_i = larfg<T>(1, alpha, x);
-             }
+          return norm;
         }
 
-        if (i_0 < (N - 1))
-           {
-             // Apply H(i)**H to A(offset+i:m,i+1:n) from the left.
-             //
-             const T Aii = A.diag(i_0);   // save diag
-             A.diag(i_0) = APL_Float(1.0);
-                Vector<T> v(&A.diag(i_0), M - i_0);
-                Matrix<T> c = A.sub_yx(i_0, i_0 + 1);
-                larf<T>(v, DZ::CONJ(tau_i), c);
-             A.diag(i_0) = Aii;           // restore diag
-           }
+   /// LApack function unm2r. Apply reflectors A(i) to matrix C.
+   template<typename T>
+   static void unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
+                     fMatrix<T> & C);
+  
+   /// template instantiation wrapper
+   static Value_P invert_DD_UTM(Crow M, Ccol N,
+                                fMatrix<DD> & QUTM, fMatrix<DD> & QAUG);
 
-        // Update partial column norms.
-        //
-        for (ShapeItem j_0 = i_0 + 1; j_0 < N; ++j_0)
-            {
-              if (vn1[j_0] != 0.0)
-                 {
-                   APL_Float temp = ABS(A.at(i_0, j_0)) / vn1[j_0];
-                   temp = 1.0 - temp*temp;
-                   temp = MAX(temp, APL_Float(0.0));
+   /// template instantiation wrapper
+   static Value_P invert_ZZ_UTM(Crow M, Ccol N,
+                                fMatrix<ZZ> & QUTM, fMatrix<ZZ> & QAUG);
 
-                   APL_Float temp2 = vn1[j_0] / vn2[j_0];
-                   temp2 = temp * temp2 * temp2;
-                   if (temp2 <= tol3z)
-                      {
-                        if (i_0 < (M - 1))
-                           {
-                             Vector<T> x(&A.at(i_0 + 1, j_0), M - i_0 - 1);
-                             vn1[j_0] = x.norm();
-                             vn2[j_0] = vn1[j_0];
-                           }
-                        else
-                           {
-                             vn1[j_0] = 0.0;
-                             vn2[j_0] = 0.0;
-                           }
-                      }
-                   else
-                      {
-                        vn1[j_0] = vn1[j_0] * sqrt(temp);
-                      }
-                 }
-            }
-      }
-}
-//-----------------------------------------------------------------------------
-/// LApack function laic1 (maximum case)
-template<typename T>
-void laic1_max(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
-{
-const APL_Float eps = dlamch_E;
-const APL_Float abs_alpha = ABS(alpha);
-const APL_Float abs_gamma = ABS(GAMMA);
-const APL_Float abs_estimate = ABS(SEST);
+   template<typename T>
+   static void invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG);
 
-   //    Estimating largest singular value ...
-   //
+   /// LApack function ung2r: convert reflectors (in A) to
+   /// orthogonal Q (returned in A)
+   template<typename T>
+   static void ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy);
 
-   //    special cases
-   //
-   if (SEST == 0.0)
-      {
-        const APL_Float s1 = MAX(abs_gamma, abs_alpha);
-        if (s1 == 0.0)
-           {
-             S = T(0.0);
-             C = T(1.0);
-             SESTPR = 0.0;
-           }
-        else
-           {
-             S = alpha / s1;
-             C = GAMMA / s1;
+   /// dd is 0.0
+   static bool is_zero(const DD & dd)
+      { return dd == 0.0; }
 
-             const APL_Float tmp = sqrt(ABS_2(S) + ABS_2(C));
-             S = S / tmp;
-             C = C / tmp;
-             SESTPR = s1*tmp;
-           }
-        return;
-      }
+   /// zz is 0.0j0.0
+   static bool is_zero(const ZZ & zz)
+      { return zz.real() == 0.0 && zz.imag() == 0.0; }
 
-   if (abs_gamma <= eps*abs_estimate)
-      {
-        S = T(1.0);
-        C = T(0.0);
-        APL_Float tmp = MAX(abs_estimate, abs_alpha);
-        const APL_Float s1 = abs_estimate / tmp;
-        const APL_Float s2 = abs_alpha / tmp;
-        SESTPR = tmp*sqrt(s1*s1 + s2*s2);
-        return;
-      }
+   /// never
+   static bool is_complex(const DD &)
+      { return false; }
 
-   if (abs_alpha <= eps*abs_estimate)
-      {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_estimate;
-        if (s1 <= s2)
-           {
-             S = T(1.0);
-             C = T(0.0);
-             SESTPR = s2;
-           }
-        else
-           {
-             S = T(0.0);
-             C = T(1.0);
-             SESTPR = s1;
-           }
-        return;
-      }
+   /// always
+   static bool is_complex(const ZZ &)
+      { return true; }
 
-   if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
-      {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_alpha;
-        if (s1 <= s2)
-           {
-             const APL_Float tmp = s1 / s2;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             SESTPR = s2*scl;
-             S = (alpha / s2) / scl;
-             C = (GAMMA / s2) / scl;
-           }
-        else
-           {
-             const APL_Float tmp = s2 / s1;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             SESTPR = s1*scl;
-             S = (alpha / s1) / scl;
-             C = (GAMMA / s1) / scl;
-           }
-        return;
-      }
+   /// compute Z←A⌹B (real A, B, and Z). Instatiation wrapper.
+   static sRank divide_DD_matrix(Value & Z, Crow rows,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
-   // normal case
-   //
-const APL_Float zeta1 = abs_alpha / abs_estimate;
-const APL_Float zeta2 = abs_gamma / abs_estimate;
-const APL_Float b = (1.0 - zeta1*zeta1 - zeta2*zeta2)*0.5;
-const APL_Float zeta1_2 = zeta1*zeta1;
-APL_Float t;
+   /// compute Z←A⌹B (complex A or B, and Z). Instatiation wrapper.
+   static sRank divide_ZZ_matrix(Value & Z, Crow rows,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
-   if (b > 0.0)  t = zeta1_2 / (b + sqrt(b*b + zeta1_2));
-   else          t = sqrt(b*b + zeta1_2) - b;
+   /// template instantiation wrapper. This wrapper forces the instantiation of
+   /// factorize_matrix<DD>() which is defined in a different object file and
+   /// may not be instantiated otherwise.
+   static void factorize_DD_matrix(Value & Z, Crow M, Ccol N,
+                                   const Cell * cB, APL_Float rcond);
 
-const T sine = -( alpha / abs_estimate ) / t;
-const T cosine = -( GAMMA / abs_estimate ) / ( 1.0 + t);
-const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
-   S = sine / tmp;
-   C = cosine / tmp;
-   SESTPR = sqrt(t + 1.0) * abs_estimate;
-}
-//-----------------------------------------------------------------------------
-/// LApack function laic1 (minimum case)
-template<typename T>
-void laic1_min(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
-{
-const APL_Float eps = dlamch_E;
-const APL_Float abs_alpha = ABS(alpha);
-const APL_Float abs_gamma = ABS(GAMMA);
-const APL_Float abs_estimate = ABS(SEST);
+   /// template instantiation wrapper. This wrapper forces the instantiation of
+   /// factorize_matrix<ZZ>() which is defined in a different object file and
+   /// may not be instantiated otherwise.
+   static void factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
+                                   const Cell * cB, APL_Float rcond);
 
-   //    Estimating smallest singular value ...
-   //
+protected:   // class LA_pack
+   /// compute Z←A⌹B
+   template<typename T>
+   static sRank divide_matrix(Value & Z, Crow M,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
-   //    special cases
-   //
-   if (SEST == 0.0)
-      {
-        SESTPR = 0.0;
-        T sine(1.0);
-        T cosine(0.0);
-        if (abs_gamma > 0.0 || abs_alpha > 0.0)
-           {
-             sine   = -DZ::CONJ(GAMMA);
-             cosine =  DZ::CONJ(alpha);
-           }
+   /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
+   /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
+   template<typename T>
+   static void grab_Q (Value & Z, fMatrix<T> & Q, PTVVy<T> & ptvvy);
 
-        const APL_Float abs_sine = ABS(sine);
-        const APL_Float abs_cosine = ABS(cosine);
-        const APL_Float s1 = MAX(abs_sine, abs_cosine);
-        const T sine_s1 = sine / s1;
-        const T cosine_s1 = cosine / s1;
-        S = sine_s1;
-        C = cosine_s1;
-        const APL_Float tmp = sqrt(ABS_2(sine_s1) + ABS_2(cosine_s1));
-        S = S / tmp;
-        C = C / tmp;
-        return;
-      }
+   /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
+   template<typename T>
+   static void grab_R(fMatrix<T> & HR, Value & Z, fMatrix<T> & Rinv);
 
-   if (abs_gamma <= eps*abs_estimate)
-      {
-        S = T(0.0);
-        C = T(1.0);
-        SESTPR = abs_gamma;
-        return;
-      }
+   /// compute the inverse of the upper triangular matrix \b utm.
+   /// On return: the inverse of qutm is stored in qaug and utm was destroyed.
+   /*  NOTES:
+       1.  fMatrix utm is actually M×N but rows N..M are 0 so that inverting
+           the upper N×N matix suffices.
 
-   if (abs_alpha <= eps*abs_estimate)
-      {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_estimate;
+       2.  The items below the diagonal of utm are only conceptionaly 0 and
+           may in fact be ≠ 0 (e.g. the Q portion of a QR factorization).
+           However, invert_QUTM() does not access these items and only
+           sets columns 1..N of qaug. The caller is responsible for setting
+           columns N..M to 0.
+    */
+   template<typename T>
+   static Value_P invert_UTM(Crow M, Ccol N,
+                             fMatrix<T> & UTM, fMatrix<T> & AUG);
 
-        if (s1 <= s2)
-          {
-            S = T(0.0);
-            C = T(1.0);
-            SESTPR = s1;
-          }
-        else
-          {
-            S = T(1.0);
-            C = T(0.0);
-            SESTPR = s2;
-          }
-        return;
-      }
+   // factorize B
+   template<typename T>
+   static sRank factorize_matrix(Value & Z, Crow M, Ccol N,
+                                const Cell * cB, APL_Float rcond);
 
-   if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
-      {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_alpha;
-        const T conj_gamma = DZ::CONJ(GAMMA);
-        const T conj_alpha = DZ::CONJ(alpha);
+   /// return the real part of dd (= dd)
+   static DD get_real(const DD & dd)
+      { return dd; }
 
-        if (s1 <= s2)
-           {
-             const APL_Float tmp = s1 / s2;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             const APL_Float tmp_scl = tmp / scl;
+   /// return the real part of zz
+   static DD get_real(const ZZ & zz)
+      { return zz.real(); }
 
-             SESTPR = abs_estimate * tmp_scl;
-             S = -(conj_gamma / s2 ) / scl;
-             C =  (conj_alpha / s2 ) / scl;
-           }
-        else
-           {
-             const APL_Float tmp = s2 / s1;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
+   /// return the imag part of dd (= dd)
+   static DD get_imag(const DD & dd)
+      { return 0.0; }
 
-             SESTPR = abs_estimate / scl;
-             S = -( conj_gamma / s1 ) / scl;
-             C = ( conj_alpha  / s1 ) / scl;
-           }
-        return;
-      }
+   /// return the imag part of zz
+   static DD get_imag(const ZZ & zz)
+      { return zz.imag(); }
 
-   // normal case
-   //
-const APL_Float zeta1 = abs_alpha / abs_estimate;
-const APL_Float zeta2 = abs_gamma / abs_estimate;
+   /// set the real part of real dd
+   static void set_real(DD & dd, APL_Float value)
+      { dd = value; }
 
-const APL_Float norma_1 = 1.0 + zeta1*zeta1 + zeta1*zeta2;
-const APL_Float norma_2 = zeta1*zeta2 + zeta2*zeta2;
-const APL_Float norma = MAX(norma_1, norma_2);
+   /// set the real part of complex zz
+   static void set_real(ZZ & zz, APL_Float value)
+      { zz.real(value); }
 
-const APL_Float test = 1.0 + 2.0*(zeta1-zeta2)*(zeta1+zeta2);
-T sine;
-T cosine;
-   if (test >= 0.0 )
-      {
-        // root is close to zero, compute directly
-        //
-        const APL_Float b = (zeta1*zeta1 + zeta2*zeta2 + 1.0)*0.5;
-        const APL_Float zeta2_2 = zeta2*zeta2;
-        const APL_Float t = zeta2_2 / (b + sqrt(ABS(b*b - zeta2_2)));
-        sine = (alpha / abs_estimate) / (1.0 - t);
-        cosine = -( GAMMA / abs_estimate ) / t;
-        SESTPR = sqrt(t + 4.0*eps*eps*norma)*abs_estimate;
-      }
-   else
-      {
-        // root is closer to ONE, shift by that amount
-        //
-        const APL_Float b = (zeta2*zeta2 + zeta1*zeta1 - 1.0)*0.5;
-        const APL_Float zeta1_2 = zeta1*zeta1;
-        APL_Float t;
-        if (b >= 0.0)   t = -zeta1_2 / (b+sqrt(b*b + zeta1_2));
-        else            t = b - sqrt(b*b + zeta1_2);
+   /// set the imag part of real dd
+   static void set_imag(DD & dd, APL_Float value)
+      { }
 
-        sine = -( alpha / abs_estimate ) / t;
-        cosine = -( GAMMA / abs_estimate ) / (1.0 + t);
-        SESTPR = sqrt(1.0 + t + 4.0*eps*eps*norma)*abs_estimate;
-      }
+   /// set the real part of complex zz
+   static void set_imag(ZZ & zz, APL_Float value)
+      { zz.imag(value); }
 
-const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
-   S = sine / tmp;
-   C = cosine / tmp;
-}
-//-----------------------------------------------------------------------------
-/// LApack function unm2r
-template<typename T>
-void unm2r(ShapeItem K, Matrix<T> & A, const T * tau, Matrix<T> & c)
-{
-const ShapeItem M = c.get_row_count();
+   /// dd is not 0.0
+   static bool is_nonzero(const DD & dd)
+      { return dd != 0.0; }
 
-   // only SIDE == "Left" is implemented
-   // only TRANS = 'T' or 'C' is implemented
-   // thus NOTRANS is always false
-   //
-   loop(i_0, K)
-       {
-         // H(i) or H(i)**H is applied to C(i:m,1:n)
-         //
-         const int MM = M - i_0;
+   /// zz is not 0.0
+   static bool is_nonzero(const ZZ & zz)
+      { return zz.real() != 0.0 || zz.imag() != 0.0; }
 
-         // Apply H(i) or H(i)**H
-         //
-         const T taui = DZ::CONJ(tau[i_0]);
+      /// conjugate real dd in place (noop)
+      static void conjugate(DD & dd)
+         { }
 
-         const T Aii = A.diag(i_0);
-         A.diag(i_0) = APL_Float(1.0);
-            Vector<T> v(&A.diag(i_0), MM);
-            Matrix<T> c1 = c.sub_yx(i_0, 0);
-            larf<T>(v, taui, c1);
-         A.diag(i_0) = Aii;
-       }
-}
-//-----------------------------------------------------------------------------
-/// LApack function geqp3
-template<typename T>
-void geqp3(Matrix<T> & A, ShapeItem * pivot, T * tau)
-{
-const ShapeItem M = A.get_row_count();
-const ShapeItem N = A.get_column_count();
+      /// conjugate complex zz in place
+      static void conjugate(ZZ & zz)
+         { zz.imag(-zz.imag()); }
 
-   // init column permutaion for pivoting
-   // so we simply create the identical permutation
-   //
-   loop(j_0, N)   pivot[j_0] = j_0;
+      /// return real dd conjugated
+      static DD conjugated(DD dd)
+         { return dd; }
 
-   // (no fixed columns)
+      /// return complex zz conjugated
+      static ZZ conjugated(const ZZ & zz)
+         { return ZZ(zz.real(), - zz.imag()); }
 
-   // Factorize free columns
-   // ======================
-   //
-   {
-     // Initialize partial column norms.
-     // the first N elements of WORK store the exact column norms.
-     //
-     APL_Float * vn12 = new APL_Float[2*N];
-     for (int j_0 = 0; j_0 < N; ++j_0)
-         {
-           Vector<T> x(&A.at(0, j_0), M);
-           vn12[N + j_0] = vn12[j_0] = x.norm();
-         }
+     /// dgelsy and zgelsy
+     template<typename T>
+     static sRank gelsy(fMatrix<T> & A, fMatrix<T> &B, APL_Float rcond);
+  
+     /// dgelsy and zgelsy with nicely scaled A and B
+     template<typename T>
+     static sRank scaled_gelsy(fMatrix<T> & A, fMatrix<T> & B, double rcond);
+  
+     /// estimate the rank of matrix A
+     template<typename T>
+     static sRank estimate_rank(const fMatrix<T> & A, APL_Float rcond,
+                                PTVVy<T> & ptvvy);
+  
+     /// LApack function laqp2: computes a QR factorization with
+     /// column pivoting of the matrix A
+     template<typename T>
+     static void laqp2(fMatrix<T> & A, PTVVy<T> & ptvvy);
 
-     // Use unblocked code to factor the last or only block
-     //
-     laqp2<T>(A, pivot, tau, vn12);
-     delete[] vn12;
-   }
-}
-//-----------------------------------------------------------------------------
-/// LApack function estimating the rank of \b A
-template<typename T>
-int estimate_rank(const Matrix<T> & A, APL_Float rcond)
-{
-   // Determine RANK using incremental condition estimation...
-
-const ShapeItem N = A.get_column_count();
-
-APL_Float smax = ABS(A.diag(0));
-APL_Float smin = smax;
-   if (smax == 0.0)   return 0;
-
-   // store minima in work_min[ 0 ... N]
-   // store maxima in work_max == work_min[N ... 2N]
-   //
-APL_Float * work_1 = new APL_Float[4*N];
-T * work_min = reinterpret_cast<T *>(work_1);
-T * work_max = work_min + N;
-
-   work_min[0] = T(1.0);
-   work_max[0] = T(1.0);
-
-   for (int RANK = 1; RANK < N; ++RANK)
-       {
-         APL_Float sminpr(0.0);
-         APL_Float smaxpr(0.0);
-         T s1(0.0);
-         T s2(0.0);
-         T c1(0.0);
-         T c2(0.0);
-         const T gamma(A.diag(RANK));
-
-         T alpha_min(0.0);
-         T alpha_max(0.0);
-         for (int r = 0; r < RANK; ++r)
-             {
-               alpha_min = alpha_min + DZ::CONJ(work_min[r] * A.at(r, RANK));
-               alpha_max = alpha_max + DZ::CONJ(work_max[r] * A.at(r, RANK));
-             }
-
-         laic1_min<T>(smin, alpha_min, gamma, sminpr, s1, c1);
-         laic1_max<T>(smax, alpha_max, gamma, smaxpr, s2, c2);
-
-         if (smaxpr*rcond > sminpr)
-            {
-              delete[] work_1;
-              return RANK;
-            }
-
-         loop(cI, RANK)
-              {
-                work_min[cI] = work_min[cI] * s1;
-                work_max[cI] = work_max[cI] * s2;
-              }
-         work_min[RANK] = c1;
-         work_max[RANK] = c2;
-         smin = sminpr;
-         smax = smaxpr;
-       }
-
-   delete[] work_1;
-   return N;
-}
-//-----------------------------------------------------------------------------
-template<typename T>
-int scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
-{
-   // gelsy is optimized for (and restricted to) the following conditions:
-   //
-   // 0 < N <= M  →  min_NM = N and max_MN = M
-   // 0 < NRHS
-   //
-const ShapeItem N    = A.get_column_count();
-const ShapeItem NRHS = B.get_column_count();
-
-   // Compute QR factorization with column pivoting of A:
-   // A * P = Q * R
-   //
-char * pivot_tau_tmp = new char[N*(sizeof(ShapeItem) + 4*sizeof(APL_Float))];
-
-   // N pivot items
-ShapeItem * pivot = reinterpret_cast<ShapeItem *>(pivot_tau_tmp);
-T * tau = reinterpret_cast<T *>(pivot + N);       // N complex tau items
-T * tmp = tau + N;                                // N complex tmp1 items
-
-   geqp3<T>(A, pivot, tau);
-
-   // Details of Householder rotations stored in WORK(1:MN).
-   //
-   // Determine RANK using incremental condition estimation
-   //
-   {
-     const int RANK = estimate_rank(A, rcond);
-     if (RANK < N)
-        {
-          delete[] pivot_tau_tmp;
-          return RANK;
-        }
-   }
-
-   // from here on, RANK == N. We leave RANK in the comments but use N un
-   // the code.
-
-   // Logically partition R = [ R11 R12 ]
-   //                         [  0  R22 ]
-   // where R11 = R(1:RANK,1:RANK)
-   // [R11,R12] = [ T11, 0 ] * Y
-   //
-
-   // Details of Householder rotations stored in WORK(MN+1:2*MN)
-   // 
-   // B(1:M, 1:NRHS) := Q**H * B(1:M,1:NRHS)
-   // 
-   unm2r<T>(N, A, tau, B);
-
-   // B(1:RANK, 1:NRHS) := inv(T11) * B(1:RANK,1:NRHS)
-   //
-   {
-     Matrix<T> B1 = B.sub_len(B.get_dx(), NRHS);
-     trsm<T>(N, NRHS, A, B1);
-   }
-
-   // workspace: 2*MN+NRHS
-   //
-   // B(1:N,1:NRHS) := P * B(1:N,1:NRHS)
-   //
-   loop(j_0, NRHS)
-      {
-        loop(i_0, N)   tmp[pivot[i_0]] = B.at(i_0, j_0);
-        loop(i_0, N)   B.at(i_0, j_0) = tmp[i_0];
-      }
-
-   delete[] pivot_tau_tmp;
-   return N;
-}
-//-----------------------------------------------------------------------------
-template<typename T>
-int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
-{
-const ShapeItem M    = A.get_row_count();
-const ShapeItem N    = A.get_column_count();
-const ShapeItem NRHS = B.get_column_count();
-
-   // APL is responsible for handling the empty cases
-   //
-   Assert(M && N && NRHS && N <= M);
-
-   // For better precision, scale A and B so that their max. element lies
-   // between small_number and big_number. Then call scaled_gelsy() and
-   // scale the result back by the same factors.
-   //
-APL_Float scale_A = 1.0;
-   {
-     const APL_Float norm_A = A.max_norm();
-
-     if (norm_A == 0.0)                return 0;   // A is rank-deficient
-     else if (norm_A < small_number)   A.scale(scale_A = big_number);
-     else if (norm_A > big_number)     A.scale(scale_A = small_number);
-   }
-
-APL_Float scale_B = 1.0;
-   {
-     const APL_Float norm_B = B.max_norm();
-
-     if (norm_B == 0.0)                /* OK */ ;
-     else if (norm_B < small_number)   B.scale(scale_B = big_number);
-     else if (norm_B > big_number)     B.scale(scale_B = small_number);
-   }
-
-   {
-     const int RANK = scaled_gelsy(A, B, rcond);
-     if (RANK < N)   return RANK;   // this is an error
-   }
-
-   // Undo scaling
-   //
-   if (scale_A != 1.0)
-      {
-        Matrix<T> A1 = A.sub_len(N, N);
-        Matrix<T> B1 = B.sub_len(N, NRHS);
-        B1.scale(APL_Float(1.0/scale_A));
-        A1.scale(scale_A);
-      }
-
-   if (scale_B != 1.0)
-      {
-        Matrix<T> B1 = B.sub_len(N, NRHS);
-        B1.scale(scale_B);
-      }
-
-   return N;   // success
-}
-//=============================================================================
-
-#endif // __GELSY_HH_DEFINED__
+     /** LApack function laic1 (estimate largest singular value).
+         apply one step of incremental condition estimation.
+  
+         SEST: largest Singular value ESTimate (in/out)
+      **/
+     template<typename T>
+     static void laic1_MAX(APL_Float & SEST, T ALPHA, T GAMMA,
+                           T & SIN, T & COS);
+  
+     /** LApack function laic1 (estimate smallest singular value).
+         apply one step of incremental condition estimation.
+  
+         SEST: smallest Singular value ESTimate (in/out)
+      **/
+     template<typename T>
+     static void laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA,
+                           T & SIN, T & COS);
+  
+     /// LApack function larfg. It generates an elementary reflector
+     /// (aka. a Householder matrix). Return the scalar tau.
+     template<typename T>
+     static T larfg(T * X, Crow len_X);
+  
+     /// LApack function trsm. Solve A ∘ X[;1:NRHS] = B[;1:NRHS]
+     template<typename T>
+     static void trsm(const fMatrix<T> & A, fMatrix<T> & B, Ccol NRHS);
+  
+    /// LApack functions ILADLC (double) and ILACLC (complex).
+    /// Scan matrix \b A for its last non-zero column in its first \b M rows
+     template<typename T>
+     static inline Ccol ila_lc(Crow M, const fMatrix<T> & A);
+  
+     /// LApack functions DGEMV and ZGEMV. Let CC←M N↑C. Multiply every column
+     /// of CC with v and add up the products.
+     template<typename T>
+     static inline void gemv(const fMatrix<T> & C, Crow M, Ccol N,
+                             const T * v, T * y);
+ 
+     /// LApack function gerc. Multiply the submatrix M N↑C of C with:
+     /// scalar ALPHA, row vector y, and column vector x.
+     template<typename T>
+     static void gerc(fMatrix<T> & C, Crow M, Ccol N,
+                      T ALPHA, const T * x, const T * y);
+ 
+     // LApack function larf: apply one elementary reflector v to matrix C
+     template<typename T>
+     static void larf(const T * v, T tau, fMatrix<T> & C, T * y);
+};                                     // class LA_pack
+//============================================================================

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __USERFUNCTION_HH_DEFINED__
 #define __USERFUNCTION_HH_DEFINED__
 
 #include <sys/types.h>
-#include <vector>
 
 #include "Error.hh"
 #include "Executable.hh"
@@ -31,40 +33,41 @@
 #include "UserFunction_header.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// One user-defined function
 class UserFunction : public Function, public Executable
 {
 public:
    /// constructor for a lambda
    UserFunction(Fun_signature sig, int lambda_num,
-                const UCS_string & text, Token_string & body);
+                const UCS_string & text, Token_string & body,
+                const basic_string<Symbol *> & lvars);
 
    /// Destructor.
    ~UserFunction();
 
-   /// return true if this function is a lambda
+   /// overloaded Function::is_lambda()
    virtual bool is_lambda() const
       { return header.get_name()[0] == UNI_LAMBDA; }
+
+   /// overloaded Function::is_defined()
+   virtual bool is_defined() const
+      { return true; }
 
    /// return the macro number (if this function is one) or -1
    virtual int get_macnum() const
       { return -1; }
 
-   /// overloaded Executable::get_ufun()
-   virtual const UserFunction * get_ufun() const
+   /// overloaded Executable::get_exec_ufun()
+   virtual const UserFunction * get_exec_ufun() const
+      { return this; }
+
+   /// overloaded Function::get_func_ufun()
+   virtual const UserFunction * get_func_ufun() const
    { return this; }
 
-   /// overloaded Function::get_ufun1()
-   virtual UserFunction * get_ufun1()
-   { return this; }
-
-   /// overloaded Function::get_ufun1()
-   virtual const UserFunction * get_ufun1() const
-   { return this; }
-
-   /// overloaded Executable::get_ufun()
-   virtual UserFunction * get_ufun()
+   /// overloaded Executable::get_exec_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return this; }
 
    /// overloaded Function::get_fun_valence()
@@ -83,6 +86,10 @@ public:
    virtual bool has_axis() const
       { return header.has_axis(); }
 
+   /// return \b true if this function localizes \b sym
+   bool localizes(const Symbol * sym) const
+      { return header.localizes(sym); }
+
    /// pop all
    void pop_local_vars() const
       { header.pop_local_vars(); }
@@ -95,11 +102,9 @@ public:
    ShapeItem local_var_count() const
       { return header.local_var_count(); }
 
-
    /// return the idx'th local variable
    const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
-
 
    /// Overloaded \b Function::is_operator.
    virtual bool is_operator() const
@@ -178,44 +183,44 @@ public:
    Function_Line get_line(Function_PC pc) const;
 
    /// Overloaded Function::eval_()
-   virtual Token eval_();
+   virtual Token eval_() const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LB.
-   virtual Token eval_LB(Token & LO, Value_P B);
+   virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LXB()
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALB.
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B);
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB()
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B);
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                            Value_P X, Value_P B);
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
+                            Value_P B) const;
 
    /// Quad_CR of this function
    virtual UCS_string canonical(bool with_lines) const;
@@ -223,8 +228,8 @@ public:
    /// overloaded Executable::line_start()
    virtual Function_PC line_start(Function_Line line) const;
 
-   /// overloaded Executable::adjust_line_starts
-   virtual void adjust_line_starts();
+   /// overloaded Executable::remove_TOK_VOID()
+   virtual VoidCount remove_TOK_VOID();
 
    /// compute lines 2 and 3 in \b error
    void set_locked_error_info(Error & error) const;
@@ -234,31 +239,34 @@ public:
       { return creator; }
 
    /// set trace or stop vector
-   void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
+   void set_trace_stop(std::basic_string<Function_Line> & lines, bool stop);
 
    /// transform a function body containing (old-style) multi-lines into a
    /// standard function body
-   ErrorCode transform_multi_line_strings();
+   ErrorCode transform_old_multi_lines();
 
    /// transform a function body containing (new-style) multi-lines into a
    /// standard function body
-   ErrorCode transform_multi_line_strings_3();
+   ErrorCode transform_new_multi_lines();
 
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
-   const std::vector<Function_Line> & get_stop_lines() const
+   const std::basic_string<Function_Line> & get_stop_lines() const
       { return stop_lines; }
 
    /// return trace lines (from S∆fun ← lines)
-   const std::vector<Function_Line> & get_trace_lines() const
+   const std::basic_string<Function_Line> & get_trace_lines() const
       { return trace_lines; }
 
    /// return the header object (return value name, argument names, local vars,
    /// and function name) for this function
    const UserFunction_header & get_header() const
       { return header; }
+
+   // debug function: print the PC for every linr
+   void print_line_PCs(const char * loc) const;
 
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
@@ -269,10 +277,10 @@ protected:
    virtual bool may_push_SI() const   { return true; }
 
    /// Overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B);
+   virtual Token eval_fill_B(Value_P B) const;
 
    /// Overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B);
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// return the line number where an error has occurred (-1 if none)
    int get_error_line() const
@@ -288,13 +296,23 @@ protected:
    /// "[nn] " prefix
    UCS_string line_prefix(Function_Line l) const;
 
+   /// resolve labels in the function body. Return \b true if any
+   /// labels were resolved.
+   bool resolve_labels();
+
+   /// optimize unconditional (→N) branches.
+   bool optimize_unconditional_branches();
+
+   // debug function: print the body tokens line by line.
+   void print_body_by_line(const char * where) const;
+
    /// the header (line [0]) of the user-defined function
    UserFunction_header header;
 
    /** Offsets to the first token in every line (for jumps).
        lines[0] points to the last line, which is automatically
        added and is TOK_RETURN_VOID for void functions
-       and TOK_RETURN_VALUET for functions returning a value.
+       and TOK_RETURN_VALUE for functions returning a value.
 
        An N line function:
 
@@ -312,13 +330,13 @@ protected:
       [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
 
    **/
-   std::vector<Function_PC> line_starts;
+   std::basic_string<Function_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   std::vector<Function_Line> stop_lines;
+   std::basic_string<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   std::vector<Function_Line> trace_lines;
+   std::basic_string<Function_Line> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];
@@ -332,6 +350,6 @@ protected:
    /// information about an error (if any)
    const char * error_info;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __USERFUNCTION_HH_DEFINED__

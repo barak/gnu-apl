@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __WORKSPACE_HH_DEFINED__
 #define __WORKSPACE_HH_DEFINED__
-
-#include <vector>
 
 #include "Command.hh"
 #include "PrimitiveOperator.hh"
@@ -38,27 +39,29 @@
 #include "Symbol.hh"
 #include "SymbolTable.hh"
 #include "SystemVariable.hh"
-#include "UTF8_string.hh"
 
 class Executable;
 class StateIndicator;
+class UTF8_string;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  The symbol tables of the Workspace. We put them into a base class for
- Workspace, so that they are initialized before all the members of Workspace.
+ Workspace, so that they are initialized before all other members of
+ Workspace.
  **/
 /// The symbol tables of an APL workspace
 class Workspace_0
 {
 protected:
-   /// the (user-defined) symbol table of this workspace.
+   /// the symbol table for user-defined names of this workspace.
    SymbolTable symbol_table;
 
-   /// the (system aka distinguished name) symbol table of this workspace.
+   /// the symbol table for system names (aka. distinguished names) of
+   /// this workspace.
    SystemSymTab distinguished_names;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     An APL workspace. This structure contains everyting (variables, functions,
     SI stack, etc.) belonging to a single APL workspace.
@@ -77,6 +80,18 @@ public:
    /// return element \b pos of the current ⎕FC (pos should be 0..5)
    static APL_Char get_FC(int p)
       { return the_workspace.v_Quad_FC.current()[p]; }
+
+   /// push ⎕FC
+   static void push_FC()
+      {
+        the_workspace.v_Quad_FC.push();
+      }
+
+   /// pop ⎕FC
+   static void pop_FC()
+      {
+        the_workspace.v_Quad_FC.pop();
+      }
 
    /// return the current ⎕IO
    static APL_Integer get_IO()
@@ -109,16 +124,15 @@ public:
    static void set_PW(int PW, const char * loc)
       { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
 
-   /// the number of SI entries
-   static int SI_entry_count()
-      { return SI_top() ? (SI_top()->get_level() + 1) : 0; }
+   /// the number of )SI stack entries
+   static inline int SI_entry_count();
 
    /// the top of the SI stack (the SI pushed last)
    static StateIndicator * SI_top()
       { return the_workspace.top_SI; }
 
    /// copy all allocated symbols into \b table of size \b table_size
-   static std::vector<const Symbol *> get_all_symbols()
+   static std::basic_string<const Symbol *> get_all_symbols()
       { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
@@ -131,8 +145,7 @@ public:
       { the_workspace.v_Quad_AI.add_wait(diff); }
 
    /// return information in SI_top()
-   static Error * get_error()
-      { return &StateIndicator::get_error(SI_top()); }
+   static inline Error * get_error();
 
    /// return reference to more info about last error
    static UCS_string & more_error()
@@ -175,7 +188,7 @@ public:
       {  return the_workspace.user_commands; }
 
    /// Create a new SI-entry on the SI stack.
-   static void push_SI(Executable * fun, const char * loc);
+   static void push_SI(const Executable * fun, const char * loc);
 
    /// Remove the current SI-entry from the SI stack.
    static void pop_SI(const char * loc);
@@ -203,12 +216,12 @@ public:
    /// the topmost SI with parse mode PM_FUNCTION
    static StateIndicator * SI_top_fun();
 
-   /// the topmost SI with an error
-   static StateIndicator * SI_top_error();
+   /// the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X.
+   static StateIndicator * SI_top_error(bool quad_LRX);
 
    /// lookup an existing name (user defined or ⎕xx, var or function).
    /// return 0 if not found.
-   static NamedObject * lookup_existing_name(const UCS_string & name);
+   static const NamedObject * lookup_existing_name(const UCS_string & name);
 
    /// lookup an existing symbol (user defined or ⎕xx).
    static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
@@ -271,12 +284,16 @@ public:
 
    // access to system variables.
    //
+/// read-only system variable
 #define ro_sv_def(x, _str, _txt) /** return x **/ static x & get_v_ ## x() \
    { return the_workspace.v_ ## x; }
-#define rw_sv_def(x, _str, _txt) /** return ## x **/ static x & get_v_ ## x() \
+
+/// read/write system variable
+#define rw_sv_def(x, _str, _txt) /** return ## x **/ static x& get_v_ ## x() \
    { return the_workspace.v_ ## x; }
-   rw_sv_def(Quad_Quad,  "", "⎕")
-   rw_sv_def(Quad_QUOTE, "", "⍞")
+
+   rw_sv_def(Quad_Quad,  "", "⎕")   /**< ⎕ (Quad) */
+   rw_sv_def(Quad_QUOTE, "", "⍞")   /**< ⍞⎕ (QuoteQuad) */
 #include "SystemVariable.def"
 
    /// push a command. This is done when ⍎Command is performed and the command
@@ -294,7 +311,9 @@ protected:
 
    // system variables.
    //
+/// read-only system variable
 #define ro_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
+/// read/write system variable
 #define rw_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
    rw_sv_def(Quad_Quad,  "", "⎕")
    rw_sv_def(Quad_QUOTE, "", "⍞")
@@ -304,7 +323,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   std::vector<const UserFunction *> expunged_functions;
+   std::basic_string<const UserFunction *> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;
@@ -321,6 +340,6 @@ protected:
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __WORKSPACE_HH_DEFINED__

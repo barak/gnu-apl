@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __DIFFOUT_HH_DEFINED__
 #define __DIFFOUT_HH_DEFINED__
 
@@ -30,7 +33,7 @@
 
 using namespace std;
 
-//=============================================================================
+//============================================================================
 /// a filebuf that compares its output with a file.
 class DiffOut : public filebuf
 {
@@ -54,8 +57,9 @@ protected:
    /// overloaded filebuf::overflow()
    virtual int overflow(int c);
 
-   /// return true iff 0-terminated strings apl and ref are different
-   bool different(const UTF8 * apl, const UTF8 * ref);
+   /// return true iff 0-terminated strings apl and ref differ
+   /// at \b pos
+   bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
 
    /// a buffer for one line of APL output
    UTF8_string aplout;
@@ -66,7 +70,7 @@ protected:
    /// expand LF to CRLF
    bool expand_LF;
 };
-//=============================================================================
+//============================================================================
 /// a filebuf for stderr output
 class ErrOut : public filebuf
 {
@@ -104,6 +108,6 @@ public:
    /// expand LF to CRLF
    bool expand_LF;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __DIFFOUT_HH_DEFINED__

@@ -1,0 +1,225 @@
+⍝ ZZ01_Invariants.tc
+
+⍝ Test some (and in the long run all) APL2 invariants
+⍝ Source references: lrm p. NNN means: IBM APL2 Language reference page NNN
+⍝                    iso p. NNN means: ISO standard page NNN
+⍝
+
+      )CLEAR
+CLEAR WS
+
+)COPY_ONCE 3 INVARIANTS.apl   ⍝ defines INV∆CHECK, INV∆EQUIV
+³   ⍝ e.g. NEW )COPY_ONCE workspace: 3 INVARIANTS.apl
+³   ⍝ e.g. DUMPED 2023-03-22  20:07:13 (GMT+1)·
+
+      COMMENT←{0 0⍴⍵}
+
+⍝ -----------------------------------------------------------------------------
+⍝ test INV∆EQUIV itself (equivalent value)
+1 2 3 INV∆EQUIV 1,2,3
+
+⍝ test INV∆EQUIV itself (different values)
+1 2 3 INV∆EQUIV 1 2 3 4
+*** L INV∆EQUIV R failed
+ ≡L: 1 
+ ≡R: 1 
+ ⍴L:  3 
+ ⍴R:  4 
+ L:  1 2 3 
+ R:  1 2 3 4 
+ 4 ⎕CR L:  ┏→━━━━┓ 
+           ┃1 2 3┃ 
+           ┗━━━━━┛ 
+ 4 ⎕CR R:  ┏→━━━━━━┓ 
+           ┃1 2 3 4┃ 
+           ┗━━━━━━━┛ 
+ 10 ⎕CR L:   L←1 2 3  
+ 10 ⎕CR R:   R←1 2 3 4  
+ 2 ⎕TF L: L←3⍴1 2 3 
+ 2 ⎕TF R: R←4⍴1 2 3 4 
+
+
+
+      ⍝ initialize the ⎕RVAL random seed from current time
+      ⍝
+      ⊣0 ⎕RVAL 8⍴256|⎕TS + 256|⎕FIO ¯1
+
+⍝ =============================== INVARIANTS... ==============================
+
+⍝ frequently used random values...
+
+      ⍝                ┌───────────────────────── rank:  random 0-3
+      ⍝                │  ┌────────────────────── shape: random 0 0 0 - 4 4 4
+      ⍝                │  │   ┌──┬──┬──┬──┬────── type: (Char/Int/Real/Complex)
+      ⍝                │  │   │  │  │  │  │  ┌─── max. depth: 4
+      ⍝                │  │   │  │  │  │  │  │
+      ANY_IRC ← ⎕RVAL ¯3 ¯4  (0 70 80 20 10) 4   ⍝ some numeric value
+      ANY_I   ← ⎕RVAL ¯3 ¯4  (0 100)             ⍝ some integer  value
+
+⍝ lrm p. 14
+      1 2    INV∆EQUIV 1(2)
+      1(2)   INV∆EQUIV (1)2
+      (1)2   INV∆EQUIV (1)(2)
+      (1)(2) INV∆EQUIV 1     2
+
+      2 'X' 8 INV∆EQUIV 2'X'8
+      2'X'8   INV∆EQUIV 2('X')8
+      2('X')8 INV∆EQUIV (2('X')(8))
+
+      'FACE' INV∆EQUIV ('F' 'A' 'C' 'E')
+
+⍝ lrm p. 30
+      'IN' 'OUT'    INV∆EQUIV ('IN')('OUT')
+      ('IN')('OUT') INV∆EQUIV ('IN')'OUT'
+
+      ( 8 1 4 3(+.÷)9 2 4 2 ) INV∆EQUIV ( 8 1 4 3+.÷9 2 4 2 )
+
+⍝ lrm p. 35
+      A←2 3 4
+      B←8
+      C←'NEW'
+
+     ( A B←C ) INV∆EQUIV ( A C )
+
+      ( ,¨/ 1 2 3 )  INV∆EQUIV ( (,¨) / 1 2 3 )
+      ( +.×/ 1 2 3 ) INV∆EQUIV ( (+.×) / 1 2 3 )
+
+⍝ lrm p. 36
+      A←1 2 3
+      ( 2 1 3/A ) INV∆EQUIV ( (2 1 3)/A )
+
+      A←1 2 3
+      B←7 8
+      LO  ← {⍺ - ⍵}
+      RO  ← {⍺ ⌈ ⍵}
+      DOP ← {⍺ ⍶ . ⍹ ⍵}
+      ( 5 LO DOP RO B ) INV∆EQUIV ( 5 (LO DOP RO) B )
+
+⍝ lrm p. 37
+      A←2 3 4
+      ( 2(+)3     )  INV∆EQUIV  ( 2+3     )     ⍝ Primitive function name
+      ( A+(.)×A   )  INV∆EQUIV  ( A+.×A   )     ⍝ Primitive operator name
+      ( (2)+1     )  INV∆EQUIV  ( 2+1     )     ⍝ Primitive array name
+      ( (A)←3     )  INV∆EQUIV  ( A←3     )     ⍝ Constructed array name
+      ( ('ABC')   )  INV∆EQUIV  ( 'ABC'   )     ⍝ Character string
+      ( ((2-3))+1 )  INV∆EQUIV (  (2-3)+1 )     ⍝ Parenthesized expression
+
+      ( 2 (3) 4 )  INV∆EQUIV  ( 2 3 4 )    ⍝ These ( ) separate but do not group.
+      ( (2 3 4) )  INV∆EQUIV  ( 2 3 4 )    ⍝ These group but do not separate.
+
+⍝ lrm p. 74
+      A←⎕RVAL ¯3 ¯4 (50 50) 4
+      B←⎕RVAL ¯3 ¯4 (50 50) 4
+      C←⎕RVAL ¯3 ¯4 (50 50) 4
+      (A B C) INV∆EQUIV (⊂A),(⊂B),⊂C
+
+⍝ lrm p. 80
+      A←⎕RVAL 3 ¯10 (0 25 25 25) 4
+      (I1 I2 I3)←⍳¨⍴A
+      I1←(1 ⊤∧ ⎕RVAL 1 (⍴I1) (0 100) 4)/I1   ⍝ pick some indices
+      I2←(1 ⊤∧ ⎕RVAL 1 (⍴I2) (0 100) 4)/I2   ⍝ pick some indices
+      I3←(1 ⊤∧ ⎕RVAL 1 (⍴I3) (0 100) 4)/I3   ⍝ pick some indices
+      Z←A[I1;I2;I3]
+      (⍴Z)  INV∆EQUIV (⍴I1)  , (⍴I2)  , ⍴I3
+      (⍴⍴Z) INV∆EQUIV (⍴⍴I1) + (⍴⍴I2) + ⍴⍴I3
+
+⍝ lrm p. 83
+      ⍝        ┌─────────────────────────── rank:  random 0-3
+      ⍝        │  ┌──────────────────────── shape: random 0 0 0 - 4 4 4
+      ⍝        │  │       ┌──┬───────────── type: (80% real, 20% complex)
+      ⍝        │  │       │  │         ┌─── max. depth: 4
+      ⍝        │  │       │  │         │
+      R←⎕RVAL ¯3 ¯4 (0 0 80 20) 4
+
+      ( 0○R)  INV∆EQUIV  2○¯1○R
+      ( 0○R)  INV∆EQUIV  1○¯2○R
+      ( 4○R)  INV∆EQUIV  6○¯5○R
+      (¯4○R)  INV∆EQUIV  5○¯6○R
+
+⍝ lrm p. 81
+      X← 9○R   ⍝ real R
+      Y←11○R   ⍝ imag R
+      I←0J1
+      S¯4← ¯1+2×(X≥0) ∨ (¯1<X)∧(X<0)∧(Y=0)                     ⍝ sign ¯4○
+      S¯8← ¯1+2×((X>0)∧(Y>0))∨((X=0)∧(Y>1))∨((X<0)∧(Y≥0))      ⍝ sign ¯8○
+
+      ( 0○R) INV∆EQUIV (1-R⋆2)⋆.5                                  ⍝
+      ( 1○R) INV∆EQUIV ((1○X)×(6○Y)) + I×(2○X)×(5○Y)               ⍝ SINZ R
+      (¯1○R) INV∆EQUIV -I×¯5○I×R                                   ⍝ ASINZ R
+      ( 2○R) INV∆EQUIV ((2○X)×(6○Y)) - I×(1○X)×(5○Y)               ⍝ COSZ R
+      (¯2○R) INV∆EQUIV (.5×○1) - ¯1○R                              ⍝ ACOSZ R
+      ( 3○R) INV∆EQUIV ((1○X)+I×(2○X)×(7○Y))÷(2○X)-I×(1○X)×(7○Y)   ⍝ TANZ R
+      ( 4○R) INV∆EQUIV (1+R⋆2)⋆.5                                  ⍝ ATANZ R
+      (¯4○R) INV∆EQUIV S¯4 × (¯1 + R⋆2)⋆.5
+      ( 5○R) INV∆EQUIV -I×1○I×R                                    ⍝ SINHZ R
+      (¯5○R) INV∆EQUIV -I×¯1○I×R                                   ⍝ ASINHZ R
+      ( 6○R) INV∆EQUIV 2○I×R                                       ⍝ COSHZ R
+      (¯6○R) INV∆EQUIV ⍟(R+¯4○R)                                   ⍝ ACOSHZ R
+      ( 7○R) INV∆EQUIV -I×3○I×R                                    ⍝ TANHZ R
+      (¯7○R) INV∆EQUIV -I×¯3○I×R                                   ⍝ ATANHZ R
+      ( 8○R) INV∆EQUIV S¯8 × (¯1-R⋆2)⋆.5
+      (¯8○R) INV∆EQUIV -8○R
+
+⍝ lrm p. 188:   (0≠L)/R   ←→    ⊃,/L⊂R
+
+COMMENT «««
+
+      first of all, lrm p.188 says: "For any appropriate L and R:". Thus the
+      above invariant stated on is wrong for some L and R. The most
+      problematic cases seem to be those with empty results
+
+      For example:
+
+      L←1 0 0 1 ◊ R ← 0 2 4⍴42
+      ⍝
+      In IBM APL2 we get:
+
+      ⍴ (0≠L)/R  gives 0 2 2
+      ⍴ ⊃,/L⊂R   gives 0 2 0
+
+      The mismatch apparently occurs for empty L⊂R and we map these
+      case to non-empty R below.
+        »»»
+
+      R←ANY_I ∣ 1000   ⍝ avoid large ints to make errors more readable
+      R←((1⌈⍴⍴R)↑(⍴R),0)⍴R   ⍝ non-scalar R
+      R←(1 ⌈⍴R)⍴R            ⍝ make R non-empty
+      ⍝
+      ⍝        ┌──────────────── rank:       1 (vector)
+      ⍝        │  ┌───────────── shape:      random 0 - 20
+      ⍝        │  │      ┌────── type:       (100% integer)
+      ⍝        │  │      │  ┌─── max. depth: 1
+      ⍝        │  │      │  │
+      L←⎕RVAL  1 20 (0 100) 1   ⍝ some integers for the partition vector
+      L←∣L                      ⍝ L must be nonnegative
+      L←4∣L                     ⍝ L shall be small (for longer partitions)
+      L←(¯1↑⍴R)⍴L               ⍝ ⍴L must match the last axis of R
+      "L:" L
+³
+      "⍴L:" (⍴L) "≡L:" (≡L)
+³
+      "⍴R:" (⍴R) "≡R:" (≡R)
+³
+
+      Z←L⊂R
+COMMENT «««
+      the left and/or right side of the invariant (0≠L)/R  ←→  ⊃,/L⊂R might
+      fail while L⊂R has succeeded. Catch and pretend success in these cases.
+        »»»
+
+      (Z1 Z2)← '1 1' ⎕EA '((0≠L)/R) (⊃,/Z)'
+
+COMMENT «««
+      empty results are also misterious. For L←0 or L←, and R←,1 both
+      GNU APL and IBM APL 2 return the same result, but the invariant
+      does not hold. In this case the right side Z2 should be 0⍴⊂Z2 instead.
+        »»»
+
+      (Z1 Z2) ← Z1 Z2 ⊢[(0ϵ⍴Z2) ∨ (0≡Z2) ] 1 1   ⍝ fix empty Z2
+      Z1 INV∆EQUIV Z2
+
+      )CHECK BRIEF
+
+      )CLEAR
+CLEAR WS
+

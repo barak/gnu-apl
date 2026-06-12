@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <vector>
+/** @file
+*/
 
+#include <string.h>
+
+#include "Bif_F12_COMMA.hh"
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Common.hh"
 #include "FloatCell.hh"
+#include "IndexExpr.hh"
 #include "IntCell.hh"
 #include "Output.hh"
 #include "Parser.hh"
@@ -37,9 +42,10 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
-Parser::parse(const UCS_string & input, Token_string & tos) const
+Parser::parse(const UCS_string & input, Token_string & tos,
+              bool optimize) const
 {
    // convert input characters into token
    //
@@ -47,24 +53,24 @@ Token_string tos1;
 
    {
      Tokenizer tokenizer(pmode, LOC, macro);
-     ErrorCode ec = tokenizer.tokenize(input, tos1);
-     if (ec != E_NO_ERROR)   return ec;
+     if (const ErrorCode ec = tokenizer.tokenize(input, tos1))   return ec;
    }
 
    // special case: single token (to speed up ⍎)
    //
    if (tos1.size() == 1)
       {
-        const ErrorCode err = parse_statement(tos1);
+        const ErrorCode err = parse_statement(tos1, optimize);
         if (err == E_NO_ERROR)   tos.push_back(tos1[0]);
         return err;
       }
 
-   return parse(tos1, tos);
+   return parse(tos1, tos, optimize);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
-Parser::parse(const Token_string & input, Token_string & tos) const
+Parser::parse(const Token_string & input, Token_string & tos,
+              bool optimize) const
 {
    Log(LOG_parse)
       {
@@ -75,19 +81,39 @@ Parser::parse(const Token_string & input, Token_string & tos) const
 
    // split input line into statements (separated by ◊)
    //
-std::vector<Token_string *> statements;
+std::basic_string<Token_string *> statements;
    {
      Token_string * stat = new Token_string();
+     int curly_depth = 0;
      loop(idx, input.size())
         {
           const Token & tok = input[idx];
-          if (tok.get_tag() == TOK_DIAMOND)
+          switch(tok.get_tag())
              {
-               statements.push_back(stat);
-               stat = new Token_string();
-             }
-          else
-             {
+               case TOK_L_CURLY:
+                    ++curly_depth;
+                    stat->push_back(tok);
+                    break;
+
+               case TOK_R_CURLY:
+                    if (curly_depth)   --curly_depth;
+                    else               return E_UNBALANCED_R_CURLY;
+                    stat->push_back(tok);
+                    break;
+
+               case TOK_DIAMOND:
+                    if (curly_depth)   // ◊ inside { ... }
+                       {
+               //        return E_ILLEGAL_DIAMOND;  // single statement { ... }
+                         stat->push_back(tok);      // multi  statement { ... }
+                       }
+                    else               // normal ◊
+                       {
+                         statements.push_back(stat);
+                         stat = new Token_string();
+                       }
+                    break;
+          default:
                stat->push_back(tok);
              }
         }
@@ -97,7 +123,7 @@ std::vector<Token_string *> statements;
    loop(s, statements.size())
       {
         Token_string * stat = statements[s];
-        if (const ErrorCode err = parse_statement(*stat))
+        if (const ErrorCode err = parse_statement(*stat, optimize))
            {
              while (size_t(s) < statements.size())
                {
@@ -112,21 +138,21 @@ std::vector<Token_string *> statements;
         loop(t, stat->size())
            {
              tos.push_back(Token());
-             tos[tos.size() - 1].move_1((*stat)[t], LOC);
+             tos[tos.size() - 1].move((*stat)[t], LOC);
            }
         delete stat;
       }
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
-Parser::parse_statement(Token_string & tos)
+Parser::parse_statement(Token_string & tos, bool optimize)
 {
    // 1. convert (X) into X and ((X...)) into (X...)
    //
    remove_nongrouping_parantheses(tos);
-   remove_void_token(tos);
+   remove_TOK_VOID(tos);
 
    Log(LOG_parse)
       {
@@ -141,7 +167,7 @@ Parser::parse_statement(Token_string & tos)
    for (int progress = true; progress;)
       {
         progress = collect_groups(tos);
-        if (progress)   remove_void_token(tos);
+        if (progress)   remove_TOK_VOID(tos);
       }
 
    Log(LOG_parse)
@@ -152,8 +178,23 @@ Parser::parse_statement(Token_string & tos)
 
    // 3. convert vectors like 1 2 3 or '1' 2 '3' into single APL values
    //
-   collect_constants(tos);
-   remove_void_token(tos);
+   if (collect_constants(tos))           remove_TOK_VOID(tos);
+
+   // parse_statement() is normally called with optimize == true; However,
+   // Executable::reparse() calls it with optimize == false in order to
+   // restore the body before it was optimized.
+   //
+   // To disable optimizations you must set the enable arg(s) in
+   // Performance.def to 0 (as opposed to setting optimize to false.
+   //
+   if (optimize)
+      {
+        if (DO_FT_LITERAL_AXIS && optimize_literal_axes(tos))
+           remove_TOK_VOID(tos);
+
+        while (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
+           remove_TOK_VOID(tos);
+      }
 
    // special case: single APL value (to speed up ⍎)
    //
@@ -169,7 +210,7 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR, true);
       }
 
-   // 4. mark symbol left of ← as LSYMB
+   // 5. mark symbol left of ← as LSYMB
    //
    mark_lsymb(tos);
    Log(LOG_parse)
@@ -178,17 +219,20 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR, true);
       }
 
-   // 5. replace bitwise functons ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant
+   // 6. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
-   replace_bitwise_functions(tos);
-   remove_void_token(tos);
-   Log(LOG_parse)
+   if (optimize)
       {
-        CERR << "parse 6 [" << tos.size() << "]: ";
-        tos.print(CERR, true);
+        optimize_static_patterns(tos);
+        Log(LOG_parse)
+           {
+             CERR << "parse 6 [" << tos.size() << "]: ";
+             tos.print(CERR, true);
+           }
       }
 
-   // 6. update distances between (), [], and {}
+   // 7. update the distances between ( and ), [ and ], or { and }. After
+   //    that, tos.size() must not be changed anymore.
    //
    {
      const ErrorCode ec = match_par_bra(tos, false);
@@ -201,10 +245,11 @@ Parser::parse_statement(Token_string & tos)
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
-void
+//----------------------------------------------------------------------------
+bool
 Parser::collect_constants(Token_string & tos)
 {
+bool progress = false;
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.size() << " token] in: ";
@@ -215,11 +260,12 @@ Parser::collect_constants(Token_string & tos)
    //
    loop (t, tos.size())
       {
-        size_t to;
+        ShapeItem to;
         switch(tos[t].get_tag())
            {
              case TOK_APL_VALUE1:
              case TOK_APL_VALUE3:
+             case TOK_APL_VALUE4:
              case TOK_CHARACTER:
              case TOK_COMPLEX:
              case TOK_INTEGER:
@@ -239,13 +285,13 @@ Parser::collect_constants(Token_string & tos)
               // In contrast, the binding rules stated in IBM's apl2lrm.pdf
               // would give 3[2] ↔ RANK ERROR.
               // 
-              // We follow apl2lrm; to enable IBM behavior write #if 0 above.
+              // We follow apl2lrm; to enable ISO behavior write #if 0 above.
               // 
 
               // if tos[to + 1] is [ then [ binds stronger than
               // vector notation and we stop collecting.
               //
-              if (size_t(to + 1) < tos.size() &&
+              if ((to + 1) < tos.size() &&
                   tos[to + 1].get_tag() == TOK_L_BRACK)   break;
 #endif
               const TokenTag tag = tos[to].get_tag();
@@ -256,6 +302,7 @@ Parser::collect_constants(Token_string & tos)
               if (tag == TOK_COMPLEX)      continue;
               if (tag == TOK_APL_VALUE1)   continue;
               if (tag == TOK_APL_VALUE3)   continue;
+              if (tag == TOK_APL_VALUE4)   continue;
 
               // no more values: stop collecting
               //
@@ -263,6 +310,7 @@ Parser::collect_constants(Token_string & tos)
             }
 
         create_value(tos, t, to - t);
+        if (to > (t + 1))   progress = true;
       }
 
    Log(LOG_collect_constants)
@@ -270,8 +318,10 @@ Parser::collect_constants(Token_string & tos)
         CERR << "collect_constants [" << tos.size() << " token] out: ";
         tos.print(CERR, true);
       }
+
+   return progress;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::collect_groups(Token_string & tos)
 {
@@ -292,6 +342,7 @@ int opening = -1;
               case TOK_COMPLEX:
               case TOK_APL_VALUE1:
               case TOK_APL_VALUE3:
+              case TOK_APL_VALUE4:
                    continue;
 
               case TOK_L_PARENT:
@@ -311,7 +362,7 @@ int opening = -1;
 
                    // we removed parantheses, so we close the value.
                    //
-                   if (tos[opening + 1].get_tag() == TOK_APL_VALUE3)
+                   if (tos[opening + 1].get_Class() == TC_VALUE)
                       tos[opening + 1].ChangeTag(TOK_APL_VALUE1);
 
                    Log(LOG_collect_constants)
@@ -330,7 +381,7 @@ int opening = -1;
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_bracket(const Token_string & tos, int pos)
 {
@@ -338,7 +389,7 @@ Parser::find_closing_bracket(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -353,7 +404,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_bracket(const Token_string & tos, int pos)
 {
@@ -376,7 +427,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_parent(const Token_string & tos, int pos)
 {
@@ -384,7 +435,7 @@ Parser::find_closing_parent(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -399,7 +450,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_parent(const Token_string & tos, int pos)
 {
@@ -422,7 +473,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
@@ -432,7 +483,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
    //
    for (bool progress = true; progress; progress = false)
        {
-         loop(t, int(tos.size()) - 2)
+         loop(t, tos.size() - 2)
              {
                if (tos[t].get_Class() != TC_L_PARENT)   continue;
 
@@ -470,7 +521,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                // If X is non-scalar, enclose it
                //
                progress = true;
-               tos[t + 2].move_1(tos[t + 1], LOC);
+               tos[t + 2].move(tos[t + 1], LOC);
 
                // we "remember" the nongrouping parantheses to disambiguate
                // e,g, SYM/xxx from (SYM)/xxx
@@ -483,51 +534,87 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Parser::replace_bitwise_functions(Token_string & tos)
+Parser::optimize_static_patterns(Token_string & tos)
 {
-   loop(t, int(tos.size()) - 1)
+   /* Replace:
+
+       ∧∧, ∨∨, ⍲⍲, and ⍱⍱    with their bitwise token variant,
+       ⎕FIO.function_name    with ⎕FIO[X] (via subfun_to_axis(function_name))
+    */
+
+bool TOK_VOID_inserted = false;
+   loop(t, tos.size() - 1)   // -1 since we need tos[t + 1]
        {
+         if (tos[t].get_tag() == TOK_OPER2_INNER    &&   // some f.g
+             t                                      &&   // f exists
+             tos[t-1].get_Class() == TC_FUN2        &&   // f is function
+             tos[t-1].get_function()                &&   // f is valid
+             tos[t-1].get_function()->has_subfuns() &&   // f is ⎕FIO or ⎕CR
+             tos[t+1].get_tag() == TOK_SYMBOL)           // g is (sub-) name
+            {
+              const Symbol * symbol = tos[t+1].get_sym_ptr();   // subfun name
+              cFunction_P fun = tos[t-1].get_function();
+              const sAxis axis = fun->subfun_to_axis(symbol->get_name());
+              if (axis != -1)   // subfunction is valid
+                 {
+                   Value_P function_axis = IntScalar(axis, LOC);
+                   Token tok_axis(TOK_AXIS, function_axis);
+                   tos[t++].move(tok_axis, LOC);      // replace . with [X]
+                   tos[t++].clear(LOC);               // invalidate g
+                   TOK_VOID_inserted = true;
+                 }
+              continue;
+            }
+
          if (tos[t].get_tag() != TOK_F12_ENCODE)   continue;
 
          switch(tos[t+1].get_tag())
             {
               case TOK_F2_AND:
-                   tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
+                   tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_OR:
-                   tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
+                   tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NAND:
-                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
+                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NOR:
-                   tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
+                   tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_EQUAL:
-                   tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
+                   tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
-              case TOK_F2_UNEQ:
-                   tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
+              case TOK_F2_UNEQU:
+                   tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               default: break;
             }
        }
+
+   if (TOK_VOID_inserted)   remove_TOK_VOID(tos);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::check_if_value(const Token_string & tos, int pos)
 {
@@ -573,52 +660,319 @@ Parser::check_if_value(const Token_string & tos, int pos)
 
    return false;   // tos[pos] is at the end of a function
 }
-//-----------------------------------------------------------------------------
-void
-Parser::remove_void_token(Token_string & tos)
+//----------------------------------------------------------------------------
+Assign_state
+Parser::get_assign_state(Token_string & tos, ShapeItem pos)
 {
-size_t dst = 0;
+   // this function is called by an optimization for static [] or [N] cases.
+   // The benefit is somewhat marginal, we therefore leave the more
+   // complicated cases (i.e. those involving ←) to the prefix parser
+   // and return ASS_unknown instead of a more precise result.
+   //
+   while (pos < tos.size())
+       {
+         if (tos[pos++].get_Class() == TC_ASSIGN)   return ASS_unknown;
+       }
+
+   return ASS_none;
+}
+//----------------------------------------------------------------------------
+bool
+Parser::optimize_literal_axes(Token_string & tos)
+{
+   // stupid macOS warns about DO_FT_LITERAL_AXIS && DO_FT_LITERAL_INDEX,
+   // so we split it.
+   //
+   if (!DO_FT_LITERAL_AXIS)    return false;
+   if (!DO_FT_LITERAL_INDEX)   return false;
+
+   // replace [ ] or [ N ] by their complete index or axis, as to relieve
+   // the Prefix parser.
+bool progress = false;
+
+   loop(src, tos.size() - 1)
+       {
+         if (tos[src].get_tag() != TOK_L_BRACK)   continue;
+
+         const Assign_state assign_state = get_assign_state(tos, src);
+         if (assign_state == ASS_unknown)   continue;
+
+         // case 1: [ ] 
+         //
+         const Token & T1 = tos[src + 1];
+         if (T1.get_tag() == TOK_R_BRACK)   // empty index [ ]
+            {
+              IndexExpr * idx = new IndexExpr(assign_state, LOC);
+              Log(LOG_delete)
+                 CERR << "new    " << voidP(idx) << " at " LOC << endl;
+              new (&tos[src++]) Token(TOK_INDEX, *idx);   // replace [
+              new (&tos[src]) Token(TOK_VOID);            // replace ]
+              OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
+              progress = true;
+              continue;
+            }
+
+         /* case 2: [N]. This case has two subcases:
+
+            2a. f[B] with (system-) function f, or
+            2b. V[B] with unknown V (most likely a SYMBOL or a Value
+
+            case 2a. is fairly frequent with f being ⎕FIO or ⎕CR.
+          */
+         if ((src + 2) < tos.size()          &&   // tos[src+2] exists
+             tos[src + 2].get_tag() == TOK_R_BRACK &&   // and is ]
+             T1.get_Class() == TC_VALUE            &&   // value N
+             T1.get_apl_val()->is_int_scalar())
+            {
+              /* at this point we either have a function axis f[N] or else a
+                 vector index V[N]. In some cases (system functions, APL
+                 primitives) we can decide that here; if not then we have
+                 to defer the decision to the Prefix parser.
+               */
+              if (src > 0 && tos[src - 1].is_function())
+                 {
+                   Value_P function_axis = T1.get_apl_val();
+                   Token tok_axis(TOK_AXIS, function_axis);
+                   new (&tos[src++]) Token(TOK_VOID);   // invalidate [
+                   tos[src++].move(tok_axis, LOC);
+                   new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                   OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
+                   progress = true;
+                 }
+              else
+                 {
+                   IndexExpr * idx = new IndexExpr(assign_state, LOC);
+                   idx->add_index(T1.get_apl_val());
+                   
+                   // T1 is an axis [ N ].
+                   new (&tos[src++]) Token(TOK_VOID);   // invalidate [
+                   new (&tos[src++]) Token(TOK_INDEX, *idx);
+                   new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                   OptmizationStatistics::count(OPTI_FT_LITERAL_INDEX);
+                   progress = true;
+                 }
+            }
+       }
+
+   return progress;
+}
+//----------------------------------------------------------------------------
+bool
+Parser::optimize_short_primitives(Token_string & tos)
+{
+   if (DONT_FT_SHORT_PRIMITIVE)   return false;
+
+   // replace APL primitives with short literal results and arguments,
+   // such as 4⍴0 with their result. The scope of tos is one statement.
+   //
+bool progress = false;
+   if (tos.size() < 3)   return false;   // too short to optimize
+
+// CERR << endl << "tos: ";   tos.print(CERR, false);
+
+   // create a list of 'terminal literals' from where the optimization
+   //  may restart. For example:
+   //
+   //  (2⍴5) ⍴ 6
+   //
+   // The optimization starts at "6" (end of statement) and restarts at ")".
+   //
+basic_string<ShapeItem> ends;
+   ends.push_back(tos.size());
+
+   // tos is in forward (aka. APL) order. We move backwards from the end
+   //
+   rev_loop(pc, tos.size())
+       {
+         if (pc < 3)   break;   // to few tokens remaining in tos
+
+         // at this point we have at least:
+         //
+         // in APL order:
+         //
+         // END A F B   (dyadic function call)
+         // END F B     (monadic function call)
+         //
+         // resp. in reverse order:
+         //
+         // B F A END   (dyadic function call)
+         // B F END     (monadic function call)
+         //
+         // That is A, F, and B are valid, and END must be checked
+         // for the dyadic cases. Below we refer to the dyadic END as Q and
+         // to the monadic END as AQ (since its position is A).
+         //
+         if ((1 << tos[pc].get_Class()) & TCG_R_PAR_BRA)   ends.push_back(pc);
+       }
+
+   loop(e, ends.size())
+       {
+         // set shortcuts for relevant positions (PCs) in tos. The rev_loop()
+         // above has checked that the tokens at src_B, src_F, and src_AQ are
+         // valid, while src_Q may or may not be valid (and must be checked).
+         //
+         const ShapeItem src_Q  =                  ends[e] - 4;
+         const ShapeItem src_AQ = src_Q  + 1;   // ends[e] - 3
+         const ShapeItem src_F  = src_AQ + 1;   // ends[e] - 2
+         const ShapeItem src_B  = src_F  + 1;   // ends[e] - 1
+
+         Token & tok_B = tos[src_B];
+         if (tok_B.get_Class() != TC_VALUE)   continue;   // no Value B
+
+         Token & tok_F = tos[src_F];
+         if (tok_F.get_Class() != TC_FUN2)    continue;   // no function F
+         cFunction_P fun = tok_F.get_function();
+
+         // check if the function call can only be monadic and rule out strand
+         // notation cases. For example (by Elias Mårtenson and verified with
+         // IBM APL2):
+         //
+         // X←2 ◊ X 1 ⍴ 10 11
+         //       │ │ │ │
+         //       │ └─┴─┴──── dyadic ⍴, but a 1 ⍴ 10 11 optimization would be
+         //       └────────── incorrect because X MAY bind stronger than ⍴.
+         //
+         const Token & tok_Q = tos[src_Q];
+
+         const bool is_dyadic =
+               tos[src_AQ].get_Class() == TC_VALUE &&        // AQ is a Value,
+               src_Q >= 0                          &&        // Q is valid, and
+               ! ((1 << tok_Q.get_Class()) & TCG_MAY_GLUE);  // Q is not sticky
+
+         const bool is_monadic =
+               ((1 << tos[src_AQ].get_Class()) & TCG_NO_A);   // A not a Value
+
+         Value_P B = tok_B.get_apl_val();
+         if (is_dyadic)
+            {
+              Token & tok_A = tos[src_AQ];
+              if (fun == &Bif_F12_RHO::fun)   // dyadic A⍴B
+                 {
+                    // NOTE: we use Bif_F12_RHO::do_reshape() instead of
+                    //       Bif_F12_RHO::eval_AB() as to bypass the A⍴B
+                    //       optimization in eval_AB() (which does not
+                    //       work well here)
+                    //
+                    const Shape sh_A(*tok_A.get_apl_val(), /* qio */ 0);
+            
+                    if (sh_A.fits_into(cfg_SHORT_VALUE_LENGTH_WANTED))
+                       {
+                         Token tZ = Bif_F12_RHO::fun.do_reshape(sh_A, *B);
+                         tok_A.clear(LOC);   // set A to TOK_VOID
+                         tok_F.clear(LOC);   // set F to TOK_VOID
+                         tok_B.clear(LOC);   // set F to TOK_VOID
+                         new (&tok_B) Token(TOK_APL_VALUE4,   // optimized
+                                            tZ.get_apl_val());
+                         OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                         progress = true;
+                       }
+                 }
+            }
+         else if (is_monadic)
+            {
+              if (fun == &Bif_F12_COMMA::fun)            // monadic ,B
+                 {
+                   const Shape new_shape(B->element_count());
+                   B->set_shape(new_shape);
+                   tok_F.clear(LOC);   // set , to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
+                 }
+              else if (fun == &Bif_F12_COMMA1::fun)      // monadic ⍪B
+                 {
+                   // 1↑⍴⍪B  ←→  1↑⍴B
+                   // 1↓⍴⍪B  ←→  ×/1↓⍴B
+                   //
+                   const Shape & sh_B = B->get_shape();
+                   const ShapeItem rows = B->get_rank() ? B->get_shape_item(0)
+                                                        : 1;
+                   ShapeItem low_volume = 1;   // ×/1↓⍴B
+                   for (ShapeItem r = 1; r < sh_B.get_rank(); ++r)
+                       low_volume *= sh_B.get_shape_item(r);
+                   const Shape new_shape(rows, low_volume);
+                   B->set_shape(new_shape);
+
+                   tok_F.clear(LOC);   // set ⍪ to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
+                 }
+              else if (fun == &Bif_F12_PARTITION::fun)   // monadic ⊂B
+                 {
+                   if (!B->is_simple_scalar())   // otherwise ⊂B is B
+                      {
+                        Value_P Z(LOC);
+                        Z->next_ravel_Pointer(B.get());
+                        Z->check_value(LOC);
+                        tok_B.clear(LOC);   // set B to TOK_VOID
+                        new (&tok_B) Token(TOK_APL_VALUE4, Z);
+                      }
+                   tok_F.clear(LOC);   // set F to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
+                 }
+            }
+         // otherwise the arity can not be determined statically (and will be
+         // decided at runtime in Prefix.cc)
+       }
+
+   return progress;
+}
+//----------------------------------------------------------------------------
+VoidCount
+Parser::remove_TOK_VOID(Token_string & tos)
+{
+ShapeItem dst = 0;
 
    loop(src, tos.size())
        {
-         if (tos[src].get_tag() == TOK_VOID)   continue;
-         if (src != ShapeItem(dst))   tos[dst].move_1(tos[src], LOC);
+         if (tos[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
+         if (src != dst)   tos[dst].move(tos[src], LOC);
          ++dst;
        }
 
+const VoidCount ret = VoidCount(tos.size() - dst);
    tos.resize(dst);
+   return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
-std::vector<ShapeItem> stack;
+std::basic_string<ShapeItem> stack;
    loop(s, tos.size())
        {
          const ShapeItem t = backwards ? (tos.size() - 1) - s : s;
-         ErrorCode ec;
+         ErrorCode ec;   // anticipated error code, not used in most cases
          TokenClass tc_peer;
          switch(tos[t].get_Class())
            {
-             // for [ ( or { push the position onto stack
-             case TC_L_BRACK:  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
+             // for [, (, or {, push the position onto stack.
+             //
+             case TC_L_BRACK:   // NOTE: also includes TOK_SEMICOL, so we check
+                  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
+                  /* fall through */
              case TC_L_PARENT:
-             case TC_L_CURLY:  stack.push_back(t);
-                               continue;
+             case TC_L_CURLY:
+                  stack.push_back(t);
+                  continue;
 
-             case TC_R_BRACK:  ec = E_UNBALANCED_BRACKET;
-                               tc_peer = TC_L_BRACK;
-                               break;
+             case TC_R_BRACK:
+                  ec = E_UNBALANCED_R_BRACKET;   // for empty stack below
+                  tc_peer = TC_L_BRACK;
+                  break;
 
-             case TC_R_PARENT: ec = E_UNBALANCED_PARENT;
-                               tc_peer = TC_L_PARENT;
-                               break;
+             case TC_R_PARENT:
+                  ec = E_UNBALANCED_R_PARENT;    // for empty stack below
+                  tc_peer = TC_L_PARENT;
+                  break;
 
-             case TC_R_CURLY:  ec = E_UNBALANCED_CURLY;
-                               tc_peer = TC_L_CURLY;
-                               break;
+             case TC_R_CURLY:
+                  ec = E_UNBALANCED_R_CURLY;     // for empty stack below
+                  tc_peer = TC_L_CURLY;
+                  break;
 
-             default:          continue;
+             default:
+                  continue;
            }
 
           // at this point, a closing ), ], or } was detected
@@ -635,19 +989,21 @@ std::vector<ShapeItem> stack;
           tos[t1].set_int_val2(diff);
        }
 
-   // if there are unmatched items: return syntax error of the outer token
+   // at this point all [ ( or { should have been matced (and therefore
+   // stack shuld be empty. If not:  return syntax error of the outer token
    //
    if (stack.size())
       {
         const TokenClass outer = tos[stack[0]].get_Class();
-        if (outer == TC_L_BRACK)    return E_UNBALANCED_BRACKET;
-        if (outer == TC_L_PARENT)   return E_UNBALANCED_PARENT;
-        return E_UNBALANCED_CURLY;
+        if (outer == TC_L_BRACK)    return E_UNBALANCED_L_BRACKET;
+        if (outer == TC_L_PARENT)   return E_UNBALANCED_L_PARENT;
+        if (outer == TC_L_CURLY)    return E_UNBALANCED_L_CURLY;
+        FIXME;
       }
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_value(Token_string & tos, int pos, int count)
 {
@@ -668,7 +1024,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_scalar_value(Token & output)
 {
@@ -678,44 +1034,34 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (scalar->next_ravel())  CharCell(output.get_char_val());
+               scalar->next_ravel_Char(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               output.move_1(tok, LOC);
+               output.move(tok, LOC);
              }
              return;
 
         case TOK_INTEGER:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   IntCell(output.get_int_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
-               output.move_1(tok, LOC);
+               Token tok(TOK_APL_VALUE3, IntScalar(output.get_int_val(), LOC));
+               output.move(tok, LOC);
              }
              return;
 
         case TOK_REAL:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())  FloatCell(output.get_flt_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
-               output.move_1(tok, LOC);
+               Token tok(TOK_APL_VALUE3,
+                         FloatScalar(output.get_flt_val(), LOC));
+               output.move(tok, LOC);
              }
              return;
 
         case TOK_COMPLEX:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   ComplexCell(output.get_cpx_real(),
-                                                        output.get_cpx_imag());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
-               output.move_1(tok, LOC);
+               Token tok(TOK_APL_VALUE3,
+                         ComplexScalar(output.get_cpx_real(),
+                                       output.get_cpx_imag(), LOC));
+               output.move(tok, LOC);
              }
              return;
 
@@ -729,56 +1075,54 @@ Parser::create_scalar_value(Token & output)
    CERR << "Unexpected token " << output.get_tag() << ": " << output << endl;
    Assert(0 && "Unexpected token");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Parser::create_vector_value(Token_string & tos,
-                            int pos, int count)
+Parser::create_vector_value(Token_string & tos, int pos, int count)
 {
-Value_P vector(count, LOC);
+Value_P Z(count, LOC);
 
    loop(l, count)
        {
-         Cell * addr = &vector->get_ravel(l);
          Token & tok = tos[pos + l];
 
          switch(tok.get_tag())
             {
               case TOK_CHARACTER:
-                   new (addr) CharCell(tok.get_char_val());
+                   Z->next_ravel_Char(tok.get_char_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_INTEGER:
-                   new (addr) IntCell(tok.get_int_val());
+                   Z->next_ravel_Int(tok.get_int_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_REAL:
-                   new (addr) FloatCell(tok.get_flt_val());
+                   Z->next_ravel_Float(tok.get_flt_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_COMPLEX:
-                   new (addr) ComplexCell(tok.get_cpx_real(),
-                                          tok.get_cpx_imag());
+                   Z->next_ravel_Complex(tok.get_cpx_real(),
+                                         tok.get_cpx_imag());
                    tok.clear(LOC);   // invalidate token
                    break;
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
-                 new (addr) PointerCell(tok.get_apl_val().get(),
-                                        vector.getref());
+            case TOK_APL_VALUE4:
+                 Z->next_ravel_Value(tok.get_apl_val().get());
                  tok.clear(LOC);   // invalidate token
                  break;
 
-              default: Assert(0);
+              default: FIXME;
             }
        }
 
-   vector->check_value(LOC);
-Token tok(TOK_APL_VALUE3, vector);
+   Z->check_value(LOC);
+Token tok(TOK_APL_VALUE3, Z);
 
-   tos[pos].move_1(tok, LOC);
+   tos[pos].move(tok, LOC);
 
    Log(LOG_create_value)
       {
@@ -786,7 +1130,8 @@ Token tok(TOK_APL_VALUE3, vector);
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// in tos, (re-) mark the symbols left of ← as left symbols
 void
 Parser::mark_lsymb(Token_string & tos)
 {
@@ -794,11 +1139,12 @@ Parser::mark_lsymb(Token_string & tos)
       {
         if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 
-        // found ←. move backwards. Before that we handle the special case of
-        // vector specification, i.e. (SYM SYM ... SYM) ← value
+        // found ← in VAR VAR)← move backwards.
+        // Before that we handle the special case of vector specification,
+        // i.e. (SYM SYM ... SYM) ← value
         //
         if (ass >= 3 && tos[ass - 1].get_Class() == TC_R_PARENT &&
-                        tos[ass - 2].get_Class() == TC_SYMBOL &&
+                        tos[ass - 2].get_Class() == TC_SYMBOL   &&
                         tos[ass - 3].get_Class() == TC_SYMBOL)
            {
              // first make sure that this is really a vector specification.
@@ -806,17 +1152,36 @@ Parser::mark_lsymb(Token_string & tos)
              const int syms_to = ass - 2;
              int syms_from = ass - 3;
              bool is_vector_spec = true;
+             bool is_selective_spec = false;
              for (int a1 = ass - 4; a1 >= 0; --a1)
                  {
-                   if (tos[a1].get_Class() == TC_L_PARENT)
+                   const TokenClass tc = tos[a1].get_Class();
+                   if (tc == TC_L_PARENT)   // end of (...)←
                       {
                         syms_from = a1 + 1;
                         break;
                       }
-                   if (tos[a1].get_Class() == TC_SYMBOL)     continue; 
+                   if (tc == TC_SYMBOL)     continue; 
+                   if ((1 << tc) & TCG_FUN12_OPER12)
+                      {
+                        is_selective_spec = true;
+                        is_vector_spec = false;
+                        break;
+                      }
+
+                   // something else
+                   //
                    is_vector_spec = false;
                    break;
                  }
+
+             if (is_selective_spec == is_vector_spec)   // none or both
+                {
+                  MORE_ERROR() <<
+                      "Left of )← seems to be neither a vector "
+                      "specification nor a selective specvification";
+                  LEFT_SYNTAX_ERROR;
+                }
 
              // if this is a vector specification, then mark all symbols
              // inside ( ... ) as TOK_LSYMB2.
@@ -857,4 +1222,4 @@ Parser::mark_lsymb(Token_string & tos)
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

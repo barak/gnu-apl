@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __PERFORMANCE_HH_DEFINED__
 #define __PERFORMANCE_HH_DEFINED__
 
@@ -25,9 +28,9 @@
 
 #include <iostream>
 
-#include "../config.h"
+#include "Common.hh"
 
-#if defined(PERFORMANCE_COUNTERS_WANTED)
+#if defined(cfg_PERFORMANCE_COUNTERS_WANTED)
 
 # define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
 # define PERFORMANCE_END(statistics, counter, len) \
@@ -47,7 +50,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// performance statistics IDs
 enum Pfstat_ID
 {
@@ -85,7 +88,7 @@ enum Pfstat_ID
         PFS_SCALAR_AB_overhead,
         PFS_ALL
 };
-//=============================================================================
+//============================================================================
 /// one statistics for computing the mean and the variance of samples
 class Statistics_record
 {
@@ -155,7 +158,7 @@ protected:
    /// sum of squares of sample values
    double data2;   // can grow quickly!
 };
-//=============================================================================
+//============================================================================
 /// Base class for different kinds of statistics
 class Statistics
 {
@@ -196,7 +199,7 @@ protected:
    /// the ID of \b this statistics
    const Pfstat_ID id;
 };
-//=============================================================================
+//============================================================================
 /// Performance counters for an entire APL system function
 class FunctionStatistics : public Statistics
 {
@@ -241,7 +244,7 @@ protected:
    /// the cycles executed
    Statistics_record vec_cycles;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Performance counters for one cell level function
 class CellFunctionStatistics : public Statistics
 {
@@ -306,7 +309,7 @@ protected:
    /// statistics for subsequent executions
    Statistics_record subsequent;
 };
-//=============================================================================
+//============================================================================
 /**
      Performance (cycle-) counters at different levels
  **/
@@ -352,5 +355,53 @@ public:
 
 #include "Performance.def"
 };
+//============================================================================
+/// The (unique) ID of an optimization
+enum Optimization_ID
+{
+  INVALID_OPTIMIZATION_COUNTER = -1,
+#define optim(_enabled, tag, _text)  OPTI_ ## tag,
+#include "Performance.def"
+  OPT_COUNTER_COUNT
+};
 
+/// Whether a group of optimizations shall be enabled (1) or disabled (0).
+/// Individual optimiizations can be enabled/disabled in Performance.def
+enum Do_Optimization
+{
+  FT_ANY = 1,   ///< all ⎕FX time optimizations
+  RT_ANY = 1,   ///< all run time optimizations
+
+#define optim(enabled, tag, __text)  \
+   DO_ ## tag = enabled, DONT_ ## tag = 1 - enabled,
+#include "Performance.def"
+};
+
+//-----------------------------------------------------------------------------
+class OptmizationStatistics
+{
+public:
+   /// return the value of counter \b opt
+   static int64_t get(Optimization_ID opt)
+      {
+        return optimization_counters[opt];
+      }
+
+   /// reset all counters
+   static void reset_all()
+      {
+        loop(opt, OPT_COUNTER_COUNT)   optimization_counters[opt] = 0;
+      }
+
+   /// increment counter \b opt
+   static void count(Optimization_ID opt)
+      {
+        ++optimization_counters[opt];
+      }
+
+protected:
+   /// an array of counters (one for each \b Optimization_ID)
+   static int64_t optimization_counters[OPT_COUNTER_COUNT];
+};
+//============================================================================
 #endif // __PERFORMANCE_HH_DEFINED__

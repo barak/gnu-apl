@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "LockWrapper.hh"
 
 LockWrapper::LockWrapper( pthread_mutex_t *lock_in ) : lock( lock_in )

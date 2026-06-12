@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Avec.hh"
 #include "Common.hh"
 #include "DiffOut.hh"
@@ -27,12 +30,15 @@
 #include "Performance.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 DiffOut::overflow(int c)
 {
+   // process one output character c from APL.
+   //
 PERFORMANCE_START(cout_perf)
-   Output::set_color_mode(errout ? Output::COLM_UERROR : Output::COLM_OUTPUT);
+   Output::set_color_mode(errout ? Output::COLM_UERROR
+                                 : Output::COLM_OUTPUT);
 
    // expand LF to CRLF if desired
    //
@@ -53,46 +59,54 @@ PERFORMANCE_START(cout_perf)
         return 0;
       }
 
-   // complete line received
+   // complete APL output line received. Compare it with the reference (= the
+   // next input line) and write the comparison result into the current
+   // .tc.log file.
    //
-ofstream & rep = IO_Files::get_current_testreport();
-   Assert(rep.is_open());
+ofstream & report = IO_Files::get_current_testreport();
+   Assert(report.is_open());
 
-const char * apl = aplout.c_str();
-UTF8_string ref;
+const char * apl = aplout.c_str();   // the APL output
+UTF8_string ref;                     // the expected output (= the reference)
 bool eof = false;
+size_t diff_pos = 0;                 // the first mismatch
    IO_Files::read_file_line(ref, eof);
-   if (eof)   // nothing in current_testfile
+   if (eof)                // nothing in current_testfile
       {
-        rep << "extra: " << apl << endl;
+        report << "extra: " << apl << endl;
       }
-   else if (different(utf8P(apl), utf8P(ref.c_str())))
+   else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
-        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
-            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl;
+        report << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
+            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
+            << " ∆ : ⋅⋅⋅";
+        loop(p, diff_pos)   report << " ";
+        report << "^" << endl;
       }
    else                    // same
       {
-        rep << "== " << apl << endl;
+        report << "== " << apl << endl;
       }
 
    aplout.clear();
    PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
+   cout << flush;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
-DiffOut::different(const UTF8 * apl, const UTF8 * ref)
+DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 {
-   for (;;)
+   for (pos = 0;; ++pos)   // compare position in ref
        {
-         int len_apl, len_ref;
+         int len_apl;   // length of the UTF8 encoding
+         int len_ref;   // length of the UTF8 encoding
 
          const Unicode a = UTF8_string::toUni(apl, len_apl, true);
          const Unicode r = UTF8_string::toUni(ref, len_ref, true);
-         apl += len_apl;
-         ref += len_ref;
+         apl += len_apl;   // skip a in apl
+         ref += len_ref;   // skip r in ref
 
          if (a == r)   // same char
             {
@@ -100,7 +114,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
               continue;
             }
 
-         // different chars: try special matches (⁰, ¹, ², or ⁿ)...
+         // different chars: try special matches (⁰, ¹, ², ³, ⁴, ⁵, ⁶, or ⁿ)...
 
          if (r == UNI_PAD_U0)   // ⁰: match one or more digits
             {
@@ -113,7 +127,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
 
          if (r == UNI_PAD_U1)   // ¹: match zero or more spaces
             {
-              if (a != UNI_ASCII_SPACE)   return true;   // different
+              if (a != UNI_SPACE)   return true;   // different
 
               // skip trailing digits
               while (*apl == ' ')   ++apl;
@@ -124,18 +138,18 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
             {
               if (!Avec::is_digit(a) &&
                   a != UNI_OVERBAR   &&
-                  a != UNI_ASCII_E   &&
-                  a != UNI_ASCII_J   &&
-                  a != UNI_ASCII_FULLSTOP)   return true;   // different
+                  a != UNI_E   &&
+                  a != UNI_J   &&
+                  a != UNI_FULLSTOP)   return true;   // different
 
               // skip trailing digits
               //
               for (;;)
                   {
                     if (Avec::is_digit(Unicode(*apl)) ||
-                        *apl == UNI_ASCII_E           ||
-                        *apl == UNI_ASCII_J           ||
-                        *apl == UNI_ASCII_FULLSTOP)   ++apl;
+                        *apl == UNI_E           ||
+                        *apl == UNI_J           ||
+                        *apl == UNI_FULLSTOP)   ++apl;
                    else
                       {
                          int len;
@@ -168,7 +182,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
 
          if (r == UNI_PAD_U6)   // ⁶: match 28 ⎕CR 42
             {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
               if (a != '1')   return true;   // different
 #else
               if (a != '0')   return true;   // different
@@ -177,15 +191,15 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
             }
          if (r == UNI_PAD_Un)   // ⁿ: optional unit multiplier
             {
-              // ⁿ shall match an optional  unit multiplier, ie.
-              // m, n, u, or μ
+              // ⁿ shall match an optional unit (milli, micro, or nano)
+              // multiplier i.e. m, n, u, or μ
               //
               if (a == 'm')       continue;
               if (a == 'n')       continue;
               if (a == 'u')       continue;
               if (a == UNI_MUE)   continue;
 
-              // no unit matches as well
+              // no unit multiplier matches
               apl -= len_apl;
               continue;
             }
@@ -193,6 +207,8 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
          return true;   // different
        }
 
-   return false;   // not different
+   // not reached
+   //
+   return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
