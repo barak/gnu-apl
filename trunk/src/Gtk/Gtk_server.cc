@@ -878,7 +878,8 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                continue;
              }
 
-          // expand buffer if needed
+          // expand buffer if needed; capture exact expected length for recv
+          ssize_t expected_rx_len = 8;
           {
             errno = 0;
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
@@ -894,6 +895,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                                      | (TLV[5] & 0xFF) << 16
                                      | (TLV[6] & 0xFF) << 8
                                      | (TLV[7] & 0xFF);
+            expected_rx_len = V_len + 8;
 
             if ((V_len + 8) > TLV_buflen)   // re-allocate a larger buffer
                {
@@ -905,7 +907,9 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                }
           }
 
-          const ssize_t rx_len = recv(3, TLV, TLV_buflen, 0);
+          // MSG_WAITALL receives exactly the one TLV packet, preventing
+          // TCP coalescing from delivering two packets in one recv call.
+          const ssize_t rx_len = recv(3, TLV, expected_rx_len, MSG_WAITALL);
           if (rx_len < 8)
              {
                cerr << "TLV socket closed (2): " << strerror(errno) << endl;

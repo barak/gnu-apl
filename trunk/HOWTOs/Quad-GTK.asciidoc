@@ -905,10 +905,10 @@ strings:
 ----
 
 ∇Z←DrawCmd
- Z←1↓"
+ Z←"""
 background  255 255 255          ⍝ white background
 fill -color 255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
-ellipse     (200 150) (100 75)"
+ellipse     (200 150) (100 75)"""
 ∇
 
 ----

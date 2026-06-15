@@ -737,6 +737,7 @@ asciidoc.install(4);
 <h1>The GNU APL <strong>⎕GTK</strong> Cookbook</h1>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
 </div>
 </div>
 <div id="content">
@@ -758,13 +759,9 @@ thousands of functions. The entire Gtk API is spread over 11 different
 libraries:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>$ pkg-config gtk+-3.0 --libs
+<pre><code>$ pkg-config gtk+-3.0 --libs
 -lgtk-3 -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0
--lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0</code>
-
-</pre>
+-lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0</code></pre>
 </div></div>
 <div class="paragraph"><p>Each library contains tens, hundreds, or even thousands of symbols. Every
 symbol represents either a function or a variable, and the vast majority of
@@ -937,9 +934,7 @@ The <strong>Gtk_server</strong> is started by <strong>⎕GTK</strong>, and after
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>                                                          ╔════════════════════════════╗
+<pre><code>                                                          ╔════════════════════════════╗
                                                           ║ GUI-description.xml file   ║
                                                           ║  ↓ GUI-stylesheet.css file ║
                                                           ║  ↓  ↓                      ║
@@ -950,9 +945,7 @@ The <strong>Gtk_server</strong> is started by <strong>⎕GTK</strong>, and after
     ║ application │ ⎕GTK ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
     ║ program.apl └───╥──┘  34⎕CR ← ← ←          pair     ║└────────────┘ │ GTK libs ├┘║
     ╚═════════════════╝     Responses, Events             ║               └──────────┘ ║
-                                                          ╚════════════════════════════╝</code>
-
-</pre>
+                                                          ╚════════════════════════════╝</code></pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic" start="3">
 <li>
@@ -1013,9 +1006,7 @@ The programmer displays the GUI - either at the start of the APL
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>    ╔══════════════════════╗
+<pre><code>    ╔══════════════════════╗
     ║  GUI Design (glade)  ║   →  my-application.ui
     ╚══════════╤═══════════╝
                │
@@ -1029,9 +1020,7 @@ The programmer displays the GUI - either at the start of the APL
     ║      GUI start       ║   → loads my-application.ui and my-application.css
     ║ ──────────────────── ║
     ║   GUI event loop     ║   → polls and reacts to events (user actions)
-    ╚══════════════════════╝</code>
-
-</pre>
+    ╚══════════════════════╝</code></pre>
 </div></div>
 <div class="paragraph"><p>The example given below will be a modal dialog with the non-modal case left
 as an exercise for the reader.</p></div>
@@ -1206,11 +1195,7 @@ the text entry.</p></div>
 <div class="paragraph"><p>Start <strong>glade</strong> without a filename:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>$ glade</code>
-
-</pre>
+<pre><code>$ glade</code></pre>
 </div></div>
 <div class="paragraph"><p>A window with four larger areas pops up:</p></div>
 <div class="imageblock">
@@ -1360,9 +1345,7 @@ it the filename <strong>my-application.ui</strong>.</p></div>
 this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!-- Generated with glade 3.16.1 --&gt;
 &lt;interface&gt;
   &lt;requires lib="gtk+" version="3.10"/&gt;
@@ -1529,9 +1512,7 @@ this:</p></div>
       &lt;/object&gt;
     &lt;/child&gt;
   &lt;/object&gt;
-&lt;/interface&gt;</code>
-
-</pre>
+&lt;/interface&gt;</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1549,12 +1530,8 @@ The GUI file is /home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui
 GNU APL and enter the following:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
-      Handle ← *⎕GTK* GUI_path             ⍝ fork Gtk_server and connect to it</code>
-
-</pre>
+<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      Handle ← *⎕GTK* GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
 </div></div>
 <div class="paragraph"><p>We see a new window at the top-left corner of the screen (that position can be
 changed by window properties in <strong>glade</strong> later on):</p></div>
@@ -1566,12 +1543,8 @@ changed by window properties in <strong>glade</strong> later on):</p></div>
 <div class="paragraph"><p>You can then stop the GUI with <strong>)CLEAR</strong> before leaving APL with <strong>)OFF</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
-      )OFF</code>
-
-</pre>
+<pre><code>      )CLEAR
+      )OFF</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1584,26 +1557,18 @@ one can specify these properties by means of a standard CSS (cascading style
 sheet) file as the (optional) left argument of dyadic <strong>⎕GTK</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
-      Handle ← CSS_path *⎕GTK* GUI_path             ⍝ fork Gtk_server and connect to it</code>
-
-</pre>
+      Handle ← CSS_path *⎕GTK* GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
 </div></div>
 <div class="paragraph"><p>Consider the following CSS example, (file <strong>my-application.css</strong>):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>/* general button */
+<pre><code>/* general button */
 .BUTTON { color: #F00;      background: #FFF; }
 
 /* the OK button */
-#OK-button { color: #F00; background: #4F4; }</code>
-
-</pre>
+#OK-button { color: #F00; background: #4F4; }</code></pre>
 </div></div>
 <div class="paragraph"><p>It specifies that buttons should, in general, have a white background and a
 red foreground (= text color), but that the button with the name <strong>"OK-button"</strong>
@@ -1640,9 +1605,7 @@ in the <a href="#TAG_appendix">Appendix</a> of this document.</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       *⎕GTK* 0   ⍝ get window handles (empty)
 
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
@@ -1653,9 +1616,7 @@ in the <a href="#TAG_appendix">Appendix</a> of this document.</td>
 6
 
       6 *⎕GTK* 0   ⍝ close window handle 6
-0</code>
-
-</pre>
+0</code></pre>
 </div></div>
 <div class="paragraph"><p>The handle above (6) can, in theory, also be used with ⎕FIO functions like
 fread() if you know what you are doing. This practice is, however, dangerous
@@ -1730,9 +1691,7 @@ recompiling and re-installing GNU APL
 We extend our example to set the initial value of the employee to "John Doe",</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path *⎕GTK* GUI_path             ⍝ fork Gtk_server and connect to it
@@ -1741,9 +1700,7 @@ We extend our example to set the initial value of the employee to "John Doe",</p
       "John Doe" ⎕GTK[H_ID] "set_text"   ⍝ set the entry to  "John Doe"
 
       6 *⎕GTK* 0   ⍝ close window handle 6
-0</code>
-
-</pre>
+0</code></pre>
 </div></div>
 <div class="paragraph"><p>The GUI now looks like this:</p></div>
 <div class="imageblock">
@@ -1759,9 +1716,7 @@ and read the entry data after that time has elapsed (regardless of whether the
 user has entered any data or not).</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it
@@ -1777,9 +1732,7 @@ user has entered any data or not).</p></div>
       ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
 
       6 *⎕GTK* 0   ⍝ close window handle 6
-0</code>
-
-</pre>
+0</code></pre>
 </div></div>
 <div class="paragraph"><p>Let <strong>B<sub>int</sub></strong> be:</p></div>
 <div class="ulist"><ul>
@@ -1816,7 +1769,7 @@ a vector <strong>B<sub>int</sub>, DATA</strong> if the corresponding Gtk functio
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Therefore, even though some Gtk functions (i.e. those having a C/C++ result
+<div class="paragraph"><p>Therefore, even though some Gtk functions (i.e. those having a C/Cpp result
 type of <strong>void</strong>) do not return values, <strong>⎕GTK</strong> always returns a value.</p></div>
 </div>
 </div>
@@ -1831,7 +1784,7 @@ needed instead is a way for the GUI to indicate that something of interest has
 happened, such as the user pressing the OK button after she has finished her
 input. Another option would have been to indicate the end of input by hitting
 the return key.</p></div>
-<div class="paragraph"><p>If an application program having a GUI is written in C/C++, then events such
+<div class="paragraph"><p>If an application program having a GUI is written in C/Cpp, then events such
 as pressing a button or a key on the keyboard are usually forwarded to the
 application by means of callback functions. Whenever the events used by the
 application change - typically accompanied by a change of the GUI - then the
@@ -2106,11 +2059,7 @@ start <strong>glade</strong> with our example GUI file:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>$ glade my-application.ui</code>
-
-</pre>
+<pre><code>$ glade my-application.ui</code></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -2157,11 +2106,7 @@ Finally, save the GUI in <strong>glade</strong>'s menu-bar under <strong>File �
 <strong>my-application.ui</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>             &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;</code>
-
-</pre>
+<pre><code>             &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>At this point the <strong>Prerequisite</strong> for sending the clicked signal from
 <strong>button1</strong> to APL is met, and steps 2-5 in the life-cycle of an event
@@ -2231,29 +2176,19 @@ done in Step 6b. above (and we assume that the updated my-application.ui is
 used). All that is needed then is to replace:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      "Please enter the Position: within 20 seconds..."
+<pre><code>      "Please enter the Position: within 20 seconds..."
       ⊣⎕DL 20   ⍝ wait 20 seconds
-      "End of input interval</code>
-
-</pre>
+      "End of input interval</code></pre>
 </div></div>
 <div class="paragraph"><p>by:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      ⊣⎕GTK 1   ⍝ wait for click on the OK button</code>
-
-</pre>
+<pre><code>      ⊣⎕GTK 1   ⍝ wait for click on the OK button</code></pre>
 </div></div>
 <div class="paragraph"><p>The example therefore becomes:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it
@@ -2269,9 +2204,7 @@ used). All that is needed then is to replace:</p></div>
       ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
 
       Handle *⎕GTK* 0                      ⍝ close window handle 6
-0</code>
-
-</pre>
+0</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -2281,9 +2214,7 @@ remove the H_ID variable (which was only used to make Step 5 above explicit),
 and we hide useless return values from  <strong>⎕GTK 1</strong> and <strong>⎕GTK[] "get_text"</strong> with ⊣:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
+<pre><code>∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
  GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
  CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
  Handle ← CSS_path *⎕GTK* GUI_path              ⍝ fork Gtk_server and connect to it
@@ -2291,9 +2222,7 @@ and we hide useless return values from  <strong>⎕GTK 1</strong> and <strong>�
  Z ←   ⊂1↓⎕GTK[Handle, "entry1"] "get_text"   ⍝ get the content of entry1
  Z ← Z,⊂1↓⎕GTK[Handle, "entry2"] "get_text"   ⍝ get the content of entry2
  ⊣Handle *⎕GTK* 0                               ⍝ close the GUI handle
-∇</code>
-
-</pre>
+∇</code></pre>
 </div></div>
 </div>
 </div>
@@ -2316,9 +2245,7 @@ That defines the size of the canvas. In the <strong>Signals</strong> tab, set th
 signal <strong>draw</strong> to <strong>do_draw</strong>. The resulting XML file <strong>circle.ui</strong> is then:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!-- Generated with glade 3.16.1 --&gt;
 &lt;interface&gt;
   &lt;requires lib="gtk+" version="3.10"/&gt;
@@ -2334,9 +2261,7 @@ signal <strong>draw</strong> to <strong>do_draw</strong>. The resulting XML file
       &lt;/object&gt;
     &lt;/child&gt;
   &lt;/object&gt;
-&lt;/interface&gt;</code>
-
-</pre>
+&lt;/interface&gt;</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -2345,13 +2270,9 @@ signal <strong>draw</strong> to <strong>do_draw</strong>. The resulting XML file
 no CSS file is used:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
-      Handle ← *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it</code>
-
-</pre>
+      Handle ← *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it</code></pre>
 </div></div>
 <div class="paragraph"><p>That code alone creates an empty canvas. That empty canvas can then be filled
 by means of drawing commands as described below.</p></div>
@@ -2371,41 +2292,29 @@ inside defined functions.</p></div>
 variable, say  <strong>DrawCmd</strong>, that is constructed with ⎕INP:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      DrawCmd ← ⎕INP '▄'
+<pre><code>      DrawCmd ← ⎕INP '▄'
 background  255 255 255          ⍝ white background
 fill -color 255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
 ellipse     (200 150) (100 75)
-▄</code>
-
-</pre>
+▄</code></pre>
 </div></div>
 <div class="paragraph"><p>An alternative to a variable is a niladic defined function using multi-line
 strings:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>∇Z←DrawCmd
- Z←1↓"
+<pre><code>∇Z←DrawCmd
+ Z←"""
 background  255 255 255          ⍝ white background
 fill -color 255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
-ellipse     (200 150) (100 75)"
-∇</code>
-
-</pre>
+ellipse     (200 150) (100 75)"""
+∇</code></pre>
 </div></div>
 <div class="paragraph"><p>In both cases <strong>DrawCmd</strong> is a 4-element vector of strings. Once the
 <strong>DrawCmd</strong> strings are constructed they are sent to the drawing area widget:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      H_ID ← Handle, "drawingarea1"
-      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
-
-</pre>
+<pre><code>      H_ID ← Handle, "drawingarea1"
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -2413,9 +2322,7 @@ ellipse     (200 150) (100 75)"
 <div class="paragraph"><p>Putting the pieces above together we get:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
       Handle ← *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it
 
@@ -2426,9 +2333,7 @@ ellipse     (200 150) (100 75)
 ▄
 
       H_ID ← Handle, "drawingarea1"
-      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
-
-</pre>
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code></pre>
 </div></div>
 <div class="paragraph"><p>The GUI created by the APL code above then looks like this:</p></div>
 <div class="imageblock">
@@ -2441,9 +2346,7 @@ different drawing commands to show additional features (lines, text, objects
 with and without borders) is:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
       Handle ← *⎕GTK* GUI_path    ⍝ fork Gtk_server and connect to it
 
@@ -2475,9 +2378,7 @@ polygon     (320 210) (380 210)  (350 250)·
 ▄
 
       H_ID ← Handle, "drawingarea1"
-      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
-
-</pre>
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code></pre>
 </div></div>
 <div class="paragraph"><p>It produces the following GUI:</p></div>
 <div class="imageblock">
@@ -2693,9 +2594,7 @@ start <strong>glade</strong>,
 Opening this file with a text editor shows its content:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!-- Generated with glade 3.22.1 --&gt;
 &lt;interface&gt;
   &lt;requires lib="gtk+" version="3.20"/&gt;
@@ -2708,18 +2607,12 @@ Opening this file with a text editor shows its content:</p></div>
       &lt;placeholder/&gt;
     &lt;/child&gt;
   &lt;/object&gt;
-&lt;/interface&gt;</code>
-
-</pre>
+&lt;/interface&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>Comparing step 4. above with line 5 of <strong>my-gui.glade</strong>, i.e.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>  &lt;object class="GtkWindow" id="window1"&gt;</code>
-
-</pre>
+<pre><code>  &lt;object class="GtkWindow" id="window1"&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>exposes the primary functionality of <strong>glade</strong>: producing XML templates and
 filling in fields in those templates according to choices made by the user (the
@@ -2730,12 +2623,8 @@ other widgets and have no effect.</p></div>
 boring) that can be used in APL via <strong>⎕GTK</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      *⎕GTK* "my-gui.glade"
-6</code>
-
-</pre>
+<pre><code>      *⎕GTK* "my-gui.glade"
+6</code></pre>
 </div></div>
 <div class="paragraph"><p>This returns GTK handle 6 and opens the following GUI:</p></div>
 <div class="imageblock">
@@ -2748,9 +2637,7 @@ and <strong>B</strong> of dyadic <strong>A *⎕GTK</strong> B* and monadic <stro
 of the files instead of the file names</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       CLEAR WS
 
       XML←"""
@@ -2774,9 +2661,7 @@ of the files instead of the file names</em>:</p></div>
 14
 
       *⎕GTK* 36 ⎕CR XML
-6</code>
-
-</pre>
+6</code></pre>
 </div></div>
 <div class="paragraph"><p>Voila, the same window as above pops up:</p></div>
 <div class="imageblock">
@@ -2832,7 +2717,7 @@ do so. This works by means of a naming convention between the XML text file
 header files) that come with the GTK libraries. The GTK header files are
 usually installed in either <strong>/usr/include/gtk-3.0/gtk/</strong> or else in
 <strong>/usr/local/include/gtk-3.0/gtk/</strong>.</p></div>
-<div class="paragraph"><p>You can use <strong>⎕GTK</strong> without any C/C++ knowledge, but looking at some of the
+<div class="paragraph"><p>You can use <strong>⎕GTK</strong> without any C/Cpp knowledge, but looking at some of the
 header files (i.e. files with extension <strong>.h</strong>) may help in understanding the
 naming conventions between XML and GTK. Understanding (and following) this
 naming convention is essential for producing a proper XML description for
@@ -2841,13 +2726,9 @@ a GUI.</p></div>
 GTK widget, i.e. <strong>window</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>  &lt;object class="GtkWindow" id="window1"&gt;
+<pre><code>  &lt;object class="GtkWindow" id="window1"&gt;
     ...
-  &lt;/object&gt;</code>
-
-</pre>
+  &lt;/object&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>To fully understand the naming conventions we use two more widgets with
 compound names: <strong>gtktextview</strong> and <strong>gtktreeviewcolumn</strong>. We call the
@@ -2941,11 +2822,7 @@ the user). In newer glade versions the ID is left empty by default. For that
 reason we had to do Step 4:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>→ select the new window and set the (topmost) property ID in tab Genera to window1</code>
-
-</pre>
+<pre><code>→ select the new window and set the (topmost) property ID in tab Genera to window1</code></pre>
 </div></div>
 <div class="paragraph"><p>above.</p></div>
 </div>
@@ -2954,19 +2831,15 @@ reason we had to do Step 4:</p></div>
 <div class="paragraph"><p>Every widget has a number of associated functions. The same function name
 may be used for different widget classes. For example. many widgets have a
 <strong>get_value()</strong> function.</p></div>
-<div class="paragraph"><p>In C++ interfaces to GTK a widget like <strong>window</strong> is declared in header file
-<strong>window.h</strong>, declare a <strong>namespace Gtk</strong>, a C++ class <strong>Window</strong> inside namespace
+<div class="paragraph"><p>In Cpp interfaces to GTK a widget like <strong>window</strong> is declared in header file
+<strong>window.h</strong>, declare a <strong>namespace Gtk</strong>, a Cpp class <strong>Window</strong> inside namespace
 <strong>Gtk</strong>, and member functions fun1, fun2, &#8230; of that class.</p></div>
-<div class="paragraph"><p>⎕GTK uses the C interface instead and the C++ luxury of namespaces and classes
+<div class="paragraph"><p>⎕GTK uses the C interface instead and the Cpp luxury of namespaces and classes
 become function name prefixes. This makes</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>    Gtk::Window::fun1(args...)                in C++, and
-    gtk_window_fun1(gtk_window *, args...)    in C</code>
-
-</pre>
+<pre><code>    Gtk::Window::fun1(args...)                in Cpp, and
+    gtk_window_fun1(gtk_window *, args...)    in C</code></pre>
 </div></div>
 <div class="paragraph"><p>essentially the same. Coming back to our example, the widget name prefixes are
 <strong>gtk_window_</strong>, <strong>gtk_text_view_</strong>, and <strong>gtk_tree_view_column</strong>.</p></div>
@@ -2977,13 +2850,9 @@ become function name prefixes. This makes</p></div>
 <div class="paragraph"><p>Let:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>H←⎕GTK 36 ⎕CR XML                     ⍝ i.e. 6 as above
+<pre><code>H←⎕GTK 36 ⎕CR XML                     ⍝ i.e. 6 as above
 H_ID← H, "window1"                    ⍝ handle and widget ID
-"MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝</code>
-
-</pre>
+"MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝</code></pre>
 </div></div>
 <div class="paragraph"><p>Then the <strong>⎕GTK</strong> calls above hopefully do this:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -3020,9 +2889,7 @@ In step 3. the function arguments and the function result (if any) are
 <div class="paragraph"><p>Adding the second <strong>⎕GTK</strong> call to our code gives:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       CLEAR WS
 
       XML←"""
@@ -3044,9 +2911,7 @@ In step 3. the function arguments and the function result (if any) are
 
       H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML
       H_ID← H, "window1"                    ⍝ handle and widget ID (in XML)
-      "MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝ calls gtk_window_set_title()</code>
-
-</pre>
+      "MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝ calls gtk_window_set_title()</code></pre>
 </div></div>
 <div class="paragraph"><p>and, when executed, this GUI:</p></div>
 <div class="imageblock">
@@ -3125,18 +2990,12 @@ is achieved by XML tag &lt;property&gt;. In the case of the window title the
 property is called <strong>title</strong> (another GTK naming convention):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>    &lt;property name="title"&gt;MY-TITLE&lt;/property&gt;</code>
-
-</pre>
+<pre><code>    &lt;property name="title"&gt;MY-TITLE&lt;/property&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>Our complete code is now (observe how MY-TITLE has moved from APL to XML:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       CLEAR WS
 
       XML←"""
@@ -3157,9 +3016,7 @@ property is called <strong>title</strong> (another GTK naming convention):</p></
 &lt;/interface&gt;
           """
 
-      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code>
-
-</pre>
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code></pre>
 </div></div>
 <div class="paragraph"><p>The GUI looks as before but the focus quirk has disappeared since
 the proper <strong>MY-TITLE</strong> was set <strong>before</strong> the <strong>window</strong> was created. Properties
@@ -3188,25 +3045,19 @@ We can fix that by adding an OK button to it. The button itself is defined
 by the following XML snipplet:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>        &lt;child&gt;
+<pre><code>        &lt;child&gt;
           &lt;object class="GtkButton"&gt;
             &lt;property name="label"&gt;OK&lt;/property&gt;
             &lt;property name="visible"&gt;True&lt;/property&gt;
             &lt;property name="width_request"&gt;80&lt;/property&gt;
             &lt;property name="height_request"&gt;30&lt;/property&gt;
           &lt;/object&gt;
-        &lt;/child&gt;</code>
-
-</pre>
+        &lt;/child&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>The entire code is now:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
       CLEAR WS
 
       XML←"""
@@ -3233,9 +3084,7 @@ by the following XML snipplet:</p></div>
 &lt;/interface&gt;
           """
 
-      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code>
-
-</pre>
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code></pre>
 </div></div>
 <div class="paragraph"><p>and produces:</p></div>
 <div class="imageblock">
@@ -3273,11 +3122,7 @@ the top-left corner. Unfortunately no such property or function exists and
 an attempt to specify one yields an error, e.g.:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>(Gtk_server:17553): Gtk-WARNING **: 17:17:39.760: GtkWindow does not have a child property called y</code>
-
-</pre>
+<pre><code>(Gtk_server:17553): Gtk-WARNING **: 17:17:39.760: GtkWindow does not have a child property called y</code></pre>
 </div></div>
 <div class="paragraph"><p>GTK handles the placement of child widgets of a parent widget by means of
 an intermediate widget that provides the missing properties. There exist
@@ -3288,26 +3133,18 @@ should be placed into their common parent. We use the simplest of them:
 <div class="paragraph"><p>Our current XML has a two-level widget structure like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>GtkWindow ⊃ GtkButton</code>
-
-</pre>
+<pre><code>GtkWindow ⊃ GtkButton</code></pre>
 </div></div>
 <div class="paragraph"><p>where A ⊃ B should mean that B is a child of A. We replace that by
 a three-level widget structure like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>GtkWindow ⊃ GtkFixed ⊃ GtkButton
+<pre><code>GtkWindow ⊃ GtkFixed ⊃ GtkButton
                 │
                 └──────────── &lt;packing&gt;
                                 &lt;property name="x"&gt;pos_x&lt;/property&gt;
                                 &lt;property name="y"&gt;pos_x&lt;/property&gt;
-                              &lt;/packing&gt;</code>
-
-</pre>
+                              &lt;/packing&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>The widget placement belongs to class <strong>GtkFixed</strong>, and happens in a separate
 XML Tag named <strong>&lt;packing&gt;</strong>, which has properties named <strong>x</strong> and <strong>y</strong>. That
@@ -3316,9 +3153,7 @@ the child (or <em>inside the parent</em> for that matter).</p></div>
 <div class="paragraph"><p>Our APL code becomes:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
 CLEAR WS
 
       XML←"""
@@ -3355,9 +3190,7 @@ CLEAR WS
 &lt;/interface&gt;
           """
 
-      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code>
-
-</pre>
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML</code></pre>
 </div></div>
 <div class="paragraph"><p>And the GUI:</p></div>
 <div class="imageblock">
@@ -3372,29 +3205,17 @@ CLEAR WS
 like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>&lt;BUTTON name="Bn-OK" bgcolor="green"&gt;"OK"&lt;/BUTTON&gt;</code>
-
-</pre>
+<pre><code>&lt;BUTTON name="Bn-OK" bgcolor="green"&gt;"OK"&lt;/BUTTON&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>These days that button would maybe look more like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>&lt;BUTTON name="Bn-OK"&gt;"OK"&lt;/BUTTON&gt;</code>
-
-</pre>
+<pre><code>&lt;BUTTON name="Bn-OK"&gt;"OK"&lt;/BUTTON&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>and some CSS file or style somewhere else would e.g. say:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>#OK-button { background-color: green }</code>
-
-</pre>
+<pre><code>#OK-button { background-color: green }</code></pre>
 </div></div>
 <div class="paragraph"><p>Nowadays the size of style files has grown to such an extent that it is no
 longer possible to specify the style of a button or other HTML widget inline
@@ -3442,11 +3263,7 @@ possibly a relation between the widgets defined in XML and the styles
 <div class="paragraph"><p>The CSS is a sequence of statements with the following simple syntax:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>Selector(s) { style attributes... }</code>
-
-</pre>
+<pre><code>Selector(s) { style attributes... }</code></pre>
 </div></div>
 <div class="paragraph"><p>The style attributes define how a widget looks (color, borders, etc.),
 while the selectors define which widgets should have the style attributes.
@@ -3459,18 +3276,14 @@ More details can be found here:</p></div>
 <div class="paragraph"><p>Let&#8217;s start simple (with variable XML as above):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      CSS ← """
+<pre><code>      CSS ← """
 window { background: #FF0; }
 
 /* all widgets of (style-) class button */
 button       { color: white; background-color: blue }
             """
 
-     (36 ⎕CR CSS) *⎕GTK* (36 ⎕CR XML)</code>
-
-</pre>
+     (36 ⎕CR CSS) *⎕GTK* (36 ⎕CR XML)</code></pre>
 </div></div>
 <div class="paragraph"><p>Not too surprisingly this shows:</p></div>
 <div class="imageblock">
@@ -3490,9 +3303,7 @@ XML, the value of that property (e.g. <strong>Bn-OK</strong> below) must then be
 with <strong>#</strong> in CSS to refer to the widget with that name:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>In XML:
+<pre><code>In XML:
           &lt;object class="GtkButton"&gt;
             &lt;property name="label"&gt;OK&lt;/property&gt;
             &lt;property name="name"&gt;Bn-OK&lt;/property&gt;
@@ -3504,9 +3315,7 @@ In CSS:                             │
    │
  ──┴──
 #Bn-OK           { color: #000; background-color: #3E3; }   /* button */
-#Bn-OK label     { color: #000; background-color: #3E3; }   /* button label */</code>
-
-</pre>
+#Bn-OK label     { color: #000; background-color: #3E3; }   /* button label */</code></pre>
 </div></div>
 <div class="paragraph"><p>You may wonder why there are CSS lines for the green OK button but only one
 for the blue class button. The reason is a little quirk in GTK (which will
@@ -3518,9 +3327,7 @@ selects the widget(s) with that name <strong>excluding their sub-widgets</strong
 <div class="paragraph"><p>The entire application is now:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      )CLEAR
+<pre><code>      )CLEAR
 CLEAR WS
 
       XML←"""
@@ -3568,9 +3375,7 @@ button:hover { font-weight: bold;    }
 #Bn-OK label     { color: #000; background-color: #3E3; }   /* button label */
             """
 
-   *⎕GTK* 3 ◊ ⊣ (36 ⎕CR CSS) *⎕GTK* (36 ⎕CR XML) ◊ ⊣ ⎕DL 2.0</code>
-
-</pre>
+   *⎕GTK* 3 ◊ ⊣ (36 ⎕CR CSS) *⎕GTK* (36 ⎕CR XML) ◊ ⊣ ⎕DL 2.0</code></pre>
 </div></div>
 <div class="paragraph"><p>It produces:</p></div>
 <div class="imageblock">
@@ -3596,18 +3401,14 @@ determine (in an APL loop) when their state changes and to return only when
 a particular widget state was reached (by an action of the user):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>∇WAIT_FOR_BUTTON_DOWN H_ID;FLAGS
+<pre><code>∇WAIT_FOR_BUTTON_DOWN H_ID;FLAGS
  ⍝
  ⍝ /usr/include/gtk-3.0/gtk/gtkenums.h : odd state flags ←→ button down
  ⍝
 LOOP: FLAGS←⎕GTK[H_ID]'GtkWidget::get_state_flags'
   → (2∣¯1↑FLAGS)⍴0   ⍝ return when button "pushed"
   ⎕DL 0.1 ◊ → LOOP   ⍝ and wait if not
-∇</code>
-
-</pre>
+∇</code></pre>
 </div></div>
 <div class="paragraph"><p>Of course, more than one widget (Cancel button, Help button, &#8230;) can
 be polled inside such a loop.</p></div>
@@ -3620,12 +3421,8 @@ the parameters of that event is mere overhead. Also, the APL code is trivial
 (assuming we want to close window when the button is pushed):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      ⊣ *⎕GTK* 1   ⍝ blocking wait for the next GTK event; discard the result
-      H *⎕GTK* 0   ⍝ close the window with handle H</code>
-
-</pre>
+<pre><code>      ⊣ *⎕GTK* 1   ⍝ blocking wait for the next GTK event; discard the result
+      H *⎕GTK* 0   ⍝ close the window with handle H</code></pre>
 </div></div>
 <div class="paragraph"><p>and it may, since no APL loop is required, even be used in immediate execution
 mode or in APL scripts.</p></div>
@@ -3647,16 +3444,12 @@ user clicks on buttons to APL need to specify which events shall be forwarded.
 For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>          &lt;object class="GtkButton"&gt;
+<pre><code>          &lt;object class="GtkButton"&gt;
             &lt;property name="label"&gt;OK&lt;/property&gt;
             &lt;property name="name"&gt;Bn-OK&lt;/property&gt;
             ...
             &lt;signal name="clicked" handler="clicked"/&gt;
-          &lt;/object&gt;</code>
-
-</pre>
+          &lt;/object&gt;</code></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -3830,15 +3623,11 @@ defined function that contains the loop.</p></div>
 which event:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>LOOP: Event←⎕GTK 1        ⍝ blocking wait for next event, then decode it
+<pre><code>LOOP: Event←⎕GTK 1        ⍝ blocking wait for next event, then decode it
       (H W E) ← 3↑Event   ⍝ common event header
       → (W ≢ "Bn-OK")/LOOP     ⍝ not from Bn-OK
       → (E ≢ "clicked")/LOOP   ⍝ not button click
- H *⎕GTK* 0       ⍝ OK button clicked: close the window</code>
-
-</pre>
+ H *⎕GTK* 0       ⍝ OK button clicked: close the window</code></pre>
 </div></div>
 <div class="paragraph"><p>The same &lt;signal&gt; line as in the example before is required. The parameters
 of an event are defined by the handler, but all start with the 3 described
@@ -3846,15 +3635,11 @@ in the following example (button click).</p></div>
 <div class="paragraph"><p>The event received from a button click is a 3-item vector like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>┌→──────────────────┐
+<pre><code>┌→──────────────────┐
 │7 ┌→────┐ ┌→──────┐│
 │  │Bn-OK│ │clicked││
 │  └─────┘ └───────┘│
-└ϵ──────────────────┘</code>
-
-</pre>
+└ϵ──────────────────┘</code></pre>
 </div></div>
 <div class="paragraph"><p>The 3 components are:</p></div>
 <div class="ulist"><ul>
@@ -3896,13 +3681,9 @@ copied into your own application.</p></div>
 <div class="paragraph"><p>In the Table 2 below, it is assumed that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre>
-
-<code>      ⍝ H is a window handle (from some H ← Zh←⎕GTK "filename.ui")
+<pre><code>      ⍝ H is a window handle (from some H ← Zh←⎕GTK "filename.ui")
       ⍝ ID is a string containing the id= property of some widget in filename.ui
-      ⍝ H_ID ← H, ID   ⍝ e.g. 6,"entry1". H_ID uniquely identifies a widget</code>
-
-</pre>
+      ⍝ H_ID ← H, ID   ⍝ e.g. 6,"entry1". H_ID uniquely identifies a widget</code></pre>
 </div></div>
 <div class="tableblock" id="Tag_table2">
 <table rules="all"
@@ -4289,7 +4070,7 @@ top-level group in glade).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-05-21 12:55:44 CEST
+ 2026-06-15 16:30:03 CEST
 </div>
 </div>
 </body>

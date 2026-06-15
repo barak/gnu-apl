@@ -3,7 +3,46 @@ The following is a collection of pitfalls that were observed when
 building GNU APL:
 
 
-1. libapl with ⎕FFT support (thanks to Chris Moller)
+1. Two build paths: release tarball vs. SVN checkout
+----------------------------------------------------
+
+GNU APL can be built from two sources:
+
+a) The release tarball (e.g. apl-2.0.tar.gz), available from the GNU
+   FTP mirrors and the Savannah repository.  The tarball already contains
+   all autotools-generated files (configure, Makefile.in, aclocal.m4,
+   libtool, ...) and can be built with the standard sequence:
+
+       ./configure
+       make
+       sudo make install
+
+   The packages autoconf, automake, and libtool are NOT required.
+
+b) An SVN or git checkout of the source tree.  The generated files in
+   the checkout were produced on the maintainer's machine and may have
+   been created with a newer version of autoconf/automake/libtool than
+   the one installed on the user's machine.  If the versions differ, the
+   build will fail with an error similar to:
+
+       libtool: Version mismatch error.  This is libtool 2.4.6, but the
+       libtool: definition of this LT_INIT comes from libtool 2.5.4.
+
+   The fix is to regenerate the autotools files using the locally
+   installed versions before building:
+
+       autoreconf -fi
+       ./configure
+       make
+       sudo make install
+
+   This requires the packages autoconf, automake, and libtool to be
+   installed.  On Debian/Ubuntu:
+
+       sudo apt install autoconf automake libtool
+
+
+2. libapl with ⎕FFT support (thanks to Chris Moller)
 ----------------------------------------------------
 
 If you build libapl, i.e. you ./configure GNU APL like:
