@@ -952,7 +952,11 @@ const int start = fun_header ? 1 : 0;
 
          // a (leaf-) multi-line literal starts at literal_start li...
          //
-         Assert1(literal_start != -1);
+         if (literal_start == -1)
+            {
+              MORE_ERROR() << ">>> closes no open <<<.";
+              return fun_header ? E_DEFN_ERROR : E_SYNTAX_ERROR;
+            }
          Assert1(status[literal_start] == MLS_Start_of_multi);
          UCS_string & prefix = text[literal_start];
          prefix.resize(prefix.multi_pos());

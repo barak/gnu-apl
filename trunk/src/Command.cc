@@ -845,8 +845,10 @@ const UCS_string suffix(line, multi_pos + 3);
 
         Lit_DB literals;
 
-        Parser::replace_multi_line_strings(content, literals, false);
-        Parser::replace_multi_line_literals(content, literals, false);
+        if (Parser::replace_multi_line_strings(content, literals, false))
+           SYNTAX_ERROR;
+        if (Parser::replace_multi_line_literals(content, literals, false))
+           SYNTAX_ERROR;
 
         // remove trailing empty lines (which would mess up the shape
         // computation)
