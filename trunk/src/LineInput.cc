@@ -24,6 +24,11 @@
 #include <errno.h>
 #include <signal.h>
 
+#if HAVE_WINDOWS_H
+# include <io.h>      // _setmode
+# include <windows.h>
+#endif
+
 #include "Assert.hh"
 #include "Command.hh"
 #include "Common.hh"
@@ -41,6 +46,10 @@
 
 struct termios LineInput::initial_termios = { 0 };
 int LineInput::initial_termios_errno = 0;
+
+#if MINGW_SRC
+unsigned long LineInput::initial_console_mode = 0;
+#endif
 
 // hooks for external editors (emacs)
 extern void (*start_input)();
@@ -1015,7 +1024,9 @@ LineInput::init(bool do_read_history)
 void
 LineInput::restore_termios()
 {
-#if ! MINGW_SRC
+#if MINGW_SRC
+   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), initial_console_mode);
+#else
    if (initial_termios_errno == 0)
       {
 #ifndef apl_TARGET_LIBAPL
@@ -1025,14 +1036,33 @@ LineInput::restore_termios()
 #endif // not apl_TARGET_LIBAPL
       }
    initial_termios_errno = 1;   // prevent multiple calls
-#endif // ! MINGW_SRC
+#endif // MINGW_SRC
 }
 //────────────────────────────────────────────────────────────────────────────
 LineInput::LineInput(bool do_read_history)
    : history(UserPreferences::uprefs.line_history_len),
      write_history(false)
 {
-#if ! MINGW_SRC
+#if MINGW_SRC
+   {
+      const HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+      GetConsoleMode(hStdin, &initial_console_mode);
+      // Disable line buffering and echo; keep ENABLE_PROCESSED_INPUT so that
+      // the console continues to deliver correct character codes (without it
+      // some OEM code-page translations corrupt alphabetic keys).
+      SetConsoleMode(hStdin,
+                     (initial_console_mode | ENABLE_PROCESSED_INPUT)
+                     & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
+      // Switch stdin to binary mode so the MinGW CRT delivers CR (0x0D)
+      // immediately instead of buffering it while waiting for a following LF.
+      _setmode(fileno(stdin), 0x8000);   // 0x8000 = _O_BINARY
+   }
+   if (do_read_history)
+      {
+        history.read_history(UserPreferences::uprefs.line_history_path.c_str());
+        write_history = true;
+      }
+#else
    initial_termios_errno = 0;
 
    if (tcgetattr(STDIN_FILENO, &initial_termios))
@@ -1063,7 +1093,7 @@ LineInput::LineInput(bool do_read_history)
     tcsetattr(STDIN_FILENO, TCSANOW, &current_termios);
 #  endif // apl_TARGET_PYTHON
 # endif // apl_TARGET_LIBAPL
-#endif // ! MINGW_SRC
+#endif // MINGW_SRC
 }
 //────────────────────────────────────────────────────────────────────────────
 LineInput::~LineInput()
@@ -1097,8 +1127,12 @@ const int b0 = safe_fgetc();
         else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x01; }
         else
            {
+#if MINGW_SRC
+             goto again;   // discard stray continuation/invalid byte
+#else
              CERR << "Bad UTF8 sequence start at " << LOC << endl;
              return Invalid_Unicode;
+#endif
            }
 
         uint32_t uni = 0;
@@ -1107,9 +1141,15 @@ const int b0 = safe_fgetc();
               const UTF8 subc = safe_fgetc();
               if ((subc & 0xC0) != 0x80)
                  {
+#if MINGW_SRC
+                   // On Windows, 0xE0 + scancode is an extended key (arrow
+                   // keys in legacy cmd.exe).  Discard silently.
+                   goto again;
+#else
                    CERR << "Bad UTF8 sequence: " << HEX(b0)
                         << "... at " LOC << endl;
                    return Invalid_Unicode;
+#endif
                  }
 
               bx  <<= 6;
@@ -1149,9 +1189,9 @@ const int b0 = safe_fgetc();
 
              keymap( 'q'  , U'?' , 'Q' , U'?' )
              keymap( 'w'  , U'⍵' , 'W' , U'⍹' )
-             keymap( 'e'  , U'∈' , 'E' , U'⋸' )
+             keymap( 'e'  , U'∊' , 'E' , U'⍷' )
              keymap( 'r'  , U'⍴' , 'R' , U'⍴' )
-             keymap( 't'  , U'∼' , 'T' , U'⍨' )
+             keymap( 't'  , '~'  , 'T' , U'⍨' )
              keymap( 'y'  , U'↑' , 'Y' , U'¥' )
              keymap( 'u'  , U'↓' , 'U' , U'↓' )
              keymap( 'i'  , U'⍳' , 'I' , U'⍸' )
@@ -1179,7 +1219,7 @@ const int b0 = safe_fgetc();
              keymap( 'v'  , U'∪' , 'V' , U'∪' )
              keymap( 'b'  , U'⊥' , 'B' , U'⊥' )
              keymap( 'n'  , U'⊤' , 'N' , U'⊤' )
-             keymap( 'm'  , U'∣' , 'M' , U'μ' )
+             keymap( 'm'  , '|'  , 'M' , U'μ' )
              keymap( ','  , U'⍝' , '<' , U'⍪' )
              keymap( '.'  , U'⍀' , '>' , U'⍙' )
              keymap( '/'  , U'⌿' , '?' , U'⍠' )
@@ -1257,8 +1297,14 @@ LineInput::safe_fgetc()
    for (;;)
        {
           errno = 0;
-          const int ret = fgetc(stdin);
+          const int ret_raw = fgetc(stdin);
+#if MINGW_SRC
+          // Windows raw console sends CR for Enter; translate to LF (ICRNL equivalent).
+          const int ret = (ret_raw == UNI_CR) ? UNI_LF : ret_raw;
+#else
           if (errno == EINTR)   continue;
+          const int ret = ret_raw;
+#endif
 
 #if cfg_ALT_MAP_WANTED
 
@@ -1268,20 +1314,28 @@ LineInput::safe_fgetc()
           if (PROFILE == 1)   switch(ret)
              {
                default:                             break;
+#if MINGW_SRC
+               // ^A is "select all" in the Windows 10/11 console; use ^O instead.
+               case UNI_SI:  map_next = true;                   // ^O
+#else
                case UNI_SOH: map_next = true;                   // ^A
+#endif
                              map_all  = false;      continue;
                case UNI_SO:  map_all = ! map_all;   continue;   // ^N
+               case UNI_LF:  map_all  = false;      break;      // LF ends map_all
              }
 #endif
 
-          if (ret != EOF)       return ret;
+          if (ret != EOF)   return ret;
 
+#if ! MINGW_SRC
           if (got_WINCH)
              {
                got_WINCH = false;
                continue;
              }
-         return EOF;   // EOF
+#endif
+          return EOF;
        }
 }
 //════════════════════════════════════════════════════════════════════════════

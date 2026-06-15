@@ -341,5 +341,50 @@ protected:
 };
 //════════════════════════════════════════════════════════════════════════════
 
+//════════════════════════════════════════════════════════════════════════════
+// Platform-independent wrappers for socket option functions.
+// On POSIX, setsockopt()/getsockopt() take const void * / void * for optval.
+// On Windows (winsock2) the same argument is const char * / char *.
+
+#if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+
+#if HAVE_WINSOCK2_H
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#endif
+
+#if HAVE_SYS_SOCKET_H || HAVE_WINSOCK2_H
+
+/// platform-independent setsockopt()
+inline int
+sys_setsockopt(int fd, int level, int optname,
+               const void * optval, socklen_t optlen)
+{
+#if HAVE_WINSOCK2_H
+   return setsockopt(fd, level, optname,
+                     reinterpret_cast<const char *>(optval), optlen);
+#else
+   return setsockopt(fd, level, optname, optval, optlen);
+#endif
+}
+
+/// platform-independent getsockopt()
+inline int
+sys_getsockopt(int fd, int level, int optname,
+               void * optval, socklen_t * optlen)
+{
+#if HAVE_WINSOCK2_H
+   return getsockopt(fd, level, optname,
+                     reinterpret_cast<char *>(optval), optlen);
+#else
+   return getsockopt(fd, level, optname, optval, optlen);
+#endif
+}
+
+#endif // HAVE_SYS_SOCKET_H || HAVE_WINSOCK2_H
+//════════════════════════════════════════════════════════════════════════════
+
 #endif // SYS_HH_DEFINED
 

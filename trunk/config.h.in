@@ -377,7 +377,7 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
-/* Compiling for MINGW ?? */
+/* Compiling for Windows with MinGW-w64 */
 #undef MINGW_SRC
 
 /* Name of package */

@@ -45,8 +45,12 @@
 #include <sstream>
 #include <vector>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>

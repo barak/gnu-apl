@@ -21,6 +21,12 @@
 /** @file
 */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#if HAVE_SYS_UN_H
+
 #include "emacs.hh"
 #include "network.hh"
 #include "UnixSocketListener.hh"
@@ -184,3 +190,5 @@ void UnixSocketListener::close_connection( void )
     }
 }
 //════════════════════════════════════════════════════════════════════════════
+
+#endif // HAVE_SYS_UN_H

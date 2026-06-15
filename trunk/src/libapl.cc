@@ -536,7 +536,7 @@ UTF8_string text;
    text.reserve(len);
    for (const char ** f = function_lines_utf8; *f; ++f)
       {
-        text << *f << UNI_LF;
+        text << *f << "\n";
       }
 
    return fix_function_NL(text.c_str());

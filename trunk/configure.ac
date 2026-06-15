@@ -107,9 +107,21 @@ AC_CONFIG_SRCDIR([src])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
+# Parse special build targets (Android, Erlang, libapl, Python, MinGW) early
+# so that --with-mingw can preset CC/CXX/host_alias before the compiler
+# detection macros below run.
+#
+m4_include([m4/apl_TARGETs.m4])
+
 # use g++ for tests
 #
 AC_LANG(C++)
+
+# Detect compilers here, before LT_INIT, so that --with-mingw's preset
+# CC/CXX values take effect before LT_INIT's AC_REQUIRE pulls these in.
+#
+AC_PROG_CXX
+AC_PROG_CC
 
 # initialize libtool in dlopen mode
 #
@@ -120,11 +132,9 @@ apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
 apl_TOPIC([compiler checks])
 
-# Checks for programs.
-#
-AC_PROG_CXX
-AC_PROG_CC
-# AC_PROG_RANLIB   obsolteted by LT_INIT
+# AC_PROG_CXX and AC_PROG_CC were moved earlier (before LT_INIT) so that
+# --with-mingw's preset CC/CXX values take effect before compiler detection.
+# AC_PROG_RANLIB   obsoleted by LT_INIT
 
 AC_USE_SYSTEM_EXTENSIONS
 
@@ -501,8 +511,6 @@ if apl_YES($cfg_CTRLD_DEL); then
               [Define to make ^D a del-char and ^Z be EOF])
 fi
 AC_MSG_RESULT([$cfg_CTRLD_DEL])
-
-m4_include([m4/apl_TARGETs.m4])
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile
@@ -996,14 +1004,14 @@ else
    AC_DEFINE_UNQUOTED(apl_PNG, 0)
 fi
 
-AC_MSG_CHECKING([for MINGW (not yet working!)])
+# Finalize MinGW target: also fires when --host=x86_64-w64-mingw32 is used
+# directly (without --with-mingw).  AM_CONDITIONAL lives here (not in
+# apl_TARGETs.m4) because $host_os is only set after AC_CANONICAL_HOST runs.
 case $host_os in
-    mingw*)   AC_DEFINE_UNQUOTED(MINGW_SRC, 1, [Compiling for MINGW ??])
-              AM_CONDITIONAL(apl_TARGET_MINGW, true)
-              AC_MSG_RESULT([yes]);;
-    *)
-              AM_CONDITIONAL(apl_TARGET_MINGW, false)
-              AC_MSG_RESULT([no]);;
+    mingw*)   AC_DEFINE(MINGW_SRC, 1, [Compiling for Windows with MinGW-w64])
+              apl_TARGET_MINGW=yes
+              AM_CONDITIONAL(apl_TARGET_MINGW, true);;
+    *)        AM_CONDITIONAL(apl_TARGET_MINGW, false);;
 esac
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
@@ -1120,4 +1128,5 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
         Erlang:                  $apl_TARGET_ERLANG
         libapl:                  $apl_TARGET_LIBAPL
         Python:                  $apl_TARGET_PYTHON
+        Windows (MinGW):         $apl_TARGET_MINGW
 "])

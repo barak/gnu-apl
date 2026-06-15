@@ -10,12 +10,14 @@ EXTRA_DIRS =
 if ! apl_TARGET_ANDROID
 EXTRA_DIRS += APs sql workspaces
 
-if ! apl_TARGET_MINGW
 EXTRA_DIRS += emacs_mode
 endif
-endif
 
+if apl_TARGET_MINGW
+SUBDIRS = $(EXTRA_DIRS)
+else
 SUBDIRS = native $(EXTRA_DIRS)
+endif
 
 EXTRA_apl_SOURCES = 
 plot_SOURCES = Plot_ascii.cc
@@ -85,7 +87,7 @@ common_SOURCES += Common.cc								Common.hh
 common_SOURCES += ComplexCell.cc						ComplexCell.hh
 common_SOURCES += 										ConstCell_P.hh
 common_SOURCES += DerivedFunction.cc					DerivedFunction.hh
-common_SOURCES += DiffOut.cc
+common_SOURCES += DiffOut.cc							DiffOut.hh
 common_SOURCES += DynamicObject.cc						DynamicObject.hh
 common_SOURCES += Error.cc			Error.def			Error.hh
 common_SOURCES +=										Error_macros.hh

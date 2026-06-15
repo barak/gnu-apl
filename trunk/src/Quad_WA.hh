@@ -28,6 +28,7 @@
 #if HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>   // for rlim_t
 #else  // windows
+#include <cstdint>
 typedef uint64_t rlim_t;
 #endif // HAVE_SYS_RESOURCE_H
 

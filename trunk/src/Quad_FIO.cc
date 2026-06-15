@@ -71,13 +71,12 @@
 
 #if MINGW_SRC
 #define NOT_MINGW(x) { MINGW_more(__FUNCTION__, __LINE__); }
-typedef int socklen_t;
 #else
 #define NOT_MINGW(x) x
 #define SOCKET(x) x
 #endif // MINGW_SRC
 
-void
+GNUC__noreturn void
 MINGW_more(const char * fun, int line)
 {
    MORE_ERROR() <<
@@ -1964,8 +1963,7 @@ const int fd = get_fd(*B.get());
 int optval = 0;
 socklen_t olen = sizeof(optval);
    errno = 0;
-const int ret = getsockopt(fd, level, optname,
-                           reinterpret_cast<char *>(&optval), &olen);
+const int ret = sys_getsockopt(fd, level, optname, &optval, &olen);
    if (ret < 0)   return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
    return Token(TOK_APL_VALUE1, IntScalar(optval, LOC));
 }
@@ -1978,7 +1976,7 @@ const APL_Integer optname = A->get_cravel(1).get_int_value();
 const int optval          = A->get_cravel(2).get_int_value();
 const int fd = get_fd(*B.get());
    errno = 0;
-   setsockopt(fd, level, optname, &optval, sizeof(optval));
+   sys_setsockopt(fd, level, optname, &optval, sizeof(optval));
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
 //────────────────────────────────────────────────────────────────────────────

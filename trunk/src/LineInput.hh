@@ -435,6 +435,11 @@ protected:
    /// the first tcgetattr() errno (or 0 if none)
    static int initial_termios_errno;
 
+#if MINGW_SRC
+   /// Windows console mode at startup; restored on exit.
+   static unsigned long initial_console_mode;   // DWORD without pulling in windows.h
+#endif
+
    /// map all subsequent ASCII chars to APL
   static bool map_all;
 

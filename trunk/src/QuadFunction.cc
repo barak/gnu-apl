@@ -57,7 +57,9 @@
 
 #include "Workspace.icc"
 
+#ifndef environ
 extern char **environ;
+#endif
 
 // ⎕-function instances
 //

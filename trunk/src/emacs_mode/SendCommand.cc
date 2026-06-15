@@ -74,7 +74,15 @@ void SendCommand::run_command(NetworkConnection &conn,
         }
     }
 
+#if MINGW_SRC
+    const char * tmp_dir = getenv( "TEMP" );
+    if (!tmp_dir) tmp_dir = getenv( "TMP" );
+    if (!tmp_dir) tmp_dir = "C:/tmp";
+    std::string tmp_prefix = std::string( tmp_dir ) + "/apl_content";
+    TempFileWrapper fd( tmp_prefix );
+#else
     TempFileWrapper fd( "/tmp/apl_content" );
+#endif
     for( vector<string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
         stringstream s;
         s << *i << "\n";

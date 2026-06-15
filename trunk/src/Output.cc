@@ -36,6 +36,25 @@
 #include "Svar_DB.hh"
 #include "UserPreferences.hh"   // for preferences and command line options
 
+#if MINGW_SRC
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+# define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
+static bool
+is_wine()
+{
+static int cached = -1;
+   if (cached < 0)
+      {
+        HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+        cached = (ntdll && GetProcAddress(ntdll, "wine_get_version")) ? 1 : 0;
+      }
+   return cached != 0;
+}
+
+#endif   // MINGW_SRC
+
 bool Output::colors_enabled = false;
 bool Output::colors_changed = false;
 
@@ -132,12 +151,78 @@ PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
 
    Output::set_color_mode(Output::COLM_INPUT);
+
+#if MINGW_SRC
+   // Accumulate bytes until a complete UTF-8 sequence is ready.
+   // ASCII bytes go to cerr directly.
+   // Multi-byte APL chars use WriteConsoleW(hout, wchar_t): UTF-8 continuation
+   // bytes 0x80–0x9F overlap with C1 control codes (e.g. ⍴=U+2374 has byte
+   // 0x8D=RI which moves the cursor up).  WriteConsoleW takes a wchar_t and
+   // bypasses the VT/C1 scanner entirely.
+   // Wine and PTY handles (mintty/MSYS2) fall back to cout.
+   {
+   static unsigned char utf8buf[4];
+   static int           utf8len = 0;
+   utf8buf[utf8len++] = (unsigned char)c;
+
+   const unsigned char b0 = utf8buf[0];
+   int needed;
+   if      ((b0 & 0x80) == 0x00)   needed = 1;
+   else if ((b0 & 0xE0) == 0xC0)   needed = 2;
+   else if ((b0 & 0xF0) == 0xE0)   needed = 3;
+   else if ((b0 & 0xF8) == 0xF0)   needed = 4;
+   else   { utf8len = 0; return 0; }
+
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;
+
+   if (utf8len < needed)   return 0;
+
+   if (needed == 1)
+      {
+        cerr << char(c);
+      }
+   else
+      {
+        wchar_t wchar = 0;
+        if (utf8len == 2)
+           wchar = wchar_t(((utf8buf[0] & 0x1F) << 6)
+                         |  (utf8buf[1] & 0x3F));
+        else if (utf8len == 3)
+           wchar = wchar_t(((utf8buf[0] & 0x0F) << 12)
+                         | ((utf8buf[1] & 0x3F) <<  6)
+                         |  (utf8buf[2] & 0x3F));
+
+        bool wrote = false;
+        if (wchar && !is_wine())
+           {
+             const HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+             DWORD mode;
+             if (GetConsoleMode(hout, &mode))
+                {
+                  DWORD written = 0;
+                  wrote = WriteConsoleW(hout, &wchar, 1, &written, NULL)
+                          && written == 1;
+                }
+           }
+        if (!wrote)
+           {
+             cout.write((const char *)utf8buf, utf8len);
+             cout.flush();
+           }
+      }
+   utf8len = 0;
+   }
+PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
+   return 0;
+#else
    cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    if      (c == '\n')            Output::output_column = 0;
-   else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;
    return 0;
+#endif
 }
 //════════════════════════════════════════════════════════════════════════════
 int
@@ -146,6 +231,65 @@ ErrOut_filebuf::overflow(int c)
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
+
+#if MINGW_SRC
+   // Same as CinOut_filebuf::overflow() — see that function for explanation.
+   {
+   static unsigned char utf8buf[4];
+   static int           utf8len = 0;
+   utf8buf[utf8len++] = (unsigned char)c;
+
+   const unsigned char b0 = utf8buf[0];
+   int needed;
+   if      ((b0 & 0x80) == 0x00)   needed = 1;
+   else if ((b0 & 0xE0) == 0xC0)   needed = 2;
+   else if ((b0 & 0xF0) == 0xE0)   needed = 3;
+   else if ((b0 & 0xF8) == 0xF0)   needed = 4;
+   else   { utf8len = 0; return 0; }
+
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;
+
+   if (utf8len < needed)   return 0;
+
+   if (needed == 1)
+      {
+        cerr << char(c);
+      }
+   else
+      {
+        wchar_t wchar = 0;
+        if (utf8len == 2)
+           wchar = wchar_t(((utf8buf[0] & 0x1F) << 6)
+                         |  (utf8buf[1] & 0x3F));
+        else if (utf8len == 3)
+           wchar = wchar_t(((utf8buf[0] & 0x0F) << 12)
+                         | ((utf8buf[1] & 0x3F) <<  6)
+                         |  (utf8buf[2] & 0x3F));
+
+        bool wrote = false;
+        if (wchar && !is_wine())
+           {
+             const HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+             DWORD mode;
+             if (GetConsoleMode(hout, &mode))
+                {
+                  DWORD written = 0;
+                  wrote = WriteConsoleW(hout, &wchar, 1, &written, NULL)
+                          && written == 1;
+                }
+           }
+        if (!wrote)
+           {
+             cout.write((const char *)utf8buf, utf8len);
+             cout.flush();
+           }
+      }
+   utf8len = 0;
+   }
+PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
+   return 0;
+#else
    if (UserPreferences::uprefs.output_to_cout)   cout << char(c);
    else                                          cerr << char(c);
 
@@ -155,6 +299,7 @@ PERFORMANCE_START(cerr_perf)
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
+#endif
 }
 //════════════════════════════════════════════════════════════════════════════
 void
@@ -177,19 +322,38 @@ Output::init(bool logit)
       }
 
 #if MINGW_SRC
-   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),
-                  ENABLE_VIRTUAL_TERMINAL_INPUT);
-   SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),
-                  ENABLE_PROCESSED_OUTPUT);
-   SetConsoleMode(GetStdHandle(STD_ERROR_HANDLE),
-                  ENABLE_PROCESSED_OUTPUT);
-
-   if (logit)
+   if (is_wine())
       {
-        CERR << "WINDOWS: set ENABLE_PROCESSED_OUTPUT "
-                "for stdout and stderr." << endl;
+        // Wine does not process VT sequences; disable them to avoid
+        // literal ESC garbage in the terminal output.
+        clear_EOL[0] = 0;
+        clear_EOS[0] = 0;
       }
+   else
+      {
+        // Real Windows 10+: enable VT sequence processing for colors and
+        // line-clearing sequences.
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+# define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+        DWORD mode;
+        HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE herr = GetStdHandle(STD_ERROR_HANDLE);
+        if (GetConsoleMode(hout, &mode))
+           SetConsoleMode(hout, mode | ENABLE_PROCESSED_OUTPUT
+                                     | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        if (GetConsoleMode(herr, &mode))
+           SetConsoleMode(herr, mode | ENABLE_PROCESSED_OUTPUT
+                                     | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        // Switch to UTF-8 so multi-byte APL characters written byte-by-byte
+        // via the CRT (cerr/cout) are decoded correctly by the console.
+        SetConsoleOutputCP(CP_UTF8);
 
+        // Multi-byte APL characters are echoed via WriteConsoleW (wchar_t)
+        // in CinOut_filebuf::overflow() and ErrOut_filebuf::overflow() to
+        // avoid C1 control-code interference from UTF-8 continuation bytes
+        // (e.g. ⍴=U+2374 has byte 0x8D=RI in its UTF-8 encoding).
+      }
 #endif // MINGW_SRC
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -242,6 +406,36 @@ void
 CIN_ostream::set_cursor(int y, int x)
 {
    if (UserPreferences::uprefs.raw_cin)   return;
+
+#if MINGW_SRC
+   if (is_wine())   return;
+   {
+     // On real Windows consoles use SetConsoleCursorPosition (Win32 API).
+     // Try STD_ERROR_HANDLE first (overflow() writes to stderr); fall back
+     // to STD_OUTPUT_HANDLE so a redirected stderr still works.
+     HANDLE hcon = GetStdHandle(STD_ERROR_HANDLE);
+     CONSOLE_SCREEN_BUFFER_INFO csbi;
+     if (!GetConsoleScreenBufferInfo(hcon, &csbi))
+        {
+          hcon = GetStdHandle(STD_OUTPUT_HANDLE);
+          if (!GetConsoleScreenBufferInfo(hcon, &csbi))
+             hcon = NULL;
+        }
+     if (hcon)
+        {
+          // y < 0: rows from bottom of viewport (-1 = last visible row).
+          // y >= 0: rows from top of viewport.
+          const int row = (y < 0)
+                          ? csbi.srWindow.Bottom + y + 1
+                          : csbi.srWindow.Top    + y;
+          COORD pos = { (SHORT)x, (SHORT)row };
+          SetConsoleCursorPosition(hcon, pos);
+          return;
+        }
+     // GetConsoleScreenBufferInfo failed on both handles: PTY (mintty/MSYS2).
+     // Fall through to ESC sequence path below.
+   }
+#endif
 
    if (y < 0)
       {

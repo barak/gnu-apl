@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 3120"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 3120", "2026-06-10 12:51:46 CEST", "Linux 5.15.0-177-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 3203", "2026-06-15 13:59:41 CEST", "Linux 5.15.0-177-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -378,7 +378,7 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
-/* Compiling for MINGW ?? */
+/* Compiling for Windows with MinGW-w64 */
 /* #undef MINGW_SRC */
 
 /* Name of package */

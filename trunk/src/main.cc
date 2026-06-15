@@ -54,6 +54,7 @@
 #endif // HAVE_WINSOCK2_H
 
 
+#include "Sys.hh"
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
 #include "Common.hh"      // #includes config.h
@@ -284,6 +285,7 @@ const int left_pad = (80 - len)/2;
             }
          out<< endl;
        }
+
 }
 //════════════════════════════════════════════════════════════════════════════
 /// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
@@ -309,8 +311,8 @@ sockaddr_in local;
    // fix bind() error when listening socket is openend too quickly
    {
      const int yes = 1;
-     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
-                     reinterpret_cast<const char *>(&yes), sizeof(yes)) < 0)
+     if (sys_setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
+                        &yes, sizeof(yes)) < 0)
         {
           perror("setsockopt(SO_REUSEADDR) failed");
         }

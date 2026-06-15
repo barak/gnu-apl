@@ -1022,34 +1022,116 @@ Open the Windows Command Prompt (<strong>cmd.exe</strong>) and enter <strong>bas
 <div class="sect2">
 <h3 id="_installation_of_an_apl_font">Installation of an APL font</h3>
 <div class="paragraph"><p>This step is only needed for <strong>WSL</strong> and not for <strong>Cygwin</strong>.</p></div>
-<div class="paragraph"><p>The installation of an APL font is the simplest step. The APL vendor Dyalog
-offers suitable APL fonts for download.</p></div>
+<div class="paragraph"><p>The recommended font for GNU APL on Windows is <strong>BQN386 Unicode</strong>, an
+open-source TrueType font (MIT licence) originally designed for the BQN
+programming language.  It covers all APL characters in their standard Unicode
+positions and works correctly in the Windows console without any workarounds.</p></div>
+<div class="sect3">
+<h4 id="_step_1_download_bqn386_unicode">Step 1: Download BQN386 Unicode</h4>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Visit <a href="https://www.dyalog.com/apl-font-keyboard.htmC">https://www.dyalog.com/apl-font-keyboard.htmC</a>.
+Open a web browser and visit <a href="https://github.com/dzaima/BQN386">https://github.com/dzaima/BQN386</a>
 </p>
 </li>
 <li>
 <p>
-On that page click on the <strong>APL385</strong> font (which downloads a file
-  named <strong>setup-fonts.msi</strong>). This file is a microsoft installer.
-</p>
-</li>
-<li>
-<p>
-In your <strong>Downloads</strong> directory, execute the <strong>setup-fonts.msi</strong> file. This
-  installs a file named <strong>Apl385.ttf</strong>. This is a True-type font.
-</p>
-</li>
-<li>
-<p>
-Right-click on that <strong>Apl385.ttf</strong> file and press <strong>install</strong>.
+On that page, click the <strong>BQN386.ttf</strong> link to download the font file.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Later on you will run GNU APL in a Windows shell such as <strong>cmd.exe</strong>. The
-installed font must be enabled in that shell to be operational.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_step_2_install_the_font">Step 2: Install the font</h4>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Double-click the downloaded <strong>BQN386.ttf</strong> file.
+  A font preview window opens showing sample characters and the name
+  <strong>BQN386 Unicode</strong> at the top.
+</p>
+</li>
+<li>
+<p>
+Click the <strong>Install</strong> button (or <strong>Install for all users</strong>).
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Windows copies the file into <strong>C:\Windows\Fonts</strong> and registers the font.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_step_3_register_the_font_for_use_in_the_windows_console">Step 3: Register the font for use in the Windows console</h4>
+<div class="paragraph"><p>Windows only allows a short pre-approved list of fonts in the <strong>cmd.exe</strong>
+font picker.  BQN386 Unicode must be added to a registry key before it
+appears there.  This step requires administrator privileges.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="./images/icons/note.png" alt="Note" />
+</td>
+<td class="content">The <code>Console\TrueTypeFont</code> registry key often does <strong>not</strong> exist on a
+fresh Windows installation.  The <code>reg add</code> command below creates it
+automatically if it is absent.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Open a Command Prompt <strong>as administrator</strong> (search for <strong>cmd</strong>, right-click →
+<strong>Run as administrator</strong>) and run:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre>
+
+<code>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v 0 /t REG_SZ /d "BQN386 Unicode" /f</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect3">
+<h4 id="_step_4_select_the_font_in_cmd_exe">Step 4: Select the font in cmd.exe</h4>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Open a <strong>cmd.exe</strong> window (<strong>Win+R</strong> → type <strong>cmd</strong> → <strong>Enter</strong>).
+</p>
+</li>
+<li>
+<p>
+Right-click the title bar and choose <strong>Properties</strong>.
+</p>
+</li>
+<li>
+<p>
+Select the <strong>Font</strong> tab.
+</p>
+</li>
+<li>
+<p>
+In the font list, choose <strong>BQN386 Unicode</strong>.
+</p>
+</li>
+<li>
+<p>
+Choose a comfortable size (10 or 12 points work well).
+</p>
+</li>
+<li>
+<p>
+Click <strong>OK</strong>.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>To make the selection permanent for all future <strong>cmd.exe</strong> windows, use
+<strong>Defaults</strong> instead of <strong>Properties</strong> in step 2, or when prompted choose
+<strong>Modify shortcut that started this window</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="./images/icons/note.png" alt="Note" />
+</td>
+<td class="content">An index of alternative APL fonts (in case BQN386 does not suit
+your needs) is maintained at <a href="https://sigapl.org/fonts/FontsIndex.php">https://sigapl.org/fonts/FontsIndex.php</a></td>
+</tr></table>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_installation_of_a_keyboard_mapping">Installation of a keyboard mapping</h3>
@@ -1115,17 +1197,6 @@ Microsoft provides a thing called <strong>Input Method Editor</strong> (<strong>
 </li>
 <li>
 <p>
-Dyalog (a prominent APL vendor) offers an IME for APL. However, the author
-  (who is using an original Dyalog keyboard with APL caps) was not able to
-  make it work under Windows 11. The IME installs without any error messages
-  on Windows 11. According to Dyalog&#8217;s installation instructions, after
-  running the installer for that IME (and rebooting the machine) that IME
-  was supposed to show up in the Windows registry, but it did not. As a
-  consequence, no key was mapped to APL.
-</p>
-</li>
-<li>
-<p>
 There are a number of keyboard mappers offered on the internet, both commercial
   and free ones. The author has not tried any of those because most looked
   like mere convenience front-ends to Windows 11 components above that did
@@ -1142,7 +1213,7 @@ mapping outside of GNU APL (where it belongs) the author vaguely
 remembered how APL characters were entered in the 1970s. At that time
 keyboards had no <strong>ALT</strong> keys. Instead, some keyboards could be switched
 between an ASCII mode and an APL mode with the ASCII control characters
-<strong>SI</strong> and <strong>SO</strong> (aka, ^O and \^N). One of them (the author has forgotten
+<strong>SI</strong> and <strong>SO</strong> (aka, <code>^O</code> and <code>^N</code>). One of them (the author has forgotten
 which in the meantime) would select the ASCII mode (and all subsequently
 typed characters were ASCII characters) and the other would select the
 APL mode (not to be confused with the APL overstrike method of that time,
@@ -1154,26 +1225,37 @@ as follows:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Typing \^A, i.e. holding down the CTRL key and typing A, will map the
-  next character typed to APL, and
+Typing <code>^O</code> (Windows) or <code>^A</code> (Linux/macOS), i.e. holding down the CTRL
+  key and typing O or A respectively, will map the next character typed to
+  APL, and
 </p>
 </li>
 <li>
 <p>
-Typing ^N will map all subsequent characters typed to APL (until
-  \^N is typed again).
+Typing <code>^N</code> will map all subsequent characters typed to APL (until
+  <code>^N</code> is typed again).
 </p>
 </li>
 </ol></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="./images/icons/note.png" alt="Note" />
+</td>
+<td class="content">On Windows, <code>^O</code> is used as the single-character trigger instead of
+<code>^A</code>, because the Windows 10/11 console intercepts <code>^A</code> as "select all"
+before GNU APL sees it.</td>
+</tr></table>
+</div>
 <div class="paragraph"><p>The built-in ASCII to APL mapper of GNU APL is disabled by default because
 all platforms other than Windows 11 have no problems generating APL
 characters.  To enable the mapper one has to <strong>./configure</strong> GNU APL with
 the option <strong>ALT_MAP_WANTED=1</strong> as it was done in the examples above.
 The parameter <strong>1</strong> of <strong>ALT_MAP_WANTED=1</strong> specifies a mapping profile
 to be used; the mapping profile to be used, where the profile defines
-the control codes (^A and \^N for profile 1) and the details of the
-mapping (map <strong>r</strong> to <strong>⍴</strong>, i to <strong>⍳</strong>, &#8230;). Currently two such profiles
-are defined:</p></div>
+the control codes (<code>^O</code> and <code>^N</code> for profile 1 on Windows) and the details
+of the mapping (map <strong>r</strong> to <strong>⍴</strong>, <strong>i</strong> to <strong>⍳</strong>, &#8230;). Currently two such
+profiles are defined:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -1184,14 +1266,14 @@ are defined:</p></div>
 <li>
 <p>
 <strong>ALT_MAP_WANTED=1</strong> maps an US-keyboard to the standard GNU APL keyboard
-   layout (which, by chance is also the layout of the Dyalog US keyboard).
+   layout.
 </p>
 </li>
 </ol></div>
 <div class="paragraph"><p>Unlike in Windows 11 (which is closed source and prevents the user from
 defining her own layout), GNU APL is free software that allows the user
 to modify it to suit her needs. To construct your own mapping,
-have a look at file <strong>src/src/LineInput.cc</strong> and search for all occurrences of
+have a look at file <strong>src/LineInput.cc</strong> and search for all occurrences of
 <strong>cfg_ALT_MAP_WANTED</strong>.</p></div>
 </div>
 </div>
@@ -1201,7 +1283,7 @@ have a look at file <strong>src/src/LineInput.cc</strong> and search for all occ
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-05-21 12:50:56 CEST
+ 2026-06-15 12:45:41 CEST
 </div>
 </div>
 </body>

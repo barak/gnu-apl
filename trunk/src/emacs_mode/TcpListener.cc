@@ -23,6 +23,7 @@
 
 #include "emacs.hh"
 #include "network.hh"
+#include "../Sys.hh"
 #include "NetworkConnection.hh"
 #include "TcpListener.hh"
 
@@ -30,11 +31,19 @@
 #include <memory>
 #include <pthread.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/un.h>
+#if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif
+#if HAVE_SYS_UN_H
+#  include <sys/un.h>
+#endif
 #include <errno.h>
-#include <netdb.h>
+#if HAVE_NETDB_H
+#  include <netdb.h>
+#endif
 //════════════════════════════════════════════════════════════════════════════
 
 std::string TcpListener::start( void )
@@ -74,8 +83,8 @@ std::string TcpListener::start( void )
     }
 
     int v = 1;
-    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR,
-                  &v, sizeof(v)) == -1) {
+    if(sys_setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR,
+                      &v, sizeof(v)) == -1) {
         stringstream errmsg;
         errmsg << "Error setting SO_REUSEADDR parameter: " << strerror(errno);
         close( server_socket );

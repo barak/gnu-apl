@@ -24,6 +24,10 @@
 #ifndef NETWORK_HH
 #define NETWORK_HH
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "emacs.hh"
 #include <errno.h>
 
@@ -35,6 +39,7 @@
 
 #if HAVE_WINSOCK2_H
 # include <winsock2.h>
+# include <ws2tcpip.h>   // getaddrinfo(), freeaddrinfo() on Windows
 #endif // HAVE_WINSOCK2_H
 
 #if HAVE_SYS_UN_H

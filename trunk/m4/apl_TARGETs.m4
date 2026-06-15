@@ -84,4 +84,44 @@ fi
 AM_CONDITIONAL(apl_TARGET_PYTHON, apl_YES($apl_TARGET_PYTHON))
 AC_MSG_RESULT([$apl_TARGET_PYTHON])
 
+
+###############################################################################
+# check if the user wants to cross-compile for Windows (MinGW-w64)
+#
+# This section runs early (before LT_INIT) so that setting host_alias here
+# is seen by AC_CANONICAL_HOST (called inside LT_INIT).  AM_CONDITIONAL and
+# AC_DEFINE for MINGW_SRC live in configure.ac's case $host_os block because
+# $host_os is only available after AC_CANONICAL_HOST.
+#
+AC_MSG_CHECKING([if the build target is Windows (MinGW-w64 cross-compilation)])
+AC_ARG_WITH([mingw],
+            [AS_HELP_STRING([--with-mingw],
+                            [cross-compile for Windows using MinGW-w64])],
+            [apl_TARGET_MINGW=$withval],
+            [apl_TARGET_MINGW=no])
+
+if apl_YES($apl_TARGET_MINGW); then
+   # Set cross-compilation defaults; override with environment variables if needed.
+   : ${host_alias:=x86_64-w64-mingw32}
+   : ${CC:=x86_64-w64-mingw32-gcc}
+   : ${CXX:=x86_64-w64-mingw32-g++}
+   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -static -static-libgcc -static-libstdc++ -lwinpthread}
+   : ${with_sqlite3:=no}
+   : ${with_postgresql:=no}
+   # Cross-compilation: AC_FUNC_MALLOC/AC_FUNC_REALLOC cannot run the test
+   # binary, so they default to "broken" and emit #define malloc rpl_malloc
+   # in config.h.  That macro then corrupts c++/stdlib.h's "using std::malloc"
+   # into "using std::rpl_malloc" (undeclared).  Cache the result to tell
+   # autoconf that Windows CRT malloc/realloc are standard-compliant.
+   : ${ac_cv_func_malloc_0_nonnull=yes}
+   : ${ac_cv_func_realloc_0_nonnull=yes}
+   # GCC 10-win32: various Windows headers include <stdlib.h> in C++ mode;
+   # GCC intercepts that with c++/stdlib.h which pulls in <cstdlib>; if
+   # ::malloc is not yet declared at that point the build fails.  Force-
+   # including <cstdlib> first ensures ::malloc and std::malloc are both
+   # declared before any Windows header triggers c++/stdlib.h.
+   CXXFLAGS="-include cstdlib $CXXFLAGS"
+fi
+AC_MSG_RESULT([$apl_TARGET_MINGW])
+
 ###############################################################################

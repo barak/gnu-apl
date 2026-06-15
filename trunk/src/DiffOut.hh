@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,33 +33,39 @@
 
 using namespace std;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a filebuf that compares its output with a file.
 class DiffOut : public filebuf
 {
 public:
    /// constructor
+   /// @param _errout true for error-message stream, false for normal APL output
    DiffOut(bool _errout)
    : aplout(""),
      errout(_errout),
      expand_LF(false)
    { aplout.clear(); }
 
+   /// set LF → CRLF expansion mode
+   /// @param on non-zero to enable LF→CRLF expansion
+   int LF_to_CRLF(int on)
+      { const int old = expand_LF;   expand_LF = on;   return old; }
+
    /// discard all characters
    void reset()
    { aplout.clear(); }
 
-   /// set LF → CRLF expansion mode
-   int LF_to_CRLF(int on)
-      { const int old = expand_LF;   expand_LF = on;   return old; }
-
 protected:
-   /// overloaded filebuf::overflow()
-   virtual int overflow(int c);
-
    /// return true iff 0-terminated strings apl and ref differ
    /// at \b pos
+   /// @param apl APL output string to compare
+   /// @param ref reference string to compare against
+   /// @param pos starting position; updated to first difference on return
    bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
+
+   /// overloaded filebuf::overflow()
+   /// @param c character to overflow into the buffer
+   virtual int overflow(int c);
 
    /// a buffer for one line of APL output
    UTF8_string aplout;
@@ -70,14 +76,10 @@ protected:
    /// expand LF to CRLF
    bool expand_LF;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a filebuf for stderr output
 class ErrOut : public filebuf
 {
-protected:
-   /// overloaded filebuf::overflow()
-   virtual int overflow(int c);
-
 public:
    /// constructor
    ErrOut()
@@ -88,6 +90,7 @@ public:
    ~ErrOut()   { used = false; }
 
    /// set LF → CRLF expansion mode
+   /// @param on non-zero to enable LF→CRLF expansion
    int LF_to_CRLF(int on)
       { const int old = expand_LF;   expand_LF = on;   return old; }
 
@@ -102,12 +105,17 @@ public:
     **/
    filebuf * use()   { used = true;   return this; }
 
+   /// expand LF to CRLF
+   bool expand_LF;
+
    /// true iff the constructor for CERR was called
    static bool used;   // set when CERR is constructed
 
-   /// expand LF to CRLF
-   bool expand_LF;
+protected:
+   /// overloaded filebuf::overflow()
+   /// @param c character to overflow into the buffer
+   virtual int overflow(int c);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __DIFFOUT_HH_DEFINED__

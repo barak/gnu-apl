@@ -177,6 +177,10 @@ protected:
                (prefix_len == cmd.size() || cmd[prefix_len] <= UNI_SPACE);
       }
 
+   /// ]AV: print ⎕AV character table
+   /// @param out  output stream for command result
+   static void cmd_AV(ostream & out);
+
    /// )BOXING: select output format for APL values
    /// @param out  output stream for command result
    /// @param arg  boxing format argument string

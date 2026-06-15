@@ -68,6 +68,7 @@ cmd_def(")VALUES"   , Command::cmd_VALUES(out)                  ,""             
 cmd_def(")VARS"     , Command::cmd_VARS(out, arg)               ,"[from-to]"               ,oFROM_oTO  )
 cmd_def(")WSID"     , Command::cmd_WSID(out, args)              ,"[[lib] wsname]"          ,oLIB_WSNAME)
 
+cmd_def("]AV"       , Command::cmd_AV(out)                       ,""                        ,NO_PARAM   )
 cmd_def("]BOXING"   , Command::cmd_BOXING(out, arg)             ,"[OFF|2-4|7-9|i20-25|29]" ,BOXING     )
 cmd_def("]COLOR"    , Command::cmd_XTERM(out, arg)              ,"[ON|OFF]"                ,oON_OFF    )
 cmd_def("]DOXY"     , Command::cmd_DOXY(out, args)              ,"[path]"                  ,oPATH      )

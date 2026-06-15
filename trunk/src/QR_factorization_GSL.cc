@@ -284,7 +284,7 @@ gsl_matrix * R = gsl_matrix_alloc(N, N);   if (R == 0)   WS_FULL;
         if (col < row)   // below diag
            {
              gsl_matrix_set(R, row, col, 0);
-             Z1->next_ravel_Number(0,0);
+             Z1->next_ravel_Number(0.0);
            }
         else
            {
@@ -304,7 +304,7 @@ Value_P Z2(N, N, LOC);   // Z[2] is the N×N matrix Ri
       {
         if (col < row)   // below diag
            {
-             Z2->next_ravel_Number(0,0);
+             Z2->next_ravel_Number(0.0);
            }
         else
            {

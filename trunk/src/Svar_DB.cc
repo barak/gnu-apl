@@ -20,7 +20,7 @@
 
 /** @file
 */
-#include "../config.h"
+#include "config.h"
 
 #include <errno.h>
 #include <fcntl.h>           /* For O_* constants */
@@ -34,6 +34,7 @@
 #include <netinet/tcp.h>
 #endif // HAVE_NETINET_TCP_H
 
+#include "Sys.hh"
 #include "Common.hh"   // for HAVE_xxx macros
 
 #ifdef HAVE_SYS_UN_H
@@ -193,8 +194,7 @@ char peer[100];
         // disable nagle
         {
           const int ndelay = 1;
-          setsockopt(sock, 6, TCP_NODELAY,
-                     reinterpret_cast<const char *>(&ndelay), sizeof(int));
+          sys_setsockopt(sock, 6, TCP_NODELAY, &ndelay, sizeof(int));
         }
 
         // bind local port to 127.0.0.1

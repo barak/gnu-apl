@@ -459,6 +459,20 @@ Bif_F12_ELEMENT::do_eval_B(const Value * B)
 
 const ShapeItem len_Z = B->get_enlist_count();
 
+   // B contains no simple scalars (e.g. ∊⊂''): recurse into the first
+   // enclosed value to determine the prototype and return an empty result.
+   //
+   if (len_Z == 0)
+      {
+        loop(c, B->element_count())
+           {
+             const Cell & cell = B->get_cravel(c);
+             if (cell.is_pointer_cell())
+                return do_eval_B(cell.get_pointer_value().get());
+           }
+        FIXME;
+      }
+
 Value_P Z(len_Z, LOC);
 
    if (B->get_lval_cellowner())   B->enlist_left(*Z);

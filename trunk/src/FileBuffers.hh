@@ -23,6 +23,7 @@
 
 #include <fstream>
 
+#include "DiffOut.hh"
 #include "UTF8_string.hh"
 
 //════════════════════════════════════════════════════════════════════════════
@@ -78,49 +79,6 @@ protected:
    /// overloaded filebuf::overflow()
    /// @param c character to overflow into the buffer
    virtual int overflow(int c);
-};
-//════════════════════════════════════════════════════════════════════════════
-/// a filebuf that compares its output with a file.
-class DiffOut : public filebuf
-{
-public:
-   /// constructor
-   /// @param _errout true for error-message stream, false for normal APL output
-   DiffOut(bool _errout)
-   : aplout(""),
-     errout(_errout),
-     expand_LF(false)
-   { aplout.clear(); }
-
-   /// discard all characters
-   void reset()
-   { aplout.clear(); }
-
-   /// set LF → CRLF expansion mode
-   /// @param on non-zero to enable LF→CRLF expansion
-   int LF_to_CRLF(int on)
-      { const int old = expand_LF;   expand_LF = on;   return old; }
-
-protected:
-   /// overloaded filebuf::overflow()
-   /// @param c character to overflow into the buffer
-   virtual int overflow(int c);
-
-   /// return true iff 0-terminated strings apl and ref differ
-   /// at \b pos
-   /// @param apl APL output string to compare
-   /// @param ref reference string to compare against
-   /// @param pos starting position; updated to first difference on return
-   bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
-
-   /// a buffer for one line of APL output
-   UTF8_string aplout;
-
-   /// true for error messages, false for normal APL output
-   bool errout;
-
-   /// expand LF to CRLF
-   bool expand_LF;
 };
 //════════════════════════════════════════════════════════════════════════════
 #endif // __FILEBUFFERS_HH_DEFINED__

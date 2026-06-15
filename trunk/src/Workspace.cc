@@ -69,7 +69,17 @@ Workspace::SI_entry_count()
 //────────────────────────────────────────────────────────────────────────────
 Workspace::Workspace()
 // : prompt(U"-----> "),
+#if 0 && MINGW_SRC
+   // U+2207 (∇) must be in the same render pass as APL Functional Symbols
+   // (U+2360–U+237F, e.g. ⍴=U+2374) for them to display.  For WriteConsoleW
+   // (CIN echo) the render pass covers one screen row; for cout/cerr it covers
+   // one flush batch.  std::endl (flush+newline) starts a new render pass and
+   // resets the effect.  The prompt places ∇ on the same row as user input so
+   // every keystroke's render pass includes ∇, making ⍴ and friends visible.
+   : prompt(U"  ∇   "),
+#else
    : prompt(U"      "),
+#endif
      top_SI(0),
      WS_id(U"CLEAR WS", true)
 {
@@ -694,7 +704,13 @@ const UTF8_string filename =
         }
    }
 
-   if (the_workspace.SI_entry_count())
+   // Warn if the )SI stack is not clean.  Suppress when the only entry is
+   // the immediate ⍎ context that invoked )SAVE (workspace was effectively
+   // clean before ⍎ was typed).
+   //
+   if (the_workspace.SI_entry_count() > 1 ||
+       (the_workspace.SI_entry_count() == 1 &&
+        the_workspace.SI_top()->get_executable()->get_exec_ufun()))
       {
         CERR << "WARNING: )SAVEing a workspace whose )SI stack is not clear."
              << endl;

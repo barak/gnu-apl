@@ -33,6 +33,7 @@
 
 #include <sys/stat.h>
 
+#include "Avec.hh"
 #include "Common.hh"
 #include "Sys.hh"
 
@@ -891,6 +892,19 @@ const UCS_string suffix(line, multi_pos + 3);
         content[0] << " " << suffix;
         process_line(content[0], 0);
       }
+}
+//════════════════════════════════════════════════════════════════════════════
+void
+Command::cmd_AV(ostream & out)
+{
+   out << "⎕AV:";
+   for (int pos = 0x20; pos < Avec::MAX_AV; pos += 0x10)
+       {
+         loop(pp, 0x10)
+            out << " " << Avec::unicode(Avec::CHT_Index(pos + pp));
+         out << endl << "    ";
+       }
+   out << endl;
 }
 //════════════════════════════════════════════════════════════════════════════
 void

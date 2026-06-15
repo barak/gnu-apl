@@ -79,8 +79,8 @@ SVN_VERSION=$(svnversion)
 
 # NOTE: -j8 fails with out of memory on small hosts (like those
 # used for nightly builds). By setting J8="" we avoid that
-J8="-j8"
-J8=""
+J8="-j10"
+# J8=""
 
 # TOP_LOG_dir="/tmp"       # where to store longer build logs
 TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs

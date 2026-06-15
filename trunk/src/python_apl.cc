@@ -505,7 +505,7 @@ int error_line = 0;
 
 const UTF8_string creator("python");
 UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
-                                       creator, true);
+                                       creator);
 
    if (fun)   return Py_None;
 
