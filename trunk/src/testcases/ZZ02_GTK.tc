@@ -1,0 +1,40 @@
+⍝ ZZ02_GTK.tc
+⍝ ----------------------------------
+
+      ]NEXTFILE no-GTK   ⍝ skip if ⎕GTK was not compiled in
+
+      ⍝ Regression test for ⎕GTK TLV round-trip (set_title + get_title).
+      ⍝ Requires a running X display.  Guards against the TCP-coalescing
+      ⍝ recv() bug fixed in Gtk_server.cc (MSG_WAITALL + exact V_len).
+      ⍝
+
+∇ check_result R;TITLE
+ TITLE ← 'TLV round-trip OK'
+ →((1 < ⍴R) ∧ (TITLE ≡ ⊃1↓R))/PASS
+ 'FAIL: unexpected result from get_title: ' , ⍕R ◊ →0
+PASS: 'PASS: Gtk_server TLV round-trip OK'
+∇
+
+      XML ← 36 ⎕CR ⎕INP 'END_XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">GTK Smoke Test</property>
+    <property name="width_request">320</property>
+    <property name="height_request">120</property>
+    <property name="visible">True</property>
+  </object>
+</interface>
+END_XML
+
+      'window opened, handle = ' , ⍕ H ← ⎕GTK XML
+window opened, handle = ⁰
+
+      ⊣ 'TLV round-trip OK' ⎕GTK[H,'window1'] 'set_title'
+
+      check_result ⎕GTK[H,'window1'] 'get_title'
+PASS: Gtk_server TLV round-trip OK
+
+      ⊣ H ⎕GTK 0
+

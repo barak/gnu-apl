@@ -536,6 +536,7 @@ AC_CONFIG_FILES([Makefile
                  src/testcases/invariants/Makefile
                  src/workspaces/Makefile
                  support-files/Makefile
+                 support-files/fonts/Makefile
                  support-files/105-key-International-Keyboard/Makefile
                  support-files/Bill_Daly_Ubuntu/Makefile
                  support-files/Dirk/Makefile

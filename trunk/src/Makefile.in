@@ -6905,6 +6905,10 @@ test2: all
 testAP: all
 	./apl --id 1010 -T testcases/AP*tc
 
+# run the ⎕GTK TLV round-trip regression test (requires X display and GTK support)
+testGTK: all
+	./apl --id 1010 -T testcases/ZZ02_GTK.tc
+
 # run all testcases, except slow ones
 test3: all
 	./apl --id 1010 -T testcases_3/*tc || true

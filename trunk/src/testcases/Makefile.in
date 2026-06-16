@@ -554,6 +554,7 @@ dist_noinst_DATA = \
         Without.tc                              \
         Zilde.tc                                \
         ZZ01_Invariants.tc                      \
+        ZZ02_GTK.tc                             \
         ZZ03_Regression.tc                      \
         ZZ04_Regression.tc                      \
         ZZ05_Regression.tc                      \
