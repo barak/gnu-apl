@@ -5,8 +5,9 @@ gnu-apl (1.9-1) unstable; urgency=medium
   * Update debian/copyright for ineffable reasons
   * New upstream version
   * Forward port patches
+  * Install new files
 
- -- Barak A. Pearlmutter <bap@debian.org>  Wed, 17 Jun 2026 03:44:47 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 17 Jun 2026 03:45:31 +0100
 
 gnu-apl (1.8-1) unstable; urgency=medium
 

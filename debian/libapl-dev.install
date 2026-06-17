@@ -1,4 +1,5 @@
 usr/include/apl/libapl.h
+usr/include/apl/Error.def
 usr/lib/*/apl/libapl.a
 usr/lib/*/apl/libapl.so
 usr/share/info/libapl.info

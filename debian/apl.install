@@ -14,4 +14,5 @@ usr/lib/*/apl/wslib4
 usr/lib/*/apl/wslib5
 usr/share/doc/apl
 usr/share/info/apl.info
+usr/share/info/apl-library.info
 usr/share/man/man1/apl.1
