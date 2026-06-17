@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ VH_entry::print_history(ostream & out, const Value & val, const char * loc)
 {
    // search backwards for events of val.
    //
-std::basic_string<const VH_entry *> var_events;
+std::vector<const VH_entry *> var_events;
 int cidx = VH_entry::idx;
 
    loop(e, VALUEHISTORY_SIZE)
@@ -127,12 +127,12 @@ flags_name(ValueFlags flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)     ret.append(UNI_M);
-  if (flags & VF_complete)   ret.append(UNI_C);
-  if (flags & VF_packed)     ret.append(UNI_P);
-  if (flags & VF_member)     ret.append(UNI_m);
+  if (flags & VF_marked)     ret << UNI_M;
+  if (flags & VF_complete)   ret << UNI_C;
+  if (flags & VF_packed)     ret << UNI_P;
+  if (flags & VF_member)     ret << UNI_m;
 
-   while (ret.size() < 4)   ret.append(UNI_SPACE);
+   while (ret.size() < 4)   ret << UNI_SPACE;
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ const ValueFlags flags_before = ValueFlags(flags);
 
         case VHE_Check:
              flags |= VF_complete;
-             out << "  VHE_Check   " << flags_before << " ";
+             out << "  VHE_Check    " << flags_before << " ";
              if (flags_before != flags)   out << ValueFlags(flags)
                                               << " ";
              else                         out << "            ";
@@ -211,7 +211,7 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_PtrCopy:
-             out << "  VHE_PtrCopy " << setw(26) << iarg;
+             out << "  VHE_PtrCopy  " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy3:
@@ -231,11 +231,11 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_TokCopy:
-             out << "  VHE_TokCopy " << setw(26) << iarg;
+             out << "  VHE_TokCopy  " << setw(26) << iarg;
              break;
 
         case VHE_TokMove:
-             out << "  VHE_TokMove " << setw(26) << iarg;
+             out << "  VHE_TokMove  " << setw(26) << iarg;
              break;
 
         case VHE_Completed:

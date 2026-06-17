@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ extern ostream & get_CERR();
 uint16_t Svar_DB::APserver_port = cfg_APSERVER_PORT;
 
 TCP_socket Svar_DB::DB_tcp = NO_TCP_SOCKET;
+bool Svar_DB::do_log = false;
 
 Svar_record Svar_record_P::cache;
 
@@ -330,7 +331,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log, &err_loc);
    if (response)
       {
-        memcpy(static_cast<void *>(&cache),
+        memcpy(reinterpret_cast<void *>(&cache),
                response->get__SVAR_RECORD_IS__record().data(),
                sizeof(Svar_record));
 
@@ -344,6 +345,7 @@ void
 Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
               bool logit, bool do_svars)
 {
+   do_log = logit;
    if (!do_svars)   // shared variables disabled
       {
         if (logit)
@@ -357,6 +359,19 @@ Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
       {
         if (logit)   get_CERR() << "using Svar_DB on APserver!" << endl;
       }
+}
+//----------------------------------------------------------------------------
+void
+Svar_DB::disconnect()
+{
+  if (DB_tcp != NO_TCP_SOCKET)
+     {
+        close_connection();
+        close(DB_tcp);
+        DB_tcp = NO_TCP_SOCKET;
+     }
+
+  do_log && get_CERR() << "APserver disconnected" << endl;
 }
 //----------------------------------------------------------------------------
 SV_key
@@ -570,7 +585,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 //----------------------------------------------------------------------------
 void
 Svar_DB::get_offering_processors(AP_num to_proc,
-                                 std::basic_string<AP_num> & processors)
+                                 std::vector<AP_num> & processors)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
@@ -596,7 +611,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 //----------------------------------------------------------------------------
 void
 Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
-                               std::basic_string<uint32_t> & varnames)
+                               std::vector<uint32_t> & varnames)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
@@ -644,6 +659,15 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
    return false;
 }
 //----------------------------------------------------------------------------
+void
+Svar_DB::close_connection()
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+DISCONNECT_c request(tcp, 0);   // no response
+}
+//----------------------------------------------------------------------------
 TCP_socket
 Svar_DB::get_Svar_DB_tcp(const char * calling_function)
 {
@@ -684,28 +708,21 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 void
 Svar_DB::print(ostream & out)
 {
-Q1(LOC)
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
-Q1(tcp)
    if (tcp == NO_TCP_SOCKET)   return;
 
-Q1(LOC)
 PRINT_SVAR_DB_c request(tcp);
-Q1(LOC)
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 4000];
 const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
 
-   if (response)
+   if (Signal_base * response =
+       Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc))
       {
-Q1(LOC)
         out << response->get__SVAR_DB_PRINTED__printout();
         delete response;
       }
-Q1(LOC)
 }
 //----------------------------------------------------------------------------
 

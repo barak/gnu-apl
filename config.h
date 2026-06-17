@@ -2,10 +2,10 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* the SVN version of Archive.cc */
-#define ARCHIVE_SVN " 1401"
+#define ARCHIVE_SVN " 2750"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1429", "2024-06-29 11:14:15 UTC", "Linux 5.15.0-91-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 2888M", "2026-03-15 16:57:50 CET", "Linux 5.15.0-171-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -61,6 +61,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available */
+#define HAVE_IOCTL_TIOCGWINSZ 1
+
 /* Define to 1 if you have the `atomicity' library (-latomicity). */
 /* #undef HAVE_LIBATOMICITY */
 
@@ -81,6 +84,12 @@
 
 /* Define to 1 if you have the `gdk-3' library (-lgdk-3). */
 #define HAVE_LIBGDK_3 1
+
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#define HAVE_LIBGSL 1
+
+/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
+#define HAVE_LIBGSLCBLAS 1
 
 /* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
 #define HAVE_LIBGTK_3 1
@@ -315,6 +324,9 @@
 /* Define to 1 if `vfork' works. */
 #define HAVE_WORKING_VFORK 1
 
+/* Define to 1 if you have the <X11/XKBlib.h> header file. */
+#define HAVE_X11_XKBLIB_H 1
+
 /* Define to 1 if you have the <X11/Xlib.h> header file. */
 #define HAVE_X11_XLIB_H 1
 
@@ -346,7 +358,7 @@
 #define PACKAGE_NAME "GNU APL"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU APL 1.9"
+#define PACKAGE_STRING "GNU APL 2.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "apl"
@@ -355,7 +367,7 @@
 #define PACKAGE_URL "https://www.gnu.org/software/apl/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.9"
+#define PACKAGE_VERSION "2.0"
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -451,7 +463,7 @@
 
 
 /* Version number of package */
-#define VERSION "1.9"
+#define VERSION "2.0"
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
@@ -493,13 +505,16 @@
 #define apl_DIR__prefix "/usr"
 
 /* top-level GNU APL source directory */
-#define apl_DIR__src "/home/eedjsa/apl-1.9/src"
+#define apl_DIR__src "/home/eedjsa/apl-2.0/src"
 
 /* --sysconfdir */
 #define apl_DIR__sysconf "/etc"
 
 /* FFT available ? */
 #define apl_FFT 1
+
+/* GSL available ? */
+#define apl_GSL 1
 
 /* GTK+ version 3 installed ? */
 #define apl_GTK3 1
@@ -533,6 +548,12 @@
 
 /* X11 is available ? */
 #define apl_X11 1
+
+/* XCB is available ? */
+#define apl_XCB 1
+
+/* Alt key map profile */
+#define cfg_ALT_MAP_WANTED 0
 
 /* APserver listen port name */
 #define cfg_APSERVER_PATH "/tmp/GNU-APL/APserver"

@@ -48,10 +48,8 @@ TempFileWrapper::TempFileWrapper( const std::string &prefix )
     std::string filename = prefix;
     filename.append("XXXXXX");
 
-    fd = mkstemp( (char *)filename.c_str() );
-    if( fd == -1 ) {
-        abort();
-    }
+    fd = mkstemp(const_cast<char *>(filename.c_str()));
+    if (fd == -1)   abort();
 
     name = filename;
     closed = false;

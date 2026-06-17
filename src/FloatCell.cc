@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -811,10 +811,11 @@ const APL_Float b = this->dfval();
    //
    return A->bif_minimum(Z, this);
 }
-//============================================================================
-// throw/nothrow boundary. Functions above MUST NOT (directly or indirectly)
-// throw while funcions below MAY throw.
-//============================================================================
+/* ╔═════════════════════════════════════════════════════════════════════════╗
+   ║ throw/nothrow boundary. Functions above MUST NOT (directly or           ║
+   ║ indirectly) throw while funcions below MAY throw.                       ║
+   ╚═════════════════════════════════════════════════════════════════════════╝
+ */
 PrintBuffer
 FloatCell::character_representation(const PrintContext & pctx) const
 {
@@ -830,15 +831,15 @@ FloatCell::character_representation(const PrintContext & pctx) const
              APL_Integer numer = get_numerator();
              if (numer < 0)
                 {
-                  ucs.append(UNI_OVERBAR);
+                  ucs << UNI_OVERBAR;
                   numer = -numer;
                 }
-             ucs.append(UCS_string::from_uint(numer));
+             ucs << UCS_string::from_uint(numer);
              info.int_len = ucs.size();
 
-             ucs.append(UNI_DIVIDE);
+             ucs << UNI_DIVIDE;
 
-             ucs.append(UCS_string::from_uint(denom));
+             ucs << UCS_string::from_uint(denom);
              info.denom_len = ucs.size() - info.int_len;
              info.real_len = ucs.size();
              return PrintBuffer(ucs, info);

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,6 +51,11 @@ using namespace std;
 class XML_Archive
 {
 protected:
+   XML_Archive(ostream & of, ostream & ef)
+   : out(of),
+     err(ef)
+   {}
+
    /** archive syntax version, hopefully stepped up after Archive.hh or
       Archive.cc were changed:
 
@@ -66,10 +71,16 @@ protected:
     **/
    enum ArchiveSyntax
       {
-        ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible)
-        ASX_MINOR = 3,   ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 7,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible change)
+        ASX_MINOR = 11,  ///< ++ if XML file format change (backward compatible)
+        ASX_OTHER = 3,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
+
+   /// where to send information messages (such as "SAVED...")
+   ostream & out;
+
+   /// where to send error messages
+   ostream & err;
 };
 //----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
@@ -77,16 +88,10 @@ class XML_Saving_Archive: public XML_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
-   XML_Saving_Archive(ofstream & of)
-   : indent(0),
-     out(of),
-     val_pars(0),
-     value_count(0),
-     char_mode(false)
-   {}
+   XML_Saving_Archive(ostream & of, ostream & ef, const char * filename);
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close();  delete [] val_pars; }
+   ~XML_Saving_Archive()   { outf.close(); }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };
@@ -137,37 +142,47 @@ public:
    /// write entire workspace
    XML_Saving_Archive & save();
 
-   /// a value and its parent (if the parent is nested)
+   /// a value and its parent (if the parent is nested, -1 if not)
    struct _val_par
       {
          /// default constructor
          _val_par()
          : _val(0),
-           _par(INVALID_VID)
+           _par(INVALID_VID),
+           _depth(-1)
          {}
 
          /// constructor
          _val_par(const Value * v, Vid par)
          : _val(v),
-           _par(par)
+           _par(par),
+           _depth(v->compute_depth())
          {}
 
          /// the value
          const Value * _val;
 
-         /// the optional parent
+         /// the optional parent, -1 for top-level values
          Vid _par;
+
+         /// the depth of the value
+         const APL_types::Depth _depth;
 
          /// assign \b other
          void operator=(const _val_par & other)
             { new (this) _val_par(other._val, other._par); }
 
          /// compare function for Heapsort::sort()
-         static bool compare_val_par(const _val_par & A, const _val_par & B,
-                                     const void *);
+         static bool greater(const _val_par & A, const _val_par & B,
+                             const void *)
+            { return A._val > B._val; }
 
          /// compare function for bsearch()
-         static int compare_val_par1(const void * key, const void * B);
+         static int compare(const Value * const & key,
+                            const _val_par & B, const void *)
+            {
+               return int64_t(key) - int64_t(B._val);
+            }
       };
 
 protected:
@@ -192,12 +207,14 @@ protected:
    /// enter char mode. maybe print ² and return the number of chars printed
    int enter_char_mode()
       { if (char_mode)   return 0;   // already in char mode
-        out << UNI_PAD_U2;   char_mode = true;   return 1; }
+        outf << UNI_PAD_U2;   char_mode = true;   return 1; }
 
    /// leave char mode. maybe print ⁰ and return the number of chars printed
    int leave_char_mode()
       { if (!char_mode)   return 0;   // not in char mode
-        out << UNI_PAD_U0;   char_mode = false;   return 1; }
+        outf << UNI_PAD_U0;   char_mode = false;   return 1; }
+
+   void write_XML_header();
 
    /// decrement \b space by length of \b str and return \b str
    static const char * decr(int & space, const char * str);
@@ -209,41 +226,31 @@ protected:
    int indent;
 
    /// output XML file
-   std::ofstream & out;
+   ofstream outf;
 
    /// an array of values and the Vid of its parent (if value is a
    ///sub-value of a nested parent). The top-level of an APL value has
    /// has no parents (i.e. INVALID_VID).
    /// all values in the workspace
-   _val_par * val_pars;
-
-   /// the number of (non-stale) values
-   ShapeItem value_count;
+   vector<_val_par> val_pars;
 
    /// true iff ² is pending
    bool char_mode;
 
    /// functions saved so far
-   basic_string<const Function *> saved_Functions;
+   vector<const Function *> saved_Functions;
 
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
 };
-//----------------------------------------------------------------------------
-inline void
-Hswap(XML_Saving_Archive::_val_par & vp1, XML_Saving_Archive::_val_par & vp2)
-{
-const XML_Saving_Archive::_val_par tmp = vp1;
-   vp1 = vp2;
-   vp2 = tmp;
-}
 //----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
 class XML_Loading_Archive: public XML_Archive
 {
 public:
    /// constructor: remember file name and workspace
-   XML_Loading_Archive(ostream & _out, const char * _filename, int & dump_fd);
+   XML_Loading_Archive(ostream & of, ostream & ef, const char * _filename,
+                       int & dump_fd);
 
    /// destructor (unmap()s file).
    ~XML_Loading_Archive();
@@ -276,9 +283,6 @@ public:
    bool next_tag(const char * loc);
 
 protected:
-   /// where to send the "SAVED..." message
-   ostream & out;
-
    /// a value ID in a )SAVEd workspace
    enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
 
@@ -344,13 +348,13 @@ protected:
    void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
-   const Executable * read_Execute();
+   const Executable * read_SI_Execute();
 
    /// read ◊ Executable
-   const Executable * read_Statement();
+   const Executable * read_SI_Statement();
 
    /// read a user defined Executable
-   const Executable * read_UserFunction();
+   const Executable * read_SI_UserFunction();
 
    /// read a lambda
    Executable * read_lambda(const UTF8 * lambda_name);
@@ -371,11 +375,13 @@ protected:
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
 
-   /// show some characters starting at the current position
-   void where(ostream & out);
+   /// show some characters starting at the current position.
+   /// Debug function, currently defined but not used.
+   void where();
 
    /// show attributes of current tag
-   void where_att(ostream & out);
+   /// Debug function, currently defined but not used.
+   void where_att();
 
    /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
    bool get_uni();
@@ -387,7 +393,7 @@ protected:
    void expect_tag(const char * prefix, const char * loc) const;
 
    /// print current tag
-   void print_tag(ostream & out) const;
+   void print_tag() const;
 
    /// find attribute \b att_name and return: a pointer to its value if found,
    /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
@@ -466,7 +472,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   std::basic_string<Vid> vids_COPY;
+   std::vector<Vid> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -482,7 +488,7 @@ protected:
      };
 
    /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
-   std::basic_string<Vid> parents;
+   std::vector<Vid> parents;
 
    /// the file name from which this archive was read
    const char * filename;

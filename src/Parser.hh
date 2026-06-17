@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,126 @@ class Executable;
 /*!
      Functions related to parsing of input lines and defined functions.
  */
+
+//===========================================================================
+/** A small dictionary for literals and their markers. A marker is a substring
+    of the form "@N@" in the program text, @b  N is a key in the \b Lit_DB,
+    and \b value is the value of the multiline string or literal.
+ */
+class Lit_DB
+{
+public:
+   /// constructor
+   Lit_DB()
+   : next_key(0)
+   {}
+
+   /// return the key that will be returned by the next \b push().
+   ShapeItem get_next_key() const
+      { return next_key; }
+
+   /// return the number of literals in the dictionary
+   ShapeItem size() const
+      { return items.size(); }
+
+   /// store a new value in the dictionary, return its key.
+   ShapeItem push(Value_P val)
+      {
+        const ShapeItem ret = next_key++;
+        const Item item = { ret, val };
+        items.push_back(item);
+        return ret;
+      }
+
+   /// return the value for key, removing it from the dictionary.
+   Value_P pull(ShapeItem key)
+      {
+         loop(i, size())
+             {
+                if (items[i].key == key)   // found
+                   {
+                     Value_P ret = items[i].value;
+                     items[i] = items.back();
+                     items.pop_back();
+                     return ret;
+                   }
+             }
+         return Value_P();
+      }
+
+   /// return the only remaining value, removing it from the dictionary.
+   Value_P pull_last()
+      {
+        Assert(size() == 1);
+        Value_P ret = items.back().value;
+        items.pop_back();
+        return ret;
+      }
+
+   void dump(ostream & out, const char * loc) const
+      {
+        out << "Lit_DB at " << loc << ":" << endl;
+        loop(i, size())
+            {
+              out << "@" << items[i].key << "@: V-"
+                  << items[i].value->get_shape() << endl;
+            }
+      }
+protected:
+   /// one key/value pair in the dictionary
+   struct Item
+      {
+        ShapeItem key;
+        Value_P   value;
+      };
+
+   /// all key/value pairs in the dictionary
+   vector<Item> items;
+
+   /// the key for the next key/value pair
+   ShapeItem    next_key;
+};
+
+//===========================================================================
+/// A state machine for multiline strings and literals
+class Multi_line_SM
+{
+public:
+   // constructor
+   Multi_line_SM()   { reset(); }
+
+   /// reset state (after an error)
+   void reset()
+      {
+        string_end = Unicode_0;
+        in_string = false;
+        literal_depth = 0;
+        
+      }
+
+   /// destructor
+   ~Multi_line_SM();
+
+   // process next triple
+   //
+   void next(Unicode triple);
+
+   /// return \b true if inside a multiline string or literal. Including
+   /// start, excluding (top-level) end.
+   bool inside_multi() const
+      { return in_string || literal_depth; }
+
+   /// return \b true if the top-level is a multiline literal (as opposed to
+   /// a multiline string).
+   bool in_literal() const
+      { return literal_depth != 0; }
+
+protected:
+   Unicode string_end;
+   bool in_string;
+   int literal_depth;
+};
+//===========================================================================
 /// A parser for APL code
 class Parser
 {
@@ -42,11 +162,11 @@ public:
      create_loc(loc)
    {}
 
-   /// Parse UCS_string \b input into token string \b tos.
+   /// Parse \b UCS_string \b input into token string \b tos.
    ErrorCode parse(const UCS_string & input, Token_string & tos,
                    bool optimize) const;
 
-   /// Parse token string \b input into token string \b tos.
+   /// Parse \b Token_string \b input into token string \b tos.
    ErrorCode parse(const Token_string & input, Token_string & tos,
                    bool optimize) const;
 
@@ -61,28 +181,46 @@ public:
    /// like 4⍴0 in place.
    static bool optimize_short_primitives(Token_string & tos);
 
-   /// remove all TOK_VOID token from \b tos (compacting \b tos).
-   /// @return the number of tpkens removed (and adjust the size of \b tos)/
-   static VoidCount remove_TOK_VOID(Token_string & tos);
-
-   /// compute distances between matching (), [], and {}
+   /// compute distances between matching (), [], and {}. The distance is
+   /// always positive.
    static ErrorCode match_par_bra(Token_string & tos, bool backwards);
 
+   /// parse a multi-line literal into a single value
+   static Value_P parse_multi_literal(UCS_string_vector & text,
+                                      Lit_DB & literals, bool fun_header);
+
+   /// return the \b Multiline_status of all lines in \b text.
+   static ErrorCode get_multiline_status(vector<Multiline_status> & status,
+                                         const UCS_string_vector & text,
+                                         bool fun_header, bool strings);
+
+   /// replace multi-line literals in \b text with marker symbols and store the
+   /// marker symbols in \b literals.
+   static ErrorCode replace_multi_line_literals(UCS_string_vector & text,
+                                                Lit_DB & literals,
+                                                bool fun_header);
+
+   /// replace multi-line strings in \b text with marker symbols and store the
+   /// marker symbols in \b literals.
+   static ErrorCode replace_multi_line_strings(UCS_string_vector & text,
+                                               Lit_DB & literals,
+                                               bool fun_header);
+
+   /// transform a function body that contains an (old-style) multi-line
+   /// string into a standard function body
+   static ErrorCode transform_old_multi_line_strings(UCS_string_vector & text);
+
 protected:
+
+   /// print a detailed log message
+   static void parse_log(int N, const Token_string & tos);
+   
    /// Parse token string \b tos (a statement without diamonds).
    static ErrorCode parse_statement(Token_string & tos, bool optimize);
 
-   /// find opening bracket; throw error if not found
-   static int find_opening_bracket(const Token_string & tos, int pos);
-
-   /// find closing bracket; throw error if not found
-   static int find_closing_bracket(const Token_string & tos, int pos);
-
-   /// find opening paranthesis; throw error if not found.
-   static int find_opening_parent(const Token_string & tos, int pos);
-
-   /// find closing paranthesis; throw error if not found.
-   static int find_closing_parent(const Token_string & tos, int pos);
+   /// return the number of INT or near-INT tokens, starting at \b pos (and
+   /// at most 4). Replace near-int floats and complex /// literals with ints.
+   static int j_length(Token_string & tos, int pos);
 
    /// Collect consecutive smaller APL values or value token into vectors
    static bool collect_constants(Token_string & tos);
@@ -90,14 +228,24 @@ protected:
    /// mark next symbol left of ← on the same level as LSYMB
    static void mark_lsymb(Token_string & tos);
 
-   /// Collect groups
-   static bool collect_groups(Token_string & tos);
+   /// Replace (V1, V2,...) with a single (nested) /// value.
+   static bool collect_value_groups(Token_string & tos);
 
-   /// Replace (X) by X and ((..) by (..) in \b string. (X is a single token)
-   static void remove_nongrouping_parantheses(Token_string & tos);
+   /// fix the syntax of the POWER (⍣) operator.
+   static bool fix_POWER_syntax(Token_string & tos);
+
+   /// fix the syntax of the RANK (⍤) operator.
+   static bool fix_RANK_syntax(Token_string & tos);
+
+   /// Replace (X) with X and ((..) with (..) in \b tos (where X is a
+   // single token).
+   static bool remove_nongrouping_parantheses(Token_string & tos);
+
+   /// replace subfunction names like ⎕XXX.subfun with a numeric
+   /// axis like XXX[num]
+   static bool map_function_groups(Token_string & tos);
 
    /** Replace:
-
        ∧∧, ∨∨, ⍲⍲, and ⍱⍱    with their bitwise variant,
        ⎕FIO.function_name    with ⎕FIO[X] (via subfun_to_axis(function_name))
     */

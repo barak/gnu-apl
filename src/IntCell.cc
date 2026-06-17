@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -549,13 +549,13 @@ const bool A_zero = A->is_near_zero();
         const APL_Integer gcd = FloatCell::gcd(b, a);
         if (b == gcd)   return IntCell::zI(Z, a/gcd);
         return FloatCell::zR(Z, a/gcd, b/gcd);
-#else
-        const APL_Float i_quot = a / b;
+#else   // not cfg_RATIONAL_NUMBERS_WANTED
+        const APL_Integer i_quot = a / b;
         const APL_Float r_quot = a / APL_Float(b);
 
         if (a != i_quot * b)   return FloatCell::zF(Z, r_quot);
-        else                   return FloatCell::zF(Z, i_quot);
-#endif
+        else                   return IntCell::zI(Z, i_quot);
+#endif   // (not) cfg_RATIONAL_NUMBERS_WANTED
       }
 
    // delegate to A
@@ -914,8 +914,8 @@ UCS_string ucs;
        {
          const char q = cc[c];
          if (q == 0)   break;
-         if (q == '-')   ucs.append(UNI_OVERBAR);
-         else            ucs.append(Unicode(q));
+         if (q == '-')   ucs << UNI_OVERBAR;
+         else            ucs << Unicode(q);
        }
 
 ColInfo info;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -256,6 +256,14 @@ public:
            }
       }
 
+   /// Overloaded Cell::is_near_int64_t().
+   virtual bool is_near_int64_t() const
+      { return Cell::is_near_int64_t(dfval()); }
+
+   /// Overloaded Cell::get_near_int().
+   virtual APL_Integer get_near_int()  const
+      { return near_int(dfval()); }
+
 #ifndef __LIBAPL__
  protected:   // public: in libapl.cc
 #endif
@@ -288,10 +296,6 @@ protected:
    /// Overloaded Cell::get_near_bool().
    virtual bool get_near_bool()  const;
 
-   /// Overloaded Cell::get_near_int().
-   virtual APL_Integer get_near_int()  const
-      { return near_int(dfval()); }
-
    /// Overloaded Cell::get_checked_near_int().
    virtual APL_Integer get_checked_near_int()  const
       { 
@@ -302,10 +306,6 @@ protected:
    /// Overloaded Cell::is_near_int().
    virtual bool is_near_int() const
       { return Cell::is_near_int(dfval()); }
-
-   /// Overloaded Cell::is_near_int64_t().
-   virtual bool is_near_int64_t() const
-      { return Cell::is_near_int64_t(dfval()); }
 
    /// overloaded Cell::bif_near_int()
    virtual ErrorCode bif_near_int64_t(Cell * Z) const;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,9 +52,6 @@ struct InputFile
      with_LX  (LX),
      line_no  (0),
      in_html  (0),
-     in_function(false),
-     in_variable(false),
-     in_matched(false),
      from_COPY(false),
      file_seq(++next_file_seq)
    {}
@@ -133,20 +130,45 @@ struct InputFile
         return count;
       }
 
-   /// add object to object_filter
-   void add_filter_object(UCS_string & object)
+   /// a line-by-line state machine for filtering objects that shall be copied.
+   struct COPY_filter
       {
-        object_filter.push_back(object);
-      }
+        /// constructor
+        COPY_filter()
+        : where(WH_outside),
+          in_matched(false)
+        {}
 
-   /// return true if this file as an oject filter (from )COPY file names...)
-   bool has_object_filter() const
-      { return object_filter.size() > 0; }
+        /// add \b object to \b this object_filter
+        void add_filter_object(UCS_string & object)
+           {
+             object_filter.push_back(object);
+           }
+       
+        /// return \b true if this object filter is valid
+        /// (from )COPY file names...)
+        bool has_object_filter() const
+           { return object_filter.size(); }
 
-   /// check the current line and return true if the line is permitted by the
-   /// object_filter. This function also updates \b in_function and \b
-   /// in_variable
-   bool check_filter(const UTF8_string & line);
+        /// check the current line and return true if the line is permitted by
+        /// the object_filter. Also, update \b in_function and \b in_variable.
+        bool check_filter(const UTF8_string & line);
+
+        // where the current (and subsequent) line(s) are located
+        enum
+           {
+             WH_outside     = 0,   ///< lines are outside any functions or var
+             WH_in_function = 1,   ///< lines belong to a function
+             WH_in_variable = 2    ///< lines belong to a variable
+           } where;
+
+        /// true if the current function or variable was mentioned in 
+        /// object_filter
+        bool in_matched;
+
+        /// the functions and variiables that shall be )COPIED
+        UCS_string_vector object_filter;
+      } copy_filter;
 
    /// true if echo (of the input) is on for the current file
    static bool echo_current_file();
@@ -167,10 +189,10 @@ struct InputFile
    static std::vector<InputFile> files_orig;
 
    /// FILE * from fopen (or 0 if file is closed)
-   FILE       * file;
+   FILE * file;
 
    /// the file name
-   UTF8_string  filename;
+   UTF8_string filename;
 
 protected:
    bool test;            ///< true for -T testfile, false for -f APL file
@@ -182,19 +204,7 @@ protected:
    int  line_no;         ///< line number in file
    int  in_html;         ///< 0: no HTML, 1: in HTML file 2: in HTML header
 
-   /// functions and vars that shoule be )COPIED
-   UCS_string_vector object_filter;
-
-   /// true if current line belongs to a function. Cleared at final ∇
-   bool in_function;
-
-   /// return true if current line belongs to a variable. Cleared by empty line
-   bool in_variable;
-
-   /// true if current function or variable was mentioned in object_filter
-   bool in_matched;
-
-   /// true if this file comes from a )COPY XXX.apl (but not XXX.xml
+   /// true if this file comes from a )COPY XXX.apl (but not XXX.xml)
    bool from_COPY;
 
    /// a unique number for this (instance of) file.

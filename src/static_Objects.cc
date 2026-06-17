@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <iostream>
 
 #include "Common.hh"
-#include "DiffOut.hh"
 #include "DynamicObject.hh"
 #include "Logging.hh"
 #include "Macro.hh"
@@ -58,8 +57,8 @@ static_Objects::~static_Objects()
 #define DO_INFO(m, l)   extern static_Objects info_ ## l; \
                         static_Objects info_ ## l  (LOC, m);
 
-INFO(ErrOut::used, __LINE__)
-bool ErrOut::used = false;
+INFO(ErrOut_filebuf::used, __LINE__)
+bool ErrOut_filebuf::used = false;
 
 // prerequisites for Workspace::the_workspace...
 
@@ -85,7 +84,7 @@ INFO(Quad_ES::fun, __LINE__)
 Quad_ES Quad_ES   ::fun;
 
 INFO(CPU_pool::the_CPUs, __LINE__);
-std::basic_string<CPU_Number> CPU_pool::the_CPUs;
+std::vector<CPU_Number> CPU_pool::the_CPUs;
 
 INFO(Macro::all_macros, __LINE__)
 #define mac_def(name, txt) Macro Macro::name(MAC_ ## name, UTF8_string(txt));

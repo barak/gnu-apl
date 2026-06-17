@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ class UserFunction : public Function, public Executable
 {
 public:
    /// constructor for a lambda
-   UserFunction(Fun_signature sig, int lambda_num,
+   UserFunction(Fun_signature sig, Lambda_number lambda_num,
                 const UCS_string & text, Token_string & body,
-                const basic_string<Symbol *> & lvars);
+                const vector<Symbol *> & lvars);
 
    /// Destructor.
    ~UserFunction();
@@ -53,6 +53,10 @@ public:
    /// overloaded Function::is_defined()
    virtual bool is_defined() const
       { return true; }
+
+   /// Overloaded \b Function::is_operator.
+   virtual bool is_operator() const
+      { return header.is_operator(); }
 
    /// return the macro number (if this function is one) or -1
    virtual int get_macnum() const
@@ -106,10 +110,6 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
 
-   /// Overloaded \b Function::is_operator.
-   virtual bool is_operator() const
-      { return header.is_operator(); }
-
    /// add a label
    void add_label(Symbol * sym, Function_Line line)
       { header.add_label(sym, line); }
@@ -129,11 +129,45 @@ public:
    /// overloaded Executable::print()
    virtual ostream & print(ostream & out) const;
 
-   /// return the name of this function
+   /// return the name of \b this function
    virtual UCS_string get_name() const
       { return header.get_name(); }
 
-   /// return e.g. 'FOO[10]' 
+   /// return \b true if \b symbol is a label of \b this function
+   bool is_label(const Symbol * symbol) const
+      {
+        loop(l, header.get_label_count())
+            {
+              if (symbol == header.get_label(l).sym)   return true;
+            }
+
+        return false;
+      }
+
+   /// return \b true if \b token is for a label of \b this function
+   bool is_label(const Token & tok)
+      { return tok.get_Class() == TC_SYMBOL && is_label(tok.get_sym_ptr()); }
+
+   /// return \b true if \b token is for a label of \b this function
+   bool is_label_or_value(const Token & tok)
+      {
+        if (tok.get_Class() == TC_VALUE)   return true;
+         return is_label(tok);
+      }
+
+   /// return the line number for label \b symbol \b this function
+   Function_Line get_label_line(const Symbol * symbol)
+      {
+        loop(l, header.get_label_count())
+            {
+              const labVal & label = header.get_label(l);
+              if (symbol == label.sym)   return label.line;
+            }
+
+        return Function_Invalid;
+      }
+
+   /// return e.g. 'FOO[10]' for the given \b pc
    UCS_string get_name_and_line(Function_PC pc) const;
 
    /// Overloaded Function::print_properties()
@@ -239,25 +273,17 @@ public:
       { return creator; }
 
    /// set trace or stop vector
-   void set_trace_stop(std::basic_string<Function_Line> & lines, bool stop);
-
-   /// transform a function body containing (old-style) multi-lines into a
-   /// standard function body
-   ErrorCode transform_old_multi_lines();
-
-   /// transform a function body containing (new-style) multi-lines into a
-   /// standard function body
-   ErrorCode transform_new_multi_lines();
+   void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
 
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
-   const std::basic_string<Function_Line> & get_stop_lines() const
+   const std::vector<Function_Line> & get_stop_lines() const
       { return stop_lines; }
 
    /// return trace lines (from S∆fun ← lines)
-   const std::basic_string<Function_Line> & get_trace_lines() const
+   const std::vector<Function_Line> & get_trace_lines() const
       { return trace_lines; }
 
    /// return the header object (return value name, argument names, local vars,
@@ -267,6 +293,15 @@ public:
 
    // debug function: print the PC for every linr
    void print_line_PCs(const char * loc) const;
+
+   /// resolve labels in the function body. Return \b true if any
+   /// labels were resolved.
+   bool optimize_labels();
+
+   bool optimize_labels2();
+
+   /// optimize vectors of labels
+   bool optimize_label_vectors();
 
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
@@ -293,15 +328,8 @@ protected:
    /// helper function to print token with Function or Value content
    static ostream & print_val_or_fun(ostream & out, Token & tok);
 
-   /// "[nn] " prefix
-   UCS_string line_prefix(Function_Line l) const;
-
-   /// resolve labels in the function body. Return \b true if any
-   /// labels were resolved.
-   bool resolve_labels();
-
-   /// optimize unconditional (→N) branches.
-   bool optimize_unconditional_branches();
+   /// return the "[nn] " prefix
+   UCS_string line_prefix(Function_Line nn) const;
 
    // debug function: print the body tokens line by line.
    void print_body_by_line(const char * where) const;
@@ -323,20 +351,20 @@ protected:
 
       will, for example, have a N+1 element jump vector:
 
-      [0] goto end of function        --------------+
-      [1] L1: xxx                                   |
-      ...                                           |
-      [N-1]   yyy                                   |
-      [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
+      [0] goto end of function        ──────────────┐
+      [1] L1: xxx                                   │
+      ...                                           │
+      [N-1]   yyy                                   │
+      [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <──┘
 
    **/
-   std::basic_string<Function_PC> line_starts;
+   std::vector<Function_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   std::basic_string<Function_Line> stop_lines;
+   vector<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   std::basic_string<Function_Line> trace_lines;
+   vector<Function_Line> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];
@@ -347,7 +375,7 @@ protected:
    /// the line number where an error has occurred (-1 if none)
    int error_line;
 
-   /// information about an error (if any)
+   /// information about an error (if any) when constructing \b this function
    const char * error_info;
 };
 //----------------------------------------------------------------------------

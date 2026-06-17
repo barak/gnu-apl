@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2022  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,10 +60,11 @@ public:
    /// return true iff the user has dictated a window caption
    bool get_user_caption() const   { return user_caption; }
 
-   // get_XXX() and set_XXX() functions for weindow properties
-# define gdef(ty,  na,  _val, _descr)                                     \
+   // get_XXX() and set_XXX() functions for window properties
+# define gdef(ty,  na,  _val, _descr)                                    \
   /** return the value of na **/                                         \
   ty get_ ## na() const   { return na; }                                 \
+  bool get_ ## na ## _provided() const   { return na ## _provided; }     \
   /** set the value of na **/                                            \
   void set_ ## na(ty val)                                                \
      { na = val;                                                         \
@@ -242,7 +243,12 @@ protected:
    /// the date to be plotted
    const Plot_data & plot_data;
 
-# define gdef(ty, na, _val, descr) /** descr **/ ty na;
+   // attribute declarations...
+# define gdef(ty, na, _val, descr)              \
+   /** descr **/                                \
+   ty na;                                       \
+   /** true if attribute \b na was provided **/ \
+   bool na ## _provided;
 # include "Quad_PLOT.def"
 
    /// whether the window position was dictated by the user
@@ -339,11 +345,11 @@ protected:
    /// true if the plot window shall have a legend
    const bool show_legend;
 
-   /// a list of properties that have been set alreay (to protect them from
-   /// from being overwridden in set_all_XXX() functions. Every 16-bit item
+   /// a list of properties that have been set already (to protect them from
+   /// from being overwritten in set_all_XXX() functions. Every 16-bit item
    /// of \b properties_set is the line (upper 8 bits) and the property number
    /// (lower 8 bits).
-   basic_string<uint16_t> properties_set;
+   vector<uint16_t> properties_set;
 };
 //============================================================================
 

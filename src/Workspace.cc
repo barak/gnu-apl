@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ using namespace std;
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "Output.hh"
+#include "Quad_CC.hh"
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_GTK.hh"
@@ -67,24 +68,24 @@ Workspace::SI_entry_count()
 }
 //----------------------------------------------------------------------------
 Workspace::Workspace()
-   : WS_name(UTF8_string("CLEAR WS")),
-//   prompt(UTF8_string("-----> ")),
-     prompt(UTF8_string("      ")),
+   : WS_id(U"CLEAR WS", true),
+//   prompt(U"-----> "),
+     prompt(U"      "),
      top_SI(0)
 {
 /// Read-Only System Variable
-#define ro_sv_def(x, str, _txt)                                   \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define ro_sv_def(x, str, _txt)                         \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 /// Read/Write System Variable
-#define rw_sv_def(x, str, _txt)                                   \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define rw_sv_def(x, str, _txt)                         \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 /// System Function
-#define sf_def(x, str, _txt)                                      \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+#define sf_def(x, str, _txt)                            \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q << str; \
    distinguished_names.add_function(q, ID_ ## x, &x::fun); }
 
 #include "SystemVariable.def"
@@ -95,6 +96,13 @@ Workspace::Workspace()
    new (&Quad_CR::fun)   Quad_CR;
    new (&Quad_EC::fun)   Quad_EC;
    new (&Quad_ES::fun)   Quad_ES;
+}
+//----------------------------------------------------------------------------
+bool
+Workspace::is_CLEAR_WS()
+{
+   return get_WSID().get_name()
+                    .compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ;
 }
 //----------------------------------------------------------------------------
 void
@@ -113,8 +121,8 @@ Workspace::push_SI(const Executable * fun, const char * loc)
 
 
         Quad_SYL::si_depth_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
    if (Value::check_WS_FULL(__FUNCTION__, 1000, LOC))
@@ -256,9 +264,9 @@ Workspace::immediate_execution(bool exit_on_error)
    for (;;)
        {
          try
-           {
-              Command::process_line();
-           }
+            {
+              Command::process_lines();
+            }
          catch (Error & err)
             {
               if (!err.get_print_loc())
@@ -266,10 +274,14 @@ Workspace::immediate_execution(bool exit_on_error)
                    if (err.get_error_code() != E_DEFN_ERROR)
                       {
                         err.print_em(UERR, LOC);
-                        CERR << __FUNCTION__ << "() caught APL error "
-                             << HEX(err.get_error_code()) << " ("
-                             << err.error_name(err.get_error_code()) << ")"
-                             << endl;
+                        if (err.get_error_code() == E_SYNTAX_ERROR)   {}
+                        else
+                           {
+                             CERR << __FUNCTION__ << "() caught APL error "
+                                  << HEX(err.get_error_code()) << " ("
+                                  << err.error_name(err.get_error_code()) << ")"
+                                  << endl;
+                           }
 
                         IO_Files::apl_error(LOC);
                       }
@@ -309,7 +321,7 @@ Workspace::lookup_existing_name(const UCS_string & name)
         int len;
         Token tok = get_quad(name, len);
         if (len == 1)                          return 0;
-        if (name.size() != len)                return 0;
+        if (name.ssize() != len)               return 0;
         if (tok.get_Class() == TC_SYMBOL)      return tok.get_sym_ptr();
         if (tok.get_Class() == TC_FUN0)        return tok.get_function();
         if (tok.get_Class() == TC_FUN1)        return tok.get_function();
@@ -342,8 +354,8 @@ Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
       {
         int len;
         Token tok = get_quad(symbol_name, len);
-        if (symbol_name.size() != len)         return 0;
-        if (tok.get_Class() != TC_SYMBOL)      return 0;   // system function
+        if (symbol_name.ssize() != len)     return 0;
+        if (tok.get_Class() != TC_SYMBOL)   return 0;   // system function
 
         return tok.get_sym_ptr();
       }
@@ -365,13 +377,13 @@ UCS_string name(UNI_Quad_Quad);
 
 SystemName * longest = 0;
 
-   for (ShapeItem u = 1; u < ucs.size(); ++u)
+   for (ShapeItem u = 1; u < ucs.ssize(); ++u)
       {
         Unicode uni = ucs[u];
         if (!Avec::is_symbol_char(uni))   break;
 
         if (uni >= 'a' && uni <= 'z')   uni = Unicode(uni - 0x20);
-        name.append(uni);
+        name << uni;
         SystemName * dn =
                the_workspace.distinguished_names.lookup_existing_symbol(name);
 
@@ -427,8 +439,8 @@ const UserFunction * ufun = fun->get_func_ufun();
 }
 //----------------------------------------------------------------------------
 void
-Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
-                     & objects)
+Workspace::write_OUT(FILE * out, uint64_t & seq,
+                     const UCS_string_vector & objects)
 {
    // if objects is empty then write all user defined objects and some system
    // variables
@@ -626,7 +638,8 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
 
    Quad_SQL::close_all_connections();
 
-   set_WS_name(UCS_ASCII_string("CLEAR WS"));
+const LibRef_name lib_name(UCS_ASCII_string("CLEAR WS"), true);
+   set_WSID(lib_name);
    if (!silent)   out << "CLEAR WS" << endl;
 }
 //----------------------------------------------------------------------------
@@ -651,32 +664,37 @@ Workspace::list_SI(ostream & out, SI_mode mode)
 }
 //----------------------------------------------------------------------------
 void
-Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
+Workspace::save_WS(ostream & out, const LibRef_name & lib_name,
                    bool name_from_WSID)
 {
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
-                                                  ".xml", 0);
+const UTF8_string filename =
+      LibPaths::get_filename(lib_name, false, ".xml", 0);
 
-   // dont )SAVE if WS_name differs from wsid and the file exists
+   // don't )SAVE if WS_name differs from wsid and the file exists
    //
-const bool file_exists = access(filename.c_str(), W_OK) == 0;
-   if (file_exists)
-      {
-        if (WS_name.compare(the_workspace.WS_name) != 0)   // names differ
-           {
-             const UCS_string & wsid = the_workspace.WS_name;
-             out << "NOT SAVED: THIS WS IS " << wsid << endl;
-
-             MORE_ERROR() <<
-                "the workspace was not saved because"
-                " the workspace name '" << wsid << "' according\n"
-                "   to )WSID does not match the name '" << WS_name
-             << "' in the )SAVE command, AND the\n"
-                "   workspace file " << filename << " already exists.\n"
-                "   Use )WSID " << WS_name << " first."; 
-             return;
-           }
-      }
+   {
+     const bool file_exists = access(filename.c_str(), W_OK) == 0;
+     if (file_exists)
+        {
+          if (lib_name.get_name()
+                      .compare(the_workspace.WS_id.get_name()) != COMP_EQ)
+             {
+               // names differ. Complain.
+               //
+               const UCS_string & wsid = the_workspace.WS_id.get_name();
+               out << "NOT SAVED: THIS WS IS " << wsid << endl;
+    
+               MORE_ERROR() <<
+                  "the workspace was not saved because"
+                  " the workspace name '" << wsid << "' according\n"
+                  "   to )WSID does not match the name '" << lib_name.get_name()
+               << "' in the )SAVE command, AND the\n"
+                  "   workspace file " << filename << " already exists.\n"
+                  "   Use )WSID " << lib_name.get_name() << " first."; 
+               return;
+             }
+        }
+   }
 
    if (UserPreferences::uprefs.backup_before_save &&
        backup_existing_file(filename.c_str()))
@@ -686,27 +704,18 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
         return;
       }
 
-   // at this point it is OK to rename and save the workspace
+   // at this point it is OK to rename and save the workspace...
    //
-ofstream outf(filename.c_str(), ofstream::out);
-   if (!outf.is_open())   // open failed
-      {
-        CERR << "Unable to )SAVE workspace '" << WS_name
-             << "'. " << strerror(errno) << endl;
-        return;
-      }
-
-   the_workspace.WS_name = WS_name;
+   the_workspace.WS_id = LibRef_name(the_workspace.WS_id.get_libref(),
+                                     lib_name.get_name());
 
    Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
-XML_Saving_Archive ar(outf);
-   Log(LOG_archive)   CERR << "saving XML_Saving_Archive..." << endl;
-   ar.save();
-   Log(LOG_archive)   CERR << "done XML_Saving_Archive." << endl;
+XML_Saving_Archive ar(out, CERR, filename.c_str());
 
    // print time and date to COUT
+   //
    get_v_Quad_TZ().print_timestamp(out, now());
-   if (name_from_WSID)   out << " " << the_workspace.WS_name;
+   if (name_from_WSID)   out << " " << the_workspace.WS_id.get_name();
    out << endl;
 }
 //----------------------------------------------------------------------------
@@ -718,7 +727,7 @@ Workspace::backup_existing_file(const char * filename)
    if (access(filename, F_OK) != 0)   return false;   // OK
 
 UTF8_string backup_filename = filename;
-   backup_filename.append_ASCII(".bak");
+   backup_filename << ".bak";
 
    // 2. if backup file exists then remove it...
    //
@@ -794,7 +803,7 @@ InputFile fam(filename, file, false, false, true, with_LX);
    if (object_filter)   // therefore )COPY, not )LOAD
       {
         loop(o, object_filter->size())
-            fam.add_filter_object((*object_filter)[o]);
+            fam.copy_filter.add_filter_object((*object_filter)[o]);
         fam.set_COPY();
         ++Bif_F1_EXECUTE::copy_pending;
       }
@@ -841,7 +850,7 @@ public:
 };
 //----------------------------------------------------------------------------
 void
-Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
+Workspace::dump_WS(ostream & out, const LibRef_name & lib_name,
                    bool html, bool silent)
 {
    // )DUMP
@@ -849,13 +858,12 @@ Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
    // )DUMP libnum WS_name
 
 const char * extension = html ? ".html" : ".apl";
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
-                                                  extension, 0);
-   if (WS_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+UTF8_string filename = LibPaths::get_filename(lib_name, false, extension, 0);
+   if (lib_name.get_name().compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
-        // don't save CLEAR WS
+        // don't dump CLEAR WS
         //
-        COUT << "NOT DUMPED: THIS WS IS " << WS_name << endl;
+        COUT << "NOT DUMPED: THIS WS IS " << lib_name.get_name() << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
         "workspace name that cannot be dumped. Use )WSID <name> first.";
@@ -874,7 +882,7 @@ ofstream outf(filename.c_str(), ofstream::out);
 
    if (!outf.is_open())   // open failed
       {
-        CERR << "Unable to )DUMP workspace '" << WS_name
+        CERR << "Unable to )DUMP workspace '" << lib_name.get_name()
              << "': " << strerror(errno) << "." << endl
              << "    NOTE: filename: " << filename << endl;
         return;
@@ -898,7 +906,7 @@ const YMDhmsu time(gmt + 1000000*offset);
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"  << endl <<
 "<html>"                                                            << endl <<
 "  <head>"                                                          << endl <<
-"    <title>" << WS_name << ".apl</title> "                         << endl <<
+"    <title>" << lib_name.get_name() << ".apl</title> "             << endl <<
 "    <meta http-equiv=\"content-type\" "                            << endl <<
 "          content=\"text/html; charset=UTF-8\">"                   << endl <<
 "    <meta name=\"author\" content=\"??????\">"                     << endl <<
@@ -931,7 +939,7 @@ const YMDhmsu time(gmt + 1000000*offset);
 "⍝"                                                                 << endl <<
                                                                        endl;
         }
-     else
+     else   // .apl
         {
           outf << "#!" << LibPaths::get_APL_bin_path()
                << "/" << LibPaths::get_APL_bin_name()
@@ -941,7 +949,7 @@ const YMDhmsu time(gmt + 1000000*offset);
      *sout <<
 " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
 "⍝                                                                    ⍝\n"
-"⍝ " << setw(36) << WS_name << " ";
+"⍝ " << setw(36) << lib_name.get_name() << " ";
      get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝\n"
 "⍝                                                                    ⍝\n"
 " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
@@ -970,7 +978,7 @@ int variable_count = 0;
       }
    else
       {
-        out << "DUMPED WORKSPACE '" << WS_name << "'" << endl
+        out << "DUMPED WORKSPACE '" << lib_name.get_name() << "'" << endl
             << " TO FILE '" << filename << "'" << endl
             << " (" << function_count << " FUNCTIONS, " << variable_count
             << " VARIABLES)" << endl;
@@ -983,73 +991,82 @@ Workspace::dump_commands(ostream & out)
 vector<Command::user_command> & cmds = get_user_commands();
 
    loop(c, cmds.size())
-      out << "]USERCMD " << cmds[c].prefix
-          << " " << cmds[c].apl_function
-          << " " << cmds[c].mode << endl;
+       {
+         out << "]USERCMD " << cmds[c].prefix << " " << cmds[c].apl_function
+             << " " << cmds[c].mode << endl;
+       }
 
    if (cmds.size())   out << endl;
 }
 //----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
-Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
+Workspace::load_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
                    UCS_string & quad_lx, bool silent)
 {
    // )LOAD WS_name                              WS_name /absolute or relative
    // )LOAD libnum WS_name                       WS_name relative
    //
-   if (UTF8_string(WS_name).ends_with(".bak"))
+   if (UTF8_string(lib_name.get_name()).ends_with(".bak"))
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << WS_name <<
+        MORE_ERROR() << lib_name.get_name() <<
         " is a backup file! You need to rename it before it can be )LOADed";
         return;
       }
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
-                                                  ".xml", ".apl");
+const UTF8_string filename = LibPaths::get_filename(lib_name, true,
+                                                    ".xml", ".apl");
 
 int dump_fd = -1;
-XML_Loading_Archive in(out, filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
 
    if (dump_fd != -1)   // probably not a WS.xml, assume WS_name.apl
       {
         the_workspace.clear_WS(out, true);
 
-        Log(LOG_command_IN)   out << "LOADING " << WS_name << " from file '"
-                                  << filename << "' ..." << endl;
+        Log(LOG_command_IN)   out << "LOADING " << lib_name.get_name()
+                                  << " from file '" << filename << "' ..."
+                                  << endl;
 
         load_DUMP(out, filename, dump_fd, do_LX, silent, 0);   // closes dump_fd
 
-        // )DUMP files have no )WSID so create one from the filename
+        // )DUMP files have no )WSID, so create one from the filename
+        //
+        // Start with the last path component, which may or may not start
+        // with a slash
         //
         const char * wsid_start = strrchr(filename.c_str(), '/');
-        if (wsid_start == 0)   wsid_start = filename.c_str();
-        else                   ++wsid_start;   // skip /
+        if (wsid_start == 0)   // no slash (single path component)
+           wsid_start = filename.c_str();
+        else                   // skip the / of the last (or only) component
+           ++wsid_start;
         const char * wsid_end = filename.c_str() + filename.size();
-        if (wsid_end > (wsid_start - 4) &&
-           wsid_end[-4] == '.' &&
-           wsid_end[-3] == 'a' &&
-           wsid_end[-2] == 'p' &&
-           wsid_end[-1] == 'l')   wsid_end -= 4;   // skip .apl extension
+
+        // skip the .apl extension (if any)
+        //
+        if (wsid_end > (wsid_start - 4) &&   // long enough
+           !strcmp(wsid_end - 4, ".apl"))  wsid_end -= 4;
+
         const UTF8_string wsid_utf8(utf8P(wsid_start), wsid_end - wsid_start);
         const UCS_string wsid_ucs(wsid_utf8);
-        wsid(out, wsid_ucs, libref, true);
+        wsid(out, wsid_ucs, lib_name.get_libref(), true);
 
-        // we cant set ⎕LX because it was not executed yet.
+        // we can't set ⎕LX because it was not executed yet.
         return;
       }
    else   // WS_name.xml
       {
         if (!in.is_open())   // open failed
            {
-             out << ")LOAD " << WS_name << " (file " << filename
+             out << ")LOAD " << lib_name.get_name() << " (file " << filename
                  << ") failed: " << strerror(errno) << endl;
              return;
            }
 
-        Log(LOG_command_IN)   out << "LOADING " << WS_name << " from file '"
-                                  << filename << "' ..." << endl;
+        Log(LOG_command_IN)   out << "LOADING " << lib_name.get_name()
+                                  << " from file '" << filename << "' ..."
+                                  << endl;
 
         // got open file. We assume that from here on everything will be fine.
         // clear current WS and load it from file
@@ -1069,7 +1086,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 }
 //----------------------------------------------------------------------------
 void
-Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
+Workspace::copy_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
 {
    // )COPY WS_name                              WS_name /absolute or relative
@@ -1077,9 +1094,8 @@ Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
    // )COPY WS_name objects...                   WS_name /absolute or relative
    // )COPY libnum WS_name objects...            WS_name relative
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
-                                                  ".xml", ".apl");
-
+const UTF8_string filename = LibPaths::get_filename(lib_name, true,
+                                                    ".xml", ".apl");
    // open filename. There are three cases:
    //
    // 1. filename.apl (i.e. file was )DUMPed). dump_fd: ≠ -1, in: closed
@@ -1087,7 +1103,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
    // 3. no such file.                         dump_fd: = -1, in: closed
    //
 int dump_fd = -1;
-XML_Loading_Archive in(out, filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
    if (dump_fd != -1)   // case 1: )DUMPed .apl file
       {
         load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects);
@@ -1097,15 +1113,15 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
    if (!in.is_open())   // case 3: open failed
       {
-        CERR << ")COPY " << WS_name << " (file " << filename
+        CERR << ")COPY " << lib_name.get_name() << " (file " << filename
              << ") failed: " << strerror(errno) << endl;
         return;
       }
 
    // case 2: )SAVEd .xml file
    //
-   Log(LOG_command_IN)   CERR << "LOADING " << WS_name << " from file '"
-                              << filename << "' ..." << endl;
+   Log(LOG_command_IN)   CERR << "LOADING " << lib_name.get_name()
+                              << " from file '" << filename << "' ..." << endl;
 
    in.set_protection(protection, lib_ws_objects);
    in.read_vids();
@@ -1115,25 +1131,6 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 void
 Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
 {
-   arg.remove_leading_and_trailing_whitespaces();
-
-   if (arg.size() == 0)   // inquire workspace name
-      {
-        out << "IS " << the_workspace.WS_name << endl;
-        return;
-      }
-
-   if (lib == LIB_WSNAME)     // i.e. arg may start with a library number
-      {
-        if (arg[0] >= '0' && arg[0] <= '9')   // it does
-           {
-             lib = LibRef(arg[0] - '0');
-             arg.erase(0);                       // skip the library number
-             arg.remove_leading_whitespaces();   // and blanks after it
-           }
-        else lib = LIB0;
-      }
-
    loop(a, arg.size())
       {
         if (arg[a] <= ' ')
@@ -1143,16 +1140,43 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
            }
       }
 
-   if (!silent)   out << "WAS " << the_workspace.WS_name << endl;
-
-   // prepend the lib number unless it is 0.
-   //
-   if (lib != LIB0)
+   if (arg.size() == 0)   // )WSID: inquire workspace name
       {
-        arg.prepend(UNI_SPACE);
-        arg.prepend(Unicode('0' + lib));
+        out << "IS ";
+        if (the_workspace.WS_id.get_libref() != LIB_NONE)
+           out << the_workspace.WS_id.get_libref() << " ";
+        out << the_workspace.WS_id.get_name() << endl;
       }
-   the_workspace.WS_name = arg;
+   else if (lib == LIB_NONE)     // )WSID wsname (i.e. without libref)
+      {
+        if (!silent)
+           {
+             out << "WAS ";
+             if (the_workspace.WS_id.get_libref() != LIB_NONE)
+                out << the_workspace.WS_id.get_libref()  << " ";
+             out << the_workspace.WS_id.get_name() << endl;
+           }
+        the_workspace.WS_id = LibRef_name(arg, true);
+        return;
+      }
+   else                          // )WSID lib wsname
+      {
+        if (!silent)
+           {
+             out << "WAS ";
+             if (the_workspace.WS_id.get_libref() != LIB_NONE)
+                out << the_workspace.WS_id.get_libref()  << " ";
+             out << the_workspace.WS_id.get_name() << endl;
+           }
+
+        if (lib < LIB0 || lib > LIB9)
+           {
+             out << "Bad library reference '" << int(lib) << "'" << endl;
+             return;
+           }
+
+        the_workspace.WS_id = LibRef_name(lib, arg);
+      }
 }
 //----------------------------------------------------------------------------
 /// start a new )MORE error info (overriding the previous one).

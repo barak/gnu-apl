@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,7 +179,8 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                       {
                         Value_P B1 = cell_B.get_pointer_value();
                         Value_P Z1(B1->get_shape(), LOC);
-                        new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
+                        new (&cell_Z) PointerCell(Z1.get(),
+                                                  *job_B->value_Z, 0x6B616769);
 
                         const PJob_scalar_B j1(Z1, B1);
                         Thread_context::get_master().joblist_B.add_job(j1);
@@ -261,10 +262,15 @@ CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
                    const PJob_scalar_B j1(Z1, B1);
                    tctx.joblist_B.add_job(j1);
                  }
-              else
+              else   // empty B1
                  {
                    Value_P Z1 = CLONE_P(B1, LOC);
-                   Z1->to_type(/* numeric */ true);
+
+                   // lrm p. 56: the fill function for primitive scalar
+                   // functions is numeric even if the (empty) argumenti
+                   //  has type character.
+                   //
+                   Z1->to_type(/* force_numeric */ true);
                    new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
                  }
               Parallel::release_lock(jobs_lock);
@@ -641,7 +647,7 @@ Token
 ScalarFunction::do_eval_fill_AB(Value_P A, Value_P B) const
 {
    /* eval_fill_AB() is called when A and/or B is empty and the non-empty
-      argument (if any) is non-scalar. The scalar case for the non-empty
+      argument (if any) is non-scalar (!!!). The scalar case for the non-empty
       argument of a dyadic scalar function is handled by do_eval_fill_B().
 
        NOTE however, that even though non-empty arguments of scalar functions
@@ -702,6 +708,7 @@ ScalarFunction::do_eval_fill_B(Value_P B) const
    if (B->get_cfirst().is_numeric() || B->get_cfirst().is_character_cell())
       {
         Value_P Z(B->get_shape(), LOC);
+        Z->set_ravel_Int(0, 0);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -711,7 +718,12 @@ ScalarFunction::do_eval_fill_B(Value_P B) const
       for character Cells.
     */
 Value_P Z = B->clone(LOC);
-   Z->to_type(/* numeric */ true);
+   Z->check_value(LOC);
+
+   // lrm p. 56: the fill function for primitive scalar functions is numeric
+   // even if the (empty) argument has type character.
+   //
+   Z->to_type(/* force_numeric */ true);
    Z->check_value(LOC);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -1066,6 +1078,66 @@ const Cell * C = &B.get_cfirst();
 }
 //============================================================================
 Token
+Bif_F2_UNEQU::eval_B(Value_P B) const
+{
+   // ≠ B : nub sievce. Return a boolean vector Z, corresponding to B, where 
+   // Z[i] is 1 iff B[i] is the first occurrence in B. Aka.(B⍳B)=(⍳⍴B).
+   //
+const double qct = Workspace::get_CT();
+vector<const Cell *> firsts;
+Value_P Z(B->get_shape(), LOC);
+   loop(b, B->element_count())
+       {
+         const Cell & cell_B = B->get_cravel(b);
+
+         // sequentially search cell_B in firsts...
+         //
+         bool existing_item = false;
+         loop(f, firsts.size())
+             {
+               const Cell & cell_F = *firsts[f];
+               if (cell_B.is_pointer_cell())   // nested B
+                  {
+                    if (cell_F.is_pointer_cell())
+                       {
+                         Value_P vB = cell_B.get_pointer_value();
+                         Value_P vF = cell_F.get_pointer_value();
+                         const Token equiv = Bif_F12_EQUIV::fun.eval_AB(vB, vF);
+                         if (equiv.get_apl_val()->get_cfirst()
+                                  .get_int_value() == 0)   continue;
+                       }
+                    else
+                       {
+                         continue;
+                       }
+                  }
+               else   // simple B
+                  {
+                    if (cell_F.is_pointer_cell())     continue;
+                    if (!cell_B.equal(cell_F, qct))   continue;
+                  }
+
+               existing_item = true;
+               break;   // loop(f, ...
+             }
+
+         if (existing_item)
+            {
+              Z->next_ravel_0();
+            }
+         else
+            {
+              Z->next_ravel_1();
+              firsts.push_back(&cell_B);   // and remember it
+            }
+       }
+
+   Z->set_default(*B.get(), LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
+Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
@@ -1147,29 +1219,26 @@ Bif_F12_WITHOUT::large_eval_AB(const Value & A, const Value & B)
 const ShapeItem len_A = A.element_count();
 const ShapeItem len_B = B.element_count();
 
-   /* pack pointers to the cells of the arguments A and B and of the
-      result Z into one big array:
+vector<const Cell *> cells_A;
+vector<const Cell *> cells_Z;
+vector<const Cell *> cells_B;
+   try {
+         cells_A.reserve(len_A);
+         cells_B.reserve(len_B);
+         cells_Z.reserve(len_A);
 
-        len_A    len_Z      len_B
-     ┌─────────┬─────────┬─────────┐
-     │ cells_A │ cells_Z │ cells_B │
-     └─────────┴─────────┴─────────┘
-    */
-const Cell ** cells_A = new const Cell *[2*len_A + len_B];
-const Cell ** cells_Z = cells_A + len_A;
-const Cell ** cells_B = cells_A + 2*len_A;
+       }   catch (...) { WS_FULL; }
 
-   loop(a, len_A)   cells_A[a] = &A.get_cravel(a);
-   loop(b, len_B)   cells_B[b] = &B.get_cravel(b);
+   loop(a, len_A)   cells_A.push_back(&A.get_cravel(a));
+   loop(b, len_B)   cells_B.push_back(&B.get_cravel(b));
 
    // sort the A-cells and the B-cells ascendingly
    //
-   Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
-   Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+   Heapsort<const Cell *>::sort(cells_A, Cell::compare_stable, 0);
+   Heapsort<const Cell *>::sort(cells_B, Cell::compare_stable, 0);
 
    // store those cells_A pointers that are not in cells_B into cells_Z. Use
    // the fact that cells_A and cells_B are sorted.
-ShapeItem len_Z = 0;
    {
      ShapeItem idx_A = 0;
      ShapeItem idx_B = 0;
@@ -1181,23 +1250,21 @@ ShapeItem len_Z = 0;
              const Cell & ref_B = *cells_B[idx_B];
              if (ref_A.equal(ref_B, qct))     ++idx_A;   // A is in B → not in Z
              else if (ref_A.greater(ref_B))   ++idx_B;
-            else cells_Z[len_Z++] = cells_A[idx_A++];    // A is in Z
+            else cells_Z.push_back(cells_A[idx_A++]);    // A is in Z
            }
 
      // the rest of A is in Z
      //
-     while (idx_A < len_A)   cells_Z[len_Z++] = cells_A[idx_A++];
+     while (idx_A < len_A)   cells_Z.push_back(cells_A[idx_A++]);
    }
 
    // sort cells_Z by position so that the original order in A is reconstructed
    //
-   Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+   Heapsort<const Cell *>::sort(cells_Z, Cell::compare_ptr, 0);
 
-Value_P Z(len_Z, LOC);
+Value_P Z(cells_Z.size(), LOC);
 
-   loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
-
-   delete[] cells_A;   // incl. cells_Z and cells_B
+   loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
    Z->check_value(LOC);
    return Z;

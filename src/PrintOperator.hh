@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,31 +48,29 @@ class  UCS_string;
 class  UTF8_string;
 class  Value;
 
-ostream & operator << (ostream &, const AP_num3 &);
-ostream & operator << (ostream &, const Format_sub &);
-ostream & operator << (ostream &, const Function &);
-ostream & operator << (ostream &, const Function_PC2 &);
-ostream & operator << (ostream &, const Cell &);
-ostream & operator << (ostream &, const DynamicObject &);
-ostream & operator << (ostream &,       Id id);
-ostream & operator << (ostream &, const IndexExpr &);
-ostream & operator << (ostream &, const LineLabel &);
-ostream & operator << (ostream &, const PrintBuffer &);
-ostream & operator << (ostream &, const Shape &);
-ostream & operator << (ostream &, const Symbol &);
-ostream & operator << (ostream &, const Token &);
-ostream & operator << (ostream &, const Token_string &);
-ostream & operator << (ostream &,       TokenTag);
-ostream & operator << (ostream &,       TokenClass);
-ostream & operator << (ostream &, const UCS_string &);
-ostream & operator << (ostream &,       Unicode);
-ostream & operator << (ostream &, const UTF8_string &);
-ostream & operator << (ostream &, const Value &);
-
-inline ostream & operator << (ostream & out,       ValueFlags flags)
-   { return print_flags(out, flags); }
-
-inline ostream & operator << (ostream & out, const labVal & lv)
-   { return out << "Line-" << lv.line << ":"; }
+// the implementations of the operators below are spread over the
+// various files in which their second argument is implemented.
+                                                            // Implementation:
+ostream & operator << (ostream &, const AP_num3 &);         // Value.cc
+ostream & operator << (ostream &, const Cell &);            // Cell.cc
+ostream & operator << (ostream &, const DynamicObject &);   // DynamicObject.cc
+ostream & operator << (ostream &, const Format_sub &);      // Bif_F12_FORMAT.cc
+ostream & operator << (ostream &, const Function &);        // Function.cc
+ostream & operator << (ostream &, const Function_PC2 &);    // Common.cc
+ostream & operator << (ostream &,       Id id);             // Id.cc
+ostream & operator << (ostream &, const IndexExpr &);       // IndexExpr.cc
+ostream & operator << (ostream &, const LineLabel &);       // Nabla.cc
+ostream & operator << (ostream &, const PrintBuffer &);     // PrintBuffer.cc
+ostream & operator << (ostream &, const Shape &);           // Shape.cc
+ostream & operator << (ostream &, const Symbol &);          // Symbol.cc
+ostream & operator << (ostream &, const Token &);           // Token.cc
+ostream & operator << (ostream &, const Token_string &);    // Token.cc
+ostream & operator << (ostream &,       TokenTag);          // Token.cc
+ostream & operator << (ostream &,       TokenClass);        // Token.cc
+ostream & operator << (ostream &, const UCS_string &);      //  UCS_string.cc
+ostream & operator << (ostream &,       Unicode);           // UCS_string.cc
+ostream & operator << (ostream &, const UTF8_string &);     // UTF8_string.cc
+ostream & operator << (ostream &, const UTF8 * );           // UTF8_string.cc
+ostream & operator << (ostream &, const Value &);           // Value.cc
 
 #endif // __PRINTOPERATOR_HH_DEFINED

@@ -99,34 +99,33 @@ PostgresArgListBuilder::~PostgresArgListBuilder()
 
 void PostgresArgListBuilder::clear_args( void )
 {
-    for( vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
-        delete *i;
-    }
+    for (vector<PostgresArg *>::iterator i = args.begin();
+         i != args.end() ;i++)   delete *i;
     args.clear();
 }
 
 void PostgresArgListBuilder::append_string( const string &arg, int pos )
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<string>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<string>(arg));
 }
 
 void PostgresArgListBuilder::append_long( long arg, int pos )
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<long>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<long>(arg));
 }
 
-void PostgresArgListBuilder::append_double( double arg, int pos )
+void PostgresArgListBuilder::append_double( double arg, int pos)
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<double>( arg ) );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresBindArg<double>(arg) );
 }
 
-void PostgresArgListBuilder::append_null( int pos )
+void PostgresArgListBuilder::append_null(int pos)
 {
-    Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresNullArg() );
+    Assert(size_t(pos) == args.size());
+    args.push_back( new PostgresNullArg());
 }
 
 static void
@@ -165,7 +164,7 @@ const double D = strtod(content, &endptr);
 }
 
 Value_P
-PostgresArgListBuilder::run_query( bool ignore_result )
+PostgresArgListBuilder::run_query()
 {
 const int n = args.size();
 const int array_len = n == 0 ? 1 : n;
@@ -177,81 +176,80 @@ vector<int>          formats(array_len, 0);
 
     loop(i, n)
         {
-          PostgresArg *arg = args[i];
+          PostgresArg * arg = args[i];
           arg->update(&types[0], &values[0], &lengths[0], &formats[0], i);
         }
 
-    PostgresResultWrapper result(PQexecParams(connection->get_db(),
-                                              sql.c_str(), n, NULL,
-                                              &values[0], &lengths[0],
-                                              &formats[0], 0));
+          PostgresResultWrapper result(PQexecParams(connection->get_db(),
+                                       sql.c_str(), n, NULL,
+                                       &values[0], &lengths[0],
+                                       &formats[0], 0));
 
-    ExecStatusType status = PQresultStatus( result.get_result() );
-    Value_P db_result_value;
+ExecStatusType status = PQresultStatus( result.get_result() );
+Value_P db_result_value;
 
     if (status == PGRES_COMMAND_OK)
        {
-         db_result_value = Str0( LOC );
+         db_result_value = Str0(LOC);
        }
     else if(status == PGRES_TUPLES_OK)
        {
-         int rows = PQntuples( result.get_result() );
-         if (rows == 0)
+         if (const int rows = PQntuples( result.get_result()))
             {
-              db_result_value = Idx0( LOC );
+              const int cols = PQnfields(result.get_result());
+              const Shape shape(rows, cols);
+              db_result_value = Value_P(shape, LOC);
+
+             loop(row,  rows)
+             loop(col,  cols)
+                 {
+                   if (PQgetisnull(result.get_result(), row, col))
+                      {
+                        db_result_value->next_ravel_Pointer(Idx0(LOC).get());
+                      }
+                   else
+                      {
+                        Oid col_type = PQftype(result.get_result(), col);
+                        char * value = PQgetvalue(result.get_result(),
+                                                  row, col);
+
+                        //  INT4OID        or INT8OID
+                        if (col_type == 23 || col_type == 20)
+                           {
+                             update_int_cell(*db_result_value, value);
+                           }
+                     else if (col_type == 1700)   // NUMERICOID
+                           {
+                             if (strchr(value, '.' ) == NULL)
+                                {
+                                  update_int_cell(*db_result_value, value);
+                                }
+                             else
+                                {
+                                  update_double_cell(*db_result_value, value);
+                                }
+                           }
+                        else
+                           {
+                             if (*value == 0)
+                                {
+                                  db_result_value->next_ravel_Pointer(
+                                              Str0(LOC).get());
+                                }
+                             else
+                                {
+                                  const UTF8_string utf(value);
+                                  Value_P ZZ(utf, LOC);
+                                  db_result_value->
+                                            next_ravel_Pointer(ZZ.get());
+                               }
+                           }
+                    }
+                 }
             }
          else
             {
-              int cols = PQnfields( result.get_result() );
-              Shape shape( rows, cols );
-              db_result_value = Value_P( shape, LOC );
-
-             loop(row,  rows)
-                 {
-                for (int col = 0 ; col < cols ; col++)
-                    {
-                      if (PQgetisnull(result.get_result(), row, col))
-                         {
-                           db_result_value->next_ravel_Pointer(Idx0(LOC).get());
-                         }
-                      else
-                         {
-                           Oid col_type = PQftype(result.get_result(), col);
-                           char * value = PQgetvalue(result.get_result(),
-                                                     row, col);
-
-                           //  INT4OID        or INT8OID
-                           if (col_type == 23 || col_type == 20)
-                              {
-                                update_int_cell(*db_result_value, value);
-                              }
-                        else if (col_type == 1700)   // NUMERICOID
-                              {
-                                if (strchr(value, '.' ) == NULL)
-                                   {
-                                     update_int_cell(*db_result_value, value);
-                                   }
-                                else
-                                   {
-                                     update_double_cell(*db_result_value, value);
-                                   }
-                              }
-                           else
-                              {
-                                if (*value == 0)
-                                   {
-                                     db_result_value->next_ravel_Pointer(
-                                                 Str0(LOC).get());
-                                   }
-                                else
-                                   {
-                                     db_result_value->next_ravel_Pointer(
-                                          make_string_cell(value, LOC).get());
-                                  }
-                              }
-                         }
-                    }
-                 }
+              db_result_value = Idx0(LOC);
             }
        }
     else

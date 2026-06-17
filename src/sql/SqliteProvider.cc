@@ -30,16 +30,16 @@ SqliteProvider::~SqliteProvider()
 }
 //-----------------------------------------------------------------------------
 static SqliteConnection *
-create_sqlite_connection(Value_P B)
+create_sqlite_connection(const Value & B)
 {
-    if (!B->is_char_string())
+    if (!B.is_char_string())
        {
          MORE_ERROR() << "SQLite database connect argument "
                          "must be a simple string (filename)";
          DOMAIN_ERROR;
        }
 
-const UTF8_string filename(B->get_UCS_ravel());
+const UTF8_string filename(B.get_UCS_ravel());
 
 sqlite3 * db;
     if (sqlite3_open(filename.c_str(), &db) == SQLITE_OK)
@@ -58,7 +58,7 @@ sqlite3 * db;
 }
 //-----------------------------------------------------------------------------
 Connection *
-SqliteProvider::open_database(Value_P B)
+SqliteProvider::open_database(const Value & B)
 {
 Connection * conn = create_sqlite_connection(B);
     return conn;

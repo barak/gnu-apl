@@ -25,7 +25,8 @@
 #include "PostgresConnection.hh"
 #include "PostgresArgListBuilder.hh"
 
-class PostgresAllocMemoryWrapper {
+class PostgresAllocMemoryWrapper
+{
 public:
     PostgresAllocMemoryWrapper( char *ptr_in ) : ptr( ptr_in ) {}
     ~PostgresAllocMemoryWrapper() { PQfreemem( ptr ); }
@@ -35,27 +36,32 @@ private:
     char *ptr;
 };
 
-PostgresConnection::PostgresConnection( PGconn *db_in )
-    : db( db_in )
+//---------------------------------------------------------------------------
+PostgresConnection::PostgresConnection(PGconn * db_in)
+    : db(db_in)
 {
 }
 
 PostgresConnection::~PostgresConnection()
 {
-    PQfinish( db );
+    PQfinish(db);
 }
-
-ArgListBuilder *PostgresConnection::make_prepared_query( const string &sql )
+//---------------------------------------------------------------------------
+ArgListBuilder *
+PostgresConnection::make_prepared_query(const string & sql)
 {
     return new PostgresArgListBuilder( this, sql );
 }
 
-ArgListBuilder *PostgresConnection::make_prepared_update( const string &sql )
+ArgListBuilder *
+PostgresConnection::make_prepared_update( const string &sql )
 {
     return new PostgresArgListBuilder( this, sql );    
 }
 
-void PostgresConnection::transaction_begin( void )
+//---------------------------------------------------------------------------
+void
+PostgresConnection::transaction_begin( void )
 {
     PostgresResultWrapper result( PQexec( db, "begin" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
@@ -66,8 +72,9 @@ void PostgresConnection::transaction_begin( void )
         DOMAIN_ERROR;
     }
 }
-
-void PostgresConnection::transaction_commit( void )
+//---------------------------------------------------------------------------
+void
+PostgresConnection::transaction_commit( void )
 {
     PostgresResultWrapper result( PQexec( db, "commit" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
@@ -77,8 +84,9 @@ void PostgresConnection::transaction_commit( void )
         DOMAIN_ERROR;
     }
 }
-
-void PostgresConnection::transaction_rollback( void )
+//---------------------------------------------------------------------------
+void
+PostgresConnection::transaction_rollback( void )
 {
     PostgresResultWrapper result( PQexec( db, "rollback" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
@@ -88,8 +96,9 @@ void PostgresConnection::transaction_rollback( void )
         DOMAIN_ERROR;
     }
 }
-
-void PostgresConnection::fill_tables( vector<string> &tables )
+//---------------------------------------------------------------------------
+void
+PostgresConnection::fill_tables( vector<string> &tables )
 {
     PostgresResultWrapper result( PQexec( db, "select tablename from pg_tables where schemaname = 'public'" ) );
     ExecStatusType status = PQresultStatus( result.get_result() );
@@ -105,7 +114,7 @@ void PostgresConnection::fill_tables( vector<string> &tables )
         tables.push_back( PQgetvalue( result.get_result(), row, 0 ) );
     }
 }
-
+//---------------------------------------------------------------------------
 void
 PostgresConnection::fill_cols(const string &table,
                               vector<ColumnDescriptor> &cols)
@@ -138,10 +147,3 @@ int rows = PQntuples( result.get_result() );
         }
 }
 //-----------------------------------------------------------------------------
-const string
-PostgresConnection::make_positional_param(int pos)
-{
-    stringstream out;
-    out << "$" << (pos + 1);
-    return out.str();
-}

@@ -49,8 +49,8 @@ Next: <a href="#Vague-details-of-the-GNU-APL-implementation" accesskey="n" rel="
 </div>
 <span id="libAPL"></span><h1 class="top">libAPL</h1>
 
-<p>libapl is a C library, kindly contributed to the GNU APL project by
-<b>Dr. Dirk Laurie</b>, that gives C programs access to GNU APL.
+<p><b>libapl</b> is a C library that was kindly contributed to the GNU APL project by
+<b>Dr. Dirk Laurie</b>. <b>libapl</b> gives C programs access to GNU APL.
 </p>
 <p>Almost everything that a user can do interactively with GNU APL can also be
 done programmatically with libapl. You can )LOAD and )SAVE workspaces,
@@ -60,8 +60,8 @@ directly with values originating from in your C code.
 <p>The main facilities provided by libapl are listed in the following.
 </p>
 <p>Some functions come in two flavours: one whose argument is a (0-terminated and
-UTF8-encoded) C-strings (that is, a const char *) and one whose argument is a
-const unsigned int * to a 0-terminated array of Unicodes.
+UTF8-encoded) C-string (that is, a <b>const char *</b>), and one whose argument
+is a <b>const unsigned int *</b> to a 0-terminated array of Unicodes.
 </p>
 <dl compact="compact">
 <dt><span><code>apl_exec(const char * line_utf8)</code></span></dt>
@@ -250,20 +250,54 @@ Next: <a href="#Programming-notes" accesskey="n" rel="next">Programming notes</a
 
 
 <ul class="section-toc">
-<li><a href="#Constructor-functions" accesskey="1">Constructor functions</a></li>
-<li><a href="#Read-access-to-Values" accesskey="2">Read access to Values</a></li>
-<li><a href="#Write-access-to-cells" accesskey="3">Write access to cells</a></li>
-<li><a href="#Interface-to-APL-interpreter" accesskey="4">Interface to APL interpreter</a></li>
-<li><a href="#Destructor-function" accesskey="5">Destructor function</a></li>
-<li><a href="#Print-support" accesskey="6">Print support</a></li>
+<li><a href="#Library-Initialization" accesskey="1">Library Initialization</a></li>
+<li><a href="#Constructor-functions" accesskey="2">Constructor functions</a></li>
+<li><a href="#Read-access-to-Values" accesskey="3">Read access to Values</a></li>
+<li><a href="#Write-access-to-cells" accesskey="4">Write access to cells</a></li>
+<li><a href="#Interface-to-APL-interpreter" accesskey="5">Interface to APL interpreter</a></li>
+<li><a href="#Destructor-function" accesskey="6">Destructor function</a></li>
+<li><a href="#Print-support" accesskey="7">Print support</a></li>
 </ul>
 <hr>
+<div class="section" id="Library-Initialization">
+<div class="header">
+<p>
+Next: <a href="#Constructor-functions" accesskey="n" rel="next">Constructor functions</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
+</div>
+<span id="Library-Initialization-1"></span><h3 class="section">2.1 Library Initialization</h3>
+<span id="g_t_0023library_002dinitialization"></span>
+<p>For the correct operation of <b>libapl</b> it is mandatory to first initialize it.
+This is accomplished by calling the libapl function
+<b>init_libapl(const char * prog, int su_log)</b> once, and before any other
+libapl function.
+</p>
+<p>The first argument <b>prog</b> is, by convention, the name of the binary program
+that uses libapl. This name is used in some of the printouts produced by libapl.
+</p>
+<p>The second argument <b>su_log</b> controls whether libapl shall emit startup
+logging messages (su_log ≠ 0) or not (su_log = 0).
+</p>
+<p>For example:
+</p><pre class="verbatim">#include &quot;apl/libapl.h&quot;
+
+int
+main(int argc, char * argv[])
+{
+   init_libapl(argv[0], /* no startup logging */ 0);
+   return apl_exec(&quot;⎕←2 3⍴⍳6&quot;);
+}
+</pre>
+<p>See also section <b>liba[l</b> in the document
+<b>HOWTOS/APL-Communication-Cookbook.html</b>
+</p>
+<hr>
+</div>
 <div class="section" id="Constructor-functions">
 <div class="header">
 <p>
-Next: <a href="#Read-access-to-Values" accesskey="n" rel="next">Read access to Values</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
+Next: <a href="#Read-access-to-Values" accesskey="n" rel="next">Read access to Values</a>, Previous: <a href="#Library-Initialization" accesskey="p" rel="prev">Library Initialization</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Constructor-functions-1"></span><h3 class="section">2.1 Constructor functions</h3>
+<span id="Constructor-functions-1"></span><h3 class="section">2.2 Constructor functions</h3>
 <span id="g_t_0023constructor_002dfunctions"></span><p>Each of these functions returns an APL value and has a name descriptive of its argument list.
 </p>
 <p><code>int_scalar(ival,loc)</code>, <code>double_scalar(xval,loc)</code>, <code>complex_scalar(xval,yval,loc)</code> and <code>char_scalar(cval,loc)</code> initialize to a given C value.
@@ -279,7 +313,7 @@ Next: <a href="#Read-access-to-Values" accesskey="n" rel="next">Read access to V
 <p>
 Next: <a href="#Write-access-to-cells" accesskey="n" rel="next">Write access to cells</a>, Previous: <a href="#Constructor-functions" accesskey="p" rel="prev">Constructor functions</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Read-access-to-Values-1"></span><h3 class="section">2.2 Read access to Values</h3>
+<span id="Read-access-to-Values-1"></span><h3 class="section">2.3 Read access to Values</h3>
 <span id="g_t_0023read_002daccess_002dto_002dvalues"></span><p><code>get_rank(val)</code>, <code>get_axis(val,k)</code> and <code>get_element_count(val)</code> give information about the shape,
 </p>
 <p><code>get_type(val,i)</code> returns the cell type of a ravel element. The predefined names can be used in e.g. a <code>switch</code> statement on the cell type.
@@ -297,7 +331,7 @@ Next: <a href="#Write-access-to-cells" accesskey="n" rel="next">Write access to 
 <p>
 Next: <a href="#Interface-to-APL-interpreter" accesskey="n" rel="next">Interface to APL interpreter</a>, Previous: <a href="#Read-access-to-Values" accesskey="p" rel="prev">Read access to Values</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Write-access-to-cells-1"></span><h3 class="section">2.3 Write access to cells</h3>
+<span id="Write-access-to-cells-1"></span><h3 class="section">2.4 Write access to cells</h3>
 <span id="g_t_0023write_002daccess_002dto_002dcells"></span><p>Cells can be accessed only via an APL value pointing to their containing Value.
 </p>
 <p><code>set_char(cval,val,i)</code>, <code>set_int(ival,val,i)</code>, <code>set_real(xval,val,i)</code>, <code>set_imag(yval,val,i)</code> and <code>set_value(pval,val,i)</code> replace the contents of cell <code>i</code> of <code>val</code>.
@@ -311,7 +345,7 @@ Next: <a href="#Interface-to-APL-interpreter" accesskey="n" rel="next">Interface
 <p>
 Next: <a href="#Destructor-function" accesskey="n" rel="next">Destructor function</a>, Previous: <a href="#Write-access-to-cells" accesskey="p" rel="prev">Write access to cells</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Interface-to-APL-interpreter-1"></span><h3 class="section">2.4 Interface to APL interpreter</h3>
+<span id="Interface-to-APL-interpreter-1"></span><h3 class="section">2.5 Interface to APL interpreter</h3>
 <span id="g_t_0023interface_002dto_002dapl_002dinterpreter"></span><p><code>set_var_value(name,val,loc)</code> and <code>get_var_value(name,val,loc)</code> save and retrieve values to the workspace under specified names.
 </p>
 <p>An external function pointer <code>res_callback</code> is called just before <code>apl_exec</code> exits. To exploit it, assign a suitable user-written function to it, e.g.
@@ -346,7 +380,7 @@ res_callback = NULL;      /* disables callback feature */
 <p>
 Next: <a href="#Print-support" accesskey="n" rel="next">Print support</a>, Previous: <a href="#Interface-to-APL-interpreter" accesskey="p" rel="prev">Interface to APL interpreter</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Destructor-function-1"></span><h3 class="section">2.5 Destructor function</h3>
+<span id="Destructor-function-1"></span><h3 class="section">2.6 Destructor function</h3>
 <span id="g_t_0023destructor_002dfunction"></span><p><code>release_value(val,loc)</code> decrements the reference count of <code>*val</code> as explained in <a href="#g_t_0023lifespan_002dof_002dvalues">Lifespan of Values</a>/
 </p>
 <hr>
@@ -356,7 +390,7 @@ Next: <a href="#Print-support" accesskey="n" rel="next">Print support</a>, Previ
 <p>
 Previous: <a href="#Destructor-function" accesskey="p" rel="prev">Destructor function</a>, Up: <a href="#Summary-of-functions" accesskey="u" rel="up">Summary of functions</a> &nbsp; </p>
 </div>
-<span id="Print-support-1"></span><h3 class="section">2.6 Print support</h3>
+<span id="Print-support-1"></span><h3 class="section">2.7 Print support</h3>
 <span id="g_t_0023print_002dsupport"></span><p><code>print_value(value,file)</code>, <code>print_value_to_string(value)</code> filter an APL value through the APL formatting routines. Their behaviour depends on several system variables, such as <code>⎕FC</code>, <code>⎕PP</code>, <code>⎕PW</code>.
 </p>
 <p><code>UTF8_to_Unicode</code>, <code>Unicode_to_UTF8</code> are provided because <code>get_char</code> and <code>set_char</code> work with 32-bit Unicode, whereas many other user interfaces use UTF-8.

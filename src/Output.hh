@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include <ostream>
 
 #include "Assert.hh"
+#include "FileBuffers.hh"
 #include "UCS_string.hh"
 
 using namespace std;
@@ -40,23 +41,23 @@ using namespace std;
  The classes below are used to combine normal user I/O and automatic
  testcase execution. It works like this:
 
-       (cin)
+       (CIN)
          │
          │
          V
      ┌───────┐             ┌───────────────────┐
-     │ Input │ <────────   │ testcase files(s) │
+     │ Input │  <────────  │ testcase files(s) │
      └───┬───┘             └───────────────────┘
-         │                           |
-         │                           |
-         V                           |
-      ┌─────┐                        |
-      │ APL │                        |
-      └──┬──┘                        |
-         │                           |
-         │                           |
-         ├───────────────────────┐   |
-         │                       │   |
+         │                           │
+         │                           │
+         V                           │
+      ┌─────┐                        │
+      │ APL │                        │
+      └──┬──┘                        │
+         │                           │
+         │      -T testcase          │
+         ├───────────────────────┐   │
+         │                       │   │
          │                       V   V
          │                    ┌─────────┐
          │                    │ compare │
@@ -64,7 +65,7 @@ using namespace std;
          │                         │
          │                         │
          V                         V
-       (cout)                (test results)
+       (COUT)                (test results)
 
  */
 
@@ -198,6 +199,13 @@ public:
    /// true if xterm/color is on
    static bool color_enabled();
 
+   /// return the current column (chars since last LF).
+   static int get_column()
+       { return output_column; }
+
+   /// the current output column
+   static int output_column;
+
 protected:
    /// true if colors were changed (and then reset_colors() shall reset
    /// them when leaving the interpreter
@@ -209,14 +217,6 @@ protected:
    /// true if colors are currently enabled (by XTERM command)
    static bool colors_enabled;
 };
-
-/// a filebuf for stdin echo
-class CinOut : public filebuf
-{
-   /// overloaded filebuf::overflow
-   virtual int overflow(int c);
-};
-extern CinOut CIN_filebuf;
 
 /// an ostream for stdin echo and a few editing capabilities
 class CIN_ostream : public ostream

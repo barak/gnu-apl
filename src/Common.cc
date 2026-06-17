@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,9 @@
 #include "Output.hh"
 #include "Parallel.hh"
 #include "ProcessorID.hh"
+#include "Quad_FIO.hh"
 #include "Quad_GTK.hh"
+#include "Quad_SQL.hh"
 #include "Quad_WA.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -47,46 +49,17 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
+#include "Workspace.hh"
 
 bool got_WINCH = false;
 
 bool gtk_init_done = false;
 
-//----------------------------------------------------------------------------
-static bool attention_raised = false;
-static uint64_t attention_count = 0;
+InterruptContext InterruptContext::interrupt_context;
 
-extern void set_attention_raised(const char * loc)
-{
-   attention_raised = true;
-}
-extern void clear_attention_raised(const char * loc)
-{
-   attention_raised = false;
-}
-bool attention_is_raised()
-{
-   return attention_raised;
-}
-//----------------------------------------------------------------------------
-APL_time_us interrupt_when = 0;
-uint64_t interrupt_count = 0;
-static bool interrupt_raised = false;
-void set_interrupt_raised(const char * loc)
-{
-   interrupt_raised = true;
-}
-void clear_interrupt_raised(const char * loc)
-{
-   interrupt_raised = false;
-}
-bool interrupt_is_raised()
-{
-   return interrupt_raised;
-}
 //----------------------------------------------------------------------------
 void
-init_1(const char * argv0, bool log_startup)
+init_modules(const char * argv0, bool log_startup)
 {
    // init the workspace memory limits
    //
@@ -150,7 +123,7 @@ rlimit rl;
 //----------------------------------------------------------------------------
 /// initialize subsystems that depend on argv[]
 void
-init_2(bool log_startup)
+init_modules2(bool log_startup)
 {
 const int retry_max = UserPreferences::uprefs.emacs_mode ? 15 : 5;
 
@@ -172,7 +145,8 @@ cleanup(bool soft)
 {
    if (soft)   // proper clean-up
       {
-        ProcessorID::disconnect();
+        Svar_DB::disconnect();
+        // ProcessorID::disconnect();
 
         NativeFunction::cleanup();
 
@@ -184,33 +158,52 @@ cleanup(bool soft)
 
         Thread_context::cleanup();
 
-        ID::cleanup();
-
         Quad_GTK::close_all_windows();
+
+        Quad_FIO::clear();
+
+        Quad_SQL::close_all_connections();
       }
    else        // minimal clean-up
       {
+        // ProcessorID::disconnect();
+        Svar_DB::disconnect();
         LineInput::close(true);
         Output::reset_colors();
       }
+
+   LineInput::restore_termios();
 }
 //----------------------------------------------------------------------------
 void
-control_C(int)
+InterruptContext::control_C(int)
 {
 APL_time_us when = now();
 
    CIN << "^C";
 
-   attention_raised = true;
-   ++attention_count;
-   if ((when - interrupt_when) < 1000000)   // second ^C within 1 second
+   if (StateIndicator * si = Workspace::SI_top())
       {
-        interrupt_raised = true;
-        ++interrupt_count;
+        const Prefix & prefix = si->get_prefix();
+        
+        interrupt_context.attention_range.low  = prefix.get_range_low();
+        interrupt_context.attention_range.high = prefix.get_range_high();
+      }
+   else
+      {
+        interrupt_context.attention_range.low  = Function_PC_invalid;
+        interrupt_context.attention_range.high = Function_PC_invalid;
+      }
+   interrupt_context.attention_raised = true;
+   ++interrupt_context.attention_count;
+   if ((when - interrupt_context.interrupt_when) < 1000000)   // second ^C within 1 second
+      {
+        interrupt_context.interrupt_raised = true;
+        interrupt_context.interrupt_range  = interrupt_context.attention_range;
+        ++interrupt_context.interrupt_count;
       }
 
-   interrupt_when = when;
+   interrupt_context.interrupt_when = when;
 }
 //----------------------------------------------------------------------------
 

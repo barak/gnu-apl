@@ -98,7 +98,8 @@ const CDR_header & header = cdr.header();
         return;
       }
 
-const string cmd((const char *)cdr.get_items() + 20, header.get_nelm());
+const string cmd(reinterpret_cast<const char *> (cdr.get_items()) + 20,
+                 header.get_nelm());
 
    if (verbose)   get_CERR() << pref << " got command[" << cmd.size() << "] '"
                              << cmd << "'" << endl;
@@ -160,7 +161,8 @@ assign_value(Coupled_var & var, const string & data)
       { error_loc = LOC;   return E_LENGTH_ERROR; }
 
    delete var.data;
-   var.data = new CDR_string((const uint8_t *)data.c_str(), data.size());
+   var.data = new CDR_string(reinterpret_cast<const uint8_t *>(data.c_str()),
+                             data.size());
    handle_var(var);
    return E_NO_ERROR;
 }
@@ -170,7 +172,8 @@ get_value(Coupled_var & var, string & data)
 {
    if (var.data == 0)   return E_VALUE_ERROR;
 
-   data = string((const char *)(var.data->get_items()), var.data->size());
+   data = string(reinterpret_cast<const char *>(var.data->get_items()),
+                 var.data->size());
    error_loc = "no_error";   return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------

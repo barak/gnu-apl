@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,8 +60,6 @@
 # define cfg_MAX_RANK_WANTED 8
 #endif
 
-enum { MAX_RANK = cfg_MAX_RANK_WANTED };
-
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
 #ifdef erase
@@ -80,6 +78,9 @@ enum { MAX_RANK = cfg_MAX_RANK_WANTED };
 
 using namespace std;
 
+/// one byte (not character !) of a UTF8 encoded Unicode (RFC 3629) string
+typedef uint8_t UTF8;
+
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
@@ -97,36 +98,101 @@ extern int64_t get_main();
 /// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
 extern bool gtk_init_done;
 
-/// initialize
-extern void init_1(const char * argv0, bool log_startup);
-extern void init_2(bool log_startup);
+/// initialize those modules (⎕WA, rlimits, Avec, LibPaths, Value, and VH_entry)
+/// that depend on the command line arguments. Note that different
+/// build targets (main.cc, libapl.cc, and python_apl.cc) provide their own
+/// \b init_modules() function.
+extern void init_modules(const char * argv0, bool log_startup);
+
+/// initialize those modules (Output, Svar_DB, LineInput, and Parallel)
+/// that are independent of the command line arguments.
+extern void init_modules2(bool log_startup);
 
 /// clean up
 extern void cleanup(bool soft);
 
-/// true if Control-C was hit (once)
-extern bool attention_is_raised();
+class InterruptContext
+{
+public:
+  InterruptContext()
+  : attention_raised(false),
+    interrupt_raised(false),
+    interrupt_when(0),
+    attention_count(0),
+    interrupt_count(0)
+  {}
 
-/// set the attention_raised flag
-extern void set_attention_raised(const char * loc);
+  // ^C handler
+  static void control_C(int);
 
-/// clear the attention_raised flag
-extern void clear_attention_raised(const char * loc);
+  /// true if Control-C was hit (once)
+  static bool attention_is_raised()
+     {
+       return interrupt_context.attention_raised;
+     }
 
-/// true if Control-C was hit twice within 500 ms
-extern bool interrupt_is_raised();
+  /// true if Control-C was hit twice within 500 ms
+  static bool interrupt_is_raised()
+     {
+       return interrupt_context.interrupt_raised;
+     }
 
-/// set the interrupt_raised flag
-extern void set_interrupt_raised(const char * loc);
+  static void set_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = true;
+     }
 
-/// clear the interrupt_raised flag
-extern void clear_interrupt_raised(const char * loc);
+  static void clear_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = false;
+     }
 
-/// the number of Control-C signals received
-extern uint64_t interrupt_count;
+   static void set_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = true;
+      }
 
-/// time when ^C was hit last
-extern APL_time_us interrupt_when;
+   static void clear_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = false;
+      }
+
+   /// return the number of interrupts
+   static uint64_t get_interrupt_count()
+      { return interrupt_context.interrupt_count; }
+
+  /// return the range in the prefix parser when ^C was hit (once)
+  static const Function_PC2 & get_attention_range()
+     { return interrupt_context.attention_range; };
+
+  /// return the range in the prefix parser when ^C was hit (twice)
+  static const Function_PC2 & get_interrupt_range()
+     { return interrupt_context.interrupt_range; }
+
+protected:
+  /// true if ^C was hit (once)
+  bool attention_raised;
+
+  /// true if ^C was hit (twice)
+  bool interrupt_raised;
+
+  APL_time_us interrupt_when = 0;   // to detect double ^C
+
+  /// the number of attentions
+  uint64_t attention_count;
+
+  /// the number of interrupts
+  uint64_t interrupt_count;
+
+  /// The range in the prefix parser when ^C was hit (once)
+  Function_PC2 attention_range;
+
+  /// The range in the prefix parser when ^C was hit (twice)
+  Function_PC2 interrupt_range;
+
+  /// the context for Attention and Interrupt.
+  static InterruptContext interrupt_context;
+};
 
 /// signal handler for ^C
 extern void control_C(int);
@@ -369,13 +435,6 @@ struct YMDhmsu
    int micro;    ///< microseconds 0-999999
 };
 //----------------------------------------------------------------------------
-/// whether ⎕LX shall be executed at the end of the file
-enum LX_mode
-{
-   no_LX = 0,     ///< no
-   do_LX = 1      ///< yes
-};
-//----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)   { return common_new(size); }
@@ -386,15 +445,9 @@ using namespace std;
 
 //----------------------------------------------------------------------------
 
-/// return true iff \b uni is a padding character (used internally).
-inline bool is_iPAD_char(Unicode uni)
-{
-   return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
-       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
-}
-//----------------------------------------------------------------------------
-
-extern std::ostream & get_CERR();
+/// a function to be used if CERR might not (yet) be initialized. Returns cerr
+/// in that case.
+extern std::ostream & get_CERR();   // defined in: Output.cc 
 
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)
@@ -404,11 +457,17 @@ extern std::ostream & get_CERR();
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
                         << " '" << x << "' at " LOC << endl;
+#define Qn(n) get_CERR() << std::left << "══════════ " << #n << "=" << int(n) \
+                         << " ══════════" << "' at " LOC << endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
 /// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" \
                          << " '" << x << "' at " LOC << endl;
+
+/// replacement for variable length arrays
+#define ALLOCA(typ, count) \
+        reinterpret_cast<typ *>(alloca((count) * sizeof(typ)))
 
 //----------------------------------------------------------------------------
 
@@ -427,18 +486,12 @@ extern std::ostream & get_CERR();
 #endif
 
 //============================================================================
-/// Function_Line ++ (post increment)
-inline Function_Line operator ++(Function_Line & fl, int)
-{
-const Function_Line before_increment = fl;
-   fl = Function_Line(fl + 1);
-   return before_increment;
-}
-//============================================================================
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
+//---------------------------------------------------------------------------
+inline const char * yes_no(bool yes)   { return yes ? "yes" : "no"; }
 //============================================================================
 inline Function_PC
 operator +(Function_PC pc, int offset)
@@ -479,9 +532,23 @@ operator --(Function_PC & pc)
 //----------------------------------------------------------------------------
 /// frequently used cast to const char *
 inline const char *
+charP(const UTF8 * utf)
+{
+   return reinterpret_cast<const char *>(utf);
+}
+//----------------------------------------------------------------------------
+/// frequently used cast to const char *
+inline const char *
 charP(const void * vp)
 {
-  return reinterpret_cast<const char *>(vp);
+   return reinterpret_cast<const char *>(vp);
+}
+//----------------------------------------------------------------------------
+/// frequently used cast to a const void *
+inline const void *
+voidP(const void * addr)
+{
+   return addr;
 }
 //----------------------------------------------------------------------------
 
@@ -503,9 +570,6 @@ charP(const void * vp)
 #define HEX16s(x)          uhexs << std::right << \
                            setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
-
-/// cast to a const void *
-inline const void * voidP(const void * addr) { return addr; }
 
 /// set the last byte in buffer to 0 (so that string functions won't fail
 /// even if the  buffer was not 0-terminated for some reason.

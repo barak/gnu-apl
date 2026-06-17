@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,12 +66,12 @@ extern void do_Assert(const char * cond, const char * fun,
 
 // use 'if (x) {}' below to suppress 'uninitialized' compiler warnings
 
-#define Assert1(x) if (x) {}
-#define Assert(x)  if (x) {}
+#define Assert1(x) if (x) {}   // no-op
+#define Assert(x)  if (x) {}   // no-op
 
 #elif cfg_ASSERT_LEVEL_WANTED == 1
 
-#define Assert1(x) if (x) {}
+#define Assert1(x) if (x) {}   // no-op
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #elif cfg_ASSERT_LEVEL_WANTED == 2

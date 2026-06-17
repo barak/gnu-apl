@@ -9,7 +9,8 @@ ASCIIDOC = \
     GNU-APL-Troubleshooting.asciidoc    \
     GNU-APL-Designers-Guide.asciidoc    \
     GNU-APL-Performance.asciidoc        \
-    LApack-primer.asciidoc
+    LApack-primer.asciidoc              \
+    GNU-APL-Windows-11.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
@@ -19,7 +20,8 @@ HTML = \
     GNU-APL-Troubleshooting.html    \
     GNU-APL-Designers-Guide.html    \
     GNU-APL-Performance.html        \
-    LApack-primer.html
+    LApack-primer.html\
+    GNU-APL-Windows-11.html
 
 # Makefile.am produces all .pdf and .html files, but not all of them
 # shall be distributed...

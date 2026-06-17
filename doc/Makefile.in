@@ -91,15 +91,18 @@ host_triplet = @host@
 subdir = doc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/m4/check_GSL.m4 $(top_srcdir)/m4/check_GTK.m4 \
+	$(top_srcdir)/m4/apl_TARGETs.m4 $(top_srcdir)/m4/build_date.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -264,6 +267,7 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
+ALT_MAP_WANTED = @ALT_MAP_WANTED@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 APSERVER_PATH = @APSERVER_PATH@
@@ -380,6 +384,8 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+apl_BUILD_DATE = @apl_BUILD_DATE@
+apl_BUILD_OS = @apl_BUILD_OS@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -432,15 +438,21 @@ SUBDIRS = DALY
 #
 info_TEXINFOS = 
 man1_MANS = apl.1
+
+# NOTE that the .html version of aspl.text refers
+# to some of the files in dist_doc_DATA.
+#
 dist_doc_DATA = \
-	apl.1			\
-	apl.texi		\
-	apl.info		\
-	apl.html		\
-	libapl.texi		\
-	libapl.info		\
-	PLOT_circle.png		\
-	PLOT_zigzag.png		\
+	apl.1					\
+	apl.texi				\
+	apl.info				\
+	apl-info.css			\
+	apl.html				\
+	libapl.texi				\
+	libapl.info				\
+	PLOT_circle.png			\
+	PLOT_zigzag.png			\
+    MX_distributions.png	\
 	libapl.html
 
 all: all-recursive
@@ -981,13 +993,13 @@ uninstall-info-am:
 
 # apl.texi in HTML format
 #
-apl.html:   apl.texi
-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
+apl.html:   apl.texi apl-info.css
+	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
 
 # apl.texi in info format
 #
 apl.info:   apl.texi
-	$(MAKEINFO) $< -o $@ --no-split || touch $@
+	@$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 # libapl.texi in HTML format
 #

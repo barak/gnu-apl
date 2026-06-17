@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -276,7 +276,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   std::basic_string<ShapeItem> all_solutions;
+   std::vector<ShapeItem> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all
@@ -462,8 +462,8 @@ ShapeItem pcnt = 0;
        }
    out << endl;
 
-char rows_used[rows];
-   memset(rows_used, 0, sizeof(rows_used));
+char * rows_used = ALLOCA(char, rows);
+   memset(rows_used, 0, rows);
 
    for (const DLX_Node * x = right; x != this; x = x->right)
    for (const DLX_Node * y = x->down; y != x; y = y->down)
@@ -471,12 +471,12 @@ char rows_used[rows];
          rows_used[y->row] = 1;     // mark row used
        }
 
-   for (ShapeItem r = 0; r < rows; ++r)
+   loop (r, rows)
        {
          if (!rows_used[r])   continue;
 
-         int row[cols];
-         memset(row, 0, sizeof(row));
+         int * row = ALLOCA(int, cols);
+         memset(row, 0, cols*sizeof(int));
          for (const DLX_Node * x = right; x != this; x = x->right)
          for (const DLX_Node * y = x->down; y != x; y = y->down)
              {
@@ -527,18 +527,18 @@ new_level:
 
    deep_check();
 
-   if (LOG_Quad_DLX || attention_is_raised())
+   if (LOG_Quad_DLX || InterruptContext::attention_is_raised())
       {
         CERR << "⎕DLX[" << level << "]";
         loop(s, level)
             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
         CERR << endl;
-        clear_attention_raised(LOC);
+        InterruptContext::clear_attention_raised(LOC);
       }
 
-   if (interrupt_is_raised())
+   if (InterruptContext::interrupt_is_raised())
       {
-        clear_interrupt_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         return;
       }
 

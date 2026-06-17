@@ -86,7 +86,7 @@ configure_options="$0 $configure_args"
 m4_include([m4/apl_sugar.m4])
 
 AC_PREREQ([2.71])
-AC_INIT([GNU APL],[1.9],[bug-apl@gnu.org])
+AC_INIT([GNU APL],[2.0],[bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 
@@ -253,7 +253,7 @@ AC_CHECK_FUNCS([                                             \
                ],, apl_missing_functions=$(($apl_missing_functions + 1)))
 
 # keep libraries in inverse-alphabetic order so ./configure prints them
-# in inverse-alphabetic order
+# in alphabetic order
 #
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
@@ -271,7 +271,7 @@ AC_STRUCT_ST_BLOCKS
 apl_TOPIC([checks for optional (not strictly required) libraries])
 
 m4_include([m4/check_X11.m4])
-   apl_NYES($apl_X11) && AS_ECHO(["   └──── may affect: ⎕PLOT"])
+   apl_NYES($apl_XCB) && AS_ECHO(["   └──── may affect: ⎕PLOT"])
 
 m4_include([m4/check_FFT.m4])
    apl_NYES($apl_FFT) && AS_ECHO(["   └──── will affect: ⎕FFT"])
@@ -293,13 +293,16 @@ apl_YES($apl_POSTGRES) && apl_POSTGRES=yes
 m4_include([m4/check_PCRE.m4])
    apl_NYES($apl_PCRE) && AS_ECHO(["   └──── will affect: ⎕RE"])
 
+m4_include([m4/check_GSL.m4])
+   apl_NYES($apl_GSL) && AS_ECHO(["   └──── will affect: ⎕MX"])
+
 m4_include([m4/check_GTK.m4])
    apl_NYES($apl_GTK3) && AS_ECHO(["   └──── may affect: ⎕PLOT, will affect ⎕PNG"])
 
-# summarize apl_GTK3 and apl_X11 as apl_GUI
+# summarize apl_GTK3 and apl_XCB as apl_GUI
 apl_GUI=no
 apl_YES($apl_GTK3) && apl_GUI=yes
-apl_YES($apl_X11)  && apl_GUI=yes
+apl_YES($apl_XCB)  && apl_GUI=yes
 
 # backtrace() seem to have been moved from libexecinfo to GLIBC_2.2.5,
 # so we do not test fore it anymore.
@@ -359,6 +362,38 @@ AM_CONDITIONAL(HAVE_SEM_INIT, apl_YES($HAVE_SEM_INIT))
 CXXFLAGS=$apl_save_CXXFLAGS
 AC_MSG_RESULT([$HAVE_SEM_INIT])
 
+
+######################## pthread_getaffinity_np() check #######################
+# see if TIOCGWINSZ is available
+#
+AC_MSG_CHECKING([whether ioctl(fd, TIOCGWINSZ, ...) is available])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([ [#include <sys/ioctl.h>] ],
+                     [ [winsize win;] [ioctl(/*fd */ 0, TIOCGWINSZ, &win);] ])
+    ],
+    [HAVE_IOCTL_TIOCGWINSZ=yes
+     AC_DEFINE(HAVE_IOCTL_TIOCGWINSZ, 1,
+               [Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available])
+    ],
+    [HAVE_IOCTL_TIOCGWINSZ=no])
+AC_MSG_RESULT([$HAVE_IOCTL_TIOCGWINSZ])
+
+######################## pthread_setname_np() check #######################
+# see if pthread_setname_np is available
+#
+AC_MSG_CHECKING([whether pthread_setname_np is available])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([ [#include <pthread.h>]
+                     ],
+                     [ [pthread_t thread = 0;]
+                       [pthread_setname_np(thread, "thread_name");]
+                     ])],
+    [HAVE_PTHREAD_SETNAME_NP=yes
+     AC_DEFINE(HAVE_PTHREAD_SETNAME_NP, 1,
+               [Define to 1 iff pthread_setname_np() is available])
+    ],
+    [HAVE_PTHREAD_SETNAME_NP=no])
+AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
 
 ######################## pthread_getaffinity_np() check #######################
 # see if pthread_getaffinity_np() and pthread_setaffinity_np are available
@@ -530,6 +565,13 @@ AC_ARG_VAR(MAX_RANK_WANTED,
 if apl_EQ($MAX_RANK_WANTED,); then MAX_RANK_WANTED=8; fi   # set default to 8
 AC_DEFINE_UNQUOTED(cfg_MAX_RANK_WANTED, $MAX_RANK_WANTED,
           [max. rank of APL values])
+
+# APL: alt map desired ?
+AC_ARG_VAR(ALT_MAP_WANTED,
+   [ Alt-key map profile (see README-2-configure) default: 0 (none)) ])
+if apl_EQ($ALT_MAP_WANTED,); then ALT_MAP_WANTED=0; fi   # set default to 0
+AC_DEFINE_UNQUOTED(cfg_ALT_MAP_WANTED, $ALT_MAP_WANTED,
+          [Alt key map profile])
 
 
 # APL: Value::check_value() desired ?
@@ -722,17 +764,9 @@ else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
-# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build.
-# reproducible builds should not contain any non-predictable data.
-#
-if test -n "$SOURCE_DATE_EPOCH"
-then
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
-    apl_BUILD_OS=""
-else
-    apl_BUILD_DATE=`date -u "+%F %R:%S %Z"`
-    apl_BUILD_OS=`uname -s -r -m`
-fi
+AC_MSG_CHECKING([when and where this interpreter was built])
+m4_include([m4/build_date.m4])
+AC_MSG_RESULT([$apl_BUILD_DATE])
 
 # set 'abs_apl_top' to the "real" top-level directory. The "real" top-level
 # directory contains file configure.ac, while the VPATH copies of it do not.
@@ -911,7 +945,7 @@ else   # normal build
                       [top-level GNU APL source directory])
 fi
 
-# we want 0/1 instead of yes/no in config.h...
+# we want yes/no in the ./configure output, but 0/1 in config.h...
 #
 if (apl_YES($apl_FFT)); then
    AC_DEFINE_UNQUOTED(apl_FFT, 1, [FFT available ?])
@@ -923,6 +957,12 @@ if (apl_YES($apl_GUI)); then
    AC_DEFINE_UNQUOTED(apl_GUI, 1, [GUI (GTK or XCB) available ?])
 else
    AC_DEFINE_UNQUOTED(apl_GUI, 0)
+fi
+
+if (apl_YES($apl_GSL)); then
+   AC_DEFINE_UNQUOTED(apl_GSL, 1, [GSL available ?])
+else
+   AC_DEFINE_UNQUOTED(apl_GSL, 0)
 fi
 
 if (apl_YES($apl_PCRE)); then
@@ -967,26 +1007,88 @@ if apl_YES($WANT1_SQLITE3); then
    fi
 fi
 
+AC_MSG_CHECKING([if any of the optional libraries shall be used])
+AC_ARG_WITH( [optional_libs],
+             [AS_HELP_STRING([--with-optional_libs],
+                      [disable to prevent the use of optional libraries])],
+             [cfg_OPTIONAL_LIBS=$withval],
+             [cfg_OPTIONAL_LIBS=yes])
+AC_MSG_RESULT([$cfg_OPTIONAL_LIBS])
+
+# we haven't found an easy way to figure if AC_CHECK_LIB([c], ...) was
+# successful. We do that by cunsulting $LIBS.
+apl_LIBC=no
+for LIBs_Lib in $LIBS; do
+    if test "$LIBs_Lib" = "-lc"; then apl_LIBC=yes; fi
+done
+
+config_nolib() {
+    # set variables $2... in config.h to 0
+    #
+    tag=$1 ; shift
+    AS_ECHO(["       disabling $tag ($*)"])
+    for macro in  $*; do
+        sed -i "s/#define $macro 1/#define $macro 0/" config.h
+        eval "$macro=no"
+        shift
+    done
+}
+
+if apl_NO($cfg_OPTIONAL_LIBS); then
+    config_nolib FFT        apl_FFT
+    config_nolib GSL        apl_GSL
+    config_nolib GUI        apl_GUI
+    config_nolib LIBC       HAVE_LIBC
+    config_nolib PCRE       apl_PCRE HAVE_LIBPCRE2_32
+    config_nolib PNG        apl_PNG
+    config_nolib POSTGRES   apl_SQL  apl_POSTGRES HAVE_POSTGRESQL
+    config_nolib SQLITE     apl_SQL  apl_SQLITE3  HAVE_SQLITE3
+    config_nolib X11        apl_X11  HAVE_LIBX11 \
+                                     HAVE_X11_XLIB_H HAVE_X11_XUTIL_H
+    config_nolib XCB        apl_XCB  XCB HAVE_LIBXCB \
+                                     HAVE_X11_XLIB_XCB_H HAVE_XCB_XCB_H 
+    config_nolib GTK        apl_GTK3 GTK HAVE_LIBGTK_3 HAVE_LIBCAIRO
+    AS_ECHO(["    patching config.h done."])
+    apl_LIBC=no
+fi
+
 AS_ECHO(["
-$as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
+$as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
+
+    # A. command line arguments for ./configure
+    #
+    prefix:                      $prefix
 
     DEVELOP_WANTED:              $DEVELOP_WANTED
     ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
+    ALT_MAP_WANTED:              $ALT_MAP_WANTED
     DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED
     PERFORMANCE_COUNTERS_WANTED: $PERFORMANCE_COUNTERS_WANTED
     VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED
     VALUE_HISTORY_WANTED:        $VALUE_HISTORY_WANTED
 
+    # B. computed variables (most of them in m4/*.m4
+    #
+    apl_BUILD_DATE:              $apl_BUILD_DATE
+    apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
     apl_missing_headers:         $apl_missing_headers
     apl_missing_functions:       $apl_missing_functions
     apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
+    apl_GSL:                     $apl_GSL	(affects: ⎕MX, ⌹[])
     apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
     apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
     apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)
     apl_SQLITE3:                 $apl_SQLITE3	(may affect: ⎕SQL)
     apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
-    apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
+    apl_XCB                      $apl_XCB	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
     apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
+    apl_LIBC:                    $apl_LIBC	(affects: ⎕RVAL)
+
+    Special Build targets:
+        Android:                 $apl_TARGET_ANDROID
+        Erlang:                  $apl_TARGET_ERLANG
+        libapl:                  $apl_TARGET_LIBAPL
+        Python:                  $apl_TARGET_PYTHON
 "])

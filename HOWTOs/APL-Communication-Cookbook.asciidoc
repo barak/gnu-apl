@@ -130,15 +130,15 @@ some more detail.
 
 Normally GNU APL initializes itself and then enters a *REPL* loop until
 the )OFF command is given (interactive mode) or the input stream ends (script
-mode). *REPL* stands for *R*ead-*E*valuate-*P*rint-*L*oop and that describes
-the top-level operation of an APL interpreter in interactive mode.
+mode). *REPL* stands for **R**ead-**E**valuate-**P**rint-**L**oop and that
+describes the top-level operation of an APL interpreter in interactive mode.
 
-If GNU APL is *./configure'd* with option *--with-libapl*, then GNU APL does not
-build a normal executable that can be started from a script or from a shell,
-but it builds a library *libapl*. That library can then be linked with another
-program that either implements its own *REPL* loop (thus providing some
-interactive mode, but with a different user interface), or only calls GNU APL
-facilities from time to time.
+If GNU APL is *./configure'd* with option *--with-libapl*, then GNU APL does
+not build a normal executable that can be started from a script or from a
+shell, but instead it builds a library *libapl*. That library can then be
+linked with another program that either implements its own *REPL* loop
+(thus providing some interactive mode, but with a different user interface),
+or only calls GNU APL facilities from time to time.
 
 The following is an example C program that demonstrates the use of libapl:
 

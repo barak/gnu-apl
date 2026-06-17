@@ -1,0 +1,271 @@
+
+// vim: et:ts=4:sw=4
+
+= GNU APL on Windows 11
+:toc:
+:toclevels: 4
+
+== Abstract
+
+Ths document contains hints for installing GNU APL under Windows 11.
+
+== Introduction
+
+GNU APL has to be compiled from the GNU APL source code (in directory *src*).
+Many system functions of GNU APL depend on external libraries that may
+or may not be installed on the user's machine. The *./configure* script of
+GNU APL determins which of these libraries are present on the user's machine
+and compiles and links GNU APL accordingly. The multitude of avilable or not
+available libraries on a Windows machine makes it unfeasible to generate a
+single binary GNU APL version that accommodates all possible combinations of
+libraries.
+
+On the GNU/Linux operating system, compiling GNU APL is relatively easy. The
+requirements of GNU APL on its environment - the display of APL characters
+on the screen and the generation of APL characters by the keyboard - are
+already satisfied by almost all modern GNU/Linux distribution and the missing
+pieces can easily be added via the package manager of the linux distribution.
+
+Even for the latest Windows version - Windows 11 as of this writing -
+the situation is more complicated. When it comes to APL, Windows 11 still has
+limitations that make the installation of GNU APL on Windows more complicated
+than on GNU/Linux. On Windows 11 the user needs to fetch different components
+from different places on the internet. Under GNU/Linux the display of APL
+characters works out-of-the box and the generation of APL characters on the
+keyboard can be dome with typically a single configurastion file
+(shipped with GNU APL; see file *README-3-keyboard* and directory
+*support-files*). On Windows the user has to install a suitable APL font to
+display APL characters and a keyboard mapping for the keyboard. While
+installing an APL font is relatively easy, the installation of a keyboard
+mapping has become more and more difficult form one Windows version to the
+next. In older Windows versions one could "hack" the Windows registry to make
+Windows produce APL characters with the keyboard, but this does not work
+anymore under Windows 11. Microsoft provides alternatives like the Keyboard
+Manager in their PowerTools, or the Input Mode Editor (IME), but both seem
+not to work for terminal applications like GNU APL. To adress this issue, GNU
+APL comes with a built-in keyboard mapper that allows the user to toggle the
+keyboard between ASCII and APL.
+
+== Top-level Installation Procedure
+
+A full installation of GNU APL on Windows 11 requires essentially 3
+sub-installations:
+
+. Installation of a development environment (compiler, linker, make),
+. Installation of an APL font. This step is needed for the WSL environment,
+  but not for Cygwin.
+. Installation of a keyboard mapping. This step is needed for the WSL
+  environment, but not for Cygwin.
+
+These 3 sub-installations are independent of each other and the third is
+somewhat optional (and likely to fail).
+
+=== Installation of a development environment
+
+GNU APL is a standard C++ program. In theory there are 3 development
+environments that could be used to compile GNU APL:
+
+. A native Microsoft C\++ compiler (Visual Studio, Visual C++, etc.), or
+. the *Cygwin* Environment, or
+. the Microsoft *WSL* (aka. **W**indows **S**ubsystem for **L**inux)
+  Environment.
+
+The author has tested all these environments with the following results.
+
+. The Microsoft C\++ compiler failed completely. The compiler emitted thousands
+  of warnings and errors, most of them bogus. The sheer amount of warnings
+  made it impossible to get GNU APL compiled with a native C++ compiler under
+  Windows.
+
+. The *Cygwin* environment works well these days. There was a short period
+  when GNU APL had problems being compiled in Cygwin, but these problems seem
+  to no longer exists. Whether the problems were related to the Windows
+  version or to the Cygwin versio is not known.
+
+. The *WSL* environment also works quite well. Some things that work in
+  *Cygwin* out-of-the-box need to be fixed in *WSL*, in particular the APL
+  font and the keyboard mapping.
+
+So the user has to choose between *Cygwin* and *WSL*. In the arguable
+opinion of the author:
+
+. *WSL* seems to be a little more lightweight than *Cygwin*. If the user has
+  already installed one of them then she should go for it.
+
+. *Cygwin* is a little harder to install than *WSL*. Also, the addition of
+  packages is a little more cumbersome in *Cygwin* than in *WSL*.
+
+. *Cygwin* is fine-grained and lets you choose the version of each package
+  that you install. *WSL* coarse-grained and lets you only choose the
+  GNU/Linux distribution that it tries to emulate. After that it is up to
+  the package manager of the chosen distribution to handle package versions.
+
+. On the other hand seems *Cygwin* to be a little closer to GNU/Linux than
+  *WSL*. In particular the fonts shipped with *Cygwin* support APL
+  out-of-the-box while in *WSL* they need to be installed and enabled in the
+  terminal emulator in which GNU APL runs.
+
+. In older Windows and/or *Cygwin* versions the usual keyboard mapping
+  programs like *xmodmap* or *compxkb* also worked out-of-the-box. In the
+  current Windows 11/*Cygwin* they do not. For example, *xmodmap* reports
+  an error _xmodmap:  unable to open display_. *xmodmap* and *compxkb* also
+  fail in *WSL*. The reason might be the same (lack of an X server).
+
+. Interestingly, *WSL* lets you choose the GNU/Linux version that it emulates.
+  But then the same GNU/Linux version that works fine on a true GNU/Linux
+  version fails under *WSL*. IOW *WSL* seems to be somewhat half-hearted
+
+==== Cygwin Installation
+
+. Visit https://cygwin.org/ and follow the steps under _Installing Cygwin_.
+  Make sure that you enable the placement of icons on your desktop so that
+  you do not need to search for them later on.
+
+. Then open the *Cygwin* setup program and install the following packages:
+.. *subversion* (for fetching the GNU APL sources)
+.. *make* (for building GNU APL).
+.. *g++* (the C++ compiler for compiling and linking GNU APL)
+
+==== WSL Installation
+
+. Open the Windows Command Prompt (i.e. *cmd.exe*) and enter *wsl --install*.
+  That should install the *WSL*.
+. Enter *bash*. That should enter the *WSL* environment.
+. Install the tools needed for fetching and compiling GNU APL:
+.. *apt install subversion*   # for fetching the GNU APL source code
+.. *apt install make*         # for building GNU APL
+.. *apt install g++*          # for compiling and linking GNU APL
+. Close the Windows Command Prompt: *exit*.
+
+After having installed *WSL*, GNU APL can be compiled as usual:
+
+. Open the Windows Command Prompt (*cmd.exe*) and enter *bash*.
+  That should enter the *WSL*.
+.. *svn co http://svn.savannah.gnu.org/svn/apl/trunk apl-2.0* # fetch GNU APL
+.. *cd apl-2.0*
+.. *./configure ALT_MAP_WANTED=1*
+.. *make*
+.. *make install*
+
+=== Installation of an APL font
+
+This step is only needed for *WSL* and not for *Cygwin*.
+
+The installation of an APL font is the simplest step. The APL vendor Dyalog
+offers suitable APL fonts for download.
+
+. Visit https://www.dyalog.com/apl-font-keyboard.htmC.
+. On that page click on the *APL385* font (which downloads a file
+  named *setup-fonts.msi*). This file is a microsoft installer.
+
+. In your *Downloads* directory, execute the *setuo-fonts.msi* file. This
+  installs a file named *Apl385.ttf*. This is a True-type font.
+. Right-click on that *Apl385.ttf* file and press *install*.
+
+Later on you will run GNU APL in a Windows shell such as *cmd.exe*. The
+installed font must be enabled in that shall to be operational.
+
+=== Installation of a keyboard mapping
+
+At this point you have a working GNU APL interpreter. What is missing is
+a way to interactively enter APL characters. What should already work at
+this point is:
+
+. Copying APL characters (\^C and \^V). If you start GNU APL and enter
+  the command  *]KEYB* then you should get the display of a keyboard
+  layout that you could copy from (with \^C) and then paste into the
+  GNU APL window (with ^V).
+. Running APL scripts or workspaces. The *)LOAD*, *)COPY*, and *OFF*
+  commands need no APL characters and can therefore be entered even if no
+  APL keyboard mapping is installed.
+. Last but not least there is the built-in ASCII-to-APL mapping of GNU APL
+  which is decribed in more detail gurther down.
+ 
+There are a number of different options that you can choose from. Many
+of them work only on true GNU/Linux systems, though. GNU APL is shipped with
+a separate file *README-3-keyboard* that discusses some of the methods.
+The author has spent quite some time to find a method that works reliably
+under Windows 11, but to no avail.
+
+Keyboard mappings in Windows 11 are, simply speaking, a mess. The author
+has tried the following.
+
+. The *Keyboard Manager* (which is a component in the *PowerTools*) offered
+  by Microsoft free of charge. One can indeed map keys to APL characters
+  with the *Keyboard Manager*. However, the mapping works in some Micorsoft
+  applications, but not in others. When the *Keyboard Manager* is running
+  (and if tan APL font is installed and selected) then you can edit APL
+  scripts in Microsoft's *Notepad*, but if you open Microsoft's Windows
+  Command Prompt *cmd.exe* in another window then the mapping provided by
+  the *Keyboard Manager* does not apply in that window.
+
+. Microsoft provides a thing called *Input Method Editor* (*IME*) that should
+  provide arbitrary keyboard mappings. In dact there are hundreds of such
+  mappings provided by Microsoft, but none of them is suitable for APL.
+  The IMEs are not configurable in any way, so if you need Chinese characters
+  then you are fine because Microsoft provides a Chinese IME, but for APL
+  you are out of luck. Also there are several defailed instruction how to
+  add IMEs under Windows 11 on the internet, but all of them fail in the first
+  or second step because the Windows 11 of the author was different from the
+  Windows 11 in these instructions. The instructions referred to items
+  in the Windows 11 *Control Panel* that simply did not exist.
+
+. Dyalog (a prominent APL vendor) offers an IME for APL. However, the author
+  (who is using an original Dyalog keyboard with APL caps) was not able to
+  make it work under Windows 11. The IME installs without any error messages
+  on Windows 11. According to Dyalog's installation instructions, after
+  running the installer for that IME (and rebooting the machine) that IME
+  was supposed to show up in the Windows registry, but it did not. As a
+  consequence, no key was mapped to APL.
+
+. There are a number keyboard mappers offered on the internet, both commercial
+  and free ones. The author has not tried any of those because most looked
+  like mere convenience front-ends to Windows 11 components above that did
+  not work. If a GNU APL user should find a mapping that works with GNU APL
+  then please report that to the mailing list bug-apl@gnu.org!
+
+
+=== The GNU APL Built-in ASCII to APL Mapper
+
+As a consequence of all the failed attempts to find a working keyboard
+mapping outside of GNU ASPL (where it belongs) the author vaguely
+remembered how APL characters were entered in the 1970s. At that time
+keyboards had no *ALT* keys. Instead, some keyboards could be switched
+between an ASCII mode and an APL mode with the ASCII control characters
+*SI* and *SO* (aka, \^O and \^N). One of them (the author has forgotten
+which in the meantime) would select the ASCII mode (and all subsequently
+typed characters were ASCII characters) and the other would select the
+APL mode (not to be confused with the APL overstrike method of that time)
+which would operate in parallel when in APL mode). Technically speaking
+these mappings were made in the keyboard driver of the operating systenm
+and not in the keyboards themselves.
+
+The built-in ASCII to APL mapper of GNU APL has adopted this old mechanism
+as follows:
+
+. Typing \^A, i.e. holding down the CRTL key and typing A, will map the
+  next character typed to APL, and
+. Typing \^N will map all subsequent characters typed to APL (until
+  \^N is typed again.
+
+The built-in ASCII to APL mapper of GNU APL is disabled by default because
+all platforms other than Windows 11 have no problems generating APL
+characters.  To enable the mapper one has to *./configure* GNU APL with
+the option *ALT_MAP_WANTED=1* as it was done in the examples above.
+The parameter *1* of *ALT_MAP_WANTED=1* specifies a mapping profile
+to be used; the mapping profile to be used, where the profile defines
+the control codes (\^A and \^N for profile 1) and the details of the
+mapping (map *r* to *⍴*, i to *⍳*, ...). Currently two such profiles
+are defined:
+
+. *ALT_MAP_WANTED=0* (or omitting the *ALT_MAP_WANTED* option disables
+  the mapper.
+. *ALT_MAP_WANTED=1* maps an US-keyboard to the standard GNU APL keyboard
+   layout (which, by chance is also the layout of the Dyalog US keyboard).
+
+Unlike in Windows 11 (which is closed source and prevents the user from
+defining her own layout), GNU APL is free software that allows the user
+to modify it to suit her needs. To construct your own mapping, 
+have a look at file *src/src/LineInput.cc* and search for all occurences of
+*cfg_ALT_MAP_WANTED*.
+

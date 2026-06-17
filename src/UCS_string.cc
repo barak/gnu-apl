@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@
 #include "UTF8_string.hh"
 #include "Value.hh"
 
+/// uncomment to NOT replace iPAD chars with blanks
+//#define KEEP_iPAD_characters
+
 ShapeItem UCS_string::total_count = 0;
 ShapeItem UCS_string::total_id = 0;
 
@@ -46,130 +49,44 @@ UCS_string::UCS_string()
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : basic_string<Unicode>(1, uni)
 {
+  push_back(uni);
   create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : basic_string<Unicode>(data, len)
 {
+   reserve(2*len);
+   loop(l, len)   push_back(data[l]);
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : basic_string<Unicode>(len, uni)
 {
+   reserve(2*len);
+   loop(l, len)   push_back(uni);
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : basic_string<Unicode>(ucs)
+   : vector<Unicode>(ucs)
 {
+   create(LOC);
+}
+//----------------------------------------------------------------------------
+UCS_string::UCS_string(const UCS_string & ucs, size_t pos)
+{
+   reserve(ucs.size());
+   while (pos < ucs.size())    push_back(ucs[pos++]);
    create(LOC);
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : basic_string<Unicode>(ucs, pos, len)
 {
+   if (len > (ucs.size() - pos))   len = ucs.ssize() - pos;
+   reserve(2*len);
+   loop(l, len)   push_back(ucs[pos + l]);
    create(LOC);
-}
-//----------------------------------------------------------------------------
-UCS_string::UCS_string(const UTF8_string & utf)
-{
-   create(LOC);
-
-   Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
-
-size_t from = 0;
-
-   for (size_t i = 0; i < utf.size();)
-      {
-start_of_sequence:
-
-        const uint32_t b0 = utf[i++];
-        uint32_t bx = b0;
-        uint32_t more;
-        if      ((b0 & 0x80) == 0x00)   { more = 0;             }
-        else if ((b0 & 0xE0) == 0xC0)   { more = 1; bx &= 0x1F; }
-        else if ((b0 & 0xF0) == 0xE0)   { more = 2; bx &= 0x0F; }
-        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
-        else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
-        else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
-        else   // invalid UTF start byte
-           {
-             Log(LOG_char_conversion)
-                {
-                 utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                   << " at " << LOC <<  endl;
-                 BACKTRACE
-                }
-
-             // map this string to the "supplementary private use area B" so
-             // that its hex code becomes (sort of) visible
-             //
-             append(Unicode(utf[from] | 0x100000));
-             i = ++from;   // retry, starting at next char
-             goto start_of_sequence;
-           }
-
-        uint32_t uni = 0;
-        for (; more; --more)
-            {
-              if (i >= utf.size())
-                 {
-                   Log(LOG_char_conversion)
-                      {
-                        utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
-                                          << " len " << utf.size()
-                                          << " at " << LOC << endl;
-                        if (utf.size() >= 40)
-                           {
-                             const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
-                           }
-                      }
-
-                   append(Unicode(utf[from] | 0x100000));
-                   i = ++from;   // retry, starting at next char
-                   goto start_of_sequence;
-                 }
-
-              const UTF8 subc = utf[i++];
-              if ((subc & 0xC0) != 0x80)   // invalid UTF continuation byte
-                 {
-                   Log(LOG_char_conversion)
-                      {
-                        utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                          << " len " << utf.size()
-                                          << " at " << LOC <<  endl;
-                        if (utf.size() >= 40)
-                           {
-                             const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
-                           }
-                        BACKTRACE
-                      }
-
-                   append(Unicode(utf[from] | 0x100000));
-                   i = ++from;   // retry, starting at next char
-                   goto start_of_sequence;
-                 }
-
-              bx  <<= 6;
-              uni <<= 6;
-              uni |= subc & 0x3F;
-            }
-
-         append(Unicode(bx | uni));
-         from = i;
-      }
-
-   Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
@@ -192,13 +109,13 @@ int expo = 0;
            {
             if (isnormal(value) || isinf(value))   // rather large
                {
-                 if (negative)   append_UTF8("¯∞");
-                 else            append_UTF8("∞");
+                 if (negative)   *this << "¯∞";
+                 else            *this << "∞";
                  FloatCell::map_FC(*this);
                }
            else
                {
-                 append_UTF8("-nan-");
+                 *this << "-nan-";
                }
              return;
            }
@@ -211,7 +128,7 @@ int expo = 0;
       {
        if (value < 1e-305)   // very small number: make it 0
           {
-            append(UNI_0);
+            *this << UNI_0;
             return;
           }
 
@@ -232,16 +149,16 @@ UCS_string digits;
         if (value >= 10.0)
            {
              // 10.0 or more is a rounding error from 9,999...
-             digits.append(Unicode(10 + '0'));
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
+             digits << Unicode(10 + '0');
+             while (digits.ssize() < (quad_pp + 2))   digits << UNI_0;
              break;
            }
         else if (value < 0.0)
            {
              // less than 0.0 is a rounding error from 0.000...
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
+             while (digits.ssize() < (quad_pp + 2))   digits << UNI_0;
              break;
-             digits.append(UNI_0);
+             digits << UNI_0;
              value = 0.0;
            }
         else
@@ -249,7 +166,7 @@ UCS_string digits;
              const int dig = int(value);
              value -= dig;
              value *= 10.0;
-             digits.append(Unicode(dig + '0'));
+             digits << Unicode(dig + '0');
            }
       }
 
@@ -294,57 +211,52 @@ const Unicode last = digits.back();
    //
    if ((expo < -6) || (expo > quad_pp))   scaled = true;
 
-   if (negative)   append(UNI_OVERBAR);
+   if (negative)   *this << UNI_OVERBAR;
 
    if (scaled)
       {
-        append(digits[0]);       // integer part
+        *this << digits[0];       // integer part
         if (digits.size() > 1)   // fractional part
            {
-             append(UNI_FULLSTOP);
-             loop(d, (digits.size() - 1))   append(digits[d + 1]);
+             *this << UNI_FULLSTOP;
+             loop(d, (digits.size() - 1))   *this << digits[d + 1];
            }
         if (expo < 0)
            {
-             append(UNI_E);
-             append(UNI_OVERBAR);
-             append_number(-expo);
+             *this << UNI_E << UNI_OVERBAR << (-expo);
            }
         else if (expo > 0)
            {
-             append(UNI_E);
-             append_number(expo);
+             *this << UNI_E << expo;
            }
         else if (!(pctx.get_style() & PST_NO_EXPO_0)) // expo == 0
            {
-             append(UNI_E);
-             append(UNI_0);
+             *this << UNI_E << UNI_0;
            }
       }
    else
       {
         if (expo < 0)   // 0.000...
            {
-             append(UNI_0);
-             append(UNI_FULLSTOP);
-             loop(e, (-(expo + 1)))   append(UNI_0);
-             append(digits);
+             *this << UNI_0 << UNI_FULLSTOP;
+             loop(e, (-(expo + 1)))   *this << UNI_0;
+             *this << digits;
            }
         else   // expo >= 0
            {
              loop(e, expo + 1)
                 {
-                  if (e < digits.size())   append(digits[e]);
-                  else                     append(UNI_0);
+                  if (e < digits.ssize())   *this << digits[e];
+                  else                      *this << UNI_0;
                 }
 
-             if ((expo + 1) < digits.size())   // there are fractional digits
+             if ((expo + 1) < digits.ssize())   // there are fractional digits
                 {
-                  append(UNI_FULLSTOP);
-                  for (int e = expo + 1; e < digits.size(); ++e)
+                  *this << UNI_FULLSTOP;
+                  for (int e = expo + 1; e < digits.ssize(); ++e)
                      {
-                       if (e < digits.size())   append(digits[e]);
-                       else                     break;
+                       if (e < digits.ssize())   *this << digits[e];
+                       else                      break;
                      }
                 }
            }
@@ -365,7 +277,7 @@ const int total_width = pb.get_column_count();
    // All subsequent rows are aligned to the first row, therefore the first
    // row can be taken as a prototype for all rows.
 size_t chunk_len = 0;
-std::basic_string<int> chunk_lengths;
+vector<int> chunk_lengths;
    chunk_lengths.reserve(2*total_width/quad_PW);
    for (int col = 0; col < total_width; col += chunk_len)
        {
@@ -377,26 +289,28 @@ std::basic_string<int> chunk_lengths;
    //
    loop(row, pb.get_row_count())
        {
-         if (row)   append(UNI_LF);   // end previous row
+         if (row)   *this << UNI_LF;   // end previous row
          int brk_idx = 0;
 
          for (int col = 0; col < total_width; col += chunk_len)
                {
                  chunk_len = chunk_lengths[brk_idx++];
 
-                 if (col)   append_UTF8("\n      ");
+                 if (col)   *this << "\n      ";
                  UCS_string trow(pb.get_line(row), col, chunk_len);
                  trow.remove_trailing_padchars();
-                 append(trow);
+                 *this << trow;
                }
        }
 
    // replace pad chars with blanks.
    //
+#ifndef KEEP_iPAD_characters
    loop(u, size())
        {
          if (is_iPAD_char(at(u)))   at(u) = UNI_SPACE;
        }
+#endif // KEEP_iPAD_characters
 }
 //----------------------------------------------------------------------------
 /// constructor
@@ -409,7 +323,7 @@ UCS_string::UCS_string(const Value & value)
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_cravel(e).get_char_value());
+   loop(e, ec)   *this << value.get_cravel(e).get_char_value();
 }
 //----------------------------------------------------------------------------
 /// constructor
@@ -419,7 +333,25 @@ UCS_string::UCS_string(const Cell & cell)
 
    if (cell.is_character_cell())
       {
-        append(cell.get_char_value());
+        *this << cell.get_char_value();
+        return;
+      }
+
+   if (cell.is_integer_cell())
+      {
+        append_int(cell.get_int_value());
+        return;
+      }
+
+   if (cell.is_float_cell())
+      {
+        *this << cell.get_real_value();
+        return;
+      }
+
+   if (cell.is_complex_cell())
+      {
+        *this << cell.get_real_value() << UNI_J << cell.get_imag_value();
         return;
       }
 
@@ -436,7 +368,7 @@ const Value & value = *cell.get_pointer_value().get();
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_cravel(e).get_char_value());
+   loop(e, ec)   *this << value.get_cravel(e).get_char_value();
 }
 //----------------------------------------------------------------------------
 UCS_string::UCS_string(istream & in)
@@ -448,8 +380,94 @@ UCS_string::UCS_string(istream & in)
         const Unicode uni = UTF8_string::getc(in);
         if (uni == Invalid_Unicode)   return;
         if (uni == UNI_LF)      return;
-        append(uni);
+        *this << uni;
       }
+}
+//----------------------------------------------------------------------------
+void
+UCS_string::decode(const UTF8 * utf, int size)
+{
+
+   Log(LOG_char_conversion)
+      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
+
+int from = 0;
+
+   for (int i = 0; i < size;)
+      {
+start_of_sequence:
+
+        const uint32_t b0 = utf[i++];
+        uint32_t bx = b0;
+        uint32_t more;
+        if      ((b0 & 0x80) == 0x00)   { more = 0;             }
+        else if ((b0 & 0xE0) == 0xC0)   { more = 1; bx &= 0x1F; }
+        else if ((b0 & 0xF0) == 0xE0)   { more = 2; bx &= 0x0F; }
+        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
+        else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
+        else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
+        else   // invalid UTF start byte
+           {
+             Log(LOG_char_conversion)
+                {
+                 CERR << "Bad UTF8 string: ";
+                 UTF8_string::dump_hex(CERR, utf, size, 40);
+                 CERR << " at " << LOC <<  endl;
+                 BACKTRACE
+                }
+
+             // map this string to the "supplementary private use area B" so
+             // that its hex code becomes (sort of) visible
+             //
+             *this << Unicode(utf[from] | 0x100000);
+             i = ++from;   // retry, starting at next char
+             goto start_of_sequence;
+           }
+
+        uint32_t uni = 0;
+        for (; more; --more)
+            {
+              if (i >= size)
+                 {
+                   Log(LOG_char_conversion)
+                      {
+                        CERR << "Truncated UTF8 string: ";
+                        UTF8_string::dump_hex(CERR, utf, size, 40);
+                        CERR << " len " << size << " at " << LOC << endl;
+                      }
+
+                   *this << Unicode(utf[from] | 0x100000);
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
+                 }
+
+              const UTF8 subc = utf[i++];
+              if ((subc & 0xC0) != 0x80)   // invalid UTF continuation byte
+                 {
+                   Log(LOG_char_conversion)
+                      {
+                        CERR << "Bad UTF8 string: ";
+                        UTF8_string::dump_hex(CERR, utf, size, 40);
+                        CERR << " len " << size << " at " << LOC <<  endl;
+                        BACKTRACE
+                      }
+
+                   *this << Unicode(utf[from] | 0x100000);
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
+                 }
+
+              bx  <<= 6;
+              uni <<= 6;
+              uni |= subc & 0x3F;
+            }
+
+         *this << Unicode(bx | uni);
+         from = i;
+      }
+
+   Log(LOG_char_conversion)
+      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
 //----------------------------------------------------------------------------
 int
@@ -464,7 +482,7 @@ const int chunk_len = col ? quad_PW - 6 : quad_PW;
    //  then return the length of the rest.
    //
 int pos = col + chunk_len;
-   if (pos >= size())   return size() - col;
+   if (pos >= ssize())   return ssize() - col;
 
    // otherwise the rest does not fit into ⎕PW. Find a whitespace
    // at which the line should be broken.
@@ -472,7 +490,9 @@ int pos = col + chunk_len;
    while (--pos > col)
       {
          const Unicode uni = at(pos);
-         if (uni == UNI_SPACE || uni == UNI_iPAD_U2 || uni == UNI_iPAD_U3)
+         if (uni == UNI_SPACE         ||
+             uni == UNI_PAD_r_NOTCHAR ||
+             uni == UNI_PAD_l_NOTCHAR)
             {
                return pos - col + 1;
             }
@@ -493,7 +513,7 @@ UCS_string::remove_comment()
            {
              resize(j);
              remove_trailing_whitespaces();
-             break;
+             return;
            }
       }
 }
@@ -506,22 +526,22 @@ UCS_string::remove_trailing_padchars()
    // But only if the line has no frame (vert).
    //
 again:
-   if (size() > 2 && contains(UNI_iPAD_L0))
+   if (size() > 2 && contains(UNI_PAD_y_AXIS))
       {
         Unicode first = Unicode_0;
-        if (back() == UNI_iPAD_U9)        first = UNI_iPAD_U8;
-        else if (back() == UNI_iPAD_U5)   first = UNI_iPAD_U4;
+        if      (back() == UNI_PAD_r_DEPTH)   first = UNI_PAD_l_DEPTH;
+        else if (back() == UNI_PAD_r_VALUE)   first = UNI_PAD_l_VALUE;
 
-        if (first && at(size() - 2) == UNI_iPAD_L0)
+        if (first && at(size() - 2) == UNI_PAD_y_AXIS)
            {
-        // last column is a nested dimension separator row
-        //
-        ShapeItem len = size() - 2;
-        while (len && (at(len - 1) == UNI_iPAD_L0 ||
-                       at(len - 1) == UNI_iPAD_U0 ||
-                       at(len - 1) == UNI_iPAD_U2 ||
-                       at(len - 1) == UNI_iPAD_U6 ||
-                       at(len - 1) == UNI_iPAD_U7))   --len;
+             // last column is a nested dimension separator row
+             //
+             ShapeItem len = size() - 2;
+             while (len && (at(len - 1) == UNI_PAD_y_AXIS     ||
+                            at(len - 1) == UNI_iPAD_U0        ||
+                            at(len - 1) == UNI_PAD_r_NOTCHAR  ||
+                            at(len - 1) == UNI_PAD_b_ROW      ||
+                            at(len - 1) == UNI_PAD_r_MAX))   --len;
              if (len && at(len - 1) == first)
                 {
                   resize(len - 1);
@@ -530,23 +550,26 @@ again:
            }
       }
 
-   // If the line contains UNI_iPAD_L0 (higher dimension separator)
-   // then discard all chars (unless the line is framed)..
+   // discard all trailing pad chars (unless the line is framed)..
    //
    while (size())
       {
         const Unicode last = back();
-        if (last == UNI_iPAD_L0 ||   // ₀: higher dimension separator
-            last == UNI_iPAD_L1 ||   // ₁: pad line to PrintBuffer width
-            last == UNI_iPAD_L2 ||   // ₂: pad PrintBuffer width to line
-            last == UNI_iPAD_L3 ||   // ₃: pad integer part to the left
-            last == UNI_iPAD_L4 ||   // ₄: pad fractional part to the right
-            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
-            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
-            last == UNI_iPAD_U7)     // ⁷  pad final to the right
-            pop_back();
+        if (last == UNI_PAD_y_AXIS      // ₀: interdimensional separator
+         || last == UNI_PAD_r_oCol      // ₁: pad new line to old PrintBuffer
+         || last == UNI_PAD_r_nCol      // ₂: pad old PrintBuffer to new line
+         || last == UNI_PAD_l_INT       // ₃: pad integer part
+         || last == UNI_PAD_r_FRACT     // ₄: pad fractional part
+         || last == UNI_PAD_r_NOTCHAR   // ¹: column separator (after NOTCHAR)
+         || last == UNI_PAD_l_NOTCHAR   // ³: column separator (before NOTCHAR)
+         || last == UNI_PAD_r_MAX)      // ⁷  pad final to the right
+           {
+             pop_back();
+           }
         else
-            break;
+           {
+             break;
+           }
       }
 }
 //----------------------------------------------------------------------------
@@ -559,16 +582,23 @@ UCS_string::remove_trailing_whitespaces()
 void
 UCS_string::remove_leading_whitespaces()
 {
-int count = 0;
+ShapeItem count = 0;
    loop(s, size())
       {
         if (at(s) <= UNI_SPACE)   ++count;
-        else                            break;
+        else                      break;
       }
 
    if (count == 0)        return;      // no leading whitspaces
-   if (count == size())   clear();     // only whitespaces
-   else                   basic_string::erase(0, count);
+   if (count == ssize())   clear();     // only whitespaces
+   else                    vector<Unicode>::erase(begin(), begin() + count);
+}
+//----------------------------------------------------------------------------
+int
+UCS_string::skip_white(int pos) const
+{
+   while (pos < ssize() && Avec::is_white(at(pos)))   ++pos;
+   return pos;
 }
 //----------------------------------------------------------------------------
 void
@@ -581,8 +611,8 @@ UCS_string::split_ws(UCS_string & rest)
          if (Avec::is_white(at(clen)))   // first whilespace: end of command
             {
               ShapeItem arg = clen;
-              while (arg < size() && Avec::is_white(at(arg)))   ++arg;
-              while (arg < size())   rest.append(at(arg++));
+              while (arg < ssize() && Avec::is_white(at(arg)))   ++arg;
+              while (arg < ssize())   rest << at(arg++);
               resize(clen);
               return;
             }
@@ -592,9 +622,23 @@ UCS_string::split_ws(UCS_string & rest)
 size_t
 UCS_string::copy_black(UCS_string & dest, int idx) const
 {
-   while (idx < size() && at(idx) <= ' ')   ++idx;
-   while (idx < size() && at(idx) >  ' ')   dest.append(at(idx++));
-   while (idx < size() && at(idx) <= ' ')   ++idx;
+   // skip leading whitespace
+   //
+   while (idx < ssize() && at(idx) <= ' ')   ++idx;
+
+bool single_quoted = false;
+bool double_quoted = false;
+   while (idx < ssize() && (at(idx) >  ' ' || single_quoted || double_quoted))
+         {
+           const Unicode uni = at(idx++);
+           dest << uni;
+           if (uni == UNI_SINGLE_QUOTE)   single_quoted = !single_quoted;
+           if (uni == UNI_DOUBLE_QUOTE)   double_quoted = !double_quoted;
+         }
+
+   // skip trailing whitespace
+   //
+   while (idx < ssize() && at(idx) <= ' ')   ++idx;
    return idx;
 }
 //----------------------------------------------------------------------------
@@ -602,18 +646,18 @@ ShapeItem
 UCS_string::LF_count() const
 {
 ShapeItem count = 0;
-   loop(u, size())   if (at(u) == UNI_LF)   ++count;
+   loop(u, ssize())   if (at(u) == UNI_LF)   ++count;
    return count;
 }
 //----------------------------------------------------------------------------
 ShapeItem
 UCS_string::substr_pos(const UCS_string & sub) const
 {
-const ShapeItem start_positions = 1 + size() - sub.size();
+const ShapeItem start_positions = 1 + ssize() - sub.ssize();
    loop(start, start_positions)
       {
         bool mismatch = false;
-        loop(u, sub.size())
+        loop(u, sub.ssize())
            {
              if (at(start + u) != sub[u])
                 {
@@ -629,68 +673,160 @@ const ShapeItem start_positions = 1 + size() - sub.size();
 }
 //----------------------------------------------------------------------------
 ShapeItem
-UCS_string::multi_pos(bool expect_end) const
+UCS_string::multi_pos() const
 {
-const ShapeItem end = size() - 2;   // excluding, 3 valid chars
-   loop(pos, end)   //
+   /* This functions returns the start or the end of a multiline
+      string or literal.
+ 
+     There are two basic multiline styles:
+
+      Old-style strings: start with one quote (" or »), but have no matching
+                         end quote on the same line. This function returns -1
+                         in this case.
+
+      New-style strings: start with three identical quotes and have a matching
+                         triple quote on some other line.
+
+      This function only cares for New-style strings or literals.
+
+      The quote pairs considered are:
+          '...'   standard APL strings (but only to skip them), or
+          "..."   GNU strings, or
+          «...»   Double Arrow Quote Marks
+
+      but not standard APL strings (because ''' is a prefix of '''' (which
+      is a normal APL string consisting of a single '.
+    */
+ShapeItem pos;
+   for (pos = 0; pos < ssize(); ++pos)
        {
-         switch(at(pos))
+         const Unicode u0 = at(pos);
+         const bool triple = pos + 2 < ssize() &&
+                             at(pos + 1) == u0 &&
+                             at(pos + 2) == u0;
+         switch(u0)
             {
-            case UNI_DOUBLE_QUOTE:   // """ or "..."
-                 if (at(pos + 1) == UNI_DOUBLE_QUOTE &&
-                     at(pos + 2) == UNI_DOUBLE_QUOTE)   return pos;   // """
-                 for (++pos; pos < end && at(pos) != UNI_DOUBLE_QUOTE; ++pos)
-                     {
-                       if (at(pos) == UNI_BACKSLASH)   ++pos;   // \X
-                     }
-                 break;
+              default:   continue;
 
-            case UNI_SINGLE_QUOTE:   // '...'
-                 for (++pos; pos < end && at(pos) != UNI_SINGLE_QUOTE; ++pos) ;
-                 break;
+              case UNI_DOUBLE_QUOTE:   // """ or "..."
+                   if (triple)   return pos;
+                   pos = string_end_pos(pos, false);   // skip string
+                   if (pos == -1)   return -1;         // old style
+                   continue;
 
-            case UNI_NUMBER_SIGN:   // #
-            case UNI_COMMENT:       // ⍝
-                 return -1;
+              case UNI_SINGLE_QUOTE:   // """ or "..."
+                   pos = string_end_pos(pos, false);   // skip string
+                   if (pos == -1)   return -1;
+                   continue;
 
-            case UNI_LEFT_DAQ:   // ««« : expliciy start of multiline
-                 if (at(pos + 1) == UNI_LEFT_DAQ &&
-                     at(pos + 2) == UNI_LEFT_DAQ)
-                    {
-                      if (expect_end)
-                         CERR << "*** WARNING: see (second) ««« "
-                                 "when expecting the closing »»»" << endl;
-                      return pos;   // """
-                    }
+              case UNI_NUMBER_SIGN:   // #
+              case UNI_COMMENT:       // ⍝
+                   return -1;
 
-            case UNI_RIGHT_DAQ:   // »»» : expliciy end of multiline
-                 if (at(pos + 1) == UNI_RIGHT_DAQ &&
-                     at(pos + 2) == UNI_RIGHT_DAQ)
-                    {
-                      if (!expect_end)
-                         CERR << "*** WARNING: see (closing) »»» "
-                                 "without prior «««" << endl;
-                      return pos;   // """
-                    }
+              case UNI_LEFT_DAQ:   // ««« : start of multiline
+                   if (triple)   goto start_found;
+                   break;
 
-              default:   ;
+              case UNI_RIGHT_DAQ:   // »»» : end of multiline
+                   if (triple)   return pos;
+                   break;
+
+              case UNI_LESS:   // <<< : start of multiline
+                   if (triple)   goto start_found;
+                   break;
+
+              case UNI_GREATER:   // >>> : end of multiline
+                   if (triple)   return pos;
+                   break;
             }
-       }
+       }   // loop(pos, end)
 
    return -1;   // not found
+
+start_found:
+const ShapeItem end = skip_white(pos + 3);
+   if (end < ssize() && !Avec::is_comment(at(end)))
+      {
+        CERR << "*** WARNING: non-blank and non-comment '"
+             << UCS_string(*this, end) << "' after "
+             << at(pos) << at(pos) << at(pos) << " (ignored)" << endl;
+      }
+   return pos;
+}
+//----------------------------------------------------------------------------
+ShapeItem
+UCS_string::string_end_pos(ShapeItem pos, bool throw_error) const
+{
+   Assert1(size());   // since at(start_pos) exists
+
+const Unicode first = at(pos++);
+   if (first == UNI_SINGLE_QUOTE)   // standard APL string
+      {
+        // standard APL string
+        //
+        for (; pos < ssize(); ++pos)
+            {
+              if (at(pos) != UNI_SINGLE_QUOTE)   continue;
+              if (pos + 1 < ssize() && at(pos + 1) == UNI_SINGLE_QUOTE)
+                 {
+                   // this is '' iniside the APL string, which is an escaped '
+                   // (and not the end of the string).
+                   ++pos;
+                 }
+              else
+                 {
+                   // this is the true end of the APL string
+                   return pos;
+                 }
+            }
+      }
+   else if (first == UNI_DOUBLE_QUOTE)   // GNU APL string
+      {
+        // GNU APL string
+        //
+        for (; pos < ssize(); ++pos)
+            {
+              if (at(pos) == UNI_DOUBLE_QUOTE)   return pos;
+              if (at(pos) == UNI_BACKSLASH)      ++pos;
+              // otherwise at(pos) belongs to this string.
+            }
+      }
+   else if (first == UNI_LEFT_DAQ)   // Double Arrow Quote Mark
+      {
+        for (; pos < ssize(); ++pos)
+            {
+              if (at(pos) == UNI_RIGHT_DAQ)   return pos;
+              // otherwise at(pos) belongs to this string.
+            }
+      }
+   else
+      {
+        // start_pos is not the start of a string (and then calling
+        // string_end_pos(start_pos) is an error).
+        Q1(*this)
+        Q1(first)
+        FIXME;
+      }
+
+   // at this point, no end of string was found.
+   //
+   if (!throw_error)   return -1;
+   MORE_ERROR() << "No end of string found. The offending string was: "
+                << *this;
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 bool
 UCS_string::has_black() const
 {
-   loop(s, size())   if (!Avec::is_white(at(s)))   return true;
+   loop(s, ssize())   if (!Avec::is_white(at(s)))   return true;
    return false;
 }
 //----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const char * prefix) const
 {
-   loop(s, size())
+   loop(s, ssize())
       {
         const char pc = *prefix++;
         if (pc == 0)   return true;   // prefix matches this string.
@@ -699,26 +835,25 @@ UCS_string::starts_with(const char * prefix) const
         if (uni != Unicode(pc))   return false;
       }
 
-   // strings match, but prefix is longer
-   //
-   return false;
+   // match, unless prefix is longer than this string
+   return *prefix == 0;
 }
 //----------------------------------------------------------------------------
 bool 
 UCS_string::ends_with(const char * suffix) const
 {
 const ShapeItem s_len = strlen(suffix);
-   if (size() < s_len)   return false;
+   if (ssize() < s_len)   return false;
 
    suffix += s_len;    // goto end of suffix
-   loop(s, s_len)   if (at(size() - s - 1) != *--suffix)   return false;
+   loop(s, s_len)   if (at(ssize() - s - 1) != *--suffix)   return false;
    return true;
 }
 //----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const UCS_string & prefix) const
 {
-   if (prefix.size() > size())   return false;
+   if (prefix.ssize() > ssize())   return false;
 
    loop(p, prefix.size())   if (at(p) != prefix[p])   return false;
 
@@ -768,7 +903,7 @@ UCS_string ret;
       {
         Unicode uni = at(s);
         if (is_iPAD_char(uni))   uni = UNI_SPACE;
-        ret.append(uni);
+        ret << uni;
       }
 
    return ret;
@@ -790,29 +925,32 @@ UCS_string ret;
    loop(s, size())
       {
         Unicode uni = at(s);
-        if (!is_iPAD_char(uni))   ret.append(uni);
+        if (!is_iPAD_char(uni))   ret << uni;
       }
 
    return ret;
 }
 //----------------------------------------------------------------------------
-UCS_string
-UCS_string::reverse() const
+void
+UCS_string::reverse()
 {
-UCS_string ret;
-   for (int s = size(); s > 0;)   ret.append(at(--s));
-   return ret;
+   loop(s, size() / 2)
+      {
+        const Unicode tmp = at(s);
+        at(s) = at(size() - s - 1);
+        at(size() - s - 1) = tmp;
+      }
 }
 //----------------------------------------------------------------------------
 bool
 UCS_string::is_comment_or_label() const
 {
-   if (size() == 0)                          return false;
-   if (at(0) == UNI_NUMBER_SIGN)       return true;   // comment
-   if (at(0) == UNI_COMMENT)                 return true;   // comment
+   if (size() == 0)                  return false;
+   if (front() == UNI_NUMBER_SIGN)   return true;   // comment
+   if (front() == UNI_COMMENT)       return true;   // comment
    loop(t, size())
        {
-         if (at(t) == UNI_COLON)       return true;   // label
+         if (at(t) == UNI_COLON)             return true;   // label
          if (!Avec::is_symbol_char(at(t)))   return false;
        }
 
@@ -929,108 +1067,63 @@ bool in_quote2 = false;
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::append_UTF8(const UTF8 * str)
+UCS_string::append_single_quoted(const UCS_string & other)
 {
-const size_t len = strlen(charP(str));
-const UTF8_string utf(str, len);
-const UCS_string ucs(utf);
-
-   append(ucs);
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::append_quoted(const UCS_string & other)
-{
-   append(UNI_DOUBLE_QUOTE);
+   *this << UNI_DOUBLE_QUOTE;
    loop(s, other.size())
        {
           const Unicode uni = other[s];
-          if (uni == UNI_DOUBLE_QUOTE)   append(UNI_BACKSLASH);
-          append(uni);
+          if (uni == UNI_DOUBLE_QUOTE)   *this << UNI_BACKSLASH;
+          *this << uni;
        }
-   append(UNI_DOUBLE_QUOTE);
+   *this << UNI_DOUBLE_QUOTE;
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::append_number(ShapeItem num)
+UCS_string::append_int(ShapeItem num)
 {
 char cc[40];
-   SPRINTF(cc, "%lld", static_cast<long long>(num));
+   SPRINTF(cc, "%lld", long_long(num));
    loop(c, sizeof(cc))
       {
-        if (char digit = cc[c])   append(Unicode(digit));
+        if (const char digit = cc[c])
+           {
+             if (digit == '-')   push_back(UNI_OVERBAR);
+             else                push_back(Unicode(digit));
+           }
         else                      break;
       }
 }
 //----------------------------------------------------------------------------
-void
-UCS_string::append_double(double num)
+UCS_string &
+UCS_string::operator <<(double num)
 {
 char cc[40];
-   SPRINTF(cc, "%g", num);
+   if (Cell::is_near_int(num))   { SPRINTF(cc, "%.2g", num); }
+   else                          { SPRINTF(cc, "%.16g", num);   }
+
    loop(c, sizeof(cc))
       {
-        if (char digit = cc[c])   append(Unicode(digit));
-        else                      break;
-      }
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::append_hex(ShapeItem num, bool uppercase)
-{
-const char * format = uppercase ? "%llX" : "%llx";
-char cc[40];
-   SPRINTF(cc, format, static_cast<long long>(num));
-   loop(c, sizeof(cc))
-      {
-        if (char hex_digit = cc[c])   append(Unicode(hex_digit));
-        else         break;
-      }
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::append_shape(const Shape & shape)
-{
-   if (shape.get_rank() == 0)   // empty shape (scalar)
-      {
-        append(UNI_ZILDE);   //  ⍬
-        return;
+        if (const char digit = cc[c])
+           {
+             if (digit == 'e')        push_back(UNI_E);
+             else if (digit == '-')   push_back(UNI_OVERBAR);
+             else                     push_back(Unicode(digit));
+           }
+        else                            break;
       }
 
-   loop(r, shape.get_rank())
-       {
-         if (r)   append(UNI_SPACE);
-         ShapeItem s = shape.get_shape_item(r);
-         if (s < 0)
-            {
-              s = -s;
-              append(UNI_OVERBAR);
-            }
-         append_number(s);
-       }
+   return *this;
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::append_members(const basic_string<const UCS_string *> & members,
-                           int m)
+UCS_string::append_members(const vector<const UCS_string *> & members, int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {
-         if (mm < int(members.size() - 1))   *this += Unicode('.');
-         append(*members[mm]);
+         if (mm < int(members.size() - 1))   push_back(UNI_FULLSTOP);
+         *this << *members[mm];
        }
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::append_float(APL_Float num)
-{
-char cc[60];
-   SPRINTF(cc, "%lf", double(num));
-   loop(c, sizeof(cc))
-      {
-        if (cc[c])   append(Unicode(cc[c]));
-        else         break;
-      }
 }
 //----------------------------------------------------------------------------
 UCS_string
@@ -1047,13 +1140,13 @@ UCS_string ret;
              const Unicode uni = at(s);
              if (uni != UNI_BACKSLASH)   // normal char
                 {
-                  ret.append(uni);
+                  ret << uni;
                   continue;
                 }
 
-             if (s >= (size() - 1))   // \ at end of string
+             if (s >= ssize() - 1)   // \ at end of string
                 {
-                  ret.append(UNI_BACKSLASH);
+                  ret << UNI_BACKSLASH;
                   break;
                 }
 
@@ -1085,8 +1178,7 @@ UCS_string ret;
                 }
              else   // \n or \": keep them escaped
                 {
-                  ret.append(uni);
-                  ret.append(uni1);
+                  ret << uni << uni1;
                   continue;
                 }
 
@@ -1095,7 +1187,7 @@ UCS_string ret;
                int value = 0;
                loop(m, max_len)
                    {
-                     if (s >= (size() - 1))   break;
+                     if (s >= ssize() - 1)   break;
                      const int dig = at(s+1);
                      const char * pos = strchr(hex, dig);
                      if (pos == 0)   break;   // non-hex character
@@ -1103,7 +1195,7 @@ UCS_string ret;
                      value = value << 4 | (pos - hex);
                      ++s;
                    }
-               ret.append(Unicode(value));
+               ret << Unicode(value);
             }
       }
    else
@@ -1116,19 +1208,19 @@ UCS_string ret;
                 {
                   if (got_quote)
                      {
-                        ret.append(UNI_SINGLE_QUOTE);
+                        ret << UNI_SINGLE_QUOTE;
                         got_quote = false;
                      }
                   else
                      {
-                        ret.append(UNI_SINGLE_QUOTE);
+                        ret << UNI_SINGLE_QUOTE;
                         got_quote = true;
                      }
                 }
              else
                 {
-                  if (got_quote)   ret.append(UNI_SINGLE_QUOTE);   // mal-formed
-                  ret.append(uni);
+                  if (got_quote)   ret << UNI_SINGLE_QUOTE;   // mal-formed
+                  ret << uni;
                   got_quote = false;
                 }
            }
@@ -1167,7 +1259,7 @@ UCS_string ret;
              //
              if (uni >= UNI_SPACE && uni < UNI_DELETE)
                 {
-                  ret.append(uni);
+                  ret << uni;
                   continue;
                 }
 
@@ -1178,7 +1270,7 @@ UCS_string ret;
                 }
              else
                 {
-                  ret.append(uni);
+                  ret << uni;
                 }
            }
       }
@@ -1187,8 +1279,8 @@ UCS_string ret;
         loop(s, size())
            {
              const Unicode uni = at(s);
-             ret.append(uni);
-             if (uni == UNI_SINGLE_QUOTE)   ret.append(uni);   // another '
+             ret << uni;
+             if (uni == UNI_SINGLE_QUOTE)   ret << uni;   // ' → ''
            }
       }
 
@@ -1212,13 +1304,13 @@ size_t max_len = 0;
              const size_t len = result.back().size();
              if (max_len < len)   max_len = len;
 
-             if (s < size() - 1)   // more coming
+             if (s < ssize() - 1)   // more coming
                 result.push_back(UCS_string());
            }
         else
            {
              if (uni != UNI_CR)         // ignore \r.
-                result.back().append(uni);
+                result.back() << uni;
            }
       }
 
@@ -1258,7 +1350,7 @@ bool negative = false;
 }
 //----------------------------------------------------------------------------
 ostream &
-operator << (ostream & os, Unicode uni)
+operator <<(ostream & os, Unicode uni)
 {
    if (uni < 0x80)      return os << char(uni);
         
@@ -1289,15 +1381,33 @@ operator << (ostream & os, Unicode uni)
 }
 //----------------------------------------------------------------------------
 ostream &
-operator << (ostream & os, const UCS_string & ucs)
+operator <<(ostream & os, const UCS_string & ucs)
 {
+   /*
+      os.width() is the minimum output width that may have been set
+      before <<, for example:
+
+      out << setw(10) << "abcde"
+
+       os.fill() is the character to be used for filling the output as tp
+       reach the minimum output width.
+    */
 const int fill_len = os.width() - ucs.size();
 
-   if (fill_len > 0)
+   if (fill_len > 0)   // unlikely
       {
         os.width(0);
-        loop(u, ucs.size())   os << ucs[u];
-        loop(f, fill_len)     os << os.fill();
+        const char fill = os.fill();
+        if (os.flags() & ios::right)   // right fill
+           {
+             loop(f, fill_len)     os << fill;
+             loop(u, ucs.size())   os << ucs[u];
+           }
+        else                           // left fill
+           {
+             loop(u, ucs.size())   os << ucs[u];
+             loop(f, fill_len)     os << fill;
+           }
       }
    else
       {
@@ -1307,19 +1417,16 @@ const int fill_len = os.width() - ucs.size();
    return os;
 }
 //----------------------------------------------------------------------------
-bool
-UCS_string::lexical_before(const UCS_string other) const
+UCS_string &
+UCS_string::operator <<(const Shape & shape)
 {
-   loop(u, size())
-      {
-        if (u >= other.size())   return false;   // other is a prefix of this
-        if (at(u) < other.at(u))   return true;
-        if (at(u) > other.at(u))   return false;
-      }
+   loop(r, shape.get_rank())
+       {
+         if (r)   *this << UNI_SPACE;
+         *this << shape.get_shape_item(r);
+       }
 
-   // at this point the common part of this and other is equal, If other
-   // is longer then this is a prefix of other (and this comes before other)
-   return other.size() > size();
+   return *this;
 }
 //----------------------------------------------------------------------------
 ostream &
@@ -1359,7 +1466,7 @@ int * d = digits;
       }
 
 UCS_string ret;
-   while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
+   while (d > digits)   ret << Unicode(UNI_0 + *--d);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1384,9 +1491,9 @@ long double fract;
    val = initial_fract;
 
 UCS_string ret;
-   if (d == digits)   ret.append(UNI_0);   // 0.xxx
+   if (d == digits)   ret << UNI_0;   // 0.xxx
 
-   while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
+   while (d > digits)   ret << Unicode(UNI_0 + *--d);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1397,18 +1504,17 @@ UCS_string ret;
 
    if (v == 0.0)
       {
-        ret.append(UNI_0);
+        ret << UNI_0;
         if (fract_digits)   // unless integer only
            {
-             ret.append(UNI_FULLSTOP);
-             loop(f, fract_digits)   ret.append(UNI_0);
+             ret << UNI_FULLSTOP;
+             loop(f, fract_digits)   ret << UNI_0;
            }
-        ret.append(UNI_E);
-        ret.append(UNI_0);
+        ret << UNI_E << UNI_0;
         return ret;
       }
 
-   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = -v; }
+   if (v < 0.0)   { ret << UNI_OVERBAR;   v = -v; }
 
 int expo = 0;
    while (v >= 1.0E1)   // scale large v ≥ 10 down to [1:10)
@@ -1497,8 +1603,8 @@ UCS_string mantissa = from_double_to_fixed(v, fract_digits);
              mantissa.resize(1);
              if (fract_digits)
                 {
-                  mantissa += UNI_FULLSTOP;
-                  loop(z, fract_digits)   mantissa += UNI_0;
+                  mantissa.push_back(UNI_FULLSTOP);
+                  loop(z, fract_digits)   mantissa.push_back(UNI_0);
                 }
              ++expo;
            }
@@ -1511,11 +1617,7 @@ UCS_string mantissa = from_double_to_fixed(v, fract_digits);
            }
       }
 
-   ret.append(mantissa);
-   ret.append(UNI_E);
-   ret.append(from_int(expo));
-
-   return ret;
+   return ret << mantissa << UNI_E << from_int(expo);
 }
 //----------------------------------------------------------------------------
 UCS_string
@@ -1524,29 +1626,41 @@ UCS_string::from_double_to_fixed(APL_Float v, int fract_digits)
    // fract_digits shall be the number of digitsd AFTER the decimal point
 
 UCS_string ret;
-   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
+   if (v < 0.0)   { ret << UNI_OVERBAR;   v = - v; }
 
    Assert(v >= 0.0);
 
    // store the integer part of v in ret, leaving the fract part in v.
    //
-   ret.append(from_big(v));   // from_big() leaves fractional part of v in v
-   ret.append(UNI_FULLSTOP);
+   ret << from_big(v) << UNI_FULLSTOP;   // from_big() leaves fractional part of v in v
 
    // append one more fractional digit than needed (the last one will be
    // rounded
    loop(f, fract_digits + 1)
-      {
-        v = v * 10.0;
-        const int vv = v;
-        ret.append(Unicode(UNI_0 + vv));
-        v -= vv;
-      }
+       {
+         v = v * 10.0;
+         const int vv = v;
+         ret << Unicode(UNI_0 + vv);
+         v -= vv;
+       }
 
    // round to last digit may increase the length
 const int ret_len = ret.size();
    ret.round_last_digit();
-   while (ret.size() > ret_len)   ret.pop_back();
+   while (ret.ssize() > ret_len)   ret.pop_back();
+   return ret;
+}
+//----------------------------------------------------------------------------
+UCS_string
+UCS_string::power(size_t n)
+{
+const Unicode expos[] = { UNI_PAD_U0, UNI_PAD_U1, UNI_PAD_U2, UNI_PAD_U3,
+                          UNI_PAD_U4, UNI_PAD_U5, UNI_PAD_U6, UNI_PAD_U7,
+                          UNI_PAD_U8, UNI_PAD_U9 };
+
+UCS_string ret;
+   do { ret << expos[n % 10];   n /= 10; }   while (n);
+   ret.reverse();
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1590,7 +1704,7 @@ bool carry = true;   // from the rounded up digit
    if (size() && back() == UNI_FULLSTOP)   pop_back();
    if (carry)
       {
-        insert(at(0) == UNI_OVERBAR || at(0) == UNI_MINUS ? 1 : 0, UNI_1);
+        insert(front() == UNI_OVERBAR || front() == UNI_MINUS ? 1 : 0, UNI_1);
       }
 }
 //----------------------------------------------------------------------------
@@ -1601,11 +1715,29 @@ UCS_string::contains(Unicode uni) const
    return false;
 }
 //----------------------------------------------------------------------------
+bool
+UCS_string::is_in_range(const UCS_string & from, const UCS_string & to) const
+{
+   if (from.size())   // from provided
+      {
+         if (this->starts_with(from))          return true;
+         if (this->compare(from) == COMP_LT)   return false;
+      }
+
+   if (to.size())   // to provided
+      {
+         if (this->starts_with(to))          return true;
+         if (this->compare(to) == COMP_GT)   return false;
+      }
+
+   return true;
+}
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::sort() const
 {
 UCS_string ret(*this);
-   Heapsort<Unicode>::sort(&ret.front(), ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, greater_uni, 0);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1618,13 +1750,13 @@ UCS_string sorted = sort();
 UCS_string ret;
    ret.reserve(sorted.size());
 
-   ret.append(sorted[0]);
-   for (ShapeItem j = 1; j < size(); ++j)
+   ret << sorted[0];
+   for (ShapeItem j = 1; j < ssize(); ++j)
        {
-         if (sorted[j] != ret.back())   ret.append(sorted[j]);
+         if (sorted[j] != ret.back())   ret << sorted[j];
        }
 
-   Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(ret, greater_uni, 0);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1632,20 +1764,20 @@ UCS_string
 UCS_string::to_HTML(int offset, bool preserve_ws) const
 {
 UCS_string ret;
-   for (;offset < size(); ++offset)
+   for (;offset < ssize(); ++offset)
       {
         const Unicode uni = at(offset);
         switch(uni)
            {
-             case ' ':  if (preserve_ws)   ret.append_ASCII("&nbsp;");
-                        else               ret.append(uni);
+             case ' ':  if (preserve_ws)   ret << "&nbsp;";
+                        else               ret << uni;
                         break;
-             case '#':  ret.append_ASCII("&#35;");   break;
-             case '%':  ret.append_ASCII("&#37;");   break;
-             case '&':  ret.append_ASCII("&#38;");   break;
-             case '<':  ret.append_ASCII("&lt;");    break;
-             case '>':  ret.append_ASCII("&gt;");    break;
-             default:   ret.append(uni);
+             case '#':  ret << "&#35;";   break;
+             case '%':  ret << "&#37;";   break;
+             case '&':  ret << "&#38;";   break;
+             case '<':  ret << "&lt;";    break;
+             case '>':  ret << "&gt;";    break;
+             default:   ret << uni;
            }
       }
 
@@ -1676,8 +1808,8 @@ UCS_ASCII_string::UCS_ASCII_string(TokenTag tag)
 {
    switch(tag)
       {
-        case TOK_NONE:   append_ASCII("TOK_NONE");             return;
-#define TD(tag, _tc, _tv, _id) case tag: append_ASCII(#tag);   return;
+        case TOK_NONE:   *this << "TOK_NONE";             return;
+#define TD(tag, _tc, _tv, _id) case tag: *this << #tag;   return;
 #include "Token.def"
       }
 
@@ -1685,41 +1817,42 @@ UCS_ASCII_string::UCS_ASCII_string(TokenTag tag)
    //
 char cc[40];
    SPRINTF(cc, "TOK_%4.4X", tag);
-   append_ASCII(cc);
+   *this << cc;
 }
 //----------------------------------------------------------------------------
 UCS_ASCII_string::UCS_ASCII_string(TokenClass tc)
 {
    switch(tc)
       {
-        case TC_ASSIGN:   append_ASCII("TC_ASSIGN");     return;
-        case TC_R_ARROW:  append_ASCII("TC_R_ARROW");    return;
-        case TC_L_BRACK:  append_ASCII("TC_L_BRACK");    return;
-        case TC_R_BRACK:  append_ASCII("TC_R_BRACK");    return;
-        case TC_END:      append_ASCII("TC_END");        return;
-        case TC_FUN0:     append_ASCII("TC_FUN0");       return;
-        case TC_FUN12:    append_ASCII("TC_FUN12");      return;
-        case TC_INDEX:    append_ASCII("TC_INDEX");      return;
-        case TC_OPER1:    append_ASCII("TC_OPER1");      return;
-        case TC_OPER2:    append_ASCII("TC_OPER2");      return;
-        case TC_L_PARENT: append_ASCII("TC_L_PARENT");   return;
-        case TC_R_PARENT: append_ASCII("TC_R_PARENT");   return;
-        case TC_RETURN:   append_ASCII("TC_RETURN");     return;
-        case TC_SYMBOL:   append_ASCII("TC_SYMBOL");     return;
-        case TC_VALUE:    append_ASCII("TC_VALUE");      return;
-        case TC_PINDEX:   append_ASCII("TC_PINDEX");     return;
-        case TC_VOID:     append_ASCII("TC_VOID");       return;
-        case TC_OFF:      append_ASCII("TC_OFF");        return;
-        case TC_SI_LEAVE: append_ASCII("TC_SI_LEAVE");   return;
-        case TC_LINE:     append_ASCII("TC_LINE");       return;
-        case TC_DIAMOND:  append_ASCII("TC_DIAMOND");    return;
-        case TC_NUMERIC:  append_ASCII("TC_NUMERIC");    return;
-        case TC_SPACE:    append_ASCII("TC_SPACE");      return;
-        case TC_NEWLINE:  append_ASCII("TC_NEWLINE");    return;
-        case TC_COLON:    append_ASCII("TC_COLON");      return;
-        case TC_QUOTE:    append_ASCII("TC_QUOTE");      return;
-        case TC_L_CURLY:  append_ASCII("TC_L_CURLY");    return;
-        case TC_R_CURLY:  append_ASCII("TC_R_CURLY");    return;
+        case TC_ASSIGN:    *this << "TC_ASSIGN";     return;
+        case TC_R_ARROW:   *this << "TC_R_ARROW";    return;
+        case TC_L_BRACK:   *this << "TC_L_BRACK";    return;
+        case TC_R_BRACK:   *this << "TC_R_BRACK";    return;
+        case TC_END:       *this << "TC_END";        return;
+        case TC_FUN0:      *this << "TC_FUN0";       return;
+        case TC_FUN12:     *this << "TC_FUN12";      return;
+        case TC_INDEX:     *this << "TC_INDEX";      return;
+        case TC_OPER1:     *this << "TC_OPER1";      return;
+        case TC_OPER2:     *this << "TC_OPER2";      return;
+        case TC_L_PARENT:  *this << "TC_L_PARENT";   return;
+        case TC_R_PARENT:  *this << "TC_R_PARENT";   return;
+        case TC_RETURN:    *this << "TC_RETURN";     return;
+        case TC_SYMBOL:    *this << "TC_SYMBOL";     return;
+        case TC_VALUE:     *this << "TC_VALUE";      return;
+        case TC_PINDEX:    *this << "TC_PINDEX";     return;
+        case TC_VOID:      *this << "TC_VOID";       return;
+        case TC_OFF:       *this << "TC_OFF";        return;
+        case TC_SI_CHANGE: *this << "TC_SI_CHANGE"; return;
+        case TC_LINE:      *this << "TC_LINE";       return;
+        case TC_NUMERIC:   *this << "TC_NUMERIC";    return;
+        case TC_SPACE:     *this << "TC_SPACE";      return;
+        case TC_NEWLINE:   *this << "TC_NEWLINE";    return;
+        case TC_COLON:     *this << "TC_COLON";      return;
+        case TC_QUOTE:     *this << "TC_QUOTE";      return;
+        case TC_L_CURLY:   *this << "TC_L_CURLY";    return;
+        case TC_R_CURLY:   *this << "TC_R_CURLY";    return;
+        case TC_LIT_ITEM:  *this << "TC_LIT_ITEM";   return;
+        case TC_LIT_GRP:   *this << "TC_LIT_GRP";    return;
 
          default: ;
       }
@@ -1728,24 +1861,24 @@ UCS_ASCII_string::UCS_ASCII_string(TokenClass tc)
    //
 char cc[40];
    SPRINTF(cc, "TC_%4.4X", tc);
-   append_ASCII(cc);
+   *this << cc;
 }
 //----------------------------------------------------------------------------
 UCS_ASCII_string::UCS_ASCII_string(TokenValueType tvt)
 {
    switch(tvt)
       {
-        case TV_MASK:  append_ASCII("TV_MASK" );   return;
-        case TV_NONE:  append_ASCII("TV_NONE" );   return;
-        case TV_CHAR:  append_ASCII("TV_CHAR" );   return;
-        case TV_INT:   append_ASCII("TV_INT"  );   return;
-        case TV_FLT:   append_ASCII("TV_FLT"  );   return;
-        case TV_CPX:   append_ASCII("TV_CPX"  );   return;
-        case TV_SYM:   append_ASCII("TV_SYM"  );   return;
-        case TV_LIN:   append_ASCII("TV_LIN"  );   return;
-        case TV_VAL:   append_ASCII("TV_VAL"  );   return;
-        case TV_INDEX: append_ASCII("TV_INDEX");   return;
-        case TV_FUN:   append_ASCII("TV_FUN"  );   return;
+        case TV_MASK:  *this << "TV_MASK";    return;
+        case TV_NONE:  *this << "TV_NONE";    return;
+        case TV_CHAR:  *this << "TV_CHAR";    return;
+        case TV_INT:   *this << "TV_INT";     return;
+        case TV_FLT:   *this << "TV_FLT";     return;
+        case TV_CPX:   *this << "TV_CPX";     return;
+        case TV_SYM:   *this << "TV_SYM";     return;
+        case TV_LIN:   *this << "TV_LIN";     return;
+        case TV_VAL:   *this << "TV_VAL";     return;
+        case TV_INDEX: *this << "TV_INDEX";   return;
+        case TV_FUN:   *this << "TV_FUN";     return;
 
          default: ;
       }
@@ -1754,7 +1887,7 @@ UCS_ASCII_string::UCS_ASCII_string(TokenValueType tvt)
    //
 char cc[40];
    SPRINTF(cc, "TV_%4.4X", tvt);
-   append_ASCII(cc);
+   *this << cc;
 }
 //----------------------------------------------------------------------------
 

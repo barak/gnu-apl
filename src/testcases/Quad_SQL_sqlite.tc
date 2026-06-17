@@ -3,11 +3,11 @@
 
       ]NEXTFILE no-SQLITE3   ⍝ done if SQLITE3 is not available
 
-      ⍝ erase old database
-      ⍝
-      )HOST rm -f testcases/test_Quad_SQL.db
+      Filename ← "testcases/test_Quad_SQL.db"
 
-0 
+      ⍝ erase old database (if any)
+      ⍝
+      ⊣⎕FIO.unlink Filename
 
       create←,⊃"""
 CREATE TABLE COMPANY(
@@ -20,7 +20,7 @@ CREATE TABLE COMPANY(
 
       ⍝ connect to DB and list tables
       ⍝
-      DB←'sqlite' ⎕SQL[1] 'testcases/test_Quad_SQL.db'
+      DB←'sqlite' ⎕SQL[1] Filename
       ⊣create ⎕SQL[3, DB] ''
 
       ⎕SQL[8] DB
@@ -53,12 +53,23 @@ CREATE TABLE COMPANY(
  3 Teddy 23 
 
       update←'UPDATE COMPANY SET SALARY=? where ID=?'
-      update ⎕SQL[4, DB] 22000 3
+      update ⎕SQL[4, DB] 22000 3        ⍝ increase TTeddy's salary
 
-      select←'SELECT ID,NAME,SALARY FROM COMPANY'
+      select←'SELECT ID, NAME, SALARY FROM COMPANY'
       select ⎕SQL[4, DB] ''
  1 Paul  20000 
  2 Allen 15000 
+ 3 Teddy 22000 
+
+      ⍝ using function name syntax
+      ⍝
+      update ⎕SQL.update DB (17000 2)     ⍝ increase Allan's salary
+
+      select←'SELECT ID, NAME, SALARY FROM COMPANY'
+
+      select ⎕SQL.query DB ''
+ 1 Paul  20000 
+ 2 Allen 17000 
  3 Teddy 22000 
 
       ⎕SQL[2] DB   ⍝ close DB
@@ -66,9 +77,8 @@ CREATE TABLE COMPANY(
 
       ⍝ remove the database
       ⍝
-      )HOST rm -f testcases/test_Quad_SQL.db
-
-0 
+      ⎕FIO.unlink Filename
+0
 
       )ERASE DB create insert select
 

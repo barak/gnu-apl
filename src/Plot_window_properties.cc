@@ -26,12 +26,16 @@
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
+/// a shared buffer for SPRINTF of various error texts.
+static char tmp_error[80];
+
 //----------------------------------------------------------------------------
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
      plot_data(*data),
-# define gdef(_ty,  na,  val, _descr) na(val),
+# define gdef(_ty,  na,  val, _descr) \
+     na(val), na ## _provided(false),
 # include "Quad_PLOT.def"
      user_pw_pos(false),
      user_caption(false),
@@ -55,6 +59,19 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      rangeZ_type(NO_RANGE),
      show_legend(legend_lX != 0)
 {
+   // adjust some defaults that can be changed by UserPreferences. The default
+   // for these preferences is 0 (= not provided) and the preference will only
+   // be used if ≠0.
+   //
+   if (const int value = UserPreferences::uprefs.plot_ASCII_rows)
+      terminal_rows = value;
+   if (const int value = UserPreferences::uprefs.plot_ASCII_columns)
+      terminal_cols = value;
+   {
+     const int value = UserPreferences::uprefs.plot_ASCII_background;
+     if (value != -1)   canvas_color = value;
+   }
+
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl
            << setw(20) << "max_X: " << max_X << endl
@@ -284,9 +301,9 @@ const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
    /*
-       called with leading whitespaces in att_and_val removed.
+       called with leading whitespaces in 'att_and_val' removed.
 
-       att_and_val is a string specifying one of:
+       'att_and_val' is a string specifying one of:
 
        1. a window attribute, e.g.:   origin_X: 100                 , or
        2. a line attribute,   e.g.:   point_color-1:  #000000       , or
@@ -361,10 +378,22 @@ int line_number = -1;
         // figure the line number in the attribute name, for example in
         // line_color-2. No line number means all lines.
         //
-        const int line = strtoll(minus + 1, 0, 10) - Workspace::get_IO();
-        if (line < 0)             return "line number ≤ ⎕IO";
-        if (line >= line_count)   return 0;   // silently ignore
-        line_number = line;
+        const int line1 = strtoll(minus + 1, 0, 10);    // ⎕IO..⎕IO+line_count
+        const int line0 = line1 - Workspace::get_IO();   // 0..line_count - 1
+        if (line0 < 0)
+           {
+             SPRINTF(tmp_error, "invalid line number (=%d) < ⎕IO(=%d)",
+                     line1, line1 - line0);
+             return tmp_error;
+           }
+
+        if (line0 >= line_count)
+           {
+             SPRINTF(tmp_error, "invalid line number (=%d) > line count (=%d)",
+                     line1, line_count);
+             return tmp_error;
+           }
+        line_number = line0;
       }
 
 # define ldef(ty,  na,  val, _descr)                                       \
@@ -385,11 +414,13 @@ int line_number = -1;
          if (!strncmp(#na, att_and_val, colon - att_and_val))         \
             { const char * error = 0;                                 \
               set_ ## na(Plot_data::ty ## _from_str(value, error));   \
+              na ## _provided = true;                                 \
               return error;                                           \
             }
 # include "Quad_PLOT.def"
 
-   return "Bad or unknown window attribute.";
+   SPRINTF(tmp_error, "Unknown attribute A.%s", att_and_val);
+   return tmp_error;
 }
 //----------------------------------------------------------------------------
 bool
@@ -447,7 +478,6 @@ const char * attname_cp = attname_utf.c_str();
       {
         return "Bad attribute value type";
       }
-
 }
 //----------------------------------------------------------------------------
 double

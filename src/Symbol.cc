@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ ostream &
 Symbol::print_verbose(ostream & out) const
 {
    out << "Symbol ";
-   print(out) << " " << voidP(this) << endl;
+   print(out) << " at " << voidP(this) << endl;
 
    loop(v, value_stack.size())
        {
@@ -352,16 +352,13 @@ bool
 Symbol::assign_named_lambda(cFunction_P lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.back();
-const UserFunction * ufun = lambda->get_func_ufun();
-   Assert(ufun);
-const Executable * uexec = ufun;
-   Assert(uexec);
-
    switch(vs.get_NC())
       {
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
+               // a lambda with the same name already exists. Remove it.
+               //
                cFunction_P old_fun = vs.get_function();
                Assert(old_fun);
                if (!old_fun->is_lambda())   SYNTAX_ERROR;
@@ -385,10 +382,19 @@ const Executable * uexec = ufun;
              /* fall through */
 
         case NC_UNUSED_USER_NAME:
-             vs.set_function(lambda);
-             const_cast<UserFunction *>(ufun)->increment_refcount(LOC);
-             if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
-             return false;
+             {
+               const UserFunction * ufun = lambda->get_func_ufun();
+               Assert(ufun);
+               UTF8_string creator;
+               creator << ufun->get_name() << "←λ";
+               
+ 
+               vs.set_function(lambda);
+               const_cast<UserFunction *>(ufun)
+                         ->increment_refcount(LOC, creator.c_str());
+               if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
+               return false;
+             }
 
         default: SYNTAX_ERROR;
       }
@@ -719,7 +725,7 @@ const ValueStackItem & vs = value_stack.back();
              else
                 {
                   Token tok_fun = vs.get_function()->get_token();
-                  tok.move(tok_fun, LOC);
+                  tok.move_from(tok_fun, LOC);
                   return;
                 }
 
@@ -752,7 +758,7 @@ const ValueStackItem & vs = value_stack.back();
              {
                Value_P value = IntScalar(vs.get_label(), LOC);
                Token t(TOK_APL_VALUE1, value);
-               tok.move(t, LOC);
+               tok.move_from(t, LOC);
              }
              return;
 
@@ -760,7 +766,7 @@ const ValueStackItem & vs = value_stack.back();
              // if we resolve a variable. the value is considered grouped.
              {
                Token tok_val(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
-               tok.move(tok_val, LOC);
+               tok.move_from(tok_val, LOC);
              }
              return;
 
@@ -768,7 +774,7 @@ const ValueStackItem & vs = value_stack.back();
         case NC_OPERATOR:
              {
                Token tok_function(vs.get_function()->get_token());
-               tok.move(tok_function, LOC);
+               tok.move_from(tok_function, LOC);
              }
              return;
 
@@ -793,7 +799,7 @@ Symbol::resolve_lv(const char * loc)
 
    if (value_stack.back().get_NC() == NC_VARIABLE)
       {
-        value_stack.back().isolate(loc);
+        value_stack.back().isolate_deep(loc);
         Value_P Z = get_var_value();
         return Token(TOK_APL_VALUE1, Z->get_cellrefs(loc));
       }
@@ -1004,11 +1010,11 @@ UCS_string data;
       {
         case NC_VARIABLE:
              {
-               data.append(UNI_A);
+               data << UNI_A;
                Token tok = Quad_TF::tf2_var(get_name(),
                                             *value_stack[0].get_val_cptr());
                const UCS_string ucs(*tok.get_apl_val());
-               data.append(ucs);
+               data << ucs;
              }
              break;
 
@@ -1035,9 +1041,7 @@ UCS_string data;
 
                // write function record(s)
                //
-               data.append(UNI_F);
-               data.append(get_name());
-               data.append(UNI_SPACE);
+               data << UNI_F << (get_name()) << UNI_SPACE;
                Quad_TF::tf2_fun_ucs(data, get_name(), *fun);
              }
              break;
@@ -1045,7 +1049,7 @@ UCS_string data;
         default: return;
       }
 
-   for (ShapeItem u = 0; u < data.size() ;)
+   for (ShapeItem u = 0; u < data.ssize() ;)
       {
         const ShapeItem rest = data.size() - u;
         if (rest <= 71)   buffer[0] = 'X';   // last record
@@ -1053,14 +1057,12 @@ UCS_string data;
         loop(uu, 71)
            {
              unsigned char cc = ' ';
-             if (u < data.size()) cc = Avec::unicode_to_cp(data[u++]);
+             if (u < data.ssize()) cc = Avec::unicode_to_cp(data[u++]);
              buffer[1 + uu] = cc;
            }
 
-        snprintf(buffer + 72,
-                 sizeof(buffer) - 72,
-                 "%8.8lld\r\n",
-                 static_cast<long long>(seq++));
+        snprintf(buffer + 72, sizeof(buffer) - 72,
+                 "%8.8lld\r\n", long_long(seq++));
         NULL_TERMINATE(buffer)
         fwrite(buffer, 1, 82, out);
       }
@@ -1140,7 +1142,7 @@ int count = 0;
 }
 //----------------------------------------------------------------------------
 void
-Symbol::vector_assignment(std::basic_string<Symbol *> & symbols, Value_P values)
+Symbol::vector_assignment(std::vector<Symbol *> & symbols, Value_P values)
 {
    if (values->get_rank() > 1)   RANK_ERROR;
    if (!values->is_scalar() &&
@@ -1188,8 +1190,6 @@ const ValueStackItem & vs = value_stack[0];
 
         if (value->is_member())
            out << "⍝ end of structured variable " << get_name() << endl;
-
-        out << endl;
       }
    else if (vs.get_NC() & NC_FUN_OPER)
       {
@@ -1215,22 +1215,22 @@ const ValueStackItem & vs = value_stack[0];
              out << get_name();
              out << "←{";
              int t = 0;
-             while (t < text.size())   // skip λ header
+             while (t < text.ssize())   // skip λ header
                 {
                   const Unicode uni = text[t++];
                   if (uni == UNI_LF)   break;
                 }
 
              // skip λ← and spaces
-             while (t < text.size() && text[t] <= ' ')   ++t;
-             if    (t < text.size() && text[t] == UNI_LAMBDA)   ++t;
-             while (t < text.size() && text[t] <= ' ')   ++t;
-             if    (t < text.size() && text[t] == UNI_LEFT_ARROW)   ++t;
-             while (t < text.size() && text[t] <= ' ')   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
+             if    (t < text.ssize() && text[t] == UNI_LAMBDA)   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
+             if    (t < text.ssize() && text[t] == UNI_LEFT_ARROW)   ++t;
+             while (t < text.ssize() && text[t] <= ' ')   ++t;
 
              // copy body
              //
-             while (t < text.size())
+             while (t < text.ssize())
                 {
                    const Unicode uni = text[t++];
                    if (uni == UNI_LF)   break;
@@ -1260,9 +1260,10 @@ const ValueStackItem & vs = value_stack[0];
 
              if (ufun->get_exec_properties()[0])   out << "⍫";
              else                                  out << "∇";
-             out << endl << endl;
+             out << endl;
            }
       }
+   out << endl;
 }
 //----------------------------------------------------------------------------
 int
@@ -1343,7 +1344,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, new_value.get());
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-std::string data(charP(cdr.get_items()), cdr.size());
+const std::string data(charP(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //

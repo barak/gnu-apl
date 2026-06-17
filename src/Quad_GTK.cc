@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -182,7 +182,7 @@ const int function = B->get_cfirst().get_int_value();
              // We can not really block because the user may want to bump
              // out of ⎕GTK with ^C.
              //
-             while (event_queue.size() == 0 && !interrupt_is_raised())
+             while (event_queue.size() == 0 && !InterruptContext::interrupt_is_raised())
                    {
                      usleep(10000);
                      poll_all();
@@ -193,7 +193,7 @@ const int function = B->get_cfirst().get_int_value();
              //
              if (event_queue.size() == 0)   // hence interrupt was raised
                 {
-                   clear_interrupt_raised(LOC);
+                   InterruptContext::clear_interrupt_raised(LOC);
                    return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
                 }
 
@@ -206,7 +206,7 @@ const int function = B->get_cfirst().get_int_value();
                //
                UCS_string_vector args;
                UCS_string arg;
-               for (ShapeItem j = 1; j < HWF.size(); ++j)
+               for (ShapeItem j = 1; j < HWF.ssize(); ++j)
                    {
                      if (HWF[j] == UNI_COLON)
                         {
@@ -215,7 +215,7 @@ const int function = B->get_cfirst().get_int_value();
                         }
                      else
                         {
-                          arg.append(HWF[j]);
+                          arg << HWF[j];
                         }
                    }
                args.push_back(arg);
@@ -348,8 +348,8 @@ UCS_string ucs_A;
                     DOMAIN_ERROR;
                  }
               Value_P command = cell.get_pointer_value();
-              ucs_A.append(UCS_string(*command));
-              ucs_A.append(UNI_LF);
+              ucs_A << UCS_string(*command);
+              ucs_A << UNI_LF;
             }
       }
    else
@@ -950,9 +950,6 @@ const size_t wlen = write(fd, path, TLV_len);
 #else   // ! apl_GTK3 or ! apl_X11
 
 //----------------------------------------------------------------------------
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
 Token
 Quad_GTK::eval_B(Value_P B) const
 {

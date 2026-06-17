@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -407,7 +407,7 @@ protected:
    static const UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   static Token reference(const std::basic_string<Function_Line> & lines,
+   static Token reference(const std::vector<Function_Line> & lines,
                           bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun

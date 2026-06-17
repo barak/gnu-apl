@@ -911,14 +911,14 @@ some more detail.</p></div>
 <h3 id="_libapl">libapl</h3>
 <div class="paragraph"><p>Normally GNU APL initializes itself and then enters a <strong>REPL</strong> loop until
 the )OFF command is given (interactive mode) or the input stream ends (script
-mode). <strong>REPL</strong> stands for *R*ead-*E*valuate-*P*rint-*L*oop and that describes
-the top-level operation of an APL interpreter in interactive mode.</p></div>
-<div class="paragraph"><p>If GNU APL is <strong>./configure&#8217;d</strong> with option <strong>--with-libapl</strong>, then GNU APL does not
-build a normal executable that can be started from a script or from a shell,
-but it builds a library <strong>libapl</strong>. That library can then be linked with another
-program that either implements its own <strong>REPL</strong> loop (thus providing some
-interactive mode, but with a different user interface), or only calls GNU APL
-facilities from time to time.</p></div>
+mode). <strong>REPL</strong> stands for <strong>R</strong>ead-<strong>E</strong>valuate-<strong>P</strong>rint-<strong>L</strong>oop and that
+describes the top-level operation of an APL interpreter in interactive mode.</p></div>
+<div class="paragraph"><p>If GNU APL is <strong>./configure&#8217;d</strong> with option <strong>--with-libapl</strong>, then GNU APL does
+not build a normal executable that can be started from a script or from a
+shell, but instead it builds a library <strong>libapl</strong>. That library can then be
+linked with another program that either implements its own <strong>REPL</strong> loop
+(thus providing some interactive mode, but with a different user interface),
+or only calls GNU APL facilities from time to time.</p></div>
 <div class="paragraph"><p>The following is an example C program that demonstrates the use of libapl:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1424,7 +1424,7 @@ done with <strong>35 ⎕CR</strong>. The terminating line feeds are removed in t
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-14 14:48:59 CET
+ 2025-04-25 16:47:28 CEST
 </div>
 </div>
 </body>

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Macro.hh"
@@ -62,8 +63,8 @@ cFunction_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P proto_A = Bif_F12_TAKE::first(*A);
-        Value_P proto_B = Bif_F12_TAKE::first(*B);
+        Value_P first_A = Bif_F12_TAKE::first(*A);
+        Value_P first_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -72,20 +73,50 @@ cFunction_P LO = _LO.get_function();
         if (B->is_empty())          shape_Z = B->get_shape();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
-        Token tZ1 = LO->eval_fill_AB(proto_A, proto_B);
-        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
+        // evaluate the fill function (lrm p. 245)
+        //
+        Value_P Z1;
+        if (LO->is_defined())
+           {
+             // the fill function of a defined functions is the identity
+             // function, i.e. its right argument
+             //
+             Z1 = first_B;
+           }
+        else if (LO->is_scalar_function())
+           {
+             // NOTE: even though eval_ALB is dyadic, we call the monadic
+             //       fill function because it (and not the dyadic fill
+             //       function handles the empty argument case).
+             //
+             Token tok_Z1 = LO->eval_fill_B(B->is_empty() ? first_B : first_A);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+        else
+           {
+             // the fill function is the function itself
+             //
+             Token tok_Z1 = LO->eval_AB(first_A, first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
 
-        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(shape_Z, LOC);
 
         // Z1 is the prototype of the empty Z
         //
         if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
-           Z->set_ravel_Cell(0, Z1->get_cscalar());
-        else   // need to encose Z1
-           Z->set_ravel_Pointer(0, Z1.get());
+           {
+             Z->set_ravel_Cell(0, Z1->get_cscalar());
+           }
+        else   // need to enclose Z1
+           {
+             Z->set_ravel_Pointer(0, Z1.get());
+           }
 
         Z->check_value(LOC);
+        Z->to_type(true);
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -248,28 +279,68 @@ cFunction_P LO = _LO.get_function();
    Assert1(LO);
 
    if (LO->is_operator() &&
-       !is_SLASH_or_BACKSLASH(_LO.get_tag()))   SYNTAX_ERROR;
-   if (!(LO->get_signature() & SIG_B))          VALENCE_ERROR;
+       !_LO.is_SLASH_or_BACKSLASH())     SYNTAX_ERROR;
+   if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
 
    if (B->is_empty())
       {
         if (!LO->has_result())   return Token(TOK_VOID);    // no-op
 
-        Value_P proto_B = Bif_F12_TAKE::first(*B);
-        Token tZ1 = LO->eval_fill_B(proto_B);
-        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
+        Value_P first_B = Bif_F12_TAKE::first(*B);
 
-        Value_P Z1 = tZ1.get_apl_val();
+        // evaluate the fill function (lrm p. 245)
+        //
+        Value_P Z1;
+        if (LO->is_defined())
+           {
+             // the fill function of a defined functions is the identity
+             // function, i.e. its right argument
+             //
+             Z1 = first_B;
+           }
+        else if (LO->is_scalar_function() || (LO == &Bif_F12_DOMINO::fun))
+           {
+             Token tok_Z1 = LO->eval_fill_B(first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+        else if (LO == &Quad_EC::fun)
+           {
+             // fake Z1←⎕EC ''  ←→  3 (0 0) (0 0⍴0)
+             //
+             if (!B->get_cfirst().is_character_cell())   DOMAIN_ERROR;
+             Z1 = Value_P(3, LOC);
+             Z1->next_ravel_Number(3);
+             {
+               Value_P sub1(2, LOC);
+               sub1->next_ravel_0();
+               sub1->next_ravel_0();
+               sub1->check_value(LOC);
+               Z1->next_ravel_Pointer(sub1.get());
+             }
+             Value_P sub2 = Idx0_0(LOC);
+             Z1->next_ravel_Pointer(sub2.get());
+           }
+        else
+           {
+             // the fill function is the function itself
+             //
+             Token tok_Z1 = LO->eval_B(first_B);
+             if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
+             Z1 = tok_Z1.get_apl_val();
+           }
+
         Value_P Z(B->get_shape(), LOC);
 
         // Z1 is the prototype of the empty Z
         //
         if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
            Z->set_ravel_Cell(0, Z1->get_cscalar());
-        else   // need to encose Z1
+        else                            // need to encose Z1
            Z->set_ravel_Pointer(0, Z1.get());
 
         Z->check_value(LOC);
+        Z->to_type(true);
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -292,8 +363,8 @@ Value_P Z;
       {
         if (LO->get_fun_valence() == 0)
            {
-             // we allow niladic functions N so that one can loop over them with
-             // N ¨ 1 2 3 4
+             // we allow niladic functions N so that one can simply loop
+             // over them with N ¨ 1 2 3 4
              //
              Token result = LO->eval_();
 
@@ -317,10 +388,10 @@ Value_P Z;
         else
            {
              const Cell * cB = &B->get_cravel(z);
-             const bool left_val = cB->is_lval_cell();
+             const bool is_left_val = cB->is_lval_cell();
              Value_P LO_B = cB->to_value(LOC);      // right argument of LO
 
-             if (left_val)
+             if (is_left_val)
                 {
                   Cell * dest = cB->get_lval_value();
                   if (dest->is_pointer_cell())
@@ -335,7 +406,8 @@ Value_P Z;
                 {
                   Value * vZ = result.get_apl_val().get();
 
-                  if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
+                  if (vZ->is_simple_scalar() ||
+                      (is_left_val && vZ->is_scalar()))
                      Z->next_ravel_Cell(vZ->get_cfirst());
                   else
                      Z->next_ravel_Pointer(vZ);

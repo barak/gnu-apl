@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2019  Dr. Jürgen Sauermann
+    Copyright © 2018-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,58 @@ enum
 //  into a .png file
 enum { SAVE_BORDER_DELAY_ms = 100 };
 
-/// The class implementing ⎕PLOT
+/** The class implementing ⎕PLOT. \b Quad_PLOT implements the APL
+    side of plotting, while the actual output work is performed by
+    plot drivers for different GUI environments (X11/XCB or GTK).
+
+    Class \b Quad_PLOT handles the APL aspects of plotting n GNU APL.
+    It is accompanied by currently 3 platform dependent driver files
+    that do the actual output work:
+
+    1. Plot_ascii.cc (always used and linked in Makefile),
+    2. Plot_gtk.cc   (used and linked if apl_GTK3 was set by ./configure), and
+    3. Plot_XCB      (used and linked if apl_CCB  was set by ./configure).
+
+    Plot_ascii runs in the same thread as the GNU APL interpreter. It plots
+    to stderr and returns a committed value with 3 planes for characters,
+    VT100 foreground colors, and VT100 background colors.
+
+    Plot_gtk.cc uses a separate phtread for every plot window. It returns an
+    integer window handle which ⎕PLOT case use to manipulate the window (e.g
+    to close it from APL).
+
+    Plot_XCB uses a single phtread for all plot windows. It returns an
+    integer window handle which ⎕PLOT case use to manipulate the window (e.g
+    to close it from APL).
+
+    PLOT synchronizes with the driver thread(s) of GTK or XCB by means of
+    two mutuial exclusion semaphores:
+
+    1. all_PLOT_windows_sema: a process semaphore; initially 1, that protects
+       the Quad_PLOT::all_PLOT_windows data structure. Used (only by XCB) to
+       remove a window from all_PLOT_windows (which could happen simultaneous
+       from ⎕PLOT in APL and from an XCB_CLIENT_MESSAGE in XCB. Whoever aquires
+       it is allowed change Quad_PLOT::all_PLOT_windows.
+
+    2. expose_sema: a threads semaphore; initially 0, that tells the interpreter
+       when a plot window was exposed (shown). Posted by GTK and XCB after the
+       plot window was shown. At this point has finishied drawing the initial
+       plot window and only reacts to (mouse-) events like window resize,
+       window close, etc. It is also the point where Quad_PLOT::start_GUI()
+       (and therefore also eval_AB() rersp. eval_B() return. This is to make
+       eval_AB() rersp. eval_B() kind of atomic operations.
+
+    A \b default_plot_driver is chosen at compile time based on the
+    ./configure result (i.e. \b config.h).
+
+    default_plot_driver = PltDrv_GTK    if GTK is avaliable, otherwise
+    default_plot_driver = PltDrv_XCB    if XCB is avaiable, otherwise
+    PltDrv_ASCII        = PltDrv_ASCII.
+
+   \b eval_B() (which has no plot attributes) always uses \b default_plot_driver.
+   \b eval_AB() uses \b default_plot_driver unless a differen driver is
+   specified in plot attribute \b w_props->get_gui_driver().
+ **/
 class Quad_PLOT : public QuadFunction
 {
 public:
@@ -95,7 +146,7 @@ public:
       };
 
    /// all open ⎕PLOT windows.
-   static basic_string<PLOT_context *> all_PLOT_windows;
+   static vector<PLOT_context *> all_PLOT_windows;
 
    /// the GTK window that handles one plot window. Always declared here
    /// (to make doxygen happy, but only implemented if apl_GTK3
@@ -105,12 +156,24 @@ public:
    /// (to make doxygen happy, but only implemented if NOT apl_GTK3
    static void * plot_main_XCB(void * vp_props);
 
+   enum Plot_driver
+      {
+        PltDrv_GTK   = 1,
+        PltDrv_XCB   = 2,
+        PltDrv_ASCII = 3,
+        
+      };
+
    static int get_verbosity()
       { return verbosity; }
 
 protected:
    /// Destructor.
    ~Quad_PLOT();
+
+   /// initialize the GUI
+   static void start_GUI(Plot_window_properties * w_props, int handle,
+                         Plot_driver driver_type);
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;

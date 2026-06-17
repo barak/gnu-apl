@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,9 +73,9 @@ enum TokenClass
    TC_MAX_PHRASE_4 = TC_MAX_PHRASE*TC_MAX_PHRASE_3,   // TC_MAX_PHRASE ^ 4
 
    TC_OFF           = 0x12,
-   TC_SI_LEAVE      = 0x13,
+   TC_SI_CHANGE     = 0x13,
    TC_LINE          = 0x14,
-   TC_DIAMOND       = 0x15,   // ◊
+// TC_DIAMOND       = 0x15,   // ◊
    TC_NUMERIC       = 0x16,   // 0-9, ¯
    TC_SPACE         = 0x17,   // space, tab, CR (but not LF)
    TC_NEWLINE       = 0x18,   // LF
@@ -83,6 +83,8 @@ enum TokenClass
    TC_QUOTE         = 0x1A,   // ' or "
    TC_L_CURLY       = 0x1B,   // {
    TC_R_CURLY       = 0x1C,   // }
+   TC_LIT_ITEM      = 0x1D,   // literal item, e.g. 1, 3.141, 'a', or 2J3
+   TC_LIT_GRP        = 0x1E,   // literal group, e.g. (1 2 3) or 'abc'
 
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
@@ -226,14 +228,6 @@ swap(TokenTag & tag1, TokenTag & tag2)
 { const TokenTag tmp = tag1;
    tag1 = tag2;
    tag2 = tmp;
-}
-
-/// return true for / ⌿ \ and ⍀
-inline bool
-is_SLASH_or_BACKSLASH(TokenTag tag)
-{
-   return tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-          tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1;
 }
 
 #endif // __TOKENENUMS_HH_DEFINED__

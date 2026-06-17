@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class Quad_CR : public QuadFunction
 {
 public:
    /// Constructor
-   Quad_CR() : QuadFunction(TOK_Quad_CR) {}
+   Quad_CR();
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
@@ -48,13 +48,6 @@ public:
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis()
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
-
    /// compute \b a ⎕CR \b B
    static Value_P do_CR(APL_Integer a, const Value * B, PrintContext pctx);
 
@@ -63,36 +56,31 @@ public:
    static bool figure_default(const Value * value, Unicode & default_char,
                               APL_Integer & default_int);
 
-   /// compute the prolog (e,g, ((⎕IO+2)⊃X)←)  for the pick of \b left
-   static UCS_string compute_prolog(int pick_level, const UCS_string & left,
-                                    const Value * value);
-
    static Quad_CR  fun;          ///< Built-in function.
+
+   /// compute \b 35 ⎕CR \b B
+   static Value_P do_CR35(const Value * B);
 
    /// portable variable encoding of value \b name (varname or varname ⊂)
    static void do_CR10_variable(UCS_string_vector & result,
                                 const UCS_string & var_name,
                                 const Value * value);
 
-   /// compute \b 35 ⎕CR \b B
-   static Value_P do_CR35(const Value * B);
-
 protected:
    /// a mapping between function names and function numbers
-   struct _sub_fun
-      {
-        unsigned int val;   ///< the function number
-        const char * key;   ///< the name for it
-      };
+   static const FunctionGroup::function_info subfunction_infos[];
 
-   /// a mapping between function names and function numbers
-   static _sub_fun sub_functions[];
+   /// overloaded FunctionGroup::get_legend
+   virtual const char * get_legend(FunctionGroup::Legend_type lt) const;
 
-   /// compare two axis strings (function names)
-   static int fun_compare(const void * key, const void * sf);
 
-   /// list all ⎕CR functions
-   static Token list_functions(ostream & out, bool mapping);
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                 const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+      virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// do eval_B() with extra spaces removed
    static Token do_eval_B(const Value * B, bool remove_extra_spaces);
@@ -102,6 +90,24 @@ protected:
 
    /// compute \b 10 ⎕CR \b B
    static Value_P do_CR10(const Value * B);
+
+   /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
+   static void do_CR10(UCS_string_vector & result, const Value * symbol_name);
+
+   /// compute 10 ⎕CR recursively (structured variable)
+   static const char * do_CR10_structured(UCS_string_vector & result,
+                                          const UCS_string & varname,
+                                          const Value * value);
+
+   /// emit one level of \b value
+   static void do_CR10_level(UCS_string_vector & result, size_t level,
+                             const Value & value);
+
+   /// emit a simple Cell
+   static UCS_string do_CR10_simple_cell(const Cell & cell);
+
+   /// emit a shaoe
+   static UCS_string do_CR10_shape(const Shape &_shape);
 
    /// compute \b 11 ⎕CR \b B
    static Value_P do_CR11(const Value * B);
@@ -179,66 +185,10 @@ protected:
    /// append \b value to result
    static void value_CR44(UCS_string & result, const Value & value);
 
-   /// the left argument of Pick (⊃) which selects a sub-item of a variable
-   /// being constructed
-   class Picker
-      {
-        public:
-           /// constructor: Picket at top (= variable) level
-           Picker(const UCS_string & vname)
-           : var_name(vname)
-           {}
+   /// print value addresses in B
+   static void do_CR45(const Value * B);
 
-          /// push \b sh on \b shapes stack and \b pidx on \b indices stack
-          void push(const Shape & sh, ShapeItem pidx)
-             {
-               shapes.push_back(sh);
-               indices.push_back(pidx);
-             }
-
-          /// pop \b shapes and \b indices
-          void pop()
-             {
-               shapes.pop_back();
-               indices.pop_back();
-             }
-
-           /// varname or pick of varname
-           void get(UCS_string & result);
-
-           /// indexed varname or pick of varname
-           void get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len);
-
-           /// the pick depth (⍴A for A⊃B)
-           int get_level() const
-              { return shapes.size(); }
-
-        protected:
-           /// the name of the variable from which we pick
-           const UCS_string & var_name;
-
-           /// the shapes along the pick
-           std::vector<Shape> shapes;
-
-           /// the indices along the pick
-           std::basic_string<ShapeItem> indices;
-      };
-
-   /// compute 10 ⎕CR recursively
-   static void do_CR10_value(UCS_string_vector & result, const Value * value,
-                             Picker & picker, ShapeItem pidx);
-
-   /// compute 10 ⎕CR recursively (structured variable)
-   static const char * do_CR10_structured(UCS_string_vector & result,
-                                          const UCS_string & varname,
-                                          const Value * value);
-
-   /// try to emit \b value in short format. Retrun true if that is not
-   /// possible.
-   static bool short_ravel(UCS_string_vector & result, bool & nested,
-                           const Value * value, const Picker & picker,
-                           const UCS_string & left,
-                           const UCS_string & shape_rho);
+   static void do_CR45_value(const UCS_string prefix, const Value * B);
 
    /// the state of the current output line
    enum V_mode
@@ -249,12 +199,9 @@ protected:
         Vm_UCS     ///< in ⎕UCS(),                  e.g. ⎕UCS(97 98 99)
       };
 
-   /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
-   static void do_CR10(UCS_string_vector & result, const Value * symbol_name);
-
-   /// one ravel item in 10 ⎕CR symbol_name
-   static V_mode do_CR10_item(UCS_string & item, const Cell & cell,
-                              V_mode mode, bool may_quote);
+   /// return true if Value is a plain string that can be double-quoted
+   /// without problems.
+   static bool is_plain_string(const Value * value);
 
    /// decide if 'xxx' or ⎕UCS(xxx) shall be used
    static bool use_quote(V_mode mode, const Value * value, ShapeItem pos);
@@ -265,6 +212,9 @@ protected:
    /// print item separator
    static void item_separator(UCS_string & line,
                               V_mode from_mode, V_mode to_mode);
+
+   /// return an (almost) unique variable name
+   static UCS_string temp_varname();
 };
 //----------------------------------------------------------------------------
 

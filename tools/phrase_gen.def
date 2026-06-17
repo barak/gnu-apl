@@ -108,12 +108,13 @@ phrase(BS_ANY+3      , LBRA , B    , I    ,      , DITO )
 // vector notation
 phrase(BS_VAL_VAL+2  , A    , B    ,      ,      , DITO )
 
-// vector assignment (A B ... C) ← B
+// vector assignment (A B ... C) ← B or selective specification (f g ... C) ← B
 //
 phrase(BS_VAL_VAL+2  , V    , RPAR , ASS  , B    , DITO )
 
 // end of statement
 //
+phrase(BS_ANY+1      , END  ,      ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , VOID ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , B    ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , GOTO ,      ,      , DITO )

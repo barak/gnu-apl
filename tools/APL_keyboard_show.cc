@@ -19,6 +19,8 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -26,6 +28,13 @@
 
 struct termios orig_tios;
 
+//----------------------------------------------------------------------------
+void
+catch_control_C(int)
+{
+   tcsetattr(STDIN_FILENO, TCSANOW, &orig_tios);
+   exit(0);
+}
 //----------------------------------------------------------------------------
 int
 main(int argc, char *argv[])
@@ -35,6 +44,8 @@ main(int argc, char *argv[])
 struct termios new_tios;
    tcgetattr(STDIN_FILENO, &orig_tios);
    tcgetattr(STDIN_FILENO, &new_tios);
+
+   signal(SIGINT, catch_control_C);
 
    new_tios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
                            | INLCR | IGNCR | ICRNL | IXON);
@@ -74,7 +85,7 @@ struct termios new_tios;
 
                 if (len <= 0)   break;
                 buflen += len;
-                if (buflen >= sizeof(buffer))   break;
+                if (buflen >= int(sizeof(buffer)))   break;
              }
 
            printf("key_seq_%d(", buflen);

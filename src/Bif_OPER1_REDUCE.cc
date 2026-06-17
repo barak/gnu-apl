@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ ShapeItem len_A = A->element_count();
    // compute len_Z ← +/A
    //
 ShapeItem len_Z = 0;
-std::basic_string<ShapeItem> rep_counts;
+std::vector<ShapeItem> rep_counts;
    rep_counts.reserve(len_B);
    if (len_A == 1)   // single a -> a a ... a (len_B times)
       {

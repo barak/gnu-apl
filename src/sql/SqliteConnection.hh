@@ -28,38 +28,54 @@
 
 #include <sqlite3.h>
 
-class SqliteConnection : public Connection {
+//============================================================================
+class SqliteConnection : public Connection
+{
 public:
-    SqliteConnection( sqlite3 *db_in );
+    SqliteConnection(sqlite3 * db_in);
     virtual ~SqliteConnection();
-    virtual ArgListBuilder *make_prepared_query( const string &sql );
-    virtual ArgListBuilder *make_prepared_update( const string &sql );
+    virtual ArgListBuilder * make_prepared_query( const string & sql);
+    virtual ArgListBuilder * make_prepared_update( const string & sql);
 
     virtual void transaction_begin();
     virtual void transaction_commit();
     virtual void transaction_rollback();
 
-    virtual void fill_tables( vector<string> &tables );
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols );
-    virtual const string make_positional_param( int pos );
+    virtual void fill_tables(vector<string> &tables);
+    virtual void fill_cols(const string &table, vector<ColumnDescriptor> &cols);
+    virtual const string make_positional_param(int pos)
+       { return "?"; }
 
-    void raise_sqlite_error( const string &message );
-    sqlite3 *get_db( void ) { return db; }
+    virtual const char * get_provider_name() const
+       { return "SQLite"; }
 
-    void run_simple( const string &sql );
+    virtual const char * get_provider_type() const
+       { return "sqlite"; }
+
+    void raise_sqlite_error(const string & message);
+    sqlite3 * get_db() { return db; }
+
+    void run_simple(const string & sql);
 
 protected:
     sqlite3 * db;
 };
-
-class SqliteStmtWrapper {
+//============================================================================
+class SqliteStmtWrapper
+{
 public:
-    SqliteStmtWrapper( sqlite3_stmt *statement_in ) : statement( statement_in ) {}
-    virtual ~SqliteStmtWrapper() { sqlite3_finalize( statement ); }
-    sqlite3_stmt *get_statement( void ) { return statement; }
+    SqliteStmtWrapper(sqlite3_stmt * statement_in)
+    : statement(statement_in) {}
+
+    virtual ~SqliteStmtWrapper()
+       { sqlite3_finalize(statement); }
+
+    sqlite3_stmt * get_statement(void)
+       { return statement; }
 
 protected:
     sqlite3_stmt * statement;
 };
+//============================================================================
 
 #endif

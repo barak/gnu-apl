@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,6 +123,10 @@ public:
    /// reverse the order of the local vars (if parsed back-to-front)
    void reverse_local_vars();
 
+   /// clear all labels
+   void clear_labels()
+      { label_values.clear(); }
+
    /// add a label
    void add_label(Symbol * sym, Function_Line line)
       {
@@ -147,7 +151,7 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return local_vars[idx]; }
 
-   /// return the number fof labels (in the function body).
+   /// return the number of labels (in the function body).
    const size_t get_label_count() const
       { return label_values.size(); }
 
@@ -204,7 +208,7 @@ protected:
    Symbol * sym_B;
 
    /// The local variables of \b this function.
-   std::basic_string<Symbol *> local_vars;
+   std::vector<Symbol *> local_vars;
 
    /// The labels of \b this function.
    std::vector<labVal> label_values;

@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2024  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,13 +24,19 @@
 
 #include "Common.hh"
 #if HAVE_LOCALE_H
-#include <locale.h>
+# include <locale.h>
 #endif
 
-#if apl_GTK3 && apl_X11
+#if apl_GTK3
 
-#include <X11/Xlib.h>
-#include <gtk/gtk.h>
+# if apl_X11
+#  include <X11/Xlib.h>   // for XInitThreads
+# define MAYBE_XInitThreads() XInitThreads()
+# else
+# define MAYBE_XInitThreads()
+# endif
+
+# include <gtk/gtk.h>
 
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
@@ -57,9 +63,9 @@ class GTK_context : public Quad_PLOT::PLOT_context
 {
 public:
    /// constructor
-   GTK_context(Plot_window_properties & pwp, Quad_PLOT::Handle handle)
+   GTK_context(Plot_window_properties & props, Quad_PLOT::Handle handle)
    : PLOT_context(handle),
-     w_props(pwp),
+     w_props(props),
      window(0),
      drawing_area(0),
      surface(0),
@@ -143,10 +149,14 @@ public:
    void set_legend_Y1(Pixel_Y y1, const char * loc)   { legend_Y1 = y1; }
 
 protected:
-   /// the left and right edges of the legend rectangle
+   /// the left and right edges of the legend rectangle (during a drag & drop
+   /// operation). The final result (when the legend is dropped) will be
+   /// stored in w_props.
    Pixel_X legend_X0, legend_X1;
 
-   /// the top and bottom edges of the legend rectangle
+   /// the top and bottom edges of the legend rectangle (during a drag & drop
+   /// operation). The final result (when the legend is dropped) will be
+   /// stored in w_props.
    Pixel_Y legend_Y0, legend_Y1;
 };
 //----------------------------------------------------------------------------
@@ -252,7 +262,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
-/// draw a 🞤 or 🞫 with given \b size around P0
+/// draw a cross with thw given \b size around P0
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
            double size, int size2)
@@ -263,14 +273,14 @@ draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
 const double half = 0.5*size;
    if (size2 == 0)   size2 = 2;   // default line thickness
    cairo_set_line_width(cr, 1.0*size2);   // 1 pixel = 2 cairo
-   if (plus)   // 🞤
+   if (plus)   // +
       {
         cairo_move_to(cr, P0.x - half, P0.y);
         cairo_line_to(cr, P0.x + half, P0.y);
         cairo_move_to(cr, P0.x, P0.y + half);
         cairo_line_to(cr, P0.x, P0.y - half);
       }
-   else        // 🞫
+   else        // ×
       {
         const double dlta = 0.707106781*half;
         cairo_move_to(cr, P0.x - dlta, P0.y + dlta);
@@ -292,14 +302,19 @@ const bool es = ! (point_style & 1);   // even style
    switch(point_style)
       {
         case 0:                                                   return;
+
         case 1: draw_circle(cr, P,     outer_color, outer_dia);   break;   // ●
+
         case 2:                                                            // ▲
         case 3: draw_delta( cr, P, es, outer_color, outer_dia);   break;   // ▼
+
         case 4:                                                            // ◆
         case 5: draw_quad(  cr, P, es, outer_color, outer_dia);   break;   // ■
-        case 6:                                                            // 🞤
+
+        case 6:                                                            // +
         case 7: draw_cross( cr, P, es, outer_color, outer_dia,
-                                                    inner_dia);   return; // 🞫
+                                                    inner_dia);   return; // ×
+
         default: cerr << "⎕PLOT: Invalid point style: "
                       << point_style << endl;                     return;
       }
@@ -974,7 +989,7 @@ const int grid_style = w_props.get_gridX_style();
                Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
    }
 
-basic_string<double> xvals;
+vector<double> xvals;
 const Plot_data & data = w_props.get_plot_data();
    loop(r, data.get_row_count())
       {
@@ -1354,7 +1369,7 @@ const int verbosity = w_props.get_verbosity();
             Option B seems to look better.
          */
 
-#if 0    /* Option A...
+# if 0    /* Option A...
 
             interpolate middle point PM with height HM and split the
             square P0-P1-P2-P3 into 4 triangles with common point PM
@@ -1372,7 +1387,7 @@ const int verbosity = w_props.get_verbosity();
          draw_triangle(pctx, verbosity, PM, HM, P3, H3, P2, H2);
          draw_triangle(pctx, verbosity, PM, HM, P2, H2, P0, H0);
 
-#else    /* Option B...
+# else    /* Option B...
 
             fold surface-square along its shorter edge
           */
@@ -1387,7 +1402,7 @@ const int verbosity = w_props.get_verbosity();
               draw_triangle(cr, pctx, verbosity, P0, H0, P1, H1, P2, H2);
               draw_triangle(cr, pctx, verbosity, P3, H3, P1, H1, P2, H2);
             }
-#endif
+# endif   // Option A/B.
        }
 
    // 2. draw lines between plot points
@@ -1420,15 +1435,15 @@ const int verbosity = w_props.get_verbosity();
          const double Z3 = data.get_Z(row + 1, col + 1);
          const Pixel_XY P3 = w_props.valXYZ2pixelXY(X3, Y3, Z3);
 
-#if 0
-         // debug: plot points as vertical lines
-         //
-         const Pixel_XY xy0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
-                                                     w_props.get_min_Y(),
-                                                     data.get_Z(row, col));
+# if 0    // debug: plot points as vertical lines
+          //
+          const Pixel_XY xy0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
+                                                      w_props.get_min_Y(),
+                                                      data.get_Z(row, col));
          draw_line(pctx, pctx.line, xy0, P0);
          continue;
-#endif
+# endif   // 0
+
          draw_line(cr, line_color, 1, line_width, P0, P1);
          if (row == (data.get_row_count() - 2))   // last row
             draw_line(cr, line_color, 1, line_width, P2, P3);
@@ -1489,7 +1504,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
 // linked properly... In our case every event handler has a trailing
 // GTK_context * pctc argument
 
-#define Event_handler(name, ...)                                \
+# define Event_handler(name, ...)                               \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
@@ -1540,7 +1555,7 @@ Event_handler(Motion_notify_event, GtkWidget * widget, GdkEventMotion * ev)
 
    if (!pctx->legend_drag)   return TRUE;
 
-   // the legend is being dragged. Compute how much since the first
+   // the legend is being dragged. Compute by how much since the first
    // (start_legend_drag) or previous (move_legend_drag) event.
    //
 const int x = ev->x;
@@ -1653,7 +1668,7 @@ UTF8_string fname(w_props.get_output_filename().c_str());
 
    // append .png unless already there
    //
-   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
+   if (!fname.ends_with(".png"))   fname << ".png";
 
    // save the plot window without its borders
    errno = 0;
@@ -1692,7 +1707,7 @@ UTF8_string fname(w_props.get_output_filename().c_str());
 
    // append .png unless already there
    //
-   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
+   if (!fname.ends_with(".png"))   fname << ".png";
 
 GdkWindow * gdk_win = gtk_widget_get_window(window);
 GdkWindow * parent = gdk_window_get_parent(gdk_win);
@@ -1783,7 +1798,7 @@ Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
    verbosity = w_props.get_verbosity();
 
-   XInitThreads();
+   MAYBE_XInitThreads();
 
    if (!gtk_init_done)
       {
@@ -1795,10 +1810,10 @@ Plot_window_properties & w_props =
         pthread_t thread = 0;
         pthread_create(&thread, 0, gtk_main_wrapper, 0);
 
-#if HAVE_PTHREAD_SETNAME_NP
+# if HAVE_PTHREAD_SETNAME_NP
          // show with e.g.   ps H -o 'pid tid cmd comm'
          pthread_setname_np(thread, "apl/GTK");
-#endif
+# endif
       }
 
 GTK_context * pctx = new GTK_context(w_props, handle);
@@ -1815,7 +1830,7 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    else   // default caption ("⎕PLOT": add the handle
      {
        char cc[50];
-       SPRINTF(cc, "%s %d", w_props.get_caption().c_str(), pctx->handle);
+       SPRINTF(cc, "%s-GTK %d", w_props.get_caption().c_str(), pctx->handle);
        gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
      }
 
@@ -1854,7 +1869,7 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 
    gtk_widget_show_all(pctx->window);
 
-#define Connect_signal(instance, signal_name, callback)               \
+# define Connect_signal(instance, signal_name, callback)               \
    g_signal_connect(instance, signal_name, G_CALLBACK(callback), pctx);
 
    Connect_signal(pctx->window,                 "hide", Hide)
@@ -1867,4 +1882,4 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }
 //----------------------------------------------------------------------------
-#endif // apl_GTK3 && apl_X11
+#endif // apl_GTK3

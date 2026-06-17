@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,26 +151,33 @@ public:
    /// return true if \b this )SI entry has entered safe execution mode.
    /// That is, \b this )SI entry has initiated  ⎕EC)
    bool is_safe_execution_start() const
-      { if (!parent)   return safe_execution_count > 0;
-        return safe_execution_count > parent->safe_execution_count;
+      { if (!parent)   return safe_execution_depth > 0;
+        return safe_execution_depth > parent->safe_execution_depth;
       }
 
    /// return the number of pending ⎕ECs (or other safe execution contexts)
-   int get_safe_execution_count() const
-      { return safe_execution_count; }
+   int get_safe_execution_depth() const
+      { return safe_execution_depth; }
 
+   /// return the depth of this )SI entry
+   int get_depth() const
+       {
+         int ret = 0;
+         for (const StateIndicator * p = this; p->parent; p = p->parent)  ++ret;
+         return ret;
+       }
    /// set safe_execution mode
-   void set_safe_execution_count()
+   void set_safe_execution_depth()
       {
-        if (parent)  safe_execution_count = parent->safe_execution_count + 1;
-        else         safe_execution_count = 1;
+        if (parent)  safe_execution_depth = parent->safe_execution_depth + 1;
+        else         safe_execution_depth = 1;
       }
 
    /// clear safe_execution mode
    void clear_safe_execution()
       {
-        if (parent)  safe_execution_count = parent->safe_execution_count;
-        else         safe_execution_count = 0;
+        if (parent)  safe_execution_depth = parent->safe_execution_depth;
+        else         safe_execution_depth = 0;
       }
 
    /// get the current prefix parser
@@ -184,6 +191,10 @@ public:
    /// return the SI entry that has called \b this one
    StateIndicator * get_parent() const
       { return parent; }
+
+   /// return uninitialized memory for a new derived function
+   DerivedFunction * get_fun_oper_slot(const char * loc)
+      { return fun_oper_cache.get(loc); }
 
    /// return the immediate child SI (if any) of \b this )SI entry
    const StateIndicator * find_child() const;
@@ -202,14 +213,14 @@ protected:
    const Executable * executable;
 
    /** track ⎕EC calls. The first )SI entry that calls ⎕ES sets
-       \b safe_execution_count to 1 and every child )SI increments it.
+       \b safe_execution_depth to 1 and every child )SI increments it.
        Therefore:
 
-       1. safe_execution_count != 0 tells if ⎕ES is in effect, and the
-       2. the parent with safe_execution_count == 1 is the one that has
+       1. safe_execution_depth != 0 tells if ⎕ES is in effect, and the
+       2. the parent with safe_execution_depth == 1 is the one that has
           initiated ⎕ES (and to which the )SI stack shall be popped on error.
     */
-   int safe_execution_count;
+   int safe_execution_depth;
 
    /// The nesting level (of sub-executions)
    const SI_level level;

@@ -4,10 +4,10 @@
 #
 # It should be placed into
 #
-# (1) in sub-directory gnu-apl.d of the system configuration directory, and/or
-# (2) in folder .config/gnu-apl/ in the user's home directory.
+# (1) sub-directory gnu-apl.d of the system configuration directory, and/or
+# (2) sub-directory .config/gnu-apl/ in the user's home directory.
 #
-# In both cases the file name must be 'preferences'.
+# In both cases the file name shall be be 'preferences'.
 #
 # The system configuration directory is usually /etc or /usr/local/etc
 # It can be overridden by  ./configure --sysconfdir=something-else
@@ -32,9 +32,10 @@
 #
 # Print (or don't) a welcome message on start-up
 #
-# The corresponding command line options is --silent
+# The corresponding command line option is --silent
 #
-  Welcome       Yes	(default)
+  Welcome       Yes (default)
+# Welcome       Brief (1-line)
 # Welcome       No
 #
 
@@ -334,9 +335,30 @@ BACKUP_BEFORE_SAVE  yes
 
 ###############################################################################
 #
+# ASCII PLOT default values
+#
+# The ASCII driver for ⎕PLOT uses default values for plot attributes that
+# were not specified (e.g. for monadic ⎕PLOT B). Some of these default values
+# can be changed by uncommenting the lines below.
+#
+# plot-ASCII-rows       24
+# plot-ASCII-columns    80
+# plot-ASCII-background 0xFFFFFF
+#
+###############################################################################
+#
 # GNU APL assumes a particular layout of your keyboard (and assumes that you
 # do your best to obtain that layout). That assumed layout is shown when you
-# give the ]KEYB command.
+# give the ]KEYB USER command.
+#
+# Before showing a user define layout, the ]KEYB command may (depending on its
+# arguments) try to figure the current keyboard layout with the help of the
+# xmodmap -pke command. That ususally works if the keyboard layout is entirely
+# controlled by xmodmap, but fails if other keyboard layout programs are
+# involved. In these cases one can disable the use of xmodmap -pke by
+# uncommentint the line below.
+#
+# NO-XMODMAP
 #
 # If your keyboard layout differs from the assumed keyboard for some reason,
 # then the ]KEYB command will show the wrong layout. You can fix this by
@@ -391,10 +413,11 @@ CONTROL-Ds-TO-EXIT 0
 #
 # By default both old-style and new-style multi line strings are enabled, but
 # old-style multi line strings will disappear in the near future. To disable
-# multi line strings, uncomment the following line(s).
+# multi line strings, uncomment (one or more of) the following line(s).
 #
 # Old-Multi-Line-Strings No
 # New-Multi-Line-Strings No
+# Multi-Line-Literals    No
 
 ###############################################################################
 #

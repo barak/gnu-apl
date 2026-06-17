@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -495,7 +495,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
       }
    else
       {
-        CERR << "Unsupprted CDR type " << vtype << endl;
+        CERR << "Unsupported CDR type " << vtype << endl;
         Assert(0 && "Bad/unsupported CDR type");
       }
 

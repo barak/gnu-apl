@@ -20,6 +20,7 @@
 
 
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -95,15 +96,15 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @apl_TARGET_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
-
-# depending on apl_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
-# but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
-#
-@apl_GTK3_TRUE@am__append_2 = Gtk
-@apl_PCRE_TRUE@am__append_3 = Regexp.cc					Regexp.hh
-@apl_SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
-@apl_SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
-@apl_SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
+@apl_GTK3_TRUE@am__append_2 = Gtk	# for ⎕GTK
+@apl_GTK3_TRUE@am__append_3 = Plot_gtk.cc
+@apl_GTK3_FALSE@am__append_4 = Plot_gtk.cc
+@apl_XCB_TRUE@am__append_5 = Plot_xcb.cc
+@apl_XCB_FALSE@am__append_6 = Plot_xcb.cc
+@apl_PCRE_TRUE@am__append_7 = Regexp.cc								Regexp.hh
+@apl_SQLITE3_TRUE@am__append_8 = $(SQLITE3_CFLAGS)
+@apl_SQLITE3_TRUE@am__append_9 = $(SQLITE3_LDFLAGS)
+@apl_SQLITE3_TRUE@am__append_10 = sql/SqliteArgListBuilder.cc \
 @apl_SQLITE3_TRUE@	sql/SqliteArgListBuilder.hh \
 @apl_SQLITE3_TRUE@	sql/SqliteConnection.cc \
 @apl_SQLITE3_TRUE@	sql/SqliteConnection.hh \
@@ -111,41 +112,45 @@ host_triplet = @host@
 @apl_SQLITE3_TRUE@	sql/SqliteResultValue.hh \
 @apl_SQLITE3_TRUE@	sql/SqliteProvider.cc sql/SqliteProvider.hh \
 @apl_SQLITE3_TRUE@	sql/Connection.cc
-@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__append_7 = sql/Connection.cc
-@apl_POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_CFLAGS)
-@apl_POSTGRES_TRUE@am__append_9 = $(POSTGRESQL_LDFLAGS)
-@apl_POSTGRES_TRUE@am__append_10 = sql/PostgresArgListBuilder.cc \
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__append_11 = sql/Connection.cc
+@apl_POSTGRES_TRUE@am__append_12 = $(POSTGRESQL_CFLAGS)
+@apl_POSTGRES_TRUE@am__append_13 = $(POSTGRESQL_LDFLAGS)
+@apl_POSTGRES_TRUE@am__append_14 = sql/PostgresArgListBuilder.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresArgListBuilder.hh \
 @apl_POSTGRES_TRUE@	sql/PostgresConnection.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresConnection.hh \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.hh
-@apl_TARGET_LIBAPL_TRUE@am__append_11 = libapl.la
-@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@apl_TARGET_LIBAPL_TRUE@am__append_15 = libapl.la
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_16 = lib_gnu_apl.la
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/m4/check_GSL.m4 $(top_srcdir)/m4/check_GTK.m4 \
+	$(top_srcdir)/m4/apl_TARGETs.m4 $(top_srcdir)/m4/build_date.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_DATA) \
-	$(am__pkginclude_HEADERS_DIST) $(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_SCRIPTS) \
+	$(dist_noinst_DATA) $(am__pkginclude_HEADERS_DIST) \
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" \
-	"$(DESTDIR)$(pkgincludedir)"
+	"$(DESTDIR)$(distdir)" "$(DESTDIR)$(pkgincludedir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -176,27 +181,28 @@ am__uninstall_files_from_dir = { \
   }
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_gnu_apl_la_LIBADD =
-am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
+am__lib_gnu_apl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc \
+	Plot_xcb.cc ../config.h APL_Float_as_class.hh APL_types.hh \
+	APL_enums.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
+	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
+	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
 	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
 	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
@@ -214,55 +220,61 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh PythonPipe.cc PythonPipe.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
-	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
-	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
-	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Quad_CC.cc Quad_CC.hh Quad_CR.cc Quad_CR.def Quad_CR.hh \
+	Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc \
+	Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
+	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
-@apl_GTK3_FALSE@am__objects_1 = lib_gnu_apl_la-Plot_xcb.lo
 @apl_GTK3_TRUE@am__objects_1 = lib_gnu_apl_la-Plot_gtk.lo
-@apl_PCRE_TRUE@am__objects_2 = lib_gnu_apl_la-Regexp.lo
+@apl_XCB_TRUE@am__objects_2 = lib_gnu_apl_la-Plot_xcb.lo
+am__objects_3 = lib_gnu_apl_la-Plot_ascii.lo $(am__objects_1) \
+	$(am__objects_2)
+@apl_PCRE_TRUE@am__objects_4 = lib_gnu_apl_la-Regexp.lo
 am__dirstamp = $(am__leading_dot)dirstamp
-@apl_SQLITE3_TRUE@am__objects_3 =  \
+@apl_SQLITE3_TRUE@am__objects_5 =  \
 @apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteArgListBuilder.lo \
 @apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteConnection.lo \
 @apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteResultValue.lo \
 @apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteProvider.lo \
 @apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-Connection.lo
-@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_4 = sql/lib_gnu_apl_la-Connection.lo
-@apl_POSTGRES_TRUE@am__objects_5 = sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_6 = sql/lib_gnu_apl_la-Connection.lo
+@apl_POSTGRES_TRUE@am__objects_7 = sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
 @apl_POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
 @apl_POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
-am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
+am__objects_8 = $(am__objects_3) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Assert.lo lib_gnu_apl_la-Avec.lo \
 	lib_gnu_apl_la-Backtrace.lo lib_gnu_apl_la-Bif_F12_COMMA.lo \
 	lib_gnu_apl_la-Bif_F12_DOMINO.lo \
@@ -280,9 +292,11 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Bif_OPER2_RANK.lo \
 	lib_gnu_apl_la-Bif_OPER1_REDUCE.lo \
 	lib_gnu_apl_la-Bif_OPER1_SCAN.lo lib_gnu_apl_la-CDR.lo \
-	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Doxy.lo \
-	lib_gnu_apl_la-CharCell.lo lib_gnu_apl_la-Command.lo \
-	lib_gnu_apl_la-Common.lo lib_gnu_apl_la-ComplexCell.lo \
+	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Cmd_KEYB.lo \
+	lib_gnu_apl_la-Cmd_LIB.lo lib_gnu_apl_la-Cmd_IN.lo \
+	lib_gnu_apl_la-Doxy.lo lib_gnu_apl_la-CharCell.lo \
+	lib_gnu_apl_la-Command.lo lib_gnu_apl_la-Common.lo \
+	lib_gnu_apl_la-ComplexCell.lo \
 	lib_gnu_apl_la-DerivedFunction.lo lib_gnu_apl_la-DiffOut.lo \
 	lib_gnu_apl_la-DynamicObject.lo lib_gnu_apl_la-Error.lo \
 	lib_gnu_apl_la-Executable.lo lib_gnu_apl_la-FloatCell.lo \
@@ -303,34 +317,39 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Plot_data.lo \
 	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
-	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-QuadFunction.lo \
-	lib_gnu_apl_la-ProcessorID.lo lib_gnu_apl_la-Quad_CR.lo \
+	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-Polynomial.lo \
+	lib_gnu_apl_la-PythonPipe.lo \
+	lib_gnu_apl_la-QR_factorization_GSL.lo \
+	lib_gnu_apl_la-QuadFunction.lo lib_gnu_apl_la-ProcessorID.lo \
+	lib_gnu_apl_la-Quad_CC.lo lib_gnu_apl_la-Quad_CR.lo \
 	lib_gnu_apl_la-Quad_DLX.lo lib_gnu_apl_la-Quad_FFT.lo \
 	lib_gnu_apl_la-Quad_FIO.lo lib_gnu_apl_la-Quad_FX.lo \
 	lib_gnu_apl_la-Quad_GTK.lo lib_gnu_apl_la-Quad_JSON.lo \
-	lib_gnu_apl_la-Quad_MAP.lo lib_gnu_apl_la-Quad_PLOT.lo \
-	lib_gnu_apl_la-Quad_PNG.lo lib_gnu_apl_la-Quad_RE.lo \
-	lib_gnu_apl_la-Quad_RL.lo lib_gnu_apl_la-Quad_RVAL.lo \
-	lib_gnu_apl_la-Quad_SQL.lo lib_gnu_apl_la-Quad_SVx.lo \
-	lib_gnu_apl_la-Quad_TF.lo lib_gnu_apl_la-Quad_WA.lo \
-	lib_gnu_apl_la-Quad_XML.lo lib_gnu_apl_la-RealCell.lo \
-	lib_gnu_apl_la-sbrk.lo lib_gnu_apl_la-Shape.lo \
-	lib_gnu_apl_la-ScalarFunction.lo lib_gnu_apl_la-Security.lo \
-	lib_gnu_apl_la-StateIndicator.lo lib_gnu_apl_la-Svar_DB.lo \
-	lib_gnu_apl_la-Svar_record.lo lib_gnu_apl_la-Symbol.lo \
-	lib_gnu_apl_la-SymbolTable.lo lib_gnu_apl_la-SystemVariable.lo \
+	lib_gnu_apl_la-Quad_MAP.lo lib_gnu_apl_la-Quad_MX.lo \
+	lib_gnu_apl_la-Quad_PLOT.lo lib_gnu_apl_la-Quad_PNG.lo \
+	lib_gnu_apl_la-Quad_RE.lo lib_gnu_apl_la-Quad_RL.lo \
+	lib_gnu_apl_la-Quad_RVAL.lo lib_gnu_apl_la-Quad_SQL.lo \
+	lib_gnu_apl_la-Quad_SVx.lo lib_gnu_apl_la-Quad_TF.lo \
+	lib_gnu_apl_la-Quad_WA.lo lib_gnu_apl_la-Quad_XML.lo \
+	lib_gnu_apl_la-RealCell.lo lib_gnu_apl_la-sbrk.lo \
+	lib_gnu_apl_la-Shape.lo lib_gnu_apl_la-ScalarFunction.lo \
+	lib_gnu_apl_la-Security.lo lib_gnu_apl_la-StateIndicator.lo \
+	lib_gnu_apl_la-Svar_DB.lo lib_gnu_apl_la-Svar_record.lo \
+	lib_gnu_apl_la-Symbol.lo lib_gnu_apl_la-SymbolTable.lo \
+	lib_gnu_apl_la-SystemVariable.lo \
 	lib_gnu_apl_la-TabExpansion.lo \
 	lib_gnu_apl_la-Thread_context.lo lib_gnu_apl_la-Token.lo \
-	lib_gnu_apl_la-Tokenizer.lo lib_gnu_apl_la-UCS_string.lo \
+	lib_gnu_apl_la-Token_string.lo lib_gnu_apl_la-Tokenizer.lo \
+	lib_gnu_apl_la-UCS_string.lo \
 	lib_gnu_apl_la-UCS_string_vector.lo \
 	lib_gnu_apl_la-UserFunction.lo \
 	lib_gnu_apl_la-UserFunction_header.lo \
 	lib_gnu_apl_la-UserPreferences.lo \
 	lib_gnu_apl_la-UTF8_string.lo lib_gnu_apl_la-Value.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
-	lib_gnu_apl_la-static_Objects.lo $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_5)
-@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS = $(am__objects_6) \
+	lib_gnu_apl_la-static_Objects.lo $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS = $(am__objects_8) \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
 lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -345,27 +364,28 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-rpath \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
-am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
+am__libapl_la_SOURCES_DIST = Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
+	../config.h APL_Float_as_class.hh APL_types.hh APL_enums.hh \
+	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
+	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
+	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
 	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
 	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
@@ -383,56 +403,62 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh PythonPipe.cc PythonPipe.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
-	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
-	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
-	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Quad_CC.cc Quad_CC.hh Quad_CR.cc Quad_CR.def Quad_CR.hh \
+	Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc \
+	Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
+	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
 	libapl.cc
-@apl_GTK3_FALSE@am__objects_7 = libapl_la-Plot_xcb.lo
-@apl_GTK3_TRUE@am__objects_7 = libapl_la-Plot_gtk.lo
-@apl_PCRE_TRUE@am__objects_8 = libapl_la-Regexp.lo
-@apl_SQLITE3_TRUE@am__objects_9 =  \
+@apl_GTK3_TRUE@am__objects_9 = libapl_la-Plot_gtk.lo
+@apl_XCB_TRUE@am__objects_10 = libapl_la-Plot_xcb.lo
+am__objects_11 = libapl_la-Plot_ascii.lo $(am__objects_9) \
+	$(am__objects_10)
+@apl_PCRE_TRUE@am__objects_12 = libapl_la-Regexp.lo
+@apl_SQLITE3_TRUE@am__objects_13 =  \
 @apl_SQLITE3_TRUE@	sql/libapl_la-SqliteArgListBuilder.lo \
 @apl_SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
 @apl_SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
 @apl_SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
 @apl_SQLITE3_TRUE@	sql/libapl_la-Connection.lo
-@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_10 = sql/libapl_la-Connection.lo
-@apl_POSTGRES_TRUE@am__objects_11 =  \
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_14 = sql/libapl_la-Connection.lo
+@apl_POSTGRES_TRUE@am__objects_15 =  \
 @apl_POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
 @apl_POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
 @apl_POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
-am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
+am__objects_16 = $(am__objects_11) libapl_la-Archive.lo \
 	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_COMMA.lo libapl_la-Bif_F12_DOMINO.lo \
 	libapl_la-Bif_F12_INDEX_OF.lo \
@@ -444,6 +470,7 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Bif_OPER2_INNER.lo libapl_la-Bif_OPER2_OUTER.lo \
 	libapl_la-Bif_OPER2_RANK.lo libapl_la-Bif_OPER1_REDUCE.lo \
 	libapl_la-Bif_OPER1_SCAN.lo libapl_la-CDR.lo libapl_la-Cell.lo \
+	libapl_la-Cmd_KEYB.lo libapl_la-Cmd_LIB.lo libapl_la-Cmd_IN.lo \
 	libapl_la-Doxy.lo libapl_la-CharCell.lo libapl_la-Command.lo \
 	libapl_la-Common.lo libapl_la-ComplexCell.lo \
 	libapl_la-DerivedFunction.lo libapl_la-DiffOut.lo \
@@ -463,58 +490,62 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Prefix.lo libapl_la-Plot_line_properties.lo \
 	libapl_la-Plot_data.lo libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrintBuffer.lo \
-	libapl_la-QuadFunction.lo libapl_la-ProcessorID.lo \
+	libapl_la-Polynomial.lo libapl_la-PythonPipe.lo \
+	libapl_la-QR_factorization_GSL.lo libapl_la-QuadFunction.lo \
+	libapl_la-ProcessorID.lo libapl_la-Quad_CC.lo \
 	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
 	libapl_la-Quad_FFT.lo libapl_la-Quad_FIO.lo \
 	libapl_la-Quad_FX.lo libapl_la-Quad_GTK.lo \
 	libapl_la-Quad_JSON.lo libapl_la-Quad_MAP.lo \
-	libapl_la-Quad_PLOT.lo libapl_la-Quad_PNG.lo \
-	libapl_la-Quad_RE.lo libapl_la-Quad_RL.lo \
-	libapl_la-Quad_RVAL.lo libapl_la-Quad_SQL.lo \
-	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
-	libapl_la-Quad_WA.lo libapl_la-Quad_XML.lo \
-	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
-	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
-	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
-	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
-	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
-	libapl_la-TabExpansion.lo libapl_la-Thread_context.lo \
-	libapl_la-Token.lo libapl_la-Tokenizer.lo \
+	libapl_la-Quad_MX.lo libapl_la-Quad_PLOT.lo \
+	libapl_la-Quad_PNG.lo libapl_la-Quad_RE.lo \
+	libapl_la-Quad_RL.lo libapl_la-Quad_RVAL.lo \
+	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
+	libapl_la-Quad_TF.lo libapl_la-Quad_WA.lo \
+	libapl_la-Quad_XML.lo libapl_la-RealCell.lo libapl_la-sbrk.lo \
+	libapl_la-Shape.lo libapl_la-ScalarFunction.lo \
+	libapl_la-Security.lo libapl_la-StateIndicator.lo \
+	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
+	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
+	libapl_la-SystemVariable.lo libapl_la-TabExpansion.lo \
+	libapl_la-Thread_context.lo libapl_la-Token.lo \
+	libapl_la-Token_string.lo libapl_la-Tokenizer.lo \
 	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
 	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
 	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
 	libapl_la-Value.lo libapl_la-ValueHistory.lo \
 	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	$(am__objects_11)
-@apl_TARGET_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15)
+@apl_TARGET_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_16) \
 @apl_TARGET_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
 libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libapl_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
 @apl_TARGET_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
-am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
-	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
-	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
-	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
+am__apl_SOURCES_DIST = main.cc Plot_ascii.cc Plot_gtk.cc Plot_xcb.cc \
+	../config.h APL_Float_as_class.hh APL_types.hh APL_enums.hh \
+	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
+	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
+	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc \
+	Cmd_IN.cc Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh ConstCell_P.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FileBuffers.hh \
 	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
 	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
 	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
@@ -532,55 +563,61 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh PythonPipe.cc PythonPipe.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
-	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
-	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
-	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Quad_CC.cc Quad_CC.hh Quad_CR.cc Quad_CR.def Quad_CR.hh \
+	Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc \
+	Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
+	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
-@apl_GTK3_FALSE@am__objects_13 = apl-Plot_xcb.$(OBJEXT)
-@apl_GTK3_TRUE@am__objects_13 = apl-Plot_gtk.$(OBJEXT)
-@apl_PCRE_TRUE@am__objects_14 = apl-Regexp.$(OBJEXT)
-@apl_SQLITE3_TRUE@am__objects_15 =  \
+@apl_GTK3_TRUE@am__objects_17 = apl-Plot_gtk.$(OBJEXT)
+@apl_XCB_TRUE@am__objects_18 = apl-Plot_xcb.$(OBJEXT)
+am__objects_19 = apl-Plot_ascii.$(OBJEXT) $(am__objects_17) \
+	$(am__objects_18)
+@apl_PCRE_TRUE@am__objects_20 = apl-Regexp.$(OBJEXT)
+@apl_SQLITE3_TRUE@am__objects_21 =  \
 @apl_SQLITE3_TRUE@	sql/apl-SqliteArgListBuilder.$(OBJEXT) \
 @apl_SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
 @apl_SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
 @apl_SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
 @apl_SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
-@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_16 = sql/apl-Connection.$(OBJEXT)
-@apl_POSTGRES_TRUE@am__objects_17 =  \
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_22 = sql/apl-Connection.$(OBJEXT)
+@apl_POSTGRES_TRUE@am__objects_23 =  \
 @apl_POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
 @apl_POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
 @apl_POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
-am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
+am__objects_24 = $(am__objects_19) apl-Archive.$(OBJEXT) \
 	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
 	apl-Backtrace.$(OBJEXT) apl-Bif_F12_COMMA.$(OBJEXT) \
 	apl-Bif_F12_DOMINO.$(OBJEXT) apl-Bif_F12_INDEX_OF.$(OBJEXT) \
@@ -592,7 +629,8 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Bif_OPER2_POWER.$(OBJEXT) apl-Bif_OPER2_INNER.$(OBJEXT) \
 	apl-Bif_OPER2_OUTER.$(OBJEXT) apl-Bif_OPER2_RANK.$(OBJEXT) \
 	apl-Bif_OPER1_REDUCE.$(OBJEXT) apl-Bif_OPER1_SCAN.$(OBJEXT) \
-	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) \
+	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Cmd_KEYB.$(OBJEXT) \
+	apl-Cmd_LIB.$(OBJEXT) apl-Cmd_IN.$(OBJEXT) apl-Doxy.$(OBJEXT) \
 	apl-CharCell.$(OBJEXT) apl-Command.$(OBJEXT) \
 	apl-Common.$(OBJEXT) apl-ComplexCell.$(OBJEXT) \
 	apl-DerivedFunction.$(OBJEXT) apl-DiffOut.$(OBJEXT) \
@@ -613,32 +651,36 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
 	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
-	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
+	apl-Polynomial.$(OBJEXT) apl-PythonPipe.$(OBJEXT) \
+	apl-QR_factorization_GSL.$(OBJEXT) apl-QuadFunction.$(OBJEXT) \
+	apl-ProcessorID.$(OBJEXT) apl-Quad_CC.$(OBJEXT) \
 	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
 	apl-Quad_FFT.$(OBJEXT) apl-Quad_FIO.$(OBJEXT) \
 	apl-Quad_FX.$(OBJEXT) apl-Quad_GTK.$(OBJEXT) \
 	apl-Quad_JSON.$(OBJEXT) apl-Quad_MAP.$(OBJEXT) \
-	apl-Quad_PLOT.$(OBJEXT) apl-Quad_PNG.$(OBJEXT) \
-	apl-Quad_RE.$(OBJEXT) apl-Quad_RL.$(OBJEXT) \
-	apl-Quad_RVAL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
-	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
-	apl-Quad_WA.$(OBJEXT) apl-Quad_XML.$(OBJEXT) \
-	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-Quad_MX.$(OBJEXT) apl-Quad_PLOT.$(OBJEXT) \
+	apl-Quad_PNG.$(OBJEXT) apl-Quad_RE.$(OBJEXT) \
+	apl-Quad_RL.$(OBJEXT) apl-Quad_RVAL.$(OBJEXT) \
+	apl-Quad_SQL.$(OBJEXT) apl-Quad_SVx.$(OBJEXT) \
+	apl-Quad_TF.$(OBJEXT) apl-Quad_WA.$(OBJEXT) \
+	apl-Quad_XML.$(OBJEXT) apl-RealCell.$(OBJEXT) \
+	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
 	apl-SymbolTable.$(OBJEXT) apl-SystemVariable.$(OBJEXT) \
 	apl-TabExpansion.$(OBJEXT) apl-Thread_context.$(OBJEXT) \
-	apl-Token.$(OBJEXT) apl-Tokenizer.$(OBJEXT) \
-	apl-UCS_string.$(OBJEXT) apl-UCS_string_vector.$(OBJEXT) \
-	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
+	apl-Token.$(OBJEXT) apl-Token_string.$(OBJEXT) \
+	apl-Tokenizer.$(OBJEXT) apl-UCS_string.$(OBJEXT) \
+	apl-UCS_string_vector.$(OBJEXT) apl-UserFunction.$(OBJEXT) \
+	apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
-	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
-	$(am__objects_17)
+	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
+	$(am__objects_23)
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
-@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(am__objects_18)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(am__objects_24)
 am__EXTRA_apl_SOURCES_DIST = Plot_gtk.cc Plot_xcb.cc
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -646,6 +688,7 @@ apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
 apl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(apl_CXXFLAGS) \
 	$(CXXFLAGS) $(apl_LDFLAGS) $(LDFLAGS) -o $@
+SCRIPTS = $(dist_SCRIPTS) $(dist_noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -680,8 +723,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-Bif_OPER2_POWER.Po \
 	./$(DEPDIR)/apl-Bif_OPER2_RANK.Po ./$(DEPDIR)/apl-CDR.Po \
 	./$(DEPDIR)/apl-Cell.Po ./$(DEPDIR)/apl-CharCell.Po \
-	./$(DEPDIR)/apl-Command.Po ./$(DEPDIR)/apl-Common.Po \
-	./$(DEPDIR)/apl-ComplexCell.Po \
+	./$(DEPDIR)/apl-Cmd_IN.Po ./$(DEPDIR)/apl-Cmd_KEYB.Po \
+	./$(DEPDIR)/apl-Cmd_LIB.Po ./$(DEPDIR)/apl-Command.Po \
+	./$(DEPDIR)/apl-Common.Po ./$(DEPDIR)/apl-ComplexCell.Po \
 	./$(DEPDIR)/apl-DerivedFunction.Po ./$(DEPDIR)/apl-DiffOut.Po \
 	./$(DEPDIR)/apl-Doxy.Po ./$(DEPDIR)/apl-DynamicObject.Po \
 	./$(DEPDIR)/apl-Error.Po ./$(DEPDIR)/apl-Executable.Po \
@@ -698,18 +742,22 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-NativeFunction.Po \
 	./$(DEPDIR)/apl-NumericCell.Po ./$(DEPDIR)/apl-Output.Po \
 	./$(DEPDIR)/apl-Parallel.Po ./$(DEPDIR)/apl-Parser.Po \
-	./$(DEPDIR)/apl-Performance.Po ./$(DEPDIR)/apl-Plot_data.Po \
-	./$(DEPDIR)/apl-Plot_gtk.Po \
+	./$(DEPDIR)/apl-Performance.Po ./$(DEPDIR)/apl-Plot_ascii.Po \
+	./$(DEPDIR)/apl-Plot_data.Po ./$(DEPDIR)/apl-Plot_gtk.Po \
 	./$(DEPDIR)/apl-Plot_line_properties.Po \
 	./$(DEPDIR)/apl-Plot_window_properties.Po \
 	./$(DEPDIR)/apl-Plot_xcb.Po ./$(DEPDIR)/apl-PointerCell.Po \
-	./$(DEPDIR)/apl-Prefix.Po ./$(DEPDIR)/apl-PrimitiveFunction.Po \
+	./$(DEPDIR)/apl-Polynomial.Po ./$(DEPDIR)/apl-Prefix.Po \
+	./$(DEPDIR)/apl-PrimitiveFunction.Po \
 	./$(DEPDIR)/apl-PrintBuffer.Po ./$(DEPDIR)/apl-ProcessorID.Po \
-	./$(DEPDIR)/apl-QuadFunction.Po ./$(DEPDIR)/apl-Quad_CR.Po \
-	./$(DEPDIR)/apl-Quad_DLX.Po ./$(DEPDIR)/apl-Quad_FFT.Po \
-	./$(DEPDIR)/apl-Quad_FIO.Po ./$(DEPDIR)/apl-Quad_FX.Po \
-	./$(DEPDIR)/apl-Quad_GTK.Po ./$(DEPDIR)/apl-Quad_JSON.Po \
-	./$(DEPDIR)/apl-Quad_MAP.Po ./$(DEPDIR)/apl-Quad_PLOT.Po \
+	./$(DEPDIR)/apl-PythonPipe.Po \
+	./$(DEPDIR)/apl-QR_factorization_GSL.Po \
+	./$(DEPDIR)/apl-QuadFunction.Po ./$(DEPDIR)/apl-Quad_CC.Po \
+	./$(DEPDIR)/apl-Quad_CR.Po ./$(DEPDIR)/apl-Quad_DLX.Po \
+	./$(DEPDIR)/apl-Quad_FFT.Po ./$(DEPDIR)/apl-Quad_FIO.Po \
+	./$(DEPDIR)/apl-Quad_FX.Po ./$(DEPDIR)/apl-Quad_GTK.Po \
+	./$(DEPDIR)/apl-Quad_JSON.Po ./$(DEPDIR)/apl-Quad_MAP.Po \
+	./$(DEPDIR)/apl-Quad_MX.Po ./$(DEPDIR)/apl-Quad_PLOT.Po \
 	./$(DEPDIR)/apl-Quad_PNG.Po ./$(DEPDIR)/apl-Quad_RE.Po \
 	./$(DEPDIR)/apl-Quad_RL.Po ./$(DEPDIR)/apl-Quad_RVAL.Po \
 	./$(DEPDIR)/apl-Quad_SQL.Po ./$(DEPDIR)/apl-Quad_SVx.Po \
@@ -723,7 +771,8 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/apl-SystemVariable.Po \
 	./$(DEPDIR)/apl-TabExpansion.Po \
 	./$(DEPDIR)/apl-Thread_context.Po ./$(DEPDIR)/apl-Token.Po \
-	./$(DEPDIR)/apl-Tokenizer.Po ./$(DEPDIR)/apl-UCS_string.Po \
+	./$(DEPDIR)/apl-Token_string.Po ./$(DEPDIR)/apl-Tokenizer.Po \
+	./$(DEPDIR)/apl-UCS_string.Po \
 	./$(DEPDIR)/apl-UCS_string_vector.Po \
 	./$(DEPDIR)/apl-UTF8_string.Po ./$(DEPDIR)/apl-UserFunction.Po \
 	./$(DEPDIR)/apl-UserFunction_header.Po \
@@ -754,6 +803,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Command.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Common.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo \
@@ -787,17 +839,22 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-PythonPipe.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Quad_CC.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo \
@@ -806,6 +863,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_JSON.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_MAP.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Quad_MX.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_PNG.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo \
@@ -830,6 +888,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Token.Plo \
+	./$(DEPDIR)/lib_gnu_apl_la-Token_string.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo \
 	./$(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo \
@@ -865,6 +924,9 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Bif_OPER2_RANK.Plo \
 	./$(DEPDIR)/libapl_la-CDR.Plo ./$(DEPDIR)/libapl_la-Cell.Plo \
 	./$(DEPDIR)/libapl_la-CharCell.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_IN.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo \
+	./$(DEPDIR)/libapl_la-Cmd_LIB.Plo \
 	./$(DEPDIR)/libapl_la-Command.Plo \
 	./$(DEPDIR)/libapl_la-Common.Plo \
 	./$(DEPDIR)/libapl_la-ComplexCell.Plo \
@@ -898,17 +960,22 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Parallel.Plo \
 	./$(DEPDIR)/libapl_la-Parser.Plo \
 	./$(DEPDIR)/libapl_la-Performance.Plo \
+	./$(DEPDIR)/libapl_la-Plot_ascii.Plo \
 	./$(DEPDIR)/libapl_la-Plot_data.Plo \
 	./$(DEPDIR)/libapl_la-Plot_gtk.Plo \
 	./$(DEPDIR)/libapl_la-Plot_line_properties.Plo \
 	./$(DEPDIR)/libapl_la-Plot_window_properties.Plo \
 	./$(DEPDIR)/libapl_la-Plot_xcb.Plo \
 	./$(DEPDIR)/libapl_la-PointerCell.Plo \
+	./$(DEPDIR)/libapl_la-Polynomial.Plo \
 	./$(DEPDIR)/libapl_la-Prefix.Plo \
 	./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo \
 	./$(DEPDIR)/libapl_la-PrintBuffer.Plo \
 	./$(DEPDIR)/libapl_la-ProcessorID.Plo \
+	./$(DEPDIR)/libapl_la-PythonPipe.Plo \
+	./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo \
 	./$(DEPDIR)/libapl_la-QuadFunction.Plo \
+	./$(DEPDIR)/libapl_la-Quad_CC.Plo \
 	./$(DEPDIR)/libapl_la-Quad_CR.Plo \
 	./$(DEPDIR)/libapl_la-Quad_DLX.Plo \
 	./$(DEPDIR)/libapl_la-Quad_FFT.Plo \
@@ -917,6 +984,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-Quad_GTK.Plo \
 	./$(DEPDIR)/libapl_la-Quad_JSON.Plo \
 	./$(DEPDIR)/libapl_la-Quad_MAP.Plo \
+	./$(DEPDIR)/libapl_la-Quad_MX.Plo \
 	./$(DEPDIR)/libapl_la-Quad_PLOT.Plo \
 	./$(DEPDIR)/libapl_la-Quad_PNG.Plo \
 	./$(DEPDIR)/libapl_la-Quad_RE.Plo \
@@ -941,6 +1009,7 @@ am__depfiles_remade = ./$(DEPDIR)/apl-Archive.Po \
 	./$(DEPDIR)/libapl_la-TabExpansion.Plo \
 	./$(DEPDIR)/libapl_la-Thread_context.Plo \
 	./$(DEPDIR)/libapl_la-Token.Plo \
+	./$(DEPDIR)/libapl_la-Token_string.Plo \
 	./$(DEPDIR)/libapl_la-Tokenizer.Plo \
 	./$(DEPDIR)/libapl_la-UCS_string.Plo \
 	./$(DEPDIR)/libapl_la-UCS_string_vector.Plo \
@@ -1089,6 +1158,7 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
+ALT_MAP_WANTED = @ALT_MAP_WANTED@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 APSERVER_PATH = @APSERVER_PATH@
@@ -1205,6 +1275,8 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+apl_BUILD_DATE = @apl_BUILD_DATE@
+apl_BUILD_OS = @apl_BUILD_OS@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -1246,13 +1318,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+dist_noinst_SCRIPTS = integral.py
+dist_SCRIPTS = integral.py
+distdir = ${bindir}
 EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
-@apl_GTK3_FALSE@plot_SOURCES = Plot_xcb.cc
-@apl_GTK3_TRUE@plot_SOURCES = Plot_gtk.cc
+EXTRA_apl_SOURCES = $(am__append_4) $(am__append_6)
+plot_SOURCES = Plot_ascii.cc $(am__append_3) $(am__append_5)
 @apl_GTK3_TRUE@plot_CXXFLAGS = -Wno-parentheses
-@apl_GTK3_FALSE@EXTRA_apl_SOURCES = Plot_gtk.cc
-@apl_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
 dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
 
@@ -1260,75 +1333,81 @@ DIST_SUBDIRS = $(SUBDIRS) testcases
 #
 common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) \
 	$(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) $(PYTHON_CFLAGS) \
-	$(am__append_4) $(am__append_8)
-common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) $(am__append_5) \
-	$(am__append_9)
+	$(am__append_8) $(am__append_12)
+common_LDFLAGS = -L/usr/local/lib -export-dynamic $(GTK_LDFLAGS) \
+	$(am__append_9) $(am__append_13)
 common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
-	APL_types.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
-	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
-	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
-	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
-	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
-	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
-	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
-	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
-	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
-	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
-	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
-	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
-	IO_Files.hh LApack.cc LAdebug.icc LApack.hh LibPaths.cc \
-	LibPaths.hh LineInput.cc LineInput.hh Logging.cc Logging.def \
-	Logging.hh LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
-	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
-	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
+	APL_types.hh APL_enums.hh Archive.cc Archive.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
+	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc \
+	Bif_F12_INDEX_OF.hh Bif_F12_INTERVAL_INDEX.cc \
+	Bif_F12_INTERVAL_INDEX.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_PARTITION_PICK.cc Bif_F12_PARTITION_PICK.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Cmd_KEYB.cc Cmd_LIB.cc Cmd_IN.cc Doxy.cc \
+	Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	ConstCell_P.hh DerivedFunction.cc DerivedFunction.hh \
+	DiffOut.cc DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FileBuffers.hh FloatCell.cc FloatCell.hh \
+	Focus.icc Function.cc Function.hh Help.def Heapsort.hh Id.cc \
+	Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LAdebug.icc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh Polynomial.cc \
+	Polynomial.hh PrintOperator.hh PythonPipe.cc PythonPipe.hh \
+	QR_factorization_GSL.cc QR_factorization_GSL.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc \
-	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
-	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
-	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	Quad_CC.cc Quad_CC.hh Quad_CR.cc Quad_CR.def Quad_CR.hh \
+	Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc \
+	Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_MX.cc Quad_MX.def Quad_MX.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_PNG.cc Quad_PNG.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh Simple_string.hh \
 	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
-	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
-	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
-	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
-	UserFunction.cc UserFunction.hh UserFunction_header.cc \
-	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
-	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh $(am__append_3) $(am__append_6) \
-	$(am__append_7) $(am__append_10)
-pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
+	Thread_context.hh Token.cc Token.def Token.hh Token_string.cc \
+	Token_string.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
+	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
+	Workspace.icc Workspace.hh static_Objects.cc static_Objects.hh \
+	$(am__append_7) $(am__append_10) $(am__append_11) \
+	$(am__append_14)
+pkglib_LTLIBRARIES = $(am__append_15) $(am__append_16)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @apl_TARGET_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) \
@@ -1542,6 +1621,41 @@ sql/apl-PostgresProvider.$(OBJEXT): sql/$(am__dirstamp) \
 apl$(EXEEXT): $(apl_OBJECTS) $(apl_DEPENDENCIES) $(EXTRA_apl_DEPENDENCIES) 
 	@rm -f apl$(EXEEXT)
 	$(AM_V_CXXLD)$(apl_LINK) $(apl_OBJECTS) $(apl_LDADD) $(LIBS)
+install-distSCRIPTS: $(dist_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	@list='$(dist_SCRIPTS)'; test -n "$(distdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(distdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(distdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n' \
+	    -e 'h;s|.*|.|' \
+	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
+	      if (++n[d] == $(am__install_max)) { \
+		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
+	    else { print "f", d "/" $$4, $$1 } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	     test -z "$$files" || { \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(distdir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(distdir)$$dir" || exit $$?; \
+	     } \
+	; done
+
+uninstall-distSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_SCRIPTS)'; test -n "$(distdir)" || exit 0; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	       sed -e 's,.*/,,;$(transform)'`; \
+	dir='$(DESTDIR)$(distdir)'; $(am__uninstall_files_from_dir)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1574,6 +1688,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-CDR.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cell.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-CharCell.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_IN.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_KEYB.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Cmd_LIB.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Command.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Common.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ComplexCell.Po@am__quote@ # am--include-marker
@@ -1607,17 +1724,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Parallel.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Parser.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Performance.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_ascii.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_gtk.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_line_properties.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_window_properties.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_xcb.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PointerCell.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Polynomial.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Prefix.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrintBuffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ProcessorID.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PythonPipe.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-QR_factorization_GSL.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-QuadFunction.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_CC.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_CR.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_DLX.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_FFT.Po@am__quote@ # am--include-marker
@@ -1626,6 +1748,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_GTK.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_JSON.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_MAP.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_MX.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_PLOT.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_PNG.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_RE.Po@am__quote@ # am--include-marker
@@ -1650,6 +1773,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-TabExpansion.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Thread_context.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Token.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Token_string.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Tokenizer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UCS_string.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UCS_string_vector.Po@am__quote@ # am--include-marker
@@ -1686,6 +1810,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Command.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Common.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo@am__quote@ # am--include-marker
@@ -1719,17 +1846,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PythonPipe.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_CC.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo@am__quote@ # am--include-marker
@@ -1738,6 +1870,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_JSON.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_MAP.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_MX.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_PNG.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo@am__quote@ # am--include-marker
@@ -1762,6 +1895,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Token.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Token_string.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo@am__quote@ # am--include-marker
@@ -1798,6 +1932,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-CDR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cell.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-CharCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_IN.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Cmd_LIB.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Command.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Common.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ComplexCell.Plo@am__quote@ # am--include-marker
@@ -1831,17 +1968,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Parallel.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Parser.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Performance.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_ascii.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_data.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_gtk.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_line_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_window_properties.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_xcb.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PointerCell.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Polynomial.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Prefix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrintBuffer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ProcessorID.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PythonPipe.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-QuadFunction.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_CC.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_CR.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_DLX.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_FFT.Plo@am__quote@ # am--include-marker
@@ -1850,6 +1992,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_GTK.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_JSON.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_MAP.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_MX.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_PLOT.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_PNG.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_RE.Plo@am__quote@ # am--include-marker
@@ -1874,6 +2017,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-TabExpansion.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Thread_context.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Token.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Token_string.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Tokenizer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UCS_string.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UCS_string_vector.Plo@am__quote@ # am--include-marker
@@ -1942,12 +2086,12 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-lib_gnu_apl_la-Plot_xcb.lo: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='lib_gnu_apl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+lib_gnu_apl_la-Plot_ascii.lo: Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_ascii.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Tpo -c -o lib_gnu_apl_la-Plot_ascii.lo `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_ascii.cc' object='lib_gnu_apl_la-Plot_ascii.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_ascii.lo `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
 
 lib_gnu_apl_la-Plot_gtk.lo: Plot_gtk.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
@@ -1955,6 +2099,13 @@ lib_gnu_apl_la-Plot_gtk.lo: Plot_gtk.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='lib_gnu_apl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+
+lib_gnu_apl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='lib_gnu_apl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
 
 lib_gnu_apl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Archive.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Archive.Tpo -c -o lib_gnu_apl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -2109,6 +2260,27 @@ lib_gnu_apl_la-Cell.lo: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='lib_gnu_apl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+lib_gnu_apl_la-Cmd_KEYB.lo: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_KEYB.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Tpo -c -o lib_gnu_apl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='lib_gnu_apl_la-Cmd_KEYB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+lib_gnu_apl_la-Cmd_LIB.lo: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_LIB.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Tpo -c -o lib_gnu_apl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='lib_gnu_apl_la-Cmd_LIB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+lib_gnu_apl_la-Cmd_IN.lo: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cmd_IN.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Tpo -c -o lib_gnu_apl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Tpo $(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='lib_gnu_apl_la-Cmd_IN.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
 
 lib_gnu_apl_la-Doxy.lo: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Doxy.Tpo -c -o lib_gnu_apl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -2397,6 +2569,27 @@ lib_gnu_apl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
 
+lib_gnu_apl_la-Polynomial.lo: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Polynomial.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Polynomial.Tpo -c -o lib_gnu_apl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Polynomial.Tpo $(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='lib_gnu_apl_la-Polynomial.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+
+lib_gnu_apl_la-PythonPipe.lo: PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PythonPipe.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PythonPipe.Tpo -c -o lib_gnu_apl_la-PythonPipe.lo `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PythonPipe.Tpo $(DEPDIR)/lib_gnu_apl_la-PythonPipe.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PythonPipe.cc' object='lib_gnu_apl_la-PythonPipe.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PythonPipe.lo `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+
+lib_gnu_apl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Tpo -c -o lib_gnu_apl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Tpo $(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='lib_gnu_apl_la-QR_factorization_GSL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+
 lib_gnu_apl_la-QuadFunction.lo: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QuadFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Tpo -c -o lib_gnu_apl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
@@ -2410,6 +2603,13 @@ lib_gnu_apl_la-ProcessorID.lo: ProcessorID.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ProcessorID.cc' object='lib_gnu_apl_la-ProcessorID.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ProcessorID.lo `test -f 'ProcessorID.cc' || echo '$(srcdir)/'`ProcessorID.cc
+
+lib_gnu_apl_la-Quad_CC.lo: Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_CC.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_CC.Tpo -c -o lib_gnu_apl_la-Quad_CC.lo `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_CC.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_CC.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_CC.cc' object='lib_gnu_apl_la-Quad_CC.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_CC.lo `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
 
 lib_gnu_apl_la-Quad_CR.lo: Quad_CR.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_CR.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_CR.Tpo -c -o lib_gnu_apl_la-Quad_CR.lo `test -f 'Quad_CR.cc' || echo '$(srcdir)/'`Quad_CR.cc
@@ -2466,6 +2666,13 @@ lib_gnu_apl_la-Quad_MAP.lo: Quad_MAP.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MAP.cc' object='lib_gnu_apl_la-Quad_MAP.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_MAP.lo `test -f 'Quad_MAP.cc' || echo '$(srcdir)/'`Quad_MAP.cc
+
+lib_gnu_apl_la-Quad_MX.lo: Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_MX.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_MX.Tpo -c -o lib_gnu_apl_la-Quad_MX.lo `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_MX.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_MX.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MX.cc' object='lib_gnu_apl_la-Quad_MX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_MX.lo `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
 
 lib_gnu_apl_la-Quad_PLOT.lo: Quad_PLOT.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_PLOT.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Tpo -c -o lib_gnu_apl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
@@ -2635,6 +2842,13 @@ lib_gnu_apl_la-Token.lo: Token.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Token.lo `test -f 'Token.cc' || echo '$(srcdir)/'`Token.cc
 
+lib_gnu_apl_la-Token_string.lo: Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Token_string.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Token_string.Tpo -c -o lib_gnu_apl_la-Token_string.lo `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Token_string.Tpo $(DEPDIR)/lib_gnu_apl_la-Token_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token_string.cc' object='lib_gnu_apl_la-Token_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Token_string.lo `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+
 lib_gnu_apl_la-Tokenizer.lo: Tokenizer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Tokenizer.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Tpo -c -o lib_gnu_apl_la-Tokenizer.lo `test -f 'Tokenizer.cc' || echo '$(srcdir)/'`Tokenizer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Tpo $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo
@@ -2782,12 +2996,12 @@ lib_gnu_apl_la-python_apl.lo: python_apl.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-python_apl.lo `test -f 'python_apl.cc' || echo '$(srcdir)/'`python_apl.cc
 
-libapl_la-Plot_xcb.lo: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_xcb.Tpo -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_xcb.Tpo $(DEPDIR)/libapl_la-Plot_xcb.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='libapl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+libapl_la-Plot_ascii.lo: Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_ascii.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_ascii.Tpo -c -o libapl_la-Plot_ascii.lo `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_ascii.Tpo $(DEPDIR)/libapl_la-Plot_ascii.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_ascii.cc' object='libapl_la-Plot_ascii.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_ascii.lo `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
 
 libapl_la-Plot_gtk.lo: Plot_gtk.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_gtk.Tpo -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
@@ -2795,6 +3009,13 @@ libapl_la-Plot_gtk.lo: Plot_gtk.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='libapl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+
+libapl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_xcb.Tpo -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_xcb.Tpo $(DEPDIR)/libapl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='libapl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
 
 libapl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Archive.lo -MD -MP -MF $(DEPDIR)/libapl_la-Archive.Tpo -c -o libapl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -2949,6 +3170,27 @@ libapl_la-Cell.lo: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='libapl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+libapl_la-Cmd_KEYB.lo: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_KEYB.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_KEYB.Tpo -c -o libapl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_KEYB.Tpo $(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='libapl_la-Cmd_KEYB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_KEYB.lo `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+libapl_la-Cmd_LIB.lo: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_LIB.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_LIB.Tpo -c -o libapl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_LIB.Tpo $(DEPDIR)/libapl_la-Cmd_LIB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='libapl_la-Cmd_LIB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_LIB.lo `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+libapl_la-Cmd_IN.lo: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Cmd_IN.lo -MD -MP -MF $(DEPDIR)/libapl_la-Cmd_IN.Tpo -c -o libapl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Cmd_IN.Tpo $(DEPDIR)/libapl_la-Cmd_IN.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='libapl_la-Cmd_IN.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cmd_IN.lo `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
 
 libapl_la-Doxy.lo: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/libapl_la-Doxy.Tpo -c -o libapl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -3237,6 +3479,27 @@ libapl_la-PrintBuffer.lo: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
 
+libapl_la-Polynomial.lo: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Polynomial.lo -MD -MP -MF $(DEPDIR)/libapl_la-Polynomial.Tpo -c -o libapl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Polynomial.Tpo $(DEPDIR)/libapl_la-Polynomial.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='libapl_la-Polynomial.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Polynomial.lo `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+
+libapl_la-PythonPipe.lo: PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-PythonPipe.lo -MD -MP -MF $(DEPDIR)/libapl_la-PythonPipe.Tpo -c -o libapl_la-PythonPipe.lo `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-PythonPipe.Tpo $(DEPDIR)/libapl_la-PythonPipe.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PythonPipe.cc' object='libapl_la-PythonPipe.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PythonPipe.lo `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+
+libapl_la-QR_factorization_GSL.lo: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-QR_factorization_GSL.lo -MD -MP -MF $(DEPDIR)/libapl_la-QR_factorization_GSL.Tpo -c -o libapl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-QR_factorization_GSL.Tpo $(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='libapl_la-QR_factorization_GSL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-QR_factorization_GSL.lo `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+
 libapl_la-QuadFunction.lo: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-QuadFunction.lo -MD -MP -MF $(DEPDIR)/libapl_la-QuadFunction.Tpo -c -o libapl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-QuadFunction.Tpo $(DEPDIR)/libapl_la-QuadFunction.Plo
@@ -3250,6 +3513,13 @@ libapl_la-ProcessorID.lo: ProcessorID.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ProcessorID.cc' object='libapl_la-ProcessorID.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-ProcessorID.lo `test -f 'ProcessorID.cc' || echo '$(srcdir)/'`ProcessorID.cc
+
+libapl_la-Quad_CC.lo: Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_CC.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_CC.Tpo -c -o libapl_la-Quad_CC.lo `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Quad_CC.Tpo $(DEPDIR)/libapl_la-Quad_CC.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_CC.cc' object='libapl_la-Quad_CC.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_CC.lo `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
 
 libapl_la-Quad_CR.lo: Quad_CR.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_CR.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_CR.Tpo -c -o libapl_la-Quad_CR.lo `test -f 'Quad_CR.cc' || echo '$(srcdir)/'`Quad_CR.cc
@@ -3306,6 +3576,13 @@ libapl_la-Quad_MAP.lo: Quad_MAP.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MAP.cc' object='libapl_la-Quad_MAP.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_MAP.lo `test -f 'Quad_MAP.cc' || echo '$(srcdir)/'`Quad_MAP.cc
+
+libapl_la-Quad_MX.lo: Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_MX.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_MX.Tpo -c -o libapl_la-Quad_MX.lo `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Quad_MX.Tpo $(DEPDIR)/libapl_la-Quad_MX.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MX.cc' object='libapl_la-Quad_MX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_MX.lo `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
 
 libapl_la-Quad_PLOT.lo: Quad_PLOT.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_PLOT.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_PLOT.Tpo -c -o libapl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
@@ -3475,6 +3752,13 @@ libapl_la-Token.lo: Token.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Token.lo `test -f 'Token.cc' || echo '$(srcdir)/'`Token.cc
 
+libapl_la-Token_string.lo: Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Token_string.lo -MD -MP -MF $(DEPDIR)/libapl_la-Token_string.Tpo -c -o libapl_la-Token_string.lo `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Token_string.Tpo $(DEPDIR)/libapl_la-Token_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token_string.cc' object='libapl_la-Token_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Token_string.lo `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+
 libapl_la-Tokenizer.lo: Tokenizer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Tokenizer.lo -MD -MP -MF $(DEPDIR)/libapl_la-Tokenizer.Tpo -c -o libapl_la-Tokenizer.lo `test -f 'Tokenizer.cc' || echo '$(srcdir)/'`Tokenizer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Tokenizer.Tpo $(DEPDIR)/libapl_la-Tokenizer.Plo
@@ -3636,19 +3920,19 @@ apl-main.obj: main.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
 
-apl-Plot_xcb.o: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.o -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.o' libtool=no @AMDEPBACKSLASH@
+apl-Plot_ascii.o: Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_ascii.o -MD -MP -MF $(DEPDIR)/apl-Plot_ascii.Tpo -c -o apl-Plot_ascii.o `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_ascii.Tpo $(DEPDIR)/apl-Plot_ascii.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_ascii.cc' object='apl-Plot_ascii.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_ascii.o `test -f 'Plot_ascii.cc' || echo '$(srcdir)/'`Plot_ascii.cc
 
-apl-Plot_xcb.obj: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.obj -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.obj' libtool=no @AMDEPBACKSLASH@
+apl-Plot_ascii.obj: Plot_ascii.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_ascii.obj -MD -MP -MF $(DEPDIR)/apl-Plot_ascii.Tpo -c -o apl-Plot_ascii.obj `if test -f 'Plot_ascii.cc'; then $(CYGPATH_W) 'Plot_ascii.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_ascii.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_ascii.Tpo $(DEPDIR)/apl-Plot_ascii.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_ascii.cc' object='apl-Plot_ascii.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_ascii.obj `if test -f 'Plot_ascii.cc'; then $(CYGPATH_W) 'Plot_ascii.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_ascii.cc'; fi`
 
 apl-Plot_gtk.o: Plot_gtk.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.o -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
@@ -3663,6 +3947,20 @@ apl-Plot_gtk.obj: Plot_gtk.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
+
+apl-Plot_xcb.o: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.o -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+apl-Plot_xcb.obj: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.obj -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
 
 apl-Archive.o: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Archive.o -MD -MP -MF $(DEPDIR)/apl-Archive.Tpo -c -o apl-Archive.o `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -3971,6 +4269,48 @@ apl-Cell.obj: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='apl-Cell.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cell.obj `if test -f 'Cell.cc'; then $(CYGPATH_W) 'Cell.cc'; else $(CYGPATH_W) '$(srcdir)/Cell.cc'; fi`
+
+apl-Cmd_KEYB.o: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_KEYB.o -MD -MP -MF $(DEPDIR)/apl-Cmd_KEYB.Tpo -c -o apl-Cmd_KEYB.o `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_KEYB.Tpo $(DEPDIR)/apl-Cmd_KEYB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='apl-Cmd_KEYB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_KEYB.o `test -f 'Cmd_KEYB.cc' || echo '$(srcdir)/'`Cmd_KEYB.cc
+
+apl-Cmd_KEYB.obj: Cmd_KEYB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_KEYB.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_KEYB.Tpo -c -o apl-Cmd_KEYB.obj `if test -f 'Cmd_KEYB.cc'; then $(CYGPATH_W) 'Cmd_KEYB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_KEYB.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_KEYB.Tpo $(DEPDIR)/apl-Cmd_KEYB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_KEYB.cc' object='apl-Cmd_KEYB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_KEYB.obj `if test -f 'Cmd_KEYB.cc'; then $(CYGPATH_W) 'Cmd_KEYB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_KEYB.cc'; fi`
+
+apl-Cmd_LIB.o: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_LIB.o -MD -MP -MF $(DEPDIR)/apl-Cmd_LIB.Tpo -c -o apl-Cmd_LIB.o `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_LIB.Tpo $(DEPDIR)/apl-Cmd_LIB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='apl-Cmd_LIB.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_LIB.o `test -f 'Cmd_LIB.cc' || echo '$(srcdir)/'`Cmd_LIB.cc
+
+apl-Cmd_LIB.obj: Cmd_LIB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_LIB.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_LIB.Tpo -c -o apl-Cmd_LIB.obj `if test -f 'Cmd_LIB.cc'; then $(CYGPATH_W) 'Cmd_LIB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_LIB.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_LIB.Tpo $(DEPDIR)/apl-Cmd_LIB.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_LIB.cc' object='apl-Cmd_LIB.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_LIB.obj `if test -f 'Cmd_LIB.cc'; then $(CYGPATH_W) 'Cmd_LIB.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_LIB.cc'; fi`
+
+apl-Cmd_IN.o: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_IN.o -MD -MP -MF $(DEPDIR)/apl-Cmd_IN.Tpo -c -o apl-Cmd_IN.o `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_IN.Tpo $(DEPDIR)/apl-Cmd_IN.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='apl-Cmd_IN.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_IN.o `test -f 'Cmd_IN.cc' || echo '$(srcdir)/'`Cmd_IN.cc
+
+apl-Cmd_IN.obj: Cmd_IN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Cmd_IN.obj -MD -MP -MF $(DEPDIR)/apl-Cmd_IN.Tpo -c -o apl-Cmd_IN.obj `if test -f 'Cmd_IN.cc'; then $(CYGPATH_W) 'Cmd_IN.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_IN.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Cmd_IN.Tpo $(DEPDIR)/apl-Cmd_IN.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cmd_IN.cc' object='apl-Cmd_IN.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cmd_IN.obj `if test -f 'Cmd_IN.cc'; then $(CYGPATH_W) 'Cmd_IN.cc'; else $(CYGPATH_W) '$(srcdir)/Cmd_IN.cc'; fi`
 
 apl-Doxy.o: Doxy.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Doxy.o -MD -MP -MF $(DEPDIR)/apl-Doxy.Tpo -c -o apl-Doxy.o `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
@@ -4546,6 +4886,48 @@ apl-PrintBuffer.obj: PrintBuffer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PrintBuffer.obj `if test -f 'PrintBuffer.cc'; then $(CYGPATH_W) 'PrintBuffer.cc'; else $(CYGPATH_W) '$(srcdir)/PrintBuffer.cc'; fi`
 
+apl-Polynomial.o: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Polynomial.o -MD -MP -MF $(DEPDIR)/apl-Polynomial.Tpo -c -o apl-Polynomial.o `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Polynomial.Tpo $(DEPDIR)/apl-Polynomial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='apl-Polynomial.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Polynomial.o `test -f 'Polynomial.cc' || echo '$(srcdir)/'`Polynomial.cc
+
+apl-Polynomial.obj: Polynomial.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Polynomial.obj -MD -MP -MF $(DEPDIR)/apl-Polynomial.Tpo -c -o apl-Polynomial.obj `if test -f 'Polynomial.cc'; then $(CYGPATH_W) 'Polynomial.cc'; else $(CYGPATH_W) '$(srcdir)/Polynomial.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Polynomial.Tpo $(DEPDIR)/apl-Polynomial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Polynomial.cc' object='apl-Polynomial.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Polynomial.obj `if test -f 'Polynomial.cc'; then $(CYGPATH_W) 'Polynomial.cc'; else $(CYGPATH_W) '$(srcdir)/Polynomial.cc'; fi`
+
+apl-PythonPipe.o: PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PythonPipe.o -MD -MP -MF $(DEPDIR)/apl-PythonPipe.Tpo -c -o apl-PythonPipe.o `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PythonPipe.Tpo $(DEPDIR)/apl-PythonPipe.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PythonPipe.cc' object='apl-PythonPipe.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PythonPipe.o `test -f 'PythonPipe.cc' || echo '$(srcdir)/'`PythonPipe.cc
+
+apl-PythonPipe.obj: PythonPipe.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PythonPipe.obj -MD -MP -MF $(DEPDIR)/apl-PythonPipe.Tpo -c -o apl-PythonPipe.obj `if test -f 'PythonPipe.cc'; then $(CYGPATH_W) 'PythonPipe.cc'; else $(CYGPATH_W) '$(srcdir)/PythonPipe.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PythonPipe.Tpo $(DEPDIR)/apl-PythonPipe.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PythonPipe.cc' object='apl-PythonPipe.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PythonPipe.obj `if test -f 'PythonPipe.cc'; then $(CYGPATH_W) 'PythonPipe.cc'; else $(CYGPATH_W) '$(srcdir)/PythonPipe.cc'; fi`
+
+apl-QR_factorization_GSL.o: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QR_factorization_GSL.o -MD -MP -MF $(DEPDIR)/apl-QR_factorization_GSL.Tpo -c -o apl-QR_factorization_GSL.o `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QR_factorization_GSL.Tpo $(DEPDIR)/apl-QR_factorization_GSL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='apl-QR_factorization_GSL.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-QR_factorization_GSL.o `test -f 'QR_factorization_GSL.cc' || echo '$(srcdir)/'`QR_factorization_GSL.cc
+
+apl-QR_factorization_GSL.obj: QR_factorization_GSL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QR_factorization_GSL.obj -MD -MP -MF $(DEPDIR)/apl-QR_factorization_GSL.Tpo -c -o apl-QR_factorization_GSL.obj `if test -f 'QR_factorization_GSL.cc'; then $(CYGPATH_W) 'QR_factorization_GSL.cc'; else $(CYGPATH_W) '$(srcdir)/QR_factorization_GSL.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QR_factorization_GSL.Tpo $(DEPDIR)/apl-QR_factorization_GSL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QR_factorization_GSL.cc' object='apl-QR_factorization_GSL.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-QR_factorization_GSL.obj `if test -f 'QR_factorization_GSL.cc'; then $(CYGPATH_W) 'QR_factorization_GSL.cc'; else $(CYGPATH_W) '$(srcdir)/QR_factorization_GSL.cc'; fi`
+
 apl-QuadFunction.o: QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-QuadFunction.o -MD -MP -MF $(DEPDIR)/apl-QuadFunction.Tpo -c -o apl-QuadFunction.o `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-QuadFunction.Tpo $(DEPDIR)/apl-QuadFunction.Po
@@ -4573,6 +4955,20 @@ apl-ProcessorID.obj: ProcessorID.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ProcessorID.cc' object='apl-ProcessorID.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-ProcessorID.obj `if test -f 'ProcessorID.cc'; then $(CYGPATH_W) 'ProcessorID.cc'; else $(CYGPATH_W) '$(srcdir)/ProcessorID.cc'; fi`
+
+apl-Quad_CC.o: Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_CC.o -MD -MP -MF $(DEPDIR)/apl-Quad_CC.Tpo -c -o apl-Quad_CC.o `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_CC.Tpo $(DEPDIR)/apl-Quad_CC.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_CC.cc' object='apl-Quad_CC.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_CC.o `test -f 'Quad_CC.cc' || echo '$(srcdir)/'`Quad_CC.cc
+
+apl-Quad_CC.obj: Quad_CC.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_CC.obj -MD -MP -MF $(DEPDIR)/apl-Quad_CC.Tpo -c -o apl-Quad_CC.obj `if test -f 'Quad_CC.cc'; then $(CYGPATH_W) 'Quad_CC.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_CC.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_CC.Tpo $(DEPDIR)/apl-Quad_CC.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_CC.cc' object='apl-Quad_CC.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_CC.obj `if test -f 'Quad_CC.cc'; then $(CYGPATH_W) 'Quad_CC.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_CC.cc'; fi`
 
 apl-Quad_CR.o: Quad_CR.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_CR.o -MD -MP -MF $(DEPDIR)/apl-Quad_CR.Tpo -c -o apl-Quad_CR.o `test -f 'Quad_CR.cc' || echo '$(srcdir)/'`Quad_CR.cc
@@ -4685,6 +5081,20 @@ apl-Quad_MAP.obj: Quad_MAP.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MAP.cc' object='apl-Quad_MAP.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_MAP.obj `if test -f 'Quad_MAP.cc'; then $(CYGPATH_W) 'Quad_MAP.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_MAP.cc'; fi`
+
+apl-Quad_MX.o: Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_MX.o -MD -MP -MF $(DEPDIR)/apl-Quad_MX.Tpo -c -o apl-Quad_MX.o `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_MX.Tpo $(DEPDIR)/apl-Quad_MX.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MX.cc' object='apl-Quad_MX.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_MX.o `test -f 'Quad_MX.cc' || echo '$(srcdir)/'`Quad_MX.cc
+
+apl-Quad_MX.obj: Quad_MX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_MX.obj -MD -MP -MF $(DEPDIR)/apl-Quad_MX.Tpo -c -o apl-Quad_MX.obj `if test -f 'Quad_MX.cc'; then $(CYGPATH_W) 'Quad_MX.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_MX.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_MX.Tpo $(DEPDIR)/apl-Quad_MX.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_MX.cc' object='apl-Quad_MX.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_MX.obj `if test -f 'Quad_MX.cc'; then $(CYGPATH_W) 'Quad_MX.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_MX.cc'; fi`
 
 apl-Quad_PLOT.o: Quad_PLOT.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_PLOT.o -MD -MP -MF $(DEPDIR)/apl-Quad_PLOT.Tpo -c -o apl-Quad_PLOT.o `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
@@ -5021,6 +5431,20 @@ apl-Token.obj: Token.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token.cc' object='apl-Token.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Token.obj `if test -f 'Token.cc'; then $(CYGPATH_W) 'Token.cc'; else $(CYGPATH_W) '$(srcdir)/Token.cc'; fi`
+
+apl-Token_string.o: Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Token_string.o -MD -MP -MF $(DEPDIR)/apl-Token_string.Tpo -c -o apl-Token_string.o `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Token_string.Tpo $(DEPDIR)/apl-Token_string.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token_string.cc' object='apl-Token_string.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Token_string.o `test -f 'Token_string.cc' || echo '$(srcdir)/'`Token_string.cc
+
+apl-Token_string.obj: Token_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Token_string.obj -MD -MP -MF $(DEPDIR)/apl-Token_string.Tpo -c -o apl-Token_string.obj `if test -f 'Token_string.cc'; then $(CYGPATH_W) 'Token_string.cc'; else $(CYGPATH_W) '$(srcdir)/Token_string.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Token_string.Tpo $(DEPDIR)/apl-Token_string.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token_string.cc' object='apl-Token_string.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Token_string.obj `if test -f 'Token_string.cc'; then $(CYGPATH_W) 'Token_string.cc'; else $(CYGPATH_W) '$(srcdir)/Token_string.cc'; fi`
 
 apl-Tokenizer.o: Tokenizer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Tokenizer.o -MD -MP -MF $(DEPDIR)/apl-Tokenizer.Tpo -c -o apl-Tokenizer.o `test -f 'Tokenizer.cc' || echo '$(srcdir)/'`Tokenizer.cc
@@ -5488,10 +5912,11 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(DATA) $(HEADERS)
+all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(SCRIPTS) $(DATA) \
+		$(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(pkgincludedir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(distdir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -5555,6 +5980,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-CDR.Po
 	-rm -f ./$(DEPDIR)/apl-Cell.Po
 	-rm -f ./$(DEPDIR)/apl-CharCell.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_IN.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_KEYB.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_LIB.Po
 	-rm -f ./$(DEPDIR)/apl-Command.Po
 	-rm -f ./$(DEPDIR)/apl-Common.Po
 	-rm -f ./$(DEPDIR)/apl-ComplexCell.Po
@@ -5588,17 +6016,22 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-Parallel.Po
 	-rm -f ./$(DEPDIR)/apl-Parser.Po
 	-rm -f ./$(DEPDIR)/apl-Performance.Po
+	-rm -f ./$(DEPDIR)/apl-Plot_ascii.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_data.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_gtk.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_line_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_window_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_xcb.Po
 	-rm -f ./$(DEPDIR)/apl-PointerCell.Po
+	-rm -f ./$(DEPDIR)/apl-Polynomial.Po
 	-rm -f ./$(DEPDIR)/apl-Prefix.Po
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
 	-rm -f ./$(DEPDIR)/apl-ProcessorID.Po
+	-rm -f ./$(DEPDIR)/apl-PythonPipe.Po
+	-rm -f ./$(DEPDIR)/apl-QR_factorization_GSL.Po
 	-rm -f ./$(DEPDIR)/apl-QuadFunction.Po
+	-rm -f ./$(DEPDIR)/apl-Quad_CC.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_CR.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_DLX.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_FFT.Po
@@ -5607,6 +6040,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-Quad_GTK.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_JSON.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_MAP.Po
+	-rm -f ./$(DEPDIR)/apl-Quad_MX.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_PLOT.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_PNG.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_RE.Po
@@ -5631,6 +6065,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/apl-TabExpansion.Po
 	-rm -f ./$(DEPDIR)/apl-Thread_context.Po
 	-rm -f ./$(DEPDIR)/apl-Token.Po
+	-rm -f ./$(DEPDIR)/apl-Token_string.Po
 	-rm -f ./$(DEPDIR)/apl-Tokenizer.Po
 	-rm -f ./$(DEPDIR)/apl-UCS_string.Po
 	-rm -f ./$(DEPDIR)/apl-UCS_string_vector.Po
@@ -5667,6 +6102,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo
@@ -5700,17 +6138,22 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PythonPipe.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CC.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo
@@ -5719,6 +6162,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_JSON.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_MAP.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_MX.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_PNG.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo
@@ -5743,6 +6187,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Token.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Token_string.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo
@@ -5779,6 +6224,9 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ComplexCell.Plo
@@ -5812,17 +6260,22 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Parallel.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Parser.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Performance.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Plot_ascii.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_data.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_gtk.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_line_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-PythonPipe.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-QuadFunction.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Quad_CC.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_DLX.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_FFT.Plo
@@ -5831,6 +6284,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_GTK.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_JSON.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_MAP.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Quad_MX.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_PLOT.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_PNG.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_RE.Plo
@@ -5855,6 +6309,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Thread_context.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Token.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Token_string.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Tokenizer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-UCS_string.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-UCS_string_vector.Plo
@@ -5908,7 +6363,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-pkgincludeHEADERS
+install-data-am: install-distSCRIPTS install-pkgincludeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -5960,6 +6415,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-CDR.Po
 	-rm -f ./$(DEPDIR)/apl-Cell.Po
 	-rm -f ./$(DEPDIR)/apl-CharCell.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_IN.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_KEYB.Po
+	-rm -f ./$(DEPDIR)/apl-Cmd_LIB.Po
 	-rm -f ./$(DEPDIR)/apl-Command.Po
 	-rm -f ./$(DEPDIR)/apl-Common.Po
 	-rm -f ./$(DEPDIR)/apl-ComplexCell.Po
@@ -5993,17 +6451,22 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-Parallel.Po
 	-rm -f ./$(DEPDIR)/apl-Parser.Po
 	-rm -f ./$(DEPDIR)/apl-Performance.Po
+	-rm -f ./$(DEPDIR)/apl-Plot_ascii.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_data.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_gtk.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_line_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_window_properties.Po
 	-rm -f ./$(DEPDIR)/apl-Plot_xcb.Po
 	-rm -f ./$(DEPDIR)/apl-PointerCell.Po
+	-rm -f ./$(DEPDIR)/apl-Polynomial.Po
 	-rm -f ./$(DEPDIR)/apl-Prefix.Po
 	-rm -f ./$(DEPDIR)/apl-PrimitiveFunction.Po
 	-rm -f ./$(DEPDIR)/apl-PrintBuffer.Po
 	-rm -f ./$(DEPDIR)/apl-ProcessorID.Po
+	-rm -f ./$(DEPDIR)/apl-PythonPipe.Po
+	-rm -f ./$(DEPDIR)/apl-QR_factorization_GSL.Po
 	-rm -f ./$(DEPDIR)/apl-QuadFunction.Po
+	-rm -f ./$(DEPDIR)/apl-Quad_CC.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_CR.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_DLX.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_FFT.Po
@@ -6012,6 +6475,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-Quad_GTK.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_JSON.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_MAP.Po
+	-rm -f ./$(DEPDIR)/apl-Quad_MX.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_PLOT.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_PNG.Po
 	-rm -f ./$(DEPDIR)/apl-Quad_RE.Po
@@ -6036,6 +6500,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/apl-TabExpansion.Po
 	-rm -f ./$(DEPDIR)/apl-Thread_context.Po
 	-rm -f ./$(DEPDIR)/apl-Token.Po
+	-rm -f ./$(DEPDIR)/apl-Token_string.Po
 	-rm -f ./$(DEPDIR)/apl-Tokenizer.Po
 	-rm -f ./$(DEPDIR)/apl-UCS_string.Po
 	-rm -f ./$(DEPDIR)/apl-UCS_string_vector.Po
@@ -6072,6 +6537,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo
@@ -6105,17 +6573,22 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_ascii.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-PythonPipe.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CC.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo
@@ -6124,6 +6597,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_JSON.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_MAP.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_MX.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_PNG.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo
@@ -6148,6 +6622,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Token.Plo
+	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Token_string.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo
 	-rm -f ./$(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo
@@ -6184,6 +6659,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-CDR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Cell.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-CharCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_IN.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_KEYB.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Cmd_LIB.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Command.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Common.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ComplexCell.Plo
@@ -6217,17 +6695,22 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Parallel.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Parser.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Performance.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Plot_ascii.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_data.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_gtk.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_line_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_window_properties.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Plot_xcb.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PointerCell.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Polynomial.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Prefix.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-PrintBuffer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-ProcessorID.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-PythonPipe.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-QR_factorization_GSL.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-QuadFunction.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Quad_CC.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_CR.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_DLX.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_FFT.Plo
@@ -6236,6 +6719,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_GTK.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_JSON.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_MAP.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Quad_MX.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_PLOT.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_PNG.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Quad_RE.Plo
@@ -6260,6 +6744,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libapl_la-TabExpansion.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Thread_context.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Token.Plo
+	-rm -f ./$(DEPDIR)/libapl_la-Token_string.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-Tokenizer.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-UCS_string.Plo
 	-rm -f ./$(DEPDIR)/libapl_la-UCS_string_vector.Plo
@@ -6313,8 +6798,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-pkgincludeHEADERS \
-	uninstall-pkglibLTLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-distSCRIPTS \
+	uninstall-pkgincludeHEADERS uninstall-pkglibLTLIBRARIES
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -6324,16 +6809,17 @@ uninstall-am: uninstall-binPROGRAMS uninstall-pkgincludeHEADERS \
 	cscopelist-am ctags ctags-am distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-pkgincludeHEADERS \
-	install-pkglibLTLIBRARIES install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-pkgincludeHEADERS \
+	install-binPROGRAMS install-data install-data-am \
+	install-distSCRIPTS install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-pkgincludeHEADERS install-pkglibLTLIBRARIES install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-distSCRIPTS uninstall-pkgincludeHEADERS \
 	uninstall-pkglibLTLIBRARIES
 
 .PRECIOUS: Makefile
@@ -6377,7 +6863,8 @@ testAP: all
 
 # run all testcases, except slow ones
 test3: all
-	./apl --id 1010 -T testcases_3/*tc
+	./apl --id 1010 -T testcases_3/*tc || true
+	stty sane
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt

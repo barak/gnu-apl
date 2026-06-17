@@ -36,7 +36,7 @@ public:
     virtual const char * get_provider_type() const  { return "sqlite"; }
 
    /// overloaded Provider::open_database()
-   virtual Connection * open_database(Value_P B);
+   virtual Connection * open_database(const Value & B);
 
    /// overloaded Provider::version_string()
     virtual const char * version_string() const;  

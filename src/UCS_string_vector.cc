@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,28 +30,42 @@
 //----------------------------------------------------------------------------
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
 {
+  // val is a simple text matrix with var_count rows and name_len columns.
+  // Each row of val is one or two variable names.
+  //
 const ShapeItem var_count = val.get_rows();
 const ShapeItem name_len = val.get_cols();
 
    loop(v, var_count)
       {
-        ShapeItem nidx = v*name_len;
-        const ShapeItem end = nidx + name_len;
-        UCS_string name;
+        ShapeItem start = v * name_len;   // the v'th variable
+        const ShapeItem end = start + name_len;
+        UCS_string name;   // name of the (left) variable
         loop(n, name_len)
            {
-             const Unicode uni = val.get_cravel(nidx++).get_char_value();
+             const Unicode uni = val.get_cravel(start++).get_char_value();
 
-             if (n == 0 && Avec::is_quad(uni))   // leading ⎕
+             if (n == 0)   // first char of the variable name
                 {
-                  name.append(uni);
-                  continue;
+                  if ( Avec::is_quad(uni))   // leading ⎕
+                     {
+                       name << uni;
+                       continue;
+                     }
+                  else if (uni == UNI_ALPHA  || uni == UNI_ALPHA_UNDERBAR ||
+                           uni == UNI_OMEGA  || uni == UNI_OMEGA_UNDERBAR ||
+                           uni == UNI_LAMBDA || uni == UNI_CHI            ||
+                           uni == UNI_QUOTE_Quad)
+                     {
+                       name << uni;
+                       continue;
+                     }
                 }
 
              if (Avec::is_symbol_char(uni)      // valid symbol char
                 || uni == UNI_FULLSTOP)   // .member dot
                 {
-                  name.append(uni);
+                  name << uni;
                   continue;
                 }
 
@@ -70,14 +84,14 @@ const ShapeItem name_len = val.get_cols();
              // 1. spaces until 'end' (= one name), or
              // 2. a second name (alias)
 
-             // skip spaces from nidx and subsequent spaces
+             // skip spaces from start and subsequent spaces
              //
-             while (nidx < end &&
-                    val.get_cravel(nidx).get_char_value() == UNI_SPACE)
-                   ++nidx;
+             while (start < end &&
+                    val.get_cravel(start).get_char_value() == UNI_SPACE)
+                   ++start;
 
 
-             if (nidx == end)   break;   // only spaces (no second name)
+             if (start == end)   break;   // only spaces (no second name)
 
              // at this point we maybe have the start of a second name, which
              // is an error (if last is false) or not. In both cases the first
@@ -91,12 +105,12 @@ const ShapeItem name_len = val.get_cols();
              // Return the second (i.e. surrogate name)
              //
              surrogate = false;
-             while (nidx < end)
+             while (start < end)
                 {
-                  const Unicode uni = val.get_cravel(nidx++).get_char_value();
+                  const Unicode uni = val.get_cravel(start++).get_char_value();
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
-                       name.append(uni);
+                       name << uni;
                      }
                   else if (uni == UNI_SPACE)
                      {
@@ -116,7 +130,7 @@ const ShapeItem name_len = val.get_cols();
 //----------------------------------------------------------------------------
 void
 UCS_string_vector::compute_column_width(int tab_size,
-                                        std::basic_string<int> & result)
+                                        std::vector<int> & result)
 {
 const int quad_PW = Workspace::get_PW();
 
@@ -132,7 +146,7 @@ const int quad_PW = Workspace::get_PW();
    // compute block counts (one block having tab_size characters)
    //
 const int max_blocks = (quad_PW + 1) / tab_size;
-std::basic_string<int> name_blocks;
+std::vector<int> name_blocks;
    loop(n, size())   name_blocks.push_back(1 + (1 + at(n).size()) / tab_size);
 
    // compute max number of column blocks based on first line blocks
@@ -197,12 +211,15 @@ int max_nb = 0;
 ShapeItem
 UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
+   /*  interpret this UCS_string_vector as a 2-dimensional array of names.
+       Assume further that this hypothetical array has column_count columns.
+       Then return the length of the longest name in column col.
+    */
 ShapeItem ret = 0;
 
-   for (ShapeItem s = col; s < size(); s += column_count)
+   for (ShapeItem s = col; s < ssize(); s += column_count)
        {
-          const ShapeItem len_s = at(s).size();
-          if (ret < len_s)   ret = len_s;
+          ret = max(ret, at(s).ssize());
        }
 
    return ret;
@@ -211,11 +228,14 @@ ShapeItem ret = 0;
 std::ostream & 
 UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
 {
+   // return the length of the longest UCS_string in \b this vector,
+   /// starting at \b col
+
 const ShapeItem column_count1 = column_count - 1;
-ShapeItem column_widths[column_count];
+ShapeItem * column_widths = ALLOCA(ShapeItem, column_count);
    loop(col, column_count)   column_widths[col] = max_width(col, column_count);
 
-const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
+const UCS_string frame(U"╔╤╗╚╧╝═║│");
 
    // top row
    //
@@ -231,13 +251,13 @@ const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
 
    // data rows
    //
-   for (ShapeItem d = 0; d < size();)
+   for (ShapeItem d = 0; d < ssize();)
        {
          out << frame[7];                                  // ║
          loop(col, column_count)
              {
                const ShapeItem width = column_widths[col];
-               if (d < size())   // valid data available
+               if (d < ssize())   // valid data available
                   {
                     const UCS_string & data = (*this)[d++];
                     loop(j, data.size())             out << data[j];

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ public:
    void gen();
 
    /// HTML-print a table containing all defined functions to \b page
-   void functions_table(const std::basic_string<const Symbol *> & functions,
+   void functions_table(const std::vector<const Symbol *> & functions,
                        ofstream & page);
 
    /// HTML-print one line og a table containing all defined functions
@@ -93,7 +93,7 @@ public:
                               size_t & total_lines);
 
    /// HTML-print a table with all variables to 'page'
-   void variables_table(const std::basic_string<const Symbol *> & variables,
+   void variables_table(const std::vector<const Symbol *> & variables,
                         ofstream & page);
 
    /// HTML-print a table with the SI stack to 'page'
@@ -123,7 +123,7 @@ protected:
    void native_page(const Function * fun, const UCS_string & alias);
 
    /// create the call graph
-   void make_call_graph(const std::basic_string<const Symbol *> & all_funs);
+   void make_call_graph(const std::vector<const Symbol *> & all_funs);
 
    /// add one symbol to the call graph. Note that one symbol can have
    /// different UserFunctions (at different SI levels).
@@ -159,10 +159,10 @@ protected:
    UTF8_string root_dir;
 
    /// the nodes for the current root.
-   std::basic_string<const Function *> nodes;
+   std::vector<const Function *> nodes;
 
    /// the nodes for all function symbols (independent of the current root).
-   std::basic_string<const Symbol *> all_functions;
+   std::vector<const Symbol *> all_functions;
 
    /// the real names for the current root.
    UCS_string_vector aliases;

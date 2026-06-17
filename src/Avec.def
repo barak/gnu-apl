@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ char_def(LESS              , '<'    , F2_LESS      , NO_SPACE ,  3C)
 char_def(EQUAL             , '='    , F2_EQUAL     , NO_SPACE ,  3D)
 char_def(GREATER           , '>'    , F2_GREATER   , NO_SPACE ,  3E)
 char_def(QUESTION          , '?'    , F12_ROLL     , NO_SPACE ,  3F)
-char_def(AT_SIGN           , '@'    , END          , NO_SPACE ,  40)
+char_def(AT_SIGN           , '@'    , MARKER       , NO_SPACE ,  40)
 char_def(A                 , 'A'    , SYMBOL       , SYMBOL   ,  41)
 char_def(B                 , 'B'    , SYMBOL       , SYMBOL   ,  42)
 char_def(C                 , 'C'    , SYMBOL       , SYMBOL   ,  43)
@@ -178,7 +178,6 @@ char_def(LAMBDA            , 0x03BB , SYMBOL       , SYMBOL   ,  99) /* λ */
 char_def(MUE               , 0x03BC , END          , SYMBOL   ,  8B) /* μ */
 char_def(CHI               , 0x03C7 , SYMBOL       , SYMBOL   ,  A2) /* χ */
 char_def(ELEMENT           , 0x03F5 , F12_ELEMENT  , NO_SPACE ,  EE) /* ϵ */
-char_uni(AV_MAX            , 0x0461 , END          , NO_SPACE      ) /* ѡ */
 char_uni(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE          ) /* ‘ */
 char_uni(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE          ) /* ‘ */
 char_uni(PAD_U0            , 0x2070 , END          , NO_SPACE      ) /* ⁰ */
@@ -342,6 +341,7 @@ char_uni(Quad_Quad1        , 0x25AF , END          , NO_SPACE      ) /* ▯ */
 char_def(RIGHT_HALF_BLOCK  , 0x2590 , END          , NO_SPACE ,  DE) /* ▐ */
 char_def(DIAMOND           , 0x25CA , DIAMOND      , NO_SPACE ,  D8) /* ◊ */
 char_def(CIRCLE            , 0x25CB , F12_CIRCLE   , NO_SPACE ,  EA) /* ○ */
+char_uni(AV_MAX            , 0x25CC , END          , NO_SPACE      ) /* ◌ */
 //------------------------------------------------------------------
 
 #undef char_def

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,6 +49,9 @@ extern void (*end_input)();
 void (*end_input)() = 0;
 
 LineInput * LineInput::the_line_input = 0;
+
+bool LineInput::map_next = false;
+bool LineInput::map_all  = false;
 
 LineHistory LineHistory::quote_quad_history(10);
 LineHistory LineHistory::quad_quad_history(10);
@@ -135,7 +138,7 @@ LineHistory::LineHistory(int maxl)
      max_lines(maxl),
      last_search_line(0)
 {
-   UCS_string u(UTF8_string("xxx"));
+const UCS_string u(U"xxx");
    add_line(u);
 }
 //----------------------------------------------------------------------------
@@ -145,7 +148,7 @@ LineHistory::LineHistory(const Nabla & nabla)
      max_lines(1000),
      last_search_line(0)
 {
-   UCS_string u(UTF8_string("xxx"));
+   UCS_string u(U"xxx");
    add_line(u);
 int cl = -1;
    loop(l, nabla.get_line_count())
@@ -171,11 +174,9 @@ FILE * hist = fopen(filename, "r");
         return;
       }
 
-   for (;;)
+char buffer[4000];
+   while (fgets(buffer, sizeof(buffer) - 1, hist))
        {
-         char buffer[4000];
-         const char * s = fgets(buffer, sizeof(buffer) - 1, hist);
-         if (s == 0)   break;   // end of file
          buffer[sizeof(buffer) - 1] = 0;
 
          int slen = strlen(buffer);
@@ -204,7 +205,7 @@ ofstream outf(filename);
       }
 
 int count = 0;
-   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)
+   for (ShapeItem p = put + 1; p < hist_lines.ssize(); ++p)
       {
         outf << hist_lines[p] << endl;
         ++count;
@@ -225,7 +226,7 @@ LineHistory::clear_history(ostream & out)
    current_line = 0;
    put = 0;
    hist_lines.clear();
-UCS_string u((UTF8_string("xxx")));
+UCS_string u((U"xxx"));
    add_line(u);
 }
 //----------------------------------------------------------------------------
@@ -234,7 +235,7 @@ LineHistory::print_history(ostream & out, const UCS_string & filter) const
 {
    // hist_lines is a ring buffer. first print its tail, then its head.
 
-   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)   // tail
+   for (ShapeItem p = put + 1; p < hist_lines.ssize(); ++p)   // tail
       {
         if (filter.size() && !hist_lines[p].starts_iwith(filter))   continue;
         out << "      " << hist_lines[p] << endl;
@@ -252,25 +253,12 @@ LineHistory::add_line(const UCS_string & line)
    if (max_lines == 0)      return;   // no history
    if (!line.has_black())   return;   // almost empty
 
-   // remove leading blanks
-   //
-int blanks = 0;
-   while (blanks < line.size() && line[blanks] <= UNI_SPACE)   ++blanks;
-
    // a repeated cut-and-paste of entire lines increases the indentation every
    // time due to the APL input prompt). We therefore limit this effect
    // to 6 blanks.
    //
-UCS_string line1;
-   if (blanks)
-      {
-        line1 = UCS_string(line, blanks, line.size() - blanks);
-      }
-   else
-      {
-        line1 = line;
-      }
-   while (line1.back() <= UNI_SPACE)   line1.pop_back();
+UCS_string line1 = line;
+   line1.remove_leading_and_trailing_whitespaces();
 
    if (int(hist_lines.size()) < max_lines)   // append
       {
@@ -443,7 +431,7 @@ const int saved_uidx = uidx;
 
    adjust_allocated_height();
    set_cursor();
-   for (; uidx < user_line.size(); ++uidx)
+   for (; uidx < user_line.ssize(); ++uidx)
        {
          refresh_wrapped_cursor();
          CIN << user_line[uidx];
@@ -487,7 +475,7 @@ const int saved_uidx = uidx;
 void
 LineEditContext::delete_char()
 {
-   if (uidx == (user_line.size() - 1))   // cursor on last char
+   if (uidx == (user_line.ssize() - 1))   // cursor on last char
       {
         CIN << ' ' << UNI_BS;
         user_line.pop_back();
@@ -504,9 +492,9 @@ LineEditContext::delete_char()
 void
 LineEditContext::insert_char(Unicode uni)
 {
-   if (uidx >= user_line.size())   // append char
+   if (uidx >= user_line.ssize())   // append char
       {
-        user_line.append(uni);
+        user_line << uni;
         adjust_allocated_height();
         refresh_wrapped_cursor();
         CIN << uni;
@@ -532,9 +520,9 @@ LineEditContext::insert_char(Unicode uni)
 void
 LineEditContext::cut_to_EOL()
 {
-   if (uidx >= user_line.size())   return;   // nothing to cut
+   if (uidx >= user_line.ssize())   return;   // nothing to cut
 
-   cut_buffer = UCS_string(user_line, uidx, user_line.size() - uidx);
+   cut_buffer = UCS_string(user_line, uidx);
    user_line.resize(uidx);
    refresh_from_cursor();
 }
@@ -544,16 +532,15 @@ LineEditContext::paste()
 {
    if (cut_buffer.size() == 0)   return;
 
-   if (uidx >= user_line.size())   // append cut buffer
+   if (uidx >= user_line.ssize())   // append cut buffer
       {
-        user_line.append(cut_buffer);
+        user_line << cut_buffer;
       }
    else                            // insert cut buffer
       {
-        const UCS_string rest(user_line, uidx, user_line.size() - uidx);
+        const UCS_string rest(user_line, uidx);
         user_line.resize(uidx);
-        user_line.append(cut_buffer);
-        user_line.append(rest);
+        user_line << cut_buffer << rest;
       }
 
    refresh_from_cursor();
@@ -600,7 +587,7 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
 
         case ER_REPLACE:
              user_line.clear();
-             user_line.append(line);
+             user_line << line;
              uidx = 0;
              refresh_from_cursor();
              move_idx(user_line.size());
@@ -825,7 +812,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
                                file_line.erase(0);
                                line.pop_back();
                              }
-                       line.append_UTF8(file_line.c_str());
+                       line << file_line;
                        break;
 
                   case LIM_Nabla:
@@ -847,7 +834,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
         char buffer[4000];
         const APL_time_us from = now();
          const char * s = fgets(buffer, sizeof(buffer) - 1, stdin);
-        Workspace::add_wait(now() - from);
+         Workspace::add_wait(now() - from);
 
         if (s == 0)
            {
@@ -891,7 +878,7 @@ const APL_time_us from = now();
 #if PARALLEL_ENABLED
                    Thread_context::kill_pool();
 #endif // PARALLEL_ENABLED
-                   UserPreferences::uprefs.silent = true;   // exit silently
+                   UserPreferences::uprefs.silence = NO_BANNER;   // exit silently
                    Command::cmd_OFF(4);    // exit()s
                    return;  // not reached
                  }
@@ -1016,7 +1003,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               case UNI_ETX:   // ^C
                    lec.clear();
-                   control_C(SIGINT);
+                   InterruptContext::control_C(SIGINT);
                    break;
 
 
@@ -1124,17 +1111,32 @@ LineInput::safe_fgetc()
 {
    for (;;)
        {
+          errno = 0;
           const int ret = fgetc(stdin);
-          if (ret != EOF)       return ret;
           if (errno == EINTR)   continue;
+
+#if cfg_ALT_MAP_WANTED
+
+          // maybe change the current ASCII to APL mapping
+          //
+          enum { PROFILE = cfg_ALT_MAP_WANTED };
+          if (PROFILE == 1)   switch(ret)
+             {
+               default:                             break;
+               case UNI_SOH: map_next = true;                   // ^A
+                             map_all  = false;      continue;
+               case UNI_SO:  map_all = ! map_all;   continue;   // ^N
+             }
+#endif
+
+          if (ret != EOF)       return ret;
 
           if (got_WINCH)
              {
                got_WINCH = false;
                continue;
              }
-
-         return EOF;
+         return EOF;   // EOF
        }
 }
 //----------------------------------------------------------------------------
@@ -1144,7 +1146,12 @@ LineInput::get_uni()
 again:
 
 const int b0 = safe_fgetc();
-   if (b0 == EOF)   return UNI_EOF;
+   if (b0 == EOF)
+      {
+        map_next = false;
+        map_all  = false;
+        return UNI_EOF;
+      }
 
    if (b0 & 0x80)   // non-ASCII unicode
       {
@@ -1179,6 +1186,75 @@ const int b0 = safe_fgetc();
 
         return Unicode(bx | uni);
       }
+
+   // at this point b0 is an ASCII character
+   //
+#if cfg_ALT_MAP_WANTED
+# define keymap(ascii_u, apl_u, ascii_s, apl_s) \
+   case ascii_u: return Unicode(apl_u);         \
+   case ascii_s: return Unicode(apl_s);
+
+   if (map_next || map_all)
+      {
+        map_next = false;
+
+        enum { PROFILE = cfg_ALT_MAP_WANTED };
+        if (PROFILE == 1)   switch(b0)
+           {
+             keymap( '1'  , U'¨' , '!' , U'⌶' )
+             keymap( '2'  , U'¯' , '@' , U'⍫' )
+             keymap( '3'  , U'<' , '#' , U'⍒' )
+             keymap( '4'  , U'≤' , '$' , U'⍋' )
+             keymap( '5'  , U'=' , '%' , U'⌽' )
+             keymap( '6'  , U'≥' , '^' , U'⍉' )
+             keymap( '7'  , U'>' , '&' , U'⊖' )
+             keymap( '8'  , U'≠' , '*' , U'⍟' )
+             keymap( '9'  , U'∨' , '(' , U'⍱' )
+             keymap( '0'  , U'∧' , ')' , U'⍲' )
+             keymap( '-'  , U'×' , '_' , U'!' )
+             keymap( '='  , U'÷' , '+' , U'⌹' )
+
+             keymap( 'q'  , U'?' , 'Q' , U'?' )
+             keymap( 'w'  , U'⍵' , 'W' , U'⍹' )
+             keymap( 'e'  , U'∈' , 'E' , U'⋸' )
+             keymap( 'r'  , U'⍴' , 'R' , U'⍴' )
+             keymap( 't'  , U'∼' , 'T' , U'⍨' )
+             keymap( 'y'  , U'↑' , 'Y' , U'¥' )
+             keymap( 'u'  , U'↓' , 'U' , U'↓' )
+             keymap( 'i'  , U'⍳' , 'I' , U'⍸' )
+             keymap( 'o'  , U'○' , 'O' , U'⍥' )
+             keymap( 'p'  , U'⋆' , 'P' , U'⍣' )
+             keymap( '['  , U'←' , '{' , U'⍞' )
+             keymap( ']'  , U'→' , '}' , U'⍬' )
+             keymap( '\\' , U'⊢' , '|' , U'⊣' )
+
+             keymap( 'a'  , U'⍺' , 'A' , U'⍶' )
+             keymap( 's'  , U'⌈' , 'S' , U'⌈' )
+             keymap( 'd'  , U'⌊' , 'D' , U'⌊' )
+             keymap( 'f'  , U'_' , 'F' , U'∇' )
+             keymap( 'g'  , U'∇' , 'G' , U'∇' )
+             keymap( 'h'  , U'∆' , 'H' , U'⍙' )
+             keymap( 'j'  , U'∘' , 'J' , U'⍤' )
+             keymap( 'k'  , U'λ' , 'K' , U'λ' )
+             keymap( 'l'  , U'⎕' , 'L' , U'⌷' )
+             keymap( ';'  , U'⍎' , ':' , U'≡' )
+             keymap( '\'' , U'⍕' , '"' , U'≢' )
+
+             keymap( 'z'  , U'⊂' , 'Z' , U'⊂' )
+             keymap( 'x'  , U'⊃' , 'X' , U'χ' )
+             keymap( 'c'  , U'∩' , 'C' , U'¢' )
+             keymap( 'v'  , U'∪' , 'V' , U'∪' )
+             keymap( 'b'  , U'⊥' , 'B' , U'⊥' )
+             keymap( 'n'  , U'⊤' , 'N' , U'⊤' )
+             keymap( 'm'  , U'∣' , 'M' , U'μ' )
+             keymap( ','  , U'⍝' , '<' , U'⍪' )
+             keymap( '.'  , U'⍀' , '>' , U'⍙' )
+             keymap( '/'  , U'⌿' , '?' , U'⍠' )
+           }
+      }
+
+# undef keymap
+#endif
 
    if (b0 == UNI_ESC)
       {

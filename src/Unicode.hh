@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,48 +51,60 @@ enum Unicode
    UNI_CursorHome  = -7,
    UNI_InsertMode  = -8,
 
-   /// internal pad characters - will be removed before printout
+   /// internal pad characters - will be removed or replaced before
+   /// the value is printed.
+   //
 #ifdef cfg_VISIBLE_MARKERS_WANTED
-   UNI_iPAD_U2    = UNI_PAD_U2,   // blank on the right after notchar column
-   UNI_iPAD_U3    = UNI_PAD_U3,   // blank on the left before notchar column
-   UNI_iPAD_U1    = UNI_PAD_U1,   // not (yet) a pad char
+   UNI_iPAD_U0       = UNI_PAD_U0,   // not (yet) a pad char
+   UNI_PAD_r_NOTCHAR = UNI_PAD_U1,   // after NOTCHAR column
+   UNI_iPAD_U2       = UNI_PAD_U2,   // not (yet) a pad char. Used in ⎕AV!
+   UNI_PAD_l_NOTCHAR = UNI_PAD_U3,   // before NOTCHAR column
+   UNI_PAD_l_VALUE   = UNI_PAD_U4,   // value separator
+   UNI_PAD_r_VALUE   = UNI_PAD_U5,   // value separator
+   UNI_PAD_b_ROW     = UNI_PAD_U6,   // pad to max_row_height
+   UNI_PAD_r_MAX     = UNI_PAD_U7,   // pad to max_spacing
+   UNI_PAD_l_DEPTH   = UNI_PAD_U8,   // depth indicator
+   UNI_PAD_r_DEPTH   = UNI_PAD_U9,   // depth indicator
 
-   UNI_iPAD_U0    = UNI_PAD_U0,   // not (yet) a pad char
-   UNI_iPAD_U4    = UNI_PAD_U4,   // blank on the left to separate values
-   UNI_iPAD_U5    = UNI_PAD_U5,   // blank on the right to separate values
-   UNI_iPAD_U6    = UNI_PAD_U6,   // empty line below to reach max_row_height
-   UNI_iPAD_U7    = UNI_PAD_U7,   // pad to the right to achieve max_spacing
-   UNI_iPAD_U8    = UNI_PAD_U8,   // blank on the left to indicate depth
-   UNI_iPAD_U9    = UNI_PAD_U9,   // blank on the right to indicate depth
-
-   UNI_iPAD_L0    = UNI_PAD_L0,   // dimension separator row (rank > 2)
-   UNI_iPAD_L1    = UNI_PAD_L1,   // new line padding to achieve column width
-   UNI_iPAD_L2    = UNI_PAD_L2,   // old lines padding to achieve column width
-   UNI_iPAD_L3    = UNI_PAD_L3,   // blanks on the left to pad integer part
-   UNI_iPAD_L4    = UNI_PAD_L4,   // blanks on the right to pad fract part
-   UNI_iPAD_L5    = UNI_PAD_L5,   // blanks on the left to pad strings
-   UNI_iPAD_L9    = UNI_PAD_L9,   // not (yet) a pad char
+   UNI_PAD_y_AXIS    = UNI_PAD_L0,   // interdimensional spacing (rank > 2)
+   UNI_PAD_r_oCol    = UNI_PAD_L1,   // pad new line to column width
+   UNI_PAD_r_nCol    = UNI_PAD_L2,   // pad old line to column width
+   UNI_PAD_l_INT     = UNI_PAD_L3,   // pad integer part
+   UNI_PAD_r_FRACT   = UNI_PAD_L4,   // pad fractional part
+   UNI_PAD_l_STRING  = UNI_PAD_L5,   // pad strings
+   UNI_iPAD_L9       = UNI_PAD_L9,   // not (yet) a pad char
 #else
-   UNI_iPAD_U2    = 0xEEEE,
-   UNI_iPAD_U3    = 0xEEEF,
-   UNI_iPAD_U1    = 0xEEF0,
+   UNI_iPAD_U2       = 0xEEEE,
+   UNI_PAD_l_NOTCHAR = 0xEEEF,
+   UNI_PAD_r_NOTCHAR = 0xEEF0,
 
-   UNI_iPAD_U0    = 0xEEF1,
-   UNI_iPAD_U4    = 0xEEF2,
-   UNI_iPAD_U5    = 0xEEF3,
-   UNI_iPAD_U6    = 0xEEF4,
-   UNI_iPAD_U7    = 0xEEF5,
-   UNI_iPAD_U8    = 0xEEF6,
-   UNI_iPAD_U9    = 0xEEF7,
+   UNI_iPAD_U0       = 0xEEF1,
+   UNI_PAD_l_VALUE   = 0xEEF2,
+   UNI_PAD_r_VALUE   = 0xEEF3,
+   UNI_PAD_b_ROW     = 0xEEF4,
+   UNI_PAD_r_MAX     = 0xEEF5,
+   UNI_PAD_l_DEPTH   = 0xEEF6,
+   UNI_PAD_r_DEPTH   = 0xEEF7,
 
-   UNI_iPAD_L0    = 0xEEF8,
-   UNI_iPAD_L1    = 0xEEF9,
-   UNI_iPAD_L2    = 0xEEFA,
-   UNI_iPAD_L3    = 0xEEFB,
-   UNI_iPAD_L4    = 0xEEFC,
-   UNI_iPAD_L5    = 0xEEFD,
-   UNI_iPAD_L9    = 0xEEFE,
+   UNI_PAD_y_AXIS    = 0xEEF8,
+   UNI_PAD_r_oCol    = 0xEEF9,
+   UNI_PAD_r_nCol    = 0xEEFA,
+   UNI_PAD_l_INT     = 0xEEFB,
+   UNI_PAD_r_FRACT   = 0xEEFC,
+   UNI_PAD_l_STRING  = 0xEEFD,
+   UNI_iPAD_L9       = 0xEEFE,
 #endif
+
+   // aliases for Diffout.cc (used in testcase files)
+   //
+   UNI_DIFF_DIGITS   = UNI_PAD_U0,   ///< ⁰: digits (integer)
+   UNI_DIFF_SPACES   = UNI_PAD_U1,   ///< ¹: blanks
+   UNI_DIFF_REAL     = UNI_PAD_U2,   ///< ²: real number
+   UNI_DIFF_ANY      = UNI_PAD_U3,   ///< ³: anything
+   UNI_DIFF_OVERBAR  = UNI_PAD_U4,   ///< ⁴: optional ¯
+   UNI_DIFF_SIGN     = UNI_PAD_U5,   ///< ⁵: ASCII sign (+ or -)
+   UNI_DIFF_CR28_29  = UNI_PAD_U6,   ///< ⁶: obsolete
+   UNI_DIFF_MULT     = UNI_PAD_Un,   ///< ⁿ: unit multiplier (m, n, u, μ)
 };
 
 /// value 0-15 of hex digit, or -1 if uni not in "023456789ABCDEFabcdef"
@@ -101,9 +113,13 @@ extern int nibble(Unicode uni);
 /// value 0-63 of base64 digit, or -1 if uni not base64 (RFC 4648)
 extern int sixbit(Unicode uni);
 
-/// swap Unicodes u1 and u2 (used by UCS_string::sort())
-inline void
-Hswap(Unicode & u1, Unicode & u2)
-{ const Unicode tmp = u1;   u1 = u2;   u2 = tmp; }
+//----------------------------------------------------------------------------
+/// return true iff \b uni is a padding character (used internally).
+inline bool is_iPAD_char(Unicode uni)
+{
+   return ((uni > UNI_iPAD_U2) && (uni <= UNI_PAD_r_NOTCHAR))    // ³ ¹
+       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
+}
+//----------------------------------------------------------------------------
 
 #endif // __UNICODE_HH_DEFINED__

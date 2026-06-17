@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -378,10 +378,9 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 Token
 Bif_F12_TRANSPOSE::do_eval_B(const Value * B)
 {
-Shape shape_A;
-
    // monadic transpose is A⍉B with A = ... 4 3 2 1 0
    //
+Shape shape_A;
    loop(r, B->get_rank())   shape_A.add_shape_item(B->get_rank() - r - 1);
 
 Value_P Z = transpose(shape_A, B);
@@ -536,7 +535,7 @@ const Shape weights_B = sh_B.get_weights();
    // sum of weights that map to z.
    //
 Shape shape_Z;
-ShapeItem weight_Z[rank_Z];
+ShapeItem * weight_Z = ALLOCA(ShapeItem, rank_Z);
    loop(z, rank_Z)
        {
          weight_Z[z] = 0;
@@ -573,7 +572,7 @@ ShapeItem weight_Z[rank_Z];
                    const APL_Integer qio = Workspace::get_IO();
                    MORE_ERROR() << "A⍉B: axis " << (qio + z)
                                 << " is missing in A; "
-                                   "A should contain all integers " << qio
+                                   "A should contain only integers " << qio
                                 << "..." << (qio + rank_Z) << ".";
                    DOMAIN_ERROR;
                  }
@@ -1060,83 +1059,161 @@ APL_Complex bc = iB->get_complex_value();   // the value being decoded
        }
 }
 //----------------------------------------------------------------------------
+Token
+Bif_F12_ENCODE::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+   // A ⊤[X] B  ←→ (X⍴A)⊤B   for X > 0, or
+   //              (Q⍴A)⊤B   for X = 0 and Q computed from B
+   //
+const APL_Integer A0 = A->get_sole_integer();   // may throw RANK_ERROR or LENGTH_ERROR
+
+   /// radix 0 means that an item of of B overflows entirely into its leading element
+   /// (which is the item itself).
+   if (A0 == 0)   return Token(TOK_APL_VALUE1, B);
+
+APL_Integer X0 = X->get_sole_integer();   // may throw RANK_ERROR or LENGTH_ERROR
+   if (X0 < 0)   DOMAIN_ERROR;
+
+   if (X0 == 0)   X0 = get_X0(A0, *B);   // compute X0 from B
+
+Value_P new_A(X0, LOC);
+   loop(x, X0)   new_A->next_ravel_Int(A0);
+   new_A->check_value(LOC);
+   return eval_AB(new_A, B);
+}
+//----------------------------------------------------------------------------
+int
+Bif_F12_ENCODE::get_X0(APL_Integer A0, const Value & B)
+{
+   // X0 == 0.   // compute X0 from B
+   //
+int64_t min_B = 0x7FFFFFFFFFFFFFFF;   // smallest item in B
+int64_t max_B = 0x8000000000000000;   // largest item in B
+   loop(b, B.element_count())
+      {
+        const Cell & cell = B.get_cravel(b);
+        if (cell.is_integer_cell())
+           {
+             const APL_Integer value = cell.get_int_value();
+             if (min_B > value)   min_B = value;
+             if (max_B < value)   max_B = value;
+           }
+        else if (cell.is_float_cell())
+           {
+             const APL_Integer value = cell.get_near_int();
+             if (min_B > value)   min_B = value;
+             if (max_B < value)   max_B = value;
+           }
+        else if (cell.is_complex_cell())
+           {
+             // there is no irect way to get the near-int values of ComplexCell, s owe
+             // split it into two FloatCells.
+             const FloatCell real_cell(cell.get_real_value());
+             const FloatCell imag_cell(cell.get_imag_value());
+             if (!(real_cell.is_near_int64_t() && imag_cell.is_near_int64_t()))
+                {
+                  MORE_ERROR() << "A ⊤[X] B: complex number " << cell
+                               << " in B is not near int.";
+                  DOMAIN_ERROR;
+                }
+
+             const APL_Integer real_value = real_cell.get_near_int();
+             if (min_B > real_value)   min_B = real_value;
+             if (max_B < real_value)   max_B = real_value;
+             const APL_Integer imag_value = imag_cell.get_near_int();
+             if (min_B > imag_value)   min_B = imag_value;
+             if (max_B < imag_value)   max_B = imag_value;
+           }
+        else
+           {
+             MORE_ERROR() << "A ⊤[X] B: invalid Cell type in B";
+             DOMAIN_ERROR;
+           }
+      }
+
+const uint64_t abs_A0 = A0 < 0 ? -A0 : A0;
+const uint64_t log_A0 = 0x8000000000000000 / abs_A0;
+
+uint64_t abs_min_B = min_B;
+   if (min_B < 0 && abs_min_B != 0x8000000000000000)   abs_min_B = - min_B;
+
+uint32_t min_N = 0;   // number of digits for abs_min_B
+   for (uint64_t min_V = 1; min_V < abs_min_B; min_V *= A0)
+       {
+         ++min_N;
+         if (min_N >= log_A0)   DOMAIN_ERROR;
+       }
+
+uint64_t abs_max_B = max_B;
+   if (max_B < 0 && abs_max_B != 0x8000000000000000)   abs_max_B = - max_B;
+uint32_t max_N = 0;   // number of digits for abs_min_B
+   for (uint64_t max_V = 1; max_V < abs_max_B; max_V *= A0)
+       {
+         ++max_N;
+         if (max_N >= log_A0)   DOMAIN_ERROR;
+       }
+
+const int N = max_N > min_N ? max_N : min_N;
+
+   // if any B is negative, then add a sign digit
+   return (min_B < 0) ? N + 1 : N;
+}
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_ELEMENT::do_eval_B(const Value * B)
 {
    // enlist
    //
+   // lrm p. 118, ⍴⍴Z = 1, ⍴Z = number of simple scalars in B
+   //
    if (B->element_count() == 0)   // empty argument
       {
-        Value_P Z(ShapeItem(0), LOC);   // empty vector with proto ' ' or '0'
-        const Cell * C = &B->get_cfirst();
-        bool left = false;
-        for (;;)
+        const Cell * C0 = &B->get_cproto();
+        if (C0->is_numeric())
+           {
+             Value_P Z(1, LOC);
+             Z->next_ravel_Int(0);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_character_cell())
+           {
+             Value_P Z(1, LOC);
+             Z->next_ravel_Char(UNI_SPACE);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_lval_cell())
+           {
+             // (∈⍬)←value is a noop
+             //
+             Value_P Z(ShapeItem(0), LOC);
+             new (&Z->get_wproto()) LvalCell(0, 0);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        if (C0->is_pointer_cell())
             {
-              if (C->is_pointer_cell())
-                 {
-                   C = &C->get_pointer_value()->get_cfirst();
-                   continue;
-                 }
-
-              if (left && C->is_lval_cell())
-                 {
-                   C = C->get_lval_value();
-                   if (C == 0)
-                      {
-                        CERR << "0-pointer at " LOC << endl;
-                        FIXME;
-                      }
-                   else if (C->is_pointer_cell())
-                      {
-                        C = &C->get_pointer_value()->get_cfirst();
-                      }
-                   else
-                      {
-                        const LvalCell & C_lval =
-                              reinterpret_cast<LvalCell &>(C);
-                        Value * owner = C_lval.get_cell_owner();
-                        new (&Z->get_wproto())
-                            LvalCell(C_lval.get_lval_value(), owner);
-                        break;
-                      }
-                 }
-
-              if (C->is_numeric())
-                 {
-                   Z->set_proto_Int();
-                   break;
-                 }
-
-              if (C->is_character_cell())
-                 {
-                   Z->set_proto_Spc();
-                   break;
-                 }
-
-              if (C->is_lval_cell())
-                 {
-                   const LvalCell & C_lval = reinterpret_cast<LvalCell &>(C);
-                   left = C_lval.get_cell_owner() != 0;
-                   C = C->get_lval_value();
-                   continue;
-                 }
-
-               // not reached
-               //
-               FIXME;
+             return do_eval_B(C0->get_pointer_value().get());
             }
 
-        Z->check_value(LOC);
-        return  Z;
+
+        // not reached
+        //
+        FIXME;
       }
 
 const ShapeItem len_Z = B->get_enlist_count();
+
 Value_P Z(len_Z, LOC);
 
    if (B->get_lval_cellowner())   B->enlist_left(*Z);
    else                           B->enlist_right(*Z);
 
-   Z->set_default(*B, LOC);
+   Assert(len_Z);   // cannot be empty
    Z->check_value(LOC);
    return Z;
 }
@@ -1288,26 +1365,21 @@ Value_P Z = IntScalar(depth, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-Token
-Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
+bool
+Bif_F12_EQUIV::do_eval_AB(Value_P A, Value_P B)
 {
    // match
    //
-
 const double qct = Workspace::get_CT();
 
-   if (!A->same_shape(*B))   //shape mismatch
-      return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+   if (!A->same_shape(*B))   return false;   // shape mismatch
 
    for (ConstRavel_P a(A, true), b(B, true); +a; ++a, ++b)
        {
-         if (!a->equal(*b, qct))
-            {
-              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
-            }
+         if (!a->equal(*b, qct))   return false;   // no match
        }
 
-   return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // match
+   return true;   // match
 }
 //============================================================================
 Token
@@ -1443,7 +1515,7 @@ UTF8_string result_utf8 = out.get_data();
 
    // result_utf8 may have multiple lines. Remember where the lines start.
    //
-std::basic_string<ShapeItem> line_starts;
+std::vector<ShapeItem> line_starts;
    line_starts.push_back(0);   // the first line
    loop(r, result_utf8.size())
       {
@@ -1459,8 +1531,8 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
         else
            len = result_utf8.size() - line_starts[l];
 
-        UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
-        UCS_string line_ucs(line_utf8);
+        const UTF8_string line_utf8(utf8P(&result_utf8[line_starts[l]]), len);
+        const UCS_string line_ucs(line_utf8);
         Value_P ZZ(line_ucs, LOC);
         Z->next_ravel_Pointer(ZZ.get());
       }
@@ -1468,191 +1540,84 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
-ShapeItem
-Bif_F12_UNION::append_zone(const Cell ** cells_Z, const Cell ** cells_B,
-               Zone_list & B_from_to, double qct)
+//============================================================================
+Token
+Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
 {
-const Cell ** Z0 = cells_Z;
+   /*
+      NOTE: Neither IBM APL2 nor ISO define dyadic A ∪ B.
+            Dyalog APL defines it as:
 
-   while (B_from_to.size())
-      {
-        const Zone zone = B_from_to.back();
-        const ShapeItem zone_count = zone.count();
-        Assert(zone_count > 0);
-        B_from_to.pop_back();
+            A ∪ B ←→ A , (B ∼ A)
 
-        const ShapeItem B_from = zone.from;
-        const ShapeItem B_to   = zone.to;
+            However, that definition suffers from asymmetry: duplicated items
+            in A remain duplicated while duplicated items in B are removed.
 
-        // Find the smallest pointer (i.e. smallest Cell address, not the
-        // smallest Cell value) in the zone. This pointer will go into Z and
-        //  it will kill all its neighbours that are equal within qct.
-        //
+            We therefore define dyadic A ∪ B as:
 
-#if 0
-        // this fails when used with char cells but is quite handy for
-        // testing the algorithm!
-        Q1(LOC)
-        fprintf(stderr, "%ld-element zone:\n", B_to - B_from);
-        for (ShapeItem j = B_from; j < B_to; ++j)
-            fprintf(stderr, "[%ld] value: %.12f\n", j,
-                    cells_B[j]->get_real_value());
-#endif
+            A ∪ B ←→ ∪ (A , B)
 
+            which is simpler, symmetrical, and closer to the mathematical
+            definition of a set.
+    */
+   if (A->get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
-        // the by far most likely cases are zones with 1 or,
-        // already less likely, 2 cells. These cases can be handled
-        // without searching the smallest element and are, for
-        // performance reasons, handled beforehand.
-        //
-        if (zone_count == 1)
-           {
-             *cells_Z++ = cells_B[B_from];
-             continue;   // zone done
-           }
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
 
-        if (zone_count == 2)
-           {
-             if (cells_B[B_from] < cells_B[B_from + 1])
-                *cells_Z++ = cells_B[B_from];
-             else
-                *cells_Z++ = cells_B[B_from + 1];
-             continue;   // zone done
-           }
+   // Z←A, B
+   //
+Value_P Z(len_A + len_B, LOC);
 
-        ShapeItem smallest = B_from;
-        for (ShapeItem bb = B_from + 1; bb < B_to; ++bb)
-            {
-              if (cells_B[smallest] > cells_B[bb])   smallest = bb;
-            }
-
-        //  See if the zone is transitive or not.
-        //
-        if (cells_B[smallest]->equal(*cells_B[B_to - 1], qct))
-           {
-             // the zone is transitive (i.e. all cells are equal within ⎕CT).
-             // The unique of the zone is then the smallest pointer (i.e.first,
-             // not the smallest Cell) in the zone.
-             //
-             *cells_Z++ = cells_B[smallest];
-             continue;   // zone done
-           }
-
-        // the zone is not transitive, i.e. cells_B[B_from] is NOT equal to
-        // cells_B[B_to-1]. Divide the zone into 3 (possibly empty) zones:
-        //
-        // a.   cells < smallest within ⎕CT,
-        // b.   cells = smallest within ⎕CT, and
-        // c.  cells > smallest within ⎕CT
-
-        // Start with the middle zone b. This zone initially contains only
-        // smallest and its then blown up with elements that are equal (within)
-        // ⎕CT) to smallest.
-        //
-        const Cell * first_B = cells_B[smallest];
-        *cells_Z++ = first_B;
-        ShapeItem from1 = smallest;      // initial start of zone b.
-        ShapeItem to1   = smallest;      // initial end of zone b.
-
-        // decrement from1 as long as its cell is within ⎕CT of smallest.
-        // That makes all
-        while (from1 > B_from && first_B->equal(*cells_B[from1], qct))  --from1;
-        if (from1 > B_from)   // non-empty zone before smallest
-           {
-             const Zone smaller(B_from, from1);
-             B_from_to.push_back(smaller);
-             continue;   // zone done
-           }
-
-        // increment to1 as long as its cell is within ⎕CT of smallest.
-        //
-        while (to1 < B_to && first_B->equal(*cells_B[to1], qct))   ++to1;
-        if (to1 < B_to)   // non-empty zone after smallest
-           {
-             Zone larger(to1, B_to);
-             B_from_to.push_back(larger);
-             continue;   // zone done
-           }
-      }
-
-   return cells_Z - Z0;
+   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
+   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   Z->set_default(*B, LOC);
+   Z->check_value(LOC);
+   return eval_B(Z);
 }
 //----------------------------------------------------------------------------
 Token
 Bif_F12_UNION::eval_B(Value_P B) const
 {
+   // ∪B : Unique. The items of B without duplicates
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
+   // 1. create a vector with all cells of B and sort it.
+   //
+vector<const Cell *> cells_B;
+   cells_B.reserve(len_B);
+
+   loop(b, len_B)   cells_B.push_back(&B->get_cravel(b));
+   Heapsort<const Cell *>::sort(cells_B, Cell::compare_stable, 0);
+
+   // 2. remove duplicates
+   //
 const double qct = Workspace::get_CT();
-
-   // 1. construct a vector of Cell pointers and sort it so that the
-   //    cells being pointed to are sorted ascendingly.
-   //
-   // For efficiency we allocate both the Cell pointers for argument B and
-   // for the result Z. Sorting is first done with ⎕CT←0; ⎕CT will be
-   // considered later on.
-   //
-const Cell ** cells_B = new const Cell *[2*len_B];
-   if (cells_B == 0)   WS_FULL;
-
-const Cell ** cells_Z = cells_B + len_B;
-ShapeItem len_Z = 0;
-
-   for (ConstRavel_P b(B, true); +b; ++b)   cells_B[b()] = &*b;
-   Heapsort<const Cell*>::sort(cells_B, len_B, 0, Cell::A_greater_B);
-
-   // 2. divide the cells into zones. A zone is a sequence of cells
-   //    B[from] (including)  ... B[to] (excluding) so that the difference
-   //    between B[i] and B[i+1] is < ⎕CT.
-   //
-   //    Then append the unique element(s) of each zone to cells_Z.
-   //
-ShapeItem from = 0;
-Zone_list from_to;
-   for (ShapeItem b = 1; b < len_B; ++b)
+vector<const Cell *> unique;
+   unique.reserve(len_B);
+   for (ShapeItem b = 0; b < len_B; )
        {
-         if (cells_B[b]->equal(*cells_B[b-1], qct))
-            {
-              // cells_B[b] belongs to the zone
-              //
-              continue;
-            }
-
-         const Zone ft0(from, b);
-         from_to.push_back(ft0);
-         len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
-         Assert(from_to.size() == 0);
-         from = b;
-         continue;   // next b (in the next zone)
+         const Cell * u = cells_B[b++];
+         unique.push_back(u);
+         while (b < len_B && u->equal(*cells_B[b], qct))   ++b;   // duplicate
        }
 
-   if (from < len_B)   // the rest
-      {
-        const Zone ft0(from, len_B);
-        from_to.push_back(ft0);
-        len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
-        Assert(from_to.size() == 0);
-      }
-
-   // 3. cells_Z now contains only the unique cells in cells_B, but sorted by
-   //    cell contnt. Sort cells_Z by address (= position in B)  so that the
-   //    original order in B is reconstructed
+   // 3. restore original order and create the result
    //
-   Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+   Heapsort<const Cell *>::sort(unique, Cell::compare_ptr, 0);
 
-   // 4. construct the result.
-   //
+const ShapeItem len_Z = unique.size();
 Value_P Z(len_Z, LOC);
-   loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
-   delete[] cells_B;   // also deletes cells_Z
+   loop(u, len_Z)   Z->next_ravel_Cell(*unique[u]);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 Token
 Bif_F2_INTER::eval_AB(Value_P A, Value_P B) const
 {
@@ -1668,17 +1633,21 @@ const double qct = Workspace::get_CT();
       {
         // large A or B: sort A and B to speed up searches
         //
-        const Cell ** cells_A = new const Cell *[2*len_A + len_B];
-        const Cell ** cells_Z = cells_A + len_A;
-        const Cell ** cells_B = cells_A + 2*len_A;
+        vector<const Cell *> cells_A;
+        vector<const Cell *> cells_B;
+        vector<const Cell *> cells_Z;
+        try {
+              cells_A.reserve(len_A);
+              cells_B.reserve(len_B);
+              cells_Z.reserve(len_A + len_B);   // worst case
+            } catch (...) { WS_FULL; }
 
-        loop(a, len_A)   cells_A[a] = &A->get_cravel(a);
-        loop(b, len_B)   cells_B[b] = &B->get_cravel(b);
+        loop(a, len_A)   cells_A.push_back(&A->get_cravel(a));
+        loop(b, len_B)   cells_B.push_back(&B->get_cravel(b));
 
-        Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
-        Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+        Heapsort<const Cell *>::sort(cells_A, Cell::compare_stable, 0);
+        Heapsort<const Cell *>::sort(cells_B, Cell::compare_stable, 0);
 
-        ShapeItem len_Z = 0;
         ShapeItem idx_B = 0;
         loop(idx_A, len_A)
             {
@@ -1687,7 +1656,7 @@ const double qct = Workspace::get_CT();
                   {
                     if (ref->equal(*cells_B[idx_B], qct))
                        {
-                         cells_Z[len_Z++] = ref;   // A is in B
+                         cells_Z.push_back(ref);   // A is in B
                          break;   // for idx_B → next idx_A
                        }
 
@@ -1701,61 +1670,38 @@ const double qct = Workspace::get_CT();
         // sort cells_Z by position so that the original order in A is
         //  reconstructed
         //
-        Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
-        Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
+        Heapsort<const Cell *>::sort(cells_Z, Cell::compare_ptr, 0);
+        Value_P Z(cells_Z.size(), LOC);
+        loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete[] cells_A;
         return Token(TOK_APL_VALUE1, Z);
       }
     else
       {
         // small A and B: use quadratic time algorithm.
         //
-        const Cell ** cells_Z = new const Cell *[len_A];
-        ShapeItem len_Z = 0;
+        vector<const Cell *> cells_Z;
+        cells_Z.reserve(len_A);
 
         for (ConstRavel_P a(A, true); +a; ++a)
         for (ConstRavel_P b(B, true); +b; ++b)
             {
               if (a->equal(*b, qct))
                  {
-                   cells_Z[len_Z++] = &*a;
+                   cells_Z.push_back(&*a);
                    break;   // loop(b)
                  }
             }
 
-        Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
+        Value_P Z(cells_Z.size(), LOC);
+        loop(z, cells_Z.size())   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete[] cells_Z;
         return Token(TOK_APL_VALUE1, Z);
       }
-}
-//----------------------------------------------------------------------------
-Token
-Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
-{
-   if (A->get_rank() > 1)   RANK_ERROR;
-   if (B->get_rank() > 1)   RANK_ERROR;
-
-   // A ∪ B ←→ A,B∼A
-   //
-Token BwoA = Bif_F12_WITHOUT::fun.eval_AB(B, A);
-
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = BwoA.get_apl_val()->element_count();
-Value_P Z(len_A + len_B, LOC);
-
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
-   Z->set_default(*B, LOC);
-   Z->check_value(LOC);
-   return Bif_F12_COMMA::fun.eval_AB(A, BwoA.get_apl_val());
 }
 //============================================================================
 Token

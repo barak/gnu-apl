@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,11 +35,13 @@
 #include "PointerCell.hh"
 #include "PrintOperator.hh"
 #include "QuadFunction.hh"
+#include "Quad_CC.hh"
 #include "Quad_FX.hh"
 #include "Quad_FFT.hh"
 #include "Quad_GTK.hh"
 #include "Quad_JSON.hh"
 #include "Quad_MAP.hh"
+#include "Quad_MX.hh"
 #include "Quad_PLOT.hh"
 #include "Quad_PNG.hh"
 #include "Quad_RE.hh"
@@ -143,7 +145,7 @@ Value_P Z(shape_Z, LOC);
            {
             const Unicode uni = B->get_cravel(b + c).get_char_value();
             if (uni == UNI_SPACE)   break;
-            symbol_name.append(uni);
+            symbol_name << uni;
            }
 
         const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
@@ -210,20 +212,20 @@ const APL_time_us end = start + 1000000 * B->get_cfirst().get_real_value();
    if (end < start)                           DOMAIN_ERROR;
    if (end > start + 31*24*60*60*1000000LL)   DOMAIN_ERROR;   // > 1 month
 
-bool need_CR = false;
+bool need_LF = false;
    while (now() < end)
        {
          usleep(20000);
-         if (attention_is_raised())   need_CR = true;
-         if (interrupt_is_raised())
+         if (InterruptContext::attention_is_raised())   need_LF = true;   // first ^C
+         if (InterruptContext::interrupt_is_raised())                     // second ^C
             {
-              need_CR = true;
+              need_LF = true;
               break;
             }
        }
 
    // interrupt or attention may have displayed ^C, start a new line if so.
-   if (need_CR)   CERR << endl;
+   if (need_LF)   CERR << endl;
 
    // we do not clear_attention_raised(LOC) or clear_interrupt_raised(LOC);
    // so that the user can continue with →''
@@ -306,7 +308,7 @@ ExecuteList * fun = 0;
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
    Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution_count();
+   Workspace::SI_top()->set_safe_execution_depth();
 
    return Token(TOK_SI_PUSHED);
 }
@@ -358,6 +360,8 @@ Quad_EC::eoc(Token & result)
 Value_P Z(3, LOC);
    if (result.get_tag() == TOK_ERROR)
       {
+        /// clear any )MORE info that may have been produced in the ⎕EC context
+        Workspace::more_error().clear();
         StateIndicator * si = Workspace::SI_top();
         si->clear_safe_execution();
 
@@ -382,7 +386,7 @@ Value_P Z(3, LOC);
 
         Z->check_value(LOC);
         Token tok_Z(TOK_APL_VALUE1, Z);
-        result.move(tok_Z, LOC);
+        result.move_from(tok_Z, LOC);
         return;
       }
 
@@ -435,7 +439,7 @@ Value_P Z2(2, LOC);
 
    Z->check_value(LOC);
 Token tok_Z(TOK_APL_VALUE1, Z);
-   result.move(tok_Z, LOC);
+   result.move_from(tok_Z, LOC);
 }
 //============================================================================
 Token
@@ -445,7 +449,7 @@ Quad_ENV::eval_B(Value_P B) const
 
 const ShapeItem ec_B = B->element_count();
 
-std::basic_string<const char *> evars;
+std::vector<const char *> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -475,7 +479,7 @@ Value_P Z(sh_Z, LOC);
         UCS_string ucs;
         while (*env)
            {
-             if (*env != '=')   ucs.append(Unicode(*env++));
+             if (*env != '=')   ucs << Unicode(*env++);
              else               break;
            }
         ++env;   // skip '='
@@ -483,7 +487,7 @@ Value_P Z(sh_Z, LOC);
         Value_P varname(ucs, LOC);
 
         ucs.clear();
-        while (*env)   ucs.append(Unicode(*env++));
+        while (*env)   ucs << Unicode(*env++);
 
         Value_P varval(ucs, LOC);
 
@@ -513,7 +517,7 @@ Quad_ES::eval_B(Value_P B) const
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
    if (error.get_error_code() == E_NO_ERROR)              return ret;
-   if (Workspace::SI_top()->get_safe_execution_count())   return ret;
+   if (Workspace::SI_top()->get_safe_execution_depth())   return ret;
 
    throw error;
 }
@@ -586,8 +590,8 @@ const ErrorCode ec = get_error_code(B);
              // and B is not empty, the event action is generated as though
              // the function were primitive.
              //
-             UCS_string ufun_name(UTF8_string("      "));
-             ufun_name.append(ufun->get_name());
+             UCS_string ufun_name(U"      ");
+             ufun_name << ufun->get_name();
              error.set_error_line_2(ufun_name, 6, -1);
              Workspace::pop_SI(LOC);
              StateIndicator::get_error(Workspace::SI_top()) = error;
@@ -703,7 +707,7 @@ int ret = 0;   // assume ⎕EX failure
 
    // build vector of member names in reverse order
    //
-basic_string<const UCS_string *>members;
+vector<const UCS_string *>members;
    {
      int dot = name.size();
      for (int from = dot - 1; from >= 0; --from)
@@ -725,9 +729,9 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
    {
      Value_P toplevel_val = symbol->get_var_value();
      if (!toplevel_val)   goto cleanup;
-     Value * owner = 0;   // not used
-     if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
+     if (const Cell * ccell = toplevel_val->get_existing_member(members))
         {
+          Cell * cell = const_cast<Cell *>(ccell);
           cell->release(LOC);   IntCell::z0(cell--);   // member value
           cell->release(LOC);   IntCell::z0(cell);     // member name
           ret = 1;   // ⎕EX success
@@ -1098,6 +1102,13 @@ Quad_NC::get_NC(const UCS_string ucs)
    if (ucs.size() == 0)   return NC_INVALID;   // invalid name
 
 const Unicode uni = ucs[0];
+   if (uni == UNI_QUOTE_Quad)   // ⍞
+      {
+        if (ucs.size() == 1)   return NC_SYSTEM_VAR;
+        else                   return NC_INVALID;
+      }
+
+   if (uni == UNI_Quad_Quad && ucs.size() == 1)   return NC_SYSTEM_VAR;   // ⎕
 
    // system name ?
    {
@@ -1116,16 +1127,20 @@ const Unicode uni = ucs[0];
      // the caller may ask for e.g. ⍺123 but we accept ⍺ and friends only if
      // their lengths is 1.
      //
-     if (ucs.size() != 1)   sys = 0;    // more than one char
+     if (sys && ucs.size() != 1)   return NC_INVALID;
 
      if (Avec::is_quad(uni))   // distinguished name
         {
-          int len = 0;
-          const Token t = Workspace::get_quad(ucs, len);
-          if (len < 2)                      return NC_SYSTEM_VAR;   // ⎕ or ⍞
-          if (t.get_Class() == TC_VOID)     return NC_INVALID;
-          if (t.get_Class() == TC_SYMBOL)   sys = t.get_sym_ptr();
-          else                              return  NC_SYSTEM_FUN;
+          int len = 0;   // set by Workspace::get_quad()
+          const Token tok = Workspace::get_quad(ucs, len);
+          if (tok.get_Class() != TC_SYMBOL)   return NC_INVALID;
+
+          // NOTE: Workspace::get_quad() tolerates prefixes (e.g ⎕FFTxyz
+          // would be accepted since ⎕FFT is valid. This is OK for toenization,
+          // but not for ⎕NC. We therefore need to check the length as well.
+          //
+          sys = tok.get_sym_ptr();
+          if (sys->get_name().size() != ucs.size())   return NC_INVALID;
         }
     
      if (sys)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
@@ -1190,7 +1205,7 @@ int requested_NCs = 0;
    //
 UCS_string_vector names;
    {
-     std::basic_string<const Symbol *> symbols = Workspace::get_all_symbols();
+     std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
      loop(s, symbols.size())
         {
@@ -1241,8 +1256,7 @@ const bool funs = requested_NCs & 1 << 6;
 ShapeItem longest = 0;
    loop(n, names.size())
       {
-        if (longest < names[n].size())
-           longest = names[n].size();
+        if (longest < names[n].ssize())   longest = names[n].size();
       }
 
 const Shape shZ(names.size(), longest);
@@ -1266,7 +1280,7 @@ Value_P Z(shZ, LOC);
         loop(l, longest)
            {
              const UCS_string & ucs = names[smallest];
-             Z->next_ravel_Char(l < ucs.size() ? ucs[l] : UNI_SPACE);
+             Z->next_ravel_Char(l < ucs.ssize() ? ucs[l] : UNI_SPACE);
            }
 
         // remove smalles from table
@@ -1327,9 +1341,7 @@ const APL_Integer b = B->get_cfirst().get_near_int();
 
         case 3:  {
                    UCS_string fun_and_line(fun_name);
-                   fun_and_line.append(UNI_L_BRACK);
-                   fun_and_line.append_number(fun_line);
-                   fun_and_line.append(UNI_R_BRACK);
+                   fun_and_line << UNI_L_BRACK << fun_line << UNI_R_BRACK;
                    Z = Value_P(fun_and_line, LOC); 
                  }
                  break;
@@ -1407,9 +1419,7 @@ Value_P Z(len, LOC);
 
              case 3:  {
                         UCS_string fun_and_line(fun_name);
-                        fun_and_line.append(UNI_L_BRACK);
-                        fun_and_line.append_number(fun_line);
-                        fun_and_line.append(UNI_R_BRACK);
+                        fun_and_line << UNI_L_BRACK << fun_line << UNI_R_BRACK;
                         Value_P name_and_line(fun_and_line, LOC);
                         Z->next_ravel_Pointer(name_and_line.get());
                       }
@@ -1539,8 +1549,7 @@ const UserFunction * ufun = fun->get_func_ufun();
 }
 //----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const std::basic_string<Function_Line> & lines,
-                      bool assigned)
+Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 
@@ -1553,7 +1562,7 @@ Value_P Z(lines.size(), LOC);
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
-std::basic_string<Function_Line> lines;
+std::vector<Function_Line> lines;
    lines.reserve(new_value.element_count());
 
    loop(l, new_value.element_count())

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,91 +36,12 @@ class Function;
     (command line arguments, config files, environment variables ...)
  */
 /// Various preferences of the user (sorted alphabetically)
-struct UserPreferences
+class UserPreferences
 {
-   UserPreferences()
-   :
-     append_summary(false),
-     auto_OFF(false),
-     backup_before_save(false),
-     control_Ds_to_exit(0),
-     CPU_limit_secs(0),
-     daemon(false),
-     discard_indentation(false),
-#define sec_def(X) X(false),
-#include "Security.def"   // all start with disable_
-     do_CONT(true),
-     do_Color(true),
-     do_not_echo(false),
-     echo_CIN(false),
-     emacs_arg(0),
-     emacs_mode(false),
-     initial_pw(DEFAULT_Quad_PW),
-     line_history_len(500),
-     line_history_path(".apl.history"),
-     mem_arg(0),
-     multi_line_strings(true),
-     multi_line_strings_3(true),
-     nabla_to_history(1),   // if function was modified
-     output_to_cout(false),
-     randomize_testfiles(false),
-     raw_cin(false),
-     requested_cc(CCNT_UNKNOWN),
-     requested_id(0),
-     requested_par(0),
-     safe_mode(false),
-     script_argc(0),
-     silent(false),
-     system_do_svars(true),
-     tcp_port(0),
-     tcp_websocket(false),
-     user_do_svars(true),
-     user_profile(0),
-     wait_ms(0),
-     WINCH_sets_pw(false)
-   { gettimeofday(&session_start, 0); }
-
-   /// read a \b preference file and update parameters set there
-   void read_config_file(bool sys, bool log_startup);
-
-   /// read a \b parallel_thresholds file and update parameters set there
-   void read_threshold_file(bool sys, bool log_startup);
-
-   /// print possible command line options and exit
-   static void usage(const char * prog);
-
-   /// return " (default)" if yes is true
-   static const char * is_default(bool yes)
-      { return yes ? " (default)" : ""; }
-
-   /// print how the interpreter was configured (via ./configure) and exit
-   static void show_configure_options();
-
-   /// print the GPL
-   static void show_GPL(ostream & out);
-
-   /// show version information
-   static void show_version(ostream & out);
-
-   /// parse the original command line parameters to figure start-up Logging
-   /// (BEFORe any expansions). Parses (only) the -l option. Return true
-   /// iff startup-logging is requested.
-   bool parse_argv_0(int argc, const char * argv[]);
-
-   /// parse command line parameters (BEFORE reading preference files).
-   /// Parses the -l, -p, -C, and -u options. Return true iff startup-logging
-   /// is requested.
-   bool parse_argv_1();
-
-   /// parse command line parameters (AFTER reading preference files)
-   /// Parses all valid options.
-   void parse_argv_2(bool logit);
-
-   /// argv/argc at startup before expand_argv()
-   std::basic_string<const char *> original_argv;
-
-   /// argv/argc after expand_argv()
-   std::basic_string<const char *> expanded_argv;
+public:
+  /// collect all user preferences (from command line arguments and from
+  /// preferences file). Return \b true iff start-up logging was requested.
+  bool collect_preferences(const std::vector<const char *> & args);
 
    /// append test results to summary.log rather than overriding it
    bool append_summary;
@@ -131,13 +52,22 @@ struct UserPreferences
    /// backup on )SAVE
    bool backup_before_save;
 
+   /// screen rows for ⎕PLOT ASCII driver
+   int plot_ASCII_rows;
+
+   /// screen columns for ⎕PLOT ASCII driver
+   int plot_ASCII_columns;
+
+   /// background color for ⎕PLOT ASCII driver
+   int plot_ASCII_background;
+
    /// number of control-Ds to exit (0 = never)
    int control_Ds_to_exit;
 
    /// limit (seconds) on the CPU time
    int CPU_limit_secs;
 
-   /// run as deamon
+   /// run GNU APL as deamon
    bool daemon;
 
    /// true if leading spaces in the ∇-editor shall be dropped
@@ -166,13 +96,16 @@ struct UserPreferences
    bool emacs_mode;
 
    /// expand lumped arguments
-   void expand_argv(int argc, const char ** argv);
+   void expand_args(const std::vector<const char *> & args);
 
    /// --eval expressions
-   std::basic_string<const char *> eval_exprs;
+   std::vector<const char *> eval_exprs;
 
    /// initial value of ⎕PW
-   int initial_pw;
+   int initial_PW;
+
+   /// user has set the initial value of ⎕PW (preferences or command line)
+   bool initial_PW_by_user;
 
    /// a workspace to be loaded at startup
    UTF8_string initial_workspace;
@@ -186,18 +119,23 @@ struct UserPreferences
    /// name of a user-provided keyboard layout file
    UTF8_string keyboard_layout_file;
 
+   /// true do disable xmodmap usage in ]KEYB command
+   bool no_xmodmap;
+
    /// location of the input line history
    UTF8_string line_history_path;
 
    /// argument of --mem (if any: 0 if not given, "" if given but empty)
    const char * mem_arg;
 
-   /// true if old-style multi-line strings are allowed (in ∇-defined
-   /// functions)
-   bool multi_line_strings;
+   /// \b true if old-style multi-line strings are allowed (in defined functions)
+   bool old_multi_line_strings;
 
-   /// true if new-style multi-line strings are allowed
-   bool multi_line_strings_3;
+   /// \b true if new-style multi-line strings are allowed
+   bool new_multi_line_strings;
+
+   /// \b true if multi-line literals are allowed
+   bool multi_line_literals;
 
    /// when function body shall go into the history
    int nabla_to_history;
@@ -224,14 +162,14 @@ struct UserPreferences
    bool safe_mode;
 
    /// the argument number of the APL script name (if run from a script)
-   /// in expanded_argv, or 0 if apl is started directly.
+   /// in expanded_args, or 0 if apl is started directly.
    size_t script_argc;
 
    /// when apl was started
    timeval session_start;
 
-   /// true if no banner/Goodbye is wanted.
-   bool silent;
+   /// banner silence
+   Silence silence;
 
    /// true if shared variables are enabled by the system. This is initially
    /// the same as user_do_svars, but can become false if something goes wrong
@@ -259,10 +197,51 @@ struct UserPreferences
    /// \b preferences files) for the APL interpreter instance
    static UserPreferences uprefs;
 
+   /// args after expand_args(). The strings in \b expanded_args are
+   /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
+   std::vector<const char *> expanded_args;
+
+   /// read a \b preference file and update parameters set there
+   void read_config_file(bool sys, bool log_startup);
+
 protected:
+   /// constructor. Called before main() and initializes the default
+   /// values for all user preferences.
+   UserPreferences();
+
+   /// read a \b parallel_thresholds file and update parameters set there
+   void read_threshold_file(bool sys, bool log_startup);
+
+   /// print possible command line options and exit
+   static void usage(const char * prog);
+
+   /// print how the interpreter was configured (via ./configure) and exit
+   static void show_configure_options();
+
+   /// print the GPL
+   static void show_GPL(ostream & out);
+
+   /// show version information
+   static void show_version(ostream & out);
+
+   /// parse the original command line arguments to figure if start-up logging
+   /// is desired (BEFORE any expansions). Parses (only) the -l option.
+   /// Return true iff startup-logging (aka. -l 37) was requested.
+   bool parse_args_0(const std::vector<const char *> & args);
+
+   /// parse \b expanded_args (BEFORE reading preference
+   /// files). Parses (only) the -l, -p, -C, and -u options.
+   /// Return true iff startup-logging was requested (from parse_args_0).
+   bool parse_args_1();
+
+   /// parse \b expanded_args (AFTER reading preference files)
+   /// Parses all valid options (and overwrite any corresponding settings in
+   /// the preference files).
+   void parse_args_2(bool logit);
+
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
-   /// itself), or 2 2-character hex value
+   /// itself), or a 2-character hex value
    /// 
    static int decode_ASCII(const char * strg);
 
@@ -277,6 +256,13 @@ protected:
    /// set the parallel threshold of function \b fun to \b threshold
    static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
+
+  /// print \b args
+  static void show_args(const std::vector<const char *> & args);
+
+   /// return " (default)" if yes is true
+   static const char * is_default(bool yes)
+      { return yes ? " (default)" : ""; }
 };
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

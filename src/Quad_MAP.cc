@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,13 +72,14 @@ ShapeItem map_len = A->get_rows();               // the number of mappings
              LENGTH_ERROR;
            }
 
-ShapeItem * indices = new ShapeItem[map_len];
-   if (indices == 0)   WS_FULL;
+vector<ShapeItem> indices;
+   try         { indices.reserve(map_len); }
+   catch (...) { WS_FULL; }
 
-   loop(m, map_len)   indices[m] = m;
+   loop(m, map_len)   indices.push_back(m);
 
 const ravel_comp_len ctx = { &A->get_cfirst(), 1};
-   Heapsort<ShapeItem>::sort(indices, map_len, &ctx, &Quad_MAP::greater_map);
+   Heapsort<ShapeItem>::sort(indices, &Quad_MAP::greater_map, &ctx);
 
    // complain about duplicated keys
    //
@@ -93,13 +94,11 @@ const double qct = Workspace::get_CT();
                MORE_ERROR() << "Duplicate keys (e.g. A["
                             << (qio + indices[m - 1]) << "] and A["
                             << (qio + indices[m]) << "]) in 'A ⎕MAP B'";
-               delete[] indices;
                DOMAIN_ERROR;
              }
        }
 
 Value_P Z = do_map(*A, indices, B.get(), recursive);
-   delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
@@ -127,7 +126,7 @@ const Cell * cells_A = rcl->ravel;
 //----------------------------------------------------------------------------
 
 Value_P
-Quad_MAP::do_map(const Value & A, const ShapeItem * ordered_indices_A,
+Quad_MAP::do_map(const Value & A, const vector<ShapeItem> ordered_indices_A,
                  const Value * B, bool recursive)
 {
 Value_P Z(B->get_shape(), LOC);         // the result, ⍴Z ←→ ⍴B
@@ -137,8 +136,6 @@ const ravel_comp_len ctx = { &A.get_cfirst(),   // start of the ravel
                            };
 
 const ShapeItem len_B = B->element_count();
-const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
-                                              : A.get_rows();
    if (len_B == 0)   // empty value
       {
          const Cell & cell_B = B->get_cfirst();
@@ -146,7 +143,6 @@ const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
                                                ordered_indices_A,
-                                               map_len,
                                                compare_MAP,
                                                &ctx))
             {
@@ -174,7 +170,7 @@ const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
        {
          const Cell & cell_B = B->get_cravel(b);
          if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
-                   (cell_B, ordered_indices_A, map_len, compare_MAP, &ctx))
+                   (cell_B, ordered_indices_A, compare_MAP, &ctx))
             {
              Z->next_ravel_Cell(A.get_cravel(*map*2 + 1));
             }

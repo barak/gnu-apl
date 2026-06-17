@@ -105,7 +105,7 @@ int year, mon, day;
      day = t->tm_mday;
    }
 
-   for (size_t a = 1; a < argc; )
+   for (int a = 1; a < argc; )
        {
          const char * opt = argv[a++];
          const char * val = (a < argc) ? argv[a] : 0;

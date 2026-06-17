@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,24 +77,24 @@ protected:
    /// parse a JSON value (false, null, true, object, array, number, or string)
    /// and increment along the way.
    static void parse_value(Value & Z, const UCS_string & ucs_B,
-                           const std::basic_string<ShapeItem> & tokens_B,
+                           const std::vector<ShapeItem> & tokens_B,
                            size_t & token0);
 
    /// parse a JSON array: [ value (, value)* ] and increment token0
    /// along the way.
    static void parse_array(Value & Z, const UCS_string & ucs_B,
-                           const std::basic_string<ShapeItem> & tokens_B,
+                           const std::vector<ShapeItem> & tokens_B,
                            size_t & token0);
 
    /// parse a JSON object: { member ( , member)* } and increment token0
    static void parse_object(Value & Z, const UCS_string & ucs_B,
-                           const std::basic_string<ShapeItem> & tokens_B,
+                           const std::vector<ShapeItem> & tokens_B,
                            size_t & token0);
 
    /// parse a JSON object member: "name" : value , ; and increment token0
    /// along the way.
    static void parse_object_member(Value & Z, const UCS_string & ucs_B,
-                                   const std::basic_string<ShapeItem> & tokens_B,
+                                   const std::vector<ShapeItem> & tokens_B,
                                    size_t & token0);
 
    /// parse a JSON number
@@ -123,7 +123,7 @@ protected:
    /// top-level of the object or array starting at token0 and increment token0
    /// along the way.
    static size_t comma_count(const UCS_string & ucs_B,
-                             const std::basic_string<ShapeItem> & tokens_B,
+                             const std::vector<ShapeItem> & tokens_B,
                              size_t & token0);
 };
 

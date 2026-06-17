@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,11 @@ DynamicObject::rValue()
    /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
       because DynamicObject is non-virtual. The caller must therefore be
       careful and we allow only class Value to use rValue().
+
+      NOTE: reinterpret_cast<Value *>(this) is 8 bytes above
+            static_cast<Value *> (and then segfaults).
     */
+
    return *static_cast<Value *>(this);
 }
 //----------------------------------------------------------------------------
@@ -89,6 +93,9 @@ DynamicObject::rValue() const
    /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
       because DynamicObject is non-virtual. The caller must therefore be
       careful and we allow only class Value to use rValue().
+
+      NOTE: reinterpret_cast<Value *>(this) is 8 bytes above
+            static_cast<Value *> (and then segfaults).
     */
   return *static_cast<const Value *>(this);
 }

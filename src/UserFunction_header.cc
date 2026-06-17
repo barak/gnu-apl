@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include "Workspace.hh"
 
 //=========================================================================
+//// constructor for a normal (non-lambda) defined function header
 UserFunction_header::UserFunction_header(const UCS_string & text0, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
     error_info("Bad header"),
@@ -66,8 +67,8 @@ UCS_string lvar_text;
            if (uni == UNI_CR)   continue;   // ignore CR
            if (uni == UNI_LF)   break;      // stop at LF
            if (uni == UNI_SEMICOLON)   in_signature = false;
-           if (in_signature)   signature_text.append(uni);
-           else                lvar_text.append(uni);
+           if (in_signature)   signature_text << uni;
+           else                lvar_text << uni;
          }
    }
 
@@ -89,6 +90,7 @@ UCS_string lvar_text;
    error = E_NO_ERROR;
 }
 //-------------------------------------------------------------------------
+//s/ constructor for lambda header
 UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
   : error(E_DEFN_ERROR),
     error_info("Bad header"),
@@ -100,8 +102,7 @@ UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
     sym_X(0),
     sym_B(0)
 {
-   function_name.append(UNI_LAMBDA);
-   function_name.append_number(lambda_num);
+   function_name << UNI_LAMBDA << lambda_num;
 
    if (!signature_is_valid(sig))
       {
@@ -452,20 +453,19 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
 UCS_string
 UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
-UCS_string u;
+UCS_string ucs;
 
-   if (sig & SIG_Z)      u.append_UTF8("λ←");
-   if (sig & SIG_A)      u.append_UTF8("⍺ ");
-   if (sig & SIG_LORO)   u.append_UTF8("(");
-   if (sig & SIG_LO)     u.append_UTF8("⍶ ");
-   u.append_UTF8("λ"); 
-   u.append_number(lambda_num); 
-   if (sig & SIG_RO)     u.append_UTF8(" ⍹ ");
-   if (sig & SIG_LORO)   u.append_UTF8(")");
-   if (sig & SIG_X)      u.append_UTF8("[χ]");
-   if (sig & SIG_B)      u.append_UTF8(" ⍵");
+   if (sig & SIG_Z)      ucs << "λ←";
+   if (sig & SIG_A)      ucs << "⍺ ";
+   if (sig & SIG_LORO)   ucs << "(";
+   if (sig & SIG_LO)     ucs << "⍶ ";
+   ucs << UNI_LAMBDA << lambda_num;
+   if (sig & SIG_RO)     ucs << " ⍹ ";
+   if (sig & SIG_LORO)   ucs << ")";
+   if (sig & SIG_X)      ucs << "[χ]";
+   if (sig & SIG_B)      ucs << " ⍵";
 
-   return u;
+   return ucs;
 }
 //----------------------------------------------------------------------------
 bool
@@ -488,14 +488,14 @@ void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
-   if (is_operator())   out << "Operator " << function_name << endl;
-   else                 out << "Function " << function_name << endl;
+   out << (is_operator() ? "Operator " : "Function ")
+       << function_name << endl;
 
-   if (sym_Z)    out << ind << "Result:         " << *sym_Z  << endl;
-   if (sym_A)    out << ind << "Left Argument:  " << *sym_A  << endl;
-   if (sym_LO)   out << ind << "Left Op Arg:    " << *sym_LO << endl;
-   if (sym_RO)   out << ind << "Right Op Arg:   " << *sym_RO << endl;
-   if (sym_B)    out << ind << "Right Argument: " << *sym_B  << endl;
+   if (sym_Z)    out << ind << "Result:        " << *sym_Z  << endl;
+   if (sym_A)    out << ind << "Left Val Arg:  " << *sym_A  << endl;
+   if (sym_LO)   out << ind << "Left Fun Arg:  " << *sym_LO << endl;
+   if (sym_RO)   out << ind << "Right Fun Arg: " << *sym_RO << endl;
+   if (sym_B)    out << ind << "Right Val Arg: " << *sym_B  << endl;
 
    if (local_vars.size())
       {

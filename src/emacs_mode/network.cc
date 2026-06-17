@@ -34,7 +34,8 @@ static pthread_cond_t registered_listeners_cond = PTHREAD_COND_INITIALIZER;
 
 void *connection_loop( void *arg )
 {
-    std::unique_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
+    std::unique_ptr<NetworkConnection>
+         connection(reinterpret_cast<NetworkConnection *>(arg));
     try {
         connection->run();
     }
@@ -52,9 +53,8 @@ void *connection_loop( void *arg )
 
 static void *listener_loop( void *arg )
 {
-    Listener *listener( (Listener *)arg );
-
-    ListenerWrapper listener_wrapper( listener );
+Listener * listener(reinterpret_cast<Listener *>(arg));
+ListenerWrapper listener_wrapper(listener);
     listener->wait_for_connection();
 
     return NULL;
@@ -68,7 +68,7 @@ unique_ptr<Listener> listener( Listener::create_listener( port ) );
 
 string conninfo = listener->start();
     
-   if (int res = pthread_create(&thread_id, 0, listener_loop, listener.get()))
+   if (pthread_create(&thread_id, 0, listener_loop, listener.get()))
       {
         throw InitProtocolError("Unable to start network connection thread");
       }

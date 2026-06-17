@@ -145,30 +145,38 @@ bool close_fun( Cause cause, const NativeFunction *caller )
     }
 }
 
-void *get_function_mux( const char *function_name )
+void *
+get_function_mux( const char *function_name )
 {
-    if( strcmp( function_name, "get_signature" ) == 0 ) return (void *)&get_signature;
-    if( strcmp( function_name, "eval_B" ) == 0 )        return (void *)&eval_B;
-    if( strcmp( function_name, "eval_AB" ) == 0 )       return (void *)&eval_AB;
-    if( strcmp( function_name, "eval_XB" ) == 0 )       return (void *)&eval_XB;
-    if( strcmp( function_name, "eval_AXB" ) == 0 )      return (void *)&eval_AXB;
-    if( strcmp( function_name, "close_fun" ) == 0 )     return (void *)&close_fun;
+    if (strcmp(function_name, "get_signature") == 0)
+       return reinterpret_cast<void *>(&get_signature);
+    if (strcmp(function_name, "eval_B") == 0)
+       return reinterpret_cast<void *>(&eval_B);
+    if (strcmp(function_name, "eval_AB") == 0)
+       return reinterpret_cast<void *>(&eval_AB);
+    if (strcmp(function_name, "eval_XB") == 0)
+       return reinterpret_cast<void *>(&eval_XB);
+    if (strcmp(function_name, "eval_AXB") == 0)
+       return reinterpret_cast<void *>(&eval_AXB);
+    if (strcmp(function_name, "close_fun") == 0)
+       return reinterpret_cast<void *>(&close_fun);
     return 0;
 }
 
 int emacs_start( const char *emacs_arg, const char *lib_path )
 {
-    int port = atoi( emacs_arg );
-    start_listener( port );
+int port = atoi(emacs_arg);
+   start_listener(port);
     return 0;
 }
 
-const UCS_string ucs_string_from_string( const std::string &string )
+const UCS_string
+ucs_string_from_string( const std::string &string )
 {
-    size_t length = string.size();
-    const char *buf = string.c_str();
-    UTF8_string utf( (const UTF8 *)buf, length );
-    return UCS_string( utf );
+const size_t length = string.size();
+const char * buf = string.c_str();
+const UTF8_string utf(reinterpret_cast<const UTF8 *>(buf), length);
+    return UCS_string(utf);
 }
 
 Value_P

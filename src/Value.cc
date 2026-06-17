@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,8 +93,8 @@ Value::init_ravel()
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::value_count_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
 const ShapeItem length = shape.get_volume();
@@ -134,8 +134,8 @@ CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::ravel_count_limit = 0;
-        set_attention_raised(LOC);
-        set_interrupt_raised(LOC);
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
       }
 
    alloc_size = length * sizeof(Cell);
@@ -281,9 +281,19 @@ Value::Value(const Cell & cell, const char * loc)
    check_value(LOC);
 }
 //----------------------------------------------------------------------------
-Value::Value(ShapeItem sh, const char * loc)
+Value::Value(ShapeItem len, const char * loc)
    : DynamicObject(loc, &all_values),
-     shape(sh),
+     shape(len),
+     flags(VF_NONE),
+     valid_ravel_items(0)
+{
+   ADD_EVENT(this, VHE_Create, 0, loc);
+   init_ravel();
+}
+//----------------------------------------------------------------------------
+Value::Value(ShapeItem rows, ShapeItem cols, const char * loc)
+   : DynamicObject(loc, &all_values),
+     shape(rows, cols),
      flags(VF_NONE),
      valid_ravel_items(0)
 {
@@ -458,7 +468,7 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
-   /* Create a non-nested (!) (left-) value left_Z from this (right-)value.
+   /* Create a non-nested (!) (left-) value left_Z from this (right-) value.
       left_Z has the same shape and consists entirely of LvalCells that point
       to the corresponding cells of this value.
 
@@ -503,9 +513,9 @@ Value_P left_Z(get_shape(), loc);
 void
 Value::assign_cellrefs(Value_P new_value)
 {
-   // assign new_value to this left value
+   // assign new_value to this (left-) value
 
-const ShapeItem value_count = new_value->nz_element_count();
+const ShapeItem new_value_count = new_value->nz_element_count();
 const ShapeItem dest_count  = element_count();
    if (dest_count == 0)   return;   // nothing to assign
 
@@ -520,7 +530,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         //        though the shapes of 1 0/M and 'abc' differ. We therefore
         //
         MORE_ERROR() << "in (f Z)←B: length(X⊃F Z) is " << dest_count
-                     << ", but length(X⊃V) is " << value_count
+                     << ", but length(X⊃V) is " << new_value_count
                      << " (for some X)";
         LENGTH_ERROR;
       }
@@ -535,7 +545,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
 
     */
 
-   // consistency check: all items are LvalCells
+   // consistency check: all items are LvalCells or PointerCells.
    //
    check_lval_consistency();
 
@@ -546,21 +556,21 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
         if (Cell * target = LVC0->get_lval_value())   // valid right Cell
            {
-             Value * owner = LVC0->get_cell_owner();
+             Value & owner = *LVC0->get_cell_owner();
              target->release(LOC);   // free sub-values etc (if any)
-             new (target)   PointerCell(new_value.get(), *owner);
+             new (target)   PointerCell(new_value.get(), owner);
            }
         return;
       }
 
-const Cell * src = &new_value->get_cfirst();
    loop(d, dest_count)
       {
-        Cell & left_C = get_wravel(d);
-        if (left_C.is_pointer_cell())
+        const Cell & src = new_value->get_cravel(d * src_incr);
+        Cell & dest = get_wravel(d);
+        if (dest.is_pointer_cell())
            {
              /*
-                NOTE: At this point left_C is one of the left cells in a
+                NOTE: At this point dest is one of the left cells in a
                       selective assignment, say:
 
                       (f1 f2 ... fn VAR) ← new_value.
@@ -568,43 +578,71 @@ const Cell * src = &new_value->get_cfirst();
                 The initial cellrefs (i.e. of VAR) contains no PointerCells
                 (though possibly Lval cells pointing to PointerCells).
 
-                Therefore left_C must have been created by one of the fi and
-                then all sub-values of left_C must also be Lval Cells.
+                Therefore dest must have been created by one of the fi and
+                then all sub-values of dest must also be Lval Cells.
               */
-              Value * sub = left_C.get_pointer_value().get();   // right-value
-              loop(s, sub->nz_element_count())
+              Value_P left_sub = dest.get_pointer_value();
+              Value_P right_sub;
+              if (src.is_pointer_cell())   right_sub = src.get_pointer_value();
+              if (+right_sub)
+                 {
+                   if (left_sub->get_rank() != right_sub->get_rank())
+                      {
+                        MORE_ERROR() <<
+                        "In selective specification: left rank is " <<
+                        left_sub->get_rank() << ", but right rank is " <<
+                        right_sub->get_rank();
+                        RANK_ERROR;
+                      }
+                   if (left_sub->get_shape() != right_sub->get_shape())
+                      {
+                        const Shape & left_shape = left_sub->get_shape();
+                        const Shape & right_shape = right_sub->get_shape();
+
+                        MORE_ERROR()                                      <<
+                            "In selective specification: left shape is: " <<
+                            left_shape                                    <<
+                            ", but right shape is: "                      <<
+                            right_shape;
+                        LENGTH_ERROR;
+                      }
+                 }
+              loop(s, left_sub->nz_element_count())
                   {
-                    Cell * Csub = &sub->get_wravel(s);
+                    Cell * Csub = &left_sub->get_wravel(s);
                     if (!Csub->is_lval_cell())   LEFT_SYNTAX_ERROR;
-
+              
                     const LvalCell * LVC =
-                                     reinterpret_cast<const LvalCell *>(Csub);
-                    if (Cell * target = LVC->get_lval_value())   // can be 0!
+                          reinterpret_cast<const LvalCell *>(Csub);
+                    Cell * target = LVC->get_lval_value();
+                    if (target)   // target can be 0!
                        {
-                         target->release(LOC);   // free sub-values etc (if any)
+                         target->release(LOC);   // free sub-values etc.
+                         Value & owner = *LVC->get_cell_owner();
 
-                         // erase the pointee when overriding a pointer-cell.
+                         // if src is simple, then scalar extend it.
+                         // Otherwise use item s of src.
                          //
-                         Value * owner = LVC->get_cell_owner();
-                         target->init(*src, *owner, LOC);
+                         const Cell & right_cell = +right_sub ?
+                                     right_sub->get_cravel(s) : src;
+                         target->init(right_cell, owner, LOC);
                        }
                   }
            }
-        else if (left_C.is_lval_cell())
+        else if (dest.is_lval_cell())
            {
-             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(left_C);
-             if (Cell * target = left_C.get_lval_value())   // target can be 0!
+             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(dest);
+             if (Cell * target = dest.get_lval_value())   // target can be 0!
                 {
                   target->release(LOC);   // free sub-values etc (if any)
 
                   // erase the pointee when overriding a pointer-cell.
                   //
-                  Value * owner = LVC.get_cell_owner();
-                  target->init(*src, *owner, LOC);
+                  Value & owner = *LVC.get_cell_owner();
+                  target->init(src, owner, LOC);
                 }
            }
         else   LEFT_SYNTAX_ERROR;
-        src += src_incr;
       }
 }
 //----------------------------------------------------------------------------
@@ -613,13 +651,14 @@ Value::check_lval_consistency() const
 {
 const ShapeItem ec = nz_element_count();
 
-   // left value rules:
-   //
-   // 1. every item is either an LvalCell, or a PointerCell
-   // 2. for every LvalCells:
-   // 2a. either cell is 0 and owner is 0,
-   // 2c, or cell is ≠0 and owner is ≠0 and cell lies in the ravel of owner
-   //
+   /* check the following left value rules:
+     
+      1. every ravel item is either an LvalCell, or a PointerCell
+
+      2. for every LvalCells:
+      2a. either cell is 0 and owner is 0,
+      2b. or cell is ≠0 and owner is ≠0 and cell lies in the ravel of owner
+    */
    loop(e, ec)
        {
          const Cell * cell = &get_cravel(e);   // rarely
@@ -641,8 +680,8 @@ const ShapeItem ec = nz_element_count();
 }
 //----------------------------------------------------------------------------
 Cell *
-Value::get_member(const basic_string<const UCS_string *> & members,
-                  Value * & owner, bool create_if_needed, bool throw_error)
+Value::get_member(const vector<const UCS_string *> & members,
+                  Value * & owner, bool throw_error)
 {
    owner = this;
 
@@ -698,7 +737,7 @@ Value::get_member(const basic_string<const UCS_string *> & members,
                                 << "member access: member " << member_ucs
                                 << " exists in ";
                    more.append_members(members, m);
-                   more << "but its (internal) value is not nested";
+                   more << " but its (internal) value is not nested";
                    DOMAIN_ERROR;
                  }
 
@@ -708,17 +747,6 @@ Value::get_member(const basic_string<const UCS_string *> & members,
             }
          else   // member does not exist
             {
-              if (!create_if_needed)   // give up
-                 {
-                   if (!throw_error)   return 0;   // silent
-
-                   UCS_string & more = MORE_ERROR()
-                                       << "member access: structure ";
-                   more.append_members(members, m + 1);
-                   more << " has no member '" << member_ucs << "'.";
-                   VALUE_ERROR;
-                 }
-
               // create new member row...
 
               // find an unused slot in owner. get_new_member() is guaranteed
@@ -732,6 +760,80 @@ Value::get_member(const basic_string<const UCS_string *> & members,
               Value_P member_sub = EmptyStruct(LOC);
               new (member_data)   PointerCell(member_sub.get(), *owner);
               owner = member_sub.get();
+            }   // if (member_cell == 0)
+       }
+
+   FIXME;   // not reached
+}
+//----------------------------------------------------------------------------
+const Cell *
+Value::get_existing_member(const vector<const UCS_string *> & members) const
+{
+const Value * parent = this;
+
+   // members[members.size() - 1] == this
+   //
+   for (int m = members.size() - 2; m >= 0; --m)
+       {
+         if (!parent->is_member())
+            {
+              UCS_string & more = MORE_ERROR()
+                  << "member access: non-structured variable "
+                  << *members.back() << " has no member ";
+              more.append_members(members, 0);
+              DOMAIN_ERROR;
+            }
+
+         const UCS_string & member_ucs = *members[m];
+         if (parent->get_rank() != 2)
+            {
+              UCS_string & more = MORE_ERROR() << "member access: the rank of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              RANK_ERROR;
+            }
+
+         if (parent->get_cols() != 2)
+            {
+              UCS_string & more = MORE_ERROR()
+                 << "member access: the number of columns of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              LENGTH_ERROR;
+            }
+
+         const Cell * member_cell = parent->get_member_data(member_ucs);
+         if (member_cell)   // existing member
+            {
+              if (m == 0)   return member_cell; // final member
+
+              // more members coming. Then member_cell should point to a
+              // structured sub-member
+              //
+              if (!member_cell->is_pointer_cell() ||
+                  !member_cell->get_pointer_value()->is_member())
+                 {
+                   UCS_string & more = MORE_ERROR()
+                                << "member access: member " << member_ucs
+                                << " exists in ";
+                   more.append_members(members, m);
+                   more << " but its (internal) value is not nested";
+                   DOMAIN_ERROR;
+                 }
+
+              // next member
+              //
+              parent = member_cell->get_pointer_value().get();
+            }
+         else   // member does not exist
+            {
+              UCS_string & more = MORE_ERROR()
+                                       << "member access: structure ";
+              more.append_members(members, m + 1);
+              more << " has no member '" << member_ucs << "'.";
+              VALUE_ERROR;
             }   // if (member_cell == 0)
        }
 
@@ -765,7 +867,7 @@ const ShapeItem rows = get_rows();
 }
 //----------------------------------------------------------------------------
 void
-Value::used_members(std::basic_string<ShapeItem> & result, bool sorted) const
+Value::used_members(std::vector<ShapeItem> & result, bool sorted) const
 {
    Assert(is_structured());
 
@@ -805,7 +907,7 @@ const ShapeItem rows = get_rows();
 }
 //----------------------------------------------------------------------------
 void
-Value::sorted_members(std::basic_string<ShapeItem> & result,
+Value::sorted_members(std::vector<ShapeItem> & result,
                       const Unicode * filters) const
 {
    // we take advantage of the fact that the positions in the member
@@ -1162,12 +1264,12 @@ Value::add_member(const UCS_string & member_name, Value * member_value)
         DOMAIN_ERROR;
       }
 
-basic_string<const UCS_string *> members;
+vector<const UCS_string *> members;
    members.push_back(&member_name);
    members.push_back(&member_name);   // ignored
 
 Value * member_owner = 0;
-Cell * data = get_member(members, member_owner, true, false);
+Cell * data = get_member(members, member_owner, false);
    Assert(member_owner);
    Assert(member_owner == this);
    new (data) PointerCell(member_value, *this);
@@ -1334,21 +1436,32 @@ Value::get_enlist_count() const
 const ShapeItem ec = element_count();
 ShapeItem count = ec;
 
+   // take care of non-simple cells...
+   //
    loop(c, ec)
        {
          const Cell & cell = get_cravel(c);
          if (cell.is_pointer_cell())
             {
-               count--;   // the pointer cell
+               count--;   // deduct the pointer cell
                count += cell.get_pointer_value()->get_enlist_count();
             }
          else if (cell.is_lval_cell())
             {
-              Cell * cp = cell.get_lval_value();
-              if (cp && cp->is_pointer_cell())
+              if (Cell * cp = cell.get_lval_value())   // valid Lval cell
                  {
-                   count--;
-                   count += cp->get_pointer_value()->get_enlist_count();
+                   if (cp->is_pointer_cell())
+                      {
+                        count--;   // deduct the pointer cell
+                        count += cp->get_pointer_value()->get_enlist_count();
+                      }
+
+                   // otherwise the Lval cell points to a cell and was
+                   // counted correctly
+                 }
+              else   // invalid Lval cel
+                 {
+                   count--;   // deduct the Lval cell
                  }
             }
        }
@@ -1529,7 +1642,7 @@ Value::equal_string(const UCS_string & ucs) const
    if (get_rank() == 1)        // most likely: char vector
       {
         const ShapeItem len = element_count();
-        if (ucs.size() != len)   return false;   // wrong length
+        if (ucs.ssize() != len)   return false;   // wrong length
         loop(u, len)
             if (ucs[u] != get_cravel(u).get_char_value())   // mismatch
                return false;
@@ -1542,6 +1655,27 @@ Value::equal_string(const UCS_string & ucs) const
       }
 
    RANK_ERROR;            // never
+}
+//----------------------------------------------------------------------------
+bool
+Value::get_sole_bool() const
+{
+   if (element_count() != 1)
+      {
+        if (element_count())
+           MORE_ERROR() << "Boolean array has length " << element_count()
+                        << " (expecting length 1).";
+        else
+           MORE_ERROR() << "Boolean array is empty (expecting length 1).";
+        LENGTH_ERROR;
+      }
+
+const Cell & c0 = get_cfirst();
+   if (c0.is_near_one())    return true;
+   if (c0.is_near_zero())   return false;
+
+   MORE_ERROR() << "array is not Boolean (expecting 0 or 1).";
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 bool
@@ -1978,8 +2112,8 @@ AxesBitmap ret = 0;
    return ret;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue(Token & result, const Token & token_A, const Token & token_B, const char * loc)
+Value_P
+Value::glue(const Token & token_A, const Token & token_B, const char * loc)
 {
 Value_P A = token_A.get_apl_val();
 Value_P B = token_B.get_apl_val();
@@ -1987,114 +2121,117 @@ Value_P B = token_B.get_apl_val();
 const bool strand_A = token_A.get_tag() == TOK_APL_VALUE3;
 const bool strand_B = token_B.get_tag() == TOK_APL_VALUE3;
 
-   if (strand_A)
+   // in this context, a strand is an (open) strand, i.e. a strand to which
+   // another item can be glued. The result is always an open strand (so
+   // the caller must put it into an TOK_APL_VALUE3).
+   //
+   if (strand_A)   // A is a strand
       {
-        if (strand_B)   glue_strand_strand(result, A, B, loc);
-        else            glue_strand_closed(result, A, B, loc);
+        if (strand_B)   return glue_strand_strand(*A, *B, loc);
+        else            return glue_strand_item(*A, *B, loc);
       }
-   else
+   else            // A is an item
       {
-        if (strand_B)   glue_closed_strand(result, A, B, loc);
-        else            glue_closed_closed(result, A, B, loc);
+        if (strand_B)   return glue_item_strand(*A, *B, loc);
+        else            return glue_item_item(*A, *B, loc);
       }
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_strand_strand(Token & result, Value_P A, Value_P B,
+Value_P
+Value::glue_strand_strand(const Value & strand_A, const Value & strand_B,
                           const char * loc)
 {
-   // glue two strands A and B
+   // glue two strands A and B together
    //
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = B->element_count();
+const ShapeItem len_A = strand_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
 
    Log(LOG_glue)
       {
-        CERR << "gluing strands " << endl << *A
-             << "with shape " << A->get_shape() << endl
-             << " and " << endl << *B << endl
-             << "with shape " << B->get_shape() << endl;
+        CERR << "gluing strands " << endl << strand_A
+             << "with shape " << strand_A.get_shape() << endl
+             << " and " << endl << strand_B << endl
+             << "with shape " << strand_B.get_shape() << endl;
       }
 
-   Assert(A->is_scalar_or_vector());
-   Assert(B->is_scalar_or_vector());
+   Assert(strand_A.is_scalar_or_vector());
+   Assert(strand_B.is_scalar_or_vector());
 
 Value_P Z(len_A + len_B, LOC);
 
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
+   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_strand_closed(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_strand_item(const Value & strand_A, Value & item_B,
+                        const char * loc)
 {
    // glue a strand A to new item B
    //
    Log(LOG_glue)
       {
-        CERR << "gluing strand " << endl << *A
-             << " to non-strand " << endl << *B << endl;
+        CERR << "gluing strand " << endl << strand_A
+             << " to item " << endl << item_B << endl;
       }
 
-   Assert(A->is_scalar_or_vector());
+   Assert(strand_A.is_scalar_or_vector());
 
-const ShapeItem len_A = A->element_count();
+const ShapeItem len_A = strand_A.element_count();
 Value_P Z(len_A + 1, LOC);
 
-   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
+   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
+   Z->next_ravel_Value(&item_B);
 
-   Z->next_ravel_Value(B.get());
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_closed_strand(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_item_strand(Value & item_A, const Value & strand_B,
+                        const char * loc)
 {
    // glue a new item A to the strand B
    //
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = B->element_count();
+const ShapeItem len_A = item_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
    Log(LOG_glue)
       {
-        CERR << "gluing non-strand[" << len_A << "] " << endl << *A
-             << " to strand[" << len_B << "] " << endl << *B << endl;
+        CERR << "gluing item[" << len_A << "] " << endl << item_A
+             << " to strand[" << len_B << "] " << endl << strand_B << endl;
       }
 
-   Assert(B->is_scalar_or_vector());
+   Assert(strand_B.is_scalar_or_vector());
 
 Value_P Z(len_B + 1, LOC);
-   Z->next_ravel_Value(A.get());
+   Z->next_ravel_Value(&item_A);
 
-   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
+   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-void
-Value::glue_closed_closed(Token & result, Value_P A, Value_P B,
-                          const char * loc)
+Value_P
+Value::glue_item_item(Value & item_A, Value & item_B, const char * loc)
 {
-   // glue two non-strands together, starting a strand
+   // glue two items together, starting a strand
    //
    Log(LOG_glue)
       {
-        CERR << "gluing two non-strands " << endl << *A
-             << " and " << endl << *B << endl;
+        CERR << "gluing two items " << endl << item_A
+             << " and " << endl << item_B << endl;
       }
 
 Value_P Z(2, LOC);
-   Z->next_ravel_Value(A.get());
-   Z->next_ravel_Value(B.get());
+   Z->next_ravel_Value(&item_A);
+   Z->next_ravel_Value(&item_B);
 
    Z->check_value(LOC);
-   new (&result) Token(TOK_APL_VALUE3, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
 void
@@ -2329,6 +2466,40 @@ PrintBuffer pb(*this, pctx, &out);   // constructor prints it
 }
 //----------------------------------------------------------------------------
 ostream &
+Value::print_brief(ostream & out) const
+{
+   // shape
+   //
+   out << "⍴";
+   loop(r, shape.get_rank())
+       {
+         r && out << ";";
+         out << shape.get_shape_item(r);
+       }
+
+   // depth
+   //
+   out << "≡" << compute_depth() << " ";
+
+   // ravel
+   //
+const int count = min(3, int(element_count()));
+   if (count == 0)   out << "⌽";   // empty
+   loop(c, count)
+      {
+        if (c)    out << " ";
+        const Cell & cell = get_cravel(c);
+        if (cell.is_integer_cell())        out << cell.get_int_value();
+        else if (cell.is_float_cell())     out << "FLT";
+        else if (cell.is_complex_cell())   out << "CPLX";
+        else if (cell.is_pointer_cell())   out << "⊂";
+        if (element_count() > count)       out << "...";
+      }
+
+   return out;
+}
+//----------------------------------------------------------------------------
+ostream &
 Value::print_member(ostream & out, UCS_string member_prefix) const
 {
 const ShapeItem rows = get_rows();
@@ -2362,8 +2533,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
          const UCS_string member_name = cell_sub->get_UCS_ravel();
          const size_t pad = longest_name - member_name.size();
          UCS_string member = member_prefix;   // ancestor.ancestor ...
-         member += UNI_FULLSTOP;
-         member.append(member_name);
+         member << UNI_FULLSTOP << member_name;
          out << member << ": ";
          out << UCS_string(pad, UNI_SPACE);
 
@@ -2507,7 +2677,7 @@ Value::get_UCS_ravel() const
 UCS_string ucs;
 
 const ShapeItem ec = element_count();
-   loop(e, ec)   ucs.append(get_cravel(e).get_char_value());
+   loop(e, ec)   ucs << get_cravel(e).get_char_value();
 
    return ucs;
 }
@@ -2520,15 +2690,18 @@ Value::to_type(bool force_numeric)
         Cell & cell = get_wravel(e);
         if (cell.is_pointer_cell())
            {
-             reinterpret_cast<PointerCell &>(cell).isolate(LOC);
-             cell.get_pointer_value()->to_type(false);
+             PointerCell & ptr_cell = reinterpret_cast<PointerCell &>(cell);
+             ptr_cell.isolate(LOC);
+             ptr_cell.get_pointer_value()->to_type(force_numeric);
            }
-        else if (cell.is_character_cell())
+        else if (cell.is_character_cell() && ! force_numeric)
            {
-             if (force_numeric)   set_ravel_Int(e, 0);
-             else                 set_ravel_Char(e, UNI_SPACE);
+             set_ravel_Char(e, UNI_SPACE);
            }
-        else                      set_ravel_Int(e, 0);
+        else
+           {
+             set_ravel_Int(e, 0);
+           }
       }
 }
 //----------------------------------------------------------------------------
@@ -2606,66 +2779,80 @@ Value::prototype(const char * loc) const
     **/
 
 const Cell & first = get_cfirst();
-   if (first.is_integer_cell())     return IntScalar(0, LOC);
+   if (first.is_numeric())          return IntScalar(0, LOC);
    if (first.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
    if (first.is_pointer_cell())
       {
-        Value_P B0 = first.get_pointer_value();
-        Value_P Z(B0->get_shape(), loc);
-
-        loop(z, Z->element_count())   Z->next_ravel_Proto(B0->get_cravel(z));
-        Z->check_value(LOC);
+        const PointerCell & sub = reinterpret_cast<const PointerCell &>(first);
+        Value_P Z = CLONE(sub.get_pointer_value().get(), LOC);
+        Z->to_type(false);
         return Z;
       }
 
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-/// lrp p.138: S←⍴⍴A + NOTCHAR (per column)
+/* lrp p.138: S←⍴⍴A + NOTCHAR (per column)
+
+   lrm defines NOTCHAR as (comments by jsa)
+
+   ∇ Z←NOTCHAR R
+   [1] Z←1              ⍝ assume NOTCHAR
+   [2] →(1<≡R)/0        ⍝ NOTCHAR if R is nested
+   [3] Z←' '∨.≠,↑0⍴⊂R   ⍝ all characters ?
+   ∇
+
+  IOW: NOTCHAR returns 1 if R is not a simple character
+       array and 0 otherwise.
+ */
 int32_t
-Value::get_col_spacing(bool & not_char, ShapeItem col, bool framed) const
+Value::get_col_spacing(bool & NOTCHAR, ShapeItem col, bool framed) const
 {
 int32_t max_spacing = 0;
-   not_char = false;
+   NOTCHAR = false;
 
 const ShapeItem ec = element_count();
 const ShapeItem cols = get_last_shape_item();
 const ShapeItem rows = ec/cols;
-   loop(row, rows)
-      {
-        // compute spacing, which is the spacing required by this item.
-        //
-        int32_t spacing = 1;   // assume simple numeric
-        const Cell & cell = get_cravel(col + row*cols);
 
-        if (cell.is_pointer_cell())   // nested 
+   loop(row, rows)   // for all items of column col
+      {
+        /* compute the S, which is the spacing demanded by this item.
+           The spacing is defined by the rank of the item (lrm p.138):
+         
+           S←((ρρA)+NOTCHAR A)⌈(ρρB)+NOTCHAR B
+
+           Instead of computing S for every pair A, B of adjacent columns
+           (which would compute it twice for every column) we only compute it
+           once for every column and reuse the result when B becomes A.
+         */ 
+        const Cell & cell = get_cravel(col + row*cols);
+        int32_t S = 1;   // assume simple numeric
+
+        if (cell.is_pointer_cell())   // nested: NOTCHAR[2]
            {
+             NOTCHAR = true;
              if (framed)
                 {
-                  not_char = true;
-                  spacing = 1;
+                  S = 1;
                 }
              else
                 {
-                  Value_P v =  cell.get_pointer_value();
-                  spacing = v->get_rank();
-                  if (v->NOTCHAR())
-                     {
-                       not_char = true;
-                       ++spacing;
-                     }
+                  const Value & sub = *cell.get_pointer_value();
+                  S = sub.get_rank();
+                  if (sub.NOTCHAR())   ++S;
                 }
            }
         else if (cell.is_character_cell())   // simple char
            {
-             spacing = 0;
+             S = 0;
            }
         else                                 // simple numeric
            {
-             not_char = true;
+             NOTCHAR = true;
            }
 
-        if (max_spacing < spacing)   max_spacing = spacing;
+        if (max_spacing < S)   max_spacing = S;
       }
 
    return max_spacing;
@@ -2674,7 +2861,7 @@ const ShapeItem rows = ec/cols;
 int
 Value::print_incomplete(ostream & out)
 {
-std::basic_string<const Value *> incomplete;
+std::vector<const Value *> incomplete;
 bool goon = true;
 
    for (const DynamicObject * dob = all_values.get_prev();
@@ -2715,8 +2902,8 @@ int count = 0;
 int
 Value::print_stale(ostream & out)
 {
-std::basic_string<const Value *> stale_vals;
-std::basic_string<const DynamicObject *> stale_dobs;
+std::vector<const Value *> stale_vals;
+std::vector<const DynamicObject *> stale_dobs;
 bool goon = true;
 int count = 0;
 

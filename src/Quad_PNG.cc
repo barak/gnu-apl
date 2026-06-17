@@ -26,37 +26,46 @@
 
 #include "Common.hh"   // for HAVE_XXX (via #include config.h)
 #include "Common.hh"
+
 #if HAVE_LOCALE_H
 # include <locale.h>
-#endif
+#endif   // HAVE_LOCALE_H
 
 #include "Quad_PNG.hh"
+#include "Token.hh"
 
 Quad_PNG  Quad_PNG::fun;
 
 /// PNG_GTK defines whether ⎕PNG B with ⍴⍴B ←→ 3 (display of a PNG file in a
 /// GTK window  shall be supported, Requires libgtk in addition to libnpng.
-#define PNG_GTK	                \
-    apl_X11                  && \
+#if apl_X11                  && \
     defined( apl_GTK3      ) && \
     defined( HAVE_LIBGTK_3 ) 
 
+# define PNG_GTK	1
+#else
+# define PNG_GTK	0
+#endif
+
 /// PNG_LIBS defines if the PNG related libraries (and their header files)
 /// are present
-#define	PNG_LIBS	                  \
-    defined( HAVE_LIBZ           ) && \
+#if	defined( HAVE_LIBZ           ) && \
     defined( HAVE_ZLIB_H         ) && \
     defined( HAVE_LIBPNG         ) && \
     defined( HAVE_LIBPNG16_PNG_H )
+# define PNG_LIBS 1
+#else
+# define PNG_LIBS 0
+#endif
 
 #if PNG_LIBS
 # include <zlib.h>
 # include <png.h>
-#else
+#else   // !PNG_LIBS
 struct png_struct;
 typedef png_struct * png_structp;
 typedef const char * png_const_charp;
-#endif
+#endif  // (!) PNG_LIBS
 
 /// window exposed semaphore
 sem_t __PNG_window_sema;
@@ -129,17 +138,21 @@ struct PNG_context
 int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
-static basic_string<PNG_context *> all_PNG_contexts;
+static vector<PNG_context *> all_PNG_contexts;
 //-----------------------------------------------------------------------------
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)
 {
+#if PNG_LIBS
    __sem_init(PNG_window_sema, /* processes */ 0, /* initial */ 0);
+#endif
 }
 //----------------------------------------------------------------------------
 Quad_PNG::~Quad_PNG()
 {
+#if PNG_LIBS
    __sem_destroy(PNG_window_sema);
+#endif   // PNG_LIBS
 }
 //---------------------------------------------------------------------------
 /// callback for libpng warnings
@@ -171,7 +184,7 @@ FILE * in = fopen(filename1.c_str(), "rb");
       {
          errno1 = errno;              // remember why filename1 has failed
          UTF8_string filename2(filename1);
-         filename2.append_ASCII(".png");
+         filename2 << ".png";
          in = fopen(filename2.c_str(), "r");
       }
 
@@ -316,9 +329,10 @@ Value_P Z(shape_Z, LOC);
 
 #else   // not PNG_LIBS
    return Value_P();
-#endif // PNG_LIBS
+#endif  // (not) PNG_LIBS
 }
 //-----------------------------------------------------------------------------
+#if PNG_LIBS
 Token
 Quad_PNG::eval_B(Value_P B) const
 {
@@ -349,11 +363,22 @@ Quad_PNG::eval_B(Value_P B) const
 
         return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
       }
-#endif
+#endif   // PNG_GTK
 
    MORE_ERROR() << "Bad B in ⎕PNG B";
    VALENCE_ERROR;
 }
+#else   // not PNG_LIBS
+Token
+Quad_PNG::eval_B(Value_P B) const
+{
+const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
+const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
+const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
+
+   return missing_files("⎕PNG", libs, hdrs, pkgs);
+}
+#endif   // PNG_LIBS
 //-----------------------------------------------------------------------------
 Value_P
 Quad_PNG::window_control(APL_Integer B0) const
@@ -393,7 +418,7 @@ Quad_PNG::window_control(APL_Integer B0) const
          PNG_context::next_handle = 0;
          return Z;
        }
-#endif
+#endif    // PNG_GTK
 
     if (B0 == -4)                // enable SHOW_DRAW
        {
@@ -444,7 +469,7 @@ Quad_PNG::window_control(APL_Integer B0) const
                all_PNG_contexts.pop_back();
 #if PNG_GTK
                gtk_window_close(GTK_WINDOW(pctx->window));
-#endif
+#endif   // PNG_GTK
                delete pctx;
 
                if (all_PNG_contexts.size() == 0)   PNG_context::next_handle = 0;
@@ -477,7 +502,7 @@ enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
 
         default: return false;
       }
-#endif // PNG_LIBS
+#endif   // PNG_LIBS
 
    return false;
 }
@@ -639,9 +664,10 @@ UTF8 * scanline = RGB;
    png_destroy_write_struct(&png_ptr, &info_ptr);
    fclose(out);
 
-#endif // PNG_LIBS
+#endif   // PNG_LIBS
 }
 //-----------------------------------------------------------------------------
+#if PNG_LIBS
 Token
 Quad_PNG::eval_AB(Value_P A, Value_P B) const
 {
@@ -684,6 +710,15 @@ Quad_PNG::eval_AB(Value_P A, Value_P B) const
         LENGTH_ERROR;
       }
 }
+#else   // not PNG_LIBS
+
+Token
+Quad_PNG::eval_AB(Value_P A, Value_P B) const
+{
+  // complain about missing libraries. Same as monadic eval_B().
+  return eval_B(B);
+}
+#endif   // PNG_LIBS
 //-----------------------------------------------------------------------------
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished. Executed in the thread named apl/⎕PNG.
@@ -855,10 +890,10 @@ Quad_PNG::display_PNG_main(Value_P B)
 
         pthread_t thread = 0;
         pthread_create(&thread, 0, gtk_main_wrapper, 0);
-#if HAVE_PTHREAD_SETNAME_NP
+# if HAVE_PTHREAD_SETNAME_NP
          // show with e.g.   ps H -o 'pid tid cmd comm'
          pthread_setname_np(thread, "apl/GTK");
-#endif
+# endif   // HAVE_PTHREAD_SETNAME_NP
       }
 
 PNG_context * pctx = new PNG_context(B);
@@ -912,27 +947,5 @@ PNG_context * pctx = new PNG_context(B);
 }
 //-----------------------------------------------------------------------------
 
-#endif
+#endif   // PNG_GTK
 
-
-#if !PNG_GTK && !PNG_LIB
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
-
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const   { return eval_B(B); }
-
-Token
-Quad_PNG::eval_B(Value_P B) const
-{
-const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
-const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
-
-   return missing_files("⎕PNG", libs, hdrs, pkgs);
-}
-
-Quad_PNG::Quad_PNG() : QuadFunction(TOK_Quad_PNG)   {}
-Quad_PNG::~Quad_PNG() {}
-
-#endif

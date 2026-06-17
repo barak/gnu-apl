@@ -1,0 +1,20 @@
+Recognize macOS 12 and later.
+https://debbugs.gnu.org/cgi/bugreport.cgi?bug=44605
+
+This patch is only relevant for some Apple users
+To be applied in /usr/share/aclocal by root.
+After that, rerun aclocal, libtoolize, autoreconf,
+and ./configure in the GNU APL top-level directory.
+
+--- libtool.m4.orig	2025-09-23 13:52:24.724767856 +0200
++++ libtool.m4	2025-09-23 13:52:33.968845949 +0200
+@@ -1075,7 +1075,7 @@
+ 	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
+ 	10.[[012]][[,.]]*)
+ 	  _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
+-	10.*|11.*)
++	*)
+ 	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
+       esac
+     ;;
+

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,18 +38,29 @@ public:
    static Quad_RVAL  fun;          ///< Built-in function.
 
 protected:
+   /// overloaded FunctionGroup::print_fun_syntax()
+   virtual void print_fun_syntax(ostream & out,
+                                 const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+      virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, do_eval_B(*B, 0)); }
+   virtual Token eval_B(Value_P B) const;
 
    /// do eval_AB(A, B);
    static Value_P do_eval_AB(int A, const Value & B);
 
+   /// overloaded Function::eval_XB().
+   /// ⎕RVAL[X] B  ←→  X ⎕RVAL B
+   virtual Token eval_XB(Value_P X, Value_P B) const;
+
    /// do eval_B(B);
-   static Value_P do_eval_B(const Value & B, int depth);
+   Value_P do_eval_B(const Value & B, int depth) const;
 
    /// set or return the state of the random generator
    static Value_P generator_state(const Value & B);
@@ -67,49 +78,49 @@ protected:
    static Value_P result_maxdepth(const Value & B);
 
    /// choose an integer value at random according to distribution \b dist
-   static int choose_integer(const basic_string<int> & dist);
+   static int choose_integer(const vector<int> & dist);
 
-   /// initialize \b cell with a random character
+   /// a random 64-bit IEEE floating point number
+   static double random_ieee();
+
+   /// initialize the next ravel cell of \b Z with a random character
    static void random_character(Value & Z);
 
-   /// initialize \b cell with a random integer
+   /// initialize the next ravel cell of \b Z with a random integer
    static void random_integer(Value & Z);
 
-   /// initialize \b cell with a random float
+   /// initialize the next ravel cell of \b Z with a random float
    static void random_float(Value & Z);
 
-   /// initialize \b cell with a random complex number
+   /// initialize the next ravel cell of \b Z with a random complex number
    static void random_complex(Value & Z);
 
-   /// initialize \b cell with a random nested value
-   static void random_nested(Value & Z, const Value & B, int depth);
+   /// initialize the next ravel cell of \b Z with a random nested value
+   void random_nested(Value & Z, const Value & B, int depth) const;
 
-   /// return a 17-bit random number
-   // of random_r()
+   /// return a 17-bit random number from random()
    static uint64_t rand17();
+
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
 
    /// the number of bytes in the state of the random number generator
    static size_t N;
 
    /// the desired rank of random values
-   static basic_string<int> desired_ranks;
+   static vector<int> desired_ranks;
 
    /// the desired rank of random values
    static Shape desired_shape;
 
    /// the desired types (or a distribution of types) of random values
-   static basic_string<int> desired_types;
+   static vector<int> desired_types;
 
    /// the desiredlimit on the depths of the random values
    static int desired_maxdepth;
 
    /// the state buffer of the random number generator
    static char state[256];
-
-#if HAVE_LIBC
-   /// the state of the random number generator
-   static struct random_data rdata;
-#endif
 };
 
 #endif // __Quad_RVAL_DEFINED__

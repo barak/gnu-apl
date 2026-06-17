@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ public:
    void write_all_symbols(FILE * out, uint64_t & seq) const;
 
    /// return all symbols  (including erased symbols)
-   std::basic_string<const Symbol *> get_all_symbols() const;
+   std::vector<const Symbol *> get_all_symbols() const;
 
    /// dump symbols to out
    void dump(ostream & out, int & fcount, int & vcount) const;

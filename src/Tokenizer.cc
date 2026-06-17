@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
 #include "Tokenizer.hh"
+#include "Token_string.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
@@ -113,12 +114,21 @@ Unicode_source src(input);
         switch(tok.get_Class())
             {
               case TC_END:   // chars without APL meaning
+                   if (tok.get_tag() == TOK_DIAMOND)
+                       {
+                         ++src;
+                         tos.push_back(tok);
+                         break;
+                       }
+
                    rest_2 = src.rest_len();
                    {
                      Log(LOG_error_throw)
-                     CERR << endl << "throwing "
-                          << Error::error_name(E_NO_TOKEN)
-                          << " in  Tokenizer" << endl;
+                        {
+                          CERR << endl << "throwing "
+                               << Error::error_name(E_NO_TOKEN)
+                               << " in  Tokenizer" << endl;
+                        }
 
                      char cc[20];
                      SPRINTF(cc, "U+%4.4X (", uni);
@@ -133,6 +143,23 @@ Unicode_source src(input);
               case TC_LINE:
               case TC_VALUE:
               case TC_INDEX:
+                   if (uni == UNI_AT_SIGN)   // marker
+                      {
+                        ++src;
+                        int64_t idx = 0;
+                        while (Avec::is_digit(*src))
+                              {
+                                idx = 10 * idx + src.get() - '0';
+                              }
+                        if (src.get() != UNI_AT_SIGN)
+                           {
+                             MORE_ERROR() << "No second '@' in marker.";
+                             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+                           }
+                        tos.push_back(Token(TOK_MARKER, idx));
+                      }
+                   break;
+
                    CERR << "Offending token: " << tok.get_tag()
                         << " (" << tok << ")" << endl;
                    if (tok.get_tag() == TOK_CHARACTER)
@@ -223,14 +250,17 @@ Unicode_source src(input);
               case TC_OPER2:
                    if (tok.get_tag() == TOK_OPER2_INNER && src.rest_len())
                       {
-                        // tok is a dot. This could mean that . is either
-                        //
-                        // the start of a number:     e.g. +.3
-                        // or an operator:            e.g. +.*
-                        // or a syntax error:         e.g. Done.
-                        //
-                        if (src.rest_len() == 1)   // syntax error
-                           Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
+                        /* tok is a dot. This could mean that . is either
+                          
+                           case 1:   the start of a number:     e.g. +.3
+                           case 2:   or an operator:            e.g. +.*
+                           case 3:   or a syntax error:         e.g. Done.
+                         */
+                        if (src.rest_len() == 1)   // case 3: syntax error
+                           {
+                             MORE_ERROR() << "no digit before or after '.'.";
+                             Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
+                           }
 
                         Unicode uni_1 = src[1];
                         const Token tok_1 = Avec::uni_to_token(uni_1, LOC);
@@ -322,11 +352,6 @@ Unicode_source src(input);
                    tos.push_back(tok);
                    break;
 
-              case TC_DIAMOND:
-                   ++src;
-                   tos.push_back(tok);
-                   break;
-
               case TC_COLON:
                    if (pmode != PM_FUNCTION)
                       {
@@ -352,7 +377,7 @@ Unicode_source src(input);
                    ++src;
                    break;
 
-              case TC_QUOTE:
+              case TC_QUOTE:   // ' or " or « or »
                    if (tok.get_tag() == TOK_QUOTE1)
                       tokenize_string1(src, tos, rest_2);
                    else
@@ -501,11 +526,11 @@ Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos) const
 UCS_string ucs(UNI_Quad_Quad);
    Assert(ucs[0]);
 
-   if (src.rest_len() > 0)   ucs.append(src[0]);
-   if (src.rest_len() > 1)   ucs.append(src[1]);
-   if (src.rest_len() > 2)   ucs.append(src[2]);
-   if (src.rest_len() > 3)   ucs.append(src[3]);
-   if (src.rest_len() > 4)   ucs.append(src[4]);
+   if (src.rest_len() > 0)   ucs << src[0];
+   if (src.rest_len() > 1)   ucs << src[1];
+   if (src.rest_len() > 2)   ucs << src[2];
+   if (src.rest_len() > 3)   ucs << src[3];
+   if (src.rest_len() > 4)   ucs << src[4];
 
 int len = 0;
 const Token t = Workspace::get_quad(ucs, len);
@@ -523,6 +548,7 @@ Tokenizer::tokenize_string1(Unicode_source & src, Token_string & tos,
 {
    Log(LOG_tokenize)   CERR << "tokenize_string1(" << src << ")" << endl;
 
+const int start_pos = src.get_pos();
 const Unicode uni = src.get();
    Assert(Avec::is_single_quote(uni));
 
@@ -544,7 +570,7 @@ bool got_end = false;
                    break;
                  }
 
-              string_value.append(UNI_SINGLE_QUOTE);
+              string_value << UNI_SINGLE_QUOTE;
               ++src;      // skip the second '
             }
          else if (uni == UNI_CR)
@@ -558,11 +584,21 @@ bool got_end = false;
             }
          else
             {
-              string_value.append(uni);
+              string_value << uni;
             }
        }
 
-   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+   // at this point, got_end could be false if (the start of )an old-style
+   // multiline string was tokenized. Such strings are, however, only allowed
+   // in function definition mode (aka. PM_FUNCTION).
+   //
+   if (pmode != PM_FUNCTION && !got_end)
+      {
+        const int pos = start_pos + Workspace::get_IO();
+        MORE_ERROR() << "Standard APL string (i.e. '...'): start at "
+                        "column (prompt+" << pos << "), but no end.";
+        Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+      }
 
    if (string_value.size() == 1)   // scalar
       {
@@ -575,8 +611,8 @@ bool got_end = false;
 }
 //----------------------------------------------------------------------------
 /** tokenize a double quoted string, i.e.  "..." or «...».
- ** If the string is a single character, then we
- **  return a TOK_CHARACTER, otherwise TOK_APL_VALUE1.
+ ** Unlike '...' strings (which may be character scalars or character vectors,
+    are "..." and «...» strings always character vectors.
  **
  ** for special cases ««« and »»» do nothing.
  **/
@@ -586,8 +622,10 @@ Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos,
 {
    Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << endl;
 
-   // remember the leading ", «. or »
+const int start_pos = src.get_pos();
 
+   // remember the leading ", «. or »
+   //
 const Unicode first = src.get();
 Unicode last = Invalid_Unicode;   // no last
    if (first == UNI_DOUBLE_QUOTE)
@@ -600,11 +638,10 @@ Unicode last = Invalid_Unicode;   // no last
       }
    else if (first == UNI_RIGHT_DAQ)
       {
-        if (src.rest_len() >= 2        &&
+        if (src.rest_len() >= 2     &&
             src[0] == UNI_RIGHT_DAQ &&
-            src[1] == UNI_RIGHT_DAQ)   // special case: «««
+            src[1] == UNI_RIGHT_DAQ)   // special case: »»»
            {
-BACKTRACE
              ++src;   ++src;   // discard second and third »
              return;
            }
@@ -629,44 +666,82 @@ bool got_end = false;
 
          if (uni == UNI_CR)          // ignore CR
             {
-              continue;
+              continue;   // while (src.has_more())
             }
-         else if (uni == UNI_LF)          // end of line before "
+
+         if (uni == UNI_LF)          // end of line before " or »
             {
               rest_2 = src.rest_len();
-              Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+              if (UserPreferences::uprefs.old_multi_line_strings)
+                 break;   // while (src.has_more())
+              else
+                 Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else if (uni == UNI_BACKSLASH)   // backslash
             {
               const Unicode uni1 = src.get();
               switch(uni1)
                  {
-                   case '0':  string_value.append(UNI_NUL);         break;
-                   case 'a':  string_value.append(UNI_BEL);         break;
-                   case 'b':  string_value.append(UNI_BS);          break;
-                   case 't':  string_value.append(UNI_HT);          break;
-                   case 'n':  string_value.append(UNI_LF);          break;
-                   case 'v':  string_value.append(UNI_VT);          break;
-                   case 'f':  string_value.append(UNI_FF);          break;
-                   case 'r':  string_value.append(UNI_CR);          break;
-                   case '[':  string_value.append(UNI_ESC);         break;
-                   case '"':  string_value.append(UNI_DOUBLE_QUOTE);break;
-                   case '\\': string_value.append(UNI_BACKSLASH);   break;
-                   default:   string_value.append(uni);
-                              string_value.append(uni1);
+                   case UNI_0:
+                   case UNI_L_BRACK:
+                   case UNI_DOUBLE_QUOTE:
+                   case UNI_LEFT_DAQ:
+                   case UNI_RIGHT_DAQ:
+                   case UNI_BACKSLASH: string_value << uni1;      break;
+
+                   case UNI_a:  string_value << UNI_BEL;            break;
+                   case UNI_b:  string_value << UNI_BS;             break;
+                   case UNI_t:  string_value << UNI_HT;             break;
+                   case UNI_n:  string_value << UNI_LF;             break;
+                   case UNI_v:  string_value << UNI_VT;             break;
+                   case UNI_f:  string_value << UNI_FF;             break;
+                   case UNI_r:  string_value << UNI_CR;             break;
+                   default:   string_value << uni << uni1;
                  }
+            }
+         else if (uni == UNI_LEFT_DAQ)   // « another
+            {
+              MORE_ERROR() << "Invalid start of « string inside a « string";
+              Error::throw_parse_error(E_NESTED_DAQ_STRING, LOC, loc);
             }
          else
             {
-              string_value.append(uni);
+              string_value << uni;
             }
        }
 
-   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+   // at this point, got_end could be false if (the start of )an old-style
+   // multiline string was tokenized. Such strings are, however, only allowed
+   // in function definition mode (aka. PM_FUNCTION).
+   //
+   if (pmode != PM_FUNCTION && !got_end)
+      {
+        const int pos = start_pos + Workspace::get_IO();
+        if (first == UNI_DOUBLE_QUOTE)
+           {
+             MORE_ERROR() << "Double quoted string (i.e. \"...\"): start at "
+                             "column (prompt+" << pos << "), but no end.";
+             Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+           }
+        if (first == UNI_LEFT_DAQ)
+           {
+             MORE_ERROR() << "DAQ string (i.e. «...»): start « at column "
+                             "(prompt+" << pos << "), but no ending ».";
+             Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
+           }
 
-   else
+        MORE_ERROR() << "DAQ string (i.e. «...»): end » at column (prompt+"
+                     << pos << "), but no starting «.";
+        Error::throw_parse_error(E_NO_STRING_START, LOC, loc);
+      }
+
+   if (got_end || UserPreferences::uprefs.old_multi_line_strings)
       {
         tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
+      }
+   else
+      {
+        Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
       }
 }
 //----------------------------------------------------------------------------
@@ -683,7 +758,7 @@ Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos,
    // real 'R' real   // magnitude + angle in radian
 
 const Int_or_Double real_val = tokenize_real(src);
-   if (!real_val.is_valid)
+   if (!real_val.is_valid)   // tokenize_real() sets )MORE info
       {
         rest_2 = src.rest_len();
         Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
@@ -691,6 +766,15 @@ const Int_or_Double real_val = tokenize_real(src);
 
    if (src.skip_if(UNI_J) || src.skip_if(UNI_j))   // e.g. 3J4
       {
+        // a complex number in real + imag format
+        //
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing imaginary part I"
+                             " in complex number RjI.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double imag_val = tokenize_real(src);
         if (!imag_val.is_valid)   // not a complex number
            {
@@ -720,6 +804,14 @@ const Int_or_Double real_val = tokenize_real(src);
       }
    else if (src.skip_if(UNI_D) || src.skip_if(UNI_d))   // e.g. 1D90 → 0J1
       {
+        // a complex number in magnitude + degrees format
+        //
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing angle D in complex number MdD.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double degrees = tokenize_real(src);
         if (!degrees.is_valid)   // not a complex number
            {
@@ -754,6 +846,14 @@ const Int_or_Double real_val = tokenize_real(src);
       }
    else if (src.skip_if(UNI_R) || src.skip_if(UNI_r))   // 1r3.141592654 → ¯1J0
       {
+        // a complex number in magnitude + radians format
+        //
+        if (!(src.has_more() && Avec::is_number(*src)))
+           {
+             MORE_ERROR() << "Missing angle R in complex number MrR.";
+             Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           }
+
         const Int_or_Double radian = tokenize_real(src);
         if (!radian.is_valid)   // not a complex number
            {
@@ -910,12 +1010,15 @@ bool dot_seen = false;      // the decimal . was seen
    if (int_digits.size()   == 0  &&   // empty integer part, and
        fract_digits.size() == 0)      // empty fractional part
       {
-        // mantisssa is empty. This is either a syntax error (by the user)
-        // or caused by discarding leading 0s in int_digits. If the mantissa
-        // is 0 here, then the exponent does not matter.
-        //
-        return skipped_0 ? Int_or_Double(APL_Integer(0))   // valid 0
-                         : Int_or_Double();                // syntax error
+        /* the mantisssa is empty. There are two possibilities:
+
+           1. input was correct (e.g. 0. ), but the 0 was skipped above.;
+           2. syntax error by the user ( . without digits)
+         */
+        if (skipped_0)    return Int_or_Double(APL_Integer(0));   // case 1
+
+        MORE_ERROR() << "expecting 0. or .0 but not . without digits.";
+        return Int_or_Double();                     // case 2: syntax error
       }
 
    // exponent part (but could also be a name starting with E or e)
@@ -943,8 +1046,12 @@ bool dot_seen = false;      // the decimal . was seen
            }
       }
 
-   // second dot (which id a syntax error)?
-   if (src.skip_if(UNI_FULLSTOP) && dot_seen)   return Int_or_Double();
+   // second dot (which is a syntax error)?
+   if (src.skip_if(UNI_FULLSTOP) && dot_seen)
+      {
+        MORE_ERROR() << "Two . in a number.";
+        return Int_or_Double();
+      }
 
    // set expo to the optional Ennn (if any) in iii.fff.Ennn)
    //
@@ -958,7 +1065,9 @@ bool dot_seen = false;      // the decimal . was seen
 
    // construct a C string according to the APL string
    //
-char buffer[int_digits.size() + fract_digits.size() + expo_digits.size() + 20];
+char * buffer = ALLOCA(char, int_digits.size() +
+                             fract_digits.size() +
+                             expo_digits.size() + 20);
 char * b = buffer;
    if (mant_negative)   *b++ = '-';
    loop(i, int_digits.size())   *b++ = int_digits[i];
@@ -1051,16 +1160,16 @@ Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos) const
 UCS_string symbol;
    if (macro)
       {
-        symbol.append(UNI_MUE);
-        symbol.append(UNI_MINUS);
+        symbol << UNI_MUE;
+        symbol << UNI_MINUS;
       }
-   symbol.append(src.get());
+   symbol << src.get();
 
    while (src.has_more())
        {
          const Unicode uni = *src;
          if (!Avec::is_symbol_char(uni))   break;
-         symbol.append(uni);
+         symbol << uni;
          ++src;
        }
 
@@ -1070,7 +1179,7 @@ UCS_string symbol;
         // S∆ or T∆
 
         while (src.has_more() && *src <= UNI_SPACE)   src.get();   // spaces
-        UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
+        UCS_string symbol1(symbol, 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         cFunction_P ST = 0;
         if (symbol[0] == UNI_S) ST = &Quad_STOP::fun;

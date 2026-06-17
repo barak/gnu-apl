@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "Avec.hh"
 #include "Token.hh"
+#include "Token_string.hh"
 #include "UCS_string_vector.hh"
 
 class Error;
@@ -132,7 +133,8 @@ public:
    virtual Function_PC line_start(Function_Line line) const
       { return Function_PC_0; }
 
-   /// remove all TOK_VOID token from the body.
+   /// remove all TOK_VOID token from the body. \b UserFunction needs to
+   /// overload this function, e.g. to update its jump table.
    /// Return the number of tokens removed
    virtual VoidCount remove_TOK_VOID();
 
@@ -163,16 +165,32 @@ public:
    const char * get_loc() const
       { return alloc_loc; }
 
+   /// return the refcount
+   int get_refcount() const
+      { return refcount; }
+
    /// increment the reference counter
-   void increment_refcount(const char * loc);
+   void increment_refcount(const char * loc, const char * creator);
 
    /// decrement the reference counter
    void decrement_refcount(const char * loc);
 
+   /// compute the targets for if/else aka →→ ←→ and ←←.
+   /// Maybe set MORE() info and return true on error.
+   bool compute_if_else_targets();
+
 protected:
-   /// the body positions of the ←← and ←→ tokens of a congitional
+   /// the body positions of the ←← and ←→ tokens of a conditional
    struct conditional
       {
+        conditional(Function_PC pc)
+        : if_THEN(pc),
+          if_ELSE(Function_PC(-2))   // -2 means no ELSE clause
+        {}
+
+        /// print \b this conditional
+        void print(ostream & out, int level, const Token_string & body) const;
+
         Function_PC if_THEN;   ///< position of the ←← token (end of condition)
         Function_PC if_ELSE;   ///< position of the ←→ token (before else)
       };
@@ -204,7 +222,8 @@ protected:
 
    /// extract one lambda expressions from body and store it in lambdas
    /// body[b] is { and body[bend] is }.
-   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend, int lambda_num);
+   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem nend,
+                              Lambda_number lambda_num);
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.
@@ -225,10 +244,6 @@ protected:
    /// parse the body line number \b line of \b this function
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              bool trace, bool tolerant, const char * loc);
-
-   /// compute the targets for if/else aka →→ ←→ and ←←.
-   /// Maybe set MORE() info and return true on error.
-   bool compute_if_else_targets();
 
    /// the mode \b this Executable
    const ParseMode pmode;
@@ -278,7 +293,7 @@ class StatementList : public Executable
 
 public:
    /// compute body token from text \b data
-   static StatementList * fix(const UCS_string & data, const char * loc);
+   static StatementList * fix(const UCS_string & data, Value_P suffix, const char * loc);
 
 protected:
    /// constructor

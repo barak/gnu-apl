@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,72 +61,22 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(ucs = " << ucs << ")" << endl;
 
-   loop(i, ucs.size())
+   loop(u, ucs.size())
       {
-        int uni = ucs[i];
+        uint32_t uni = ucs[u];
         if (uni < 0x80)            // 1-byte unicode (ASCII)
            {
              *this += uni;
            }
-        else if (uni < 0x800)      // 2-byte unicode
+        else                       // N-byte unicode
            {
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xC0;
-             *this += b1  | 0x80;
-           }
-        else if (uni < 0x10000)    // 3-byte unicode
-           {
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xE0;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-           }
-        else if (uni < 0x200000)   // 4-byte unicode
-           {
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xF0;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-           }
-        else if (uni < 0x4000000)   // 5-byte unicode
-           {
-             const uint8_t b4 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xF8;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-             *this += b4  | 0x80;
-           }
-        else if (size_t(uni) < 0x80000000)   // 6-byte unicode
-           {
-             const uint8_t b5 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b4 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b3 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b2 = uni & 0x3F;   uni >>= 6; 
-             const uint8_t b1 = uni & 0x3F;   uni >>= 6; 
-             *this += uni | 0xFC;
-             *this += b1  | 0x80;
-             *this += b2  | 0x80;
-             *this += b3  | 0x80;
-             *this += b4  | 0x80;
-             *this += b5  | 0x80;
-           }
-        else
-           {
-             CERR << "Bad Unicode: " << UNI(uni) << endl
-                  << "The offending ucs string is:";
-             loop(ii, ucs.size()) CERR << " " << HEX(ucs[ii]);
-             CERR << endl;
-
-             BACKTRACE
-             Assert(0 && "Error in UTF8_string::UTF8_string(ucs)");
+             char sixbits[5];
+             char * s = sixbits;
+             while (uni >= 0x40U >> (s - sixbits))  
+                   { *s++ = 0x80 | (uni & 0x3F);   uni >>= 6; }
+         
+             *this += char(uni | 0xFE << (6 + (sixbits - s)));
+             while (s > sixbits)   *this += *--s;
            }
       }
 
@@ -134,18 +84,35 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
 //----------------------------------------------------------------------------
-ostream &
-UTF8_string::dump_hex(ostream & out, int max_bytes) const
+void
+UTF8_string::dump_hex(ostream & out, const UTF8 * utf, int size, int max_bytes)
 {
-   loop(b, size())
+   if (size < 3*max_bytes)   // small string
       {
-        if (b)   out << " ";
-        if (b >= max_bytes)   return out << "...";
-
-         out << HEX2(at(b));
+        loop(b, size)
+           {
+              if (utf[b] == 0)   break;
+             if (b)   out << " ";
+             out << HEX2(utf[b]);
+           }
       }
-
-   return out;
+   else                        // large string
+      {
+        const int max1 = 2*max_bytes/3 - 2;
+        const int max2 = 1*max_bytes/3 - 2;
+        loop(b, max1)
+           {
+             if (utf[b] == 0)   break;
+             if (b)   out << " ";
+             out << HEX2(utf[b]);
+           }
+        out << "  ... ";
+        for (int b = size - max2; b < size; ++b)
+           {
+             if (utf[b] == 0)   break;
+             out << " "; out << HEX2(utf[b]);
+           }
+      }
 }
 //----------------------------------------------------------------------------
 Unicode
@@ -414,8 +381,37 @@ UTF8_string::round_0_1()
 ostream &
 operator <<(ostream & os, const UTF8_string & utf)
 {
-   loop(c, utf.size())   os << utf[c];
-   return os;
+   return os << utf.c_str();
+}
+//----------------------------------------------------------------------------
+/// declared in PrintOperator.hh
+ostream &
+operator <<(ostream & os, const UTF8 * utf)
+{
+   return os << charP(utf);
+}
+//============================================================================
+UTF8_string_vector::UTF8_string_vector(const char * lines)
+{
+UTF8_string current;
+   current.reserve(80);
+   while (*lines)
+      {
+        const char cc = *lines++;
+        if (cc == '\r')   continue;   // ignore \r
+        if (cc == '\n')
+           {
+             push_back(current);
+             current.clear();
+           }
+        else
+           {
+             current += cc;
+           }
+      }
+
+   if (current.size())   push_back(current);
+
 }
 //============================================================================
 int

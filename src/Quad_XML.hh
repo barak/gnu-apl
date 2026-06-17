@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ public:
       }
 
    /// append \b garbage to this garbage can (for later deletion)
-   void append(XML_node * garbage)
+   void append_garbage(XML_node * garbage)
       {
         // check that garbage was properly unlinked.
         Assert(garbage->next == garbage);
@@ -226,7 +226,7 @@ protected:
    static Value_P APL_to_XML(const Value & B);
 
    /// return the entities in B, sorted by their position prefix
-   static void add_sorted_entities(basic_string<const UCS_string *> & entities,
+   static void add_sorted_entities(vector<const UCS_string *> & entities,
                                    const Value & B);
 
    /// convert XML string to APL associative array

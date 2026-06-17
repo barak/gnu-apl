@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,12 @@ public:
    /// constructor
    Bif_OPER2_POWER() : PrimitiveOperator(TOK_OPER2_POWER) {}
 
+   /// split strand N_B into scalar N and B
+   static void unstrand_RO_B(Value_P RO_B, Value_P & RO, Value_P & B);
+
+   static Bif_OPER2_POWER  fun;      ///< Built-in function
+
+protected:
    /// overloaded Function::eval_ALRB()
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
@@ -52,9 +58,6 @@ public:
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
    static Token eval_form_2(Value_P A, Token & LO, Token & RO, Value_P B);
 
-   static Bif_OPER2_POWER  fun;      ///< Built-in function
-
-protected:
 };
 //----------------------------------------------------------------------------
 

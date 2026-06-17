@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,6 +93,9 @@ public:
    /// clone value if more than one Value_P points to it
    inline void isolate(const char * loc);
 
+   /// isolate this value and its sub-values
+   inline void isolate_deep(const char * loc);
+
    /// move the Value * from \b other to \b this.
    inline void move(Value_P_Base & other, const char * loc);
 
@@ -107,16 +110,19 @@ class Value_P : public Value_P_Base
 public:
    /// Constructor: 0 pointer
    Value_P()
-   { value_p = 0; }
+      { value_p = 0; }
 
    /// a new scalar value with un-initialized ravel
    inline Value_P(const char * loc);
 
-   /// a new scalar value with the value of Cell
+   /// a new scalar value with the value of cell
    inline Value_P(const Cell & cell, const char * loc);
 
    /// a new true vector (rank 1 value) of length len and un-initialized ravel
    inline Value_P(ShapeItem len, const char * loc);
+
+   /// a new matrix (rank 2 value) with an un-initialized ravel
+   inline Value_P(ShapeItem rows, ShapeItem cols, const char * loc);
 
    /// a new value with shape sh and un-initialized ravel
    inline Value_P(const Shape & sh, const char * loc);

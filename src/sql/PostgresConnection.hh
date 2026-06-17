@@ -30,20 +30,31 @@
 
 class PostgresConnection : public Connection {
 public:
-    PostgresConnection( PGconn *db_in );
+    PostgresConnection(PGconn * db_in);
     virtual ~PostgresConnection();
-    virtual ArgListBuilder *make_prepared_query( const string &sql );
-    virtual ArgListBuilder *make_prepared_update( const string &sql );
+    virtual ArgListBuilder * make_prepared_query(const string &sql);
+    virtual ArgListBuilder * make_prepared_update(const string &sql);
 
-    virtual void transaction_begin( void );
-    virtual void transaction_commit( void );
-    virtual void transaction_rollback( void );
+    virtual void transaction_begin();
+    virtual void transaction_commit();
+    virtual void transaction_rollback();
 
-    virtual void fill_tables( vector<string> &tables );
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols );
-    virtual const string make_positional_param( int pos );
+    virtual void fill_tables(vector<string> & tables);
+    virtual void fill_cols(const string & table,
+                           vector<ColumnDescriptor> & cols);
 
-    PGconn *get_db() { return db; }
+    virtual const char * get_provider_name() const
+       { return "postgreSQL"; }
+
+    virtual const char * get_provider_type() const
+       { return "postgresql"; }
+
+    /// return the name of a positional parameter. In PostgreSQL the positional
+    /// parameters are: "$1", "$2", "$3", ...
+    virtual const string make_positional_param(int pos)
+       { return string("$") + to_string(pos + 1); }
+
+    PGconn * get_db() { return db; }
 
 private:
     PGconn *db;

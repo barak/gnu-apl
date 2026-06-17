@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 
 #include "Backtrace.hh"   // for init_DWARF()
 #include "Command.hh"
-#include "Common.hh"
+#include "Common.hh"      // #includes config.h
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "LineInput.hh"
@@ -52,6 +52,10 @@
 #include "Output.hh"
 #include "Workspace.hh"
 #include "UserPreferences.hh"
+
+#if HAVE_IOCTL_TIOCGWINSZ   // platform has ioctl(fd, TIOCGWINSZ. ...)
+# include <sys/ioctl.h>
+#endif
 
 #if HAVE_LIBELFIN_ELF_ELF___HH
 # include <libelfin/elf/elf++.hh>
@@ -123,19 +127,36 @@ static void
 signal_WINCH_handler(int)
 {
    // fgets() returns EOF when the WINCH signal is received. We remember
-   // this fact and repeat fgets() once after a WINCH signal
+   // this fact and repeat fgets() once after a WINCH signal. got_WINCH
+   // is used in LineInput::safe_fgetc()
    //
    got_WINCH = true;
 
-struct winsize wsize;
-   // TIOCGWINSZ is 0x5413 on GNU/Linux. We use 0x5413 instead of TIOCGWINSZ
-   // because TIOCGWINSZ may not exist on all platforms
-   //
-   if (0 != ioctl(STDIN_FILENO, 0x5413, &wsize))   return;
-   if (wsize.ws_col < MIN_Quad_PW)   return;
-   if (wsize.ws_col > MAX_Quad_PW)   return;
 
-   Workspace::set_PW(wsize.ws_col, LOC);
+#if HAVE_IOCTL_TIOCGWINSZ
+
+
+   // query the window size and set ⎕PW if we have ioctl TIOCGWINSZ
+   //
+    
+   // MAX_Quad_PW is 10,000 or so, which is certainly larger than
+   // the number of screen columns. We trust TIOCGWINSZ only if
+   // it is resonably small. We allow it to be too small (and then
+   // increase it). but ignore it if it is too large.
+   //
+struct winsize wsize;
+   wsize.ws_col = MAX_Quad_PW;   // invalidate the column count
+   if (0 == ioctl(STDIN_FILENO, TIOCGWINSZ, &wsize))
+      {
+        if (wsize.ws_col < MIN_Quad_PW)   // increase too small ws_col
+           wsize.ws_col = MIN_Quad_PW;
+        if (wsize.ws_col > MAX_Quad_PW)   // limit ws_col
+           wsize.ws_col = MAX_Quad_PW;
+        Workspace::set_PW(wsize.ws_col, LOC);
+      }
+#endif
+   // just return if we don't have ioctl TIOCGWINSZ
+   return;
 }
 //----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
@@ -197,32 +218,18 @@ signal_HUP_handler(int)
    raise(SIGHUP);
 }
 //----------------------------------------------------------------------------
-/// print argc and argv[]
-static void
-show_argv(int argc, const char ** argv)
-{
-   CERR << "argc: " << argc << endl;
-   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
-
-   // tell if stdin is open or closed
-   //
-   if (fcntl(STDIN_FILENO, F_GETFD))
-      CERR << "stdin is: CLOSED" << endl;
-   else
-      CERR << "stdin is: OPEN" << endl;
-
-   // tell if fd 3 is open or closed
-   //
-   if (fcntl(3, F_GETFD))
-      CERR << "fd 3 is:  CLOSED" << endl;
-   else
-      CERR << "fd 3 is:  OPEN" << endl;
-}
-//----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
-show_welcome(ostream & out, const char * argv0)
+show_welcome(ostream & out, const char * argv0, Silence silence)
 {
+   if (silence == NO_BANNER)   return;
+   if (silence == BRIEF_BANNER)
+      {
+        out << "GNU APL version " << build_tag[1] << endl;
+        return;
+      }
+
+
 char c1[200];
 char c2[200];
    SPRINTF(c1, "Welcome to GNU APL version %s", build_tag[1]);
@@ -239,7 +246,7 @@ const char * lines[] =
   ""                                                                      ,
   c1                                                                      ,
   ""                                                                      ,
-  "Copyright © 2008-2023  Dr. Jürgen Sauermann"                         ,
+  "Copyright © 2008-2026  Dr. Jürgen Sauermann"                         ,
   "Banner by FIGlet: www.figlet.org"                                      ,
   ""                                                                      ,
   "This program comes with ABSOLUTELY NO WARRANTY;"                       ,
@@ -248,24 +255,23 @@ const char * lines[] =
   "This program is free software, and you are welcome to redistribute it" ,
   "according to the GNU Public License (GPL) version 3 or later."         ,
   ""                                                                      ,
-  0
 };
 
    // compute max. length
    //
 int len = 0;
-   for (const char ** l = lines; *l; ++l)
+   loop(l, sizeof(lines)/sizeof(*lines))
        {
-         const char * cl = *l;
+         const char * cl = lines[l];
          const int clen = strlen(cl);
          if (len < clen)   len = clen;
        }
  
 const int left_pad = (80 - len)/2;
 
-   for (const char ** l = lines; *l; ++l)
+   loop(l, sizeof(lines)/sizeof(*lines))
        {
-         const char * cl = *l;
+         const char * cl = lines[l];
          if (const int clen = strlen(cl))   // unless empty line
             {
               const int pad = left_pad + (len - clen)/2;
@@ -305,10 +311,11 @@ sockaddr_in local;
           perror("setsockopt(SO_REUSEADDR) failed");
         }
 
-      // continue, since a failed setsockopt() is sort of OK here.
+      // continue, since a failed setsockopt(SO_REUSEADDR) is sort of OK here.
    }
 
-   if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+   if (::bind(listen_socket, reinterpret_cast<const sockaddr *>(&local),
+              sizeof(local)))
       {
         perror("bind() failed");
         exit(1);
@@ -373,7 +380,7 @@ sockaddr_in local;
 //----------------------------------------------------------------------------
 /// initialize the interpreter
 int
-init_apl(int argc, const char * argv[])
+init_apl(const std::vector<const char *> & args)
 {
    {
      // make curses happy
@@ -382,40 +389,10 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
-const bool log_startup0 = UserPreferences::uprefs.parse_argv_0(argc, argv);
-   if (LOG_argc_argv || log_startup0)
-      {
-         CERR << "argc/argv before expansion:\n";
-         show_argv(argc, argv);
-      }
-
-   UserPreferences::uprefs.expand_argv(argc, argv);
-
-const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
-   if (LOG_argc_argv || log_startup)
-      {
-         CERR << "argc/argv after expansion:\n";
-         show_argv(UserPreferences::uprefs.expanded_argv.size(),
-                  &UserPreferences::uprefs.expanded_argv[0]);
-      }
-
-#ifdef cfg_DYNAMIC_LOG_WANTED
-   if (log_startup)   Log_control(LID_startup, true);
-#endif // cfg_DYNAMIC_LOG_WANTED
-
-   init_1(argv[0], log_startup);
-
-   // read /etc/gnu-apl.d/preferences
-   UserPreferences::uprefs.read_config_file(true,  log_startup);
-
-   // read $HOME/.config/gnu_apl/preferences
-   UserPreferences::uprefs.read_config_file(false, log_startup);
-
-  // read /etc/gnu-apl.d/parallel_thresholds
-   UserPreferences::uprefs.read_threshold_file(true, log_startup);
-
-  // read $HOME/.config/gnu_apl/parallel_thresholds
-   UserPreferences::uprefs.read_threshold_file(false, log_startup);
+  // collect all user preferences.
+  //
+const bool log_startup =
+      UserPreferences::uprefs.collect_preferences(args);
 
    // NOTE: struct sigaction differs between GNU/Linux and other systems,
    // which causes compile errors for direct curly bracket assignment on
@@ -431,7 +408,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    memset(&new_TERM_action,      0, sizeof(struct sigaction));
    memset(&new_HUP_action,       0, sizeof(struct sigaction));
 
-   new_control_C_action.sa_handler = &control_C;
+   new_control_C_action.sa_handler = &InterruptContext::control_C;
    new_WINCH_action    .sa_handler = &signal_WINCH_handler;
    new_USR1_action     .sa_handler = &signal_USR1_handler;
    new_SEGV_action     .sa_handler = &signal_SEGV_handler;
@@ -444,15 +421,35 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
-   if (UserPreferences::uprefs.WINCH_sets_pw)
+
+#if HAVE_IOCTL_TIOCGWINSZ
+   // Enable the ability to change ⎕PW on window resize only if the
+   // platform supports ioctl TIOCGWINSZ
+   //
+const UserPreferences & uprefs = UserPreferences::uprefs;    
+   if (uprefs.WINCH_sets_pw)
       {
+        // IF WINCH_sets_pw preference is enabled, set up a handler for the
+        // SIGWINCH signal.
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
+         
+        // The platform supports reading back of the window size. If the user
+        // wants ⎕PW to be controlled by the window size, then she most likely
+        // also wants ⎕PW to be controlled by the window size at start-up.
+        // We do this by by using the WINCH signal handler to pretend that
+        // there's a window size change
+        
         signal_WINCH_handler(0);   // pretend window size change
+        got_WINCH = false;
       }
-   else
-      {
-        Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
-      }
+#endif
+
+    // the final word should be the user preferences (if any).
+    //
+    if (uprefs.initial_PW_by_user)
+       {
+         Workspace::set_PW(uprefs.initial_PW, LOC);
+       }
 
 #if PARALLEL_ENABLED
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));
@@ -460,14 +457,12 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
 #endif
 
-   UserPreferences::uprefs.parse_argv_2(log_startup);
-
    // maybe use TCP connection instead of stdin/stderr. This function blocks
    // until a TCP connections was received.
    //
    remap_stdio();
 
-   if (UserPreferences::uprefs.CPU_limit_secs)
+   if (uprefs.CPU_limit_secs)
       {
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
@@ -478,7 +473,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    if (UserPreferences::uprefs.emacs_mode)
       {
         UCS_string info;
-        if (const char * emacs_arg = UserPreferences::uprefs.emacs_arg)
+        if (const char * emacs_arg = uprefs.emacs_arg)
            {
              info = NativeFunction::load_emacs_library(emacs_arg);
            }
@@ -522,7 +517,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
            }
       }
 
-   if (UserPreferences::uprefs.daemon)
+   if (uprefs.daemon)
       {
         const pid_t pid = fork();
         if (pid)   // parent
@@ -538,33 +533,30 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
            CERR << "child forked (pid" << getpid() << ")" << endl;
       }
 
-   if (const int wait = UserPreferences::uprefs.wait_ms)   usleep(1000*wait);
+   if (const int wait = uprefs.wait_ms)   usleep(1000*wait);
 
-   init_2(log_startup);
+   init_modules2(log_startup);
 
-   if (!UserPreferences::uprefs.silent)   show_welcome(cout, argv[0]);
+   show_welcome(cout, args[0], uprefs.silence);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
-   Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);
 
    if (ProcessorID::init(log_startup))
       {
         // error message printed in ProcessorID::init()
+        //
+        cleanup(true);
         return 8;
       }
 
-   if (UserPreferences::uprefs.do_Color)
-      Output::toggle_color(UTF8_string("ON"));
+   if (uprefs.do_Color)   Output::toggle_color(U"ON");
 
-   if (UserPreferences::uprefs.latent_expression.size())
+   if (uprefs.latent_expression.size())
       {
         // there was a --LX expression on the command line
         //
-        UCS_string lx(UserPreferences::uprefs.latent_expression);
-
-        if (log_startup)
-           CERR << "executing --LX '" << lx << "'" << endl;
-
+        UCS_string lx(uprefs.latent_expression);
+        if (log_startup)   CERR << "executing --LX '" << lx << "'" << endl;
         Command::process_line(lx, 0);
       }
 
@@ -575,48 +567,47 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    // (2) --script (which implies --noCONT), or
    // (3)  -L wsname
    //
-   if (UserPreferences::uprefs.do_CONT &&
-       !UserPreferences::uprefs.initial_workspace.size())
+   if (uprefs.do_CONT && !uprefs.initial_workspace.size())
       {
-         UCS_string cont(UTF8_string("CONTINUE"));
+         UCS_string cont(U"CONTINUE");
+         LibRef_name lib_name(LIB0, cont);
          UTF8_string filename =
-            LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
+            LibPaths::get_filename(lib_name, true, ".xml", ".apl");
 
          if (access(filename.c_str(), F_OK) == 0)
             {
               // CONTINUE workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(UTF8_string(")LOAD CONTINUE"));
+              UCS_string load_cmd(U")LOAD CONTINUE");
               Command::process_line(load_cmd, 0);
               return 0;
             }
 
          // no CONTINUE workspace but maybe SETUP
          //
-         cont = UCS_ASCII_string("SETUP");
-         filename =
-            LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
+         lib_name = LibRef_name(UCS_ASCII_string("SETUP"), true);
+         filename = LibPaths::get_filename(lib_name, true, ".xml", ".apl");
 
          if (access(filename.c_str(), F_OK) == 0)
             {
               // SETUP workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(UTF8_string(")LOAD SETUP"));
+              UCS_string load_cmd(U")LOAD SETUP");
               Command::process_line(load_cmd, 0);
               return 0;
             }
       }
 
-   if (UserPreferences::uprefs.initial_workspace.size())
+   if (uprefs.initial_workspace.size())
       {
          // the user has provided a workspace name via -L
          //
-         UCS_string init_ws(UserPreferences::uprefs.initial_workspace);
-         const char * cmd = UserPreferences::uprefs.silent
+         UCS_string init_ws(uprefs.initial_workspace);
+         const char * cmd = uprefs.silence == NO_BANNER
                           ? ")QLOAD " : ")LOAD ";
          const UTF8_string utf(cmd);
          UCS_string load_cmd(utf);
-         load_cmd.append(init_ws);
+         load_cmd << init_ws;
          Command::process_line(load_cmd, 0);
       }
 
@@ -634,16 +625,24 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
 int
 main(int argc, const char *argv[])
 {
-   if (const int ret = init_apl(argc, argv))   return ret;
+std::vector<const char *> args(argc);
+   loop(a, argc)   args[a] = argv[a];
+   if (const int ret = init_apl(args))   return ret;
 
    if (UserPreferences::uprefs.eval_exprs.size())
       {
-         loop(e, UserPreferences::uprefs.eval_exprs.size())
+        loop(e, UserPreferences::uprefs.eval_exprs.size())
             {
               const char * expr = UserPreferences::uprefs.eval_exprs[e];
               const UTF8_string expr_utf(expr);
               UCS_string expr_ucs(expr_utf);
-              Command::process_line(expr_ucs, 0);
+              try
+                 { Command::process_line(expr_ucs, 0); }
+              catch (...)
+                 {
+                   CERR << "*** --eval '" << expr << "' failed.";
+                   Command::cmd_OFF(6);
+                 }
             }
         Command::cmd_OFF(0);
         return 0;

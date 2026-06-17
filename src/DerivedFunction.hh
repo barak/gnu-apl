@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,33 +28,19 @@
 #include "Function.hh"
 #include "Output.hh"
 
-//----------------------------------------------------------------------------
-/** an operator bound to its left and (in the case of a dyadic operator) to
-   its right operand.
+//============================================================================
+/** base class for all Derived_XXX classes. Used to bind an axis and/or left
+    and/or right function or operator arguments to a function or operator.
+
+    DerivedFunction can not be instantiated directly but only via a class
+    derived from it.
  **/
-/// An APL operator bound to its function operand(s)
+/// An APL function operator bound to its function operand(s) and/or axis.
 class DerivedFunction : public Function
 {
 public:
-   /// default constructor (for DerivedFunctionCache)
+   /// default constructor (for DerivedFunctionCache items)
    DerivedFunction() : Function(TOK_FUN0)   {}
-
-   /// constructor (dyadic operator). Normally lf and rf are functions, but
-   /// APL2 explicitly permits values.
-   DerivedFunction(Token & lf, cFunction_P dyop, Token & rf, const char * loc);
-
-   /// Constructor (dyadic operator with axis: fun ⍤[] rval)
-   DerivedFunction(Token & lf, cFunction_P dyop, Value_P X, Token & rval,
-                   const char * loc);
-
-   /// Constructor (monadic operator, no axis)
-   DerivedFunction(Token & lfun, cFunction_P monop, const char * loc);
-
-   /// Constructor (monadic operator, with axis)
-   DerivedFunction(Token & lf, cFunction_P monop, Value_P X, const char * loc);
-
-   /// Constructor (function with axis)
-   DerivedFunction(cFunction_P func, Value_P X, const char * loc);
 
    /// deallocate resources held by this DerivedFunction
    void destroy_derived(const char * loc);
@@ -87,7 +73,7 @@ public:
    /// return the right operand (or 0) of this derived function
    cFunction_P get_RO() const
       {
-        return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
+        return right_arg.get_tag() == TOK_VOID ? 0 : right_arg.get_function();
       }
 
    /// return the axis argument (or 0 if none) of this derived function
@@ -101,33 +87,29 @@ public:
    void unmark_all_values() const;   // unmark values bound to this operator
 
 protected:
+  /// constructor. Set omitted arguments to 0.
+  DerivedFunction(Token * LO, cFunction_P F_or_M_or_D, Token * RO, Value_P X,
+                  const char * loc);
+
    /// Overloaded Function::print_properties()
    virtual void print_properties(ostream & out, int indent) const;
-
-   /// overloaded Function::eval_B();
-   virtual Token eval_B(Value_P B) const;
-
-   /// overloaded Function::eval_XB();
-   virtual Token eval_XB(Value_P X, Value_P B) const;
-
-   /// overloaded Function::eval_AB();
-   virtual Token eval_AB(Value_P A, Value_P B) const;
-
-   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return   oper->may_push_SI()
         || (left_arg .is_function() && left_arg .get_function()->may_push_SI())
-        || (right_fun.is_function() && right_fun.get_function()->may_push_SI());
+        || (right_arg.is_function() && right_arg.get_function()->may_push_SI());
       }
 
    /// overloaded Function::locate_X()
    virtual Value_P * locate_X() const
       { return !axis ? 0 : const_cast<Value_P *>(&axis); }
 
-   /// the function (to the left of the operator)
+   /// debug printout when an eval_XXX() function is called.
+   void entering(const char * class_name, const char * fun_name) const;
+
+   /// the function (to the left of the operator).
+   // Token are ephemeral, therefore we need a copy here.
    Token left_arg;
 
    /// the monadic operator (to the right of the function)
@@ -136,14 +118,127 @@ protected:
    /// the (normally) function on the right of the (dyadic) operator (if any).
    //  Acording to lrm p. 35, the right operand is a function or array (even
    //  though no primitive dyadic operator takes an array as right operand).
-   Token right_fun;
+   // Token are ephemeral, therefore we need a copy here.
+   Token right_arg;
 
    /// the axis for \b mon_oper, or 0 if no axis
    Value_P axis;
 
-private:
    /// destructor
    ~DerivedFunction();
+};
+//============================================================================
+/// A dyadic operator bound to its left and right function. E.g. +.× ←→ (+.×)
+class Derived_LO_D_RO: public DerivedFunction
+{
+public:
+   /// constructor
+   Derived_LO_D_RO(Token & LO, cDyaOP D, Token & RO, const char * loc)
+   : DerivedFunction(&LO, D, &RO, Value_P(), loc)
+   {
+     Log(LOG_FunOperX)   CERR << "Binding: (LO D RO) at " << loc << endl;
+   }
+
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const;
+
+   /// overloaded Function::eval_AXB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_XB()
+   virtual Token eval_XB(Value_P X, Value_P B) const;
+};
+//============================================================================
+/// A dyadic operator bound to its left and right functions and its axis.
+class Derived_LO_D_X_RO : public DerivedFunction
+{
+public:
+   /// constructor
+   Derived_LO_D_X_RO(Token & LO, cDyaOP D, Value_P X, Token & RO,
+                             const char * loc)
+   : DerivedFunction(&LO, D, &RO, X, loc)
+   {
+     Log(LOG_FunOperX)   CERR << "Binding: (LO D X RO) at " << loc << endl;
+     Assert(+X);
+   }
+
+   /// overloaded Function::eval_AXB()
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_XB()
+   virtual Token eval_B(Value_P B) const;
+};
+//============================================================================
+/// A monadic operator bound to its left function. E.g. +/ ←→ (+/)
+class Derived_LO_M: public DerivedFunction
+{
+public:
+   /// constructor
+   Derived_LO_M(Token & LO, cMonOP M, const char * loc)
+   : DerivedFunction(&LO, M, 0, Value_P(), loc)
+   {
+     Log(LOG_FunOperX)   CERR << "Binding: (LO M) at " << loc << endl;
+   }
+
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_AB()
+   virtual Token eval_B(Value_P B) const;
+
+   /// overloaded Function::eval_AXB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_XB()
+   virtual Token eval_XB(Value_P X, Value_P B) const;
+};
+//============================================================================
+/// A monadic operator bound to its left function and to its axis.
+/// E.g. +/[X] ←→ (+/[X])
+class Derived_LO_M_X: public DerivedFunction
+{
+public:
+   /// constructor
+   Derived_LO_M_X(Token & LO, cMonOP M, Value_P X,
+                          const char * loc)
+   : DerivedFunction(&LO, M, 0, X, loc)
+   {}
+
+   /// overloaded Function::eval_AB();
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B();
+   virtual Token eval_B(Value_P B) const;
+
+   /// overloaded Function::eval_AXB();
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
+   /// overloaded Function::eval_XB();
+   virtual Token eval_XB(Value_P X, Value_P B) const;
+
+
+};
+//============================================================================
+/// A function axis bound to its function (not operaator). E.g. f[X] ←→ (f[X])
+class Derived_F_X : public DerivedFunction
+{
+public:
+   /// constructor
+   Derived_F_X(cFunction_P F, Value_P X, const char * loc)
+   : DerivedFunction(0, F, 0, X, loc)
+   {
+     Log(LOG_FunOperX)   CERR << "Binding: (F rXM) at " << loc << endl;
+     Assert(+X);
+   }
+
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(Value_P B) const;
 };
 //============================================================================
 /// a small cache for storing a few DerivedFunction objects
@@ -192,5 +287,5 @@ protected:
    /// the number of elements in \b cache
    size_t idx;
 };
-//----------------------------------------------------------------------------
+//============================================================================
 #endif // __DERIVED_FUNCTION__DEFINED__

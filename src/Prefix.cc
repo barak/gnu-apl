@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 */
 
 #include "Bif_OPER2_RANK.hh"
+#include "Bif_OPER2_POWER.hh"
 #include "Common.hh"
 #include "DerivedFunction.hh"
 #include "Executable.hh"
@@ -56,7 +57,7 @@ Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
 void
 Prefix::clean_up()
 {
-   loop(s, size())
+   loop(s, ssize())
       {
         Token & tok = at(s).get_token();
         if (tok.get_Class() == TC_VALUE)
@@ -89,7 +90,7 @@ Prefix::syntax_error(const char * loc)
 
    // clear values in FIFO
    //
-   loop (s, size())
+   loop (s, ssize())
       {
         Token & tok = at(s).get_token();
         if (tok.get_Class() == TC_VALUE)
@@ -110,7 +111,7 @@ Prefix::syntax_error(const char * loc)
    // see if error was caused by a function not returning a value.
    // In that case we throw a value error instead of a syntax error.
    //
-   loop (s, size())
+   loop (s, ssize())
       {
         if (at(s).get_Class() == TC_VOID)
            {
@@ -127,7 +128,7 @@ Prefix::syntax_error(const char * loc)
 bool
 Prefix::uses_function(const UserFunction * ufun) const
 {
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() == TV_FUN &&
@@ -152,7 +153,7 @@ Prefix::has_quad_LRX() const
         B  [X]                       in  5 6 [2]
     */
 
-   switch(size())
+   switch(ssize())
       {
         case 0:  return false;
         case 1:  return false;
@@ -171,7 +172,7 @@ Prefix::is_value_parenthesis(int pc) const
    Assert1(body[pc].get_Class() == TC_R_PARENT);
 
    ++pc;
-   if (pc >= int(body.size()))   return true;   // syntax error
+   if (pc >= int(body.ssize()))   return true;   // syntax error
 
 TokenClass next = body[pc].get_Class();
 
@@ -180,7 +181,7 @@ TokenClass next = body[pc].get_Class();
         const int offset = body[pc].get_int_val2();
         pc += offset;
         Assert1(body[pc].get_Class() == TC_L_BRACK);   // opening [
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
         next = body[pc].get_Class();
       }
 
@@ -204,11 +205,11 @@ TokenClass next = body[pc].get_Class();
         if (!is_value_parenthesis(pc))   return false;   // (fun)) XXX
         const int offset = body[pc].get_int_val2();
         pc += offset;
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
         next = body[pc].get_Class();
         Assert1(next == TC_L_PARENT);   // opening (
         ++pc;
-        if (pc >= Function_PC(body.size()))   return true;   // syntax error
+        if (pc >= Function_PC(body.ssize()))   return true;   // syntax error
 
         //   (val)) XXX
         //  ^
@@ -232,7 +233,7 @@ TokenClass next = body[pc].get_Class();
    // dyadic operator with numeric function argument, for example:  ⍤ 0
    //
    if (next == TC_VALUE                  &&
-       pc < Function_PC(body.size() - 1) &&
+       pc < Function_PC(body.ssize() - 1) &&
        body[pc+1].get_Class() == TC_OPER2)   return false;
 
    return true;
@@ -255,7 +256,7 @@ const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
 }
 //----------------------------------------------------------------------------
 void
-Prefix::collect_symbols(basic_string<Symbol *> & symbols)
+Prefix::collect_symbols(vector<Symbol *> & symbols)
 {
    // TOKEN ... TOKEN VAR ) ←   (reversed)
    //             ↑
@@ -263,12 +264,13 @@ Prefix::collect_symbols(basic_string<Symbol *> & symbols)
    //
    // return the TOK_LSYMB2 symbols left of \b PC.
    //
-   for (Function_PC pc = PC; pc < Function_PC(body.size()); ++pc)
+   while (PC < Function_PC(body.ssize()))
        {
-         if (body[pc].get_ValueType() != TV_SYM)   break;
+         const Token & tok = body[PC];
+         if (tok.get_ValueType() != TV_SYM)   break;
 
-         const Token & tok_var = lookahead().get_token();
-         Symbol * sym_var = tok_var.get_sym_ptr();
+         ++PC;
+         Symbol * sym_var = tok.get_sym_ptr();
          Assert(sym_var);
          if (!sym_var->can_be_assigned())   break;   // not a variable
          symbols.push_back(sym_var);
@@ -280,13 +282,13 @@ Prefix::print_stack(ostream & out, const char * loc) const
 {
 const int si_depth = si.get_level();
 
-   out << "fifo[si=" << si_depth << " len=" << size()
+   out << "fifo[si=" << si_depth << " len=" << ssize()
        << " PC=" << PC << "] is now :";
 
-   loop(s, size())
+   loop(s, ssize())
       {
-        const TokenClass tc = at(s).get_Class();
-        out << " " << Token::class_name(tc);
+        const TokenTag tag = at(s).get_tag();
+        out << " " << Token::class_name(tag);
       }
 
    out << "  at " << loc << endl;
@@ -298,7 +300,7 @@ Prefix::show_owners(const char * prefix, ostream & out,
 {
 int count = 0;
 
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() != TV_VAL)      continue;
@@ -312,6 +314,146 @@ int count = 0;
       }
 
    return count;
+}
+//----------------------------------------------------------------------------
+ostream &
+Prefix::print_token_value(ostream & out, const Token & tok)
+{
+const TokenClass tc = tok.get_Class();
+   if (tc == TC_SYMBOL)
+      {
+        out << "SYMBOL(";
+        const Symbol * sym = tok.get_sym_ptr();
+        out << sym->get_name();
+        return out << ")";
+      }
+
+   if (tc == TC_VALUE)
+      {
+        const TokenTag tag = tok.get_tag();
+        if      (tag == TOK_APL_VALUE1)   out << "VALUE1(";
+        else if (tag == TOK_APL_VALUE2)   out << "VALUE2(";
+        else if (tag == TOK_APL_VALUE3)   out << "VALUE3(";
+        else if (tag == TOK_APL_VALUE4)   out << "VALUE4(";
+        else                              out << "VALUE?(";
+
+        Value_P value = tok.get_apl_val();
+        if (+value)   value->print_brief(out);
+        else          out << "0";
+        return out << ")";
+      }
+
+   if (tc == TC_END)
+      {
+        const TokenTag tag = tok.get_tag();
+        if (tag == TOK_END)       return out << "◊";
+        if (tag == TOK_ENDL)      return out << "ENDL";
+        if (tag == TOK_IF_THEN)   return out << "→→";
+        if (tag == TOK_IF_ELSE)   return out << "←→";
+        if (tag == TOK_IF_END)    return out << "←←";
+      }
+
+   return out << (Token::class_name(tok.get_tag()) + 3);
+}
+//----------------------------------------------------------------------------
+ostream &
+Prefix::print_patterns(ostream & out, int which)
+{
+const bool on_stack = which & 1;
+const bool ahead    = which & 2;
+const bool reverse  = which & 4;   // print ahead in APL order
+
+   if (on_stack)   // print token on the stack
+      {
+        int Nval = 0;
+        loop (s, ssize())
+             {
+               const Token & tok = at(s).get_token();
+               if (tok.get_Class() == TC_VALUE)   ++Nval;
+             }
+        const char * AB[4]  = { "A", "B",  "-", "-" };
+        const char * ARB[4] = { "A", "RO", "B", "-" };
+        const char * FG[4]  = { "F", "G",  "-", "-" };
+        const char ** V = AB;
+        const char ** F = FG;
+
+        if      (Nval <= 1)   V = AB + 1;
+        else if (Nval >  2)   V = ARB;
+
+        int sepa = 0;
+        out << "«";
+        loop (s, ssize())
+             {
+               if (sepa++)   out << " ";
+
+               const Token & tok = at(s).get_token();
+               switch(const TokenClass tc = tok.get_Class())
+                  {
+                    case TC_ASSIGN:    out << "←";          break;
+                    case TC_R_ARROW:   out << "→";          break;
+                    case TC_L_BRACK:   out << "[";          break;
+                    case TC_R_BRACK:   out << "]";          break;
+                    case TC_END:       out << "END";        break;
+                    case TC_FUN0:      out << "N";          break;
+                    case TC_FUN12:     out << *F++;         break;
+                    case TC_INDEX:     out << "C";          break;
+                    case TC_OPER1:     out << "M";          break;
+                    case TC_OPER2:     out << "D";          break;
+                    case TC_L_PARENT:  out << "(";          break;
+                    case TC_R_PARENT:  out << ")";          break;
+                    case TC_RETURN:    out << "RET";        break;
+                    case TC_SYMBOL:    out << "SYM";        break;
+                    case TC_VALUE:     out << *V++;         break;
+                    case TC_VOID:      out << "VOID";       break;
+                    case TC_SI_CHANGE: out << "SI_CHANGE";  break;
+                    default:           out << "-TC_" << int(tc);
+                  }
+             }
+        out << "»";
+      }
+
+   if (on_stack && ahead)   out << " ";   // both
+
+   if (ahead)   // print token ahead
+      {
+        int sepa = 0;
+        if (reverse)
+           {
+             size_t end_of_statement = body.size() - 1;
+             for (size_t pc = PC; pc < body.size(); ++pc)
+                 {
+                   if (body[pc].get_Class() == TC_END)
+                      {
+                        end_of_statement = pc;
+                        break;
+                      }
+                 }
+
+             for (int pc = end_of_statement - 1; pc >= PC; --pc)
+                 {
+                   if (sepa++)   out << " ";
+                   const TokenTag tag = body[pc].get_tag();
+                   out << Token::short_class_name(tag);
+                 }
+
+             if (end_of_statement != body.size() - 1)
+                {
+                  if (sepa++)   out << " ";
+                  out << "END";
+                }
+           }
+        else
+           {
+             for (size_t pc = PC; pc < body.size(); ++pc)
+                 {
+                   if (sepa++)   out << " ";
+                   const TokenTag tag = body[pc].get_tag();
+                   out << Token::short_class_name(tag);
+                   if ((tag & TC_MASK) == TC_END)   break;   // end of statement
+                 }
+           }
+      }
+   return out;
 }
 //----------------------------------------------------------------------------
 bool
@@ -341,7 +483,7 @@ Prefix::value_expected() const
 
    // look ahead further until value index vs. function axis can be decided.
    //
-   for (ShapeItem pc = PC; pc < body.size();)
+   for (ShapeItem pc = PC; pc < body.ssize();)
       {
         const Token & tok = body[pc++];
         switch(tok.get_Class())
@@ -381,7 +523,7 @@ Prefix::value_expected() const
 void
 Prefix::unmark_all_values() const
 {
-   loop (s, size())
+   loop (s, ssize())
       {
         const Token & tok = at(s).get_token();
         if (tok.get_ValueType() != TV_VAL)      continue;
@@ -409,7 +551,7 @@ Prefix::push_Symbol(Token_loc & tl)
       }
 
 Symbol * const symbol = tl.get_token().get_sym_ptr();
-   if (PC < body.size() && body[PC].get_tag() == TOK_OPER2_INNER)
+   if (PC < body.ssize() && body[PC].get_tag() == TOK_OPER2_INNER)
       {
         /* The APL code is .SYM which could be:
  
@@ -458,7 +600,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
         return false;
       }
 
-   if (size()                        &&          // at0() is valid,
+   if (ssize()                       &&          // at0() is valid,
        at0().get_Class() == TC_INDEX &&          // at0() is [...;... ], and
        tl.get_tag() == TOK_SYMBOL)   // user defined variable
       {
@@ -471,7 +613,7 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
         if (+value)
            {
              Token tok(TOK_APL_VALUE1, value);
-             tl.get_token().move(tok, LOC);
+             tl.get_token().move_from(tok, LOC);
            }
        else
           {
@@ -480,7 +622,6 @@ Symbol * const symbol = tl.get_token().get_sym_ptr();
       }
    else
       {
-
         symbol->resolve_right(tl.get_token(), PC);
       }
 
@@ -505,7 +646,7 @@ Prefix::push_END_error()
 
    // provide help on some common cases...
    //
-   for (int j = 1; j < (size() - 1); ++j)
+   for (int j = 1; j < ssize() - 1; ++j)
        {
          if ( (at(j)    .get_Class() == TC_ASSIGN) &&
               (at(j + 1).get_Class() == TC_VALUE))
@@ -534,31 +675,31 @@ UCS_string & more = MORE_ERROR();
    enum { MAX_j = 4 };   // limit for the number of tokens displayed
    loop(j, MAX_j)
        {
-         const bool rightmost = (j == size() - 1);   // end of phrase
+         const bool rightmost = (j == ssize() - 1);   // end of phrase
          const Token & tok = at(j).get_token();
          more << " ";
          if (tok.is_function())   // token is a function
             {
               const Function * fun = tok.get_function();
               more << fun->get_name();
-              if (rightmost)   // rightmost token is a function
+              if (rightmost)   // rightmost token of the stack is a function
                  {
-                   if (MAX_j < size())   more << "...";
+                   if (MAX_j < ssize())   more << "...";
 
                    // frequent error: missing right argument of a non-niladic
                    // function.
                    more << "\nMissing mandatory right argument of function "
                         << fun->get_name() << "?";
+                   VALENCE_ERROR;
                  }
             }
          else
             {
               const UCS_string name = at(j).get_token().tag_name();
-              if (name.starts_with("TOK_"))
-                 more << UCS_string(name, 4, name.size() - 4);
+              if (name.starts_with("TOK_"))   more << UCS_string(name, 4);
               else
                  more << name;
-              if (rightmost && MAX_j < size())   more << "...";
+              if (rightmost && MAX_j < ssize())   more << "...";
             }
 
          if (rightmost)   break;
@@ -582,58 +723,95 @@ Prefix::push_next_token()
 
 again:
 
-   // TC_END is the end of the statement (i.e. the leftmost token in APL).
-   // The caller wants one more Token, but we may not have any. In that
-   /// case: prepare the )MORE info and throw a SYNTAX_ERROR.
-   //
-   if (size() && at0().get_Class() == TC_END)   push_END_error();
-
-Token_loc tloc = lookahead();   // tloc is possibly changed by Symbol::resolve()
-const TokenClass tcl = tloc.get_Class();
+const Function_PC old_PC = PC++;
+const Token & tok = body[old_PC];
+const TokenClass tcl = tok.get_Class();
    Log(LOG_prefix_parser)
       {
         CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
-             << "] Read token[" << size()
-             << "] (←" << get_assign_state() << "←) " << tloc.get_token() << " "
-             << Token::class_name(tcl) << endl;
+             << "] Read token[" << ssize()
+             << "] (←" << get_assign_state() << "←) " << tok << " "
+             << Token::class_name(tok.get_tag()) << endl;
       }
 
-   saved_MISC.set_PC(tloc.get_PC());   // expand the PC range of the stack
+   saved_MISC.set_PC(old_PC);   // expand the PC range of the stack
 
-   if (tloc.get_tag() == TOK_GOTO_PC)   // →N
+   if (tok.get_tag() == TOK_GOTO_PC)   // →N
       {
-        PC = Function_PC(tloc.get_token().get_int_val());
-        Assert1(size() == 0);
+        PC = Function_PC(tok.get_int_val());
+        Assert1(ssize() == 0);
         goto again;
       }
 
    if (tcl == TC_SYMBOL)          // resolve symbol if necessary
       {
+        Token_loc tloc(tok, old_PC);
         return push_Symbol(tloc);   // true iff )SI pushed
       }
-   else if (tcl == TC_ASSIGN)     // update assign_state (from right to left)
+
+   if (tcl == TC_ASSIGN)     // update assign_state (from right to left)
       {
         if (get_assign_state() != ASS_none)   syntax_error(LOC);
         set_assign_state(ASS_arrow_seen);
       }
 
+const Token_loc tloc(tok, old_PC);
    push(tloc);
    return false;   // )SI not pushed
+}
+//----------------------------------------------------------------------------
+Fun_signature
+Prefix::get_current_signature()
+{
+   // this function is called after some eval_XXX() was invoked and
+   // computes the signature XXX from the current stack.
+   //
+const Prefix & prefix = Workspace::SI_top()->get_prefix();
+const int prefix_len = prefix.prefix_len;
+
+int ret = SIG_NONE;
+   Assert(prefix_len > 1);   // at least FUN B
+   if (prefix.Class_at(prefix_len - 1) == TC_VALUE)   ret |= SIG_B;
+   if (prefix.Class_at(0) == TC_VALUE)                ret |= SIG_A;
+   loop(p, prefix_len)
+       {
+         switch(prefix.Class_at(p))
+            {
+              case TC_FUN12: ret |= SIG_FUN;   break;
+              case TC_OPER1: ret |= SIG_LO;    break;
+              case TC_OPER2: ret |= SIG_OP2;   break;
+              case TC_INDEX: ret |= SIG_X;     break;
+              default:       ;
+            }
+       }
+
+   return Fun_signature(ret);
 }
 //----------------------------------------------------------------------------
 #ifdef PREFIX_HASH
 inline void
 Prefix::find_best_phrase()
 {
-const int s_max = size() < 4 ? size() : 4;
+const int s_max = ssize() < 4 ? ssize() : 4;
 const int s_max_1 = s_max - 1;
 unsigned int hash[4] = { at0().get_Class() };
+
+   /* compute s_max_1 hash values from the token classes, starting at at(0).
+      That is:
+
+      hash[0] =                                    TC₀
+      hash[1] =                         TC₀ << 5 | TC₁
+      hash[3] = TC₀ <<             10 | TC₁ << 5 | TC₂
+      hash[4] = TC₀ << 15 | TC₁ << 10 | TC₂ << 5 | TC₃
+    */
    for (int s = 0; s < s_max_1;)
        {
          const int prev = s++;
          hash[s] = hash[prev] | Class_at(s) << 5*s;
        }
 
+   // match hashes in hash_table, from longest to shortest phrases
+   //
    rev_loop(s, s_max)
        {
          const unsigned int hash_s = hash[s];
@@ -649,7 +827,7 @@ unsigned int hash[4] = { at0().get_Class() };
 inline void
 Prefix::find_best_phrase()
 {
-   best_phrase = 0;   // assume nbothing found
+   best_phrase = 0;   // assume nothing found
 
 // CERR << "\nfind_best_phrase(): size=" << size() << endl;
 // print_stack(CERR, LOC);
@@ -723,13 +901,20 @@ const Prefix::Phrase Prefix::hash_table[] =
 Token
 Prefix::reduce_statements()
 {
+   Log(LOG_Reduce_XXX)
+      {
+       loop(s, si.get_depth())   CERR << "    ";   // indent
+        CERR << "Reduce Statement (in APL order): ";
+        print_patterns(CERR, 6) << endl;
+      }
+
    Log(LOG_prefix_parser)
       {
         CERR << endl << "changed to Prefix[si=" << si.get_level()
              << "]) ============================================" << endl;
       }
 
-   if (size())   goto again;
+   if (ssize())   goto again;
 
    // the main loop of an LALR(1) parser...
    //
@@ -737,30 +922,61 @@ grow:    // aka. SHIFT
    // the current stack does not contain a valid phrase.
    // Push one more token onto the stack and continue
    //
-   if (push_next_token())   return Token(TOK_SI_PUSHED);
+   Log(LOG_Shift_XXX)
+      {
+        loop(s, si.get_depth() + 1)   CERR << "    ";   // indent
+        CERR << "PC=" << PC << " Shift[" << ssize() << "]: ";
+        print_token_value(CERR, body[PC]) << " into ";
+        print_patterns(CERR, 1);
+      }
+
+   if (push_next_token())
+      {
+        Log(LOG_Shift_XXX)   CERR << "pushed )SI.";
+        return Token(TOK_SI_PUSHED);
+      }
+
+   Log(LOG_Shift_XXX)
+      {
+        while (Output::get_column() < 50)   CERR << " ";
+        CERR << " yields: ";
+        print_patterns(CERR, 3) << endl;
+      }
 
 again:   // aka. REDUCE
    Log(LOG_prefix_parser)   print_stack(CERR, LOC);
 
    // search longest prefixes in phrase table...
    //
-   find_best_phrase();   // set best_phrase
-   if (best_phrase == 0)   goto grow;
+   find_best_phrase();                  // set best_phrase
+   if (best_phrase == 0)   goto grow;   // no best_phrase
 
-   // found a reducible prefix. See if the next token class binds stronger
-   // than best_phrase->prio
-   //
-   if (check_next_binding())   goto grow;
+   /* found a reducible prefix. See if the next token class binds stronger
+      than best_phrase->prio.
 
-   Log(LOG_prefix_parser)  CERR
-      << "   phrase #" <<  (best_phrase - hash_table)
-      << ": " << best_phrase->phrase_name
-      << " matches, prio " << best_phrase->prio
-      << ", calling reduce_" << best_phrase->reduce_name
-      << "()" << endl;
+      If best_phrase->prio ≥ BS_ANY_BRA then we reduce immediately,
+      since ALWAYS [ ] has the strongest binding.
+    */
+   if (best_phrase->prio < BS_ANY_BRA && check_next_binding())   goto grow;
+
+   Log(LOG_prefix_parser)
+      {
+        CERR << "   phrase #" <<  (best_phrase - hash_table)
+             << ": " << best_phrase->phrase_name
+             << " matches, prio " << best_phrase->prio
+             << ", calling reduce_" << best_phrase->reduce_name
+             << "()" << endl;
+      }
+
+   prefix_len = best_phrase->phrase_len;
+   Log(LOG_Reduce_XXX)
+      {
+        loop(s, si.get_depth() + 1)   CERR << "    ";   // indent
+        CERR << "Match[" << prefix_len << "]: calling: reduce_"
+             << best_phrase->reduce_name << "()" << endl;
+      }
 
    action = RA_FIXME;   // to detect missing 'action = ' in a reduce_XXX()
-   prefix_len = best_phrase->phrase_len;
    if (best_phrase->misc)   // MISC phrase: save X and remove it
       {
         Assert(!has_MISC());
@@ -775,6 +991,13 @@ again:   // aka. REDUCE
     */
 const uint64_t inst = instance;
    (this->*best_phrase->reduce_fun)();
+
+   Log(LOG_Reduce_XXX)
+      {
+        while (Output::get_column() < 50)   CERR << " ";
+        CERR << " yields: ";
+        print_patterns(CERR, 3) << endl;
+      }
 
    if (inst != Workspace::SI_top()->get_prefix().instance)
       {
@@ -841,7 +1064,7 @@ inline bool
 Prefix::check_next_binding()
 {
 TokenClass next = TC_INVALID;   // assume no bext
-    if (PC < Function_PC(body.size()))
+    if (PC < Function_PC(body.ssize()))
        {
          const Token & tok = body[PC];
          next = tok.get_Class();
@@ -876,7 +1099,7 @@ TokenClass next = TC_INVALID;   // assume no bext
               // entire indexed value A[ ... ] is computed
               prefix_len = 1;
               reduce_RBRA___();
-              return true;
+              return true;   // do bind
             }
        }
 
@@ -893,15 +1116,21 @@ TokenClass next = TC_INVALID;   // assume no bext
              << " matches, but prio " << best_phrase->prio
              << " is too small to call " << best_phrase->reduce_name
              << "()" << endl;
-        return true;
+        return true;   // do bind
       }
 
-   return false;
+   return false;    // don't bind
 }
 //----------------------------------------------------------------------------
 bool
 Prefix::do_shift(TokenClass next) const
 {
+   /* resolve a shift/reduce conflict.
+
+       at0() ist the (in APL order) current token
+       at1() ist the (in APL order) token right of the current token
+       next is the class of the token left of at0()
+    */
    switch(at0().get_Class())
       {
         case TC_VALUE:
@@ -956,24 +1185,24 @@ Prefix::locate_L(UCS_string & function) const
         2   ÷   0   3            in 2 ÷ 0   (⎕L is 2)
     */
 
-   if (size() && at0().get_ValueType() == TV_FUN)
+   if (ssize() && at0().get_ValueType() == TV_FUN)
       {
-        // e.g. DOMAIN ERROR in × ÷ 0. size() is 2 and at0() is ÷
+        // e.g. DOMAIN ERROR in × ÷ 0. ssize() is 2 and at0() is ÷
         function = at0().get_function()->get_name();
         return 0;
       }
 
-   if (size() > 1 && at1().get_ValueType() == TV_FUN)
+   if (ssize() > 1 && at1().get_ValueType() == TV_FUN)
       {
         function = at1().get_function()->get_name();
       }
-   else if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   else if (ssize() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_ASCII_string("[]");
         return at0().get_apl_valp();
       }
 
-   if (size() < 3)   return 0;
+   if (ssize() < 3)   return 0;
 
    if (at0().get_Class() == TC_VALUE)   return at0().get_apl_valp();
    return 0;
@@ -984,9 +1213,9 @@ Prefix::locate_R(UCS_string & function) const
 {
    // ⎕R requires at least f B (so we have at0() and at1()
 
-   if (size() < 2)   return 0;
+   if (ssize() < 2)   return 0;
 
-   if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   if (ssize() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_ASCII_string("[]");   // valid function
         return 0;                      // but no ⎕R.
@@ -998,7 +1227,7 @@ Prefix::locate_R(UCS_string & function) const
    if (at0().get_ValueType() != TV_FUN &&
        at1().get_ValueType() != TV_FUN)   return 0;
 
-const Token & ret = content[size() - prefix_len].get_token();
+const Token & ret = content[ssize() - prefix_len].get_token();
    if (ret.get_Class() == TC_VALUE)   return ret.get_apl_valp();
    return 0;
 }
@@ -1008,12 +1237,12 @@ Prefix::locate_X(UCS_string & function) const
 {
    // ⎕X requires at least X B (so we have at0() and at1()
 
-   if (size() < 2)   return 0;
+   if (ssize() < 2)   return 0;
 
    // either at0() (for monadic f X B) or at1() (for dyadic A f X B) must
    // be a function or operator
    //
-   rev_loop(x, size())
+   rev_loop(x, ssize())
        {
          if (content[x].get_ValueType() == TV_FUN)
             {
@@ -1039,7 +1268,7 @@ Prefix::print(ostream & out, int indent) const
 {
    loop(i, indent)   out << "    ";
    out << "Token: ";
-   loop(s, size())   out << " " << at(s).get_token();
+   loop(s, ssize())   out << " " << at(s).get_token();
    out << endl;
 }
 //----------------------------------------------------------------------------
@@ -1113,9 +1342,49 @@ Prefix::adjust_right_caret(Function_PC2 & range,
              }
        }
 }
-//============================================================================
+//----------------------------------------------------------------------------
+DerivedFunction *
+Prefix::get_fun_oper_slot(const char * loc) const
+{
+   return si.get_fun_oper_slot(LOC);
+}
+//----------------------------------------------------------------------------
+void
+Prefix::set_action(const Token & result)
+{
+   switch(result.get_Class())
+      {
+        case TC_VALUE:
+        case TC_VOID:
+        case TC_END:
+        case TC_FUN2:
+             set_action(RA_CONTINUE);
+             return;
+
+        case TC_RETURN:
+             // result was one of TOK_RETURN_EXEC, TOK_RETURN_STATS,
+             // TOK_RETURN_VOID, or TOK_RETURN_SYMBOL.
+             // The current context is complete and may or may not
+             // have produced a value.
+             //
+             set_action(RA_RETURN);
+             return;
+
+        case TC_SI_CHANGE:
+             //
+             // result was TOK_SI_PUSHED or TOK_ERROR
+             if (result.get_tag() == TOK_ERROR)   set_action(RA_RETURN);
+             else                                 set_action(RA_SI_PUSHED);
+             return;
+
+        default: CERR << "CLASS = " << result.get_Class()
+                      << " at " << LOC << endl;
+                 FIXME;
+      }
+}
+//=======================================================================
 //
-// phrase reduce functions...
+// e reduce functions...
 //
 //----------------------------------------------------------------------------
 void
@@ -1163,8 +1432,8 @@ Prefix::reduce_LPAR_F_C_RPAR()
    // before: ( F C )
    // after:  F C
    //
-   at3().move(at2(), LOC);   // move C left
-   at2().move(at1(), LOC);   // move F left
+   at3().move_from(at2(), LOC);   // move C left
+   at2().move_from(at1(), LOC);   // move F left
    pop_and_discard();          // discard old C
    pop_and_discard();          // discard old RPAR
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1189,7 +1458,12 @@ Prefix::reduce_MISC_F_B_()
 
    if (saved_MISC.get_Class() == TC_INDEX)
       {
-        if (value_expected())
+        // resolve a potential SHIFT/REDUCE conflict. If [] belongs to
+        // an indexed left value A[...] then we must not reduce with
+        // monadic F, but shift [] for the dyadyc F to reduce A[] F B
+        // later on..
+        //
+        if (value_expected())   // then SHIFT
            {
              // push [...] and read one more token
              //
@@ -1198,141 +1472,180 @@ Prefix::reduce_MISC_F_B_()
              set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
+
+        // fall through (REDUCE)
       }
 
 const Token result = at0().get_function()->eval_B(at1().get_apl_val());
-   if (result.get_Class() == TC_SI_LEAVE)
+   if (result.get_Class() != TC_SI_CHANGE)   // the normal case
       {
-        if (result.get_tag() == TOK_SI_PUSHED)   goto done;
+        pop_args_push_result(result);
+        set_action(result);
+        return;
+      }
+   
+    /* the executing of monadic at0().get_function() resulted in a
+       change of the current )SI entry. This change could have been in
+       in two directions:
 
-        /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
-                 and TOK_QUAD_ES_ERR below can only occur if:
+       1. a new )SI entry was pushed. This is the most common case
+          after a defined function was called. In this case the current
+          parser is abandoned until the new )SI entry returns.
 
-            1. ⎕EA resp. ⎕EB is called; each is implemented as macro
-               Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
+       2. ⎕ES (Event Simulate) has simulated an event (with one of
+              the ⎕EC results like:
+       2a.    0 - Error,
+       2b.    1 - non-committed value,
+       2c.    2 - committed value,
+       2d.    3 - missing value (function w/o a result),
+       2e.    4 - branch to function line, or
+       2f.    5 - escape from function.
 
-            2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
-
-            Token result is the return token of Quad_ES::eval_AB() or
-            Quad_ES::eval_B() and contains the right argument B (as set in
-            the macro).
-
-            We must check that ⎕ES 100 was not called directly, but only via
-            ⎕EA or ⎕EB.
-         */
-
-        if (result.get_tag() == TOK_QUAD_ES_COM)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
-
-             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-             if (QES_arg2.is_pointer_cell())
-                {
-                  Value_P val = QES_arg2.get_pointer_value();
-                  new (&si_pushed)  Token(TOK_APL_VALUE2, val);
-                }
-             else
-                {
-                  Value_P scalar(LOC);
-                  scalar->next_ravel_Cell(QES_arg2);
-                  scalar->check_value(LOC);
-                  new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
-                }
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_ESC)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-             new (&si_pushed)  Token(TOK_ESCAPE);
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_BRA)
-           {
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-
-             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
-             const APL_Integer line = QES_arg2.get_int_value();
-
-             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-
-             Value_P v_line = IntScalar(line, LOC);
-             Workspace::SI_top()->jump(v_line.get());
-             return;
-           }
-
-        if (result.get_tag() == TOK_QUAD_ES_ERR)
-           {
-             // this case can only occur with ⎕EA, but not with ⎕EB.
-
-             // make sure that ⎕ES was called from a macro (implies parent)
-             //
-             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
-                DOMAIN_ERROR;
-
-             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
-             StateIndicator * top = Workspace::SI_top();
-
-             Token & si_pushed = top->get_prefix().at0();
-             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-
-             const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
-             UCS_string statement_A(  *QES_arg[2].get_pointer_value());
-             const APL_Integer major = QES_arg[3].get_int_value();
-             const APL_Integer minor = QES_arg[4].get_int_value();
-             const ErrorCode ec      = ErrorCode(major << 16 | minor);
-
-             Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
-             if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
-                {
-                  Workspace::SI_top()->get_prefix().at0().move(result_A, LOC);
-                  return;
-                }
-             new (&StateIndicator::get_error(top)) Error(ec, LOC);
-             return;
-           }
-
-        // at this point a normal monadic function (i.e. other than ⎕EA/⎕EB)
-        // has returned an error
-        //
-        if (push_error(result))   return;
-
-        // not reached
-        Q1(result.get_tag())
-        FIXME;
+          Normally ⎕ES has pop'ed the )SI stack, so this parser does
+          not exist anymore (and we must not use its member.
+          in particular si
+     */
+   if (result.get_tag() == TOK_SI_PUSHED)   // case 1.
+      {
+        pop_args_push_result(result);
+        set_action(result);
+        return;
       }
 
-done:
-   pop_args_push_result(result);
-   set_action(result);
+   /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
+            and TOK_QUAD_ES_ERR below can only occur if:
+
+       1. ⎕EA resp. ⎕EB is called; each is implemented as macro
+          Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
+
+       2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
+
+       Token result is the return token of Quad_ES::eval_AB() or
+       Quad_ES::eval_B() and contains the right argument B (as set in
+       the macro).
+
+       We must check that ⎕ES 100 was not called directly, but only via
+       ⎕EA or ⎕EB.
+    */
+
+   switch(result.get_tag())
+       {
+         default: break;
+         case TOK_QUAD_ES_COM:   handle_QUAD_ES_COM(result);   return;
+         case TOK_QUAD_ES_ESC:   handle_QUAD_ES_ESC();         return;
+         case TOK_QUAD_ES_BRA:   handle_QUAD_ES_BRA(result);   return;
+         case TOK_QUAD_ES_ERR:   handle_QUAD_ES_ERR(result);   return;
+      }
+
+   // at this point a normal monadic function (i.e. other than ⎕EA/⎕EB)
+   // has returned an error
+   //
+   if (push_error(result))   return;
+
+   // not reached
+   //
+   Q1(result.get_tag())
+   FIXME;
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_COM(const Token & result)
+{
+   // make sure that ⎕ES was called from a macro (which implies
+   // that it has a parent).
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
+
+const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+   if (QES_arg2.is_pointer_cell())
+      {
+        Value_P val = QES_arg2.get_pointer_value();
+        new (&si_pushed)  Token(TOK_APL_VALUE2, val);
+      }
+   else
+      {
+        Value_P scalar(LOC);
+        scalar->next_ravel_Cell(QES_arg2);
+        scalar->check_value(LOC);
+        new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
+      }
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_ESC()
+{
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+   new (&si_pushed)  Token(TOK_ESCAPE);
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_BRA(const Token & result)
+{
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
+const APL_Integer line = QES_arg2.get_int_value();
+
+Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+
+Value_P v_line = IntScalar(line, LOC);
+   Workspace::SI_top()->jump(v_line.get());
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_QUAD_ES_ERR(const Token & result)
+{
+   // this case can only occur with ⎕EA, but not with ⎕EB.
+
+   // make sure that ⎕ES was called from a macro (implies parent)
+   //
+   if (Workspace::SI_top()->function_name()[0] != UNI_MUE)   DOMAIN_ERROR;
+
+   Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+StateIndicator * top = Workspace::SI_top();
+
+Token & si_pushed = top->get_prefix().at0();
+   Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+
+const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
+UCS_string statement_A(  *QES_arg[2].get_pointer_value());
+const APL_Integer major = QES_arg[3].get_int_value();
+const APL_Integer minor = QES_arg[4].get_int_value();
+const ErrorCode ec      = ErrorCode(major << 16 | minor);
+
+Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
+   if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
+      {
+        Workspace::SI_top()->get_prefix().at0().move_from(result_A, LOC);
+        return;
+      }
+   new (&StateIndicator::get_error(top)) Error(ec, LOC);
 }
 //----------------------------------------------------------------------------
 void
 Prefix::reduce_MISC_F_C_B()
 {
-   Assert1(prefix_len == 3);
+   Assert1(prefix_len == 3);   // F C B
+
+cMonOP  M = at0().get_function();
+Value_P C = at1().get_function_axis();
+Value_P B = at2().get_apl_val();
 
    if (saved_MISC.get_Class() == TC_INDEX)
       {
@@ -1347,43 +1660,43 @@ Prefix::reduce_MISC_F_C_B()
            }
       }
 
-   if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
+   // ⎕FIO and ⌹ are primarily functions, but have subfunctions that are
+   // operators. If saved_MISC is a function, then M was possibly called
+   // as an operator and we derive it here if the subfunction was anindeed
+   // an operator.
+   //
+   if (saved_MISC.get_Class() == TC_FUN12)
       {
-        // the user has mistakenly used a bracket index instead of a
-        // function axis. We must delete the current IndexExpr before
-        // throwing the syntax error.
+        // C may have more than one item, so we should call get_sole_integer()
+        // only after having checked that M is ⎕FIO The subfunction which is
+        // an operator is ⎕FIO[49] aka. ⎕FIO,read_text
         //
-        IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC
-                               << endl;
-        delete idx;
-        at1().clear(LOC);
-        SYNTAX_ERROR;
+        const TokenTag tag_M = at0().get_tag();
+        if (tag_M == TOK_Quad_FIO && C->get_sole_integer() == 49)
+           {
+             Token & LO = saved_MISC.get_token();
+             DerivedFunction * derived = get_fun_oper_slot(LOC);
+             new (derived)  Derived_LO_M_X(LO, M, C, LOC);
+             clear_MISC(LOC);
+
+             const Function_PC pc_M = at(0).get_PC();   // PC of M
+             pop_and_discard();   // pop M
+             pop_and_discard();   // pop C
+                                  // but leave B
+             Token tok_Derived(TOK_FUN2, derived);
+             Token_loc tl_Derived(tok_Derived, pc_M);
+             push(tl_Derived);
+             prefix_len = 2;   // only f ⎕FIO resp. f ⌹
+             set_action(RA_CONTINUE);   // match again (w/o SHIFT)
+             return;
+           }
       }
 
-   if (!at1().get_apl_val())   SYNTAX_ERROR;
+const Token Z = M->eval_XB(C, B);
+   if (push_error(Z))   return;
 
-   if (at0().get_tag() == TOK_Quad_FIO &&
-       saved_MISC.get_Class() == TC_FUN12)
-      {
-        DerivedFunction * derived =
-                          Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived)   DerivedFunction(saved_MISC.get_token(),
-                                        at0().get_function(),
-                                        at1().get_apl_val(),  LOC);
-        saved_MISC.get_token().clear(LOC);
-        prefix_len = 2;   // only f ⎕FIO
-        pop_args_push_result(Token(TOK_FUN2, derived));
-        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
-        return;
-      }
-
-const Token result = at0().get_function()->eval_XB(at1().get_apl_val(),
-                                                   at2().get_apl_val());
-   if (push_error(result))   return;
-
-   pop_args_push_result(result);
-   set_action(result);
+   pop_args_push_result(Z);
+   set_action(Z);
 }
 //----------------------------------------------------------------------------
 void
@@ -1402,32 +1715,36 @@ const Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
 void
 Prefix::reduce_A_M_B_()
 {
-   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_B_();
+   if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_B_();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
 void
 Prefix::reduce_A_F_C_B()
 {
-   Assert1(prefix_len == 4);
+   Assert1(prefix_len == 4);   // A F C B
 
-   if (at2().get_ValueType() != TV_VAL)   SYNTAX_ERROR;
-   if (!at2().get_apl_val())              SYNTAX_ERROR;
+Value_P     A = at0().get_apl_val();
+cFunction_P F = at1().get_function();
+Value_P     C = at2().get_function_axis();
+Value_P     B = at3().get_apl_val();
 
-const Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
-                                                    at2().get_apl_val(),
-                                                    at3().get_apl_val());
+const Token Z = F->eval_AXB(A, C, B);
 
-   if (push_error(result))   return;
+   // result could be a value or an error
+   //
+   if (push_error(Z))   return;   // if result was an error
 
-   pop_args_push_result(result);
-   set_action(result);
+   // result was a value
+   //
+   pop_args_push_result(Z);
+   set_action(Z);
 }
 //----------------------------------------------------------------------------
 void
 Prefix::reduce_A_M_C_B()
 {
-   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_C_B();
+   if (at1().is_SLASH_or_BACKSLASH())   return reduce_A_F_C_B();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
@@ -1436,9 +1753,11 @@ Prefix::reduce_F_M__()
 {
    Assert1(prefix_len == 2);
 
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
+Token & LO_F = at0();
+cMonOP     M = at1().get_function();
+
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_M(LO_F, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1463,7 +1782,7 @@ Prefix::MM_is_FM(Function_PC pc)
 
        NOTE: if M1 is an operator then its left argument must either be a
              value or a function. Therefore the token in metaclass MISC,
-             i.e. ← → ; [ END or ( imply that M1 shall be a function F
+             i.e. ← → ; [ END or ( implies that M1 shall be a function F
              (which, unless M1 / ⌿ \ or ⍀) will rise a syntax error in
              reduce_F_M__().
     */
@@ -1490,14 +1809,14 @@ Prefix::MM_is_FM(Function_PC pc)
                                     //               │ │ │
               case TC_FUN12:        //               + / ¨ (1 2)(3 4)(5 6)
               case TC_OPER1:        // M1 is M       / / ¨ (1 2)(3 4)(5 6)
-                   return false;
+                   return false;    // MM is operator
 
               case TC_SYMBOL:
                    return NEXT.get_sym_ptr()->M_is_F();
 
-              // TC_INDEX should not happen here since body[PC]... have
-              // not yet been parsed
-              case TC_INDEX: FIXME
+              // most likely an indexed value
+              case TC_INDEX:
+                   return true;   // MM is function
 
               case TC_R_BRACK:   // skip over [ ... ]
                    pc = Function_PC(int(pc) + body[pc].get_int_val2());
@@ -1516,7 +1835,7 @@ Prefix::MM_is_FM(Function_PC pc)
 void
 Prefix::reduce_M_M__()
 {
-   if (is_SLASH_or_BACKSLASH(at0().get_tag()) && MM_is_FM(PC))
+   if (at0().is_SLASH_or_BACKSLASH() && MM_is_FM(PC))
       {
         reduce_F_M__();
       }
@@ -1531,8 +1850,11 @@ Prefix::reduce_A_M__()
 {
    Assert1(prefix_len == 2);
 
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
+Token & LO_A = at0();
+cMonOP     M = at1().get_function();
+
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_M(LO_A, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1543,18 +1865,12 @@ Prefix::reduce_F_M_C_()
 {
    Assert1(prefix_len == 3);
 
-   if (at2().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+Token & LO_F = at0();
+cMonOP     M = at1().get_function();
+Value_P C      = at2().get_function_axis();
 
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(),
-                                 at1().get_function(),
-                                 at2().get_axes(), LOC);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_M_X(LO_F, M, C, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1565,22 +1881,16 @@ Prefix::reduce_F_C_M_()
 {
    Assert1(prefix_len == 3);
 
-   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+cFunction_P LO_F = at0().get_function();
+Value_P        C = at1().get_function_axis();
+cMonOP         M = at2().get_function();
 
-DerivedFunction * F_C =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(),
-                             at1().get_axes(), LOC);
+DerivedFunction * derived_F_C = get_fun_oper_slot(LOC);
+   new (derived_F_C) Derived_F_X(LO_F, C, LOC);
 
-Token tok_F_C(TOK_FUN2, F_C);
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(tok_F_C, at2().get_function(), LOC);
+Token tok_F_C(TOK_FUN2, derived_F_C);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_M(tok_F_C, M, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1591,28 +1901,17 @@ Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
 
-   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+cFunction_P F  = at0().get_function();
+Value_P     FX = at1().get_axes();
+cMonOP      M  = at2().get_function();
+Value_P     MX = at3().get_function_axis();
 
-   if (at3().get_tag() != TOK_AXIS)   // e.g. M[;2] instead of M[2]
-      {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
-      }
+DerivedFunction * derived_F_C = get_fun_oper_slot(LOC);
+   new (derived_F_C) Derived_F_X(F, FX, LOC);
 
-DerivedFunction * F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(), at1().get_axes(), LOC);
-
-Token tok_F_C(TOK_FUN2, F_C);
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(tok_F_C, at2().get_function(),
-                                          at3().get_axes(), LOC);
+Token tok_F_C(TOK_FUN2, derived_F_C);
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_M_X(tok_F_C, M, MX, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1621,46 +1920,79 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_B_()
 {
-   // same as G2, except for ⍤
+Token &  LO_F = at0();
+cDyaOP   D    = at1().get_function();
+Value_P  RO_B = at2().get_apl_val();
+
+   // same as F D G, except for D = ⍤ or ⍣
    //
-   if (at1().get_function()->get_Id() != ID_OPER2_RANK)
+const Id id_D = D->get_Id();
+   if (id_D != ID_OPER2_RANK && id_D != ID_OPER2_POWER)
       {
          reduce_F_D_G_();
          return;
       }
 
-   // we have f ⍤ y_B with y_B glued beforehand. Unglue it.
-   //
-Value_P y123;
-Value_P B;
-   Bif_OPER2_RANK::split_y123_B(at2().get_apl_val(), y123, B);
-Token new_y123(TOK_APL_VALUE1, y123);
+   /* At this point we have:
+ 
+      f ⍤ RO with RO←(y B) that were stranded together in Parser.cc, or else
+      f ⍣ RO with RO←(N B) that were stranded together in Parser.cc.
 
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), new_y123, LOC);
+      Unstrand RO into y resp. N and (maybe) B. NOTE that in this context
+      B is y resp. N of the strand RO and not the real right argument B of
+      (f ⍤ RO) B resp. (f ⍣ RO) B.
+     
+      There may or may not be a left A on the way. Since f can be nomadic
+      we do not know if a left argument A for f⍤ is coming and we have to
+      create a derived function instead of calling >eval_ALRB() or eval_LRB()
+      of ⍤ directly.
+    */
+Value_P value_B;   // the original B (before stranding RO and B).
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   {
+     Value_P value_RO;   // j123 (for ⍤) or N (for ⍣)
+     if (id_D == ID_OPER2_RANK)
+        Bif_OPER2_RANK::unstrand_RO_B(RO_B, value_RO, value_B);
+     else
+        Bif_OPER2_POWER::unstrand_RO_B(RO_B, value_RO, value_B);
 
-const Token result(TOK_FUN2, derived);
+     Token tok_RO(TOK_APL_VALUE1, value_RO);
+     new (derived) Derived_LO_D_RO(LO_F, D, tok_RO, LOC);
+   }
 
-   if (!B)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
-      {
-        pop_args_push_result(result);
-      }
-   else      // a new B split off from the original B
+   /* for unstrand_RO_B() there are 2 main cases:
+ 
+      case 1: y and B were stranded into y_B, for example: f ⍤ y B.
+              In this case unstrand_RO_B() returns y and a valid B
+
+      case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
+              f ⍤ y SYM In this case unstrand_RO_B() returns only y and no
+              valid B. The right argument B is waiting on the stack (at
+              at3() for f⍤B, or at at4() for (f⍤B), or at a5() for ((f⍤B)),
+              and so on.
+    */
+const Token dD(TOK_FUN2, derived);
+
+   if (+value_B)   // case 1 (valid B)
       {
         // save locations of ⍤ and B
         //
         const Function_PC pc_D = at(1).get_PC();
         const Function_PC pc_B = at(2).get_PC();
 
-        pop_and_discard();   // pop F
-        pop_and_discard();   // pop C
-        pop_and_discard();   // pop B (old)
+        pop_and_discard();   // pop LO_F
+        pop_and_discard();   // pop D
+        pop_and_discard();   // pop y_B
 
-        Token new_B(TOK_APL_VALUE1, B);
-        Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(result, pc_D);
-        push(tl_B);
-        push(tl_derived);
+        Token B(TOK_APL_VALUE1, value_B);
+        Token_loc tloc_B(B, pc_B);
+        Token_loc tloc_dD(dD, pc_D);
+        push(tloc_B);    // was y_B
+        push(tloc_dD);   // was D
+      }
+   else    // case 2: only y123, but no B (e.g. (f ⍤ 1 2 3) B
+      {
+        pop_args_push_result(dD);
       }
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1669,14 +2001,22 @@ const Token result(TOK_FUN2, derived);
 void
 Prefix::reduce_D_V__()
 {
-   /* end of an A.B.C...V chain. at0() is the final member V and at1() is
-      the '.' (aka. D) before V. Collect the members (and discard the '.'
-      preceeding them) until no more '.' token are found.
+   /* This is the end of an A.B.C...V chain.
+
+      at0() is the final member V, and
+      at1() is the '.' (aka. D) before V.
+
+      Collect the members (and discard the '.' preceeding them)
+      until no more '.' token are found.
 
       Prefix::reduce_D_V__() is called from two places:
 
-      1. from reduce_statements() with prefix_len == 2, or else
-      2. from reduce_D_V_ASS_B()  with prefix_len == 4.
+      case 1. from reduce_statements() with prefix D V and (therefore
+               prefix_len == 2), or else
+
+      case 2. from reduce_D_V_ASS_B() and therefore prefix_len == 4.
+
+      case 1 is called via best_phrase->reduce_fun)() with best_phrase D V.
 
       The processing of member variables is somewhat lengthy and almost the
       same for member reference and for member assignment. We therefore
@@ -1685,14 +2025,15 @@ Prefix::reduce_D_V__()
     */
 
 const bool member_assign = prefix_len == 4;   // assume member reference
-   if (prefix_len == 2)        // case 1: member reference
+   if (prefix_len == 2)      // case 1: member reference
       {
+        Assert(get_assign_state() != ASS_var_seen);
       }
-   else if (member_assign)     // case 2: member assignment
+   else if (member_assign)   // case 2: member assignment
       {
         Assert(get_assign_state() == ASS_var_seen);   // by reduce_D_V_ASS_B
       }
-   else                        // something unexected
+   else                      // something unexected
       {
         Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
         return;
@@ -1715,10 +2056,10 @@ const bool member_assign = prefix_len == 4;   // assume member reference
       then e.g. ⎕CR.subfun is replaced with ⎕CR[fun] where fun is the function
       number corresponding for the subfunction name subfun. Dito for ⎕FIO.
     */
-basic_string<const UCS_string *>members;
+vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
-   while (PC < (body.size() - 1))   // at least 2 more token
+   while (PC < body.ssize() - 1)   // at least 2 more token
          {
            if (body[PC].get_Class() == TC_SYMBOL)   // the normal case
               {
@@ -1781,10 +2122,12 @@ Value_P top_val = top_sym->get_var_value();
       {
         if (member_assign)
            {
-             // VAR.member ← value. The user assigns a value to the member of
-             // a structured variable that does not yet exist. We do the same
-             // as for VAR←value for not existing APL variables, i.e. we
-             // create it automatically.
+             // VAR.member ← value.
+             //
+             // The user assigns a value to the member of a structured
+             // variable that does not yet exist. We do the same as for
+             // VAR←value for not existing APL variables, i.e. we create
+             // t automatically.
              //
              top_val = EmptyStruct(LOC);
              top_sym->assign(top_val, false, LOC);
@@ -1801,17 +2144,19 @@ Value_P top_val = top_sym->get_var_value();
                     << top_sym->get_name() << " for member ";
              more.append_members(members, 0);
              more << " not found";
-             VALUE_ERROR;
+             VALUE_ERROR;   // bail out
            }
       }
 
-Value * member_owner = 0;
-Cell * member_cell = top_val->get_member(members, member_owner,
-                                         member_assign, true);
-   Assert(member_owner);
+   // at this point the structured variable exist, either beforehand or
+   // created above
 
-   if (member_assign)   // (direct) member assignment
+   if (member_assign)   // (direct) member assignment e.g. A.B.C←V
       {
+        Value * member_owner = 0;
+        Cell * member_cell = top_val->get_member(members, member_owner, true);
+        Assert(member_owner);
+
         if (member_cell->is_member_anchor())
            {
              UCS_string & more = MORE_ERROR() <<
@@ -1836,6 +2181,9 @@ Cell * member_cell = top_val->get_member(members, member_owner,
       }
    else                 // member reference (or selective specification)
       {
+        const Cell * member_cell = top_val->get_existing_member(members);
+        Assert(member_cell);
+
         if (member_cell->is_member_anchor() &&
             get_assign_state() == ASS_arrow_seen)
            {
@@ -1850,6 +2198,7 @@ Cell * member_cell = top_val->get_member(members, member_owner,
             {
               if (get_assign_state() == ASS_arrow_seen)   // selective spec.
                  {
+                   set_assign_state(ASS_none);
                    Value_P cell_refs = member_cell->get_pointer_value()
                                                  ->get_cellrefs(LOC);
                    pop_args_push_result(Token(TOK_APL_VALUE2, cell_refs));
@@ -1876,9 +2225,14 @@ Cell * member_cell = top_val->get_member(members, member_owner,
 void
 Prefix::reduce_F_D_G_()
 {
-DerivedFunction * derived =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(), at2(), LOC);
+   // bind F and G to D.
+   //
+Token &     LO_F = at0();
+cFunction_P D    = at1().get_function();
+Token &     RO_G = at2();
+
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   new (derived) Derived_LO_D_RO(LO_F, D, RO_G, LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1887,68 +2241,106 @@ DerivedFunction * derived =
 void
 Prefix::reduce_F_D_C_B()
 {
-   // reduce, except if another dyadic operator is coming. In that case
-   // F belongs to the other operator and we simply continue.
-   //
-   if (PC < Function_PC(body.size()))
-        {
-          const Token & tok = body[PC];
-          TokenClass next =  tok.get_Class();
-          if (next == TC_SYMBOL)
-             {
-               Symbol * sym = tok.get_sym_ptr();
-               const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
-               next = sym->resolve_class(is_left_sym);
-             }
+Token & LO_F = at0();
+cDyaOP     D = at1().get_function();
+Value_P  X_C = at2().get_function_axis();
+Value_P RO_B = at3().get_apl_val();
 
-          if (next == TC_OPER2)
-             {
-               set_action(RA_PUSH_NEXT);   // aka. SHIFT
-               return;
-             }
-        }
-   // we have f ⍤ [X] y_B with y_B glued beforehand. Unglue it.
-   //
-Value_P y123;
-Value_P B;
-   Bif_OPER2_RANK::split_y123_B(at3().get_apl_val(), y123, B);
-Token new_y123(TOK_APL_VALUE1, y123);
+const Function_PC pc_D = at(1).get_PC();
 
-   if (at2().get_tag() != TOK_AXIS)   // e.g. D[;2] instead of D[;2]
+   // reduce, unless if another dyadic operator is coming. In that case
+   // F is the right operand of the other operator (and not the left operand
+   // of D and we simply continue (because right operand binds stronger than
+   // left operand).
+   //
+   if (PC < Function_PC(body.ssize()))   // more token ahead
       {
-        // the user has provided a TOK_INDEX where TOK_AXIS was expected
-        MORE_ERROR() << "illegal ; in axis";
-        AXIS_ERROR;
+        const Token & tok = body[PC];
+        TokenClass next =  tok.get_Class();
+        if (next == TC_SYMBOL)
+           {
+             Symbol * sym = tok.get_sym_ptr();
+             const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+             next = sym->resolve_class(is_left_sym);
+           }
+
+        if (next == TC_OPER2)
+           {
+             set_action(RA_PUSH_NEXT);   // aka. SHIFT
+             return;
+           }
       }
 
-Value_P v_idx = at2().get_axes();
-DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(),
-                                 v_idx, new_y123, LOC);
-
-const Token result(TOK_FUN2, derived);
-
-   if (!B)   // only y123, no B (e.g. (f ⍤[X] 1 2 3)
+   if (D != &Bif_OPER2_RANK::fun)   // the normal case
       {
-        pop_args_push_result(result);
-      }
-   else      // a new B split off from the original B
-      {
-        // save locations of ⍤ and B
-        //
-        const Function_PC pc_D = at(1).get_PC();
-        const Function_PC pc_B = at(3).get_PC();
-
-        pop_and_discard();   // pop F
+        DerivedFunction * derived = get_fun_oper_slot(LOC);
+        new (derived) Derived_LO_D_RO(LO_F, D, at2(), LOC);
+        pop_and_discard();   // pop LO_F
         pop_and_discard();   // pop D
         pop_and_discard();   // pop C
-        pop_and_discard();   // pop B (old)
+        Token tok_derived(TOK_FUN2, derived);
+        Token_loc tloc_D(tok_derived, pc_D);
+        push(tloc_D);
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
+        return;
+      }
 
-        Token new_B(TOK_APL_VALUE1, B);
-        Token_loc tl_B(new_B, pc_B);
-        Token_loc tl_derived(result, pc_D);
-        push(tl_B);
-        push(tl_derived);
+   /* At this point we have the special case: (A) f ⍤[X] y_B
+      with y_B stranded together in Parser.cc.  Unstrand y_B into y
+      and (maybe) B. NOTE that B is y (and not the real B).
+     
+      There may or may not be a left A on the way. Since f can be nomadic
+      we do not know if a left argument A for f⍤ is coming and we have to
+      create a derived function instead of calling >eval_ALRB() or eval_LRB()
+      of ⍤ directly.
+
+      Note that X_C is the axes for LO_F (for the final disclose of the
+      NARS variant of ⍤ with axes.
+    */
+Value_P value_B;   // the original B (before stranding j and B).
+DerivedFunction * derived = get_fun_oper_slot(LOC);
+   {
+     Value_P y123;
+     Bif_OPER2_RANK::unstrand_RO_B(RO_B, y123, value_B);
+     Token T_y123_orig_RO(TOK_APL_VALUE1, y123);
+
+     new (derived) Derived_LO_D_X_RO(LO_F, D, X_C, T_y123_orig_RO, LOC);
+   }
+
+   /* for unstrand_RO_B() there are 2 main cases:
+ 
+      case 1: y and B were stranded into y_B, for example: f ⍤ y B.
+              In this case unstrand_RO_B() returns y and a valid B
+
+      case 2: y and B were not stranded into y_B, for example: (f ⍤ y) B or
+              f ⍤ y SYM In this case unstrand_RO_B() returns only y and no
+              valid B. The right argument B is waiting on the stack (at
+              at4() for f⍤B, or at at5() for (f⍤B), or at a6() for ((f⍤B)),
+              and so on.
+    */
+const Token tok_derived(TOK_FUN2, derived);
+
+   if (+value_B)   // case 1 (valid B)
+      {
+        const Function_PC pc_B = at(3).get_PC();
+
+        pop_and_discard();   // pop LO_F
+        pop_and_discard();   // pop D
+        pop_and_discard();   // pop C
+        pop_and_discard();   // pop y_B
+
+        Token B(TOK_APL_VALUE1, value_B);
+        Token_loc tloc_B(B, pc_B);
+        Token_loc tloc_dD(tok_derived, pc_D);
+        push(tloc_B);    // was y_B
+        push(tloc_dD);   // was D
+      }
+   else    // case 2: only y123, but no B (e.g. (f ⍤[X] 1 2 3) B
+      {
+        // replace F, D, C, and B with derived. Note that B is RO and not
+        // the real B for derived.
+        //
+        pop_args_push_result(tok_derived);
       }
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1960,13 +2352,13 @@ Prefix::reduce_A_C__()
 Value_P A = at0().get_apl_val();
 Value_P Z;
 
-   if (at1().get_tag() == TOK_AXIS)
+   if (at1().get_tag() == TOK_AXIS)   // [] or [IX]
       {
         Z = A->index(at1().get_apl_val().get());
       }
-   else
+   else                               // [I1; I2...]
       {
-        IndexExpr * idx =  &at1().get_index_val();
+        const IndexExpr * idx =  &at1().get_index_val();
         try
            {
              Z = A->index(*idx);
@@ -1997,7 +2389,7 @@ Prefix::reduce_V_C__()
 {
 Symbol * V = at0().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);   // not Token & !
-   at0().move(tok, LOC);
+   at0().move_from(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2029,7 +2421,7 @@ Value_P B = at3().get_apl_val();
       }
    else                               // [a;...]
       {
-        IndexExpr * idx = &at1().get_index_val();
+        const IndexExpr * idx = &at1().get_index_val();
         try
            {
              V->assign_indexed(*idx, B);
@@ -2065,7 +2457,7 @@ Prefix::reduce_F_V__()
    //
 Symbol * V = at1().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);   // not Token & !
-   at1().move(tok, LOC);
+   at1().move_from(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2185,12 +2577,12 @@ Token result = at1();
         if (idx.is_axis())
            {
              Token tok_axis(TOK_AXIS, idx.values[0]);
-             result.move(tok_axis, LOC);
+             result.move_from(tok_axis, LOC);
            }
         else
            {
                Token tok_index(TOK_INDEX, idx);
-               result.move(tok_index, LOC);
+               result.move_from(tok_index, LOC);
            }
       }
    else
@@ -2224,7 +2616,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
              Value_P X = idx.extract_axis();
              Assert1(+X);   // not [ ]
              Token tok_axis(TOK_AXIS, X);
-             I.move(tok_axis, LOC);
+             I.move_from(tok_axis, LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;
@@ -2232,7 +2624,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
         else
            {
              Token tok_index(TOK_INDEX, idx);
-             I.move(tok_index, LOC);
+             I.move_from(tok_index, LOC);
            }
       }
    else
@@ -2249,11 +2641,57 @@ Prefix::reduce_A_B__()
 {
    Assert1(prefix_len == 2);
 
-Token result;
-   Value::glue(result, at0(), at1(), LOC);
+   /* vector notation. Glue A and B together, unless A is the right operand
+      of a dyadic operator.
+
+      Right operand is the only case where vector notation binds weaker
+      (since bracket (i.e. B[...]) and specification left (i.e. ←A) ido
+      obviously not apply here.
+
+       The only cases where A is a right operand are:
+
+    */
+const int pc_A = at(0).get_PC();
+   if (body[pc_A + 1].get_Class() == TC_OPER2)   // case 1.
+      {
+        /* case 1:
+
+                  ┌────────── PC_A + 1
+                  │   ┌────── PC_A
+                  │   │ ┌──── PC_A - 1
+         ... LO OPER2 A B ...   and
+         */
+        set_action(RA_PUSH_NEXT);
+        return;
+      }
+
+   if (body[pc_A + 1].get_Class() == TC_R_PARENT)   // maybe case 2.
+      {
+        /* case 2:
+
+                    ┌───────────────── PC_A + 3 + n   (with n = 0 if single ')')
+                    │    ┌──────────── PC_A + 2 + n   (with n = 0 if single ')')
+                    │    │ ┌────────── PC_A + 1
+                    │    │ │ ┌──────── PC_A
+                    │    │ │ │ ┌────── PC_A - 1
+         ... ( LO OPER2 RO ) A B) ...
+         */
+        // normally there is only one ), but there could be more.
+        //
+        int pc_RPAR = pc_A + 1;   // rightmost RPAR
+        while (body[pc_RPAR + 1].get_Class() == TC_R_PARENT)   ++pc_RPAR;
+        if (body[pc_RPAR + 2].get_Class() == TC_OPER2)   // definitively case 2
+           {
+             set_action(RA_PUSH_NEXT);
+             return;
+           }
+      }
+
+Value_P Z = Value::glue(at0(), at1(), LOC);
+const Token result(TOK_APL_VALUE3, Z);
    pop_args_push_result(result);
 
-   set_action(result);
+   set_action(RA_CONTINUE);
 }
 //----------------------------------------------------------------------------
 /// pattern V ) ← B.
@@ -2268,7 +2706,7 @@ Prefix::reduce_V_RPAR_ASS_B()
       2. vector assignment;         (C D ... V) ← B
     */
 
-basic_string<Symbol *> symbols;
+vector<Symbol *> symbols;
    symbols.reserve(10);
    symbols.push_back(at0().get_sym_ptr());   // i.e. the last symbol V
    collect_symbols(symbols);   // of the remaining symbols C D ...
@@ -2281,7 +2719,7 @@ basic_string<Symbol *> symbols;
         // false around line 820 in Parser.cc). We fix this case here.
         //
         const TokenClass tc = body[PC].get_Class();
-        if (!((1 << tc) & TCG_FUN12_OPER12))
+        if (!((1 << tc) & TCG_FUN12_OPER12))   // tc is neither fun nor oper
            {
              // this case is rather rare, so we can afford a little time
              // to verify that we have at least one function in the supposed
@@ -2314,31 +2752,33 @@ basic_string<Symbol *> symbols;
       }
 
    // at this point the pattern could still be a selective specification
-   // or a vector assignment. However, the count computed above shall
-   // distinguishes them, e.g.
+   // or a vector assignment. However, the count (i.e. symbol.size())
+   // computed above shall distinguishes them. For example:
    //
-   // (T U V) ← value        count = 2      vector assignment
-   //   (U V) ← value        count = 1      vector assignment
-   // (2 ↑ V) ← value        count = 0      selective specification
+   // case 1: (T U V) ← value        count = 2      vector assignment
+   // case 2:   (U V) ← value        count = 1      vector assignment
+   // case 3: (2 ↑ V) ← value        count = 0      selective specification
    //
    if (symbols.size() < 2)   // single variable V
       {
-        // definitively case 1. (selective specification).
+        // definitively case 3. (selective specification).
         // Replace variable V by its (left-) value and repeat matching
         //
         Symbol * V = at0().get_sym_ptr();
         Assert1(V);
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
-        at0().move(result, LOC);
+        at0().move_from(result, LOC);
 
-        // at thid point variable name V was resolved to the (left-) value
+        // at this point variable name V was resolved to the (left-) value
         // of V. Repeat matching with the updated phrase.
         //
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
+   // cases 1. or 2. (vector assugnment)
+   //
 Value_P B = at3().get_apl_val();
    Symbol::vector_assignment(symbols, B);
 
@@ -2348,9 +2788,62 @@ Value_P B = at3().get_apl_val();
    //
 const Token result(TOK_APL_VALUE2, at3().get_apl_val());
    pop_args_push_result(result);
-   if (lookahead().get_Class() != TC_L_PARENT)   syntax_error(LOC);
+   if (PC >= body.ssize() ||
+       body[PC++].get_Class() != TC_L_PARENT)   syntax_error(LOC);
 
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
+}
+//----------------------------------------------------------------------------
+void
+Prefix::handle_ELSE(const Token & maybe_else, int num)
+{
+   // the int value of TOK_IF_ELSE is the PC of the end of the ELSE clause.
+   //
+   if (maybe_else.get_tag() != TOK_IF_ELSE)   return;   // not ←→
+
+const Function_PC PC_from = PC = Function_PC(maybe_else.get_int_val());
+   while (body[PC].get_tag() == TOK_IF_END)   ++PC;   // nested else
+   if (body[PC].get_tag() == TOK_IF_ELSE)   // another ELSE clause
+      PC = Function_PC(body[PC].get_int_val());
+   Log(LOG_IfElse)
+      {
+        CERR << "END of THEN (" << num << ") reached, PC is now: " << PC
+             << "(" << PC_from << ")" << endl;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Prefix::reduce_END___()
+{
+   /*
+      this phrase occurs only if none of the other reduce_END_XXX phrases
+      has matched. This happens rarely if either:
+
+      1. the entire statement was empty (and then ssize() == 1).
+         However, empty statements are normaly optimized away (in
+         Executable::parse_body_line() around line 277) so that this does
+         not happen under normal conditions, but conditionals may become
+         an exception in the future. Currently empty conditional clauses
+         are rejected at parse time in Executable::parse_body_line() around
+         line 193, but this may change.
+
+         or otherwise:
+
+      2. an invalid phrase. In this case there are tokens other than B,
+         VOID, or GOTO phrases on the stack and the end of statment is
+         reacehd. This is a SYNTAX ERROR and we can throw it here rather
+         than shifting the END token and failing then.
+
+         will trigger a SYNTAX ERROR because END X will not match.
+    */
+
+   if (ssize() > 1)   push_END_error();   // case 2
+
+   handle_ELSE(at0(), 1);
+
+   // case 1 (empty statement)
+   put = 0;
+   set_action(RA_PUSH_NEXT);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2358,22 +2851,23 @@ Prefix::reduce_END_VOID__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
 const bool trace = end_of_line && (at0().get_int_val() & 1);
 
-   pop_and_discard();   // pop END
-   pop_and_discard();   // pop VOID
+   handle_ELSE(at0(), 3);
+
+   put = 0;             // pop END and VOID
 
 Token Void(TOK_VOID);
    si.statement_result(Void, trace);
    set_action(RA_PUSH_NEXT);   // aka. SHIFT
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }
@@ -2384,7 +2878,17 @@ Prefix::reduce_END_B__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)
+      {
+        UCS_string & more = MORE_ERROR();
+        more << "non-empty stack at end of statement:";
+        loop(s, ssize())
+           {
+             const TokenTag tag = at(s).get_tag();
+             more << " " << Token::class_name(tag);
+           }
+        syntax_error(LOC);
+      }
 
 const Token END = pop().get_token();   // pop END
 const bool end_of_line = END.get_tag() == TOK_ENDL;
@@ -2394,36 +2898,20 @@ Token B = pop().get_token();   // pop B
 
    if (END.get_tag() == TOK_IF_THEN)   // end of condition B
       {
-        // B is supposed to be the Boolean condition of an if/else conditional
-        // END is the token after the condition (PC of the ELSE clause).
+        // B is the Boolean condition of an if/else conditional.
+        // END is the token after the condition (PC of the IF clause).
         //
-        // If COND is 1 then continue, wlse jump to the else clause
-        Value_P COND(B.get_apl_val());
-        if (COND->element_count() != 1)
+        // If COND is 1 then continue, else jump to the else clause
+        const bool cond = B.get_apl_val()->get_sole_bool();
+        if (!cond)   PC = Function_PC(END.get_int_val());   // else clause
+
+        Log(LOG_IfElse)
            {
-             if (COND->element_count())
-                MORE_ERROR() << "In B ←← ... →→ : condition B is too long";
-             else
-                MORE_ERROR() << "In B ←← ... →→ : condition B is empty";
-             LENGTH_ERROR;
+             if (cond)   CERR << "IF(1) : Proceeding with THEN clause";
+             else        CERR << "IF(0) : Jump to ELSE/ENDIF clause";
+             CERR << " PC is now: " << PC << endl;
            }
-        const Cell & c0 = COND->get_cfirst();
-         if (c0.is_near_one())         // continue with the THEN clause
-            {
-              Log(LOG_IfElse)   CERR << 
-                  "IF(1) : Proceeding with THEN clause, PC now: " << PC << endl;
-            }
-         else if (c0.is_near_zero())   // continue with the ELSE clause
-            {
-              PC = Function_PC(END.get_int_val());
-              Log(LOG_IfElse)     CERR <<
-                  "IF(0) : Jump to ELSE/ENDIF clause, PC now: " << PC << endl;
-            }
-         else
-            {
-             MORE_ERROR() << "In B ←← ... →→ : condition B is not Boolean";
-             DOMAIN_ERROR;
-            }
+
          set_action(RA_PUSH_NEXT);
          return;
       }
@@ -2434,7 +2922,7 @@ Token B = pop().get_token();   // pop B
    // TOK_IF_END:  the end of (or no) ELSE clause:   no op
    // TOK_END(L):  normal end of statement or line:  no op
    //
-   if (END.get_tag() == TOK_IF_END)
+   if (END.get_tag() == TOK_IF_END)   // ←←
       {
         Log(LOG_IfElse)   CERR << 
             "ENDIF reached, PC is now: " << PC << endl;
@@ -2444,27 +2932,20 @@ Token B = pop().get_token();   // pop B
         Log(LOG_IfElse)   CERR << 
             "ENDIF reached, fixed PC is now: " << PC << endl;
       }
-   else if (END.get_tag() == TOK_IF_ELSE)
+   else
       {
-        PC = Function_PC(END.get_int_val()); 
-        Log(LOG_IfElse)   CERR << 
-            "END of THEN reached, PC is now: " << PC << endl;
-        while (body[PC].get_tag() == TOK_IF_END)   ++PC;   // nested else
-        if (body[PC].get_tag() == TOK_IF_ELSE)
-           PC = Function_PC(body[PC].get_int_val());
-        Log(LOG_IfElse)   CERR << 
-            "END of THEN reached, fixed PC is now: " << PC << endl;
+        handle_ELSE(END, 2);   // maybe ←→
       }
 
    si.fun_oper_cache.reset();
    si.statement_result(B, trace);
 
    set_action(RA_PUSH_NEXT);   // aka. SHIFT
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }
@@ -2522,11 +3003,11 @@ const APL_Integer jump_offset = A0.get_near_int();
         // function (token ENDL). However, that skips the return of the
         // ∇-result. Fix it.
         //
-        if (PC >= body.size())           // PC at or past end of function
+        if (PC >= body.ssize())           // PC at or past end of function
            {
              Assert(body[PC-1].get_tag() == TOK_ENDL);
              Assert(body[PC].get_Class() == TC_RETURN);
-             PC = Function_PC(body.size() -1);
+             PC = Function_PC(body.ssize() -1);
            }
       }
    else         // ⍎ or ◊ context
@@ -2591,6 +3072,7 @@ const Token result = si.jump(line);   // may change the PC
 
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
+        handle_ELSE(at0(), 4);
         reset(LOC);
         set_action(RA_PUSH_NEXT);   // again with modified stack
         return;
@@ -2613,11 +3095,11 @@ const Token result = si.jump(line);   // may change the PC
 void
 Prefix::check_interrupt_or_attention(bool end_of_line)
 {
-   if (attention_is_raised() && end_of_line)
+   if (InterruptContext::attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_is_raised();
-        clear_attention_raised(LOC);
-        clear_interrupt_raised(LOC);
+        const bool int_raised = InterruptContext::interrupt_is_raised();
+        InterruptContext::clear_attention_raised(LOC);
+        InterruptContext::clear_interrupt_raised(LOC);
         if (int_raised)   INTERRUPT
         else              ATTENTION
       }
@@ -2634,7 +3116,7 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
            returned by si.jump(line) in reduce_END_GOTO_B_(), where
            si.jump() also modifies the PC.
 
-       In UserFunction::optimize_unconditional_branches() we optimize
+       In UserFunction::optimize_labels() we optimize
        the statements →N (with literal integer N) and →LABEL into a single
        token TOK_GOTO_PC whose integer value is the new PC, and:
 
@@ -2645,14 +3127,14 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
     */
     if (at1().get_tag() == TOK_GOTO_PC)   // optimized →N
        {
-              reset(LOC);
+         reset(LOC);
          const Function_PC new_PC = Function_PC(at1().get_int_val());
          if (new_PC == Function_PC_done)   // →0 etc.
             {
-              PC = Function_PC(body.size() - 1);
+              PC = Function_PC(body.ssize() - 1);   // RETURN_XXX
               const Token result(TOK_VOID);
               pop_args_push_result(result);
-              set_action(RA_RETURN);      // return from defined function
+              set_action(RA_CONTINUE);      // return from defined function
             }
          else                             // normal →N
             {
@@ -2664,7 +3146,7 @@ Prefix::reduce_END_GOTO__()   // Escape ( → )
 
    Assert1(prefix_len == 2);
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
    si.fun_oper_cache.reset();
 
@@ -2685,6 +3167,7 @@ const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
            {
               // the function ignores attention (aka. weak interrupt)
               //
+              handle_ELSE(at0(), 5);
               pop_and_discard();   // pop END
               pop_and_discard();   // pop GOTO
               set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -2714,6 +3197,9 @@ Prefix::reduce_RETC_VOID__()
 
    Assert1(prefix_len == 2);
 
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
+
 const Token result(TOK_VOID);   // function result is VOID
    pop_args_push_result(result);
    set_action(RA_RETURN);            // return from context;
@@ -2724,7 +3210,10 @@ Prefix::reduce_RETC___()
 {
    Assert1(prefix_len == 1);
 
-   if (size() != 1)   syntax_error(LOC);
+   if (ssize() != 1)   syntax_error(LOC);
+
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
 
    // end of context reached. There are 4 cases:
    //
@@ -2805,13 +3294,15 @@ Prefix::reduce_RETC_A__()
 {
    Assert1(prefix_len == 2);
 
-   if (size() != 2)
+   if (ssize() != 2)   // there extra tokens
       {
         syntax_error(LOC);
       }
 
-   Log(LOG_prefix_parser)
-      CERR << "- end of ⍎ context.";
+   // action is RA_RETURN, therefore the entire si.fun_oper_cache will be
+   // discarded and no reset() of it is required.
+
+   Log(LOG_prefix_parser)   CERR << "- end of ⍎ context.";
 
 Token B = at1();
    pop_args_push_result(B);
@@ -2835,7 +3326,7 @@ Prefix::reduce_RETC_GOTO_B_()
    // Note: reduce_RETC_GOTO_B__ can only happen for context ⍎, since
    //       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
 
-   if (size() != 3)   syntax_error(LOC);
+   if (ssize() != 3)   syntax_error(LOC);
 
    // monadic →LABEL.
 
@@ -2908,7 +3399,7 @@ Prefix::reduce_RETC_GOTO__()
    // Note: reduce_RETC_ESC___ can only happen for context ⍎, since
    //       contexts ◊ and ∇ use reduce_END_ESC___ instead
 
-   if (size() != 2)   syntax_error(LOC);
+   if (ssize() != 2)   syntax_error(LOC);
 
    reduce_END_GOTO__();
 }

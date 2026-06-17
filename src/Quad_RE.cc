@@ -280,14 +280,8 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
 
 const uint32_t ovector_count = rem.get_ovector_count();
    B_offset = ovector[1];
-int parents[ovector_count];
-int ccount[ovector_count];
-
-   loop(o, ovector_count)
-       {
-         parents[o] = -1;
-         ccount[o]  = 0;
-       }
+vector<int> parents(ovector_count, -1);   // no parents
+vector<int> ccount(ovector_count, 0);     // 0 children
 
    for (int o = ovector_count - 1; o >= 0; --o)
        {
@@ -303,7 +297,8 @@ int ccount[ovector_count];
              }
        }
 
-   return deep_value(0, ovector, ovector_count, parents, ccount, &B);
+   return deep_value(0, ovector, ovector_count,
+                     parents.data(), ccount.data(), &B);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -338,15 +333,9 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
       }
 
 const uint32_t ovector_count = rem.get_ovector_count();
-int parents[ovector_count];
+vector<int> parents(ovector_count, -1);   // no parent
+vector<int> ccount(ovector_count,   0);   // 0 children
    B_offset = ovector[1];
-int ccount[ovector_count];
-
-   loop(o, ovector_count)
-       {
-         parents[o] = -1;
-         ccount[o]  = 0;
-       }
 
    for (int o = ovector_count - 1; o >= 0; --o)
        {
@@ -362,7 +351,8 @@ int ccount[ovector_count];
              }
        }
 
-   return deep_value(0, ovector, ovector_count, parents, ccount, 0);
+   return deep_value(0, ovector, ovector_count,
+                     parents.data(), ccount.data(), 0);
 }
 //----------------------------------------------------------------------------
 Token
@@ -412,9 +402,6 @@ Value_P Z(shape, LOC);
 }
 
 #else // ! HAVE_LIBPCRE2_32
-
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
 
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const

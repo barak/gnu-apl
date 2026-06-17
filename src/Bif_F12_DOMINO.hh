@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,15 +29,15 @@
 #include "PrimitiveFunction.hh"
 
 //----------------------------------------------------------------------------
-/** primitive functions matrix divide and matrix invert */
-/// The class implementing ⌹
+/** primitive functions matrix divide and matrix inverti (and a number
+    of nonstandard GNMNU APL functions 
+ */
+/// The class implementing ⌹.
 class Bif_F12_DOMINO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
-   Bif_F12_DOMINO()
-   : NonscalarFunction_default_identity(TOK_F12_DOMINO)
-   {}
+   Bif_F12_DOMINO();
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
@@ -60,6 +60,17 @@ public:
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
 protected:
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
+
+   /// overloaded FunctionGroup::print_fun_syntax()
+  virtual void print_fun_syntax(ostream & out,
+                                const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
    /// compute the Q matrix of B = QR
    static void QR_Helzer(Value_P Z, bool need_complex, ShapeItem rows,
                          ShapeItem cols, const Cell * cB, double EPS);
@@ -69,6 +80,47 @@ protected:
    static double * householder(double * B, ShapeItem rows, ShapeItem cols,
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
+
+   /// return the polynomial B with indeterminant A as APL string
+   static Value_P print_polynomial(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant A as APL string
+   static UCS_string print_polynomial(const UCS_string_vector & vars,
+                                      const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P print_polynomial(const Value & B);
+
+   /// return the product A×B of polynomilals A and B
+   static Value_P polynomial_product(const Value & A, const Value & B);
+
+   /// return the quotient A÷B of polynomilals A and B (1 indeterminant)
+   static Value_P poly_quotient(const Value & A, const Value & B);
+
+   /// return the quotient A÷B of polynomilals A and B (with orders)
+   static Value_P poly_quotient_NO(const Value & A, const Value & B,
+                                   const Value * optional_order_A,
+                                   const Value * optional_order_B);
+
+   /// return the quotient A÷B of polynomilals A and B
+   static Value_P poly_quotient_N(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P scan_polynomial(const Value & A, const Value & B);
+
+   /// return the polynomial B with indeterminant 'x' as APL string
+   static Value_P scan_polynomial(const Value & B);
+
+   /// return the polynomial B with indeterminant A as APL string
+   static Value_P scan_polynomial(const UCS_string_vector & vars,
+                                  const Value & B);
+
+   /// run (python-) script \b script with command line arguments \b args
+   static void run_script(const UTF8_string & script, const UTF8_string & args,
+                          UCS_string_vector & result);
+
+   /// return the integral for B.
+   static Value_P integral(const Value * A, const Value & B);
 
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
